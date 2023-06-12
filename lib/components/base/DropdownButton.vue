@@ -14,24 +14,24 @@
           'render-up': dropdownVisible && renderUp && !disabled,
         }"
         :disabled="disabled"
+        :color="color"
         @click="clickOption"
       >
         <slot :name="selectedOption" />
       </Button>
-      <div
+      <Button
         class="selected"
         :class="{
-          disabled: disabled,
-          'button-base': !disabled,
           'render-down': dropdownVisible && !renderUp && !disabled,
           'render-up': dropdownVisible && renderUp && !disabled,
         }"
+        icon-only
+        :color="color"
+        :disabled="disabled"
         @click="toggleDropdown"
       >
-        <div class="arrow" :class="{ rotate: dropdownVisible }">
-          <DropdownIcon />
-        </div>
-      </div>
+        <DropdownIcon class="arrow" :class="{ rotate: dropdownVisible }" />
+      </Button>
     </div>
     <div class="options-wrapper" :class="{ down: !renderUp, up: renderUp }">
       <transition name="options">
@@ -98,6 +98,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false,
+  },
+  color: {
+    type: String,
+    default: '',
   },
 })
 
@@ -196,21 +200,11 @@ onBeforeUnmount(() => {
   }
 
   .selected {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--gap-sm) var(--gap-lg);
-    background-color: var(--color-button-bg);
-    cursor: pointer;
-    user-select: none;
+    height: auto;
+    width: auto;
+    margin-left: 1px;
+    padding: var(--gap-sm);
     border-radius: 0 var(--radius-md) var(--radius-md) 0;
-    box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
-
-    &.disabled {
-      cursor: not-allowed;
-      filter: grayscale(50%);
-      opacity: 0.5;
-    }
 
     &.render-up {
       border-radius: 0 0 var(--radius-md) 0;
@@ -227,9 +221,10 @@ onBeforeUnmount(() => {
     }
 
     .arrow {
+      min-width: 1.125rem;
+      min-height: 1.125rem;
       display: inline-block;
       transition: transform 0.2s ease;
-      height: 18px;
 
       &.rotate {
         transform: rotate(180deg);

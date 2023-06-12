@@ -4,6 +4,7 @@
     :options="['delete', 'save', 'recycle', 'reduce', 'reuse']"
     default-value="delete"
     name="dropdown-one"
+    color="primary"
   >
     <template #delete>
       <TrashIcon /> Delete
@@ -95,6 +96,7 @@
   :options="['delete', 'save', 'recycle', 'reduce', 'reuse']"
   default-value="delete"
   @option-click="handleOptionClick"
+  color="primary"
   render-up
 >
   <template #delete>
