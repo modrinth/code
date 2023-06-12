@@ -24,6 +24,8 @@
             versions
               .flatMap((value) => value.game_versions)
               .filter((value, index, self) => self.indexOf(value) === index)
+              .sort()
+              .reverse()
           "
           :multiple="true"
           :searchable="true"
