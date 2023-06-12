@@ -2,12 +2,12 @@
   <Card class="log-card">
     <div class="button-row">
       <DropdownSelect
+        v-model="selectedLogIndex"
+        :default-value="0"
         name="Log date"
-        :model-value="logs[selectedLogIndex]"
-        :options="logs"
-        :display-name="(option) => option?.name"
+        :options="logs.map((_, index) => index)"
+        :display-name="(option) => logs[option]?.name"
         :disabled="logs.length === 0"
-        @change="(value) => (selectedLogIndex = value.index)"
       />
       <div class="button-group">
         <Button :disabled="!logs[selectedLogIndex]" @click="copyLog()">
@@ -30,7 +30,11 @@
       </div>
     </div>
     <div ref="logContainer" class="log-text">
-      <span v-for="line in logs[selectedLogIndex]?.stdout.split('\n')" :key="line" class="no-wrap">
+      <span
+        v-for="(line, index) in logs[selectedLogIndex]?.stdout.split('\n')"
+        :key="index"
+        class="no-wrap"
+      >
         {{ line }} <br />
       </span>
     </div>
@@ -68,15 +72,18 @@ const props = defineProps({
 })
 
 async function getLiveLog() {
-  const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
-  let returnValue
-  if (uuids.length === 0) {
-    returnValue = 'No live game detected. \nStart your game to proceed'
-  } else {
-    returnValue = await get_stdout_by_uuid(uuids[0]).catch(handleError)
-  }
+  if (route.params.id) {
+    const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
+    let returnValue
+    if (uuids.length === 0) {
+      returnValue = 'No live game detected. \nStart your game to proceed'
+    } else {
+      returnValue = await get_stdout_by_uuid(uuids[0]).catch(handleError)
+    }
 
-  return { name: 'Live Log', stdout: returnValue, live: true }
+    return { name: 'Live Log', stdout: returnValue, live: true }
+  }
+  return null
 }
 
 async function getLogs() {

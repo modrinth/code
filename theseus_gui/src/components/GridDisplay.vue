@@ -1,7 +1,20 @@
 <script setup>
 import Instance from '@/components/ui/Instance.vue'
 import { computed, ref } from 'vue'
-import { SearchIcon, DropdownSelect, Card, formatCategoryHeader, Button } from 'omorphia'
+import {
+  ClipboardCopyIcon,
+  FolderOpenIcon,
+  PlayIcon,
+  PlusIcon,
+  TrashIcon,
+  StopCircleIcon,
+  EyeIcon,
+  Card,
+  DropdownSelect,
+  SearchIcon,
+  formatCategoryHeader,
+} from 'omorphia'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
 
 const props = defineProps({
@@ -16,6 +29,70 @@ const props = defineProps({
     default: '',
   },
 })
+const instanceOptions = ref(null)
+const instanceComponents = ref(null)
+
+const handleRightClick = (event, item) => {
+  const baseOptions = [
+    { name: 'add_content' },
+    { type: 'divider' },
+    { name: 'edit' },
+    { name: 'open' },
+    { name: 'copy' },
+    { type: 'divider' },
+    {
+      name: 'delete',
+      color: 'danger',
+    },
+  ]
+
+  instanceOptions.value.showMenu(
+    event,
+    item,
+    item.playing
+      ? [
+          {
+            name: 'stop',
+            color: 'danger',
+          },
+          ...baseOptions,
+        ]
+      : [
+          {
+            name: 'play',
+            color: 'primary',
+          },
+          ...baseOptions,
+        ]
+  )
+}
+
+const handleOptionsClick = async (args) => {
+  console.log(args)
+  switch (args.option) {
+    case 'play':
+      args.item.play()
+      break
+    case 'stop':
+      args.item.stop()
+      break
+    case 'add_content':
+      await args.item.addContent()
+      break
+    case 'edit':
+      await args.item.seeInstance()
+      break
+    case 'delete':
+      await args.item.deleteInstance()
+      break
+    case 'open':
+      await args.item.openFolder()
+      break
+    case 'copy':
+      await navigator.clipboard.writeText(args.item.instance.path)
+      break
+  }
+}
 
 const search = ref('')
 const group = ref('Category')
@@ -145,7 +222,10 @@ const filteredResults = computed(() => {
     </div>
   </Card>
   <div
-    v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({ key, value }))"
+    v-for="(instanceSection, index) in Array.from(filteredResults, ([key, value]) => ({
+      key,
+      value,
+    }))"
     :key="instanceSection.key"
     class="row"
   >
@@ -156,12 +236,22 @@ const filteredResults = computed(() => {
     <section class="instances">
       <Instance
         v-for="instance in instanceSection.value"
+        ref="instanceComponents"
         :key="instance.id"
-        display="card"
         :instance="instance"
+        @contextmenu.prevent.stop="(event) => handleRightClick(event, instanceComponents[index])"
       />
     </section>
   </div>
+  <ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
+    <template #play> <PlayIcon /> Play </template>
+    <template #stop> <StopCircleIcon /> Stop </template>
+    <template #add_content> <PlusIcon /> Add content </template>
+    <template #edit> <EyeIcon /> View instance </template>
+    <template #delete> <TrashIcon /> Delete </template>
+    <template #open> <FolderOpenIcon /> Open folder </template>
+    <template #copy> <ClipboardCopyIcon /> Copy path </template>
+  </ContextMenu>
 </template>
 <style lang="scss" scoped>
 .row {

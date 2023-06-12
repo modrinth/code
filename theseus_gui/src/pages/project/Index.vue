@@ -1,8 +1,30 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
-      <Instance v-if="instance" :instance="instance" small />
-      <Card class="sidebar-card">
+      <div v-if="instance" class="small-instance">
+        <div class="instance">
+          <Avatar
+            :src="
+              !instance.metadata.icon ||
+              (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
+                ? instance.metadata.icon
+                : convertFileSrc(instance.metadata?.icon)
+            "
+            :alt="instance.metadata.name"
+            size="sm"
+          />
+          <div class="small-instance_info">
+            <span class="title">{{ instance.metadata.name }}</span>
+            <span>
+              {{
+                instance.metadata.loader.charAt(0).toUpperCase() + instance.metadata.loader.slice(1)
+              }}
+              {{ instance.metadata.game_version }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
           <h2 class="name">{{ data.title }}</h2>
@@ -119,8 +141,8 @@
             <span>Wiki</span>
           </a>
           <a
-            v-if="data.wiki_url"
-            :href="data.wiki_url"
+            v-if="data.discord_url"
+            :href="data.discord_url"
             class="title"
             rel="noopener nofollow ugc external"
           >
@@ -197,6 +219,11 @@
   <InstallConfirmModal ref="confirmModal" />
   <InstanceInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarning" />
+  <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+    <template #install> <DownloadIcon /> Install </template>
+    <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+  </ContextMenu>
 </template>
 
 <script setup>
@@ -220,6 +247,8 @@ import {
   formatNumber,
   ExternalIcon,
   CheckIcon,
+  GlobeIcon,
+  ClipboardCopyIcon,
 } from 'omorphia'
 import {
   BuyMeACoffeeIcon,
@@ -231,7 +260,12 @@ import {
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
-import { list, add_project_from_version as installMod, check_installed } from '@/helpers/profile'
+import {
+  list,
+  add_project_from_version as installMod,
+  check_installed,
+  get as getInstance,
+} from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute, useRouter } from 'vue-router'
@@ -239,14 +273,12 @@ import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
-import Instance from '@/components/ui/Instance.vue'
-import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
-
-const searchStore = useSearch()
+import { convertFileSrc } from '@tauri-apps/api/tauri'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -255,10 +287,11 @@ const breadcrumbs = useBreadcrumbs()
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
 const incompatibilityWarning = ref(null)
-const instance = ref(searchStore.instanceContext)
+
+const options = ref(null)
 const installing = ref(false)
 
-const [data, versions, members, dependencies, categories, loaders] = await Promise.all([
+const [data, versions, members, dependencies, categories, loaders, instance] = await Promise.all([
   useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project').then(shallowRef),
   useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project').then(
     shallowRef
@@ -271,6 +304,7 @@ const [data, versions, members, dependencies, categories, loaders] = await Promi
   ),
   get_loaders().then(ref).catch(handleError),
   get_categories().then(ref).catch(handleError),
+  route.query.i ? getInstance(route.query.i, true).then(ref) : Promise.resolve().then(ref),
 ])
 
 const installed = ref(
@@ -393,6 +427,37 @@ async function install(version) {
   }
 
   installing.value = false
+}
+
+const handleRightClick = (e) => {
+  options.value.showMenu(e, data.value, [
+    { name: 'install' },
+    { type: 'divider' },
+    { name: 'open_link' },
+    { name: 'copy_link' },
+  ])
+}
+
+const handleOptionsClick = (args) => {
+  switch (args.option) {
+    case 'install':
+      install(null)
+      break
+    case 'open_link':
+      window.__TAURI_INVOKE__('tauri', {
+        __tauriModule: 'Shell',
+        message: {
+          cmd: 'open',
+          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+        },
+      })
+      break
+    case 'copy_link':
+      navigator.clipboard.writeText(
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`
+      )
+      break
+  }
 }
 </script>
 
@@ -545,6 +610,31 @@ async function install(version) {
 
   :deep(svg) {
     color: var(--color-contrast);
+  }
+}
+
+.small-instance {
+  background: var(--color-bg);
+  padding: var(--gap-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--gap-md);
+
+  .instance {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    .title {
+      font-weight: 600;
+      color: var(--color-contrast);
+    }
+  }
+
+  .small-instance_info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.25rem 0;
   }
 }
 </style>

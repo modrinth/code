@@ -33,6 +33,7 @@
           @click="
             router.push({
               path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+              query: { i: $route.params.id },
             })
           "
         >
@@ -85,12 +86,21 @@
         <div class="table-cell table-text">Author</div>
         <div class="table-cell table-text">Actions</div>
       </div>
-      <div v-for="mod in search" :key="mod.file_name" class="table-row">
+      <div
+        v-for="mod in search"
+        :key="mod.file_name"
+        class="table-row"
+        @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
+      >
         <div class="table-cell table-text">
           <Checkbox v-model="mod.selected" class="select-checkbox" />
         </div>
         <div class="table-cell table-text name-cell">
-          <router-link v-if="mod.slug" :to="`/project/${mod.slug}/`" class="mod-text">
+          <router-link
+            v-if="mod.slug"
+            :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
+            class="mod-text"
+          >
             <Avatar :src="mod.icon" />
             {{ mod.name }}
           </router-link>
@@ -183,6 +193,12 @@ const router = useRouter()
 
 const props = defineProps({
   instance: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+  options: {
     type: Object,
     default() {
       return {}
@@ -347,7 +363,6 @@ async function updateProject(mod) {
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
-  console.log(mod.disabled)
   mod.disabled = !mod.disabled
 }
 
@@ -396,6 +411,18 @@ watch(selectAll, () => {
     project.selected = selectAll.value
   }
 })
+
+const handleRightClick = (event, mod) => {
+  if (mod.slug && mod.project_type) {
+    props.options.showMenu(
+      event,
+      {
+        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
+      },
+      [{ name: 'open_link' }, { name: 'copy_link' }]
+    )
+  }
+}
 </script>
 
 <style scoped lang="scss">

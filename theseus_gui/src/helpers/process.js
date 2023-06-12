@@ -37,8 +37,8 @@ export async function get_uuids_by_profile_path(profilePath) {
 
 /// Gets all running process IDs with a given profile path
 /// Returns [u32]
-export async function get_all_running_profile_paths(profile_path) {
-  return await invoke('process_get_all_running_profile_paths', { profile_path })
+export async function get_all_running_profile_paths(profilePath) {
+  return await invoke('process_get_all_running_profile_paths', { profilePath })
 }
 
 /// Gets all running process IDs with a given profile path
