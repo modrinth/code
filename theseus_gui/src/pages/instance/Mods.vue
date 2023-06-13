@@ -379,7 +379,7 @@ async function toggleDisableMod(mod) {
 }
 
 async function toggleAllSelected() {
-  for (const project of projects.value.filter(p => p.selected)) {
+  for (const project of projects.value.filter((p) => p.selected)) {
     project.disabled = !toggleSelected.value
   }
 }
