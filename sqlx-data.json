@@ -1014,19 +1014,6 @@
     },
     "query": "\n            SELECT mod_id FROM versions WHERE id = $1\n            "
   },
-  "16b3ac53ef5e94f51ab39484add21e2f76d49015917dc877560607a31f5537e9": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    UPDATE users\n                    SET email = $1\n                    WHERE (id = $2)\n                    "
-  },
   "177716d2b04fd2a2b63b2e14c8ffdfa554d84254b14053496c118dec24bf5049": {
     "describe": {
       "columns": [],
@@ -3482,6 +3469,19 @@
       }
     },
     "query": "\n            UPDATE mods\n            SET loaders = (\n                SELECT COALESCE(ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null), array[]::varchar[])\n                FROM versions v\n                     INNER JOIN loaders_versions lv ON lv.version_id = v.id\n                     INNER JOIN loaders l on lv.loader_id = l.id\n                WHERE v.mod_id = mods.id AND v.status != ALL($2)\n            )\n            WHERE id = $1\n            "
+  },
+  "6ba05a1b6ddc18f43ccffd5ef2d9349ce73d0da35479dcf10b6d20b57aa78728": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        UPDATE users\n        SET email = $1\n        WHERE kratos_id = $2\n        "
   },
   "6c4a42c263ae2787744aa6903e3cd85e90beaa5bea7ba78b45dbf55ce007753d": {
     "describe": {

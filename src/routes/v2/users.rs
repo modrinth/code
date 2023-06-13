@@ -186,13 +186,6 @@ pub struct EditUser {
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(email, length(max = 2048))]
-    pub email: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
@@ -284,20 +277,6 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     bio.as_deref(),
-                    id as crate::database::models::ids::UserId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(email) = &new_user.email {
-                sqlx::query!(
-                    "
-                    UPDATE users
-                    SET email = $1
-                    WHERE (id = $2)
-                    ",
-                    email.as_deref(),
                     id as crate::database::models::ids::UserId,
                 )
                 .execute(&mut *transaction)

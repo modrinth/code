@@ -21,6 +21,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(count_download)
             .service(add_minos_user)
             .service(edit_github_id)
+            .service(edit_email)
             .service(get_legacy_account)
             .service(process_payout),
     );
@@ -70,6 +71,38 @@ pub async fn edit_github_id(
         WHERE kratos_id = $2
         ",
         github_id,
+        kratos_id.into_inner()
+    )
+    .execute(&mut transaction)
+    .await?;
+    transaction.commit().await?;
+    Ok(HttpResponse::Ok().finish())
+}
+
+// Update a user's email ID by their kratos id
+// email ids should be kept in Minos, but email is duplicated in Labrinth for legacy support (and to avoid Minos calls)
+// This should not be directly useable by applications, only by the Minos backend
+// user id is passed in path, email is passed in body
+#[derive(Deserialize)]
+pub struct EditEmail {
+    email: String,
+}
+#[post("_edit_email/{kratos_id}", guard = "admin_key_guard")]
+pub async fn edit_email(
+    pool: web::Data<PgPool>,
+    kratos_id: web::Path<String>,
+    email: web::Json<EditEmail>,
+) -> Result<HttpResponse, ApiError> {
+    let email = email.into_inner().email;
+
+    let mut transaction = pool.begin().await?;
+    sqlx::query!(
+        "
+        UPDATE users
+        SET email = $1
+        WHERE kratos_id = $2
+        ",
+        email,
         kratos_id.into_inner()
     )
     .execute(&mut transaction)
