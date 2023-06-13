@@ -52,6 +52,17 @@
         <UpdatedIcon />
         Update {{ selected.length > 0 ? 'selected' : 'all' }}
       </Button>
+      <div v-if="selected.length > 0" class="text-combo">
+        Toggle selected
+        <input
+          id="select-switch"
+          v-model="toggleSelected"
+          autocomplete="off"
+          type="checkbox"
+          class="switch stylized-toggle"
+          @change="toggleAllSelected"
+        />
+      </div>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
         <TrashIcon />
         Remove selected
@@ -256,6 +267,7 @@ const sortFilter = ref('')
 const selectedProjectType = ref('All')
 const selected = computed(() => projects.value.filter((mod) => mod.selected))
 const deleteWarning = ref(null)
+const toggleSelected = ref(false)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -364,6 +376,12 @@ async function updateProject(mod) {
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
+}
+
+async function toggleAllSelected() {
+  for (const project of projects.value.filter(p => p.selected)) {
+    project.disabled = !toggleSelected.value
+  }
 }
 
 async function removeMod(mod) {
