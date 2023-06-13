@@ -82,8 +82,17 @@ pub fn show_in_folder(path: String) -> Result<()> {
 // Returns a Command struct- see events.js
 #[tauri::command]
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
+    tracing::debug!("Opening arguments: {:?}", env::args_os());
+
     // Tauri is not CLI, we use arguments as path to file to call
+    // 0 on mac, 1 on windows
+    #[cfg(target_os = "macos")]
+    let cmd_arg = env::args_os().nth(0);
+    #[cfg(target_os = "windows")]
     let cmd_arg = env::args_os().nth(1);
+    #[cfg(target_os = "linux")]
+    let cmd_arg = env::args_os().nth(0); // linux not supported right now
+
     let cmd_arg = cmd_arg.map(|path| path.to_string_lossy().to_string());
     if let Some(cmd) = cmd_arg {
         tracing::info!("Opening command: {:?}", cmd);
