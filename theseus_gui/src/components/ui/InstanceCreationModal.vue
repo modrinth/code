@@ -107,6 +107,7 @@ import {
 } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
+import mixpanel from 'mixpanel-browser'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -132,6 +133,8 @@ defineExpose({
     icon.value = null
     display_icon.value = null
     modal.value.show()
+
+    mixpanel.track('InstanceCreateStart', { source: 'CreationModal' })
   },
 })
 
@@ -183,14 +186,20 @@ const create_instance = async () => {
   creating.value = true
   const loader_version_value =
     loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
+  const loaderVersion = loader.value === 'vanilla' ? null : loader_version_value ?? 'stable'
 
-  create(
-    profile_name.value,
-    game_version.value,
-    loader.value,
-    loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
-    icon.value
-  ).catch(handleError)
+  create(profile_name.value, game_version.value, loader.value, loaderVersion, icon.value).catch(
+    handleError
+  )
+
+  mixpanel.track('InstanceCreate', {
+    profile_name: profile_name.value,
+    game_version: game_version.value,
+    loader: loader.value,
+    loader_version: loaderVersion,
+    has_icon: !!icon.value,
+    source: 'CreationModal',
+  })
 
   modal.value.hide()
   creating.value = false

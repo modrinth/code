@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue'
-import { RouterView, RouterLink } from 'vue-router'
+import { RouterView, RouterLink, useRouter } from 'vue-router'
 import {
   HomeIcon,
   SearchIcon,
@@ -20,6 +20,8 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
 import { warning_listener } from '@/helpers/events.js'
+import { isDev } from '@/helpers/utils.js'
+import mixpanel from 'mixpanel-browser'
 
 const themeStore = useTheming()
 
@@ -41,10 +43,24 @@ onMounted(async () => {
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme } = await get()
+    const { theme, opt_out_analytics } = await get()
+    const dev = await isDev()
+
+    mixpanel.init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+    if (opt_out_analytics) {
+      mixpanel.opt_out_tracking()
+    }
+
     themeStore.setThemeState(theme)
+    if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
   },
 })
+
+const router = useRouter()
+router.afterEach((to, from, failure) => {
+  mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
+})
+
 const loading = useLoading()
 
 const notifications = useNotifications()
@@ -53,8 +69,6 @@ const notificationsWrapper = ref(null)
 watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
-
-document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 document.querySelector('body').addEventListener('click', function (e) {
   let target = e.target

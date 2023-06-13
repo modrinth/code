@@ -44,6 +44,7 @@ import {
   get_all_jre,
 } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)
@@ -75,6 +76,10 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
   emit('submit', javaInstall)
   detectJavaModal.value.hide()
+  mixpanel.track('JavaAutoDetect', {
+    path: javaInstall.path,
+    version: javaInstall.version,
+  })
 }
 </script>
 <style lang="scss" scoped>

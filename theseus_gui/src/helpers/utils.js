@@ -3,6 +3,10 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import { invoke } from '@tauri-apps/api/tauri'
 
+export async function isDev() {
+  return await invoke('is_dev')
+}
+
 export async function showInFolder(path) {
   return await invoke('show_in_folder', { path })
 }
@@ -45,7 +49,9 @@ export const installVersionDependencies = async (profile, version) => {
           v.game_versions.includes(profile.metadata.game_version) &&
           v.loaders.includes(profile.metadata.loader)
       )
-      await installMod(profile.path, latest.id).catch(handleError)
+      if (latest) {
+        await installMod(profile.path, latest.id).catch(handleError)
+      }
     }
   }
 }

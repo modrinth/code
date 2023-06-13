@@ -138,6 +138,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 
 const router = useRouter()
 
@@ -172,6 +173,7 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       updateVersion: project.metadata.update_version,
       outdated: !!project.metadata.update_version,
       project_type: project.metadata.project.project_type,
+      id: project.metadata.project.id,
     })
   } else if (project.metadata.type === 'inferred') {
     projects.value.push({
@@ -296,6 +298,12 @@ async function updateAll() {
   for (const project of setProjects) {
     projects.value[project].updating = false
   }
+
+  mixpanel.track('InstanceUpdateAll', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    count: setProjects.length,
+  })
 }
 
 async function updateProject(mod) {
@@ -306,16 +314,41 @@ async function updateProject(mod) {
   mod.outdated = false
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
+
+  mixpanel.track('InstanceProjectUpdate', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
+
+  mixpanel.track('InstanceProjectDisable', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+    disabled: mod.disabled,
+  })
 }
 
 async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
+
+  mixpanel.track('InstanceProjectRemove', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 const handleRightClick = (event, mod) => {

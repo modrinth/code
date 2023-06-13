@@ -279,6 +279,7 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import mixpanel from 'mixpanel-browser'
 
 const route = useRoute()
 const router = useRouter()
@@ -356,6 +357,13 @@ async function install(version) {
         data.value.title,
         data.value.icon_url
       ).catch(handleError)
+
+      mixpanel.track('PackInstall', {
+        id: data.value.id,
+        version_id: queuedVersionData.id,
+        title: data.value.title,
+        source: 'ProjectPage',
+      })
     } else {
       confirmModal.value.show(
         data.value.id,
@@ -381,14 +389,26 @@ async function install(version) {
             instance.value,
             data.value.title,
             versions.value,
-            markInstalled
+            markInstalled,
+            data.value.id,
+            data.value.project_type
           )
           installing.value = false
           return
         } else {
           queuedVersionData = selectedVersion
           await installMod(instance.value.path, selectedVersion.id).catch(handleError)
-          installVersionDependencies(instance.value, queuedVersionData)
+          await installVersionDependencies(instance.value, queuedVersionData)
+
+          mixpanel.track('ProjectInstall', {
+            loader: instance.value.metadata.loader,
+            game_version: instance.value.metadata.game_version,
+            id: data.value.id,
+            project_type: data.value.project_type,
+            version_id: queuedVersionData.id,
+            title: data.value.title,
+            source: 'ProjectPage',
+          })
         }
       } else {
         const gameVersion = instance.value.metadata.game_version
@@ -403,12 +423,24 @@ async function install(version) {
         if (compatible) {
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
+
+          mixpanel.track('ProjectInstall', {
+            loader: instance.value.metadata.loader,
+            game_version: instance.value.metadata.game_version,
+            id: data.value.id,
+            project_type: data.value.project_type,
+            version_id: queuedVersionData.id,
+            title: data.value.title,
+            source: 'ProjectPage',
+          })
         } else {
           incompatibilityWarning.value.show(
             instance.value,
             data.value.title,
             [queuedVersionData],
-            markInstalled
+            markInstalled,
+            data.value.id,
+            data.value.project_type
           )
           installing.value = false
           return
@@ -416,13 +448,12 @@ async function install(version) {
       }
       installed.value = true
     } else {
-      if (version) {
-        modInstallModal.value.show(data.value.id, [
-          versions.value.find((v) => v.id === queuedVersionData.id),
-        ])
-      } else {
-        modInstallModal.value.show(data.value.id, versions.value)
-      }
+      modInstallModal.value.show(
+        data.value.id,
+        version ? [versions.value.find((v) => v.id === queuedVersionData.id)] : versions.value,
+        data.value.title,
+        data.value.project_type
+      )
     }
   }
 
@@ -622,7 +653,7 @@ const handleOptionsClick = (args) => {
   .instance {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
 
     .title {
       font-weight: 600;

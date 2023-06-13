@@ -2,6 +2,7 @@
 import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
+import mixpanel from 'mixpanel-browser'
 
 const version = ref('')
 const title = ref('')
@@ -17,6 +18,8 @@ defineExpose({
     title.value = projectTitle
     icon.value = projectIcon
     confirmModal.value.show()
+
+    mixpanel.track('PackInstallStart')
   },
 })
 
@@ -24,6 +27,13 @@ async function install() {
   installing.value = true
   await pack_install(projectId.value, version.value, title.value, icon.value ? icon.value : null)
   confirmModal.value.hide()
+
+  mixpanel.track('PackInstall', {
+    id: projectId.value,
+    version_id: version.value,
+    title: title.value,
+    source: 'ConfirmModal',
+  })
 }
 </script>
 

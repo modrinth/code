@@ -5,6 +5,7 @@ import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
+import mixpanel from 'mixpanel-browser'
 
 const themeStore = useTheming()
 
@@ -25,6 +26,12 @@ watch(
   settings,
   async (oldSettings, newSettings) => {
     const setSettings = JSON.parse(JSON.stringify(newSettings))
+
+    if (setSettings.opt_out_analytics) {
+      mixpanel.opt_out_tracking()
+    } else {
+      mixpanel.opt_in_tracking()
+    }
 
     if (setSettings.java_globals.JAVA_8?.path === '') {
       setSettings.java_globals.JAVA_8 = undefined
@@ -156,6 +163,23 @@ watch(
           :max="50"
           :step="1"
         />
+      </div>
+    </Card>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Privacy</span>
+        </h3>
+      </div>
+      <div class="adjacent-input">
+        <label for="theme">
+          <span class="label__title">Analytics</span>
+          <span class="label__description">
+            Modrinth collects anonymized analytics and usage data to improve our user experience and
+            customize your experience. Opting out will disable this data collection.
+          </span>
+        </label>
+        <Toggle id="opt-out-analytics" v-model="settings.opt_out_analytics" />
       </div>
     </Card>
     <Card>

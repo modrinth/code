@@ -71,11 +71,6 @@ const handleInstanceRightClick = (event, passedInstance) => {
     { name: 'edit' },
     { name: 'open_folder' },
     { name: 'copy_path' },
-    { type: 'divider' },
-    {
-      name: 'delete',
-      color: 'danger',
-    },
   ]
 
   const options = !passedInstance.instance.path
@@ -114,19 +109,16 @@ const handleInstanceRightClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await args.item.play()
+      await args.item.play(null, 'InstanceRowContextMenu')
       break
     case 'stop':
-      await args.item.stop()
+      await args.item.stop(null, 'InstanceRowContextMenu')
       break
     case 'add_content':
       await args.item.addContent()
       break
     case 'edit':
       await args.item.seeInstance()
-      break
-    case 'delete':
-      await args.item.deleteInstance()
       break
     case 'open_folder':
       await args.item.openFolder()

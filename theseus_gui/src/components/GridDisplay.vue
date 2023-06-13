@@ -39,11 +39,6 @@ const handleRightClick = (event, item) => {
     { name: 'edit' },
     { name: 'open' },
     { name: 'copy' },
-    { type: 'divider' },
-    {
-      name: 'delete',
-      color: 'danger',
-    },
   ]
 
   instanceOptions.value.showMenu(
@@ -71,19 +66,16 @@ const handleOptionsClick = async (args) => {
   console.log(args)
   switch (args.option) {
     case 'play':
-      args.item.play()
+      args.item.play(null, 'InstanceGridContextMenu')
       break
     case 'stop':
-      args.item.stop()
+      args.item.stop(null, 'InstanceGridContextMenu')
       break
     case 'add_content':
       await args.item.addContent()
       break
     case 'edit':
       await args.item.seeInstance()
-      break
-    case 'delete':
-      await args.item.deleteInstance()
       break
     case 'open':
       await args.item.openFolder()

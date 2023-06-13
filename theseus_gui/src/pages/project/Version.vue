@@ -236,13 +236,25 @@ const displayDependencies = ref(
         subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
         link: `/project/${project.slug}/version/${version.id}`,
       }
-    } else
-      return {
-        icon: null,
-        title: dependency.file_name,
-        subtitle: `Added via overrides`,
-        link: null,
+    } else {
+      const project = props.dependencies.projects.find((obj) => obj.id === dependency.project_id)
+
+      if (project) {
+        return {
+          icon: project?.icon_url,
+          title: project?.title || project?.name,
+          subtitle: `${dependency.dependency_type}`,
+          link: `/project/${project.slug}`,
+        }
+      } else {
+        return {
+          icon: null,
+          title: dependency.file_name,
+          subtitle: `Added via overrides`,
+          link: null,
+        }
       }
+    }
   })
 )
 </script>

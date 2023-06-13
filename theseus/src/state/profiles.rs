@@ -228,6 +228,9 @@ impl Profile {
                         ProfilePayloadType::Synced,
                     )
                         .await?;
+
+                    let profiles = state.profiles.read().await;
+                    profiles.sync().await?;
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",

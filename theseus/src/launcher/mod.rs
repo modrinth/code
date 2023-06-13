@@ -36,9 +36,12 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
             features: Some(ref features),
             ..
         } => {
-            features.has_demo_resolution.unwrap_or(false)
-                || (features.has_demo_resolution.is_none()
-                    && features.is_demo_user.is_none())
+            !features.is_demo_user.unwrap_or(true)
+                || features.has_custom_resolution.unwrap_or(false)
+                || !features.has_quick_plays_support.unwrap_or(true)
+                || !features.is_quick_play_multiplayer.unwrap_or(true)
+                || !features.is_quick_play_realms.unwrap_or(true)
+                || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
         _ => false,
     };

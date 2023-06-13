@@ -17,6 +17,16 @@ app.use(pinia)
 app.use(FloatingVue)
 app.mixin(loadCssMixin)
 
+// FIXME: this causes the app to lag
+// import * as Sentry from '@sentry/vue'
+//
+// Sentry.init({
+//   app,
+//   dsn: 'https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592',
+//   integrations: [],
+//   enableTracing: false,
+// })
+
 const mountedApp = app.mount('#app')
 
 initialize_state()

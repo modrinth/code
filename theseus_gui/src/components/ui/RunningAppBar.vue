@@ -59,6 +59,7 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 
 const router = useRouter()
 const card = ref(null)
@@ -79,6 +80,12 @@ const stop = async () => {
   try {
     const processes = await getProfileProcesses(currentProcesses.value[0].path)
     await killProfile(processes[0])
+
+    mixpanel.track('InstanceStop', {
+      loader: currentProcesses.value[0].metadata.loader,
+      game_version: currentProcesses.value[0].metadata.game_version,
+      source: 'AppBar',
+    })
   } catch (e) {
     console.error(e)
   }
