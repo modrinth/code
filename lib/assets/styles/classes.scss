@@ -899,13 +899,22 @@ select {
   border: 1px solid #000000;
 }
 
-.text-link {
-  color: var(--color-blue);
-  text-decoration: none;
+.goto-link {
+  display: flex;
+  align-items: center;
+  gap: 3px;
 
-  &:hover {
-    text-decoration: underline;
-  }
+  color: var(--color-blue);
+}
+
+.goto-link:hover,
+.goto-link:focus-visible {
+  filter: brightness(1.1);
+  text-decoration: underline;
+}
+
+.goto-link:active {
+  filter: brightness(1.2);
 }
 
 .multiselect {
