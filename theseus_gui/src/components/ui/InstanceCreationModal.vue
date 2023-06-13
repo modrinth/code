@@ -1,6 +1,9 @@
 <template>
   <Modal ref="modal" header="Create instance">
-    <div class="modal-body">
+    <div class="modal-header">
+      <Chips v-model="creationType" :items="['custom', 'from file']" />
+    </div>
+    <div v-if="creationType === 'custom'" class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
         <div class="image-input">
@@ -78,11 +81,10 @@
           {{ creating ? 'Creating...' : 'Create' }}
         </Button>
       </div>
-      <hr class="card-divider labeled-divider" />
-      <div class="file-upload">
-        <Button @click="openFile"> <FolderOpenIcon /> Import a project from a file </Button>
-        <div class="info"><InfoIcon /> Or drag and drop your modpack file</div>
-      </div>
+    </div>
+    <div v-else class="modal-body">
+      <Button @click="openFile"> <FolderOpenIcon /> Import from file </Button>
+      <div class="info"><InfoIcon /> Or drag and drop your .mrpack file</div>
     </div>
   </Modal>
 </template>
@@ -127,6 +129,7 @@ const display_icon = ref(null)
 const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
+const creationType = ref('from file')
 
 defineExpose({
   show: () => {
@@ -321,20 +324,19 @@ listen('tauri://file-drop', async (event) => {
   top: -0.5rem;
 }
 
-.file-upload {
+.info {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 0.5rem;
-  justify-content: center;
-  align-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+}
 
-  .info {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    align-items: center;
-  }
+.modal-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--gap-lg);
+  padding-bottom: 0;
 }
 </style>
