@@ -52,21 +52,29 @@
         <UpdatedIcon />
         Update {{ selected.length > 0 ? 'selected' : 'all' }}
       </Button>
-      <div v-if="selected.length > 0" class="text-combo">
-        Toggle selected
-        <input
-          id="select-switch"
-          v-model="toggleSelected"
-          autocomplete="off"
-          type="checkbox"
-          class="switch stylized-toggle"
-          @change="toggleAllSelected"
-        />
-      </div>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
         <TrashIcon />
         Remove selected
       </Button>
+      <DropdownButton
+        v-if="selected.length > 0"
+        :options="['toggle', 'disable', 'enable']"
+        default-value="toggle"
+        @option-click="toggleSelected"
+      >
+        <template #toggle>
+          <GlobeIcon />
+          Toggle selected
+        </template>
+        <template #disable>
+          <EditIcon />
+          Disable selected
+        </template>
+        <template #enable>
+          <HashIcon />
+          Enable selected
+        </template>
+      </DropdownButton>
       <DropdownButton
         v-if="selected.length > 0"
         :options="['copy_name', 'copy_url', 'copy_slug']"
@@ -151,12 +159,14 @@
   </Card>
   <Modal ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
-      <p>
-        Are you sure you want to remove <strong>{{ selected.length }} projects</strong> from
-        {{ instance.metadata.name }}?
-        <br />
-        This action <strong>cannot</strong> be undone.
-      </p>
+      <div class="markdown-body">
+        <p>
+          Are you sure you want to remove <strong>{{ selected.length }} projects</strong> from
+          {{ instance.metadata.name }}?
+          <br />
+          This action <strong>cannot</strong> be undone.
+        </p>
+      </div>
       <div class="button-group push-right">
         <Button @click="deleteWarning.hide()"> Cancel </Button>
         <Button color="danger" @click="deleteSelected">
@@ -267,7 +277,6 @@ const sortFilter = ref('')
 const selectedProjectType = ref('All')
 const selected = computed(() => projects.value.filter((mod) => mod.selected))
 const deleteWarning = ref(null)
-const toggleSelected = ref(false)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -378,12 +387,6 @@ async function toggleDisableMod(mod) {
   mod.disabled = !mod.disabled
 }
 
-async function toggleAllSelected() {
-  for (const project of projects.value.filter((p) => p.selected)) {
-    project.disabled = !toggleSelected.value
-  }
-}
-
 async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
@@ -400,11 +403,9 @@ async function deleteSelected() {
 async function copySelected(args) {
   switch (args.option) {
     case 'copy_name':
-      console.log('Name copied')
       await navigator.clipboard.writeText(selected.value.map((x) => x.name).join('\n'))
       break
     case 'copy_slug':
-      console.log('Slug copied')
       await navigator.clipboard.writeText(
         selected.value
           .filter((x) => x.slug)
@@ -413,13 +414,36 @@ async function copySelected(args) {
       )
       break
     case 'copy_url':
-      console.log('URL copied')
       await navigator.clipboard.writeText(
         selected.value
           .filter((x) => x.slug)
           .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
           .join('\n')
       )
+      break
+  }
+}
+
+async function toggleSelected(args) {
+  switch (args.option) {
+    case 'toggle':
+      for (const project of selected.value) {
+        await toggleDisableMod(project)
+      }
+      break
+    case 'enable':
+      for (const project of selected.value) {
+        if (project.disabled) {
+          await toggleDisableMod(project)
+        }
+      }
+      break
+    case 'disable':
+      for (const project of selected.value) {
+        if (!project.disabled) {
+          await toggleDisableMod(project)
+        }
+      }
       break
   }
 }
