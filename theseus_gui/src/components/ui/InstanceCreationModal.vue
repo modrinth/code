@@ -196,16 +196,16 @@ const create_instance = async () => {
   const loader_version_value =
     loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
 
-  create(
+  modal.value.hide()
+  creating.value = false
+
+  await create(
     profile_name.value,
     game_version.value,
     loader.value,
     loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
     icon.value
   ).catch(handleError)
-
-  modal.value.hide()
-  creating.value = false
 }
 
 const upload_icon = async () => {
@@ -251,14 +251,13 @@ const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
 
-  await install_from_file(newProject).catch(handleError)
   modal.value.hide()
+  await install_from_file(newProject).catch(handleError)
 }
 
 listen('tauri://file-drop', async (event) => {
-  console.log(event)
-  await install_from_file(event.payload[0]).catch(handleError)
   modal.value.hide()
+  await install_from_file(event.payload[0]).catch(handleError)
 })
 </script>
 
