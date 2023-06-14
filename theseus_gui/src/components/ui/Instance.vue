@@ -1,19 +1,20 @@
 <script setup>
 import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
+import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
-import { run, list } from '@/helpers/profile'
+import { list, remove, run } from '@/helpers/profile'
 import {
-  kill_by_uuid,
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
+  kill_by_uuid,
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import { showInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 
 const props = defineProps({
@@ -66,7 +67,7 @@ const checkProcess = async () => {
 }
 
 const install = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   modLoading.value = true
   const versions = await useFetch(
     `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
@@ -105,7 +106,7 @@ const install = async (e) => {
 }
 
 const play = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   modLoading.value = true
   uuid.value = await run(props.instance.path).catch(handleError)
   modLoading.value = false
@@ -113,7 +114,7 @@ const play = async (e) => {
 }
 
 const stop = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   playing.value = false
 
   // If we lost the uuid for some reason, such as a user navigating
@@ -128,6 +129,33 @@ const stop = async (e) => {
   uuid.value = null
 }
 
+const deleteInstance = async () => {
+  await remove(props.instance.path).catch(handleError)
+}
+
+const openFolder = async () => {
+  await showInFolder(props.instance.path)
+}
+
+const addContent = async () => {
+  await router.push({
+    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    query: { i: props.instance.path },
+  })
+}
+
+defineExpose({
+  install,
+  playing,
+  play,
+  stop,
+  seeInstance,
+  openFolder,
+  deleteInstance,
+  addContent,
+  instance: props.instance,
+})
+
 const unlisten = await process_listener((e) => {
   if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
 })
@@ -139,7 +167,7 @@ onUnmounted(() => unlisten())
   <div class="instance">
     <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
-        size="none"
+        size="sm"
         :src="
           props.instance.metadata
             ? !props.instance.metadata.icon ||
@@ -175,7 +203,7 @@ onUnmounted(() => unlisten())
       @click="stop"
       @mousehover="checkProcess"
     >
-      <XIcon />
+      <StopCircleIcon />
     </div>
     <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />

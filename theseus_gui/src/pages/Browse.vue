@@ -433,16 +433,24 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
 
 const selectableProjectTypes = computed(() => {
   const values = [
-    { label: 'Data Packs', href: `/browse/datapack` },
     { label: 'Shaders', href: `/browse/shader` },
     { label: 'Resource Packs', href: `/browse/resourcepack` },
   ]
 
   if (instanceContext.value) {
+    if (
+      availableGameVersions.value.findIndex(
+        (x) => x.version === instanceContext.value.metadata.game_version
+      ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
+    ) {
+      values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
+    }
+
     if (instanceContext.value.metadata.loader !== 'vanilla') {
       values.unshift({ label: 'Mods', href: '/browse/mod' })
     }
   } else {
+    values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
     values.unshift({ label: 'Mods', href: '/browse/mod' })
     values.unshift({ label: 'Modpacks', href: '/browse/modpack' })
   }
@@ -473,7 +481,7 @@ const showLoaders = computed(
               !instanceContext.metadata.icon ||
               (instanceContext.metadata.icon && instanceContext.metadata.icon.startsWith('http'))
                 ? instanceContext.metadata.icon
-                : convertFileSrc(instanceContext.metadata?.icon)
+                : convertFileSrc(instanceContext.metadata.icon)
             "
             :alt="instanceContext.metadata.name"
             size="sm"
@@ -713,6 +721,8 @@ const showLoaders = computed(
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    justify-content: space-between;
+    padding: 0.25rem 0;
   }
 }
 

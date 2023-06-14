@@ -137,7 +137,7 @@ impl Drop for LoadingBarId {
                     // Emit event to indicatif progress bar arc
                     #[cfg(feature = "cli")]
                     {
-                        let cli_progress_bar = bar.cli_progress_bar;
+                        let cli_progress_bar = bar.cli_progress_bar.clone();
                         cli_progress_bar.finish();
                     }
                 }
@@ -150,6 +150,7 @@ impl Drop for LoadingBarId {
                 loader_uuid,
             )
             .await;
+
         });
     }
 }

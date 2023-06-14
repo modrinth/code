@@ -24,7 +24,7 @@
           </div>
         </div>
       </div>
-      <Card class="sidebar-card">
+      <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
           <h2 class="name">{{ data.title }}</h2>
@@ -219,6 +219,11 @@
   <InstallConfirmModal ref="confirmModal" />
   <InstanceInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarning" />
+  <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+    <template #install> <DownloadIcon /> Install </template>
+    <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
+  </ContextMenu>
 </template>
 
 <script setup>
@@ -242,6 +247,8 @@ import {
   formatNumber,
   ExternalIcon,
   CheckIcon,
+  GlobeIcon,
+  ClipboardCopyIcon,
 } from 'omorphia'
 import {
   BuyMeACoffeeIcon,
@@ -270,6 +277,8 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -278,6 +287,8 @@ const breadcrumbs = useBreadcrumbs()
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
 const incompatibilityWarning = ref(null)
+
+const options = ref(null)
 const installing = ref(false)
 
 const [data, versions, members, dependencies, categories, loaders, instance] = await Promise.all([
@@ -416,6 +427,37 @@ async function install(version) {
   }
 
   installing.value = false
+}
+
+const handleRightClick = (e) => {
+  options.value.showMenu(e, data.value, [
+    { name: 'install' },
+    { type: 'divider' },
+    { name: 'open_link' },
+    { name: 'copy_link' },
+  ])
+}
+
+const handleOptionsClick = (args) => {
+  switch (args.option) {
+    case 'install':
+      install(null)
+      break
+    case 'open_link':
+      window.__TAURI_INVOKE__('tauri', {
+        __tauriModule: 'Shell',
+        message: {
+          cmd: 'open',
+          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
+        },
+      })
+      break
+    case 'copy_link':
+      navigator.clipboard.writeText(
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`
+      )
+      break
+  }
 }
 </script>
 
@@ -591,7 +633,8 @@ async function install(version) {
   .small-instance_info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    justify-content: space-between;
+    padding: 0.25rem 0;
   }
 }
 </style>

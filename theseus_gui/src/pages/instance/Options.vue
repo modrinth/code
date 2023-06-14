@@ -1,4 +1,12 @@
 <template>
+  <ModalConfirm
+    ref="modal_confirm"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    @proceed="removeProfile"
+  />
   <Modal ref="changeVersionsModal" header="Change instance versions">
     <div class="change-versions-modal universal-body">
       <div class="input-row">
@@ -288,7 +296,7 @@
         id="delete-profile"
         class="btn btn-danger"
         :disabled="removing"
-        @click="removeProfile"
+        @click="$refs.modal_confirm.show()"
       >
         <TrashIcon /> Delete
       </button>
@@ -311,6 +319,7 @@ import {
   XIcon,
   SaveIcon,
   HammerIcon,
+  ModalConfirm,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
