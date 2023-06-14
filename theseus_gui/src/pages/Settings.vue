@@ -123,6 +123,26 @@ watch(
           "
         />
       </div>
+      <div class="adjacent-input">
+        <label for="advanced-rendering">
+          <span class="label__title">Advanced rendering</span>
+          <span class="label__description">
+            Enables advanced rendering such as blur effects that may cause performance issues
+            without hardware-accelerated rendering.
+          </span>
+        </label>
+        <Toggle
+          id="advanced-rendering"
+          :model-value="themeStore.advancedRendering"
+          :checked="themeStore.advancedRendering"
+          @update:model-value="
+            (e) => {
+              themeStore.advancedRendering = e
+              settings.advanced_rendering = themeStore.advancedRendering
+            }
+          "
+        />
+      </div>
     </Card>
     <Card>
       <div class="label">
@@ -172,8 +192,8 @@ watch(
         </h3>
       </div>
       <div class="adjacent-input">
-        <label for="theme">
-          <span class="label__title">Analytics</span>
+        <label for="opt-out-analytics">
+          <span class="label__title">Disable analytics</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
             customize your experience. Opting out will disable this data collection.

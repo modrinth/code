@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" header="Create instance">
+  <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
@@ -108,6 +108,9 @@ import {
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/state.js'
+
+const themeStore = useTheming()
 
 const profile_name = ref('')
 const game_version = ref('')

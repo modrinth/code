@@ -29,11 +29,12 @@ const isLoading = ref(true)
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation } = await get()
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering } = await get()
     const dev = await isDev()
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
+    themeStore.advancedRendering = advanced_rendering
 
     mixpanel.init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
     if (opt_out_analytics) {

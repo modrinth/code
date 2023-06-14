@@ -1,7 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
-use crate::event::emit::emit_profile;
+use crate::event::emit::{emit_profile, emit_warning};
 use crate::event::ProfilePayloadType;
 use crate::prelude::JavaVersion;
 use crate::state::projects::Project;
@@ -198,6 +198,30 @@ impl Profile {
         Ok(())
     }
 
+    pub fn crash_task(path: PathBuf) {
+        tokio::task::spawn(async move {
+            let res = async {
+                let profile = crate::api::profile::get(&path, None).await?;
+
+                if let Some(profile) = profile {
+                    emit_warning(&format!("Profile {} has crashed! Visit the logs page to see a crash report.", profile.metadata.name)).await?;
+                }
+
+                Ok::<(), crate::Error>(())
+            }
+                .await;
+
+            match res {
+                Ok(()) => {}
+                Err(err) => {
+                    tracing::warn!(
+                        "Unable to send crash report to frontend: {err}"
+                    )
+                }
+            };
+        });
+    }
+
     pub fn sync_projects_task(path: PathBuf) {
         tokio::task::spawn(async move {
             let res = async {
@@ -228,9 +252,6 @@ impl Profile {
                         ProfilePayloadType::Synced,
                     )
                         .await?;
-
-                    let profiles = state.profiles.read().await;
-                    profiles.sync().await?;
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",
@@ -309,6 +330,7 @@ impl Profile {
         .await?;
         watch_path(profile_path, watcher, ProjectType::DataPack.get_folder())
             .await?;
+        watch_path(profile_path, watcher, "crash-reports").await?;
 
         Ok(())
     }
@@ -577,6 +599,11 @@ impl Profiles {
                 },
             ))
             .await?;
+
+            {
+                let profiles = state.profiles.read().await;
+                profiles.sync().await?;
+            }
 
             Ok::<(), crate::Error>(())
         }

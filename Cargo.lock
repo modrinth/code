@@ -4600,6 +4600,7 @@ dependencies = [
  "tracing-subscriber 0.3.17",
  "url",
  "uuid",
+ "whoami",
  "winreg 0.50.0",
  "zip",
 ]
@@ -4639,7 +4640,6 @@ dependencies = [
  "daedalus",
  "futures",
  "os_info",
- "regex",
  "sentry",
  "sentry-rust-minidump",
  "serde",
@@ -5432,6 +5432,16 @@ dependencies = [
  "windows 0.39.0",
  "windows-bindgen",
  "windows-metadata",
+]
+
+[[package]]
+name = "whoami"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c70234412ca409cc04e864e89523cb0fc37f5e1344ebed5a3ebf4192b6b9f68"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

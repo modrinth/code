@@ -12,7 +12,6 @@ build = "build.rs"
 
 [build-dependencies]
 tauri-build = { version = "1.3", features = [] }
-regex = "1.5"
 
 [dependencies]
 theseus = { path = "../../theseus", features = ["tauri"] }

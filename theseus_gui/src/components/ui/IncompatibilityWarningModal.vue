@@ -1,5 +1,9 @@
 <template>
-  <Modal ref="incompatibleModal" header="Incompatibility warning">
+  <Modal
+    ref="incompatibleModal"
+    header="Incompatibility warning"
+    :noblur="!themeStore.advancedRendering"
+  >
     <div class="modal-body">
       <p>
         This {{ versions?.length > 0 ? 'project' : 'version' }} is not compatible with the instance
@@ -54,8 +58,10 @@
 import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from 'omorphia'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { defineExpose, ref } from 'vue'
-import { handleError } from '@/store/state.js'
+import { handleError, useTheming } from '@/store/state.js'
 import mixpanel from 'mixpanel-browser'
+
+const themeStore = useTheming()
 
 const instance = ref(null)
 const project = ref(null)

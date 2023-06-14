@@ -12,7 +12,12 @@ import {
   CheckIcon,
 } from 'omorphia'
 import { computed, ref } from 'vue'
-import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
+import {
+  add_project_from_version as installMod,
+  check_installed,
+  get,
+  list,
+} from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -20,6 +25,9 @@ import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
+
+const themeStore = useTheming()
 
 const versions = ref([])
 const project = ref('')
@@ -162,6 +170,9 @@ const createInstance = async () => {
 
   await installMod(id, versions.value[0].id).catch(handleError)
 
+  const instance = await get(id, true)
+  await installVersionDependencies(instance, versions.value)
+
   mixpanel.track('InstanceCreate', {
     profile_name: name.value,
     game_version: versions.value[0].game_versions[0],
@@ -191,7 +202,11 @@ const check_valid = computed(() => {
 </script>
 
 <template>
-  <Modal ref="installModal" header="Install project to instance">
+  <Modal
+    ref="installModal"
+    header="Install project to instance"
+    :noblur="!themeStore.advancedRendering"
+  >
     <div class="modal-body">
       <input
         v-model="searchFilter"

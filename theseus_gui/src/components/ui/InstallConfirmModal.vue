@@ -3,6 +3,9 @@ import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
 import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
+
+const themeStore = useTheming()
 
 const version = ref('')
 const title = ref('')
@@ -38,7 +41,7 @@ async function install() {
 </script>
 
 <template>
-  <Modal ref="confirmModal" header="Are you sure?">
+  <Modal ref="confirmModal" header="Are you sure?" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
       <p>You already have this modpack installed. Are you sure you want to install it again?</p>
       <div class="input-group push-right">

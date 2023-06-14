@@ -5,9 +5,14 @@
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
+    :noblur="!themeStore.advancedRendering"
     @proceed="removeProfile"
   />
-  <Modal ref="changeVersionsModal" header="Change instance versions">
+  <Modal
+    ref="changeVersionsModal"
+    header="Change instance versions"
+    :noblur="!themeStore.advancedRendering"
+  >
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -334,6 +339,7 @@ import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/h
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
 
 const router = useRouter()
 
@@ -343,6 +349,8 @@ const props = defineProps({
     required: true,
   },
 })
+
+const themeStore = useTheming()
 
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)

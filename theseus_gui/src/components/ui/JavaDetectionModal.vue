@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="detectJavaModal" header="Select java version">
+  <Modal ref="detectJavaModal" header="Select java version" :noblur="!themeStore.advancedRendering">
     <div class="auto-detect-modal">
       <div class="table">
         <div class="table-row table-head">
@@ -45,6 +45,9 @@ import {
 } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
+
+const themeStore = useTheming()
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)
