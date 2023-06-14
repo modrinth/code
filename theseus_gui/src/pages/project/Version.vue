@@ -1,19 +1,23 @@
 <template>
   <div>
     <Card>
+      <Breadcrumbs
+        :current-title="version.name"
+        :link-stack="[
+          {
+            href: `/project/${route.params.id}/versions`,
+            label: 'Versions',
+          },
+        ]"
+      />
       <div class="version-title">
         <h2>{{ version.name }}</h2>
-        <span v-if="version.featured">Auto-Featured</span>
       </div>
       <div class="button-group">
         <Button color="primary" :action="() => install(version.id)" :disabled="installed">
           <DownloadIcon v-if="!installed" />
           <CheckIcon v-else />
           {{ installed ? 'Installed' : 'Install' }}
-        </Button>
-        <Button :link="`/project/${route.params.id}/versions`">
-          <LeftArrowIcon />
-          Back to list
         </Button>
         <Button>
           <ReportIcon />
@@ -65,10 +69,15 @@
             </Button>
           </Card>
         </Card>
-        <Card v-if="displayDependencies[0]">
+        <Card v-if="displayDependencies.length > 0">
           <h2>Dependencies</h2>
           <div v-for="dependency in displayDependencies" :key="dependency.title">
-            <router-link v-if="dependency.link" class="btn dependency" :to="dependency.link">
+            <router-link
+              v-if="dependency.link"
+              class="btn dependency"
+              :to="dependency.link"
+              @click="testTest"
+            >
               <Avatar size="sm" :src="dependency.icon" />
               <div>
                 <span class="title"> {{ dependency.title }} </span> <br />
@@ -173,17 +182,17 @@ import {
   DownloadIcon,
   FileIcon,
   Avatar,
-  LeftArrowIcon,
   ReportIcon,
   Badge,
   ExternalIcon,
   CopyCode,
   CheckIcon,
+  Breadcrumbs,
   formatBytes,
   renderString,
 } from 'omorphia'
 import { releaseColor } from '@/helpers/utils'
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
@@ -221,9 +230,21 @@ const props = defineProps({
 const version = ref(props.versions.find((version) => version.id === route.params.version))
 breadcrumbs.setName('Version', version.value.name)
 
-const author = ref(props.members.find((member) => member.user.id === version.value.author_id))
+watch(
+  () => props.versions,
+  async () => {
+    if (route.params.version) {
+      version.value = props.versions.find((version) => version.id === route.params.version)
+      breadcrumbs.setName('Version', version.value.name)
+    }
+  }
+)
 
-const displayDependencies = ref(
+const author = computed(() =>
+  props.members.find((member) => member.user.id === version.value.author_id)
+)
+
+const displayDependencies = computed(() =>
   version.value.dependencies.map((dependency) => {
     const version = props.dependencies.versions.find((obj) => obj.id === dependency.version_id)
     if (version) {

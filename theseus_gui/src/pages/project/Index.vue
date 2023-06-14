@@ -32,17 +32,11 @@
         </div>
         <Categories
           class="tags"
-          type=""
-          :categories="[
-            ...categories.filter(
+          :categories="
+            categories.filter(
               (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
-            ),
-            ...loaders.filter(
-              (loader) =>
-                data.categories.includes(loader.name) &&
-                loader.supported_project_types?.includes('modpack')
-            ),
-          ]"
+            )
+          "
         >
           <EnvironmentIndicator
             :client-side="data.client_side"
@@ -258,7 +252,7 @@ import {
   KoFiIcon,
   OpenCollectiveIcon,
 } from '@/assets/external'
-import { get_categories, get_loaders } from '@/helpers/tags'
+import { get_categories } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
 import {
   list,
@@ -268,7 +262,7 @@ import {
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
@@ -282,7 +276,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
 
 const route = useRoute()
-const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
@@ -292,32 +285,46 @@ const incompatibilityWarning = ref(null)
 const options = ref(null)
 const installing = ref(false)
 
-const [data, versions, members, dependencies, categories, loaders, instance] = await Promise.all([
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project').then(shallowRef),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project').then(
-    shallowRef
-  ),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project').then(
-    shallowRef
-  ),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project').then(
-    shallowRef
-  ),
-  get_loaders().then(ref).catch(handleError),
-  get_categories().then(ref).catch(handleError),
-  route.query.i ? getInstance(route.query.i, true).then(ref) : Promise.resolve().then(ref),
-])
+const data = shallowRef(null)
+const versions = shallowRef([])
+const members = shallowRef([])
+const dependencies = shallowRef([])
+const categories = shallowRef([])
+const instance = ref(null)
 
-const installed = ref(
-  instance.value && (await check_installed(instance.value.path, data.value.id).catch(handleError))
-)
+const installed = ref(false)
 
-breadcrumbs.setName('Project', data.value.title)
+async function fetchProjectData() {
+  ;[
+    data.value,
+    versions.value,
+    members.value,
+    dependencies.value,
+    categories.value,
+    instance.value,
+  ] = await Promise.all([
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project'),
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project'),
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project'),
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project'),
+    get_categories().catch(handleError),
+    route.query.i ? getInstance(route.query.i, true).catch(handleError) : Promise.resolve(),
+  ])
+
+  installed.value =
+    instance.value?.path &&
+    (await check_installed(instance.value.path, data.value.id).catch(handleError))
+  breadcrumbs.setName('Project', data.value.title)
+}
+
+await fetchProjectData()
 
 watch(
   () => route.params.id,
-  () => {
-    if (route.params.id) router.go()
+  async () => {
+    if (route.params.id && route.path.startsWith('/project')) {
+      await fetchProjectData()
+    }
   }
 )
 

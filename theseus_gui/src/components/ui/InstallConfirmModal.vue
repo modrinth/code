@@ -12,9 +12,9 @@ const confirmModal = ref(null)
 const installing = ref(false)
 
 defineExpose({
-  show: (id, projectId, projectTitle, projectIcon) => {
+  show: (id, projectIdVal, projectTitle, projectIcon) => {
     version.value = id
-    projectId.value = projectId
+    projectId.value = projectIdVal
     title.value = projectTitle
     icon.value = projectIcon
     confirmModal.value.show()

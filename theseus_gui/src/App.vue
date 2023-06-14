@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import {
   HomeIcon,
@@ -10,7 +10,7 @@ import {
   Button,
   Notifications,
 } from 'omorphia'
-import { handleError, useLoading, useTheming } from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -26,39 +26,38 @@ import mixpanel from 'mixpanel-browser'
 const themeStore = useTheming()
 
 const isLoading = ref(true)
-onMounted(async () => {
-  const { settings, collapsed_navigation } = await get().catch(handleError)
-  themeStore.setThemeState(settings)
-  themeStore.collapsedNavigation = collapsed_navigation
-
-  await warning_listener((e) =>
-    notificationsWrapper.value.addNotification({
-      title: 'Warning',
-      text: e.message,
-      type: 'warn',
-    })
-  )
-})
-
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics } = await get()
+    const { theme, opt_out_analytics, collapsed_navigation } = await get()
     const dev = await isDev()
+
+    themeStore.setThemeState(theme)
+    themeStore.collapsedNavigation = collapsed_navigation
 
     mixpanel.init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
     if (opt_out_analytics) {
       mixpanel.opt_out_tracking()
     }
+    mixpanel.track('Launched')
 
-    themeStore.setThemeState(theme)
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
+
+    await warning_listener((e) =>
+      notificationsWrapper.value.addNotification({
+        title: 'Warning',
+        text: e.message,
+        type: 'warn',
+      })
+    )
   },
 })
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-  mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
+  if (mixpanel.__loaded) {
+    mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
+  }
 })
 
 const loading = useLoading()
