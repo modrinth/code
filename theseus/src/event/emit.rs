@@ -236,7 +236,6 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 #[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     debug!("{}", serde_json::to_string(&command)?);
-    emit_warning(&serde_json::to_string(&command)?).await?; // dbg remove me println
     #[cfg(feature = "tauri")]
     {
         let event_state = crate::EventState::get().await?;
