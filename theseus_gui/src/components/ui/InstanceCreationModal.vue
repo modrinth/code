@@ -213,7 +213,7 @@ const create_instance = async () => {
     loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
     icon.value
   ).catch(handleError)
-  
+
   mixpanel.track('InstanceCreate', {
     profile_name: profile_name.value,
     game_version: game_version.value,
@@ -269,11 +269,18 @@ const openFile = async () => {
 
   modal.value.hide()
   await install_from_file(newProject).catch(handleError)
+
+  mixpanel.track('InstanceCreate', {
+    source: 'CreationModalFileOpen',
+  })
 }
 
 listen('tauri://file-drop', async (event) => {
   modal.value.hide()
   await install_from_file(event.payload[0]).catch(handleError)
+  mixpanel.track('InstanceCreate', {
+    source: 'CreationModalFileDrop',
+  })
 })
 </script>
 

@@ -392,6 +392,7 @@ async function updateAll() {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
     count: setProjects.length,
+    selected: selected.value.length > 1,
   })
 }
 
@@ -444,14 +445,13 @@ const handleContentOptionClick = async (args) => {
   if (args.option === 'search') {
     await router.push({
       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+      query: { i: props.instance.path },
     })
   } else if (args.option === 'from_file') {
     const newProject = await open({ multiple: true })
-    console.log(newProject)
     if (!newProject) return
 
     for (const project of newProject) {
-      console.log(project)
       await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
       initProjects(await get(props.instance.path).catch(handleError))
     }

@@ -50,12 +50,7 @@
       </div>
     </div>
     <div class="install">
-      <Button
-        :to="`/browse/${project.slug}`"
-        color="primary"
-        :disabled="installed || installing"
-        @click.stop="install()"
-      >
+      <Button color="primary" :disabled="installed || installing" @click.stop="install()">
         <DownloadIcon v-if="!installed" />
         <CheckIcon v-else />
         {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
