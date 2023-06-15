@@ -67,15 +67,15 @@
         @option-click="toggleSelected"
       >
         <template #toggle>
-          <GlobeIcon />
+          <EditIcon />
           Toggle selected
         </template>
         <template #disable>
-          <EditIcon />
+          <XIcon />
           Disable selected
         </template>
         <template #enable>
-          <HashIcon />
+          <CheckCircleIcon />
           Enable selected
         </template>
       </DropdownButton>
@@ -202,6 +202,7 @@ import {
   HashIcon,
   Modal,
   XIcon,
+  CheckCircleIcon,
 } from 'omorphia'
 import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
