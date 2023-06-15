@@ -172,6 +172,7 @@
         :min="256"
         :max="maxMemory"
         :step="1"
+        unit="mb"
       />
     </div>
   </Card>

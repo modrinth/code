@@ -1,6 +1,9 @@
 <template>
   <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
-    <div class="modal-body">
+    <div class="modal-header">
+      <Chips v-model="creationType" :items="['custom', 'from file']" />
+    </div>
+    <div v-if="creationType === 'custom'" class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
         <div class="image-input">
@@ -79,6 +82,10 @@
         </Button>
       </div>
     </div>
+    <div v-else class="modal-body">
+      <Button @click="openFile"> <FolderOpenIcon /> Import from file </Button>
+      <div class="info"><InfoIcon /> Or drag and drop your .mrpack file</div>
+    </div>
   </Modal>
 </template>
 
@@ -93,6 +100,8 @@ import {
   XIcon,
   CodeIcon,
   Checkbox,
+  FolderOpenIcon,
+  InfoIcon,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
@@ -109,6 +118,8 @@ import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/state.js'
+import { listen } from '@tauri-apps/api/event'
+import { install_from_file } from '@/helpers/pack.js'
 
 const themeStore = useTheming()
 
@@ -122,6 +133,7 @@ const display_icon = ref(null)
 const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
+const creationType = ref('from file')
 
 defineExpose({
   show: () => {
@@ -191,10 +203,17 @@ const create_instance = async () => {
     loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
   const loaderVersion = loader.value === 'vanilla' ? null : loader_version_value ?? 'stable'
 
-  create(profile_name.value, game_version.value, loader.value, loaderVersion, icon.value).catch(
-    handleError
-  )
+  modal.value.hide()
+  creating.value = false
 
+  await create(
+    profile_name.value,
+    game_version.value,
+    loader.value,
+    loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
+    icon.value
+  ).catch(handleError)
+  
   mixpanel.track('InstanceCreate', {
     profile_name: profile_name.value,
     game_version: game_version.value,
@@ -203,9 +222,6 @@ const create_instance = async () => {
     has_icon: !!icon.value,
     source: 'CreationModal',
   })
-
-  modal.value.hide()
-  creating.value = false
 }
 
 const upload_icon = async () => {
@@ -246,14 +262,27 @@ const selectable_versions = computed(() => {
 const toggle_advanced = () => {
   showAdvanced.value = !showAdvanced.value
 }
+
+const openFile = async () => {
+  const newProject = await open({ multiple: false })
+  if (!newProject) return
+
+  modal.value.hide()
+  await install_from_file(newProject).catch(handleError)
+}
+
+listen('tauri://file-drop', async (event) => {
+  modal.value.hide()
+  await install_from_file(event.payload[0]).catch(handleError)
+})
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .modal-body {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
+  padding: var(--gap-lg);
+  gap: var(--gap-md);
 }
 
 .input-label {
@@ -295,5 +324,34 @@ const toggle_advanced = () => {
 
 .selector {
   max-width: 20rem;
+}
+
+.labeled-divider {
+  text-align: center;
+}
+
+.labeled-divider:after {
+  background-color: var(--color-raised-bg);
+  content: 'Or';
+  color: var(--color-base);
+  padding: var(--gap-sm);
+  position: relative;
+  top: -0.5rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.modal-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--gap-lg);
+  padding-bottom: 0;
 }
 </style>

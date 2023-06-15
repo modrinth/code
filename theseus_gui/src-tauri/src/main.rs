@@ -5,7 +5,7 @@
 
 use theseus::prelude::*;
 
-use tauri::Manager;
+use tauri::{Manager, WindowEvent};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -67,14 +67,34 @@ fn main() {
     tracing::subscriber::set_global_default(subscriber)
         .expect("setting default subscriber failed");
 
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
-        .plugin(tauri_plugin_window_state::Builder::default().build())
-        .invoke_handler(tauri::generate_handler![
-            initialize_state,
+        .plugin(tauri_plugin_window_state::Builder::default().build());
+
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder
+            .setup(|app| {
+                use api::window_ext::WindowExt;
+                let win = app.get_window("main").unwrap();
+                win.set_transparent_titlebar(true);
+                win.position_traffic_lights(0.0, 0.0);
+                Ok(())
+            })
+            .on_window_event(|e| {
+                use api::window_ext::WindowExt;
+                if let WindowEvent::Resized(..) = e.event() {
+                    let win = e.window();
+                    win.position_traffic_lights(0., 0.);
+                }
+            })
+    }
+
+    builder = builder.invoke_handler(tauri::generate_handler![
+        initialize_state,
             is_dev,
             api::progress_bars_list,
             api::profile_create::profile_create_empty,
@@ -145,7 +165,9 @@ fn main() {
             api::logs::logs_delete_logs_by_datetime,
             api::utils::show_in_folder,
             api::utils::should_disable_mouseover,
-        ])
+    ]);
+
+    builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
