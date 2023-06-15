@@ -37,7 +37,7 @@
         >
           <template #search>
             <SearchIcon />
-            <span class="no-wrap"> Search addons </span>
+            <span class="no-wrap"> Add content </span>
           </template>
           <template #from_file>
             <FolderOpenIcon />
@@ -287,6 +287,11 @@ const initProjects = (initInstance) => {
 }
 
 initProjects(props.instance)
+
+watch(
+  () => props.instance.projects,
+  () => initProjects(props.instance)
+)
 
 const searchFilter = ref('')
 const selectAll = ref(false)

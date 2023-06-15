@@ -2,7 +2,7 @@
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
       <div v-if="instance" class="small-instance">
-        <div class="instance">
+        <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
           <Avatar
             :src="
               !instance.metadata.icon ||
@@ -22,7 +22,7 @@
               {{ instance.metadata.game_version }}
             </span>
           </div>
-        </div>
+        </router-link>
       </div>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" />

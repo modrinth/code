@@ -91,7 +91,7 @@ function setJavaInstall(javaInstall) {
 
   .table {
     .table-row {
-      grid-template-columns: 1fr 4fr 1.5fr;
+      grid-template-columns: 1fr 4fr min-content;
     }
 
     span {

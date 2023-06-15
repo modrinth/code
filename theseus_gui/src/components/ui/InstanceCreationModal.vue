@@ -277,10 +277,12 @@ const openFile = async () => {
 
 listen('tauri://file-drop', async (event) => {
   modal.value.hide()
-  await install_from_file(event.payload[0]).catch(handleError)
-  mixpanel.track('InstanceCreate', {
-    source: 'CreationModalFileDrop',
-  })
+  if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
+    await install_from_file(event.payload[0]).catch(handleError)
+    mixpanel.track('InstanceCreate', {
+      source: 'CreationModalFileDrop',
+    })
+  }
 })
 </script>
 

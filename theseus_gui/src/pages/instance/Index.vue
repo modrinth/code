@@ -189,16 +189,6 @@ const stopInstance = async (context) => {
   })
 }
 
-const unlistenProfiles = await profile_listener(async (event) => {
-  if (event.path === route.params.id) {
-    instance.value = await get(route.params.id).catch(handleError)
-  }
-})
-
-const unlistenProcesses = await process_listener((e) => {
-  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
-})
-
 const handleRightClick = (event) => {
   const baseOptions = [
     { name: 'add_content' },
@@ -257,6 +247,16 @@ const handleOptionsClick = async (args) => {
       break
   }
 }
+
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (event.path === route.params.id) {
+    instance.value = await get(route.params.id).catch(handleError)
+  }
+})
+
+const unlistenProcesses = await process_listener((e) => {
+  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
+})
 
 onUnmounted(() => {
   unlistenProcesses()

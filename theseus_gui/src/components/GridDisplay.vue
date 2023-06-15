@@ -12,6 +12,8 @@ import {
   Card,
   DropdownSelect,
   SearchIcon,
+  XIcon,
+  Button,
   formatCategoryHeader,
 } from 'omorphia'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -290,6 +292,10 @@ const filteredResults = computed(() => {
 
   .iconified-input {
     flex-grow: 1;
+
+    input {
+      min-width: 100%;
+    }
   }
 
   .sort-dropdown {
