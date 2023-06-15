@@ -56,8 +56,8 @@ devDependencies:
     specifier: ^2.0.1
     version: 2.0.1(@formatjs/intl@2.7.2)
   '@vintl/nuxt':
-    specifier: ^1.2.2
-    version: 1.2.2(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
+    specifier: ^1.2.3
+    version: 1.2.3(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
   eslint:
     specifier: ^8.41.0
     version: 8.42.0
@@ -1536,8 +1536,8 @@ packages:
       intl-messageformat: 10.3.5
     dev: true
 
-  /@vintl/nuxt@1.2.2(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
-    resolution: {integrity: sha512-/barKaJWoB/2Y7On1wImAGwoFZsVoAC23lKQsvs8Afa19mlgiuihawdmE5AJDE6s8gzfdJ8QrwXgA+jWXbzY3A==}
+  /@vintl/nuxt@1.2.3(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
+    resolution: {integrity: sha512-7grMFQqWc6S9nUU7q9K+fhRZ/SvPzG4Dll/fcCnDbIzGBgzH+Nni2b+yFuoT0sjmXN3lsksHa+5hxyJDxq9Q0A==}
     dependencies:
       '@formatjs/intl': 2.7.2(typescript@5.0.4)
       '@nuxt/kit': 3.5.3
