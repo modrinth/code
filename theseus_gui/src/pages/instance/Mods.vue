@@ -28,18 +28,22 @@
             class="dropdown"
           />
         </span>
-        <Button
+        <DropdownButton
+          :options="['search', 'from_file']"
+          default-value="search"
+          name="add-content-dropdown"
           color="primary"
-          @click="
-            router.push({
-              path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-              query: { i: $route.params.id },
-            })
-          "
+          @option-click="handleContentOptionClick"
         >
-          <PlusIcon />
-          <span class="no-wrap"> Add content </span>
-        </Button>
+          <template #search>
+            <SearchIcon />
+            <span class="no-wrap"> Search addons </span>
+          </template>
+          <template #from_file>
+            <FolderOpenIcon />
+            <span class="no-wrap"> Add from file </span>
+          </template>
+        </DropdownButton>
       </span>
     </div>
     <div class="second-row">
@@ -63,15 +67,15 @@
         @option-click="toggleSelected"
       >
         <template #toggle>
-          <GlobeIcon />
+          <EditIcon />
           Toggle selected
         </template>
         <template #disable>
-          <EditIcon />
+          <XIcon />
           Disable selected
         </template>
         <template #enable>
-          <HashIcon />
+          <CheckCircleIcon />
           Enable selected
         </template>
       </DropdownButton>
@@ -182,7 +186,6 @@ import {
   Avatar,
   Button,
   TrashIcon,
-  PlusIcon,
   Card,
   CheckIcon,
   SearchIcon,
@@ -190,6 +193,7 @@ import {
   DropdownSelect,
   AnimatedLogo,
   Chips,
+  FolderOpenIcon,
   Checkbox,
   formatProjectType,
   DropdownButton,
@@ -198,17 +202,22 @@ import {
   HashIcon,
   Modal,
   XIcon,
+  CheckCircleIcon,
 } from 'omorphia'
 import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import {
+  add_project_from_path,
+  get,
   remove_project,
   toggle_disable_project,
   update_all,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import { open } from '@tauri-apps/api/dialog'
+import { listen } from '@tauri-apps/api/event'
 
 const router = useRouter()
 
@@ -228,48 +237,54 @@ const props = defineProps({
 })
 
 const projects = ref([])
-for (const [path, project] of Object.entries(props.instance.projects)) {
-  if (project.metadata.type === 'modrinth') {
-    let owner = project.metadata.members.find((x) => x.role === 'Owner')
-    projects.value.push({
-      path,
-      name: project.metadata.project.title,
-      slug: project.metadata.project.slug,
-      author: owner ? owner.user.username : null,
-      version: project.metadata.version.version_number,
-      file_name: project.file_name,
-      icon: project.metadata.project.icon_url,
-      disabled: project.disabled,
-      updateVersion: project.metadata.update_version,
-      outdated: !!project.metadata.update_version,
-      project_type: project.metadata.project.project_type,
-    })
-  } else if (project.metadata.type === 'inferred') {
-    projects.value.push({
-      path,
-      name: project.metadata.title ?? project.file_name,
-      author: project.metadata.authors[0],
-      version: project.metadata.version,
-      file_name: project.file_name,
-      icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-      disabled: project.disabled,
-      outdated: false,
-      project_type: project.metadata.project_type,
-    })
-  } else {
-    projects.value.push({
-      path,
-      name: project.file_name,
-      author: '',
-      version: null,
-      file_name: project.file_name,
-      icon: null,
-      disabled: project.disabled,
-      outdated: false,
-      project_type: null,
-    })
+
+const initProjects = (initInstance) => {
+  projects.value = []
+  for (const [path, project] of Object.entries(initInstance.projects)) {
+    if (project.metadata.type === 'modrinth') {
+      let owner = project.metadata.members.find((x) => x.role === 'Owner')
+      projects.value.push({
+        path,
+        name: project.metadata.project.title,
+        slug: project.metadata.project.slug,
+        author: owner ? owner.user.username : null,
+        version: project.metadata.version.version_number,
+        file_name: project.file_name,
+        icon: project.metadata.project.icon_url,
+        disabled: project.disabled,
+        updateVersion: project.metadata.update_version,
+        outdated: !!project.metadata.update_version,
+        project_type: project.metadata.project.project_type,
+      })
+    } else if (project.metadata.type === 'inferred') {
+      projects.value.push({
+        path,
+        name: project.metadata.title ?? project.file_name,
+        author: project.metadata.authors[0],
+        version: project.metadata.version,
+        file_name: project.file_name,
+        icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
+        disabled: project.disabled,
+        outdated: false,
+        project_type: project.metadata.project_type,
+      })
+    } else {
+      projects.value.push({
+        path,
+        name: project.file_name,
+        author: '',
+        version: null,
+        file_name: project.file_name,
+        icon: null,
+        disabled: project.disabled,
+        outdated: false,
+        project_type: null,
+      })
+    }
   }
 }
+
+initProjects(props.instance)
 
 const searchFilter = ref('')
 const selectAll = ref(false)
@@ -391,6 +406,31 @@ async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 }
+
+const handleContentOptionClick = async (args) => {
+  if (args.option === 'search') {
+    await router.push({
+      path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    })
+  } else if (args.option === 'from_file') {
+    const newProject = await open({ multiple: true })
+    console.log(newProject)
+    if (!newProject) return
+
+    for (const project of newProject) {
+      console.log(project)
+      await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
+      initProjects(await get(props.instance.path).catch(handleError))
+    }
+  }
+}
+
+listen('tauri://file-drop', async (event) => {
+  for (const file of event.payload) {
+    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+    initProjects(await get(props.instance.path).catch(handleError))
+  }
+})
 
 async function deleteSelected() {
   for (const project of selected.value) {
