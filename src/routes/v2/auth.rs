@@ -133,10 +133,10 @@ pub async fn init(
     transaction.commit().await?;
 
     let kratos_url = dotenvy::var("KRATOS_URL")?;
-    let labrinth_url = dotenvy::var("BIND_ADDR")?;
+    let labrinth_url = dotenvy::var("SELF_ADDR")?;
     let url = format!(
         // Callback URL of initialization is /callback below.
-        "{kratos_url}/self-service/login/browser?return_to=http://{labrinth_url}/v2/auth/callback?state={}",
+        "{kratos_url}/self-service/login/browser?return_to={labrinth_url}/v2/auth/callback?state={}",
             to_base62(state.0 as u64)
     );
     Ok(HttpResponse::TemporaryRedirect()

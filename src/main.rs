@@ -396,6 +396,7 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("MEILISEARCH_ADDR");
     failed |= check_var::<String>("MEILISEARCH_KEY");
     failed |= check_var::<String>("BIND_ADDR");
+    failed |= check_var::<String>("SELF_ADDR");
 
     failed |= check_var::<String>("STORAGE_BACKEND");
 
