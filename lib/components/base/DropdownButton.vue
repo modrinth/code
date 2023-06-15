@@ -284,12 +284,13 @@ onBeforeUnmount(() => {
 
 .options-enter-from,
 .options-leave-to {
+  // this is not 100% due to a safari bug
   &.up {
-    transform: translateY(100%);
+    transform: translateY(99.999%);
   }
 
   &.down {
-    transform: translateY(-100%);
+    transform: translateY(-99.999%);
   }
 }
 
@@ -308,7 +309,7 @@ onBeforeUnmount(() => {
 
   &.up {
     top: 0;
-    transform: translateY(-100%);
+    transform: translateY(-99.999%);
     border-radius: var(--radius-md) var(--radius-md) 0 0;
   }
 
