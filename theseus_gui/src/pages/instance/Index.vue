@@ -284,7 +284,6 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .instance-card {
-  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -306,7 +305,6 @@ Button {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: var(--color-raised-bg);
   min-height: calc(100% - 3.25rem);
   overflow: hidden;
 }
@@ -339,7 +337,7 @@ Button {
 }
 
 .content {
-  margin-left: 20rem;
+  margin-left: 19rem;
 }
 
 .instance-info {
@@ -391,28 +389,6 @@ Button {
   }
 }
 
-.header-nav {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 0.5rem;
-  gap: 0.5rem;
-  background: var(--color-raised-bg);
-}
-
-.project-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1rem;
-  background: var(--color-raised-bg);
-  width: 20rem;
-}
-
 .instance-nav {
   display: flex;
   flex-direction: row;
@@ -420,7 +396,6 @@ Button {
   justify-content: left;
   padding: 1rem;
   gap: 0.5rem;
-  background: var(--color-raised-bg);
   height: min-content;
   width: 100%;
 }

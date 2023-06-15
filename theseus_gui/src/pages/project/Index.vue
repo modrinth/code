@@ -1,7 +1,7 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
-      <div v-if="instance" class="small-instance">
+      <Card v-if="instance" class="small-instance">
         <div class="instance">
           <Avatar
             :src="
@@ -23,7 +23,7 @@
             </span>
           </div>
         </div>
-      </div>
+      </Card>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
@@ -475,15 +475,20 @@ const handleOptionsClick = (args) => {
   height: fit-content;
   max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
-  background: var(--color-raised-bg);
-  padding: 1rem;
+  padding: 1rem 0.5rem 1rem 1rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
 }
 
 .sidebar-card {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: var(--color-bg);
 }
 
 .content-container {
@@ -491,7 +496,7 @@ const handleOptionsClick = (args) => {
   flex-direction: column;
   width: 100%;
   padding: 1rem;
-  margin-left: 20rem;
+  margin-left: 19.5rem;
 }
 
 .button-group {
@@ -614,7 +619,6 @@ const handleOptionsClick = (args) => {
 }
 
 .small-instance {
-  background: var(--color-bg);
   padding: var(--gap-lg);
   border-radius: var(--radius-md);
   margin-bottom: var(--gap-md);

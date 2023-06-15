@@ -54,7 +54,7 @@ watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
 
-document.addEventListener('contextmenu', (event) => event.preventDefault())
+// document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 document.querySelector('body').addEventListener('click', function (e) {
   let target = e.target
@@ -161,7 +161,7 @@ document.querySelector('body').addEventListener('click', function (e) {
       </div>
     </div>
     <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
-      <div class="appbar">
+      <div data-tauri-drag-region class="appbar">
         <section class="navigation-controls">
           <Breadcrumbs />
         </section>
@@ -177,7 +177,7 @@ document.querySelector('body').addEventListener('click', function (e) {
           offset-width="var(--sidebar-width)"
         />
         <Notifications ref="notificationsWrapper" />
-        <RouterView v-slot="{ Component }">
+        <RouterView v-slot="{ Component }" class="main-view">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
               <component :is="Component"></component>
@@ -196,7 +196,7 @@ document.querySelector('body').addEventListener('click', function (e) {
 }
 .container {
   --appbar-height: 3.25rem;
-  --sidebar-width: 5rem;
+  --sidebar-width: 4.5rem;
 
   height: 100vh;
   display: flex;
@@ -214,47 +214,11 @@ document.querySelector('body').addEventListener('click', function (e) {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--color-super-raised-bg);
+      background: var(--color-raised-bg);
+      box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
       text-align: center;
       padding: 0 0 0 1rem;
       height: 3.25rem;
-
-      .navigation-controls {
-        display: inherit;
-        align-items: inherit;
-        justify-content: stretch;
-
-        svg {
-          width: 1.25rem;
-          height: 1.25rem;
-          transition: all ease-in-out 0.1s;
-
-          &:hover {
-            filter: brightness(150%);
-          }
-        }
-
-        p {
-          margin-left: 0.3rem;
-        }
-
-        svg {
-          margin: auto 0.1rem;
-          transition: all ease-in-out 0.1s;
-          cursor: pointer;
-
-          &:hover {
-            font-weight: bolder;
-          }
-        }
-      }
-
-      .mod-stats {
-        height: 100%;
-        display: inherit;
-        align-items: inherit;
-        justify-content: flex-end;
-      }
     }
 
     .router-view {
@@ -262,25 +226,8 @@ document.querySelector('body').addEventListener('click', function (e) {
       height: calc(100% - 3.125rem);
       overflow: auto;
       overflow-x: hidden;
+      background-color: var(--color-bg);
     }
-  }
-}
-
-.dark-mode {
-  .nav-container {
-    background: var(--color-bg) !important;
-  }
-  .pages-list {
-    a.router-link-active {
-      color: #fff;
-    }
-  }
-}
-
-.light-mode {
-  .nav-container {
-    box-shadow: var(--shadow-floating), var(--shadow-floating), var(--shadow-floating),
-      var(--shadow-floating) !important;
   }
 }
 
@@ -290,9 +237,10 @@ document.querySelector('body').addEventListener('click', function (e) {
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-  padding: 1rem;
-  background: var(--color-raised-bg);
+  padding: var(--gap-md);
+  padding-top: calc(var(--gap-md) + 3.25rem);
 
   &.expanded {
     --sidebar-width: 13rem;
@@ -318,6 +266,7 @@ document.querySelector('body').addEventListener('click', function (e) {
     background: inherit;
     transition: all ease-in-out 0.1s;
     color: var(--color-base);
+    box-shadow: none;
 
     &.router-link-active {
       color: var(--color-contrast);

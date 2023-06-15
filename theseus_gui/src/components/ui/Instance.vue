@@ -230,27 +230,7 @@ onUnmounted(() => unlisten())
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 4.75rem;
-    }
-
-    .instance-card-item {
-      background: hsl(220, 11%, 11%) !important;
-    }
-  }
-}
-
-.light-mode {
-  .instance:hover {
-    .instance-card-item {
-      background: hsl(0, 0%, 91%) !important;
-    }
-  }
-
-  .instance-card-item {
-    background: hsl(0, 0%, 100%) !important;
-
-    &:hover {
-      background: hsl(0, 0%, 91%) !important;
+      bottom: 50%;
     }
   }
 }
@@ -264,8 +244,9 @@ onUnmounted(() => unlisten())
   z-index: 1;
   width: 3rem;
   height: 3rem;
-  right: 1.25rem;
-  bottom: 4.25rem;
+  left: 50%;
+  bottom: 30%;
+  transform: translateX(-50%);
   opacity: 0;
   transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
@@ -301,17 +282,11 @@ onUnmounted(() => unlisten())
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0.75rem !important; /* overrides card class */
+  padding: var(--gap-md);
   transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
-  background: hsl(220, 11%, 17%) !important;
   margin-bottom: 0;
 
-  &:hover {
-    filter: brightness(1) !important;
-    background: hsl(220, 11%, 11%) !important;
-  }
-
-  > .avatar {
+  .mod-image {
     --size: 100%;
 
     width: 100% !important;

@@ -297,7 +297,7 @@ watch(
 
 <style lang="scss" scoped>
 .settings-page {
-  margin: 1rem 1rem 1rem 0;
+  margin: 1rem;
 }
 
 .installation-input {

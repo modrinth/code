@@ -135,14 +135,14 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .status {
-  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
-  background-color: var(--color-raised-bg);
-  padding: 0 1rem;
-  margin: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-button-bg);
+  padding: var(--gap-sm) var(--gap-lg);
+  margin: var(--gap-md);
 }
 
 .running-text {

@@ -269,13 +269,13 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-bg);
+  background-color: var(--color-raised-bg);
   border-radius: var(--radius-md);
-  box-shadow: none;
   width: 100%;
   text-align: left;
 
   &.expanded {
+    border: 1px solid var(--color-button-bg);
     padding: 1rem;
   }
 }
