@@ -14,6 +14,7 @@ import {
   formatCategoryHeader,
   formatCategory,
   Promotion,
+  XIcon,
   DropdownSelect,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
@@ -630,6 +631,9 @@ const showLoaders = computed(
             :placeholder="`Search ${projectType}s...`"
             @input="onSearchChange(1)"
           />
+          <Button @click="() => (searchStore.searchInput = '')">
+            <XIcon />
+          </Button>
         </div>
         <div class="inline-option">
           <span>Sort by</span>

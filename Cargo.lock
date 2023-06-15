@@ -4281,8 +4281,10 @@ name = "theseus_gui"
 version = "0.0.0"
 dependencies = [
  "chrono",
+ "cocoa",
  "daedalus",
  "futures",
+ "objc",
  "os_info",
  "regex",
  "serde",
