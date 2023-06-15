@@ -1,9 +1,17 @@
 <template>
-  <div v-if="currentProcesses[0]" class="status">
+  <div v-if="selectedProfile" class="status">
     <span class="circle running" />
-    <span class="running-text">
-      {{ currentProcesses[0].metadata.name }}
-    </span>
+    <div
+      ref="profileButton"
+      class="running-text"
+      :class="{ clickable: currentProcesses.length > 1 }"
+      @click="toggleProfiles()"
+    >
+      {{ selectedProfile.metadata.name }}
+      <div v-if="currentProcesses.length > 1" class="arrow" :class="{ rotate: showProfiles }">
+        <DropdownIcon />
+      </div>
+    </div>
     <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop" @click="stop()">
       <StopCircleIcon />
     </Button>
@@ -44,10 +52,56 @@
       </div>
     </Card>
   </transition>
+  <transition name="download">
+    <Card v-if="showCard === true" ref="card" class="info-card">
+      <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
+        <h3 class="info-title">
+          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
+        </h3>
+        <ProgressBar :progress="Math.floor(loadingBar.current)" />
+        <div class="row">{{ Math.floor(loadingBar.current) }}% {{ loadingBar.message }}</div>
+      </div>
+    </Card>
+  </transition>
+  <transition name="download">
+    <Card v-if="showProfiles === true" ref="profiles" class="profile-card">
+      <Button
+        v-for="profile in currentProcesses"
+        :key="profile.id"
+        class="profile-button"
+        @click="selectProfile(profile)"
+      >
+        <div class="text"><span class="circle running" /> {{ profile.metadata.name }}</div>
+        <Button
+          v-tooltip="'Stop instance'"
+          icon-only
+          class="icon-button stop"
+          @click.stop="stop(profile.path)"
+        >
+          <StopCircleIcon />
+        </Button>
+        <Button
+          v-tooltip="'View logs'"
+          icon-only
+          class="icon-button"
+          @click.stop="goToTerminal(profile.path)"
+        >
+          <TerminalSquareIcon />
+        </Button>
+      </Button>
+    </Card>
+  </transition>
 </template>
 
 <script setup>
-import { Button, DownloadIcon, Card, StopCircleIcon, TerminalSquareIcon } from 'omorphia'
+import {
+  Button,
+  DownloadIcon,
+  Card,
+  StopCircleIcon,
+  TerminalSquareIcon,
+  DropdownIcon,
+} from 'omorphia'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   get_all_running_profiles as getRunningProfiles,
@@ -62,10 +116,14 @@ import { handleError } from '@/store/notifications.js'
 
 const router = useRouter()
 const card = ref(null)
+const profiles = ref(null)
 const infoButton = ref(null)
+const profileButton = ref(null)
 const showCard = ref(false)
+const showProfiles = ref(false)
 
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
+const selectedProfile = ref(currentProcesses.value[0])
 
 const unlistenProcess = await process_listener(async () => {
   await refresh()
@@ -73,11 +131,14 @@ const unlistenProcess = await process_listener(async () => {
 
 const refresh = async () => {
   currentProcesses.value = await getRunningProfiles().catch(handleError)
+  if (!currentProcesses.value.includes(selectedProfile.value)) {
+    selectedProfile.value = currentProcesses.value[0]
+  }
 }
 
-const stop = async () => {
+const stop = async (path) => {
   try {
-    const processes = await getProfileProcesses(currentProcesses.value[0].path)
+    const processes = await getProfileProcesses(path ?? selectedProfile.value.path)
     await killProfile(processes[0])
   } catch (e) {
     console.error(e)
@@ -85,8 +146,8 @@ const stop = async () => {
   await refresh()
 }
 
-const goToTerminal = () => {
-  router.push(`/instance/${encodeURIComponent(currentProcesses.value[0].path)}/logs`)
+const goToTerminal = (path) => {
+  router.push(`/instance/${encodeURIComponent(path ?? selectedProfile.value.path)}/logs`)
 }
 
 const currentLoadingBars = ref(Object.values(await progress_bars_list().catch(handleError)))
@@ -105,35 +166,70 @@ const refreshInfo = async () => {
   }
 }
 
-const handleClickOutside = (event) => {
+const selectProfile = (profile) => {
+  selectedProfile.value = profile
+  showProfiles.value = false
+}
+
+const handleClickOutsideCard = (event) => {
+  const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
     card.value &&
-    infoButton.value.$el !== event.target &&
     card.value.$el !== event.target &&
-    !document.elementsFromPoint(event.clientX, event.clientY).includes(card.value.$el) &&
-    !document.elementsFromPoint(event.clientX, event.clientY).includes(infoButton.value.$el)
+    !elements.includes(card.value.$el) &&
+    !infoButton.value.contains(event.target)
   ) {
     showCard.value = false
   }
 }
 
+const handleClickOutsideProfile = (event) => {
+  const elements = document.elementsFromPoint(event.clientX, event.clientY)
+  if (
+    profiles.value &&
+    profiles.value.$el !== event.target &&
+    !elements.includes(profiles.value.$el) &&
+    !profileButton.value.contains(event.target)
+  ) {
+    showProfiles.value = false
+  }
+}
+
 const toggleCard = async () => {
   showCard.value = !showCard.value
+  showProfiles.value = false
   await refreshInfo()
 }
 
+const toggleProfiles = async () => {
+  if (currentProcesses.value.length === 1) return
+  showProfiles.value = !showProfiles.value
+  showCard.value = false
+}
+
 onMounted(() => {
-  window.addEventListener('click', handleClickOutside)
+  window.addEventListener('click', handleClickOutsideCard)
+  window.addEventListener('click', handleClickOutsideProfile)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('click', handleClickOutsideCard)
+  window.removeEventListener('click', handleClickOutsideProfile)
   unlistenProcess()
   unlistenLoading()
 })
 </script>
 
 <style scoped lang="scss">
+.arrow {
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  &.rotate {
+    transform: rotate(180deg);
+  }
+}
+
 .status {
   height: 100%;
   display: flex;
@@ -146,8 +242,18 @@ onBeforeUnmount(() => {
 }
 
 .running-text {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-xs);
   white-space: nowrap;
   overflow: hidden;
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none;
+
+  &.clickable:hover {
+    cursor: pointer;
+  }
 }
 
 .circle {
@@ -265,5 +371,38 @@ onBeforeUnmount(() => {
 
 .info-title {
   margin: 0;
+}
+
+.profile-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-sm);
+  width: 100%;
+  background-color: var(--color-raised-bg);
+  box-shadow: none;
+
+  .text {
+    margin-right: auto;
+  }
+}
+
+.profile-card {
+  position: absolute;
+  top: 3.5rem;
+  right: 0.5rem;
+  z-index: 9;
+  background-color: var(--color-raised-bg);
+  box-shadow: var(--shadow-raised);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--color-button-bg);
+  padding: var(--gap-md);
+
+  &.hidden {
+    transform: translateY(-100%);
+  }
 }
 </style>
