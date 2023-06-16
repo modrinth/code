@@ -20,6 +20,12 @@ pub struct FrontendSettings {
     pub collapsed_navigation: bool,
 }
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("settings")
+        .invoke_handler(tauri::generate_handler![settings_get, settings_set,])
+        .build()
+}
+
 // Get full settings
 // invoke('settings_get')
 #[tauri::command]

@@ -5,9 +5,10 @@ use std::path::PathBuf;
 
 use crate::event::emit::{emit_loading, init_loading};
 use crate::util::fetch::{fetch_advanced, fetch_json};
+use crate::util::jre::extract_java_majorminor_version;
 use crate::{
     state::JavaGlobals,
-    util::jre::{self, extract_java_majorminor_version, JavaVersion},
+    util::jre::{self, JavaVersion},
     LoadingBarType, State,
 };
 
@@ -15,13 +16,26 @@ pub const JAVA_8_KEY: &str = "JAVA_8";
 pub const JAVA_17_KEY: &str = "JAVA_17";
 pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
 
-// Autodetect JavaSettings default
-// Make a guess for what the default Java global settings should be
-pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
-    let mut java_8 = find_java8_jres().await?;
-    let mut java_17 = find_java17_jres().await?;
-    let mut java_18plus = find_java18plus_jres().await?;
+// Prefer using autodetect_java_globals if from Tauri, due to tauri::command bug
+pub async fn get_autodetect_java_globals() -> crate::Result<JavaGlobals> {
+    let jres = jre::get_all_jre().await?;
+    let java_8 = filter_java8_jres(jres.clone()).await?;
+    let java_17 = filter_java17_jres(jres.clone()).await?;
+    let java_18plus = filter_java18plus_jres(jres).await?;
+    let java_globals =
+        autodetect_java_globals(java_8, java_17, java_18plus).await?;
+    Ok(java_globals)
+}
 
+// Autodetect JavaSettings default
+// Using the supplied JavaVersions, autodetects the default JavaSettings
+// Make a guess for what the default Java global settings should be
+// Currently, this just pops the last one found
+pub async fn autodetect_java_globals(
+    mut java_8: Vec<JavaVersion>,
+    mut java_17: Vec<JavaVersion>,
+    mut java_18plus: Vec<JavaVersion>,
+) -> crate::Result<JavaGlobals> {
     // Simply select last one found for initial guess
     let mut java_globals = JavaGlobals::new();
     if let Some(jre) = java_8.pop() {
@@ -38,9 +52,10 @@ pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
 }
 
 // Searches for jres on the system that are 1.18 or higher
-pub async fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
+pub async fn filter_java18plus_jres(
+    jres: Vec<JavaVersion>,
+) -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.18")?;
-    let jres = jre::get_all_jre().await?;
     // Filter out JREs that are not 1.17 or higher
     Ok(jres
         .into_iter()
@@ -56,10 +71,10 @@ pub async fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
 }
 
 // Searches for jres on the system that are 1.8 exactly
-pub async fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
+pub async fn filter_java8_jres(
+    jres: Vec<JavaVersion>,
+) -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.8")?;
-    let jres = jre::get_all_jre().await?;
-
     // Filter out JREs that are not 1.8
     Ok(jres
         .into_iter()
@@ -75,10 +90,10 @@ pub async fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
 }
 
 // Searches for jres on the system that are 1.17 exactly
-pub async fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
+pub async fn filter_java17_jres(
+    jres: Vec<JavaVersion>,
+) -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.17")?;
-    let jres = jre::get_all_jre().await?;
-
     // Filter out JREs that are not 1.8
     Ok(jres
         .into_iter()

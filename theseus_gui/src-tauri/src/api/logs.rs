@@ -12,6 +12,19 @@ pub struct Logs {
 }
 */
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("logs")
+        .invoke_handler(tauri::generate_handler![
+            logs_get_logs,
+            logs_get_logs_by_datetime,
+            logs_get_stdout_by_datetime,
+            logs_get_stderr_by_datetime,
+            logs_delete_logs,
+            logs_delete_logs_by_datetime,
+        ])
+        .build()
+}
+
 /// Get all Logs for a profile, sorted by datetime
 #[tauri::command]
 pub async fn logs_get_logs(

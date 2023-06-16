@@ -1,5 +1,21 @@
 use crate::api::Result;
+use tauri::plugin::TauriPlugin;
 use theseus::prelude::*;
+
+pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
+    tauri::plugin::Builder::new("auth")
+        .invoke_handler(tauri::generate_handler![
+            auth_authenticate_begin_flow,
+            auth_authenticate_await_completion,
+            auth_cancel_flow,
+            auth_refresh,
+            auth_remove_user,
+            auth_has_user,
+            auth_users,
+            auth_get_user,
+        ])
+        .build()
+}
 
 /// Authenticate a user with Hydra - part 1
 /// This begins the authentication flow quasi-synchronously, returning a URL to visit (that the user will sign in at)

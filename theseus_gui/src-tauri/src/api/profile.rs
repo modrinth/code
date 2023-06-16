@@ -6,6 +6,31 @@ use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use uuid::Uuid;
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("profile")
+        .invoke_handler(tauri::generate_handler![
+            profile_remove,
+            profile_get,
+            profile_get_optimal_jre_key,
+            profile_list,
+            profile_check_installed,
+            profile_install,
+            profile_update_all,
+            profile_update_project,
+            profile_add_project_from_version,
+            profile_add_project_from_path,
+            profile_toggle_disable_project,
+            profile_remove_project,
+            profile_run,
+            profile_run_wait,
+            profile_run_credentials,
+            profile_run_wait_credentials,
+            profile_edit,
+            profile_edit_icon,
+        ])
+        .build()
+}
+
 // Remove a profile
 // invoke('profile_add_path',path)
 #[tauri::command]

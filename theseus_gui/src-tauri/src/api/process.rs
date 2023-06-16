@@ -4,6 +4,24 @@ use crate::api::Result;
 use theseus::prelude::*;
 use uuid::Uuid;
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("process")
+        .invoke_handler(tauri::generate_handler![
+            process_has_finished_by_uuid,
+            process_get_exit_status_by_uuid,
+            process_get_all_uuids,
+            process_get_all_running_uuids,
+            process_get_uuids_by_profile_path,
+            process_get_all_running_profile_paths,
+            process_get_all_running_profiles,
+            process_get_stderr_by_uuid,
+            process_get_stdout_by_uuid,
+            process_kill_by_uuid,
+            process_wait_for_by_uuid,
+        ])
+        .build()
+}
+
 // Checks if a process has finished by process UUID
 #[tauri::command]
 pub async fn process_has_finished_by_uuid(uuid: Uuid) -> Result<bool> {

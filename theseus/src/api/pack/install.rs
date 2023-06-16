@@ -1,247 +1,53 @@
-use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{
-    emit_loading, init_loading, init_or_edit_loading,
-    loading_try_for_each_concurrent,
+    emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
 };
-use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{
-    LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
-};
-use crate::util::fetch::{
-    fetch, fetch_advanced, fetch_json, fetch_mirrors, write, write_cached_icon,
-};
+use crate::event::LoadingBarType;
+use crate::pack::install_from::{EnvType, PackFile, PackFileHash};
+use crate::state::{LinkedData, ProfileInstallStage, SideType};
+use crate::util::fetch::{fetch_mirrors, write};
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
-use reqwest::Method;
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
-use tokio::fs;
 
-#[derive(Serialize, Deserialize, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
-struct PackFormat {
-    pub game: String,
-    pub format_version: i32,
-    pub version_id: String,
-    pub name: String,
-    pub summary: Option<String>,
-    pub files: Vec<PackFile>,
-    pub dependencies: HashMap<PackDependency, String>,
-}
+use super::install_from::{
+    generate_pack_from_file, generate_pack_from_version_id,
+    CreatePackDescription, CreatePackLocation, PackDependency, PackFormat,
+};
 
-#[derive(Serialize, Deserialize, Eq, PartialEq)]
-#[serde(rename_all = "camelCase")]
-struct PackFile {
-    pub path: String,
-    pub hashes: HashMap<PackFileHash, String>,
-    pub env: Option<HashMap<EnvType, SideType>>,
-    pub downloads: Vec<String>,
-    pub file_size: u32,
-}
-
-#[derive(Serialize, Deserialize, Eq, PartialEq, Hash)]
-#[serde(rename_all = "camelCase", from = "String")]
-enum PackFileHash {
-    Sha1,
-    Sha512,
-    Unknown(String),
-}
-
-impl From<String> for PackFileHash {
-    fn from(s: String) -> Self {
-        return match s.as_str() {
-            "sha1" => PackFileHash::Sha1,
-            "sha512" => PackFileHash::Sha512,
-            _ => PackFileHash::Unknown(s),
-        };
-    }
-}
-
-#[derive(Serialize, Deserialize, Eq, PartialEq, Hash)]
-#[serde(rename_all = "camelCase")]
-enum EnvType {
-    Client,
-    Server,
-}
-
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
-#[serde(rename_all = "kebab-case")]
-enum PackDependency {
-    Forge,
-    FabricLoader,
-    QuiltLoader,
-    Minecraft,
-}
-
-#[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn install_pack_from_version_id(
-    project_id: String,
-    version_id: String,
-    title: String,
-    icon_url: Option<String>,
-) -> crate::Result<PathBuf> {
-    let state = State::get().await?;
-    let profile = crate::api::profile_create::profile_create(
-        title.clone(),
-        "1.19.4".to_string(),
-        ModLoader::Vanilla,
-        None,
-        None,
-        icon_url.clone(),
-        Some(LinkedData {
-            project_id: Some(project_id),
-            version_id: Some(version_id.clone()),
-        }),
-        Some(true),
-    )
-    .await?;
-
-    let loading_bar = init_loading(
-        LoadingBarType::PackFileDownload {
-            profile_path: profile.clone(),
-            pack_name: title,
-            icon: icon_url,
-            pack_version: version_id.clone(),
-        },
-        100.0,
-        "Downloading pack file",
-    )
-    .await?;
-
-    emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
-    let version: ModrinthVersion = fetch_json(
-        Method::GET,
-        &format!("{}version/{}", MODRINTH_API_URL, version_id),
-        None,
-        None,
-        &state.fetch_semaphore,
-    )
-    .await?;
-    emit_loading(&loading_bar, 10.0, None).await?;
-
-    let (url, hash) =
-        if let Some(file) = version.files.iter().find(|x| x.primary) {
-            Some((file.url.clone(), file.hashes.get("sha1")))
-        } else {
-            version
-                .files
-                .first()
-                .map(|file| (file.url.clone(), file.hashes.get("sha1")))
-        }
-        .ok_or_else(|| {
-            crate::ErrorKind::InputError(
-                "Specified version has no files".to_string(),
-            )
-        })?;
-
-    let file = fetch_advanced(
-        Method::GET,
-        &url,
-        hash.map(|x| &**x),
-        None,
-        None,
-        Some((&loading_bar, 70.0)),
-        &state.fetch_semaphore,
-    )
-    .await?;
-    emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
-
-    let project: ModrinthProject = fetch_json(
-        Method::GET,
-        &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
-        None,
-        None,
-        &state.fetch_semaphore,
-    )
-    .await?;
-
-    emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
-    let icon = if let Some(icon_url) = project.icon_url {
-        let state = State::get().await?;
-        let icon_bytes = fetch(&icon_url, None, &state.fetch_semaphore).await?;
-
-        let filename = icon_url.rsplit('/').next();
-
-        if let Some(filename) = filename {
-            Some(
-                write_cached_icon(
-                    filename,
-                    &state.directories.caches_dir(),
-                    icon_bytes,
-                    &state.io_semaphore,
-                )
-                .await?,
-            )
-        } else {
-            None
-        }
-    } else {
-        None
-    };
-    emit_loading(&loading_bar, 10.0, None).await?;
-
-    install_pack(
-        file,
-        icon,
-        Some(project.title),
-        Some(version.project_id),
-        Some(version.id),
-        Some(loading_bar),
-        profile,
-    )
-    .await
-}
-
-#[tracing::instrument]
-#[theseus_macros::debug_pin]
-pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
-    let file = fs::read(&path).await?;
-
-    let file_name = path
-        .file_name()
-        .unwrap_or_default()
-        .to_string_lossy()
-        .to_string();
-
-    let profile = crate::api::profile_create::profile_create(
-        file_name,
-        "1.19.4".to_string(),
-        ModLoader::Vanilla,
-        None,
-        None,
-        None,
-        None,
-        Some(true),
-    )
-    .await?;
-
-    install_pack(
-        bytes::Bytes::from(file),
-        None,
-        None,
-        None,
-        None,
-        None,
-        profile,
-    )
-    .await
-}
-
-#[tracing::instrument(skip(file))]
-#[theseus_macros::debug_pin]
-async fn install_pack(
-    file: bytes::Bytes,
-    icon: Option<PathBuf>,
-    override_title: Option<String>,
-    project_id: Option<String>,
-    version_id: Option<String>,
-    existing_loading_bar: Option<LoadingBarId>,
+pub async fn install_pack(
+    location: CreatePackLocation,
     profile: PathBuf,
 ) -> crate::Result<PathBuf> {
+    // Get file from description
+    let description: CreatePackDescription = match location {
+        CreatePackLocation::FromVersionId {
+            project_id,
+            version_id,
+            title,
+            icon_url,
+        } => {
+            generate_pack_from_version_id(
+                project_id, version_id, title, icon_url, profile,
+            )
+            .await?
+        }
+        CreatePackLocation::FromFile { path } => {
+            generate_pack_from_file(path, profile).await?
+        }
+    };
+
+    let file = description.file;
+    let icon = description.icon;
+    let override_title = description.override_title;
+    let project_id = description.project_id;
+    let version_id = description.version_id;
+    let existing_loading_bar = description.existing_loading_bar;
+    let profile = description.profile;
+
     let state = &State::get().await?;
 
     let result = async {
