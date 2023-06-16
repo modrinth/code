@@ -146,7 +146,6 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         .await?
         .into_iter()
         .collect();
-    println!("{:?}", j);
     Ok(j)
 }
 
