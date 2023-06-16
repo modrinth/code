@@ -69,14 +69,14 @@ fn main() {
                 use api::window_ext::WindowExt;
                 let win = app.get_window("main").unwrap();
                 win.set_transparent_titlebar(true);
-                win.position_traffic_lights(0.0, 0.0);
+                win.position_traffic_lights(9.0, 16.0);
                 Ok(())
             })
             .on_window_event(|e| {
                 use api::window_ext::WindowExt;
                 if let WindowEvent::Resized(..) = e.event() {
                     let win = e.window();
-                    win.position_traffic_lights(0., 0.);
+                    win.position_traffic_lights(9.0, 16.0);
                 }
             })
     }

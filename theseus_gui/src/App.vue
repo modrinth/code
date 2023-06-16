@@ -240,7 +240,7 @@ document.querySelector('body').addEventListener('click', function (e) {
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: var(--gap-md);
-  padding-top: calc(var(--gap-md) + 3.25rem);
+  padding-top: calc(var(--gap-md) + 1.75rem);
 
   &.expanded {
     --sidebar-width: 13rem;

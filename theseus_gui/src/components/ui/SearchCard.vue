@@ -258,28 +258,6 @@ async function install() {
   }
 }
 
-.badge {
-  display: flex;
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  font-weight: 500;
-  align-items: center;
-  background-color: var(--color-bg);
-  padding-block: var(--gap-sm);
-  padding-inline: var(--gap-lg);
-
-  svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-right: 0.5rem;
-  }
-
-  &.featured {
-    background-color: var(--color-brand-highlight);
-    color: var(--color-contrast);
-  }
-}
-
 .button-group {
   display: inline-flex;
   flex-direction: row;

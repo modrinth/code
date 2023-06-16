@@ -144,7 +144,7 @@ const calculateCardsPerRow = () => {
   // Convert container width from pixels to rem
   const containerWidthInRem = containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize);
   maxInstancesPerRow.value = Math.floor((containerWidthInRem - 10) / 10);
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem - 5) / 20);
+  maxProjectsPerRow.value = Math.floor((containerWidthInRem - 5) / 18);
 }
 
 onMounted(() => {
@@ -181,6 +181,7 @@ onUnmounted(() => {
       </section>
       <section v-else ref="modsRow" class="projects">
         <ProjectCard
+          class="item"
           v-for="(instance) in row.instances.slice(0, maxProjectsPerRow)"
           :key="instance?.project_id"
           :project="instance"
@@ -235,19 +236,22 @@ onUnmounted(() => {
   .header {
     width: 100%;
     margin-bottom: 1rem;
-    gap: var(--gap-sm);
+    gap: var(--gap-xs);
     display: flex;
     flex-direction: row;
     align-items: center;
 
     a {
       margin: 0;
-      font-size: 1rem;
+      font-size: var(--font-size-lg);
+      font-weight: bolder;
       white-space: nowrap;
       color: var(--color-contrast);
     }
 
     svg {
+      height: 1.5rem;
+      width: 1.5rem;
       color: var(--color-contrast);
     }
   }
@@ -262,8 +266,13 @@ onUnmounted(() => {
   .projects {
     display: grid;
     width: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
     grid-gap: 1rem;
+
+    .item {
+      width: 100%;
+      max-width: 100%;
+    }
   }
 }
 </style>

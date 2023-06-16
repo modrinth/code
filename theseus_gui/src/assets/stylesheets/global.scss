@@ -53,3 +53,25 @@ input {
   gap: 1rem;
   color: var(--color-contrast);
 }
+
+.badge {
+  display: flex;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  align-items: center;
+  background-color: var(--color-bg);
+  padding-block: var(--gap-sm);
+  padding-inline: var(--gap-lg);
+  width: min-content;
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-right: 0.5rem;
+  }
+
+  &.featured {
+    background-color: var(--color-brand-highlight);
+    color: var(--color-contrast);
+  }
+}
