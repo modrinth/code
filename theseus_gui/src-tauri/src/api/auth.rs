@@ -16,6 +16,11 @@ pub async fn auth_authenticate_await_completion() -> Result<Credentials> {
     Ok(auth::authenticate_await_complete_flow().await?)
 }
 
+#[tauri::command]
+pub async fn auth_cancel_flow() -> Result<()> {
+    Ok(auth::cancel_flow().await?)
+}
+
 /// Refresh some credentials using Hydra, if needed
 // invoke('auth_refresh',user)
 #[tauri::command]

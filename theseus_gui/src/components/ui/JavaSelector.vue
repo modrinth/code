@@ -2,6 +2,7 @@
   <JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
   <div class="toggle-setting">
     <input
+      autocomplete="off"
       :disabled="props.disabled"
       :value="props.modelValue ? props.modelValue.path : ''"
       type="text"
@@ -19,40 +20,34 @@
     <span class="installation-buttons">
       <Button
         :disabled="props.disabled"
-        :icon-only="compact"
         @click="$refs.detectJavaModal.show(props.version, props.modelValue)"
       >
         <SearchIcon />
-        {{ compact ? '' : 'Auto detect' }}
+        Auto detect
       </Button>
-      <Button :disabled="props.disabled" :icon-only="compact" @click="handleJavaFileInput()">
+      <Button :disabled="props.disabled" @click="handleJavaFileInput()">
         <FolderSearchIcon />
-        {{ compact ? '' : 'Browse' }}
+        Browse
       </Button>
-      <Button :disabled="props.disabled" :icon-only="compact" @click="testJava">
+      <Button v-if="testingJava" disabled> Testing... </Button>
+      <Button v-else-if="testingJavaSuccess === true">
+        <CheckIcon class="test-success" />
+        Success
+      </Button>
+      <Button v-else-if="testingJavaSuccess === false">
+        <XIcon class="test-fail" />
+        Failed
+      </Button>
+      <Button v-else :disabled="props.disabled" @click="testJava">
         <PlayIcon />
-        {{ compact ? '' : 'Test' }}
+        Test
       </Button>
-      <AnimatedLogo v-if="testingJava === true" class="testing-loader" />
-      <CheckIcon
-        v-else-if="testingJavaSuccess === true && testingJava === false"
-        class="test-success"
-      />
-      <XIcon v-else-if="testingJavaSuccess === false && testingJava === false" class="test-fail" />
     </span>
   </div>
 </template>
 
 <script setup>
-import {
-  Button,
-  SearchIcon,
-  PlayIcon,
-  CheckIcon,
-  XIcon,
-  AnimatedLogo,
-  FolderSearchIcon,
-} from 'omorphia'
+import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
 import { get_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
@@ -77,12 +72,7 @@ const props = defineProps({
     type: String,
     required: false,
     default: null,
-  },
-  compact: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
+  }
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -146,16 +136,5 @@ async function handleJavaFileInput() {
 
 .test-fail {
   color: var(--color-red);
-}
-</style>
-<style lang="scss">
-.testing-loader {
-  height: 1rem !important;
-  width: 1rem !important;
-
-  svg {
-    height: inherit !important;
-    width: inherit !important;
-  }
 }
 </style>

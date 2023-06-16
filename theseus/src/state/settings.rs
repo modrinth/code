@@ -26,6 +26,8 @@ pub struct Settings {
     pub max_concurrent_writes: usize,
     pub version: u32,
     pub collapsed_navigation: bool,
+    #[serde(default)]
+    pub developer_mode: bool,
 }
 
 impl Default for Settings {
@@ -43,6 +45,7 @@ impl Default for Settings {
             max_concurrent_writes: 10,
             version: CURRENT_FORMAT_VERSION,
             collapsed_navigation: false,
+            developer_mode: false,
         }
     }
 }
@@ -118,17 +121,12 @@ pub enum Theme {
 /// Minecraft memory settings
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct MemorySettings {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minimum: Option<u32>,
     pub maximum: u32,
 }
 
 impl Default for MemorySettings {
     fn default() -> Self {
-        Self {
-            minimum: None,
-            maximum: 2048,
-        }
+        Self { maximum: 2048 }
     }
 }
 

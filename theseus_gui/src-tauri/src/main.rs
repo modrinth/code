@@ -5,6 +5,7 @@
 
 use theseus::prelude::*;
 
+use tauri::{Manager, WindowEvent};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -20,28 +21,13 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
-// cfg only on mac os
-// disables mouseover and fixes a random crash error only fixed by recent versions of macos
-#[cfg(target_os = "macos")]
-#[tauri::command]
-async fn should_disable_mouseover() -> bool {
-    // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
-    let os = os_info::get();
-    if let os_info::Version::Semantic(major, minor, _) = os.version() {
-        if *major >= 12 && *minor >= 3 {
-            // Mac os version is 12.3 or higher, we allow mouseover
-            return false;
-        }
-    }
-    true
-}
-#[cfg(not(target_os = "macos"))]
-#[tauri::command]
-async fn should_disable_mouseover() -> bool {
-    false
-}
-
 use tracing_subscriber::prelude::*;
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    args: Vec<String>,
+    cwd: String,
+}
 
 fn main() {
     /*
@@ -69,79 +55,108 @@ fn main() {
     tracing::subscriber::set_global_default(subscriber)
         .expect("setting default subscriber failed");
 
-    tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![
-            initialize_state,
-            should_disable_mouseover,
-            api::progress_bars_list,
-            api::profile_create::profile_create_empty,
-            api::profile_create::profile_create,
-            api::profile::profile_remove,
-            api::profile::profile_get,
-            api::profile::profile_get_optimal_jre_key,
-            api::profile::profile_list,
-            api::profile::profile_install,
-            api::profile::profile_update_all,
-            api::profile::profile_update_project,
-            api::profile::profile_add_project_from_version,
-            api::profile::profile_add_project_from_path,
-            api::profile::profile_toggle_disable_project,
-            api::profile::profile_remove_project,
-            api::profile::profile_run,
-            api::profile::profile_run_wait,
-            api::profile::profile_run_credentials,
-            api::profile::profile_run_wait_credentials,
-            api::profile::profile_edit,
-            api::profile::profile_edit_icon,
-            api::profile::profile_check_installed,
-            api::pack::pack_install_version_id,
-            api::pack::pack_install_file,
-            api::auth::auth_authenticate_begin_flow,
-            api::auth::auth_authenticate_await_completion,
-            api::auth::auth_refresh,
-            api::auth::auth_remove_user,
-            api::auth::auth_has_user,
-            api::auth::auth_users,
-            api::auth::auth_get_user,
-            api::tags::tags_get_categories,
-            api::tags::tags_get_donation_platforms,
-            api::tags::tags_get_game_versions,
-            api::tags::tags_get_loaders,
-            api::tags::tags_get_report_types,
-            api::tags::tags_get_tag_bundle,
-            api::settings::settings_get,
-            api::settings::settings_set,
-            api::jre::jre_get_all_jre,
-            api::jre::jre_autodetect_java_globals,
-            api::jre::jre_find_jre_18plus_jres,
-            api::jre::jre_find_jre_17_jres,
-            api::jre::jre_find_jre_8_jres,
-            api::jre::jre_validate_globals,
-            api::jre::jre_get_jre,
-            api::jre::jre_auto_install_java,
-            api::jre::jre_get_max_memory,
-            api::process::process_get_all_uuids,
-            api::process::process_get_all_running_uuids,
-            api::process::process_get_uuids_by_profile_path,
-            api::process::process_get_all_running_profile_paths,
-            api::process::process_get_all_running_profiles,
-            api::process::process_get_exit_status_by_uuid,
-            api::process::process_has_finished_by_uuid,
-            api::process::process_get_stderr_by_uuid,
-            api::process::process_get_stdout_by_uuid,
-            api::process::process_kill_by_uuid,
-            api::process::process_wait_for_by_uuid,
-            api::metadata::metadata_get_game_versions,
-            api::metadata::metadata_get_fabric_versions,
-            api::metadata::metadata_get_forge_versions,
-            api::metadata::metadata_get_quilt_versions,
-            api::logs::logs_get_logs,
-            api::logs::logs_get_logs_by_datetime,
-            api::logs::logs_get_stdout_by_datetime,
-            api::logs::logs_get_stderr_by_datetime,
-            api::logs::logs_delete_logs,
-            api::logs::logs_delete_logs_by_datetime,
-        ])
+    let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            app.emit_all("single-instance", Payload { args: argv, cwd })
+                .unwrap();
+        }))
+        .plugin(tauri_plugin_window_state::Builder::default().build());
+
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder
+            .setup(|app| {
+                use api::window_ext::WindowExt;
+                let win = app.get_window("main").unwrap();
+                win.set_transparent_titlebar(true);
+                win.position_traffic_lights(0.0, 0.0);
+                Ok(())
+            })
+            .on_window_event(|e| {
+                use api::window_ext::WindowExt;
+                if let WindowEvent::Resized(..) = e.event() {
+                    let win = e.window();
+                    win.position_traffic_lights(0., 0.);
+                }
+            })
+    }
+
+    builder = builder.invoke_handler(tauri::generate_handler![
+        initialize_state,
+        api::progress_bars_list,
+        api::profile_create::profile_create_empty,
+        api::profile_create::profile_create,
+        api::profile::profile_remove,
+        api::profile::profile_get,
+        api::profile::profile_get_optimal_jre_key,
+        api::profile::profile_list,
+        api::profile::profile_install,
+        api::profile::profile_update_all,
+        api::profile::profile_update_project,
+        api::profile::profile_add_project_from_version,
+        api::profile::profile_add_project_from_path,
+        api::profile::profile_toggle_disable_project,
+        api::profile::profile_remove_project,
+        api::profile::profile_run,
+        api::profile::profile_run_wait,
+        api::profile::profile_run_credentials,
+        api::profile::profile_run_wait_credentials,
+        api::profile::profile_edit,
+        api::profile::profile_edit_icon,
+        api::profile::profile_check_installed,
+        api::pack::pack_install_version_id,
+        api::pack::pack_install_file,
+        api::auth::auth_authenticate_begin_flow,
+        api::auth::auth_authenticate_await_completion,
+        api::auth::auth_cancel_flow,
+        api::auth::auth_refresh,
+        api::auth::auth_remove_user,
+        api::auth::auth_has_user,
+        api::auth::auth_users,
+        api::auth::auth_get_user,
+        api::tags::tags_get_categories,
+        api::tags::tags_get_donation_platforms,
+        api::tags::tags_get_game_versions,
+        api::tags::tags_get_loaders,
+        api::tags::tags_get_report_types,
+        api::tags::tags_get_tag_bundle,
+        api::settings::settings_get,
+        api::settings::settings_set,
+        api::jre::jre_get_all_jre,
+        api::jre::jre_autodetect_java_globals,
+        api::jre::jre_find_jre_18plus_jres,
+        api::jre::jre_find_jre_17_jres,
+        api::jre::jre_find_jre_8_jres,
+        api::jre::jre_validate_globals,
+        api::jre::jre_get_jre,
+        api::jre::jre_auto_install_java,
+        api::jre::jre_get_max_memory,
+        api::process::process_get_all_uuids,
+        api::process::process_get_all_running_uuids,
+        api::process::process_get_uuids_by_profile_path,
+        api::process::process_get_all_running_profile_paths,
+        api::process::process_get_all_running_profiles,
+        api::process::process_get_exit_status_by_uuid,
+        api::process::process_has_finished_by_uuid,
+        api::process::process_get_stderr_by_uuid,
+        api::process::process_get_stdout_by_uuid,
+        api::process::process_kill_by_uuid,
+        api::process::process_wait_for_by_uuid,
+        api::metadata::metadata_get_game_versions,
+        api::metadata::metadata_get_fabric_versions,
+        api::metadata::metadata_get_forge_versions,
+        api::metadata::metadata_get_quilt_versions,
+        api::logs::logs_get_logs,
+        api::logs::logs_get_logs_by_datetime,
+        api::logs::logs_get_stdout_by_datetime,
+        api::logs::logs_get_stderr_by_datetime,
+        api::logs::logs_delete_logs,
+        api::logs::logs_delete_logs_by_datetime,
+        api::utils::show_in_folder,
+        api::utils::should_disable_mouseover,
+    ]);
+
+    builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -96,44 +96,57 @@ pub async fn profile_create(
     let path = canonicalize(&path)?;
     let mut profile =
         Profile::new(uuid, name, game_version, path.clone()).await?;
-    if let Some(ref icon) = icon {
-        let bytes = tokio::fs::read(icon).await?;
-        profile
-            .set_icon(
-                &state.directories.caches_dir(),
-                &state.io_semaphore,
-                bytes::Bytes::from(bytes),
-                &icon.to_string_lossy(),
-            )
-            .await?;
+    let result = async {
+        if let Some(ref icon) = icon {
+            let bytes = tokio::fs::read(icon).await?;
+            profile
+                .set_icon(
+                    &state.directories.caches_dir(),
+                    &state.io_semaphore,
+                    bytes::Bytes::from(bytes),
+                    &icon.to_string_lossy(),
+                )
+                .await?;
+        }
+
+        profile.metadata.icon_url = icon_url;
+        if let Some(loader_version) = loader {
+            profile.metadata.loader = modloader;
+            profile.metadata.loader_version = Some(loader_version);
+        }
+
+        profile.metadata.linked_data = linked_data;
+
+        emit_profile(
+            uuid,
+            path.clone(),
+            &profile.metadata.name,
+            ProfilePayloadType::Created,
+        )
+        .await?;
+
+        {
+            let mut profiles = state.profiles.write().await;
+            profiles.insert(profile.clone()).await?;
+        }
+
+        if !skip_install_profile.unwrap_or(false) {
+            crate::launcher::install_minecraft(&profile, None).await?;
+        }
+        State::sync().await?;
+
+        Ok(path)
     }
-    profile.metadata.icon_url = icon_url;
-    if let Some(loader_version) = loader {
-        profile.metadata.loader = modloader;
-        profile.metadata.loader_version = Some(loader_version);
+    .await;
+
+    match result {
+        Ok(profile) => Ok(profile),
+        Err(err) => {
+            let _ = crate::api::profile::remove(&profile.path).await;
+
+            Err(err)
+        }
     }
-
-    profile.metadata.linked_data = linked_data;
-
-    emit_profile(
-        uuid,
-        path.clone(),
-        &profile.metadata.name,
-        ProfilePayloadType::Created,
-    )
-    .await?;
-
-    {
-        let mut profiles = state.profiles.write().await;
-        profiles.insert(profile.clone()).await?;
-    }
-
-    if !skip_install_profile.unwrap_or(false) {
-        crate::launcher::install_minecraft(&profile, None).await?;
-    }
-    State::sync().await?;
-
-    Ok(path)
 }
 
 #[tracing::instrument]

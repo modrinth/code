@@ -1,5 +1,13 @@
 <template>
-  <Card class="card button-base" @click="$router.push(`/project/${project.project_id}/`)">
+  <Card
+    class="card button-base"
+    @click="
+      $router.push({
+        path: `/project/${project.project_id}/`,
+        query: { i: props.instance ? props.instance.path : undefined },
+      })
+    "
+  >
     <div class="icon">
       <Avatar :src="project.icon_url" size="md" class="search-icon" />
     </div>
@@ -117,14 +125,7 @@ const props = defineProps({
 })
 
 const installing = ref(false)
-
-const installed = ref(
-  props.instance
-    ? Object.values(props.instance.projects).some(
-        (p) => p.metadata?.project?.id === props.project.project_id
-      )
-    : false
-)
+const installed = ref(props.project.installed)
 
 async function install() {
   installing.value = true
@@ -140,7 +141,7 @@ async function install() {
     queuedVersionData = versions.find(
       (v) =>
         v.game_versions.includes(props.instance.metadata.game_version) &&
-        v.loaders.includes(props.instance.metadata.loader)
+        (props.project.project_type !== 'mod' || v.loaders.includes(props.instance.metadata.loader))
     )
   }
 
@@ -152,11 +153,19 @@ async function install() {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === props.project.project_id)
     ) {
-      await packInstall(queuedVersionData.id, props.project.title, props.project.icon_url).catch(
-        handleError
-      )
+      await packInstall(
+        props.project.project_id,
+        queuedVersionData.id,
+        props.project.title,
+        props.project.icon_url
+      ).catch(handleError)
     } else {
-      props.confirmModal.show(queuedVersionData.id)
+      props.confirmModal.show(
+        props.project.project_id,
+        queuedVersionData.id,
+        props.project.title,
+        props.project.icon_url
+      )
     }
   } else {
     if (props.instance) {

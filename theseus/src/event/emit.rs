@@ -175,7 +175,7 @@ pub async fn emit_loading(
             );
         }
 
-        // Emit event to tauri
+        //Emit event to tauri
         #[cfg(feature = "tauri")]
         event_state
             .app

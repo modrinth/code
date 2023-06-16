@@ -7,6 +7,7 @@ import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import dayjs from 'dayjs'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -20,15 +21,18 @@ breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 const recentInstances = shallowRef([])
 
 const getInstances = async () => {
-  filter.value = ''
   const profiles = await list(true).catch(handleError)
-  recentInstances.value = Object.values(profiles)
-
-  const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
-  excludeIds.forEach((id, index) => {
-    filter.value += `NOT"project_id"="${id}"`
-    if (index < excludeIds.length - 1) filter.value += ' AND '
+  recentInstances.value = Object.values(profiles).sort((a, b) => {
+    return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
   })
+
+  let filters = []
+  for (const instance of recentInstances.value) {
+    if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
+      filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
+    }
+  }
+  filter.value = filters.join(' AND ')
 }
 
 const getFeaturedModpacks = async () => {
@@ -40,7 +44,7 @@ const getFeaturedModpacks = async () => {
 }
 const getFeaturedMods = async () => {
   const response = await useFetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows&filters=${filter.value}`,
+    'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
     'featured mods'
   )
   featuredMods.value = response.hits
@@ -61,9 +65,26 @@ onUnmounted(() => unlisten())
 
 <template>
   <div class="page-container">
-    <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
-    <RowDisplay label="Popular packs" :instances="featuredModpacks" :can-paginate="true" />
-    <RowDisplay label="Popular mods" :instances="featuredMods" :can-paginate="true" />
+    <RowDisplay
+      :instances="[
+        {
+          label: 'Jump back in',
+          instances: recentInstances,
+          downloaded: true,
+        },
+        {
+          label: 'Popular packs',
+          instances: featuredModpacks,
+          downloaded: false,
+        },
+        {
+          label: 'Popular mods',
+          instances: featuredMods,
+          downloaded: false,
+        },
+      ]"
+      :can-paginate="true"
+    />
   </div>
 </template>
 

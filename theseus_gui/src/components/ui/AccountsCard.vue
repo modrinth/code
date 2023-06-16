@@ -14,7 +14,7 @@
       <div class="text no-select">
         {{ selectedAccount ? selectedAccount.username : 'Offline' }}
       </div>
-      <p class="no-select">
+      <p class="accounts-text no-select">
         <UsersIcon />
         Accounts
       </p>
@@ -33,13 +33,13 @@
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
         </div>
-        <Button icon-only color="raised" @click="logout(selectedAccount.id)">
-          <XIcon />
+        <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.id)">
+          <TrashIcon />
         </Button>
       </div>
       <div v-else class="logged-out account">
         <h4>Not signed in</h4>
-        <Button icon-only color="primary" @click="login()">
+        <Button v-tooltip="'Log in'" icon-only color="primary" @click="login()">
           <LogInIcon />
         </Button>
       </div>
@@ -49,8 +49,8 @@
             <Avatar :src="account.profile_picture" class="icon" />
             <p>{{ account.username }}</p>
           </Button>
-          <Button icon-only @click="logout(account.id)">
-            <XIcon />
+          <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
+            <TrashIcon />
           </Button>
         </div>
       </div>
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, XIcon, UsersIcon, LogInIcon } from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
 import { ref, defineProps, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
@@ -89,7 +89,7 @@ const appendProfiles = (accounts) => {
   return accounts.map((account) => {
     return {
       ...account,
-      profile_picture: `https://crafthead.net/helm/${account.id.replace(/-/g, '')}/128`,
+      profile_picture: `https://mc-heads.net/avatar/${account.id}/128`,
     }
   })
 }
@@ -197,6 +197,11 @@ onBeforeUnmount(() => {
   align-items: center;
   text-align: left;
   padding: 0.5rem 1rem;
+
+  h4,
+  p {
+    margin: 0;
+  }
 }
 
 .account-card {
@@ -302,5 +307,12 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.accounts-text {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
 }
 </style>

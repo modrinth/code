@@ -1,19 +1,21 @@
 <script setup>
-import { onUnmounted, ref, useSlots } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
+import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
-import { run, list } from '@/helpers/profile'
+import { list, remove, run } from '@/helpers/profile'
 import {
-  kill_by_uuid,
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
+  kill_by_uuid,
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
+import { showInFolder } from '@/helpers/utils.js'
+import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 
 const props = defineProps({
   instance: {
@@ -22,18 +24,25 @@ const props = defineProps({
       return {}
     },
   },
-  small: {
-    type: Boolean,
-    default: false,
-  },
 })
 
 const confirmModal = ref(null)
+const modInstallModal = ref(null)
 const playing = ref(false)
 
 const uuid = ref(null)
-const modLoading = ref(false)
-const slots = useSlots()
+const modLoading = ref(
+  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
+)
+
+watch(
+  () => props.instance,
+  () => {
+    modLoading.value = props.instance.install_stage
+      ? props.instance.install_stage !== 'installed'
+      : false
+  }
+)
 
 const router = useRouter()
 
@@ -58,7 +67,7 @@ const checkProcess = async () => {
 }
 
 const install = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   modLoading.value = true
   const versions = await useFetch(
     `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
@@ -74,25 +83,30 @@ const install = async (e) => {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
     ) {
-      try {
-        modLoading.value = true
-        await pack_install(versions[0].id, props.instance.title, props.instance.icon_url).catch(
-          handleError
-        )
-        modLoading.value = false
-      } catch (err) {
-        console.error(err)
-        modLoading.value = false
-      }
-    } else confirmModal.value.show(versions[0].id, props.instance.title, props.instance.icon_url)
+      modLoading.value = true
+      await pack_install(
+        props.instance.project_id,
+        versions[0].id,
+        props.instance.title,
+        props.instance.icon_url
+      ).catch(handleError)
+      modLoading.value = false
+    } else
+      confirmModal.value.show(
+        props.instance.project_id,
+        versions[0].id,
+        props.instance.title,
+        props.instance.icon_url
+      )
+  } else {
+    modInstallModal.value.show(props.instance.project_id, versions)
   }
 
   modLoading.value = false
-  // TODO: Add condition for installing a mod
 }
 
 const play = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   modLoading.value = true
   uuid.value = await run(props.instance.path).catch(handleError)
   modLoading.value = false
@@ -100,27 +114,47 @@ const play = async (e) => {
 }
 
 const stop = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   playing.value = false
 
-  try {
-    // If we lost the uuid for some reason, such as a user navigating
-    // from-then-back to this page, we will get all uuids by the instance path.
-    // For-each uuid, kill the process.
-    if (!uuid.value) {
-      const uuids = await get_uuids_by_profile_path(props.instance.path).catch(handleError)
-      uuid.value = uuids[0]
-      uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
-    } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
-  } catch (err) {
-    // Theseus currently throws:
-    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
-    // For now, we will catch and just warn
-    console.warn(err)
-  }
+  // If we lost the uuid for some reason, such as a user navigating
+  // from-then-back to this page, we will get all uuids by the instance path.
+  // For-each uuid, kill the process.
+  if (!uuid.value) {
+    const uuids = await get_uuids_by_profile_path(props.instance.path).catch(handleError)
+    uuid.value = uuids[0]
+    uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
+  } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
 
   uuid.value = null
 }
+
+const deleteInstance = async () => {
+  await remove(props.instance.path).catch(handleError)
+}
+
+const openFolder = async () => {
+  await showInFolder(props.instance.path)
+}
+
+const addContent = async () => {
+  await router.push({
+    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    query: { i: props.instance.path },
+  })
+}
+
+defineExpose({
+  install,
+  playing,
+  play,
+  stop,
+  seeInstance,
+  openFolder,
+  deleteInstance,
+  addContent,
+  instance: props.instance,
+})
 
 const unlisten = await process_listener((e) => {
   if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
@@ -131,49 +165,15 @@ onUnmounted(() => unlisten())
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card" :class="{ 'button-base': !slots.content }">
-      <div
-        class="instance-small-card__description"
-        :class="{ 'button-base': slots.content }"
-        @click="seeInstance"
-      >
-        <Avatar
-          :src="
-            !props.instance.metadata.icon ||
-            (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
-              ? props.instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
-          "
-          :alt="props.instance.metadata.name"
-          size="sm"
-        />
-        <div class="instance-small-card__info">
-          <span class="title">{{ props.instance.metadata.name }}</span>
-          {{
-            props.instance.metadata.loader.charAt(0).toUpperCase() +
-            props.instance.metadata.loader.slice(1)
-          }}
-          {{ props.instance.metadata.game_version }}
-        </div>
-      </div>
-      <div v-if="slots.content" class="instance-small-card__content">
-        <slot name="content" />
-      </div>
-    </Card>
-    <Card
-      v-else
-      class="instance-card-item button-base"
-      @click="seeInstance"
-      @mouseenter="checkProcess"
-    >
+    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
-        size="none"
+        size="sm"
         :src="
           props.instance.metadata
             ? !props.instance.metadata.icon ||
               (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
               ? props.instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
+              : convertFileSrc(props.instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
@@ -187,28 +187,27 @@ onUnmounted(() => unlisten())
         </p>
       </div>
     </Card>
-    <template v-if="!props.small">
-      <div
-        v-if="props.instance.metadata && playing === false && modLoading === false"
-        class="install cta button-base"
-        @click="play"
-      >
-        <PlayIcon />
-      </div>
-      <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-        <AnimatedLogo class="loading-indicator" />
-      </div>
-      <div
-        v-else-if="playing === true"
-        class="stop cta button-base"
-        @click="stop"
-        @mousehover="checkProcess"
-      >
-        <XIcon />
-      </div>
-      <div v-else class="install cta buttonbase" @click="install"><DownloadIcon /></div>
-    </template>
+    <div
+      v-if="props.instance.metadata && playing === false && modLoading === false"
+      class="install cta button-base"
+      @click="play"
+    >
+      <PlayIcon />
+    </div>
+    <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
+      <AnimatedLogo class="loading-indicator" />
+    </div>
+    <div
+      v-else-if="playing === true"
+      class="stop cta button-base"
+      @click="stop"
+      @mousehover="checkProcess"
+    >
+      <StopCircleIcon />
+    </div>
+    <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
+    <InstanceInstallModal ref="modInstallModal" />
   </div>
 </template>
 
@@ -225,58 +224,13 @@ onUnmounted(() => unlisten())
 </style>
 
 <style lang="scss" scoped>
-.instance-small-card {
-  background-color: var(--color-bg) !important;
-  display: flex;
-  flex-direction: column;
-  min-height: min-content !important;
-  gap: 0.5rem;
-  align-items: flex-start;
-  padding: 0;
-
-  .instance-small-card__description {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 1rem;
-    flex-grow: 1;
-    padding: var(--gap-xl);
-    padding-bottom: 0;
-    width: 100%;
-
-    &:not(.button-base) {
-      padding-bottom: var(--gap-xl);
-    }
-  }
-
-  .instance-small-card__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .title {
-      color: var(--color-contrast);
-      font-weight: bolder;
-    }
-  }
-
-  .instance-small-card__content {
-    padding: var(--gap-xl);
-    padding-top: 0;
-  }
-
-  .cta {
-    display: none;
-  }
-}
-
 .instance {
   position: relative;
 
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 4.5rem;
+      bottom: 4.75rem;
     }
 
     .instance-card-item {
@@ -291,9 +245,7 @@ onUnmounted(() => unlisten())
       background: hsl(0, 0%, 91%) !important;
     }
   }
-}
 
-.light-mode {
   .instance-card-item {
     background: hsl(0, 0%, 100%) !important;
 
@@ -312,21 +264,17 @@ onUnmounted(() => unlisten())
   z-index: 1;
   width: 3rem;
   height: 3rem;
-  right: 1rem;
-  bottom: 3.5rem;
+  right: 1.25rem;
+  bottom: 4.25rem;
   opacity: 0;
-  transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity !important;
+  transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
+  box-shadow: var(--shadow-floating);
 
   svg {
     color: var(--color-accent-contrast);
     width: 1.5rem !important;
     height: 1.5rem !important;
-  }
-
-  &:hover {
-    filter: none !important; /* overrides button-base class */
-    box-shadow: var(--shadow-floating);
   }
 
   &.install {
@@ -356,6 +304,7 @@ onUnmounted(() => unlisten())
   padding: 0.75rem !important; /* overrides card class */
   transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
   background: hsl(220, 11%, 17%) !important;
+  margin-bottom: 0;
 
   &:hover {
     filter: brightness(1) !important;
@@ -400,6 +349,8 @@ onUnmounted(() => unlisten())
       line-height: 125%;
       margin: 0.25rem 0 0;
       text-transform: capitalize;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 }

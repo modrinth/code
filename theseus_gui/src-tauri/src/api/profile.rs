@@ -88,7 +88,7 @@ pub async fn profile_update_project(
     path: &Path,
     project_path: &Path,
 ) -> Result<PathBuf> {
-    Ok(profile::update_project(path, project_path).await?)
+    Ok(profile::update_project(path, project_path, None).await?)
 }
 
 // Adds a project to a profile from a version ID
@@ -195,6 +195,7 @@ pub struct EditProfileMetadata {
     pub game_version: Option<String>,
     pub loader: Option<ModLoader>,
     pub loader_version: Option<LoaderVersion>,
+    pub groups: Option<Vec<String>>,
 }
 
 // Edits a profile
@@ -207,21 +208,27 @@ pub async fn profile_edit(
     profile::edit(path, |prof| {
         if let Some(metadata) = edit_profile.metadata.clone() {
             if let Some(name) = metadata.name {
-                prof.metadata.name = name
+                prof.metadata.name = name;
             }
             if let Some(game_version) = metadata.game_version {
-                prof.metadata.game_version = game_version
+                prof.metadata.game_version = game_version;
             }
             if let Some(loader) = metadata.loader {
-                prof.metadata.loader = loader
+                prof.metadata.loader = loader;
             }
-            prof.metadata.loader_version = metadata.loader_version
+            prof.metadata.loader_version = metadata.loader_version;
+
+            if let Some(groups) = metadata.groups {
+                prof.metadata.groups = groups;
+            }
         }
 
         prof.java = edit_profile.java.clone();
         prof.memory = edit_profile.memory;
         prof.resolution = edit_profile.resolution;
         prof.hooks = edit_profile.hooks.clone();
+
+        prof.metadata.date_modified = chrono::Utc::now();
 
         async { Ok(()) }
     })

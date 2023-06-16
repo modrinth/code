@@ -10,6 +10,7 @@ use crate::util::fetch::{
     fetch, fetch_json, write, write_cached_icon, IoSemaphore,
 };
 use crate::State;
+use chrono::{DateTime, Utc};
 use daedalus::get_hash;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
@@ -29,9 +30,6 @@ use uuid::Uuid;
 const PROFILE_JSON_PATH: &str = "profile.json";
 
 pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
-
-// TODO: possibly add defaults to some of these values
-pub const CURRENT_FORMAT_VERSION: u32 = 1;
 
 #[derive(
     Serialize, Deserialize, Clone, Copy, Debug, Default, Eq, PartialEq,
@@ -75,13 +73,24 @@ pub struct ProfileMetadata {
     pub icon: Option<PathBuf>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon_url: Option<String>,
+    #[serde(default)]
+    pub groups: Vec<String>,
+
     pub game_version: String,
     #[serde(default)]
     pub loader: ModLoader,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
-    pub format_version: u32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub linked_data: Option<LinkedData>,
+
+    #[serde(default)]
+    pub date_created: DateTime<Utc>,
+    #[serde(default)]
+    pub date_modified: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_played: Option<DateTime<Utc>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -157,11 +166,14 @@ impl Profile {
                 name,
                 icon: None,
                 icon_url: None,
+                groups: vec![],
                 game_version: version,
                 loader: ModLoader::Vanilla,
                 loader_version: None,
-                format_version: CURRENT_FORMAT_VERSION,
                 linked_data: None,
+                date_created: Utc::now(),
+                date_modified: Utc::now(),
+                last_played: None,
             },
             projects: HashMap::new(),
             java: None,
@@ -182,6 +194,7 @@ impl Profile {
         let file =
             write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
         self.metadata.icon = Some(file);
+        self.metadata.date_modified = Utc::now();
         Ok(())
     }
 
@@ -400,16 +413,9 @@ impl Profile {
                         file_name: file_name.to_string(),
                     },
                 );
+                profile.metadata.date_modified = Utc::now();
             }
         }
-
-        emit_profile(
-            self.uuid,
-            self.path.clone(),
-            &self.metadata.name,
-            ProfilePayloadType::Synced,
-        )
-        .await?;
 
         Ok(path)
     }
@@ -454,6 +460,7 @@ impl Profile {
             let mut profiles = state.profiles.write().await;
             if let Some(profile) = profiles.0.get_mut(&self.path) {
                 profile.projects.insert(new_path.clone(), project);
+                profile.metadata.date_modified = Utc::now();
             }
 
             Ok(new_path)
@@ -479,6 +486,7 @@ impl Profile {
 
                 if let Some(profile) = profiles.0.get_mut(&self.path) {
                     profile.projects.remove(path);
+                    profile.metadata.date_modified = Utc::now();
                 }
             }
         } else {

@@ -9,6 +9,7 @@ use crate::{
     state::{self as st, MinecraftChild},
     State,
 };
+use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::VersionInfo;
 use dunce::canonicalize;
@@ -34,7 +35,11 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
         Rule {
             features: Some(ref features),
             ..
-        } => features.has_demo_resolution.unwrap_or(false),
+        } => {
+            features.has_demo_resolution.unwrap_or(false)
+                || (features.has_demo_resolution.is_none()
+                    && features.is_demo_user.is_none())
+        }
         _ => false,
     };
 
@@ -427,6 +432,13 @@ pub async fn launch_minecraft(
 
     let stdout_log_path = logs_dir.join("stdout.log");
     let stderr_log_path = logs_dir.join("stderr.log");
+
+    crate::api::profile::edit(&profile.path, |prof| {
+        prof.metadata.last_played = Some(Utc::now());
+
+        async { Ok(()) }
+    })
+    .await?;
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
