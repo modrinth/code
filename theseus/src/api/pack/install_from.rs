@@ -73,7 +73,7 @@ pub enum PackDependency {
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(tag = "type")]
+#[serde(rename_all = "camelCase", tag = "type")]
 pub enum CreatePackLocation {
     FromVersionId {
         project_id: String,

@@ -20,7 +20,7 @@ pub async fn profile_get_profile_empty() -> Result<CreatePackProfile> {
 }
 
 // Creates a profile at  the given filepath and adds it to the in-memory state
-// invoke('profile_add',profile)
+// invoke('plugin:profile|profile_add',profile)
 #[tauri::command]
 pub async fn profile_create(
     name: String,         // the name of the profile, and relative path

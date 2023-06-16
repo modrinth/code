@@ -27,7 +27,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 }
 
 // Get full settings
-// invoke('settings_get')
+// invoke('plugin:settings|settings_get')
 #[tauri::command]
 pub async fn settings_get() -> Result<Settings> {
     let res = settings::get().await?;
@@ -35,7 +35,7 @@ pub async fn settings_get() -> Result<Settings> {
 }
 
 // Set full settings
-// invoke('settings_set', settings)
+// invoke('plugin:settings|settings_set', settings)
 #[tauri::command]
 pub async fn settings_set(settings: Settings) -> Result<()> {
     settings::set(settings).await?;

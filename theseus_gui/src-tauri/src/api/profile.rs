@@ -32,7 +32,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 }
 
 // Remove a profile
-// invoke('profile_add_path',path)
+// invoke('plugin:profile|profile_add_path',path)
 #[tauri::command]
 pub async fn profile_remove(path: &Path) -> Result<()> {
     profile::remove(path).await?;
@@ -40,7 +40,7 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 }
 
 // Get a profile by path
-// invoke('profile_add_path',path)
+// invoke('plugin:profile|profile_add_path',path)
 #[tauri::command]
 pub async fn profile_get(
     path: &Path,
@@ -60,7 +60,7 @@ pub async fn profile_get_optimal_jre_key(
 }
 
 // Get a copy of the profile set
-// invoke('profile_list')
+// invoke('plugin:profile|profile_list')
 #[tauri::command]
 pub async fn profile_list(
     clear_projects: Option<bool>,
@@ -90,7 +90,7 @@ pub async fn profile_check_installed(
 }
 
 /// Installs/Repairs a profile
-/// invoke('profile_install')
+/// invoke('plugin:profile|profile_install')
 #[tauri::command]
 pub async fn profile_install(path: &Path) -> Result<()> {
     profile::install(path).await?;
@@ -98,7 +98,7 @@ pub async fn profile_install(path: &Path) -> Result<()> {
 }
 
 /// Updates all of the profile's projects
-/// invoke('profile_update_all')
+/// invoke('plugin:profile|profile_update_all')
 #[tauri::command]
 pub async fn profile_update_all(
     path: &Path,
@@ -107,7 +107,7 @@ pub async fn profile_update_all(
 }
 
 /// Updates a specified project
-/// invoke('profile_update_project')
+/// invoke('plugin:profile|profile_update_project')
 #[tauri::command]
 pub async fn profile_update_project(
     path: &Path,
@@ -117,7 +117,7 @@ pub async fn profile_update_project(
 }
 
 // Adds a project to a profile from a version ID
-// invoke('profile_add_project_from_version')
+// invoke('plugin:profile|profile_add_project_from_version')
 #[tauri::command]
 pub async fn profile_add_project_from_version(
     path: &Path,
@@ -127,7 +127,7 @@ pub async fn profile_add_project_from_version(
 }
 
 // Adds a project to a profile from a path
-// invoke('profile_add_project_from_path')
+// invoke('plugin:profile|profile_add_project_from_path')
 #[tauri::command]
 pub async fn profile_add_project_from_path(
     path: &Path,
@@ -140,7 +140,7 @@ pub async fn profile_add_project_from_path(
 }
 
 // Toggles disabling a project from its path
-// invoke('profile_toggle_disable_project')
+// invoke('plugin:profile|profile_toggle_disable_project')
 #[tauri::command]
 pub async fn profile_toggle_disable_project(
     path: &Path,
@@ -150,7 +150,7 @@ pub async fn profile_toggle_disable_project(
 }
 
 // Removes a project from a profile
-// invoke('profile_remove_project')
+// invoke('plugin:profile|profile_remove_project')
 #[tauri::command]
 pub async fn profile_remove_project(
     path: &Path,
@@ -162,7 +162,7 @@ pub async fn profile_remove_project(
 // Run minecraft using a profile using the default credentials
 // Returns the UUID, which can be used to poll
 // for the actual Child in the state.
-// invoke('profile_run', path)
+// invoke('plugin:profile|profile_run', path)
 #[tauri::command]
 pub async fn profile_run(path: &Path) -> Result<Uuid> {
     let minecraft_child = profile::run(path).await?;
@@ -171,7 +171,7 @@ pub async fn profile_run(path: &Path) -> Result<Uuid> {
 }
 
 // Run Minecraft using a profile using the default credentials, and wait for the result
-// invoke('profile_run_wait', path)
+// invoke('plugin:profile|profile_run_wait', path)
 #[tauri::command]
 pub async fn profile_run_wait(path: &Path) -> Result<()> {
     let proc_lock = profile::run(path).await?;
@@ -182,7 +182,7 @@ pub async fn profile_run_wait(path: &Path) -> Result<()> {
 // Run Minecraft using a profile using chosen credentials
 // Returns the UUID, which can be used to poll
 // for the actual Child in the state.
-// invoke('profile_run_credentials', {path, credentials})')
+// invoke('plugin:profile|profile_run_credentials', {path, credentials})')
 #[tauri::command]
 pub async fn profile_run_credentials(
     path: &Path,
@@ -194,7 +194,7 @@ pub async fn profile_run_credentials(
 }
 
 // Run Minecraft using a profile using the chosen credentials, and wait for the result
-// invoke('profile_run_wait', {path, credentials)
+// invoke('plugin:profile|profile_run_wait', {path, credentials)
 #[tauri::command]
 pub async fn profile_run_wait_credentials(
     path: &Path,
@@ -224,7 +224,7 @@ pub struct EditProfileMetadata {
 }
 
 // Edits a profile
-// invoke('profile_edit', {path, editProfile})
+// invoke('plugin:profile|profile_edit', {path, editProfile})
 #[tauri::command]
 pub async fn profile_edit(
     path: &Path,
@@ -263,7 +263,7 @@ pub async fn profile_edit(
 }
 
 // Edits a profile's icon
-// invoke('profile_edit_icon')
+// invoke('plugin:profile|profile_edit_icon')
 #[tauri::command]
 pub async fn profile_edit_icon(
     path: &Path,

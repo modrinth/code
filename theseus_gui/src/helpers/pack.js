@@ -7,15 +7,15 @@ import { invoke } from '@tauri-apps/api/tauri'
 import { create } from './profile'
 
 // Installs pack from a version ID
-export async function install(projectId, versionId, packTitle, packIcon) {
+export async function install(projectId, versionId, packTitle, iconUrl) {
   const location = {
-    type: 'FromVersionId',
-    projectId: projectId,
-    versionId: versionId,
-    packTitle: packTitle,
-    packIcon: packIcon,
+    type: 'fromVersionId',
+    project_id: projectId,
+    version_id: versionId,
+    title: packTitle,
+    icon_url: iconUrl,
   }
-  const profile_creator = await invoke('pack_get_profile_from_pack', { location })
+  const profile_creator = await invoke('plugin:pack|pack_get_profile_from_pack', { location })
   const profile = await create(
     profile_creator.name,
     profile_creator.gameVersion,
@@ -24,16 +24,16 @@ export async function install(projectId, versionId, packTitle, packIcon) {
     profile_creator.icon
   )
 
-  return await invoke('pack_install', { location, profile })
+  return await invoke('plugin:pack|pack_install', { location, profile })
 }
 
 // Installs pack from a path
 export async function install_from_file(path) {
   const location = {
-    type: 'FromFile',
+    type: 'fromFile',
     path: path,
   }
-  const profile_creator = await invoke('pack_get_profile_from_pack', { location })
+  const profile_creator = await invoke('plugin:pack|pack_get_profile_from_pack', { location })
   const profile = await create(
     profile_creator.name,
     profile_creator.gameVersion,
@@ -41,5 +41,5 @@ export async function install_from_file(path) {
     profile_creator.loaderVersion,
     profile_creator.icon
   )
-  return await invoke('pack_install', { location, profile })
+  return await invoke('plugin:pack|pack_install', { location, profile })
 }

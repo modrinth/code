@@ -23,21 +23,21 @@ export async function get_all_jre() {
 // Finds all the installation of Java 7, if it exists
 // Returns [JavaVersion]
 export async function find_jre_8_jres() {
-  const jres = await invoke('jre_get_all_jre')
+  const jres = await invoke('plugin:jre|jre_get_all_jre')
   return await invoke('plugin:jre|jre_filter_jre_8_jres', { jres })
 }
 
 // Finds the installation of Java 17, if it exists
 // Returns [JavaVersion]
 export async function find_jre_17_jres() {
-  const jres = await invoke('jre_get_all_jre')
+  const jres = await invoke('plugin:jre|jre_get_all_jre')
   return await invoke('plugin:jre|jre_filter_jre_17_jres', { jres })
 }
 
 // Finds the highest version of Java 18+, if it exists
 // Returns [JavaVersion]
 export async function find_jre_18plus_jres() {
-  const jres = await invoke('jre_get_all_jre')
+  const jres = await invoke('plugin:jre|jre_get_all_jre')
   return await invoke('plugin:jre|jre_filter_jre_18plus_jres', { jres })
 }
 

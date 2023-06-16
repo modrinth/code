@@ -38,7 +38,7 @@ pub async fn auth_cancel_flow() -> Result<()> {
 }
 
 /// Refresh some credentials using Hydra, if needed
-// invoke('auth_refresh',user)
+// invoke('plugin:auth|auth_refresh',user)
 #[tauri::command]
 pub async fn auth_refresh(user: uuid::Uuid) -> Result<Credentials> {
     Ok(auth::refresh(user).await?)
@@ -50,14 +50,14 @@ pub async fn auth_remove_user(user: uuid::Uuid) -> Result<()> {
 }
 
 /// Check if a user exists in Theseus
-// invoke('auth_has_user',user)
+// invoke('plugin:auth|auth_has_user',user)
 #[tauri::command]
 pub async fn auth_has_user(user: uuid::Uuid) -> Result<bool> {
     Ok(auth::has_user(user).await?)
 }
 
 /// Get a copy of the list of all user credentials
-// invoke('auth_users',user)
+// invoke('plugin:auth|auth_users',user)
 #[tauri::command]
 pub async fn auth_users() -> Result<Vec<Credentials>> {
     Ok(auth::users().await?)
@@ -65,7 +65,7 @@ pub async fn auth_users() -> Result<Vec<Credentials>> {
 
 /// Get a user from the UUID
 /// Prefer to use refresh instead, as it will refresh the credentials as well
-// invoke('auth_users',user)
+// invoke('plugin:auth|auth_users',user)
 #[tauri::command]
 pub async fn auth_get_user(user: uuid::Uuid) -> Result<Credentials> {
     Ok(auth::get_user(user).await?)
