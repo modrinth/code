@@ -8,12 +8,11 @@ import { invoke } from '@tauri-apps/api/tauri'
 // Add empty default instance
 export async function create_empty() {
   const profile_create = await invoke('plugin:profile_create|profile_get_profile_empty')
-  console.log(profile_create);
   return await create(
     profile_create.name,
-    profile_create.game_version,
+    profile_create.gameVersion,
     profile_create.modloader,
-    profile_create.loader_version,
+    profile_create.loaderVersion,
     profile_create.icon
   )
 }

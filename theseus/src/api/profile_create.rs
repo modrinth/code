@@ -21,6 +21,7 @@ use uuid::Uuid;
 const DEFAULT_NAME: &str = "Untitled Instance";
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CreatePackProfile {
     pub name: String, // the name of the profile, and relative path
     pub game_version: String, // the game version of the profile
