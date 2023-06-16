@@ -72,7 +72,7 @@ const props = defineProps({
     type: String,
     required: false,
     default: null,
-  }
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
