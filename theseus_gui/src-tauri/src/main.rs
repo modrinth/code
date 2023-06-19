@@ -21,6 +21,15 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
+#[tauri::command]
+fn is_dev() -> bool {
+    if cfg!(debug_assertions) {
+        true
+    } else {
+        false
+    }
+}
+
 use tracing_subscriber::prelude::*;
 
 #[derive(Clone, serde::Serialize)]
@@ -30,6 +39,9 @@ struct Payload {
 }
 
 fn main() {
+    let client = sentry::init("https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592");
+
+    let _guard = sentry_rust_minidump::init(&client);
     /*
        tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
            ERROR > WARN > INFO > DEBUG > TRACE
@@ -83,6 +95,7 @@ fn main() {
 
     builder = builder.invoke_handler(tauri::generate_handler![
         initialize_state,
+        is_dev,
         api::progress_bars_list,
         api::profile_create::profile_create_empty,
         api::profile_create::profile_create,
@@ -138,8 +151,7 @@ fn main() {
         api::process::process_get_all_running_profiles,
         api::process::process_get_exit_status_by_uuid,
         api::process::process_has_finished_by_uuid,
-        api::process::process_get_stderr_by_uuid,
-        api::process::process_get_stdout_by_uuid,
+        api::process::process_get_output_by_uuid,
         api::process::process_kill_by_uuid,
         api::process::process_wait_for_by_uuid,
         api::metadata::metadata_get_game_versions,
@@ -148,8 +160,7 @@ fn main() {
         api::metadata::metadata_get_quilt_versions,
         api::logs::logs_get_logs,
         api::logs::logs_get_logs_by_datetime,
-        api::logs::logs_get_stdout_by_datetime,
-        api::logs::logs_get_stderr_by_datetime,
+        api::logs::logs_get_output_by_datetime,
         api::logs::logs_delete_logs,
         api::logs::logs_delete_logs_by_datetime,
         api::utils::show_in_folder,
@@ -159,4 +170,9 @@ fn main() {
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    #[allow(deref_nullptr)]
+    unsafe {
+        *std::ptr::null_mut() = true;
+    }
 }

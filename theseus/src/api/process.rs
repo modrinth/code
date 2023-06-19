@@ -69,9 +69,9 @@ pub async fn get_uuids_by_profile_path(
     children.running_keys_with_profile(profile_path).await
 }
 
-// Gets stdout of a child process stored in the state by UUID, as a string
+// Gets output of a child process stored in the state by UUID, as a string
 #[tracing::instrument]
-pub async fn get_stdout_by_uuid(uuid: &Uuid) -> crate::Result<String> {
+pub async fn get_output_by_uuid(uuid: &Uuid) -> crate::Result<String> {
     let state = State::get().await?;
     // Get stdout from child
     let children = state.children.read().await;
@@ -79,30 +79,10 @@ pub async fn get_stdout_by_uuid(uuid: &Uuid) -> crate::Result<String> {
     // Extract child or return crate::Error
     if let Some(child) = children.get(uuid) {
         let child = child.read().await;
-        Ok(child.stdout.get_output().await?)
+        Ok(child.output.get_output().await?)
     } else {
         Err(crate::ErrorKind::LauncherError(format!(
             "No child process by UUID {}",
-            uuid
-        ))
-        .as_error())
-    }
-}
-
-// Gets stderr of a child process stored in the state by UUID, as a string
-#[tracing::instrument]
-pub async fn get_stderr_by_uuid(uuid: &Uuid) -> crate::Result<String> {
-    let state = State::get().await?;
-    // Get stdout from child
-    let children = state.children.read().await;
-
-    // Extract child or return crate::Error
-    if let Some(child) = children.get(uuid) {
-        let child = child.read().await;
-        Ok(child.stderr.get_output().await?)
-    } else {
-        Err(crate::ErrorKind::LauncherError(format!(
-            "No child process with UUID {}",
             uuid
         ))
         .as_error())
@@ -150,7 +130,7 @@ pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
 pub async fn wait_for(running: &mut MinecraftChild) -> crate::Result<()> {
     // We do not wait on the Child directly, but wait on the thread manager.
     // This way we can still run all cleanup hook functions that happen after.
-    let result = running
+    running
         .manager
         .take()
         .ok_or_else(|| {
@@ -166,12 +146,5 @@ pub async fn wait_for(running: &mut MinecraftChild) -> crate::Result<()> {
             ))
         })?;
 
-    match result.success() {
-        false => Err(crate::ErrorKind::LauncherError(format!(
-            "Minecraft exited with non-zero code {}",
-            result.code().unwrap_or(-1)
-        ))
-        .as_error()),
-        true => Ok(()),
-    }
+    Ok(())
 }

@@ -12,10 +12,14 @@ import {
   StopCircleIcon,
   ExternalIcon,
   EyeIcon,
+  ModalConfirm,
 } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import { remove } from '@/helpers/profile.js'
+import { handleError } from '@/store/notifications.js'
+import { useTheming } from '@/store/state.js'
 
 const props = defineProps({
   instances: {
@@ -35,6 +39,19 @@ const allowPagination = ref(Array.apply(false, Array(props.instances.length)))
 const modsRow = ref(null)
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
+
+const themeStore = useTheming()
+const currentDeleteInstance = ref(null)
+const confirmModal = ref(null)
+
+async function deleteProfile() {
+  if (currentDeleteInstance.value) {
+    instanceComponents.value = instanceComponents.value.filter(
+      (x) => x.instance.path !== currentDeleteInstance.value
+    )
+    await remove(currentDeleteInstance.value).catch(handleError)
+  }
+}
 
 const handlePaginationDisplay = () => {
   for (let i = 0; i < props.instances.length; i++) {
@@ -114,10 +131,10 @@ const handleInstanceRightClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await args.item.play()
+      await args.item.play(null, 'InstanceRowContextMenu')
       break
     case 'stop':
-      await args.item.stop()
+      await args.item.stop(null, 'InstanceRowContextMenu')
       break
     case 'add_content':
       await args.item.addContent()
@@ -126,7 +143,8 @@ const handleOptionsClick = async (args) => {
       await args.item.seeInstance()
       break
     case 'delete':
-      await args.item.deleteInstance()
+      currentDeleteInstance.value = args.item.instance.path
+      confirmModal.value.show()
       break
     case 'open_folder':
       await args.item.openFolder()
@@ -165,6 +183,15 @@ const getInstanceIndex = (rowIndex, index) => {
 </script>
 
 <template>
+  <ModalConfirm
+    ref="confirmModal"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    :noblur="!themeStore.advancedRendering"
+    @proceed="deleteProfile"
+  />
   <div class="content">
     <div v-for="(row, rowIndex) in instances" :key="row.label" class="row">
       <div class="header">

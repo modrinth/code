@@ -34,20 +34,11 @@ pub async fn logs_get_logs_by_datetime(
 
 /// Get the stdout for a profile by profile id and datetime string
 #[tauri::command]
-pub async fn logs_get_stdout_by_datetime(
+pub async fn logs_get_output_by_datetime(
     profile_uuid: Uuid,
     datetime_string: String,
 ) -> Result<String> {
-    Ok(logs::get_stdout_by_datetime(profile_uuid, &datetime_string).await?)
-}
-
-/// Get the stderr for a profile by profile id and datetime string
-#[tauri::command]
-pub async fn logs_get_stderr_by_datetime(
-    profile_uuid: Uuid,
-    datetime_string: String,
-) -> Result<String> {
-    Ok(logs::get_stderr_by_datetime(profile_uuid, &datetime_string).await?)
+    Ok(logs::get_output_by_datetime(profile_uuid, &datetime_string).await?)
 }
 
 /// Delete all logs for a profile by profile id
