@@ -1,9 +1,12 @@
 <script setup>
-import {Card, Avatar, formatNumber, formatCategory, DownloadIcon, HeartIcon, CalendarIcon} from "omorphia";
+import {Card, Avatar, Button, formatNumber, formatCategory, DownloadIcon, HeartIcon, CalendarIcon} from "omorphia";
 import {computed} from "vue";
 import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
+import {useRouter} from "vue-router";
 dayjs.extend(relativeTime)
+
+const router = useRouter()
 
 const props = defineProps({
   project: {
@@ -36,54 +39,71 @@ const toTransparent = computed(() => {
 </script>
 
 <template>
-  <Card class="project-card button-base">
-    <div
-      class="banner"
-      :style="{
-        'background-color': project.featured_gallery ?? project.gallery[0] ? null : toColor,
-        'background-image': `url(${project.featured_gallery ?? project.gallery[0] ?? 'https://cdn.discordapp.com/attachments/817413688771608587/1119143634319724564/image.png'})`,
-        'no-image': !project.featured_gallery && !project.gallery[0]
-    }"
-    >
+  <div class="wrapper">
+    <Card class="project-card button-base" @click="router.push(`/project/${project.slug}`)">
       <div
-        class="badges"
-        :class="{
-          'no-image': !project.featured_gallery && !project.gallery[0]
-        }"
+        class="banner"
         :style="{
-          'background': !project.featured_gallery && !project.gallery[0] ? toTransparent : null,
-        }"
+          'background-color': project.featured_gallery ?? project.gallery[0] ? null : toColor,
+          'background-image': `url(${project.featured_gallery ?? project.gallery[0] ?? 'https://cdn.discordapp.com/attachments/817413688771608587/1119143634319724564/image.png'})`,
+          'no-image': !project.featured_gallery && !project.gallery[0]
+      }"
       >
-        <div class="badge">
-          <DownloadIcon />
-          {{ formatNumber(project.downloads) }}
-        </div>
-        <div class="badge">
-          <HeartIcon />
-          {{ formatNumber(project.follows) }}
-        </div>
-        <div class="badge">
-          <CalendarIcon />
-          {{ formatCategory(dayjs(project.date_modified).fromNow()) }}
+        <div
+          class="badges"
+          :class="{
+            'no-image': !project.featured_gallery && !project.gallery[0]
+          }"
+          :style="{
+            'background': !project.featured_gallery && !project.gallery[0] ? toTransparent : null,
+          }"
+        >
+          <div class="badge">
+            <DownloadIcon />
+            {{ formatNumber(project.downloads) }}
+          </div>
+          <div class="badge">
+            <HeartIcon />
+            {{ formatNumber(project.follows) }}
+          </div>
+          <div class="badge">
+            <CalendarIcon />
+            {{ formatCategory(dayjs(project.date_modified).fromNow()) }}
+          </div>
         </div>
       </div>
-    </div>
-    <Avatar class="icon" size="sm" :src="project.icon_url"/>
-    <div class="title">
-      <div class="title-text">
-        {{ project.title }}
+      <Avatar class="icon" size="sm" :src="project.icon_url"/>
+      <div class="title">
+        <div class="title-text">
+          {{ project.title }}
+        </div>
+        <div class="author">
+          by {{ project.author }}
+        </div>
       </div>
-      <div class="author">
-        by {{ project.author }}
+      <div class="description">
+        {{ project.description }}
       </div>
-    </div>
-    <div class="description">
-      {{ project.description }}
-    </div>
-  </Card>
+    </Card>
+    <Button color="primary" class="install">
+      <DownloadIcon/>
+      Install
+    </Button>
+  </div>
 </template>
 
 <style scoped lang="scss">
+.wrapper {
+  position: relative;
+  aspect-ratio: 1;
+
+  &:hover {
+    .install {
+      opacity: 1;
+    }
+  }
+}
+
 .project-card {
   display: grid;
   grid-gap: 1rem;
@@ -93,8 +113,8 @@ const toTransparent = computed(() => {
     "banner banner banner banner" auto
     ". description description ." 3.5rem
     ". . . ." 0 / 0 3rem minmax(0, 1fr) 0;
-  aspect-ratio: 1;
   max-width: 100%;
+  height: 100%;
   padding: 0;
   margin: 0;
 
@@ -162,6 +182,20 @@ const toTransparent = computed(() => {
     width: 1rem;
     height: 1rem;
     margin-right: var(--gap-xs);
+  }
+}
+
+.install {
+  position: absolute;
+  top: calc(5rem + var(--gap-sm));
+  right: var(--gap-sm);
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
   }
 }
 </style>

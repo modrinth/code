@@ -50,7 +50,7 @@ const handleInstanceRightClick = (event, passedInstance) => {
     },
   ]
 
-  const options = !passedInstance.instance.path
+  const options = !passedInstance?.instance?.path
     ? [
         {
           name: 'install',
@@ -181,10 +181,18 @@ onUnmounted(() => {
       </section>
       <section v-else ref="modsRow" class="projects">
         <ProjectCard
+          v-for="(project, projectIndex) in row.instances.slice(0, maxProjectsPerRow)"
+          :key="project?.project_id"
+          ref="instanceComponents"
           class="item"
-          v-for="(instance) in row.instances.slice(0, maxProjectsPerRow)"
-          :key="instance?.project_id"
-          :project="instance"
+          :project="project"
+          @contextmenu.prevent.stop="
+            (event) =>
+              handleInstanceRightClick(
+                event,
+                instanceComponents[getInstanceIndex(rowIndex, projectIndex)]
+              )
+          "
         />
       </section>
     </div>
