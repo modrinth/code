@@ -262,12 +262,17 @@ fn parse_minecraft_argument(
     resolution: WindowSize,
 ) -> crate::Result<String> {
     Ok(argument
+        .replace("${accessToken}", access_token)
         .replace("${auth_access_token}", access_token)
         .replace("${auth_session}", access_token)
         .replace("${auth_player_name}", username)
+        // TODO: add auth xuid eventually
+        .replace("${auth_xuid}", "0")
         .replace("${auth_uuid}", &uuid.hyphenated().to_string())
+        .replace("${uuid}", &uuid.hyphenated().to_string())
+        .replace("${clientid}", "c4502edb-87c6-40cb-b595-64a280cf8906")
         .replace("${user_properties}", "{}")
-        .replace("${user_type}", "mojang")
+        .replace("${user_type}", "msa")
         .replace("${version_name}", version)
         .replace("${assets_index_name}", asset_index_name)
         .replace(

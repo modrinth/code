@@ -37,7 +37,7 @@
         >
           <template #search>
             <SearchIcon />
-            <span class="no-wrap"> Search addons </span>
+            <span class="no-wrap"> Add content </span>
           </template>
           <template #from_file>
             <FolderOpenIcon />
@@ -216,6 +216,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 
@@ -255,6 +256,7 @@ const initProjects = (initInstance) => {
         updateVersion: project.metadata.update_version,
         outdated: !!project.metadata.update_version,
         project_type: project.metadata.project.project_type,
+        id: project.metadata.project.id,
       })
     } else if (project.metadata.type === 'inferred') {
       projects.value.push({
@@ -285,6 +287,11 @@ const initProjects = (initInstance) => {
 }
 
 initProjects(props.instance)
+
+watch(
+  () => props.instance.projects,
+  () => initProjects(props.instance)
+)
 
 const searchFilter = ref('')
 const selectAll = ref(false)
@@ -385,6 +392,13 @@ async function updateAll() {
   for (const project of setProjects) {
     projects.value[project].updating = false
   }
+
+  mixpanel.track('InstanceUpdateAll', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    count: setProjects.length,
+    selected: selected.value.length > 1,
+  })
 }
 
 async function updateProject(mod) {
@@ -395,30 +409,54 @@ async function updateProject(mod) {
   mod.outdated = false
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
+
+  mixpanel.track('InstanceProjectUpdate', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
+
+  mixpanel.track('InstanceProjectDisable', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+    disabled: mod.disabled,
+  })
 }
 
 async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
+
+  mixpanel.track('InstanceProjectRemove', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 const handleContentOptionClick = async (args) => {
   if (args.option === 'search') {
     await router.push({
       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+      query: { i: props.instance.path },
     })
   } else if (args.option === 'from_file') {
     const newProject = await open({ multiple: true })
-    console.log(newProject)
     if (!newProject) return
 
     for (const project of newProject) {
-      console.log(project)
       await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
       initProjects(await get(props.instance.path).catch(handleError))
     }

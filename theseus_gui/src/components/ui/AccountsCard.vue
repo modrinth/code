@@ -65,6 +65,7 @@ import {
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
+import mixpanel from 'mixpanel-browser'
 
 defineProps({
   expanded: {
@@ -131,6 +132,7 @@ const login = async () => {
   await setAccount(loggedIn)
   await refreshValues()
   await window.close()
+  mixpanel.track('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -140,6 +142,7 @@ const logout = async (id) => {
     await setAccount(accounts.value[0])
     await refreshValues()
   }
+  mixpanel.track('AccountLogOut')
 }
 
 const toggle = () => {

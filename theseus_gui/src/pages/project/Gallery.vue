@@ -93,6 +93,7 @@ import {
   Button,
 } from 'omorphia'
 import { ref } from 'vue'
+import mixpanel from 'mixpanel-browser'
 
 const props = defineProps({
   project: {
@@ -111,6 +112,10 @@ const nextImage = () => {
     expandedGalleryIndex.value = 0
   }
   expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
+  mixpanel.track('GalleryImageNext', {
+    project_id: props.project.id,
+    url: expandedGalleryItem.value.url,
+  })
 }
 
 const previousImage = () => {
@@ -119,12 +124,21 @@ const previousImage = () => {
     expandedGalleryIndex.value = props.project.gallery.length - 1
   }
   expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
+  mixpanel.track('GalleryImagePrevious', {
+    project_id: props.project.id,
+    url: expandedGalleryItem.value,
+  })
 }
 
 const expandImage = (item, index) => {
   expandedGalleryItem.value = item
   expandedGalleryIndex.value = index
   zoomedIn.value = false
+
+  mixpanel.track('GalleryImageExpand', {
+    project_id: props.project.id,
+    url: item.url,
+  })
 }
 </script>
 

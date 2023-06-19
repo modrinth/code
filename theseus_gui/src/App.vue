@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
-import { RouterView, RouterLink } from 'vue-router'
+import { ref, watch } from 'vue'
+import { RouterView, RouterLink, useRouter } from 'vue-router'
 import {
   HomeIcon,
   SearchIcon,
@@ -10,7 +10,7 @@ import {
   Button,
   Notifications,
 } from 'omorphia'
-import { handleError, useLoading, useTheming } from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -20,31 +20,47 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
 import { warning_listener } from '@/helpers/events.js'
+import { isDev } from '@/helpers/utils.js'
+import mixpanel from 'mixpanel-browser'
 
 const themeStore = useTheming()
 
 const isLoading = ref(true)
-onMounted(async () => {
-  const { settings, collapsed_navigation } = await get().catch(handleError)
-  themeStore.setThemeState(settings)
-  themeStore.collapsedNavigation = collapsed_navigation
-
-  await warning_listener((e) =>
-    notificationsWrapper.value.addNotification({
-      title: 'Warning',
-      text: e.message,
-      type: 'warn',
-    })
-  )
-})
-
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme } = await get()
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering } = await get()
+    const dev = await isDev()
+
     themeStore.setThemeState(theme)
+    themeStore.collapsedNavigation = collapsed_navigation
+    themeStore.advancedRendering = advanced_rendering
+
+    mixpanel.init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+    if (opt_out_analytics) {
+      mixpanel.opt_out_tracking()
+    }
+    mixpanel.track('Launched')
+
+    if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
+
+    await warning_listener((e) =>
+      notificationsWrapper.value.addNotification({
+        title: 'Warning',
+        text: e.message,
+        type: 'warn',
+      })
+    )
   },
 })
+
+const router = useRouter()
+router.afterEach((to, from, failure) => {
+  if (mixpanel.__loaded) {
+    mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
+  }
+})
+
 const loading = useLoading()
 
 const notifications = useNotifications()
@@ -53,8 +69,6 @@ const notificationsWrapper = ref(null)
 watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
-
-document.addEventListener('contextmenu', (event) => event.preventDefault())
 
 document.querySelector('body').addEventListener('click', function (e) {
   let target = e.target

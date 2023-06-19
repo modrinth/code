@@ -5,8 +5,7 @@ use tokio::fs::read_to_string;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Logs {
     pub datetime_string: String,
-    pub stdout: Option<String>,
-    pub stderr: Option<String>,
+    pub output: Option<String>,
 }
 impl Logs {
     async fn build(
@@ -15,19 +14,11 @@ impl Logs {
         clear_contents: Option<bool>,
     ) -> crate::Result<Self> {
         Ok(Self {
-            stdout: if clear_contents.unwrap_or(false) {
+            output: if clear_contents.unwrap_or(false) {
                 None
             } else {
                 Some(
-                    get_stdout_by_datetime(profile_uuid, &datetime_string)
-                        .await?,
-                )
-            },
-            stderr: if clear_contents.unwrap_or(false) {
-                None
-            } else {
-                Some(
-                    get_stderr_by_datetime(profile_uuid, &datetime_string)
+                    get_output_by_datetime(profile_uuid, &datetime_string)
                         .await?,
                 )
             },
@@ -74,18 +65,15 @@ pub async fn get_logs_by_datetime(
     datetime_string: String,
 ) -> crate::Result<Logs> {
     Ok(Logs {
-        stdout: Some(
-            get_stdout_by_datetime(profile_uuid, &datetime_string).await?,
-        ),
-        stderr: Some(
-            get_stderr_by_datetime(profile_uuid, &datetime_string).await?,
+        output: Some(
+            get_output_by_datetime(profile_uuid, &datetime_string).await?,
         ),
         datetime_string,
     })
 }
 
 #[tracing::instrument]
-pub async fn get_stdout_by_datetime(
+pub async fn get_output_by_datetime(
     profile_uuid: uuid::Uuid,
     datetime_string: &str,
 ) -> crate::Result<String> {
@@ -93,19 +81,6 @@ pub async fn get_stdout_by_datetime(
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
     Ok(
         read_to_string(logs_folder.join(datetime_string).join("stdout.log"))
-            .await?,
-    )
-}
-
-#[tracing::instrument]
-pub async fn get_stderr_by_datetime(
-    profile_uuid: uuid::Uuid,
-    datetime_string: &str,
-) -> crate::Result<String> {
-    let state = State::get().await?;
-    let logs_folder = state.directories.profile_logs_dir(profile_uuid);
-    Ok(
-        read_to_string(logs_folder.join(datetime_string).join("stderr.log"))
             .await?,
     )
 }

@@ -50,12 +50,7 @@
       </div>
     </div>
     <div class="install">
-      <Button
-        :to="`/browse/${project.slug}`"
-        color="primary"
-        :disabled="installed || installing"
-        @click.stop="install()"
-      >
+      <Button color="primary" :disabled="installed || installing" @click.stop="install()">
         <DownloadIcon v-if="!installed" />
         <CheckIcon v-else />
         {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
@@ -87,6 +82,7 @@ import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 dayjs.extend(relativeTime)
 
 const props = defineProps({
@@ -159,6 +155,13 @@ async function install() {
         props.project.title,
         props.project.icon_url
       ).catch(handleError)
+
+      mixpanel.track('PackInstall', {
+        id: props.project.project_id,
+        version_id: queuedVersionData.id,
+        title: props.project.title,
+        source: 'SearchCard',
+      })
     } else {
       props.confirmModal.show(
         props.project.project_id,
@@ -174,16 +177,33 @@ async function install() {
           props.instance,
           props.project.title,
           versions,
-          () => (installed.value = true)
+          () => (installed.value = true),
+          props.project.project_id,
+          props.project.project_type
         )
         installing.value = false
         return
       } else {
         await installMod(props.instance.path, queuedVersionData.id).catch(handleError)
-        installVersionDependencies(props.instance, queuedVersionData)
+        await installVersionDependencies(props.instance, queuedVersionData)
+
+        mixpanel.track('ProjectInstall', {
+          loader: props.instance.metadata.loader,
+          game_version: props.instance.metadata.game_version,
+          id: props.project.project_id,
+          project_type: props.project.project_type,
+          version_id: queuedVersionData.id,
+          title: props.project.title,
+          source: 'SearchCard',
+        })
       }
     } else {
-      props.modInstallModal.show(props.project.project_id, versions)
+      props.modInstallModal.show(
+        props.project.project_id,
+        versions,
+        props.project.title,
+        props.project.project_type
+      )
       installing.value = false
       return
     }

@@ -12,16 +12,28 @@ import {
   CheckIcon,
 } from 'omorphia'
 import { computed, ref } from 'vue'
-import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
+import {
+  add_project_from_version as installMod,
+  check_installed,
+  get,
+  list,
+} from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
+
+const themeStore = useTheming()
 
 const versions = ref([])
 const project = ref('')
+const projectTitle = ref('')
+const projectType = ref('')
+
 const installModal = ref(null)
 const searchFilter = ref('')
 const showCreation = ref(false)
@@ -33,13 +45,18 @@ const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
 defineExpose({
-  show: async (projectId, selectedVersions) => {
+  show: async (projectId, selectedVersions, title, type) => {
     project.value = projectId
     versions.value = selectedVersions
+    projectTitle.value = title
+    projectType.value = type
+
     installModal.value.show()
     searchFilter.value = ''
 
     profiles.value = await getData()
+
+    mixpanel.track('ProjectInstallStart', { source: 'ProjectInstallModal' })
   },
 })
 
@@ -59,6 +76,16 @@ async function install(instance) {
 
   instance.installedMod = true
   instance.installing = false
+
+  mixpanel.track('ProjectInstall', {
+    loader: instance.metadata.loader,
+    game_version: instance.metadata.game_version,
+    id: project.value,
+    version_id: version.id,
+    project_type: projectType.value,
+    title: projectTitle.value,
+    source: 'ProjectInstallModal',
+  })
 }
 
 async function getData() {
@@ -88,6 +115,7 @@ async function getData() {
   return filtered
 }
 
+const alreadySentCreation = ref(false)
 const toggleCreation = () => {
   showCreation.value = !showCreation.value
   name.value = null
@@ -95,6 +123,11 @@ const toggleCreation = () => {
   display_icon.value = null
   gameVersion.value = null
   loader.value = null
+
+  if (!alreadySentCreation.value) {
+    alreadySentCreation.value = false
+    mixpanel.track('InstanceCreateStart', { source: 'ProjectInstallModal' })
+  }
 }
 
 const upload_icon = async () => {
@@ -119,19 +152,45 @@ const reset_icon = () => {
 
 const createInstance = async () => {
   creatingInstance.value = true
+
+  const loader =
+    versions.value[0].loaders[0] !== 'forge' ||
+    versions.value[0].loaders[0] !== 'fabric' ||
+    versions.value[0].loaders[0] !== 'quilt'
+      ? versions.value[0].loaders[0]
+      : 'vanilla'
+
   const id = await create(
     name.value,
     versions.value[0].game_versions[0],
-    versions.value[0].loaders[0] !== 'forge' ||
-      versions.value[0].loaders[0] !== 'fabric' ||
-      versions.value[0].loaders[0] !== 'quilt'
-      ? versions.value[0].loaders[0]
-      : 'vanilla',
+    loader,
     'latest',
     icon.value
   ).catch(handleError)
 
   await installMod(id, versions.value[0].id).catch(handleError)
+
+  const instance = await get(id, true)
+  await installVersionDependencies(instance, versions.value)
+
+  mixpanel.track('InstanceCreate', {
+    profile_name: name.value,
+    game_version: versions.value[0].game_versions[0],
+    loader: loader,
+    loader_version: 'latest',
+    has_icon: !!icon.value,
+    source: 'ProjectInstallModal',
+  })
+
+  mixpanel.track('ProjectInstall', {
+    loader: loader,
+    game_version: versions.value[0].game_versions[0],
+    id: project.value,
+    version_id: versions.value[0].id,
+    project_type: projectType.value,
+    title: projectTitle.value,
+    source: 'ProjectInstallModal',
+  })
 
   installModal.value.hide()
   creatingInstance.value = false
@@ -143,7 +202,11 @@ const check_valid = computed(() => {
 </script>
 
 <template>
-  <Modal ref="installModal" header="Install project to instance">
+  <Modal
+    ref="installModal"
+    header="Install project to instance"
+    :noblur="!themeStore.advancedRendering"
+  >
     <div class="modal-body">
       <input
         v-model="searchFilter"
@@ -159,7 +222,15 @@ const check_valid = computed(() => {
             class="profile-button"
             @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
           >
-            <Avatar :src="convertFileSrc(profile.metadata.icon)" class="profile-image" />
+            <Avatar
+              :src="
+                !profile.metadata.icon ||
+                (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
+                  ? profile.metadata.icon
+                  : convertFileSrc(profile.metadata?.icon)
+              "
+              class="profile-image"
+            />
             {{ profile.metadata.name }}
           </Button>
           <Button :disabled="profile.installedMod || profile.installing" @click="install(profile)">

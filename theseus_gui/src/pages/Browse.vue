@@ -476,7 +476,7 @@ const showLoaders = computed(
   <div class="search-container">
     <aside class="filter-panel">
       <div v-if="instanceContext" class="small-instance">
-        <div class="instance">
+        <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
           <Avatar
             :src="
               !instanceContext.metadata.icon ||
@@ -497,18 +497,20 @@ const showLoaders = computed(
               {{ instanceContext.metadata.game_version }}
             </span>
           </div>
-        </div>
+        </router-link>
         <Checkbox
           v-model="ignoreInstanceGameVersions"
           label="Override game versions"
           class="filter-checkbox"
           @update:model-value="onSearchChangeToTop(1)"
+          @click.prevent.stop
         />
         <Checkbox
           v-model="ignoreInstanceLoaders"
           label="Override loaders"
           class="filter-checkbox"
           @update:model-value="onSearchChangeToTop(1)"
+          @click.prevent.stop
         />
       </div>
       <Card class="search-panel-card">
