@@ -13,7 +13,6 @@
     "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write ."
   },
   "dependencies": {
-    "@sentry/vue": "^7.54.0",
     "@tauri-apps/api": "^1.3.0",
     "dayjs": "^1.11.7",
     "floating-vue": "^2.0.0-beta.20",
