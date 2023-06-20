@@ -173,10 +173,11 @@ pub fn create_mrpack_json(
         profile.metadata.game_version.clone(),
     );
 
-    // Converts a HashMap<String, String> to a HashMap<String, LoaderVersionString>
+    // Converts a HashMap<String, String> to a HashMap<String, String>
+    // But the values are sanitized to only include the version number
     let dependencies = dependencies
         .into_iter()
-        .map(|(k, v)| (k, v.into()))
+        .map(|(k, v)| (k, sanitize_loader_version_string(&v).to_string()))
         .collect::<HashMap<_, _>>();
 
     let base_path = &profile.path;
@@ -250,6 +251,23 @@ pub fn create_mrpack_json(
         dependencies,
     })
 }
+
+
+fn sanitize_loader_version_string (s: &str) -> &str {
+    // Split on '-'
+    // If two or more, take the second
+    // If one, take the first
+    // If none, take the whole thing
+    let mut split: std::str::Split<'_, char> = s.split('-');
+    match split.next() {
+        Some(first) => match split.next() {
+            Some(second) => second,
+            None => first,
+        },
+        None => s,
+    }
+}
+
 
 // Given a folder path, populate a Vec of all the files in the folder, recursively
 #[async_recursion::async_recursion]
