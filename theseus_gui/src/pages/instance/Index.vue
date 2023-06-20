@@ -49,17 +49,6 @@
             Loading...
           </Button>
           <Button
-            v-tooltip="'export instance'"
-            class="instance-button"
-            @click="do_export(instance.path)"
-          >
-            export
-          </Button>
-          <Button v-tooltip="'import instance'" class="instance-button" @click="do_import()">
-            import
-          </Button>
-
-          <Button
             v-tooltip="'Open instance folder'"
             class="instance-button"
             @click="showInFolder(instance.path)"
@@ -124,7 +113,7 @@ import {
   PlusIcon,
   ExternalIcon,
 } from 'omorphia'
-import { export_profile_mrpack, get, get_potential_override_folders, run } from '@/helpers/profile'
+import { get, get_potential_override_folders, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
@@ -138,7 +127,6 @@ import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
-import { install_from_file } from '@/helpers/pack'
 
 const route = useRoute()
 
@@ -183,17 +171,6 @@ const checkProcess = async () => {
 
   playing.value = false
   uuid.value = null
-}
-
-const do_export = async (path) => {
-  const folders = await get_potential_override_folders(path).catch(handleError)
-  await export_profile_mrpack(path, '/home/thesuzerain/finaltest', folders, '1.0').catch(
-    handleError
-  )
-}
-
-const do_import = async () => {
-  install_from_file('/home/thesuzerain/finaltest').catch(handleError)
 }
 
 await checkProcess()

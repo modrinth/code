@@ -493,17 +493,13 @@ pub async fn remove_project(
 
 /// Exports the profile to a Modrinth-formatted .mrpack file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub async fn export_mrpack(
     profile_path: &Path,
     export_path: PathBuf,
     included_overrides: Vec<String>, // which folders to include in the overrides
     version_id: Option<String>,
 ) -> crate::Result<()> {
-
-    // Force sync the profile before export functions
-    Profile::sync_projects_inner(profile_path.clone()).await?;
-
     let state = State::get().await?;
     let io_semaphore = state.io_semaphore.0.read().await;
     let permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;

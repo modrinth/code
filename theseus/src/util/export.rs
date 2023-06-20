@@ -16,7 +16,7 @@ use tokio::sync::SemaphorePermit;
 
 /// Creates a .mrpack (Modrinth zip file) for a given modpack
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 #[theseus_macros::debug_pin]
 pub async fn export_mrpack(
     profile: &Profile,
@@ -140,7 +140,7 @@ fn get_modrinth_pack_list(packfile: &PackFormat) -> Vec<String> {
 
 /// Creates a json configuration for a .mrpack zipped file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub fn create_mrpack_json(
     profile: &Profile,
     version_id: String,
@@ -298,11 +298,6 @@ pub async fn build_folder(
 pub async fn get_potential_override_folders(
     profile_path: PathBuf,
 ) -> crate::Result<Vec<PathBuf>> {
-
-    // Force sync the profile before export functions
-    Profile::sync_projects_inner(profile_path.clone()).await?;
-
-
     // First, get a dummy mrpack json for the files within
     let profile: Profile =
         get(&profile_path, None).await?.ok_or_else(|| {

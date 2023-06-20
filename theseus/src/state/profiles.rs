@@ -263,7 +263,7 @@ impl Profile {
                 &profile.metadata.name,
                 ProfilePayloadType::Synced,
             )
-                .await?;
+            .await?;
         } else {
             tracing::warn!(
                 "Unable to fetch single profile projects: path {path:?} invalid",
