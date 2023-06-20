@@ -37,7 +37,7 @@
         >
           <template #search>
             <SearchIcon />
-            <span class="no-wrap"> Search addons </span>
+            <span class="no-wrap"> Add content </span>
           </template>
           <template #from_file>
             <FolderOpenIcon />
@@ -52,17 +52,28 @@
         v-model="selectedProjectType"
         :items="Object.keys(selectableProjectTypes)"
       />
-      <Button :disabled="!projects.some((x) => x.outdated)" class="no-wrap" @click="updateAll">
-        <UpdatedIcon />
-        Update {{ selected.length > 0 ? 'selected' : 'all' }}
-      </Button>
+      <DropdownButton
+        :options="['update_all', 'filter_update']"
+        default-value="update_all"
+        :disabled="!projects.some((x) => x.outdated)"
+        @option-click="updateAll"
+      >
+        <template #update_all>
+          <UpdatedIcon />
+          Update {{ selected.length > 0 ? 'selected' : 'all' }}
+        </template>
+        <template #filter_update>
+          <UpdatedIcon />
+          Select Updatable
+        </template>
+      </DropdownButton>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
         <TrashIcon />
         Remove selected
       </Button>
       <DropdownButton
         v-if="selected.length > 0"
-        :options="['toggle', 'disable', 'enable']"
+        :options="['toggle', 'disable', 'enable', 'hide_show']"
         default-value="toggle"
         @option-click="toggleSelected"
       >
@@ -77,6 +88,10 @@
         <template #enable>
           <CheckCircleIcon />
           Enable selected
+        </template>
+        <template #hide_show>
+          <CheckCircleIcon />
+          {{ hideNonSelected ? 'Show' : 'Hide' }} unselected
         </template>
       </DropdownButton>
       <DropdownButton
@@ -216,6 +231,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 
@@ -255,6 +271,7 @@ const initProjects = (initInstance) => {
         updateVersion: project.metadata.update_version,
         outdated: !!project.metadata.update_version,
         project_type: project.metadata.project.project_type,
+        id: project.metadata.project.id,
       })
     } else if (project.metadata.type === 'inferred') {
       projects.value.push({
@@ -286,12 +303,18 @@ const initProjects = (initInstance) => {
 
 initProjects(props.instance)
 
+watch(
+  () => props.instance.projects,
+  () => initProjects(props.instance)
+)
+
 const searchFilter = ref('')
 const selectAll = ref(false)
 const sortFilter = ref('')
 const selectedProjectType = ref('All')
 const selected = computed(() => projects.value.filter((mod) => mod.selected))
 const deleteWarning = ref(null)
+const hideNonSelected = ref(false)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -306,12 +329,19 @@ const selectableProjectTypes = computed(() => {
 
 const search = computed(() => {
   const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = projects.value.filter((mod) => {
-    return (
-      mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
-      (projectType === 'all' || mod.project_type === projectType)
-    )
-  })
+  const filtered = projects.value
+    .filter((mod) => {
+      return (
+        mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
+        (projectType === 'all' || mod.project_type === projectType)
+      )
+    })
+    .filter((mod) => {
+      if (hideNonSelected.value) {
+        return mod.selected
+      }
+      return true
+    })
 
   return updateSort(filtered, sortFilter.value)
 })
@@ -361,29 +391,44 @@ function updateSort(projects, sort) {
   }
 }
 
-async function updateAll() {
-  const setProjects = []
-  for (const [i, project] of selected.value ?? projects.value.entries()) {
-    if (project.outdated) {
-      project.updating = true
-      setProjects.push(i)
+async function updateAll(args) {
+  if (args.option === 'update_all') {
+    const setProjects = []
+    for (const [i, project] of selected.value ?? projects.value.entries()) {
+      if (project.outdated) {
+        project.updating = true
+        setProjects.push(i)
+      }
     }
-  }
 
-  const paths = await update_all(props.instance.path).catch(handleError)
+    const paths = await update_all(props.instance.path).catch(handleError)
 
-  for (const [oldVal, newVal] of Object.entries(paths)) {
-    const index = projects.value.findIndex((x) => x.path === oldVal)
-    projects.value[index].path = newVal
-    projects.value[index].outdated = false
+    for (const [oldVal, newVal] of Object.entries(paths)) {
+      const index = projects.value.findIndex((x) => x.path === oldVal)
+      projects.value[index].path = newVal
+      projects.value[index].outdated = false
 
-    if (projects.value[index].updateVersion) {
-      projects.value[index].version = projects.value[index].updateVersion.version_number
-      projects.value[index].updateVersion = null
+      if (projects.value[index].updateVersion) {
+        projects.value[index].version = projects.value[index].updateVersion.version_number
+        projects.value[index].updateVersion = null
+      }
     }
-  }
-  for (const project of setProjects) {
-    projects.value[project].updating = false
+    for (const project of setProjects) {
+      projects.value[project].updating = false
+    }
+
+    mixpanel.track('InstanceUpdateAll', {
+      loader: props.instance.metadata.loader,
+      game_version: props.instance.metadata.game_version,
+      count: setProjects.length,
+      selected: selected.value.length > 1,
+    })
+  } else {
+    for (const project of projects.value) {
+      if (project.outdated) {
+        project.selected = true
+      }
+    }
   }
 }
 
@@ -395,30 +440,54 @@ async function updateProject(mod) {
   mod.outdated = false
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
+
+  mixpanel.track('InstanceProjectUpdate', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
+
+  mixpanel.track('InstanceProjectDisable', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+    disabled: mod.disabled,
+  })
 }
 
 async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
+
+  mixpanel.track('InstanceProjectRemove', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 const handleContentOptionClick = async (args) => {
   if (args.option === 'search') {
     await router.push({
       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+      query: { i: props.instance.path },
     })
   } else if (args.option === 'from_file') {
     const newProject = await open({ multiple: true })
-    console.log(newProject)
     if (!newProject) return
 
     for (const project of newProject) {
-      console.log(project)
       await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
       initProjects(await get(props.instance.path).catch(handleError))
     }
@@ -484,6 +553,9 @@ async function toggleSelected(args) {
           await toggleDisableMod(project)
         }
       }
+      break
+    case 'hide_show':
+      hideNonSelected.value = !hideNonSelected.value
       break
   }
 }

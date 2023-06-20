@@ -52,6 +52,7 @@ import { get_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
+import mixpanel from 'mixpanel-browser'
 
 const props = defineProps({
   version: {
@@ -85,6 +86,11 @@ async function testJava() {
   testingJava.value = false
   testingJavaSuccess.value = !!result
 
+  mixpanel.track('JavaTest', {
+    path: props.modelValue ? props.modelValue.path : '',
+    success: !!result,
+  })
+
   setTimeout(() => {
     testingJavaSuccess.value = null
   }, 2000)
@@ -101,6 +107,11 @@ async function handleJavaFileInput() {
         version: props.version.toString(),
         architecture: 'x86',
       }
+
+      mixpanel.track('JavaManualSelect', {
+        path: filePath,
+        version: props.version,
+      })
     }
 
     emit('update:modelValue', result)

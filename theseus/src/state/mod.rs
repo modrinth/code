@@ -266,7 +266,16 @@ async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                             }
                         }
 
-                        if !visited_paths.contains(&new_path) {
+                        if e.path
+                            .components()
+                            .any(|x| x.as_os_str() == "crash-reports")
+                            && e.path
+                                .extension()
+                                .map(|x| x == "txt")
+                                .unwrap_or(false)
+                        {
+                            Profile::crash_task(new_path);
+                        } else if !visited_paths.contains(&new_path) {
                             Profile::sync_projects_task(new_path.clone());
                             visited_paths.push(new_path);
                         }

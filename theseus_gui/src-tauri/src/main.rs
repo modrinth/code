@@ -5,7 +5,7 @@
 
 use theseus::prelude::*;
 
-use tauri::{Manager, WindowEvent};
+use tauri::Manager;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -21,6 +21,15 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
+#[tauri::command]
+fn is_dev() -> bool {
+    if cfg!(debug_assertions) {
+        true
+    } else {
+        false
+    }
+}
+
 use tracing_subscriber::prelude::*;
 
 #[derive(Clone, serde::Serialize)]
@@ -30,6 +39,9 @@ struct Payload {
 }
 
 fn main() {
+    let client = sentry::init("https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592");
+
+    let _guard = sentry_rust_minidump::init(&client);
     /*
        tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
            ERROR > WARN > INFO > DEBUG > TRACE
@@ -62,21 +74,31 @@ fn main() {
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build());
 
+    #[cfg(not(target_os = "macos"))]
+    {
+        builder = builder.setup(|app| {
+            let win = app.get_window("main").unwrap();
+            win.set_decorations(false).unwrap();
+            Ok(())
+        })
+    }
+
     #[cfg(target_os = "macos")]
     {
+        use tauri::WindowEvent;
         builder = builder
             .setup(|app| {
                 use api::window_ext::WindowExt;
                 let win = app.get_window("main").unwrap();
                 win.set_transparent_titlebar(true);
-                win.position_traffic_lights(0.0, 0.0);
+                win.position_traffic_lights(9.0, 16.0);
                 Ok(())
             })
             .on_window_event(|e| {
                 use api::window_ext::WindowExt;
                 if let WindowEvent::Resized(..) = e.event() {
                     let win = e.window();
-                    win.position_traffic_lights(0., 0.);
+                    win.position_traffic_lights(9.0, 16.0);
                 }
             })
     }
@@ -92,9 +114,14 @@ fn main() {
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())
-        .invoke_handler(tauri::generate_handler![initialize_state,]);
+        .invoke_handler(tauri::generate_handler![initialize_state, is_dev]);
 
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+
+    #[allow(deref_nullptr)]
+    unsafe {
+        *std::ptr::null_mut() = true;
+    }
 }

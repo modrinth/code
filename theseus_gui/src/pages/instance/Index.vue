@@ -25,7 +25,7 @@
             v-else-if="playing === true"
             color="danger"
             class="instance-button"
-            @click="stopInstance"
+            @click="stopInstance('InstancePage')"
             @mouseover="checkProcess"
           >
             <StopCircleIcon />
@@ -35,7 +35,7 @@
             v-else-if="playing === false && loading === false"
             color="primary"
             class="instance-button"
-            @click="startInstance"
+            @click="startInstance('InstancePage')"
             @mouseover="checkProcess"
           >
             <PlayIcon />
@@ -57,21 +57,22 @@
             Folder
           </Button>
         </span>
+        <hr class="card-divider" />
+        <div class="pages-list">
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
+            <BoxIcon />
+            Mods
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
+            <FileIcon />
+            Logs
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+            <SettingsIcon />
+            Options
+          </RouterLink>
+        </div>
       </Card>
-      <div class="pages-list">
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
-          <BoxIcon />
-          Mods
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
-          <FileIcon />
-          Logs
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-          <SettingsIcon />
-          Options
-        </RouterLink>
-      </div>
     </div>
     <div class="content">
       <Promotion />
@@ -93,8 +94,6 @@
     <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
     <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
     <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
-    <template #repair> <HammerIcon /> Repair </template>
-    <template #delete> <TrashIcon /> Delete </template>
   </ContextMenu>
 </template>
 <script setup>
@@ -109,14 +108,12 @@ import {
   PlayIcon,
   StopCircleIcon,
   EditIcon,
-  HammerIcon,
-  TrashIcon,
   FolderOpenIcon,
   ClipboardCopyIcon,
   PlusIcon,
   ExternalIcon,
 } from 'omorphia'
-import { get, install, remove, run } from '@/helpers/profile'
+import { get, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
@@ -129,6 +126,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import mixpanel from 'mixpanel-browser'
 
 const route = useRoute()
 
@@ -151,11 +149,17 @@ const playing = ref(false)
 const loading = ref(false)
 const options = ref(null)
 
-const startInstance = async () => {
+const startInstance = async (context) => {
   loading.value = true
   uuid.value = await run(route.params.id).catch(handleError)
   loading.value = false
   playing.value = true
+
+  mixpanel.track('InstanceStart', {
+    loader: instance.value.metadata.loader,
+    game_version: instance.value.metadata.game_version,
+    source: context,
+  })
 }
 
 const checkProcess = async () => {
@@ -171,24 +175,20 @@ const checkProcess = async () => {
 
 await checkProcess()
 
-const stopInstance = async () => {
+const stopInstance = async (context) => {
   playing.value = false
   if (!uuid.value) {
     const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
     uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
     uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
   } else await kill_by_uuid(uuid.value).catch(handleError)
+
+  mixpanel.track('InstanceStop', {
+    loader: instance.value.metadata.loader,
+    game_version: instance.value.metadata.game_version,
+    source: context,
+  })
 }
-
-const unlistenProfiles = await profile_listener(async (event) => {
-  if (event.path === route.params.id) {
-    instance.value = await get(route.params.id).catch(handleError)
-  }
-})
-
-const unlistenProcesses = await process_listener((e) => {
-  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
-})
 
 const handleRightClick = (event) => {
   const baseOptions = [
@@ -197,15 +197,6 @@ const handleRightClick = (event) => {
     { name: 'edit' },
     { name: 'open_folder' },
     { name: 'copy_path' },
-    { type: 'divider' },
-    {
-      name: 'repair',
-      color: 'contrast',
-    },
-    {
-      name: 'delete',
-      color: 'danger',
-    },
   ]
 
   options.value.showMenu(
@@ -233,10 +224,10 @@ const handleOptionsClick = async (args) => {
   console.log(args)
   switch (args.option) {
     case 'play':
-      await startInstance()
+      await startInstance('InstancePageContextMenu')
       break
     case 'stop':
-      await stopInstance()
+      await stopInstance('InstancePageContextMenu')
       break
     case 'add_content':
       await router.push({
@@ -249,32 +240,24 @@ const handleOptionsClick = async (args) => {
         path: `/instance/${encodeURIComponent(route.params.id)}/options`,
       })
       break
-    case 'repair':
-      await install(instance.value.path).catch(handleError)
-      break
-    case 'delete':
-      await remove(instance.value.path).catch(handleError)
-      break
     case 'open_folder':
       await showInFolder(instance.value.path)
       break
     case 'copy_path':
       await navigator.clipboard.writeText(instance.value.path)
       break
-    case 'open_link':
-      window.__TAURI_INVOKE__('tauri', {
-        __tauriModule: 'Shell',
-        message: {
-          cmd: 'open',
-          path: args.item.link,
-        },
-      })
-      break
-    case 'copy_link':
-      await navigator.clipboard.writeText(args.item.link)
-      break
   }
 }
+
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (event.path === route.params.id) {
+    instance.value = await get(route.params.id).catch(handleError)
+  }
+})
+
+const unlistenProcesses = await process_listener((e) => {
+  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
+})
 
 onUnmounted(() => {
   unlistenProcesses()
@@ -284,7 +267,6 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .instance-card {
-  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -306,7 +288,6 @@ Button {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: var(--color-raised-bg);
   min-height: calc(100% - 3.25rem);
   overflow: hidden;
 }
@@ -339,7 +320,7 @@ Button {
 }
 
 .content {
-  margin-left: 20rem;
+  margin-left: 19rem;
 }
 
 .instance-info {
@@ -359,7 +340,7 @@ Button {
 .pages-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--gap-xs);
 
   a {
     font-size: 100%;
@@ -368,7 +349,6 @@ Button {
     transition: all ease-in-out 0.1s;
     width: 100%;
     color: var(--color-primary);
-    padding: var(--gap-md);
     box-shadow: none;
 
     &.router-link-exact-active {
@@ -391,28 +371,6 @@ Button {
   }
 }
 
-.header-nav {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 0.5rem;
-  gap: 0.5rem;
-  background: var(--color-raised-bg);
-}
-
-.project-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1rem;
-  background: var(--color-raised-bg);
-  width: 20rem;
-}
-
 .instance-nav {
   display: flex;
   flex-direction: row;
@@ -420,7 +378,6 @@ Button {
   justify-content: left;
   padding: 1rem;
   gap: 0.5rem;
-  background: var(--color-raised-bg);
   height: min-content;
   width: 100%;
 }

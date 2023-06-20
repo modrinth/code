@@ -26,8 +26,7 @@ pub struct MinecraftChild {
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
-    pub stdout: SharedOutput,
-    pub stderr: SharedOutput,
+    pub output: SharedOutput,
 }
 
 impl Children {
@@ -45,27 +44,27 @@ impl Children {
         &mut self,
         uuid: Uuid,
         profile_path: PathBuf,
-        stdout_log_path: PathBuf,
-        stderr_log_path: PathBuf,
+        log_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Command to run after minecraft.
+        censor_strings: HashMap<String, String>,
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
         let mut child = mc_command.spawn()?;
 
         // Create std watcher threads for stdout and stderr
-        let stdout = SharedOutput::build(&stdout_log_path).await?;
+        let shared_output =
+            SharedOutput::build(&log_path, censor_strings).await?;
         if let Some(child_stdout) = child.stdout.take() {
-            let stdout_clone = stdout.clone();
+            let stdout_clone = shared_output.clone();
             tokio::spawn(async move {
                 if let Err(e) = stdout_clone.read_stdout(child_stdout).await {
                     error!("Stdout process died with error: {}", e);
                 }
             });
         }
-        let stderr = SharedOutput::build(&stderr_log_path).await?;
         if let Some(child_stderr) = child.stderr.take() {
-            let stderr_clone = stderr.clone();
+            let stderr_clone = shared_output.clone();
             tokio::spawn(async move {
                 if let Err(e) = stderr_clone.read_stderr(child_stderr).await {
                     error!("Stderr process died with error: {}", e);
@@ -100,8 +99,7 @@ impl Children {
             uuid,
             profile_path,
             current_child,
-            stdout,
-            stderr,
+            output: shared_output,
             manager,
         };
 
@@ -293,13 +291,18 @@ impl Default for Children {
 pub struct SharedOutput {
     output: Arc<RwLock<String>>,
     log_file: Arc<RwLock<File>>,
+    censor_strings: HashMap<String, String>,
 }
 
 impl SharedOutput {
-    async fn build(log_file_path: &Path) -> crate::Result<Self> {
+    async fn build(
+        log_file_path: &Path,
+        censor_strings: HashMap<String, String>,
+    ) -> crate::Result<Self> {
         Ok(SharedOutput {
             output: Arc::new(RwLock::new(String::new())),
             log_file: Arc::new(RwLock::new(File::create(log_file_path).await?)),
+            censor_strings,
         })
     }
 
@@ -317,14 +320,17 @@ impl SharedOutput {
         let mut line = String::new();
 
         while buf_reader.read_line(&mut line).await? > 0 {
+            let val_line = self.censor_log(line.clone());
+
             {
                 let mut output = self.output.write().await;
-                output.push_str(&line);
+                output.push_str(&val_line);
             }
             {
                 let mut log_file = self.log_file.write().await;
-                log_file.write_all(line.as_bytes()).await?;
+                log_file.write_all(val_line.as_bytes()).await?;
             }
+
             line.clear();
         }
         Ok(())
@@ -338,12 +344,27 @@ impl SharedOutput {
         let mut line = String::new();
 
         while buf_reader.read_line(&mut line).await? > 0 {
+            let val_line = self.censor_log(line.clone());
+
             {
                 let mut output = self.output.write().await;
-                output.push_str(&line);
+                output.push_str(&val_line);
             }
+            {
+                let mut log_file = self.log_file.write().await;
+                log_file.write_all(val_line.as_bytes()).await?;
+            }
+
             line.clear();
         }
         Ok(())
+    }
+
+    fn censor_log(&self, mut val: String) -> String {
+        for (find, replace) in &self.censor_strings {
+            val = val.replace(find, replace);
+        }
+
+        val
     }
 }

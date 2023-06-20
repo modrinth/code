@@ -3,6 +3,10 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import { invoke } from '@tauri-apps/api/tauri'
 
+export async function isDev() {
+  return await invoke('is_dev')
+}
+
 export async function showInFolder(path) {
   return await invoke('plugin:utils|show_in_folder', { path })
 }
@@ -23,6 +27,8 @@ export const releaseColor = (releaseType) => {
 export const installVersionDependencies = async (profile, version) => {
   for (const dep of version.dependencies) {
     if (dep.dependency_type !== 'required') continue
+    // disallow fabric api install on quilt
+    if (dep.project_id === 'P7dR8mSH' && profile.metadata.loader === 'quilt') continue
     if (dep.version_id) {
       if (
         dep.project_id &&
@@ -45,7 +51,9 @@ export const installVersionDependencies = async (profile, version) => {
           v.game_versions.includes(profile.metadata.game_version) &&
           v.loaders.includes(profile.metadata.loader)
       )
-      await installMod(profile.path, latest.id).catch(handleError)
+      if (latest) {
+        await installMod(profile.path, latest.id).catch(handleError)
+      }
     }
   }
 }

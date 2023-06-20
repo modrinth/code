@@ -177,7 +177,11 @@ pub(crate) async fn get_loader_version_from_loader(
     let filter = |it: &LoaderVersion| match version.as_str() {
         "latest" => true,
         "stable" => it.stable,
-        id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
+        id => {
+            it.id == *id
+                || format!("{}-{}", game_version, id) == it.id
+                || format!("{}-{}-{}", game_version, id, game_version) == it.id
+        }
     };
 
     let loader_data = match loader {

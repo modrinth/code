@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="detectJavaModal" header="Select java version">
+  <Modal ref="detectJavaModal" header="Select java version" :noblur="!themeStore.advancedRendering">
     <div class="auto-detect-modal">
       <div class="table">
         <div class="table-row table-head">
@@ -44,6 +44,10 @@ import {
   get_all_jre,
 } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
+
+const themeStore = useTheming()
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)
@@ -75,6 +79,10 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
   emit('submit', javaInstall)
   detectJavaModal.value.hide()
+  mixpanel.track('JavaAutoDetect', {
+    path: javaInstall.path,
+    version: javaInstall.version,
+  })
 }
 </script>
 <style lang="scss" scoped>
@@ -83,7 +91,7 @@ function setJavaInstall(javaInstall) {
 
   .table {
     .table-row {
-      grid-template-columns: 1fr 4fr 1.5fr;
+      grid-template-columns: 1fr 4fr min-content;
     }
 
     span {

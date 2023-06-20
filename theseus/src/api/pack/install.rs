@@ -141,7 +141,6 @@ pub async fn install_pack(
                 async { Ok(()) }
             })
             .await?;
-            State::sync().await?;
 
             let profile = profile.clone();
             let result = async {
@@ -293,6 +292,8 @@ pub async fn install_pack(
                         Some(loading_bar),
                     )
                     .await?;
+
+                    State::sync().await?;
                 }
 
                 Ok::<PathBuf, crate::Error>(profile.clone())

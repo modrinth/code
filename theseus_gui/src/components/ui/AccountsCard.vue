@@ -65,6 +65,7 @@ import {
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
+import mixpanel from 'mixpanel-browser'
 
 defineProps({
   expanded: {
@@ -131,6 +132,7 @@ const login = async () => {
   await setAccount(loggedIn)
   await refreshValues()
   await window.close()
+  mixpanel.track('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -140,6 +142,7 @@ const logout = async (id) => {
     await setAccount(accounts.value[0])
     await refreshValues()
   }
+  mixpanel.track('AccountLogOut')
 }
 
 const toggle = () => {
@@ -269,13 +272,13 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-bg);
+  background-color: var(--color-raised-bg);
   border-radius: var(--radius-md);
-  box-shadow: none;
   width: 100%;
   text-align: left;
 
   &.expanded {
+    border: 1px solid var(--color-button-bg);
     padding: 1rem;
   }
 }

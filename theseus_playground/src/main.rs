@@ -93,51 +93,7 @@ async fn main() -> theseus::Result<()> {
         None,
     )
     .await?;
-    //
-    // install(&profile_path).await.unwrap();
 
-    // let mut value = list().await?;
-    // let profile_path = value.iter().next().map(|x| x.0).unwrap();
-
-    println!("Adding sodium");
-    let sodium_path = profile::add_project_from_version(
-        &profile_path,
-        "rAfhHfow".to_string(),
-    )
-    .await?;
-
-    let mod_menu_path = profile::add_project_from_version(
-        &profile_path,
-        "gSoPJyVn".to_string(),
-    )
-    .await?;
-
-    println!("Disabling sodium");
-    profile::toggle_disable_project(&profile_path, &sodium_path).await?;
-
-    profile::remove_project(&profile_path, &mod_menu_path).await?;
-
-    // let profile_path = pack::install_pack_from_version_id(
-    //     "CeeCkHke".to_string(),
-    //     "Technical Electrical".to_string(),
-    //     None,
-    // )
-    // .await
-    // .unwrap();
-
-    //  async closure for testing any desired edits
-    // (ie: changing the java runtime of an added profile)
-    println!("Editing.");
-    profile::edit(&profile_path, |_profile| {
-        // Add some hooks, for instance!
-        // profile.hooks = Some(Hooks {
-        //     pre_launch: Some("echo This is before Minecraft runs!".to_string()),
-        //     wrapper: None,
-        //     post_exit: None,
-        // });
-        async { Ok(()) }
-    })
-    .await?;
     State::sync().await?;
 
     // Attempt to run game
@@ -158,10 +114,8 @@ async fn main() -> theseus::Result<()> {
     // Wait 5 seconds
     println!("Waiting 5 seconds to gather logs...");
     sleep(Duration::from_secs(5)).await;
-    let stdout = process::get_stdout_by_uuid(&uuid).await?;
-    let stderr = process::get_stderr_by_uuid(&uuid).await?;
+    let stdout = process::get_output_by_uuid(&uuid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
-    println!("Logs after 5sec <<< {stderr} >>> end stderr");
 
     println!(
         "All running process UUID {:?}",

@@ -54,7 +54,6 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
         #[cfg(target_os = "linux")]
         {
-            use std::fs;
             use std::fs::metadata;
             use std::path::PathBuf;
 

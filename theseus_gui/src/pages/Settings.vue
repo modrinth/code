@@ -5,6 +5,7 @@ import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
+import mixpanel from 'mixpanel-browser'
 
 const themeStore = useTheming()
 
@@ -25,6 +26,12 @@ watch(
   settings,
   async (oldSettings, newSettings) => {
     const setSettings = JSON.parse(JSON.stringify(newSettings))
+
+    if (setSettings.opt_out_analytics) {
+      mixpanel.opt_out_tracking()
+    } else {
+      mixpanel.opt_in_tracking()
+    }
 
     if (setSettings.java_globals.JAVA_8?.path === '') {
       setSettings.java_globals.JAVA_8 = undefined
@@ -116,6 +123,26 @@ watch(
           "
         />
       </div>
+      <div class="adjacent-input">
+        <label for="advanced-rendering">
+          <span class="label__title">Advanced rendering</span>
+          <span class="label__description">
+            Enables advanced rendering such as blur effects that may cause performance issues
+            without hardware-accelerated rendering.
+          </span>
+        </label>
+        <Toggle
+          id="advanced-rendering"
+          :model-value="themeStore.advancedRendering"
+          :checked="themeStore.advancedRendering"
+          @update:model-value="
+            (e) => {
+              themeStore.advancedRendering = e
+              settings.advanced_rendering = themeStore.advancedRendering
+            }
+          "
+        />
+      </div>
     </Card>
     <Card>
       <div class="label">
@@ -156,6 +183,23 @@ watch(
           :max="50"
           :step="1"
         />
+      </div>
+    </Card>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Privacy</span>
+        </h3>
+      </div>
+      <div class="adjacent-input">
+        <label for="opt-out-analytics">
+          <span class="label__title">Disable analytics</span>
+          <span class="label__description">
+            Modrinth collects anonymized analytics and usage data to improve our user experience and
+            customize your experience. Opting out will disable this data collection.
+          </span>
+        </label>
+        <Toggle id="opt-out-analytics" v-model="settings.opt_out_analytics" />
       </div>
     </Card>
     <Card>
@@ -298,7 +342,7 @@ watch(
 
 <style lang="scss" scoped>
 .settings-page {
-  margin: 1rem 1rem 1rem 0;
+  margin: 1rem;
 }
 
 .installation-input {
