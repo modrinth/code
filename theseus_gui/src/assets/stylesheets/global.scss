@@ -80,6 +80,10 @@ input {
   .nav-container {
     padding-top: calc(var(--gap-md) + 1.75rem);
   }
+
+  .account-card {
+    top: calc(var(--gap-md) + 1.75rem);
+  }
 }
 
 .windows {

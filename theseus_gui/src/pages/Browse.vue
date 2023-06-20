@@ -828,6 +828,13 @@ const showLoaders = computed(
     min-height: calc(100vh - 3.25rem);
     max-height: calc(100vh - 3.25rem);
     overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
 
     h2 {
       color: var(--color-contrast);
