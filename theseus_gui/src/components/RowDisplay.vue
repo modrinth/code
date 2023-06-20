@@ -31,7 +31,7 @@ import { showInFolder } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { install as pack_install } from '@/helpers/pack.js'
 import { useTheming } from '@/store/state.js'
-import mixpanel from "mixpanel-browser";
+import mixpanel from 'mixpanel-browser'
 
 const router = useRouter()
 
@@ -54,6 +54,7 @@ const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 const rows = ref(null)
 const confirmModal = ref(null)
+const deleteConfirmModal = ref(null)
 const modInstallModal = ref(null)
 
 const themeStore = useTheming()
@@ -61,9 +62,6 @@ const currentDeleteInstance = ref(null)
 
 async function deleteProfile() {
   if (currentDeleteInstance.value) {
-    instanceComponents.value = instanceComponents.value.filter(
-      (x) => x.instance.path !== currentDeleteInstance.value
-    )
     await remove(currentDeleteInstance.value).catch(handleError)
   }
 }
@@ -134,7 +132,7 @@ const handleOptionsClick = async (args) => {
       }
       mixpanel.track('InstanceStop', {
         loader: args.item.metadata.loader,
-        game_version: args.item.metadata.game_version
+        game_version: args.item.metadata.game_version,
       })
       break
     case 'add_content':
@@ -150,7 +148,7 @@ const handleOptionsClick = async (args) => {
       break
     case 'delete':
       currentDeleteInstance.value = args.item.path
-      confirmModal.value.show()
+      deleteConfirmModal.value.show()
       break
     case 'open_folder':
       await showInFolder(args.item.path)
@@ -218,7 +216,7 @@ onUnmounted(() => {
 
 <template>
   <ModalConfirm
-    ref="confirmModal"
+    ref="deleteConfirmModal"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"

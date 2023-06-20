@@ -250,7 +250,7 @@ onUnmounted(() => unlisten())
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 50%;
+      bottom: calc(var(--gap-md) + 4.25rem);
     }
   }
 }
@@ -260,15 +260,14 @@ onUnmounted(() => unlisten())
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   z-index: 1;
   width: 3rem;
   height: 3rem;
-  left: 50%;
-  bottom: 30%;
-  transform: translateX(-50%);
+  right: calc(var(--gap-md) * 2);
+  bottom: 3.25rem;
   opacity: 0;
-  transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
+  transition: 0.2s ease-in-out bottom, 0.2s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
   box-shadow: var(--shadow-floating);
 
