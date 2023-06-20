@@ -569,46 +569,47 @@
               <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
             </nuxt-link>
           </div>
-          <ClientOnly>
-            <NuxtLink
-              v-for="(version, index) in featuredVersions"
-              :key="index"
-              class="featured-version button-transparent"
-              :to="`/${project.project_type}/${
-                project.slug ? project.slug : project.id
-              }/version/${encodeURI(version.displayUrlEnding)}`"
-              :ref_key="`featured-version-${index}`"
+          <div
+            v-for="version in featuredVersions"
+            :key="version.id"
+            class="featured-version button-transparent"
+            @click="
+              $router.push(
+                `/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/version/${encodeURI(version.displayUrlEnding)}`
+              )
+            "
+          >
+            <a
+              v-tooltip="
+                version.primaryFile.filename + ' (' + $formatBytes(version.primaryFile.size) + ')'
+              "
+              :href="version.primaryFile.url"
+              class="download square-button brand-button"
+              :aria-label="`Download ${version.name}`"
+              @click.stop="(event) => event.stopPropagation()"
             >
-              <NuxtLink
-                v-tooltip="
-                  version.primaryFile.filename + ' (' + $formatBytes(version.primaryFile.size) + ')'
-                "
-                :to="version.primaryFile.url"
-                external
-                class="download square-button brand-button"
-                :aria-label="`Download ${version.name}`"
+              <DownloadIcon aria-hidden="true" />
+            </a>
+            <div class="info">
+              <nuxt-link
+                :to="`/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/version/${encodeURI(version.displayUrlEnding)}`"
+                class="top"
               >
-                <DownloadIcon aria-hidden="true" />
-              </NuxtLink>
-              <div class="info">
-                <NuxtLink
-                  :to="`/${project.project_type}/${
-                    project.slug ? project.slug : project.id
-                  }/version/${encodeURI(version.displayUrlEnding)}`"
-                  class="top"
-                >
-                  {{ version.name }}
-                </NuxtLink>
-                <div v-if="version.game_versions.length > 0" class="game-version item">
-                  {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
-                  {{ $formatVersion(version.game_versions) }}
-                </div>
-                <Badge v-if="version.version_type === 'release'" type="release" color="green" />
-                <Badge v-else-if="version.version_type === 'beta'" type="beta" color="orange" />
-                <Badge v-else-if="version.version_type === 'alpha'" type="alpha" color="red" />
+                {{ version.name }}
+              </nuxt-link>
+              <div v-if="version.game_versions.length > 0" class="game-version item">
+                {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
+                {{ $formatVersion(version.game_versions) }}
               </div>
-            </NuxtLink>
-          </ClientOnly>
+              <Badge v-if="version.version_type === 'release'" type="release" color="green" />
+              <Badge v-else-if="version.version_type === 'beta'" type="beta" color="orange" />
+              <Badge v-else-if="version.version_type === 'alpha'" type="alpha" color="red" />
+            </div>
+          </div>
           <hr class="card-divider" />
         </template>
         <h2 class="card-header">Project members</h2>
