@@ -14,7 +14,7 @@ import {
   ModalConfirm,
 } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ProjectCard from '@/components/ui/ProjectCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
@@ -35,7 +35,7 @@ import mixpanel from 'mixpanel-browser'
 
 const router = useRouter()
 
-defineProps({
+const props = defineProps({
   instances: {
     type: Array,
     default() {
@@ -48,6 +48,10 @@ defineProps({
   },
   canPaginate: Boolean,
 })
+
+const actualInstances = computed(() =>
+  props.instances.filter((x) => x && x.instances && x.instances[0])
+)
 
 const modsRow = ref(null)
 const instanceOptions = ref(null)
@@ -225,7 +229,7 @@ onUnmounted(() => {
     @proceed="deleteProfile"
   />
   <div class="content">
-    <div v-for="row in instances" ref="rows" :key="row.label" class="row">
+    <div v-for="row in actualInstances" ref="rows" :key="row.label" class="row">
       <div class="header">
         <router-link :to="row.route">{{ row.label }}</router-link>
         <ChevronRightIcon />

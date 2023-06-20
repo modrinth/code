@@ -74,13 +74,12 @@ fn main() {
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build());
 
-    #[cfg(target_os = "windows")]
+    #[cfg(not(target_os = "macos"))]
     {
-      builder = builder
-        .setup(|app| {
-          let win = app.get_window("main").unwrap();
-          win.set_decorations(false);
-          Ok(())
+        builder = builder.setup(|app| {
+            let win = app.get_window("main").unwrap();
+            win.set_decorations(false);
+            Ok(())
         })
     }
 
