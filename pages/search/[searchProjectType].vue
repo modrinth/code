@@ -848,13 +848,15 @@ export default defineNuxtComponent({
 .normal-page__sidebar {
   grid-row: 3;
 
-  // Hide on mobile unless open
-  @media screen and (max-width: 1024px) {
-    display: none;
+  // Always show on desktop
+  @media screen and (min-width: 1024px) {
+    display: block;
+  }
 
-    &.open {
-      display: block;
-    }
+  // Hide on mobile unless open
+  display: none;
+  &.open {
+    display: block;
   }
 }
 
