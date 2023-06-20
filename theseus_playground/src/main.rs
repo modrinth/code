@@ -85,7 +85,7 @@ async fn main() -> theseus::Result<()> {
         name.clone(),
         game_version,
         modloader,
-        Some(loader_version.into()),
+        Some(loader_version),
         None,
         None,
         None,

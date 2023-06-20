@@ -14,7 +14,7 @@ use crate::util::fetch::{
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
 use reqwest::Method;
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};

@@ -191,7 +191,7 @@ impl ProfileInit {
             name,
             game_version,
             loader.clone().map(|x| x.1).unwrap_or(ModLoader::Vanilla),
-            loader.map(|x| x.0.id.into()),
+            loader.map(|x| x.0.id),
             None,
             None,
             None,

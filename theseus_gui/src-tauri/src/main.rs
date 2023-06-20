@@ -5,7 +5,7 @@
 
 use theseus::prelude::*;
 
-use tauri::{Manager, WindowEvent};
+use tauri::Manager;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 

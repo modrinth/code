@@ -46,7 +46,7 @@ pub async fn profile_create(
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
-    icon: Option<PathBuf>,                       // the icon for the profile
+    icon: Option<PathBuf>,          // the icon for the profile
     icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
@@ -159,8 +159,7 @@ pub(crate) async fn get_loader_version_from_loader(
     let state = State::get().await?;
     let metadata = state.metadata.read().await;
 
-    let version = loader_version
-        .unwrap_or_else(|| "latest".to_string().into());
+    let version = loader_version.unwrap_or_else(|| "latest".to_string());
 
     let filter = |it: &LoaderVersion| match version.as_str() {
         "latest" => true,

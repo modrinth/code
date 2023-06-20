@@ -1,6 +1,6 @@
 use crate::api::Result;
 use std::path::PathBuf;
-use theseus::{prelude::*};
+use theseus::prelude::*;
 
 // Generic basic profile creation tool.
 // Creates an essentially empty dummy profile with profile_create
@@ -18,7 +18,7 @@ pub async fn profile_create(
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-    icon: Option<PathBuf>,                       // the icon for the profile
+    icon: Option<PathBuf>,          // the icon for the profile
 ) -> Result<PathBuf> {
     let res = profile_create::profile_create(
         name,

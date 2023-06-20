@@ -252,8 +252,7 @@ pub fn create_mrpack_json(
     })
 }
 
-
-fn sanitize_loader_version_string (s: &str) -> &str {
+fn sanitize_loader_version_string(s: &str) -> &str {
     // Split on '-'
     // If two or more, take the second
     // If one, take the first
@@ -267,7 +266,6 @@ fn sanitize_loader_version_string (s: &str) -> &str {
         None => s,
     }
 }
-
 
 // Given a folder path, populate a Vec of all the files in the folder, recursively
 #[async_recursion::async_recursion]
