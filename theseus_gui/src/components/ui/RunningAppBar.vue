@@ -1,9 +1,4 @@
 <template>
-  <div class="external-buttons">
-    <Button icon-only class="icon-button" @click="modal.show()">
-      <DashboardIcon />
-    </Button>
-  </div>
   <div class="action-groups">
     <Button
       v-if="currentLoadingBars.length > 0"
@@ -52,7 +47,7 @@
     <Card v-if="showCard === true" ref="card" class="info-card">
       <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
         <h3 class="info-title">
-          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
+          {{ loadingBar.title }}
         </h3>
         <ProgressBar :progress="Math.floor(loadingBar.current)" />
         <div class="row">{{ Math.floor(loadingBar.current) }}% {{ loadingBar.message }}</div>
@@ -87,7 +82,6 @@
       </Button>
     </Card>
   </transition>
-  <OnboardingModal ref="modal" />
 </template>
 
 <script setup>
@@ -97,7 +91,6 @@ import {
   Card,
   StopCircleIcon,
   TerminalSquareIcon,
-  DashboardIcon,
   DropdownIcon,
 } from 'omorphia'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
@@ -111,7 +104,6 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import OnboardingModal from '@/components/OnboardingModal.vue'
 import mixpanel from 'mixpanel-browser'
 
 const router = useRouter()
@@ -120,11 +112,6 @@ const profiles = ref(null)
 const infoButton = ref(null)
 const profileButton = ref(null)
 const showCard = ref(false)
-const modal = ref(null)
-
-defineExpose({
-  modal,
-})
 
 const showProfiles = ref(false)
 
@@ -162,21 +149,36 @@ const goToTerminal = (path) => {
   router.push(`/instance/${encodeURIComponent(path ?? selectedProfile.value.path)}/logs`)
 }
 
-const currentLoadingBars = ref(Object.values(await progress_bars_list().catch(handleError)))
-
-const unlistenLoading = await loading_listener(async () => {
-  await refreshInfo()
-})
+const currentLoadingBars = ref([])
 
 const refreshInfo = async () => {
   const currentLoadingBarCount = currentLoadingBars.value.length
-  currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
+  currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError)).map(
+    (x) => {
+      if (x.bar_type.type === 'java_download') {
+        x.title = 'Downloading Java ' + x.bar_type.version
+      }
+      if (x.bar_type.profile_name) {
+        x.title = x.bar_type.profile_name
+      }
+      if (x.bar_type.pack_name) {
+        x.title = x.bar_type.pack_name
+      }
+
+      return x
+    }
+  )
   if (currentLoadingBars.value.length === 0) {
     showCard.value = false
   } else if (currentLoadingBarCount < currentLoadingBars.value.length) {
     showCard.value = true
   }
 }
+
+await refreshInfo()
+const unlistenLoading = await loading_listener(async () => {
+  await refreshInfo()
+})
 
 const selectProfile = (profile) => {
   selectedProfile.value = profile
@@ -220,7 +222,6 @@ const toggleProfiles = async () => {
 }
 
 onMounted(() => {
-  modal.value.show()
   window.addEventListener('click', handleClickOutsideCard)
   window.addEventListener('click', handleClickOutsideProfile)
 })
@@ -234,15 +235,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-.external-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.5rem;
-  height: 100%;
-  padding: 0 1rem;
-}
-
 .action-groups {
   display: flex;
   flex-direction: row;

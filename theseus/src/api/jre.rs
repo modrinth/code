@@ -18,9 +18,9 @@ pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
 // Autodetect JavaSettings default
 // Make a guess for what the default Java global settings should be
 pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
-    let mut java_8 = find_java8_jres().await?;
-    let mut java_17 = find_java17_jres().await?;
-    let mut java_18plus = find_java18plus_jres().await?;
+    let mut java_8 = find_filtered_jres("1.8").await?;
+    let mut java_17 = find_filtered_jres("1.17").await?;
+    let mut java_18plus = find_filtered_jres("1.18").await?;
 
     // Simply select last one found for initial guess
     let mut java_globals = JavaGlobals::new();
@@ -37,55 +37,19 @@ pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
     Ok(java_globals)
 }
 
-// Searches for jres on the system that are 1.18 or higher
-pub async fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.18")?;
+// Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
+pub async fn find_filtered_jres(
+    version: &str,
+) -> crate::Result<Vec<JavaVersion>> {
+    let version = extract_java_majorminor_version(version)?;
     let jres = jre::get_all_jre().await?;
-    // Filter out JREs that are not 1.17 or higher
+
     Ok(jres
         .into_iter()
         .filter(|jre| {
             let jre_version = extract_java_majorminor_version(&jre.version);
             if let Ok(jre_version) = jre_version {
                 jre_version >= version
-            } else {
-                false
-            }
-        })
-        .collect())
-}
-
-// Searches for jres on the system that are 1.8 exactly
-pub async fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.8")?;
-    let jres = jre::get_all_jre().await?;
-
-    // Filter out JREs that are not 1.8
-    Ok(jres
-        .into_iter()
-        .filter(|jre| {
-            let jre_version = extract_java_majorminor_version(&jre.version);
-            if let Ok(jre_version) = jre_version {
-                jre_version == version
-            } else {
-                false
-            }
-        })
-        .collect())
-}
-
-// Searches for jres on the system that are 1.17 exactly
-pub async fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.17")?;
-    let jres = jre::get_all_jre().await?;
-
-    // Filter out JREs that are not 1.8
-    Ok(jres
-        .into_iter()
-        .filter(|jre| {
-            let jre_version = extract_java_majorminor_version(&jre.version);
-            if let Ok(jre_version) = jre_version {
-                jre_version == version
             } else {
                 false
             }
@@ -157,16 +121,36 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             ))
         })?;
         emit_loading(&loading_bar, 10.0, Some("Done extracting java")).await?;
-        Ok(path
-            .join(
-                download
-                    .name
-                    .file_stem()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-                    .to_string(),
-            )
-            .join(format!("zulu-{}.jre/Contents/Home/bin/java", java_version)))
+        let mut base_path = path.join(
+            download
+                .name
+                .file_stem()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string(),
+        );
+
+        #[cfg(target_os = "macos")]
+        {
+            base_path = base_path
+                .join(format!("zulu-{}.jre", java_version))
+                .join("Contents")
+                .join("Home")
+                .join("bin")
+                .join("java")
+        }
+
+        #[cfg(target_os = "windows")]
+        {
+            base_path = base_path.join("bin").join("javaw.exe")
+        }
+
+        #[cfg(target_os = "linux")]
+        {
+            base_path = base_path.join("bin").join("java")
+        }
+
+        Ok(base_path)
     } else {
         Err(crate::ErrorKind::LauncherError(format!(
                     "No Java Version found for Java version {}, OS {}, and Architecture {}",
