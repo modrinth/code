@@ -213,6 +213,7 @@
         :dependencies="dependencies"
         :install="install"
         :installed="installed"
+        :installedVersion="installedVersion"
       />
     </div>
   </div>
@@ -264,7 +265,7 @@ import {
   list,
   add_project_from_version as installMod,
   check_installed,
-  get as getInstance,
+  get as getInstance, remove_project,
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -304,11 +305,13 @@ const [data, versions, members, dependencies, categories, loaders, instance] = a
   ),
   get_loaders().then(ref).catch(handleError),
   get_categories().then(ref).catch(handleError),
-  route.query.i ? getInstance(route.query.i, true).then(ref) : Promise.resolve().then(ref),
+  route.query.i ? getInstance(route.query.i, false).then(ref) : Promise.resolve().then(ref),
 ])
 
-const installed = ref(
-  instance.value && (await check_installed(instance.value.path, data.value.id).catch(handleError))
+const installed = ref(instance.value && (await check_installed(instance.value.path, data.value.id).catch(handleError)))
+
+const installedVersion = ref(
+  instance.value ? Object.values(instance.value.projects).find((p) => p?.metadata?.version?.project_id === data.value.id)?.metadata?.version?.id : null
 )
 
 breadcrumbs.setName('Project', data.value.title)
@@ -329,6 +332,13 @@ const markInstalled = () => {
 async function install(version) {
   installing.value = true
   let queuedVersionData
+
+  if(installed.value) {
+    await remove_project(instance.value.path, Object.entries(instance.value.projects).map(([key, value]) => ({
+      key,
+      value
+    })).find((p) => p.value.metadata?.version?.project_id === data.value.id).key)
+  }
 
   if (version) {
     queuedVersionData = versions.value.find((v) => v.id === version)
@@ -388,7 +398,8 @@ async function install(version) {
         } else {
           queuedVersionData = selectedVersion
           await installMod(instance.value.path, selectedVersion.id).catch(handleError)
-          installVersionDependencies(instance.value, queuedVersionData)
+          await installVersionDependencies(instance.value, queuedVersionData)
+          installedVersion.value = selectedVersion.id
         }
       } else {
         const gameVersion = instance.value.metadata.game_version
@@ -403,6 +414,7 @@ async function install(version) {
         if (compatible) {
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
+          installedVersion.value = queuedVersionData.id
         } else {
           incompatibilityWarning.value.show(
             instance.value,

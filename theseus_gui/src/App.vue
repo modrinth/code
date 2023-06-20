@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   Button,
   Notifications,
+  XIcon,
 } from 'omorphia'
 import { handleError, useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -20,6 +21,9 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
 import { warning_listener } from '@/helpers/events.js'
+import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
+import { type } from '@tauri-apps/api/os'
+import { appWindow } from '@tauri-apps/api/window'
 
 const themeStore = useTheming()
 
@@ -36,6 +40,12 @@ onMounted(async () => {
       type: 'warn',
     })
   )
+
+  if ((await type()) === 'Darwin') {
+    document.getElementsByTagName('html')[0].classList.add('mac')
+  } else {
+    document.getElementsByTagName('html')[0].classList.add('windows')
+  }
 })
 
 defineExpose({
@@ -163,12 +173,23 @@ document.querySelector('body').addEventListener('click', function (e) {
     <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div data-tauri-drag-region class="appbar">
         <section class="navigation-controls">
-          <Breadcrumbs />
+          <Breadcrumbs data-tauri-drag-region />
         </section>
         <section class="mod-stats">
           <Suspense>
-            <RunningAppBar />
+            <RunningAppBar data-tauri-drag-region />
           </Suspense>
+        </section>
+        <section class="window-controls">
+          <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
+            <MinimizeIcon />
+          </Button>
+          <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
+            <MaximizeIcon />
+          </Button>
+          <Button class="titlebar-button close" icon-only @click="() => appWindow.close()">
+            <XIcon />
+          </Button>
         </section>
       </div>
       <div class="router-view">
@@ -194,6 +215,43 @@ document.querySelector('body').addEventListener('click', function (e) {
   background-color: var(--color-brand-highlight);
   transition: all ease-in-out 0.1s;
 }
+
+.navigation-controls {
+  flex-grow: 1;
+  width: min-content;
+}
+
+.window-controls {
+  display: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+
+  .titlebar-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all ease-in-out 0.1s;
+    background-color: var(--color-raised-bg);
+    color: var(--color-base);
+
+    &.close {
+      &:hover,
+      &:active {
+        background-color: var(--color-red);
+        color: var(--color-accent-contrast);
+      }
+    }
+
+    &:hover,
+    &:active {
+      background-color: var(--color-button-bg);
+      color: var(--color-contrast);
+    }
+  }
+}
+
 .container {
   --appbar-height: 3.25rem;
   --sidebar-width: 4.5rem;
@@ -212,13 +270,16 @@ document.querySelector('body').addEventListener('click', function (e) {
 
     .appbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
       background: var(--color-raised-bg);
       box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
       text-align: center;
-      padding: 0 0 0 1rem;
+      padding: var(--gap-md);
       height: 3.25rem;
+      gap: var(--gap-sm);
+      //no select
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .router-view {
@@ -240,7 +301,6 @@ document.querySelector('body').addEventListener('click', function (e) {
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: var(--gap-md);
-  padding-top: calc(var(--gap-md) + 1.75rem);
 
   &.expanded {
     --sidebar-width: 13rem;

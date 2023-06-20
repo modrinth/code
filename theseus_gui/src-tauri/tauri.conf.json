@@ -37,6 +37,9 @@
         "unminimize": true,
         "startDragging": true,
         "setDecorations": true
+      },
+      "os": {
+        "all": true
       }
     },
     "macOSPrivateApi": true,

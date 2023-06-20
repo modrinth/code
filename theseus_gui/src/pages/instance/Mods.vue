@@ -52,17 +52,28 @@
         v-model="selectedProjectType"
         :items="Object.keys(selectableProjectTypes)"
       />
-      <Button :disabled="!projects.some((x) => x.outdated)" class="no-wrap" @click="updateAll">
-        <UpdatedIcon />
-        Update {{ selected.length > 0 ? 'selected' : 'all' }}
-      </Button>
+      <DropdownButton
+        :options="['update_all', 'filter_update']"
+        default-value="update_all"
+        :disabled="!projects.some((x) => x.outdated)"
+        @option-click="updateAll"
+      >
+        <template #update_all>
+          <UpdatedIcon />
+          Update {{selected.length > 0 ? 'selected' : 'all'}}
+        </template>
+        <template #filter_update>
+          <UpdatedIcon />
+          Select Updatable
+        </template>
+      </DropdownButton>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
         <TrashIcon />
         Remove selected
       </Button>
       <DropdownButton
         v-if="selected.length > 0"
-        :options="['toggle', 'disable', 'enable']"
+        :options="['toggle', 'disable', 'enable', 'hide_show']"
         default-value="toggle"
         @option-click="toggleSelected"
       >
@@ -77,6 +88,10 @@
         <template #enable>
           <CheckCircleIcon />
           Enable selected
+        </template>
+        <template #hide_show>
+          <CheckCircleIcon />
+          {{hideNonSelected ? 'Show' : 'Hide'}} unselected
         </template>
       </DropdownButton>
       <DropdownButton
@@ -292,6 +307,7 @@ const sortFilter = ref('')
 const selectedProjectType = ref('All')
 const selected = computed(() => projects.value.filter((mod) => mod.selected))
 const deleteWarning = ref(null)
+const hideNonSelected = ref(false);
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -311,6 +327,11 @@ const search = computed(() => {
       mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
       (projectType === 'all' || mod.project_type === projectType)
     )
+  }).filter((mod) => {
+    if (hideNonSelected.value) {
+      return mod.selected
+    }
+    return true
   })
 
   return updateSort(filtered, sortFilter.value)
@@ -361,29 +382,37 @@ function updateSort(projects, sort) {
   }
 }
 
-async function updateAll() {
-  const setProjects = []
-  for (const [i, project] of selected.value ?? projects.value.entries()) {
-    if (project.outdated) {
-      project.updating = true
-      setProjects.push(i)
+async function updateAll(args) {
+  if (args.option === 'update_all') {
+    const setProjects = []
+    for (const [i, project] of selected.value ?? projects.value.entries()) {
+      if (project.outdated) {
+        project.updating = true
+        setProjects.push(i)
+      }
     }
-  }
 
-  const paths = await update_all(props.instance.path).catch(handleError)
+    const paths = await update_all(props.instance.path).catch(handleError)
 
-  for (const [oldVal, newVal] of Object.entries(paths)) {
-    const index = projects.value.findIndex((x) => x.path === oldVal)
-    projects.value[index].path = newVal
-    projects.value[index].outdated = false
+    for (const [oldVal, newVal] of Object.entries(paths)) {
+      const index = projects.value.findIndex((x) => x.path === oldVal)
+      projects.value[index].path = newVal
+      projects.value[index].outdated = false
 
-    if (projects.value[index].updateVersion) {
-      projects.value[index].version = projects.value[index].updateVersion.version_number
-      projects.value[index].updateVersion = null
+      if (projects.value[index].updateVersion) {
+        projects.value[index].version = projects.value[index].updateVersion.version_number
+        projects.value[index].updateVersion = null
+      }
     }
-  }
-  for (const project of setProjects) {
-    projects.value[project].updating = false
+    for (const project of setProjects) {
+      projects.value[project].updating = false
+    }
+  } else {
+    for (const project of projects.value) {
+      if (project.outdated) {
+        project.selected = true
+      }
+    }
   }
 }
 
@@ -411,6 +440,7 @@ const handleContentOptionClick = async (args) => {
   if (args.option === 'search') {
     await router.push({
       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+      query: { i: props.instance.path },
     })
   } else if (args.option === 'from_file') {
     const newProject = await open({ multiple: true })
@@ -484,6 +514,9 @@ async function toggleSelected(args) {
           await toggleDisableMod(project)
         }
       }
+      break
+    case 'hide_show':
+      hideNonSelected.value = !hideNonSelected.value;
       break
   }
 }

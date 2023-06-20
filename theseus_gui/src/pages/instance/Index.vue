@@ -57,21 +57,22 @@
             Folder
           </Button>
         </span>
+        <hr class="card-divider"/>
+        <div class="pages-list">
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
+            <BoxIcon />
+            Mods
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
+            <FileIcon />
+            Logs
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+            <SettingsIcon />
+            Options
+          </RouterLink>
+        </div>
       </Card>
-      <div class="pages-list">
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
-          <BoxIcon />
-          Mods
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
-          <FileIcon />
-          Logs
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-          <SettingsIcon />
-          Options
-        </RouterLink>
-      </div>
     </div>
     <div class="content">
       <Promotion />
@@ -357,7 +358,7 @@ Button {
 .pages-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--gap-xs);
 
   a {
     font-size: 100%;
@@ -366,7 +367,6 @@ Button {
     transition: all ease-in-out 0.1s;
     width: 100%;
     color: var(--color-primary);
-    padding: var(--gap-md);
     box-shadow: none;
 
     &.router-link-exact-active {

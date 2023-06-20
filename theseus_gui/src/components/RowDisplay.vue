@@ -10,14 +10,29 @@ import {
   StopCircleIcon,
   ExternalIcon,
   EyeIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
 } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
-import {onMounted, onUnmounted, ref} from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import ProjectCard from "@/components/ui/ProjectCard.vue";
+import ProjectCard from '@/components/ui/ProjectCard.vue'
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import {
+  get_all_running_profile_paths,
+  get_uuids_by_profile_path,
+  kill_by_uuid,
+} from '@/helpers/process.js'
+import { handleError } from '@/store/notifications.js'
+import { remove, run } from '@/helpers/profile.js'
+import { useRouter } from 'vue-router'
+import { showInFolder } from '@/helpers/utils.js'
+import { useFetch } from '@/helpers/fetch.js'
+import { install as pack_install } from '@/helpers/pack.js'
 
-const props = defineProps({
+const router = useRouter()
+
+defineProps({
   instances: {
     type: Array,
     default() {
@@ -35,8 +50,10 @@ const modsRow = ref(null)
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 const rows = ref(null)
+const confirmModal = ref(null)
+const modInstallModal = ref(null)
 
-const handleInstanceRightClick = (event, passedInstance) => {
+const handleInstanceRightClick = async (event, passedInstance) => {
   const baseOptions = [
     { name: 'add_content' },
     { type: 'divider' },
@@ -50,21 +67,9 @@ const handleInstanceRightClick = (event, passedInstance) => {
     },
   ]
 
-  const options = !passedInstance?.instance?.path
-    ? [
-        {
-          name: 'install',
-          color: 'primary',
-        },
-        { type: 'divider' },
-        {
-          name: 'open_link',
-        },
-        {
-          name: 'copy_link',
-        },
-      ]
-    : passedInstance.playing
+  const running = await get_all_running_profile_paths().catch(handleError)
+
+  const options = running.includes(passedInstance.path)
     ? [
         {
           name: 'stop',
@@ -83,116 +88,135 @@ const handleInstanceRightClick = (event, passedInstance) => {
   instanceOptions.value.showMenu(event, passedInstance, options)
 }
 
+const handleProjectClick = (event, passedInstance) => {
+  instanceOptions.value.showMenu(event, passedInstance, [
+    {
+      name: 'install',
+      color: 'primary',
+    },
+    { type: 'divider' },
+    {
+      name: 'open_link',
+    },
+    {
+      name: 'copy_link',
+    },
+  ])
+}
+
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await args.item.play()
+      await run(args.item.path).catch(handleError)
       break
     case 'stop':
-      await args.item.stop()
+      for (const u of await get_uuids_by_profile_path(args.item.path).catch(handleError)) {
+        await kill_by_uuid(u).catch(handleError)
+      }
       break
     case 'add_content':
-      await args.item.addContent()
+      await router.push({
+        path: `/browse/${args.item.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        query: { i: args.item.path },
+      })
       break
     case 'edit':
-      await args.item.seeInstance()
+      await router.push({
+        path: `/instance/${encodeURIComponent(args.item.path)}/`,
+      })
       break
     case 'delete':
-      await args.item.deleteInstance()
+      await remove(args.item.path).catch(handleError)
       break
     case 'open_folder':
-      await args.item.openFolder()
+      await showInFolder(args.item.path)
       break
     case 'copy_path':
-      await navigator.clipboard.writeText(args.item.instance.path)
+      await navigator.clipboard.writeText(args.item.path)
       break
-    case 'install':
-      args.item.install()
+    case 'install': {
+      const versions = await useFetch(
+        `https://api.modrinth.com/v2/project/${args.item.project_id}/version`,
+        'project versions'
+      )
+
+      if (args.item.project_type === 'modpack') {
+        await pack_install(
+          args.item.project_id,
+          versions[0].id,
+          args.item.title,
+          args.item.icon_url
+        )
+      } else {
+        modInstallModal.value.show(args.item.project_id, versions)
+      }
       break
+    }
     case 'open_link':
       window.__TAURI_INVOKE__('tauri', {
         __tauriModule: 'Shell',
         message: {
           cmd: 'open',
-          path: `https://modrinth.com/${args.item.instance.project_type}/${args.item.instance.slug}`,
+          path: `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
         },
       })
       break
     case 'copy_link':
       await navigator.clipboard.writeText(
-        `https://modrinth.com/${args.item.instance.project_type}/${args.item.instance.slug}`
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`
       )
       break
   }
 }
 
-const getInstanceIndex = (rowIndex, index) => {
-  let instanceIndex = 0
-  for (let i = 0; i < rowIndex; i++) {
-    instanceIndex += props.instances[i].instances.length
-  }
-  instanceIndex += index
-  return instanceIndex
-}
-
-const maxInstancesPerRow = ref(0);
-const maxProjectsPerRow = ref(0);
+const maxInstancesPerRow = ref(0)
+const maxProjectsPerRow = ref(0)
 
 const calculateCardsPerRow = () => {
   // Calculate how many cards fit in one row
-  const containerWidth = rows.value[0].clientWidth;
+  const containerWidth = rows.value[0].clientWidth
   // Convert container width from pixels to rem
-  const containerWidthInRem = containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize);
-  maxInstancesPerRow.value = Math.floor((containerWidthInRem - 10) / 10);
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem - 5) / 18);
+  const containerWidthInRem =
+    containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
+  maxInstancesPerRow.value = Math.floor((containerWidthInRem + 1) / 11)
+  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 19)
 }
 
 onMounted(() => {
-  calculateCardsPerRow();
-  window.addEventListener('resize', calculateCardsPerRow);
-});
+  calculateCardsPerRow()
+  window.addEventListener('resize', calculateCardsPerRow)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('resize', calculateCardsPerRow);
-});
+  window.removeEventListener('resize', calculateCardsPerRow)
+})
 </script>
 
 <template>
   <div class="content">
-    <div v-for="(row, rowIndex) in instances" ref="rows" :key="row.label" class="row">
+    <div v-for="row in instances" ref="rows" :key="row.label" class="row">
       <div class="header">
-        <router-link :to="row.route">{{row.label}}</router-link>
-        <ChevronRightIcon/>
+        <router-link :to="row.route">{{ row.label }}</router-link>
+        <ChevronRightIcon />
       </div>
       <section v-if="row.instances[0].metadata" ref="modsRow" class="instances">
         <Instance
-          v-for="(instance, instanceIndex) in row.instances.slice(0, maxInstancesPerRow)"
-          ref="instanceComponents"
+          v-for="instance in row.instances.slice(0, maxInstancesPerRow)"
           :key="instance?.project_id || instance?.id"
           :instance="instance"
-          @contextmenu.prevent.stop="
-            (event) =>
-              handleInstanceRightClick(
-                event,
-                instanceComponents[getInstanceIndex(rowIndex, instanceIndex)]
-              )
-          "
+          @contextmenu.prevent.stop="(event) => handleInstanceRightClick(event, instance)"
         />
       </section>
       <section v-else ref="modsRow" class="projects">
         <ProjectCard
-          v-for="(project, projectIndex) in row.instances.slice(0, maxProjectsPerRow)"
+          v-for="project in row.instances.slice(0, maxProjectsPerRow)"
           :key="project?.project_id"
           ref="instanceComponents"
           class="item"
           :project="project"
-          @contextmenu.prevent.stop="
-            (event) =>
-              handleInstanceRightClick(
-                event,
-                instanceComponents[getInstanceIndex(rowIndex, projectIndex)]
-              )
-          "
+          :confirm-modal="confirmModal"
+          :mod-install-modal="modInstallModal"
+          @contextmenu.prevent.stop="(event) => handleProjectClick(event, project)"
         />
       </section>
     </div>
@@ -209,6 +233,8 @@ onUnmounted(() => {
     <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
     <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
   </ContextMenu>
+  <InstallConfirmModal ref="confirmModal" />
+  <InstanceInstallModal ref="modInstallModal" />
 </template>
 <style lang="scss" scoped>
 .content {
@@ -266,7 +292,7 @@ onUnmounted(() => {
 
   .instances {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
     grid-gap: 1rem;
     width: 100%;
   }
@@ -274,7 +300,7 @@ onUnmounted(() => {
   .projects {
     display: grid;
     width: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
     grid-gap: 1rem;
 
     .item {

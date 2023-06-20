@@ -82,7 +82,7 @@ import {
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
+import {add_project_from_version as installMod, check_installed, list} from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
@@ -125,7 +125,7 @@ const props = defineProps({
 })
 
 const installing = ref(false)
-const installed = ref(props.project.installed)
+const installed = ref(props.instance ? await check_installed(props.instance.path, props.project.project_id) : false)
 
 async function install() {
   installing.value = true

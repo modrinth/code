@@ -475,7 +475,7 @@ const showLoaders = computed(
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <div v-if="instanceContext" class="small-instance">
+      <Card v-if="instanceContext" class="small-instance">
         <div class="instance">
           <Avatar
             :src="
@@ -510,7 +510,7 @@ const showLoaders = computed(
           class="filter-checkbox"
           @update:model-value="onSearchChangeToTop(1)"
         />
-      </div>
+      </Card>
       <Card class="search-panel-card">
         <Button
           role="button"
@@ -705,10 +705,7 @@ const showLoaders = computed(
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
 .small-instance {
-  background: var(--color-bg);
-  padding: var(--gap-lg);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--gap-md);
+  min-height: unset !important;
 
   .instance {
     display: flex;
@@ -763,7 +760,7 @@ const showLoaders = computed(
 .search-panel-card {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
   min-height: min-content !important;
 }
 

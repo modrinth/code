@@ -16,9 +16,7 @@
         :show-labels="false"
         :selectable="() => versions.length <= 6"
         placeholder="Filter loader..."
-        :custom-label="(
-          option
-        ) => option.charAt(0).toUpperCase() + option.slice(1)"
+        :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
       />
       <multiselect
         v-model="filterGameVersions"
@@ -35,9 +33,7 @@
         :show-labels="false"
         :selectable="() => versions.length <= 6"
         placeholder="Filter versions..."
-        :custom-label="(
-          option
-        ) => option.charAt(0).toUpperCase() + option.slice(1)"
+        :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
       />
       <multiselect
         v-model="filterVersions"
@@ -54,17 +50,14 @@
         :show-labels="false"
         :selectable="() => versions.length <= 6"
         placeholder="Filter release channel..."
-        :custom-label="(
-          option
-        ) => option.charAt(0).toUpperCase() + option.slice(1)"
+        :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
       />
     </div>
     <Button
       class="no-wrap clear-filters"
       :disabled="
-        filterVersions.length === 0 &&
-        filterLoader.length === 0 &&
-        filterGameVersions.length === 0"
+        filterVersions.length === 0 && filterLoader.length === 0 && filterGameVersions.length === 0
+      "
       :action="clearFilters"
     >
       <ClearIcon />
@@ -94,12 +87,13 @@
       >
         <div class="table-cell table-text">
           <Button
-            color="primary"
+            :color="installed && version.id === installedVersion ? '' : 'primary'"
             icon-only
-            :disabled="installed"
+            :disabled="installed && version.id === installedVersion"
             @click.stop="() => install(version.id)"
           >
             <DownloadIcon v-if="!installed" />
+            <SwapIcon v-else-if="installed && version.id !== installedVersion" />
             <CheckIcon v-else />
           </Button>
         </div>
@@ -157,10 +151,20 @@
 </template>
 
 <script setup>
-import { Card, Button, CheckIcon, ClearIcon, Badge, DownloadIcon, Pagination, formatNumber } from 'omorphia'
+import {
+  Card,
+  Button,
+  CheckIcon,
+  ClearIcon,
+  Badge,
+  DownloadIcon,
+  Pagination,
+  formatNumber,
+} from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
-import {computed, ref, watch} from 'vue'
+import { computed, ref, watch } from 'vue'
+import {SwapIcon} from "@/assets/icons/index.js";
 
 const filterVersions = ref([])
 const filterLoader = ref([])
@@ -184,17 +188,30 @@ const props = defineProps({
     required: true,
   },
   installed: {
-    type: String,
+    type: Boolean,
     default: null,
   },
+  instance: {
+    type: Object,
+    default: null,
+  },
+  installedVersion: {
+    type: String,
+    default: null,
+  }
 })
 
 const filteredVersions = computed(() => {
   return props.versions.filter(
     (projectVersion) =>
-      (filterGameVersions.value.length === 0 || filterGameVersions.value.some((gameVersion) => projectVersion.game_versions.includes(gameVersion))) &&
-      (filterLoader.value.length === 0 || filterLoader.value.some((loader) => projectVersion.loaders.includes(loader))) &&
-      (filterVersions.value.length === 0 || filterVersions.value.includes(projectVersion.version_type))
+      (filterGameVersions.value.length === 0 ||
+        filterGameVersions.value.some((gameVersion) =>
+          projectVersion.game_versions.includes(gameVersion)
+        )) &&
+      (filterLoader.value.length === 0 ||
+        filterLoader.value.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (filterVersions.value.length === 0 ||
+        filterVersions.value.includes(projectVersion.version_type))
   )
 })
 
@@ -206,7 +223,6 @@ function switchPage(page) {
 watch([filterVersions, filterLoader, filterGameVersions], () => {
   currentPage.value = 1
 })
-
 </script>
 
 <style scoped lang="scss">
