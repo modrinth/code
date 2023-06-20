@@ -207,7 +207,7 @@
         :dependencies="dependencies"
         :install="install"
         :installed="installed"
-        :installedVersion="installedVersion"
+        :installed-version="installedVersion"
       />
     </div>
   </div>
@@ -259,7 +259,8 @@ import {
   list,
   add_project_from_version as installMod,
   check_installed,
-  get as getInstance, remove_project,
+  get as getInstance,
+  remove_project,
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -316,9 +317,12 @@ async function fetchProjectData() {
     instance.value?.path &&
     (await check_installed(instance.value.path, data.value.id).catch(handleError))
   breadcrumbs.setName('Project', data.value.title)
-  installedVersion.value = instance.value ? Object.values(instance.value.projects).find((p) => p?.metadata?.version?.project_id === data.value.id)?.metadata?.version?.id : null
+  installedVersion.value = instance.value
+    ? Object.values(instance.value.projects).find(
+        (p) => p?.metadata?.version?.project_id === data.value.id
+      )?.metadata?.version?.id
+    : null
 }
-
 
 await fetchProjectData()
 
@@ -341,11 +345,16 @@ async function install(version) {
   installing.value = true
   let queuedVersionData
 
-  if(installed.value) {
-    await remove_project(instance.value.path, Object.entries(instance.value.projects).map(([key, value]) => ({
-      key,
-      value
-    })).find((p) => p.value.metadata?.version?.project_id === data.value.id).key)
+  if (installed.value) {
+    await remove_project(
+      instance.value.path,
+      Object.entries(instance.value.projects)
+        .map(([key, value]) => ({
+          key,
+          value,
+        }))
+        .find((p) => p.value.metadata?.version?.project_id === data.value.id).key
+    )
   }
 
   if (version) {

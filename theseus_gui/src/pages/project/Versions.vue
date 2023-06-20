@@ -164,7 +164,7 @@ import {
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
 import { computed, ref, watch } from 'vue'
-import {SwapIcon} from "@/assets/icons/index.js";
+import { SwapIcon } from '@/assets/icons/index.js'
 
 const filterVersions = ref([])
 const filterLoader = ref([])
@@ -198,7 +198,7 @@ const props = defineProps({
   installedVersion: {
     type: String,
     default: null,
-  }
+  },
 })
 
 const filteredVersions = computed(() => {

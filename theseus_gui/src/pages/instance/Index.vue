@@ -57,7 +57,7 @@
             Folder
           </Button>
         </span>
-        <hr class="card-divider"/>
+        <hr class="card-divider" />
         <div class="pages-list">
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
             <BoxIcon />

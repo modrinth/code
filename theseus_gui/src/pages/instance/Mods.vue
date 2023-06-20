@@ -60,7 +60,7 @@
       >
         <template #update_all>
           <UpdatedIcon />
-          Update {{selected.length > 0 ? 'selected' : 'all'}}
+          Update {{ selected.length > 0 ? 'selected' : 'all' }}
         </template>
         <template #filter_update>
           <UpdatedIcon />
@@ -91,7 +91,7 @@
         </template>
         <template #hide_show>
           <CheckCircleIcon />
-          {{hideNonSelected ? 'Show' : 'Hide'}} unselected
+          {{ hideNonSelected ? 'Show' : 'Hide' }} unselected
         </template>
       </DropdownButton>
       <DropdownButton
@@ -314,7 +314,7 @@ const sortFilter = ref('')
 const selectedProjectType = ref('All')
 const selected = computed(() => projects.value.filter((mod) => mod.selected))
 const deleteWarning = ref(null)
-const hideNonSelected = ref(false);
+const hideNonSelected = ref(false)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -329,17 +329,19 @@ const selectableProjectTypes = computed(() => {
 
 const search = computed(() => {
   const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = projects.value.filter((mod) => {
-    return (
-      mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
-      (projectType === 'all' || mod.project_type === projectType)
-    )
-  }).filter((mod) => {
-    if (hideNonSelected.value) {
-      return mod.selected
-    }
-    return true
-  })
+  const filtered = projects.value
+    .filter((mod) => {
+      return (
+        mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
+        (projectType === 'all' || mod.project_type === projectType)
+      )
+    })
+    .filter((mod) => {
+      if (hideNonSelected.value) {
+        return mod.selected
+      }
+      return true
+    })
 
   return updateSort(filtered, sortFilter.value)
 })
@@ -553,7 +555,7 @@ async function toggleSelected(args) {
       }
       break
     case 'hide_show':
-      hideNonSelected.value = !hideNonSelected.value;
+      hideNonSelected.value = !hideNonSelected.value
       break
   }
 }

@@ -1,5 +1,5 @@
 <script setup>
-import {handleError, onMounted, ref, watch} from 'vue'
+import { handleError, onMounted, ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import {
   HomeIcon,
