@@ -1,45 +1,47 @@
 <template>
-  <div v-if="selectedProfile" class="status">
-    <span class="circle running" />
-    <div
-      ref="profileButton"
-      class="running-text"
-      :class="{ clickable: currentProcesses.length > 1 }"
-      @click="toggleProfiles()"
+  <div class="action-groups">
+    <Button
+      v-if="currentLoadingBars.length > 0"
+      ref="infoButton"
+      icon-only
+      class="icon-button show-card-icon"
+      @click="toggleCard()"
     >
-      {{ selectedProfile.metadata.name }}
-      <div v-if="currentProcesses.length > 1" class="arrow" :class="{ rotate: showProfiles }">
-        <DropdownIcon />
+      <DownloadIcon />
+    </Button>
+    <div v-if="selectedProfile" class="status">
+      <span class="circle running" />
+      <div
+        ref="profileButton"
+        class="running-text"
+        :class="{ clickable: currentProcesses.length > 1 }"
+        @click="toggleProfiles()"
+      >
+        {{ selectedProfile.metadata.name }}
+        <div v-if="currentProcesses.length > 1" class="arrow" :class="{ rotate: showProfiles }">
+          <DropdownIcon />
+        </div>
       </div>
+      <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop" @click="stop()">
+        <StopCircleIcon />
+      </Button>
+      <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
+        <TerminalSquareIcon />
+      </Button>
+      <Button
+        v-if="currentLoadingBars.length > 0"
+        ref="infoButton"
+        icon-only
+        class="icon-button show-card-icon"
+        @click="toggleCard()"
+      >
+        <DownloadIcon />
+      </Button>
     </div>
-    <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop" @click="stop()">
-      <StopCircleIcon />
-    </Button>
-    <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
-      <TerminalSquareIcon />
-    </Button>
-    <Button
-      v-if="currentLoadingBars.length > 0"
-      ref="infoButton"
-      icon-only
-      class="icon-button show-card-icon"
-      @click="toggleCard()"
-    >
-      <DownloadIcon />
-    </Button>
-  </div>
-  <div v-else class="status">
-    <span class="circle stopped" />
-    <span class="running-text"> No running instances </span>
-    <Button
-      v-if="currentLoadingBars.length > 0"
-      ref="infoButton"
-      icon-only
-      class="icon-button show-card-icon"
-      @click="toggleCard()"
-    >
-      <DownloadIcon />
-    </Button>
+    <div v-else class="status">
+      <span class="circle stopped" />
+      <span class="running-text"> No running instances </span>
+    </div>
   </div>
   <transition name="download">
     <Card v-if="showCard === true" ref="card" class="info-card">
@@ -228,6 +230,13 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.action-groups {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
 .arrow {
   transition: transform 0.2s ease-in-out;
   display: flex;
@@ -238,14 +247,13 @@ onBeforeUnmount(() => {
 }
 
 .status {
-  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
-  background-color: var(--color-raised-bg);
-  padding: 0 1rem;
-  margin: 0;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-button-bg);
+  padding: var(--gap-sm) var(--gap-lg);
 }
 
 .running-text {

@@ -1,50 +1,76 @@
 <template>
-  <Card>
-    <div class="filter-header">
-      <div class="manage">
-        <multiselect
-          v-model="filterVersions"
-          :options="
-            versions
-              .flatMap((value) => value.loaders)
-              .filter((value, index, self) => self.indexOf(value) === index)
-          "
-          :multiple="true"
-          :searchable="true"
-          :show-no-results="false"
-          :close-on-select="false"
-          :clear-search-on-select="false"
-          :show-labels="false"
-          :selectable="() => versions.length <= 6"
-          placeholder="Filter loader..."
-        />
-        <multiselect
-          v-model="filterLoader"
-          :options="
-            versions
-              .flatMap((value) => value.game_versions)
-              .filter((value, index, self) => self.indexOf(value) === index)
-          "
-          :multiple="true"
-          :searchable="true"
-          :show-no-results="false"
-          :close-on-select="false"
-          :clear-search-on-select="false"
-          :show-labels="false"
-          :selectable="() => versions.length <= 6"
-          placeholder="Filter versions..."
-        />
-      </div>
-      <Button
-        class="no-wrap clear-filters"
-        :disabled="!filterLoader && !filterVersions"
-        :action="clearFilters"
-      >
-        <ClearIcon />
-        Clear filters
-      </Button>
+  <Card class="filter-header">
+    <div class="manage">
+      <multiselect
+        v-model="filterLoader"
+        :options="
+          versions
+            .flatMap((value) => value.loaders)
+            .filter((value, index, self) => self.indexOf(value) === index)
+        "
+        :multiple="true"
+        :searchable="true"
+        :show-no-results="false"
+        :close-on-select="false"
+        :clear-search-on-select="false"
+        :show-labels="false"
+        :selectable="() => versions.length <= 6"
+        placeholder="Filter loader..."
+        :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
+      />
+      <multiselect
+        v-model="filterGameVersions"
+        :options="
+          versions
+            .flatMap((value) => value.game_versions)
+            .filter((value, index, self) => self.indexOf(value) === index)
+        "
+        :multiple="true"
+        :searchable="true"
+        :show-no-results="false"
+        :close-on-select="false"
+        :clear-search-on-select="false"
+        :show-labels="false"
+        :selectable="() => versions.length <= 6"
+        placeholder="Filter versions..."
+        :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
+      />
+      <multiselect
+        v-model="filterVersions"
+        :options="
+          versions
+            .map((value) => value.version_type)
+            .filter((value, index, self) => self.indexOf(value) === index)
+        "
+        :multiple="true"
+        :searchable="true"
+        :show-no-results="false"
+        :close-on-select="false"
+        :clear-search-on-select="false"
+        :show-labels="false"
+        :selectable="() => versions.length <= 6"
+        placeholder="Filter release channel..."
+        :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
+      />
     </div>
+    <Button
+      class="no-wrap clear-filters"
+      :disabled="
+        filterVersions.length === 0 && filterLoader.length === 0 && filterGameVersions.length === 0
+      "
+      :action="clearFilters"
+    >
+      <ClearIcon />
+      Clear filters
+    </Button>
   </Card>
+  <Pagination
+    :page="currentPage"
+    :count="Math.ceil(filteredVersions.length / 20)"
+    class="pagination-before"
+    :link-function="(page) => `?page=${page}`"
+    @switch-page="switchPage"
+  />
   <Card class="mod-card">
     <div class="table">
       <div class="table-row table-head">
@@ -54,19 +80,20 @@
         <div class="table-cell table-text">Stats</div>
       </div>
       <div
-        v-for="version in versions"
+        v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
         :key="version.id"
         class="table-row selectable"
         @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
           <Button
-            color="primary"
+            :color="installed && version.id === installedVersion ? '' : 'primary'"
             icon-only
-            :disabled="installed"
+            :disabled="installed && version.id === installedVersion"
             @click.stop="() => install(version.id)"
           >
             <DownloadIcon v-if="!installed" />
+            <SwapIcon v-else-if="installed && version.id !== installedVersion" />
             <CheckIcon v-else />
           </Button>
         </div>
@@ -124,20 +151,34 @@
 </template>
 
 <script setup>
-import { Card, Button, CheckIcon, ClearIcon, Badge, DownloadIcon, formatNumber } from 'omorphia'
+import {
+  Card,
+  Button,
+  CheckIcon,
+  ClearIcon,
+  Badge,
+  DownloadIcon,
+  Pagination,
+  formatNumber,
+} from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { SwapIcon } from '@/assets/icons/index.js'
 
-let filterVersions = ref(null)
-let filterLoader = ref(null)
+const filterVersions = ref([])
+const filterLoader = ref([])
+const filterGameVersions = ref([])
+
+const currentPage = ref(1)
 
 const clearFilters = () => {
-  filterVersions.value = null
-  filterLoader.value = null
+  filterVersions.value = []
+  filterLoader.value = []
+  filterGameVersions.value = []
 }
 
-defineProps({
+const props = defineProps({
   versions: {
     type: Array,
     required: true,
@@ -148,8 +189,39 @@ defineProps({
   },
   installed: {
     type: Boolean,
-    required: true,
+    default: null,
   },
+  instance: {
+    type: Object,
+    default: null,
+  },
+  installedVersion: {
+    type: String,
+    default: null,
+  },
+})
+
+const filteredVersions = computed(() => {
+  return props.versions.filter(
+    (projectVersion) =>
+      (filterGameVersions.value.length === 0 ||
+        filterGameVersions.value.some((gameVersion) =>
+          projectVersion.game_versions.includes(gameVersion)
+        )) &&
+      (filterLoader.value.length === 0 ||
+        filterLoader.value.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (filterVersions.value.length === 0 ||
+        filterVersions.value.includes(projectVersion.version_type))
+  )
+})
+
+function switchPage(page) {
+  currentPage.value = page
+}
+
+//watch all the filters and if a value changes, reset to page 1
+watch([filterVersions, filterLoader, filterGameVersions], () => {
+  currentPage.value = 1
 })
 </script>
 
@@ -160,6 +232,7 @@ defineProps({
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .table-row {
@@ -188,6 +261,7 @@ defineProps({
   flex-direction: column;
   gap: 1rem;
   overflow: hidden;
+  margin-top: 0.5rem;
 }
 
 .text-combo {

@@ -475,7 +475,7 @@ const showLoaders = computed(
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <div v-if="instanceContext" class="small-instance">
+      <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
           <Avatar
             :src="
@@ -512,7 +512,7 @@ const showLoaders = computed(
           @update:model-value="onSearchChangeToTop(1)"
           @click.prevent.stop
         />
-      </div>
+      </Card>
       <Card class="search-panel-card">
         <Button
           role="button"
@@ -707,10 +707,7 @@ const showLoaders = computed(
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
 .small-instance {
-  background: var(--color-bg);
-  padding: var(--gap-lg);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--gap-md);
+  min-height: unset !important;
 
   .instance {
     display: flex;
@@ -765,8 +762,7 @@ const showLoaders = computed(
 .search-panel-card {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-bg) !important;
-  margin-bottom: 0;
+  margin-bottom: 0 !important;
   min-height: min-content !important;
 }
 
@@ -825,14 +821,20 @@ const showLoaders = computed(
   .filter-panel {
     position: fixed;
     width: 20rem;
-    background: var(--color-raised-bg);
-    padding: 1rem;
+    padding: 1rem 0.5rem 1rem 1rem;
     display: flex;
     flex-direction: column;
     height: fit-content;
     min-height: calc(100vh - 3.25rem);
     max-height: calc(100vh - 3.25rem);
     overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      width: 0;
+      background: transparent;
+    }
 
     h2 {
       color: var(--color-contrast);
@@ -844,8 +846,8 @@ const showLoaders = computed(
 
   .search {
     scroll-behavior: smooth;
-    margin: 0 1rem 0.5rem 21rem;
-    width: calc(100% - 22rem);
+    margin: 0 1rem 0.5rem 20.5rem;
+    width: calc(100% - 20.5rem);
 
     .loading {
       margin: 2rem;

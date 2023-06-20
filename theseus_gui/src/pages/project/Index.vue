@@ -1,7 +1,7 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
-      <div v-if="instance" class="small-instance">
+      <Card v-if="instance" class="small-instance">
         <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
           <Avatar
             :src="
@@ -23,7 +23,7 @@
             </span>
           </div>
         </router-link>
-      </div>
+      </Card>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
@@ -207,6 +207,7 @@
         :dependencies="dependencies"
         :install="install"
         :installed="installed"
+        :installed-version="installedVersion"
       />
     </div>
   </div>
@@ -259,6 +260,7 @@ import {
   add_project_from_version as installMod,
   check_installed,
   get as getInstance,
+  remove_project,
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -284,7 +286,6 @@ const incompatibilityWarning = ref(null)
 
 const options = ref(null)
 const installing = ref(false)
-
 const data = shallowRef(null)
 const versions = shallowRef([])
 const members = shallowRef([])
@@ -293,6 +294,7 @@ const categories = shallowRef([])
 const instance = ref(null)
 
 const installed = ref(false)
+const installedVersion = ref(null)
 
 async function fetchProjectData() {
   ;[
@@ -315,6 +317,11 @@ async function fetchProjectData() {
     instance.value?.path &&
     (await check_installed(instance.value.path, data.value.id).catch(handleError))
   breadcrumbs.setName('Project', data.value.title)
+  installedVersion.value = instance.value
+    ? Object.values(instance.value.projects).find(
+        (p) => p?.metadata?.version?.project_id === data.value.id
+      )?.metadata?.version?.id
+    : null
 }
 
 await fetchProjectData()
@@ -337,6 +344,18 @@ const markInstalled = () => {
 async function install(version) {
   installing.value = true
   let queuedVersionData
+
+  if (installed.value) {
+    await remove_project(
+      instance.value.path,
+      Object.entries(instance.value.projects)
+        .map(([key, value]) => ({
+          key,
+          value,
+        }))
+        .find((p) => p.value.metadata?.version?.project_id === data.value.id).key
+    )
+  }
 
   if (version) {
     queuedVersionData = versions.value.find((v) => v.id === version)
@@ -406,7 +425,7 @@ async function install(version) {
           queuedVersionData = selectedVersion
           await installMod(instance.value.path, selectedVersion.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
-
+          installedVersion.value = selectedVersion.id
           mixpanel.track('ProjectInstall', {
             loader: instance.value.metadata.loader,
             game_version: instance.value.metadata.game_version,
@@ -430,7 +449,7 @@ async function install(version) {
         if (compatible) {
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
-
+          installedVersion.value = queuedVersionData.id
           mixpanel.track('ProjectInstall', {
             loader: instance.value.metadata.loader,
             game_version: instance.value.metadata.game_version,
@@ -513,15 +532,20 @@ const handleOptionsClick = (args) => {
   height: fit-content;
   max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
-  background: var(--color-raised-bg);
-  padding: 1rem;
+  padding: 1rem 0.5rem 1rem 1rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
 }
 
 .sidebar-card {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: var(--color-bg);
 }
 
 .content-container {
@@ -529,7 +553,7 @@ const handleOptionsClick = (args) => {
   flex-direction: column;
   width: 100%;
   padding: 1rem;
-  margin-left: 20rem;
+  margin-left: 19.5rem;
 }
 
 .button-group {
@@ -652,7 +676,6 @@ const handleOptionsClick = (args) => {
 }
 
 .small-instance {
-  background: var(--color-bg);
   padding: var(--gap-lg);
   border-radius: var(--radius-md);
   margin-bottom: var(--gap-md);
