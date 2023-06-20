@@ -28,6 +28,10 @@ pub struct Settings {
     pub collapsed_navigation: bool,
     #[serde(default)]
     pub developer_mode: bool,
+    #[serde(default)]
+    pub opt_out_analytics: bool,
+    #[serde(default)]
+    pub advanced_rendering: bool,
 }
 
 impl Default for Settings {
@@ -46,6 +50,8 @@ impl Default for Settings {
             version: CURRENT_FORMAT_VERSION,
             collapsed_navigation: false,
             developer_mode: false,
+            opt_out_analytics: false,
+            advanced_rendering: true,
         }
     }
 }

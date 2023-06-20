@@ -11,6 +11,7 @@ import {
   ExternalIcon,
   EyeIcon,
   ChevronRightIcon,
+  ModalConfirm,
 } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -29,6 +30,7 @@ import { useRouter } from 'vue-router'
 import { showInFolder } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { install as pack_install } from '@/helpers/pack.js'
+import { useTheming } from '@/store/state.js'
 
 const router = useRouter()
 
@@ -52,6 +54,18 @@ const instanceComponents = ref(null)
 const rows = ref(null)
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
+
+const themeStore = useTheming()
+const currentDeleteInstance = ref(null)
+
+async function deleteProfile() {
+  if (currentDeleteInstance.value) {
+    instanceComponents.value = instanceComponents.value.filter(
+      (x) => x.instance.path !== currentDeleteInstance.value
+    )
+    await remove(currentDeleteInstance.value).catch(handleError)
+  }
+}
 
 const handleInstanceRightClick = async (event, passedInstance) => {
   const baseOptions = [
@@ -126,7 +140,8 @@ const handleOptionsClick = async (args) => {
       })
       break
     case 'delete':
-      await remove(args.item.path).catch(handleError)
+      currentDeleteInstance.value = args.item.path
+      confirmModal.value.show()
       break
     case 'open_folder':
       await showInFolder(args.item.path)
@@ -193,6 +208,15 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <ModalConfirm
+    ref="confirmModal"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    :noblur="!themeStore.advancedRendering"
+    @proceed="deleteProfile"
+  />
   <div class="content">
     <div v-for="row in instances" ref="rows" :key="row.label" class="row">
       <div class="header">

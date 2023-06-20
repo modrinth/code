@@ -233,6 +233,7 @@ pub async fn profile_edit(
         async { Ok(()) }
     })
     .await?;
+    State::sync().await?;
 
     Ok(())
 }
