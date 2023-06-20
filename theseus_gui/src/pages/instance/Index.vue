@@ -113,7 +113,7 @@ import {
   PlusIcon,
   ExternalIcon,
 } from 'omorphia'
-import { get, get_potential_override_folders, run } from '@/helpers/profile'
+import { get, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
