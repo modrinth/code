@@ -4,6 +4,7 @@ use crate::pack::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::process::Profile;
+use crate::profile::get;
 use crate::LoadingBarType;
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
@@ -32,16 +33,7 @@ pub async fn export_mrpack(
 
     // Create mrpack json configuration file
     let packfile = create_mrpack_json(profile, version_id)?;
-    let modrinth_path_list = packfile
-        .files
-        .iter()
-        .map(|f| {
-            let path = PathBuf::from(f.path.clone());
-            let name = path.to_string_lossy();
-            let name = name.replace('\\', "/");
-            name.trim_start_matches('/').to_string()
-        })
-        .collect::<Vec<String>>();
+    let modrinth_path_list = get_modrinth_pack_list(&packfile);
 
     // Build vec of all files in the folder
     let mut path_list = Vec::new();
@@ -72,11 +64,11 @@ pub async fn export_mrpack(
         }
 
         // Get local path of file, relative to profile folder
-        let name = path.strip_prefix(profile_base_path)?;
+        let relative_path = path.strip_prefix(profile_base_path)?;
 
         // Get highest level folder pair ('a/b' in 'a/b/c', 'a' in 'a')
         // We only go one layer deep for the sake of not having a huge list of overrides
-        let topmost_two = name
+        let topmost_two = relative_path
             .iter()
             .take(2)
             .map(|os| os.to_string_lossy().to_string())
@@ -99,11 +91,12 @@ pub async fn export_mrpack(
             continue;
         }
 
-        let name: std::borrow::Cow<str> = name.to_string_lossy();
-        let name = name.replace('\\', "/");
-        let name = name.trim_start_matches('/').to_string();
+        let relative_path: std::borrow::Cow<str> =
+            relative_path.to_string_lossy();
+        let relative_path = relative_path.replace('\\', "/");
+        let relative_path = relative_path.trim_start_matches('/').to_string();
 
-        if modrinth_path_list.contains(&name) {
+        if modrinth_path_list.contains(&relative_path) {
             continue;
         }
 
@@ -113,7 +106,7 @@ pub async fn export_mrpack(
             let mut data = Vec::new();
             file.read_to_end(&mut data).await?;
             let builder = ZipEntryBuilder::new(
-                format!("overrides/{name}"),
+                format!("overrides/{relative_path}"),
                 Compression::Deflate,
             );
             writer.write_entry_whole(builder, &data).await?;
@@ -130,6 +123,19 @@ pub async fn export_mrpack(
 
     writer.close().await?;
     Ok(())
+}
+
+fn get_modrinth_pack_list(packfile: &PackFormat) -> Vec<String> {
+    packfile
+        .files
+        .iter()
+        .map(|f| {
+            let path = PathBuf::from(f.path.clone());
+            let name = path.to_string_lossy();
+            let name = name.replace('\\', "/");
+            name.trim_start_matches('/').to_string()
+        })
+        .collect::<Vec<String>>()
 }
 
 /// Creates a json configuration for a .mrpack zipped file
@@ -276,6 +282,17 @@ pub async fn build_folder(
 pub async fn get_potential_override_folders(
     profile_path: PathBuf,
 ) -> crate::Result<Vec<PathBuf>> {
+    // First, get a dummy mrpack json for the files within
+    let profile: Profile =
+        get(&profile_path, None).await?.ok_or_else(|| {
+            crate::ErrorKind::OtherError(format!(
+                "Tried to export a nonexistent or unloaded profile at path {}!",
+                profile_path.display()
+            ))
+        })?;
+    let mrpack = create_mrpack_json(&profile, "0".to_string())?;
+    let mrpack_files = get_modrinth_pack_list(&mrpack);
+
     let mut path_list: Vec<PathBuf> = Vec::new();
     let mut read_dir = fs::read_dir(&profile_path).await?;
     while let Some(entry) = read_dir.next_entry().await? {
@@ -286,12 +303,16 @@ pub async fn get_potential_override_folders(
             while let Some(entry) = read_dir.next_entry().await? {
                 let path: PathBuf = entry.path();
                 let name = path.strip_prefix(&profile_path)?.to_path_buf();
-                path_list.push(name);
+                if !mrpack_files.contains(&name.to_string_lossy().to_string()) {
+                    path_list.push(name);
+                }
             }
         } else {
             // One layer of files/folders if its a file
             let name = path.strip_prefix(&profile_path)?.to_path_buf();
-            path_list.push(name);
+            if !mrpack_files.contains(&name.to_string_lossy().to_string()) {
+                path_list.push(name);
+            }
         }
     }
     Ok(path_list)
