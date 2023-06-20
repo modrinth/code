@@ -709,6 +709,10 @@
       background-color: var(--color-button-bg);
       border-radius: var(--size-rounded-xs);
 
+      > * {
+        display: inline-block;
+      }
+
       &:hover {
         background-color: var(--color-button-bg-hover);
       }
