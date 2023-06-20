@@ -37,8 +37,8 @@ export async function get_uuids_by_profile_path(profilePath) {
 
 /// Gets all running process IDs with a given profile path
 /// Returns [u32]
-export async function get_all_running_profile_paths(profile_path) {
-  return await invoke('process_get_all_running_profile_paths', { profile_path })
+export async function get_all_running_profile_paths(profilePath) {
+  return await invoke('process_get_all_running_profile_paths', { profilePath })
 }
 
 /// Gets all running process IDs with a given profile path
@@ -47,16 +47,10 @@ export async function get_all_running_profiles() {
   return await invoke('process_get_all_running_profiles')
 }
 
-/// Gets process stderr by UUID
-/// Returns String
-export async function get_stderr_by_uuid(uuid) {
-  return await invoke('process_get_stderr_by_uuid', { uuid })
-}
-
 /// Gets process stdout by UUID
 /// Returns String
-export async function get_stdout_by_uuid(uuid) {
-  return await invoke('process_get_stdout_by_uuid', { uuid })
+export async function get_output_by_uuid(uuid) {
+  return await invoke('process_get_output_by_uuid', { uuid })
 }
 
 /// Kills a process by UUID

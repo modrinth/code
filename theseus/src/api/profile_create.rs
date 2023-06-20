@@ -164,17 +164,13 @@ pub(crate) async fn get_loader_version_from_loader(
         .unwrap_or_else(|| "latest".to_string().into())
         .0;
 
-    let filter = |it: &LoaderVersion| {
-        tracing::trace!(
-            "Checking loader version: {} to match version: {}",
-            it.id,
-            version.as_str()
-        );
-
-        match version.as_str() {
-            "latest" => true,
-            "stable" => it.stable,
-            id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
+    let filter = |it: &LoaderVersion| match version.as_str() {
+        "latest" => true,
+        "stable" => it.stable,
+        id => {
+            it.id == *id
+                || format!("{}-{}", game_version, id) == it.id
+                || format!("{}-{}-{}", game_version, id, game_version) == it.id
         }
     };
 

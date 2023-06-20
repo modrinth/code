@@ -5,6 +5,7 @@ import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
+import mixpanel from 'mixpanel-browser'
 
 const themeStore = useTheming()
 
@@ -21,35 +22,58 @@ fetchSettings.envArgs = fetchSettings.custom_env_args.map((x) => x.join('=')).jo
 const settings = ref(fetchSettings)
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
-watch(settings.value, async (oldSettings, newSettings) => {
-  const setSettings = JSON.parse(JSON.stringify(newSettings))
+watch(
+  settings,
+  async (oldSettings, newSettings) => {
+    const setSettings = JSON.parse(JSON.stringify(newSettings))
 
-  if (setSettings.java_globals.JAVA_8?.path === '') {
-    setSettings.java_globals.JAVA_8 = undefined
-  }
-  if (setSettings.java_globals.JAVA_17?.path === '') {
-    setSettings.java_globals.JAVA_17 = undefined
-  }
+    if (setSettings.opt_out_analytics) {
+      mixpanel.opt_out_tracking()
+    } else {
+      mixpanel.opt_in_tracking()
+    }
 
-  setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
-  setSettings.custom_env_args = setSettings.envArgs
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((x) => x.split('=').filter(Boolean))
+    if (setSettings.java_globals.JAVA_8?.path === '') {
+      setSettings.java_globals.JAVA_8 = undefined
+    }
+    if (setSettings.java_globals.JAVA_17?.path === '') {
+      setSettings.java_globals.JAVA_17 = undefined
+    }
 
-  if (!setSettings.hooks.pre_launch) {
-    setSettings.hooks.pre_launch = null
-  }
-  if (!setSettings.hooks.wrapper) {
-    setSettings.hooks.wrapper = null
-  }
-  if (!setSettings.hooks.post_exit) {
-    setSettings.hooks.post_exit = null
-  }
+    if (setSettings.java_globals.JAVA_8?.path) {
+      setSettings.java_globals.JAVA_8.path = setSettings.java_globals.JAVA_8.path.replace(
+        'java.exe',
+        'javaw.exe'
+      )
+    }
+    if (setSettings.java_globals.JAVA_17?.path) {
+      setSettings.java_globals.JAVA_17.path = setSettings.java_globals.JAVA_17?.path.replace(
+        'java.exe',
+        'javaw.exe'
+      )
+    }
 
-  await set(setSettings)
-})
+    setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
+    setSettings.custom_env_args = setSettings.envArgs
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((x) => x.split('=').filter(Boolean))
+
+    if (!setSettings.hooks.pre_launch) {
+      setSettings.hooks.pre_launch = null
+    }
+    if (!setSettings.hooks.wrapper) {
+      setSettings.hooks.wrapper = null
+    }
+    if (!setSettings.hooks.post_exit) {
+      setSettings.hooks.post_exit = null
+    }
+
+    await set(setSettings)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -99,6 +123,26 @@ watch(settings.value, async (oldSettings, newSettings) => {
           "
         />
       </div>
+      <div class="adjacent-input">
+        <label for="advanced-rendering">
+          <span class="label__title">Advanced rendering</span>
+          <span class="label__description">
+            Enables advanced rendering such as blur effects that may cause performance issues
+            without hardware-accelerated rendering.
+          </span>
+        </label>
+        <Toggle
+          id="advanced-rendering"
+          :model-value="themeStore.advancedRendering"
+          :checked="themeStore.advancedRendering"
+          @update:model-value="
+            (e) => {
+              themeStore.advancedRendering = e
+              settings.advanced_rendering = themeStore.advancedRendering
+            }
+          "
+        />
+      </div>
     </Card>
     <Card>
       <div class="label">
@@ -119,7 +163,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
           id="max-downloads"
           v-model="settings.max_concurrent_downloads"
           :min="1"
-          :max="100"
+          :max="10"
           :step="1"
         />
       </div>
@@ -136,9 +180,26 @@ watch(settings.value, async (oldSettings, newSettings) => {
           id="max-writes"
           v-model="settings.max_concurrent_writes"
           :min="1"
-          :max="100"
+          :max="50"
           :step="1"
         />
+      </div>
+    </Card>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Privacy</span>
+        </h3>
+      </div>
+      <div class="adjacent-input">
+        <label for="opt-out-analytics">
+          <span class="label__title">Disable analytics</span>
+          <span class="label__description">
+            Modrinth collects anonymized analytics and usage data to improve our user experience and
+            customize your experience. Opting out will disable this data collection.
+          </span>
+        </label>
+        <Toggle id="opt-out-analytics" v-model="settings.opt_out_analytics" />
       </div>
     </Card>
     <Card>
@@ -192,6 +253,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
           :min="256"
           :max="maxMemory"
           :step="1"
+          unit="mb"
         />
       </div>
     </Card>
@@ -280,7 +342,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
 
 <style lang="scss" scoped>
 .settings-page {
-  margin: 1rem 1rem 1rem 0;
+  margin: 1rem;
 }
 
 .installation-input {

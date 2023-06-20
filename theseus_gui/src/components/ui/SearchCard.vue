@@ -1,5 +1,13 @@
 <template>
-  <Card class="card button-base" @click="$router.push(`/project/${project.project_id}/`)">
+  <Card
+    class="card button-base"
+    @click="
+      $router.push({
+        path: `/project/${project.project_id}/`,
+        query: { i: props.instance ? props.instance.path : undefined },
+      })
+    "
+  >
     <div class="icon">
       <Avatar :src="project.icon_url" size="md" class="search-icon" />
     </div>
@@ -42,12 +50,7 @@
       </div>
     </div>
     <div class="install">
-      <Button
-        :to="`/browse/${project.slug}`"
-        color="primary"
-        :disabled="installed || installing"
-        @click.stop="install()"
-      >
+      <Button color="primary" :disabled="installed || installing" @click.stop="install()">
         <DownloadIcon v-if="!installed" />
         <CheckIcon v-else />
         {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
@@ -74,11 +77,12 @@ import {
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
+import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
 dayjs.extend(relativeTime)
 
 const props = defineProps({
@@ -117,13 +121,8 @@ const props = defineProps({
 })
 
 const installing = ref(false)
-
 const installed = ref(
-  props.instance
-    ? Object.values(props.instance.projects).some(
-        (p) => p.metadata?.project?.id === props.project.project_id
-      )
-    : false
+  props.instance ? await check_installed(props.instance.path, props.project.project_id) : false
 )
 
 async function install() {
@@ -158,6 +157,13 @@ async function install() {
         props.project.title,
         props.project.icon_url
       ).catch(handleError)
+
+      mixpanel.track('PackInstall', {
+        id: props.project.project_id,
+        version_id: queuedVersionData.id,
+        title: props.project.title,
+        source: 'SearchCard',
+      })
     } else {
       props.confirmModal.show(
         props.project.project_id,
@@ -173,16 +179,33 @@ async function install() {
           props.instance,
           props.project.title,
           versions,
-          () => (installed.value = true)
+          () => (installed.value = true),
+          props.project.project_id,
+          props.project.project_type
         )
         installing.value = false
         return
       } else {
         await installMod(props.instance.path, queuedVersionData.id).catch(handleError)
-        installVersionDependencies(props.instance, queuedVersionData)
+        await installVersionDependencies(props.instance, queuedVersionData)
+
+        mixpanel.track('ProjectInstall', {
+          loader: props.instance.metadata.loader,
+          game_version: props.instance.metadata.game_version,
+          id: props.project.project_id,
+          project_type: props.project.project_type,
+          version_id: queuedVersionData.id,
+          title: props.project.title,
+          source: 'SearchCard',
+        })
       }
     } else {
-      props.modInstallModal.show(props.project.project_id, versions)
+      props.modInstallModal.show(
+        props.project.project_id,
+        versions,
+        props.project.title,
+        props.project.project_type
+      )
       installing.value = false
       return
     }
@@ -254,28 +277,6 @@ async function install() {
     margin-bottom: 0 !important;
     word-wrap: break-word;
     overflow-wrap: anywhere;
-  }
-}
-
-.badge {
-  display: flex;
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-  font-weight: 500;
-  align-items: center;
-  background-color: var(--color-bg);
-  padding-block: var(--gap-sm);
-  padding-inline: var(--gap-lg);
-
-  svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-right: 0.5rem;
-  }
-
-  &.featured {
-    background-color: var(--color-brand-highlight);
-    color: var(--color-contrast);
   }
 }
 

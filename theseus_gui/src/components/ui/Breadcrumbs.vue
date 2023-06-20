@@ -3,7 +3,10 @@
     <div v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name" class="breadcrumbs__item">
       <router-link
         v-if="breadcrumb.link"
-        :to="breadcrumb.link.replace('{id}', encodeURIComponent($route.params.id))"
+        :to="{
+          path: breadcrumb.link.replace('{id}', encodeURIComponent($route.params.id)),
+          query: breadcrumb.query,
+        }"
         >{{
           breadcrumb.name.charAt(0) === '?'
             ? breadcrumbData.getName(breadcrumb.name.slice(1))

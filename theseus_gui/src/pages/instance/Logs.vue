@@ -2,12 +2,12 @@
   <Card class="log-card">
     <div class="button-row">
       <DropdownSelect
+        v-model="selectedLogIndex"
+        :default-value="0"
         name="Log date"
-        :model-value="logs[selectedLogIndex]"
-        :options="logs"
-        :display-name="(option) => option?.name"
+        :options="logs.map((_, index) => index)"
+        :display-name="(option) => logs[option]?.name"
         :disabled="logs.length === 0"
-        @change="(value) => (selectedLogIndex = value.index)"
       />
       <div class="button-group">
         <Button :disabled="!logs[selectedLogIndex]" @click="copyLog()">
@@ -30,7 +30,11 @@
       </div>
     </div>
     <div ref="logContainer" class="log-text">
-      <span v-for="line in logs[selectedLogIndex]?.stdout.split('\n')" :key="line" class="no-wrap">
+      <span
+        v-for="(line, index) in logs[selectedLogIndex]?.stdout.split('\n')"
+        :key="index"
+        class="no-wrap"
+      >
         {{ line }} <br />
       </span>
     </div>
@@ -47,11 +51,11 @@ import {
   SendIcon,
   TrashIcon,
 } from 'omorphia'
-import { delete_logs_by_datetime, get_logs, get_stdout_by_datetime } from '@/helpers/logs.js'
+import { delete_logs_by_datetime, get_logs, get_output_by_datetime } from '@/helpers/logs.js'
 import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import calendar from 'dayjs/plugin/calendar'
-import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
+import { get_output_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
@@ -68,15 +72,18 @@ const props = defineProps({
 })
 
 async function getLiveLog() {
-  const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
-  let returnValue
-  if (uuids.length === 0) {
-    returnValue = 'No live game detected. \nStart your game to proceed'
-  } else {
-    returnValue = await get_stdout_by_uuid(uuids[0]).catch(handleError)
-  }
+  if (route.params.id) {
+    const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
+    let returnValue
+    if (uuids.length === 0) {
+      returnValue = 'No live game detected. \nStart your game to proceed'
+    } else {
+      returnValue = await get_output_by_uuid(uuids[0]).catch(handleError)
+    }
 
-  return { name: 'Live Log', stdout: returnValue, live: true }
+    return { name: 'Live Log', stdout: returnValue, live: true }
+  }
+  return null
 }
 
 async function getLogs() {
@@ -113,12 +120,16 @@ watch(selectedLogIndex, async (newIndex) => {
 
   if (newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
-    logs.value[newIndex].stdout = await get_stdout_by_datetime(
+    logs.value[newIndex].stdout = await get_output_by_datetime(
       props.instance.uuid,
       logs.value[newIndex].datetime_string
     ).catch(handleError)
   }
 })
+
+if (logs.value.length >= 1) {
+  selectedLogIndex.value = 1
+}
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
@@ -158,9 +169,13 @@ interval.value = setInterval(async () => {
 }, 250)
 
 const unlistenProcesses = await process_listener(async (e) => {
+  if (e.event === 'launched') {
+    selectedLogIndex.value = 0
+  }
   if (e.event === 'finished') {
     userScrolled.value = false
     await setLogs()
+    selectedLogIndex.value = 1
   }
 })
 

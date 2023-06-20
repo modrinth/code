@@ -25,7 +25,7 @@
           <p>Selected</p>
         </div>
         <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.id)">
-          <XIcon />
+          <TrashIcon />
         </Button>
       </div>
       <div v-else class="logged-out account">
@@ -41,7 +41,7 @@
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
-            <XIcon />
+            <TrashIcon />
           </Button>
         </div>
       </div>
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, XIcon, UsersIcon, LogInIcon } from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
 import { ref, defineProps, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
@@ -65,6 +65,7 @@ import {
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
+import mixpanel from 'mixpanel-browser'
 
 defineProps({
   expanded: {
@@ -131,6 +132,7 @@ const login = async () => {
   await setAccount(loggedIn)
   await refreshValues()
   await window.close()
+  mixpanel.track('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -140,6 +142,7 @@ const logout = async (id) => {
     await setAccount(accounts.value[0])
     await refreshValues()
   }
+  mixpanel.track('AccountLogOut')
 }
 
 const toggle = () => {
@@ -269,13 +272,13 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-bg);
+  background-color: var(--color-raised-bg);
   border-radius: var(--radius-md);
-  box-shadow: none;
   width: 100%;
   text-align: left;
 
   &.expanded {
+    border: 1px solid var(--color-button-bg);
     padding: 1rem;
   }
 }

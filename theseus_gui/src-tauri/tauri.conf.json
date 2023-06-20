@@ -28,9 +28,21 @@
       },
       "window": {
         "create": true,
-        "close": true
+        "close": true,
+        "hide": true,
+        "show": true,
+        "maximize": true,
+        "minimize": true,
+        "unmaximize": true,
+        "unminimize": true,
+        "startDragging": true,
+        "setDecorations": true
+      },
+      "os": {
+        "all": true
       }
     },
+    "macOSPrivateApi": true,
     "bundle": {
       "active": true,
       "category": "Entertainment",
@@ -40,7 +52,6 @@
       },
       "externalBin": [],
       "icon": [
-        "icons/32x32.png",
         "icons/128x128.png",
         "icons/128x128@2x.png",
         "icons/icon.icns",
@@ -75,6 +86,8 @@
     },
     "windows": [
       {
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
         "fullscreen": false,
         "height": 650,
         "resizable": true,

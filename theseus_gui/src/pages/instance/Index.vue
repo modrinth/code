@@ -1,7 +1,7 @@
 <template>
   <div class="instance-container">
     <div class="side-cards">
-      <Card class="instance-card">
+      <Card class="instance-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar
           size="lg"
           :src="
@@ -25,17 +25,17 @@
             v-else-if="playing === true"
             color="danger"
             class="instance-button"
-            @click="stopInstance"
+            @click="stopInstance('InstancePage')"
             @mouseover="checkProcess"
           >
-            <XIcon />
+            <StopCircleIcon />
             Stop
           </Button>
           <Button
             v-else-if="playing === false && loading === false"
             color="primary"
             class="instance-button"
-            @click="startInstance"
+            @click="startInstance('InstancePage')"
             @mouseover="checkProcess"
           >
             <PlayIcon />
@@ -57,46 +57,61 @@
             Folder
           </Button>
         </span>
+        <hr class="card-divider" />
+        <div class="pages-list">
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
+            <BoxIcon />
+            Mods
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
+            <FileIcon />
+            Logs
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+            <SettingsIcon />
+            Options
+          </RouterLink>
+        </div>
       </Card>
-      <div class="pages-list">
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
-          <BoxIcon />
-          Mods
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
-          <FileIcon />
-          Logs
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-          <SettingsIcon />
-          Options
-        </RouterLink>
-      </div>
     </div>
     <div class="content">
       <Promotion />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
-            <component :is="Component" :instance="instance"></component>
+            <component :is="Component" :instance="instance" :options="options"></component>
           </Suspense>
         </template>
       </RouterView>
     </div>
   </div>
+  <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+    <template #play> <PlayIcon /> Play </template>
+    <template #stop> <StopCircleIcon /> Stop </template>
+    <template #add_content> <PlusIcon /> Add Content </template>
+    <template #edit> <EditIcon /> Edit </template>
+    <template #copy_path> <ClipboardCopyIcon /> Copy Path </template>
+    <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
+    <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
+  </ContextMenu>
 </template>
 <script setup>
 import {
   BoxIcon,
   SettingsIcon,
   FileIcon,
-  XIcon,
   Button,
   Avatar,
   Card,
   Promotion,
   PlayIcon,
+  StopCircleIcon,
+  EditIcon,
   FolderOpenIcon,
+  ClipboardCopyIcon,
+  PlusIcon,
+  ExternalIcon,
 } from 'omorphia'
 import { get, run } from '@/helpers/profile'
 import {
@@ -105,23 +120,26 @@ import {
   kill_by_uuid,
 } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { handleError, useBreadcrumbs, useLoading, useSearch } from '@/store/state'
+import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
+import mixpanel from 'mixpanel-browser'
 
 const route = useRoute()
-const searchStore = useSearch()
+
+const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 
 const instance = ref(await get(route.params.id).catch(handleError))
 
-searchStore.instanceContext = instance.value
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
+  query: route.query,
 })
 
 const loadingBar = useLoading()
@@ -129,12 +147,19 @@ const loadingBar = useLoading()
 const uuid = ref(null)
 const playing = ref(false)
 const loading = ref(false)
+const options = ref(null)
 
-const startInstance = async () => {
+const startInstance = async (context) => {
   loading.value = true
   uuid.value = await run(route.params.id).catch(handleError)
   loading.value = false
   playing.value = true
+
+  mixpanel.track('InstanceStart', {
+    loader: instance.value.metadata.loader,
+    game_version: instance.value.metadata.game_version,
+    source: context,
+  })
 }
 
 const checkProcess = async () => {
@@ -150,19 +175,83 @@ const checkProcess = async () => {
 
 await checkProcess()
 
-const stopInstance = async () => {
+const stopInstance = async (context) => {
   playing.value = false
   if (!uuid.value) {
     const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
     uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
     uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
   } else await kill_by_uuid(uuid.value).catch(handleError)
+
+  mixpanel.track('InstanceStop', {
+    loader: instance.value.metadata.loader,
+    game_version: instance.value.metadata.game_version,
+    source: context,
+  })
+}
+
+const handleRightClick = (event) => {
+  const baseOptions = [
+    { name: 'add_content' },
+    { type: 'divider' },
+    { name: 'edit' },
+    { name: 'open_folder' },
+    { name: 'copy_path' },
+  ]
+
+  options.value.showMenu(
+    event,
+    instance.value,
+    playing.value
+      ? [
+          {
+            name: 'stop',
+            color: 'danger',
+          },
+          ...baseOptions,
+        ]
+      : [
+          {
+            name: 'play',
+            color: 'primary',
+          },
+          ...baseOptions,
+        ]
+  )
+}
+
+const handleOptionsClick = async (args) => {
+  console.log(args)
+  switch (args.option) {
+    case 'play':
+      await startInstance('InstancePageContextMenu')
+      break
+    case 'stop':
+      await stopInstance('InstancePageContextMenu')
+      break
+    case 'add_content':
+      await router.push({
+        path: `/browse/${instance.value.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        query: { i: route.params.id },
+      })
+      break
+    case 'edit':
+      await router.push({
+        path: `/instance/${encodeURIComponent(route.params.id)}/options`,
+      })
+      break
+    case 'open_folder':
+      await showInFolder(instance.value.path)
+      break
+    case 'copy_path':
+      await navigator.clipboard.writeText(instance.value.path)
+      break
+  }
 }
 
 const unlistenProfiles = await profile_listener(async (event) => {
   if (event.path === route.params.id) {
     instance.value = await get(route.params.id).catch(handleError)
-    searchStore.instanceContext = instance.value
   }
 })
 
@@ -178,7 +267,6 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .instance-card {
-  background: var(--color-bg);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -200,7 +288,6 @@ Button {
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  background: var(--color-raised-bg);
   min-height: calc(100% - 3.25rem);
   overflow: hidden;
 }
@@ -233,7 +320,7 @@ Button {
 }
 
 .content {
-  margin-left: 20rem;
+  margin-left: 19rem;
 }
 
 .instance-info {
@@ -253,7 +340,7 @@ Button {
 .pages-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: var(--gap-xs);
 
   a {
     font-size: 100%;
@@ -262,7 +349,6 @@ Button {
     transition: all ease-in-out 0.1s;
     width: 100%;
     color: var(--color-primary);
-    padding: var(--gap-md);
     box-shadow: none;
 
     &.router-link-exact-active {
@@ -285,28 +371,6 @@ Button {
   }
 }
 
-.header-nav {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 0.5rem;
-  gap: 0.5rem;
-  background: var(--color-raised-bg);
-}
-
-.project-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1rem;
-  background: var(--color-raised-bg);
-  width: 20rem;
-}
-
 .instance-nav {
   display: flex;
   flex-direction: row;
@@ -314,7 +378,6 @@ Button {
   justify-content: left;
   padding: 1rem;
   gap: 0.5rem;
-  background: var(--color-raised-bg);
   height: min-content;
   width: 100%;
 }

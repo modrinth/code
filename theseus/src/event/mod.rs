@@ -94,51 +94,43 @@ impl Drop for LoadingBarId {
         let _event = LoadingBarType::StateInit;
         let _message = "finished".to_string();
         tokio::spawn(async move {
-            if let Ok(event_state) = crate::EventState::get().await {
-                {
-                    let mut bars = event_state.loading_bars.write().await;
-                    bars.remove(&loader_uuid);
+            if let Ok(event_state) = EventState::get().await {
+                let mut bars = event_state.loading_bars.write().await;
+
+                #[cfg(any(feature = "tauri", feature = "cli"))]
+                if let Some(bar) = bars.remove(&loader_uuid) {
+                    #[cfg(feature = "tauri")]
+                    {
+                        let loader_uuid = bar.loading_bar_uuid;
+                        let event = bar.bar_type.clone();
+                        let fraction = bar.current / bar.total;
+
+                        use tauri::Manager;
+                        let _ = event_state.app.emit_all(
+                            "loading",
+                            LoadingPayload {
+                                fraction: None,
+                                message: "Completed".to_string(),
+                                event,
+                                loader_uuid,
+                            },
+                        );
+                        tracing::trace!(
+                            "Exited at {fraction} for loading bar: {:?}",
+                            loader_uuid
+                        );
+                    }
+
+                    // Emit event to indicatif progress bar arc
+                    #[cfg(feature = "cli")]
+                    {
+                        let cli_progress_bar = bar.cli_progress_bar;
+                        cli_progress_bar.finish();
+                    }
                 }
-            }
-        });
-    }
-}
 
-// When Loading bar is dropped, should attempt to throw out one last event to indicate that the loading bar is done
-#[cfg(feature = "tauri")]
-impl Drop for LoadingBar {
-    fn drop(&mut self) {
-        let loader_uuid = self.loading_bar_uuid;
-        let event = self.bar_type.clone();
-        let fraction = self.current / self.total;
-
-        #[cfg(feature = "cli")]
-        let cli_progress_bar = self.cli_progress_bar.clone();
-
-        tokio::spawn(async move {
-            #[cfg(feature = "tauri")]
-            {
-                use tauri::Manager;
-                if let Ok(event_state) = crate::EventState::get().await {
-                    let _ = event_state.app.emit_all(
-                        "loading",
-                        LoadingPayload {
-                            fraction: None,
-                            message: "Completed".to_string(),
-                            event,
-                            loader_uuid,
-                        },
-                    );
-                    tracing::trace!(
-                        "Exited at {fraction} for loading bar: {:?}",
-                        loader_uuid
-                    );
-                }
-            }
-            // Emit event to indicatif progress bar arc
-            #[cfg(feature = "cli")]
-            {
-                cli_progress_bar.finish();
+                #[cfg(not(any(feature = "tauri", feature = "cli")))]
+                bars.remove(&loader_uuid);
             }
         });
     }

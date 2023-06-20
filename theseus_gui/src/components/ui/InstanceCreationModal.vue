@@ -1,6 +1,9 @@
 <template>
-  <Modal ref="modal" header="Create instance">
-    <div class="modal-body">
+  <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
+    <div class="modal-header">
+      <Chips v-model="creationType" :items="['custom', 'from file']" />
+    </div>
+    <div v-if="creationType === 'custom'" class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
         <div class="image-input">
@@ -79,6 +82,10 @@
         </Button>
       </div>
     </div>
+    <div v-else class="modal-body">
+      <Button @click="openFile"> <FolderOpenIcon /> Import from file </Button>
+      <div class="info"><InfoIcon /> Or drag and drop your .mrpack file</div>
+    </div>
   </Modal>
 </template>
 
@@ -93,6 +100,8 @@ import {
   XIcon,
   CodeIcon,
   Checkbox,
+  FolderOpenIcon,
+  InfoIcon,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
@@ -107,6 +116,12 @@ import {
 } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
+import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/state.js'
+import { listen } from '@tauri-apps/api/event'
+import { install_from_file } from '@/helpers/pack.js'
+
+const themeStore = useTheming()
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -118,6 +133,7 @@ const display_icon = ref(null)
 const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
+const creationType = ref('from file')
 
 defineExpose({
   show: () => {
@@ -132,6 +148,8 @@ defineExpose({
     icon.value = null
     display_icon.value = null
     modal.value.show()
+
+    mixpanel.track('InstanceCreateStart', { source: 'CreationModal' })
   },
 })
 
@@ -183,8 +201,12 @@ const create_instance = async () => {
   creating.value = true
   const loader_version_value =
     loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
+  const loaderVersion = loader.value === 'vanilla' ? null : loader_version_value ?? 'stable'
 
-  create(
+  modal.value.hide()
+  creating.value = false
+
+  await create(
     profile_name.value,
     game_version.value,
     loader.value,
@@ -192,8 +214,14 @@ const create_instance = async () => {
     icon.value
   ).catch(handleError)
 
-  modal.value.hide()
-  creating.value = false
+  mixpanel.track('InstanceCreate', {
+    profile_name: profile_name.value,
+    game_version: game_version.value,
+    loader: loader.value,
+    loader_version: loaderVersion,
+    has_icon: !!icon.value,
+    source: 'CreationModal',
+  })
 }
 
 const upload_icon = async () => {
@@ -234,14 +262,36 @@ const selectable_versions = computed(() => {
 const toggle_advanced = () => {
   showAdvanced.value = !showAdvanced.value
 }
+
+const openFile = async () => {
+  const newProject = await open({ multiple: false })
+  if (!newProject) return
+
+  modal.value.hide()
+  await install_from_file(newProject).catch(handleError)
+
+  mixpanel.track('InstanceCreate', {
+    source: 'CreationModalFileOpen',
+  })
+}
+
+listen('tauri://file-drop', async (event) => {
+  modal.value.hide()
+  if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
+    await install_from_file(event.payload[0]).catch(handleError)
+    mixpanel.track('InstanceCreate', {
+      source: 'CreationModalFileDrop',
+    })
+  }
+})
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .modal-body {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
+  padding: var(--gap-lg);
+  gap: var(--gap-md);
 }
 
 .input-label {
@@ -283,5 +333,34 @@ const toggle_advanced = () => {
 
 .selector {
   max-width: 20rem;
+}
+
+.labeled-divider {
+  text-align: center;
+}
+
+.labeled-divider:after {
+  background-color: var(--color-raised-bg);
+  content: 'Or';
+  color: var(--color-base);
+  padding: var(--gap-sm);
+  position: relative;
+  top: -0.5rem;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.modal-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--gap-lg);
+  padding-bottom: 0;
 }
 </style>

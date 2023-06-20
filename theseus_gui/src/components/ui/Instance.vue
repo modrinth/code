@@ -1,20 +1,22 @@
 <script setup>
-import { onUnmounted, ref, useSlots, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
+import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
-import { run, list } from '@/helpers/profile'
+import { list, run } from '@/helpers/profile'
 import {
-  kill_by_uuid,
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
+  kill_by_uuid,
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import { showInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import mixpanel from 'mixpanel-browser'
 
 const props = defineProps({
   instance: {
@@ -22,10 +24,6 @@ const props = defineProps({
     default() {
       return {}
     },
-  },
-  small: {
-    type: Boolean,
-    default: false,
   },
 })
 
@@ -38,13 +36,14 @@ const modLoading = ref(
   props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
 )
 
-watch(props.instance, () => {
-  modLoading.value = props.instance.install_stage
-    ? props.instance.install_stage !== 'installed'
-    : false
-})
-
-const slots = useSlots()
+watch(
+  () => props.instance,
+  () => {
+    modLoading.value = props.instance.install_stage
+      ? props.instance.install_stage !== 'installed'
+      : false
+  }
+)
 
 const router = useRouter()
 
@@ -69,7 +68,7 @@ const checkProcess = async () => {
 }
 
 const install = async (e) => {
-  e.stopPropagation()
+  e?.stopPropagation()
   modLoading.value = true
   const versions = await useFetch(
     `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
@@ -93,6 +92,13 @@ const install = async (e) => {
         props.instance.icon_url
       ).catch(handleError)
       modLoading.value = false
+
+      mixpanel.track('PackInstall', {
+        id: props.instance.project_id,
+        version_id: versions[0].id,
+        title: props.instance.title,
+        source: 'InstanceCard',
+      })
     } else
       confirmModal.value.show(
         props.instance.project_id,
@@ -101,22 +107,33 @@ const install = async (e) => {
         props.instance.icon_url
       )
   } else {
-    modInstallModal.value.show(props.instance.project_id, versions)
+    modInstallModal.value.show(
+      props.instance.project_id,
+      versions,
+      props.instance.title,
+      props.instance.project_type
+    )
   }
 
   modLoading.value = false
 }
 
-const play = async (e) => {
-  e.stopPropagation()
+const play = async (e, context) => {
+  e?.stopPropagation()
   modLoading.value = true
   uuid.value = await run(props.instance.path).catch(handleError)
   modLoading.value = false
   playing.value = true
+
+  mixpanel.track('InstancePlay', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    source: context,
+  })
 }
 
-const stop = async (e) => {
-  e.stopPropagation()
+const stop = async (e, context) => {
+  e?.stopPropagation()
   playing.value = false
 
   // If we lost the uuid for some reason, such as a user navigating
@@ -128,8 +145,36 @@ const stop = async (e) => {
     uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
   } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
 
+  mixpanel.track('InstanceStop', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    source: context,
+  })
+
   uuid.value = null
 }
+
+const openFolder = async () => {
+  await showInFolder(props.instance.path)
+}
+
+const addContent = async () => {
+  await router.push({
+    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    query: { i: props.instance.path },
+  })
+}
+
+defineExpose({
+  install,
+  playing,
+  play,
+  stop,
+  seeInstance,
+  openFolder,
+  addContent,
+  instance: props.instance,
+})
 
 const unlisten = await process_listener((e) => {
   if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
@@ -140,49 +185,15 @@ onUnmounted(() => unlisten())
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card" :class="{ 'button-base': !slots.content }">
-      <div
-        class="instance-small-card__description"
-        :class="{ 'button-base': slots.content }"
-        @click="seeInstance"
-      >
-        <Avatar
-          :src="
-            !props.instance.metadata.icon ||
-            (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
-              ? props.instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
-          "
-          :alt="props.instance.metadata.name"
-          size="sm"
-        />
-        <div class="instance-small-card__info">
-          <span class="title">{{ props.instance.metadata.name }}</span>
-          {{
-            props.instance.metadata.loader.charAt(0).toUpperCase() +
-            props.instance.metadata.loader.slice(1)
-          }}
-          {{ props.instance.metadata.game_version }}
-        </div>
-      </div>
-      <div v-if="slots.content" class="instance-small-card__content">
-        <slot name="content" />
-      </div>
-    </Card>
-    <Card
-      v-else
-      class="instance-card-item button-base"
-      @click="seeInstance"
-      @mouseenter="checkProcess"
-    >
+    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
-        size="none"
+        size="sm"
         :src="
           props.instance.metadata
             ? !props.instance.metadata.icon ||
               (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
               ? props.instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
+              : convertFileSrc(props.instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
@@ -196,27 +207,25 @@ onUnmounted(() => unlisten())
         </p>
       </div>
     </Card>
-    <template v-if="!props.small">
-      <div
-        v-if="props.instance.metadata && playing === false && modLoading === false"
-        class="install cta button-base"
-        @click="play"
-      >
-        <PlayIcon />
-      </div>
-      <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-        <AnimatedLogo class="loading-indicator" />
-      </div>
-      <div
-        v-else-if="playing === true"
-        class="stop cta button-base"
-        @click="stop"
-        @mousehover="checkProcess"
-      >
-        <XIcon />
-      </div>
-      <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
-    </template>
+    <div
+      v-if="props.instance.metadata && playing === false && modLoading === false"
+      class="install cta button-base"
+      @click="(e) => play(e, 'InstanceCard')"
+    >
+      <PlayIcon />
+    </div>
+    <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
+      <AnimatedLogo class="loading-indicator" />
+    </div>
+    <div
+      v-else-if="playing === true"
+      class="stop cta button-base"
+      @click="(e) => stop(e, 'InstanceCard')"
+      @mousehover="checkProcess"
+    >
+      <StopCircleIcon />
+    </div>
+    <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
     <InstanceInstallModal ref="modInstallModal" />
   </div>
@@ -235,80 +244,13 @@ onUnmounted(() => unlisten())
 </style>
 
 <style lang="scss" scoped>
-.instance-small-card {
-  background-color: var(--color-bg) !important;
-  display: flex;
-  flex-direction: column;
-  min-height: min-content !important;
-  gap: 0.5rem;
-  align-items: flex-start;
-  padding: 0;
-
-  .instance-small-card__description {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 1rem;
-    flex-grow: 1;
-    padding: var(--gap-xl);
-    padding-bottom: 0;
-    width: 100%;
-
-    &:not(.button-base) {
-      padding-bottom: var(--gap-xl);
-    }
-  }
-
-  .instance-small-card__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .title {
-      color: var(--color-contrast);
-      font-weight: bolder;
-    }
-  }
-
-  .instance-small-card__content {
-    padding: var(--gap-xl);
-    padding-top: 0;
-  }
-
-  .cta {
-    display: none;
-  }
-}
-
 .instance {
   position: relative;
 
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 5.5rem;
-    }
-
-    .instance-card-item {
-      background: hsl(220, 11%, 11%) !important;
-    }
-  }
-}
-
-.light-mode {
-  .instance:hover {
-    .instance-card-item {
-      background: hsl(0, 0%, 91%) !important;
-    }
-  }
-}
-
-.light-mode {
-  .instance-card-item {
-    background: hsl(0, 0%, 100%) !important;
-
-    &:hover {
-      background: hsl(0, 0%, 91%) !important;
+      bottom: calc(var(--gap-md) + 4.25rem);
     }
   }
 }
@@ -318,14 +260,14 @@ onUnmounted(() => unlisten())
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   z-index: 1;
   width: 3rem;
   height: 3rem;
-  right: 1.25rem;
-  bottom: 5rem;
+  right: calc(var(--gap-md) * 2);
+  bottom: 3.25rem;
   opacity: 0;
-  transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
+  transition: 0.2s ease-in-out bottom, 0.2s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
   box-shadow: var(--shadow-floating);
 
@@ -359,17 +301,11 @@ onUnmounted(() => unlisten())
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0.75rem !important; /* overrides card class */
+  padding: var(--gap-md);
   transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
-  background: hsl(220, 11%, 17%) !important;
   margin-bottom: 0;
 
-  &:hover {
-    filter: brightness(1) !important;
-    background: hsl(220, 11%, 11%) !important;
-  }
-
-  > .avatar {
+  .mod-image {
     --size: 100%;
 
     width: 100% !important;
