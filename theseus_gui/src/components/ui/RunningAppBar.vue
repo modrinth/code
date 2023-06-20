@@ -68,6 +68,28 @@
     </Card>
   </transition>
   <transition name="download">
+    <Card v-if="showCard === true" ref="card" class="info-card">
+      <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
+        <h3 class="info-title">
+          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
+        </h3>
+        <ProgressBar :progress="Math.floor(loadingBar.current)" />
+        <div class="row">{{ Math.floor(loadingBar.current) }}% {{ loadingBar.message }}</div>
+      </div>
+    </Card>
+  </transition>
+  <transition name="download">
+    <Card v-if="showCard === true" ref="card" class="info-card">
+      <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
+        <h3 class="info-title">
+          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
+        </h3>
+        <ProgressBar :progress="Math.floor(loadingBar.current)" />
+        <div class="row">{{ Math.floor(loadingBar.current) }}% {{ loadingBar.message }}</div>
+      </div>
+    </Card>
+  </transition>
+  <transition name="download">
     <Card v-if="showProfiles === true" ref="profiles" class="profile-card">
       <Button
         v-for="profile in currentProcesses"
