@@ -141,8 +141,8 @@ export default defineNuxtComponent({
     return {
       licenseUrl: '',
       license: { friendly: '', short: '', requiresOnlyOrLater: false },
-      allowOrLater: false,
-      nonSpdxLicense: false,
+      allowOrLater: this.project.license.id.includes('-or-later'),
+      nonSpdxLicense: this.project.license.id.includes('LicenseRef-'),
       showKnownErrors: false,
     }
   },
@@ -240,15 +240,10 @@ export default defineNuxtComponent({
       }
     }
 
-    const allowOrLater = computed(() => props.project.license.id.includes('-or-later'))
-    const nonSpdxLicense = computed(() => props.project.license.id.includes('LicenseRef-'))
-
     return {
       defaultLicenses,
       licenseUrl,
       license,
-      allowOrLater,
-      nonSpdxLicense,
     }
   },
   computed: {
