@@ -21,7 +21,9 @@ breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 const recentInstances = shallowRef([])
 
 const getInstances = async () => {
+  console.log('aa')
   const profiles = await list(true).catch(handleError)
+  console.log(profiles)
   recentInstances.value = Object.values(profiles).sort((a, b) => {
     return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
   })
@@ -69,16 +71,19 @@ onUnmounted(() => unlisten())
       :instances="[
         {
           label: 'Jump back in',
+          route: '/library',
           instances: recentInstances,
           downloaded: true,
         },
         {
           label: 'Popular packs',
+          route: '/browse/modpack',
           instances: featuredModpacks,
           downloaded: false,
         },
         {
           label: 'Popular mods',
+          route: '/browse/mod',
           instances: featuredMods,
           downloaded: false,
         },

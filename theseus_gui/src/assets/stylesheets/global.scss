@@ -53,3 +53,71 @@ input {
   gap: 1rem;
   color: var(--color-contrast);
 }
+
+.badge {
+  display: flex;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  align-items: center;
+  background-color: var(--color-bg);
+  padding-block: var(--gap-sm);
+  padding-inline: var(--gap-lg);
+  width: min-content;
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-right: 0.5rem;
+  }
+
+  &.featured {
+    background-color: var(--color-brand-highlight);
+    color: var(--color-contrast);
+  }
+}
+
+.mac {
+  .nav-container {
+    padding-top: calc(var(--gap-md) + 1.75rem);
+  }
+
+  .account-card {
+    top: calc(var(--gap-md) + 1.75rem);
+  }
+}
+
+.windows {
+  .window-controls {
+    display: flex !important;
+  }
+
+  .info-card {
+    right: 8rem;
+  }
+
+  .profile-card {
+    right: 8rem;
+  }
+}
+
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-button-bg) var(--color-bg);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: var(--gap-md);
+  border: 3px solid var(--color-bg);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-bg);
+  border: 3px solid var(--color-bg);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-button-bg);
+  border-radius: var(--radius-lg);
+  border: 3px solid var(--color-bg);
+}
