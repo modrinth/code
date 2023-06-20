@@ -232,7 +232,7 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  margin: 0;
+  margin-bottom: 0.5rem;
 }
 
 .table-row {
@@ -261,6 +261,7 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   flex-direction: column;
   gap: 1rem;
   overflow: hidden;
+  margin-top: 0.5rem;
 }
 
 .text-combo {

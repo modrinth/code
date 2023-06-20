@@ -414,6 +414,13 @@ async function updateAll(args) {
     for (const project of setProjects) {
       projects.value[project].updating = false
     }
+
+    mixpanel.track('InstanceUpdateAll', {
+      loader: props.instance.metadata.loader,
+      game_version: props.instance.metadata.game_version,
+      count: setProjects.length,
+      selected: selected.value.length > 1,
+    })
   } else {
     for (const project of projects.value) {
       if (project.outdated) {
@@ -421,13 +428,6 @@ async function updateAll(args) {
       }
     }
   }
-
-  mixpanel.track('InstanceUpdateAll', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
-    count: setProjects.length,
-    selected: selected.value.length > 1,
-  })
 }
 
 async function updateProject(mod) {
