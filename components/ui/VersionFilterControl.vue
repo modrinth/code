@@ -96,6 +96,7 @@ const props = defineProps({
     },
   },
 })
+const emit = defineEmits(['switch-page'])
 
 const data = useNuxtApp()
 const route = useRoute()
@@ -140,6 +141,7 @@ async function updateQuery() {
       s: includeSnapshots.value ? true : undefined,
     },
   })
+  emit('switch-page', 1)
 }
 </script>
 

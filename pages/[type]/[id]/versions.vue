@@ -22,7 +22,7 @@
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
     </div>
-    <VersionFilterControl :versions="props.versions" />
+    <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
     <Pagination
       :page="currentPage"
       :count="Math.ceil(filteredVersions.length / 20)"
