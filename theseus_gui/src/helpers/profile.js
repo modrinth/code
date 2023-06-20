@@ -93,7 +93,6 @@ export async function remove_project(path, projectPath) {
 /// included_overrides is an array of paths to override folders to include (ie: 'mods', 'resource_packs')
 // Version id is optional (ie: 1.1.5)
 export async function export_profile_mrpack(path, exportLocation, includedOverrides, versionId) {
-  console.log('exporting profile', path, exportLocation, includedOverrides, versionId)
   return await invoke('profile_export_mrpack', {
     path,
     exportLocation,
