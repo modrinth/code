@@ -38,9 +38,6 @@ fn main() {
     let client = sentry::init("https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592");
 
     let _guard = sentry_rust_minidump::init(&client);
-    let client = sentry::init("https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592");
-
-    let _guard = sentry_rust_minidump::init(&client);
     /*
        tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
            ERROR > WARN > INFO > DEBUG > TRACE
@@ -180,11 +177,6 @@ fn main() {
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-
-    #[allow(deref_nullptr)]
-    unsafe {
-        *std::ptr::null_mut() = true;
-    }
 
     #[allow(deref_nullptr)]
     unsafe {
