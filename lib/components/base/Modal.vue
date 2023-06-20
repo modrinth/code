@@ -6,6 +6,7 @@
         noblur: props.noblur,
       }"
       class="modal-overlay"
+      data-tauri-drag-region
       @click="() => (closable ? hide() : {})"
     />
     <div class="modal-container" :class="{ shown: actuallyShown }">
