@@ -205,7 +205,7 @@ const calculateCardsPerRow = () => {
   const containerWidthInRem =
     containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
   maxInstancesPerRow.value = Math.floor((containerWidthInRem + 1) / 11)
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 19)
+  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 17)
 }
 
 onMounted(() => {
@@ -335,7 +335,7 @@ onUnmounted(() => {
   .projects {
     display: grid;
     width: 100%;
-    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
     grid-gap: 1rem;
 
     .item {
