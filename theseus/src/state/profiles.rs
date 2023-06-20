@@ -224,44 +224,7 @@ impl Profile {
 
     pub fn sync_projects_task(path: PathBuf) {
         tokio::task::spawn(async move {
-            let res = async {
-                let state = State::get().await?;
-                let profile = crate::api::profile::get(&path, None).await?;
-
-                if let Some(profile) = profile {
-                    let paths = profile.get_profile_project_paths()?;
-
-                    let projects = crate::state::infer_data_from_files(
-                        profile.clone(),
-                        paths,
-                        state.directories.caches_dir(),
-                        &state.io_semaphore,
-                        &state.fetch_semaphore,
-                    )
-                    .await?;
-
-                    let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&path) {
-                        profile.projects = projects;
-                    }
-
-                    emit_profile(
-                        profile.uuid,
-                        profile.path,
-                        &profile.metadata.name,
-                        ProfilePayloadType::Synced,
-                    )
-                        .await?;
-                } else {
-                    tracing::warn!(
-                        "Unable to fetch single profile projects: path {path:?} invalid",
-                    );
-                }
-
-                Ok::<(), crate::Error>(())
-            }
-            .await;
-
+            let res = Self::sync_projects_inner(path).await;
             match res {
                 Ok(()) => {}
                 Err(err) => {
@@ -271,6 +234,42 @@ impl Profile {
                 }
             };
         });
+    }
+
+    pub async fn sync_projects_inner(path: PathBuf) -> crate::Result<()> {
+        let state = State::get().await?;
+        let profile = crate::api::profile::get(&path, None).await?;
+
+        if let Some(profile) = profile {
+            let paths = profile.get_profile_project_paths()?;
+
+            let projects = crate::state::infer_data_from_files(
+                profile.clone(),
+                paths,
+                state.directories.caches_dir(),
+                &state.io_semaphore,
+                &state.fetch_semaphore,
+            )
+            .await?;
+
+            let mut new_profiles = state.profiles.write().await;
+            if let Some(profile) = new_profiles.0.get_mut(&path) {
+                profile.projects = projects;
+            }
+
+            emit_profile(
+                profile.uuid,
+                profile.path,
+                &profile.metadata.name,
+                ProfilePayloadType::Synced,
+            )
+                .await?;
+        } else {
+            tracing::warn!(
+                "Unable to fetch single profile projects: path {path:?} invalid",
+            );
+        }
+        Ok::<(), crate::Error>(())
     }
 
     pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {

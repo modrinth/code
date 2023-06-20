@@ -298,6 +298,11 @@ pub async fn build_folder(
 pub async fn get_potential_override_folders(
     profile_path: PathBuf,
 ) -> crate::Result<Vec<PathBuf>> {
+
+    // Force sync the profile before export functions
+    Profile::sync_projects_inner(profile_path.clone()).await?;
+
+
     // First, get a dummy mrpack json for the files within
     let profile: Profile =
         get(&profile_path, None).await?.ok_or_else(|| {
