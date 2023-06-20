@@ -112,7 +112,7 @@ input {
 }
 
 *::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--color-bg);
   border: 3px solid var(--color-bg);
 }
 
