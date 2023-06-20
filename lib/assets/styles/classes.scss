@@ -304,6 +304,18 @@ a,
   --background-color: var(--color-button-bg);
   --shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
+  &.btn-outline {
+    --background-color: var(--color-contrast);
+    --text-color: var(--color-raised-bg);
+    box-sizing: border-box;
+
+    background-color: transparent;
+    border: 2px solid var(--background-color);
+    color: var(--background-color);
+
+    padding-block: calc(var(--gap-sm) - 2px);
+  }
+
   &.btn-raised {
     --shadow: var(--shadow-inset-sm), var(--shadow-raised);
     --background-color: var(--color-raised-bg);
@@ -326,6 +338,11 @@ a,
   &.btn-highlight {
     --text-color: var(--color-accent-contrast);
     --background-color: var(--color-orange);
+  }
+
+  &.btn-large {
+    font-weight: 700;
+    min-height: 2.5rem;
   }
 
   box-sizing: border-box;

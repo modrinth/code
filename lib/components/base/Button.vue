@@ -24,6 +24,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  large: {
+    type: Boolean,
+    default: false,
+  },
+  outline: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const accentedButton = computed(() => ['danger', 'primary'].includes(props.color))
@@ -35,11 +43,13 @@ const accentedButton = computed(() => ['danger', 'primary'].includes(props.color
     class="btn"
     :class="{
       'icon-only': props.iconOnly,
+      'btn-large': props.large,
       'btn-raised': color === 'raised',
       'btn-danger': color === 'danger',
       'btn-primary': color === 'primary',
       'btn-secondary': color === 'secondary',
       'btn-highlight': color === 'highlight',
+      'btn-outline': props.outline,
       'color-accent-contrast': accentedButton,
     }"
     :to="link"
@@ -54,11 +64,13 @@ const accentedButton = computed(() => ['danger', 'primary'].includes(props.color
     class="btn"
     :class="{
       'icon-only': props.iconOnly,
+      'btn-large': props.large,
       'btn-raised': color === 'raised',
       'btn-danger': color === 'danger',
       'btn-primary': color === 'primary',
       'btn-secondary': color === 'secondary',
       'btn-highlight': color === 'highlight',
+      'btn-outline': props.outline,
       'color-accent-contrast': accentedButton,
     }"
     @click="action"
