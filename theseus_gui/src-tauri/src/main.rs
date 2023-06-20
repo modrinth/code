@@ -81,6 +81,7 @@ fn main() {
 
     #[cfg(target_os = "macos")]
     {
+        use tauri::WindowEvent;
         builder = builder
             .setup(|app| {
                 use api::window_ext::WindowExt;
