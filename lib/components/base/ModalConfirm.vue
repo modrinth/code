@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" :header="props.title">
+  <Modal ref="modal" :header="props.title" :noblur="noblur">
     <div class="modal-delete">
       <div class="markdown-body" v-html="renderString(props.description)" />
       <label v-if="props.hasToType" for="confirmation" class="confirmation-label">
@@ -60,6 +60,10 @@ const props = defineProps({
   proceedLabel: {
     type: String,
     default: 'Proceed',
+  },
+  noblur: {
+    type: Boolean,
+    default: false,
   },
 })
 

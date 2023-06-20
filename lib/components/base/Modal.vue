@@ -6,13 +6,13 @@
         noblur: props.noblur,
       }"
       class="modal-overlay"
-      @click="hide"
+      @click="() => (closable ? hide() : {})"
     />
     <div class="modal-container" :class="{ shown: actuallyShown }">
       <div class="modal-body">
         <div v-if="props.header" class="header">
           <h1>{{ props.header }}</h1>
-          <button class="btn icon-only transparent" @click="hide">
+          <button v-if="closable" class="btn icon-only transparent" @click="hide">
             <XIcon />
           </button>
         </div>
@@ -37,6 +37,10 @@ const props = defineProps({
   noblur: {
     type: Boolean,
     default: false,
+  },
+  closable: {
+    type: Boolean,
+    default: true,
   },
 })
 

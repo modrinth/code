@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" :header="`Report ${props.itemType}`">
+  <Modal ref="modal" :header="`Report ${props.itemType}`" :noblur="noblur">
     <div class="modal-report">
       <div class="markdown-body">
         <p>
@@ -75,6 +75,10 @@ const props = defineProps({
   submitReport: {
     type: Function,
     default: () => {},
+  },
+  noblur: {
+    type: Boolean,
+    default: false,
   },
 })
 
