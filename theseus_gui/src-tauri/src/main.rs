@@ -7,6 +7,8 @@ use theseus::prelude::*;
 
 use tauri::Manager;
 
+use window_shadows::set_shadow;
+
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -83,6 +85,12 @@ fn main() {
             Ok(())
         })
     }
+
+  builder = builder.setup(|app| {
+    let win = app.get_window("main").unwrap();
+    set_shadow(&win, true).unwrap();
+    Ok(())
+  });
 
     #[cfg(target_os = "macos")]
     {
