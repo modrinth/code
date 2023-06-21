@@ -688,6 +688,7 @@ const showLoaders = computed(
           :confirm-modal="confirmModal"
           :mod-install-modal="modInstallModal"
           :incompatibility-warning-modal="incompatibilityWarningModal"
+          :installed="result.installed"
         />
       </section>
       <pagination
