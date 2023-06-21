@@ -63,7 +63,7 @@ export async function autodetect_java_globals() {
 }
 
 // Automatically installs specified java version
-export async function jre_auto_install_java(javaVersion) {
+export async function auto_install_java(javaVersion) {
   return await invoke('plugin:jre|jre_auto_install_java', { javaVersion })
 }
 
