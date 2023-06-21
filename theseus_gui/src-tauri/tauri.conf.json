@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "Modrinth App",
-    "version": "0.0.1"
+    "version": "0.2.1"
   },
   "tauri": {
     "allowlist": {
@@ -39,6 +39,9 @@
         "setDecorations": true
       },
       "os": {
+        "all": true
+      },
+      "app": {
         "all": true
       }
     },
@@ -72,11 +75,11 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "http://timestamp.digicert.com"
       }
     },
     "security": {
-      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost"
+      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com https://mixpanel.com https://*.mixpanel.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost"
     },
     "updater": {
       "active": true,
@@ -92,7 +95,7 @@
         "height": 650,
         "resizable": true,
         "title": "Modrinth App",
-        "width": 1140,
+        "width": 1280,
         "minHeight": 630,
         "minWidth": 1100
       }

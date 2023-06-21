@@ -1,5 +1,5 @@
 <script setup>
-import { handleError, onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import {
   HomeIcon,
@@ -26,35 +26,20 @@ import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
 import { isDev } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
+import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import OnboardingModal from '@/components/OnboardingModal.vue'
+import { getVersion } from '@tauri-apps/api/app'
 
 const themeStore = useTheming()
 
 const isLoading = ref(true)
-onMounted(async () => {
-  const { settings, collapsed_navigation } = await get().catch(handleError)
-  themeStore.setThemeState(settings)
-  themeStore.collapsedNavigation = collapsed_navigation
-
-  await warning_listener((e) =>
-    notificationsWrapper.value.addNotification({
-      title: 'Warning',
-      text: e.message,
-      type: 'warn',
-    })
-  )
-
-  if ((await type()) === 'Darwin') {
-    document.getElementsByTagName('html')[0].classList.add('mac')
-  } else {
-    document.getElementsByTagName('html')[0].classList.add('windows')
-  }
-})
-
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering } = await get()
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded } =
+      await get()
     const dev = await isDev()
+    const version = await getVersion()
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -64,9 +49,15 @@ defineExpose({
     if (opt_out_analytics) {
       mixpanel.opt_out_tracking()
     }
-    mixpanel.track('Launched')
+    mixpanel.track('Launched', { version, dev, onboarded })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
+
+    if ((await type()) === 'Darwin') {
+      document.getElementsByTagName('html')[0].classList.add('mac')
+    } else {
+      document.getElementsByTagName('html')[0].classList.add('windows')
+    }
 
     await warning_listener((e) =>
       notificationsWrapper.value.addNotification({
@@ -119,15 +110,23 @@ document.querySelector('body').addEventListener('click', function (e) {
     target = target.parentElement
   }
 })
+
+const accounts = ref(null)
 </script>
 
 <template>
   <SplashScreen v-if="isLoading" app-loading />
   <div v-else class="container">
+    <suspense>
+      <OnboardingModal ref="testModal" :accounts="accounts" />
+    </suspense>
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
-          <AccountsCard ref="accounts" :expanded="!themeStore.collapsedNavigation" />
+          <AccountsCard
+            ref="accounts"
+            :mode="themeStore.collapsedNavigation ? 'small' : 'expanded'"
+          />
         </suspense>
         <div class="pages-list">
           <RouterLink
@@ -215,7 +214,16 @@ document.querySelector('body').addEventListener('click', function (e) {
           <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
             <MaximizeIcon />
           </Button>
-          <Button class="titlebar-button close" icon-only @click="() => appWindow.close()">
+          <Button
+            class="titlebar-button close"
+            icon-only
+            @click="
+              () => {
+                saveWindowState(StateFlags.ALL)
+                appWindow.close()
+              }
+            "
+          >
             <XIcon />
           </Button>
         </section>
@@ -250,10 +258,11 @@ document.querySelector('body').addEventListener('click', function (e) {
 }
 
 .window-controls {
+  z-index: 20;
   display: none;
   flex-direction: row;
   align-items: center;
-  gap: 0;
+  gap: 0.25rem;
 
   .titlebar-button {
     display: flex;

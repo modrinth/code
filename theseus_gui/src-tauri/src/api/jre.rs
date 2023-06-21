@@ -27,7 +27,7 @@ pub async fn jre_get_all_jre() -> Result<Vec<JavaVersion>> {
     Ok(jre::get_all_jre().await?)
 }
 
-// Finds the isntallation of Java 7, if it exists
+// Finds the installation of Java 8, if it exists
 #[tauri::command]
 pub async fn jre_filter_jre_8_jres(
     jres: Vec<JavaVersion>,

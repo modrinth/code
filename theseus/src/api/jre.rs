@@ -172,16 +172,31 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             ))
         })?;
         emit_loading(&loading_bar, 10.0, Some("Done extracting java")).await?;
-        Ok(path
-            .join(
-                download
-                    .name
-                    .file_stem()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-                    .to_string(),
-            )
-            .join(format!("zulu-{}.jre/Contents/Home/bin/java", java_version)))
+        let mut base_path = path.join(
+            download
+                .name
+                .file_stem()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_string(),
+        );
+
+        #[cfg(target_os = "macos")]
+        {
+            base_path = base_path
+                .join(format!("zulu-{}.jre", java_version))
+                .join("Contents")
+                .join("Home")
+                .join("bin")
+                .join("java")
+        }
+
+        #[cfg(not(target_os = "macos"))]
+        {
+            base_path = base_path.join("bin").join(jre::JAVA_BIN)
+        }
+
+        Ok(base_path)
     } else {
         Err(crate::ErrorKind::LauncherError(format!(
                     "No Java Version found for Java version {}, OS {}, and Architecture {}",
