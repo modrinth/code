@@ -187,11 +187,11 @@ async function fetchSettings() {
     await props.accounts.refreshValues()
   }
 }
-const settings = ref({})
+const settings = ref(null)
 await fetchSettings()
 
-watch(settings.value, async (oldSettings, newSettings) => {
-  const setSettings = JSON.parse(JSON.stringify(newSettings))
+watch([settings, settings.value], async () => {
+  const setSettings = JSON.parse(JSON.stringify(settings.value))
 
   if (setSettings.java_globals.JAVA_17?.path === '') {
     setSettings.java_globals.JAVA_17 = undefined
@@ -203,13 +203,9 @@ watch(settings.value, async (oldSettings, newSettings) => {
     )
   }
 
-  const refresh = await get()
-  if (refresh !== setSettings) {
-    await set(setSettings)
-
-    if (accountsCard.value) {
-      await accountsCard.value.refreshValues()
-    }
+  await set(setSettings)
+  if (accountsCard.value) {
+    await accountsCard.value.refreshValues()
   }
 })
 
@@ -238,7 +234,11 @@ const javaSelectionType = ref('automatically install')
 
 async function autoInstallJava() {
   const path = await auto_install_java(17).catch(handleError)
-  settings.value.java_globals.JAVA_17 = await get_jre(path).catch(handleError)
+  if (!settings.value.java_globals) settings.value.java_globals = {}
+  const version = await get_jre(path).catch(handleError)
+  // weird vue bug, ignore
+  settings.value.java_globals.JAVA_17 = version
+  settings.value.java_globals.JAVA_17 = version
   mixpanel.track('OnboardingAutoInstallJava')
 }
 

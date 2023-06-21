@@ -132,6 +132,8 @@ const logout = async (id) => {
   if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
+  } else {
+    emit('change')
   }
   mixpanel.track('AccountLogOut')
 }

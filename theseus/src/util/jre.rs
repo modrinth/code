@@ -177,7 +177,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         let path = PathBuf::from(path);
         jre_paths.insert(PathBuf::from(&path).join("jre").join("bin"));
         jre_paths.insert(PathBuf::from(&path).join("bin"));
-        if let Ok(dir) = std::fs::read_dir(base_path) {
+        if let Ok(dir) = std::fs::read_dir(path) {
             for entry in dir {
                 if let Ok(entry) = entry {
                     let entry_path = entry.path();
