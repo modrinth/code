@@ -39,6 +39,7 @@ tracing-error = "0.1"
 sentry = "0.30"
 sentry-rust-minidump = "0.5"
 
+[target.'cfg(not(target_os = "linux"))'.dependencies]
 window-shadows = "0.2.1"
 
 [target.'cfg(target_os = "macos")'.dependencies]
