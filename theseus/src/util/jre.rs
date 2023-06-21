@@ -213,7 +213,8 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
                     if let Ok(entry) = entry {
                         let file_path = entry.path().join("bin");
 
-                        if let Ok(contents) = std::fs::read_to_string(file_path)
+                        if let Ok(contents) =
+                            std::fs::read_to_string(file_path.clone())
                         {
                             let entry = entry.path().join(contents);
                             jre_paths.insert(entry);
