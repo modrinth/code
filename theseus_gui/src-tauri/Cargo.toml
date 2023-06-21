@@ -52,16 +52,6 @@ window-shadows = "0.2.1"
 cocoa = "0.24.1"
 objc = "0.2.7"
 
-sentry = "0.30"
-sentry-rust-minidump = "0.5"
-
-[target.'cfg(not(target_os = "linux"))'.dependencies]
-window-shadows = "0.2.1"
-
-[target.'cfg(target_os = "macos")'.dependencies]
-cocoa = "0.24.1"
-objc = "0.2.7"
-
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL

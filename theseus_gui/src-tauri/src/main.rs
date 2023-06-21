@@ -7,9 +7,6 @@ use theseus::prelude::*;
 
 use tauri::Manager;
 
-use tracing_error::ErrorLayer;
-use tracing_subscriber::EnvFilter;
-
 mod api;
 mod error;
 mod logger;
@@ -44,7 +41,6 @@ fn main() {
     tauri_plugin_deep_link::prepare("com.modrinth.theseus");
 
     let client = sentry::init("https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592");
-
     let _guard = sentry_rust_minidump::init(&client);
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
@@ -60,23 +56,16 @@ fn main() {
             RUST_LOG="theseus=trace" {run command}
 
     */
-    let _guard = logger::start_logger();
+    let _log_guard = logger::start_logger();
 
-    let subscriber = tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
-        .with(filter)
-        .with(ErrorLayer::default());
-
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting default subscriber failed");
+    tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
     let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
-        .plugin(tauri_plugin_window_state::Builder::default().build());
-
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|_app| {
             tauri_plugin_deep_link::register("modrinth", |request: String| {
                 tauri::async_runtime::spawn(api::utils::handle_command(
@@ -86,7 +75,8 @@ fn main() {
             .unwrap();
 
             Ok(())
-        })
+        });
+
     #[cfg(not(target_os = "macos"))]
     {
         builder = builder.setup(|app| {
@@ -132,7 +122,7 @@ fn main() {
         initialize_state,
         is_dev,
         api::progress_bars_list,
-            api::check_safe_loading_bars,
+        api::check_safe_loading_bars,
         api::profile_create::profile_create_empty,
         api::profile_create::profile_create,
         api::profile::profile_remove,
@@ -171,7 +161,7 @@ fn main() {
         api::tags::tags_get_tag_bundle,
         api::settings::settings_get,
         api::settings::settings_set,
-            api::settings::settings_await_settings_sync,
+        api::settings::settings_await_settings_sync,
         api::jre::jre_get_all_jre,
         api::jre::jre_autodetect_java_globals,
         api::jre::jre_find_jre_18plus_jres,
@@ -202,7 +192,7 @@ fn main() {
         api::logs::logs_delete_logs_by_datetime,
         api::utils::show_in_folder,
         api::utils::should_disable_mouseover,
-            api::utils::get_opening_command,
+        api::utils::get_opening_command,
     ]);
 
     builder
