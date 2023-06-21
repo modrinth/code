@@ -61,7 +61,6 @@ const hideContextMenu = () => {
 }
 
 const optionClicked = (option) => {
-  console.log('item check', item.value)
   emit('option-clicked', {
     item: item.value,
     option: option,

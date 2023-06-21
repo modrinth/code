@@ -5,7 +5,10 @@
 
 use theseus::prelude::*;
 
-use tauri::{Manager, WindowEvent};
+use tauri::Manager;
+
+use window_shadows::set_shadow;
+
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -78,13 +81,21 @@ fn main() {
     {
         builder = builder.setup(|app| {
             let win = app.get_window("main").unwrap();
-            win.set_decorations(false);
+            win.set_decorations(false).unwrap();
             Ok(())
         })
     }
 
+  builder = builder.setup(|app| {
+    let win = app.get_window("main").unwrap();
+    set_shadow(&win, true).unwrap();
+    Ok(())
+  });
+
     #[cfg(target_os = "macos")]
     {
+        use tauri::WindowEvent;
+
         builder = builder
             .setup(|app| {
                 use api::window_ext::WindowExt;

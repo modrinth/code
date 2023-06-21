@@ -57,7 +57,7 @@
 <script setup>
 import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from 'omorphia'
 import { add_project_from_version as installMod } from '@/helpers/profile'
-import { defineExpose, ref } from 'vue'
+import { ref } from 'vue'
 import { handleError, useTheming } from '@/store/state.js'
 import mixpanel from 'mixpanel-browser'
 

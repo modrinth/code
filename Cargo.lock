@@ -4567,7 +4567,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-tungstenite",
  "async_zip",
@@ -4608,7 +4608,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "argh",
  "color-eyre",
@@ -4660,6 +4660,7 @@ dependencies = [
  "tracing-subscriber 0.2.25",
  "url",
  "uuid",
+ "window-shadows",
 ]
 
 [[package]]
@@ -4672,7 +4673,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_playground"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "daedalus",
  "dunce",
@@ -5483,6 +5484,18 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
+[[package]]
+name = "window-shadows"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29d30320647cfc3dc45554c8ad825b84831def81f967a2f7589931328ff9b16d"
+dependencies = [
+ "cocoa",
+ "objc",
+ "raw-window-handle",
+ "windows-sys 0.42.0",
+]
 
 [[package]]
 name = "windows"

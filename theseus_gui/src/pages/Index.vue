@@ -21,9 +21,7 @@ breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 const recentInstances = shallowRef([])
 
 const getInstances = async () => {
-  console.log('aa')
   const profiles = await list(true).catch(handleError)
-  console.log(profiles)
   recentInstances.value = Object.values(profiles).sort((a, b) => {
     return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
   })
