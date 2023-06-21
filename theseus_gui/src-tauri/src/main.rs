@@ -193,9 +193,4 @@ fn main() {
     builder
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-
-    #[allow(deref_nullptr)]
-    unsafe {
-        *std::ptr::null_mut() = true;
-    }
 }

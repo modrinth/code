@@ -4567,7 +4567,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "async-tungstenite",
  "async_zip",
@@ -4608,7 +4608,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_cli"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "argh",
  "color-eyre",
