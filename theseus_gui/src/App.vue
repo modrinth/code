@@ -28,6 +28,7 @@ import { isDev } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import OnboardingModal from '@/components/OnboardingModal.vue'
+import { getVersion } from '@tauri-apps/api/app'
 
 const themeStore = useTheming()
 
@@ -35,8 +36,10 @@ const isLoading = ref(true)
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering } = await get()
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded } =
+      await get()
     const dev = await isDev()
+    const version = await getVersion()
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -46,7 +49,7 @@ defineExpose({
     if (opt_out_analytics) {
       mixpanel.opt_out_tracking()
     }
-    mixpanel.track('Launched')
+    mixpanel.track('Launched', { version, dev, onboarded })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -107,13 +110,15 @@ document.querySelector('body').addEventListener('click', function (e) {
     target = target.parentElement
   }
 })
+
+const accounts = ref(null)
 </script>
 
 <template>
   <SplashScreen v-if="isLoading" app-loading />
   <div v-else class="container">
     <suspense>
-      <OnboardingModal ref="testModal" />
+      <OnboardingModal ref="testModal" :accounts="accounts" />
     </suspense>
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">

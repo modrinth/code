@@ -140,14 +140,9 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 .join("java")
         }
 
-        #[cfg(target_os = "windows")]
+        #[cfg(not(target_os = "macos"))]
         {
-            base_path = base_path.join("bin").join("javaw.exe")
-        }
-
-        #[cfg(target_os = "linux")]
-        {
-            base_path = base_path.join("bin").join("java")
+            base_path = base_path.join("bin").join(jre::JAVA_BIN)
         }
 
         Ok(base_path)

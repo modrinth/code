@@ -110,7 +110,7 @@
         </div>
 
         <div class="center-grow">
-          <AccountsCard mode="isolated" />
+          <AccountsCard ref="accountsCard" mode="isolated" @change="fetchSettings" />
         </div>
       </div>
       <div v-else-if="page === 3" key="3" class="content">
@@ -163,22 +163,32 @@ import { get, set } from '@/helpers/settings.js'
 import { auto_install_java, get_jre } from '@/helpers/jre.js'
 import { loading_listener } from '@/helpers/events.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
+import mixpanel from 'mixpanel-browser'
 
 const onboardingModal = ref(null)
+const accountsCard = ref(null)
 const page = ref(1)
 
-const fetchSettings = await get().catch(handleError)
-
-onMounted(() => {
-  if (!fetchSettings.onboarded) {
-    onboardingModal.value.show()
-  }
+const props = defineProps({
+  accounts: {
+    type: Object,
+    default: () => {},
+  },
 })
 
-if (!fetchSettings.java_globals.JAVA_17)
-  fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
+async function fetchSettings() {
+  const fetchSettings = await get().catch(handleError)
 
-const settings = ref(fetchSettings)
+  if (!fetchSettings.java_globals.JAVA_17)
+    fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
+
+  settings.value = fetchSettings
+  if (props.accounts) {
+    await props.accounts.refreshValues()
+  }
+}
+const settings = ref({})
+await fetchSettings()
 
 watch(settings.value, async (oldSettings, newSettings) => {
   const setSettings = JSON.parse(JSON.stringify(newSettings))
@@ -193,24 +203,43 @@ watch(settings.value, async (oldSettings, newSettings) => {
     )
   }
 
-  await set(setSettings)
+  const refresh = await get()
+  if (refresh !== setSettings) {
+    await set(setSettings)
+
+    if (accountsCard.value) {
+      await accountsCard.value.refreshValues()
+    }
+  }
 })
 
-const pageTurn = () => {
+onMounted(() => {
+  if (!settings.value.onboarded) {
+    onboardingModal.value.show()
+  }
+})
+
+async function pageTurn() {
   if (page.value === 3) {
     settings.value.onboarded = true
     onboardingModal.value.hide()
+    mixpanel.track('OnboardingFinish')
     return
   }
   page.value++
+  mixpanel.track('OnboardingPage', { page: page.value })
+
+  if (accountsCard.value) {
+    await accountsCard.value.refreshValues()
+  }
 }
 
 const javaSelectionType = ref('automatically install')
 
 async function autoInstallJava() {
   const path = await auto_install_java(17).catch(handleError)
-  const version = await get_jre(path).catch(handleError)
-  settings.value.java_globals.JAVA_17 = version
+  settings.value.java_globals.JAVA_17 = await get_jre(path).catch(handleError)
+  mixpanel.track('OnboardingAutoInstallJava')
 }
 
 const javaLoadingEvent = ref(null)

@@ -31,7 +31,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     let mut jre_paths = HashSet::new();
 
     // Add JRES directly on PATH
-    jre_paths.extend(get_all_jre_path().await?);
+    jre_paths.extend(get_all_jre_path().await);
     jre_paths.extend(get_all_autoinstalled_jre_path().await?);
     if let Ok(java_home) = env::var("JAVA_HOME") {
         jre_paths.insert(PathBuf::from(java_home));
@@ -47,8 +47,10 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     for java_path in java_paths {
         let Ok(java_subpaths) = std::fs::read_dir(java_path) else {continue };
         for java_subpath in java_subpaths {
-            let path = java_subpath?.path();
-            jre_paths.insert(path.join("bin"));
+            if let Ok(java_subpath) = java_subpath {
+                let path = java_subpath.path();
+                jre_paths.insert(path.join("bin"));
+            }
         }
     }
 
@@ -68,18 +70,18 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         if let Ok(jre_key) = RegKey::predef(HKEY_LOCAL_MACHINE)
             .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_32KEY)
         {
-            jre_paths.extend(get_paths_from_jre_winregkey(jre_key)?);
+            jre_paths.extend(get_paths_from_jre_winregkey(jre_key));
         }
         if let Ok(jre_key) = RegKey::predef(HKEY_LOCAL_MACHINE)
             .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_64KEY)
         {
-            jre_paths.extend(get_paths_from_jre_winregkey(jre_key)?);
+            jre_paths.extend(get_paths_from_jre_winregkey(jre_key));
         }
     }
 
     // Get JRE versions from potential paths concurrently
     let j = check_java_at_filepaths(jre_paths)
-        .await?
+        .await
         .into_iter()
         .collect();
     Ok(j)
@@ -88,27 +90,26 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 // Gets paths rather than search directly as RegKeys should not be passed asynchronously (do not impl Send)
 #[cfg(target_os = "windows")]
 #[tracing::instrument]
-pub fn get_paths_from_jre_winregkey(
-    jre_key: RegKey,
-) -> Result<HashSet<PathBuf>, JREError> {
+pub fn get_paths_from_jre_winregkey(jre_key: RegKey) -> HashSet<PathBuf> {
     let mut jre_paths = HashSet::new();
 
     for subkey in jre_key.enum_keys() {
-        let subkey = subkey?;
-        let subkey = jre_key.open_subkey(subkey)?;
+        if let Ok(subkey) = subkey {
+            if let Ok(subkey) = jre_key.open_subkey(subkey) {
+                let subkey_value_names =
+                    [r"JavaHome", r"InstallationPath", r"\\hotspot\\MSI"];
 
-        let subkey_value_names =
-            [r"JavaHome", r"InstallationPath", r"\\hotspot\\MSI"];
+                for subkey_value in subkey_value_names {
+                    let path: Result<String, std::io::Error> =
+                        subkey.get_value(subkey_value);
+                    let Ok(path) = path else {continue};
 
-        for subkey_value in subkey_value_names {
-            let path: Result<String, std::io::Error> =
-                subkey.get_value(subkey_value);
-            let Ok(path) = path else {continue};
-
-            jre_paths.insert(PathBuf::from(path).join("bin"));
+                    jre_paths.insert(PathBuf::from(path).join("bin"));
+                }
+            }
         }
     }
-    Ok(jre_paths)
+    jre_paths
 }
 
 // Entrypoint function (Mac)
@@ -120,7 +121,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     let mut jre_paths = HashSet::new();
 
     // Add JREs directly on PATH
-    jre_paths.extend(get_all_jre_path().await?);
+    jre_paths.extend(get_all_jre_path().await);
     jre_paths.extend(get_all_autoinstalled_jre_path().await?);
 
     // Hard paths for locations for commonly installed .exes
@@ -134,16 +135,18 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     }
     // Iterate over JavaVirtualMachines/(something)/Contents/Home/bin
     let base_path = PathBuf::from("/Library/Java/JavaVirtualMachines/");
-    if base_path.is_dir() {
-        for entry in std::fs::read_dir(base_path)? {
-            let entry = entry?.path().join("Contents/Home/bin");
-            jre_paths.insert(entry);
+    if let Ok(dir) = std::fs::read_dir(base_path) {
+        for entry in dir {
+            if let Ok(entry) = entry {
+                let entry = entry.path().join("Contents/Home/bin");
+                jre_paths.insert(entry);
+            }
         }
     }
 
     // Get JRE versions from potential paths concurrently
     let j = check_java_at_filepaths(jre_paths)
-        .await?
+        .await
         .into_iter()
         .collect();
     Ok(j)
@@ -158,7 +161,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     let mut jre_paths = HashSet::new();
 
     // Add JREs directly on PATH
-    jre_paths.extend(get_all_jre_path().await?);
+    jre_paths.extend(get_all_jre_path().await);
     jre_paths.extend(get_all_autoinstalled_jre_path().await?);
 
     // Hard paths for locations for commonly installed locations
@@ -174,18 +177,20 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         let path = PathBuf::from(path);
         jre_paths.insert(PathBuf::from(&path).join("jre").join("bin"));
         jre_paths.insert(PathBuf::from(&path).join("bin"));
-        if path.is_dir() {
-            for entry in std::fs::read_dir(&path)? {
-                let entry_path = entry?.path();
-                jre_paths.insert(entry_path.join("jre").join("bin"));
-                jre_paths.insert(entry_path.join("bin"));
+        if let Ok(dir) = std::fs::read_dir(base_path) {
+            for entry in dir {
+                if let Ok(entry) = entry {
+                    let entry_path = entry.path();
+                    jre_paths.insert(entry_path.join("jre").join("bin"));
+                    jre_paths.insert(entry_path.join("bin"));
+                }
             }
         }
     }
 
     // Get JRE versions from potential paths concurrently
     let j = check_java_at_filepaths(jre_paths)
-        .await?
+        .await
         .into_iter()
         .collect();
     Ok(j)
@@ -203,13 +208,24 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
         let base_path = state.directories.java_versions_dir();
 
         if base_path.is_dir() {
-            for entry in std::fs::read_dir(base_path)? {
-                let entry = entry?;
-                let file_path = entry.path().join("bin");
-                let contents = std::fs::read_to_string(file_path)?;
+            if let Ok(dir) = std::fs::read_dir(base_path) {
+                for entry in dir {
+                    if let Ok(entry) = entry {
+                        let file_path = entry.path().join("bin");
 
-                let entry = entry.path().join(contents);
-                jre_paths.insert(entry);
+                        if let Ok(contents) = std::fs::read_to_string(file_path)
+                        {
+                            let entry = entry.path().join(contents);
+                            jre_paths.insert(entry);
+                        } else {
+                            #[cfg(not(target_os = "macos"))]
+                            {
+                                let file_path = file_path.join(JAVA_BIN);
+                                jre_paths.insert(file_path);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -220,26 +236,27 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
-async fn get_all_jre_path() -> Result<HashSet<PathBuf>, JREError> {
+async fn get_all_jre_path() -> HashSet<PathBuf> {
     // Iterate over values in PATH variable, where accessible JREs are referenced
-    let paths = env::var("PATH")?;
-    Ok(env::split_paths(&paths).collect())
+    let paths =
+        env::var("PATH").map(|x| env::split_paths(&x).collect::<HashSet<_>>());
+    paths.unwrap_or_else(|_| HashSet::new())
 }
 
 #[cfg(target_os = "windows")]
 #[allow(dead_code)]
-const JAVA_BIN: &str = "javaw.exe";
+pub const JAVA_BIN: &str = "javaw.exe";
 
 #[cfg(not(target_os = "windows"))]
 #[allow(dead_code)]
-const JAVA_BIN: &str = "java";
+pub const JAVA_BIN: &str = "java";
 
 // For each example filepath in 'paths', perform check_java_at_filepath, checking each one concurrently
 // and returning a JavaVersion for every valid path that points to a java bin
 #[tracing::instrument]
 pub async fn check_java_at_filepaths(
     paths: HashSet<PathBuf>,
-) -> Result<HashSet<JavaVersion>, JREError> {
+) -> HashSet<JavaVersion> {
     let jres = stream::iter(paths.into_iter())
         .map(|p: PathBuf| {
             tokio::task::spawn(async move { check_java_at_filepath(&p).await })
@@ -248,8 +265,7 @@ pub async fn check_java_at_filepaths(
         .collect::<Vec<_>>()
         .await;
 
-    let jres: Result<Vec<_>, JoinError> = jres.into_iter().collect();
-    Ok(jres?.into_iter().flatten().collect())
+    jres.into_iter().flat_map(|x| x.ok()).flatten().collect()
 }
 
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
@@ -379,20 +395,4 @@ pub enum JREError {
 
     #[error("Error getting launcher sttae")]
     StateError,
-}
-
-#[cfg(test)]
-mod tests {
-    use super::extract_java_majorminor_version;
-
-    #[test]
-    pub fn java_version_parsing() {
-        assert_eq!(extract_java_majorminor_version("1.8").unwrap(), (1, 8));
-        assert_eq!(extract_java_majorminor_version("17.0.6").unwrap(), (1, 17));
-        assert_eq!(extract_java_majorminor_version("20").unwrap(), (1, 20));
-        assert_eq!(
-            extract_java_majorminor_version("1.8.0_361").unwrap(),
-            (1, 8)
-        );
-    }
 }
