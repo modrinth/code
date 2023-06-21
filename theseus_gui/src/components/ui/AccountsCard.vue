@@ -1,12 +1,16 @@
 <template>
   <div
+    v-if="mode !== 'isolated'"
     ref="button"
     class="button-base avatar-button"
-    :class="{ expanded: expanded }"
-    @click="toggle()"
+    :class="{ expanded: mode === 'expanded' }"
+    @click="showCard = !showCard"
   >
-    <Avatar :size="expanded ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
-    <div v-show="expanded" class="avatar-text">
+    <Avatar
+      :size="mode === 'expanded' ? 'xs' : 'sm'"
+      :src="selectedAccount ? `https://mc-heads.net/avatar/${selectedAccount.id}/128` : ''"
+    />
+    <div v-show="mode === 'expanded'" class="avatar-text">
       <div class="text no-select">
         {{ selectedAccount ? selectedAccount.username : 'Offline' }}
       </div>
@@ -17,9 +21,14 @@
     </div>
   </div>
   <transition name="fade">
-    <Card v-if="showCard" ref="card" class="account-card" :class="{ expanded: expanded }">
+    <Card
+      v-if="showCard || mode === 'isolated'"
+      ref="card"
+      class="account-card"
+      :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
+    >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="selectedAccount.profile_picture" />
+        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`" />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
@@ -37,7 +46,7 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="account.profile_picture" class="icon" />
+            <Avatar :src="`https://mc-heads.net/avatar/${account.id}/128`" class="icon" />
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
@@ -55,7 +64,7 @@
 
 <script setup>
 import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
-import { ref, defineProps, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
   remove_user,
@@ -65,53 +74,44 @@ import {
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
+import mixpanel from 'mixpanel-browser'
 
 defineProps({
-  expanded: {
-    type: Boolean,
+  mode: {
+    type: String,
     required: true,
+    default: 'normal',
   },
 })
 
-const settings = ref(await get().catch(handleError))
+const emit = defineEmits(['change'])
 
-const appendProfiles = (accounts) => {
-  return accounts.map((account) => {
-    return {
-      ...account,
-      profile_picture: `https://mc-heads.net/avatar/${account.id}/128`,
-    }
-  })
+const settings = ref({})
+const accounts = ref([])
+async function refreshValues() {
+  settings.value = await get().catch(handleError)
+  accounts.value = await users().catch(handleError)
 }
-
-const accounts = ref(await users().then(appendProfiles).catch(handleError))
+defineExpose({
+  refreshValues,
+})
+await refreshValues()
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => settings.value.default_user !== account.id)
 )
 
-const selectedAccount = ref(
+const selectedAccount = computed(() =>
   accounts.value.find((account) => account.id === settings.value.default_user)
 )
 
-const refreshValues = async () => {
-  accounts.value = await users().then(appendProfiles).catch(handleError)
-  selectedAccount.value = accounts.value.find(
-    (account) => account.id === settings.value.default_user
-  )
-}
-
-let showCard = ref(false)
-let card = ref(null)
-let button = ref(null)
-
-const setAccount = async (account) => {
+async function setAccount(account) {
   settings.value.default_user = account.id
-  selectedAccount.value = account
   await set(settings.value).catch(handleError)
+  emit('change')
 }
 
-const login = async () => {
+async function login() {
   const url = await authenticate_begin_flow().catch(handleError)
 
   const window = new WebviewWindow('loginWindow', {
@@ -119,18 +119,11 @@ const login = async () => {
     url: url,
   })
 
-  window.once('tauri://created', function () {
-    console.log('webview created')
-  })
-
-  window.once('tauri://error', function (e) {
-    console.log('webview error', e)
-  })
-
   const loggedIn = await authenticate_await_completion().catch(handleError)
   await setAccount(loggedIn)
   await refreshValues()
   await window.close()
+  mixpanel.track('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -139,13 +132,15 @@ const logout = async (id) => {
   if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
+  } else {
+    emit('change')
   }
+  mixpanel.track('AccountLogOut')
 }
 
-const toggle = () => {
-  showCard.value = !showCard.value
-}
-
+let showCard = ref(false)
+let card = ref(null)
+let button = ref(null)
 const handleClickOutside = (event) => {
   const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
@@ -216,6 +211,12 @@ onBeforeUnmount(() => {
   &.expanded {
     left: 13.5rem;
   }
+
+  &.isolated {
+    position: relative;
+    left: 0;
+    top: 0;
+  }
 }
 
 .accounts-title {
@@ -269,13 +270,13 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
-  background-color: var(--color-bg);
+  background-color: var(--color-raised-bg);
   border-radius: var(--radius-md);
-  box-shadow: none;
   width: 100%;
   text-align: left;
 
   &.expanded {
+    border: 1px solid var(--color-button-bg);
     padding: 1rem;
   }
 }

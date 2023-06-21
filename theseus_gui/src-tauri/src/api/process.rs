@@ -52,14 +52,8 @@ pub async fn process_get_all_running_profiles() -> Result<Vec<Profile>> {
 
 // Gets process stderr by process UUID
 #[tauri::command]
-pub async fn process_get_stderr_by_uuid(uuid: Uuid) -> Result<String> {
-    Ok(process::get_stderr_by_uuid(&uuid).await?)
-}
-
-// Gets process stdout by process UUID
-#[tauri::command]
-pub async fn process_get_stdout_by_uuid(uuid: Uuid) -> Result<String> {
-    Ok(process::get_stdout_by_uuid(&uuid).await?)
+pub async fn process_get_output_by_uuid(uuid: Uuid) -> Result<String> {
+    Ok(process::get_output_by_uuid(&uuid).await?)
 }
 
 // Kill a process by process UUID

@@ -23,12 +23,7 @@ onUnmounted(() => unlisten())
 </script>
 
 <template>
-  <GridDisplay
-    v-if="instances.length > 0"
-    label="Instances"
-    :instances="instances"
-    class="display"
-  />
+  <GridDisplay label="Instances" :instances="instances" class="display" />
 </template>
 
 <style lang="scss" scoped>

@@ -120,6 +120,7 @@ pub async fn edit_icon(
                     ProfilePayloadType::Edited,
                 )
                 .await?;
+                State::sync().await?;
 
                 Ok(())
             }
@@ -133,7 +134,10 @@ pub async fn edit_icon(
             profile.metadata.icon = None;
             async { Ok(()) }
         })
-        .await
+        .await?;
+        State::sync().await?;
+
+        Ok(())
     }
 }
 
@@ -288,6 +292,7 @@ pub async fn update_all(
             ProfilePayloadType::Edited,
         )
         .await?;
+        State::sync().await?;
 
         Ok(Arc::try_unwrap(map).unwrap().into_inner())
     } else {
@@ -344,6 +349,7 @@ pub async fn update_project(
                         ProfilePayloadType::Edited,
                     )
                     .await?;
+                    State::sync().await?;
                 }
 
                 return Ok(path);
@@ -378,6 +384,7 @@ pub async fn add_project_from_version(
             ProfilePayloadType::Edited,
         )
         .await?;
+        State::sync().await?;
 
         Ok(path)
     } else {
@@ -418,6 +425,7 @@ pub async fn add_project_from_path(
             ProfilePayloadType::Edited,
         )
         .await?;
+        State::sync().await?;
 
         Ok(path)
     } else {
@@ -444,6 +452,7 @@ pub async fn toggle_disable_project(
             ProfilePayloadType::Edited,
         )
         .await?;
+        State::sync().await?;
 
         Ok(res)
     } else {
@@ -470,6 +479,7 @@ pub async fn remove_project(
             ProfilePayloadType::Edited,
         )
         .await?;
+        State::sync().await?;
 
         Ok(())
     } else {

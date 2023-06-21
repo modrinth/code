@@ -52,12 +52,12 @@ export async function get_jre(path) {
 
 // Autodetect Java globals, by searching the users computer.
 // Returns a *NEW* JavaGlobals that can be put into Settings
-export async function autodetect_java_globals(path) {
-  return await invoke('jre_autodetect_java_globals', { path })
+export async function autodetect_java_globals() {
+  return await invoke('jre_autodetect_java_globals')
 }
 
 // Automatically installs specified java version
-export async function jre_auto_install_java(javaVersion) {
+export async function auto_install_java(javaVersion) {
   return await invoke('jre_auto_install_java', { javaVersion })
 }
 

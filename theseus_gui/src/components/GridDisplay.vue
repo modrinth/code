@@ -12,10 +12,16 @@ import {
   Card,
   DropdownSelect,
   SearchIcon,
+  XIcon,
+  Button,
   formatCategoryHeader,
+  ModalConfirm,
 } from 'omorphia'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
+import { useTheming } from '@/store/theme.js'
+import { remove } from '@/helpers/profile.js'
+import { handleError } from '@/store/notifications.js'
 
 const props = defineProps({
   instances: {
@@ -31,6 +37,19 @@ const props = defineProps({
 })
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
+
+const themeStore = useTheming()
+const currentDeleteInstance = ref(null)
+const confirmModal = ref(null)
+
+async function deleteProfile() {
+  if (currentDeleteInstance.value) {
+    instanceComponents.value = instanceComponents.value.filter(
+      (x) => x.instance.path !== currentDeleteInstance.value
+    )
+    await remove(currentDeleteInstance.value).catch(handleError)
+  }
+}
 
 const handleRightClick = (event, item) => {
   const baseOptions = [
@@ -68,13 +87,12 @@ const handleRightClick = (event, item) => {
 }
 
 const handleOptionsClick = async (args) => {
-  console.log(args)
   switch (args.option) {
     case 'play':
-      args.item.play()
+      args.item.play(null, 'InstanceGridContextMenu')
       break
     case 'stop':
-      args.item.stop()
+      args.item.stop(null, 'InstanceGridContextMenu')
       break
     case 'add_content':
       await args.item.addContent()
@@ -82,14 +100,15 @@ const handleOptionsClick = async (args) => {
     case 'edit':
       await args.item.seeInstance()
       break
-    case 'delete':
-      await args.item.deleteInstance()
-      break
     case 'open':
       await args.item.openFolder()
       break
     case 'copy':
       await navigator.clipboard.writeText(args.item.instance.path)
+      break
+    case 'delete':
+      currentDeleteInstance.value = args.item.instance.path
+      confirmModal.value.show()
       break
   }
 }
@@ -185,10 +204,22 @@ const filteredResults = computed(() => {
 })
 </script>
 <template>
+  <ModalConfirm
+    ref="confirmModal"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    :noblur="!themeStore.advancedRendering"
+    @proceed="deleteProfile"
+  />
   <Card class="header">
     <div class="iconified-input">
       <SearchIcon />
       <input v-model="search" type="text" placeholder="Search" class="search-input" />
+      <Button @click="() => (search = '')">
+        <XIcon />
+      </Button>
     </div>
     <div class="labeled_button">
       <span>Sort by</span>
@@ -219,7 +250,7 @@ const filteredResults = computed(() => {
     </div>
   </Card>
   <div
-    v-for="(instanceSection, index) in Array.from(filteredResults, ([key, value]) => ({
+    v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({
       key,
       value,
     }))"
@@ -232,7 +263,7 @@ const filteredResults = computed(() => {
     </div>
     <section class="instances">
       <Instance
-        v-for="instance in instanceSection.value"
+        v-for="(instance, index) in instanceSection.value"
         ref="instanceComponents"
         :key="instance.id"
         :instance="instance"
@@ -295,6 +326,10 @@ const filteredResults = computed(() => {
 
   .iconified-input {
     flex-grow: 1;
+
+    input {
+      min-width: 100%;
+    }
   }
 
   .sort-dropdown {

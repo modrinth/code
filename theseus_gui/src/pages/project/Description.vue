@@ -23,6 +23,10 @@ export default {
 
 <style scoped lang="scss">
 .markdown-body {
+  :deep(table) {
+    width: auto;
+  }
+
   :deep(hr),
   :deep(h1),
   :deep(h2) {

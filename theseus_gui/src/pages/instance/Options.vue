@@ -5,9 +5,14 @@
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
+    :noblur="!themeStore.advancedRendering"
     @proceed="removeProfile"
   />
-  <Modal ref="changeVersionsModal" header="Change instance versions">
+  <Modal
+    ref="changeVersionsModal"
+    header="Change instance versions"
+    :noblur="!themeStore.advancedRendering"
+  >
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -167,6 +172,7 @@
         :min="256"
         :max="maxMemory"
         :step="1"
+        unit="mb"
       />
     </div>
   </Card>
@@ -333,6 +339,8 @@ import { open } from '@tauri-apps/api/dialog'
 import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
+import { useTheming } from '@/store/theme.js'
 
 const router = useRouter()
 
@@ -342,6 +350,8 @@ const props = defineProps({
     required: true,
   },
 })
+
+const themeStore = useTheming()
 
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
@@ -359,6 +369,7 @@ const availableGroups = ref([
 async function resetIcon() {
   icon.value = null
   await edit_icon(props.instance.path, null).catch(handleError)
+  mixpanel.track('InstanceRemoveIcon')
 }
 
 async function setIcon() {
@@ -376,6 +387,8 @@ async function setIcon() {
 
   icon.value = value
   await edit_icon(props.instance.path, icon.value).catch(handleError)
+
+  mixpanel.track('InstanceSetIcon')
 }
 
 const globalSettings = await get().catch(handleError)
@@ -427,6 +440,7 @@ watch(
       metadata: {
         name: title.value.trim().substring(0, 16) ?? 'Instance',
         groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
+        loader_version: props.instance.metadata.loader_version,
       },
       java: {},
     }
@@ -480,6 +494,11 @@ async function repairProfile() {
   repairing.value = true
   await install(props.instance.path).catch(handleError)
   repairing.value = false
+
+  mixpanel.track('InstanceRepair', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
 }
 
 const removing = ref(false)
@@ -487,6 +506,11 @@ async function removeProfile() {
   removing.value = true
   await remove(props.instance.path).catch(handleError)
   removing.value = false
+
+  mixpanel.track('InstanceRemove', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
 
   await router.push({ path: '/' })
 }

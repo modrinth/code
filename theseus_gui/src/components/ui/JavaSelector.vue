@@ -1,6 +1,6 @@
 <template>
   <JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
-  <div class="toggle-setting">
+  <div class="toggle-setting" :class="{ compact }">
     <input
       autocomplete="off"
       :disabled="props.disabled"
@@ -18,10 +18,7 @@
       "
     />
     <span class="installation-buttons">
-      <Button
-        :disabled="props.disabled"
-        @click="$refs.detectJavaModal.show(props.version, props.modelValue)"
-      >
+      <Button :disabled="props.disabled" @click="autoDetect">
         <SearchIcon />
         Auto detect
       </Button>
@@ -48,10 +45,12 @@
 
 <script setup>
 import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
-import { get_jre } from '@/helpers/jre.js'
+import { find_jre_17_jres, get_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
+import mixpanel from 'mixpanel-browser'
+import { handleError } from '@/store/state.js'
 
 const props = defineProps({
   version: {
@@ -73,6 +72,10 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  compact: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -84,6 +87,11 @@ async function testJava() {
   let result = await get_jre(props.modelValue ? props.modelValue.path : '')
   testingJava.value = false
   testingJavaSuccess.value = !!result
+
+  mixpanel.track('JavaTest', {
+    path: props.modelValue ? props.modelValue.path : '',
+    success: !!result,
+  })
 
   setTimeout(() => {
     testingJavaSuccess.value = null
@@ -101,9 +109,26 @@ async function handleJavaFileInput() {
         version: props.version.toString(),
         architecture: 'x86',
       }
+
+      mixpanel.track('JavaManualSelect', {
+        path: filePath,
+        version: props.version,
+      })
     }
 
     emit('update:modelValue', result)
+  }
+}
+
+const detectJavaModal = ref(null)
+async function autoDetect() {
+  if (!props.compact) {
+    detectJavaModal.value.show(props.version, props.modelValue)
+  } else {
+    let versions = await find_jre_17_jres().catch(handleError)
+    if (versions.length > 0) {
+      emit('update:modelValue', versions[0])
+    }
   }
 }
 </script>
@@ -120,12 +145,15 @@ async function handleJavaFileInput() {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+
+  &.compact {
+    flex-wrap: wrap;
+  }
 }
 
 .installation-buttons {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin: 0;

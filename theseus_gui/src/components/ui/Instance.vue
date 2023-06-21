@@ -5,7 +5,7 @@ import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } fr
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
-import { list, remove, run } from '@/helpers/profile'
+import { list, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
@@ -16,6 +16,7 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
 import { showInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import mixpanel from 'mixpanel-browser'
 
 const props = defineProps({
   instance: {
@@ -91,6 +92,13 @@ const install = async (e) => {
         props.instance.icon_url
       ).catch(handleError)
       modLoading.value = false
+
+      mixpanel.track('PackInstall', {
+        id: props.instance.project_id,
+        version_id: versions[0].id,
+        title: props.instance.title,
+        source: 'InstanceCard',
+      })
     } else
       confirmModal.value.show(
         props.instance.project_id,
@@ -99,21 +107,32 @@ const install = async (e) => {
         props.instance.icon_url
       )
   } else {
-    modInstallModal.value.show(props.instance.project_id, versions)
+    modInstallModal.value.show(
+      props.instance.project_id,
+      versions,
+      props.instance.title,
+      props.instance.project_type
+    )
   }
 
   modLoading.value = false
 }
 
-const play = async (e) => {
+const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
   uuid.value = await run(props.instance.path).catch(handleError)
   modLoading.value = false
   playing.value = true
+
+  mixpanel.track('InstancePlay', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    source: context,
+  })
 }
 
-const stop = async (e) => {
+const stop = async (e, context) => {
   e?.stopPropagation()
   playing.value = false
 
@@ -126,11 +145,13 @@ const stop = async (e) => {
     uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
   } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
 
-  uuid.value = null
-}
+  mixpanel.track('InstanceStop', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    source: context,
+  })
 
-const deleteInstance = async () => {
-  await remove(props.instance.path).catch(handleError)
+  uuid.value = null
 }
 
 const openFolder = async () => {
@@ -151,7 +172,6 @@ defineExpose({
   stop,
   seeInstance,
   openFolder,
-  deleteInstance,
   addContent,
   instance: props.instance,
 })
@@ -190,7 +210,7 @@ onUnmounted(() => unlisten())
     <div
       v-if="props.instance.metadata && playing === false && modLoading === false"
       class="install cta button-base"
-      @click="play"
+      @click="(e) => play(e, 'InstanceCard')"
     >
       <PlayIcon />
     </div>
@@ -200,7 +220,7 @@ onUnmounted(() => unlisten())
     <div
       v-else-if="playing === true"
       class="stop cta button-base"
-      @click="stop"
+      @click="(e) => stop(e, 'InstanceCard')"
       @mousehover="checkProcess"
     >
       <StopCircleIcon />
@@ -230,27 +250,7 @@ onUnmounted(() => unlisten())
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 4.75rem;
-    }
-
-    .instance-card-item {
-      background: hsl(220, 11%, 11%) !important;
-    }
-  }
-}
-
-.light-mode {
-  .instance:hover {
-    .instance-card-item {
-      background: hsl(0, 0%, 91%) !important;
-    }
-  }
-
-  .instance-card-item {
-    background: hsl(0, 0%, 100%) !important;
-
-    &:hover {
-      background: hsl(0, 0%, 91%) !important;
+      bottom: calc(var(--gap-md) + 4.25rem);
     }
   }
 }
@@ -260,14 +260,14 @@ onUnmounted(() => unlisten())
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   z-index: 1;
   width: 3rem;
   height: 3rem;
-  right: 1.25rem;
-  bottom: 4.25rem;
+  right: calc(var(--gap-md) * 2);
+  bottom: 3.25rem;
   opacity: 0;
-  transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
+  transition: 0.2s ease-in-out bottom, 0.2s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
   box-shadow: var(--shadow-floating);
 
@@ -301,17 +301,11 @@ onUnmounted(() => unlisten())
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0.75rem !important; /* overrides card class */
+  padding: var(--gap-md);
   transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
-  background: hsl(220, 11%, 17%) !important;
   margin-bottom: 0;
 
-  &:hover {
-    filter: brightness(1) !important;
-    background: hsl(220, 11%, 11%) !important;
-  }
-
-  > .avatar {
+  .mod-image {
     --size: 100%;
 
     width: 100% !important;

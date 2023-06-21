@@ -32,6 +32,12 @@ pub struct Settings {
     pub default_page: DefaultPage,
     #[serde(default)]
     pub developer_mode: bool,
+    #[serde(default)]
+    pub opt_out_analytics: bool,
+    #[serde(default)]
+    pub advanced_rendering: bool,
+    #[serde(default)]
+    pub onboarded: bool,
 }
 
 impl Default for Settings {
@@ -52,6 +58,9 @@ impl Default for Settings {
             hide_on_process: false,
             default_page: DefaultPage::Home,
             developer_mode: false,
+            opt_out_analytics: false,
+            advanced_rendering: true,
+            onboarded: false,
         }
     }
 }

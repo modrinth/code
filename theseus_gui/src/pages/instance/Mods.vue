@@ -13,6 +13,9 @@
           class="text-input"
           autocomplete="off"
         />
+        <Button @click="() => (searchFilter = '')">
+          <XIcon />
+        </Button>
       </div>
       <span class="manage">
         <span class="text-combo">
@@ -25,36 +28,96 @@
             class="dropdown"
           />
         </span>
-        <Button
+        <DropdownButton
+          :options="['search', 'from_file']"
+          default-value="search"
+          name="add-content-dropdown"
           color="primary"
-          @click="
-            router.push({
-              path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-              query: { i: $route.params.id },
-            })
-          "
+          @option-click="handleContentOptionClick"
         >
-          <PlusIcon />
-          <span class="no-wrap"> Add content </span>
-        </Button>
+          <template #search>
+            <SearchIcon />
+            <span class="no-wrap"> Add content </span>
+          </template>
+          <template #from_file>
+            <FolderOpenIcon />
+            <span class="no-wrap"> Add from file </span>
+          </template>
+        </DropdownButton>
       </span>
     </div>
-    <Chips
-      v-if="Object.keys(selectableProjectTypes).length > 1"
-      v-model="selectedProjectType"
-      :items="Object.keys(selectableProjectTypes)"
-    />
+    <div class="second-row">
+      <Chips
+        v-if="Object.keys(selectableProjectTypes).length > 1"
+        v-model="selectedProjectType"
+        :items="Object.keys(selectableProjectTypes)"
+      />
+      <DropdownButton
+        :options="['update_all', 'filter_update']"
+        default-value="update_all"
+        :disabled="!projects.some((x) => x.outdated)"
+        @option-click="updateAll"
+      >
+        <template #update_all>
+          <UpdatedIcon />
+          Update {{ selected.length > 0 ? 'selected' : 'all' }}
+        </template>
+        <template #filter_update>
+          <UpdatedIcon />
+          Select Updatable
+        </template>
+      </DropdownButton>
+      <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
+        <TrashIcon />
+        Remove selected
+      </Button>
+      <DropdownButton
+        v-if="selected.length > 0"
+        :options="['toggle', 'disable', 'enable', 'hide_show']"
+        default-value="toggle"
+        @option-click="toggleSelected"
+      >
+        <template #toggle>
+          <EditIcon />
+          Toggle selected
+        </template>
+        <template #disable>
+          <XIcon />
+          Disable selected
+        </template>
+        <template #enable>
+          <CheckCircleIcon />
+          Enable selected
+        </template>
+        <template #hide_show>
+          <CheckCircleIcon />
+          {{ hideNonSelected ? 'Show' : 'Hide' }} unselected
+        </template>
+      </DropdownButton>
+      <DropdownButton
+        v-if="selected.length > 0"
+        :options="['copy_name', 'copy_url', 'copy_slug']"
+        default-value="copy_name"
+        @option-click="copySelected"
+      >
+        <template #copy_name>
+          <EditIcon />
+          Copy names
+        </template>
+        <template #copy_slug>
+          <HashIcon />
+          Copy slugs
+        </template>
+        <template #copy_url>
+          <GlobeIcon />
+          Copy URLs
+        </template>
+      </DropdownButton>
+    </div>
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button
-            v-tooltip="'Update all projects'"
-            icon-only
-            :disabled="!projects.some((x) => x.outdated)"
-            @click="updateAll"
-          >
-            <UpdatedIcon />
-          </Button>
+          <Checkbox v-model="selectAll" class="select-checkbox" />
         </div>
         <div class="table-cell table-text name-cell">Name</div>
         <div class="table-cell table-text">Version</div>
@@ -68,17 +131,7 @@
         @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
       >
         <div class="table-cell table-text">
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <Button
-            v-else
-            v-tooltip="'Update project'"
-            :disabled="!mod.outdated"
-            icon-only
-            @click="updateProject(mod)"
-          >
-            <UpdatedIcon v-if="mod.outdated" />
-            <CheckIcon v-else />
-          </Button>
+          <Checkbox v-model="mod.selected" class="select-checkbox" />
         </div>
         <div class="table-cell table-text name-cell">
           <router-link
@@ -100,6 +153,17 @@
           <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
             <TrashIcon />
           </Button>
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+          <Button
+            v-else
+            v-tooltip="'Update project'"
+            :disabled="!mod.outdated"
+            icon-only
+            @click="updateProject(mod)"
+          >
+            <UpdatedIcon v-if="mod.outdated" />
+            <CheckIcon v-else />
+          </Button>
           <input
             id="switch-1"
             autocomplete="off"
@@ -112,13 +176,31 @@
       </div>
     </div>
   </Card>
+  <Modal ref="deleteWarning" header="Are you sure?">
+    <div class="modal-body">
+      <div class="markdown-body">
+        <p>
+          Are you sure you want to remove <strong>{{ selected.length }} projects</strong> from
+          {{ instance.metadata.name }}?
+          <br />
+          This action <strong>cannot</strong> be undone.
+        </p>
+      </div>
+      <div class="button-group push-right">
+        <Button @click="deleteWarning.hide()"> Cancel </Button>
+        <Button color="danger" @click="deleteSelected">
+          <TrashIcon />
+          Remove
+        </Button>
+      </div>
+    </div>
+  </Modal>
 </template>
 <script setup>
 import {
   Avatar,
   Button,
   TrashIcon,
-  PlusIcon,
   Card,
   CheckIcon,
   SearchIcon,
@@ -126,18 +208,32 @@ import {
   DropdownSelect,
   AnimatedLogo,
   Chips,
+  FolderOpenIcon,
+  Checkbox,
   formatProjectType,
+  DropdownButton,
+  EditIcon,
+  GlobeIcon,
+  HashIcon,
+  Modal,
+  XIcon,
+  CheckCircleIcon,
 } from 'omorphia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import {
+  add_project_from_path,
+  get,
   remove_project,
   toggle_disable_project,
   update_all,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
+import { open } from '@tauri-apps/api/dialog'
+import { listen } from '@tauri-apps/api/event'
 
 const router = useRouter()
 
@@ -157,52 +253,68 @@ const props = defineProps({
 })
 
 const projects = ref([])
-for (const [path, project] of Object.entries(props.instance.projects)) {
-  if (project.metadata.type === 'modrinth') {
-    let owner = project.metadata.members.find((x) => x.role === 'Owner')
-    projects.value.push({
-      path,
-      name: project.metadata.project.title,
-      slug: project.metadata.project.slug,
-      author: owner ? owner.user.username : null,
-      version: project.metadata.version.version_number,
-      file_name: project.file_name,
-      icon: project.metadata.project.icon_url,
-      disabled: project.disabled,
-      updateVersion: project.metadata.update_version,
-      outdated: !!project.metadata.update_version,
-      project_type: project.metadata.project.project_type,
-    })
-  } else if (project.metadata.type === 'inferred') {
-    projects.value.push({
-      path,
-      name: project.metadata.title ?? project.file_name,
-      author: project.metadata.authors[0],
-      version: project.metadata.version,
-      file_name: project.file_name,
-      icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-      disabled: project.disabled,
-      outdated: false,
-      project_type: project.metadata.project_type,
-    })
-  } else {
-    projects.value.push({
-      path,
-      name: project.file_name,
-      author: '',
-      version: null,
-      file_name: project.file_name,
-      icon: null,
-      disabled: project.disabled,
-      outdated: false,
-      project_type: null,
-    })
+
+const initProjects = (initInstance) => {
+  projects.value = []
+  for (const [path, project] of Object.entries(initInstance.projects)) {
+    if (project.metadata.type === 'modrinth') {
+      let owner = project.metadata.members.find((x) => x.role === 'Owner')
+      projects.value.push({
+        path,
+        name: project.metadata.project.title,
+        slug: project.metadata.project.slug,
+        author: owner ? owner.user.username : null,
+        version: project.metadata.version.version_number,
+        file_name: project.file_name,
+        icon: project.metadata.project.icon_url,
+        disabled: project.disabled,
+        updateVersion: project.metadata.update_version,
+        outdated: !!project.metadata.update_version,
+        project_type: project.metadata.project.project_type,
+        id: project.metadata.project.id,
+      })
+    } else if (project.metadata.type === 'inferred') {
+      projects.value.push({
+        path,
+        name: project.metadata.title ?? project.file_name,
+        author: project.metadata.authors[0],
+        version: project.metadata.version,
+        file_name: project.file_name,
+        icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
+        disabled: project.disabled,
+        outdated: false,
+        project_type: project.metadata.project_type,
+      })
+    } else {
+      projects.value.push({
+        path,
+        name: project.file_name,
+        author: '',
+        version: null,
+        file_name: project.file_name,
+        icon: null,
+        disabled: project.disabled,
+        outdated: false,
+        project_type: null,
+      })
+    }
   }
 }
 
+initProjects(props.instance)
+
+watch(
+  () => props.instance.projects,
+  () => initProjects(props.instance)
+)
+
 const searchFilter = ref('')
+const selectAll = ref(false)
 const sortFilter = ref('')
 const selectedProjectType = ref('All')
+const selected = computed(() => projects.value.filter((mod) => mod.selected))
+const deleteWarning = ref(null)
+const hideNonSelected = ref(false)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -217,12 +329,19 @@ const selectableProjectTypes = computed(() => {
 
 const search = computed(() => {
   const projectType = selectableProjectTypes.value[selectedProjectType.value]
-  const filtered = projects.value.filter((mod) => {
-    return (
-      mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
-      (projectType === 'all' || mod.project_type === projectType)
-    )
-  })
+  const filtered = projects.value
+    .filter((mod) => {
+      return (
+        mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
+        (projectType === 'all' || mod.project_type === projectType)
+      )
+    })
+    .filter((mod) => {
+      if (hideNonSelected.value) {
+        return mod.selected
+      }
+      return true
+    })
 
   return updateSort(filtered, sortFilter.value)
 })
@@ -272,29 +391,44 @@ function updateSort(projects, sort) {
   }
 }
 
-async function updateAll() {
-  const setProjects = []
-  for (const [i, project] of projects.value.entries()) {
-    if (project.outdated) {
-      project.updating = true
-      setProjects.push(i)
+async function updateAll(args) {
+  if (args.option === 'update_all') {
+    const setProjects = []
+    for (const [i, project] of selected.value ?? projects.value.entries()) {
+      if (project.outdated) {
+        project.updating = true
+        setProjects.push(i)
+      }
     }
-  }
 
-  const paths = await update_all(props.instance.path).catch(handleError)
+    const paths = await update_all(props.instance.path).catch(handleError)
 
-  for (const [oldVal, newVal] of Object.entries(paths)) {
-    const index = projects.value.findIndex((x) => x.path === oldVal)
-    projects.value[index].path = newVal
-    projects.value[index].outdated = false
+    for (const [oldVal, newVal] of Object.entries(paths)) {
+      const index = projects.value.findIndex((x) => x.path === oldVal)
+      projects.value[index].path = newVal
+      projects.value[index].outdated = false
 
-    if (projects.value[index].updateVersion) {
-      projects.value[index].version = projects.value[index].updateVersion.version_number
-      projects.value[index].updateVersion = null
+      if (projects.value[index].updateVersion) {
+        projects.value[index].version = projects.value[index].updateVersion.version_number
+        projects.value[index].updateVersion = null
+      }
     }
-  }
-  for (const project of setProjects) {
-    projects.value[project].updating = false
+    for (const project of setProjects) {
+      projects.value[project].updating = false
+    }
+
+    mixpanel.track('InstanceUpdateAll', {
+      loader: props.instance.metadata.loader,
+      game_version: props.instance.metadata.game_version,
+      count: setProjects.length,
+      selected: selected.value.length > 1,
+    })
+  } else {
+    for (const project of projects.value) {
+      if (project.outdated) {
+        project.selected = true
+      }
+    }
   }
 }
 
@@ -306,17 +440,131 @@ async function updateProject(mod) {
   mod.outdated = false
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
+
+  mixpanel.track('InstanceProjectUpdate', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
+
+  mixpanel.track('InstanceProjectDisable', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+    disabled: mod.disabled,
+  })
 }
 
 async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
+
+  mixpanel.track('InstanceProjectRemove', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+    id: mod.id,
+    name: mod.name,
+    project_type: mod.project_type,
+  })
 }
+
+const handleContentOptionClick = async (args) => {
+  if (args.option === 'search') {
+    await router.push({
+      path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+      query: { i: props.instance.path },
+    })
+  } else if (args.option === 'from_file') {
+    const newProject = await open({ multiple: true })
+    if (!newProject) return
+
+    for (const project of newProject) {
+      await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
+      initProjects(await get(props.instance.path).catch(handleError))
+    }
+  }
+}
+
+listen('tauri://file-drop', async (event) => {
+  for (const file of event.payload) {
+    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+    initProjects(await get(props.instance.path).catch(handleError))
+  }
+})
+
+async function deleteSelected() {
+  for (const project of selected.value) {
+    await remove_project(props.instance.path, project.path).catch(handleError)
+  }
+  projects.value = projects.value.filter((x) => !x.selected)
+  deleteWarning.value.hide()
+}
+
+async function copySelected(args) {
+  switch (args.option) {
+    case 'copy_name':
+      await navigator.clipboard.writeText(selected.value.map((x) => x.name).join('\n'))
+      break
+    case 'copy_slug':
+      await navigator.clipboard.writeText(
+        selected.value
+          .filter((x) => x.slug)
+          .map((x) => x.slug)
+          .join('\n')
+      )
+      break
+    case 'copy_url':
+      await navigator.clipboard.writeText(
+        selected.value
+          .filter((x) => x.slug)
+          .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
+          .join('\n')
+      )
+      break
+  }
+}
+
+async function toggleSelected(args) {
+  switch (args.option) {
+    case 'toggle':
+      for (const project of selected.value) {
+        await toggleDisableMod(project)
+      }
+      break
+    case 'enable':
+      for (const project of selected.value) {
+        if (project.disabled) {
+          await toggleDisableMod(project)
+        }
+      }
+      break
+    case 'disable':
+      for (const project of selected.value) {
+        if (!project.disabled) {
+          await toggleDisableMod(project)
+        }
+      }
+      break
+    case 'hide_show':
+      hideNonSelected.value = !hideNonSelected.value
+      break
+  }
+}
+
+watch(selectAll, () => {
+  for (const project of projects.value) {
+    project.selected = selectAll.value
+  }
+})
 
 const handleRightClick = (event, mod) => {
   if (mod.slug && mod.project_type) {
@@ -346,7 +594,7 @@ const handleRightClick = (event, mod) => {
 }
 
 .table-row {
-  grid-template-columns: min-content 2fr 1fr 1fr 8rem;
+  grid-template-columns: min-content 2fr 1fr 1fr 11rem;
 }
 
 .table-cell {
@@ -384,6 +632,34 @@ const handleRightClick = (event, mod) => {
 .sort {
   padding-left: 0.5rem;
 }
+
+.second-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+
+  .chips {
+    flex-grow: 1;
+  }
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: var(--gap-lg);
+
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  strong {
+    color: var(--color-contrast);
+  }
+}
 </style>
 <style lang="scss">
 .updating-indicator {
@@ -394,5 +670,11 @@ const handleRightClick = (event, mod) => {
 
 .v-popper--theme-tooltip .v-popper__inner {
   background: #fff !important;
+}
+
+.select-checkbox {
+  button.checkbox {
+    border: none;
+  }
 }
 </style>

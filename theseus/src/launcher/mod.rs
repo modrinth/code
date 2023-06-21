@@ -15,6 +15,7 @@ use daedalus as d;
 use daedalus::minecraft::VersionInfo;
 use dunce::canonicalize;
 use st::Profile;
+use std::collections::HashMap;
 use std::fs;
 use std::{process::Stdio, sync::Arc};
 use tokio::process::Command;
@@ -37,9 +38,12 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
             features: Some(ref features),
             ..
         } => {
-            features.has_demo_resolution.unwrap_or(false)
-                || (features.has_demo_resolution.is_none()
-                    && features.is_demo_user.is_none())
+            !features.is_demo_user.unwrap_or(true)
+                || features.has_custom_resolution.unwrap_or(false)
+                || !features.has_quick_plays_support.unwrap_or(true)
+                || !features.is_quick_play_multiplayer.unwrap_or(true)
+                || !features.is_quick_play_realms.unwrap_or(true)
+                || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
         _ => false,
     };
@@ -432,7 +436,6 @@ pub async fn launch_minecraft(
     fs::create_dir_all(&logs_dir)?;
 
     let stdout_log_path = logs_dir.join("stdout.log");
-    let stderr_log_path = logs_dir.join("stderr.log");
 
     crate::api::profile::edit(&profile.path, |prof| {
         prof.metadata.last_played = Some(Utc::now());
@@ -440,6 +443,34 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
+    State::sync().await?;
+
+    let mut censor_strings = HashMap::new();
+    let username = whoami::username();
+    censor_strings.insert(
+        format!("/{}/", username),
+        "/{COMPUTER_USERNAME}/".to_string(),
+    );
+    censor_strings.insert(
+        format!("\\{}\\", username),
+        "\\{COMPUTER_USERNAME}\\".to_string(),
+    );
+    censor_strings.insert(
+        credentials.access_token.clone(),
+        "{MINECRAFT_ACCESS_TOKEN}".to_string(),
+    );
+    censor_strings.insert(
+        credentials.username.clone(),
+        "{MINECRAFT_USERNAME}".to_string(),
+    );
+    censor_strings.insert(
+        credentials.id.as_simple().to_string(),
+        "{MINECRAFT_UUID}".to_string(),
+    );
+    censor_strings.insert(
+        credentials.id.as_hyphenated().to_string(),
+        "{MINECRAFT_UUID}".to_string(),
+    );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     let window = EventState::get_main_window().await?;
@@ -459,9 +490,9 @@ pub async fn launch_minecraft(
             Uuid::new_v4(),
             instance_path.to_path_buf(),
             stdout_log_path,
-            stderr_log_path,
             command,
             post_exit_hook,
+            censor_strings,
         )
         .await
 }

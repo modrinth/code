@@ -69,16 +69,19 @@ onUnmounted(() => unlisten())
       :instances="[
         {
           label: 'Jump back in',
+          route: '/library',
           instances: recentInstances,
           downloaded: true,
         },
         {
           label: 'Popular packs',
+          route: '/browse/modpack',
           instances: featuredModpacks,
           downloaded: false,
         },
         {
           label: 'Popular mods',
+          route: '/browse/mod',
           instances: featuredMods,
           downloaded: false,
         },

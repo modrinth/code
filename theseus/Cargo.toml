@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "0.1.0"
+version = "0.2.1"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2018"
 
@@ -22,7 +22,7 @@ async_zip = { version = "0.0.13", features = ["full"] }
 tempfile = "3.5.0"
 
 chrono = { version = "0.4.19", features = ["serde"] }
-daedalus = { version = "0.1.21" }
+daedalus = { version = "0.1.23" }
 dirs = "5.0.1"
 
 regex = "1.5"
@@ -48,6 +48,8 @@ notify-debouncer-mini = { version = "0.2.1", default-features = false }
 
 lazy_static = "1.4.0"
 dunce = "1.0.3"
+
+whoami = "1.4.0"
 
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.50.0"

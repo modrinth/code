@@ -1,8 +1,8 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
-      <div v-if="instance" class="small-instance">
-        <div class="instance">
+      <Card v-if="instance" class="small-instance">
+        <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
           <Avatar
             :src="
               !instance.metadata.icon ||
@@ -22,8 +22,8 @@
               {{ instance.metadata.game_version }}
             </span>
           </div>
-        </div>
-      </div>
+        </router-link>
+      </Card>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
@@ -32,17 +32,11 @@
         </div>
         <Categories
           class="tags"
-          type=""
-          :categories="[
-            ...categories.filter(
+          :categories="
+            categories.filter(
               (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
-            ),
-            ...loaders.filter(
-              (loader) =>
-                data.categories.includes(loader.name) &&
-                loader.supported_project_types?.includes('modpack')
-            ),
-          ]"
+            )
+          "
         >
           <EnvironmentIndicator
             :client-side="data.client_side"
@@ -213,6 +207,7 @@
         :dependencies="dependencies"
         :install="install"
         :installed="installed"
+        :installed-version="installedVersion"
       />
     </div>
   </div>
@@ -258,17 +253,18 @@ import {
   KoFiIcon,
   OpenCollectiveIcon,
 } from '@/assets/external'
-import { get_categories, get_loaders } from '@/helpers/tags'
+import { get_categories } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
 import {
   list,
   add_project_from_version as installMod,
   check_installed,
   get as getInstance,
+  remove_project,
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
@@ -279,9 +275,9 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
+import mixpanel from 'mixpanel-browser'
 
 const route = useRoute()
-const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
@@ -290,33 +286,52 @@ const incompatibilityWarning = ref(null)
 
 const options = ref(null)
 const installing = ref(false)
+const data = shallowRef(null)
+const versions = shallowRef([])
+const members = shallowRef([])
+const dependencies = shallowRef([])
+const categories = shallowRef([])
+const instance = ref(null)
 
-const [data, versions, members, dependencies, categories, loaders, instance] = await Promise.all([
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project').then(shallowRef),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project').then(
-    shallowRef
-  ),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project').then(
-    shallowRef
-  ),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project').then(
-    shallowRef
-  ),
-  get_loaders().then(ref).catch(handleError),
-  get_categories().then(ref).catch(handleError),
-  route.query.i ? getInstance(route.query.i, true).then(ref) : Promise.resolve().then(ref),
-])
+const installed = ref(false)
+const installedVersion = ref(null)
 
-const installed = ref(
-  instance.value && (await check_installed(instance.value.path, data.value.id).catch(handleError))
-)
+async function fetchProjectData() {
+  ;[
+    data.value,
+    versions.value,
+    members.value,
+    dependencies.value,
+    categories.value,
+    instance.value,
+  ] = await Promise.all([
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project'),
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project'),
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project'),
+    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project'),
+    get_categories().catch(handleError),
+    route.query.i ? getInstance(route.query.i, true).catch(handleError) : Promise.resolve(),
+  ])
 
-breadcrumbs.setName('Project', data.value.title)
+  installed.value =
+    instance.value?.path &&
+    (await check_installed(instance.value.path, data.value.id).catch(handleError))
+  breadcrumbs.setName('Project', data.value.title)
+  installedVersion.value = instance.value
+    ? Object.values(instance.value.projects).find(
+        (p) => p?.metadata?.version?.project_id === data.value.id
+      )?.metadata?.version?.id
+    : null
+}
+
+await fetchProjectData()
 
 watch(
   () => route.params.id,
-  () => {
-    if (route.params.id) router.go()
+  async () => {
+    if (route.params.id && route.path.startsWith('/project')) {
+      await fetchProjectData()
+    }
   }
 )
 
@@ -329,6 +344,18 @@ const markInstalled = () => {
 async function install(version) {
   installing.value = true
   let queuedVersionData
+
+  if (installed.value) {
+    await remove_project(
+      instance.value.path,
+      Object.entries(instance.value.projects)
+        .map(([key, value]) => ({
+          key,
+          value,
+        }))
+        .find((p) => p.value.metadata?.version?.project_id === data.value.id).key
+    )
+  }
 
   if (version) {
     queuedVersionData = versions.value.find((v) => v.id === version)
@@ -356,6 +383,13 @@ async function install(version) {
         data.value.title,
         data.value.icon_url
       ).catch(handleError)
+
+      mixpanel.track('PackInstall', {
+        id: data.value.id,
+        version_id: queuedVersionData.id,
+        title: data.value.title,
+        source: 'ProjectPage',
+      })
     } else {
       confirmModal.value.show(
         data.value.id,
@@ -381,14 +415,26 @@ async function install(version) {
             instance.value,
             data.value.title,
             versions.value,
-            markInstalled
+            markInstalled,
+            data.value.id,
+            data.value.project_type
           )
           installing.value = false
           return
         } else {
           queuedVersionData = selectedVersion
           await installMod(instance.value.path, selectedVersion.id).catch(handleError)
-          installVersionDependencies(instance.value, queuedVersionData)
+          await installVersionDependencies(instance.value, queuedVersionData)
+          installedVersion.value = selectedVersion.id
+          mixpanel.track('ProjectInstall', {
+            loader: instance.value.metadata.loader,
+            game_version: instance.value.metadata.game_version,
+            id: data.value.id,
+            project_type: data.value.project_type,
+            version_id: queuedVersionData.id,
+            title: data.value.title,
+            source: 'ProjectPage',
+          })
         }
       } else {
         const gameVersion = instance.value.metadata.game_version
@@ -403,12 +449,24 @@ async function install(version) {
         if (compatible) {
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
+          installedVersion.value = queuedVersionData.id
+          mixpanel.track('ProjectInstall', {
+            loader: instance.value.metadata.loader,
+            game_version: instance.value.metadata.game_version,
+            id: data.value.id,
+            project_type: data.value.project_type,
+            version_id: queuedVersionData.id,
+            title: data.value.title,
+            source: 'ProjectPage',
+          })
         } else {
           incompatibilityWarning.value.show(
             instance.value,
             data.value.title,
             [queuedVersionData],
-            markInstalled
+            markInstalled,
+            data.value.id,
+            data.value.project_type
           )
           installing.value = false
           return
@@ -416,13 +474,12 @@ async function install(version) {
       }
       installed.value = true
     } else {
-      if (version) {
-        modInstallModal.value.show(data.value.id, [
-          versions.value.find((v) => v.id === queuedVersionData.id),
-        ])
-      } else {
-        modInstallModal.value.show(data.value.id, versions.value)
-      }
+      modInstallModal.value.show(
+        data.value.id,
+        version ? [versions.value.find((v) => v.id === queuedVersionData.id)] : versions.value,
+        data.value.title,
+        data.value.project_type
+      )
     }
   }
 
@@ -475,15 +532,20 @@ const handleOptionsClick = (args) => {
   height: fit-content;
   max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
-  background: var(--color-raised-bg);
-  padding: 1rem;
+  padding: 1rem 0.5rem 1rem 1rem;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
 }
 
 .sidebar-card {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background-color: var(--color-bg);
 }
 
 .content-container {
@@ -491,7 +553,7 @@ const handleOptionsClick = (args) => {
   flex-direction: column;
   width: 100%;
   padding: 1rem;
-  margin-left: 20rem;
+  margin-left: 19.5rem;
 }
 
 .button-group {
@@ -614,7 +676,6 @@ const handleOptionsClick = (args) => {
 }
 
 .small-instance {
-  background: var(--color-bg);
   padding: var(--gap-lg);
   border-radius: var(--radius-md);
   margin-bottom: var(--gap-md);
@@ -622,7 +683,7 @@ const handleOptionsClick = (args) => {
   .instance {
     display: flex;
     gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
 
     .title {
       font-weight: 600;

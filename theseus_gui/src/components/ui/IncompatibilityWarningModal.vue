@@ -1,5 +1,9 @@
 <template>
-  <Modal ref="incompatibleModal" header="Incompatibility warning">
+  <Modal
+    ref="incompatibleModal"
+    header="Incompatibility warning"
+    :noblur="!themeStore.advancedRendering"
+  >
     <div class="modal-body">
       <p>
         This {{ versions?.length > 0 ? 'project' : 'version' }} is not compatible with the instance
@@ -53,10 +57,15 @@
 <script setup>
 import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from 'omorphia'
 import { add_project_from_version as installMod } from '@/helpers/profile'
-import { defineExpose, ref } from 'vue'
-import { handleError } from '@/store/state.js'
+import { ref } from 'vue'
+import { handleError, useTheming } from '@/store/state.js'
+import mixpanel from 'mixpanel-browser'
+
+const themeStore = useTheming()
 
 const instance = ref(null)
+const project = ref(null)
+const projectType = ref(null)
 const projectTitle = ref(null)
 const versions = ref(null)
 const selectedVersion = ref(null)
@@ -66,13 +75,26 @@ const installing = ref(false)
 let markInstalled = () => {}
 
 defineExpose({
-  show: (instanceVal, projectTitleVal, selectedVersions, extMarkInstalled) => {
+  show: (
+    instanceVal,
+    projectTitleVal,
+    selectedVersions,
+    extMarkInstalled,
+    projectIdVal,
+    projectTypeVal
+  ) => {
     instance.value = instanceVal
     projectTitle.value = projectTitleVal
     versions.value = selectedVersions
     selectedVersion.value = selectedVersions[0]
+
+    project.value = projectIdVal
+    projectType.value = projectTypeVal
+
     incompatibleModal.value.show()
     markInstalled = extMarkInstalled
+
+    mixpanel.track('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
   },
 })
 
@@ -82,6 +104,16 @@ const install = async () => {
   installing.value = false
   markInstalled()
   incompatibleModal.value.hide()
+
+  mixpanel.track('ProjectInstall', {
+    loader: instance.value.metadata.loader,
+    game_version: instance.value.metadata.game_version,
+    id: project.value,
+    version_id: selectedVersion.value.id,
+    project_type: projectType.value,
+    title: projectTitle.value,
+    source: 'ProjectIncompatibilityWarningModal',
+  })
 }
 </script>
 
