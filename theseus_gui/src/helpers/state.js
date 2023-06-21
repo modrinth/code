@@ -13,7 +13,7 @@ export async function initialize_state() {
 
 // Gets active progress bars
 export async function progress_bars_list() {
-  return await invoke('progress_bars_list')
+  return await invoke('plugin:utils|progress_bars_list')
 }
 
 // Check if any safe loading bars are active

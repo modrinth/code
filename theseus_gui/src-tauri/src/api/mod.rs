@@ -45,16 +45,6 @@ pub enum TheseusSerializableError {
 //     }
 // }
 
-// Lists active progress bars
-// Create a new HashMap with the same keys
-// Values provided should not be used directly, as they are not guaranteed to be up-to-date
-#[tauri::command]
-pub async fn progress_bars_list(
-) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
-    let res = theseus::EventState::list_progress_bars().await?;
-    Ok(res)
-}
-
 // Check if there are any safe loading bars running
 #[tauri::command]
 pub async fn check_safe_loading_bars() -> Result<bool> {

@@ -95,8 +95,8 @@ impl Settings {
 
             if settings_read.java_globals.count() == 0 {
                 drop(settings_read);
-                let java_globals = jre::autodetect_java_globals().await?;
-                state.settings.write().await.java_globals = java_globals;
+                state.settings.write().await.java_globals =
+                    jre::get_autodetect_java_globals().await?;
             }
 
             Ok::<(), crate::Error>(())
