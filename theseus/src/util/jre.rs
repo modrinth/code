@@ -136,11 +136,10 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     // Iterate over JavaVirtualMachines/(something)/Contents/Home/bin
     let base_path = PathBuf::from("/Library/Java/JavaVirtualMachines/");
     if let Ok(dir) = std::fs::read_dir(base_path) {
-        for entry in dir {
-            if let Ok(entry) = entry {
-                let entry = entry.path().join("Contents/Home/bin");
-                jre_paths.insert(entry);
-            }
+        for entry in dir.flatten() {
+            // flatten() is necessary to convert Result<DirEntry, std::io::Error> to DirEntry
+            let entry = entry.path().join("Contents/Home/bin");
+            jre_paths.insert(entry);
         }
     }
 
@@ -209,21 +208,20 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 
         if base_path.is_dir() {
             if let Ok(dir) = std::fs::read_dir(base_path) {
-                for entry in dir {
-                    if let Ok(entry) = entry {
-                        let file_path = entry.path().join("bin");
+                for entry in dir.flatten() {
+                    // flatten() is necessary to convert Result<DirEntry, std::io::Error> to DirEntry
+                    let file_path = entry.path().join("bin");
 
-                        if let Ok(contents) =
-                            std::fs::read_to_string(file_path.clone())
+                    if let Ok(contents) =
+                        std::fs::read_to_string(file_path.clone())
+                    {
+                        let entry = entry.path().join(contents);
+                        jre_paths.insert(entry);
+                    } else {
+                        #[cfg(not(target_os = "macos"))]
                         {
-                            let entry = entry.path().join(contents);
-                            jre_paths.insert(entry);
-                        } else {
-                            #[cfg(not(target_os = "macos"))]
-                            {
-                                let file_path = file_path.join(JAVA_BIN);
-                                jre_paths.insert(file_path);
-                            }
+                            let file_path = file_path.join(JAVA_BIN);
+                            jre_paths.insert(file_path);
                         }
                     }
                 }

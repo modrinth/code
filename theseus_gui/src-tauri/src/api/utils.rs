@@ -9,6 +9,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             should_disable_mouseover,
             show_in_folder,
             progress_bars_list,
+            safety_check_safe_loading_bars,
+            get_opening_command
         ])
         .build()
 }
@@ -21,6 +23,12 @@ pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
+}
+
+// Check if there are any safe loading bars running
+#[tauri::command]
+pub async fn safety_check_safe_loading_bars() -> Result<bool> {
+    Ok(theseus::safety::check_safe_loading_bars().await?)
 }
 
 // cfg only on mac os

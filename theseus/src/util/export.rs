@@ -1,6 +1,6 @@
 //! Functions for fetching infromation from the Internet
 use crate::event::emit::{emit_loading, init_loading};
-use crate::pack::{
+use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::process::Profile;
