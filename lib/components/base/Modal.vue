@@ -1,12 +1,17 @@
 <template>
   <div v-if="shown">
     <div
+      :class="{ shown: actuallyShown }"
+      class="tauri-overlay"
+      data-tauri-drag-region
+      @click="() => (closable ? hide() : {})"
+    />
+    <div
       :class="{
         shown: actuallyShown,
         noblur: props.noblur,
       }"
       class="modal-overlay"
-      data-tauri-drag-region
       @click="() => (closable ? hide() : {})"
     />
     <div class="modal-container" :class="{ shown: actuallyShown }">
@@ -69,6 +74,21 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+.tauri-overlay {
+  position: fixed;
+  visibility: hidden;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  z-index: 20;
+
+  &.shown {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
 .modal-overlay {
   visibility: hidden;
   position: fixed;
@@ -76,7 +96,7 @@ defineExpose({
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 20;
+  z-index: 19;
   transition: all 0.3s ease-in-out;
 
   &.shown {
