@@ -221,7 +221,6 @@ const handleRightClick = (event) => {
 }
 
 const handleOptionsClick = async (args) => {
-  console.log(args)
   switch (args.option) {
     case 'play':
       await startInstance('InstancePageContextMenu')

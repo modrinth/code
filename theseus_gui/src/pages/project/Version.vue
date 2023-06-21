@@ -192,7 +192,7 @@ import {
   renderString,
 } from 'omorphia'
 import { releaseColor } from '@/helpers/utils'
-import { ref, defineProps, watch, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 

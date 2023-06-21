@@ -47,20 +47,7 @@
     <Card v-if="showCard === true" ref="card" class="info-card">
       <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
         <h3 class="info-title">
-          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
-        </h3>
-        <ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
-        <div class="row">
-          {{ Math.floor((100 * loadingBar.current) / loadingBar.total) }}% {{ loadingBar.message }}
-        </div>
-      </div>
-    </Card>
-  </transition>
-  <transition name="download">
-    <Card v-if="showCard === true" ref="card" class="info-card">
-      <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
-        <h3 class="info-title">
-          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
+          {{ loadingBar.title }}
         </h3>
         <ProgressBar :progress="Math.floor((100 * loadingBar.current) / loadingBar.total)" />
         <div class="row">
@@ -127,6 +114,7 @@ const profiles = ref(null)
 const infoButton = ref(null)
 const profileButton = ref(null)
 const showCard = ref(false)
+
 const showProfiles = ref(false)
 
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
@@ -163,21 +151,36 @@ const goToTerminal = (path) => {
   router.push(`/instance/${encodeURIComponent(path ?? selectedProfile.value.path)}/logs`)
 }
 
-const currentLoadingBars = ref(Object.values(await progress_bars_list().catch(handleError)))
-
-const unlistenLoading = await loading_listener(async () => {
-  await refreshInfo()
-})
+const currentLoadingBars = ref([])
 
 const refreshInfo = async () => {
   const currentLoadingBarCount = currentLoadingBars.value.length
-  currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
+  currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError)).map(
+    (x) => {
+      if (x.bar_type.type === 'java_download') {
+        x.title = 'Downloading Java ' + x.bar_type.version
+      }
+      if (x.bar_type.profile_name) {
+        x.title = x.bar_type.profile_name
+      }
+      if (x.bar_type.pack_name) {
+        x.title = x.bar_type.pack_name
+      }
+
+      return x
+    }
+  )
   if (currentLoadingBars.value.length === 0) {
     showCard.value = false
   } else if (currentLoadingBarCount < currentLoadingBars.value.length) {
     showCard.value = true
   }
 }
+
+await refreshInfo()
+const unlistenLoading = await loading_listener(async () => {
+  await refreshInfo()
+})
 
 const selectProfile = (profile) => {
   selectedProfile.value = profile

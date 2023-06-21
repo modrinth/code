@@ -32,6 +32,8 @@ pub struct Settings {
     pub opt_out_analytics: bool,
     #[serde(default)]
     pub advanced_rendering: bool,
+    #[serde(default)]
+    pub onboarded: bool,
 }
 
 impl Default for Settings {
@@ -52,6 +54,7 @@ impl Default for Settings {
             developer_mode: false,
             opt_out_analytics: false,
             advanced_rendering: true,
+            onboarded: false,
         }
     }
 }
