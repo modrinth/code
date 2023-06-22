@@ -18,7 +18,7 @@ export async function progress_bars_list() {
 
 // Check if any safe loading bars are active
 export async function check_safe_loading_bars_complete() {
-  return await invoke('plugins:utils|safety_check_safe_loading_bars')
+  return await invoke('plugin:utils|safety_check_safe_loading_bars')
 }
 
 // Get opening command
@@ -26,5 +26,5 @@ export async function check_safe_loading_bars_complete() {
 // This should be called once and only when the app is done booting up and ready to receive a command
 // Returns a Command struct- see events.js
 export async function get_opening_command() {
-  return await invoke('get_opening_command')
+  return await invoke('plugin:utils|get_opening_command')
 }
