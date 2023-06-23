@@ -2,6 +2,8 @@ use uuid::Uuid;
 
 use crate::State;
 
+// We implement a store for safe loading bars such that we can wait for them to complete
+// We create this store separately from the loading bars themselves, because this may be extended as needed
 pub struct SafeProcesses {
     pub save_settings: Vec<Uuid>,
     pub loading_bars: Vec<Uuid>,
@@ -22,6 +24,7 @@ impl SafeProcesses {
         }
     }
 
+    // Adds a new running safe process to the list
     pub async fn add(r#type: ProcessType) -> crate::Result<Uuid> {
         let uuid = Uuid::new_v4();
         Self::add_uuid(r#type, uuid).await
@@ -44,6 +47,7 @@ impl SafeProcesses {
         Ok(uuid)
     }
 
+    // Mark a safe process as finishing
     pub async fn complete(
         r#type: ProcessType,
         uuid: Uuid,
@@ -62,6 +66,7 @@ impl SafeProcesses {
         Ok(())
     }
 
+    // Check if a safe process is complete
     pub async fn is_complete(r#type: ProcessType) -> crate::Result<bool> {
         let state = State::get().await?;
         let safe_processes = state.safety_processes.read().await;
@@ -80,6 +85,7 @@ impl SafeProcesses {
         Ok(false)
     }
 
+    // Wait for a safe process to complete
     pub async fn wait_for_completion(r#type: ProcessType) -> crate::Result<()> {
         loop {
             if Self::is_complete(r#type).await? {

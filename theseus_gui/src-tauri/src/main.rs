@@ -38,8 +38,6 @@ struct Payload {
 fn main() {
     tauri_plugin_deep_link::prepare("com.modrinth.theseus");
 
-    //let client = sentry::init("https://19a14416dafc4b4a858fa1a38db3b704@o485889.ingest.sentry.io/4505349067374592");
-    //let _guard = sentry_rust_minidump::init(&client);
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
             ERROR > WARN > INFO > DEBUG > TRACE
@@ -58,7 +56,7 @@ fn main() {
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
-    let mut builder = tauri::Builder::default()
+    let builder = tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();

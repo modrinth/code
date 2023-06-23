@@ -11,9 +11,13 @@
     on unix:
         RUST_LOG="theseus=trace" {run command}
 
+    The default is theseus=show, meaning only logs from theseus will be displayed, and at the info or higher level.
+
 */
 use tracing_appender::non_blocking::WorkerGuard;
 
+// Handling for the live development logging
+// This will log to the console, and will not log to a file
 #[cfg(debug_assertions)]
 pub fn start_logger() -> Option<WorkerGuard> {
     use tracing_subscriber::prelude::*;
@@ -29,6 +33,8 @@ pub fn start_logger() -> Option<WorkerGuard> {
     None
 }
 
+// Handling for the live production logging
+// This will log to a file in the logs directory, and will not show any logs in the console
 #[cfg(not(debug_assertions))]
 pub fn start_logger() -> Option<WorkerGuard> {
     use theseus::prelude::DirectoryInfo;

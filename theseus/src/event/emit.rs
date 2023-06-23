@@ -45,10 +45,11 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
    }
 */
 
-// Initialize a loading bar for use in emit_loading
-// This will generate a LoadingBarId, which is used to refer to the loading bar uniquely.
-// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
-// title is the title of the loading bar
+/// Initialize a loading bar for use in emit_loading
+/// This will generate a LoadingBarId, which is used to refer to the loading bar uniquely.
+/// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
+/// title is the title of the loading bar
+/// The app will wait for this loading bar to finish before exiting, as it is considered safe.
 #[theseus_macros::debug_pin]
 pub async fn init_loading(
     bar_type: LoadingBarType,
@@ -60,6 +61,8 @@ pub async fn init_loading(
     Ok(key)
 }
 
+/// An unsafe loading bar can be created without adding it to the SafeProcesses list,
+/// meaning that the app won't ask to wait for it to finish before exiting.
 #[theseus_macros::debug_pin]
 pub async fn init_loading_unsafe(
     bar_type: LoadingBarType,
@@ -232,6 +235,8 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 }
 
 // emit_command(CommandPayload::Something { something })
+// ie: installing a pack, opening an .mrpack, etc
+// Generally used for url deep links and file opens that we we want to handle in the frontend
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {

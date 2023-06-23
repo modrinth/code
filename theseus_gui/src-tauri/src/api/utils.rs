@@ -105,7 +105,7 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 
     let cmd_arg = cmd_arg.map(|path| path.to_string_lossy().to_string());
     if let Some(cmd) = cmd_arg {
-        tracing::info!("Opening command: {:?}", cmd);
+        tracing::debug!("Opening command: {:?}", cmd);
         return Ok(Some(handler::parse_command(&cmd).await?));
     }
     Ok(None)

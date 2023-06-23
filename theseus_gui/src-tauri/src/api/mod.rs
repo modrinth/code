@@ -33,6 +33,7 @@ pub enum TheseusSerializableError {
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
 
+    #[cfg(target_os = "macos")]
     #[error("Callback error: {0}")]
     Callback(String),
 }
@@ -82,7 +83,12 @@ macro_rules! impl_serialize {
 }
 
 // Use the macro to implement Serialize for TheseusSerializableError
+#[cfg(target_os = "macos")]
 impl_serialize! {
     IO,
     Callback
+}
+#[cfg(not(target_os = "macos"))]
+impl_serialize! {
+    IO,
 }
