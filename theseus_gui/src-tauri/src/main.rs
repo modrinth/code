@@ -56,7 +56,9 @@ fn main() {
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
-    let builder = tauri::Builder::default()
+
+    let mut builder = tauri::Builder::default();
+    builder = builder
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
