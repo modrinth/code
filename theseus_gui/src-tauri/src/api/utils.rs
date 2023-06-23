@@ -57,12 +57,12 @@ pub fn show_in_folder(path: String) -> Result<()> {
             use std::fs::metadata;
             use std::path::PathBuf;
 
-            if path.contains(",") {
+            if path.contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
                 let new_path = match metadata(&path)?.is_dir() {
-                    true => path.clone(),
+                    true => path,
                     false => {
-                        let mut path2 = PathBuf::from(path.clone());
+                        let mut path2 = PathBuf::from(path);
                         path2.pop();
                         path2.to_string_lossy().to_string()
                     }

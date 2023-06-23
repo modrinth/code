@@ -159,6 +159,42 @@ pub async fn profile_remove_project(
     profile::remove_project(path, project_path).await?;
     Ok(())
 }
+
+// Exports a profile to a .mrpack file (export_location should end in .mrpack)
+// invoke('profile_export_mrpack')
+#[tauri::command]
+pub async fn profile_export_mrpack(
+    path: &Path,
+    export_location: PathBuf,
+    included_overrides: Vec<String>,
+    version_id: Option<String>,
+) -> Result<()> {
+    profile::export_mrpack(
+        path,
+        export_location,
+        included_overrides,
+        version_id,
+    )
+    .await?;
+    Ok(())
+}
+
+// Given a folder path, populate a Vec of all the subfolders
+// Intended to be used for finding potential override folders
+// profile
+// -- folder1
+// -- folder2
+// -- file1
+// => [folder1, folder2]
+#[tauri::command]
+pub async fn profile_get_potential_override_folders(
+    profile_path: PathBuf,
+) -> Result<Vec<PathBuf>> {
+    let overrides =
+        profile::get_potential_override_folders(profile_path).await?;
+    Ok(overrides)
+}
+
 // Run minecraft using a profile using the default credentials
 // Returns the UUID, which can be used to poll
 // for the actual Child in the state.

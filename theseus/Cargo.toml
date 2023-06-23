@@ -42,6 +42,7 @@ futures = "0.3"
 reqwest = { version = "0.11", features = ["json", "stream"] }
 tokio = { version = "1", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["fs"] }
+async-recursion = "1.0.4"
 
 notify = { version = "5.1.0", default-features = false }
 notify-debouncer-mini = { version = "0.2.1", default-features = false }

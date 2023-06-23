@@ -82,11 +82,14 @@ pub enum ErrorKind {
     #[error("Zip error: {0}")]
     ZipError(#[from] async_zip::error::ZipError),
 
-    #[error("Error: {0}")]
-    OtherError(String),
-
     #[error("File watching error: {0}")]
     NotifyError(#[from] notify::Error),
+
+    #[error("Error stripping prefix: {0}")]
+    StripPrefixError(#[from] std::path::StripPrefixError),
+
+    #[error("Error: {0}")]
+    OtherError(String),
 }
 
 #[derive(Debug)]

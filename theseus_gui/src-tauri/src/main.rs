@@ -24,11 +24,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 
 #[tauri::command]
 fn is_dev() -> bool {
-    if cfg!(debug_assertions) {
-        true
-    } else {
-        false
-    }
+    cfg!(debug_assertions)
 }
 
 use tracing_subscriber::prelude::*;
