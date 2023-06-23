@@ -49,17 +49,7 @@ pub fn show_in_folder(path: String) -> Result<()> {
                 };
                 Command::new("xdg-open").arg(&new_path).spawn()?;
             } else {
-                Command::new("dbus-send")
-                    .args([
-                        "--session",
-                        "--dest=org.freedesktop.FileManager1",
-                        "--type=method_call",
-                        "/org/freedesktop/FileManager1",
-                        "org.freedesktop.FileManager1.ShowItems",
-                        format!("array:string:\"file://{path}\"").as_str(),
-                        "string:\"\"",
-                    ])
-                    .spawn()?;
+                Command::new("xdg-open").arg(&path).spawn()?;
             }
         }
 
