@@ -3,13 +3,15 @@
     windows_subsystem = "windows"
 )]
 
-use theseus::prelude::*;
-
 use tauri::Manager;
+use theseus::prelude::*;
 
 mod api;
 mod error;
 mod logger;
+
+#[cfg(target_os = "macos")]
+mod macos;
 
 // Should be called in launcher initialization
 #[tauri::command]
@@ -62,7 +64,7 @@ fn main() {
                 .unwrap();
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
-        .setup(|_app| {
+        .setup(|app| {
             tauri_plugin_deep_link::register("modrinth", |request: String| {
                 tauri::async_runtime::spawn(api::utils::handle_command(
                     request,
@@ -70,48 +72,45 @@ fn main() {
             })
             .unwrap();
 
+            let win = app.get_window("main").unwrap();
+            #[cfg(not(target_os = "linux"))]
+            {
+                use window_shadows::set_shadow;
+                set_shadow(&win, true).unwrap();
+            }
+            #[cfg(target_os = "macos")]
+            {
+                use macos::window_ext::WindowExt;
+                win.set_transparent_titlebar(true);
+                win.position_traffic_lights(9.0, 16.0);
+            }
+            #[cfg(not(target_os = "macos"))]
+            {
+                win.set_decorations(false).unwrap();
+            }
+            #[cfg(target_os = "macos")]
+            {
+                macos::delegate::register_open_file(|filename| {
+                    tauri::async_runtime::spawn(api::utils::handle_command(
+                        filename,
+                    ));
+                })
+                .unwrap();
+            }
+
             Ok(())
         });
-
-    #[cfg(not(target_os = "macos"))]
-    {
-        builder = builder.setup(|app| {
-            let win = app.get_window("main").unwrap();
-            win.set_decorations(false).unwrap();
-            Ok(())
-        })
-    }
-
-    #[cfg(not(target_os = "linux"))]
-    {
-        use window_shadows::set_shadow;
-
-        builder = builder.setup(|app| {
-            let win = app.get_window("main").unwrap();
-            set_shadow(&win, true).unwrap();
-            Ok(())
-        });
-    }
 
     #[cfg(target_os = "macos")]
     {
         use tauri::WindowEvent;
-
-        builder = builder
-            .setup(|app| {
-                use api::window_ext::WindowExt;
-                let win = app.get_window("main").unwrap();
-                win.set_transparent_titlebar(true);
+        builder = builder.on_window_event(|e| {
+            use macos::window_ext::WindowExt;
+            if let WindowEvent::Resized(..) = e.event() {
+                let win = e.window();
                 win.position_traffic_lights(9.0, 16.0);
-                Ok(())
-            })
-            .on_window_event(|e| {
-                use api::window_ext::WindowExt;
-                if let WindowEvent::Resized(..) = e.event() {
-                    let win = e.window();
-                    win.position_traffic_lights(9.0, 16.0);
-                }
-            })
+            }
+        })
     }
     let builder = builder
         .plugin(api::auth::init())

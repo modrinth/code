@@ -71,28 +71,28 @@ defineExpose({
       })
     )
 
-  const confirmClose = async () => {
-    const confirmed = await confirm(
-      'An action is currently in progress. Are you sure you want to exit?',
-      {
-        title: 'Modrinth',
-        type: 'warning',
-      }
-    )
-    return confirmed
-  }
-
-  window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-    const isSafe = await check_safe_loading_bars_complete()
-    if (!isSafe) {
-      const response = await confirmClose()
-      if (!response) {
-        return
-      }
+    const confirmClose = async () => {
+      const confirmed = await confirm(
+        'An action is currently in progress. Are you sure you want to exit?',
+        {
+          title: 'Modrinth',
+          type: 'warning',
+        }
+      )
+      return confirmed
     }
-    await await_settings_sync()
-    window.getCurrent().close()
-  })
+
+    window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+      const isSafe = await check_safe_loading_bars_complete()
+      if (!isSafe) {
+        const response = await confirmClose()
+        if (!response) {
+          return
+        }
+      }
+      await await_settings_sync()
+      window.getCurrent().close()
+    })
   },
 })
 

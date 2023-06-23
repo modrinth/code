@@ -7,7 +7,6 @@ import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import mixpanel from 'mixpanel-browser'
 
-
 const pageOptions = ['Home', 'Library']
 
 const themeStore = useTheming()

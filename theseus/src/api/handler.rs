@@ -37,7 +37,7 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
 pub async fn parse_command(
     command_string: &str,
 ) -> crate::Result<CommandPayload> {
-    tracing::info!("Parsing command: {}", command_string);
+    tracing::debug!("Parsing command: {}", &command_string);
 
     // modrinth://some-command
     // This occurs when following a web redirect link
@@ -47,8 +47,21 @@ pub async fn parse_command(
         // We assume anything else is a filepath to an .mrpack file
         let path = PathBuf::from(command_string);
         let path = path.canonicalize()?;
-
-        Ok(CommandPayload::RunMRPack { path })
+        if let Some(ext) = path.extension() {
+            if ext == "mrpack" {
+                return Ok(CommandPayload::RunMRPack { path });
+            }
+        }
+        emit_warning(&format!(
+            "Invalid command, unrecognized filetype: {}",
+            path.display()
+        ))
+        .await?;
+        Err(crate::ErrorKind::InputError(format!(
+            "Invalid command, unrecognized filetype: {}",
+            path.display()
+        ))
+        .into())
     }
 }
 
