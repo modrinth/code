@@ -89,6 +89,30 @@ export async function remove_project(path, projectPath) {
   return await invoke('profile_remove_project', { path, projectPath })
 }
 
+// Export a profile to .mrpack
+/// included_overrides is an array of paths to override folders to include (ie: 'mods', 'resource_packs')
+// Version id is optional (ie: 1.1.5)
+export async function export_profile_mrpack(path, exportLocation, includedOverrides, versionId) {
+  return await invoke('profile_export_mrpack', {
+    path,
+    exportLocation,
+    includedOverrides,
+    versionId,
+  })
+}
+
+// Given a folder path, populate an array of all the subfolders
+// Intended to be used for finding potential override folders
+// profile
+// -- mods
+// -- resourcepacks
+// -- file1
+// => [mods, resourcepacks]
+// allows selection for 'included_overrides' in export_profile_mrpack
+export async function get_potential_override_folders(profilePath) {
+  return await invoke('profile_get_potential_override_folders', { profilePath })
+}
+
 // Run Minecraft using a pathed profile
 // Returns PID of child
 export async function run(path) {

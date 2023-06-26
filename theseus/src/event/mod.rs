@@ -115,7 +115,7 @@ impl Drop for LoadingBarId {
                                 loader_uuid,
                             },
                         );
-                        tracing::debug!(
+                        tracing::trace!(
                             "Exited at {fraction} for loading bar: {:?}",
                             loader_uuid
                         );
@@ -162,6 +162,10 @@ pub enum LoadingBarType {
         profile_name: String,
     },
     ProfileUpdate {
+        profile_path: PathBuf,
+        profile_name: String,
+    },
+    ZipExtract {
         profile_path: PathBuf,
         profile_name: String,
     },

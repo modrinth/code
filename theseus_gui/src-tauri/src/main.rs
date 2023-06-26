@@ -24,11 +24,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 
 #[tauri::command]
 fn is_dev() -> bool {
-    if cfg!(debug_assertions) {
-        true
-    } else {
-        false
-    }
+    cfg!(debug_assertions)
 }
 
 use tracing_subscriber::prelude::*;
@@ -167,6 +163,8 @@ fn main() {
         api::jre::jre_get_jre,
         api::jre::jre_auto_install_java,
         api::jre::jre_get_max_memory,
+        api::profile::profile_export_mrpack,
+        api::profile::profile_get_potential_override_folders,
         api::process::process_get_all_uuids,
         api::process::process_get_all_running_uuids,
         api::process::process_get_uuids_by_profile_path,
