@@ -1,9 +1,11 @@
 use crate::api::Result;
 use std::path::PathBuf;
 use theseus::{
-    pack::{install::install_pack, install_from::CreatePackLocation},
+    pack::{
+        install::install_pack,
+        install_from::{CreatePackLocation, CreatePackProfile},
+    },
     prelude::*,
-    profile_create::CreatePackProfile,
 };
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {

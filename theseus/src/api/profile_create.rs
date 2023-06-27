@@ -11,25 +11,12 @@ pub use crate::{
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
-use serde::{Deserialize, Serialize};
+
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 use tracing::{info, trace};
 use uuid::Uuid;
-
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct CreatePackProfile {
-    pub name: String, // the name of the profile, and relative path
-    pub game_version: String, // the game version of the profile
-    pub modloader: ModLoader, // the modloader to use
-    pub loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
-    pub icon: Option<PathBuf>,          // the icon for the profile
-    pub icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
-    pub linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
-    pub skip_install_profile: Option<bool>,
-}
 
 // Creates a profile at  the given filepath and adds it to the in-memory state
 // Returns filepath at which it can be accessed in the State

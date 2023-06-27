@@ -2,7 +2,6 @@ use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::profile_create::CreatePackProfile;
 use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, write_cached_icon,
@@ -84,6 +83,19 @@ pub enum CreatePackLocation {
     FromFile {
         path: PathBuf,
     },
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreatePackProfile {
+    pub name: String, // the name of the profile, and relative path
+    pub game_version: String, // the game version of the profile
+    pub modloader: ModLoader, // the modloader to use
+    pub loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
+    pub icon: Option<PathBuf>,          // the icon for the profile
+    pub icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
+    pub linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
+    pub skip_install_profile: Option<bool>,
 }
 
 pub struct CreatePackDescription {
