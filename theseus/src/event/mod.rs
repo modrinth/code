@@ -70,17 +70,11 @@ impl EventState {
         Ok(display_list)
     }
 
+    #[cfg(feature = "tauri")]
     pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
+        use tauri::Manager;
         let value = Self::get().await?;
-        #[cfg(feature = "tauri")]
-        {
-            use tauri::Manager;
-            Ok(value.app.get_window("main"))
-        }
-        #[cfg(not(feature = "tauri"))]
-        {
-            None
-        }
+        Ok(value.app.get_window("main"))
     }
 }
 

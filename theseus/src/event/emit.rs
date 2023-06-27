@@ -8,7 +8,6 @@ use crate::{
 };
 use futures::prelude::*;
 use std::path::PathBuf;
-use tracing::{debug, warn};
 
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -230,7 +229,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
             )
             .map_err(EventError::from)?;
     }
-    warn!("{}", message);
+    tracing::warn!("{}", message);
     Ok(())
 }
 
@@ -240,7 +239,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
-    debug!("{}", serde_json::to_string(&command)?);
+    tracing::debug!("Command: {}", serde_json::to_string(&command)?);
     #[cfg(feature = "tauri")]
     {
         let event_state = crate::EventState::get().await?;

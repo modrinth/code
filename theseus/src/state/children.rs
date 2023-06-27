@@ -132,10 +132,12 @@ impl Children {
         }
 
         // If in tauri, window should show itself again after process exists if it was hidden
-        let window = EventState::get_main_window().await?;
         #[cfg(feature = "tauri")]
-        if let Some(window) = window {
-            window.unminimize()?;
+        {
+            let window = EventState::get_main_window().await?;
+            if let Some(window) = window {
+                window.unminimize()?;
+            }
         }
 
         if !mc_exit_status.success() {

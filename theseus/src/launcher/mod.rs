@@ -473,12 +473,14 @@ pub async fn launch_minecraft(
     );
 
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
-    let window = EventState::get_main_window().await?;
     #[cfg(feature = "tauri")]
-    if let Some(window) = window {
-        let settings = state.settings.read().await;
-        if settings.hide_on_process {
-            window.minimize()?;
+    {
+        let window = EventState::get_main_window().await?;
+        if let Some(window) = window {
+            let settings = state.settings.read().await;
+            if settings.hide_on_process {
+                window.minimize()?;
+            }
         }
     }
 
