@@ -64,12 +64,18 @@ fn main() {
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
-            tauri_plugin_deep_link::register("modrinth", |request: String| {
-                tauri::async_runtime::spawn(api::utils::handle_command(
-                    request,
-                ));
-            })
-            .unwrap();
+            // Register deep link handler, allowing reading of modrinth:// links
+            if let Err(e) = tauri_plugin_deep_link::register(
+                "modrinth",
+                |request: String| {
+                    tauri::async_runtime::spawn(api::utils::handle_command(
+                        request,
+                    ));
+                },
+            ) {
+                // Allow it to fail- see https://github.com/FabianLars/tauri-plugin-deep-link/issues/19
+                tracing::error!("Error registering deep link handler: {}", e);
+            }
 
             let win = app.get_window("main").unwrap();
             #[cfg(not(target_os = "linux"))]

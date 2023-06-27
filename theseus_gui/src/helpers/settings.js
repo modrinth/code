@@ -37,8 +37,3 @@ export async function get() {
 export async function set(settings) {
   return await invoke('plugin:settings|settings_set', { settings })
 }
-
-// Wait for settings to sync
-export async function await_settings_sync() {
-  return await invoke('plugin:settings|settings_await_settings_sync')
-}

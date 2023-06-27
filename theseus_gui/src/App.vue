@@ -14,7 +14,7 @@ import {
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { await_settings_sync, get } from '@/helpers/settings'
+import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
@@ -31,7 +31,7 @@ import OnboardingModal from '@/components/OnboardingModal.vue'
 import { getVersion } from '@tauri-apps/api/app'
 import { window } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
-import { check_safe_loading_bars_complete } from './helpers/state'
+import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
@@ -70,30 +70,34 @@ defineExpose({
         type: 'warn',
       })
     )
-
-    const confirmClose = async () => {
-      const confirmed = await confirm(
-        'An action is currently in progress. Are you sure you want to exit?',
-        {
-          title: 'Modrinth',
-          type: 'warning',
-        }
-      )
-      return confirmed
-    }
-
-    window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-      const isSafe = await check_safe_loading_bars_complete()
-      if (!isSafe) {
-        const response = await confirmClose()
-        if (!response) {
-          return
-        }
-      }
-      await await_settings_sync()
-      window.getCurrent().close()
-    })
   },
+})
+
+const confirmClose = async () => {
+  const confirmed = await confirm(
+    'An action is currently in progress. Are you sure you want to exit?',
+    {
+      title: 'Modrinth',
+      type: 'warning',
+    }
+  )
+  return confirmed
+}
+
+const handleClose = async () => {
+  const isSafe = await check_safe_loading_bars_complete()
+  if (!isSafe) {
+    const response = await confirmClose()
+    if (!response) {
+      return
+    }
+  }
+  await await_sync()
+  window.getCurrent().close()
+}
+
+window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+  await handleClose()
 })
 
 const router = useRouter()
@@ -247,7 +251,7 @@ const accounts = ref(null)
             @click="
               () => {
                 saveWindowState(StateFlags.ALL)
-                appWindow.close()
+                handleClose()
               }
             "
           >

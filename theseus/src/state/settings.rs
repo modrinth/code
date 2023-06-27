@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tokio::fs;
 
-use super::{JavaGlobals, ProcessType, SafeProcesses};
+use super::JavaGlobals;
 
 // TODO: convert to semver?
 const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -113,7 +113,6 @@ impl Settings {
 
     #[tracing::instrument(skip(self))]
     pub async fn sync(&self, to: &Path) -> crate::Result<()> {
-        let safety_uuid = SafeProcesses::add(ProcessType::SaveSettings).await?;
         fs::write(to, serde_json::to_vec(self)?)
             .await
             .map_err(|err| {
@@ -122,7 +121,6 @@ impl Settings {
                 ))
                 .as_error()
             })?;
-        SafeProcesses::complete(ProcessType::SaveSettings, safety_uuid).await?;
         Ok(())
     }
 }

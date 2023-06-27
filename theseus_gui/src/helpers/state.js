@@ -28,3 +28,8 @@ export async function check_safe_loading_bars_complete() {
 export async function get_opening_command() {
   return await invoke('plugin:utils|get_opening_command')
 }
+
+// Wait for settings to sync
+export async function await_sync() {
+  return await invoke('plugin:utils|await_sync')
+}

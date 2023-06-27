@@ -22,11 +22,7 @@ pub struct FrontendSettings {
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("settings")
-        .invoke_handler(tauri::generate_handler![
-            settings_get,
-            settings_set,
-            settings_await_settings_sync
-        ])
+        .invoke_handler(tauri::generate_handler![settings_get, settings_set,])
         .build()
 }
 
@@ -43,12 +39,5 @@ pub async fn settings_get() -> Result<Settings> {
 #[tauri::command]
 pub async fn settings_set(settings: Settings) -> Result<()> {
     settings::set(settings).await?;
-    Ok(())
-}
-
-// Waits for settings to be synced
-#[tauri::command]
-pub async fn settings_await_settings_sync() -> Result<()> {
-    settings::await_settings_sync().await?;
     Ok(())
 }

@@ -1,4 +1,4 @@
-use theseus::{handler, prelude::CommandPayload};
+use theseus::{handler, prelude::CommandPayload, State};
 
 use crate::api::Result;
 use std::{env, process::Command};
@@ -10,7 +10,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             show_in_folder,
             progress_bars_list,
             safety_check_safe_loading_bars,
-            get_opening_command
+            get_opening_command,
+            await_sync,
         ])
         .build()
 }
@@ -115,4 +116,12 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
+}
+
+// Waits for state to be synced
+#[tauri::command]
+pub async fn await_sync() -> Result<()> {
+    State::sync().await?;
+    tracing::info!("State synced");
+    Ok(())
 }
