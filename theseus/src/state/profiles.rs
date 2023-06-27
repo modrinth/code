@@ -224,7 +224,7 @@ impl Profile {
 
     pub fn sync_projects_task(path: PathBuf) {
         tokio::task::spawn(async move {
-            let res =async {
+            let res = async {
                 let state = State::get().await?;
                 let profile = crate::api::profile::get(&path, None).await?;
 

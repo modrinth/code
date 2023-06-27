@@ -41,7 +41,8 @@ pub async fn autodetect_java_globals(
     Ok(java_globals)
 }
 
-// Searches for jres on the system that are 1.18 or higher
+// Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
+// Allow higher allows for versions higher than the given version to be returned ('at least')
 pub async fn find_filtered_jres(
     version: &str,
     jres: Vec<JavaVersion>,
