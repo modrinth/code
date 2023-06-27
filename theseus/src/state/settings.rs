@@ -1,5 +1,8 @@
 //! Theseus settings file
-use crate::{jre, State};
+use crate::{
+    jre::{self, autodetect_java_globals, find_filtered_jres},
+    State,
+};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use tokio::fs;
@@ -89,8 +92,17 @@ impl Settings {
 
             if settings_read.java_globals.count() == 0 {
                 drop(settings_read);
-                state.settings.write().await.java_globals =
-                    jre::get_autodetect_java_globals().await?;
+                let jres = jre::get_all_jre().await?;
+                let java_8 =
+                    find_filtered_jres("1.8", jres.clone(), false).await?;
+                let java_17 =
+                    find_filtered_jres("1.17", jres.clone(), false).await?;
+                let java_18plus =
+                    find_filtered_jres("1.18", jres.clone(), true).await?;
+                let java_globals =
+                    autodetect_java_globals(java_8, java_17, java_18plus)
+                        .await?;
+                state.settings.write().await.java_globals = java_globals;
             }
 
             Ok::<(), crate::Error>(())

@@ -24,21 +24,27 @@ export async function get_all_jre() {
 // Returns [JavaVersion]
 export async function find_jre_8_jres() {
   const jres = await invoke('plugin:jre|jre_get_all_jre')
-  return await invoke('plugin:jre|jre_filter_jre_8_jres', { jres })
+  const version = '1.8'
+  const allow_higher = false
+  return await invoke('plugin:jre|jre_find_filtered_jres', { jres, version, allow_higher })
 }
 
 // Finds the installation of Java 17, if it exists
 // Returns [JavaVersion]
 export async function find_jre_17_jres() {
   const jres = await invoke('plugin:jre|jre_get_all_jre')
-  return await invoke('plugin:jre|jre_filter_jre_17_jres', { jres })
+  const version = '1.17'
+  const allow_higher = false
+  return await invoke('plugin:jre|jre_filter_jre_17_jres', { jres, version, allow_higher })
 }
 
 // Finds the highest version of Java 18+, if it exists
 // Returns [JavaVersion]
 export async function find_jre_18plus_jres() {
   const jres = await invoke('plugin:jre|jre_get_all_jre')
-  return await invoke('plugin:jre|jre_filter_jre_18plus_jres', { jres })
+  const version = '1.18'
+  const allow_higher = true
+  return await invoke('plugin:jre|jre_filter_jre_18plus_jres', { jres, version, allow_higher })
 }
 
 // Validates globals. Recommend directing the user to reassigned the globals if this returns false
