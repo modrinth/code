@@ -137,7 +137,6 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     let base_path = PathBuf::from("/Library/Java/JavaVirtualMachines/");
     if let Ok(dir) = std::fs::read_dir(base_path) {
         for entry in dir.flatten() {
-            // flatten() is necessary to convert Result<DirEntry, std::io::Error> to DirEntry
             let entry = entry.path().join("Contents/Home/bin");
             jre_paths.insert(entry);
         }
@@ -207,7 +206,6 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
         if base_path.is_dir() {
             if let Ok(dir) = std::fs::read_dir(base_path) {
                 for entry in dir.flatten() {
-                    // flatten() is necessary to convert Result<DirEntry, std::io::Error> to DirEntry
                     let file_path = entry.path().join("bin");
 
                     if let Ok(contents) =

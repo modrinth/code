@@ -28,7 +28,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit,
             profile_edit_icon,
             profile_export_mrpack,
-            profile_get_potential_override_folders
+            profile_get_potential_override_folders,
         ])
         .build()
 }
