@@ -25,8 +25,8 @@ export async function get_all_jre() {
 export async function find_jre_8_jres() {
   const jres = await invoke('plugin:jre|jre_get_all_jre')
   const version = '1.8'
-  const allow_higher = false
-  return await invoke('plugin:jre|jre_find_filtered_jres', { jres, version, allow_higher })
+  const allowHigher = false
+  return await invoke('plugin:jre|jre_find_filtered_jres', { jres, version, allowHigher })
 }
 
 // Finds the installation of Java 17, if it exists
@@ -34,8 +34,8 @@ export async function find_jre_8_jres() {
 export async function find_jre_17_jres() {
   const jres = await invoke('plugin:jre|jre_get_all_jre')
   const version = '1.17'
-  const allow_higher = false
-  return await invoke('plugin:jre|jre_filter_jre_17_jres', { jres, version, allow_higher })
+  const allowHigher = false
+  return await invoke('plugin:jre|jre_find_filtered_jres', { jres, version, allowHigher })
 }
 
 // Finds the highest version of Java 18+, if it exists
@@ -43,8 +43,8 @@ export async function find_jre_17_jres() {
 export async function find_jre_18plus_jres() {
   const jres = await invoke('plugin:jre|jre_get_all_jre')
   const version = '1.18'
-  const allow_higher = true
-  return await invoke('plugin:jre|jre_filter_jre_18plus_jres', { jres, version, allow_higher })
+  const allowHigher = true
+  return await invoke('plugin:jre|jre_find_filtered_jres', { jres, version, allowHigher })
 }
 
 // Validates globals. Recommend directing the user to reassigned the globals if this returns false
