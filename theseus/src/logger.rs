@@ -37,7 +37,7 @@ pub fn start_logger() -> Option<WorkerGuard> {
 // This will log to a file in the logs directory, and will not show any logs in the console
 #[cfg(not(debug_assertions))]
 pub fn start_logger() -> Option<WorkerGuard> {
-    use theseus::prelude::DirectoryInfo;
+    use crate::prelude::DirectoryInfo;
     use tracing_appender::rolling::{RollingFileAppender, Rotation};
     use tracing_subscriber::fmt::time::ChronoLocal;
 
