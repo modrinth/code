@@ -1,22 +1,11 @@
 use crate::api::Result;
 use std::path::PathBuf;
-use theseus::{prelude::*, profile_create::CreatePackProfile};
+use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile_create")
-        .invoke_handler(tauri::generate_handler![
-            profile_get_profile_empty,
-            profile_create,
-        ])
+        .invoke_handler(tauri::generate_handler![profile_create,])
         .build()
-}
-
-// Generic basic profile creation tool.
-// Creates an essentially empty dummy profile for use with profile_create
-#[tauri::command]
-pub async fn profile_get_profile_empty() -> Result<CreatePackProfile> {
-    let res = profile_create::get_profile_empty();
-    Ok(res)
 }
 
 // Creates a profile at  the given filepath and adds it to the in-memory state

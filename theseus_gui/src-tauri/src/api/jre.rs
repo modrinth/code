@@ -9,9 +9,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::new("jre")
         .invoke_handler(tauri::generate_handler![
             jre_get_all_jre,
-            jre_filter_jre_8_jres,
-            jre_filter_jre_17_jres,
-            jre_filter_jre_18plus_jres,
+            jre_find_filtered_jres,
             jre_autodetect_java_globals,
             jre_validate_globals,
             jre_get_jre,
@@ -29,26 +27,12 @@ pub async fn jre_get_all_jre() -> Result<Vec<JavaVersion>> {
 
 // Finds the installation of Java 8, if it exists
 #[tauri::command]
-pub async fn jre_filter_jre_8_jres(
+pub async fn jre_find_filtered_jres(
     jres: Vec<JavaVersion>,
+    version: String,
+    allow_higher: bool,
 ) -> Result<Vec<JavaVersion>> {
-    Ok(jre::filter_java8_jres(jres).await?)
-}
-
-// finds the installation of Java 17, if it exists
-#[tauri::command]
-pub async fn jre_filter_jre_17_jres(
-    jres: Vec<JavaVersion>,
-) -> Result<Vec<JavaVersion>> {
-    Ok(jre::filter_java17_jres(jres).await?)
-}
-
-// Finds the highest version of Java 18+, if it exists
-#[tauri::command]
-pub async fn jre_filter_jre_18plus_jres(
-    jres: Vec<JavaVersion>,
-) -> Result<Vec<JavaVersion>> {
-    Ok(jre::filter_java18plus_jres(jres).await?)
+    Ok(jre::find_filtered_jres(&version, jres, allow_higher).await?)
 }
 
 // Autodetect Java globals, by searching the users computer.

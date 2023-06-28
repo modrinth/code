@@ -16,21 +16,11 @@ pub const JAVA_8_KEY: &str = "JAVA_8";
 pub const JAVA_17_KEY: &str = "JAVA_17";
 pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
 
-// Prefer using autodetect_java_globals if from Tauri, due to tauri::command bug
-pub async fn get_autodetect_java_globals() -> crate::Result<JavaGlobals> {
-    let jres = jre::get_all_jre().await?;
-    let java_8 = filter_java8_jres(jres.clone()).await?;
-    let java_17 = filter_java17_jres(jres.clone()).await?;
-    let java_18plus = filter_java18plus_jres(jres).await?;
-    let java_globals =
-        autodetect_java_globals(java_8, java_17, java_18plus).await?;
-    Ok(java_globals)
-}
-
 // Autodetect JavaSettings default
 // Using the supplied JavaVersions, autodetects the default JavaSettings
 // Make a guess for what the default Java global settings should be
-// Currently, this just pops the last one found
+// Since the JRE paths are passed in as args, this handles the logic for selection. Currently this just pops the last one found
+// TODO: When tauri compiler issue is fixed, this can be be improved (ie: getting JREs in-function)
 pub async fn autodetect_java_globals(
     mut java_8: Vec<JavaVersion>,
     mut java_17: Vec<JavaVersion>,
@@ -51,56 +41,25 @@ pub async fn autodetect_java_globals(
     Ok(java_globals)
 }
 
-// Searches for jres on the system that are 1.18 or higher
-pub async fn filter_java18plus_jres(
+// Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
+// Allow higher allows for versions higher than the given version to be returned ('at least')
+pub async fn find_filtered_jres(
+    version: &str,
     jres: Vec<JavaVersion>,
+    allow_higher: bool,
 ) -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.18")?;
+    let version = extract_java_majorminor_version(version)?;
     // Filter out JREs that are not 1.17 or higher
     Ok(jres
         .into_iter()
         .filter(|jre| {
             let jre_version = extract_java_majorminor_version(&jre.version);
             if let Ok(jre_version) = jre_version {
-                jre_version >= version
-            } else {
-                false
-            }
-        })
-        .collect())
-}
-
-// Searches for jres on the system that are 1.8 exactly
-pub async fn filter_java8_jres(
-    jres: Vec<JavaVersion>,
-) -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.8")?;
-    // Filter out JREs that are not 1.8
-    Ok(jres
-        .into_iter()
-        .filter(|jre| {
-            let jre_version = extract_java_majorminor_version(&jre.version);
-            if let Ok(jre_version) = jre_version {
-                jre_version == version
-            } else {
-                false
-            }
-        })
-        .collect())
-}
-
-// Searches for jres on the system that are 1.17 exactly
-pub async fn filter_java17_jres(
-    jres: Vec<JavaVersion>,
-) -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.17")?;
-    // Filter out JREs that are not 1.8
-    Ok(jres
-        .into_iter()
-        .filter(|jre| {
-            let jre_version = extract_java_majorminor_version(&jre.version);
-            if let Ok(jre_version) = jre_version {
-                jre_version == version
+                if allow_higher {
+                    jre_version >= version
+                } else {
+                    jre_version == version
+                }
             } else {
                 false
             }
