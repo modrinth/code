@@ -14,6 +14,7 @@
     The default is theseus=show, meaning only logs from theseus will be displayed, and at the info or higher level.
 
 */
+
 use tracing_appender::non_blocking::WorkerGuard;
 
 // Handling for the live development logging
@@ -39,10 +40,9 @@ pub fn start_logger() -> Option<WorkerGuard> {
 pub fn start_logger() -> Option<WorkerGuard> {
     use crate::prelude::DirectoryInfo;
     use tracing_appender::rolling::{RollingFileAppender, Rotation};
-    use tracing_subscriber::fmt::time::ChronoLocal;
-
     use tracing_subscriber::prelude::*;
-
+    use tracing_subscriber::fmt::time::ChronoLocal;
+    
     // Initialize and get logs directory path
     let path = if let Some(dir) = DirectoryInfo::init().ok() {
         dir.launcher_logs_dir()
