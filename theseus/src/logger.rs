@@ -40,9 +40,9 @@ pub fn start_logger() -> Option<WorkerGuard> {
 pub fn start_logger() -> Option<WorkerGuard> {
     use crate::prelude::DirectoryInfo;
     use tracing_appender::rolling::{RollingFileAppender, Rotation};
-    use tracing_subscriber::prelude::*;
     use tracing_subscriber::fmt::time::ChronoLocal;
-    
+    use tracing_subscriber::prelude::*;
+
     // Initialize and get logs directory path
     let path = if let Some(dir) = DirectoryInfo::init().ok() {
         dir.launcher_logs_dir()
