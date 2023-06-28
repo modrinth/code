@@ -623,10 +623,14 @@ a,
 
 .resizable-textarea-wrapper {
   display: block;
+  flex-grow: 1;
+  width: 100%;
+  margin-bottom: 0;
+  height: 10rem !important;
 
   textarea {
+    height: 100%;
     border-radius: var(--radius-sm);
-    min-height: 10rem;
     width: calc(100% - var(--gap-xl) - var(--gap-sm));
     resize: vertical;
   }

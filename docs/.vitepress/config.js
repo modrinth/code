@@ -44,6 +44,7 @@ export default {
           { text: 'Markdown', link: '/components/markdown' },
           { text: 'Copy Code', link: '/components/copy-code' },
           { text: 'Notifications', link: '/components/notifications' },
+          { text: 'Share Modal', link: '/components/share-modal' },
         ],
       },
     ],

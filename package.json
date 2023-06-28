@@ -1,7 +1,7 @@
 {
   "name": "omorphia",
   "type": "module",
-  "version": "0.4.31",
+  "version": "0.4.32",
   "files": [
     "dist",
     "lib"
@@ -29,6 +29,7 @@
     "floating-vue": "^2.0.0-beta.20",
     "highlight.js": "^11.8.0",
     "markdown-it": "^13.0.1",
+    "qrcode.vue": "^3.4.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.1",
     "vue-select": "^4.0.0-beta.6",
