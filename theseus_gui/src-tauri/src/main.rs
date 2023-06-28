@@ -8,7 +8,6 @@ use theseus::prelude::*;
 
 mod api;
 mod error;
-mod logger;
 
 #[cfg(target_os = "macos")]
 mod macos;
@@ -52,7 +51,7 @@ fn main() {
             RUST_LOG="theseus=trace" {run command}
 
     */
-    let _log_guard = logger::start_logger();
+    let _log_guard = theseus::start_logger();
 
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
