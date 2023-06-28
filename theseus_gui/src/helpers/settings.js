@@ -30,10 +30,10 @@ Memorysettings {
 
 // Get full settings object
 export async function get() {
-  return await invoke('settings_get')
+  return await invoke('plugin:settings|settings_get')
 }
 
 // Set full settings object
 export async function set(settings) {
-  return await invoke('settings_set', { settings })
+  return await invoke('plugin:settings|settings_set', { settings })
 }

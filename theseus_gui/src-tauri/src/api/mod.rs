@@ -45,16 +45,6 @@ pub enum TheseusSerializableError {
 //     }
 // }
 
-// Lists active progress bars
-// Create a new HashMap with the same keys
-// Values provided should not be used directly, as they are not guaranteed to be up-to-date
-#[tauri::command]
-pub async fn progress_bars_list(
-) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
-    let res = theseus::EventState::list_progress_bars().await?;
-    Ok(res)
-}
-
 // This is a very simple macro that implements a very basic Serializable for each variant of TheseusSerializableError,
 // where the field is the string. (This allows easy extension to errors without many match arms)
 macro_rules! impl_serialize {

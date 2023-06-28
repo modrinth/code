@@ -1,5 +1,5 @@
 use crate::launcher::auth::Credentials;
-use std::mem;
+
 use tokio::task::JoinHandle;
 
 // Authentication task
@@ -43,7 +43,7 @@ impl AuthTask {
             let state = crate::State::get().await?;
             let mut write = state.auth_flow.write().await;
 
-            mem::replace(&mut write.0, None)
+            write.0.take()
         };
 
         // Waits for the task to complete, and returns the credentials
@@ -61,7 +61,7 @@ impl AuthTask {
             let state = crate::State::get().await?;
             let mut write = state.auth_flow.write().await;
 
-            mem::replace(&mut write.0, None)
+            write.0.take()
         };
         if let Some(task) = task {
             // Cancels the task

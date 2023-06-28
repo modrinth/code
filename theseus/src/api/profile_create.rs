@@ -11,30 +11,12 @@ pub use crate::{
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
+
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 use tracing::{info, trace};
 use uuid::Uuid;
-
-const DEFAULT_NAME: &str = "Untitled Instance";
-
-// Generic basic profile creation tool.
-// Creates an essentially empty dummy profile with profile_create
-#[tracing::instrument]
-pub async fn profile_create_empty() -> crate::Result<PathBuf> {
-    profile_create(
-        String::from(DEFAULT_NAME), // the name/path of the profile
-        String::from("1.19.2"),     // the game version of the profile
-        ModLoader::Vanilla,         // the modloader to use
-        None, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-        None, // the icon for the profile
-        None,
-        None,
-        None,
-    )
-    .await
-}
 
 // Creates a profile at  the given filepath and adds it to the in-memory state
 // Returns filepath at which it can be accessed in the State

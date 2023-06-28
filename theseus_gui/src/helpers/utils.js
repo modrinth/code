@@ -8,7 +8,7 @@ export async function isDev() {
 }
 
 export async function showInFolder(path) {
-  return await invoke('show_in_folder', { path })
+  return await invoke('plugin:utils|show_in_folder', { path })
 }
 
 export const releaseColor = (releaseType) => {
