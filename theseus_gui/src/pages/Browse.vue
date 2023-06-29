@@ -272,6 +272,11 @@ async function onSearchChangeToTop(newPageNumber) {
   searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+async function clearSearch() {
+  query.value = ''
+  await onSearchChange(1)
+}
+
 function getSearchUrl(offset, useObj) {
   const queryItems = []
   const obj = {}
@@ -355,6 +360,25 @@ const sortedCategories = computed(() => {
   return values
 })
 
+// Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
+async function sortByNameOrNumber(sortable) {
+  sortable.sort((a, b) => {
+    let aNum = parseFloat(a.name)
+    let bNum = parseFloat(b.name)
+    if (isNaN(aNum) && isNaN(bNum)) {
+      // Both are strings, sort alphabetically
+      return a.name.localeCompare(b.name)
+    } else if (!isNaN(aNum) && !isNaN(bNum)) {
+      // Both are numbers, sort numerically
+      return aNum - bNum
+    } else {
+      // One is a number and one is a string, numbers go first
+      return isNaN(aNum) ? 1 : -1
+    }
+  })
+  return sortable
+}
+
 async function clearFilters() {
   for (const facet of [...facets.value]) {
     await toggleFacet(facet, true)
@@ -426,7 +450,7 @@ watch(
 )
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories().catch(handleError).then(ref),
+  get_categories().catch(handleError).then(sortByNameOrNumber).then(ref),
   get_loaders().catch(handleError).then(ref),
   get_game_versions().catch(handleError).then(ref),
   refreshSearch(),
@@ -633,7 +657,7 @@ const showLoaders = computed(
             :placeholder="`Search ${projectType}s...`"
             @input="onSearchChange(1)"
           />
-          <Button @click="() => (searchStore.searchInput = '')">
+          <Button @click="() => clearSearch()">
             <XIcon />
           </Button>
         </div>
