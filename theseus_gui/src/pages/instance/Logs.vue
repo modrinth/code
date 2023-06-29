@@ -15,7 +15,7 @@
           <CheckIcon v-else />
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
-        <Button disabled color="primary">
+        <Button color="primary" @click="share">
           <SendIcon />
           Share
         </Button>
@@ -38,6 +38,7 @@
         {{ line }} <br />
       </span>
     </div>
+    <ShareModal ref="shareModal" header="Share Log" share-title="Instance Log" share-text="Check out this log from an instance on the Modrinth App" link/>
   </Card>
 </template>
 
@@ -59,6 +60,8 @@ import { get_output_by_uuid, get_uuids_by_profile_path } from '@/helpers/process
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
+import {ofetch} from "ofetch";
+import ShareModal from "@/components/ui/ShareModal.vue";
 
 dayjs.extend(calendar)
 
@@ -70,6 +73,17 @@ const props = defineProps({
     required: true,
   },
 })
+
+const logs = ref([])
+await setLogs()
+
+const selectedLogIndex = ref(0)
+const copied = ref(false)
+const logContainer = ref(null)
+const interval = ref(null)
+const userScrolled = ref(false)
+const isAutoScrolling = ref(false)
+const shareModal = ref(null);
 
 async function getLiveLog() {
   if (route.params.id) {
@@ -101,16 +115,24 @@ async function setLogs() {
   logs.value = [liveLog, ...allLogs]
 }
 
-const logs = ref([])
-await setLogs()
-
-const selectedLogIndex = ref(0)
-const copied = ref(false)
-
 const copyLog = () => {
   if (logs.value[selectedLogIndex.value]) {
     navigator.clipboard.writeText(logs.value[selectedLogIndex.value].stdout)
     copied.value = true
+  }
+}
+
+const share = async () => {
+  if (logs.value[selectedLogIndex.value]) {
+    const url = await ofetch('https://api.mclo.gs/1/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: `content=${encodeURIComponent(logs.value[selectedLogIndex.value].stdout)}`
+    }).catch(handleError)
+
+    shareModal.value.show(url.url)
   }
 }
 
@@ -142,11 +164,6 @@ const deleteLog = async () => {
     await setLogs()
   }
 }
-
-const logContainer = ref(null)
-const interval = ref(null)
-const userScrolled = ref(false)
-const isAutoScrolling = ref(false)
 
 function handleUserScroll() {
   if (!isAutoScrolling.value) {

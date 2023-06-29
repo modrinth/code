@@ -52,77 +52,39 @@
         v-model="selectedProjectType"
         :items="Object.keys(selectableProjectTypes)"
       />
-      <DropdownButton
-        :options="['update_all', 'filter_update']"
-        default-value="update_all"
-        :disabled="!projects.some((x) => x.outdated)"
-        @option-click="updateAll"
-      >
-        <template #update_all>
-          <UpdatedIcon />
-          Update {{ selected.length > 0 ? 'selected' : 'all' }}
-        </template>
-        <template #filter_update>
-          <UpdatedIcon />
-          Select Updatable
-        </template>
-      </DropdownButton>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
         <TrashIcon />
         Remove selected
       </Button>
-      <DropdownButton
-        v-if="selected.length > 0"
-        :options="['toggle', 'disable', 'enable', 'hide_show']"
-        default-value="toggle"
-        @option-click="toggleSelected"
-      >
-        <template #toggle>
-          <EditIcon />
-          Toggle selected
-        </template>
-        <template #disable>
-          <XIcon />
-          Disable selected
-        </template>
-        <template #enable>
-          <CheckCircleIcon />
-          Enable selected
-        </template>
-        <template #hide_show>
-          <CheckCircleIcon />
-          {{ hideNonSelected ? 'Show' : 'Hide' }} unselected
-        </template>
-      </DropdownButton>
-      <DropdownButton
-        v-if="selected.length > 0"
-        :options="['copy_name', 'copy_url', 'copy_slug']"
-        default-value="copy_name"
-        @option-click="copySelected"
-      >
-        <template #copy_name>
-          <EditIcon />
-          Copy names
-        </template>
-        <template #copy_slug>
-          <HashIcon />
-          Copy slugs
-        </template>
-        <template #copy_url>
-          <GlobeIcon />
-          Copy URLs
-        </template>
-      </DropdownButton>
     </div>
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
           <Checkbox v-model="selectAll" class="select-checkbox" />
         </div>
-        <div class="table-cell table-text name-cell">Name</div>
+        <div class="table-cell table-text name-cell actions-cell">
+          Project
+          <Button class="transparent" icon-only @click="copySelected">
+            <ClipboardCopyIcon />
+          </Button>
+          <Button class="transparent" icon-only>
+            <SendIcon />
+          </Button>
+        </div>
         <div class="table-cell table-text">Version</div>
         <div class="table-cell table-text">Author</div>
-        <div class="table-cell table-text">Actions</div>
+        <div class="table-cell table-text actions-cell">
+          Actions
+          <Button class="transparent trash" icon-only @click="deleteSelected">
+            <TrashIcon/>
+          </Button>
+          <Button class="transparent update" icon-only @click="updateAll">
+            <UpdatedIcon/>
+          </Button>
+          <Button class="transparent" icon-only @click="toggleSelected">
+            <ToggleIcon/>
+          </Button>
+        </div>
       </div>
       <div
         v-for="mod in search"
@@ -131,7 +93,11 @@
         @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
       >
         <div class="table-cell table-text">
-          <Checkbox v-model="mod.selected" class="select-checkbox" />
+          <Checkbox
+            :model-value="selectionMap.get(mod.path)"
+            class="select-checkbox"
+            @update:model-value="newValue => selectionMap.set(mod.path, newValue)"
+          />
         </div>
         <div class="table-cell table-text name-cell">
           <router-link
@@ -212,12 +178,10 @@ import {
   Checkbox,
   formatProjectType,
   DropdownButton,
-  EditIcon,
-  GlobeIcon,
-  HashIcon,
   Modal,
   XIcon,
-  CheckCircleIcon,
+  ClipboardCopyIcon,
+  SendIcon
 } from 'omorphia'
 import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -234,6 +198,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
+import { ToggleIcon } from "@/assets/icons";
 
 const router = useRouter()
 
@@ -253,6 +218,7 @@ const props = defineProps({
 })
 
 const projects = ref([])
+const selectionMap = ref(new Map())
 
 const initProjects = (initInstance) => {
   projects.value = []
@@ -299,20 +265,32 @@ const initProjects = (initInstance) => {
       })
     }
   }
+
+  const newSelectionMap = new Map()
+  for (const project of projects.value) {
+    newSelectionMap.set(project.path, selectionMap.value.get(project.path) ?? selectionMap.value.get(project.path.slice(0, -9)) ?? selectionMap.value.get(project.path + '.disabled') ?? false)
+  }
+  selectionMap.value = newSelectionMap
 }
 
 initProjects(props.instance)
 
 watch(
   () => props.instance.projects,
-  () => initProjects(props.instance)
+  () => {
+    initProjects(props.instance)
+  }
 )
 
 const searchFilter = ref('')
 const selectAll = ref(false)
 const sortFilter = ref('')
 const selectedProjectType = ref('All')
-const selected = computed(() => projects.value.filter((mod) => mod.selected))
+const selected = computed(() => Array.from(selectionMap.value).filter((args) => {
+  return args[1]
+}).map((args) => {
+  return projects.value.find((x) => x.path === args[0])
+}))
 const deleteWarning = ref(null)
 const hideNonSelected = ref(false)
 
@@ -489,16 +467,16 @@ const handleContentOptionClick = async (args) => {
 
     for (const project of newProject) {
       await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
-      initProjects(await get(props.instance.path).catch(handleError))
     }
+    initProjects(await get(props.instance.path).catch(handleError))
   }
 }
 
 listen('tauri://file-drop', async (event) => {
   for (const file of event.payload) {
     await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
-    initProjects(await get(props.instance.path).catch(handleError))
   }
+  initProjects(await get(props.instance.path).catch(handleError))
 })
 
 async function deleteSelected() {
@@ -537,20 +515,20 @@ async function toggleSelected(args) {
   switch (args.option) {
     case 'toggle':
       for (const project of selected.value) {
-        await toggleDisableMod(project)
+        await toggleDisableMod(project, false)
       }
       break
     case 'enable':
       for (const project of selected.value) {
         if (project.disabled) {
-          await toggleDisableMod(project)
+          await toggleDisableMod(project, false)
         }
       }
       break
     case 'disable':
       for (const project of selected.value) {
         if (!project.disabled) {
-          await toggleDisableMod(project)
+          await toggleDisableMod(project, false)
         }
       }
       break
@@ -561,8 +539,10 @@ async function toggleSelected(args) {
 }
 
 watch(selectAll, () => {
-  for (const project of projects.value) {
-    project.selected = selectAll.value
+  for (const [key, value] of Array.from(selectionMap.value)) {
+    if (value !== selectAll.value) {
+      selectionMap.value.set(key, selectAll.value)
+    }
   }
 })
 
@@ -611,7 +591,8 @@ const handleRightClick = (event, mod) => {
 .mod-card {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: var(--gap-sm);
+  justify-content: center;
   overflow: hidden;
 }
 
@@ -658,6 +639,26 @@ const handleRightClick = (event, mod) => {
 
   strong {
     color: var(--color-contrast);
+  }
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .btn {
+    height: unset;
+    width: unset;
+    padding: 0;
+
+    &.trash {
+      color: var(--color-red);
+    }
+
+    &.update {
+      color: var(--color-green);
+    }
   }
 }
 </style>

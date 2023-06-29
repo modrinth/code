@@ -94,6 +94,15 @@
     <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
     <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
     <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
+    <template #copy_names><EditIcon />Copy names</template>
+    <template #copy_slugs><HashIcon />Copy slugs</template>
+    <template #copy_links><GlobeIcon />Copy Links</template>
+    <template #toggle><EditIcon />Toggle selected</template>
+    <template #disable><XIcon />Disable selected</template>
+    <template #enable><CheckCircleIcon />Enable selected</template>
+    <template #hide_show><EyeIcon/>Show/Hide unselected</template>
+    <template #update_all><UpdatedIcon />Update {{ selected.length > 0 ? 'selected' : 'all' }}</template>
+    <template #filter_update><UpdatedIcon />Select Updatable</template>
   </ContextMenu>
 </template>
 <script setup>
@@ -111,7 +120,7 @@ import {
   FolderOpenIcon,
   ClipboardCopyIcon,
   PlusIcon,
-  ExternalIcon,
+  ExternalIcon, HashIcon, GlobeIcon, EyeIcon, XIcon, CheckCircleIcon, UpdatedIcon
 } from 'omorphia'
 import { get, run } from '@/helpers/profile'
 import {
@@ -159,7 +168,7 @@ const startInstance = async (context) => {
     loader: instance.value.metadata.loader,
     game_version: instance.value.metadata.game_version,
     source: context,
-  })
+  });
 }
 
 const checkProcess = async () => {
@@ -187,7 +196,7 @@ const stopInstance = async (context) => {
     loader: instance.value.metadata.loader,
     game_version: instance.value.metadata.game_version,
     source: context,
-  })
+  });
 }
 
 const handleRightClick = (event) => {
