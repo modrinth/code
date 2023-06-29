@@ -5,9 +5,10 @@ use std::path::PathBuf;
 
 use crate::event::emit::{emit_loading, init_loading};
 use crate::util::fetch::{fetch_advanced, fetch_json};
+use crate::util::jre::extract_java_majorminor_version;
 use crate::{
     state::JavaGlobals,
-    util::jre::{self, extract_java_majorminor_version, JavaVersion},
+    util::jre::{self, JavaVersion},
     LoadingBarType, State,
 };
 
@@ -16,12 +17,15 @@ pub const JAVA_17_KEY: &str = "JAVA_17";
 pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
 
 // Autodetect JavaSettings default
+// Using the supplied JavaVersions, autodetects the default JavaSettings
 // Make a guess for what the default Java global settings should be
-pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
-    let mut java_8 = find_filtered_jres("1.8").await?;
-    let mut java_17 = find_filtered_jres("1.17").await?;
-    let mut java_18plus = find_filtered_jres("1.18").await?;
-
+// Since the JRE paths are passed in as args, this handles the logic for selection. Currently this just pops the last one found
+// TODO: When tauri compiler issue is fixed, this can be be improved (ie: getting JREs in-function)
+pub async fn autodetect_java_globals(
+    mut java_8: Vec<JavaVersion>,
+    mut java_17: Vec<JavaVersion>,
+    mut java_18plus: Vec<JavaVersion>,
+) -> crate::Result<JavaGlobals> {
     // Simply select last one found for initial guess
     let mut java_globals = JavaGlobals::new();
     if let Some(jre) = java_8.pop() {
@@ -38,18 +42,24 @@ pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
 }
 
 // Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
+// Allow higher allows for versions higher than the given version to be returned ('at least')
 pub async fn find_filtered_jres(
     version: &str,
+    jres: Vec<JavaVersion>,
+    allow_higher: bool,
 ) -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version(version)?;
-    let jres = jre::get_all_jre().await?;
-
+    // Filter out JREs that are not 1.17 or higher
     Ok(jres
         .into_iter()
         .filter(|jre| {
             let jre_version = extract_java_majorminor_version(&jre.version);
             if let Ok(jre_version) = jre_version {
-                jre_version >= version
+                if allow_higher {
+                    jre_version >= version
+                } else {
+                    jre_version == version
+                }
             } else {
                 false
             }

@@ -244,24 +244,20 @@ impl Profile {
                     if let Some(profile) = new_profiles.0.get_mut(&path) {
                         profile.projects = projects;
                     }
-
                     emit_profile(
                         profile.uuid,
                         profile.path,
                         &profile.metadata.name,
                         ProfilePayloadType::Synced,
                     )
-                        .await?;
+                    .await?;
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",
                     );
                 }
-
                 Ok::<(), crate::Error>(())
-            }
-            .await;
-
+            }.await;
             match res {
                 Ok(()) => {}
                 Err(err) => {

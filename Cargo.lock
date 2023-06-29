@@ -4569,6 +4569,7 @@ dependencies = [
 name = "theseus"
 version = "0.2.2"
 dependencies = [
+ "async-recursion",
  "async-tungstenite",
  "async_zip",
  "bytes",

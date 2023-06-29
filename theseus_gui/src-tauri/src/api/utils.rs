@@ -1,6 +1,26 @@
 use crate::api::Result;
 use std::process::Command;
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("utils")
+        .invoke_handler(tauri::generate_handler![
+            should_disable_mouseover,
+            show_in_folder,
+            progress_bars_list,
+        ])
+        .build()
+}
+
+// Lists active progress bars
+// Create a new HashMap with the same keys
+// Values provided should not be used directly, as they are not guaranteed to be up-to-date
+#[tauri::command]
+pub async fn progress_bars_list(
+) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
+    let res = theseus::EventState::list_progress_bars().await?;
+    Ok(res)
+}
+
 // cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
 #[cfg(target_os = "macos")]
@@ -34,16 +54,15 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
         #[cfg(target_os = "linux")]
         {
-            use std::fs;
             use std::fs::metadata;
             use std::path::PathBuf;
 
-            if path.contains(",") {
+            if path.contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
                 let new_path = match metadata(&path)?.is_dir() {
-                    true => path.clone(),
+                    true => path,
                     false => {
-                        let mut path2 = PathBuf::from(path.clone());
+                        let mut path2 = PathBuf::from(path);
                         path2.pop();
                         path2.to_string_lossy().to_string()
                     }
