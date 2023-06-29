@@ -531,8 +531,8 @@ const handleOptionsClick = (args) => {
   min-height: calc(100vh - 3.25rem);
   height: fit-content;
   max-height: calc(100vh - 3.25rem);
-  overflow-y: auto;
   padding: 1rem 0.5rem 1rem 1rem;
+  overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
 
