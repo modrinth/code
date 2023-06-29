@@ -1,5 +1,6 @@
 //! Theseus profile management interface
 use crate::state::LinkedData;
+use crate::util::io::{self, IOError};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     prelude::ModLoader,
@@ -13,7 +14,6 @@ use dunce::canonicalize;
 use futures::prelude::*;
 
 use std::path::PathBuf;
-use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 use tracing::{info, trace};
 use uuid::Uuid;
@@ -48,7 +48,7 @@ pub async fn profile_create(
             .into());
         }
 
-        if ReadDirStream::new(fs::read_dir(&path).await?)
+        if ReadDirStream::new(io::read_dir(&path).await?)
             .next()
             .await
             .is_some()
@@ -56,12 +56,14 @@ pub async fn profile_create(
             return Err(ProfileCreationError::NotEmptyFolder.into());
         }
     } else {
-        fs::create_dir_all(&path).await?;
+        io::create_dir_all(&path).await?;
     }
 
     info!(
         "Creating profile at path {}",
-        &canonicalize(&path)?.display()
+        &canonicalize(&path)
+            .map_err(|e| IOError::with_path(e, &path))?
+            .display()
     );
     let loader = if modloader != ModLoader::Vanilla {
         get_loader_version_from_loader(
@@ -75,12 +77,12 @@ pub async fn profile_create(
     };
 
     // Fully canonicalize now that its created for storing purposes
-    let path = canonicalize(&path)?;
+    let path = canonicalize(&path).map_err(|e| IOError::with_path(e, &path))?;
     let mut profile =
         Profile::new(uuid, name, game_version, path.clone()).await?;
     let result = async {
         if let Some(ref icon) = icon {
-            let bytes = tokio::fs::read(icon).await?;
+            let bytes = io::read(icon).await?;
             profile
                 .set_icon(
                     &state.directories.caches_dir(),

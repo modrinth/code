@@ -1,5 +1,5 @@
 //! Theseus error type
-use crate::profile_create;
+use crate::{profile_create, util};
 use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]
@@ -29,7 +29,7 @@ pub enum ErrorKind {
     AuthTaskError(#[from] crate::state::AuthTaskError),
 
     #[error("I/O error: {0}")]
-    IOError(#[from] std::io::Error),
+    IOError(#[from] util::io::IOError),
 
     #[error("Error launching Minecraft: {0}")]
     LauncherError(String),

@@ -3,7 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use dunce::canonicalize;
 use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
@@ -22,7 +21,8 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
     let url = auth::authenticate_begin_flow().await?;
 
     println!("URL {}", url.as_str());
-    webbrowser::open(url.as_str())?;
+    webbrowser::open(url.as_str())
+        .map_err(|e| IOError::with_path(e, url.as_str()))?;
 
     let credentials = auth::authenticate_await_complete_flow().await?;
     State::sync().await?;

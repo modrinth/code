@@ -169,6 +169,7 @@
             autocomplete="off"
             type="checkbox"
             class="switch stylized-toggle"
+            :disabled="mod.toggleInProgress"
             :checked="!mod.disabled"
             @change="toggleDisableMod(mod)"
           />
@@ -451,8 +452,13 @@ async function updateProject(mod) {
 }
 
 async function toggleDisableMod(mod) {
+  console.log('Starting')
+  mod.toggleInProgress = true
+  console.log('enabled')
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
+  mod.toggleInProgress = false
+  console.log('disabled')
 
   mixpanel.track('InstanceProjectDisable', {
     loader: props.instance.metadata.loader,

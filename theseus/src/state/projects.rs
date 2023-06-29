@@ -5,6 +5,7 @@ use crate::state::Profile;
 use crate::util::fetch::{
     fetch_json, write_cached_icon, FetchSemaphore, IoSemaphore,
 };
+use crate::util::io::IOError;
 use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
@@ -265,10 +266,12 @@ pub async fn infer_data_from_files(
 
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
     for path in paths {
-        let mut file = tokio::fs::File::open(path.clone()).await?;
+        let mut file = tokio::fs::File::open(path.clone())
+            .await
+            .map_err(|e| IOError::with_path(e, &path))?;
 
         let mut buffer = Vec::new();
-        file.read_to_end(&mut buffer).await?;
+        file.read_to_end(&mut buffer).await.map_err(IOError::from)?;
 
         let hash = format!("{:x}", sha2::Sha512::digest(&buffer));
         file_path_hashes.insert(hash, path.clone());

@@ -4,6 +4,7 @@ use crate::event::{LoadingBarId, LoadingBarType};
 use crate::jre::{JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
+use crate::util::io;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -12,10 +13,8 @@ use crate::{
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::VersionInfo;
-use dunce::canonicalize;
 use st::Profile;
 use std::collections::HashMap;
-use std::fs;
 use std::{process::Stdio, sync::Arc};
 use tokio::process::Command;
 use uuid::Uuid;
@@ -124,7 +123,7 @@ pub async fn install_minecraft(
     State::sync().await?;
 
     let state = State::get().await?;
-    let instance_path = &canonicalize(&profile.path)?;
+    let instance_path = &io::canonicalize(&profile.path)?;
     let metadata = state.metadata.read().await;
 
     let version = metadata
@@ -309,7 +308,7 @@ pub async fn launch_minecraft(
 
     let state = State::get().await?;
     let metadata = state.metadata.read().await;
-    let instance_path = &canonicalize(&profile.path)?;
+    let instance_path = &io::canonicalize(&profile.path)?;
 
     let version = metadata
         .minecraft
@@ -432,7 +431,7 @@ pub async fn launch_minecraft(
             .profile_logs_dir(profile.uuid)
             .join(&datetime_string)
     };
-    fs::create_dir_all(&logs_dir)?;
+    io::create_dir_all(&logs_dir).await?;
 
     let stdout_log_path = logs_dir.join("stdout.log");
 

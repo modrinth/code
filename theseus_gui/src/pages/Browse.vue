@@ -361,20 +361,28 @@ const sortedCategories = computed(() => {
 })
 
 // Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
-async function sortByNameOrNumber(sortable) {
+// identifier[0], then if it ties, identifier[1], etc
+async function sortByNameOrNumber(sortable, identifiers) {
+  console.log(sortable)
   sortable.sort((a, b) => {
-    let aNum = parseFloat(a.name)
-    let bNum = parseFloat(b.name)
-    if (isNaN(aNum) && isNaN(bNum)) {
-      // Both are strings, sort alphabetically
-      return a.name.localeCompare(b.name)
-    } else if (!isNaN(aNum) && !isNaN(bNum)) {
-      // Both are numbers, sort numerically
-      return aNum - bNum
-    } else {
-      // One is a number and one is a string, numbers go first
-      return isNaN(aNum) ? 1 : -1
+    for (let identifier of identifiers) {
+      let aNum = parseFloat(a[identifier])
+      let bNum = parseFloat(b[identifier])
+      if (isNaN(aNum) && isNaN(bNum)) {
+        // Both are strings, sort alphabetically
+        let stringComp = a[identifier].localeCompare(b[identifier])
+        if (stringComp != 0) return stringComp
+      } else if (!isNaN(aNum) && !isNaN(bNum)) {
+        // Both are numbers, sort numerically
+        let numComp = aNum - bNum
+        if (numComp != 0) return numComp
+      } else {
+        // One is a number and one is a string, numbers go first
+        let numStringComp = isNaN(aNum) ? 1 : -1
+        if (numStringComp != 0) return numStringComp
+      }
     }
+    return 0
   })
   return sortable
 }
@@ -450,7 +458,10 @@ watch(
 )
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories().catch(handleError).then(sortByNameOrNumber).then(ref),
+  get_categories()
+    .catch(handleError)
+    .then((s) => sortByNameOrNumber(s, ['header', 'name']))
+    .then(ref),
   get_loaders().catch(handleError).then(ref),
   get_game_versions().catch(handleError).then(ref),
   refreshSearch(),
