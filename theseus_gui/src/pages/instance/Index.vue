@@ -74,7 +74,7 @@
         </div>
         <hr class="card-divider" />
         <div class="pages-list">
-          <Button class="transparent" @click="exportModal.show()" >
+          <Button class="transparent" @click="exportModal.show()">
             <PackageIcon />
             Export modpack
           </Button>
@@ -135,8 +135,8 @@ import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
-import {PackageIcon} from "@/assets/icons/index.js";
-import ExportModal from "@/components/ui/ExportModal.vue";
+import { PackageIcon } from '@/assets/icons/index.js'
+import ExportModal from '@/components/ui/ExportModal.vue'
 
 const route = useRoute()
 
@@ -324,7 +324,6 @@ Button {
   gap: 0.5rem;
   background: var(--color-raised-bg);
   height: 100%;
-
 }
 
 .name {
