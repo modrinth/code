@@ -9,7 +9,7 @@ export default {
     async checkDisableMouseover() {
       try {
         // Fetch the CSS content from the Rust backend
-        const should_disable_mouseover = await invoke('should_disable_mouseover')
+        const should_disable_mouseover = await invoke('plugin:utils|should_disable_mouseover')
 
         if (should_disable_mouseover) {
           // Create a style element and set its content

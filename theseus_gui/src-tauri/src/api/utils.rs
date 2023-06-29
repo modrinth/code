@@ -1,6 +1,26 @@
 use crate::api::Result;
 use std::process::Command;
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("utils")
+        .invoke_handler(tauri::generate_handler![
+            should_disable_mouseover,
+            show_in_folder,
+            progress_bars_list,
+        ])
+        .build()
+}
+
+// Lists active progress bars
+// Create a new HashMap with the same keys
+// Values provided should not be used directly, as they are not guaranteed to be up-to-date
+#[tauri::command]
+pub async fn progress_bars_list(
+) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
+    let res = theseus::EventState::list_progress_bars().await?;
+    Ok(res)
+}
+
 // cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
 #[cfg(target_os = "macos")]

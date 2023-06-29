@@ -1,6 +1,19 @@
 use crate::api::Result;
 use theseus::tags::{Category, DonationPlatform, GameVersion, Loader, Tags};
 
+pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
+    tauri::plugin::Builder::new("tags")
+        .invoke_handler(tauri::generate_handler![
+            tags_get_categories,
+            tags_get_report_types,
+            tags_get_loaders,
+            tags_get_game_versions,
+            tags_get_donation_platforms,
+            tags_get_tag_bundle,
+        ])
+        .build()
+}
+
 /// Gets cached category tags from the database
 #[tauri::command]
 pub async fn tags_get_categories() -> Result<Vec<Category>> {
