@@ -64,7 +64,7 @@
         </template>
         <template #filter_update>
           <UpdatedIcon />
-          Select Updatable
+          Select updatable
         </template>
       </DropdownButton>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">

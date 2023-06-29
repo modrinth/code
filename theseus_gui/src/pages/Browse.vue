@@ -549,7 +549,7 @@ const showLoaders = computed(
           "
           @click="clearFilters"
         >
-          <ClearIcon /> Clear Filters
+          <ClearIcon /> Clear filters
         </Button>
         <div v-if="showLoaders" class="loaders">
           <h2>Loaders</h2>

@@ -29,7 +29,7 @@
           class="btn"
         >
           <ExternalIcon />
-          Modrinth Website
+          Modrinth website
         </a>
       </div>
     </Card>
