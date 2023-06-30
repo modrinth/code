@@ -5,6 +5,8 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
+use crate::state::SafeProcesses;
+
 pub mod emit;
 
 // Global event state
@@ -48,6 +50,12 @@ impl EventState {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
+    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
+    #[cfg(not(feature = "tauri"))]
+    pub async fn get() -> crate::Result<Arc<Self>> {
+        Self::init().await
+    }
+
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
     pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
     {
@@ -62,10 +70,11 @@ impl EventState {
         Ok(display_list)
     }
 
-    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
-    #[cfg(not(feature = "tauri"))]
-    pub async fn get() -> crate::Result<Arc<Self>> {
-        Self::init().await
+    #[cfg(feature = "tauri")]
+    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
+        use tauri::Manager;
+        let value = Self::get().await?;
+        Ok(value.app.get_window("main"))
     }
 }
 
@@ -91,8 +100,6 @@ pub struct LoadingBarId(Uuid);
 impl Drop for LoadingBarId {
     fn drop(&mut self) {
         let loader_uuid = self.0;
-        let _event = LoadingBarType::StateInit;
-        let _message = "finished".to_string();
         tokio::spawn(async move {
             if let Ok(event_state) = EventState::get().await {
                 let mut bars = event_state.loading_bars.write().await;
@@ -132,6 +139,11 @@ impl Drop for LoadingBarId {
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
                 bars.remove(&loader_uuid);
             }
+            let _ = SafeProcesses::complete(
+                crate::state::ProcessType::LoadingBar,
+                loader_uuid,
+            )
+            .await;
         });
     }
 }
@@ -182,6 +194,24 @@ pub struct LoadingPayload {
 #[derive(Serialize, Clone)]
 pub struct WarningPayload {
     pub message: String,
+}
+
+#[derive(Serialize, Clone)]
+#[serde(tag = "event")]
+pub enum CommandPayload {
+    InstallMod {
+        id: String,
+    },
+    InstallVersion {
+        id: String,
+    },
+    InstallModpack {
+        id: String,
+    },
+    RunMRPack {
+        // run or install .mrpack
+        path: PathBuf,
+    },
 }
 
 #[derive(Serialize, Clone)]

@@ -1,11 +1,13 @@
 use super::LoadingBarId;
-use crate::event::{
-    EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
-    ProfilePayloadType,
+use crate::{
+    event::{
+        CommandPayload, EventError, LoadingBar, LoadingBarType,
+        ProcessPayloadType, ProfilePayloadType,
+    },
+    state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
 use std::path::PathBuf;
-use tracing::warn;
 
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -42,12 +44,26 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
    }
 */
 
-// Initialize a loading bar for use in emit_loading
-// This will generate a LoadingBarId, which is used to refer to the loading bar uniquely.
-// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
-// title is the title of the loading bar
+/// Initialize a loading bar for use in emit_loading
+/// This will generate a LoadingBarId, which is used to refer to the loading bar uniquely.
+/// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
+/// title is the title of the loading bar
+/// The app will wait for this loading bar to finish before exiting, as it is considered safe.
 #[theseus_macros::debug_pin]
 pub async fn init_loading(
+    bar_type: LoadingBarType,
+    total: f64,
+    title: &str,
+) -> crate::Result<LoadingBarId> {
+    let key = init_loading_unsafe(bar_type, total, title).await?;
+    SafeProcesses::add_uuid(ProcessType::LoadingBar, key.0).await?;
+    Ok(key)
+}
+
+/// An unsafe loading bar can be created without adding it to the SafeProcesses list,
+/// meaning that the app won't ask to wait for it to finish before exiting.
+#[theseus_macros::debug_pin]
+pub async fn init_loading_unsafe(
     bar_type: LoadingBarType,
     total: f64,
     title: &str,
@@ -76,8 +92,6 @@ pub async fn init_loading(
                         ).unwrap()
                         .progress_chars("#>-"),
                 );
-                //pb.set_message(title);
-
                 pb
             },
         },
@@ -215,7 +229,25 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
             )
             .map_err(EventError::from)?;
     }
-    warn!("{}", message);
+    tracing::warn!("{}", message);
+    Ok(())
+}
+
+// emit_command(CommandPayload::Something { something })
+// ie: installing a pack, opening an .mrpack, etc
+// Generally used for url deep links and file opens that we we want to handle in the frontend
+#[allow(dead_code)]
+#[allow(unused_variables)]
+pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
+    tracing::debug!("Command: {}", serde_json::to_string(&command)?);
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get().await?;
+        event_state
+            .app
+            .emit_all("command", command)
+            .map_err(EventError::from)?;
+    }
     Ok(())
 }
 

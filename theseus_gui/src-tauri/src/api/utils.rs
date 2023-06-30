@@ -1,5 +1,7 @@
+use theseus::{handler, prelude::CommandPayload, State};
+
 use crate::api::Result;
-use std::process::Command;
+use std::{env, process::Command};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -7,6 +9,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             should_disable_mouseover,
             show_in_folder,
             progress_bars_list,
+            safety_check_safe_loading_bars,
+            get_opening_command,
+            await_sync,
         ])
         .build()
 }
@@ -19,6 +24,12 @@ pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
+}
+
+// Check if there are any safe loading bars running
+#[tauri::command]
+pub async fn safety_check_safe_loading_bars() -> Result<bool> {
+    Ok(theseus::safety::check_safe_loading_bars().await?)
 }
 
 // cfg only on mac os
@@ -81,5 +92,36 @@ pub fn show_in_folder(path: String) -> Result<()> {
         Ok::<(), theseus::Error>(())
     }?;
 
+    Ok(())
+}
+
+// Get opening command
+// For example, if a user clicks on an .mrpack to open the app.
+// This should be called once and only when the app is done booting up and ready to receive a command
+// Returns a Command struct- see events.js
+#[tauri::command]
+pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
+    // Tauri is not CLI, we use arguments as path to file to call
+    let cmd_arg = env::args_os().nth(1);
+
+    let cmd_arg = cmd_arg.map(|path| path.to_string_lossy().to_string());
+    if let Some(cmd) = cmd_arg {
+        tracing::debug!("Opening command: {:?}", cmd);
+        return Ok(Some(handler::parse_command(&cmd).await?));
+    }
+    Ok(None)
+}
+
+// helper function called when redirected by a weblink (ie: modrith://do-something) or when redirected by a .mrpack file (in which case its a filepath)
+// We hijack the deep link library (which also contains functionality for instance-checking)
+pub async fn handle_command(command: String) -> Result<()> {
+    Ok(theseus::handler::parse_and_emit_command(&command).await?)
+}
+
+// Waits for state to be synced
+#[tauri::command]
+pub async fn await_sync() -> Result<()> {
+    State::sync().await?;
+    tracing::info!("State synced");
     Ok(())
 }

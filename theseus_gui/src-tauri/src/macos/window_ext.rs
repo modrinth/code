@@ -12,7 +12,6 @@ pub trait WindowExt {
 impl<R: Runtime> WindowExt for Window<R> {
     fn set_transparent_titlebar(&self, transparent: bool) {
         use cocoa::appkit::{NSWindow, NSWindowTitleVisibility};
-
         let window = self.ns_window().unwrap() as cocoa::base::id;
 
         unsafe {

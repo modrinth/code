@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,

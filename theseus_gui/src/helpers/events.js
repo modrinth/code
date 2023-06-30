@@ -70,6 +70,19 @@ export async function profile_listener(callback) {
   return await listen('profile', (event) => callback(event.payload))
 }
 
+/// Payload for the 'command' event
+/*
+  CommandPayload {
+    event: event type ("InstallMod", "InstallModpack", "InstallVersion"),
+    id: string id of the mod/modpack/version to install
+  }
+*/
+export async function command_listener(callback) {
+  return await listen('command', (event) => {
+    callback(event.payload)
+  })
+}
+
 /// Payload for the 'warning' event
 /*
     WarningPayload {

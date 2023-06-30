@@ -1,8 +1,7 @@
 //! Theseus state management system
-use crate::event::emit::emit_loading;
+use crate::event::emit::{emit_loading, init_loading_unsafe};
 use std::path::PathBuf;
 
-use crate::event::emit::init_loading;
 use crate::event::LoadingBarType;
 use crate::loading_join;
 
@@ -46,6 +45,9 @@ pub use self::tags::*;
 mod java_globals;
 pub use self::java_globals::*;
 
+mod safe_processes;
+pub use self::safe_processes::*;
+
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
@@ -75,6 +77,8 @@ pub struct State {
     pub(crate) users: RwLock<Users>,
     /// Launcher tags
     pub(crate) tags: RwLock<Tags>,
+    /// Launcher processes that should be safely exited on shutdown
+    pub(crate) safety_processes: RwLock<SafeProcesses>,
 
     /// File watcher debouncer
     pub(crate) file_watcher: RwLock<Debouncer<RecommendedWatcher>>,
@@ -88,7 +92,7 @@ impl State {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
-                    let loading_bar = init_loading(
+                    let loading_bar = init_loading_unsafe(
                         LoadingBarType::StateInit,
                         100.0,
                         "Initializing launcher",
@@ -97,7 +101,7 @@ impl State {
 
                     let mut file_watcher = init_watcher().await?;
 
-                    let directories = DirectoryInfo::init().await?;
+                    let directories = DirectoryInfo::init()?;
                     emit_loading(&loading_bar, 10.0, None).await?;
 
                     // Settings
@@ -132,6 +136,7 @@ impl State {
 
                     let children = Children::new();
                     let auth_flow = AuthTask::new();
+                    let safety_processes = SafeProcesses::new();
                     emit_loading(&loading_bar, 10.0, None).await?;
 
                     Ok(Arc::new(Self {
@@ -151,6 +156,7 @@ impl State {
                         children: RwLock::new(children),
                         auth_flow: RwLock::new(auth_flow),
                         tags: RwLock::new(tags),
+                        safety_processes: RwLock::new(safety_processes),
                         file_watcher: RwLock::new(file_watcher),
                     }))
                 }

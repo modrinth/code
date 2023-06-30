@@ -29,6 +29,10 @@ import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import { getVersion } from '@tauri-apps/api/app'
+import { window } from '@tauri-apps/api'
+import { TauriEvent } from '@tauri-apps/api/event'
+import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
+import { confirm } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
 
@@ -67,6 +71,33 @@ defineExpose({
       })
     )
   },
+})
+
+const confirmClose = async () => {
+  const confirmed = await confirm(
+    'An action is currently in progress. Are you sure you want to exit?',
+    {
+      title: 'Modrinth',
+      type: 'warning',
+    }
+  )
+  return confirmed
+}
+
+const handleClose = async () => {
+  const isSafe = await check_safe_loading_bars_complete()
+  if (!isSafe) {
+    const response = await confirmClose()
+    if (!response) {
+      return
+    }
+  }
+  await await_sync()
+  window.getCurrent().close()
+}
+
+window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+  await handleClose()
 })
 
 const router = useRouter()
@@ -220,7 +251,7 @@ const accounts = ref(null)
             @click="
               () => {
                 saveWindowState(StateFlags.ALL)
-                appWindow.close()
+                handleClose()
               }
             "
           >

@@ -9,9 +9,6 @@ use theseus::prelude::*;
 
 use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
-use tracing_error::ErrorLayer;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::EnvFilter;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -35,16 +32,7 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("theseus=info"));
-
-    let subscriber = tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
-        .with(filter)
-        .with(ErrorLayer::default());
-
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting default subscriber failed");
+    let _log_guard = theseus::start_logger();
 
     // Initialize state
     let st = State::get().await?;
