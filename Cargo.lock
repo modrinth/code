@@ -4598,7 +4598,7 @@ dependencies = [
  "tokio-stream",
  "toml 0.7.3",
  "tracing",
- "tracing-error 0.2.0",
+ "tracing-error 0.1.2",
  "tracing-subscriber 0.3.17",
  "url",
  "uuid",

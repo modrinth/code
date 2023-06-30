@@ -25,8 +25,6 @@ export const useBreadcrumbs = defineStore('breadcrumbsStore', {
           this.names.delete(route)
         }
       }
-      console.log('BREADCRUMBS')
-      console.log(this.names)
     },
     setContext(context) {
       this.context = context

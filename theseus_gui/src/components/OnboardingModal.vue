@@ -239,6 +239,7 @@ async function autoInstallJava() {
   // weird vue bug, ignore
   settings.value.java_globals.JAVA_17 = version
   settings.value.java_globals.JAVA_17 = version
+  set(settings.value)
   mixpanel.track('OnboardingAutoInstallJava')
 }
 

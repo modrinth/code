@@ -1,6 +1,6 @@
 //! Theseus profile management interface
 use crate::state::LinkedData;
-use crate::util::io::{self, IOError};
+use crate::util::io::{self, canonicalize};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     prelude::ModLoader,
@@ -10,7 +10,6 @@ pub use crate::{
     State,
 };
 use daedalus::modded::LoaderVersion;
-use dunce::canonicalize;
 use futures::prelude::*;
 
 use std::path::PathBuf;
@@ -61,8 +60,7 @@ pub async fn profile_create(
 
     info!(
         "Creating profile at path {}",
-        &canonicalize(&path)
-            .map_err(|e| IOError::with_path(e, &path))?
+        &canonicalize(&path)?
             .display()
     );
     let loader = if modloader != ModLoader::Vanilla {
@@ -77,7 +75,7 @@ pub async fn profile_create(
     };
 
     // Fully canonicalize now that its created for storing purposes
-    let path = canonicalize(&path).map_err(|e| IOError::with_path(e, &path))?;
+    let path = canonicalize(&path)?;
     let mut profile =
         Profile::new(uuid, name, game_version, path.clone()).await?;
     let result = async {

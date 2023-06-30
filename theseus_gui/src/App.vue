@@ -309,7 +309,7 @@ const accounts = ref(null)
       display: flex;
       align-items: center;
       background: var(--color-raised-bg);
-      box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+      box-shadow: inset 0px -3px 0px black;
       text-align: center;
       padding: var(--gap-md);
       height: 3.25rem;

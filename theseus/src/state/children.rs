@@ -39,7 +39,8 @@ impl Children {
     // The threads for stdout and stderr are spawned here
     // Unlike a Hashmap's 'insert', this directly returns the reference to the MinecraftChild rather than any previously stored MinecraftChild that may exist
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(skip(self,uuid,log_path, mc_command, post_command, censor_strings))]
+    #[tracing::instrument(level = "trace", skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn insert_process(
         &mut self,

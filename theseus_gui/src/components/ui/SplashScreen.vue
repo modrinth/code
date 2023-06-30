@@ -14,6 +14,7 @@ defineProps({
 
 <style scoped lang="scss">
 .page-loading {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
