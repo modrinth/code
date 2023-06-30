@@ -72,6 +72,13 @@
             Options
           </RouterLink>
         </div>
+        <hr class="card-divider" />
+        <div class="pages-list">
+          <Button class="transparent" @click="exportModal.show()">
+            <PackageIcon />
+            Export modpack
+          </Button>
+        </div>
       </Card>
     </div>
     <div class="content">
@@ -95,6 +102,7 @@
     <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
     <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
   </ContextMenu>
+  <ExportModal ref="exportModal" :instance="instance" />
 </template>
 <script setup>
 import {
@@ -127,11 +135,14 @@ import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
+import { PackageIcon } from '@/assets/icons/index.js'
+import ExportModal from '@/components/ui/ExportModal.vue'
 
 const route = useRoute()
 
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
+const exportModal = ref(null)
 
 const instance = ref(await get(route.params.id).catch(handleError))
 
@@ -288,7 +299,20 @@ Button {
   flex-direction: column;
   padding: 1rem;
   min-height: calc(100% - 3.25rem);
-  overflow: hidden;
+  max-height: calc(100% - 3.25rem);
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    width: 0;
+    background: transparent;
+  }
+
+  .card {
+    min-height: unset;
+    margin-bottom: 0;
+  }
 }
 
 .instance-nav {
@@ -341,7 +365,7 @@ Button {
   flex-direction: column;
   gap: var(--gap-xs);
 
-  a {
+  .btn {
     font-size: 100%;
     font-weight: 400;
     background: inherit;
