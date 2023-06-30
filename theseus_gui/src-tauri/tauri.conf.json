@@ -13,6 +13,7 @@
   "tauri": {
     "allowlist": {
       "dialog": {
+        "confirm": true,
         "open": true
       },
       "protocol": {
@@ -75,7 +76,10 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": "http://timestamp.digicert.com"
+        "timestampUrl": "http://timestamp.digicert.com",
+        "wix": {
+          "template": "./msi/main.wxs"
+        }
       }
     },
     "security": {

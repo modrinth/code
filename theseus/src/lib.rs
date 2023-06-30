@@ -15,9 +15,11 @@ mod config;
 mod error;
 mod event;
 mod launcher;
+mod logger;
 mod state;
 
 pub use api::*;
 pub use error::*;
 pub use event::{EventState, LoadingBar, LoadingBarType};
+pub use logger::start_logger;
 pub use state::State;

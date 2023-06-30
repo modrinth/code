@@ -13,7 +13,6 @@ pub mod profile_create;
 pub mod settings;
 pub mod tags;
 pub mod utils;
-pub mod window_ext;
 
 pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
 
@@ -33,6 +32,10 @@ pub enum TheseusSerializableError {
 
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
+
+    #[cfg(target_os = "macos")]
+    #[error("Callback error: {0}")]
+    Callback(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -80,6 +83,12 @@ macro_rules! impl_serialize {
 }
 
 // Use the macro to implement Serialize for TheseusSerializableError
+#[cfg(target_os = "macos")]
 impl_serialize! {
-    IO
+    IO,
+    Callback
+}
+#[cfg(not(target_os = "macos"))]
+impl_serialize! {
+    IO,
 }

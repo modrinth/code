@@ -7,6 +7,8 @@ import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import mixpanel from 'mixpanel-browser'
 
+const pageOptions = ['Home', 'Library']
+
 const themeStore = useTheming()
 
 const fetchSettings = await get().catch(handleError)
@@ -139,6 +141,43 @@ watch(
             (e) => {
               themeStore.advancedRendering = e
               settings.advanced_rendering = themeStore.advancedRendering
+            }
+          "
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="minimize-launcher">
+          <span class="label__title">Minimize launcher</span>
+          <span class="label__description"
+            >Minimize the launcher when a Minecraft process starts.</span
+          >
+        </label>
+        <Toggle
+          id="minimize-launcher"
+          :model-value="settings.hide_on_process"
+          :checked="settings.hide_on_process"
+          @update:model-value="
+            (e) => {
+              settings.hide_on_process = e
+            }
+          "
+        />
+      </div>
+      <div class="opening-page">
+        <label for="opening-page">
+          <span class="label__title">Default landing page</span>
+          <span class="label__description">Change the page to which the launcher opens on.</span>
+        </label>
+        <DropdownSelect
+          id="opening-page"
+          name="Opening page dropdown"
+          :options="pageOptions"
+          :default-value="settings.default_page"
+          :model-value="settings.default_page"
+          class="opening-page"
+          @change="
+            (e) => {
+              settings.default_page = e.option
             }
           "
         />
