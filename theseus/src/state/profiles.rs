@@ -192,7 +192,7 @@ impl Profile {
     ) -> crate::Result<()> {
         let file =
             write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
-        self.metadata.icon = Some(file);
+            self.metadata.icon = Some(file);
         self.metadata.date_modified = Utc::now();
         Ok(())
     }

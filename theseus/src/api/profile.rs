@@ -129,7 +129,7 @@ pub async fn edit_icon(
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    if let Some(icon) = icon_path {
+    let res = if let Some(icon) = icon_path {
         let bytes = io::read(icon).await?;
 
         let mut profiles = state.profiles.write().await;
@@ -152,8 +152,6 @@ pub async fn edit_icon(
                     ProfilePayloadType::Edited,
                 )
                 .await?;
-                State::sync().await?;
-
                 Ok(())
             }
             None => Err(crate::ErrorKind::UnmanagedProfileError(
@@ -170,7 +168,9 @@ pub async fn edit_icon(
         State::sync().await?;
 
         Ok(())
-    }
+    };
+    State::sync().await?;
+    res
 }
 
 // Gets the optimal JRE key for the given profile, using Daedalus
