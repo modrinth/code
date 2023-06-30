@@ -5,6 +5,7 @@ use crate::jre::{self, JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
 use crate::util::io;
+use crate::EventState;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -479,6 +480,18 @@ pub async fn launch_minecraft(
         credentials.id.as_hyphenated().to_string(),
         "{MINECRAFT_UUID}".to_string(),
     );
+
+    // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
+    #[cfg(feature = "tauri")]
+    {
+        let window = EventState::get_main_window().await?;
+        if let Some(window) = window {
+            let settings = state.settings.read().await;
+            if settings.hide_on_process {
+                window.minimize()?;
+            }
+        }
+    }
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes

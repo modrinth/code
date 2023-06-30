@@ -1,6 +1,6 @@
 //! Theseus directory information
+use std::fs;
 use std::path::PathBuf;
-use tokio::fs;
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
@@ -11,7 +11,7 @@ pub struct DirectoryInfo {
 impl DirectoryInfo {
     /// Get all paths needed for Theseus to operate properly
     #[tracing::instrument]
-    pub async fn init() -> crate::Result<Self> {
+    pub fn init() -> crate::Result<Self> {
         // Working directory
         let working_dir = std::env::current_dir().map_err(|err| {
             crate::ErrorKind::FSError(format!(
@@ -26,7 +26,7 @@ impl DirectoryInfo {
                 "Could not find valid config dir".to_string(),
             ))?;
 
-        fs::create_dir_all(&config_dir).await.map_err(|err| {
+        fs::create_dir_all(&config_dir).map_err(|err| {
             crate::ErrorKind::FSError(format!(
                 "Error creating Theseus config directory: {err}"
             ))
@@ -128,6 +128,11 @@ impl DirectoryInfo {
         self.profiles_dir()
             .join(profile.to_string())
             .join("modrinth_logs")
+    }
+
+    #[inline]
+    pub fn launcher_logs_dir(&self) -> PathBuf {
+        self.config_dir.join("launcher_logs")
     }
 
     /// Get the file containing the global database

@@ -56,6 +56,7 @@
         :options="['update_all', 'filter_update']"
         default-value="update_all"
         :disabled="!projects.some((x) => x.outdated)"
+        name="update-all-dropdown"
         @option-click="updateAll"
       >
         <template #update_all>
