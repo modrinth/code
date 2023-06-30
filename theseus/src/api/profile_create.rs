@@ -60,8 +60,7 @@ pub async fn profile_create(
 
     info!(
         "Creating profile at path {}",
-        &canonicalize(&path)?
-            .display()
+        &canonicalize(&path)?.display()
     );
     let loader = if modloader != ModLoader::Vanilla {
         get_loader_version_from_loader(

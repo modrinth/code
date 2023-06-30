@@ -1,7 +1,7 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::jre::{JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY, self};
+use crate::jre::{self, JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
 use crate::util::io;
@@ -344,14 +344,16 @@ pub async fn launch_minecraft(
                 "Missing correct java installation".to_string(),
             )
         })?;
-    
+
     // Test jre version
-    let java_version = jre::check_jre(java_version.path.clone().into())        .await?
-    .ok_or_else(|| {
-        crate::ErrorKind::LauncherError(
-            format!("Java path invalid or non-functional: {}", java_version.path)
-        )
-    })?;
+    let java_version = jre::check_jre(java_version.path.clone().into())
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Java path invalid or non-functional: {}",
+                java_version.path
+            ))
+        })?;
 
     let client_path = state
         .directories

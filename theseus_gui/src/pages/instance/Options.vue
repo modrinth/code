@@ -610,6 +610,10 @@ async function saveGvLoaderEdits() {
   padding: 1rem;
   gap: 1rem;
 
+  :deep(.animated-dropdown .options) {
+    max-height: 13.375rem;
+  }
+
   .input-label {
     font-size: 1rem;
     font-weight: bolder;

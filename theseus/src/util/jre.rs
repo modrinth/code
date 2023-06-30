@@ -1,3 +1,4 @@
+use super::io;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -7,7 +8,6 @@ use std::process::Command;
 use std::{collections::HashSet, path::Path};
 use tempfile::NamedTempFile;
 use tokio::task::JoinError;
-use super::io;
 
 use crate::State;
 #[cfg(target_os = "windows")]

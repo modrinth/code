@@ -207,6 +207,7 @@
         :dependencies="dependencies"
         :install="install"
         :installed="installed"
+        :installing="installing"
         :installed-version="installedVersion"
       />
     </div>
@@ -260,6 +261,7 @@ import {
   add_project_from_version as installMod,
   check_installed,
   get as getInstance,
+  get_projects_metadata as getMetadatas,
   remove_project,
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
@@ -292,6 +294,7 @@ const members = shallowRef([])
 const dependencies = shallowRef([])
 const categories = shallowRef([])
 const instance = ref(null)
+const metadatas = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
@@ -304,6 +307,7 @@ async function fetchProjectData() {
     dependencies.value,
     categories.value,
     instance.value,
+    metadatas.value,
   ] = await Promise.all([
     useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project'),
     useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project'),
@@ -311,6 +315,7 @@ async function fetchProjectData() {
     useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project'),
     get_categories().catch(handleError),
     route.query.i ? getInstance(route.query.i, true).catch(handleError) : Promise.resolve(),
+    route.query.i ? getMetadatas(route.query.i).catch(handleError) : Promise.resolve(),
   ])
 
   installed.value =
@@ -318,9 +323,8 @@ async function fetchProjectData() {
     (await check_installed(instance.value.path, data.value.id).catch(handleError))
   breadcrumbs.setName('Project', data.value.title)
   installedVersion.value = instance.value
-    ? Object.values(instance.value.projects).find(
-        (p) => p?.metadata?.version?.project_id === data.value.id
-      )?.metadata?.version?.id
+    ? Object.values(metadatas.value).find((p) => p?.version?.project_id === data.value.id)?.version
+        ?.id
     : null
 }
 
@@ -344,16 +348,17 @@ const markInstalled = () => {
 async function install(version) {
   installing.value = true
   let queuedVersionData
+  metadatas.value = await getMetadatas(instance.value.path).catch(handleError)
 
   if (installed.value) {
     await remove_project(
       instance.value.path,
-      Object.entries(instance.value.projects)
+      Object.entries(metadatas.value)
         .map(([key, value]) => ({
           key,
           value,
         }))
-        .find((p) => p.value.metadata?.version?.project_id === data.value.id).key
+        .find((p) => p.value.version?.project_id === data.value.id).key
     )
   }
 

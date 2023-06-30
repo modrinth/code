@@ -154,15 +154,9 @@
             <TrashIcon />
           </Button>
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <Button
-            v-else
-            v-tooltip="'Update project'"
-            :disabled="!mod.outdated"
-            icon-only
-            @click="updateProject(mod)"
-          >
-            <UpdatedIcon v-if="mod.outdated" />
-            <CheckIcon v-else />
+          <Button v-else :disabled="!mod.outdated" icon-only @click="updateProject(mod)">
+            <UpdatedIcon v-if="mod.outdated" v-tooltip="'Update project'" />
+            <CheckIcon v-else v-tooltip="'Fully updated'" />
           </Button>
           <input
             id="switch-1"

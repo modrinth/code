@@ -68,6 +68,28 @@ pub async fn get(
     Ok(profile)
 }
 
+/// Gets all projects version metadata for a profile
+/// Allows loading metadata without loading all project data
+#[tracing::instrument]
+pub async fn get_projects_metadata(
+    path: &Path,
+) -> crate::Result<Option<HashMap<PathBuf, ProjectMetadata>>> {
+    let state = State::get().await?;
+    let profiles = state.profiles.read().await;
+    let profile = profiles.0.get(path).cloned();
+    if let Some(profile) = profile {
+        Ok(Some(
+            profile
+                .projects
+                .into_iter()
+                .map(|(k, v)| (k, v.metadata))
+                .collect(),
+        ))
+    } else {
+        Ok(None)
+    }
+}
+
 /// Edit a profile using a given asynchronous closure
 pub async fn edit<Fut>(
     path: &Path,

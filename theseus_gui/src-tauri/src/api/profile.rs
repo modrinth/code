@@ -11,6 +11,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             profile_remove,
             profile_get,
+            profile_get_projects_metadata,
             profile_get_optimal_jre_key,
             profile_list,
             profile_check_installed,
@@ -52,6 +53,16 @@ pub async fn profile_get(
     Ok(res)
 }
 
+// Get a profile's projects metadata
+// Designed to access metadata without needing to load all project data
+// invoke('plugin:profile|profile_get_projects_metadata',path)
+#[tauri::command]
+pub async fn profile_get_projects_metadata(
+    path: &Path,
+) -> Result<Option<HashMap<PathBuf, ProjectMetadata>>> {
+    let res = profile::get_projects_metadata(path).await?;
+    Ok(res)
+}
 // Get optimal java version from profile
 #[tauri::command]
 pub async fn profile_get_optimal_jre_key(
