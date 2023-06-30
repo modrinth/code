@@ -267,8 +267,22 @@ async function onSearchChange(newPageNumber) {
 
 const searchWrapper = ref(null)
 async function onSearchChangeToTop(newPageNumber) {
+  console.log('onSearchChangeToTop')
   await onSearchChange(newPageNumber)
   await nextTick()
+  // Loop through all elements on the page
+  for (let i = 0; i < document.querySelectorAll('div').length; i++) {
+    const el = document.querySelectorAll('div')[i]
+    if (el === searchWrapper.value) {
+      console.log(`Element name (IS searchWrapper): ${el.nodeName}, id: ${i}`)
+    }
+    if (el.scrollHeight > el.clientHeight && el.scrollTop > 0) {
+      console.log(`Element name: ${el.nodeName}, id: ${i}, scroll: ${el.scrollTop}`)
+    }
+  }
+  console.log(document.querySelectorAll('div'))
+  console.log(searchWrapper.value)
+  console.log(searchWrapper.value.scrollTop)
   searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
@@ -508,7 +522,7 @@ const showLoaders = computed(
 </script>
 
 <template>
-  <div class="search-container">
+  <div ref="searchWrapper" class="search-container">
     <aside class="filter-panel">
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
@@ -653,7 +667,7 @@ const showLoaders = computed(
         </div>
       </Card>
     </aside>
-    <div ref="searchWrapper" class="search">
+    <div class="search">
       <Promotion class="promotion" />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
@@ -733,6 +747,7 @@ const showLoaders = computed(
         class="pagination-after"
         @switch-page="onSearchChangeToTop"
       />
+      <br />
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
@@ -853,6 +868,9 @@ const showLoaders = computed(
 
 .search-container {
   display: flex;
+  height: 100%; /* takes up only the necessary height */
+  overflow-y: auto;
+  scroll-behavior: smooth;
 
   .filter-panel {
     position: fixed;
@@ -881,7 +899,6 @@ const showLoaders = computed(
   }
 
   .search {
-    scroll-behavior: smooth;
     margin: 0 1rem 0.5rem 20.5rem;
     width: calc(100% - 20.5rem);
 
