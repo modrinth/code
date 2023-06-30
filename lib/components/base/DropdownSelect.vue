@@ -23,7 +23,7 @@
       @click="toggleDropdown"
     >
       <span>{{ selectedOption }}</span>
-      <i class="arrow" :class="{ rotate: dropdownVisible }"></i>
+      <DropdownIcon class="arrow" :class="{ rotate: dropdownVisible }" />
     </div>
     <div class="options-wrapper" :class="{ down: !renderUp, up: renderUp }">
       <transition name="options">
@@ -61,6 +61,7 @@
 </template>
 
 <script setup>
+import { DropdownIcon } from '@/components'
 import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -203,6 +204,7 @@ const isChildOfDropdown = (element) => {
     justify-content: space-between;
     padding: var(--gap-sm) var(--gap-lg);
     background-color: var(--color-button-bg);
+    gap: var(--gap-md);
     cursor: pointer;
     user-select: none;
     border-radius: var(--radius-md);
@@ -229,13 +231,6 @@ const isChildOfDropdown = (element) => {
     }
 
     .arrow {
-      display: inline-block;
-      width: 0;
-      height: 0;
-      margin-left: 0.4rem;
-      border-left: 0.4rem solid transparent;
-      border-right: 0.4rem solid transparent;
-      border-top: 0.4rem solid var(--color-base);
       transition: transform 0.2s ease;
       &.rotate {
         transform: rotate(180deg);

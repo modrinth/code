@@ -93,6 +93,31 @@ input[type='number'] {
   }
 }
 
+.dropdown-input {
+  display: flex;
+  flex-direction: row;
+  gap: 1px;
+  .animated-dropdown {
+    width: unset;
+
+    .selected {
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+
+      &.render-down {
+        border-radius: var(--radius-md) 0 0 0;
+      }
+
+      &.render-up {
+        border-radius: 0 0 0 var(--radius-md);
+      }
+    }
+  }
+
+  input {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+}
+
 .iconified-input {
   align-items: center;
   display: inline-flex;

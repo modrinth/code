@@ -50,3 +50,52 @@ const inputText = ref(null)
   </Button>
 </div>
 ```
+
+<DemoContainer>
+<div class="dropdown-input">
+  <DropdownSelect
+    v-model="value"
+    :options="['Daily', 'Weekly', 'Monthly', 'Tomorrow', 'Yesterday', 'Today', 'Biweekly', 'Tuesday', 'January']"
+    placeholder="Choose Frequency"
+  />
+  <div class="iconified-input">
+    <SearchIcon/>
+    <input
+        v-model="inputText"
+        type="text"
+        placeholder="Text input"
+    />
+    <Button @click="() => inputText = ''">
+      <XIcon/>
+    </Button>
+  </div>
+</div>
+</DemoContainer>
+
+```vue
+<script setup>
+import { ref } from "vue";
+const inputText = ref(null)
+const value = ref(null)
+</script>
+
+<div class="dropdown-input">
+  <DropdownSelect
+    v-model="value"
+    :options="['Daily', 'Weekly', 'Monthly', 'Tomorrow', 'Yesterday', 'Today', 'Biweekly', 'Tuesday', 'January']"
+    placeholder="Choose Frequency"
+  />
+  <div class="iconified-input">
+    <SearchIcon/>
+    <input
+      v-model="inputText"
+      type="text"
+      placeholder="Text input"
+    />
+    <Button @click="() => inputText = ''">
+      <XIcon/>
+    </Button>
+  </div>
+</div>
+```
+
