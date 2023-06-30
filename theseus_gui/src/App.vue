@@ -75,7 +75,7 @@ router.afterEach((to, from, failure) => {
     mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
   }
 })
-const route = useRoute();
+const route = useRoute()
 const isOnBrowse = computed(() => route.path.startsWith('/browse'))
 
 const loading = useLoading()

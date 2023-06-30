@@ -208,7 +208,7 @@
         :install="install"
         :installed="installed"
         :installing="installing"
-        :installed-version="installedVersion"
+        :installedVersion="installedVersion"
       />
     </div>
   </div>
