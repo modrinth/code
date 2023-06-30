@@ -253,7 +253,7 @@ async fn read_icon_from_file(
     Ok(None)
 }
 
-#[tracing::instrument(skip(paths,profile, io_semaphore, fetch_semaphore))]
+#[tracing::instrument(skip(paths, profile, io_semaphore, fetch_semaphore))]
 #[theseus_macros::debug_pin]
 pub async fn infer_data_from_files(
     profile: Profile,
