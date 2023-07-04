@@ -269,8 +269,10 @@ export default defineNuxtConfig({
 
       owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
       slug: process.env.VERCEL_GIT_REPO_SLUG || 'knossos',
-      branch: process.env.VERCEL_GIT_COMMIT_REF || 'master',
-      hash: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
+      // @ts-ignore
+      branch: process.env.VERCEL_GIT_COMMIT_REF || globalThis.CF_PAGES_BRANCH || 'master',
+      // @ts-ignore
+      hash: process.env.VERCEL_GIT_COMMIT_SHA || globalThis.CF_PAGES_COMMIT_SHA || 'unknown',
     },
   },
   typescript: {
@@ -309,6 +311,11 @@ function getDomain() {
   if (process.env.NODE_ENV === 'production') {
     if (process.env.SITE_URL) {
       return process.env.SITE_URL
+    }
+    // @ts-ignore
+    else if (process.env.CF_PAGES_URL || globalThis.CF_PAGES_URL) {
+      // @ts-ignore
+      return process.env.CF_PAGES_URL ?? globalThis.CF_PAGES_URL
     } else if (process.env.HEROKU_APP_NAME) {
       return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
     } else if (process.env.VERCEL_URL) {
