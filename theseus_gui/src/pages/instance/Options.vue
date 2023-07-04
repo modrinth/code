@@ -21,7 +21,7 @@
       <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" render-up />
+          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" render-up small />
           <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
         </div>
       </div>
@@ -32,6 +32,7 @@
           :options="selectableLoaderVersions"
           :display-name="(option) => option?.id"
           render-up
+          small
           @change="(value) => (loaderVersionIndex = value.index)"
         />
       </div>
