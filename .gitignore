@@ -5,7 +5,9 @@ node_modules
 .cache
 .output
 .env
+.dev.vars
 dist
+.wrangler/
 
 generated/
 !.gitkeep

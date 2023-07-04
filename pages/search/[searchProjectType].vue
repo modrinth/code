@@ -341,7 +341,7 @@
     </section>
   </div>
 </template>
-<script>
+<script setup>
 import { Multiselect } from 'vue-multiselect'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Pagination from '~/components/ui/Pagination.vue'
@@ -361,477 +361,429 @@ import ImageIcon from '~/assets/images/utils/image.svg'
 
 import Promotion from '~/components/ads/Promotion.vue'
 
-export default defineNuxtComponent({
-  components: {
-    LogoAnimated,
-    Promotion,
-    ProjectCard,
-    Pagination,
-    Multiselect,
-    SearchFilter,
-    Checkbox,
-    ClientIcon,
-    ServerIcon,
-    SearchIcon,
-    ClearIcon,
-    FilterIcon,
-    GridIcon,
-    ListIcon,
-    ImageIcon,
-  },
-  data() {
-    return {
-      previousMaxResults: 20,
+const sidebarMenuOpen = ref(false)
+const showAllLoaders = ref(false)
 
-      maxResultsForView: {
-        list: [5, 10, 15, 20, 50, 100],
-        grid: [6, 12, 18, 24, 48, 96],
-        gallery: [6, 10, 16, 20, 50, 100],
-      },
+const data = useNuxtApp()
+const route = useRoute()
 
-      sidebarMenuOpen: false,
-      showAllLoaders: false,
-    }
-  },
-  setup() {
-    const data = useNuxtApp()
-    const route = useRoute()
+const query = ref('')
+const facets = ref([])
+const orFacets = ref([])
+const selectedVersions = ref([])
+const onlyOpenSource = ref(false)
+const showSnapshots = ref(false)
+const selectedEnvironments = ref([])
+const sortTypes = shallowReadonly([
+  { display: 'Relevance', name: 'relevance' },
+  { display: 'Download count', name: 'downloads' },
+  { display: 'Follow count', name: 'follows' },
+  { display: 'Recently published', name: 'newest' },
+  { display: 'Recently updated', name: 'updated' },
+])
+const sortType = ref({ display: 'Relevance', name: 'relevance' })
+const maxResults = ref(20)
+const currentPage = ref(1)
+const projectType = ref({ id: 'mod', display: 'mod', actual: 'mod' })
 
-    const query = ref('')
-    const facets = ref([])
-    const orFacets = ref([])
-    const selectedVersions = ref([])
-    const onlyOpenSource = ref(false)
-    const showSnapshots = ref(false)
-    const selectedEnvironments = ref([])
-    const sortTypes = shallowReadonly([
-      { display: 'Relevance', name: 'relevance' },
-      { display: 'Download count', name: 'downloads' },
-      { display: 'Follow count', name: 'follows' },
-      { display: 'Recently published', name: 'newest' },
-      { display: 'Recently updated', name: 'updated' },
-    ])
-    const sortType = ref({ display: 'Relevance', name: 'relevance' })
-    const maxResults = ref(20)
-    const currentPage = ref(1)
-    const projectType = ref({ id: 'mod', display: 'mod', actual: 'mod' })
+const metaDescription = computed(
+  () =>
+    `Search and browse thousands of Minecraft ${data.$formatProjectType(
+      projectType.value.display
+    )}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${data.$formatProjectType(
+      projectType.value.display
+    )}s.`
+)
+if (route.query.q) {
+  query.value = route.query.q
+}
+if (route.query.f) {
+  facets.value = getArrayOrString(route.query.f)
+}
+if (route.query.g) {
+  orFacets.value = getArrayOrString(route.query.g)
+}
+if (route.query.v) {
+  selectedVersions.value = getArrayOrString(route.query.v)
+}
+if (route.query.l) {
+  onlyOpenSource.value = route.query.l === 'true'
+}
+if (route.query.h) {
+  showSnapshots.value = route.query.h === 'true'
+}
+if (route.query.e) {
+  selectedEnvironments.value = getArrayOrString(route.query.e)
+}
+if (route.query.s) {
+  sortType.value.name = route.query.s
 
-    const metaDescription = computed(
-      () =>
-        `Search and browse thousands of Minecraft ${data.$formatProjectType(
-          projectType.value.display
-        )}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${data.$formatProjectType(
-          projectType.value.display
-        )}s.`
-    )
-    if (route.query.q) {
-      query.value = route.query.q
-    }
-    if (route.query.f) {
-      facets.value = getArrayOrString(route.query.f)
-    }
-    if (route.query.g) {
-      orFacets.value = getArrayOrString(route.query.g)
-    }
-    if (route.query.v) {
-      selectedVersions.value = getArrayOrString(route.query.v)
-    }
-    if (route.query.l) {
-      onlyOpenSource.value = route.query.l === 'true'
-    }
-    if (route.query.h) {
-      showSnapshots.value = route.query.h === 'true'
-    }
-    if (route.query.e) {
-      selectedEnvironments.value = getArrayOrString(route.query.e)
-    }
-    if (route.query.s) {
-      sortType.value.name = route.query.s
+  switch (sortType.value.name) {
+    case 'relevance':
+      sortType.value.display = 'Relevance'
+      break
+    case 'downloads':
+      sortType.value.display = 'Downloads'
+      break
+    case 'newest':
+      sortType.value.display = 'Recently published'
+      break
+    case 'updated':
+      sortType.value.display = 'Recently updated'
+      break
+    case 'follows':
+      sortType.value.display = 'Follow count'
+      break
+  }
+}
 
-      switch (sortType.value.name) {
-        case 'relevance':
-          sortType.value.display = 'Relevance'
-          break
-        case 'downloads':
-          sortType.value.display = 'Downloads'
-          break
-        case 'newest':
-          sortType.value.display = 'Recently published'
-          break
-        case 'updated':
-          sortType.value.display = 'Recently updated'
-          break
-        case 'follows':
-          sortType.value.display = 'Follow count'
-          break
-      }
+if (route.query.m) {
+  maxResults.value = route.query.m
+}
+if (route.query.o) {
+  currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1
+}
+
+projectType.value = data.$tag.projectTypes.find(
+  (x) => x.id === route.path.substring(1, route.path.length - 1)
+)
+
+const noLoad = ref(false)
+const {
+  data: rawResults,
+  refresh: refreshSearch,
+  pending: searchLoading,
+} = useLazyFetch(
+  () => {
+    const config = useRuntimeConfig()
+    const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl
+
+    const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
+
+    if (query.value.length > 0) {
+      params.push(`query=${encodeURIComponent(query.value.replace(/ /g, '+'))}`)
     }
 
-    if (route.query.m) {
-      maxResults.value = route.query.m
-    }
-    if (route.query.o) {
-      currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1
-    }
-
-    projectType.value = data.$tag.projectTypes.find(
-      (x) => x.id === route.path.substring(1, route.path.length - 1)
-    )
-
-    const noLoad = ref(false)
-    const {
-      data: rawResults,
-      refresh: refreshSearch,
-      pending: searchLoading,
-    } = useLazyFetch(
-      () => {
-        const config = useRuntimeConfig()
-        const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl
-
-        const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
-
-        if (query.value.length > 0) {
-          params.push(`query=${query.value.replace(/ /g, '+')}`)
-        }
-
-        if (
-          facets.value.length > 0 ||
-          orFacets.value.length > 0 ||
-          selectedVersions.value.length > 0 ||
-          selectedEnvironments.value.length > 0 ||
-          projectType.value
-        ) {
-          let formattedFacets = []
-          for (const facet of facets.value) {
-            formattedFacets.push([facet])
-          }
-
-          // loaders specifier
-          if (orFacets.value.length > 0) {
-            formattedFacets.push(orFacets.value)
-          } else if (projectType.value.id === 'plugin') {
-            formattedFacets.push(
-              data.$tag.loaderData.allPluginLoaders.map(
-                (x) => `categories:'${encodeURIComponent(x)}'`
-              )
-            )
-          } else if (projectType.value.id === 'mod') {
-            formattedFacets.push(
-              data.$tag.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
-            )
-          } else if (projectType.value.id === 'datapack') {
-            formattedFacets.push(
-              data.$tag.loaderData.dataPackLoaders.map(
-                (x) => `categories:'${encodeURIComponent(x)}'`
-              )
-            )
-          }
-
-          if (selectedVersions.value.length > 0) {
-            const versionFacets = []
-            for (const facet of selectedVersions.value) {
-              versionFacets.push('versions:' + facet)
-            }
-            formattedFacets.push(versionFacets)
-          }
-
-          if (onlyOpenSource.value) {
-            formattedFacets.push(['open_source:true'])
-          }
-
-          if (selectedEnvironments.value.length > 0) {
-            let environmentFacets = []
-
-            const includesClient = selectedEnvironments.value.includes('client')
-            const includesServer = selectedEnvironments.value.includes('server')
-            if (includesClient && includesServer) {
-              environmentFacets = [['client_side:required'], ['server_side:required']]
-            } else {
-              if (includesClient) {
-                environmentFacets = [
-                  ['client_side:optional', 'client_side:required'],
-                  ['server_side:optional', 'server_side:unsupported'],
-                ]
-              }
-              if (includesServer) {
-                environmentFacets = [
-                  ['client_side:optional', 'client_side:unsupported'],
-                  ['server_side:optional', 'server_side:required'],
-                ]
-              }
-            }
-
-            formattedFacets = [...formattedFacets, ...environmentFacets]
-          }
-
-          if (projectType.value) {
-            formattedFacets.push([`project_type:${projectType.value.actual}`])
-          }
-
-          params.push(`facets=${JSON.stringify(formattedFacets)}`)
-        }
-
-        const offset = (currentPage.value - 1) * maxResults.value
-        if (currentPage.value !== 1) {
-          params.push(`offset=${offset}`)
-        }
-
-        let url = 'search'
-
-        if (params.length > 0) {
-          for (let i = 0; i < params.length; i++) {
-            url += i === 0 ? `?${params[i]}` : `&${params[i]}`
-          }
-        }
-
-        return `${base}${url}`
-      },
-      {
-        transform(hits) {
-          noLoad.value = false
-          return hits
-        },
-      }
-    )
-
-    const results = shallowRef(toRaw(rawResults))
-    const pageCount = computed(() =>
-      results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1
-    )
-
-    const onSearchChange = (newPageNumber) => {
-      noLoad.value = true
-
-      currentPage.value = newPageNumber
-
-      if (query.value === null) {
-        return
+    if (
+      facets.value.length > 0 ||
+      orFacets.value.length > 0 ||
+      selectedVersions.value.length > 0 ||
+      selectedEnvironments.value.length > 0 ||
+      projectType.value
+    ) {
+      let formattedFacets = []
+      for (const facet of facets.value) {
+        formattedFacets.push([facet])
       }
 
-      refreshSearch()
-
-      if (process.client) {
-        const router = useRouter()
-        const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
-        router.replace({ path: route.path, query: obj })
-      }
-    }
-
-    const getSearchUrl = (offset, useObj) => {
-      const queryItems = []
-      const obj = {}
-
-      if (query.value) {
-        queryItems.push(`q=${encodeURIComponent(query.value)}`)
-        obj.q = query.value
-      }
-      if (offset > 0) {
-        queryItems.push(`o=${offset}`)
-        obj.o = offset
-      }
-      if (facets.value.length > 0) {
-        queryItems.push(`f=${encodeURIComponent(facets.value)}`)
-        obj.f = facets.value
-      }
+      // loaders specifier
       if (orFacets.value.length > 0) {
-        queryItems.push(`g=${encodeURIComponent(orFacets.value)}`)
-        obj.g = orFacets.value
-      }
-      if (selectedVersions.value.length > 0) {
-        queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`)
-        obj.v = selectedVersions.value
-      }
-      if (onlyOpenSource.value) {
-        queryItems.push('l=true')
-        obj.l = true
-      }
-      if (showSnapshots.value) {
-        queryItems.push('h=true')
-        obj.h = true
-      }
-      if (selectedEnvironments.value.length > 0) {
-        queryItems.push(`e=${encodeURIComponent(selectedEnvironments.value)}`)
-        obj.e = selectedEnvironments.value
-      }
-      if (sortType.value.name !== 'relevance') {
-        queryItems.push(`s=${encodeURIComponent(sortType.value.name)}`)
-        obj.s = sortType.value.name
-      }
-      if (maxResults.value !== 20) {
-        queryItems.push(`m=${encodeURIComponent(maxResults.value)}`)
-        obj.m = maxResults.value
-      }
-
-      let url = `${route.path}`
-
-      if (queryItems.length > 0) {
-        url += `?${queryItems[0]}`
-
-        for (let i = 1; i < queryItems.length; i++) {
-          url += `&${queryItems[i]}`
-        }
-      }
-
-      return useObj ? obj : url
-    }
-
-    return {
-      query,
-      results,
-      facets,
-      orFacets,
-      selectedVersions,
-      onlyOpenSource,
-      showSnapshots,
-      selectedEnvironments,
-      sortTypes,
-      sortType,
-      maxResults,
-      currentPage,
-      pageCount,
-      projectType,
-      onSearchChange,
-      getSearchUrl,
-      searchLoading,
-      noLoad,
-      metaDescription,
-    }
-  },
-  computed: {
-    categoriesMap() {
-      const categories = {}
-
-      for (const category of this.$sortedCategories) {
-        if (categories[category.header]) {
-          categories[category.header].push(category)
-        } else {
-          categories[category.header] = [category]
-        }
-      }
-
-      const newVals = Object.keys(categories).reduce((obj, key) => {
-        obj[key] = categories[key]
-        return obj
-      }, {})
-
-      return newVals
-    },
-  },
-  methods: {
-    clearFilters() {
-      for (const facet of [...this.facets]) {
-        this.toggleFacet(facet, true)
-      }
-      for (const facet of [...this.orFacets]) {
-        this.toggleOrFacet(facet, true)
-      }
-
-      this.onlyOpenSource = false
-      this.selectedVersions = []
-      this.selectedEnvironments = []
-      this.onSearchChange(1)
-    },
-    toggleFacet(elementName, doNotSendRequest = false) {
-      const index = this.facets.indexOf(elementName)
-
-      if (index !== -1) {
-        this.facets.splice(index, 1)
-      } else {
-        this.facets.push(elementName)
-      }
-
-      if (!doNotSendRequest) {
-        this.onSearchChange(1)
-      }
-    },
-    toggleOrFacet(elementName, doNotSendRequest) {
-      const index = this.orFacets.indexOf(elementName)
-      if (index !== -1) {
-        this.orFacets.splice(index, 1)
-      } else {
-        if (elementName === 'categories:purpur') {
-          if (!this.orFacets.includes('categories:paper')) {
-            this.orFacets.push('categories:paper')
-          }
-          if (!this.orFacets.includes('categories:spigot')) {
-            this.orFacets.push('categories:spigot')
-          }
-          if (!this.orFacets.includes('categories:bukkit')) {
-            this.orFacets.push('categories:bukkit')
-          }
-        } else if (elementName === 'categories:paper') {
-          if (!this.orFacets.includes('categories:spigot')) {
-            this.orFacets.push('categories:spigot')
-          }
-          if (!this.orFacets.includes('categories:bukkit')) {
-            this.orFacets.push('categories:bukkit')
-          }
-        } else if (elementName === 'categories:spigot') {
-          if (!this.orFacets.includes('categories:bukkit')) {
-            this.orFacets.push('categories:bukkit')
-          }
-        } else if (elementName === 'categories:waterfall') {
-          if (!this.orFacets.includes('categories:bungeecord')) {
-            this.orFacets.push('categories:bungeecord')
-          }
-        }
-        this.orFacets.push(elementName)
-      }
-
-      if (!doNotSendRequest) {
-        this.onSearchChange(1)
-      }
-    },
-    toggleEnv(environment, sendRequest) {
-      const index = this.selectedEnvironments.indexOf(environment)
-      if (index !== -1) {
-        this.selectedEnvironments.splice(index, 1)
-      } else {
-        this.selectedEnvironments.push(environment)
-      }
-
-      if (!sendRequest) {
-        this.onSearchChange(1)
-      }
-    },
-    onSearchChangeToTop(newPageNumber) {
-      if (process.client) {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-
-      this.onSearchChange(newPageNumber)
-    },
-    onMaxResultsChange(newPageNumber) {
-      newPageNumber = Math.max(
-        1,
-        Math.min(
-          Math.floor(newPageNumber / (this.maxResults / this.previousMaxResults)),
-          this.pageCount
+        formattedFacets.push(orFacets.value)
+      } else if (projectType.value.id === 'plugin') {
+        formattedFacets.push(
+          data.$tag.loaderData.allPluginLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
         )
-      )
-      this.previousMaxResults = this.maxResults
-      this.onSearchChange(newPageNumber)
-    },
-    cycleSearchDisplayMode() {
-      this.$cosmetics.searchDisplayMode[this.projectType.id] = this.$cycleValue(
-        this.$cosmetics.searchDisplayMode[this.projectType.id],
-        this.$tag.projectViewModes
-      )
-      saveCosmetics()
-      this.setClosestMaxResults()
-    },
-    setClosestMaxResults() {
-      const view = this.$cosmetics.searchDisplayMode[this.projectType.id]
-      const maxResultsOptions = this.maxResultsForView[view] ?? [20]
-      const currentMax = this.maxResults
-      if (!maxResultsOptions.includes(currentMax)) {
-        this.maxResults = maxResultsOptions.reduce(function (prev, curr) {
-          return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev
-        })
+      } else if (projectType.value.id === 'mod') {
+        formattedFacets.push(
+          data.$tag.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
+        )
+      } else if (projectType.value.id === 'datapack') {
+        formattedFacets.push(
+          data.$tag.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
+        )
       }
-    },
+
+      if (selectedVersions.value.length > 0) {
+        const versionFacets = []
+        for (const facet of selectedVersions.value) {
+          versionFacets.push('versions:' + facet)
+        }
+        formattedFacets.push(versionFacets)
+      }
+
+      if (onlyOpenSource.value) {
+        formattedFacets.push(['open_source:true'])
+      }
+
+      if (selectedEnvironments.value.length > 0) {
+        let environmentFacets = []
+
+        const includesClient = selectedEnvironments.value.includes('client')
+        const includesServer = selectedEnvironments.value.includes('server')
+        if (includesClient && includesServer) {
+          environmentFacets = [['client_side:required'], ['server_side:required']]
+        } else {
+          if (includesClient) {
+            environmentFacets = [
+              ['client_side:optional', 'client_side:required'],
+              ['server_side:optional', 'server_side:unsupported'],
+            ]
+          }
+          if (includesServer) {
+            environmentFacets = [
+              ['client_side:optional', 'client_side:unsupported'],
+              ['server_side:optional', 'server_side:required'],
+            ]
+          }
+        }
+
+        formattedFacets = [...formattedFacets, ...environmentFacets]
+      }
+
+      if (projectType.value) {
+        formattedFacets.push([`project_type:${projectType.value.actual}`])
+      }
+
+      params.push(`facets=${encodeURIComponent(JSON.stringify(formattedFacets))}`)
+    }
+
+    const offset = (currentPage.value - 1) * maxResults.value
+    if (currentPage.value !== 1) {
+      params.push(`offset=${offset}`)
+    }
+
+    let url = 'search'
+
+    if (params.length > 0) {
+      for (let i = 0; i < params.length; i++) {
+        url += i === 0 ? `?${params[i]}` : `&${params[i]}`
+      }
+    }
+
+    return `${base}${url}`
   },
+  {
+    transform: (hits) => {
+      noLoad.value = false
+      return hits
+    },
+  }
+)
+
+const results = shallowRef(toRaw(rawResults))
+const pageCount = computed(() =>
+  results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1
+)
+
+function onSearchChange(newPageNumber) {
+  noLoad.value = true
+
+  currentPage.value = newPageNumber
+
+  if (query.value === null) {
+    return
+  }
+
+  refreshSearch()
+
+  if (process.client) {
+    const router = useRouter()
+    const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
+    router.replace({ path: route.path, query: obj })
+  }
+}
+
+function getSearchUrl(offset, useObj) {
+  const queryItems = []
+  const obj = {}
+
+  if (query.value) {
+    queryItems.push(`q=${encodeURIComponent(query.value)}`)
+    obj.q = query.value
+  }
+  if (offset > 0) {
+    queryItems.push(`o=${offset}`)
+    obj.o = offset
+  }
+  if (facets.value.length > 0) {
+    queryItems.push(`f=${encodeURIComponent(facets.value)}`)
+    obj.f = facets.value
+  }
+  if (orFacets.value.length > 0) {
+    queryItems.push(`g=${encodeURIComponent(orFacets.value)}`)
+    obj.g = orFacets.value
+  }
+  if (selectedVersions.value.length > 0) {
+    queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`)
+    obj.v = selectedVersions.value
+  }
+  if (onlyOpenSource.value) {
+    queryItems.push('l=true')
+    obj.l = true
+  }
+  if (showSnapshots.value) {
+    queryItems.push('h=true')
+    obj.h = true
+  }
+  if (selectedEnvironments.value.length > 0) {
+    queryItems.push(`e=${encodeURIComponent(selectedEnvironments.value)}`)
+    obj.e = selectedEnvironments.value
+  }
+  if (sortType.value.name !== 'relevance') {
+    queryItems.push(`s=${encodeURIComponent(sortType.value.name)}`)
+    obj.s = sortType.value.name
+  }
+  if (maxResults.value !== 20) {
+    queryItems.push(`m=${encodeURIComponent(maxResults.value)}`)
+    obj.m = maxResults.value
+  }
+
+  let url = `${route.path}`
+
+  if (queryItems.length > 0) {
+    url += `?${queryItems[0]}`
+
+    for (let i = 1; i < queryItems.length; i++) {
+      url += `&${queryItems[i]}`
+    }
+  }
+
+  return useObj ? obj : url
+}
+
+const categoriesMap = computed(() => {
+  const categories = {}
+
+  for (const category of data.$sortedCategories) {
+    if (categories[category.header]) {
+      categories[category.header].push(category)
+    } else {
+      categories[category.header] = [category]
+    }
+  }
+
+  return Object.keys(categories).reduce((obj, key) => {
+    obj[key] = categories[key]
+    return obj
+  }, {})
 })
+
+function clearFilters() {
+  for (const facet of [...facets.value]) {
+    toggleFacet(facet, true)
+  }
+  for (const facet of [...orFacets.value]) {
+    toggleOrFacet(facet, true)
+  }
+
+  onlyOpenSource.value = false
+  selectedVersions.value = []
+  selectedEnvironments.value = []
+  onSearchChange(1)
+}
+
+function toggleFacet(elementName, doNotSendRequest = false) {
+  const index = facets.value.indexOf(elementName)
+
+  if (index !== -1) {
+    facets.value.splice(index, 1)
+  } else {
+    facets.value.push(elementName)
+  }
+
+  if (!doNotSendRequest) {
+    onSearchChange(1)
+  }
+}
+
+function toggleOrFacet(elementName, doNotSendRequest) {
+  const index = orFacets.value.indexOf(elementName)
+  if (index !== -1) {
+    orFacets.value.splice(index, 1)
+  } else {
+    if (elementName === 'categories:purpur') {
+      if (!orFacets.value.includes('categories:paper')) {
+        orFacets.value.push('categories:paper')
+      }
+      if (!orFacets.value.includes('categories:spigot')) {
+        orFacets.value.push('categories:spigot')
+      }
+      if (!orFacets.value.includes('categories:bukkit')) {
+        orFacets.value.push('categories:bukkit')
+      }
+    } else if (elementName === 'categories:paper') {
+      if (!orFacets.value.includes('categories:spigot')) {
+        orFacets.value.push('categories:spigot')
+      }
+      if (!orFacets.value.includes('categories:bukkit')) {
+        orFacets.value.push('categories:bukkit')
+      }
+    } else if (elementName === 'categories:spigot') {
+      if (!orFacets.value.includes('categories:bukkit')) {
+        orFacets.value.push('categories:bukkit')
+      }
+    } else if (elementName === 'categories:waterfall') {
+      if (!orFacets.value.includes('categories:bungeecord')) {
+        orFacets.value.push('categories:bungeecord')
+      }
+    }
+    orFacets.value.push(elementName)
+  }
+
+  if (!doNotSendRequest) {
+    onSearchChange(1)
+  }
+}
+
+function toggleEnv(environment, sendRequest) {
+  const index = selectedEnvironments.value.indexOf(environment)
+  if (index !== -1) {
+    selectedEnvironments.value.splice(index, 1)
+  } else {
+    selectedEnvironments.value.push(environment)
+  }
+
+  if (!sendRequest) {
+    onSearchChange(1)
+  }
+}
+
+function onSearchChangeToTop(newPageNumber) {
+  if (process.client) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  onSearchChange(newPageNumber)
+}
+
+function cycleSearchDisplayMode() {
+  data.$cosmetics.searchDisplayMode[projectType.value.id] = data.$cycleValue(
+    data.$cosmetics.searchDisplayMode[projectType.value.id],
+    data.$tag.projectViewModes
+  )
+  saveCosmetics()
+  setClosestMaxResults()
+}
+
+const previousMaxResults = ref(20)
+const maxResultsForView = ref({
+  list: [5, 10, 15, 20, 50, 100],
+  grid: [6, 12, 18, 24, 48, 96],
+  gallery: [6, 10, 16, 20, 50, 100],
+})
+
+function onMaxResultsChange(newPageNumber) {
+  newPageNumber = Math.max(
+    1,
+    Math.min(
+      Math.floor(newPageNumber / (maxResults.value / previousMaxResults.value)),
+      pageCount.value
+    )
+  )
+  previousMaxResults.value = maxResults.value
+  onSearchChange(newPageNumber)
+}
+
+function setClosestMaxResults() {
+  const view = data.$cosmetics.searchDisplayMode[projectType.value.id]
+  const maxResultsOptions = maxResultsForView.value[view] ?? [20]
+  const currentMax = maxResults.value
+  if (!maxResultsOptions.includes(currentMax)) {
+    maxResults.value = maxResultsOptions.reduce(function (prev, curr) {
+      return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
