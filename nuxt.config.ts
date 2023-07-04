@@ -269,10 +269,18 @@ export default defineNuxtConfig({
 
       owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
       slug: process.env.VERCEL_GIT_REPO_SLUG || 'knossos',
-      // @ts-ignore
-      branch: process.env.VERCEL_GIT_COMMIT_REF || globalThis.CF_PAGES_BRANCH || 'master',
-      // @ts-ignore
-      hash: process.env.VERCEL_GIT_COMMIT_SHA || globalThis.CF_PAGES_COMMIT_SHA || 'unknown',
+      branch:
+        process.env.VERCEL_GIT_COMMIT_REF ||
+        process.env.CF_PAGES_BRANCH ||
+        // @ts-ignore
+        globalThis.CF_PAGES_BRANCH ||
+        'master',
+      hash:
+        process.env.VERCEL_GIT_COMMIT_SHA ||
+        process.env.CF_PAGES_COMMIT_SHA ||
+        // @ts-ignore
+        globalThis.CF_PAGES_COMMIT_SHA ||
+        'unknown',
     },
   },
   typescript: {
