@@ -36,7 +36,7 @@ pub async fn profile_create(
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let uuid = Uuid::new_v4();
-    let path = state.directories.profiles_dir().join(uuid.to_string());
+    let path = state.directories.profiles_dir().join(&name);
     if path.exists() {
         if !path.is_dir() {
             return Err(ProfileCreationError::NotFolder.into());

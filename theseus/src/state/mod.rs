@@ -248,6 +248,7 @@ async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
         None,
         move |res: DebounceEventResult| {
             futures::executor::block_on(async {
+                tracing::info!("File watcher event: {:?}", res);
                 tx.send(res).await.unwrap();
             })
         },
@@ -256,13 +257,16 @@ async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
     tokio::task::spawn(async move {
         while let Some(res) = rx.next().await {
             match res {
-                Ok(events) => {
+                Ok(mut events) => {
                     let mut visited_paths = Vec::new();
-                    events.iter().for_each(|e| {
+                        // sort events by e.path
+                        events.sort_by(|a, b| a.path.cmp(&b.path));
+                        events.iter().for_each(|e| {
+                        tracing::debug!("File watcher event: {:?}", serde_json::to_string(&e.path).unwrap());
                         let mut new_path = PathBuf::new();
+                        let mut components_iterator = e.path.components();
                         let mut found = false;
-
-                        for component in e.path.components() {
+                        while let Some(component) = components_iterator.next() {
                             new_path.push(component);
                             if found {
                                 break;
@@ -271,6 +275,8 @@ async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                                 found = true;
                             }
                         }
+                        // if any remain, it's a subfile
+                        let subfile = components_iterator.next().is_some();
 
                         if e.path
                             .components()
@@ -282,8 +288,16 @@ async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                         {
                             Profile::crash_task(new_path);
                         } else if !visited_paths.contains(&new_path) {
-                            Profile::sync_projects_task(new_path.clone());
-                            visited_paths.push(new_path);
+                            if subfile {
+                                Profile::sync_projects_task(new_path.clone());
+                                visited_paths.push(new_path);
+                            } else {
+                                tracing::warn!("No subfile found ");
+
+                                Profiles::sync_available_profiles_task(
+                                    new_path.clone(),
+                                );
+                            }
                         }
                     });
                 }

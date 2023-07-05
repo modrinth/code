@@ -58,7 +58,9 @@ pub async fn get(
     path: &Path,
     clear_projects: Option<bool>,
 ) -> crate::Result<Option<Profile>> {
+    tracing::debug!("Getting profile: {}", path.display());
     let state = State::get().await?;
+
     let profiles = state.profiles.read().await;
     let mut profile = profiles.0.get(path).cloned();
 
@@ -316,6 +318,8 @@ pub async fn update_all(
     }
 }
 
+/// Updates a project to the latest version
+/// Uses and returns the relative path to the project
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn update_project(
@@ -382,6 +386,7 @@ pub async fn update_project(
 }
 
 /// Add a project from a version
+/// Returns the relative path to the project
 #[tracing::instrument]
 pub async fn add_project_from_version(
     profile_path: &Path,
@@ -409,6 +414,7 @@ pub async fn add_project_from_version(
 }
 
 /// Add a project from an FS path
+/// Uses and returns the relative path to the project
 #[tracing::instrument]
 pub async fn add_project_from_path(
     profile_path: &Path,
@@ -450,6 +456,8 @@ pub async fn add_project_from_path(
 }
 
 /// Toggle whether a project is disabled or not
+/// Project path should be relative to the profile
+/// returns the new state, relative to the profile
 #[tracing::instrument]
 pub async fn toggle_disable_project(
     profile: &Path,
@@ -477,6 +485,7 @@ pub async fn toggle_disable_project(
 }
 
 /// Remove a project from a profile
+/// Uses and returns the relative path to the project
 #[tracing::instrument]
 pub async fn remove_project(
     profile: &Path,
@@ -832,17 +841,11 @@ pub fn create_mrpack_json(
         .map(|(k, v)| (k, sanitize_loader_version_string(&v).to_string()))
         .collect::<HashMap<_, _>>();
 
-    let base_path = &profile.path;
     let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path = match mod_path.strip_prefix(base_path) {
-                Ok(path) => path.to_string_lossy().to_string(),
-                Err(e) => {
-                    return Some(Err(e.into()));
-                }
-            };
+            let path =  mod_path.to_string_lossy().to_string();
 
             // Only Modrinth projects have a modrinth metadata field for the modrinth.json
             Some(Ok(match project.metadata {

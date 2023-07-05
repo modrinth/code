@@ -19,6 +19,7 @@ use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::Debouncer;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use tracing::info;
 use std::io::Cursor;
 use std::{
     collections::HashMap,
@@ -183,6 +184,11 @@ impl Profile {
         })
     }
 
+    #[inline]
+    pub fn name(&self) -> String {
+        self.metadata.name.clone()
+    }
+
     #[tracing::instrument(skip(self, semaphore, icon))]
     pub async fn set_icon<'a>(
         &'a mut self,
@@ -224,12 +230,16 @@ impl Profile {
 
     pub fn sync_projects_task(path: PathBuf) {
         tokio::task::spawn(async move {
+            let span =
+                tracing::span!(tracing::Level::INFO, "sync_projects_task");
+            info!(parent: &span, "Syncing projects for profile {}", path.display());
             let res = async {
+                let _span = span.enter();
                 let state = State::get().await?;
                 let profile = crate::api::profile::get(&path, None).await?;
 
                 if let Some(profile) = profile {
-                    let paths = profile.get_profile_project_paths()?;
+                    let paths = profile.get_profile_full_project_paths()?;
 
                     let projects = crate::state::infer_data_from_files(
                         profile.clone(),
@@ -251,6 +261,7 @@ impl Profile {
                         ProfilePayloadType::Synced,
                     )
                     .await?;
+                    tracing::info!("Done syncing");
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",
@@ -269,7 +280,9 @@ impl Profile {
         });
     }
 
-    pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
+    /// Gets paths to projects as their full paths, not just their relative paths
+    pub fn get_profile_full_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
+        tracing::info!("Getting profile project paths, profile path: {}", self.path.display());
         let mut files = Vec::new();
         let mut read_paths = |path: &str| {
             let new_path = self.path.join(path);
@@ -416,8 +429,9 @@ impl Profile {
             }
         };
 
-        let state = State::get().await?;
-        let path = self.path.join(project_type.get_folder()).join(file_name);
+        let state: std::sync::Arc<State> = State::get().await?;
+        let relative_name = PathBuf::new().join(project_type.get_folder()).join(file_name);
+        let path = self.path.join(relative_name.clone());
         write(&path, &bytes, &state.io_semaphore).await?;
 
         let hash = get_hash(bytes).await?;
@@ -438,32 +452,34 @@ impl Profile {
             }
         }
 
-        Ok(path)
+        Ok(relative_name)
     }
 
+    /// Toggle a project's disabled state.
+    /// 'path' should be relative to the profile's path.
     #[tracing::instrument(skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn toggle_disable_project(
         &self,
-        path: &Path,
+        relative_path: &Path,
     ) -> crate::Result<PathBuf> {
         let state = State::get().await?;
         if let Some(mut project) = {
-            let mut profiles = state.profiles.write().await;
+            let mut profiles: tokio::sync::RwLockWriteGuard<'_, Profiles> = state.profiles.write().await;
 
             if let Some(profile) = profiles.0.get_mut(&self.path) {
-                profile.projects.remove(path)
+                profile.projects.remove(relative_path)
             } else {
                 None
             }
         } {
-            let path = path.to_path_buf();
-            let mut new_path = path.clone();
+            let relative_path = relative_path.to_path_buf();
+            let mut new_path = relative_path.clone();
 
-            if path.extension().map_or(false, |ext| ext == "disabled") {
+            if relative_path.extension().map_or(false, |ext| ext == "disabled") {
                 project.disabled = false;
                 new_path.set_file_name(
-                    path.file_name()
+                    relative_path.file_name()
                         .unwrap_or_default()
                         .to_string_lossy()
                         .replace(".disabled", ""),
@@ -471,12 +487,14 @@ impl Profile {
             } else {
                 new_path.set_file_name(format!(
                     "{}.disabled",
-                    path.file_name().unwrap_or_default().to_string_lossy()
+                    relative_path.file_name().unwrap_or_default().to_string_lossy()
                 ));
                 project.disabled = true;
             }
 
-            fs::rename(path, &new_path).await?;
+            let true_path = self.path.join(&relative_path);
+            let true_new_path = self.path.join(&new_path);
+            fs::rename(true_path, &true_new_path).await?;
 
             let mut profiles = state.profiles.write().await;
             if let Some(profile) = profiles.0.get_mut(&self.path) {
@@ -488,7 +506,7 @@ impl Profile {
         } else {
             Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
-                path
+                relative_path
             ))
             .into())
         }
@@ -496,24 +514,24 @@ impl Profile {
 
     pub async fn remove_project(
         &self,
-        path: &Path,
+        relative_path: &Path,
         dont_remove_arr: Option<bool>,
     ) -> crate::Result<()> {
         let state = State::get().await?;
-        if self.projects.contains_key(path) {
-            fs::remove_file(path).await?;
+        if self.projects.contains_key(relative_path) {
+            fs::remove_file(self.path.join(relative_path)).await?;
             if !dont_remove_arr.unwrap_or(false) {
                 let mut profiles = state.profiles.write().await;
 
                 if let Some(profile) = profiles.0.get_mut(&self.path) {
-                    profile.projects.remove(path);
+                    profile.projects.remove(relative_path);
                     profile.metadata.date_modified = Utc::now();
                 }
             }
         } else {
             return Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
-                path
+                relative_path
             ))
             .into());
         }
@@ -531,6 +549,11 @@ impl Profiles {
     ) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
         fs::create_dir_all(dirs.profiles_dir()).await?;
+
+        file_watcher
+            .watcher()
+            .watch(&dirs.profiles_dir(), RecursiveMode::NonRecursive)?;
+
         let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
@@ -566,7 +589,7 @@ impl Profiles {
             {
                 let profiles = state.profiles.read().await;
                 for (_profile_path, profile) in profiles.0.iter() {
-                    let paths = profile.get_profile_project_paths()?;
+                    let paths = profile.get_profile_full_project_paths()?;
 
                     files.push((profile.clone(), paths));
                 }
@@ -661,6 +684,7 @@ impl Profiles {
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
             .try_for_each_concurrent(None, |(path, profile)| async move {
+                tracing::info!("Syncing profile: {:?}", path);
                 let json = serde_json::to_vec(&profile)?;
 
                 let json_path = Path::new(&path.to_string_lossy().to_string())
@@ -674,10 +698,56 @@ impl Profiles {
         Ok(self)
     }
 
-    async fn read_profile_from_dir(path: &Path) -> crate::Result<Profile> {
+    async fn  read_profile_from_dir(path: &Path) -> crate::Result<Profile> {
         let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
         let mut profile = serde_json::from_slice::<Profile>(&json)?;
         profile.path = PathBuf::from(path);
         Ok(profile)
+    }
+
+    pub fn sync_available_profiles_task(path: PathBuf) {
+        tokio::task::spawn(async move {
+            let span = tracing::span!(
+                tracing::Level::INFO,
+                "sync_available_profiles_task"
+            );
+            let res = async {
+                let _span = span.enter();
+                let state = State::get().await?;
+
+                let mut profiles = state.profiles.write().await;
+
+                tracing::info!("Updating: {path}", path = path.display());
+                if let Some(profile) = profiles.0.get_mut(&path) {
+                    if !path.exists() {
+                        // if path exists in the state but no longer in the filesystem, remove it from the state list
+                        emit_profile(
+                            profile.uuid,
+                            profile.path.clone(),
+                            &profile.metadata.name,
+                            ProfilePayloadType::Removed,
+                        )
+                        .await?;
+                        tracing::debug!("Removed!");
+                        profiles.0.remove(&path);
+                    }
+                } else if path.exists() {
+                    // if it exists in the filesystem but no longer in the state, add it to the state list
+                    profiles
+                        .insert(Self::read_profile_from_dir(&path).await?)
+                        .await?;
+                    Profile::sync_projects_task(path);
+                }
+                Ok::<(), crate::Error>(())
+            }
+            .await;
+
+            match res {
+                Ok(()) => {}
+                Err(err) => {
+                    tracing::warn!("Unable to fetch all profiles: {err}")
+                }
+            };
+        });
     }
 }
