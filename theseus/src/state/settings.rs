@@ -121,11 +121,6 @@ impl Settings {
         };
     }
 
-    // #[inline]
-    // pub fn get_config_dir(&self) -> crate::Result<PathBuf> {
-    //     self.config_dir.clone()
-    // }
-
     #[tracing::instrument(skip(self))]
     pub async fn sync(&self, to: &Path) -> crate::Result<()> {
         fs::write(to, serde_json::to_vec(self)?)

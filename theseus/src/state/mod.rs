@@ -49,7 +49,7 @@ mod safe_processes;
 pub use self::safe_processes::*;
 
 // Global state
-// RwLock on state only has concurrent reads, except for config dir change
+// RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<RwLock<State>> = OnceCell::const_new();
 pub struct State {
     /// Information on the location of files used in the launcher
@@ -292,7 +292,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                                 found = true;
                             }
                         }
-                        // if any remain, it's a subfile
+                        // if any remain, it's a subfile of the profile folder and not the profile folder itself
                         let subfile = components_iterator.next().is_some();
 
                         // At this point, new_path is the path to the profile, and subfile is whether it's a subfile of the profile or not
@@ -315,8 +315,6 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                                 Profile::sync_projects_task(profile_path_id);
                                 visited_paths.push(new_path);
                             } else {
-                                tracing::warn!("No subfile found ");
-
                                 Profiles::sync_available_profiles_task(
                                     profile_path_id,
                                 );

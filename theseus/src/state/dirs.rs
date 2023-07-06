@@ -8,8 +8,8 @@ use super::{ProfilePathId, Settings};
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
-    pub settings_dir: PathBuf,
-    pub config_dir: RwLock<PathBuf>,
+    pub settings_dir: PathBuf, // Base settings directory- settings.json and icon cache.
+    pub config_dir: RwLock<PathBuf>, // Base config directory- instances, minecraft downloads, etc. Changeable as a setting.
     pub working_dir: PathBuf,
 }
 
@@ -63,7 +63,6 @@ impl DirectoryInfo {
 
         Ok(Self {
             settings_dir,
-            // config_dir: RwLock::new(config_dir),
             config_dir: RwLock::new(config_dir),
             working_dir,
         })

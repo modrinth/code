@@ -24,7 +24,7 @@ import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { tauri } from '@tauri-apps/api'
 
 const themeStore = useTheming()
 
@@ -141,7 +141,7 @@ const upload_icon = async () => {
   })
 
   if (!icon.value) return
-  display_icon.value = convertFileSrc(icon.value)
+  display_icon.value = tauri.convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {
@@ -226,7 +226,7 @@ const check_valid = computed(() => {
                 !profile.metadata.icon ||
                 (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
                   ? profile.metadata.icon
-                  : convertFileSrc(profile.metadata?.icon)
+                  : tauri.convertFileSrc(profile.metadata?.icon)
               "
               class="profile-image"
             />

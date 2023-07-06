@@ -116,15 +116,14 @@ pub async fn profile_create(
         }
         State::sync().await?;
 
-        Ok(profile.name_as_path_id())
+        Ok(profile.profile_id())
     }
     .await;
 
     match result {
         Ok(profile) => Ok(profile),
         Err(err) => {
-            let _ =
-                crate::api::profile::remove(&profile.name_as_path_id()).await;
+            let _ = crate::api::profile::remove(&profile.profile_id()).await;
 
             Err(err)
         }

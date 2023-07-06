@@ -107,6 +107,7 @@ import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
+import { tauri } from '@tauri-apps/api'
 import {
   get_game_versions,
   get_fabric_versions,
@@ -119,7 +120,6 @@ import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const themeStore = useTheming()
 
@@ -236,7 +236,7 @@ const upload_icon = async () => {
   })
 
   if (!icon.value) return
-  display_icon.value = convertFileSrc(icon.value)
+  display_icon.value = tauri.convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {

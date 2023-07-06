@@ -116,7 +116,7 @@ pub async fn install_minecraft(
     )
     .await?;
 
-    crate::api::profile::edit(&profile.name_as_path_id(), |prof| {
+    crate::api::profile::edit(&profile.profile_id(), |prof| {
         prof.install_stage = ProfileInstallStage::Installing;
 
         async { Ok(()) }
@@ -273,7 +273,7 @@ pub async fn install_minecraft(
         }
     }
 
-    crate::api::profile::edit(&profile.name_as_path_id(), |prof| {
+    crate::api::profile::edit(&profile.profile_id(), |prof| {
         prof.install_stage = ProfileInstallStage::Installed;
 
         async { Ok(()) }
@@ -371,11 +371,11 @@ pub async fn launch_minecraft(
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
-        process::get_uuids_by_profile_path(profile.name_as_path_id()).await?;
+        process::get_uuids_by_profile_path(profile.profile_id()).await?;
     if let Some(uuid) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Profile {} is already running at UUID: {uuid}",
-            profile.name_as_path_id()
+            profile.profile_id()
         ))
         .as_error());
     }
@@ -436,7 +436,7 @@ pub async fn launch_minecraft(
     let logs_dir = {
         let st = State::get().await?;
         st.directories
-            .profile_logs_dir(&profile.name_as_path_id())
+            .profile_logs_dir(&profile.profile_id())
             .await?
             .join(&datetime_string)
     };
@@ -444,7 +444,7 @@ pub async fn launch_minecraft(
 
     let stdout_log_path = logs_dir.join("stdout.log");
 
-    crate::api::profile::edit(&profile.name_as_path_id(), |prof| {
+    crate::api::profile::edit(&profile.profile_id(), |prof| {
         prof.metadata.last_played = Some(Utc::now());
 
         async { Ok(()) }
@@ -497,7 +497,7 @@ pub async fn launch_minecraft(
     state_children
         .insert_process(
             Uuid::new_v4(),
-            profile.name_as_path_id(),
+            profile.profile_id(),
             stdout_log_path,
             command,
             post_exit_hook,

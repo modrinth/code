@@ -36,7 +36,7 @@ pub async fn get_logs(
     let profile_path = if let Some(p) =
         crate::profile::get_by_uuid(profile_uuid, None).await?
     {
-        p.name_as_path_id()
+        p.profile_id()
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_uuid.to_string(),
@@ -78,7 +78,7 @@ pub async fn get_logs_by_datetime(
     let profile_path = if let Some(p) =
         crate::profile::get_by_uuid(profile_uuid, None).await?
     {
-        p.name_as_path_id()
+        p.profile_id()
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_uuid.to_string(),
@@ -112,7 +112,7 @@ pub async fn delete_logs(profile_uuid: uuid::Uuid) -> crate::Result<()> {
     let profile_path = if let Some(p) =
         crate::profile::get_by_uuid(profile_uuid, None).await?
     {
-        p.name_as_path_id()
+        p.profile_id()
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_uuid.to_string(),
@@ -140,7 +140,7 @@ pub async fn delete_logs_by_datetime(
     let profile_path = if let Some(p) =
         crate::profile::get_by_uuid(profile_uuid, None).await?
     {
-        p.name_as_path_id()
+        p.profile_id()
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_uuid.to_string(),

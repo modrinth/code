@@ -139,7 +139,7 @@ pub struct Profile {
     #[serde(default)]
     pub install_stage: ProfileInstallStage,
     #[serde(default)]
-    pub path: PathBuf,
+    pub path: PathBuf, // Relative path to the profile, to be used in ProfilePathId
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub java: Option<JavaSettings>,
@@ -268,13 +268,9 @@ impl Profile {
         })
     }
 
+    // Gets the ProfilePathId for this profile
     #[inline]
-    pub fn name(&self) -> String {
-        self.metadata.name.clone()
-    }
-
-    #[inline]
-    pub fn name_as_path_id(&self) -> ProfilePathId {
+    pub fn profile_id(&self) -> ProfilePathId {
         ProfilePathId::new(&self.path)
     }
 
@@ -546,7 +542,7 @@ impl Profile {
         {
             let mut profiles = state.profiles.write().await;
 
-            if let Some(profile) = profiles.0.get_mut(&self.name_as_path_id()) {
+            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
                 profile.projects.insert(
                     project_path_id.clone(),
                     Project {
@@ -576,7 +572,7 @@ impl Profile {
             let mut profiles: tokio::sync::RwLockWriteGuard<'_, Profiles> =
                 state.profiles.write().await;
 
-            if let Some(profile) = profiles.0.get_mut(&self.name_as_path_id()) {
+            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
                 profile.projects.remove(relative_path)
             } else {
                 None
@@ -618,7 +614,7 @@ impl Profile {
             let new_project_path_id = ProjectPathId::new(&new_path);
 
             let mut profiles = state.profiles.write().await;
-            if let Some(profile) = profiles.0.get_mut(&self.name_as_path_id()) {
+            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
                 profile
                     .projects
                     .insert(new_project_path_id.clone(), project);
@@ -651,9 +647,7 @@ impl Profile {
             if !dont_remove_arr.unwrap_or(false) {
                 let mut profiles = state.profiles.write().await;
 
-                if let Some(profile) =
-                    profiles.0.get_mut(&self.name_as_path_id())
-                {
+                if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
                     profile.projects.remove(relative_path);
                     profile.metadata.date_modified = Utc::now();
                 }
@@ -702,7 +696,7 @@ impl Profiles {
                 if let Some(profile) = prof {
                     let path = canonicalize(path)?;
                     Profile::watch_fs(&path, file_watcher).await?;
-                    profiles.insert(profile.name_as_path_id(), profile);
+                    profiles.insert(profile.profile_id(), profile);
                 }
             }
         }
@@ -731,7 +725,7 @@ impl Profiles {
             let caches_dir = state.directories.caches_dir();
             future::try_join_all(files.into_iter().map(
                 |(profile, files)| async {
-                    let profile_name = profile.name_as_path_id();
+                    let profile_name = profile.profile_id();
                     let inferred = super::projects::infer_data_from_files(
                         profile,
                         files,
@@ -789,7 +783,7 @@ impl Profiles {
         )
         .await?;
 
-        let profile_name = profile.name_as_path_id();
+        let profile_name = profile.profile_id();
         profile_name.check_valid_utf()?;
         self.0.insert(profile_name, profile);
         Ok(self)

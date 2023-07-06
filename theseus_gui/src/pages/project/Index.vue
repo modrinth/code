@@ -273,9 +273,9 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()

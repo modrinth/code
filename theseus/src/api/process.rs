@@ -56,8 +56,7 @@ pub async fn get_all_running_profile_paths() -> crate::Result<Vec<ProfilePathId>
 pub async fn get_all_running_profiles() -> crate::Result<Vec<Profile>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    let ret = children.running_profiles().await?;
-    Ok(ret)
+    children.running_profiles().await
 }
 
 // Gets the UUID of each stored process in the state by profile path
