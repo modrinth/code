@@ -111,11 +111,15 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
         let entry_path = entry.path();
         if let Some(file_name) = entry_path.file_name() {
             // Ignore settings.json
-            if file_name == "settings.json" {
+            if file_name == state::SETTINGS_FILE_NAME {
                 continue;
             }
             // Ignore caches folder
-            if file_name == "caches" {
+            if file_name == state::CACHES_FOLDER_NAME {
+                continue;
+            }
+            // Ignore modrinth_logs folder
+            if file_name == state::LAUNCHER_LOGS_FOLDER_NAME {
                 continue;
             }
 

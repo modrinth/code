@@ -6,6 +6,10 @@ use tokio::sync::RwLock;
 
 use super::{ProfilePathId, Settings};
 
+pub const SETTINGS_FILE_NAME: &str = "settings.json";
+pub const CACHES_FOLDER_NAME: &str = "caches";
+pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
+
 #[derive(Debug)]
 pub struct DirectoryInfo {
     pub settings_dir: PathBuf, // Base settings directory- settings.json and icon cache.
@@ -162,8 +166,9 @@ impl DirectoryInfo {
     }
 
     #[inline]
-    pub async fn launcher_logs_dir(&self) -> PathBuf {
-        self.config_dir.read().await.join("launcher_logs")
+    pub fn launcher_logs_dir() -> Option<PathBuf> {
+        Self::get_initial_settings_dir()
+            .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
     }
 
     /// Get the file containing the global database
@@ -175,13 +180,13 @@ impl DirectoryInfo {
     /// Get the settings file for Theseus
     #[inline]
     pub fn settings_file(&self) -> PathBuf {
-        self.settings_dir.join("settings.json")
+        self.settings_dir.join(SETTINGS_FILE_NAME)
     }
 
     /// Get the cache directory for Theseus
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
-        self.settings_dir.join("caches")
+        self.settings_dir.join(CACHES_FOLDER_NAME)
     }
 
     #[inline]
