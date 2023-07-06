@@ -106,8 +106,11 @@ impl Metadata {
             let metadata_fetch = Metadata::fetch().await?;
             let state = State::get().await?;
 
-            let metadata_path =
-                state.directories.caches_meta_dir().await.join("metadata.json");
+            let metadata_path = state
+                .directories
+                .caches_meta_dir()
+                .await
+                .join("metadata.json");
 
             write(
                 &metadata_path,

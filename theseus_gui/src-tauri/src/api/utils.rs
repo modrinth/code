@@ -1,7 +1,7 @@
 use theseus::{handler, prelude::CommandPayload, State};
 
 use crate::api::Result;
-use std::{env, process::Command, path::PathBuf};
+use std::{env, process::Command};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -12,7 +12,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             safety_check_safe_loading_bars,
             get_opening_command,
             await_sync,
-            get_cache_path
         ])
         .build()
 }
@@ -125,12 +124,4 @@ pub async fn await_sync() -> Result<()> {
     State::sync().await?;
     tracing::debug!("State synced");
     Ok(())
-}
-
-// Get cached path from relative path
-// Returns "%CACHE_DIR%/relative_path"
-#[tauri::command]
-pub async fn get_cache_path() -> Result<PathBuf> {
-    let state = theseus::State::get().await?;
-    Ok(state.directories.caches_dir().await)
 }

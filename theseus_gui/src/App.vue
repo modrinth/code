@@ -96,12 +96,6 @@ const handleClose = async () => {
   window.getCurrent().close()
 }
 
-const do_change = async () => {
-  console.log("123")
- await change_config_dir('/home/thesuzerain/newone')
- console.log("456")
-}
-
 window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   await handleClose()
 })
@@ -157,9 +151,6 @@ const accounts = ref(null)
     <suspense>
       <OnboardingModal ref="testModal" :accounts="accounts" />
     </suspense>
-    <Button
-      class="expand-button"
-      @click="do_change">Press me</Button>
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>

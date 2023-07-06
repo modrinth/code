@@ -62,7 +62,7 @@
     </label>
     <div class="input-group">
       <Avatar
-        :src="!icon || (icon && icon.startsWith('http')) ? icon : convertCachedFileSrc(cacheDir, icon)"
+        :src="!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon)"
         size="md"
         class="project__icon"
       />
@@ -340,7 +340,7 @@ import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
-import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const router = useRouter()
 
@@ -356,10 +356,6 @@ const themeStore = useTheming()
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
 const groups = ref(props.instance.metadata.groups)
-
-const cacheDir = await getCacheDir();
-
-
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([

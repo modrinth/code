@@ -24,7 +24,11 @@ pub struct FrontendSettings {
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("settings")
-        .invoke_handler(tauri::generate_handler![settings_get, settings_set, settings_change_config_dir])
+        .invoke_handler(tauri::generate_handler![
+            settings_get,
+            settings_set,
+            settings_change_config_dir
+        ])
         .build()
 }
 

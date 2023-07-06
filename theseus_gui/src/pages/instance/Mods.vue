@@ -234,7 +234,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
-import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const router = useRouter()
 
@@ -281,7 +281,7 @@ const initProjects = (initInstance) => {
         author: project.metadata.authors[0],
         version: project.metadata.version,
         file_name: project.file_name,
-        icon: project.metadata.icon ? convertCachedFileSrc(cacheDir, project.metadata.icon) : null,
+        icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
         disabled: project.disabled,
         outdated: false,
         project_type: project.metadata.project_type,
@@ -316,8 +316,6 @@ const selectedProjectType = ref('All')
 const selected = computed(() => projects.value.filter((mod) => mod.selected))
 const deleteWarning = ref(null)
 const hideNonSelected = ref(false)
-
-const cacheDir = await getCacheDir();
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }

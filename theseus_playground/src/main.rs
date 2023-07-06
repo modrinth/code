@@ -3,7 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use dunce::canonicalize;
 use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
@@ -98,7 +97,7 @@ async fn main() -> theseus::Result<()> {
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
-    let proc_lock = profile::run(&canonicalize(&profile_path)?).await?;
+    let proc_lock = profile::run(&profile_path).await?;
     let uuid = proc_lock.read().await.uuid;
     let pid = proc_lock.read().await.current_child.read().await.id();
 

@@ -109,14 +109,14 @@ pub async fn install_minecraft(
         LoadingBarType::MinecraftDownload {
             // If we are downloading minecraft for a profile, provide its name and uuid
             profile_name: profile.metadata.name.clone(),
-            profile_path: profile.path.clone(),
+            profile_path: profile.get_profile_full_path().await?,
         },
         100.0,
         "Downloading Minecraft",
     )
     .await?;
 
-    crate::api::profile::edit(&profile.path, |prof| {
+    crate::api::profile::edit(&profile.name_as_path_id(), |prof| {
         prof.install_stage = ProfileInstallStage::Installing;
 
         async { Ok(()) }
@@ -125,7 +125,7 @@ pub async fn install_minecraft(
     State::sync().await?;
 
     let state = State::get().await?;
-    let instance_path = &canonicalize(&profile.path)?;
+    let instance_path = &canonicalize(&profile.get_profile_full_path().await?)?;
     let metadata = state.metadata.read().await;
 
     let version = metadata
@@ -273,7 +273,7 @@ pub async fn install_minecraft(
         }
     }
 
-    crate::api::profile::edit(&profile.path, |prof| {
+    crate::api::profile::edit(&profile.name_as_path_id(), |prof| {
         prof.install_stage = ProfileInstallStage::Installed;
 
         async { Ok(()) }
@@ -314,7 +314,7 @@ pub async fn launch_minecraft(
     let state = State::get().await?;
     let metadata = state.metadata.read().await;
 
-    let instance_path = state.directories.profiles_dir().await.join(&profile.path);
+    let instance_path = profile.get_profile_full_path().await?;
     let instance_path = &canonicalize(instance_path)?;
 
     let version = metadata
@@ -371,11 +371,11 @@ pub async fn launch_minecraft(
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
-        process::get_uuids_by_profile_path(instance_path).await?;
+        process::get_uuids_by_profile_path(profile.name_as_path_id()).await?;
     if let Some(uuid) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Profile {} is already running at UUID: {uuid}",
-            instance_path.display()
+            profile.name_as_path_id()
         ))
         .as_error());
     }
@@ -436,15 +436,15 @@ pub async fn launch_minecraft(
     let logs_dir = {
         let st = State::get().await?;
         st.directories
-            .profile_logs_dir(&profile.path)
-            .await
+            .profile_logs_dir(&profile.name_as_path_id())
+            .await?
             .join(&datetime_string)
     };
     fs::create_dir_all(&logs_dir)?;
 
     let stdout_log_path = logs_dir.join("stdout.log");
 
-    crate::api::profile::edit(&profile.path, |prof| {
+    crate::api::profile::edit(&profile.name_as_path_id(), |prof| {
         prof.metadata.last_played = Some(Utc::now());
 
         async { Ok(()) }
@@ -497,7 +497,7 @@ pub async fn launch_minecraft(
     state_children
         .insert_process(
             Uuid::new_v4(),
-            profile.path.clone(),
+            profile.name_as_path_id(),
             stdout_log_path,
             command,
             post_exit_hook,

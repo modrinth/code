@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::state::LinkedData;
+use crate::state::{LinkedData, ProfilePathId};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     prelude::ModLoader,
@@ -18,8 +18,8 @@ use tokio_stream::wrappers::ReadDirStream;
 use tracing::{info, trace};
 use uuid::Uuid;
 
-// Creates a profile at  the given filepath and adds it to the in-memory state
-// Returns filepath at which it can be accessed in the State
+// Creates a profile of a given name and adds it to the in-memory state
+// Returns relative filepath as ProfilePathId which can be used to access it in the State
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
@@ -32,7 +32,7 @@ pub async fn profile_create(
     icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProfilePathId> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let uuid = Uuid::new_v4();
@@ -74,17 +74,15 @@ pub async fn profile_create(
         None
     };
 
-    // Fully canonicalize now that its created for storing purposes
-    let path = canonicalize(&path)?;
-    let mut profile =
-        Profile::new(uuid, name, game_version, path.clone()).await?;
+    let mut profile = Profile::new(uuid, name, game_version).await?;
     let result = async {
         if let Some(ref icon) = icon {
-            let caches_dir = state.directories.caches_dir().await;
-            let bytes = tokio::fs::read(caches_dir.join(icon)).await?;
+            let bytes =
+                tokio::fs::read(state.directories.caches_dir().join(icon))
+                    .await?;
             profile
                 .set_icon(
-                    &state.directories.caches_dir().await,
+                    &state.directories.caches_dir(),
                     &state.io_semaphore,
                     bytes::Bytes::from(bytes),
                     &icon.to_string_lossy(),
@@ -102,7 +100,7 @@ pub async fn profile_create(
 
         emit_profile(
             uuid,
-            path.clone(),
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Created,
         )
@@ -118,14 +116,15 @@ pub async fn profile_create(
         }
         State::sync().await?;
 
-        Ok(path)
+        Ok(profile.name_as_path_id())
     }
     .await;
 
     match result {
         Ok(profile) => Ok(profile),
         Err(err) => {
-            let _ = crate::api::profile::remove(&profile.path).await;
+            let _ =
+                crate::api::profile::remove(&profile.name_as_path_id()).await;
 
             Err(err)
         }

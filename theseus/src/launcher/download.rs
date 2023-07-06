@@ -151,7 +151,8 @@ pub async fn download_assets_index(
     let path = st
         .directories
         .assets_index_dir()
-        .await.join(format!("{}.json", &version.asset_index.id));
+        .await
+        .join(format!("{}.json", &version.asset_index.id));
 
     let res = if path.exists() {
         fs::read(path)
@@ -316,7 +317,7 @@ pub async fn download_libraries(
                                 let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore).await?;
                                 let reader = std::io::Cursor::new(&data);
                                 if let Ok(mut archive) = zip::ZipArchive::new(reader) {
-                                    match archive.extract(&st.directories.version_natives_dir(version).await) {
+                                    match archive.extract(st.directories.version_natives_dir(version).await) {
                                         Ok(_) => tracing::info!("Fetched native {}", &library.name),
                                         Err(err) => tracing::error!("Failed extracting native {}. err: {}", &library.name, err)
                                     }

@@ -30,7 +30,7 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { check_installed, get as getInstance } from '@/helpers/profile.js'
-import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const router = useRouter()
 const route = useRoute()
@@ -69,8 +69,6 @@ const results = shallowRef([])
 const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1
 )
-
-const cacheDir = await getCacheDir();
 
 function getArrayOrString(x) {
   if (typeof x === 'string' || x instanceof String) {
@@ -484,7 +482,7 @@ const showLoaders = computed(
               !instanceContext.metadata.icon ||
               (instanceContext.metadata.icon && instanceContext.metadata.icon.startsWith('http'))
                 ? instanceContext.metadata.icon
-                : convertCachedFileSrc(cacheDir, instanceContext.metadata.icon)
+                : convertFileSrc(instanceContext.metadata.icon)
             "
             :alt="instanceContext.metadata.name"
             size="sm"

@@ -50,10 +50,15 @@ pub async fn logs_get_output_by_datetime(
     profile_uuid: Uuid,
     datetime_string: String,
 ) -> Result<String> {
-    let profile_path = if let Some(p) = crate::profile::get_by_uuid(profile_uuid, None).await? {
-        p.path
+    let profile_path = if let Some(p) =
+        crate::profile::get_by_uuid(profile_uuid, None).await?
+    {
+        p.name_as_path_id()
     } else {
-        return Err(theseus::Error::from(theseus::ErrorKind::UnmanagedProfileError(profile_uuid.to_string())).into());
+        return Err(theseus::Error::from(
+            theseus::ErrorKind::UnmanagedProfileError(profile_uuid.to_string()),
+        )
+        .into());
     };
 
     Ok(logs::get_output_by_datetime(&profile_path, &datetime_string).await?)

@@ -1,10 +1,10 @@
 //! Theseus directory information
 use std::fs;
-use std::path::{PathBuf, Path};
+use std::path::PathBuf;
 
 use tokio::sync::RwLock;
 
-use super::Settings;
+use super::{ProfilePathId, Settings};
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
@@ -14,7 +14,6 @@ pub struct DirectoryInfo {
 }
 
 impl DirectoryInfo {
-
     // Get the settings directory
     // init() is not needed for this function
     pub fn get_initial_settings_dir() -> Option<PathBuf> {
@@ -24,15 +23,17 @@ impl DirectoryInfo {
 
     #[inline]
     pub fn get_initial_settings_file() -> crate::Result<PathBuf> {
-        let settings_dir = Self::get_initial_settings_dir().ok_or(crate::ErrorKind::FSError(
-            "Could not find valid config dir".to_string(),
-        ))?;
+        let settings_dir = Self::get_initial_settings_dir().ok_or(
+            crate::ErrorKind::FSError(
+                "Could not find valid config dir".to_string(),
+            ),
+        )?;
         Ok(settings_dir.join("settings.json"))
     }
 
     /// Get all paths needed for Theseus to operate properly
     #[tracing::instrument]
-    pub fn init(settings : &Settings) -> crate::Result<Self> {
+    pub fn init(settings: &Settings) -> crate::Result<Self> {
         // Working directory
         let working_dir = std::env::current_dir().map_err(|err| {
             crate::ErrorKind::FSError(format!(
@@ -40,9 +41,11 @@ impl DirectoryInfo {
             ))
         })?;
 
-        let settings_dir = Self::get_initial_settings_dir()            .ok_or(crate::ErrorKind::FSError(
-            "Could not find valid settings dir".to_string(),
-        ))?;
+        let settings_dir = Self::get_initial_settings_dir().ok_or(
+            crate::ErrorKind::FSError(
+                "Could not find valid settings dir".to_string(),
+            ),
+        )?;
 
         fs::create_dir_all(&settings_dir).map_err(|err| {
             crate::ErrorKind::FSError(format!(
@@ -52,9 +55,11 @@ impl DirectoryInfo {
 
         // config directory (for instances, etc.)
         // by default this is the same as the settings directory
-        let config_dir = settings.loaded_config_dir.clone().ok_or(crate::ErrorKind::FSError(
-            "Could not find valid config dir".to_string(),
-        ))?;
+        let config_dir = settings.loaded_config_dir.clone().ok_or(
+            crate::ErrorKind::FSError(
+                "Could not find valid config dir".to_string(),
+            ),
+        )?;
 
         Ok(Self {
             settings_dir,
@@ -150,10 +155,11 @@ impl DirectoryInfo {
 
     /// Gets the logs dir for a given profile
     #[inline]
-    pub async fn profile_logs_dir(&self, profile_relative_path: &Path) -> PathBuf {
-        self.profiles_dir().await
-            .join(profile_relative_path)
-            .join("modrinth_logs")
+    pub async fn profile_logs_dir(
+        &self,
+        profile_id: &ProfilePathId,
+    ) -> crate::Result<PathBuf> {
+        Ok(profile_id.get_full_path().await?.join("modrinth_logs"))
     }
 
     #[inline]
@@ -175,13 +181,13 @@ impl DirectoryInfo {
 
     /// Get the cache directory for Theseus
     #[inline]
-    pub async fn caches_dir(&self) -> PathBuf {
-        self.config_dir.read().await.join("caches")
+    pub fn caches_dir(&self) -> PathBuf {
+        self.settings_dir.join("caches")
     }
 
     #[inline]
     pub async fn caches_meta_dir(&self) -> PathBuf {
-        self.config_dir.read().await.join("caches").join("metadata")
+        self.caches_dir().join("metadata")
     }
 
     /// Get path from environment variable

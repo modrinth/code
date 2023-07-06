@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tokio::fs;
 
-use super::{JavaGlobals, DirectoryInfo};
+use super::{DirectoryInfo, JavaGlobals};
 
 // TODO: convert to semver?
 const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -80,7 +80,7 @@ impl Settings {
                 opt_out_analytics: false,
                 advanced_rendering: true,
                 onboarded: false,
-    
+
                 // By default, the config directory is the same as the settings directory
                 loaded_config_dir: DirectoryInfo::get_initial_settings_dir(),
             })

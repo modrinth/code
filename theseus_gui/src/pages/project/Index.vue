@@ -8,7 +8,7 @@
               !instance.metadata.icon ||
               (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
                 ? instance.metadata.icon
-                : convertCachedFileSrc(cacheDir, instance.metadata?.icon)
+                : convertFileSrc(instance.metadata?.icon)
             "
             :alt="instance.metadata.name"
             size="sm"
@@ -275,7 +275,7 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
-import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -295,8 +295,6 @@ const instance = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
-
-const cacheDir = await getCacheDir();
 
 async function fetchProjectData() {
   ;[

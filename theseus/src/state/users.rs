@@ -29,7 +29,8 @@ impl Users {
 
     pub async fn save(&self) -> crate::Result<()> {
         let state = State::get().await?;
-        let users_path = state.directories.caches_meta_dir().await.join(USERS_JSON);
+        let users_path =
+            state.directories.caches_meta_dir().await.join(USERS_JSON);
         write(
             &users_path,
             &serde_json::to_vec(&self.0)?,

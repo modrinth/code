@@ -7,6 +7,7 @@ use crate::util::fetch::{
 };
 use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
+use futures::StreamExt;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -14,6 +15,8 @@ use sha2::Digest;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
+
+use super::ProjectPathId;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -252,7 +255,6 @@ async fn read_icon_from_file(
     Ok(None)
 }
 
-
 // Creates Project data from the existing files in the file system, for a given Profile
 // Paths must be the full paths to the files in the FS, and not the relative paths
 // eg: with get_profile_full_project_paths
@@ -260,11 +262,11 @@ async fn read_icon_from_file(
 #[theseus_macros::debug_pin]
 pub async fn infer_data_from_files(
     profile: Profile,
-    paths: Vec<PathBuf>, 
+    paths: Vec<PathBuf>,
     cache_dir: PathBuf,
     io_semaphore: &IoSemaphore,
     fetch_semaphore: &FetchSemaphore,
-) -> crate::Result<HashMap<PathBuf, Project>> {
+) -> crate::Result<HashMap<ProjectPathId, Project>> {
     let mut file_path_hashes = HashMap::new();
 
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
@@ -765,10 +767,13 @@ pub async fn infer_data_from_files(
     }
 
     // Project paths should be relative
-    let return_projects: HashMap<PathBuf, Project> = return_projects.into_iter().map(|(h, v)| {
-        let h = h.strip_prefix(profile.path.clone())?.to_path_buf();
-        Ok::<_,crate::Error>((h,v))
-    }).collect::<crate::Result<HashMap<PathBuf, Project>>>()?;
+    let _profile_base_path = profile.get_profile_full_path().await?;
+    let mut corrected_hashmap = HashMap::new();
+    let mut stream = tokio_stream::iter(return_projects);
+    while let Some((h, v)) = stream.next().await {
+        let h = ProjectPathId::from_fs_path(h).await?;
+        corrected_hashmap.insert(h, v);
+    }
 
-    Ok(return_projects)
+    Ok(corrected_hashmap)
 }
