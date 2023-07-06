@@ -228,6 +228,8 @@ pub async fn profile_run_credentials(
 ) -> Result<Uuid> {
     let minecraft_child = profile::run_credentials(path, &credentials).await?;
     let uuid = minecraft_child.read().await.uuid;
+    
+
     Ok(uuid)
 }
 

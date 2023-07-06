@@ -241,10 +241,11 @@ impl Profile {
                 if let Some(profile) = profile {
                     let paths = profile.get_profile_full_project_paths()?;
 
+                    let caches_dir = state.directories.caches_dir().await;
                     let projects = crate::state::infer_data_from_files(
                         profile.clone(),
                         paths,
-                        state.directories.caches_dir(),
+                        caches_dir,
                         &state.io_semaphore,
                         &state.fetch_semaphore,
                     )
@@ -261,7 +262,6 @@ impl Profile {
                         ProfilePayloadType::Synced,
                     )
                     .await?;
-                    tracing::info!("Done syncing");
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",
@@ -282,7 +282,6 @@ impl Profile {
 
     /// Gets paths to projects as their full paths, not just their relative paths
     pub fn get_profile_full_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
-        tracing::info!("Getting profile project paths, profile path: {}", self.path.display());
         let mut files = Vec::new();
         let mut read_paths = |path: &str| {
             let new_path = self.path.join(path);
@@ -429,7 +428,7 @@ impl Profile {
             }
         };
 
-        let state: std::sync::Arc<State> = State::get().await?;
+        let state = State::get().await?;
         let relative_name = PathBuf::new().join(project_type.get_folder()).join(file_name);
         let path = self.path.join(relative_name.clone());
         write(&path, &bytes, &state.io_semaphore).await?;
@@ -548,19 +547,21 @@ impl Profiles {
         file_watcher: &mut Debouncer<RecommendedWatcher>,
     ) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
-        fs::create_dir_all(dirs.profiles_dir()).await?;
+        let profiles_dir = dirs.profiles_dir().await;
+        fs::create_dir_all(&profiles_dir).await?;
 
         file_watcher
             .watcher()
-            .watch(&dirs.profiles_dir(), RecursiveMode::NonRecursive)?;
+            .watch(&profiles_dir, RecursiveMode::NonRecursive)?;
 
-        let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
+        let mut entries = fs::read_dir(dirs.profiles_dir().await).await?;
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
             if path.is_dir() {
-                let prof = match Self::read_profile_from_dir(&path).await {
+                let prof = match Self::read_profile_from_dir(&path, &dirs).await {
                     Ok(prof) => Some(prof),
                     Err(err) => {
+                        
                         tracing::warn!(
                             "Error loading profile: {err}. Skipping..."
                         );
@@ -570,7 +571,7 @@ impl Profiles {
                 if let Some(profile) = prof {
                     let path = canonicalize(path)?;
                     Profile::watch_fs(&path, file_watcher).await?;
-                    profiles.insert(path, profile);
+                    profiles.insert(profile.path.clone(), profile);
                 }
             }
         }
@@ -595,13 +596,14 @@ impl Profiles {
                 }
             }
 
+            let caches_dir = state.directories.caches_dir().await;
             future::try_join_all(files.into_iter().map(
                 |(profile, files)| async {
                     let profile_path = profile.path.clone();
                     let inferred = super::projects::infer_data_from_files(
                         profile,
                         files,
-                        state.directories.caches_dir(),
+                        caches_dir.clone(),
                         &state.io_semaphore,
                         &state.fetch_semaphore,
                     )
@@ -681,14 +683,14 @@ impl Profiles {
 
     #[tracing::instrument(skip_all)]
     pub async fn sync(&self) -> crate::Result<&Self> {
+        let state = State::get().await?;
+        let profiles_dir = &state.directories.profiles_dir().await;
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
             .try_for_each_concurrent(None, |(path, profile)| async move {
-                tracing::info!("Syncing profile: {:?}", path);
                 let json = serde_json::to_vec(&profile)?;
 
-                let json_path = Path::new(&path.to_string_lossy().to_string())
-                    .join(PROFILE_JSON_PATH);
+                let json_path = profiles_dir.join(&path).join(PROFILE_JSON_PATH);
 
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::Error>(())
@@ -698,10 +700,21 @@ impl Profiles {
         Ok(self)
     }
 
-    async fn  read_profile_from_dir(path: &Path) -> crate::Result<Profile> {
+    async fn  read_profile_from_dir(path: &Path, dirs : &DirectoryInfo) -> crate::Result<Profile> {
         let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
         let mut profile = serde_json::from_slice::<Profile>(&json)?;
-        profile.path = PathBuf::from(path);
+        
+        profile.path = PathBuf::from(path.strip_prefix(dirs.profiles_dir().await)?);
+
+        // Cache icons were changed to be relative in v0.2.3. This strips the cache dir from the icon path if it exists.
+        let cache_dir = dirs.caches_dir().await;
+        if let Some(icon) = &mut profile.metadata.icon {
+                *icon = match icon.strip_prefix(cache_dir) {
+                    Ok(path) => path.to_path_buf(),
+                    Err(_) => icon.clone(),
+                };
+        }
+
         Ok(profile)
     }
 
@@ -714,10 +727,9 @@ impl Profiles {
             let res = async {
                 let _span = span.enter();
                 let state = State::get().await?;
-
+                let dirs = &state.directories;
                 let mut profiles = state.profiles.write().await;
 
-                tracing::info!("Updating: {path}", path = path.display());
                 if let Some(profile) = profiles.0.get_mut(&path) {
                     if !path.exists() {
                         // if path exists in the state but no longer in the filesystem, remove it from the state list
@@ -734,7 +746,7 @@ impl Profiles {
                 } else if path.exists() {
                     // if it exists in the filesystem but no longer in the state, add it to the state list
                     profiles
-                        .insert(Self::read_profile_from_dir(&path).await?)
+                        .insert(Self::read_profile_from_dir(&path, &dirs).await?)
                         .await?;
                     Profile::sync_projects_task(path);
                 }

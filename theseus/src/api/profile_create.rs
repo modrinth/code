@@ -36,7 +36,7 @@ pub async fn profile_create(
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let uuid = Uuid::new_v4();
-    let path = state.directories.profiles_dir().join(&name);
+    let path = state.directories.profiles_dir().await.join(&name);
     if path.exists() {
         if !path.is_dir() {
             return Err(ProfileCreationError::NotFolder.into());
@@ -80,10 +80,11 @@ pub async fn profile_create(
         Profile::new(uuid, name, game_version, path.clone()).await?;
     let result = async {
         if let Some(ref icon) = icon {
-            let bytes = tokio::fs::read(icon).await?;
+            let caches_dir = state.directories.caches_dir().await;
+            let bytes = tokio::fs::read(caches_dir.join(icon)).await?;
             profile
                 .set_icon(
-                    &state.directories.caches_dir(),
+                    &state.directories.caches_dir().await,
                     &state.io_semaphore,
                     bytes::Bytes::from(bytes),
                     &icon.to_string_lossy(),

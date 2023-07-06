@@ -61,7 +61,7 @@ impl Metadata {
         io_semaphore: &IoSemaphore,
     ) -> crate::Result<Self> {
         let mut metadata = None;
-        let metadata_path = dirs.caches_meta_dir().join("metadata.json");
+        let metadata_path = dirs.caches_meta_dir().await.join("metadata.json");
 
         if let Ok(metadata_json) =
             read_json::<Metadata>(&metadata_path, io_semaphore).await
@@ -107,7 +107,7 @@ impl Metadata {
             let state = State::get().await?;
 
             let metadata_path =
-                state.directories.caches_meta_dir().join("metadata.json");
+                state.directories.caches_meta_dir().await.join("metadata.json");
 
             write(
                 &metadata_path,

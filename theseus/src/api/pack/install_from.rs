@@ -232,7 +232,7 @@ pub async fn generate_pack_from_version_id(
             Some(
                 write_cached_icon(
                     filename,
-                    &state.directories.caches_dir(),
+                    &state.directories.caches_dir().await,
                     icon_bytes,
                     &state.io_semaphore,
                 )

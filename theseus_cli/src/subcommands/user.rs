@@ -151,7 +151,7 @@ impl UserDefault {
     ) -> Result<()> {
         info!("Setting user {} as default", self.user.as_hyphenated());
 
-        let state: std::sync::Arc<State> = State::get().await?;
+        let state = State::get().await?;
         let mut settings = state.settings.write().await;
 
         if settings.default_user == Some(self.user) {

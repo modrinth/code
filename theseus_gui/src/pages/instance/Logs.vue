@@ -87,7 +87,7 @@ async function getLiveLog() {
 }
 
 async function getLogs() {
-  return (await get_logs(props.instance.uuid, true).catch(handleError)).reverse().map((log) => {
+  return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
     log.name = dayjs(
       log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)
     ).calendar()
@@ -121,7 +121,7 @@ watch(selectedLogIndex, async (newIndex) => {
   if (newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_datetime(
-      props.instance.uuid,
+      props.instance.path,
       logs.value[newIndex].datetime_string
     ).catch(handleError)
   }
@@ -136,7 +136,7 @@ const deleteLog = async () => {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_datetime(
-      props.instance.uuid,
+      props.instance.path,
       logs.value[deleteIndex].datetime_string
     ).catch(handleError)
     await setLogs()

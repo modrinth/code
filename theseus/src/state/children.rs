@@ -24,7 +24,7 @@ pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub uuid: Uuid,
-    pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
+    pub profile_relative_path: PathBuf, 
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
     pub output: SharedOutput,
@@ -39,12 +39,12 @@ impl Children {
     // The threads for stdout and stderr are spawned here
     // Unlike a Hashmap's 'insert', this directly returns the reference to the MinecraftChild rather than any previously stored MinecraftChild that may exist
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(skip(self, mc_command, post_command, censor_strings))]
     #[theseus_macros::debug_pin]
     pub async fn insert_process(
         &mut self,
         uuid: Uuid,
-        profile_path: PathBuf,
+        profile_relative_path: PathBuf,
         log_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Command to run after minecraft.
@@ -56,7 +56,7 @@ impl Children {
         // Create std watcher threads for stdout and stderr
         let shared_output =
             SharedOutput::build(&log_path, censor_strings).await?;
-        if let Some(child_stdout) = child.stdout.take() {
+            if let Some(child_stdout) = child.stdout.take() {
             let stdout_clone = shared_output.clone();
             tokio::spawn(async move {
                 if let Err(e) = stdout_clone.read_stdout(child_stdout).await {
@@ -98,7 +98,7 @@ impl Children {
         // Create MinecraftChild
         let mchild = MinecraftChild {
             uuid,
-            profile_path,
+            profile_relative_path,
             current_child,
             output: shared_output,
             manager,
@@ -243,7 +243,7 @@ impl Children {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
                 let child = child.read().await;
-                if child.profile_path == profile_path {
+                if child.profile_relative_path == profile_path {
                     keys.push(key);
                 }
             }
@@ -259,7 +259,7 @@ impl Children {
                 let child = child.clone();
                 let child = child.write().await;
                 if child.current_child.write().await.try_wait()?.is_none() {
-                    profiles.push(child.profile_path.clone());
+                    profiles.push(child.profile_relative_path.clone());
                 }
             }
         }
@@ -276,7 +276,7 @@ impl Children {
                 let child = child.write().await;
                 if child.current_child.write().await.try_wait()?.is_none() {
                     if let Some(prof) = crate::api::profile::get(
-                        &child.profile_path.clone(),
+                        &child.profile_relative_path.clone(),
                         None,
                     )
                     .await?

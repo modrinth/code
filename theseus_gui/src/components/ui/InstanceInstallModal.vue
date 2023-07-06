@@ -18,14 +18,13 @@ import {
   get,
   list,
 } from '@/helpers/profile'
-import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
+import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
 
 const themeStore = useTheming()
 
@@ -61,6 +60,7 @@ defineExpose({
 })
 
 const profiles = ref([])
+const cacheDir = await getCacheDir();
 
 async function install(instance) {
   instance.installing = true
@@ -142,7 +142,7 @@ const upload_icon = async () => {
   })
 
   if (!icon.value) return
-  display_icon.value = tauri.convertFileSrc(icon.value)
+  display_icon.value = convertCachedFileSrc(cacheDir, icon.value)
 }
 
 const reset_icon = () => {
@@ -227,7 +227,7 @@ const check_valid = computed(() => {
                 !profile.metadata.icon ||
                 (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
                   ? profile.metadata.icon
-                  : convertFileSrc(profile.metadata?.icon)
+                  : convertCachedFileSrc(cacheDir, profile.metadata?.icon)
               "
               class="profile-image"
             />

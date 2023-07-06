@@ -62,7 +62,7 @@
     </label>
     <div class="input-group">
       <Avatar
-        :src="!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon)"
+        :src="!icon || (icon && icon.startsWith('http')) ? icon : convertCachedFileSrc(cacheDir, icon)"
         size="md"
         class="project__icon"
       />
@@ -334,13 +334,13 @@ import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
+import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
 
 const router = useRouter()
 
@@ -356,6 +356,10 @@ const themeStore = useTheming()
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
 const groups = ref(props.instance.metadata.groups)
+
+const cacheDir = await getCacheDir();
+
+
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([

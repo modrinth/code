@@ -2,7 +2,6 @@
 import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
 import { list, run } from '@/helpers/profile'
@@ -17,6 +16,7 @@ import { handleError } from '@/store/state.js'
 import { showInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import mixpanel from 'mixpanel-browser'
+import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
 
 const props = defineProps({
   instance: {
@@ -176,6 +176,8 @@ defineExpose({
   instance: props.instance,
 })
 
+const cacheDir = await getCacheDir();
+
 const unlisten = await process_listener((e) => {
   if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
 })
@@ -193,7 +195,7 @@ onUnmounted(() => unlisten())
             ? !props.instance.metadata.icon ||
               (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
               ? props.instance.metadata.icon
-              : convertFileSrc(props.instance.metadata?.icon)
+              : convertCachedFileSrc(cacheDir,props.instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"

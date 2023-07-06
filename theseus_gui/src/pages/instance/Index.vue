@@ -8,7 +8,7 @@
             !instance.metadata.icon ||
             (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
               ? instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
+              : convertCachedFileSrc(cacheDir, instance.metadata?.icon)
           "
         />
         <div class="instance-info">
@@ -130,13 +130,13 @@ import {
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
 import { PackageIcon } from '@/assets/icons/index.js'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import { convertCachedFileSrc, getCacheDir } from '@/helpers/cache'
 
 const route = useRoute()
 
@@ -154,6 +154,8 @@ breadcrumbs.setContext({
 })
 
 const loadingBar = useLoading()
+
+const cacheDir = await getCacheDir();
 
 const uuid = ref(null)
 const playing = ref(false)

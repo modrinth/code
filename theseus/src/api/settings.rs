@@ -1,5 +1,10 @@
 //! Theseus profile management interface
 
+use std::path::PathBuf;
+
+use tokio::{fs, sync::RwLock};
+
+use crate::{prelude::DirectoryInfo, state::{self, Profiles}};
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
@@ -19,6 +24,14 @@ pub async fn get() -> crate::Result<Settings> {
 #[tracing::instrument]
 pub async fn set(settings: Settings) -> crate::Result<()> {
     let state = State::get().await?;
+
+    if settings.loaded_config_dir != state.settings.read().await.loaded_config_dir {
+        return Err(crate::ErrorKind::OtherError(
+            "Cannot change config directory as setting".to_string(),
+        )
+        .as_error());
+    }
+
     let (reset_io, reset_fetch) = async {
         let read = state.settings.read().await;
         (
@@ -42,3 +55,68 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
     State::sync().await?;
     Ok(())
 }
+
+/// Sets the new config dir, the location of all Theseus data except for the settings.json itself
+/// Takes control of the entire state and blocks until completion
+pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
+
+    tracing::info!("Setting new config dir: {}", new_config_dir.display());
+    if !new_config_dir.is_dir() {
+        return Err(crate::ErrorKind::FSError(
+            format!("New config dir is not a folder: {}", new_config_dir.display()),
+        )
+        .as_error());
+    }
+
+    // Take control of the state
+    let mut state_write = State::get_write().await?;
+    let old_config_dir = state_write.directories.config_dir.read().await.clone();
+
+    // Set load config dir setting
+    let settings = {
+        let mut settings = state_write.settings.write().await;
+        settings.loaded_config_dir = Some(new_config_dir.clone());
+
+        // Some java paths are hardcoded to within our config dir, so we need to update them
+        for key in  settings.java_globals.keys() {
+            if let Some(java) = settings.java_globals.get_mut(&key) {
+                // If the path is within the old config dir path, update it to the new config dir
+                if let Ok(relative_path) = PathBuf::from(java.path.clone()).strip_prefix(&old_config_dir) {
+                    java.path = new_config_dir.join(relative_path).to_string_lossy().to_string();
+                }
+            }
+        }
+        settings.sync(&state_write.directories.settings_file()).await?;
+        settings.clone()
+    };
+
+    // Set new state information 
+    state_write.directories = DirectoryInfo::init(&settings)?;
+
+    // Move all files over from state_write.directories.config_dir to new_config_dir
+
+    let mut entries = fs::read_dir(old_config_dir).await?;
+        while let Some(entry) = entries.next_entry().await? {
+        let entry_path = entry.path();
+        if let Some(file_name) = entry_path.file_name()  {
+            // Ignore settings.json
+            if file_name == "settings.json" {
+                continue;
+            }
+            let new_path = new_config_dir.join(file_name);
+            fs::rename(entry_path, new_path).await?;                
+        }
+    }
+
+    // Reset file watcher
+    let mut file_watcher =  state::init_watcher().await?;
+
+    // Reset profiles (for filepaths, file watcher, etc)
+    state_write.profiles = RwLock::new(Profiles::init(&state_write.directories, &mut file_watcher).await?);
+    state_write.file_watcher =  RwLock::new(file_watcher);
+
+    // TODO: need to be able to safely error out of this function, reverting the changes
+
+    Ok(())
+}
+

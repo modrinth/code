@@ -218,6 +218,7 @@ pub async fn write<'a>(
     Ok(())
 }
 
+// Writes a icon to the cache and returns the *relative* path of the icon within the cache directory
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn write_cached_icon(
     icon_path: &str,
@@ -236,6 +237,7 @@ pub async fn write_cached_icon(
     write(&path, &bytes, semaphore).await?;
 
     let path = dunce::canonicalize(path)?;
+    let path = path.strip_prefix(cache_dir)?.to_path_buf();
     Ok(path)
 }
 

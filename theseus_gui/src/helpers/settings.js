@@ -37,3 +37,11 @@ export async function get() {
 export async function set(settings) {
   return await invoke('plugin:settings|settings_set', { settings })
 }
+
+
+// Changes the config dir
+// Seizes the entire application state until its done
+export async function change_config_dir(newConfigDir) {
+  console.log("tedst")
+  return await invoke('plugin:settings|settings_change_config_dir', { newConfigDir })
+}

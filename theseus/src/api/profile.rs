@@ -58,11 +58,30 @@ pub async fn get(
     path: &Path,
     clear_projects: Option<bool>,
 ) -> crate::Result<Option<Profile>> {
-    tracing::debug!("Getting profile: {}", path.display());
     let state = State::get().await?;
 
     let profiles = state.profiles.read().await;
     let mut profile = profiles.0.get(path).cloned();
+
+    if clear_projects.unwrap_or(false) {
+        if let Some(profile) = &mut profile {
+            profile.projects = HashMap::new();
+        }
+    }
+
+    Ok(profile)
+}
+
+/// Get a profile by uuid
+#[tracing::instrument]
+pub async fn get_by_uuid(
+    uuid: uuid::Uuid,
+    clear_projects: Option<bool>,
+) -> crate::Result<Option<Profile>> {
+    let state = State::get().await?;
+
+    let profiles = state.profiles.read().await;
+    let mut profile = profiles.0.values().find(|x| x.uuid == uuid).cloned();
 
     if clear_projects.unwrap_or(false) {
         if let Some(profile) = &mut profile {
@@ -121,7 +140,7 @@ pub async fn edit_icon(
             Some(ref mut profile) => {
                 profile
                     .set_icon(
-                        &state.directories.caches_dir(),
+                        &state.directories.caches_dir().await,
                         &state.io_semaphore,
                         bytes::Bytes::from(bytes),
                         &icon.to_string_lossy(),
