@@ -16,7 +16,7 @@
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
         <Button color="primary" @click="share">
-          <SendIcon />
+          <ShareIcon />
           Share
         </Button>
         <Button
@@ -49,8 +49,9 @@ import {
   CheckIcon,
   ClipboardCopyIcon,
   DropdownSelect,
-  SendIcon,
+  ShareIcon,
   TrashIcon,
+  ShareModal,
 } from 'omorphia'
 import { delete_logs_by_datetime, get_logs, get_output_by_datetime } from '@/helpers/logs.js'
 import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -61,7 +62,6 @@ import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import {ofetch} from "ofetch";
-import ShareModal from "@/components/ui/ShareModal.vue";
 
 dayjs.extend(calendar)
 
