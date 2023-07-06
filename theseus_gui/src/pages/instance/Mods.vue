@@ -209,7 +209,7 @@
       </div>
     </div>
   </Card>
-  <div v-else class="">
+  <div v-else class="empty-prompt">
     <div class="empty-icon">
       <AddProjectImage />
     </div>
@@ -873,6 +873,28 @@ listen('tauri://file-drop', async (event) => {
         transform: rotate(180deg);
       }
     }
+  }
+}
+.empty-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-md);
+  height: 100%;
+  width: 100%;
+  margin: auto;
+
+  .empty-icon {
+    svg {
+      width: 10rem;
+      height: 10rem;
+      color: var(--color-contrast);
+    }
+  }
+
+  p, h3 {
+    margin: 0
   }
 }
 </style>

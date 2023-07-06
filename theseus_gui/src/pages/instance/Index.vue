@@ -349,6 +349,7 @@ Button {
   flex-direction: row;
   overflow: auto;
   gap: 1rem;
+  min-height: 100%;
 }
 
 .content {
