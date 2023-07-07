@@ -1,11 +1,4 @@
-/*!
-Current edition of Ory kratos does not support PAT access of data, so this module is how we allow for PAT authentication.
-
-
-Just as a summary: Don't implement this flow in your application!
-*/
-
-use super::auth::AuthenticationError;
+use crate::auth::AuthenticationError;
 use crate::database;
 use crate::database::models::{DatabaseError, UserId};
 use crate::models::users::{self, Badges, RecipientType, RecipientWallet};
@@ -35,11 +28,11 @@ where
     let row = sqlx::query!(
         "
                 SELECT pats.expires_at,
-                    u.id, u.name, u.kratos_id, u.email, u.github_id,
+                    u.id, u.name, u.email,
                     u.avatar_url, u.username, u.bio,
                     u.created, u.role, u.badges,
-                    u.balance, u.payout_wallet, u.payout_wallet_type,
-                    u.payout_address
+                    u.balance, u.payout_wallet, u.payout_wallet_type, u.payout_address,
+                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id
                 FROM pats LEFT OUTER JOIN users u ON pats.user_id = u.id
                 WHERE access_token = $1
                 ",
@@ -54,9 +47,13 @@ where
 
         return Ok(Some(database::models::User {
             id: UserId(row.id),
-            kratos_id: row.kratos_id,
             name: row.name,
             github_id: row.github_id,
+            discord_id: row.discord_id,
+            gitlab_id: row.gitlab_id,
+            google_id: row.google_id,
+            steam_id: row.steam_id,
+            microsoft_id: row.microsoft_id,
             email: row.email,
             avatar_url: row.avatar_url,
             username: row.username,

@@ -1,11 +1,19 @@
 use super::ids::*;
 use super::DatabaseError;
 use crate::models::ids::base62_impl::parse_base62;
-use crate::models::projects::{FileType, VersionStatus, VersionType};
+use crate::models::projects::{FileType, VersionStatus};
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use itertools::Itertools;
+use redis::cmd;
+use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+
+const VERSIONS_NAMESPACE: &str = "versions";
+// TODO: Cache version slugs call
+// const VERSIONS_SLUGS_NAMESPACE: &str = "versions_slugs";
+const VERSION_FILES_NAMESPACE: &str = "versions_files";
+const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
 pub struct VersionBuilder {
     pub version_id: VersionId,
@@ -199,7 +207,7 @@ impl VersionBuilder {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Version {
     pub id: VersionId,
     pub project_id: ProjectId,
@@ -254,20 +262,18 @@ impl Version {
 
     pub async fn remove_full(
         id: VersionId,
+        redis: &deadpool_redis::Pool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<Option<()>, sqlx::Error> {
-        let result = sqlx::query!(
-            "
-            SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)
-            ",
-            id as VersionId,
-        )
-        .fetch_one(&mut *transaction)
-        .await?;
+    ) -> Result<Option<()>, DatabaseError> {
+        let result = Self::get(id, &mut *transaction, redis).await?;
 
-        if !result.exists.unwrap_or(false) {
+        let result = if let Some(result) = result {
+            result
+        } else {
             return Ok(None);
-        }
+        };
+
+        Version::clear_cache(&result, redis).await?;
 
         sqlx::query!(
             "
@@ -374,276 +380,383 @@ impl Version {
         .execute(&mut *transaction)
         .await?;
 
-        crate::database::models::Project::update_game_versions(
-            ProjectId(project_id.mod_id),
-            &mut *transaction,
-        )
-        .await?;
-        crate::database::models::Project::update_loaders(
-            ProjectId(project_id.mod_id),
-            &mut *transaction,
-        )
-        .await?;
-
         Ok(Some(()))
     }
 
-    pub async fn get_project_versions<'a, E>(
-        project_id: ProjectId,
-        game_versions: Option<Vec<String>>,
-        loaders: Option<Vec<String>>,
-        version_type: Option<VersionType>,
-        limit: Option<u32>,
-        offset: Option<u32>,
-        exec: E,
-    ) -> Result<Vec<VersionId>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-    {
-        use futures::stream::TryStreamExt;
-
-        let vec = sqlx::query!(
-            "
-            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.date_published FROM versions v
-            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
-            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))
-            INNER JOIN loaders_versions lv ON lv.version_id = v.id
-            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-            WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)
-            ORDER BY v.date_published DESC, v.id
-            LIMIT $5 OFFSET $6
-            ",
-            project_id as ProjectId,
-            &game_versions.unwrap_or_default(),
-            &loaders.unwrap_or_default(),
-            version_type.map(|x| x.as_str()),
-            limit.map(|x| x as i64),
-            offset.map(|x| x as i64),
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|v| VersionId(v.version_id))) })
-        .try_collect::<Vec<VersionId>>()
-        .await?;
-
-        Ok(vec)
-    }
-
-    pub async fn get_projects_versions<'a, E>(
-        project_ids: Vec<ProjectId>,
-        game_versions: Option<Vec<String>>,
-        loaders: Option<Vec<String>>,
-        version_type: Option<VersionType>,
-        limit: Option<u32>,
-        offset: Option<u32>,
-        exec: E,
-    ) -> Result<HashMap<ProjectId, Vec<VersionId>>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-    {
-        use futures::stream::TryStreamExt;
-
-        let vec = sqlx::query!(
-            "
-            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.mod_id, v.date_published FROM versions v
-            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
-            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))
-            INNER JOIN loaders_versions lv ON lv.version_id = v.id
-            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-            WHERE v.mod_id = ANY($1) AND ($4::varchar IS NULL OR v.version_type = $4)
-            ORDER BY v.date_published, v.id ASC
-            LIMIT $5 OFFSET $6
-            ",
-            &project_ids.into_iter().map(|x| x.0).collect::<Vec<i64>>(),
-            &game_versions.unwrap_or_default(),
-            &loaders.unwrap_or_default(),
-            version_type.map(|x| x.as_str()),
-            limit.map(|x| x as i64),
-            offset.map(|x| x as i64),
-        )
-            .fetch_many(exec)
-            .try_filter_map(|e| async { Ok(e.right().map(|v| (ProjectId(v.mod_id), VersionId(v.version_id)))) })
-            .try_collect::<Vec<(ProjectId, VersionId)>>()
-            .await?;
-
-        let mut map: HashMap<ProjectId, Vec<VersionId>> = HashMap::new();
-
-        for (project_id, version_id) in vec {
-            if let Some(value) = map.get_mut(&project_id) {
-                value.push(version_id);
-            } else {
-                map.insert(project_id, vec![version_id]);
-            }
-        }
-
-        Ok(map)
-    }
-
-    pub async fn get_full<'a, 'b, E>(
+    pub async fn get<'a, 'b, E>(
         id: VersionId,
         executor: E,
-    ) -> Result<Option<QueryVersion>, sqlx::error::Error>
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<QueryVersion>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Self::get_many_full(&[id], executor)
+        Self::get_many(&[id], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
 
-    pub async fn get_many_full<'a, E>(
+    pub async fn get_many<'a, E>(
         version_ids: &[VersionId],
         exec: E,
-    ) -> Result<Vec<QueryVersion>, sqlx::Error>
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<QueryVersion>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        if version_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        use futures::stream::TryStreamExt;
+
+        let mut version_ids_parsed: Vec<i64> = version_ids.iter().map(|x| x.0).collect();
+
+        let mut redis = redis.get().await?;
+
+        let mut found_versions = Vec::new();
+
+        let versions = cmd("MGET")
+            .arg(
+                version_ids_parsed
+                    .iter()
+                    .map(|x| format!("{}:{}", VERSIONS_NAMESPACE, x))
+                    .collect::<Vec<_>>(),
+            )
+            .query_async::<_, Vec<Option<String>>>(&mut redis)
+            .await?;
+
+        for version in versions {
+            if let Some(version) =
+                version.and_then(|x| serde_json::from_str::<QueryVersion>(&x).ok())
+            {
+                version_ids_parsed.retain(|x| &version.inner.id.0 != x);
+                found_versions.push(version);
+                continue;
+            }
+        }
+
+        if !version_ids_parsed.is_empty() {
+            let db_versions: Vec<QueryVersion> = sqlx::query!(
+                "
+                SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
+                v.changelog changelog, v.date_published date_published, v.downloads downloads,
+                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
+                JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
+                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+                JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,
+                JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
+                JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
+                FROM versions v
+                LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
+                LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
+                LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
+                LEFT OUTER JOIN loaders l on lv.loader_id = l.id
+                LEFT OUTER JOIN files f on v.id = f.version_id
+                LEFT OUTER JOIN hashes h on f.id = h.file_id
+                LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
+                WHERE v.id = ANY($1)
+                GROUP BY v.id
+                ORDER BY v.date_published ASC;
+                ",
+                &version_ids_parsed
+            )
+                .fetch_many(exec)
+                .try_filter_map(|e| async {
+                    Ok(e.right().map(|v|
+                        QueryVersion {
+                            inner: Version {
+                                id: VersionId(v.id),
+                                project_id: ProjectId(v.mod_id),
+                                author_id: UserId(v.author_id),
+                                name: v.version_name,
+                                version_number: v.version_number,
+                                changelog: v.changelog,
+                                changelog_url: None,
+                                date_published: v.date_published,
+                                downloads: v.downloads,
+                                version_type: v.version_type,
+                                featured: v.featured,
+                                status: VersionStatus::from_str(&v.status),
+                                requested_status: v.requested_status
+                                    .map(|x| VersionStatus::from_str(&x)),
+                            },
+                            files: {
+                                #[derive(Deserialize)]
+                                struct Hash {
+                                    pub file_id: FileId,
+                                    pub algorithm: String,
+                                    pub hash: String,
+                                }
+
+                                #[derive(Deserialize)]
+                                struct File {
+                                    pub id: FileId,
+                                    pub url: String,
+                                    pub filename: String,
+                                    pub primary: bool,
+                                    pub size: u32,
+                                    pub file_type: Option<FileType>,
+                                }
+
+                                let hashes: Vec<Hash> = serde_json::from_value(
+                                    v.hashes.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default();
+
+                                let files: Vec<File> = serde_json::from_value(
+                                    v.files.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default();
+
+                                let mut files = files.into_iter().map(|x| {
+                                    let mut file_hashes = HashMap::new();
+
+                                    for hash in &hashes {
+                                        if hash.file_id == x.id {
+                                            file_hashes.insert(
+                                                hash.algorithm.clone(),
+                                                hash.hash.clone(),
+                                            );
+                                        }
+                                    }
+
+                                    QueryFile {
+                                        id: x.id,
+                                        url: x.url,
+                                        filename: x.filename,
+                                        hashes: file_hashes,
+                                        primary: x.primary,
+                                        size: x.size,
+                                        file_type: x.file_type,
+                                    }
+                                }).collect::<Vec<_>>();
+
+                                files.sort_by(|a, b| {
+                                    if a.primary {
+                                        Ordering::Less
+                                    } else if b.primary {
+                                        Ordering::Greater
+                                    } else {
+                                        a.filename.cmp(&b.filename)
+                                    }
+                                });
+
+                                files
+                            },
+                            game_versions: {
+                                #[derive(Deserialize)]
+                                struct GameVersion {
+                                    pub version: String,
+                                    pub created: DateTime<Utc>,
+                                }
+
+                                let mut game_versions: Vec<GameVersion> = serde_json::from_value(
+                                    v.game_versions.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default();
+
+                                game_versions.sort_by(|a, b| a.created.cmp(&b.created));
+
+                                game_versions.into_iter().map(|x| x.version).collect()
+                            },
+                            loaders: v.loaders.unwrap_or_default(),
+                            dependencies: serde_json::from_value(
+                                v.dependencies.unwrap_or_default(),
+                            )
+                                .ok()
+                                .unwrap_or_default(),
+                        }
+                    ))
+                })
+                .try_collect::<Vec<QueryVersion>>()
+                .await?;
+
+            for version in db_versions {
+                cmd("SET")
+                    .arg(format!("{}:{}", VERSIONS_NAMESPACE, version.inner.id.0))
+                    .arg(serde_json::to_string(&version)?)
+                    .arg("EX")
+                    .arg(DEFAULT_EXPIRY)
+                    .query_async::<_, ()>(&mut redis)
+                    .await?;
+
+                found_versions.push(version);
+            }
+        }
+
+        Ok(found_versions)
+    }
+
+    pub async fn get_file_from_hash<'a, 'b, E>(
+        algo: String,
+        hash: String,
+        version_id: Option<VersionId>,
+        executor: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<SingleFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use futures::stream::TryStreamExt;
-
-        let version_ids_parsed: Vec<i64> = version_ids.iter().map(|x| x.0).collect();
-        sqlx::query!(
-            "
-            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
-            v.changelog changelog, v.date_published date_published, v.downloads downloads,
-            v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
-            JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
-            ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,
-            JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
-            JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
-            FROM versions v
-            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
-            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
-            LEFT OUTER JOIN loaders l on lv.loader_id = l.id
-            LEFT OUTER JOIN files f on v.id = f.version_id
-            LEFT OUTER JOIN hashes h on f.id = h.file_id
-            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
-            WHERE v.id = ANY($1)
-            GROUP BY v.id
-            ORDER BY v.date_published ASC;
-            ",
-            &version_ids_parsed
-        )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|v|
-                    QueryVersion {
-                        inner: Version {
-                            id: VersionId(v.id),
-                            project_id: ProjectId(v.mod_id),
-                            author_id: UserId(v.author_id),
-                            name: v.version_name,
-                            version_number: v.version_number,
-                            changelog: v.changelog,
-                            changelog_url: None,
-                            date_published: v.date_published,
-                            downloads: v.downloads,
-                            version_type: v.version_type,
-                            featured: v.featured,
-                            status: VersionStatus::from_str(&v.status),
-                            requested_status: v.requested_status
-                                .map(|x| VersionStatus::from_str(&x)),
-                        },
-                        files: {
-                            #[derive(Deserialize)]
-                            struct Hash {
-                                pub file_id: FileId,
-                                pub algorithm: String,
-                                pub hash: String,
-                            }
-
-                            #[derive(Deserialize)]
-                            struct File {
-                                pub id: FileId,
-                                pub url: String,
-                                pub filename: String,
-                                pub primary: bool,
-                                pub size: u32,
-                                pub file_type: Option<FileType>,
-                            }
-
-                            let hashes: Vec<Hash> = serde_json::from_value(
-                                v.hashes.unwrap_or_default(),
-                            )
-                                .ok()
-                                .unwrap_or_default();
-
-                            let files: Vec<File> = serde_json::from_value(
-                                v.files.unwrap_or_default(),
-                            )
-                                .ok()
-                                .unwrap_or_default();
-
-                            let mut files = files.into_iter().map(|x| {
-                                let mut file_hashes = HashMap::new();
-
-                                for hash in &hashes {
-                                    if hash.file_id == x.id {
-                                        file_hashes.insert(
-                                            hash.algorithm.clone(),
-                                            hash.hash.clone(),
-                                        );
-                                    }
-                                }
-
-                                QueryFile {
-                                    id: x.id,
-                                    url: x.url,
-                                    filename: x.filename,
-                                    hashes: file_hashes,
-                                    primary: x.primary,
-                                    size: x.size,
-                                    file_type: x.file_type,
-                                }
-                            }).collect::<Vec<_>>();
-
-                            files.sort_by(|a, b| {
-                                if a.primary {
-                                    Ordering::Less
-                                } else if b.primary {
-                                    Ordering::Greater
-                                } else {
-                                    a.filename.cmp(&b.filename)
-                                }
-                            });
-
-                            files
-                        },
-                        game_versions: {
-                            #[derive(Deserialize)]
-                            struct GameVersion {
-                                pub version: String,
-                                pub created: DateTime<Utc>,
-                            }
-
-                            let mut game_versions: Vec<GameVersion> = serde_json::from_value(
-                                v.game_versions.unwrap_or_default(),
-                            )
-                                .ok()
-                                .unwrap_or_default();
-
-                            game_versions.sort_by(|a, b| a.created.cmp(&b.created));
-
-                            game_versions.into_iter().map(|x| x.version).collect()
-                        },
-                        loaders: v.loaders.unwrap_or_default(),
-                        dependencies: serde_json::from_value(
-                            v.dependencies.unwrap_or_default(),
-                        )
-                            .ok()
-                            .unwrap_or_default(),
-                    }
-                ))
-            })
-            .try_collect::<Vec<QueryVersion>>()
+        Self::get_files_from_hash(algo, &[hash], executor, redis)
             .await
+            .map(|x| {
+                x.into_iter()
+                    .find_or_first(|x| Some(x.version_id) == version_id)
+            })
     }
 
+    pub async fn get_files_from_hash<'a, 'b, E>(
+        algorithm: String,
+        hashes: &[String],
+        executor: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<SingleFile>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        if hashes.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        use futures::stream::TryStreamExt;
+
+        let mut file_ids_parsed = hashes.to_vec();
+
+        let mut redis = redis.get().await?;
+
+        let mut found_files = Vec::new();
+
+        let files = cmd("MGET")
+            .arg(
+                file_ids_parsed
+                    .iter()
+                    .map(|hash| format!("{}:{}_{}", VERSION_FILES_NAMESPACE, algorithm, hash))
+                    .collect::<Vec<_>>(),
+            )
+            .query_async::<_, Vec<Option<String>>>(&mut redis)
+            .await?;
+
+        for file in files {
+            if let Some(mut file) =
+                file.and_then(|x| serde_json::from_str::<Vec<SingleFile>>(&x).ok())
+            {
+                file_ids_parsed.retain(|x| {
+                    !file
+                        .iter()
+                        .any(|y| y.hashes.iter().any(|z| z.0 == &algorithm && z.1 == x))
+                });
+                found_files.append(&mut file);
+                continue;
+            }
+        }
+
+        if !file_ids_parsed.is_empty() {
+            let db_files: Vec<SingleFile> = sqlx::query!(
+                "
+                SELECT f.id, f.version_id, v.mod_id, f.url, f.filename, f.is_primary, f.size, f.file_type,
+                JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'))) filter (where h.hash is not null) hashes
+                FROM files f
+                INNER JOIN versions v on v.id = f.version_id
+                INNER JOIN hashes h on h.file_id = f.id
+                WHERE h.algorithm = $1 AND h.hash = ANY($2)
+                GROUP BY f.id, v.mod_id, v.date_published
+                ORDER BY v.date_published
+                ",
+                algorithm,
+                &file_ids_parsed.into_iter().map(|x| x.as_bytes().to_vec()).collect::<Vec<_>>(),
+            )
+                .fetch_many(executor)
+                .try_filter_map(|e| async {
+                    Ok(e.right().map(|f| {
+                        #[derive(Deserialize)]
+                        struct Hash {
+                            pub algorithm: String,
+                            pub hash: String,
+                        }
+
+                        SingleFile {
+                            id: FileId(f.id),
+                            version_id: VersionId(f.version_id),
+                            project_id: ProjectId(f.mod_id),
+                            url: f.url,
+                            filename: f.filename,
+                            hashes: serde_json::from_value::<Vec<Hash>>(
+                                f.hashes.unwrap_or_default(),
+                            )
+                                .ok()
+                                .unwrap_or_default().into_iter().map(|x| (x.algorithm, x.hash)).collect(),
+                            primary: f.is_primary,
+                            size: f.size as u32,
+                            file_type: f.file_type.map(|x| FileType::from_str(&x)),
+                        }
+                    }
+                    ))
+                })
+                .try_collect::<Vec<SingleFile>>()
+                .await?;
+
+            let mut save_files: HashMap<String, Vec<SingleFile>> = HashMap::new();
+
+            for file in db_files {
+                for (algo, hash) in &file.hashes {
+                    let key = format!("{}_{}", algo, hash);
+
+                    if let Some(files) = save_files.get_mut(&key) {
+                        files.push(file.clone());
+                    } else {
+                        save_files.insert(key, vec![file.clone()]);
+                    }
+                }
+            }
+
+            for (key, mut files) in save_files {
+                cmd("SET")
+                    .arg(format!("{}:{}", VERSIONS_NAMESPACE, key))
+                    .arg(serde_json::to_string(&files)?)
+                    .arg("EX")
+                    .arg(DEFAULT_EXPIRY)
+                    .query_async::<_, ()>(&mut redis)
+                    .await?;
+
+                found_files.append(&mut files);
+            }
+        }
+
+        Ok(found_files)
+    }
+
+    pub async fn clear_cache(
+        version: &QueryVersion,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.get().await?;
+
+        let mut cmd = cmd("DEL");
+
+        cmd.arg(format!("{}:{}", VERSIONS_NAMESPACE, version.inner.id.0));
+
+        for file in &version.files {
+            for (algo, hash) in &file.hashes {
+                cmd.arg(format!("{}:{}_{}", VERSION_FILES_NAMESPACE, algo, hash));
+            }
+        }
+
+        cmd.query_async::<_, ()>(&mut redis).await?;
+
+        Ok(())
+    }
+
+    // TODO: Needs to be cached
     pub async fn get_full_from_id_slug<'a, 'b, E>(
         project_id_or_slug: &str,
         slug: &str,
         executor: E,
-    ) -> Result<Option<QueryVersion>, sqlx::error::Error>
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<QueryVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -665,14 +778,14 @@ impl Version {
         .await?;
 
         if let Some(version_id) = id {
-            Version::get_full(VersionId(version_id.id), executor).await
+            Ok(Version::get(VersionId(version_id.id), executor, redis).await?)
         } else {
             Ok(None)
         }
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct QueryVersion {
     pub inner: Version,
 
@@ -682,7 +795,7 @@ pub struct QueryVersion {
     pub dependencies: Vec<QueryDependency>,
 }
 
-#[derive(Clone, Deserialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct QueryDependency {
     pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
@@ -690,9 +803,22 @@ pub struct QueryDependency {
     pub dependency_type: String,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct QueryFile {
     pub id: FileId,
+    pub url: String,
+    pub filename: String,
+    pub hashes: HashMap<String, String>,
+    pub primary: bool,
+    pub size: u32,
+    pub file_type: Option<FileType>,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+pub struct SingleFile {
+    pub id: FileId,
+    pub version_id: VersionId,
+    pub project_id: ProjectId,
     pub url: String,
     pub filename: String,
     pub hashes: HashMap<String, String>,

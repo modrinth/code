@@ -4,9 +4,9 @@ use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Serialize;
 use sqlx::PgPool;
 
+use crate::auth::{filter_authorized_versions, get_user_from_headers, is_authorized};
 use crate::database;
 use crate::models::projects::VersionType;
-use crate::util::auth::{filter_authorized_versions, get_user_from_headers, is_authorized};
 
 use super::ApiError;
 
@@ -19,35 +19,35 @@ pub async fn forge_updates(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     const ERROR: &str = "The specified project does not exist!";
 
     let (id,) = info.into_inner();
 
-    let project = database::models::Project::get_from_slug_or_project_id(&id, &**pool)
+    let project = database::models::Project::get(&id, &**pool, &redis)
         .await?
         .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
 
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+        .await
+        .ok();
 
-    if !is_authorized(&project, &user_option, &pool).await? {
+    if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Err(ApiError::InvalidInput(ERROR.to_string()));
     }
 
-    let version_ids = database::models::Version::get_project_versions(
-        project.id,
-        None,
-        Some(vec!["forge".to_string()]),
-        None,
-        None,
-        None,
-        &**pool,
+    let versions = database::models::Version::get_many(&project.versions, &**pool, &redis).await?;
+
+    let mut versions = filter_authorized_versions(
+        versions
+            .into_iter()
+            .filter(|x| x.loaders.iter().any(|y| *y == "forge"))
+            .collect(),
+        &user_option,
+        &pool,
     )
     .await?;
-
-    let versions = database::models::Version::get_many_full(&version_ids, &**pool).await?;
-
-    let mut versions = filter_authorized_versions(versions, &user_option, &pool).await?;
 
     versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
 

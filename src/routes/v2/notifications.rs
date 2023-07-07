@@ -1,8 +1,8 @@
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
 use crate::routes::ApiError;
-use crate::util::auth::get_user_from_headers;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -30,8 +30,9 @@ pub async fn notifications_get(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     use database::models::notification_item::Notification as DBNotification;
     use database::models::NotificationId as DBNotificationId;
@@ -60,8 +61,9 @@ pub async fn notification_get(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let id = info.into_inner().0;
 
@@ -84,8 +86,9 @@ pub async fn notification_read(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let id = info.into_inner().0;
 
@@ -117,8 +120,9 @@ pub async fn notification_delete(
     req: HttpRequest,
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let id = info.into_inner().0;
 
@@ -150,8 +154,9 @@ pub async fn notifications_read(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
         .into_iter()
@@ -185,8 +190,9 @@ pub async fn notifications_delete(
     req: HttpRequest,
     web::Query(ids): web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
         .into_iter()

@@ -8,6 +8,7 @@ use crate::util::env::{parse_strings_from_var, parse_var};
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use chrono::{DateTime, Utc};
+use deadpool_redis::{Config, Runtime};
 use env_logger::Env;
 use log::{error, info, warn};
 use search::indexing::index_projects;
@@ -15,9 +16,9 @@ use search::indexing::IndexingSettings;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+mod auth;
 mod database;
 mod file_hosting;
-mod health;
 mod models;
 mod queue;
 mod ratelimit;
@@ -73,6 +74,12 @@ async fn main() -> std::io::Result<()> {
     let pool = database::connect()
         .await
         .expect("Database connection failed");
+
+    // Redis connector
+    let redis_cfg = Config::from_url(dotenvy::var("REDIS_URL").expect("Redis URL not set"));
+    let redis_pool = redis_cfg
+        .create_pool(Some(Runtime::Tokio1))
+        .expect("Redis connection failed");
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
 
@@ -152,6 +159,7 @@ async fn main() -> std::io::Result<()> {
 
     // Changes statuses of scheduled projects/versions
     let pool_ref = pool.clone();
+    // TODO: Clear cache when these are run
     scheduler.run(std::time::Duration::from_secs(60), move || {
         let pool_ref = pool_ref.clone();
         info!("Releasing scheduled versions/projects!");
@@ -245,7 +253,7 @@ async fn main() -> std::io::Result<()> {
                     }
                 }
 
-                Ok::<(), crate::routes::ApiError>(())
+                Ok::<(), routes::ApiError>(())
             };
 
             if let Err(e) = do_steps.await {
@@ -342,6 +350,7 @@ async fn main() -> std::io::Result<()> {
                     routes::ApiError::Validation(err.to_string()).into()
                 }),
             )
+            .app_data(web::Data::new(redis_pool.clone()))
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
             .app_data(web::Data::new(search_config.clone()))
@@ -352,6 +361,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::root_config)
             .configure(routes::v2::config)
             .configure(routes::v3::config)
+            .configure(auth::config)
             .default_service(web::get().to(routes::not_found))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
@@ -387,9 +397,6 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
-    failed |= check_var::<String>("MINOS_URL");
-    failed |= check_var::<String>("KRATOS_URL");
-    failed |= check_var::<String>("ORY_AUTH_BEARER");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
     failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
     failed |= check_var::<String>("DATABASE_URL");
@@ -397,6 +404,8 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("MEILISEARCH_KEY");
     failed |= check_var::<String>("BIND_ADDR");
     failed |= check_var::<String>("SELF_ADDR");
+
+    failed |= check_var::<String>("REDIS_URL");
 
     failed |= check_var::<String>("STORAGE_BACKEND");
 
@@ -431,12 +440,10 @@ fn check_env_vars() -> bool {
     failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
 
     failed |= check_var::<String>("GITHUB_CLIENT_ID");
+    failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
 
     failed |= check_var::<String>("ARIADNE_ADMIN_KEY");
     failed |= check_var::<String>("ARIADNE_URL");
-
-    failed |= check_var::<String>("STRIPE_TOKEN");
-    failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
 
     failed |= check_var::<String>("PAYPAL_API_URL");
     failed |= check_var::<String>("PAYPAL_CLIENT_ID");

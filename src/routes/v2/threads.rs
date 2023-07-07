@@ -1,13 +1,13 @@
+use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::models::ids::ThreadMessageId;
 use crate::models::notifications::NotificationBody;
 use crate::models::projects::ProjectStatus;
-use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadMessage, ThreadType};
+use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadType};
 use crate::models::users::User;
 use crate::routes::ApiError;
-use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use futures::TryStreamExt;
 use serde::Deserialize;
@@ -68,6 +68,7 @@ pub async fn filter_authorized_threads(
     threads: Vec<database::models::Thread>,
     user: &User,
     pool: &web::Data<PgPool>,
+    redis: &deadpool_redis::Pool,
 ) -> Result<Vec<Thread>, ApiError> {
     let user_id: database::models::UserId = user.id.into();
 
@@ -171,7 +172,7 @@ pub async fn filter_authorized_threads(
             .collect::<Vec<database::models::UserId>>(),
     );
 
-    let users: Vec<User> = database::models::User::get_many(&user_ids, &***pool)
+    let users: Vec<User> = database::models::User::get_many_ids(&user_ids, &***pool, redis)
         .await?
         .into_iter()
         .map(From::from)
@@ -190,7 +191,7 @@ pub async fn filter_authorized_threads(
                 .collect::<Vec<_>>(),
         );
 
-        final_threads.push(convert_thread(
+        final_threads.push(Thread::from(
             thread,
             users
                 .iter()
@@ -204,56 +205,18 @@ pub async fn filter_authorized_threads(
     Ok(final_threads)
 }
 
-fn convert_thread(data: database::models::Thread, users: Vec<User>, user: &User) -> Thread {
-    let thread_type = data.type_;
-
-    Thread {
-        id: data.id.into(),
-        type_: thread_type,
-        messages: data
-            .messages
-            .into_iter()
-            .filter(|x| {
-                if let MessageBody::Text { private, .. } = x.body {
-                    !private || user.role.is_mod()
-                } else {
-                    true
-                }
-            })
-            .map(|x| ThreadMessage {
-                id: x.id.into(),
-                author_id: if users
-                    .iter()
-                    .find(|y| x.author_id == Some(y.id.into()))
-                    .map(|x| x.role.is_mod() && !user.role.is_mod())
-                    .unwrap_or(false)
-                {
-                    None
-                } else {
-                    x.author_id.map(|x| x.into())
-                },
-                body: x.body,
-                created: x.created,
-            })
-            .collect(),
-        members: users
-            .into_iter()
-            .filter(|x| !x.role.is_mod() || user.role.is_mod())
-            .collect(),
-    }
-}
-
 #[get("{id}")]
 pub async fn thread_get(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0.into();
 
     let thread_data = database::models::Thread::get(string, &**pool).await?;
 
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     if let Some(mut data) = thread_data {
         if is_authorized_thread(&data, &user, &pool).await? {
@@ -267,13 +230,13 @@ pub async fn thread_get(
                     .collect::<Vec<_>>(),
             );
 
-            let users: Vec<User> = database::models::User::get_many(authors, &**pool)
+            let users: Vec<User> = database::models::User::get_many_ids(authors, &**pool, &redis)
                 .await?
                 .into_iter()
                 .map(From::from)
                 .collect();
 
-            return Ok(HttpResponse::Ok().json(convert_thread(data, users, &user)));
+            return Ok(HttpResponse::Ok().json(Thread::from(data, users, &user)));
         }
     }
     Ok(HttpResponse::NotFound().body(""))
@@ -289,8 +252,9 @@ pub async fn threads_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ThreadIds>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let thread_ids: Vec<database::models::ids::ThreadId> =
         serde_json::from_str::<Vec<ThreadId>>(&ids.ids)?
@@ -300,7 +264,7 @@ pub async fn threads_get(
 
     let threads_data = database::models::Thread::get_many(&thread_ids, &**pool).await?;
 
-    let threads = filter_authorized_threads(threads_data, &user, &pool).await?;
+    let threads = filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
 
     Ok(HttpResponse::Ok().json(threads))
 }
@@ -316,8 +280,9 @@ pub async fn thread_send_message(
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
     new_message: web::Json<NewThreadMessage>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let string: database::models::ThreadId = info.into_inner().0.into();
 
@@ -392,6 +357,7 @@ pub async fn thread_send_message(
                 let members = database::models::TeamMember::get_from_team_full(
                     database::models::TeamId(record.team_id),
                     &**pool,
+                    &redis,
                 )
                 .await?;
 
@@ -475,8 +441,9 @@ pub async fn thread_send_message(
 pub async fn moderation_inbox(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = check_is_moderator_from_headers(req.headers(), &**pool).await?;
+    let user = check_is_moderator_from_headers(req.headers(), &**pool, &redis).await?;
 
     let ids = sqlx::query!(
         "
@@ -491,7 +458,7 @@ pub async fn moderation_inbox(
     .await?;
 
     let threads_data = database::models::Thread::get_many(&ids, &**pool).await?;
-    let threads = filter_authorized_threads(threads_data, &user, &pool).await?;
+    let threads = filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
 
     Ok(HttpResponse::Ok().json(threads))
 }
@@ -501,8 +468,9 @@ pub async fn thread_read(
     req: HttpRequest,
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(req.headers(), &**pool).await?;
+    check_is_moderator_from_headers(req.headers(), &**pool, &redis).await?;
 
     let id = info.into_inner().0;
     let mut transaction = pool.begin().await?;
@@ -528,8 +496,9 @@ pub async fn message_delete(
     req: HttpRequest,
     info: web::Path<(ThreadMessageId,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let result = database::models::ThreadMessage::get(info.into_inner().0.into(), &**pool).await?;
 

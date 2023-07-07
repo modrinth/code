@@ -1,9 +1,18 @@
 use super::ids::*;
+use crate::database::models;
+use crate::database::models::DatabaseError;
+use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::projects::{MonetizationStatus, ProjectStatus};
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use redis::cmd;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, Deserialize)]
+const PROJECTS_NAMESPACE: &str = "projects";
+const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
+const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies";
+const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DonationUrl {
     pub platform_id: DonationPlatformId,
     pub platform_short: String,
@@ -37,7 +46,7 @@ impl DonationUrl {
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GalleryItem {
     pub image_url: String,
     pub featured: bool,
@@ -109,7 +118,7 @@ impl ProjectBuilder {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<ProjectId, super::DatabaseError> {
+    ) -> Result<ProjectId, DatabaseError> {
         let project_struct = Project {
             id: self.project_id,
             project_type: self.project_type_id,
@@ -144,8 +153,6 @@ impl ProjectBuilder {
             moderation_message_body: None,
             webhook_sent: false,
             color: self.color,
-            loaders: vec![],
-            game_versions: vec![],
             thread_id: Some(self.thread_id),
             monetization_status: self.monetization_status,
         };
@@ -190,13 +197,10 @@ impl ProjectBuilder {
             .await?;
         }
 
-        Project::update_game_versions(self.project_id, &mut *transaction).await?;
-        Project::update_loaders(self.project_id, &mut *transaction).await?;
-
         Ok(self.project_id)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Project {
     pub id: ProjectId,
     pub project_type: ProjectTypeId,
@@ -227,8 +231,6 @@ pub struct Project {
     pub moderation_message_body: Option<String>,
     pub webhook_sent: bool,
     pub color: Option<u32>,
-    pub loaders: Vec<String>,
-    pub game_versions: Vec<String>,
     pub thread_id: Option<ThreadId>,
     pub monetization_status: MonetizationStatus,
 }
@@ -237,7 +239,7 @@ impl Project {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<(), sqlx::error::Error> {
+    ) -> Result<(), DatabaseError> {
         sqlx::query!(
             "
             INSERT INTO mods (
@@ -285,402 +287,303 @@ impl Project {
         Ok(())
     }
 
-    pub async fn get<'a, 'b, E>(
-        id: ProjectId,
-        executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        Project::get_many(&[id], executor)
-            .await
-            .map(|x| x.into_iter().next())
-    }
-
-    pub async fn get_many<'a, E>(
-        project_ids: &[ProjectId],
-        exec: E,
-    ) -> Result<Vec<Project>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        use futures::stream::TryStreamExt;
-
-        let project_ids_parsed: Vec<i64> = project_ids.iter().map(|x| x.0).collect();
-        let projects = sqlx::query!(
-            "
-            SELECT id, project_type, title, description, downloads, follows,
-                   icon_url, body, published,
-                   updated, approved, queued, status, requested_status,
-                   issues_url, source_url, wiki_url, discord_url, license_url,
-                   team_id, client_side, server_side, license, slug,
-                   moderation_message, moderation_message_body,
-                   webhook_sent, color, loaders, game_versions, thread_id, monetization_status
-            FROM mods
-            WHERE id = ANY($1)
-            ",
-            &project_ids_parsed
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|m| Project {
-                id: ProjectId(m.id),
-                project_type: ProjectTypeId(m.project_type),
-                team_id: TeamId(m.team_id),
-                title: m.title,
-                description: m.description,
-                downloads: m.downloads,
-                body_url: None,
-                icon_url: m.icon_url,
-                published: m.published,
-                updated: m.updated,
-                issues_url: m.issues_url,
-                source_url: m.source_url,
-                wiki_url: m.wiki_url,
-                license_url: m.license_url,
-                discord_url: m.discord_url,
-                client_side: SideTypeId(m.client_side),
-                status: ProjectStatus::from_str(&m.status),
-                requested_status: m.requested_status.map(|x| ProjectStatus::from_str(&x)),
-                server_side: SideTypeId(m.server_side),
-                license: m.license,
-                slug: m.slug,
-                body: m.body,
-                follows: m.follows,
-                moderation_message: m.moderation_message,
-                moderation_message_body: m.moderation_message_body,
-                approved: m.approved,
-                webhook_sent: m.webhook_sent,
-                color: m.color.map(|x| x as u32),
-                loaders: m.loaders,
-                game_versions: m.game_versions,
-                queued: m.queued,
-                thread_id: m.thread_id.map(ThreadId),
-                monetization_status: MonetizationStatus::from_str(&m.monetization_status),
-            }))
-        })
-        .try_collect::<Vec<Project>>()
-        .await?;
-
-        Ok(projects)
-    }
-
-    pub async fn remove_full(
+    pub async fn remove(
         id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<Option<()>, sqlx::error::Error> {
-        let result = sqlx::query!(
-            "
-            SELECT team_id FROM mods WHERE id = $1
-            ",
-            id as ProjectId,
-        )
-        .fetch_optional(&mut *transaction)
-        .await?;
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<()>, DatabaseError> {
+        let project = Self::get_id(id, &mut *transaction, redis).await?;
 
-        let team_id: TeamId = if let Some(id) = result {
-            TeamId(id.team_id)
-        } else {
-            return Ok(None);
-        };
+        if let Some(project) = project {
+            Project::clear_cache(id, project.inner.slug, Some(true), redis).await?;
 
-        let thread_id = sqlx::query!(
-            "
-            SELECT thread_id FROM mods
-            WHERE id = $1
-            ",
-            id as ProjectId
-        )
-        .fetch_optional(&mut *transaction)
-        .await?;
+            sqlx::query!(
+                "
+                DELETE FROM mod_follows
+                WHERE mod_id = $1
+                ",
+                id as ProjectId
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM mod_follows
-            WHERE mod_id = $1
-            ",
-            id as ProjectId
-        )
-        .execute(&mut *transaction)
-        .await?;
+            sqlx::query!(
+                "
+                DELETE FROM mods_gallery
+                WHERE mod_id = $1
+                ",
+                id as ProjectId
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM mods_gallery
-            WHERE mod_id = $1
-            ",
-            id as ProjectId
-        )
-        .execute(&mut *transaction)
-        .await?;
+            sqlx::query!(
+                "
+                DELETE FROM mod_follows
+                WHERE mod_id = $1
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM mod_follows
-            WHERE mod_id = $1
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
+            sqlx::query!(
+                "
+                DELETE FROM reports
+                WHERE mod_id = $1
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM reports
-            WHERE mod_id = $1
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
+            sqlx::query!(
+                "
+                DELETE FROM mods_categories
+                WHERE joining_mod_id = $1
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM mods_categories
-            WHERE joining_mod_id = $1
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
+            sqlx::query!(
+                "
+                DELETE FROM mods_donations
+                WHERE joining_mod_id = $1
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM mods_donations
-            WHERE joining_mod_id = $1
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        use futures::TryStreamExt;
-        let versions: Vec<VersionId> = sqlx::query!(
-            "
-            SELECT id FROM versions
-            WHERE mod_id = $1
-            ",
-            id as ProjectId,
-        )
-        .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|c| VersionId(c.id))) })
-        .try_collect::<Vec<VersionId>>()
-        .await?;
-
-        for version in versions {
-            super::Version::remove_full(version, transaction).await?;
-        }
-
-        sqlx::query!(
-            "
-            DELETE FROM dependencies WHERE mod_dependency_id = $1
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            UPDATE payouts_values
-            SET mod_id = NULL
-            WHERE (mod_id = $1)
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM mods
-            WHERE id = $1
-            ",
-            id as ProjectId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM team_members
-            WHERE team_id = $1
-            ",
-            team_id as TeamId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM teams
-            WHERE id = $1
-            ",
-            team_id as TeamId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        if let Some(thread_id) = thread_id {
-            if let Some(id) = thread_id.thread_id {
-                crate::database::models::Thread::remove_full(ThreadId(id), transaction).await?;
+            for version in project.versions {
+                super::Version::remove_full(version, redis, transaction).await?;
             }
-        }
 
-        Ok(Some(()))
-    }
+            sqlx::query!(
+                "
+                DELETE FROM dependencies WHERE mod_dependency_id = $1
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-    pub async fn get_full_from_slug<'a, 'b, E>(
-        slug: &str,
-        executor: E,
-    ) -> Result<Option<QueryProject>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        let id = sqlx::query!(
-            "
-            SELECT id FROM mods
-            WHERE slug = LOWER($1)
-            ",
-            slug
-        )
-        .fetch_optional(executor)
-        .await?;
+            sqlx::query!(
+                "
+                UPDATE payouts_values
+                SET mod_id = NULL
+                WHERE (mod_id = $1)
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        if let Some(project_id) = id {
-            Project::get_full(ProjectId(project_id.id), executor).await
+            sqlx::query!(
+                "
+                DELETE FROM mods
+                WHERE id = $1
+                ",
+                id as ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            models::TeamMember::clear_cache(project.inner.team_id, redis).await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM team_members
+                WHERE team_id = $1
+                ",
+                project.inner.team_id as TeamId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM teams
+                WHERE id = $1
+                ",
+                project.inner.team_id as TeamId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            if let Some(thread_id) = project.inner.thread_id {
+                models::Thread::remove_full(thread_id, transaction).await?;
+            }
+
+            Ok(Some(()))
         } else {
             Ok(None)
         }
     }
 
-    pub async fn get_from_slug<'a, 'b, E>(
-        slug: &str,
+    pub async fn get<'a, 'b, E>(
+        string: &str,
         executor: E,
-    ) -> Result<Option<Project>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        let id = sqlx::query!(
-            "
-            SELECT id FROM mods
-            WHERE slug = LOWER($1)
-            ",
-            slug
-        )
-        .fetch_optional(executor)
-        .await?;
-
-        if let Some(project_id) = id {
-            Project::get(ProjectId(project_id.id), executor).await
-        } else {
-            Ok(None)
-        }
-    }
-
-    pub async fn get_from_slug_or_project_id<'a, 'b, E>(
-        slug_or_project_id: &str,
-        executor: E,
-    ) -> Result<Option<Project>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        let id_option = crate::models::ids::base62_impl::parse_base62(slug_or_project_id).ok();
-
-        if let Some(id) = id_option {
-            let mut project = Project::get(ProjectId(id as i64), executor).await?;
-
-            if project.is_none() {
-                project = Project::get_from_slug(slug_or_project_id, executor).await?;
-            }
-
-            Ok(project)
-        } else {
-            let project = Project::get_from_slug(slug_or_project_id, executor).await?;
-
-            Ok(project)
-        }
-    }
-
-    pub async fn get_full_from_slug_or_project_id<'a, 'b, E>(
-        slug_or_project_id: &str,
-        executor: E,
-    ) -> Result<Option<QueryProject>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        let id_option = crate::models::ids::base62_impl::parse_base62(slug_or_project_id).ok();
-
-        if let Some(id) = id_option {
-            let mut project = Project::get_full(ProjectId(id as i64), executor).await?;
-
-            if project.is_none() {
-                project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
-            }
-
-            Ok(project)
-        } else {
-            let project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
-            Ok(project)
-        }
-    }
-
-    pub async fn get_full<'a, 'b, E>(
-        id: ProjectId,
-        executor: E,
-    ) -> Result<Option<QueryProject>, sqlx::error::Error>
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<QueryProject>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Project::get_many_full(&[id], executor)
+        Project::get_many(&[string], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
 
-    pub async fn get_many_full<'a, E>(
+    pub async fn get_id<'a, 'b, E>(
+        id: ProjectId,
+        executor: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<QueryProject>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Project::get_many(&[crate::models::ids::ProjectId::from(id)], executor, redis)
+            .await
+            .map(|x| x.into_iter().next())
+    }
+
+    pub async fn get_many_ids<'a, E>(
         project_ids: &[ProjectId],
         exec: E,
-    ) -> Result<Vec<QueryProject>, sqlx::Error>
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<QueryProject>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let ids = project_ids
+            .iter()
+            .map(|x| crate::models::ids::ProjectId::from(*x))
+            .collect::<Vec<_>>();
+        Project::get_many(&ids, exec, redis).await
+    }
+
+    pub async fn get_many<'a, E, T: ToString>(
+        project_strings: &[T],
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<QueryProject>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::TryStreamExt;
 
-        let project_ids_parsed: Vec<i64> = project_ids.iter().map(|x| x.0).collect();
-        sqlx::query!(
-            "
-            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
-            m.icon_url icon_url, m.body body, m.published published,
-            m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
-            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.webhook_sent, m.color,
-            m.loaders loaders, m.game_versions game_versions, m.thread_id thread_id, m.monetization_status monetization_status,
-            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
-            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
-            JSONB_AGG(DISTINCT jsonb_build_object('image_url', mg.image_url, 'featured', mg.featured, 'title', mg.title, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering)) filter (where mg.image_url is not null) gallery,
-            JSONB_AGG(DISTINCT jsonb_build_object('platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url)) filter (where md.joining_platform_id is not null) donations
-            FROM mods m
-            INNER JOIN project_types pt ON pt.id = m.project_type
-            INNER JOIN side_types cs ON m.client_side = cs.id
-            INNER JOIN side_types ss ON m.server_side = ss.id
-            LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
-            LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
-            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id
-            LEFT JOIN versions v ON v.mod_id = m.id AND v.status = ANY($2)
-            LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
-            WHERE m.id = ANY($1)
-            GROUP BY pt.id, cs.id, ss.id, m.id;
-            ",
-            &project_ids_parsed,
-            &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_listed()).map(|x| x.to_string()).collect::<Vec<String>>()
-        )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|m| {
-                    let id = m.id;
+        if project_strings.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let mut redis = redis.get().await?;
+
+        let mut found_projects = Vec::new();
+        let mut remaining_strings = project_strings
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>();
+
+        let mut project_ids = project_strings
+            .iter()
+            .flat_map(|x| parse_base62(&x.to_string()).map(|x| x as i64))
+            .collect::<Vec<_>>();
+
+        project_ids.append(
+            &mut cmd("MGET")
+                .arg(
+                    project_strings
+                        .iter()
+                        .map(|x| {
+                            format!(
+                                "{}:{}",
+                                PROJECTS_SLUGS_NAMESPACE,
+                                x.to_string().to_lowercase()
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                )
+                .query_async::<_, Vec<Option<i64>>>(&mut redis)
+                .await?
+                .into_iter()
+                .flatten()
+                .collect(),
+        );
+
+        if !project_ids.is_empty() {
+            let projects = cmd("MGET")
+                .arg(
+                    project_ids
+                        .iter()
+                        .map(|x| format!("{}:{}", PROJECTS_NAMESPACE, x))
+                        .collect::<Vec<_>>(),
+                )
+                .query_async::<_, Vec<Option<String>>>(&mut redis)
+                .await?;
+
+            for project in projects {
+                if let Some(project) =
+                    project.and_then(|x| serde_json::from_str::<QueryProject>(&x).ok())
+                {
+                    remaining_strings.retain(|x| {
+                        &to_base62(project.inner.id.0 as u64) != x
+                            && project.inner.slug.as_ref() != Some(x)
+                    });
+                    found_projects.push(project);
+                    continue;
+                }
+            }
+        }
+
+        if !remaining_strings.is_empty() {
+            let project_ids_parsed: Vec<i64> = remaining_strings
+                .iter()
+                .flat_map(|x| parse_base62(&x.to_string()).ok())
+                .map(|x| x as i64)
+                .collect();
+            let db_projects: Vec<QueryProject> = sqlx::query!(
+                "
+                SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
+                m.icon_url icon_url, m.body body, m.published published,
+                m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
+                m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
+                m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
+                cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.webhook_sent, m.color,
+                m.thread_id thread_id, m.monetization_status monetization_status,
+                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+                JSONB_AGG(DISTINCT jsonb_build_object('id', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
+                ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
+                ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
+                JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
+                JSONB_AGG(DISTINCT jsonb_build_object('image_url', mg.image_url, 'featured', mg.featured, 'title', mg.title, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering)) filter (where mg.image_url is not null) gallery,
+                JSONB_AGG(DISTINCT jsonb_build_object('platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url)) filter (where md.joining_platform_id is not null) donations
+                FROM mods m
+                INNER JOIN project_types pt ON pt.id = m.project_type
+                INNER JOIN side_types cs ON m.client_side = cs.id
+                INNER JOIN side_types ss ON m.server_side = ss.id
+                LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
+                LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
+                LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+                LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+                LEFT JOIN categories c ON mc.joining_category_id = c.id
+                LEFT JOIN versions v ON v.mod_id = m.id AND v.status = ANY($3)
+                LEFT JOIN loaders_versions lv ON v.id = lv.version_id
+                LEFT JOIN loaders l ON lv.loader_id = l.id
+                LEFT JOIN game_versions_versions gvv ON v.id = gvv.joining_version_id
+                LEFT JOIN game_versions gv ON gvv.game_version_id = gv.id
+                WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                GROUP BY pt.id, cs.id, ss.id, m.id;
+                ",
+                &project_ids_parsed,
+                &remaining_strings.into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<_>>(),
+                &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_listed()).map(|x| x.to_string()).collect::<Vec<String>>()
+            )
+                .fetch_many(exec)
+                .try_filter_map(|e| async {
+                    Ok(e.right().map(|m| {
+                        let id = m.id;
 
                     QueryProject {
                         inner: Project {
@@ -716,8 +619,6 @@ impl Project {
                             approved: m.approved,
                             webhook_sent: m.webhook_sent,
                             color: m.color.map(|x| x as u32),
-                            loaders: m.loaders,
-                            game_versions: m.game_versions,
                             queued: m.queued,
                             thread_id: m.thread_id.map(ThreadId),
                             monetization_status: MonetizationStatus::from_str(
@@ -728,94 +629,179 @@ impl Project {
                         categories: m.categories.unwrap_or_default(),
                         additional_categories: m.additional_categories.unwrap_or_default(),
                         versions: {
-                            #[derive(Deserialize)]
-                            struct Version {
-                                pub id: VersionId,
-                                pub date_published: DateTime<Utc>,
+                                #[derive(Deserialize)]
+                                struct Version {
+                                    pub id: VersionId,
+                                    pub date_published: DateTime<Utc>,
+                                }
+
+                                let mut versions: Vec<Version> = serde_json::from_value(
+                                    m.versions.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default();
+
+                                versions.sort_by(|a, b| a.date_published.cmp(&b.date_published));
+
+                                versions.into_iter().map(|x| x.id).collect()
+                            },
+                            gallery_items: {
+                                let mut gallery: Vec<GalleryItem> = serde_json::from_value(
+                                    m.gallery.unwrap_or_default(),
+                                ).ok().unwrap_or_default();
+
+                                gallery.sort_by(|a, b| a.ordering.cmp(&b.ordering));
+
+                                gallery
+                            },
+                            donation_urls: serde_json::from_value(
+                                m.donations.unwrap_or_default(),
+                            ).ok().unwrap_or_default(),
+                            client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
+                            server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
+                            loaders: m.loaders.unwrap_or_default(),
+                            game_versions: {
+                                #[derive(Deserialize)]
+                                struct GameVersion {
+                                    pub id: String,
+                                    pub created: DateTime<Utc>,
+                                }
+
+                                let mut game_versions: Vec<GameVersion> = serde_json::from_value(
+                                    m.game_versions.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default();
+
+                                game_versions.sort_by(|a, b| a.created.cmp(&b.created));
+
+                                game_versions.into_iter().map(|x| x.id).collect()
                             }
+                        }}))
+                })
+                .try_collect::<Vec<QueryProject>>()
+                .await?;
 
-                            let mut versions: Vec<Version> = serde_json::from_value(
-                                m.versions.unwrap_or_default(),
-                            )
-                                .ok()
-                                .unwrap_or_default();
+            for project in db_projects {
+                cmd("SET")
+                    .arg(format!("{}:{}", PROJECTS_NAMESPACE, project.inner.id.0))
+                    .arg(serde_json::to_string(&project)?)
+                    .arg("EX")
+                    .arg(DEFAULT_EXPIRY)
+                    .query_async::<_, ()>(&mut redis)
+                    .await?;
 
-                            versions.sort_by(|a, b| a.date_published.cmp(&b.date_published));
+                if let Some(slug) = &project.inner.slug {
+                    cmd("SET")
+                        .arg(format!(
+                            "{}:{}",
+                            PROJECTS_SLUGS_NAMESPACE,
+                            slug.to_lowercase()
+                        ))
+                        .arg(project.inner.id.0)
+                        .arg("EX")
+                        .arg(DEFAULT_EXPIRY)
+                        .query_async::<_, ()>(&mut redis)
+                        .await?;
+                }
+                found_projects.push(project);
+            }
+        }
 
-                            versions.into_iter().map(|x| x.id).collect()
-                        },
-                        gallery_items: {
-                            let mut gallery: Vec<GalleryItem> = serde_json::from_value(
-                                m.gallery.unwrap_or_default(),
-                            ).ok().unwrap_or_default();
-
-                            gallery.sort_by(|a, b| a.ordering.cmp(&b.ordering));
-
-                            gallery
-                        },
-                        donation_urls: serde_json::from_value(
-                            m.donations.unwrap_or_default(),
-                        ).ok().unwrap_or_default(),
-                        client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
-                        server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
-                    }}))
-            })
-            .try_collect::<Vec<QueryProject>>()
-            .await
+        Ok(found_projects)
     }
 
-    pub async fn update_game_versions(
+    pub async fn get_dependencies<'a, E>(
         id: ProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<(), sqlx::error::Error> {
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET game_versions = (
-                SELECT COALESCE(ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null), array[]::varchar[])
-                FROM versions v
-                     INNER JOIN game_versions_versions gvv ON v.id = gvv.joining_version_id
-                     INNER JOIN game_versions gv on gvv.game_version_id = gv.id
-                WHERE v.mod_id = mods.id AND v.status != ALL($2)
-            )
-            WHERE id = $1
-            ",
-            id as ProjectId,
-            &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>()
-        )
-            .execute(&mut *transaction)
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        type Dependencies = Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>;
+
+        use futures::stream::TryStreamExt;
+
+        let mut redis = redis.get().await?;
+
+        let dependencies = cmd("GET")
+            .arg(format!("{}:{}", PROJECTS_DEPENDENCIES_NAMESPACE, id.0))
+            .query_async::<_, Option<String>>(&mut redis)
             .await?;
 
-        Ok(())
+        if let Some(dependencies) =
+            dependencies.and_then(|x| serde_json::from_str::<Dependencies>(&x).ok())
+        {
+            return Ok(dependencies);
+        }
+
+        let dependencies: Dependencies = sqlx::query!(
+            "
+            SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id
+            FROM versions v
+            INNER JOIN dependencies d ON d.dependent_id = v.id
+            LEFT JOIN versions vd ON d.dependency_id = vd.id
+            WHERE v.mod_id = $1
+            ",
+            id as ProjectId
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|x| {
+                (
+                    x.dependency_id.map(VersionId),
+                    if x.mod_id == Some(0) {
+                        None
+                    } else {
+                        x.mod_id.map(ProjectId)
+                    },
+                    x.mod_dependency_id.map(ProjectId),
+                )
+            }))
+        })
+        .try_collect::<Dependencies>()
+        .await?;
+
+        cmd("SET")
+            .arg(format!("{}:{}", PROJECTS_DEPENDENCIES_NAMESPACE, id.0))
+            .arg(serde_json::to_string(&dependencies)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
+
+        Ok(dependencies)
     }
 
-    pub async fn update_loaders(
+    pub async fn clear_cache(
         id: ProjectId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<(), sqlx::error::Error> {
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET loaders = (
-                SELECT COALESCE(ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null), array[]::varchar[])
-                FROM versions v
-                     INNER JOIN loaders_versions lv ON lv.version_id = v.id
-                     INNER JOIN loaders l on lv.loader_id = l.id
-                WHERE v.mod_id = mods.id AND v.status != ALL($2)
-            )
-            WHERE id = $1
-            ",
-            id as ProjectId,
-            &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>()
-        )
-            .execute(&mut *transaction)
-            .await?;
+        slug: Option<String>,
+        clear_dependencies: Option<bool>,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.get().await?;
+        let mut cmd = cmd("DEL");
+
+        cmd.arg(format!("{}:{}", PROJECTS_NAMESPACE, id.0));
+        if let Some(slug) = slug {
+            cmd.arg(format!(
+                "{}:{}",
+                PROJECTS_SLUGS_NAMESPACE,
+                slug.to_lowercase()
+            ));
+        }
+        if clear_dependencies.unwrap_or(false) {
+            cmd.arg(format!("{}:{}", PROJECTS_DEPENDENCIES_NAMESPACE, id.0));
+        }
+
+        cmd.query_async::<_, ()>(&mut redis).await?;
 
         Ok(())
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct QueryProject {
     pub inner: Project,
     pub project_type: String,
@@ -826,4 +812,6 @@ pub struct QueryProject {
     pub gallery_items: Vec<GalleryItem>,
     pub client_side: crate::models::projects::SideType,
     pub server_side: crate::models::projects::SideType,
+    pub loaders: Vec<String>,
+    pub game_versions: Vec<String>,
 }

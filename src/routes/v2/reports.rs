@@ -1,11 +1,9 @@
+use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database::models::thread_item::{ThreadBuilder, ThreadMessageBuilder};
 use crate::models::ids::{base62_impl::parse_base62, ProjectId, UserId, VersionId};
 use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::routes::ApiError;
-use crate::util::auth::{
-    check_is_moderator_from_headers, get_user_from_headers, get_user_from_headers_transaction,
-};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::StreamExt;
@@ -35,10 +33,11 @@ pub async fn report_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     mut body: web::Payload,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool.begin().await?;
 
-    let current_user = get_user_from_headers_transaction(req.headers(), &mut transaction).await?;
+    let current_user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let mut bytes = web::BytesMut::new();
     while let Some(item) = body.next().await {
@@ -179,9 +178,10 @@ fn default_all() -> bool {
 pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     count: web::Query<ReportsRequestOptions>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     use futures::stream::TryStreamExt;
 
@@ -225,10 +225,10 @@ pub async fn reports(
     let query_reports =
         crate::database::models::report_item::Report::get_many(&report_ids, &**pool).await?;
 
-    let mut reports = Vec::new();
+    let mut reports: Vec<Report> = Vec::new();
 
     for x in query_reports {
-        reports.push(to_report(x));
+        reports.push(x.into());
     }
 
     Ok(HttpResponse::Ok().json(reports))
@@ -244,6 +244,7 @@ pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let report_ids: Vec<crate::database::models::ids::ReportId> =
         serde_json::from_str::<Vec<crate::models::ids::ReportId>>(&ids.ids)?
@@ -254,12 +255,12 @@ pub async fn reports_get(
     let reports_data =
         crate::database::models::report_item::Report::get_many(&report_ids, &**pool).await?;
 
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let all_reports = reports_data
         .into_iter()
         .filter(|x| user.role.is_mod() || x.reporter == user.id.into())
-        .map(to_report)
+        .map(|x| x.into())
         .collect::<Vec<Report>>();
 
     Ok(HttpResponse::Ok().json(all_reports))
@@ -269,9 +270,10 @@ pub async fn reports_get(
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     info: web::Path<(crate::models::reports::ReportId,)>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
     let id = info.into_inner().0.into();
 
     let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
@@ -281,7 +283,8 @@ pub async fn report_get(
             return Ok(HttpResponse::NotFound().body(""));
         }
 
-        Ok(HttpResponse::Ok().json(to_report(report)))
+        let report: Report = report.into();
+        Ok(HttpResponse::Ok().json(report))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
@@ -298,10 +301,11 @@ pub struct EditReport {
 pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     info: web::Path<(crate::models::reports::ReportId,)>,
     edit_report: web::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
     let id = info.into_inner().0.into();
 
     let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
@@ -374,8 +378,9 @@ pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     info: web::Path<(crate::models::reports::ReportId,)>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(req.headers(), &**pool).await?;
+    check_is_moderator_from_headers(req.headers(), &**pool, &redis).await?;
 
     let mut transaction = pool.begin().await?;
     let result = crate::database::models::report_item::Report::remove_full(
@@ -389,33 +394,5 @@ pub async fn report_delete(
         Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-fn to_report(x: crate::database::models::report_item::QueryReport) -> Report {
-    let mut item_id = "".to_string();
-    let mut item_type = ItemType::Unknown;
-
-    if let Some(project_id) = x.project_id {
-        item_id = ProjectId::from(project_id).to_string();
-        item_type = ItemType::Project;
-    } else if let Some(version_id) = x.version_id {
-        item_id = VersionId::from(version_id).to_string();
-        item_type = ItemType::Version;
-    } else if let Some(user_id) = x.user_id {
-        item_id = UserId::from(user_id).to_string();
-        item_type = ItemType::User;
-    }
-
-    Report {
-        id: x.id.into(),
-        report_type: x.report_type,
-        item_id,
-        item_type,
-        reporter: x.reporter.into(),
-        body: x.body,
-        created: x.created,
-        closed: x.closed,
-        thread_id: x.thread_id.map(|x| x.into()),
     }
 }

@@ -1,3 +1,4 @@
+use crate::auth::get_user_from_headers;
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
@@ -5,7 +6,6 @@ use crate::models::projects::Project;
 use crate::models::users::{Badges, RecipientType, RecipientWallet, Role, UserId};
 use crate::queue::payouts::{PayoutAmount, PayoutItem, PayoutsQueue};
 use crate::routes::ApiError;
-use crate::util::auth::get_user_from_headers;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
@@ -43,8 +43,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    Ok(HttpResponse::Ok().json(get_user_from_headers(req.headers(), &**pool).await?))
+    Ok(HttpResponse::Ok().json(get_user_from_headers(req.headers(), &**pool, &redis).await?))
 }
 
 #[derive(Serialize)]
@@ -57,8 +58,9 @@ pub struct UserData {
 pub async fn user_data_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     let data = sqlx::query!(
         "
@@ -93,13 +95,11 @@ pub struct UserIds {
 pub async fn users_get(
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_ids = serde_json::from_str::<Vec<UserId>>(&ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect::<Vec<crate::database::models::UserId>>();
+    let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
 
-    let users_data = User::get_many(&user_ids, &**pool).await?;
+    let users_data = User::get_many(&user_ids, &**pool, &redis).await?;
 
     let users: Vec<crate::models::users::User> = users_data.into_iter().map(From::from).collect();
 
@@ -110,21 +110,9 @@ pub async fn users_get(
 pub async fn user_get(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let string = info.into_inner().0;
-    let id_option: Option<UserId> = serde_json::from_str(&format!("\"{string}\"")).ok();
-
-    let mut user_data;
-
-    if let Some(id) = id_option {
-        user_data = User::get(id.into(), &**pool).await?;
-
-        if user_data.is_none() {
-            user_data = User::get_from_username(string, &**pool).await?;
-        }
-    } else {
-        user_data = User::get_from_username(string, &**pool).await?;
-    }
+    let user_data = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(data) = user_data {
         let response: crate::models::users::User = data.into();
@@ -139,12 +127,15 @@ pub async fn projects_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let user = get_user_from_headers(req.headers(), &**pool, &redis)
+        .await
+        .ok();
 
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(id) = id_option.map(|x| x.id) {
         let user_id: UserId = id.into();
 
         let can_view_private = user
@@ -153,12 +144,13 @@ pub async fn projects_list(
 
         let project_data = User::get_projects(id, &**pool).await?;
 
-        let response: Vec<_> = crate::database::Project::get_many_full(&project_data, &**pool)
-            .await?
-            .into_iter()
-            .filter(|x| can_view_private || x.inner.status.is_searchable())
-            .map(Project::from)
-            .collect();
+        let response: Vec<_> =
+            crate::database::Project::get_many_ids(&project_data, &**pool, &redis)
+                .await?
+                .into_iter()
+                .filter(|x| can_view_private || x.inner.status.is_searchable())
+                .map(Project::from)
+                .collect();
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -211,29 +203,30 @@ pub struct EditPayoutData {
 pub async fn user_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
     new_user: web::Json<EditUser>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
 
     new_user
         .validate()
         .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(actual_user) = id_option {
+        let id = actual_user.id;
         let user_id: UserId = id.into();
 
         if user.id == user_id || user.role.is_mod() {
             let mut transaction = pool.begin().await?;
 
             if let Some(username) = &new_user.username {
-                let existing_user_id_option =
-                    User::get_id_from_username_or_id(username, &**pool).await?;
+                let existing_user_id_option = User::get(username, &**pool, &redis).await?;
 
                 if existing_user_id_option
-                    .map(UserId::from)
+                    .map(|x| UserId::from(x.id))
                     .map(|id| id == user.id)
                     .unwrap_or(true)
                 {
@@ -394,6 +387,7 @@ pub async fn user_edit(
                 }
             }
 
+            User::clear_caches(&[(id, Some(actual_user.username))], &redis).await?;
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
@@ -417,34 +411,24 @@ pub async fn user_icon_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
         let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(req.headers(), &**pool).await?;
-        let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+        let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+        let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-        if let Some(id) = id_option {
-            if user.id != id.into() && !user.role.is_mod() {
+        if let Some(actual_user) = id_option {
+            if user.id != actual_user.id.into() && !user.role.is_mod() {
                 return Err(ApiError::CustomAuthentication(
                     "You don't have permission to edit this user's icon.".to_string(),
                 ));
             }
 
-            let mut icon_url = user.avatar_url;
-
-            let user_id: UserId = id.into();
-
-            if user.id != user_id {
-                let new_user = User::get(id, &**pool).await?;
-
-                if let Some(new) = new_user {
-                    icon_url = new.avatar_url;
-                } else {
-                    return Ok(HttpResponse::NotFound().body(""));
-                }
-            }
+            let icon_url = actual_user.avatar_url;
+            let user_id: UserId = actual_user.id.into();
 
             if let Some(icon) = icon_url {
                 let name = icon.split(&format!("{cdn_url}/")).nth(1);
@@ -473,10 +457,12 @@ pub async fn user_icon_edit(
                 WHERE (id = $2)
                 ",
                 format!("{}/{}", cdn_url, upload_data.file_name),
-                id as crate::database::models::ids::UserId,
+                actual_user.id as crate::database::models::ids::UserId,
             )
             .execute(&**pool)
             .await?;
+            User::clear_caches(&[(actual_user.id, None)], &redis).await?;
+
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Ok(HttpResponse::NotFound().body(""))
@@ -505,11 +491,12 @@ pub async fn user_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     removal_type: web::Query<RemovalType>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to delete this user!".to_string(),
@@ -518,11 +505,13 @@ pub async fn user_delete(
 
         let mut transaction = pool.begin().await?;
 
-        let result = if &*removal_type.removal_type == "full" {
-            User::remove_full(id, &mut transaction).await?
-        } else {
-            User::remove(id, &mut transaction).await?
-        };
+        let result = User::remove(
+            id,
+            removal_type.removal_type == "full",
+            &mut transaction,
+            &redis,
+        )
+        .await?;
 
         transaction.commit().await?;
 
@@ -541,11 +530,12 @@ pub async fn user_follows(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the projects this user follows!".to_string(),
@@ -569,11 +559,12 @@ pub async fn user_follows(
         .try_collect::<Vec<crate::database::models::ProjectId>>()
         .await?;
 
-        let projects: Vec<_> = crate::database::Project::get_many_full(&project_ids, &**pool)
-            .await?
-            .into_iter()
-            .map(Project::from)
-            .collect();
+        let projects: Vec<_> =
+            crate::database::Project::get_many_ids(&project_ids, &**pool, &redis)
+                .await?
+                .into_iter()
+                .map(Project::from)
+                .collect();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
@@ -586,11 +577,12 @@ pub async fn user_notifications(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the notifications of this user!".to_string(),
@@ -624,11 +616,12 @@ pub async fn user_payouts(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the payouts of this user!".to_string(),
@@ -699,13 +692,14 @@ pub async fn user_payouts_request(
     pool: web::Data<PgPool>,
     data: web::Json<PayoutData>,
     payouts_queue: web::Data<Arc<Mutex<PayoutsQueue>>>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let mut payouts_queue = payouts_queue.lock().await;
 
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
-    if let Some(id) = id_option {
+    if let Some(id) = id_option.map(|x| x.id) {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to request payouts of this user!".to_string(),
@@ -761,6 +755,7 @@ pub async fn user_payouts_request(
                             )
                             .execute(&mut *transaction)
                             .await?;
+                            User::clear_caches(&[(id, None)], &redis).await?;
 
                             transaction.commit().await?;
 

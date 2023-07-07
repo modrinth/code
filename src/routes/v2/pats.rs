@@ -9,10 +9,10 @@ use crate::database;
 use crate::database::models::generate_pat_id;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 
+use crate::auth::get_user_from_headers;
+use crate::auth::{generate_pat, PersonalAccessToken};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
-use crate::util::auth::get_user_from_headers;
-use crate::util::pat::{generate_pat, PersonalAccessToken};
 
 use actix_web::web::{self, Data, Query};
 use actix_web::{delete, get, patch, post, HttpRequest, HttpResponse};
@@ -46,8 +46,13 @@ pub struct ModifyPersonalAccessToken {
 // Get all personal access tokens for the given user. Minos/Kratos cookie must be attached for it to work.
 // Does not return the actual access token, only the ID + metadata.
 #[get("pat")]
-pub async fn get_pats(req: HttpRequest, pool: Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let user: crate::models::users::User = get_user_from_headers(req.headers(), &**pool).await?;
+pub async fn get_pats(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let user: crate::models::users::User =
+        get_user_from_headers(req.headers(), &**pool, &redis).await?;
     let db_user_id: database::models::UserId = database::models::UserId::from(user.id);
 
     let pats = sqlx::query!(
@@ -84,8 +89,10 @@ pub async fn create_pat(
     req: HttpRequest,
     Query(info): Query<CreatePersonalAccessToken>, // callback url
     pool: Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user: crate::models::users::User = get_user_from_headers(req.headers(), &**pool).await?;
+    let user: crate::models::users::User =
+        get_user_from_headers(req.headers(), &**pool, &redis).await?;
     let db_user_id: database::models::UserId = database::models::UserId::from(user.id);
 
     let mut transaction: sqlx::Transaction<sqlx::Postgres> = pool.begin().await?;
@@ -135,8 +142,10 @@ pub async fn edit_pat(
     id: web::Path<String>,
     Query(info): Query<ModifyPersonalAccessToken>, // callback url
     pool: Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user: crate::models::users::User = get_user_from_headers(req.headers(), &**pool).await?;
+    let user: crate::models::users::User =
+        get_user_from_headers(req.headers(), &**pool, &redis).await?;
     let pat_id = database::models::PatId(parse_base62(&id)? as i64);
     let db_user_id: database::models::UserId = database::models::UserId::from(user.id);
 
@@ -198,8 +207,10 @@ pub async fn delete_pat(
     req: HttpRequest,
     id: web::Path<String>,
     pool: Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user: crate::models::users::User = get_user_from_headers(req.headers(), &**pool).await?;
+    let user: crate::models::users::User =
+        get_user_from_headers(req.headers(), &**pool, &redis).await?;
     let pat_id = database::models::PatId(parse_base62(&id)? as i64);
     let db_user_id: database::models::UserId = database::models::UserId::from(user.id);
 

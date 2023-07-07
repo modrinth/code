@@ -1,4 +1,5 @@
 use super::project_creation::{CreateError, UploadedFile};
+use crate::auth::get_user_from_headers;
 use crate::database::models;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
@@ -12,7 +13,6 @@ use crate::models::projects::{
     VersionId, VersionStatus, VersionType,
 };
 use crate::models::teams::Permissions;
-use crate::util::auth::get_user_from_headers_transaction;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
@@ -82,6 +82,7 @@ pub async fn version_create(
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -91,8 +92,10 @@ pub async fn version_create(
         req,
         &mut payload,
         &mut transaction,
+        &redis,
         &***file_host,
         &mut uploaded_files,
+        &client,
     )
     .await;
 
@@ -116,8 +119,10 @@ async fn version_create_inner(
     req: HttpRequest,
     payload: &mut Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    redis: &deadpool_redis::Pool,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
+    pool: &PgPool,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
 
@@ -127,7 +132,7 @@ async fn version_create_inner(
     let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
     let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
 
-    let user = get_user_from_headers_transaction(req.headers(), &mut *transaction).await?;
+    let user = get_user_from_headers(req.headers(), pool, redis).await?;
 
     let mut error = None;
     while let Some(item) = payload.next().await {
@@ -417,8 +422,7 @@ async fn version_create_inner(
     let project_id = builder.project_id;
     builder.insert(transaction).await?;
 
-    models::Project::update_game_versions(project_id, &mut *transaction).await?;
-    models::Project::update_loaders(project_id, &mut *transaction).await?;
+    models::Project::clear_cache(project_id, None, Some(true), redis).await?;
 
     Ok(HttpResponse::Ok().json(response))
 }
@@ -430,6 +434,7 @@ pub async fn upload_file_to_version(
     url_data: web::Path<(VersionId,)>,
     mut payload: Multipart,
     client: Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
@@ -442,6 +447,7 @@ pub async fn upload_file_to_version(
         &mut payload,
         client,
         &mut transaction,
+        redis,
         &***file_host,
         &mut uploaded_files,
         version_id,
@@ -470,6 +476,7 @@ async fn upload_file_to_version_inner(
     payload: &mut Multipart,
     client: Data<PgPool>,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    redis: Data<deadpool_redis::Pool>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
@@ -479,9 +486,9 @@ async fn upload_file_to_version_inner(
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
-    let user = get_user_from_headers_transaction(req.headers(), &mut *transaction).await?;
+    let user = get_user_from_headers(req.headers(), &**client, &redis).await?;
 
-    let result = models::Version::get_full(version_id, &**client).await?;
+    let result = models::Version::get(version_id, &**client, &redis).await?;
 
     let version = match result {
         Some(v) => v,
@@ -493,8 +500,8 @@ async fn upload_file_to_version_inner(
     };
 
     if !user.role.is_admin() {
-        let team_member = models::TeamMember::get_from_user_id_version(
-            version_id,
+        let team_member = models::TeamMember::get_from_user_id_project(
+            version.inner.project_id,
             user.id.into(),
             &mut *transaction,
         )

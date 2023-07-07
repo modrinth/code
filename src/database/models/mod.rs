@@ -5,6 +5,7 @@ pub mod ids;
 pub mod notification_item;
 pub mod project_item;
 pub mod report_item;
+pub mod session_item;
 pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
@@ -21,11 +22,13 @@ pub use version_item::Version;
 #[derive(Error, Debug)]
 pub enum DatabaseError {
     #[error("Error while interacting with the database: {0}")]
-    Database(#[from] sqlx::error::Error),
+    Database(#[from] sqlx::Error),
     #[error("Error while trying to generate random ID")]
     RandomId,
-    #[error("A database request failed")]
-    Other(String),
-    #[error("Error while parsing JSON: {0}")]
-    Json(#[from] serde_json::Error),
+    #[error("Error while interacting with the cache: {0}")]
+    CacheError(#[from] redis::RedisError),
+    #[error("Redis Pool Error: {0}")]
+    RedisPool(#[from] deadpool_redis::PoolError),
+    #[error("Error while serializing with the cache: {0}")]
+    SerdeCacheError(#[from] serde_json::Error),
 }

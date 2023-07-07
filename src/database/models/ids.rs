@@ -2,7 +2,7 @@ use super::DatabaseError;
 use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::random_base62_rng;
 use censor::Censor;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::sqlx_macros::Type;
 
 const ID_RETRY_COUNT: usize = 20;
@@ -129,35 +129,43 @@ generate_ids!(
     ThreadMessageId
 );
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Deserialize)]
+generate_ids!(
+    pub generate_session_id,
+    SessionId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM sessions WHERE id=$1)",
+    SessionId
+);
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Type, Eq, PartialEq, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct TeamId(pub i64);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Deserialize, Hash)]
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct ProjectId(pub i64);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct ProjectTypeId(pub i32);
 
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct StatusId(pub i32);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct SideTypeId(pub i32);
-#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct DonationPlatformId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Deserialize)]
@@ -177,7 +185,7 @@ pub struct ReportId(pub i64);
 #[sqlx(transparent)]
 pub struct ReportTypeId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq, Deserialize, Serialize)]
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
 
@@ -196,12 +204,16 @@ pub struct NotificationId(pub i64);
 #[sqlx(transparent)]
 pub struct NotificationActionId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Deserialize, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq)]
 #[sqlx(transparent)]
 pub struct ThreadId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Deserialize)]
 #[sqlx(transparent)]
 pub struct ThreadMessageId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
+#[sqlx(transparent)]
+pub struct SessionId(pub i64);
 
 use crate::models::ids;
 
@@ -283,5 +295,10 @@ impl From<ids::ThreadMessageId> for ThreadMessageId {
 impl From<ThreadMessageId> for ids::ThreadMessageId {
     fn from(id: ThreadMessageId) -> Self {
         ids::ThreadMessageId(id.0 as u64)
+    }
+}
+impl From<SessionId> for ids::SessionId {
+    fn from(id: SessionId) -> Self {
+        ids::SessionId(id.0 as u64)
     }
 }

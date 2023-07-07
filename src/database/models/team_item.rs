@@ -1,8 +1,14 @@
 use super::ids::*;
 use crate::database::models::User;
 use crate::models::teams::Permissions;
-use crate::models::users::{Badges, RecipientType, RecipientWallet};
+use crate::models::users::Badges;
+use itertools::Itertools;
+use redis::cmd;
 use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
+
+const TEAMS_NAMESPACE: &str = "teams";
+const DEFAULT_EXPIRY: i64 = 1800;
 
 pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,
@@ -90,6 +96,7 @@ pub struct TeamMember {
 }
 
 /// A member of a team
+#[derive(Deserialize, Serialize)]
 pub struct QueryTeamMember {
     pub id: TeamMemberId,
     pub team_id: TeamId,
@@ -107,81 +114,139 @@ impl TeamMember {
     pub async fn get_from_team_full<'a, 'b, E>(
         id: TeamId,
         executor: E,
+        redis: &deadpool_redis::Pool,
     ) -> Result<Vec<QueryTeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        Self::get_from_team_full_many(&[id], executor).await
+        Self::get_from_team_full_many(&[id], executor, redis).await
     }
 
     pub async fn get_from_team_full_many<'a, E>(
         team_ids: &[TeamId],
         exec: E,
+        redis: &deadpool_redis::Pool,
     ) -> Result<Vec<QueryTeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
+        if team_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+
         use futures::stream::TryStreamExt;
 
-        let team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
+        let mut team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
-        let teams = sqlx::query!(
-            "
-            SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split, tm.ordering,
-            u.id user_id, u.name user_name, u.email email, u.kratos_id kratos_id, u.github_id github_id,
-            u.avatar_url avatar_url, u.username username, u.bio bio,
-            u.created created, u.role user_role, u.badges badges, u.balance balance,
-            u.payout_wallet payout_wallet, u.payout_wallet_type payout_wallet_type,
-            u.payout_address payout_address
-            FROM team_members tm
-            INNER JOIN users u ON u.id = tm.user_id
-            WHERE tm.team_id = ANY($1)
-            ORDER BY tm.team_id, tm.ordering
-            ",
-            &team_ids_parsed
-        )
-          .fetch_many(exec)
-          .try_filter_map(|e| async {
-              if let Some(m) = e.right() {
+        let mut redis = redis.get().await?;
 
-                      Ok(Some(Ok(QueryTeamMember {
-                          id: TeamMemberId(m.id),
-                          team_id: TeamId(m.team_id),
-                          role: m.member_role,
-                          permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
-                          accepted: m.accepted,
-                          user: User {
-                              id: UserId(m.user_id),
-                              github_id: m.github_id,
-                              kratos_id: m.kratos_id,
-                              name: m.user_name,
-                              email: m.email,
-                              avatar_url: m.avatar_url,
-                              username: m.username,
-                              bio: m.bio,
-                              created: m.created,
-                              role: m.user_role,
-                              badges: Badges::from_bits(m.badges as u64).unwrap_or_default(),
-                              balance: m.balance,
-                              payout_wallet: m.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
-                              payout_wallet_type: m.payout_wallet_type.map(|x| RecipientType::from_string(&x)),
-                              payout_address: m.payout_address,
-                          },
-                          payouts_split: m.payouts_split,
-                          ordering: m.ordering,
-                      })))
-              } else {
-                  Ok(None)
-              }
-          })
-          .try_collect::<Vec<Result<QueryTeamMember, super::DatabaseError>>>()
-          .await?;
+        let mut found_teams = Vec::new();
 
-        let team_members = teams
-            .into_iter()
-            .collect::<Result<Vec<QueryTeamMember>, super::DatabaseError>>()?;
+        let teams = cmd("MGET")
+            .arg(
+                team_ids_parsed
+                    .iter()
+                    .map(|x| format!("{}:{}", TEAMS_NAMESPACE, x))
+                    .collect::<Vec<_>>(),
+            )
+            .query_async::<_, Vec<Option<String>>>(&mut redis)
+            .await?;
 
-        Ok(team_members)
+        for team_raw in teams {
+            if let Some(mut team) = team_raw
+                .clone()
+                .and_then(|x| serde_json::from_str::<Vec<QueryTeamMember>>(&x).ok())
+            {
+                if let Some(team_id) = team.first().map(|x| x.team_id) {
+                    team_ids_parsed.retain(|x| &team_id.0 != x);
+                }
+
+                found_teams.append(&mut team);
+                continue;
+            }
+        }
+
+        if !team_ids_parsed.is_empty() {
+            let teams: Vec<QueryTeamMember> = sqlx::query!(
+                "
+                SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split, tm.ordering,
+                u.id user_id, u.name user_name,
+                u.avatar_url avatar_url, u.username username, u.bio bio,
+                u.created created, u.role user_role, u.badges badges
+                FROM team_members tm
+                INNER JOIN users u ON u.id = tm.user_id
+                WHERE tm.team_id = ANY($1)
+                ORDER BY tm.team_id, tm.ordering
+                ",
+                &team_ids_parsed
+            )
+                .fetch_many(exec)
+                .try_filter_map(|e| async {
+                    Ok(e.right().map(|m|
+                        QueryTeamMember {
+                            id: TeamMemberId(m.id),
+                            team_id: TeamId(m.team_id),
+                            role: m.member_role,
+                            permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
+                            accepted: m.accepted,
+                            user: User {
+                                id: UserId(m.user_id),
+                                github_id: None,
+                                discord_id: None,
+                                gitlab_id: None,
+                                google_id: None,
+                                steam_id: None,
+                                name: m.user_name,
+                                email: None,
+                                avatar_url: m.avatar_url,
+                                username: m.username,
+                                bio: m.bio,
+                                created: m.created,
+                                role: m.user_role,
+                                badges: Badges::from_bits(m.badges as u64).unwrap_or_default(),
+                                balance: Decimal::ZERO,
+                                payout_wallet: None,
+                                payout_wallet_type: None,
+                                payout_address: None,
+                                microsoft_id: None,
+                            },
+                            payouts_split: m.payouts_split,
+                            ordering: m.ordering,
+                        }
+                    ))
+                })
+                .try_collect::<Vec<QueryTeamMember>>()
+                .await?;
+
+            for (id, members) in &teams.into_iter().group_by(|x| x.team_id) {
+                let mut members = members.collect::<Vec<_>>();
+
+                cmd("SET")
+                    .arg(format!("{}:{}", TEAMS_NAMESPACE, id.0))
+                    .arg(serde_json::to_string(&members)?)
+                    .arg("EX")
+                    .arg(DEFAULT_EXPIRY)
+                    .query_async::<_, ()>(&mut redis)
+                    .await?;
+
+                found_teams.append(&mut members);
+            }
+        }
+
+        Ok(found_teams)
+    }
+
+    pub async fn clear_cache(
+        id: TeamId,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<(), super::DatabaseError> {
+        let mut redis = redis.get().await?;
+        cmd("DEL")
+            .arg(format!("{}:{}", TEAMS_NAMESPACE, id.0))
+            .query_async::<_, ()>(&mut redis)
+            .await?;
+
+        Ok(())
     }
 
     /// Gets a team member from a user id and team id.  Does not return pending members.

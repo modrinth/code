@@ -6,7 +6,6 @@ use futures::FutureExt;
 pub mod v2;
 pub mod v3;
 
-mod health;
 mod index;
 mod maven;
 mod not_found;
@@ -16,7 +15,6 @@ pub use self::not_found::not_found;
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {
     cfg.service(index::index_get);
-    cfg.service(health::health_get);
     cfg.service(web::scope("maven").configure(maven::config));
     cfg.service(web::scope("updates").configure(updates::config));
     cfg.service(
@@ -47,7 +45,7 @@ pub enum ApiError {
     #[error("Deserialization error: {0}")]
     Json(#[from] serde_json::Error),
     #[error("Authentication Error: {0}")]
-    Authentication(#[from] crate::util::auth::AuthenticationError),
+    Authentication(#[from] crate::auth::AuthenticationError),
     #[error("Authentication Error: {0}")]
     CustomAuthentication(String),
     #[error("Invalid Input: {0}")]
@@ -60,8 +58,6 @@ pub enum ApiError {
     Indexing(#[from] crate::search::indexing::IndexingError),
     #[error("Ariadne Error: {0}")]
     Analytics(String),
-    #[error("Crypto Error: {0}")]
-    Crypto(String),
     #[error("Payments Error: {0}")]
     Payments(String),
     #[error("Discord Error: {0}")]
@@ -88,7 +84,6 @@ impl actix_web::ResponseError for ApiError {
             ApiError::InvalidInput(..) => StatusCode::BAD_REQUEST,
             ApiError::Validation(..) => StatusCode::BAD_REQUEST,
             ApiError::Analytics(..) => StatusCode::FAILED_DEPENDENCY,
-            ApiError::Crypto(..) => StatusCode::FORBIDDEN,
             ApiError::Payments(..) => StatusCode::FAILED_DEPENDENCY,
             ApiError::DiscordError(..) => StatusCode::FAILED_DEPENDENCY,
             ApiError::Decoding(..) => StatusCode::BAD_REQUEST,
@@ -112,7 +107,6 @@ impl actix_web::ResponseError for ApiError {
                 ApiError::InvalidInput(..) => "invalid_input",
                 ApiError::Validation(..) => "invalid_input",
                 ApiError::Analytics(..) => "analytics_error",
-                ApiError::Crypto(..) => "crypto_error",
                 ApiError::Payments(..) => "payments_error",
                 ApiError::DiscordError(..) => "discord_error",
                 ApiError::Decoding(..) => "decoding_error",

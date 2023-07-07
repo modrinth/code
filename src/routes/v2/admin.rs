@@ -1,12 +1,10 @@
-use crate::database::models::user_item;
+use crate::database::models::{User, UserId};
 use crate::models::ids::ProjectId;
 use crate::models::projects::MonetizationStatus;
-use crate::models::users::User;
 use crate::routes::ApiError;
-use crate::util::auth::{link_or_insert_new_user, MinosNewUser};
 use crate::util::guards::admin_key_guard;
 use crate::DownloadQueue;
-use actix_web::{get, patch, post, web, HttpResponse};
+use actix_web::{patch, post, web, HttpResponse};
 use chrono::{DateTime, SecondsFormat, Utc};
 use rust_decimal::Decimal;
 use serde::Deserialize;
@@ -19,108 +17,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("admin")
             .service(count_download)
-            .service(add_minos_user)
-            .service(edit_github_id)
-            .service(edit_email)
-            .service(get_legacy_account)
             .service(process_payout),
     );
-}
-
-// Adds a Minos user to the database
-// This is an internal endpoint, and should not be used by applications, only by the Minos backend
-#[post("_minos-user-callback", guard = "admin_key_guard")]
-pub async fn add_minos_user(
-    minos_user: web::Json<MinosNewUser>, // getting directly from Kratos rather than Minos, so unparse
-    client: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
-    let minos_new_user = minos_user.into_inner();
-    let mut transaction = client.begin().await?;
-    link_or_insert_new_user(&mut transaction, minos_new_user).await?;
-    transaction.commit().await?;
-    Ok(HttpResponse::Ok().finish())
-}
-
-// Add or update a user's GitHub ID by their kratos id
-// OIDC ids should be kept in Minos, but Github is duplicated in Labrinth for legacy support
-// This should not be directly useable by applications, only by the Minos backend
-// user id is passed in path, github id is passed in body
-#[derive(Deserialize)]
-pub struct EditGithubId {
-    github_id: Option<String>,
-}
-#[post("_edit_github_id/{kratos_id}", guard = "admin_key_guard")]
-pub async fn edit_github_id(
-    pool: web::Data<PgPool>,
-    kratos_id: web::Path<String>,
-    github_id: web::Json<EditGithubId>,
-) -> Result<HttpResponse, ApiError> {
-    let github_id = github_id.into_inner().github_id;
-    // Parse error if github inner id not a number
-    let github_id = github_id
-        .as_ref()
-        .map(|x| x.parse::<i64>())
-        .transpose()
-        .map_err(|_| ApiError::InvalidInput("Github id must be a number".to_string()))?;
-
-    let mut transaction = pool.begin().await?;
-    sqlx::query!(
-        "
-        UPDATE users
-        SET github_id = $1
-        WHERE kratos_id = $2
-        ",
-        github_id,
-        kratos_id.into_inner()
-    )
-    .execute(&mut transaction)
-    .await?;
-    transaction.commit().await?;
-    Ok(HttpResponse::Ok().finish())
-}
-
-// Update a user's email ID by their kratos id
-// email ids should be kept in Minos, but email is duplicated in Labrinth for legacy support (and to avoid Minos calls)
-// This should not be directly useable by applications, only by the Minos backend
-// user id is passed in path, email is passed in body
-#[derive(Deserialize)]
-pub struct EditEmail {
-    email: String,
-}
-#[post("_edit_email/{kratos_id}", guard = "admin_key_guard")]
-pub async fn edit_email(
-    pool: web::Data<PgPool>,
-    kratos_id: web::Path<String>,
-    email: web::Json<EditEmail>,
-) -> Result<HttpResponse, ApiError> {
-    let email = email.into_inner().email;
-
-    let mut transaction = pool.begin().await?;
-    sqlx::query!(
-        "
-        UPDATE users
-        SET email = $1
-        WHERE kratos_id = $2
-        ",
-        email,
-        kratos_id.into_inner()
-    )
-    .execute(&mut transaction)
-    .await?;
-    transaction.commit().await?;
-    Ok(HttpResponse::Ok().finish())
-}
-
-#[get("_legacy_account/{github_id}", guard = "admin_key_guard")]
-
-pub async fn get_legacy_account(
-    pool: web::Data<PgPool>,
-    github_id: web::Path<i32>,
-) -> Result<HttpResponse, ApiError> {
-    let github_id = github_id.into_inner();
-    let user = user_item::User::get_from_github_id(github_id as u64, &**pool).await?;
-    let user: Option<User> = user.map(|u| u.into());
-    Ok(HttpResponse::Ok().json(user))
 }
 
 #[derive(Deserialize)]
@@ -214,6 +112,7 @@ pub struct PayoutData {
 #[post("/_process_payout", guard = "admin_key_guard")]
 pub async fn process_payout(
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     data: web::Json<PayoutData>,
 ) -> Result<HttpResponse, ApiError> {
     let start: DateTime<Utc> = DateTime::from_utc(
@@ -409,6 +308,8 @@ pub async fn process_payout(
             let sum_splits: Decimal = project.team_members.iter().map(|x| x.1).sum();
             let sum_tm_splits: Decimal = project.split_team_members.iter().map(|x| x.1).sum();
 
+            let mut clear_cache_users = Vec::new();
+
             if sum_splits > Decimal::ZERO {
                 for (user_id, split) in project.team_members {
                     let payout: Decimal = data.amount
@@ -445,6 +346,7 @@ pub async fn process_payout(
                         )
                         .execute(&mut *transaction)
                         .await?;
+                        clear_cache_users.push(user_id);
                     }
                 }
             }
@@ -481,9 +383,19 @@ pub async fn process_payout(
                         )
                         .execute(&mut *transaction)
                         .await?;
+                        clear_cache_users.push(user_id);
                     }
                 }
             }
+
+            User::clear_caches(
+                &clear_cache_users
+                    .into_iter()
+                    .map(|x| (UserId(x), None))
+                    .collect::<Vec<_>>(),
+                &redis,
+            )
+            .await?;
         }
     }
 

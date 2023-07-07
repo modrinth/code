@@ -1,9 +1,9 @@
+use crate::auth::{get_user_from_headers, is_authorized_version};
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
 use crate::models::projects::{ProjectId, VersionId};
 use crate::routes::ApiError;
-use crate::util::auth::{get_user_from_headers, is_authorized_version};
-use crate::{database, util::auth::is_authorized};
+use crate::{auth::is_authorized, database};
 use actix_web::{get, route, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use std::collections::HashSet;
@@ -66,10 +66,10 @@ pub async fn maven_metadata(
     req: HttpRequest,
     params: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
-    let project_data =
-        database::models::Project::get_from_slug_or_project_id(&project_id, &**pool).await?;
+    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
 
     let data = if let Some(data) = project_data {
         data
@@ -77,9 +77,11 @@ pub async fn maven_metadata(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+        .await
+        .ok();
 
-    if !is_authorized(&data, &user_option, &pool).await? {
+    if !is_authorized(&data.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
@@ -90,7 +92,7 @@ pub async fn maven_metadata(
         WHERE mod_id = $1 AND status = ANY($2)
         ORDER BY date_published ASC
         ",
-        data.id as database::models::ids::ProjectId,
+        data.inner.id as database::models::ids::ProjectId,
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())
             .map(|x| x.to_string())
@@ -118,7 +120,7 @@ pub async fn maven_metadata(
         new_versions.push(value);
     }
 
-    let project_id: ProjectId = data.id.into();
+    let project_id: ProjectId = data.inner.id.into();
 
     let respdata = Metadata {
         group_id: "maven.modrinth".to_string(),
@@ -132,7 +134,7 @@ pub async fn maven_metadata(
             versions: Versions {
                 versions: new_versions,
             },
-            last_updated: data.updated.format("%Y%m%d%H%M%S").to_string(),
+            last_updated: data.inner.updated.format("%Y%m%d%H%M%S").to_string(),
         },
     };
 
@@ -185,10 +187,10 @@ pub async fn version_file(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
 
     let project = if let Some(data) = project_data {
         data
@@ -196,7 +198,9 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+        .await
+        .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
@@ -221,7 +225,7 @@ pub async fn version_file(
     };
 
     let version = if let Some(version) =
-        database::models::Version::get_full(database::models::ids::VersionId(vid.id), &**pool)
+        database::models::Version::get(database::models::ids::VersionId(vid.id), &**pool, &redis)
             .await?
     {
         version
@@ -266,10 +270,10 @@ pub async fn version_file_sha1(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
 
     let project = if let Some(data) = project_data {
         data
@@ -277,7 +281,9 @@ pub async fn version_file_sha1(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+        .await
+        .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
@@ -302,7 +308,7 @@ pub async fn version_file_sha1(
     };
 
     let version = if let Some(version) =
-        database::models::Version::get_full(database::models::ids::VersionId(vid.id), &**pool)
+        database::models::Version::get(database::models::ids::VersionId(vid.id), &**pool, &redis)
             .await?
     {
         version
@@ -321,10 +327,10 @@ pub async fn version_file_sha512(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
 
     let project = if let Some(data) = project_data {
         data
@@ -332,7 +338,9 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+        .await
+        .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
@@ -357,7 +365,7 @@ pub async fn version_file_sha512(
     };
 
     let version = if let Some(version) =
-        database::models::Version::get_full(database::models::ids::VersionId(vid.id), &**pool)
+        database::models::Version::get(database::models::ids::VersionId(vid.id), &**pool, &redis)
             .await?
     {
         version

@@ -1,12 +1,28 @@
 use super::ids::{ProjectId, UserId};
+use crate::database::models::DatabaseError;
+use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::{Badges, RecipientType, RecipientWallet};
 use chrono::{DateTime, Utc};
+use redis::cmd;
 use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
 
+const USERS_NAMESPACE: &str = "users";
+const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
+// const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
+const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
+
+#[derive(Deserialize, Serialize)]
 pub struct User {
     pub id: UserId,
-    pub kratos_id: Option<String>, // None if legacy user unconnected to Minos/Kratos
+
     pub github_id: Option<i64>,
+    pub discord_id: Option<i64>,
+    pub gitlab_id: Option<i64>,
+    pub google_id: Option<String>,
+    pub steam_id: Option<i64>,
+    pub microsoft_id: Option<String>,
+
     pub username: String,
     pub name: Option<String>,
     pub email: Option<String>,
@@ -29,22 +45,29 @@ impl User {
         sqlx::query!(
             "
             INSERT INTO users (
-                id, kratos_id, username, name, email,
-                avatar_url, bio, created
+                id, username, name, email,
+                avatar_url, bio, created,
+                github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7, $8
+                $6, $7,
+                $8, $9, $10, $11, $12, $13
             )
             ",
             self.id as UserId,
-            self.kratos_id,
             &self.username,
             self.name.as_ref(),
             self.email.as_ref(),
             self.avatar_url.as_ref(),
             self.bio.as_ref(),
             self.created,
+            self.github_id,
+            self.discord_id,
+            self.gitlab_id,
+            self.google_id,
+            self.steam_id,
+            self.microsoft_id,
         )
         .execute(&mut *transaction)
         .await?;
@@ -52,199 +75,192 @@ impl User {
         Ok(())
     }
 
-    pub async fn get<'a, 'b, E>(id: UserId, executor: E) -> Result<Option<Self>, sqlx::error::Error>
+    pub async fn get<'a, 'b, E>(
+        string: &str,
+        executor: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<User>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        Self::get_many(&[id], executor)
+        User::get_many(&[string], executor, redis)
             .await
             .map(|x| x.into_iter().next())
     }
 
-    pub async fn get_from_github_id<'a, 'b, E>(
-        github_id: u64,
+    pub async fn get_id<'a, 'b, E>(
+        id: UserId,
         executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<User>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let result = sqlx::query!(
-            "
-            SELECT u.id, u.name, u.email, u.kratos_id,
-                u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges,
-                u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address
-            FROM users u
-            WHERE u.github_id = $1
-            ",
-            github_id as i64,
-        )
-        .fetch_optional(executor)
-        .await?;
-
-        if let Some(row) = result {
-            Ok(Some(User {
-                id: UserId(row.id),
-                github_id: Some(github_id as i64),
-                name: row.name,
-                email: row.email,
-                kratos_id: row.kratos_id,
-                avatar_url: row.avatar_url,
-                username: row.username,
-                bio: row.bio,
-                created: row.created,
-                role: row.role,
-                badges: Badges::from_bits(row.badges as u64).unwrap_or_default(),
-                balance: row.balance,
-                payout_wallet: row.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
-                payout_wallet_type: row
-                    .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&x)),
-                payout_address: row.payout_address,
-            }))
-        } else {
-            Ok(None)
-        }
+        User::get_many(&[crate::models::ids::UserId::from(id)], executor, redis)
+            .await
+            .map(|x| x.into_iter().next())
     }
 
-    pub async fn get_from_minos_kratos_id<'a, 'b, E>(
-        kratos_id: String,
-        executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
+    pub async fn get_many_ids<'a, E>(
+        user_ids: &[UserId],
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<User>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let result = sqlx::query!(
-            "
-            SELECT u.id, u.name, u.kratos_id, u.email, u.github_id,
-                u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges,
-                u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address
-            FROM users u
-            WHERE u.kratos_id = $1
-            ",
-            kratos_id as String,
-        )
-        .fetch_optional(executor)
-        .await?;
-
-        if let Some(row) = result {
-            Ok(Some(User {
-                id: UserId(row.id),
-                kratos_id: row.kratos_id,
-                github_id: row.github_id,
-                name: row.name,
-                email: row.email,
-                avatar_url: row.avatar_url,
-                username: row.username,
-                bio: row.bio,
-                created: row.created,
-                role: row.role,
-                badges: Badges::from_bits(row.badges as u64).unwrap_or_default(),
-                balance: row.balance,
-                payout_wallet: row.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
-                payout_wallet_type: row
-                    .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&x)),
-                payout_address: row.payout_address,
-            }))
-        } else {
-            Ok(None)
-        }
+        let ids = user_ids
+            .iter()
+            .map(|x| crate::models::ids::UserId::from(*x))
+            .collect::<Vec<_>>();
+        User::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_from_username<'a, 'b, E>(
-        username: String,
-        executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
+    pub async fn get_many<'a, E, T: ToString>(
+        users_strings: &[T],
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<User>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let result = sqlx::query!(
-            "
-            SELECT u.id, u.kratos_id, u.name, u.email, u.github_id,
-                u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges,
-                u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address
-            FROM users u
-            WHERE LOWER(u.username) = LOWER($1)
-            ",
-            username
-        )
-        .fetch_optional(executor)
-        .await?;
+        use futures::TryStreamExt;
 
-        if let Some(row) = result {
-            Ok(Some(User {
-                id: UserId(row.id),
-                kratos_id: row.kratos_id,
-                github_id: row.github_id,
-                name: row.name,
-                email: row.email,
-                avatar_url: row.avatar_url,
-                username: row.username,
-                bio: row.bio,
-                created: row.created,
-                role: row.role,
-                badges: Badges::from_bits(row.badges as u64).unwrap_or_default(),
-                balance: row.balance,
-                payout_wallet: row.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
-                payout_wallet_type: row
-                    .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&x)),
-                payout_address: row.payout_address,
-            }))
-        } else {
-            Ok(None)
+        if users_strings.is_empty() {
+            return Ok(Vec::new());
         }
-    }
 
-    pub async fn get_many<'a, E>(user_ids: &[UserId], exec: E) -> Result<Vec<User>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        use futures::stream::TryStreamExt;
+        let mut redis = redis.get().await?;
 
-        let user_ids_parsed: Vec<i64> = user_ids.iter().map(|x| x.0).collect();
-        let users = sqlx::query!(
-            "
-            SELECT u.id, u.kratos_id, u.name, u.email, u.github_id,
-                u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges,
-                u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address
-            FROM users u
-            WHERE u.id = ANY($1)
-            ",
-            &user_ids_parsed
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|u| User {
-                id: UserId(u.id),
-                kratos_id: u.kratos_id,
-                github_id: u.github_id,
-                name: u.name,
-                email: u.email,
-                avatar_url: u.avatar_url,
-                username: u.username,
-                bio: u.bio,
-                created: u.created,
-                role: u.role,
-                badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
-                balance: u.balance,
-                payout_wallet: u.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
-                payout_wallet_type: u.payout_wallet_type.map(|x| RecipientType::from_string(&x)),
-                payout_address: u.payout_address,
-            }))
-        })
-        .try_collect::<Vec<User>>()
-        .await?;
+        let mut found_users = Vec::new();
+        let mut remaining_strings = users_strings
+            .iter()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>();
 
-        Ok(users)
+        let mut user_ids = users_strings
+            .iter()
+            .flat_map(|x| parse_base62(&x.to_string()).map(|x| x as i64))
+            .collect::<Vec<_>>();
+
+        user_ids.append(
+            &mut cmd("MGET")
+                .arg(
+                    users_strings
+                        .iter()
+                        .map(|x| {
+                            format!(
+                                "{}:{}",
+                                USER_USERNAMES_NAMESPACE,
+                                x.to_string().to_lowercase()
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                )
+                .query_async::<_, Vec<Option<i64>>>(&mut redis)
+                .await?
+                .into_iter()
+                .flatten()
+                .collect(),
+        );
+
+        if !user_ids.is_empty() {
+            let users = cmd("MGET")
+                .arg(
+                    user_ids
+                        .iter()
+                        .map(|x| format!("{}:{}", USERS_NAMESPACE, x))
+                        .collect::<Vec<_>>(),
+                )
+                .query_async::<_, Vec<Option<String>>>(&mut redis)
+                .await?;
+
+            for user in users {
+                if let Some(user) = user.and_then(|x| serde_json::from_str::<User>(&x).ok()) {
+                    remaining_strings
+                        .retain(|x| &to_base62(user.id.0 as u64) != x && &user.username != x);
+                    found_users.push(user);
+                    continue;
+                }
+            }
+        }
+
+        if !remaining_strings.is_empty() {
+            let user_ids_parsed: Vec<i64> = remaining_strings
+                .iter()
+                .flat_map(|x| parse_base62(&x.to_string()).ok())
+                .map(|x| x as i64)
+                .collect();
+            let db_users: Vec<User> = sqlx::query!(
+                "
+                SELECT id, name, email,
+                    avatar_url, username, bio,
+                    created, role, badges,
+                    balance, payout_wallet, payout_wallet_type, payout_address,
+                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id
+                FROM users
+                WHERE id = ANY($1) OR username = ANY($2)
+                ",
+                &user_ids_parsed,
+                &remaining_strings
+                    .into_iter()
+                    .map(|x| x.to_string().to_lowercase())
+                    .collect::<Vec<_>>(),
+            )
+            .fetch_many(exec)
+            .try_filter_map(|e| async {
+                Ok(e.right().map(|u| User {
+                    id: UserId(u.id),
+                    github_id: u.github_id,
+                    discord_id: u.discord_id,
+                    gitlab_id: u.gitlab_id,
+                    google_id: u.google_id,
+                    steam_id: u.steam_id,
+                    microsoft_id: u.microsoft_id,
+                    name: u.name,
+                    email: u.email,
+                    avatar_url: u.avatar_url,
+                    username: u.username,
+                    bio: u.bio,
+                    created: u.created,
+                    role: u.role,
+                    badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
+                    balance: u.balance,
+                    payout_wallet: u.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
+                    payout_wallet_type: u
+                        .payout_wallet_type
+                        .map(|x| RecipientType::from_string(&x)),
+                    payout_address: u.payout_address,
+                }))
+            })
+            .try_collect::<Vec<User>>()
+            .await?;
+
+            for user in db_users {
+                cmd("SET")
+                    .arg(format!("{}:{}", USERS_NAMESPACE, user.id.0))
+                    .arg(serde_json::to_string(&user)?)
+                    .arg("EX")
+                    .arg(DEFAULT_EXPIRY)
+                    .query_async::<_, ()>(&mut redis)
+                    .await?;
+
+                cmd("SET")
+                    .arg(format!(
+                        "{}:{}",
+                        USER_USERNAMES_NAMESPACE,
+                        user.username.to_lowercase()
+                    ))
+                    .arg(user.id.0)
+                    .arg("EX")
+                    .arg(DEFAULT_EXPIRY)
+                    .query_async::<_, ()>(&mut redis)
+                    .await?;
+                found_users.push(user);
+            }
+        }
+
+        Ok(found_users)
     }
 
     pub async fn get_projects<'a, E>(
@@ -273,321 +289,207 @@ impl User {
         Ok(projects)
     }
 
-    pub async fn remove(
-        id: UserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<Option<()>, sqlx::error::Error> {
-        let deleted_user: UserId = crate::models::users::DELETED_USER.into();
+    pub async fn clear_caches(
+        user_ids: &[(UserId, Option<String>)],
+        redis: &deadpool_redis::Pool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.get().await?;
+        let mut cmd = cmd("DEL");
 
-        sqlx::query!(
-            "
-            UPDATE team_members
-            SET user_id = $1
-            WHERE (user_id = $2 AND role = $3)
-            ",
-            deleted_user as UserId,
-            id as UserId,
-            crate::models::teams::OWNER_ROLE
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            UPDATE versions
-            SET author_id = $1
-            WHERE (author_id = $2)
-            ",
-            deleted_user as UserId,
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        use futures::TryStreamExt;
-        let notifications: Vec<i64> = sqlx::query!(
-            "
-            SELECT n.id FROM notifications n
-            WHERE n.user_id = $1
-            ",
-            id as UserId,
-        )
-        .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id)) })
-        .try_collect::<Vec<i64>>()
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM notifications
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM reports
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM mod_follows
-            WHERE follower_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM notifications_actions
-             WHERE notification_id = ANY($1)
-            ",
-            &notifications
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM team_members
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM payouts_values
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM historical_payouts
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM users
-            WHERE id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        Ok(Some(()))
-    }
-
-    pub async fn remove_full(
-        id: UserId,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<Option<()>, sqlx::error::Error> {
-        use futures::TryStreamExt;
-        let projects: Vec<ProjectId> = sqlx::query!(
-            "
-            SELECT m.id FROM mods m
-            INNER JOIN team_members tm ON tm.team_id = m.team_id
-            WHERE tm.user_id = $1 AND tm.role = $2
-            ",
-            id as UserId,
-            crate::models::teams::OWNER_ROLE
-        )
-        .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
-        .try_collect::<Vec<ProjectId>>()
-        .await?;
-
-        for project_id in projects {
-            let _result =
-                super::project_item::Project::remove_full(project_id, transaction).await?;
-        }
-
-        let notifications: Vec<i64> = sqlx::query!(
-            "
-            SELECT n.id FROM notifications n
-            WHERE n.user_id = $1
-            ",
-            id as UserId,
-        )
-        .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id)) })
-        .try_collect::<Vec<i64>>()
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM notifications
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM notifications_actions
-             WHERE notification_id = ANY($1)
-            ",
-            &notifications
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        let deleted_user: UserId = crate::models::users::DELETED_USER.into();
-
-        sqlx::query!(
-            "
-            UPDATE versions
-            SET author_id = $1
-            WHERE (author_id = $2)
-            ",
-            deleted_user as UserId,
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM team_members
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            r#"
-            UPDATE threads_messages
-            SET body = '{"type": "deleted"}', author_id = $2
-            WHERE author_id = $1
-            "#,
-            id as UserId,
-            deleted_user as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM threads_members
-            WHERE user_id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM users
-            WHERE id = $1
-            ",
-            id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        Ok(Some(()))
-    }
-
-    pub async fn get_id_from_username_or_id<'a, 'b, E>(
-        username_or_id: &str,
-        executor: E,
-    ) -> Result<Option<UserId>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        let id_option = crate::models::ids::base62_impl::parse_base62(username_or_id).ok();
-
-        if let Some(id) = id_option {
-            let id = UserId(id as i64);
-
-            let mut user_id = sqlx::query!(
-                "
-                SELECT id FROM users
-                WHERE id = $1
-                ",
-                id as UserId
-            )
-            .fetch_optional(executor)
-            .await?
-            .map(|x| UserId(x.id));
-
-            if user_id.is_none() {
-                user_id = sqlx::query!(
-                    "
-                    SELECT id FROM users
-                    WHERE LOWER(username) = LOWER($1)
-                    ",
-                    username_or_id
-                )
-                .fetch_optional(executor)
-                .await?
-                .map(|x| UserId(x.id));
+        for (id, username) in user_ids {
+            cmd.arg(format!("{}:{}", USERS_NAMESPACE, id.0));
+            if let Some(username) = username {
+                cmd.arg(format!(
+                    "{}:{}",
+                    USER_USERNAMES_NAMESPACE,
+                    username.to_lowercase()
+                ));
             }
-
-            Ok(user_id)
-        } else {
-            let id = sqlx::query!(
-                "
-                SELECT id FROM users
-                WHERE LOWER(username) = LOWER($1)
-                ",
-                username_or_id
-            )
-            .fetch_optional(executor)
-            .await?;
-
-            Ok(id.map(|x| UserId(x.id)))
         }
-    }
 
-    pub async fn merge_minos_user<'a, 'b, E>(
-        &self,
-        kratos_id: &str,
-        executor: E,
-    ) -> Result<(), sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-    {
-        // If the user exists, link the Minos user into the existing user rather tham create a new one
-        sqlx::query!(
-            "
-            UPDATE users
-            SET kratos_id = $1
-            WHERE (id = $2)
-        ",
-            kratos_id,
-            self.id.0,
-        )
-        .execute(executor)
-        .await?;
+        cmd.query_async::<_, ()>(&mut redis).await?;
 
         Ok(())
+    }
+
+    pub async fn remove(
+        id: UserId,
+        full: bool,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Option<()>, DatabaseError> {
+        let user = Self::get_id(id, &mut *transaction, redis).await?;
+
+        if let Some(delete_user) = user {
+            User::clear_caches(&[(id, Some(delete_user.username))], redis).await?;
+
+            let deleted_user: UserId = crate::models::users::DELETED_USER.into();
+
+            if full {
+                let projects: Vec<ProjectId> = sqlx::query!(
+                    "
+                    SELECT m.id FROM mods m
+                    INNER JOIN team_members tm ON tm.team_id = m.team_id
+                    WHERE tm.user_id = $1 AND tm.role = $2
+                    ",
+                    id as UserId,
+                    crate::models::teams::OWNER_ROLE
+                )
+                .fetch_many(&mut *transaction)
+                .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
+                .try_collect::<Vec<ProjectId>>()
+                .await?;
+
+                for project_id in projects {
+                    let _result =
+                        super::project_item::Project::remove(project_id, transaction, redis)
+                            .await?;
+                }
+            } else {
+                sqlx::query!(
+                    "
+                    UPDATE team_members
+                    SET user_id = $1
+                    WHERE (user_id = $2 AND role = $3)
+                    ",
+                    deleted_user as UserId,
+                    id as UserId,
+                    crate::models::teams::OWNER_ROLE
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            sqlx::query!(
+                "
+                UPDATE versions
+                SET author_id = $1
+                WHERE (author_id = $2)
+                ",
+                deleted_user as UserId,
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            use futures::TryStreamExt;
+            let notifications: Vec<i64> = sqlx::query!(
+                "
+                SELECT n.id FROM notifications n
+                WHERE n.user_id = $1
+                ",
+                id as UserId,
+            )
+            .fetch_many(&mut *transaction)
+            .try_filter_map(|e| async { Ok(e.right().map(|m| m.id)) })
+            .try_collect::<Vec<i64>>()
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM notifications
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM notifications_actions
+                 WHERE notification_id = ANY($1)
+                ",
+                &notifications
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM reports
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM mod_follows
+                WHERE follower_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM team_members
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM payouts_values
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM historical_payouts
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                r#"
+                UPDATE threads_messages
+                SET body = '{"type": "deleted"}', author_id = $2
+                WHERE author_id = $1
+                "#,
+                id as UserId,
+                deleted_user as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM threads_members
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM users
+                WHERE id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            Ok(Some(()))
+        } else {
+            Ok(None)
+        }
     }
 }

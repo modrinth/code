@@ -82,3 +82,44 @@ impl ThreadType {
         }
     }
 }
+
+impl Thread {
+    pub fn from(data: crate::database::models::Thread, users: Vec<User>, user: &User) -> Self {
+        let thread_type = data.type_;
+
+        Thread {
+            id: data.id.into(),
+            type_: thread_type,
+            messages: data
+                .messages
+                .into_iter()
+                .filter(|x| {
+                    if let MessageBody::Text { private, .. } = x.body {
+                        !private || user.role.is_mod()
+                    } else {
+                        true
+                    }
+                })
+                .map(|x| ThreadMessage {
+                    id: x.id.into(),
+                    author_id: if users
+                        .iter()
+                        .find(|y| x.author_id == Some(y.id.into()))
+                        .map(|x| x.role.is_mod() && !user.role.is_mod())
+                        .unwrap_or(false)
+                    {
+                        None
+                    } else {
+                        x.author_id.map(|x| x.into())
+                    },
+                    body: x.body,
+                    created: x.created,
+                })
+                .collect(),
+            members: users
+                .into_iter()
+                .filter(|x| !x.role.is_mod() || user.role.is_mod())
+                .collect(),
+        }
+    }
+}

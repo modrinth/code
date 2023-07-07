@@ -1,7 +1,7 @@
 use super::ApiError;
+use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models::projects::ProjectStatus;
-use crate::util::auth::check_is_moderator_from_headers;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -24,9 +24,10 @@ fn default_count() -> i16 {
 pub async fn get_projects(
     req: HttpRequest,
     pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
     count: web::Query<ResultCount>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(req.headers(), &**pool).await?;
+    check_is_moderator_from_headers(req.headers(), &**pool, &redis).await?;
 
     use futures::stream::TryStreamExt;
 
@@ -45,7 +46,7 @@ pub async fn get_projects(
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
-    let projects: Vec<_> = database::Project::get_many_full(&project_ids, &**pool)
+    let projects: Vec<_> = database::Project::get_many_ids(&project_ids, &**pool, &redis)
         .await?
         .into_iter()
         .map(crate::models::projects::Project::from)
