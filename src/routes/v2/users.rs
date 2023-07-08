@@ -5,12 +5,17 @@ use crate::models::notifications::Notification;
 use crate::models::projects::Project;
 use crate::models::users::{Badges, RecipientType, RecipientWallet, Role, UserId};
 use crate::queue::payouts::{PayoutAmount, PayoutItem, PayoutsQueue};
+use crate::queue::session::SessionQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use lazy_static::lazy_static;
+use rand_chacha::rand_core::SeedableRng;
+use rand_chacha::ChaCha20Rng;
 use regex::Regex;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -44,8 +49,12 @@ pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    Ok(HttpResponse::Ok().json(get_user_from_headers(req.headers(), &**pool, &redis).await?))
+    Ok(
+        HttpResponse::Ok()
+            .json(get_user_from_headers(&req, &**pool, &redis, &session_queue).await?),
+    )
 }
 
 #[derive(Serialize)]
@@ -59,8 +68,9 @@ pub async fn user_data_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
 
     let data = sqlx::query!(
         "
@@ -128,8 +138,9 @@ pub async fn projects_list(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -189,6 +200,7 @@ pub struct EditUser {
     )]
     #[validate]
     pub payout_data: Option<Option<EditPayoutData>>,
+    pub password: Option<(Option<String>, Option<String>)>,
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -206,8 +218,9 @@ pub async fn user_edit(
     new_user: web::Json<EditUser>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
 
     new_user
         .validate()
@@ -387,6 +400,78 @@ pub async fn user_edit(
                 }
             }
 
+            if let Some((old_password, new_password)) = &new_user.password {
+                if let Some(pass) = actual_user.password {
+                    let old_password = old_password.as_ref().ok_or_else(|| {
+                        ApiError::CustomAuthentication(
+                            "You must specify the old password to change your password!"
+                                .to_string(),
+                        )
+                    })?;
+
+                    let hasher = Argon2::default();
+                    hasher.verify_password(old_password.as_bytes(), &PasswordHash::new(&pass)?)?;
+                }
+
+                let update_password = if let Some(new_password) = new_password {
+                    let score = zxcvbn::zxcvbn(
+                        new_password,
+                        &[
+                            &actual_user.username,
+                            &actual_user.email.unwrap_or_default(),
+                            &actual_user.name.unwrap_or_default(),
+                        ],
+                    )?;
+
+                    if score.score() < 3 {
+                        return Err(ApiError::InvalidInput(
+                            if let Some(feedback) =
+                                score.feedback().clone().and_then(|x| x.warning())
+                            {
+                                format!("Password too weak: {}", feedback)
+                            } else {
+                                "Specified password is too weak! Please improve its strength."
+                                    .to_string()
+                            },
+                        ));
+                    }
+
+                    let hasher = Argon2::default();
+                    let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+                    let password_hash = hasher
+                        .hash_password(new_password.as_bytes(), &salt)?
+                        .to_string();
+
+                    Some(password_hash)
+                } else {
+                    if !(actual_user.github_id.is_some()
+                        || actual_user.gitlab_id.is_some()
+                        || actual_user.microsoft_id.is_some()
+                        || actual_user.google_id.is_some()
+                        || actual_user.steam_id.is_some()
+                        || actual_user.discord_id.is_some())
+                    {
+                        return Err(ApiError::InvalidInput(
+                            "You must have another authentication method added to remove password authentication!".to_string(),
+                        ));
+                    }
+
+                    None
+                };
+
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET password = $1
+                    WHERE (id = $2)
+                    ",
+                    update_password,
+                    id as crate::database::models::ids::UserId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
             User::clear_caches(&[(id, Some(actual_user.username))], &redis).await?;
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
@@ -406,6 +491,7 @@ pub struct Extension {
 }
 
 #[patch("{id}/icon")]
+#[allow(clippy::too_many_arguments)]
 pub async fn user_icon_edit(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
@@ -414,10 +500,11 @@ pub async fn user_icon_edit(
     redis: web::Data<deadpool_redis::Pool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
         let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+        let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
         let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
         if let Some(actual_user) = id_option {
@@ -492,8 +579,9 @@ pub async fn user_delete(
     pool: web::Data<PgPool>,
     removal_type: web::Query<RemovalType>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -531,8 +619,9 @@ pub async fn user_follows(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -578,8 +667,9 @@ pub async fn user_notifications(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -617,8 +707,9 @@ pub async fn user_payouts(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -691,12 +782,13 @@ pub async fn user_payouts_request(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     data: web::Json<PayoutData>,
-    payouts_queue: web::Data<Arc<Mutex<PayoutsQueue>>>,
+    payouts_queue: web::Data<Mutex<PayoutsQueue>>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let mut payouts_queue = payouts_queue.lock().await;
 
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {

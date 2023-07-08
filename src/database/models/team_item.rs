@@ -1,7 +1,5 @@
 use super::ids::*;
-use crate::database::models::User;
 use crate::models::teams::Permissions;
-use crate::models::users::Badges;
 use itertools::Itertools;
 use redis::cmd;
 use rust_decimal::Decimal;
@@ -83,25 +81,12 @@ pub struct Team {
 }
 
 /// A member of a team
+#[derive(Deserialize, Serialize)]
 pub struct TeamMember {
     pub id: TeamMemberId,
     pub team_id: TeamId,
     /// The ID of the user associated with the member
     pub user_id: UserId,
-    pub role: String,
-    pub permissions: Permissions,
-    pub accepted: bool,
-    pub payouts_split: Decimal,
-    pub ordering: i64,
-}
-
-/// A member of a team
-#[derive(Deserialize, Serialize)]
-pub struct QueryTeamMember {
-    pub id: TeamMemberId,
-    pub team_id: TeamId,
-    /// The user associated with the member
-    pub user: User,
     pub role: String,
     pub permissions: Permissions,
     pub accepted: bool,
@@ -115,7 +100,7 @@ impl TeamMember {
         id: TeamId,
         executor: E,
         redis: &deadpool_redis::Pool,
-    ) -> Result<Vec<QueryTeamMember>, super::DatabaseError>
+    ) -> Result<Vec<TeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -126,7 +111,7 @@ impl TeamMember {
         team_ids: &[TeamId],
         exec: E,
         redis: &deadpool_redis::Pool,
-    ) -> Result<Vec<QueryTeamMember>, super::DatabaseError>
+    ) -> Result<Vec<TeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -155,7 +140,7 @@ impl TeamMember {
         for team_raw in teams {
             if let Some(mut team) = team_raw
                 .clone()
-                .and_then(|x| serde_json::from_str::<Vec<QueryTeamMember>>(&x).ok())
+                .and_then(|x| serde_json::from_str::<Vec<TeamMember>>(&x).ok())
             {
                 if let Some(team_id) = team.first().map(|x| x.team_id) {
                     team_ids_parsed.retain(|x| &team_id.0 != x);
@@ -167,14 +152,11 @@ impl TeamMember {
         }
 
         if !team_ids_parsed.is_empty() {
-            let teams: Vec<QueryTeamMember> = sqlx::query!(
+            let teams: Vec<TeamMember> = sqlx::query!(
                 "
                 SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split, tm.ordering,
-                u.id user_id, u.name user_name,
-                u.avatar_url avatar_url, u.username username, u.bio bio,
-                u.created created, u.role user_role, u.badges badges
+                tm.user_id user_id
                 FROM team_members tm
-                INNER JOIN users u ON u.id = tm.user_id
                 WHERE tm.team_id = ANY($1)
                 ORDER BY tm.team_id, tm.ordering
                 ",
@@ -183,39 +165,19 @@ impl TeamMember {
                 .fetch_many(exec)
                 .try_filter_map(|e| async {
                     Ok(e.right().map(|m|
-                        QueryTeamMember {
+                        TeamMember {
                             id: TeamMemberId(m.id),
                             team_id: TeamId(m.team_id),
                             role: m.member_role,
                             permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
                             accepted: m.accepted,
-                            user: User {
-                                id: UserId(m.user_id),
-                                github_id: None,
-                                discord_id: None,
-                                gitlab_id: None,
-                                google_id: None,
-                                steam_id: None,
-                                name: m.user_name,
-                                email: None,
-                                avatar_url: m.avatar_url,
-                                username: m.username,
-                                bio: m.bio,
-                                created: m.created,
-                                role: m.user_role,
-                                badges: Badges::from_bits(m.badges as u64).unwrap_or_default(),
-                                balance: Decimal::ZERO,
-                                payout_wallet: None,
-                                payout_wallet_type: None,
-                                payout_address: None,
-                                microsoft_id: None,
-                            },
+                            user_id: UserId(m.user_id),
                             payouts_split: m.payouts_split,
                             ordering: m.ordering,
                         }
                     ))
                 })
-                .try_collect::<Vec<QueryTeamMember>>()
+                .try_collect::<Vec<TeamMember>>()
                 .await?;
 
             for (id, members) in &teams.into_iter().group_by(|x| x.team_id) {

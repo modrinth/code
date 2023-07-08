@@ -12,7 +12,7 @@ const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
 // const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
 const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct User {
     pub id: UserId,
 
@@ -22,10 +22,12 @@ pub struct User {
     pub google_id: Option<String>,
     pub steam_id: Option<i64>,
     pub microsoft_id: Option<String>,
+    pub password: Option<String>,
 
     pub username: String,
     pub name: Option<String>,
     pub email: Option<String>,
+    pub email_verified: bool,
     pub avatar_url: Option<String>,
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
@@ -47,12 +49,14 @@ impl User {
             INSERT INTO users (
                 id, username, name, email,
                 avatar_url, bio, created,
-                github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id
+                github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
+                email_verified, password
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
-                $8, $9, $10, $11, $12, $13
+                $8, $9, $10, $11, $12, $13,
+                $14, $15
             )
             ",
             self.id as UserId,
@@ -68,6 +72,8 @@ impl User {
             self.google_id,
             self.steam_id,
             self.microsoft_id,
+            self.email_verified,
+            self.password,
         )
         .execute(&mut *transaction)
         .await?;
@@ -197,9 +203,10 @@ impl User {
                     avatar_url, username, bio,
                     created, role, badges,
                     balance, payout_wallet, payout_wallet_type, payout_address,
-                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id
+                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
+                    email_verified, password
                 FROM users
-                WHERE id = ANY($1) OR username = ANY($2)
+                WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                 ",
                 &user_ids_parsed,
                 &remaining_strings
@@ -219,6 +226,7 @@ impl User {
                     microsoft_id: u.microsoft_id,
                     name: u.name,
                     email: u.email,
+                    email_verified: u.email_verified,
                     avatar_url: u.avatar_url,
                     username: u.username,
                     bio: u.bio,
@@ -231,6 +239,7 @@ impl User {
                         .payout_wallet_type
                         .map(|x| RecipientType::from_string(&x)),
                     payout_address: u.payout_address,
+                    password: u.password,
                 }))
             })
             .try_collect::<Vec<User>>()

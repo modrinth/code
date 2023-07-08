@@ -2,6 +2,7 @@ use crate::auth::{get_user_from_headers, is_authorized_version};
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
 use crate::models::projects::{ProjectId, VersionId};
+use crate::queue::session::SessionQueue;
 use crate::routes::ApiError;
 use crate::{auth::is_authorized, database};
 use actix_web::{get, route, web, HttpRequest, HttpResponse};
@@ -67,6 +68,7 @@ pub async fn maven_metadata(
     params: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
     let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
@@ -77,7 +79,7 @@ pub async fn maven_metadata(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -188,6 +190,7 @@ pub async fn version_file(
     params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
@@ -198,7 +201,7 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -271,6 +274,7 @@ pub async fn version_file_sha1(
     params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
@@ -281,7 +285,7 @@ pub async fn version_file_sha1(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -328,6 +332,7 @@ pub async fn version_file_sha512(
     params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
@@ -338,7 +343,7 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 

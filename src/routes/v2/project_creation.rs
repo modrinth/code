@@ -10,6 +10,7 @@ use crate::models::projects::{
 };
 use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
+use crate::queue::session::SessionQueue;
 use crate::search::indexing::IndexingError;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -272,6 +273,7 @@ pub async fn project_create(
     client: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: Data<SessionQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -284,6 +286,7 @@ pub async fn project_create(
         &mut uploaded_files,
         &client,
         &redis,
+        &session_queue,
     )
     .await;
 
@@ -331,6 +334,7 @@ Get logged in user
     - Add project data to indexing queue
 */
 
+#[allow(clippy::too_many_arguments)]
 async fn project_create_inner(
     req: HttpRequest,
     payload: &mut Multipart,
@@ -339,12 +343,13 @@ async fn project_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     redis: &deadpool_redis::Pool,
+    session_queue: &SessionQueue,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to backblaze
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     // The currently logged in user
-    let current_user = get_user_from_headers(req.headers(), pool, redis).await?;
+    let current_user = get_user_from_headers(&req, pool, redis, session_queue).await?;
 
     let project_id: ProjectId = models::generate_project_id(transaction).await?.into();
 

@@ -1,26 +1,33 @@
-use crate::database::models::{generate_state_id, StateId};
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
-use std::collections::HashMap;
-use std::sync::Arc;
-
-use crate::parse_strings_from_var;
-
-use actix_web::web::{scope, Data, Query, ServiceConfig};
-use actix_web::{get, HttpRequest, HttpResponse};
-use chrono::Utc;
-use reqwest::header::AUTHORIZATION;
-use rust_decimal::Decimal;
-
 use crate::auth::session::issue_session;
 use crate::auth::AuthenticationError;
+use crate::database::models::{generate_state_id, StateId};
 use crate::file_hosting::FileHost;
+use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::{Badges, Role};
+use crate::parse_strings_from_var;
+use crate::routes::ApiError;
+use crate::util::captcha::check_turnstile_captcha;
 use crate::util::ext::{get_image_content_type, get_image_ext};
+use crate::util::validate::{validation_errors_to_string, RE_URL_SAFE};
+use actix_web::web::{scope, Data, Query, ServiceConfig};
+use actix_web::{get, post, web, HttpRequest, HttpResponse};
+use argon2::password_hash::SaltString;
+use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use chrono::Utc;
+use rand_chacha::rand_core::SeedableRng;
+use rand_chacha::ChaCha20Rng;
+use reqwest::header::AUTHORIZATION;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
+use std::collections::HashMap;
+use std::sync::Arc;
+use validator::Validate;
 
 pub fn config(cfg: &mut ServiceConfig) {
-    cfg.service(scope("auth").service(auth_callback).service(init));
+    cfg.service(scope("auth").service(auth_callback).service(init))
+        .service(create_account_with_password)
+        .service(login_password);
 }
 
 #[derive(Serialize, Deserialize, Default, Eq, PartialEq)]
@@ -849,9 +856,11 @@ pub async fn auth_callback(
                     } else {
                         None
                     },
+                    password: None,
                     username,
                     name: oauth_user.name,
                     email: oauth_user.email,
+                    email_verified: true,
                     avatar_url,
                     bio: oauth_user.bio,
                     created: Utc::now(),
@@ -886,4 +895,156 @@ pub async fn auth_callback(
     } else {
         Err(AuthenticationError::InvalidCredentials)
     }
+}
+
+#[derive(Deserialize, Validate)]
+pub struct NewAccount {
+    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
+    pub username: String,
+    #[validate(length(min = 8, max = 256))]
+    pub password: String,
+    #[validate(email)]
+    pub email: String,
+    pub challenge: String,
+}
+
+#[post("create")]
+pub async fn create_account_with_password(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    new_account: web::Json<NewAccount>,
+) -> Result<HttpResponse, ApiError> {
+    new_account
+        .0
+        .validate()
+        .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
+
+    if check_turnstile_captcha(&req, &new_account.challenge).await? {
+        return Err(ApiError::Turnstile);
+    }
+
+    if crate::database::models::User::get(&new_account.username, &**pool, &redis)
+        .await?
+        .is_some()
+    {
+        return Err(ApiError::InvalidInput("Username is taken!".to_string()));
+    }
+
+    let mut transaction = pool.begin().await?;
+    let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
+
+    let new_account = new_account.0;
+
+    let score = zxcvbn::zxcvbn(
+        &new_account.password,
+        &[&new_account.username, &new_account.email],
+    )?;
+
+    if score.score() < 3 {
+        return Err(ApiError::InvalidInput(
+            if let Some(feedback) = score.feedback().clone().and_then(|x| x.warning()) {
+                format!("Password too weak: {}", feedback)
+            } else {
+                "Specified password is too weak! Please improve its strength.".to_string()
+            },
+        ));
+    }
+
+    let hasher = Argon2::default();
+    let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+    let password_hash = hasher
+        .hash_password(new_account.password.as_bytes(), &salt)?
+        .to_string();
+
+    crate::database::models::User {
+        id: user_id,
+        github_id: None,
+        discord_id: None,
+        gitlab_id: None,
+        google_id: None,
+        steam_id: None,
+        microsoft_id: None,
+        password: Some(password_hash),
+        username: new_account.username.clone(),
+        name: Some(new_account.username),
+        email: Some(new_account.email),
+        email_verified: false,
+        avatar_url: None,
+        bio: None,
+        created: Utc::now(),
+        role: Role::Developer.to_string(),
+        badges: Badges::default(),
+        balance: Decimal::ZERO,
+        payout_wallet: None,
+        payout_wallet_type: None,
+        payout_address: None,
+    }
+    .insert(&mut transaction)
+    .await?;
+
+    let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+    let res = crate::models::sessions::Session::from(session, true);
+    transaction.commit().await?;
+
+    Ok(HttpResponse::Ok().json(res))
+}
+
+#[derive(Deserialize, Validate)]
+pub struct Login {
+    pub username: String,
+    pub password: String,
+    pub challenge: String,
+}
+
+#[post("login")]
+pub async fn login_password(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    login: web::Json<Login>,
+) -> Result<HttpResponse, ApiError> {
+    if check_turnstile_captcha(&req, &login.challenge).await? {
+        return Err(ApiError::Turnstile);
+    }
+
+    let (user_id, password) = if let Some(user) =
+        crate::database::models::User::get(&login.username, &**pool, &redis).await?
+    {
+        (
+            user.id,
+            user.password
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?,
+        )
+    } else {
+        let user_pass = sqlx::query!(
+            "
+            SELECT id, password FROM users
+            WHERE email = $1
+            ",
+            login.username
+        )
+        .fetch_one(&**pool)
+        .await
+        .map_err(|_| AuthenticationError::InvalidCredentials)?;
+
+        (
+            crate::database::models::UserId(user_pass.id),
+            user_pass
+                .password
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?,
+        )
+    };
+
+    let hasher = Argon2::default();
+    hasher
+        .verify_password(login.password.as_bytes(), &PasswordHash::new(&password)?)
+        .map_err(|_| AuthenticationError::InvalidCredentials)?;
+
+    let mut transaction = pool.begin().await?;
+    let session = issue_session(req, user_id, &mut transaction, &redis).await?;
+    let res = crate::models::sessions::Session::from(session, true);
+    transaction.commit().await?;
+
+    Ok(HttpResponse::Ok().json(res))
 }

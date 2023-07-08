@@ -61,11 +61,17 @@ pub enum ApiError {
     #[error("Payments Error: {0}")]
     Payments(String),
     #[error("Discord Error: {0}")]
-    DiscordError(String),
+    Discord(String),
+    #[error("Captcha Error. Try resubmitting the form.")]
+    Turnstile,
     #[error("Error while decoding Base62: {0}")]
     Decoding(#[from] crate::models::ids::DecodingError),
     #[error("Image Parsing Error: {0}")]
-    ImageError(#[from] image::ImageError),
+    ImageParse(#[from] image::ImageError),
+    #[error("Password Hashing Error: {0}")]
+    PasswordHashing(#[from] argon2::password_hash::Error),
+    #[error("Password strength checking error: {0}")]
+    PasswordStrengthCheck(#[from] zxcvbn::ZxcvbnError),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -85,9 +91,12 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Validation(..) => StatusCode::BAD_REQUEST,
             ApiError::Analytics(..) => StatusCode::FAILED_DEPENDENCY,
             ApiError::Payments(..) => StatusCode::FAILED_DEPENDENCY,
-            ApiError::DiscordError(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::Discord(..) => StatusCode::FAILED_DEPENDENCY,
+            ApiError::Turnstile => StatusCode::BAD_REQUEST,
             ApiError::Decoding(..) => StatusCode::BAD_REQUEST,
-            ApiError::ImageError(..) => StatusCode::BAD_REQUEST,
+            ApiError::ImageParse(..) => StatusCode::BAD_REQUEST,
+            ApiError::PasswordHashing(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::PasswordStrengthCheck(..) => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -108,9 +117,12 @@ impl actix_web::ResponseError for ApiError {
                 ApiError::Validation(..) => "invalid_input",
                 ApiError::Analytics(..) => "analytics_error",
                 ApiError::Payments(..) => "payments_error",
-                ApiError::DiscordError(..) => "discord_error",
+                ApiError::Discord(..) => "discord_error",
+                ApiError::Turnstile => "turnstile_error",
                 ApiError::Decoding(..) => "decoding_error",
-                ApiError::ImageError(..) => "invalid_image",
+                ApiError::ImageParse(..) => "invalid_image",
+                ApiError::PasswordHashing(..) => "password_hashing_error",
+                ApiError::PasswordStrengthCheck(..) => "strength_check_error",
             },
             description: &self.to_string(),
         })

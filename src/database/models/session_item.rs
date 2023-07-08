@@ -10,8 +10,6 @@ const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids";
 const SESSIONS_USERS_NAMESPACE: &str = "sessions_users";
 const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
-// TODO: Manage sessions cache + clear cache when needed
-
 pub struct SessionBuilder {
     pub session: String,
     pub user_id: UserId,
@@ -293,10 +291,33 @@ impl Session {
         Ok(db_sessions)
     }
 
+    pub async fn clear_cache(
+        clear_sessions: Vec<(Option<SessionId>, Option<String>, Option<UserId>)>,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<(), DatabaseError> {
+        let mut redis = redis.get().await?;
+        let mut cmd = cmd("DEL");
+
+        for (id, session, user_id) in clear_sessions {
+            if let Some(id) = id {
+                cmd.arg(format!("{}:{}", SESSIONS_NAMESPACE, id.0));
+            }
+            if let Some(session) = session {
+                cmd.arg(format!("{}:{}", SESSIONS_IDS_NAMESPACE, session));
+            }
+            if let Some(user_id) = user_id {
+                cmd.arg(format!("{}:{}", SESSIONS_USERS_NAMESPACE, user_id.0));
+            }
+        }
+
+        cmd.query_async::<_, ()>(&mut redis).await?;
+
+        Ok(())
+    }
+
     pub async fn remove(
         id: SessionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-        // redis: &deadpool_redis::Pool,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "

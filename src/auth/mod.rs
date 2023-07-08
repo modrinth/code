@@ -1,14 +1,13 @@
 pub mod checks;
 pub mod flows;
 pub mod pat;
-mod session;
+pub mod session;
 pub mod validate;
 
 pub use checks::{
     filter_authorized_projects, filter_authorized_versions, is_authorized, is_authorized_version,
 };
-pub use flows::config;
-pub use pat::{generate_pat, get_user_from_pat, PersonalAccessToken};
+// pub use pat::{generate_pat, PersonalAccessToken};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
 use crate::file_hosting::FileHostingError;
@@ -29,6 +28,8 @@ pub enum AuthenticationError {
     SerDe(#[from] serde_json::Error),
     #[error("Error while communicating to external oauth provider")]
     Reqwest(#[from] reqwest::Error),
+    #[error("Error uploading user profile picture")]
+    FileHosting(#[from] FileHostingError),
     #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] crate::models::ids::DecodingError),
     #[error("Invalid Authentication Credentials")]
@@ -39,8 +40,6 @@ pub enum AuthenticationError {
     InvalidClientId,
     #[error("Invalid callback URL specified")]
     Url,
-    #[error("Error uploading user profile picture")]
-    FileHosting(#[from] FileHostingError),
 }
 
 impl actix_web::ResponseError for AuthenticationError {

@@ -11,7 +11,6 @@ use serde::Deserialize;
 use serde_json::json;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::sync::Arc;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -36,7 +35,7 @@ pub struct DownloadBody {
 pub async fn count_download(
     pool: web::Data<PgPool>,
     download_body: web::Json<DownloadBody>,
-    download_queue: web::Data<Arc<DownloadQueue>>,
+    download_queue: web::Data<DownloadQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id: crate::database::models::ids::ProjectId = download_body.project_id.into();
 

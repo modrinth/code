@@ -83,13 +83,13 @@ generate_ids!(
     "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)",
     StateId
 );
-generate_ids!(
-    pub generate_pat_id,
-    PatId,
-    8,
-    "SELECT EXISTS(SELECT 1 FROM pats WHERE id=$1)",
-    PatId
-);
+// generate_ids!(
+//     pub generate_pat_id,
+//     PatId,
+//     8,
+//     "SELECT EXISTS(SELECT 1 FROM pats WHERE id=$1)",
+//     PatId
+// );
 
 generate_ids!(
     pub generate_user_id,

@@ -62,7 +62,7 @@ pub struct UserPayoutData {
     pub payout_address: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum RecipientType {
     Email,
@@ -94,7 +94,7 @@ impl RecipientType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum RecipientWallet {
     Venmo,

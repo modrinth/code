@@ -1,5 +1,4 @@
 use super::ids::Base62Id;
-use crate::database::models::team_item::QueryTeamMember;
 use crate::models::users::User;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -70,8 +69,12 @@ pub struct TeamMember {
 }
 
 impl TeamMember {
-    pub fn from(data: QueryTeamMember, override_permissions: bool) -> Self {
-        let user: User = data.user.into();
+    pub fn from(
+        data: crate::database::models::team_item::TeamMember,
+        user: crate::database::models::User,
+        override_permissions: bool,
+    ) -> Self {
+        let user: User = user.into();
 
         Self {
             team_id: data.team_id.into(),

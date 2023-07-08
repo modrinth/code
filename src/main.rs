@@ -1,6 +1,7 @@
 use crate::file_hosting::S3Host;
 use crate::queue::download::DownloadQueue;
 use crate::queue::payouts::PayoutsQueue;
+use crate::queue::session::SessionQueue;
 use crate::ratelimit::errors::ARError;
 use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
 use crate::ratelimit::middleware::RateLimiter;
@@ -269,7 +270,7 @@ async fn main() -> std::io::Result<()> {
 
     scheduler::schedule_versions(&mut scheduler, pool.clone());
 
-    let download_queue = Arc::new(DownloadQueue::new());
+    let download_queue = web::Data::new(DownloadQueue::new());
 
     let pool_ref = pool.clone();
     let download_queue_ref = download_queue.clone();
@@ -287,11 +288,31 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
+    let session_queue = web::Data::new(SessionQueue::new());
+
+    let pool_ref = pool.clone();
+    let redis_ref = redis_pool.clone();
+    let session_queue_ref = session_queue.clone();
+    scheduler.run(std::time::Duration::from_secs(60), move || {
+        let pool_ref = pool_ref.clone();
+        let redis_ref = redis_ref.clone();
+        let session_queue_ref = session_queue_ref.clone();
+
+        async move {
+            info!("Indexing sessions queue");
+            let result = session_queue_ref.index(&pool_ref, &redis_ref).await;
+            if let Err(e) = result {
+                warn!("Indexing sessions queue failed: {:?}", e);
+            }
+            info!("Done indexing sessions queue");
+        }
+    });
+
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),
     };
 
-    let payouts_queue = Arc::new(Mutex::new(PayoutsQueue::new()));
+    let payouts_queue = web::Data::new(Mutex::new(PayoutsQueue::new()));
 
     let store = MemoryStore::new();
 
@@ -354,14 +375,14 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
             .app_data(web::Data::new(search_config.clone()))
-            .app_data(web::Data::new(download_queue.clone()))
-            .app_data(web::Data::new(payouts_queue.clone()))
+            .app_data(download_queue.clone())
+            .app_data(session_queue.clone())
+            .app_data(payouts_queue.clone())
             .app_data(web::Data::new(ip_salt.clone()))
             .wrap(sentry_actix::Sentry::new())
             .configure(routes::root_config)
             .configure(routes::v2::config)
             .configure(routes::v3::config)
-            .configure(auth::config)
             .default_service(web::get().to(routes::not_found))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?
@@ -441,6 +462,17 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("GITHUB_CLIENT_ID");
     failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
+    failed |= check_var::<String>("GITLAB_CLIENT_ID");
+    failed |= check_var::<String>("GITLAB_CLIENT_SECRET");
+    failed |= check_var::<String>("DISCORD_CLIENT_ID");
+    failed |= check_var::<String>("DISCORD_CLIENT_SECRET");
+    failed |= check_var::<String>("MICROSOFT_CLIENT_ID");
+    failed |= check_var::<String>("MICROSOFT_CLIENT_SECRET");
+    failed |= check_var::<String>("GOOGLE_CLIENT_ID");
+    failed |= check_var::<String>("GOOGLE_CLIENT_SECRET");
+    failed |= check_var::<String>("STEAM_API_KEY");
+
+    failed |= check_var::<String>("TURNSTILE_SECRET");
 
     failed |= check_var::<String>("ARIADNE_ADMIN_KEY");
     failed |= check_var::<String>("ARIADNE_URL");

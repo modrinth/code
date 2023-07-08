@@ -11,7 +11,7 @@ pub struct SessionId(pub u64);
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Session {
     pub id: SessionId,
-    pub session: String,
+    pub session: Option<String>,
     pub user_id: UserId,
 
     pub created: DateTime<Utc>,
@@ -26,4 +26,31 @@ pub struct Session {
     pub city: Option<String>,
     pub country: Option<String>,
     pub ip: String,
+}
+
+impl Session {
+    pub fn from(
+        data: crate::database::models::session_item::Session,
+        include_session: bool,
+    ) -> Self {
+        Session {
+            id: data.id.into(),
+            session: if include_session {
+                Some(data.session)
+            } else {
+                None
+            },
+            user_id: data.user_id.into(),
+            created: data.created,
+            last_login: data.last_login,
+            expires: data.expires,
+            refresh_expires: data.refresh_expires,
+            os: data.os,
+            platform: data.platform,
+            user_agent: data.user_agent,
+            city: data.city,
+            country: data.country,
+            ip: data.ip,
+        }
+    }
 }

@@ -1,3 +1,4 @@
+pub mod captcha;
 pub mod env;
 pub mod ext;
 pub mod guards;

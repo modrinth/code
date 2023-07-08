@@ -1,19 +1,43 @@
-use crate::auth::AuthenticationError;
-use crate::database::models::session_item::{Session, SessionBuilder};
+use crate::auth::{get_user_from_headers, AuthenticationError};
+use crate::database::models::session_item::Session as DBSession;
+use crate::database::models::session_item::SessionBuilder;
 use crate::database::models::UserId;
+use crate::models::sessions::Session;
+use crate::queue::session::SessionQueue;
+use crate::routes::ApiError;
 use crate::util::env::parse_var;
-use actix_web::HttpRequest;
+use actix_web::http::header::AUTHORIZATION;
+use actix_web::web::{scope, Data, ServiceConfig};
+use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use chrono::Utc;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
+use sqlx::PgPool;
 use woothee::parser::Parser;
 
-pub async fn issue_session(
-    req: HttpRequest,
-    user_id: UserId,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    redis: &deadpool_redis::Pool,
-) -> Result<Session, AuthenticationError> {
+pub fn config(cfg: &mut ServiceConfig) {
+    cfg.service(
+        scope("session")
+            .service(list)
+            .service(delete)
+            .service(refresh),
+    );
+}
+
+pub struct SessionMetadata {
+    pub city: Option<String>,
+    pub country: Option<String>,
+    pub ip: String,
+
+    pub os: Option<String>,
+    pub platform: Option<String>,
+    pub user_agent: String,
+}
+
+pub async fn get_session_metadata(
+    req: &HttpRequest,
+) -> Result<SessionMetadata, AuthenticationError> {
     let conn_info = req.connection_info().clone();
     let ip_addr = if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
@@ -45,6 +69,26 @@ pub async fn issue_session(
         None
     };
 
+    Ok(SessionMetadata {
+        os: os.map(|x| x.0.to_string()),
+        platform: os.map(|x| x.1.to_string()),
+        city: city.map(|x| x.to_string()),
+        country: country.map(|x| x.to_string()),
+        ip: ip_addr
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?
+            .to_string(),
+        user_agent: user_agent.to_string(),
+    })
+}
+
+pub async fn issue_session(
+    req: HttpRequest,
+    user_id: UserId,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    redis: &deadpool_redis::Pool,
+) -> Result<DBSession, AuthenticationError> {
+    let metadata = get_session_metadata(&req).await?;
+
     let session = ChaCha20Rng::from_entropy()
         .sample_iter(&Alphanumeric)
         .take(60)
@@ -56,25 +100,118 @@ pub async fn issue_session(
     let id = SessionBuilder {
         session,
         user_id,
-        os: os.map(|x| x.0.to_string()),
-        platform: os.map(|x| x.1.to_string()),
-        city: city.map(|x| x.to_string()),
-        country: country.map(|x| x.to_string()),
-        ip: ip_addr
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?
-            .to_string(),
-        user_agent: user_agent.to_string(),
+        os: metadata.os,
+        platform: metadata.platform,
+        city: metadata.city,
+        country: metadata.country,
+        ip: metadata.ip,
+        user_agent: metadata.user_agent,
     }
     .insert(transaction)
     .await?;
 
-    let session = Session::get_id(id, &mut *transaction, redis)
+    let session = DBSession::get_id(id, &mut *transaction, redis)
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
     Ok(session)
 }
 
-// TODO: List user sessions route
-// TODO: Delete User Session Route / logout
-// TODO: Refresh session route
+#[get("list")]
+pub async fn list(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    session_queue: Data<SessionQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+
+    let session_ids = DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis).await?;
+    let sessions = DBSession::get_many_ids(&session_ids, &**pool, &redis)
+        .await?
+        .into_iter()
+        .filter(|x| x.expires > Utc::now())
+        .map(|x| Session::from(x, false))
+        .collect::<Vec<_>>();
+
+    Ok(HttpResponse::Ok().json(sessions))
+}
+
+#[delete("{id}")]
+pub async fn delete(
+    info: web::Path<(String,)>,
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    session_queue: Data<SessionQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+
+    let session = DBSession::get(info.into_inner().0, &**pool, &redis).await?;
+
+    if let Some(session) = session {
+        if session.user_id != current_user.id.into() {
+            let mut transaction = pool.begin().await?;
+            DBSession::remove(session.id, &mut transaction).await?;
+            DBSession::clear_cache(
+                vec![(
+                    Some(session.id),
+                    Some(session.session),
+                    Some(session.user_id),
+                )],
+                &redis,
+            )
+            .await?;
+            transaction.commit().await?;
+        }
+    }
+
+    Ok(HttpResponse::NoContent().body(""))
+}
+
+#[post("refresh")]
+pub async fn refresh(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    session_queue: Data<SessionQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let session = req
+        .headers()
+        .get(AUTHORIZATION)
+        .and_then(|x| x.to_str().ok())
+        .ok_or_else(|| ApiError::Authentication(AuthenticationError::InvalidCredentials))?;
+
+    let session = DBSession::get(session, &**pool, &redis).await?;
+
+    if let Some(session) = session {
+        if current_user.id != session.user_id.into() || session.refresh_expires < Utc::now() {
+            return Err(ApiError::Authentication(
+                AuthenticationError::InvalidCredentials,
+            ));
+        }
+
+        let mut transaction = pool.begin().await?;
+
+        DBSession::remove(session.id, &mut transaction).await?;
+        let new_session = issue_session(req, session.user_id, &mut transaction, &redis).await?;
+        DBSession::clear_cache(
+            vec![(
+                Some(session.id),
+                Some(session.session),
+                Some(session.user_id),
+            )],
+            &redis,
+        )
+        .await?;
+
+        transaction.commit().await?;
+
+        Ok(HttpResponse::Ok().json(Session::from(new_session, true)))
+    } else {
+        Err(ApiError::Authentication(
+            AuthenticationError::InvalidCredentials,
+        ))
+    }
+}

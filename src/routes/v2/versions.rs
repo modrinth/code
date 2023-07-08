@@ -6,6 +6,7 @@ use crate::database;
 use crate::models;
 use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
 use crate::models::teams::Permissions;
+use crate::queue::session::SessionQueue;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
@@ -44,12 +45,13 @@ pub async fn version_list(
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
     let result = database::models::Project::get(&string, &**pool, &redis).await?;
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -152,12 +154,13 @@ pub async fn version_project_get(
     info: web::Path<(String, String)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner();
     let version_data =
         database::models::Version::get_full_from_id_slug(&id.0, &id.1, &**pool, &redis).await?;
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -181,6 +184,7 @@ pub async fn versions_get(
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let version_ids = serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
         .into_iter()
@@ -188,7 +192,7 @@ pub async fn versions_get(
         .collect::<Vec<database::models::VersionId>>();
     let versions_data = database::models::Version::get_many(&version_ids, &**pool, &redis).await?;
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -203,11 +207,12 @@ pub async fn version_get(
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     let version_data = database::models::Version::get(id.into(), &**pool, &redis).await?;
 
-    let user_option = get_user_from_headers(req.headers(), &**pool, &redis)
+    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
         .await
         .ok();
 
@@ -263,8 +268,9 @@ pub async fn version_edit(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     new_version: web::Json<EditVersion>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
 
     new_version
         .validate()
@@ -639,8 +645,9 @@ pub async fn version_schedule(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     scheduling_data: web::Json<SchedulingData>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
 
     if scheduling_data.time < Utc::now() {
         return Err(ApiError::InvalidInput(
@@ -704,8 +711,9 @@ pub async fn version_delete(
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<SessionQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool, &redis).await?;
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
     let id = info.into_inner().0;
 
     let version = database::models::Version::get(id.into(), &**pool, &redis)

@@ -1,29 +1,35 @@
 use crate::auth::flows::AuthProvider;
-use crate::auth::get_user_from_pat;
+use crate::auth::session::get_session_metadata;
 use crate::auth::AuthenticationError;
 use crate::database::models::user_item;
 use crate::models::users::{Role, User, UserId, UserPayoutData};
-use actix_web::http::header::HeaderMap;
+use crate::queue::session::SessionQueue;
+use actix_web::HttpRequest;
+use chrono::Utc;
 use reqwest::header::{HeaderValue, AUTHORIZATION};
 
 pub async fn get_user_from_headers<'a, E>(
-    headers: &HeaderMap,
+    req: &HttpRequest,
     executor: E,
     redis: &deadpool_redis::Pool,
+    session_queue: &SessionQueue,
 ) -> Result<User, AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
+    let headers = req.headers();
     let token: Option<&HeaderValue> = headers.get(AUTHORIZATION);
 
     // Fetch DB user record and minos user from headers
     let db_user = get_user_record_from_bearer_token(
+        req,
         token
             .ok_or_else(|| AuthenticationError::InvalidAuthMethod)?
             .to_str()
             .map_err(|_| AuthenticationError::InvalidCredentials)?,
         executor,
         redis,
+        session_queue,
     )
     .await?
     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
@@ -55,24 +61,33 @@ where
 }
 
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
+    req: &HttpRequest,
     token: &str,
     executor: E,
     redis: &deadpool_redis::Pool,
+    session_queue: &SessionQueue,
 ) -> Result<Option<user_item::User>, AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
-    let token: &str = token.trim_start_matches("Bearer ");
-
     let possible_user = match token.split_once('_') {
-        Some(("modrinth", _)) => get_user_from_pat(token, executor).await?,
+        //Some(("modrinth", _)) => get_user_from_pat(token, executor).await?,
         Some(("mra", _)) => {
             let session =
                 crate::database::models::session_item::Session::get(token, executor, redis)
                     .await?
                     .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-            user_item::User::get_id(session.user_id, executor, redis).await?
+            if session.expires < Utc::now() {
+                return Err(AuthenticationError::InvalidCredentials);
+            }
+
+            let user = user_item::User::get_id(session.user_id, executor, redis).await?;
+
+            let metadata = get_session_metadata(req).await?;
+            session_queue.add(session.id, metadata).await;
+
+            user
         }
         Some(("github", _)) | Some(("gho", _)) | Some(("ghp", _)) => {
             let user = AuthProvider::GitHub.get_user(token).await?;
@@ -91,14 +106,15 @@ where
 }
 
 pub async fn check_is_moderator_from_headers<'a, 'b, E>(
-    headers: &HeaderMap,
+    req: &HttpRequest,
     executor: E,
     redis: &deadpool_redis::Pool,
+    session_queue: &SessionQueue,
 ) -> Result<User, AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
-    let user = get_user_from_headers(headers, executor, redis).await?;
+    let user = get_user_from_headers(req, executor, redis, session_queue).await?;
 
     if user.role.is_mod() {
         Ok(user)
