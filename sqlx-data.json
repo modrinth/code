@@ -2665,36 +2665,6 @@
     },
     "query": "\n            INSERT INTO team_members (\n                id, team_id, user_id, role, permissions, accepted\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6\n            )\n            "
   },
-  "7028615c2af313f48ce68addef860b6e15a9736117cd64ec96277487d54d5964": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "session",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 2,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": []
-      }
-    },
-    "query": "\n                SELECT id, session, user_id\n                FROM sessions\n                WHERE refresh_expires >= NOW()\n                "
-  },
   "70b510956a40583eef8c57dcced71c67f525eee455ae8b09e9b2403668068751": {
     "describe": {
       "columns": [],
@@ -5179,6 +5149,36 @@
       }
     },
     "query": "\n                DELETE FROM team_members\n                WHERE team_id = $1\n                "
+  },
+  "d93ce03a186c03668d5eebab2bb4cbc4fc9dd002529e37575d94509b67908c8d": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "session",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\n                SELECT id, session, user_id\n                FROM sessions\n                WHERE refresh_expires <= NOW()\n                "
   },
   "dc6aa2e7bfd5d5004620ddd4cd6a47ecc56159e1489054e0652d56df802fb5e5": {
     "describe": {

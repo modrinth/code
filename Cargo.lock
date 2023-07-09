@@ -4245,6 +4245,7 @@ dependencies = [
  "base32",
  "constant_time_eq 0.2.6",
  "hmac 0.12.1",
+ "rand",
  "sha1 0.10.5",
  "sha2 0.10.7",
 ]

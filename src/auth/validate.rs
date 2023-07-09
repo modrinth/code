@@ -84,8 +84,11 @@ where
 
             let user = user_item::User::get_id(session.user_id, executor, redis).await?;
 
-            let metadata = get_session_metadata(req).await?;
-            session_queue.add(session.id, metadata).await;
+            let rate_limit_ignore = dotenvy::var("RATE_LIMIT_IGNORE_KEY")?;
+            if !req.headers().get("x-ratelimit-key").and_then(|x| x.to_str().ok()).map(|x| x == rate_limit_ignore).unwrap_or(false) {
+                let metadata = get_session_metadata(req).await?;
+                session_queue.add(session.id, metadata).await;
+            }
 
             user
         }

@@ -65,7 +65,7 @@ impl SessionQueue {
                 "
                 SELECT id, session, user_id
                 FROM sessions
-                WHERE refresh_expires >= NOW()
+                WHERE refresh_expires <= NOW()
                 "
             )
             .fetch_many(&mut *transaction)

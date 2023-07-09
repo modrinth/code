@@ -49,7 +49,7 @@ argon2 = { version = "0.5.0", features = ["std"] }
 bitflags = "1.3.2"
 hex = "0.4.3"
 zxcvbn = "2.2.2"
-totp-rs = "5.0.2"
+totp-rs = { version = "5.0.2", features = ["gen_secret"] }
 
 url = "2.4.0"
 urlencoding = "2.1.2"
