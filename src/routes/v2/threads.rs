@@ -4,10 +4,11 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::models::ids::ThreadMessageId;
 use crate::models::notifications::NotificationBody;
+use crate::models::pats::Scopes;
 use crate::models::projects::ProjectStatus;
 use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadType};
 use crate::models::users::User;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use futures::TryStreamExt;
@@ -38,28 +39,34 @@ pub async fn is_authorized_thread(
     let user_id: database::models::UserId = user.id.into();
     Ok(match thread.type_ {
         ThreadType::Report => {
-            let report_exists = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM reports WHERE thread_id = $1 AND reporter = $2)",
-                thread.id as database::models::ids::ThreadId,
-                user_id as database::models::ids::UserId,
-            )
-            .fetch_one(pool)
-            .await?
-            .exists;
+            if let Some(report_id) = thread.report_id {
+                let report_exists = sqlx::query!(
+                    "SELECT EXISTS(SELECT 1 FROM reports WHERE id = $1 AND reporter = $2)",
+                    report_id as database::models::ids::ReportId,
+                    user_id as database::models::ids::UserId,
+                )
+                    .fetch_one(pool)
+                    .await?
+                    .exists;
 
-            report_exists.unwrap_or(false)
+                report_exists.unwrap_or(false)
+            } else { false }
         }
         ThreadType::Project => {
-            let project_exists = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 WHERE thread_id = $1)",
-                thread.id as database::models::ids::ThreadId,
-                user_id as database::models::ids::UserId,
-            )
-                .fetch_one(pool)
-                .await?
-                .exists;
+            if let Some(project_id) = thread.project_id {
+                let project_exists = sqlx::query!(
+                    "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 WHERE m.id = $1)",
+                    project_id as database::models::ids::ProjectId,
+                    user_id as database::models::ids::UserId,
+                )
+                    .fetch_one(pool)
+                    .await?
+                    .exists;
 
-            project_exists.unwrap_or(false)
+                project_exists.unwrap_or(false)
+            } else {
+                false
+            }
         }
         ThreadType::DirectMessage => thread.members.contains(&user_id),
     })
@@ -90,15 +97,15 @@ pub async fn filter_authorized_threads(
         let project_thread_ids = check_threads
             .iter()
             .filter(|x| x.type_ == ThreadType::Project)
-            .map(|x| x.id.0)
+            .flat_map(|x| x.project_id.map(|x| x.0))
             .collect::<Vec<_>>();
 
         if !project_thread_ids.is_empty() {
             sqlx::query!(
                 "
-                SELECT m.thread_id FROM mods m
+                SELECT m.id FROM mods m
                 INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2
-                WHERE m.thread_id = ANY($1)
+                WHERE m.id = ANY($1)
                 ",
                 &*project_thread_ids,
                 user_id as database::models::ids::UserId,
@@ -107,7 +114,7 @@ pub async fn filter_authorized_threads(
             .try_for_each(|e| {
                 if let Some(row) = e.right() {
                     check_threads.retain(|x| {
-                        let bool = Some(x.id.0) == row.thread_id;
+                        let bool = x.project_id.map(|x| x.0) == Some(row.id);
 
                         if bool {
                             return_threads.push(x.clone());
@@ -125,14 +132,14 @@ pub async fn filter_authorized_threads(
         let report_thread_ids = check_threads
             .iter()
             .filter(|x| x.type_ == ThreadType::Report)
-            .map(|x| x.id.0)
+            .flat_map(|x| x.report_id.map(|x| x.0))
             .collect::<Vec<_>>();
 
         if !report_thread_ids.is_empty() {
             sqlx::query!(
                 "
-                SELECT thread_id FROM reports
-                WHERE thread_id = ANY($1) AND reporter = $2
+                SELECT id FROM reports
+                WHERE id = ANY($1) AND reporter = $2
                 ",
                 &*report_thread_ids,
                 user_id as database::models::ids::UserId,
@@ -141,7 +148,7 @@ pub async fn filter_authorized_threads(
             .try_for_each(|e| {
                 if let Some(row) = e.right() {
                     check_threads.retain(|x| {
-                        let bool = Some(x.id.0) == row.thread_id;
+                        let bool = x.report_id.map(|x| x.0) == Some(row.id);
 
                         if bool {
                             return_threads.push(x.clone());
@@ -212,13 +219,21 @@ pub async fn thread_get(
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0.into();
 
     let thread_data = database::models::Thread::get(string, &**pool).await?;
 
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::THREAD_READ]),
+    )
+    .await?
+    .1;
 
     if let Some(mut data) = thread_data {
         if is_authorized_thread(&data, &user, &pool).await? {
@@ -255,9 +270,17 @@ pub async fn threads_get(
     web::Query(ids): web::Query<ThreadIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::THREAD_READ]),
+    )
+    .await?
+    .1;
 
     let thread_ids: Vec<database::models::ids::ThreadId> =
         serde_json::from_str::<Vec<ThreadId>>(&ids.ids)?
@@ -284,9 +307,17 @@ pub async fn thread_send_message(
     pool: web::Data<PgPool>,
     new_message: web::Json<NewThreadMessage>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::THREAD_WRITE]),
+    )
+    .await?
+    .1;
 
     let string: database::models::ThreadId = info.into_inner().0.into();
 
@@ -347,50 +378,45 @@ pub async fn thread_send_message(
         .insert(&mut transaction)
         .await?;
 
-        let mod_notif = if thread.type_ == ThreadType::Project {
-            let record = sqlx::query!(
-                "SELECT m.id, m.status, m.team_id FROM mods m WHERE thread_id = $1",
-                thread.id as database::models::ids::ThreadId,
+        let mod_notif = if let Some(project_id) = thread.project_id {
+            let project = database::models::Project::get_id(
+                project_id,
+                &**pool,
+                &redis,
             )
-            .fetch_one(&**pool)
-            .await?;
-
-            let status = ProjectStatus::from_str(&record.status);
-
-            if status != ProjectStatus::Processing && user.role.is_mod() {
-                let members = database::models::TeamMember::get_from_team_full(
-                    database::models::TeamId(record.team_id),
-                    &**pool,
-                    &redis,
-                )
                 .await?;
 
-                NotificationBuilder {
-                    body: NotificationBody::ModeratorMessage {
-                        thread_id: thread.id.into(),
-                        message_id: id.into(),
-                        project_id: Some(database::models::ProjectId(record.id).into()),
-                        report_id: None,
-                    },
+            if let Some(project) = project {
+                if project.inner.status != ProjectStatus::Processing && user.role.is_mod() {
+                    let members = database::models::TeamMember::get_from_team_full(
+                        project.inner.team_id,
+                        &**pool,
+                        &redis,
+                    )
+                        .await?;
+
+                    NotificationBuilder {
+                        body: NotificationBody::ModeratorMessage {
+                            thread_id: thread.id.into(),
+                            message_id: id.into(),
+                            project_id: Some(project.inner.id.into()),
+                            report_id: None,
+                        },
+                    }
+                        .insert_many(
+                            members.into_iter().map(|x| x.user_id).collect(),
+                            &mut transaction,
+                        )
+                        .await?;
                 }
-                .insert_many(
-                    members.into_iter().map(|x| x.user_id).collect(),
-                    &mut transaction,
-                )
-                .await?;
+
+                project.inner.status == ProjectStatus::Processing && !user.role.is_mod()
+            } else {
+                !user.role.is_mod()
             }
-
-            status == ProjectStatus::Processing && !user.role.is_mod()
-        } else if thread.type_ == ThreadType::Report {
-            let record = sqlx::query!(
-                "SELECT r.id FROM reports r WHERE thread_id = $1",
-                thread.id as database::models::ids::ThreadId,
-            )
-            .fetch_one(&**pool)
-            .await?;
-
+        } else if let Some(report_id) = thread.report_id {
             let report = database::models::report_item::Report::get(
-                database::models::ReportId(record.id),
+                report_id,
                 &**pool,
             )
             .await?;
@@ -446,7 +472,7 @@ pub async fn moderation_inbox(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = check_is_moderator_from_headers(&req, &**pool, &redis, &session_queue).await?;
 
@@ -474,7 +500,7 @@ pub async fn thread_read(
     info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(&req, &**pool, &redis, &session_queue).await?;
 
@@ -503,9 +529,17 @@ pub async fn message_delete(
     info: web::Path<(ThreadMessageId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::THREAD_WRITE]),
+    )
+    .await?
+    .1;
 
     let result = database::models::ThreadMessage::get(info.into_inner().0.into(), &**pool).await?;
 

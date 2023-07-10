@@ -1,6 +1,6 @@
 pub mod checks;
 pub mod flows;
-pub mod pat;
+pub mod pats;
 pub mod session;
 pub mod validate;
 

@@ -3,9 +3,10 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::TeamMember;
 use crate::models::ids::ProjectId;
 use crate::models::notifications::NotificationBody;
+use crate::models::pats::Scopes;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use rust_decimal::Decimal;
@@ -32,15 +33,22 @@ pub async fn team_members_get_project(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let project_data = crate::database::models::Project::get(&string, &**pool, &redis).await?;
 
     if let Some(project) = project_data {
-        let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-            .await
-            .ok();
+        let current_user = get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Some(&[Scopes::PROJECT_READ]),
+        )
+        .await
+        .map(|x| x.1)
+        .ok();
 
         if !is_authorized(&project.inner, &current_user, &pool).await? {
             return Ok(HttpResponse::NotFound().body(""));
@@ -93,7 +101,7 @@ pub async fn team_members_get(
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     let members_data = TeamMember::get_from_team_full(id.into(), &**pool, &redis).await?;
@@ -104,9 +112,16 @@ pub async fn team_members_get(
     )
     .await?;
 
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
     let user_id = current_user.as_ref().map(|x| x.id.into());
 
     let logged_in = current_user
@@ -148,7 +163,7 @@ pub async fn teams_get(
     web::Query(ids): web::Query<TeamIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     use itertools::Itertools;
 
@@ -165,9 +180,16 @@ pub async fn teams_get(
     )
     .await?;
 
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let teams_groups = teams_data.into_iter().group_by(|data| data.team_id.0);
 
@@ -206,10 +228,18 @@ pub async fn join_team(
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
 
     let member =
         TeamMember::get_from_user_id_pending(team_id, current_user.id.into(), &**pool).await?;
@@ -275,13 +305,21 @@ pub async fn add_team_member(
     pool: web::Data<PgPool>,
     new_member: web::Json<NewTeamMember>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
 
     let mut transaction = pool.begin().await?;
 
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
     let member = TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool)
         .await?
         .ok_or_else(|| {
@@ -390,13 +428,21 @@ pub async fn edit_team_member(
     pool: web::Data<PgPool>,
     edit_member: web::Json<EditTeamMember>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
     let user_id = ids.1.into();
 
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
     let member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
         .await?
         .ok_or_else(|| {
@@ -481,11 +527,19 @@ pub async fn transfer_ownership(
     pool: web::Data<PgPool>,
     new_owner: web::Json<TransferOwnership>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
 
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
 
     if !current_user.role.is_admin() {
         let member = TeamMember::get_from_user_id(id.into(), current_user.id.into(), &**pool)
@@ -554,13 +608,21 @@ pub async fn remove_team_member(
     info: web::Path<(TeamId, UserId)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
     let id = ids.0.into();
     let user_id = ids.1.into();
 
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
     let member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
         .await?
         .ok_or_else(|| {

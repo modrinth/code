@@ -2,7 +2,7 @@ use super::ApiError;
 use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models::projects::ProjectStatus;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -27,7 +27,7 @@ pub async fn get_projects(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     count: web::Query<ResultCount>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(&req, &**pool, &redis, &session_queue).await?;
 

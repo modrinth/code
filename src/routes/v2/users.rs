@@ -1,11 +1,12 @@
-use crate::auth::get_user_from_headers;
+use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
+use crate::models::pats::Scopes;
 use crate::models::projects::Project;
 use crate::models::users::{Badges, RecipientType, RecipientWallet, Role, UserId};
 use crate::queue::payouts::{PayoutAmount, PayoutItem, PayoutsQueue};
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
@@ -27,7 +28,6 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(user_auth_get);
-    cfg.service(user_data_get);
     cfg.service(users_get);
 
     cfg.service(
@@ -49,51 +49,36 @@ pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    Ok(
-        HttpResponse::Ok()
-            .json(get_user_from_headers(&req, &**pool, &redis, &session_queue).await?),
+    let (scopes, mut user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_READ]),
     )
-}
+    .await?;
 
-#[derive(Serialize)]
-pub struct UserData {
-    pub notifs_count: u64,
-    pub followed_projects: Vec<crate::models::ids::ProjectId>,
-}
-
-#[get("user_data")]
-pub async fn user_data_get(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
-
-    let data = sqlx::query!(
-        "
-        SELECT COUNT(DISTINCT n.id) notifs_count, ARRAY_AGG(mf.mod_id) followed_projects FROM notifications n
-        LEFT OUTER JOIN mod_follows mf ON mf.follower_id = $1
-        WHERE user_id = $1 AND read = FALSE
-        ",
-        user.id.0 as i64
-    ).fetch_optional(&**pool).await?;
-
-    if let Some(data) = data {
-        Ok(HttpResponse::Ok().json(UserData {
-            notifs_count: data.notifs_count.map(|x| x as u64).unwrap_or(0),
-            followed_projects: data
-                .followed_projects
-                .unwrap_or_default()
-                .into_iter()
-                .map(|x| crate::models::ids::ProjectId(x as u64))
-                .collect(),
-        }))
-    } else {
-        Ok(HttpResponse::NoContent().body(""))
+    if !scopes.contains(Scopes::USER_READ_EMAIL) {
+        user.email = None;
     }
+
+    if !scopes.contains(Scopes::PAYOUTS_READ) {
+        user.payout_data = None;
+    }
+
+    Ok(HttpResponse::Ok().json(
+        get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Some(&[Scopes::USER_READ]),
+        )
+        .await?
+        .1,
+    ))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -138,11 +123,18 @@ pub async fn projects_list(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
@@ -218,9 +210,16 @@ pub async fn user_edit(
     new_user: web::Json<EditUser>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let (scopes, user) = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_WRITE]),
+    )
+    .await?;
 
     new_user
         .validate()
@@ -343,6 +342,12 @@ pub async fn user_edit(
                         ));
                     }
 
+                    if !scopes.contains(Scopes::PAYOUTS_WRITE) {
+                        return Err(ApiError::Authentication(
+                            AuthenticationError::InvalidCredentials,
+                        ));
+                    }
+
                     if !match payout_data.payout_wallet_type {
                         RecipientType::Email => {
                             validator::validate_email(&payout_data.payout_address)
@@ -401,6 +406,12 @@ pub async fn user_edit(
             }
 
             if let Some((old_password, new_password)) = &new_user.password {
+                if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+                    return Err(ApiError::Authentication(
+                        AuthenticationError::InvalidCredentials,
+                    ));
+                }
+
                 if let Some(pass) = actual_user.password {
                     let old_password = old_password.as_ref().ok_or_else(|| {
                         ApiError::CustomAuthentication(
@@ -500,11 +511,19 @@ pub async fn user_icon_edit(
     redis: web::Data<deadpool_redis::Pool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
         let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+        let user = get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Some(&[Scopes::USER_WRITE]),
+        )
+        .await?
+        .1;
         let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
         if let Some(actual_user) = id_option {
@@ -579,9 +598,17 @@ pub async fn user_delete(
     pool: web::Data<PgPool>,
     removal_type: web::Query<RemovalType>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_DELETE]),
+    )
+    .await?
+    .1;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -619,9 +646,17 @@ pub async fn user_follows(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_READ]),
+    )
+    .await?
+    .1;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -667,9 +702,17 @@ pub async fn user_notifications(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_READ]),
+    )
+    .await?
+    .1;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -707,9 +750,17 @@ pub async fn user_payouts(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PAYOUTS_READ]),
+    )
+    .await?
+    .1;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {
@@ -784,11 +835,19 @@ pub async fn user_payouts_request(
     data: web::Json<PayoutData>,
     payouts_queue: web::Data<Mutex<PayoutsQueue>>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let mut payouts_queue = payouts_queue.lock().await;
 
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PAYOUTS_WRITE]),
+    )
+    .await?
+    .1;
     let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
     if let Some(id) = id_option.map(|x| x.id) {

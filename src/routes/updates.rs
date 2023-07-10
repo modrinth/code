@@ -6,8 +6,9 @@ use sqlx::PgPool;
 
 use crate::auth::{filter_authorized_versions, get_user_from_headers, is_authorized};
 use crate::database;
+use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 
 use super::ApiError;
 
@@ -21,7 +22,7 @@ pub async fn forge_updates(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     const ERROR: &str = "The specified project does not exist!";
 
@@ -31,9 +32,16 @@ pub async fn forge_updates(
         .await?
         .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
 
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Err(ApiError::InvalidInput(ERROR.to_string()));

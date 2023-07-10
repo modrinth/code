@@ -107,14 +107,14 @@ impl Session {
     }
 
     pub async fn get_many_ids<'a, E>(
-        user_ids: &[SessionId],
+        session_ids: &[SessionId],
         exec: E,
         redis: &deadpool_redis::Pool,
     ) -> Result<Vec<Session>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let ids = user_ids
+        let ids = session_ids
             .iter()
             .map(|x| crate::models::ids::SessionId::from(*x))
             .collect::<Vec<_>>();

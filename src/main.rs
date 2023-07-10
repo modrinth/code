@@ -1,7 +1,7 @@
 use crate::file_hosting::S3Host;
 use crate::queue::download::DownloadQueue;
 use crate::queue::payouts::PayoutsQueue;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::ratelimit::errors::ARError;
 use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
 use crate::ratelimit::middleware::RateLimiter;
@@ -288,7 +288,7 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    let session_queue = web::Data::new(SessionQueue::new());
+    let session_queue = web::Data::new(AuthQueue::new());
 
     let pool_ref = pool.clone();
     let redis_ref = redis_pool.clone();

@@ -2,8 +2,9 @@ use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::session_item::Session as DBSession;
 use crate::database::models::session_item::SessionBuilder;
 use crate::database::models::UserId;
+use crate::models::pats::Scopes;
 use crate::models::sessions::Session;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
 use actix_web::http::header::AUTHORIZATION;
@@ -122,9 +123,17 @@ pub async fn list(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
-    session_queue: Data<SessionQueue>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::SESSION_READ]),
+    )
+    .await?
+    .1;
 
     let session_ids = DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis).await?;
     let sessions = DBSession::get_many_ids(&session_ids, &**pool, &redis)
@@ -143,9 +152,17 @@ pub async fn delete(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
-    session_queue: Data<SessionQueue>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::SESSION_DELETE]),
+    )
+    .await?
+    .1;
 
     let session = DBSession::get(info.into_inner().0, &**pool, &redis).await?;
 
@@ -174,9 +191,11 @@ pub async fn refresh(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
-    session_queue: Data<SessionQueue>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let current_user = get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
+        .await?
+        .1;
     let session = req
         .headers()
         .get(AUTHORIZATION)

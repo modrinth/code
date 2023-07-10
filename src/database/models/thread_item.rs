@@ -7,12 +7,18 @@ use serde::Deserialize;
 pub struct ThreadBuilder {
     pub type_: ThreadType,
     pub members: Vec<UserId>,
+    pub project_id: Option<ProjectId>,
+    pub report_id: Option<ReportId>,
 }
 
 #[derive(Clone)]
 pub struct Thread {
     pub id: ThreadId,
+
+    pub project_id: Option<ProjectId>,
+    pub report_id: Option<ReportId>,
     pub type_: ThreadType,
+
     pub messages: Vec<ThreadMessage>,
     pub members: Vec<UserId>,
     pub show_in_mod_inbox: bool,
@@ -70,14 +76,16 @@ impl ThreadBuilder {
         sqlx::query!(
             "
             INSERT INTO threads (
-                id, thread_type
+                id, thread_type, mod_id, report_id
             )
             VALUES (
-                $1, $2
+                $1, $2, $3, $4
             )
             ",
             thread_id as ThreadId,
-            self.type_.as_str()
+            self.type_.as_str(),
+            self.project_id.map(|x| x.0),
+            self.report_id.map(|x| x.0),
         )
         .execute(&mut *transaction)
         .await?;
@@ -125,7 +133,7 @@ impl Thread {
         let thread_ids_parsed: Vec<i64> = thread_ids.iter().map(|x| x.0).collect();
         let threads = sqlx::query!(
             "
-            SELECT t.id, t.thread_type, t.show_in_mod_inbox,
+            SELECT t.id, t.thread_type, t.mod_id, t.report_id, t.show_in_mod_inbox,
             ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,
             JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages
             FROM threads t
@@ -140,6 +148,8 @@ impl Thread {
         .try_filter_map(|e| async {
             Ok(e.right().map(|x| Thread {
                 id: ThreadId(x.id),
+                project_id: x.mod_id.map(ProjectId),
+                report_id: x.report_id.map(ReportId),
                 type_: ThreadType::from_str(&x.thread_type),
                 messages: {
                     let mut messages: Vec<ThreadMessage> = serde_json::from_value(

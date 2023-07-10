@@ -4,9 +4,10 @@ use crate::auth::{
     is_authorized_version,
 };
 use crate::models::ids::VersionId;
+use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::models::teams::Permissions;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::{database, models};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use itertools::Itertools;
@@ -49,11 +50,18 @@ pub async fn get_version_from_hash(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     hash_query: web::Query<HashQuery>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let hash = info.into_inner().0.to_lowercase();
     let file = database::models::Version::get_file_from_hash(
@@ -95,11 +103,18 @@ pub async fn download_version(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     hash_query: web::Query<HashQuery>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let hash = info.into_inner().0.to_lowercase();
     let file = database::models::Version::get_file_from_hash(
@@ -138,9 +153,17 @@ pub async fn delete_file(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     hash_query: web::Query<HashQuery>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_WRITE]),
+    )
+    .await?
+    .1;
 
     let hash = info.into_inner().0.to_lowercase();
 
@@ -234,11 +257,18 @@ pub async fn get_update_from_hash(
     redis: web::Data<deadpool_redis::Pool>,
     hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
     let hash = info.into_inner().0.to_lowercase();
 
     if let Some(file) = database::models::Version::get_file_from_hash(
@@ -304,11 +334,18 @@ pub async fn get_versions_from_hashes(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     file_data: web::Json<FileHashes>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let files = database::models::Version::get_files_from_hash(
         file_data.algorithm.clone(),
@@ -345,11 +382,18 @@ pub async fn get_projects_from_hashes(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     file_data: web::Json<FileHashes>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let files = database::models::Version::get_files_from_hash(
         file_data.algorithm.clone(),
@@ -396,11 +440,18 @@ pub async fn update_files(
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
     update_data: web::Json<ManyUpdateData>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(&req, &**pool, &redis, &session_queue)
-        .await
-        .ok();
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
 
     let files = database::models::Version::get_files_from_hash(
         update_data.algorithm.clone(),

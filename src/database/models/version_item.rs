@@ -10,11 +10,10 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 const VERSIONS_NAMESPACE: &str = "versions";
-// TODO: Cache version slugs call
-// const VERSIONS_SLUGS_NAMESPACE: &str = "versions_slugs";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
 const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
+#[derive(Clone)]
 pub struct VersionBuilder {
     pub version_id: VersionId,
     pub project_id: ProjectId,
@@ -32,6 +31,7 @@ pub struct VersionBuilder {
     pub requested_status: Option<VersionStatus>,
 }
 
+#[derive(Clone)]
 pub struct DependencyBuilder {
     pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
@@ -79,6 +79,7 @@ impl DependencyBuilder {
     }
 }
 
+#[derive(Clone)]
 pub struct VersionFileBuilder {
     pub url: String,
     pub filename: String,
@@ -130,6 +131,7 @@ impl VersionFileBuilder {
     }
 }
 
+#[derive(Clone)]
 pub struct HashBuilder {
     pub algorithm: String,
     pub hash: Vec<u8>,

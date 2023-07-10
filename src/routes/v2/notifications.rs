@@ -2,7 +2,8 @@ use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::models::ids::NotificationId;
 use crate::models::notifications::Notification;
-use crate::queue::session::SessionQueue;
+use crate::models::pats::Scopes;
+use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -32,9 +33,17 @@ pub async fn notifications_get(
     web::Query(ids): web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_READ]),
+    )
+    .await?
+    .1;
 
     use database::models::notification_item::Notification as DBNotification;
     use database::models::NotificationId as DBNotificationId;
@@ -64,9 +73,17 @@ pub async fn notification_get(
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_READ]),
+    )
+    .await?
+    .1;
 
     let id = info.into_inner().0;
 
@@ -90,9 +107,17 @@ pub async fn notification_read(
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_WRITE]),
+    )
+    .await?
+    .1;
 
     let id = info.into_inner().0;
 
@@ -125,9 +150,17 @@ pub async fn notification_delete(
     info: web::Path<(NotificationId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_WRITE]),
+    )
+    .await?
+    .1;
 
     let id = info.into_inner().0;
 
@@ -160,9 +193,17 @@ pub async fn notifications_read(
     web::Query(ids): web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_WRITE]),
+    )
+    .await?
+    .1;
 
     let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
         .into_iter()
@@ -197,9 +238,17 @@ pub async fn notifications_delete(
     web::Query(ids): web::Query<NotificationIds>,
     pool: web::Data<PgPool>,
     redis: web::Data<deadpool_redis::Pool>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::NOTIFICATION_WRITE]),
+    )
+    .await?
+    .1;
 
     let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
         .into_iter()

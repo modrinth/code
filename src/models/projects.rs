@@ -106,7 +106,7 @@ pub struct Project {
     pub color: Option<u32>,
 
     /// The thread of the moderation messages of the project
-    pub thread_id: Option<ThreadId>,
+    pub thread_id: ThreadId,
 
     /// The monetization status of this project
     pub monetization_status: MonetizationStatus,
@@ -196,7 +196,7 @@ impl From<QueryProject> for Project {
                 })
                 .collect(),
             color: m.color,
-            thread_id: m.thread_id.map(|x| x.into()),
+            thread_id: data.thread_id.into(),
             monetization_status: m.monetization_status,
         }
     }

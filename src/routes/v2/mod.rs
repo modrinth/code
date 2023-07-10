@@ -1,7 +1,6 @@
 mod admin;
 mod moderation;
 mod notifications;
-mod pats;
 pub(crate) mod project_creation;
 mod projects;
 mod reports;
@@ -22,6 +21,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(admin::config)
             .configure(crate::auth::session::config)
             .configure(crate::auth::flows::config)
+            .configure(crate::auth::pats::config)
             .configure(moderation::config)
             .configure(notifications::config)
             //.configure(pats::config)

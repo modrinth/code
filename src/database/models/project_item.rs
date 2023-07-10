@@ -85,6 +85,7 @@ impl GalleryItem {
     }
 }
 
+#[derive(Clone)]
 pub struct ProjectBuilder {
     pub project_id: ProjectId,
     pub project_type_id: ProjectTypeId,
@@ -110,7 +111,6 @@ pub struct ProjectBuilder {
     pub donation_urls: Vec<DonationUrl>,
     pub gallery_items: Vec<GalleryItem>,
     pub color: Option<u32>,
-    pub thread_id: ThreadId,
     pub monetization_status: MonetizationStatus,
 }
 
@@ -153,7 +153,6 @@ impl ProjectBuilder {
             moderation_message_body: None,
             webhook_sent: false,
             color: self.color,
-            thread_id: Some(self.thread_id),
             monetization_status: self.monetization_status,
         };
         project_struct.insert(&mut *transaction).await?;
@@ -231,7 +230,6 @@ pub struct Project {
     pub moderation_message_body: Option<String>,
     pub webhook_sent: bool,
     pub color: Option<u32>,
-    pub thread_id: Option<ThreadId>,
     pub monetization_status: MonetizationStatus,
 }
 
@@ -247,14 +245,14 @@ impl Project {
                 published, downloads, icon_url, issues_url,
                 source_url, wiki_url, status, requested_status, discord_url,
                 client_side, server_side, license_url, license,
-                slug, project_type, color, thread_id, monetization_status
+                slug, project_type, color, monetization_status
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9,
                 $10, $11, $12, $13, $14,
                 $15, $16, $17, $18,
-                LOWER($19), $20, $21, $22, $23
+                LOWER($19), $20, $21, $22
             )
             ",
             self.id as ProjectId,
@@ -278,7 +276,6 @@ impl Project {
             self.slug.as_ref(),
             self.project_type as ProjectTypeId,
             self.color.map(|x| x as i32),
-            self.thread_id.map(|x| x.0),
             self.monetization_status.as_str(),
         )
         .execute(&mut *transaction)
@@ -381,6 +378,8 @@ impl Project {
             .execute(&mut *transaction)
             .await?;
 
+            models::Thread::remove_full(project.thread_id, transaction).await?;
+
             sqlx::query!(
                 "
                 DELETE FROM mods
@@ -412,10 +411,6 @@ impl Project {
             )
             .execute(&mut *transaction)
             .await?;
-
-            if let Some(thread_id) = project.inner.thread_id {
-                models::Thread::remove_full(thread_id, transaction).await?;
-            }
 
             Ok(Some(()))
         } else {
@@ -551,7 +546,7 @@ impl Project {
                 m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
                 m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                 cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.webhook_sent, m.color,
-                m.thread_id thread_id, m.monetization_status monetization_status,
+                t.id thread_id, m.monetization_status monetization_status,
                 ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
                 JSONB_AGG(DISTINCT jsonb_build_object('id', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
@@ -563,6 +558,7 @@ impl Project {
                 INNER JOIN project_types pt ON pt.id = m.project_type
                 INNER JOIN side_types cs ON m.client_side = cs.id
                 INNER JOIN side_types ss ON m.server_side = ss.id
+                INNER JOIN threads t ON t.mod_id = m.id
                 LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
                 LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
                 LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
@@ -574,7 +570,7 @@ impl Project {
                 LEFT JOIN game_versions_versions gvv ON v.id = gvv.joining_version_id
                 LEFT JOIN game_versions gv ON gvv.game_version_id = gv.id
                 WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                GROUP BY pt.id, cs.id, ss.id, m.id;
+                GROUP BY pt.id, cs.id, ss.id, t.id, m.id;
                 ",
                 &project_ids_parsed,
                 &remaining_strings.into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<_>>(),
@@ -620,7 +616,6 @@ impl Project {
                             webhook_sent: m.webhook_sent,
                             color: m.color.map(|x| x as u32),
                             queued: m.queued,
-                            thread_id: m.thread_id.map(ThreadId),
                             monetization_status: MonetizationStatus::from_str(
                                 &m.monetization_status,
                             ),
@@ -676,8 +671,9 @@ impl Project {
                                 game_versions.sort_by(|a, b| a.created.cmp(&b.created));
 
                                 game_versions.into_iter().map(|x| x.id).collect()
-                            }
-                        }}))
+                            },
+                            thread_id: ThreadId(m.thread_id),
+                    }}))
                 })
                 .try_collect::<Vec<QueryProject>>()
                 .await?;
@@ -814,4 +810,5 @@ pub struct QueryProject {
     pub server_side: crate::models::projects::SideType,
     pub loaders: Vec<String>,
     pub game_versions: Vec<String>,
+    pub thread_id: ThreadId,
 }

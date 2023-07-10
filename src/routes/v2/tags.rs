@@ -29,8 +29,6 @@ pub struct CategoryData {
     header: String,
 }
 
-// TODO: searching / filtering? Could be used to implement a live
-// searching category list
 #[get("category")]
 pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let results = Category::list(&**pool)

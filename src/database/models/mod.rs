@@ -3,6 +3,7 @@ use thiserror::Error;
 pub mod categories;
 pub mod ids;
 pub mod notification_item;
+pub mod pat_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;

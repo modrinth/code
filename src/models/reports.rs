@@ -19,7 +19,7 @@ pub struct Report {
     pub body: String,
     pub created: DateTime<Utc>,
     pub closed: bool,
-    pub thread_id: Option<ThreadId>,
+    pub thread_id: ThreadId,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -67,7 +67,7 @@ impl From<DBReport> for Report {
             body: x.body,
             created: x.created,
             closed: x.closed,
-            thread_id: x.thread_id.map(|x| x.into()),
+            thread_id: x.thread_id.into(),
         }
     }
 }

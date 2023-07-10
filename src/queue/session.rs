@@ -1,27 +1,41 @@
 use crate::auth::session::SessionMetadata;
+use crate::database::models::pat_item::PersonalAccessToken;
 use crate::database::models::session_item::Session;
-use crate::database::models::{DatabaseError, SessionId, UserId};
+use crate::database::models::{DatabaseError, PatId, SessionId, UserId};
 use chrono::Utc;
 use sqlx::PgPool;
 use tokio::sync::Mutex;
 
-pub struct SessionQueue {
-    queue: Mutex<Vec<(SessionId, SessionMetadata)>>,
+pub struct AuthQueue {
+    session_queue: Mutex<Vec<(SessionId, SessionMetadata)>>,
+    pat_queue: Mutex<Vec<PatId>>,
 }
 
 // Batches session accessing transactions every 30 seconds
-impl SessionQueue {
+impl AuthQueue {
     pub fn new() -> Self {
-        SessionQueue {
-            queue: Mutex::new(Vec::with_capacity(1000)),
+        AuthQueue {
+            session_queue: Mutex::new(Vec::with_capacity(1000)),
+            pat_queue: Mutex::new(Vec::with_capacity(1000)),
         }
     }
-    pub async fn add(&self, id: SessionId, metadata: SessionMetadata) {
-        self.queue.lock().await.push((id, metadata));
+    pub async fn add_session(&self, id: SessionId, metadata: SessionMetadata) {
+        self.session_queue.lock().await.push((id, metadata));
     }
 
-    pub async fn take(&self) -> Vec<(SessionId, SessionMetadata)> {
-        let mut queue = self.queue.lock().await;
+    pub async fn add_pat(&self, id: PatId) {
+        self.pat_queue.lock().await.push(id);
+    }
+
+    pub async fn take_sessions(&self) -> Vec<(SessionId, SessionMetadata)> {
+        let mut queue = self.session_queue.lock().await;
+        let len = queue.len();
+
+        std::mem::replace(&mut queue, Vec::with_capacity(len))
+    }
+
+    pub async fn take_pats(&self) -> Vec<PatId> {
+        let mut queue = self.pat_queue.lock().await;
         let len = queue.len();
 
         std::mem::replace(&mut queue, Vec::with_capacity(len))
@@ -32,13 +46,14 @@ impl SessionQueue {
         pool: &PgPool,
         redis: &deadpool_redis::Pool,
     ) -> Result<(), DatabaseError> {
-        let queue = self.take().await;
+        let session_queue = self.take_sessions().await;
+        let pat_queue = self.take_pats().await;
 
-        if !queue.is_empty() {
+        if !session_queue.is_empty() || !pat_queue.is_empty() {
             let mut transaction = pool.begin().await?;
             let mut clear_cache_sessions = Vec::new();
 
-            for (id, metadata) in queue {
+            for (id, metadata) in session_queue {
                 clear_cache_sessions.push((Some(id), None, None));
 
                 sqlx::query!(
@@ -82,6 +97,26 @@ impl SessionQueue {
             }
 
             Session::clear_cache(clear_cache_sessions, redis).await?;
+
+            let mut clear_cache_pats = Vec::new();
+
+            for id in pat_queue {
+                clear_cache_pats.push((Some(id), None, None));
+
+                sqlx::query!(
+                    "
+                    UPDATE pats
+                    SET last_used = $2
+                    WHERE (id = $1)
+                    ",
+                    id as PatId,
+                    Utc::now(),
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
 
             transaction.commit().await?;
         }

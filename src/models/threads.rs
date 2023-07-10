@@ -3,6 +3,7 @@ use crate::models::projects::ProjectStatus;
 use crate::models::users::{User, UserId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use crate::models::ids::{ProjectId, ReportId};
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
@@ -19,6 +20,8 @@ pub struct Thread {
     pub id: ThreadId,
     #[serde(rename = "type")]
     pub type_: ThreadType,
+    pub project_id: Option<ProjectId>,
+    pub report_id: Option<ReportId>,
     pub messages: Vec<ThreadMessage>,
     pub members: Vec<User>,
 }
@@ -90,6 +93,8 @@ impl Thread {
         Thread {
             id: data.id.into(),
             type_: thread_type,
+            project_id: data.project_id.map(|x| x.into()),
+            report_id: data.report_id.map(|x| x.into()),
             messages: data
                 .messages
                 .into_iter()

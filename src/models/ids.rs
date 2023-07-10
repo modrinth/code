@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 pub use super::notifications::NotificationId;
+pub use super::pats::PatId;
 pub use super::projects::{ProjectId, VersionId};
 pub use super::reports::ReportId;
 pub use super::sessions::SessionId;
@@ -115,6 +116,7 @@ base62_id_impl!(NotificationId, NotificationId);
 base62_id_impl!(ThreadId, ThreadId);
 base62_id_impl!(ThreadMessageId, ThreadMessageId);
 base62_id_impl!(SessionId, SessionId);
+base62_id_impl!(PatId, PatId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

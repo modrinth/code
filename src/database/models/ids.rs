@@ -83,13 +83,13 @@ generate_ids!(
     "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)",
     StateId
 );
-// generate_ids!(
-//     pub generate_pat_id,
-//     PatId,
-//     8,
-//     "SELECT EXISTS(SELECT 1 FROM pats WHERE id=$1)",
-//     PatId
-// );
+generate_ids!(
+    pub generate_pat_id,
+    PatId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM pats WHERE id=$1)",
+    PatId
+);
 
 generate_ids!(
     pub generate_user_id,
@@ -193,7 +193,7 @@ pub struct FileId(pub i64);
 #[sqlx(transparent)]
 pub struct StateId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Deserialize, Serialize)]
 #[sqlx(transparent)]
 pub struct PatId(pub i64);
 
@@ -300,5 +300,10 @@ impl From<ThreadMessageId> for ids::ThreadMessageId {
 impl From<SessionId> for ids::SessionId {
     fn from(id: SessionId) -> Self {
         ids::SessionId(id.0 as u64)
+    }
+}
+impl From<PatId> for ids::PatId {
+    fn from(id: PatId) -> Self {
+        ids::PatId(id.0 as u64)
     }
 }

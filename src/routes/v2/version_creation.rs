@@ -8,12 +8,13 @@ use crate::database::models::version_item::{
 use crate::file_hosting::FileHost;
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
+use crate::models::pats::Scopes;
 use crate::models::projects::{
     Dependency, DependencyType, FileType, GameVersion, Loader, ProjectId, Version, VersionFile,
     VersionId, VersionStatus, VersionType,
 };
 use crate::models::teams::Permissions;
-use crate::queue::session::SessionQueue;
+use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
@@ -85,7 +86,7 @@ pub async fn version_create(
     client: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: Data<SessionQueue>,
+    session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -127,7 +128,7 @@ async fn version_create_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
-    session_queue: &SessionQueue,
+    session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
 
@@ -137,7 +138,15 @@ async fn version_create_inner(
     let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
     let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
 
-    let user = get_user_from_headers(&req, pool, redis, session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        pool,
+        redis,
+        session_queue,
+        Some(&[Scopes::VERSION_CREATE]),
+    )
+    .await?
+    .1;
 
     let mut error = None;
     while let Some(item) = payload.next().await {
@@ -441,7 +450,7 @@ pub async fn upload_file_to_version(
     client: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    session_queue: web::Data<SessionQueue>,
+    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -487,14 +496,22 @@ async fn upload_file_to_version_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
-    session_queue: &SessionQueue,
+    session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
-    let user = get_user_from_headers(&req, &**client, &redis, session_queue).await?;
+    let user = get_user_from_headers(
+        &req,
+        &**client,
+        &redis,
+        session_queue,
+        Some(&[Scopes::VERSION_WRITE]),
+    )
+    .await?
+    .1;
 
     let result = models::Version::get(version_id, &**client, &redis).await?;
 

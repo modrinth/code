@@ -80,3 +80,5 @@ image = "0.24.6"
 color-thief = "0.2.2"
 
 woothee = "0.13.0"
+
+lettre = "0.10.4"
