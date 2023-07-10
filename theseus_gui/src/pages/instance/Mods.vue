@@ -1,5 +1,12 @@
 <template>
   <Card v-if="projects.length > 0" class="mod-card">
+    <div class="second-row">
+      <Chips
+        v-if="Object.keys(selectableProjectTypes).length > 1"
+        v-model="selectedProjectType"
+        :items="Object.keys(selectableProjectTypes)"
+      />
+    </div>
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
@@ -36,121 +43,112 @@
         </DropdownButton>
       </span>
     </div>
-    <div class="second-row">
-      <Chips
-        v-if="Object.keys(selectableProjectTypes).length > 1"
-        v-model="selectedProjectType"
-        :items="Object.keys(selectableProjectTypes)"
-      />
-    </div>
     <div>
-      <div class="editing-box">
-        <Button class="transparent" @click="() => showingOptions = !showingOptions">
-          Show advanced options
-          <ChevronRightIcon :class="{'open': showingOptions}"/>
-        </Button>
-        |
-        <Button class="transparent share" @click="shareNames()" @mouseover="selectedOption = 'Share'">
-          <ShareIcon />
-          Share
-        </Button>
-        <Button class="transparent trash" @click="deleteWarning.show()" @mouseover="selectedOption = 'Delete'">
-          <TrashIcon/>
-          Delete
-        </Button>
-        <Button class="transparent update" @click="updateAll()" @mouseover="selectedOption = 'Update'">
-          <UpdatedIcon/>
-          Update
-        </Button>
-        <Button class="transparent" @click="toggleSelected()" @mouseover="selectedOption = 'Toggle'">
-          <ToggleIcon/>
-          Toggle
-        </Button>
-      </div>
-      <div v-if="showingOptions" class="more-box">
-        <section v-if="selectedOption === 'Share'" class="options">
-          <Button class="transparent" @click="shareNames()">
-            <TextInputIcon/>
-            Share {{selected.length > 0 ? 'selected' : 'all'}} names
-          </Button>
-          <Button class="transparent" @click="shareUrls()">
-            <GlobeIcon/>
-            Share {{selected.length > 0 ? 'selected' : 'all'}} URLs
-          </Button>
-          <Button class="transparent" @click="shareFileNames()">
-            <FileIcon/>
-            Share {{selected.length > 0 ? 'selected' : 'all'}} file names
-          </Button>
-          <Button class="transparent" @click="shareMarkdown()">
-            <CodeIcon/>
-            Share as markdown
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Delete'" class="options">
-          <Button class="transparent" @click="deleteWarning.show()">
-            <TrashIcon/>
-            Delete {{selected.length > 0 ? 'selected' : 'all'}}
-          </Button>
-          <Button class="transparent" @click="deleteDisabledWarning.show()">
-            <ToggleIcon/>
-            Delete disabled
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Update'" class="options">
-          <Button class="transparent" @click="updateAll()">
-            <UpdatedIcon/>
-            Update all
-          </Button>
-          <Button class="transparent" @click="selectUpdatable()">
-            <CheckIcon/>
-            Select updatable
-          </Button>
-        </section>
-        <section v-if="selectedOption === 'Toggle'" class="options">
-          <Button class="transparent" @click="enableALl()">
-            <CheckIcon/>
-            Enable {{selected.length > 0 ? 'selected' : 'all'}}
-          </Button>
-          <Button class="transparent" @click="disableAll()">
-            <XIcon/>
-            Disable {{selected.length > 0 ? 'selected' : 'all'}}
-          </Button>
-          <Button class="transparent" @click="hideShowAll()">
-            <EyeIcon v-if="hideNonSelected"/>
-            <EyeOffIcon v-else/>
-            {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
-          </Button>
-        </section>
-      </div>
       <div class="table">
-        <div class="table-row table-head">
+        <div class="table-row table-head" :class="{'show-options': selected.length > 0}">
           <div class="table-cell table-text">
             <Checkbox v-model="selectAll" class="select-checkbox" />
           </div>
-          <div class="table-cell table-text name-cell actions-cell">
+          <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
             <Button class="transparent" @click="sortProjects('Name')">
               Name
               <DropdownIcon v-if="sortColumn === 'Name'" :class="{'down': ascending}"/>
             </Button>
           </div>
-          <div class="table-cell table-text">
+          <div v-if="selected.length === 0" class="table-cell table-text">
             <Button class="transparent" @click="sortProjects('Version')">
               Version
               <DropdownIcon v-if="sortColumn === 'Version'" :class="{'down': ascending}"/>
             </Button>
           </div>
-          <div class="table-cell table-text">
+          <div v-if="selected.length === 0" class="table-cell table-text">
             <Button class="transparent" @click="sortProjects('Author')">
               Author
               <DropdownIcon v-if="sortColumn === 'Author'" :class="{'down': ascending}"/>
             </Button>
           </div>
-          <div class="table-cell table-text actions-cell">
+          <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
             <Button class="transparent" @click="sortProjects('Enabled')">
               Actions
               <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{'down': ascending}"/>
             </Button>
           </div>
+          <div v-else class="options table-cell name-cell">
+            <Button class="transparent share" @click="() => showingOptions = !showingOptions" @mouseover="selectedOption = 'Share'">
+              <MenuIcon :class="{'open': showingOptions}"/>
+            </Button>
+            <Button class="transparent share" @click="shareNames()" @mouseover="selectedOption = 'Share'">
+              <ShareIcon />
+              Share
+            </Button>
+            <Button class="transparent trash" @click="deleteWarning.show()" @mouseover="selectedOption = 'Delete'">
+              <TrashIcon/>
+              Delete
+            </Button>
+            <Button class="transparent update" @click="updateAll()" @mouseover="selectedOption = 'Update'">
+              <UpdatedIcon/>
+              Update
+            </Button>
+            <Button class="transparent" @click="toggleSelected()" @mouseover="selectedOption = 'Toggle'">
+              <ToggleIcon/>
+              Toggle
+            </Button>
+          </div>
+        </div>
+        <div v-if="showingOptions && selected.length > 0" class="more-box">
+          <section v-if="selectedOption === 'Share'" class="options">
+            <Button class="transparent" @click="shareNames()">
+              <TextInputIcon/>
+              Share names
+            </Button>
+            <Button class="transparent" @click="shareUrls()">
+              <GlobeIcon/>
+              Share URLs
+            </Button>
+            <Button class="transparent" @click="shareFileNames()">
+              <FileIcon/>
+              Share file names
+            </Button>
+            <Button class="transparent" @click="shareMarkdown()">
+              <CodeIcon/>
+              Share as markdown
+            </Button>
+          </section>
+          <section v-if="selectedOption === 'Delete'" class="options">
+            <Button class="transparent" @click="deleteWarning.show()">
+              <TrashIcon/>
+              Delete selected
+            </Button>
+            <Button class="transparent" @click="deleteDisabledWarning.show()">
+              <ToggleIcon/>
+              Delete disabled
+            </Button>
+          </section>
+          <section v-if="selectedOption === 'Update'" class="options">
+            <Button class="transparent" @click="updateAll()">
+              <UpdatedIcon/>
+              Update all
+            </Button>
+            <Button class="transparent" @click="selectUpdatable()">
+              <CheckIcon/>
+              Select updatable
+            </Button>
+          </section>
+          <section v-if="selectedOption === 'Toggle'" class="options">
+            <Button class="transparent" @click="enableALl()">
+              <CheckIcon/>
+              Toggle on
+            </Button>
+            <Button class="transparent" @click="disableAll()">
+              <XIcon/>
+              Toggle off
+            </Button>
+            <Button class="transparent" @click="hideShowAll()">
+              <EyeIcon v-if="hideNonSelected"/>
+              <EyeOffIcon v-else/>
+              {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
+            </Button>
+          </section>
         </div>
         <div
           v-for="mod in search"
@@ -297,13 +295,12 @@ import {
   XIcon,
   ShareIcon,
   DropdownIcon,
-  ChevronRightIcon,
   GlobeIcon,
   FileIcon,
   EyeIcon,
   EyeOffIcon,
   ShareModal,
-  CodeIcon
+  CodeIcon,
 } from 'omorphia'
 import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -320,7 +317,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
-import { ToggleIcon, TextInputIcon, AddProjectImage } from "@/assets/icons";
+import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from "@/assets/icons";
 
 const router = useRouter()
 
@@ -725,13 +722,23 @@ listen('tauri://file-drop', async (event) => {
 
 .table {
   margin-block-start: 0;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  border-radius: var(--radius-lg);
   border: 2px solid var(--color-bg);
-  border-top: none;
 }
 
 .table-row {
   grid-template-columns: min-content 2fr 1fr 1fr 11rem;
+
+  &.show-options {
+    grid-template-columns: min-content auto;
+
+    .options {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: var(--gap-md);
+    }
+  }
 }
 
 .table-cell {
@@ -741,6 +748,7 @@ listen('tauri://file-drop', async (event) => {
 .card-row {
   display: flex;
   align-items: center;
+  gap: var(--gap-md);
   justify-content: space-between;
   background-color: var(--color-raised-bg);
 }
@@ -823,25 +831,10 @@ listen('tauri://file-drop', async (event) => {
   }
 }
 
-.editing-box {
-  display: flex;
-  flex-direction: row;
-  gap: var(--gap-lg);
-  background-color: var(--color-bg);
-  padding: var(--gap-md);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  border: 2px solid var(--color-bg);
-  border-bottom: none;
-  flex-wrap: wrap;
-  overflow: auto;
-}
-
 .more-box {
   display: flex;
-  background-color: var(--color-raised-bg);
-  padding: var(--gap-md);
-  border: 2px solid var(--color-bg);
-  border-bottom: none;
+  background-color: var(--color-bg);
+  padding: var(--gap-lg);
 
   .options {
     display: flex;
