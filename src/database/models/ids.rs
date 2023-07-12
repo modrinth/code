@@ -77,13 +77,6 @@ generate_ids!(
     TeamMemberId
 );
 generate_ids!(
-    pub generate_state_id,
-    StateId,
-    8,
-    "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)",
-    StateId
-);
-generate_ids!(
     pub generate_pat_id,
     PatId,
     8,
@@ -188,10 +181,6 @@ pub struct ReportTypeId(pub i32);
 #[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq, Deserialize, Serialize)]
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
-
-#[derive(Copy, Clone, Debug, Type)]
-#[sqlx(transparent)]
-pub struct StateId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type, Deserialize, Serialize)]
 #[sqlx(transparent)]

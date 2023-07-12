@@ -4,6 +4,7 @@ use crate::auth::{
 };
 use crate::database;
 use crate::models;
+use crate::models::ids::base62_impl::parse_base62;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
 use crate::models::teams::Permissions;
@@ -165,8 +166,8 @@ pub async fn version_project_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner();
-    let version_data =
-        database::models::Version::get_full_from_id_slug(&id.0, &id.1, &**pool, &redis).await?;
+
+    let result = database::models::Project::get(&id.0, &**pool, &redis).await?;
 
     let user_option = get_user_from_headers(
         &req,
@@ -179,9 +180,23 @@ pub async fn version_project_get(
     .map(|x| x.1)
     .ok();
 
-    if let Some(data) = version_data {
-        if is_authorized_version(&data.inner, &user_option, &pool).await? {
-            return Ok(HttpResponse::Ok().json(models::projects::Version::from(data)));
+    if let Some(project) = result {
+        if !is_authorized(&project.inner, &user_option, &pool).await? {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
+
+        let versions =
+            database::models::Version::get_many(&project.versions, &**pool, &redis).await?;
+
+        let id_opt = parse_base62(&id.1).ok();
+        let version = versions
+            .into_iter()
+            .find(|x| Some(x.inner.id.0 as u64) == id_opt || x.inner.version_number == id.1);
+
+        if let Some(version) = version {
+            if is_authorized_version(&version.inner, &user_option, &pool).await? {
+                return Ok(HttpResponse::Ok().json(models::projects::Version::from(version)));
+            }
         }
     }
 

@@ -1,6 +1,5 @@
 use super::ids::*;
 use super::DatabaseError;
-use crate::models::ids::base62_impl::parse_base62;
 use crate::models::projects::{FileType, VersionStatus};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
@@ -750,40 +749,6 @@ impl Version {
         cmd.query_async::<_, ()>(&mut redis).await?;
 
         Ok(())
-    }
-
-    // TODO: Needs to be cached
-    pub async fn get_full_from_id_slug<'a, 'b, E>(
-        project_id_or_slug: &str,
-        slug: &str,
-        executor: E,
-        redis: &deadpool_redis::Pool,
-    ) -> Result<Option<QueryVersion>, DatabaseError>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        let project_id_opt = parse_base62(project_id_or_slug).ok().map(|x| x as i64);
-        let id_opt = parse_base62(slug).ok().map(|x| x as i64);
-        let id = sqlx::query!(
-            "
-            SELECT v.id FROM versions v
-            INNER JOIN mods m ON mod_id = m.id
-            WHERE (m.id = $1 OR m.slug = $2) AND (v.id = $3 OR v.version_number = $4)
-            ORDER BY date_published ASC
-            ",
-            project_id_opt,
-            project_id_or_slug,
-            id_opt,
-            slug
-        )
-        .fetch_optional(executor)
-        .await?;
-
-        if let Some(version_id) = id {
-            Ok(Version::get(VersionId(version_id.id), executor, redis).await?)
-        } else {
-            Ok(None)
-        }
     }
 }
 

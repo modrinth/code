@@ -785,8 +785,8 @@ async fn project_create_inner(
             project_id: Some(id),
             report_id: None,
         }
-            .insert(&mut *transaction)
-            .await?;
+        .insert(&mut *transaction)
+        .await?;
 
         let response = crate::models::projects::Project {
             id: project_id,

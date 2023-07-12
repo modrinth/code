@@ -130,34 +130,6 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    // Deleting old authentication states from the database every 15 minutes
-    let pool_ref = pool.clone();
-    scheduler.run(std::time::Duration::from_secs(15 * 60), move || {
-        let pool_ref = pool_ref.clone();
-        // Use sqlx to delete records more than an hour old
-        info!("Deleting old records from temporary tables");
-
-        async move {
-            let states_result = sqlx::query!(
-                "
-                DELETE FROM states
-                WHERE expires < CURRENT_DATE
-                "
-            )
-            .execute(&pool_ref)
-            .await;
-
-            if let Err(e) = states_result {
-                warn!(
-                    "Deleting old records from temporary table states failed: {:?}",
-                    e
-                );
-            }
-
-            info!("Finished deleting old records from temporary tables");
-        }
-    });
-
     // Changes statuses of scheduled projects/versions
     let pool_ref = pool.clone();
     // TODO: Clear cache when these are run

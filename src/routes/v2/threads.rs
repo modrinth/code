@@ -45,12 +45,14 @@ pub async fn is_authorized_thread(
                     report_id as database::models::ids::ReportId,
                     user_id as database::models::ids::UserId,
                 )
-                    .fetch_one(pool)
-                    .await?
-                    .exists;
+                .fetch_one(pool)
+                .await?
+                .exists;
 
                 report_exists.unwrap_or(false)
-            } else { false }
+            } else {
+                false
+            }
         }
         ThreadType::Project => {
             if let Some(project_id) = thread.project_id {
@@ -379,12 +381,7 @@ pub async fn thread_send_message(
         .await?;
 
         let mod_notif = if let Some(project_id) = thread.project_id {
-            let project = database::models::Project::get_id(
-                project_id,
-                &**pool,
-                &redis,
-            )
-                .await?;
+            let project = database::models::Project::get_id(project_id, &**pool, &redis).await?;
 
             if let Some(project) = project {
                 if project.inner.status != ProjectStatus::Processing && user.role.is_mod() {
@@ -393,7 +390,7 @@ pub async fn thread_send_message(
                         &**pool,
                         &redis,
                     )
-                        .await?;
+                    .await?;
 
                     NotificationBuilder {
                         body: NotificationBody::ModeratorMessage {
@@ -403,11 +400,11 @@ pub async fn thread_send_message(
                             report_id: None,
                         },
                     }
-                        .insert_many(
-                            members.into_iter().map(|x| x.user_id).collect(),
-                            &mut transaction,
-                        )
-                        .await?;
+                    .insert_many(
+                        members.into_iter().map(|x| x.user_id).collect(),
+                        &mut transaction,
+                    )
+                    .await?;
                 }
 
                 project.inner.status == ProjectStatus::Processing && !user.role.is_mod()
@@ -415,11 +412,7 @@ pub async fn thread_send_message(
                 !user.role.is_mod()
             }
         } else if let Some(report_id) = thread.report_id {
-            let report = database::models::report_item::Report::get(
-                report_id,
-                &**pool,
-            )
-            .await?;
+            let report = database::models::report_item::Report::get(report_id, &**pool).await?;
 
             if let Some(report) = report {
                 if report.closed && !user.role.is_mod() {

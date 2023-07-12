@@ -24,6 +24,8 @@ pub struct User {
     pub microsoft_id: Option<String>,
     pub password: Option<String>,
 
+    pub totp_secret: Option<String>,
+
     pub username: String,
     pub name: Option<String>,
     pub email: Option<String>,
@@ -204,7 +206,7 @@ impl User {
                     created, role, badges,
                     balance, payout_wallet, payout_wallet_type, payout_address,
                     github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                    email_verified, password
+                    email_verified, password, totp_secret
                 FROM users
                 WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                 ",
@@ -240,6 +242,7 @@ impl User {
                         .map(|x| RecipientType::from_string(&x)),
                     payout_address: u.payout_address,
                     password: u.password,
+                    totp_secret: u.totp_secret,
                 }))
             })
             .try_collect::<Vec<User>>()
@@ -272,6 +275,23 @@ impl User {
         Ok(found_users)
     }
 
+    pub async fn get_email<'a, E>(email: &str, exec: E) -> Result<Option<UserId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let user_pass = sqlx::query!(
+            "
+            SELECT id FROM users
+            WHERE email = $1
+            ",
+            email
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(user_pass.map(|x| UserId(x.id)))
+    }
+
     pub async fn get_projects<'a, E>(
         user_id: UserId,
         exec: E,
@@ -296,6 +316,30 @@ impl User {
         .await?;
 
         Ok(projects)
+    }
+
+    pub async fn get_backup_codes<'a, E>(
+        user_id: UserId,
+        exec: E,
+    ) -> Result<Vec<String>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let codes = sqlx::query!(
+            "
+            SELECT code FROM user_backup_codes
+            WHERE user_id = $1
+            ",
+            user_id as UserId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| to_base62(m.code as u64))) })
+        .try_collect::<Vec<String>>()
+        .await?;
+
+        Ok(codes)
     }
 
     pub async fn clear_caches(
@@ -479,6 +523,36 @@ impl User {
             sqlx::query!(
                 "
                 DELETE FROM threads_members
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM sessions
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM pats
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            sqlx::query!(
+                "
+                DELETE FROM user_backup_codes
                 WHERE user_id = $1
                 ",
                 id as UserId,

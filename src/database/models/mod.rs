@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 pub mod categories;
+pub mod flow_item;
 pub mod ids;
 pub mod notification_item;
 pub mod pat_item;

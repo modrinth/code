@@ -38,6 +38,8 @@ pub enum AuthenticationError {
     InvalidAuthMethod,
     #[error("GitHub Token from incorrect Client ID")]
     InvalidClientId,
+    #[error("User email/account is already registered on Modrinth")]
+    DuplicateUser,
     #[error("Invalid callback URL specified")]
     Url,
 }
@@ -56,6 +58,7 @@ impl actix_web::ResponseError for AuthenticationError {
             AuthenticationError::InvalidClientId => StatusCode::UNAUTHORIZED,
             AuthenticationError::Url => StatusCode::BAD_REQUEST,
             AuthenticationError::FileHosting(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthenticationError::DuplicateUser => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -73,6 +76,7 @@ impl actix_web::ResponseError for AuthenticationError {
                 AuthenticationError::InvalidClientId => "invalid_client_id",
                 AuthenticationError::Url => "url_error",
                 AuthenticationError::FileHosting(..) => "file_hosting",
+                AuthenticationError::DuplicateUser => "duplicate_user",
             },
             description: &self.to_string(),
         })

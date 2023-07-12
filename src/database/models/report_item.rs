@@ -135,7 +135,8 @@ impl Report {
         .await?;
 
         if let Some(thread_id) = thread_id {
-            crate::database::models::Thread::remove_full(ThreadId(thread_id.id), transaction).await?;
+            crate::database::models::Thread::remove_full(ThreadId(thread_id.id), transaction)
+                .await?;
         }
 
         sqlx::query!(

@@ -153,8 +153,8 @@ pub async fn report_create(
         project_id: None,
         report_id: Some(report.id),
     }
-        .insert(&mut transaction)
-        .await?;
+    .insert(&mut transaction)
+    .await?;
 
     transaction.commit().await?;
 
@@ -395,8 +395,8 @@ pub async fn report_edit(
                 },
                 thread_id: report.thread_id,
             }
-                .insert(&mut transaction)
-                .await?;
+            .insert(&mut transaction)
+            .await?;
 
             sqlx::query!(
                 "

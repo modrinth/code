@@ -584,8 +584,8 @@ pub async fn project_edit(
                     },
                     thread_id: project_item.thread_id,
                 }
-                    .insert(&mut transaction)
-                    .await?;
+                .insert(&mut transaction)
+                .await?;
 
                 sqlx::query!(
                     "

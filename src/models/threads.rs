@@ -1,9 +1,9 @@
 use super::ids::Base62Id;
+use crate::models::ids::{ProjectId, ReportId};
 use crate::models::projects::ProjectStatus;
 use crate::models::users::{User, UserId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use crate::models::ids::{ProjectId, ReportId};
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]

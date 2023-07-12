@@ -1,3 +1,4 @@
+use crate::auth::flows::AuthProvider;
 use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
@@ -193,6 +194,7 @@ pub struct EditUser {
     #[validate]
     pub payout_data: Option<Option<EditPayoutData>>,
     pub password: Option<(Option<String>, Option<String>)>,
+    pub remove_auth_providers: Option<Vec<AuthProvider>>,
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -412,7 +414,7 @@ pub async fn user_edit(
                     ));
                 }
 
-                if let Some(pass) = actual_user.password {
+                if let Some(pass) = actual_user.password.as_ref() {
                     let old_password = old_password.as_ref().ok_or_else(|| {
                         ApiError::CustomAuthentication(
                             "You must specify the old password to change your password!"
@@ -421,7 +423,7 @@ pub async fn user_edit(
                     })?;
 
                     let hasher = Argon2::default();
-                    hasher.verify_password(old_password.as_bytes(), &PasswordHash::new(&pass)?)?;
+                    hasher.verify_password(old_password.as_bytes(), &PasswordHash::new(pass)?)?;
                 }
 
                 let update_password = if let Some(new_password) = new_password {
@@ -481,6 +483,116 @@ pub async fn user_edit(
                 )
                 .execute(&mut *transaction)
                 .await?;
+            }
+
+            if let Some(remove_auth_providers) = &new_user.remove_auth_providers {
+                if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+                    return Err(ApiError::Authentication(
+                        AuthenticationError::InvalidCredentials,
+                    ));
+                }
+
+                let mut auth_providers = Vec::new();
+                if actual_user.github_id.is_some() {
+                    auth_providers.push(AuthProvider::GitHub)
+                }
+                if actual_user.gitlab_id.is_some() {
+                    auth_providers.push(AuthProvider::GitLab)
+                }
+                if actual_user.discord_id.is_some() {
+                    auth_providers.push(AuthProvider::Discord)
+                }
+                if actual_user.google_id.is_some() {
+                    auth_providers.push(AuthProvider::Google)
+                }
+                if actual_user.microsoft_id.is_some() {
+                    auth_providers.push(AuthProvider::Microsoft)
+                }
+                if actual_user.steam_id.is_some() {
+                    auth_providers.push(AuthProvider::Steam)
+                }
+
+                if auth_providers.len() <= remove_auth_providers.len()
+                    && actual_user.password.is_none()
+                {
+                    return Err(ApiError::InvalidInput(
+                        "You must have another authentication method added to this method!"
+                            .to_string(),
+                    ));
+                }
+
+                if remove_auth_providers.contains(&AuthProvider::GitHub) {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET github_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+                if remove_auth_providers.contains(&AuthProvider::GitLab) {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET gitlab_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+                if remove_auth_providers.contains(&AuthProvider::Google) {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET google_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+                if remove_auth_providers.contains(&AuthProvider::Steam) {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET steam_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+                if remove_auth_providers.contains(&AuthProvider::Discord) {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET discord_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+                if remove_auth_providers.contains(&AuthProvider::Microsoft) {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET microsoft_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
             }
 
             User::clear_caches(&[(id, Some(actual_user.username))], &redis).await?;

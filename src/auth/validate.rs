@@ -19,34 +19,38 @@ pub async fn get_user_from_headers<'a, E>(
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
-    let headers = req.headers();
-    let token: Option<&HeaderValue> = headers.get(AUTHORIZATION);
-
     // Fetch DB user record and minos user from headers
-    let (scopes, db_user) = get_user_record_from_bearer_token(
-        req,
-        token
-            .ok_or_else(|| AuthenticationError::InvalidAuthMethod)?
-            .to_str()
-            .map_err(|_| AuthenticationError::InvalidCredentials)?,
-        executor,
-        redis,
-        session_queue,
-    )
-    .await?
-    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+    let (scopes, db_user) =
+        get_user_record_from_bearer_token(req, None, executor, redis, session_queue)
+            .await?
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+    let mut auth_providers = Vec::new();
+    if db_user.github_id.is_some() {
+        auth_providers.push(AuthProvider::GitHub)
+    }
+    if db_user.gitlab_id.is_some() {
+        auth_providers.push(AuthProvider::GitLab)
+    }
+    if db_user.discord_id.is_some() {
+        auth_providers.push(AuthProvider::Discord)
+    }
+    if db_user.google_id.is_some() {
+        auth_providers.push(AuthProvider::Google)
+    }
+    if db_user.microsoft_id.is_some() {
+        auth_providers.push(AuthProvider::Microsoft)
+    }
+    if db_user.steam_id.is_some() {
+        auth_providers.push(AuthProvider::Steam)
+    }
 
     let user = User {
         id: UserId::from(db_user.id),
-        github_id: db_user.github_id.map(|x| x as u64),
-        // discord_id: minos_user.discord_id,
-        // google_id: minos_user.google_id,
-        // microsoft_id: minos_user.microsoft_id,
-        // apple_id: minos_user.apple_id,
-        // gitlab_id: minos_user.gitlab_id,
         username: db_user.username,
         name: db_user.name,
         email: db_user.email,
+        email_verified: Some(db_user.email_verified),
         avatar_url: db_user.avatar_url,
         bio: db_user.bio,
         created: db_user.created,
@@ -58,6 +62,10 @@ where
             payout_wallet_type: db_user.payout_wallet_type,
             payout_address: db_user.payout_address,
         }),
+        auth_providers: Some(auth_providers),
+        has_password: Some(db_user.password.is_some()),
+        has_totp: Some(db_user.totp_secret.is_some()),
+        github_id: None,
     };
 
     if let Some(required_scopes) = required_scopes {
@@ -73,7 +81,7 @@ where
 
 pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     req: &HttpRequest,
-    token: &str,
+    token: Option<&str>,
     executor: E,
     redis: &deadpool_redis::Pool,
     session_queue: &AuthQueue,
@@ -81,6 +89,17 @@ pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
+    let token = if let Some(token) = token {
+        token
+    } else {
+        let headers = req.headers();
+        let token_val: Option<&HeaderValue> = headers.get(AUTHORIZATION);
+        token_val
+            .ok_or_else(|| AuthenticationError::InvalidAuthMethod)?
+            .to_str()
+            .map_err(|_| AuthenticationError::InvalidCredentials)?
+    };
+
     let possible_user = match token.split_once('_') {
         Some(("mrp", _)) => {
             let pat =
