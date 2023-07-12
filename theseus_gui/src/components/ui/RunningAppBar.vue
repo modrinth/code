@@ -14,11 +14,11 @@
       <div
         ref="profileButton"
         class="running-text"
-        :class="{ clickable: currentProcesses.length > 1 }"
-        @click="toggleProfiles()"
       >
-        {{ selectedProfile.metadata.name }}
-        <div v-if="currentProcesses.length > 1" class="arrow" :class="{ rotate: showProfiles }">
+        <router-link :to="`/instance/${encodeURIComponent(selectedProfile.path)}`">
+          {{ selectedProfile.metadata.name }}
+        </router-link>
+        <div v-if="currentProcesses.length > 1" class="arrow button-base" :class="{ rotate: showProfiles }" @click="toggleProfiles()">
           <DropdownIcon />
         </div>
       </div>
