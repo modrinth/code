@@ -10,6 +10,7 @@ import {
   Button,
   Notifications,
   XIcon,
+  CodeIcon
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -20,7 +21,7 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
-import { warning_listener } from '@/helpers/events.js'
+import {command_listener, warning_listener} from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
@@ -33,10 +34,12 @@ import { window } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
+import URLConfirmModal from "@/components/ui/URLConfirmModal.vue";
 
 const themeStore = useTheming()
-
+const urlModal = ref(null)
 const isLoading = ref(true)
+
 defineExpose({
   initialize: async () => {
     isLoading.value = false
@@ -143,6 +146,11 @@ document.querySelector('body').addEventListener('click', function (e) {
 })
 
 const accounts = ref(null)
+
+command_listener((e) => {
+  console.log(e)
+  urlModal.value.show()
+})
 </script>
 
 <template>
@@ -214,6 +222,18 @@ const accounts = ref(null)
           <PlusIcon />
           <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New instance</span>
         </Button>
+        <Button
+          class="sleek-primary"
+          :class="{
+            'icon-only': themeStore.collapsedNavigation,
+            'collapsed-button': themeStore.collapsedNavigation,
+            'expanded-button': !themeStore.collapsedNavigation,
+          }"
+          @click="() => $refs.urlModal.show('sodium')"
+        >
+          <CodeIcon />
+          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">Test</span>
+        </Button>
         <RouterLink
           to="/settings"
           class="btn"
@@ -275,6 +295,7 @@ const accounts = ref(null)
       </div>
     </div>
   </div>
+  <URLConfirmModal ref="urlModal"/>
 </template>
 
 <style lang="scss" scoped>
