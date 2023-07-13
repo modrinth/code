@@ -57,7 +57,7 @@ defineExpose({
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
-    if ((await type()) === 'Darwin') {
+    if ((await type()) !== 'Darwin') {
       document.getElementsByTagName('html')[0].classList.add('mac')
     } else {
       document.getElementsByTagName('html')[0].classList.add('windows')
@@ -229,15 +229,17 @@ const accounts = ref(null)
       </div>
     </div>
     <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
-      <div data-tauri-drag-region class="appbar">
-        <section class="navigation-controls">
-          <Breadcrumbs data-tauri-drag-region />
-        </section>
-        <section class="mod-stats">
-          <Suspense>
-            <RunningAppBar data-tauri-drag-region />
-          </Suspense>
-        </section>
+      <div class="appbar-row">
+        <div data-tauri-drag-region class="appbar">
+          <section class="navigation-controls">
+            <Breadcrumbs data-tauri-drag-region />
+          </section>
+          <section class="mod-stats">
+            <Suspense>
+              <RunningAppBar data-tauri-drag-region />
+            </Suspense>
+          </section>
+        </div>
         <section class="window-controls">
           <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
             <MinimizeIcon />
@@ -288,12 +290,16 @@ const accounts = ref(null)
   width: min-content;
 }
 
+.appbar-row {
+  display: flex;
+  flex-direction: row;
+}
+
 .window-controls {
   z-index: 20;
   display: none;
   flex-direction: row;
   align-items: center;
-  gap: 0.25rem;
 
   .titlebar-button {
     display: flex;
@@ -303,6 +309,8 @@ const accounts = ref(null)
     transition: all ease-in-out 0.1s;
     background-color: var(--color-raised-bg);
     color: var(--color-base);
+    border-radius: 0;
+    height: 3.25rem;
 
     &.close {
       &:hover,
@@ -339,6 +347,7 @@ const accounts = ref(null)
     .appbar {
       display: flex;
       align-items: center;
+      flex-grow: 1;
       background: var(--color-raised-bg);
       box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
       text-align: center;
