@@ -122,7 +122,6 @@
         </div>
         <div class="table-cell table-text name-cell">Name</div>
         <div class="table-cell table-text">Version</div>
-        <div class="table-cell table-text">Author</div>
         <div class="table-cell table-text">Actions</div>
       </div>
       <div
@@ -138,18 +137,22 @@
           <router-link
             v-if="mod.slug"
             :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
-            class="mod-text"
+            class="mod-content"
           >
             <Avatar :src="mod.icon" />
-            {{ mod.name }}
+            <div class="mod-text" v-tooltip="`${mod.name} by ${mod.author}`">
+              <div class="title">{{ mod.name }}</div>
+              <span class="no-wrap">by {{ mod.author }}</span>
+            </div>
           </router-link>
-          <div v-else class="mod-text">
+          <div v-else class="mod-content">
             <Avatar :src="mod.icon" />
-            {{ mod.name }}
+            <span class="title" v-tooltip="`${mod.name}`">{{ mod.name }}</span>
           </div>
         </div>
-        <div class="table-cell table-text">{{ mod.version }}</div>
-        <div class="table-cell table-text">{{ mod.author }}</div>
+        <div class="table-cell table-text">
+          <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
+        </div>
         <div class="table-cell table-text manage">
           <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
             <TrashIcon />
@@ -595,7 +598,7 @@ const handleRightClick = (event, mod) => {
 }
 
 .table-row {
-  grid-template-columns: min-content 2fr 1fr 1fr 11rem;
+  grid-template-columns: min-content 2fr 1fr 11rem;
 }
 
 .table-cell {
@@ -659,6 +662,22 @@ const handleRightClick = (event, mod) => {
 
   strong {
     color: var(--color-contrast);
+  }
+}
+
+.mod-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .mod-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title {
+    color: var(--color-contrast);
+    font-weight: bolder;
   }
 }
 </style>
