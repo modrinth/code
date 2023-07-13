@@ -1,4 +1,5 @@
 pub mod checks;
+pub mod email;
 pub mod flows;
 pub mod pats;
 pub mod session;
@@ -32,6 +33,8 @@ pub enum AuthenticationError {
     FileHosting(#[from] FileHostingError),
     #[error("Error while decoding PAT: {0}")]
     Decoding(#[from] crate::models::ids::DecodingError),
+    #[error("{0}")]
+    Mail(#[from] email::MailError),
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
     #[error("Authentication method was not valid")]
@@ -54,6 +57,7 @@ impl actix_web::ResponseError for AuthenticationError {
             AuthenticationError::Reqwest(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
             AuthenticationError::Decoding(..) => StatusCode::BAD_REQUEST,
+            AuthenticationError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthenticationError::InvalidAuthMethod => StatusCode::UNAUTHORIZED,
             AuthenticationError::InvalidClientId => StatusCode::UNAUTHORIZED,
             AuthenticationError::Url => StatusCode::BAD_REQUEST,
@@ -72,6 +76,7 @@ impl actix_web::ResponseError for AuthenticationError {
                 AuthenticationError::Reqwest(..) => "network_error",
                 AuthenticationError::InvalidCredentials => "invalid_credentials",
                 AuthenticationError::Decoding(..) => "decoding_error",
+                AuthenticationError::Mail(..) => "mail_error",
                 AuthenticationError::InvalidAuthMethod => "invalid_auth_method",
                 AuthenticationError::InvalidClientId => "invalid_client_id",
                 AuthenticationError::Url => "url_error",

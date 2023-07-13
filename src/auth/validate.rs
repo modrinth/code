@@ -154,7 +154,7 @@ where
             )
             .await?;
 
-            user.map(|x| (Scopes::ALL, x))
+            user.map(|x| (Scopes::NOT_RESTRICTED, x))
         }
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };

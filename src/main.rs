@@ -378,16 +378,6 @@ fn check_env_vars() -> bool {
         check
     }
 
-    if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
-        warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
-        failed |= true;
-    }
-
-    if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
-        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
-        failed |= true;
-    }
-
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
@@ -395,10 +385,9 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("DATABASE_URL");
     failed |= check_var::<String>("MEILISEARCH_ADDR");
     failed |= check_var::<String>("MEILISEARCH_KEY");
+    failed |= check_var::<String>("REDIS_URL");
     failed |= check_var::<String>("BIND_ADDR");
     failed |= check_var::<String>("SELF_ADDR");
-
-    failed |= check_var::<String>("REDIS_URL");
 
     failed |= check_var::<String>("STORAGE_BACKEND");
 
@@ -428,9 +417,26 @@ fn check_env_vars() -> bool {
             failed |= true;
         }
     }
-    failed |= check_var::<usize>("LOCAL_INDEX_INTERVAL");
 
+    failed |= check_var::<usize>("LOCAL_INDEX_INTERVAL");
     failed |= check_var::<usize>("VERSION_INDEX_INTERVAL");
+
+    if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
+        warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
+        failed |= true;
+    }
+
+    if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
+        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
+        failed |= true;
+    }
+
+    failed |= check_var::<String>("ARIADNE_ADMIN_KEY");
+    failed |= check_var::<String>("ARIADNE_URL");
+
+    failed |= check_var::<String>("PAYPAL_API_URL");
+    failed |= check_var::<String>("PAYPAL_CLIENT_ID");
+    failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
 
     failed |= check_var::<String>("GITHUB_CLIENT_ID");
     failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
@@ -446,12 +452,12 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("TURNSTILE_SECRET");
 
-    failed |= check_var::<String>("ARIADNE_ADMIN_KEY");
-    failed |= check_var::<String>("ARIADNE_URL");
+    failed |= check_var::<String>("SMTP_USERNAME");
+    failed |= check_var::<String>("SMTP_PASSWORD");
+    failed |= check_var::<String>("SMTP_HOST");
 
-    failed |= check_var::<String>("PAYPAL_API_URL");
-    failed |= check_var::<String>("PAYPAL_CLIENT_ID");
-    failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
+    failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
+    failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
 
     failed
 }

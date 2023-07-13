@@ -214,6 +214,19 @@
     },
     "query": "\n            SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ORDER BY c.ordering, c.category\n            "
   },
+  "09f4fba5c0c26457a7415a2196d4f5a9b2c72662b92cae8c96dda9557a024df7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        UPDATE users\n        SET email = $1, email_verified = FALSE\n        WHERE (id = $2)\n        "
+  },
   "0a1a470c12b84c7e171f0f51e8e541e9abe8bbee17fc441a5054e1dfd5607c05": {
     "describe": {
       "columns": [],
@@ -1013,19 +1026,6 @@
     },
     "query": "\n            SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n            FROM mods m\n            INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n            WHERE m.id = ANY($1)\n            "
   },
-  "282190042b5ccc85e9b1643072a8703edae76dbbcc9493d5c9db392dca60230d": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET google_id = $2\n                        WHERE (id = $1)\n                        "
-  },
   "294f264382ad55475b51776cd5d306c4867e8e6966ab79921bba69dc023f8337": {
     "describe": {
       "columns": [],
@@ -1163,6 +1163,19 @@
     },
     "query": "\n            SELECT code FROM user_backup_codes\n            WHERE user_id = $1\n            "
   },
+  "2df7a4dd792736be89c9da00c039ad7e271f79f4c756daac79ce5622ccb50db2": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "\n                    UPDATE users\n                    SET google_id = $2\n                    WHERE (id = $1)\n                    "
+  },
   "2e14706127d9822d5a0d7ada02425d224805637d03eda1343e12111f7deba443": {
     "describe": {
       "columns": [],
@@ -1242,18 +1255,6 @@
     },
     "query": "\n            SELECT id FROM users\n            WHERE email = $1\n            "
   },
-  "31415c0678f9f968181d1b1ee83e0ded54a99afc62a643dce73636f9bb20fd57": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET microsoft_id = NULL\n                        WHERE (id = $1)\n                        "
-  },
   "320d73cd900a6e00f0e74b7a8c34a7658d16034b01a35558cb42fa9c16185eb5": {
     "describe": {
       "columns": [
@@ -1323,6 +1324,18 @@
     },
     "query": "\n                    UPDATE mods\n                    SET downloads = downloads + $1\n                    WHERE (id = $2)\n                    "
   },
+  "33b9f52f7c67bf6272d0ba90a25185238d12494c9526ab112a854799627a69d7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            UPDATE users\n            SET email_verified = TRUE\n            WHERE (id = $1)\n            "
+  },
   "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b": {
     "describe": {
       "columns": [],
@@ -1374,18 +1387,6 @@
       }
     },
     "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)"
-  },
-  "36d4b7a18f35cd177cec15e64d3cf4c156980167f0629af37c3947e5ed317faa": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET discord_id = NULL\n                        WHERE (id = $1)\n                        "
   },
   "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6": {
     "describe": {
@@ -1550,6 +1551,19 @@
       }
     },
     "query": "\n                        DELETE FROM mods_categories\n                        WHERE joining_mod_id = $1 AND is_additional = TRUE\n                        "
+  },
+  "4242d5d0a6d1d4f22172cdfb06ef47189b69b52e01d00ec2effe580b42eda717": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        UPDATE users\n        SET password = $1\n        WHERE (id = $2)\n        "
   },
   "447350097928db863d47d756354cd52668f52f7156dd7f3673a826f7b9aca2fd": {
     "describe": {
@@ -2244,18 +2258,6 @@
     },
     "query": "\n            UPDATE mods_gallery\n            SET ordering = $2\n            WHERE id = $1\n            "
   },
-  "5f614c000f1a83ec87ebd0d514c9b484554dc0d097c6e105c42717930fd58058": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET steam_id = NULL\n                        WHERE (id = $1)\n                        "
-  },
   "5f94e9e767ec4be7f9136b991b4a29373dbe48feb2f61281e3212721095ed675": {
     "describe": {
       "columns": [],
@@ -2431,19 +2433,6 @@
       }
     },
     "query": "\n                UPDATE mods_gallery\n                SET featured = $2\n                WHERE mod_id = $1\n                "
-  },
-  "6289dead78b0e128603f996be47e2d2a487668417124c48828eba8e01e18e651": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET discord_id = $2\n                        WHERE (id = $1)\n                        "
   },
   "64d5e7cfb8472fbedcd06143db0db2f4c9677c42f73c540e85ccb5aee1a7b6f9": {
     "describe": {
@@ -2716,18 +2705,6 @@
     },
     "query": "\n                SELECT hp.created, hp.amount, hp.status\n                FROM historical_payouts hp\n                WHERE hp.user_id = $1\n                ORDER BY hp.created DESC\n                "
   },
-  "6d2f27f02fe1073153a95ed2f7431a19170c9641588b444e45c94d0c6ba5b52c": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET github_id = NULL\n                        WHERE (id = $1)\n                        "
-  },
   "6d883ea05aead20f571a0f63bfd63f1d432717ec7a0fb9ab29e01fcb061b3afc": {
     "describe": {
       "columns": [],
@@ -2739,19 +2716,6 @@
       }
     },
     "query": "\n                    UPDATE files\n                    SET is_primary = FALSE\n                    WHERE (version_id = $1)\n                    "
-  },
-  "6db583cb1c69cffeefaacc728046d62cc7d43018ced98420f9f629145f65f81a": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET steam_id = $2\n                        WHERE (id = $1)\n                        "
   },
   "6db607d629be3047d53ff92bb82c07700595e8f4fcb7b602918540af4ae50d8b": {
     "describe": {
@@ -2826,19 +2790,6 @@
       }
     },
     "query": "\n                INSERT INTO threads_members (\n                    thread_id, user_id\n                )\n                VALUES (\n                    $1, $2\n                )\n                "
-  },
-  "71650a60acac690130e53c347c5882ead19c9b071f72de45e8737dc077c593d6": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET gitlab_id = $2\n                        WHERE (id = $1)\n                        "
   },
   "71abd207410d123f9a50345ddcddee335fea0d0cc6f28762713ee01a36aee8a0": {
     "describe": {
@@ -3173,19 +3124,6 @@
     },
     "query": "\n                SELECT n.id FROM notifications n\n                WHERE n.user_id = $1\n                "
   },
-  "7b284f2c766ab64c57309f903d2c456ff74e06ea5f8454f0303215a5ad2cc93f": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    UPDATE users\n                    SET password = $1\n                    WHERE (id = $2)\n                    "
-  },
   "7c0cdacf0898155c94008a96a0b918550df4475b9e3362a926d4d00e001880c1": {
     "describe": {
       "columns": [
@@ -3238,6 +3176,32 @@
       }
     },
     "query": "\n                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                VALUES ($1, $2, FALSE)\n                "
+  },
+  "7e030d43f3412e7df63c970f873d0a73dd2deb9857aa6f201ec5eec628eb336c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                    UPDATE users\n                    SET github_id = $2\n                    WHERE (id = $1)\n                    "
+  },
+  "81e2e17bfbaadbb3d25072cf6cb8e8d7b3842252b3c72fcbd24aadd2ad933472": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "\n                    UPDATE users\n                    SET microsoft_id = $2\n                    WHERE (id = $1)\n                    "
   },
   "83d428e1c07d16e356ef26bdf1d707940b1683b5f631ded1f6674a081453d67b": {
     "describe": {
@@ -3701,18 +3665,6 @@
     },
     "query": "\n                        DELETE FROM mods_categories\n                        WHERE joining_mod_id = $1 AND is_additional = FALSE\n                        "
   },
-  "a04c2455d4ad53e2559927f1783322196c2e067666716407da737a7a44b23e66": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET google_id = NULL\n                        WHERE (id = $1)\n                        "
-  },
   "a0c91184d5a02b986decac3c34e78b61451ff90e103bcf1ec46f8da3bbcc1ff2": {
     "describe": {
       "columns": [],
@@ -4009,18 +3961,6 @@
       }
     },
     "query": "\n                SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,\n                JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,\n                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n                JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,\n                JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,\n                JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies\n                FROM versions v\n                LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n                LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n                LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n                LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n                LEFT OUTER JOIN files f on v.id = f.version_id\n                LEFT OUTER JOIN hashes h on f.id = h.file_id\n                LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n                WHERE v.id = ANY($1)\n                GROUP BY v.id\n                ORDER BY v.date_published ASC;\n                "
-  },
-  "aa1d5c33e4ef370e372c6ea467cef103e494bbd167e8d1608ebd6786b87d4129": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET gitlab_id = NULL\n                        WHERE (id = $1)\n                        "
   },
   "aaec611bae08eac41c163367dc508208178170de91165095405f1b41e47f5e7f": {
     "describe": {
@@ -5129,6 +5069,19 @@
     },
     "query": "\n                    SELECT v.id version_id, v.mod_id project_id, h.hash hash FROM hashes h\n                    INNER JOIN files f on h.file_id = f.id\n                    INNER JOIN versions v on f.version_id = v.id\n                    WHERE h.algorithm = 'sha1' AND h.hash = ANY($1)\n                    "
   },
+  "cfd80c4417c0534d24d65c782753927ba446e6ba542095c211ae5ee9b06b2753": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                    UPDATE users\n                    SET gitlab_id = $2\n                    WHERE (id = $1)\n                    "
+  },
   "d1566672369ea22cb1f638f073f8e3fb467b354351ae71c67941323749ec9bcd": {
     "describe": {
       "columns": [
@@ -5218,6 +5171,19 @@
       }
     },
     "query": "\n            INSERT INTO pats (\n                id, name, access_token, scopes, user_id,\n                expires\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6\n            )\n            "
+  },
+  "d3f317f7d767f5188bace4064d548d3049df0d06420e3a23ebd8f326703a448e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                    UPDATE users\n                    SET discord_id = $2\n                    WHERE (id = $1)\n                    "
   },
   "d59a0ca4725d40232eae8bf5735787e1b76282c390d2a8d07fb34e237a0b2132": {
     "describe": {
@@ -5493,19 +5459,6 @@
     },
     "query": "\n                    DELETE FROM user_backup_codes\n                    WHERE user_id = $1 AND code = $2\n                    "
   },
-  "de644eab84656a7e2b0d3108580763ebcd149cd6256d474521423d3e6ffaae65": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET microsoft_id = $2\n                        WHERE (id = $1)\n                        "
-  },
   "debb47a2718f79684c8776da7f289b8d178c302bb5a69562b963b8d008973b8d": {
     "describe": {
       "columns": [],
@@ -5518,19 +5471,6 @@
       }
     },
     "query": "\n                UPDATE threads_messages\n                SET body = '{\"type\": \"deleted\"}', author_id = $2\n                WHERE author_id = $1\n                "
-  },
-  "df816c410a7bd4c0616ed24436bfc84308477b6d40de0b70adbc0c723a1f5cea": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE users\n                        SET github_id = $2\n                        WHERE (id = $1)\n                        "
   },
   "df871bd959ba97f105ac575f34d8d2a39cbc44a07e0339750a0e477e6fd582ed": {
     "describe": {
@@ -6103,6 +6043,19 @@
       }
     },
     "query": "\n                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))\n                "
+  },
+  "f9bc19beaa70db45b058e80ba86599d393fad4c7d4af98426a8a9d9ca9b24035": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                    UPDATE users\n                    SET steam_id = $2\n                    WHERE (id = $1)\n                    "
   },
   "fa1b92b15cc108fa046998f789c8b259e0226e7dac16c635927ca74abc78cea9": {
     "describe": {

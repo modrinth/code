@@ -82,7 +82,8 @@ bitflags::bitflags! {
         // delete a session22
         const SESSION_DELETE = 1 << 29;
 
-        const ALL = 0b11111111111111111111111111;
+        const ALL = 0b11111111111111111111111111111;
+        const NOT_RESTRICTED = 0b00000011111111111111100111;
         const NONE = 0b0;
     }
 }
@@ -97,7 +98,8 @@ impl Scopes {
                 | Scopes::PAT_DELETE
                 | Scopes::SESSION_READ
                 | Scopes::SESSION_DELETE
-                | Scopes::USER_AUTH_WRITE,
+                | Scopes::USER_AUTH_WRITE
+                | Scopes::USER_DELETE,
         )
     }
 }

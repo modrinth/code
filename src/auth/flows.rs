@@ -1,3 +1,4 @@
+use crate::auth::email::send_email;
 use crate::auth::session::issue_session;
 use crate::auth::validate::get_user_record_from_bearer_token;
 use crate::auth::{get_user_from_headers, AuthenticationError};
@@ -14,7 +15,7 @@ use crate::util::captcha::check_turnstile_captcha;
 use crate::util::ext::{get_image_content_type, get_image_ext};
 use crate::util::validate::{validation_errors_to_string, RE_URL_SAFE};
 use actix_web::web::{scope, Data, Query, ServiceConfig};
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{Duration, Utc};
@@ -29,13 +30,23 @@ use std::sync::Arc;
 use validator::Validate;
 
 pub fn config(cfg: &mut ServiceConfig) {
-    cfg.service(scope("auth").service(auth_callback).service(init))
-        .service(create_account_with_password)
-        .service(login_password)
-        .service(login_2fa)
-        .service(begin_2fa_flow)
-        .service(finish_2fa_flow)
-        .service(remove_2fa);
+    cfg.service(
+        scope("auth")
+            .service(init)
+            .service(auth_callback)
+            .service(delete_auth_provider)
+            .service(create_account_with_password)
+            .service(login_password)
+            .service(login_2fa)
+            .service(begin_2fa_flow)
+            .service(finish_2fa_flow)
+            .service(remove_2fa)
+            .service(reset_password_begin)
+            .service(change_password)
+            .service(resend_verify_email)
+            .service(set_email)
+            .service(verify_email),
+    );
 }
 
 #[derive(Serialize, Deserialize, Default, Eq, PartialEq, Clone, Copy)]
@@ -607,6 +618,107 @@ impl AuthProvider {
             }
         })
     }
+
+    pub async fn update_user_id(
+        &self,
+        user_id: crate::database::models::UserId,
+        id: Option<&str>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), AuthenticationError> {
+        match self {
+            AuthProvider::GitHub => {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET github_id = $2
+                    WHERE (id = $1)
+                    ",
+                    user_id as crate::database::models::UserId,
+                    id.and_then(|x| x.parse::<i64>().ok())
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            AuthProvider::Discord => {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET discord_id = $2
+                    WHERE (id = $1)
+                    ",
+                    user_id as crate::database::models::UserId,
+                    id.and_then(|x| x.parse::<i64>().ok())
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            AuthProvider::Microsoft => {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET microsoft_id = $2
+                    WHERE (id = $1)
+                    ",
+                    user_id as crate::database::models::UserId,
+                    id,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            AuthProvider::GitLab => {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET gitlab_id = $2
+                    WHERE (id = $1)
+                    ",
+                    user_id as crate::database::models::UserId,
+                    id.and_then(|x| x.parse::<i64>().ok())
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            AuthProvider::Google => {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET google_id = $2
+                    WHERE (id = $1)
+                    ",
+                    user_id as crate::database::models::UserId,
+                    id,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+            AuthProvider::Steam => {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET steam_id = $2
+                    WHERE (id = $1)
+                    ",
+                    user_id as crate::database::models::UserId,
+                    id.and_then(|x| x.parse::<i64>().ok())
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            AuthProvider::GitHub => "GitHub",
+            AuthProvider::Discord => "Discord",
+            AuthProvider::Microsoft => "Microsoft",
+            AuthProvider::GitLab => "GitLab",
+            AuthProvider::Google => "Google",
+            AuthProvider::Steam => "Steam",
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -704,85 +816,19 @@ pub async fn auth_callback(
                 return Err(AuthenticationError::DuplicateUser);
             }
 
-            match provider {
-                AuthProvider::GitHub => {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET github_id = $2
-                        WHERE (id = $1)
-                        ",
-                        id as crate::database::models::UserId,
-                        oauth_user.id.parse::<i64>().ok(),
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-                AuthProvider::Discord => {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET discord_id = $2
-                        WHERE (id = $1)
-                        ",
-                        id as crate::database::models::UserId,
-                        oauth_user.id.parse::<i64>().ok(),
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-                AuthProvider::Microsoft => {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET microsoft_id = $2
-                        WHERE (id = $1)
-                        ",
-                        id as crate::database::models::UserId,
-                        oauth_user.id,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-                AuthProvider::GitLab => {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET gitlab_id = $2
-                        WHERE (id = $1)
-                        ",
-                        id as crate::database::models::UserId,
-                        oauth_user.id.parse::<i64>().ok(),
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-                AuthProvider::Google => {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET google_id = $2
-                        WHERE (id = $1)
-                        ",
-                        id as crate::database::models::UserId,
-                        oauth_user.id,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-                AuthProvider::Steam => {
-                    sqlx::query!(
-                        "
-                        UPDATE users
-                        SET steam_id = $2
-                        WHERE (id = $1)
-                        ",
-                        id as crate::database::models::UserId,
-                        oauth_user.id.parse::<i64>().ok(),
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
+            provider
+                .update_user_id(id, Some(&oauth_user.id), &mut transaction)
+                .await?;
+
+            let user = crate::database::models::User::get_id(id, &**client, &redis).await?;
+            if let Some(email) = user.and_then(|x| x.email) {
+                send_email(
+                    email,
+                    "Authentication method added",
+                    &format!("When logging into Modrinth, you can now log in using the {} authentication provider.", provider.as_str()),
+                    "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+                    None,
+                )?;
             }
 
             crate::database::models::User::clear_caches(&[(id, None)], &redis).await?;
@@ -991,6 +1037,60 @@ pub async fn auth_callback(
     }
 }
 
+#[derive(Deserialize)]
+pub struct DeleteAuthProvider {
+    pub provider: AuthProvider,
+}
+
+#[delete("provider")]
+pub async fn delete_auth_provider(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    delete_provider: web::Json<DeleteAuthProvider>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_AUTH_WRITE]),
+    )
+    .await?
+    .1;
+
+    if !user.auth_providers.map(|x| x.len() > 1).unwrap_or(false)
+        && !user.has_password.unwrap_or(false)
+    {
+        return Err(ApiError::InvalidInput(
+            "You must have another authentication method added to this account!".to_string(),
+        ));
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    delete_provider
+        .provider
+        .update_user_id(user.id.into(), None, &mut transaction)
+        .await?;
+
+    if let Some(email) = user.email {
+        send_email(
+            email,
+            "Authentication method removed",
+            &format!("When logging into Modrinth, you can no longer log in using the {} authentication provider.", delete_provider.provider.as_str()),
+            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            None,
+        )?;
+    }
+
+    crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().finish())
+}
+
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
     #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
@@ -1059,6 +1159,19 @@ pub async fn create_account_with_password(
             "Email is already registered on Modrinth!".to_string(),
         ));
     }
+
+    let flow = Flow::ConfirmEmail {
+        user_id,
+        confirm_email: new_account.email.clone(),
+    }
+    .insert(Utc::now() + Duration::hours(24), &redis)
+    .await?;
+
+    send_email_verify(
+        new_account.email.clone(),
+        flow,
+        &format!("Welcome to Modritnh, {}!", new_account.username),
+    )?;
 
     crate::database::models::User {
         id: user_id,
@@ -1243,7 +1356,7 @@ pub async fn login_2fa(
     }
 }
 
-#[get("2fa")]
+#[post("2fa/get_secret")]
 pub async fn begin_2fa_flow(
     req: HttpRequest,
     pool: Data<PgPool>,
@@ -1368,6 +1481,16 @@ pub async fn finish_2fa_flow(
             codes.push(to_base62(val));
         }
 
+        if let Some(email) = user.email {
+            send_email(
+                email,
+                "Two-factor authentication enabled",
+                "When logging into Modrinth, you can now enter a code generated by your authenticator app in addition to entering your usual email address and password.",
+                "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+                None,
+            )?;
+        }
+
         crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
         transaction.commit().await?;
 
@@ -1438,9 +1561,385 @@ pub async fn remove_2fa(
     .execute(&mut *transaction)
     .await?;
 
-    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+    if let Some(email) = user.email {
+        send_email(
+            email,
+            "Two-factor authentication removed",
+            "When logging into Modrinth, you no longer need two-factor authentication to gain access.",
+            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            None,
+        )?;
+    }
 
+    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
     transaction.commit().await?;
 
     Ok(HttpResponse::NoContent().finish())
+}
+
+#[derive(Deserialize)]
+pub struct ResetPassword {
+    pub username: String,
+    pub challenge: String,
+}
+
+#[post("password/reset")]
+pub async fn reset_password_begin(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    reset_password: web::Json<ResetPassword>,
+) -> Result<HttpResponse, ApiError> {
+    if check_turnstile_captcha(&req, &reset_password.challenge).await? {
+        return Err(ApiError::Turnstile);
+    }
+
+    let user = if let Some(user_id) =
+        crate::database::models::User::get_email(&reset_password.username, &**pool).await?
+    {
+        crate::database::models::User::get_id(user_id, &**pool, &redis).await?
+    } else {
+        crate::database::models::User::get(&reset_password.username, &**pool, &redis).await?
+    };
+
+    if let Some(user) = user {
+        let flow = Flow::ForgotPassword { user_id: user.id }
+            .insert(Utc::now() + Duration::hours(24), &redis)
+            .await?;
+
+        if let Some(email) = user.email {
+            send_email(
+                email,
+                "Reset your password",
+                "Please visit the following link below to reset your password. If the button does not work, you can copy the link and paste it into your browser.",
+                "If you did not request for your password to be reset, you can safely ignore this email.",
+                Some(("Reset password", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_RESET_PASSWORD_PATH")?, flow))),
+            )?;
+        }
+    }
+
+    Ok(HttpResponse::Ok().finish())
+}
+
+#[derive(Deserialize, Validate)]
+pub struct ChangePassword {
+    pub flow: Option<String>,
+    pub old_password: Option<String>,
+    pub new_password: Option<String>,
+}
+
+#[patch("password")]
+pub async fn change_password(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    change_password: web::Json<ChangePassword>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = if let Some(flow) = &change_password.flow {
+        let flow = Flow::get(flow, &redis).await?;
+
+        if let Some(Flow::ForgotPassword { user_id }) = flow {
+            let user = crate::database::models::User::get_id(user_id, &**pool, &redis)
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+            Some(user)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    let user = if let Some(user) = user {
+        user
+    } else {
+        let (scopes, user) =
+            get_user_record_from_bearer_token(&req, None, &**pool, &redis, &session_queue)
+                .await?
+                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+        if !scopes.contains(Scopes::USER_AUTH_WRITE) {
+            return Err(ApiError::Authentication(
+                AuthenticationError::InvalidCredentials,
+            ));
+        }
+
+        if let Some(pass) = user.password.as_ref() {
+            let old_password = change_password.old_password.as_ref().ok_or_else(|| {
+                ApiError::CustomAuthentication(
+                    "You must specify the old password to change your password!".to_string(),
+                )
+            })?;
+
+            let hasher = Argon2::default();
+            hasher.verify_password(old_password.as_bytes(), &PasswordHash::new(pass)?)?;
+        }
+
+        user
+    };
+
+    let mut transaction = pool.begin().await?;
+
+    let update_password = if let Some(new_password) = &change_password.new_password {
+        let score = zxcvbn::zxcvbn(
+            new_password,
+            &[
+                &user.username,
+                &user.email.clone().unwrap_or_default(),
+                &user.name.unwrap_or_default(),
+            ],
+        )?;
+
+        if score.score() < 3 {
+            return Err(ApiError::InvalidInput(
+                if let Some(feedback) = score.feedback().clone().and_then(|x| x.warning()) {
+                    format!("Password too weak: {}", feedback)
+                } else {
+                    "Specified password is too weak! Please improve its strength.".to_string()
+                },
+            ));
+        }
+
+        let hasher = Argon2::default();
+        let salt = SaltString::generate(&mut ChaCha20Rng::from_entropy());
+        let password_hash = hasher
+            .hash_password(new_password.as_bytes(), &salt)?
+            .to_string();
+
+        Some(password_hash)
+    } else {
+        if !(user.github_id.is_some()
+            || user.gitlab_id.is_some()
+            || user.microsoft_id.is_some()
+            || user.google_id.is_some()
+            || user.steam_id.is_some()
+            || user.discord_id.is_some())
+        {
+            return Err(ApiError::InvalidInput(
+                "You must have another authentication method added to remove password authentication!".to_string(),
+            ));
+        }
+
+        None
+    };
+
+    sqlx::query!(
+        "
+        UPDATE users
+        SET password = $1
+        WHERE (id = $2)
+        ",
+        update_password,
+        user.id as crate::database::models::ids::UserId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    if let Some(flow) = &change_password.flow {
+        Flow::remove(flow, &redis).await?;
+    }
+
+    if let Some(email) = user.email {
+        let changed = if update_password.is_some() {
+            "changed"
+        } else {
+            "removed"
+        };
+
+        send_email(
+            email,
+            &format!("Password {}", changed),
+            &format!("Your password has been {} on your account.", changed),
+            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            None,
+        )?;
+    }
+
+    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+    transaction.commit().await?;
+
+    Ok(HttpResponse::Ok().finish())
+}
+
+#[derive(Deserialize, Validate)]
+pub struct SetEmail {
+    #[validate(email)]
+    pub email: String,
+}
+
+#[patch("email")]
+pub async fn set_email(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    email: web::Json<SetEmail>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    email
+        .0
+        .validate()
+        .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
+
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_AUTH_WRITE]),
+    )
+    .await?
+    .1;
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        UPDATE users
+        SET email = $1, email_verified = FALSE
+        WHERE (id = $2)
+        ",
+        email.email,
+        user.id.0 as i64,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    if let Some(user_email) = user.email {
+        send_email(
+            user_email,
+            "Email changed",
+            &format!("Your email has been updated to {} on your account.", email.email),
+            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+            None,
+        )?;
+    }
+
+    let flow = Flow::ConfirmEmail {
+        user_id: user.id.into(),
+        confirm_email: email.email.clone(),
+    }
+    .insert(Utc::now() + Duration::hours(24), &redis)
+    .await?;
+
+    send_email_verify(
+        email.email.clone(),
+        flow,
+        "We need to verify your email address.",
+    )?;
+
+    crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
+    transaction.commit().await?;
+
+    Ok(HttpResponse::Ok().finish())
+}
+
+#[post("email/resend_verify")]
+pub async fn resend_verify_email(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_AUTH_WRITE]),
+    )
+    .await?
+    .1;
+
+    if let Some(email) = user.email {
+        if user.email_verified.unwrap_or(false) {
+            return Err(ApiError::InvalidInput(
+                "User email is already verified!".to_string(),
+            ));
+        }
+
+        let flow = Flow::ConfirmEmail {
+            user_id: user.id.into(),
+            confirm_email: email.clone(),
+        }
+        .insert(Utc::now() + Duration::hours(24), &redis)
+        .await?;
+
+        send_email_verify(email, flow, "We need to verify your email address.")?;
+
+        Ok(HttpResponse::NoContent().finish())
+    } else {
+        Err(ApiError::InvalidInput(
+            "User does not have an email.".to_string(),
+        ))
+    }
+}
+
+#[derive(Deserialize)]
+pub struct VerifyEmail {
+    pub flow: String,
+}
+
+#[post("email/verify")]
+pub async fn verify_email(
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    email: web::Json<VerifyEmail>,
+) -> Result<HttpResponse, ApiError> {
+    let flow = Flow::get(&email.flow, &redis).await?;
+
+    if let Some(Flow::ConfirmEmail {
+        user_id,
+        confirm_email,
+    }) = flow
+    {
+        let user = crate::database::models::User::get_id(user_id, &**pool, &redis)
+            .await?
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
+        if user.email != Some(confirm_email) {
+            return Err(ApiError::InvalidInput(
+                "E-mail does not match verify email. Try re-requesting the verification link."
+                    .to_string(),
+            ));
+        }
+
+        let mut transaction = pool.begin().await?;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET email_verified = TRUE
+            WHERE (id = $1)
+            ",
+            user.id as crate::database::models::ids::UserId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        Flow::remove(&email.flow, &redis).await?;
+        crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
+        transaction.commit().await?;
+
+        Ok(HttpResponse::NoContent().finish())
+    } else {
+        Err(ApiError::InvalidInput(
+            "Flow does not exist. Try re-requesting the verification link.".to_string(),
+        ))
+    }
+}
+
+fn send_email_verify(
+    email: String,
+    flow: String,
+    opener: &str,
+) -> Result<(), super::email::MailError> {
+    send_email(
+        email,
+        "Verify your email",
+        opener,
+        "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
+        Some(("Reset password", &format!("{}/{}?flow={}", dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,  dotenvy::var("SITE_RESET_PASSWORD_PATH")?, flow))),
+    )
 }

@@ -72,6 +72,8 @@ pub enum ApiError {
     PasswordHashing(#[from] argon2::password_hash::Error),
     #[error("Password strength checking error: {0}")]
     PasswordStrengthCheck(#[from] zxcvbn::ZxcvbnError),
+    #[error("{0}")]
+    Mail(#[from] crate::auth::email::MailError),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -97,6 +99,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::ImageParse(..) => StatusCode::BAD_REQUEST,
             ApiError::PasswordHashing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PasswordStrengthCheck(..) => StatusCode::BAD_REQUEST,
+            ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -123,6 +126,7 @@ impl actix_web::ResponseError for ApiError {
                 ApiError::ImageParse(..) => "invalid_image",
                 ApiError::PasswordHashing(..) => "password_hashing_error",
                 ApiError::PasswordStrengthCheck(..) => "strength_check_error",
+                ApiError::Mail(..) => "mail_error",
             },
             description: &self.to_string(),
         })
