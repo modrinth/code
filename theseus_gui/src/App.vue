@@ -57,7 +57,7 @@ defineExpose({
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
-    if ((await type()) !== 'Darwin') {
+    if ((await type()) === 'Darwin') {
       document.getElementsByTagName('html')[0].classList.add('mac')
     } else {
       document.getElementsByTagName('html')[0].classList.add('windows')
