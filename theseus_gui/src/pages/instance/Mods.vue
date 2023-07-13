@@ -140,15 +140,18 @@
             class="mod-content"
           >
             <Avatar :src="mod.icon" />
-            <div class="mod-text" v-tooltip="`${mod.name} by ${mod.author}`">
+            <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
               <div class="title">{{ mod.name }}</div>
               <span class="no-wrap">by {{ mod.author }}</span>
             </div>
           </router-link>
           <div v-else class="mod-content">
             <Avatar :src="mod.icon" />
-            <span class="title" v-tooltip="`${mod.name}`">{{ mod.name }}</span>
+            <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
           </div>
+          <Button v-tooltip="`Show ${mod.file_name}`" class="transparent" icon-only @click="showInFolder(mod.path)">
+            <FolderOpenIcon />
+          </Button>
         </div>
         <div class="table-cell table-text">
           <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
@@ -238,6 +241,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
+import {showInFolder} from "@/helpers/utils.js";
 
 const router = useRouter()
 
@@ -627,6 +631,11 @@ const handleRightClick = (event, mod) => {
 
 .name-cell {
   padding-left: 0;
+
+  .btn {
+    margin-left: var(--gap-sm);
+    min-width: unset;
+  }
 }
 
 .dropdown {
