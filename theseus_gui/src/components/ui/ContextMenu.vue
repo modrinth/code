@@ -127,16 +127,19 @@ onBeforeUnmount(() => {
       &.primary {
         background-color: var(--color-brand);
         color: var(--color-accent-contrast);
+        font-weight: bold;
       }
 
       &.danger {
         background-color: var(--color-red);
         color: var(--color-accent-contrast);
+        font-weight: bold;
       }
 
       &.contrast {
         background-color: var(--color-orange);
         color: var(--color-accent-contrast);
+        font-weight: bold;
       }
     }
   }
