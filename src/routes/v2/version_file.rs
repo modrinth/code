@@ -27,7 +27,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("version_files")
             .service(get_versions_from_hashes)
-            .service(update_files),
+            .service(update_files)
+            .service(update_individual_files),
     );
 }
 
@@ -510,6 +511,111 @@ pub async fn update_files(
                             hash.clone(),
                             models::projects::Version::from(version.clone()),
                         );
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(response))
+}
+
+#[derive(Deserialize)]
+pub struct FileUpdateData {
+    pub hash: String,
+    pub loaders: Option<Vec<String>>,
+    pub game_versions: Option<Vec<String>>,
+    pub version_types: Option<Vec<VersionType>>,
+}
+
+#[derive(Deserialize)]
+pub struct ManyFileUpdateData {
+    pub algorithm: String,
+    pub hashes: Vec<FileUpdateData>,
+}
+
+#[post("update_individual")]
+pub async fn update_individual_files(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+    update_data: web::Json<ManyFileUpdateData>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::VERSION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    let files = database::models::Version::get_files_from_hash(
+        update_data.algorithm.clone(),
+        &update_data
+            .hashes
+            .iter()
+            .map(|x| x.hash.clone())
+            .collect::<Vec<_>>(),
+        &**pool,
+        &redis,
+    )
+    .await?;
+
+    let projects = database::models::Project::get_many_ids(
+        &files.iter().map(|x| x.project_id).collect::<Vec<_>>(),
+        &**pool,
+        &redis,
+    )
+    .await?;
+    let all_versions = database::models::Version::get_many(
+        &projects
+            .iter()
+            .flat_map(|x| x.versions.clone())
+            .collect::<Vec<_>>(),
+        &**pool,
+        &redis,
+    )
+    .await?;
+
+    let mut response = HashMap::new();
+
+    for project in projects {
+        for file in files.iter().filter(|x| x.project_id == project.inner.id) {
+            if let Some(hash) = file.hashes.get(&update_data.algorithm) {
+                if let Some(query_file) = update_data.hashes.iter().find(|x| &x.hash == hash) {
+                    let version = all_versions
+                        .iter()
+                        .filter(|x| {
+                            let mut bool = true;
+
+                            if let Some(version_types) = &query_file.version_types {
+                                bool &= version_types
+                                    .iter()
+                                    .any(|y| y.as_str() == x.inner.version_type);
+                            }
+                            if let Some(loaders) = &query_file.loaders {
+                                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+                            }
+                            if let Some(game_versions) = &query_file.game_versions {
+                                bool &= x.game_versions.iter().any(|y| game_versions.contains(y));
+                            }
+
+                            bool
+                        })
+                        .sorted_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published))
+                        .next();
+
+                    if let Some(version) = version {
+                        if is_authorized_version(&version.inner, &user_option, &pool).await? {
+                            response.insert(
+                                hash.clone(),
+                                models::projects::Version::from(version.clone()),
+                            );
+                        }
                     }
                 }
             }

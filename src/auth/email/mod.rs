@@ -22,21 +22,17 @@ pub fn send_email_raw(to: String, subject: String, body: String) -> Result<(), M
             Some("Modrinth".to_string()),
             Address::new("no-reply", "mail.modrinth.com")?,
         ))
-        .to(to.parse().unwrap())
+        .to(to.parse()?)
         .subject(subject)
         .header(ContentType::TEXT_HTML)
-        .body(body)
-        .unwrap();
+        .body(body)?;
 
     let username = dotenvy::var("SMTP_USERNAME")?;
     let password = dotenvy::var("SMTP_PASSWORD")?;
     let host = dotenvy::var("SMTP_HOST")?;
     let creds = Credentials::new(username, password);
 
-    let mailer = SmtpTransport::relay(&host)
-        .unwrap()
-        .credentials(creds)
-        .build();
+    let mailer = SmtpTransport::relay(&host)?.credentials(creds).build();
 
     mailer.send(&email)?;
 

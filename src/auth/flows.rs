@@ -1114,7 +1114,7 @@ pub async fn create_account_with_password(
         .validate()
         .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
 
-    if check_turnstile_captcha(&req, &new_account.challenge).await? {
+    if !check_turnstile_captcha(&req, &new_account.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1221,7 +1221,7 @@ pub async fn login_password(
     redis: Data<deadpool_redis::Pool>,
     login: web::Json<Login>,
 ) -> Result<HttpResponse, ApiError> {
-    if check_turnstile_captcha(&req, &login.challenge).await? {
+    if !check_turnstile_captcha(&req, &login.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
@@ -1590,7 +1590,7 @@ pub async fn reset_password_begin(
     redis: Data<deadpool_redis::Pool>,
     reset_password: web::Json<ResetPassword>,
 ) -> Result<HttpResponse, ApiError> {
-    if check_turnstile_captcha(&req, &reset_password.challenge).await? {
+    if !check_turnstile_captcha(&req, &reset_password.challenge).await? {
         return Err(ApiError::Turnstile);
     }
 
