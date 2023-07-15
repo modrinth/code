@@ -81,7 +81,7 @@ input {
     padding-top: calc(var(--gap-md) + 1.75rem);
   }
 
-  .account-card {
+  .account-card, .card-section {
     top: calc(var(--gap-md) + 1.75rem);
   }
 }
@@ -120,4 +120,8 @@ input {
   background-color: var(--color-button-bg);
   border-radius: var(--radius-lg);
   border: 3px solid var(--color-bg);
+}
+
+.highlighted {
+  box-shadow: 0 0 1rem var(--color-brand) !important;
 }

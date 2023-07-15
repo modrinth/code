@@ -20,7 +20,7 @@ defineExpose({
 </script>
 
 <template>
-  <Modal ref="confirmModal" :header="`Install ${project.title}`">
+  <Modal ref="confirmModal" :header="`Install ${project?.title}`">
     <div class="modal-body">
       <SearchCard :project="project" class="project-card" :categories="categories"/>
     </div>

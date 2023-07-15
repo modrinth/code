@@ -12,7 +12,7 @@ import {
   XIcon,
   CodeIcon
 } from 'omorphia'
-import { useLoading, useTheming } from '@/store/state'
+import {useLoading, useTheming} from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -28,17 +28,19 @@ import { appWindow } from '@tauri-apps/api/window'
 import { isDev } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
-import OnboardingModal from '@/components/OnboardingModal.vue'
 import { getVersion } from '@tauri-apps/api/app'
 import { window } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from "@/components/ui/URLConfirmModal.vue";
+import OnboardingScreen from "@/components/ui/tutorial/OnboardingScreen.vue";
 
 const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
+const videoPlaying = ref(true)
+const showOnboarding = ref(false)
 
 defineExpose({
   initialize: async () => {
@@ -47,6 +49,7 @@ defineExpose({
       await get()
     const dev = await isDev()
     const version = await getVersion()
+    showOnboarding.value = true
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -154,11 +157,17 @@ command_listener((e) => {
 </script>
 
 <template>
-  <SplashScreen v-if="isLoading" app-loading />
+  <video
+    v-if="videoPlaying"
+    class="video"
+    src="@/assets/video.mp4"
+    autoplay
+    muted
+    @ended="videoPlaying = false"
+  />
+  <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
+  <OnboardingScreen v-else-if="showOnboarding" :finish="() => showOnboarding = false"/>
   <div v-else class="container">
-    <suspense>
-      <OnboardingModal ref="testModal" :accounts="accounts" />
-    </suspense>
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
@@ -514,5 +523,11 @@ command_listener((e) => {
   width: 100%;
   height: 100%;
   gap: 1rem;
+}
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  border-radius: var(--radius-md);
 }
 </style>
