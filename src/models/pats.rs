@@ -79,10 +79,10 @@ bitflags::bitflags! {
 
         // read a user's sessions
         const SESSION_READ = 1 << 28;
-        // delete a session22
+        // delete a session
         const SESSION_DELETE = 1 << 29;
 
-        const ALL = 0b11111111111111111111111111111;
+        const ALL = 0b111111111111111111111111111111;
         const NOT_RESTRICTED = 0b00000011111111111111100111;
         const NONE = 0b0;
     }

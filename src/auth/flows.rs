@@ -773,7 +773,7 @@ pub async fn init(
         url: info.url,
         provider: info.provider,
     }
-    .insert(Utc::now() + Duration::minutes(30), &redis)
+    .insert(Duration::minutes(30), &redis)
     .await?;
 
     let url = info.provider.get_redirect_url(state)?;
@@ -845,7 +845,7 @@ pub async fn auth_callback(
 
                 if user.totp_secret.is_some() {
                     let flow = Flow::Login2FA { user_id: user.id }
-                        .insert(Utc::now() + Duration::minutes(30), &redis)
+                        .insert(Duration::minutes(30), &redis)
                         .await?;
 
                     let redirect_url = format!(
@@ -1164,7 +1164,7 @@ pub async fn create_account_with_password(
         user_id,
         confirm_email: new_account.email.clone(),
     }
-    .insert(Utc::now() + Duration::hours(24), &redis)
+    .insert(Duration::hours(24), &redis)
     .await?;
 
     send_email_verify(
@@ -1253,7 +1253,7 @@ pub async fn login_password(
 
     if user.totp_secret.is_some() {
         let flow = Flow::Login2FA { user_id: user.id }
-            .insert(Utc::now() + Duration::minutes(30), &redis)
+            .insert(Duration::minutes(30), &redis)
             .await?;
 
         Ok(HttpResponse::Ok().json(serde_json::json!({
@@ -1381,7 +1381,7 @@ pub async fn begin_2fa_flow(
             user_id: user.id.into(),
             secret: encoded.to_string(),
         }
-        .insert(Utc::now() + Duration::minutes(30), &redis)
+        .insert(Duration::minutes(30), &redis)
         .await?;
 
         Ok(HttpResponse::Ok().json(serde_json::json!({
@@ -1514,7 +1514,7 @@ pub async fn remove_2fa(
     req: HttpRequest,
     pool: Data<PgPool>,
     redis: Data<deadpool_redis::Pool>,
-    login: web::Json<Login2FA>,
+    login: web::Json<Remove2FA>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, user) =
@@ -1604,7 +1604,7 @@ pub async fn reset_password_begin(
 
     if let Some(user) = user {
         let flow = Flow::ForgotPassword { user_id: user.id }
-            .insert(Utc::now() + Duration::hours(24), &redis)
+            .insert(Duration::hours(24), &redis)
             .await?;
 
         if let Some(email) = user.email {
@@ -1820,7 +1820,7 @@ pub async fn set_email(
         user_id: user.id.into(),
         confirm_email: email.email.clone(),
     }
-    .insert(Utc::now() + Duration::hours(24), &redis)
+    .insert(Duration::hours(24), &redis)
     .await?;
 
     send_email_verify(
@@ -1863,7 +1863,7 @@ pub async fn resend_verify_email(
             user_id: user.id.into(),
             confirm_email: email.clone(),
         }
-        .insert(Utc::now() + Duration::hours(24), &redis)
+        .insert(Duration::hours(24), &redis)
         .await?;
 
         send_email_verify(email, flow, "We need to verify your email address.")?;
@@ -1940,6 +1940,6 @@ fn send_email_verify(
         "Verify your email",
         opener,
         "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
-        Some(("Reset password", &format!("{}/{}?flow={}", dotenvy::var("SITE_VERIFY_EMAIL_PATH")?,  dotenvy::var("SITE_RESET_PASSWORD_PATH")?, flow))),
+        Some(("Verify email", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_VERIFY_EMAIL_PATH")?, flow))),
     )
 }

@@ -1,7 +1,7 @@
 use super::ids::*;
 use crate::auth::flows::AuthProvider;
 use crate::database::models::DatabaseError;
-use chrono::{DateTime, Timelike, Utc};
+use chrono::Duration;
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use rand_chacha::rand_core::SeedableRng;
@@ -38,7 +38,7 @@ pub enum Flow {
 impl Flow {
     pub async fn insert(
         &self,
-        expires: DateTime<Utc>,
+        expires: Duration,
         redis: &deadpool_redis::Pool,
     ) -> Result<String, DatabaseError> {
         let mut redis = redis.get().await?;
@@ -53,7 +53,7 @@ impl Flow {
             .arg(format!("{}:{}", FLOWS_NAMESPACE, flow))
             .arg(serde_json::to_string(&self)?)
             .arg("EX")
-            .arg(expires.second())
+            .arg(expires.num_seconds())
             .query_async::<_, ()>(&mut redis)
             .await?;
 
