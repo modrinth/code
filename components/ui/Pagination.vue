@@ -141,15 +141,6 @@ a {
     filter: grayscale(50%);
     opacity: 0.5;
   }
-
-  &:hover:not(&:disabled) {
-    filter: brightness(0.85);
-  }
-
-  &:active:not(&:disabled) {
-    transform: scale(0.95);
-    filter: brightness(0.8);
-  }
 }
 
 .has-icon {

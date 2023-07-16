@@ -15,9 +15,9 @@
             <section class="user-controls">
               <nuxt-link
                 v-if="auth.user"
-                to="/notifications"
+                to="/dashboard/notifications"
                 class="control-button button-transparent"
-                :class="{ bubble: user.notifications.length > 0 }"
+                :class="{ bubble: user.notifications.some((notif) => !notif.read) }"
                 title="Notifications"
               >
                 <NotificationIcon aria-hidden="true" />
@@ -63,15 +63,15 @@
                     <span class="title">Create a project</span>
                   </button>
                   <hr class="divider" />
-                  <NuxtLink class="item button-transparent" to="/notifications">
+                  <NuxtLink class="item button-transparent" to="/dashboard/notifications">
                     <NotificationIcon class="icon" />
                     <span class="title">Notifications</span>
                   </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/dashboard">
                     <ChartIcon class="icon" />
-                    <span class="title">Dashboard</span><span class="beta-badge">BETA</span>
+                    <span class="title">Dashboard</span>
                   </NuxtLink>
-                  <NuxtLink class="item button-transparent" to="/settings/follows">
+                  <NuxtLink class="item button-transparent" to="/dashboard/follows">
                     <HeartIcon class="icon" />
                     <span class="title">Following</span>
                   </NuxtLink>
@@ -170,7 +170,7 @@
                 <PlusIcon aria-hidden="true" />
                 Create a project
               </button>
-              <NuxtLink class="iconified-button" to="/settings/follows">
+              <NuxtLink class="iconified-button" to="/dashboard/follows">
                 <HeartIcon aria-hidden="true" />
                 Following
               </NuxtLink>
@@ -214,7 +214,7 @@
           </button>
           <template v-if="auth.user">
             <NuxtLink
-              to="/notifications"
+              to="/dashboard/notifications"
               class="tab button-animation"
               :class="{
                 bubble: user.notifications.length > 0,
@@ -263,7 +263,7 @@
     </main>
     <footer>
       <div class="logo-info" role="region" aria-label="Modrinth information">
-        <BrandTextLogo aria-hidden="true" class="text-logo" />
+        <BrandTextLogo aria-hidden="true" class="text-logo" @click="developerModeIncrement()" />
         <p>
           Modrinth is
           <a
@@ -362,6 +362,7 @@ import NavRow from '~/components/ui/NavRow.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import Avatar from '~/components/ui/Avatar.vue'
 
+const app = useNuxtApp()
 const auth = await useAuth()
 const user = await useUser()
 
@@ -377,6 +378,32 @@ useHead({
     },
   ],
 })
+
+let developerModeCounter = 0
+
+function developerModeIncrement() {
+  if (developerModeCounter >= 5) {
+    app.$cosmetics.developerMode = !app.$cosmetics.developerMode
+    developerModeCounter = 0
+    if (app.$cosmetics.developerMode) {
+      app.$notify({
+        group: 'main',
+        title: 'Developer mode activated',
+        text: 'Developer mode has been enabled',
+        type: 'success',
+      })
+    } else {
+      app.$notify({
+        group: 'main',
+        title: 'Developer mode deactivated',
+        text: 'Developer mode has been disabled',
+        type: 'success',
+      })
+    }
+  } else {
+    developerModeCounter++
+  }
+}
 </script>
 <script>
 export default defineNuxtComponent({
@@ -500,6 +527,7 @@ export default defineNuxtComponent({
 
 <style lang="scss">
 @import '~/assets/styles/global.scss';
+@import 'omorphia/dist/style.css';
 
 .layout {
   min-height: 100vh;

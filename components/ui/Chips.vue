@@ -4,7 +4,7 @@
       v-for="item in items"
       :key="item"
       class="iconified-button"
-      :class="{ selected: selected === item }"
+      :class="{ selected: selected === item, capitalize: capitalize }"
       @click="toggleItem(item)"
     >
       <CheckIcon v-if="selected === item" />
@@ -36,6 +36,10 @@ export default {
     formatLabel: {
       default: (x) => x,
       type: Function,
+    },
+    capitalize: {
+      type: Boolean,
+      default: true,
     },
   },
   emits: ['update:modelValue'],
@@ -73,7 +77,9 @@ export default {
   flex-wrap: wrap;
 
   .iconified-button {
-    text-transform: capitalize;
+    &.capitalize {
+      text-transform: capitalize;
+    }
 
     svg {
       width: 1em;

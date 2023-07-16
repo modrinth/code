@@ -31,6 +31,9 @@ dependencies:
   markdown-it:
     specifier: ^13.0.1
     version: 13.0.1(patch_hash=3vlxaukqep4gvqytxeznhg6wbq)
+  omorphia:
+    specifier: ^0.4.31
+    version: 0.4.31
   vue-multiselect:
     specifier: ^3.0.0-alpha.2
     version: 3.0.0-alpha.2
@@ -2010,7 +2013,6 @@ packages:
 
   /@vue/devtools-api@6.5.0:
     resolution: {integrity: sha512-o9KfBeaBmCKl10usN4crU53fYtC1r7jJwdGKjPT24t348rHxgfpZ0xL3Xm/gLUYnc0oTp8LAmrxOeLyu6tbk2Q==}
-    dev: true
 
   /@vue/reactivity-transform@3.3.4:
     resolution: {integrity: sha512-MXgwjako4nu5WFLAjpBnCj/ieqcjE2aJBINUNQzkZQfzIZA4xn+0fV1tIYBJvvva3N3OvKGofRLvQIwEQPpaXw==}
@@ -4155,6 +4157,11 @@ packages:
     engines: {node: '>=12.0.0'}
     dev: false
 
+  /highlight.js@11.8.0:
+    resolution: {integrity: sha512-MedQhoqVdr0U6SSnWPzfiadUcDHfN/Wzq25AkXiQv9oiOO/sG0S7XkvpFIqWBl9Yq1UYyYOOVORs5UW2XlPyzg==}
+    engines: {node: '>=12.0.0'}
+    dev: false
+
   /hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
     dev: true
@@ -5383,6 +5390,19 @@ packages:
   /ohash@1.1.2:
     resolution: {integrity: sha512-9CIOSq5945rI045GFtcO3uudyOkYVY1nyfFxVQp+9BRgslr8jPNiSSrsFGg/BNTUFOLqx0P5tng6G32brIPw0w==}
     dev: true
+
+  /omorphia@0.4.31:
+    resolution: {integrity: sha512-xeb9bD42VFRDKCkKz678hBYCIS//Atd4/hx6/YmboJLMEIjIJfS2Ocf9G53G52XkfS4DWs9CIzKz71NDh86kxQ==}
+    dependencies:
+      dayjs: 1.11.7
+      floating-vue: 2.0.0-beta.20(vue@3.3.4)
+      highlight.js: 11.8.0
+      markdown-it: 13.0.1(patch_hash=3vlxaukqep4gvqytxeznhg6wbq)
+      vue: 3.3.4
+      vue-router: 4.2.2(vue@3.3.4)
+      vue-select: 4.0.0-beta.6(vue@3.3.4)
+      xss: 1.0.14
+    dev: false
 
   /on-finished@2.4.1:
     resolution: {integrity: sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg==}
@@ -7208,7 +7228,14 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.5.0
       vue: 3.3.4
-    dev: true
+
+  /vue-select@4.0.0-beta.6(vue@3.3.4):
+    resolution: {integrity: sha512-K+zrNBSpwMPhAxYLTCl56gaMrWZGgayoWCLqe5rWwkB8aUbAUh7u6sXjIR7v4ckp2WKC7zEEUY27g6h1MRsIHw==}
+    peerDependencies:
+      vue: 3.x
+    dependencies:
+      vue: 3.3.4
+    dev: false
 
   /vue-template-compiler@2.7.14:
     resolution: {integrity: sha512-zyA5Y3ArvVG0NacJDkkzJuPQDF8RFeRlzV2vLeSnhSpieO6LK2OVbdLPi5MPPs09Ii+gMO8nY4S3iKQxBxDmWQ==}

@@ -147,10 +147,12 @@
       <div class="adjacent-input">
         <label for="project-visibility">
           <span class="label__title">Visibility</span>
-          <span class="label__description">
+          <div class="label__description">
             Listed and archived projects are visible in search. Unlisted projects are published, but
             not visible in search or on user profiles. Private projects are only accessible by
             members of the project.
+
+            <p>If approved by the moderators:</p>
             <ul class="visibility-info">
               <li>
                 <CheckIcon
@@ -183,7 +185,7 @@
                 {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible via URL
               </li>
             </ul>
-          </span>
+          </div>
         </label>
         <Multiselect
           id="project-visibility"
@@ -408,7 +410,7 @@ export default defineNuxtComponent({
         ...this.$defaultHeaders(),
       })
       await initUserProjects()
-      await this.$router.push('/dashboard/projects')
+      await this.$router.push('/dashboard/review')
       this.$notify({
         group: 'main',
         title: 'Project deleted',

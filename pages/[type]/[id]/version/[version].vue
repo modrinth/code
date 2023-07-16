@@ -135,8 +135,8 @@
         </button>
         <button class="iconified-button" @click="version.featured = !version.featured">
           <StarIcon aria-hidden="true" />
-          <template v-if="!version.featured"> Feature version </template>
-          <template v-else> Unfeature version </template>
+          <template v-if="!version.featured"> Feature version</template>
+          <template v-else> Unfeature version</template>
         </button>
         <nuxt-link
           v-if="currentMember"
@@ -160,11 +160,7 @@
           <DownloadIcon aria-hidden="true" />
           Download
         </a>
-        <button
-          v-if="$auth.user && !currentMember"
-          class="iconified-button"
-          @click="$refs.modal_version_report.show()"
-        >
+        <button class="iconified-button" @click="$refs.modal_version_report.show()">
           <ReportIcon aria-hidden="true" />
           Report
         </button>
@@ -240,12 +236,12 @@
       />
     </div>
     <div
-      v-if="version.dependencies.length > 0 || (isEditing && project.project_type !== 'modpack')"
+      v-if="deps.length > 0 || (isEditing && project.project_type !== 'modpack')"
       class="version-page__dependencies universal-card"
     >
       <h3>Dependencies</h3>
       <div
-        v-for="(dependency, index) in version.dependencies.filter((x) => !x.file_name)"
+        v-for="(dependency, index) in deps.filter((x) => !x.file_name)"
         :key="index"
         class="dependency"
         :class="{ 'button-transparent': !isEditing }"
@@ -260,11 +256,11 @@
           <span class="project-title">
             {{ dependency.project ? dependency.project.title : 'Unknown Project' }}
           </span>
-          <span v-if="dependency.version">
+          <span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
             Version {{ dependency.version.version_number }} is
             {{ dependency.dependency_type }}
           </span>
-          <span v-else class="dep-type">
+          <span v-else class="dep-type" :class="dependency.dependency_type">
             {{ dependency.dependency_type }}
           </span>
         </nuxt-link>
@@ -272,11 +268,11 @@
           <span class="project-title">
             {{ dependency.project ? dependency.project.title : 'Unknown Project' }}
           </span>
-          <span v-if="dependency.version">
+          <span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
             Version {{ dependency.version.version_number }} is
             {{ dependency.dependency_type }}
           </span>
-          <span v-else class="dep-type">
+          <span v-else class="dep-type" :class="dependency.dependency_type">
             {{ dependency.dependency_type }}
           </span>
         </div>
@@ -290,7 +286,7 @@
         </button>
       </div>
       <div
-        v-for="(dependency, index) in version.dependencies.filter((x) => x.file_name)"
+        v-for="(dependency, index) in deps.filter((x) => x.file_name)"
         :key="index"
         class="dependency"
       >
@@ -299,7 +295,7 @@
           <span class="project-title">
             {{ dependency.file_name }}
           </span>
-          <span>Added via overrides</span>
+          <span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
         </div>
       </div>
       <div v-if="isEditing && project.project_type !== 'modpack'" class="add-dependency">
@@ -630,7 +626,7 @@
         <div v-if="!isEditing">
           <h4>Publication date</h4>
           <span>
-            {{ $dayjs(version.date_published).format('MMMM D, YYYY [at] h:mm:ss A') }}
+            {{ $dayjs(version.date_published).format('MMMM D, YYYY [at] h:mm A') }}
           </span>
         </div>
         <div v-if="!isEditing && version.author">
@@ -896,6 +892,8 @@ export default defineNuxtComponent({
 
     oldFileTypes = version.files.map((x) => fileTypes.find((y) => y.value === x.file_type))
 
+    const order = ['required', 'optional', 'incompatible', 'embedded']
+
     return {
       fileTypes: ref(fileTypes),
       oldFileTypes: ref(oldFileTypes),
@@ -918,6 +916,11 @@ export default defineNuxtComponent({
             .join(' & ')}. Published on ${data
             .$dayjs(version.date_published)
             .format('MMM D, YYYY')}. ${version.downloads} downloads.`
+      ),
+      deps: computed(() =>
+        version.dependencies.sort(
+          (a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type)
+        )
       ),
     }
   },
@@ -1428,6 +1431,11 @@ export default defineNuxtComponent({
 
         .dep-type {
           text-transform: capitalize;
+          color: var(--color-text-secondary);
+
+          &.incompatible {
+            color: var(--color-red);
+          }
         }
       }
 
@@ -1529,6 +1537,7 @@ export default defineNuxtComponent({
       h4 {
         margin-bottom: 0.5rem;
       }
+
       label {
         margin-top: 0.5rem;
       }

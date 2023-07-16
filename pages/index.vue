@@ -1241,11 +1241,9 @@ const rows = shallowRef([
           }
 
           .notifs-demo {
-            .notifications .notification {
-              img {
-                width: 5rem;
-                height: 5rem;
-              }
+            .notifications .notification .avatar {
+              width: 5rem;
+              height: 5rem;
             }
           }
         }

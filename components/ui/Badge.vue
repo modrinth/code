@@ -1,22 +1,23 @@
 <template>
-  <span :class="'version-badge ' + color + ' type--' + type">
-    <template v-if="color"> <span class="circle" /> {{ $capitalizeString(type) }} </template>
+  <span :class="'badge ' + color + ' type--' + type">
+    <template v-if="color"> <span class="circle" /> {{ $capitalizeString(type) }}</template>
 
     <!-- User roles -->
-    <template v-else-if="type === 'admin'"> <ModrinthIcon /> Modrinth Team </template>
-    <template v-else-if="type === 'moderator'"> <ModeratorIcon /> Moderator </template>
+    <template v-else-if="type === 'admin'"> <ModrinthIcon /> Modrinth Team</template>
+    <template v-else-if="type === 'moderator'"> <ModeratorIcon /> Moderator</template>
     <template v-else-if="type === 'creator'"><CreatorIcon /> Creator</template>
 
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'"><ListIcon /> Listed</template>
+    <template v-else-if="type === 'approved-general'"><CheckIcon /> Approved</template>
     <template v-else-if="type === 'unlisted'"><EyeOffIcon /> Unlisted</template>
     <template v-else-if="type === 'withheld'"><EyeOffIcon /> Withheld</template>
     <template v-else-if="type === 'private'"><LockIcon /> Private</template>
-    <template v-else-if="type === 'scheduled'"> <CalendarIcon /> Scheduled </template>
+    <template v-else-if="type === 'scheduled'"> <CalendarIcon /> Scheduled</template>
     <template v-else-if="type === 'draft'"><DraftIcon /> Draft</template>
-    <template v-else-if="type === 'archived'"> <ArchiveIcon /> Archived </template>
+    <template v-else-if="type === 'archived'"> <ArchiveIcon /> Archived</template>
     <template v-else-if="type === 'rejected'"><CrossIcon /> Rejected</template>
-    <template v-else-if="type === 'processing'"> <ProcessingIcon /> Under review </template>
+    <template v-else-if="type === 'processing'"> <ProcessingIcon /> Under review</template>
 
     <!-- Team members -->
     <template v-else-if="type === 'accepted'"><CheckIcon /> Accepted</template>
@@ -24,6 +25,9 @@
 
     <!-- Transaction statuses -->
     <template v-else-if="type === 'success'"><CheckIcon /> Success</template>
+
+    <!-- Report status -->
+    <template v-else-if="type === 'closed'"> <CloseIcon /> Closed</template>
 
     <!-- Other -->
     <template v-else> <span class="circle" /> {{ $capitalizeString(type) }} </template>
@@ -43,6 +47,7 @@ import ProcessingIcon from '~/assets/images/utils/updated.svg'
 import CheckIcon from '~/assets/images/utils/check.svg'
 import LockIcon from '~/assets/images/utils/lock.svg'
 import CalendarIcon from '~/assets/images/utils/calendar.svg'
+import CloseIcon from '~/assets/images/utils/check-circle.svg'
 
 export default {
   components: {
@@ -58,6 +63,7 @@ export default {
     CheckIcon,
     LockIcon,
     CalendarIcon,
+    CloseIcon,
   },
   props: {
     type: {
@@ -73,13 +79,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.version-badge {
-  display: flex;
-  align-items: center;
+.badge {
   font-weight: bold;
   width: fit-content;
   --badge-color: var(--color-special-gray);
   color: var(--badge-color);
+  white-space: nowrap;
 
   .circle {
     width: 0.5rem;
@@ -91,9 +96,12 @@ export default {
   }
 
   svg {
-    margin-right: 0.25rem;
+    vertical-align: -15%;
+    width: 1em;
+    height: 1em;
   }
 
+  &.type--closed,
   &.type--withheld,
   &.type--rejected,
   &.red {
@@ -111,6 +119,7 @@ export default {
   &.type--accepted,
   &.type--admin,
   &.type--success,
+  &.type--approved-general,
   &.green {
     --badge-color: var(--color-special-green);
   }

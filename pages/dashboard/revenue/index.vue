@@ -20,19 +20,6 @@
             >Enroll in the Creator Monetization Program to withdraw your revenue.</span
           >
         </p>
-
-        <div v-if="enrolled" class="input-group">
-          <button class="iconified-button brand-button" @click="$refs.modal_transfer.show()">
-            <TransferIcon /> Transfer to
-            {{ $formatWallet(auth.user.payout_data.payout_wallet) }}
-          </button>
-          <NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
-            <HistoryIcon /> View transfer history
-          </NuxtLink>
-          <NuxtLink class="iconified-button" to="/settings/monetization">
-            <SettingsIcon /> Monetization settings
-          </NuxtLink>
-        </div>
       </div>
       <p v-else-if="auth.user.payout_data.balance > 0">
         You have made
@@ -47,6 +34,22 @@
       <div v-if="!enrolled">
         <NuxtLink class="iconified-button" to="/settings/monetization">
           <SettingsIcon /> Enroll in the Creator Monetization Program
+        </NuxtLink>
+      </div>
+      <div v-if="enrolled" class="input-group">
+        <button
+          v-if="auth.user.payout_data.balance >= minWithdraw"
+          class="iconified-button brand-button"
+          @click="$refs.modal_transfer.show()"
+        >
+          <TransferIcon /> Transfer to
+          {{ $formatWallet(auth.user.payout_data.payout_wallet) }}
+        </button>
+        <NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
+          <HistoryIcon /> View transfer history
+        </NuxtLink>
+        <NuxtLink class="iconified-button" to="/settings/monetization">
+          <SettingsIcon /> Monetization settings
         </NuxtLink>
       </div>
     </section>

@@ -166,7 +166,6 @@
   @extend .padding-lg;
 
   position: relative;
-  min-height: var(--font-size-2xl);
 
   background-color: var(--color-raised-bg);
   border-radius: var(--size-rounded-card);
@@ -212,6 +211,11 @@
 
   &.moderation-card {
     background-color: var(--color-warning-banner-bg);
+  }
+
+  &.recessed {
+    background-color: var(--color-bg);
+    box-shadow: none;
   }
 }
 
@@ -328,7 +332,9 @@
       .resizable-textarea-wrapper + *,
       .input-div + *
     ) {
-    margin-block-start: var(--spacing-card-md);
+    &:not(:empty) {
+      margin-block-start: var(--spacing-card-md);
+    }
   }
 
   :where(button, .button, .iconified-button) {
@@ -480,6 +486,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   row-gap: 0.5rem;
+  min-height: 3.75rem;
 }
 
 /*
@@ -527,6 +534,15 @@
 
   &:active {
     color: var(--color-link-active);
+  }
+
+  &.no-underline {
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
   }
 }
 
@@ -767,15 +783,6 @@
   }
 }
 
-.button-animation {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
-    outline 0.2s ease-in-out;
-
-  &:active:not(&:disabled) {
-    transform: scale(0.95);
-  }
-}
-
 .button-base {
   @extend .button-animation;
   font-weight: 500;
@@ -809,6 +816,14 @@
   &:hover:not(&:disabled),
   &:active:not(&:disabled) {
     background-color: var(--color-raised-bg);
+  }
+
+  &.brand-button {
+    color: var(--color-brand);
+  }
+
+  &.danger-button {
+    color: var(--color-special-red);
   }
 }
 
@@ -849,11 +864,6 @@ tr.button-transparent {
 
   &:active:not(&.disabled) {
     filter: brightness(0.8);
-  }
-
-  // For some reason this within the above block makes it universal and not only applied to children. SCSS bug maybe?
-  &:active:not(&.disabled) button:not(&:disabled) {
-    transform: scale(0.95);
   }
 
   &.disabled {
@@ -1461,13 +1471,17 @@ button {
       flex-shrink: 1;
     }
   }
+
+  &.right-aligned {
+    justify-content: end;
+  }
 }
 
 .input-stack {
   display: flex;
   flex-direction: column;
 
-  > * {
+  > *:not(:last-child) {
     margin-bottom: var(--spacing-card-sm);
   }
 
@@ -1604,4 +1618,85 @@ button {
   width: 0;
   height: 0;
   overflow: hidden;
+}
+
+.backed-svg {
+  --size: 2.5rem;
+  border-radius: var(--size-rounded-sm);
+  background-color: var(--color-button-bg);
+  width: var(--size);
+  height: var(--size);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  svg {
+    width: calc(0.6 * var(--size));
+    height: calc(0.6 * var(--size));
+  }
+
+  &.circle {
+    border-radius: 50%;
+  }
+
+  &.raised {
+    background-color: var(--color-raised-bg);
+  }
+}
+
+a.iconified-link,
+a.iconified-stacked-link {
+  display: contents;
+
+  .space {
+    opacity: 0;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
+  .stacked {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  &:focus-visible .title,
+  &:hover .title {
+    text-decoration: underline;
+    filter: var(--hover-filter);
+  }
+
+  &:active .title {
+    filter: var(--active-filter);
+  }
+}
+
+a.iconified-link {
+  &:focus-visible span,
+  &:hover span {
+    text-decoration: underline;
+    filter: var(--hover-filter);
+  }
+
+  &:active span {
+    filter: var(--active-filter);
+  }
+}
+
+a.subtle-link {
+  &:focus-visible,
+  &:hover {
+    text-decoration: underline;
+    filter: var(--hover-filter);
+  }
+
+  &:active {
+    filter: var(--active-filter);
+  }
+}
+
+.inline-svg svg,
+svg.inline-svg {
+  vertical-align: middle;
 }

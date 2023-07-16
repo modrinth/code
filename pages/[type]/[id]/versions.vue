@@ -290,10 +290,6 @@ async function handleFiles(files) {
       flex-direction: column;
       gap: var(--spacing-card-xs);
     }
-
-    &:active:not(&:disabled) {
-      transform: scale(0.99) !important;
-    }
   }
 }
 

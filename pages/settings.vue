@@ -12,9 +12,6 @@
             <NavStackItem link="/settings/account" label="Account">
               <UserIcon />
             </NavStackItem>
-            <NavStackItem link="/settings/follows" label="Followed projects">
-              <HeartIcon />
-            </NavStackItem>
             <NavStackItem link="/settings/monetization" label="Monetization">
               <CurrencyIcon />
             </NavStackItem>
@@ -33,7 +30,6 @@ import NavStackItem from '~/components/ui/NavStackItem.vue'
 
 import PaintbrushIcon from '~/assets/images/utils/paintbrush.svg'
 import UserIcon from '~/assets/images/utils/user.svg'
-import HeartIcon from '~/assets/images/utils/heart.svg'
 import CurrencyIcon from '~/assets/images/utils/currency.svg'
 
 const route = useRoute()

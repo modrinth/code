@@ -4,7 +4,7 @@
     ref="img"
     :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
       pixelated ? 'pixelated' : ''
-    }`"
+    } ${raised ? 'raised' : ''}`"
     :src="src"
     :alt="alt"
     :loading="loading"
@@ -12,7 +12,9 @@
   />
   <svg
     v-else
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''}`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
+      raised ? 'raised' : ''
+    }`"
     xml:space="preserve"
     fill-rule="evenodd"
     stroke-linecap="round"
@@ -47,7 +49,7 @@ export default {
       type: String,
       default: 'sm',
       validator(value) {
-        return ['xs', 'sm', 'md', 'lg'].includes(value)
+        return ['xxs', 'xs', 'sm', 'md', 'lg'].includes(value)
       },
     },
     circle: {
@@ -61,6 +63,10 @@ export default {
     loading: {
       type: String,
       default: 'eager',
+    },
+    raised: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -88,6 +94,12 @@ export default {
   width: var(--size);
   background-color: var(--color-button-bg);
   object-fit: contain;
+
+  &.size-xxs {
+    --size: 1.25rem;
+    box-shadow: var(--shadow-inset), var(--shadow-card);
+    border-radius: var(--size-rounded-sm);
+  }
 
   &.size-xs {
     --size: 2.5rem;
@@ -121,6 +133,10 @@ export default {
 
   &.pixelated {
     image-rendering: pixelated;
+  }
+
+  &.raised {
+    background-color: var(--color-raised-bg);
   }
 }
 </style>

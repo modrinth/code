@@ -1,3 +1,5 @@
+import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
+
 export default defineNuxtPlugin((nuxtApp) => {
   const tagStore = nuxtApp.$tag
   const authStore = nuxtApp.$auth
@@ -121,33 +123,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     return type
   })
-  nuxtApp.provide('getProjectTypeForUrl', (type, categories) => {
-    if (type === 'mod') {
-      const isMod = categories.some((category) => {
-        return tagStore.loaderData.modLoaders.includes(category)
-      })
-
-      const isPlugin = categories.some((category) => {
-        return tagStore.loaderData.allPluginLoaders.includes(category)
-      })
-
-      const isDataPack = categories.some((category) => {
-        return tagStore.loaderData.dataPackLoaders.includes(category)
-      })
-
-      if (isDataPack) {
-        return 'datapack'
-      } else if (isPlugin) {
-        return 'plugin'
-      } else if (isMod) {
-        return 'mod'
-      } else {
-        return 'mod'
-      }
-    } else {
-      return type
-    }
-  })
+  nuxtApp.provide('getProjectTypeForUrl', (type, loaders) =>
+    getProjectTypeForUrlShorthand(nuxtApp, type, loaders)
+  )
   nuxtApp.provide('cycleValue', cycleValue)
   const sortedCategories = tagStore.categories.slice().sort((a, b) => {
     const headerCompare = a.header.localeCompare(b.header)

@@ -41,11 +41,9 @@ useHead({
 const auth = await useAuth()
 const app = useNuxtApp()
 
-const [raw] = await Promise.all([
-  useBaseFetch(`user/${auth.value.user.id}/payouts`, app.$defaultHeaders()),
-])
-
-const payouts = ref(raw)
+const { data: payouts } = await useAsyncData(`user/${auth.value.user.id}/payouts`, () =>
+  useBaseFetch(`user/${auth.value.user.id}/payouts`, app.$defaultHeaders())
+)
 </script>
 <style lang="scss" scoped>
 .grid-table {

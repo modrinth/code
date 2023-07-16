@@ -35,15 +35,15 @@
 <script setup>
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 
-import HeartIcon from '~/assets/images/utils/heart.svg'
-import FollowIllustration from '~/assets/images/illustrations/follow_illustration.svg'
+import HeartIcon from 'assets/images/utils/heart.svg'
+import FollowIllustration from 'assets/images/illustrations/follow_illustration.svg'
 
 const user = await useUser()
 if (process.client) {
   await initUserFollows()
 }
 
-useHead({ title: 'Followed projects - Modrinth' })
+useHead({ title: 'Followed review - Modrinth' })
 definePageMeta({
   middleware: 'auth',
 })

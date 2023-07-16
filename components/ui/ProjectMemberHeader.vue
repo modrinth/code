@@ -1,4 +1,18 @@
 <template>
+  <div v-if="$auth.user && showInvitation" class="universal-card information invited">
+    <h2>Invitation to join project</h2>
+    <p>
+      You've been invited be a member of this project with the role of '{{ currentMember.role }}'.
+    </p>
+    <div class="input-group">
+      <button class="iconified-button brand-button" @click="acceptInvite()">
+        <CheckIcon />Accept
+      </button>
+      <button class="iconified-button danger-button" @click="declineInvite()">
+        <CrossIcon />Decline
+      </button>
+    </div>
+  </div>
   <div
     v-if="
       $auth.user &&
@@ -63,17 +77,6 @@
           />{{ nag.title }}</span
         >
         {{ nag.description }}
-        <Checkbox
-          v-if="
-            nag.status === 'review' &&
-            project.moderator_message &&
-            $tag.rejectedStatuses.includes(project.status)
-          "
-          v-model="acknowledgedMessage"
-          description="Acknowledge staff message in sidebar"
-        >
-          I acknowledge that I have addressed the staff's message on the sidebar
-        </Checkbox>
         <NuxtLink
           v-if="nag.link"
           :class="{ invisible: nag.link.hide }"
@@ -103,18 +106,19 @@
 import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
 import DropdownIcon from '~/assets/images/utils/dropdown.svg'
 import CheckIcon from '~/assets/images/utils/check.svg'
+import CrossIcon from '~/assets/images/utils/x.svg'
 import RequiredIcon from '~/assets/images/utils/asterisk.svg'
 import SuggestionIcon from '~/assets/images/utils/lightbulb.svg'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg'
 import SendIcon from '~/assets/images/utils/send.svg'
-import Checkbox from '~/components/ui/Checkbox.vue'
+import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams.js'
 
 export default {
   components: {
-    Checkbox,
     ChevronRightIcon,
     DropdownIcon,
     CheckIcon,
+    CrossIcon,
     RequiredIcon,
     SuggestionIcon,
     ModerationIcon,
@@ -132,6 +136,10 @@ export default {
       },
     },
     currentMember: {
+      type: Object,
+      default: null,
+    },
+    allMembers: {
       type: Object,
       default: null,
     },
@@ -173,11 +181,19 @@ export default {
         }
       },
     },
-  },
-  data() {
-    return {
-      acknowledgedMessage: !this.project.moderator_message,
-    }
+    updateMembers: {
+      type: Function,
+      default() {
+        return () => {
+          this.$notify({
+            group: 'main',
+            title: 'An error occurred',
+            text: 'updateMembers function not found',
+            type: 'error',
+          })
+        }
+      },
+    },
   },
   computed: {
     featuredGalleryImage() {
@@ -326,13 +342,10 @@ export default {
             Modrinth's staff. In most cases, you can resubmit for review after
             addressing the staff's message.`,
           status: 'review',
-          link: null,
-          action: {
-            onClick: this.submitForReview,
-            title: 'Resubmit for review',
-            disabled: () =>
-              !this.acknowledgedMessage ||
-              this.nags.filter((x) => x.condition && x.status === 'required').length > 0,
+          link: {
+            path: 'moderation',
+            title: 'Visit moderation page',
+            hide: this.routeName === 'type-id-moderation',
           },
         },
       ]
@@ -349,8 +362,23 @@ export default {
           )
         )
     },
+    showInvitation() {
+      if (this.allMembers && this.$auth) {
+        const member = this.allMembers.find((x) => x.user.id === this.$auth.user.id)
+        return member && !member.accepted
+      }
+      return false
+    },
   },
   methods: {
+    acceptInvite() {
+      acceptTeamInvite(this.project.team)
+      this.updateMembers()
+    },
+    declineInvite() {
+      removeSelfFromTeam(this.project.team)
+      this.updateMembers()
+    },
     sortByTrue(a, b, ifEqual = 0) {
       if (a === b) {
         return ifEqual
@@ -382,6 +410,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.invited {
+}
+
 .author-actions {
   &:empty {
     display: none;

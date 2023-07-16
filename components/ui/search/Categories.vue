@@ -46,9 +46,12 @@ export default {
     display: flex;
     align-items: center;
     flex-direction: row;
-    margin-right: var(--spacing-card-md);
 
-    &:not(.version-badge) {
+    &:not(:last-child) {
+      margin-right: var(--spacing-card-md);
+    }
+
+    &:not(.badge) {
       color: var(--color-icon);
     }
 

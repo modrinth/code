@@ -15,6 +15,7 @@ export const useCosmetics = () =>
         modpacksAlphaNotice: true,
         advancedRendering: true,
         externalLinksNewTab: true,
+        developerMode: false,
         notUsingBlockers: false,
         searchDisplayMode: {
           mod: 'list',

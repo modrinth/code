@@ -94,7 +94,7 @@
       </aside>
     </div>
     <div class="normal-page__content">
-      <ProjectPublishingChecklist
+      <ProjectMemberHeader
         v-if="currentMember"
         :project="project"
         :versions="versions"
@@ -104,6 +104,8 @@
         :set-processing="setProcessing"
         :collapsed="collapsedChecklist"
         :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+        :all-members="allMembers"
+        :update-members="updateMembers"
       />
       <NuxtPage
         v-model:project="project"
@@ -258,7 +260,7 @@
             </div>
             <div class="dates">
               <div
-                v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm:ss A')"
+                v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
                 class="date"
               >
                 <CalendarIcon aria-hidden="true" />
@@ -266,12 +268,21 @@
                 <span class="value">{{ fromNow(project.published) }}</span>
               </div>
               <div
-                v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm:ss A')"
+                v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
                 class="date"
               >
                 <UpdateIcon aria-hidden="true" />
                 <span class="label">Updated</span>
                 <span class="value">{{ fromNow(project.updated) }}</span>
+              </div>
+              <div
+                v-if="project.status === 'processing' && project.queued"
+                v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+                class="date"
+              >
+                <QueuedIcon aria-hidden="true" />
+                <span class="label">Submitted</span>
+                <span class="value">{{ fromNow(project.queued) }}</span>
               </div>
             </div>
             <hr class="card-divider" />
@@ -361,17 +372,21 @@
             </button>
             <button
               v-if="
-                $tag.approvedStatuses.includes(project.status) || project.status === 'processing'
+                $tag.approvedStatuses.includes(project.status) ||
+                project.status === 'processing' ||
+                ($tag.rejectedStatuses.includes(project.status) && project.status !== 'withheld')
               "
               class="iconified-button danger-button"
               @click="openModerationModal('withheld')"
             >
-              <EyeIcon />
+              <EyeOffIcon />
               Withhold
             </button>
             <button
               v-if="
-                $tag.approvedStatuses.includes(project.status) || project.status === 'processing'
+                $tag.approvedStatuses.includes(project.status) ||
+                project.status === 'processing' ||
+                ($tag.rejectedStatuses.includes(project.status) && project.status !== 'rejected')
               "
               class="iconified-button danger-button"
               @click="openModerationModal('rejected')"
@@ -383,15 +398,19 @@
               <EditIcon />
               Edit message
             </button>
-            <nuxt-link class="iconified-button" to="/moderation">
+            <nuxt-link class="iconified-button" to="/moderation/review">
               <ModerationIcon />
-              Visit moderation queue
+              Visit review queue
+            </nuxt-link>
+            <nuxt-link class="iconified-button" to="/moderation/reports">
+              <ReportIcon />
+              Visit reports
             </nuxt-link>
           </div>
         </div>
       </div>
       <section class="normal-page__content">
-        <ProjectPublishingChecklist
+        <ProjectMemberHeader
           v-if="currentMember"
           :project="project"
           :versions="versions"
@@ -401,6 +420,8 @@
           :set-processing="setProcessing"
           :collapsed="collapsedChecklist"
           :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+          :all-members="allMembers"
+          :update-members="updateMembers"
         />
         <div v-else-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
           {{ project.title }} has been removed from search by Modrinth's moderators. Please use
@@ -454,6 +475,13 @@
                   project.slug ? project.slug : project.id
                 }/versions`,
                 shown: versions.length > 0 || !!currentMember,
+              },
+              {
+                label: 'Moderation',
+                href: `/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/moderation`,
+                shown: !!currentMember,
               },
             ]"
           />
@@ -689,6 +717,38 @@
               <CopyCode :text="project.id" />
             </div>
           </div>
+          <div class="input-group">
+            <a
+              v-if="
+                config.public.apiBaseUrl.startsWith('https://api.modrinth.com') &&
+                config.public.siteUrl !== 'https://modrinth.com'
+              "
+              class="iconified-button"
+              :href="`https://modrinth.com/${project.project_type}/${
+                project.slug ? project.slug : project.id
+              }`"
+              rel="noopener nofollow"
+              target="_blank"
+            >
+              <ExternalIcon aria-hidden="true" />
+              View on modrinth.com
+            </a>
+            <a
+              v-else-if="
+                config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
+                config.public.siteUrl !== 'https://staging.modrinth.com'
+              "
+              class="iconified-button"
+              :href="`https://staging.modrinth.com/${project.project_type}/${
+                project.slug ? project.slug : project.id
+              }`"
+              rel="noopener nofollow"
+              target="_blank"
+            >
+              <ExternalIcon aria-hidden="true" />
+              View on staging.modrinth.com
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -700,7 +760,9 @@ import CheckIcon from '~/assets/images/utils/check.svg'
 import ClearIcon from '~/assets/images/utils/clear.svg'
 import DownloadIcon from '~/assets/images/utils/download.svg'
 import UpdateIcon from '~/assets/images/utils/updated.svg'
+import QueuedIcon from '~/assets/images/utils/list-end.svg'
 import CodeIcon from '~/assets/images/sidebar/mod.svg'
+import ExternalIcon from '~/assets/images/utils/external.svg'
 import ReportIcon from '~/assets/images/utils/report.svg'
 import HeartIcon from '~/assets/images/utils/heart.svg'
 import IssuesIcon from '~/assets/images/utils/issues.svg'
@@ -713,7 +775,7 @@ import PayPalIcon from '~/assets/images/external/paypal.svg'
 import OpenCollectiveIcon from '~/assets/images/external/opencollective.svg'
 import UnknownIcon from '~/assets/images/utils/unknown-donation.svg'
 import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
-import EyeIcon from '~/assets/images/utils/eye.svg'
+import EyeOffIcon from '~/assets/images/utils/eye-off.svg'
 import BoxIcon from '~/assets/images/utils/box.svg'
 import Promotion from '~/components/ads/Promotion.vue'
 import Badge from '~/components/ui/Badge.vue'
@@ -727,7 +789,7 @@ import CopyCode from '~/components/ui/CopyCode.vue'
 import Avatar from '~/components/ui/Avatar.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
-import ProjectPublishingChecklist from '~/components/ui/ProjectPublishingChecklist.vue'
+import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
 import SettingsIcon from '~/assets/images/utils/settings.svg'
 import UsersIcon from '~/assets/images/utils/users.svg'
 import CategoriesIcon from '~/assets/images/utils/tags.svg'
@@ -744,6 +806,7 @@ import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 
 const data = useNuxtApp()
 const route = useRoute()
+const config = useRuntimeConfig()
 
 const user = await useUser()
 
@@ -1068,6 +1131,23 @@ function openModerationModal(status) {
   moderationStatus.value = status
 
   modalModeration.value.show()
+}
+
+async function updateMembers() {
+  allMembers.value = await useAsyncData(
+    `project/${route.params.id}/members`,
+    () => useBaseFetch(`project/${route.params.id}/members`, data.$defaultHeaders()),
+    {
+      transform: (members) => {
+        members.forEach((it, index) => {
+          members[index].avatar_url = it.user.avatar_url
+          members[index].name = it.user.username
+        })
+
+        return members
+      },
+    }
+  )
 }
 
 const collapsedChecklist = ref(false)

@@ -2,12 +2,12 @@ html {
   @extend .dark-mode;
   --dark-color-text: #b0bac5;
   --dark-color-text-dark: #ecf9fb;
+  --color-text-secondary: var(--color-icon);
 }
 
 .light-mode {
   --color-icon: #6b7280;
   --color-text: hsl(221, 39%, 11%);
-  --color-text-secondary: var(--color-icon);
   --color-text-inactive: hsl(215, 14%, 34%);
   --color-text-dark: #1a202c;
   --color-heading: #2c313d;
@@ -260,6 +260,9 @@ html {
   --landing-green-label-bg: rgba(0, 216, 69, 0.15);
 
   --landing-raw-bg: #000;
+
+  --hover-filter: brightness(120%);
+  --active-filter: brightness(140%);
 }
 
 .oled-mode {
@@ -271,6 +274,10 @@ html {
   --color-button-bg-hover: #2d2d32;
   --color-button-bg-active: #3c3c40;
   --color-table-alternate-row: #19191c;
+  --color-divider-dark: #2c3134;
+
+  --color-warning-banner-bg: hsl(0, 45%, 11%);
+  --color-ad: #0d1828;
 }
 
 body {
