@@ -37,12 +37,6 @@ export async function get(path, clearProjects) {
   return await invoke('plugin:profile|profile_get', { path, clearProjects })
 }
 
-// Get a profile's metadata
-// Returns an hash of project path => ProfileMetadata
-export async function get_projects_metadata(path) {
-  return await invoke('plugin:profile|profile_get_projects_metadata', { path })
-}
-
 // Get optimal java version from profile
 // Returns a java version
 export async function get_optimal_jre_key(path) {

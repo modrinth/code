@@ -267,22 +267,8 @@ async function onSearchChange(newPageNumber) {
 
 const searchWrapper = ref(null)
 async function onSearchChangeToTop(newPageNumber) {
-  console.log('onSearchChangeToTop')
   await onSearchChange(newPageNumber)
   await nextTick()
-  // Loop through all elements on the page
-  for (let i = 0; i < document.querySelectorAll('div').length; i++) {
-    const el = document.querySelectorAll('div')[i]
-    if (el === searchWrapper.value) {
-      console.log(`Element name (IS searchWrapper): ${el.nodeName}, id: ${i}`)
-    }
-    if (el.scrollHeight > el.clientHeight && el.scrollTop > 0) {
-      console.log(`Element name: ${el.nodeName}, id: ${i}, scroll: ${el.scrollTop}`)
-    }
-  }
-  console.log(document.querySelectorAll('div'))
-  console.log(searchWrapper.value)
-  console.log(searchWrapper.value.scrollTop)
   searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
 }
 

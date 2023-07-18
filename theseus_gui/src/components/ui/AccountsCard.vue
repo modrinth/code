@@ -4,7 +4,7 @@
     ref="button"
     class="button-base avatar-button"
     :class="{ expanded: mode === 'expanded' }"
-    @click="toggleShow()"
+    @click="showCard = !showCard"
   >
     <Avatar
       :size="mode === 'expanded' ? 'xs' : 'sm'"
@@ -33,23 +33,7 @@
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
         </div>
-
-        <Button
-          v-if="showLogoutWarning(selectedAccount.id)"
-          v-tooltip="'Log out'"
-          icon-only
-          color="highlight"
-          @click="logout(selectedAccount.id)"
-        >
-          <TrashIcon />
-        </Button>
-        <Button
-          v-else
-          v-tooltip="'Log out'"
-          icon-only
-          color="raised"
-          @click="logout(selectedAccount.id)"
-        >
+        <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.id)">
           <TrashIcon />
         </Button>
       </div>
@@ -66,8 +50,7 @@
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
-            <SwapIcon v-if="showLogoutWarning(account.id)" />
-            <TrashIcon v-else />
+            <TrashIcon />
           </Button>
         </div>
       </div>
@@ -92,7 +75,6 @@ import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
 import mixpanel from 'mixpanel-browser'
-import { SwapIcon } from '@/assets/icons'
 
 defineProps({
   mode: {
@@ -105,15 +87,10 @@ defineProps({
 const emit = defineEmits(['change'])
 
 const settings = ref({})
-const logoutWarning = ref({})
-const showLogoutWarning = (id) => {
-  return logoutWarning.value[id] == true
-}
 const accounts = ref([])
 async function refreshValues() {
   settings.value = await get().catch(handleError)
   accounts.value = await users().catch(handleError)
-  logoutWarning.value = {}
 }
 defineExpose({
   refreshValues,
@@ -150,26 +127,18 @@ async function login() {
 }
 
 const logout = async (id) => {
-  if (!logoutWarning.value[id]) {
-    logoutWarning.value[id] = true
-  } else {
-    await remove_user(id).catch(handleError)
+  await remove_user(id).catch(handleError)
+  await refreshValues()
+  if (!selectedAccount.value && accounts.value.length > 0) {
+    await setAccount(accounts.value[0])
     await refreshValues()
-    if (!selectedAccount.value && accounts.value.length > 0) {
-      await setAccount(accounts.value[0])
-      await refreshValues()
-    } else {
-      emit('change')
-    }
-    mixpanel.track('AccountLogOut')
+  } else {
+    emit('change')
   }
+  mixpanel.track('AccountLogOut')
 }
 
 let showCard = ref(false)
-const toggleShow = () => {
-  showCard.value = !showCard.value
-  logoutWarning.value = {}
-}
 let card = ref(null)
 let button = ref(null)
 const handleClickOutside = (event) => {
