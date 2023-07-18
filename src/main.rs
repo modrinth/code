@@ -459,5 +459,8 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
 
+    failed |= check_var::<String>("BEEHIIV_PUBLICATION_ID");
+    failed |= check_var::<String>("BEEHIIV_API_KEY");
+
     failed
 }

@@ -27,7 +27,7 @@ pub enum AuthenticationError {
     Database(#[from] crate::database::models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
-    #[error("Error while communicating to external oauth provider")]
+    #[error("Error while communicating to external provider")]
     Reqwest(#[from] reqwest::Error),
     #[error("Error uploading user profile picture")]
     FileHosting(#[from] FileHostingError),

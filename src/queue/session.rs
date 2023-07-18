@@ -4,41 +4,42 @@ use crate::database::models::session_item::Session;
 use crate::database::models::{DatabaseError, PatId, SessionId, UserId};
 use chrono::Utc;
 use sqlx::PgPool;
+use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
 
 pub struct AuthQueue {
-    session_queue: Mutex<Vec<(SessionId, SessionMetadata)>>,
-    pat_queue: Mutex<Vec<PatId>>,
+    session_queue: Mutex<HashMap<SessionId, SessionMetadata>>,
+    pat_queue: Mutex<HashSet<PatId>>,
 }
 
 // Batches session accessing transactions every 30 seconds
 impl AuthQueue {
     pub fn new() -> Self {
         AuthQueue {
-            session_queue: Mutex::new(Vec::with_capacity(1000)),
-            pat_queue: Mutex::new(Vec::with_capacity(1000)),
+            session_queue: Mutex::new(HashMap::with_capacity(1000)),
+            pat_queue: Mutex::new(HashSet::with_capacity(1000)),
         }
     }
     pub async fn add_session(&self, id: SessionId, metadata: SessionMetadata) {
-        self.session_queue.lock().await.push((id, metadata));
+        self.session_queue.lock().await.insert(id, metadata);
     }
 
     pub async fn add_pat(&self, id: PatId) {
-        self.pat_queue.lock().await.push(id);
+        self.pat_queue.lock().await.insert(id);
     }
 
-    pub async fn take_sessions(&self) -> Vec<(SessionId, SessionMetadata)> {
+    pub async fn take_sessions(&self) -> HashMap<SessionId, SessionMetadata> {
         let mut queue = self.session_queue.lock().await;
         let len = queue.len();
 
-        std::mem::replace(&mut queue, Vec::with_capacity(len))
+        std::mem::replace(&mut queue, HashMap::with_capacity(len))
     }
 
-    pub async fn take_pats(&self) -> Vec<PatId> {
+    pub async fn take_pats(&self) -> HashSet<PatId> {
         let mut queue = self.pat_queue.lock().await;
         let len = queue.len();
 
-        std::mem::replace(&mut queue, Vec::with_capacity(len))
+        std::mem::replace(&mut queue, HashSet::with_capacity(len))
     }
 
     pub async fn index(

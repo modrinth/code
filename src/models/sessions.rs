@@ -26,15 +26,19 @@ pub struct Session {
     pub city: Option<String>,
     pub country: Option<String>,
     pub ip: String,
+
+    pub current: bool,
 }
 
 impl Session {
     pub fn from(
         data: crate::database::models::session_item::Session,
         include_session: bool,
+        current_session: Option<&str>,
     ) -> Self {
         Session {
             id: data.id.into(),
+            current: Some(&*data.session) == current_session,
             session: if include_session {
                 Some(data.session)
             } else {

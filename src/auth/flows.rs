@@ -45,7 +45,8 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(change_password)
             .service(resend_verify_email)
             .service(set_email)
-            .service(verify_email),
+            .service(verify_email)
+            .service(subscribe_newsletter),
     );
 }
 
@@ -1022,11 +1023,17 @@ pub async fn auth_callback(
             let session = issue_session(req, user_id, &mut transaction, &redis).await?;
             transaction.commit().await?;
 
-            let redirect_url = if url.contains('?') {
-                format!("{}&code={}", url, session.session)
-            } else {
-                format!("{}?code={}", url, session.session)
-            };
+            let redirect_url = format!(
+                "{}{}code={}{}",
+                url,
+                if url.contains('?') { '&' } else { '?' },
+                session.session,
+                if user_id_opt.is_none() {
+                    "&new_account=true"
+                } else {
+                    ""
+                }
+            );
 
             Ok(HttpResponse::TemporaryRedirect()
                 .append_header(("Location", &*redirect_url))
@@ -1091,6 +1098,32 @@ pub async fn delete_auth_provider(
     Ok(HttpResponse::NoContent().finish())
 }
 
+pub async fn sign_up_beehiiv(email: &str) -> Result<(), AuthenticationError> {
+    let id = dotenvy::var("BEEHIIV_PUBLICATION_ID")?;
+    let api_key = dotenvy::var("BEEHIIV_API_KEY")?;
+    let site_url = dotenvy::var("SITE_URL")?;
+
+    let client = reqwest::Client::new();
+    client
+        .post(&format!(
+            "https://api.beehiiv.com/v2/publications/{id}/subscriptions"
+        ))
+        .header(AUTHORIZATION, format!("Bearer {}", api_key))
+        .json(&serde_json::json!({
+            "email": email,
+            "utm_source": "modrinth",
+            "utm_medium": "account_creation",
+            "referring_site": site_url,
+        }))
+        .send()
+        .await?
+        .error_for_status()?
+        .text()
+        .await?;
+
+    Ok(())
+}
+
 #[derive(Deserialize, Validate)]
 pub struct NewAccount {
     #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
@@ -1100,6 +1133,7 @@ pub struct NewAccount {
     #[validate(email)]
     pub email: String,
     pub challenge: String,
+    pub sign_up_newsletter: Option<bool>,
 }
 
 #[post("create")]
@@ -1170,7 +1204,7 @@ pub async fn create_account_with_password(
     send_email_verify(
         new_account.email.clone(),
         flow,
-        &format!("Welcome to Modritnh, {}!", new_account.username),
+        &format!("Welcome to Modrinth, {}!", new_account.username),
     )?;
 
     crate::database::models::User {
@@ -1185,7 +1219,7 @@ pub async fn create_account_with_password(
         totp_secret: None,
         username: new_account.username.clone(),
         name: Some(new_account.username),
-        email: Some(new_account.email),
+        email: Some(new_account.email.clone()),
         email_verified: false,
         avatar_url: None,
         bio: None,
@@ -1201,7 +1235,12 @@ pub async fn create_account_with_password(
     .await?;
 
     let session = issue_session(req, user_id, &mut transaction, &redis).await?;
-    let res = crate::models::sessions::Session::from(session, true);
+    let res = crate::models::sessions::Session::from(session, true, None);
+
+    if new_account.sign_up_newsletter.unwrap_or(false) {
+        sign_up_beehiiv(&new_account.email).await?;
+    }
+
     transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(res))
@@ -1264,7 +1303,7 @@ pub async fn login_password(
     } else {
         let mut transaction = pool.begin().await?;
         let session = issue_session(req, user.id, &mut transaction, &redis).await?;
-        let res = crate::models::sessions::Session::from(session, true);
+        let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
         Ok(HttpResponse::Ok().json(res))
@@ -1277,7 +1316,15 @@ pub struct Login2FA {
     pub flow: String,
 }
 
-fn get_2fa_code(secret: String) -> Result<String, AuthenticationError> {
+async fn validate_2fa_code(
+    input: String,
+    secret: String,
+    allow_backup: bool,
+    user_id: crate::database::models::UserId,
+    redis: &deadpool_redis::Pool,
+    pool: &PgPool,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+) -> Result<bool, AuthenticationError> {
     let totp = totp_rs::TOTP::new(
         totp_rs::Algorithm::SHA1,
         6,
@@ -1292,7 +1339,34 @@ fn get_2fa_code(secret: String) -> Result<String, AuthenticationError> {
         .generate_current()
         .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    Ok(token)
+    if input == token {
+        Ok(true)
+    } else if allow_backup {
+        let backup_codes = crate::database::models::User::get_backup_codes(user_id, pool).await?;
+
+        if !backup_codes.contains(&input) {
+            Ok(false)
+        } else {
+            let code = parse_base62(&input).unwrap_or_default();
+
+            sqlx::query!(
+                "
+                    DELETE FROM user_backup_codes
+                    WHERE user_id = $1 AND code = $2
+                    ",
+                user_id as crate::database::models::ids::UserId,
+                code as i64,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            crate::database::models::User::clear_caches(&[(user_id, None)], redis).await?;
+
+            Ok(true)
+        }
+    } else {
+        Err(AuthenticationError::InvalidCredentials)
+    }
 }
 
 #[post("login/2fa")]
@@ -1311,41 +1385,27 @@ pub async fn login_2fa(
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
-        let token = get_2fa_code(
+        let mut transaction = pool.begin().await?;
+        if !validate_2fa_code(
+            login.code.clone(),
             user.totp_secret
                 .ok_or_else(|| AuthenticationError::InvalidCredentials)?,
-        )?;
-
-        let mut transaction = pool.begin().await?;
-        if token != login.code {
-            let backup_codes =
-                crate::database::models::User::get_backup_codes(user_id, &**pool).await?;
-
-            if !backup_codes.contains(&login.code) {
-                return Err(ApiError::Authentication(
-                    AuthenticationError::InvalidCredentials,
-                ));
-            } else {
-                let code = parse_base62(&login.code).unwrap_or_default();
-
-                sqlx::query!(
-                    "
-                    DELETE FROM user_backup_codes
-                    WHERE user_id = $1 AND code = $2
-                    ",
-                    user_id as crate::database::models::ids::UserId,
-                    code as i64,
-                )
-                .execute(&mut *transaction)
-                .await?;
-
-                crate::database::models::User::clear_caches(&[(user_id, None)], &redis).await?;
-            }
+            true,
+            user.id,
+            &redis,
+            &pool,
+            &mut transaction,
+        )
+        .await?
+        {
+            return Err(ApiError::Authentication(
+                AuthenticationError::InvalidCredentials,
+            ));
         }
         Flow::remove(&login.flow, &redis).await?;
 
         let session = issue_session(req, user_id, &mut transaction, &redis).await?;
-        let res = crate::models::sessions::Session::from(session, true);
+        let res = crate::models::sessions::Session::from(session, true, None);
         transaction.commit().await?;
 
         Ok(HttpResponse::Ok().json(res))
@@ -1424,16 +1484,25 @@ pub async fn finish_2fa_flow(
             ));
         }
 
-        let token = get_2fa_code(secret.clone())?;
+        let mut transaction = pool.begin().await?;
 
-        if token != login.code {
+        if !validate_2fa_code(
+            login.code.clone(),
+            secret.clone(),
+            false,
+            user.id.into(),
+            &redis,
+            &pool,
+            &mut transaction,
+        )
+        .await?
+        {
             return Err(ApiError::Authentication(
                 AuthenticationError::InvalidCredentials,
             ));
         }
-        Flow::remove(&login.flow, &redis).await?;
 
-        let mut transaction = pool.begin().await?;
+        Flow::remove(&login.flow, &redis).await?;
 
         sqlx::query!(
             "
@@ -1528,17 +1597,25 @@ pub async fn remove_2fa(
         ));
     }
 
-    let token = get_2fa_code(user.totp_secret.ok_or_else(|| {
-        ApiError::InvalidInput("User does not have 2FA enabled on the account!".to_string())
-    })?)?;
+    let mut transaction = pool.begin().await?;
 
-    if token != login.code {
+    if !validate_2fa_code(
+        login.code.clone(),
+        user.totp_secret.ok_or_else(|| {
+            ApiError::InvalidInput("User does not have 2FA enabled on the account!".to_string())
+        })?,
+        true,
+        user.id,
+        &redis,
+        &pool,
+        &mut transaction,
+    )
+    .await?
+    {
         return Err(ApiError::Authentication(
             AuthenticationError::InvalidCredentials,
         ));
     }
-
-    let mut transaction = pool.begin().await?;
 
     sqlx::query!(
         "
@@ -1926,6 +2003,34 @@ pub async fn verify_email(
     } else {
         Err(ApiError::InvalidInput(
             "Flow does not exist. Try re-requesting the verification link.".to_string(),
+        ))
+    }
+}
+
+#[post("email/subscribe")]
+pub async fn subscribe_newsletter(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<deadpool_redis::Pool>,
+    session_queue: Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::USER_AUTH_WRITE]),
+    )
+    .await?
+    .1;
+
+    if let Some(email) = user.email {
+        sign_up_beehiiv(&email).await?;
+
+        Ok(HttpResponse::NoContent().finish())
+    } else {
+        Err(ApiError::InvalidInput(
+            "User does not have an email.".to_string(),
         ))
     }
 }

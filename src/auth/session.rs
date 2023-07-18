@@ -115,6 +115,16 @@ pub async fn issue_session(
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 
+    DBSession::clear_cache(
+        vec![(
+            Some(session.id),
+            Some(session.session.clone()),
+            Some(session.user_id),
+        )],
+        redis,
+    )
+    .await?;
+
     Ok(session)
 }
 
@@ -135,12 +145,18 @@ pub async fn list(
     .await?
     .1;
 
+    let session = req
+        .headers()
+        .get(AUTHORIZATION)
+        .and_then(|x| x.to_str().ok())
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+
     let session_ids = DBSession::get_user_sessions(current_user.id.into(), &**pool, &redis).await?;
     let sessions = DBSession::get_many_ids(&session_ids, &**pool, &redis)
         .await?
         .into_iter()
         .filter(|x| x.expires > Utc::now())
-        .map(|x| Session::from(x, false))
+        .map(|x| Session::from(x, false, Some(session)))
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(sessions))
@@ -227,7 +243,7 @@ pub async fn refresh(
 
         transaction.commit().await?;
 
-        Ok(HttpResponse::Ok().json(Session::from(new_session, true)))
+        Ok(HttpResponse::Ok().json(Session::from(new_session, true, None)))
     } else {
         Err(ApiError::Authentication(
             AuthenticationError::InvalidCredentials,

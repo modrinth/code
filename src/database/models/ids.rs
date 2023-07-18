@@ -182,7 +182,7 @@ pub struct ReportTypeId(pub i32);
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Deserialize, Serialize)]
+#[derive(Copy, Clone, Debug, Type, Deserialize, Serialize, Eq, PartialEq, Hash)]
 #[sqlx(transparent)]
 pub struct PatId(pub i64);
 
@@ -200,7 +200,7 @@ pub struct ThreadId(pub i64);
 #[sqlx(transparent)]
 pub struct ThreadMessageId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[sqlx(transparent)]
 pub struct SessionId(pub i64);
 

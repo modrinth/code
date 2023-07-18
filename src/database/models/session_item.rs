@@ -187,7 +187,7 @@ impl Session {
         }
 
         if !remaining_strings.is_empty() {
-            let session_ids_parsed: Vec<i64> = session_strings
+            let session_ids_parsed: Vec<i64> = remaining_strings
                 .iter()
                 .flat_map(|x| parse_base62(&x.to_string()).ok())
                 .map(|x| x as i64)
@@ -201,7 +201,7 @@ impl Session {
                 ORDER BY created DESC
                 ",
                 &session_ids_parsed,
-                &session_strings.into_iter().map(|x| x.to_string()).collect::<Vec<_>>(),
+                &remaining_strings.into_iter().map(|x| x.to_string()).collect::<Vec<_>>(),
             )
                 .fetch_many(exec)
                 .try_filter_map(|e| async {
@@ -258,8 +258,9 @@ impl Session {
         let mut redis = redis.get().await?;
         let res = cmd("GET")
             .arg(format!("{}:{}", SESSIONS_USERS_NAMESPACE, user_id.0))
-            .query_async::<_, Option<Vec<i64>>>(&mut redis)
-            .await?;
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<i64>>(&x).ok());
 
         if let Some(res) = res {
             return Ok(res.into_iter().map(SessionId).collect());
@@ -295,6 +296,10 @@ impl Session {
         clear_sessions: Vec<(Option<SessionId>, Option<String>, Option<UserId>)>,
         redis: &deadpool_redis::Pool,
     ) -> Result<(), DatabaseError> {
+        if clear_sessions.is_empty() {
+            return Ok(());
+        }
+
         let mut redis = redis.get().await?;
         let mut cmd = cmd("DEL");
 
