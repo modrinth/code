@@ -2,7 +2,7 @@ use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
+use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType, ProfileInstallStage};
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, write_cached_icon,
 };
@@ -62,7 +62,7 @@ pub enum EnvType {
     Server,
 }
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum PackDependency {
     Forge,
@@ -74,12 +74,14 @@ pub enum PackDependency {
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", tag = "type")]
 pub enum CreatePackLocation {
+    // Create a pack from a modrinth version ID (such as a modpack)
     FromVersionId {
         project_id: String,
         version_id: String,
         title: String,
         icon_url: Option<String>,
     },
+    // Create a pack from a file (such as an .mrpack for installing from a file, or a folder name for importing)
     FromFile {
         path: PathBuf,
     },
@@ -98,8 +100,29 @@ pub struct CreatePackProfile {
     pub skip_install_profile: Option<bool>,
 }
 
-pub struct CreatePackDescription {
+// default
+impl Default for CreatePackProfile {
+    fn default() -> Self {
+        CreatePackProfile {
+            name: "Untitled".to_string(),
+            game_version: "1.19.4".to_string(),
+            modloader: ModLoader::Vanilla,
+            loader_version: None,
+            icon: None,
+            icon_url: None,
+            linked_data: None,
+            skip_install_profile: Some(true),
+        }
+    }
+}
+
+pub struct CreatePack {
     pub file: bytes::Bytes,
+    pub description: CreatePackDescription,
+}
+
+#[derive(Clone, Debug)]
+pub struct CreatePackDescription {
     pub icon: Option<PathBuf>,
     pub override_title: Option<String>,
     pub project_id: Option<String>,
@@ -119,16 +142,12 @@ pub fn get_profile_from_pack(
             icon_url,
         } => CreatePackProfile {
             name: title,
-            game_version: "1.19.4".to_string(),
-            modloader: ModLoader::Vanilla,
-            loader_version: None,
-            icon: None,
             icon_url,
             linked_data: Some(LinkedData {
                 project_id: Some(project_id),
                 version_id: Some(version_id),
             }),
-            skip_install_profile: Some(true),
+            ..Default::default()
         },
         CreatePackLocation::FromFile { path } => {
             let file_name = path
@@ -139,15 +158,9 @@ pub fn get_profile_from_pack(
 
             CreatePackProfile {
                 name: file_name,
-                game_version: "1.19.4".to_string(),
-                modloader: ModLoader::Vanilla,
-                loader_version: None,
-                icon: None,
-                icon_url: None,
-                linked_data: None,
-                skip_install_profile: Some(true),
+                ..Default::default()
             }
-        }
+        },
     }
 }
 
@@ -159,7 +172,7 @@ pub async fn generate_pack_from_version_id(
     title: String,
     icon_url: Option<String>,
     profile: PathBuf,
-) -> crate::Result<CreatePackDescription> {
+) -> crate::Result<CreatePack> {
     let state = State::get().await?;
 
     let loading_bar = init_loading(
@@ -246,15 +259,14 @@ pub async fn generate_pack_from_version_id(
     };
     emit_loading(&loading_bar, 10.0, None).await?;
 
-    Ok(CreatePackDescription {
-        file,
+    Ok(CreatePack {file, description: CreatePackDescription {
         icon,
         override_title: None,
         project_id: Some(project_id),
         version_id: Some(version_id),
         existing_loading_bar: Some(loading_bar),
         profile,
-    })
+    }})
 }
 
 #[tracing::instrument]
@@ -262,15 +274,88 @@ pub async fn generate_pack_from_version_id(
 pub async fn generate_pack_from_file(
     path: PathBuf,
     profile: PathBuf,
-) -> crate::Result<CreatePackDescription> {
+) -> crate::Result<CreatePack> {
     let file = fs::read(&path).await?;
-    Ok(CreatePackDescription {
-        file: bytes::Bytes::from(file),
+    Ok(CreatePack { file: bytes::Bytes::from(file), description: CreatePackDescription {
         icon: None,
         override_title: None,
         project_id: None,
         version_id: None,
         existing_loading_bar: None,
         profile,
-    })
+    }})
 }
+
+/// Sets generated profile attributes to the pack ones (using profile::edit)
+/// This includes the pack name, icon, game version, loader version, and loader
+#[theseus_macros::debug_pin]
+pub async fn set_profile_information(profile_path: PathBuf, description: &CreatePackDescription, backup_name: &str, dependencies: &HashMap<PackDependency, String>) -> crate::Result<()> {
+    let mut game_version: Option<&String> = None;
+    let mut mod_loader = None;
+    let mut loader_version = None;
+    println!("here1");
+
+
+    for (key, value) in dependencies {
+        match key {
+            PackDependency::Forge => {
+                mod_loader = Some(ModLoader::Forge);
+                loader_version = Some(value);
+            }
+            PackDependency::FabricLoader => {
+                mod_loader = Some(ModLoader::Fabric);
+                loader_version = Some(value);
+            }
+            PackDependency::QuiltLoader => {
+                mod_loader = Some(ModLoader::Quilt);
+                loader_version = Some(value);
+            }
+            PackDependency::Minecraft => game_version = Some(value),
+        }
+    }
+
+    
+    let game_version = if let Some(game_version) = game_version {
+        game_version
+    } else {
+        return Err(crate::ErrorKind::InputError(
+            "Pack did not specify Minecraft version".to_string(),
+        )
+        .into());
+    };
+
+    println!("here4 - {:?}", mod_loader);
+
+    let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
+    let loader_version = if mod_loader != ModLoader::Vanilla {
+        crate::profile_create::get_loader_version_from_loader(
+            game_version.clone(),
+            mod_loader,
+            loader_version.cloned(),
+        )
+        .await?
+    } else { 
+        None
+    };
+    println!("her5 - {:?}", game_version);
+    println!("her5 - {:?}", loader_version);
+    println!("her5 - {:?}", description.override_title);
+    // Sets values in profile
+    crate::api::profile::edit(&profile_path, |prof| {
+        prof.metadata.name =
+        description.override_title.clone().unwrap_or_else(|| backup_name.to_string());
+        prof.install_stage = ProfileInstallStage::PackInstalling;
+        prof.metadata.linked_data = Some(LinkedData {
+            project_id: description.project_id.clone(),
+            version_id: description.version_id.clone(),
+        });
+        prof.metadata.icon = description.icon.clone();
+        prof.metadata.game_version = game_version.clone();
+        prof.metadata.loader_version = loader_version.clone();
+        prof.metadata.loader = mod_loader;
+
+        async { Ok(()) }
+    })
+    .await?;
+    Ok(())
+ }

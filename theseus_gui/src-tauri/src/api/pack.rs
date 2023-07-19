@@ -2,8 +2,7 @@ use crate::api::Result;
 use std::path::PathBuf;
 use theseus::{
     pack::{
-        install::install_pack,
-        install_from::{CreatePackLocation, CreatePackProfile},
+        install_from::{CreatePackLocation, CreatePackProfile}, install_mrpack::install_zipped_mrpack,
     },
     prelude::*,
 };
@@ -22,7 +21,7 @@ pub async fn pack_install(
     location: CreatePackLocation,
     profile: PathBuf,
 ) -> Result<PathBuf> {
-    Ok(install_pack(location, profile).await?)
+    Ok(install_zipped_mrpack(location, profile).await?)
 }
 
 #[tauri::command]

@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::pack::install_from::CreatePackProfile;
 use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
@@ -129,6 +130,10 @@ pub async fn profile_create(
             Err(err)
         }
     }
+}
+
+pub async fn profile_create_from_creator(profile : CreatePackProfile)  -> crate::Result<PathBuf> {
+    profile_create(profile.name, profile.game_version, profile.modloader, profile.loader_version, profile.icon, profile.icon_url, profile.linked_data, profile.skip_install_profile).await
 }
 
 #[tracing::instrument]

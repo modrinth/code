@@ -3,27 +3,30 @@ use crate::event::emit::{
     emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
 };
 use crate::event::LoadingBarType;
-use crate::pack::install_from::{EnvType, PackFile, PackFileHash};
+use crate::pack::install_from::{EnvType, PackFile, PackFileHash, set_profile_information};
 use crate::state::{LinkedData, ProfileInstallStage, SideType};
 use crate::util::fetch::{fetch_mirrors, write};
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
+use tokio::fs;
 
+use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
 
 use super::install_from::{
     generate_pack_from_file, generate_pack_from_version_id,
-    CreatePackDescription, CreatePackLocation, PackDependency, PackFormat,
+    CreatePackDescription, CreatePackLocation, PackDependency, PackFormat, CreatePack,
 };
 
+/// Install a modpack from a mrpack file (a modrinth .zip format)
 #[theseus_macros::debug_pin]
-pub async fn install_pack(
+pub async fn install_zipped_mrpack(
     location: CreatePackLocation,
     profile: PathBuf,
 ) -> crate::Result<PathBuf> {
     // Get file from description
-    let description: CreatePackDescription = match location {
+    let create_pack: CreatePack = match location {
         CreatePackLocation::FromVersionId {
             project_id,
             version_id,
@@ -40,13 +43,13 @@ pub async fn install_pack(
         }
     };
 
-    let file = description.file;
-    let icon = description.icon;
-    let override_title = description.override_title;
-    let project_id = description.project_id;
-    let version_id = description.version_id;
-    let existing_loading_bar = description.existing_loading_bar;
-    let profile = description.profile;
+    let file = create_pack.file;
+    let description = create_pack.description.clone(); // make a copy for profile edit function
+    let icon = create_pack.description.icon;
+    let project_id = create_pack.description.project_id;
+    let version_id = create_pack.description.version_id;
+    let existing_loading_bar = create_pack.description.existing_loading_bar;
+    let profile = create_pack.description.profile;
 
     let state = &State::get().await?;
 
@@ -88,59 +91,8 @@ pub async fn install_pack(
                 .into());
             }
 
-            let mut game_version = None;
-            let mut mod_loader = None;
-            let mut loader_version = None;
-            for (key, value) in &pack.dependencies {
-                match key {
-                    PackDependency::Forge => {
-                        mod_loader = Some(ModLoader::Forge);
-                        loader_version = Some(value);
-                    }
-                    PackDependency::FabricLoader => {
-                        mod_loader = Some(ModLoader::Fabric);
-                        loader_version = Some(value);
-                    }
-                    PackDependency::QuiltLoader => {
-                        mod_loader = Some(ModLoader::Quilt);
-                        loader_version = Some(value);
-                    }
-                    PackDependency::Minecraft => game_version = Some(value),
-                }
-            }
-
-            let game_version = if let Some(game_version) = game_version {
-                game_version
-            } else {
-                return Err(crate::ErrorKind::InputError(
-                    "Pack did not specify Minecraft version".to_string(),
-                )
-                .into());
-            };
-
-            let loader_version =
-                crate::profile_create::get_loader_version_from_loader(
-                    game_version.clone(),
-                    mod_loader.unwrap_or(ModLoader::Vanilla),
-                    loader_version.cloned(),
-                )
-                .await?;
-            crate::api::profile::edit(&profile, |prof| {
-                prof.metadata.name =
-                    override_title.clone().unwrap_or_else(|| pack.name.clone());
-                prof.install_stage = ProfileInstallStage::PackInstalling;
-                prof.metadata.linked_data = Some(LinkedData {
-                    project_id: project_id.clone(),
-                    version_id: version_id.clone(),
-                });
-                prof.metadata.icon = icon.clone();
-                prof.metadata.game_version = game_version.clone();
-                prof.metadata.loader_version = loader_version.clone();
-                prof.metadata.loader = mod_loader.unwrap_or(ModLoader::Vanilla);
-
-                async { Ok(()) }
-            })
-            .await?;
+            // Sets generated profile attributes to the pack ones (using profile::edit)
+            set_profile_information(profile.clone(), &description, &pack.name, &pack.dependencies).await?;
 
             let profile = profile.clone();
             let result = async {
@@ -325,3 +277,140 @@ pub async fn install_pack(
         }
     }
 }
+
+
+/// Install a modpack from existing files on the system in .mrpack format
+/// (This would be used to re-install an .mrpack from a different launcher)
+pub async fn install_importable_mrpack(profile_path: PathBuf, description: CreatePackDescription, pack : PackFormat, overrides_base_path: PathBuf,  override_paths : Vec<PathBuf> ) -> crate::Result<PathBuf> {
+    let state = &State::get().await?;
+
+    println!("Hello123!");
+    if &*pack.game != "minecraft" {
+        return Err(crate::ErrorKind::InputError(
+            "Pack does not support Minecraft".to_string(),
+        )
+        .into());
+    }
+    println!("Hello1233!");
+
+    // Sets generated profile attributes to the pack ones (using profile::edit)
+    set_profile_information(profile_path.clone(), &description, &pack.name, &pack.dependencies).await?;
+
+    let base_path = profile_path.clone();
+    let result = async {
+        let loading_bar = init_or_edit_loading(
+            description.existing_loading_bar,
+            LoadingBarType::PackDownload {
+                profile_path: base_path.clone(),
+                pack_name: pack.name.clone(),
+                icon: description.icon,
+                pack_id: description.project_id,
+                pack_version: description.version_id,
+            },
+            100.0,
+            "Downloading modpack",
+        )
+        .await?;
+    println!("Hello1237!");
+
+        let num_files = pack.files.len();
+        use futures::StreamExt;
+        loading_try_for_each_concurrent(
+            futures::stream::iter(pack.files.into_iter())
+                .map(Ok::<PackFile, crate::Error>),
+            None,
+            Some(&loading_bar),
+            70.0,
+            num_files,
+            None,
+            |project| {
+                let base_path = base_path.clone();
+                async move {
+                    //TODO: Future update: prompt user for optional files in a modpack
+                    if let Some(env) = project.env {
+                        if env
+                            .get(&EnvType::Client)
+                            .map(|x| x == &SideType::Unsupported)
+                            .unwrap_or(false)
+                        {
+                            return Ok(());
+                        }
+                    }
+                    println!("Hello128!");
+
+                    let file = fetch_mirrors(
+                        &project
+                            .downloads
+                            .iter()
+                            .map(|x| &**x)
+                            .collect::<Vec<&str>>(),
+                        project
+                            .hashes
+                            .get(&PackFileHash::Sha1)
+                            .map(|x| &**x),
+                        &state.fetch_semaphore,
+                    )
+                    .await?;
+
+                    let path = std::path::Path::new(&project.path)
+                        .components()
+                        .next();
+                    if let Some(path) = path {
+                        match path {
+                            Component::CurDir
+                            | Component::Normal(_) => {
+                                let path = base_path.join(project.path);
+                                write(
+                                    &path,
+                                    &file,
+                                    &state.io_semaphore,
+                                )
+                                .await?;
+                            }
+                            _ => {}
+                        };
+                    }
+                    Ok(())
+                }
+            },
+        )
+        .await?;
+    println!("Hello129!");
+
+        emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))
+            .await?;
+
+        // Copy in overrides
+        for override_path in override_paths {
+            // ensures any parent directories exist
+            fs::create_dir_all(&base_path.join(&override_path).parent().ok_or_else(|| crate::ErrorKind::InputError(format!("Override file destionation is invalid: {}", &override_path.display())))?).await?;
+            fs::copy(&overrides_base_path.join(&override_path), &base_path.join(&override_path)).await?;
+        }
+        
+        if let Some(profile_val) =
+            crate::api::profile::get(&base_path, None).await?
+        {
+            crate::launcher::install_minecraft(
+                &profile_val,
+                Some(loading_bar),
+            )
+            .await?;
+
+            State::sync().await?;
+        }
+
+        Ok::<PathBuf, crate::Error>(base_path.clone())
+    }
+    .await;
+println!("Hello12--10!");
+
+    match result {
+        Ok(profile) => Ok(base_path),
+        Err(err) => {
+            let _ = crate::api::profile::remove(&base_path).await;
+
+            Err(err)
+        }
+    }
+}
+
