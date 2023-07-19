@@ -1,5 +1,6 @@
 <template>
   <div class="breadcrumbs">
+    {{ breadcrumbData.resetToNames(breadcrumbs) }}
     <div v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name" class="breadcrumbs__item">
       <router-link
         v-if="breadcrumb.link"

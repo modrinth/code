@@ -122,9 +122,9 @@
         </div>
         <Chips
           v-model="javaSelectionType"
-          :items="['automatically install', 'use existing installation']"
+          :items="['Automatically install', 'Use existing installation']"
         />
-        <div v-if="javaSelectionType === 'use existing installation'" class="settings-group">
+        <div v-if="javaSelectionType === 'Use existing installation'" class="settings-group">
           <h3>Java location</h3>
           <JavaSelector v-model="settings.java_globals.JAVA_17" compact />
         </div>
@@ -230,7 +230,7 @@ async function pageTurn() {
   }
 }
 
-const javaSelectionType = ref('automatically install')
+const javaSelectionType = ref('Automatically install')
 
 async function autoInstallJava() {
   const path = await auto_install_java(17).catch(handleError)
@@ -239,6 +239,7 @@ async function autoInstallJava() {
   // weird vue bug, ignore
   settings.value.java_globals.JAVA_17 = version
   settings.value.java_globals.JAVA_17 = version
+  set(settings.value)
   mixpanel.track('OnboardingAutoInstallJava')
 }
 
@@ -258,6 +259,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+:deep(.chips .btn) {
+  text-transform: none !important;
+}
+
 .modal-body {
   display: flex;
   flex-direction: column;

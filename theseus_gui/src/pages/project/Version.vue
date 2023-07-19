@@ -14,10 +14,21 @@
         <h2>{{ version.name }}</h2>
       </div>
       <div class="button-group">
-        <Button color="primary" :action="() => install(version.id)" :disabled="installed">
+        <Button
+          color="primary"
+          :action="() => install(version.id)"
+          :disabled="installing || (installed && installedVersion === version.id)"
+        >
           <DownloadIcon v-if="!installed" />
+          <SwapIcon v-else-if="installedVersion !== version.id" />
           <CheckIcon v-else />
-          {{ installed ? 'Installed' : 'Install' }}
+          {{
+            installing
+              ? 'Installing...'
+              : installed && installedVersion === version.id
+              ? 'Installed'
+              : 'Install'
+          }}
         </Button>
         <Button>
           <ReportIcon />
@@ -29,7 +40,7 @@
           class="btn"
         >
           <ExternalIcon />
-          Modrinth Website
+          Modrinth website
         </a>
       </div>
     </Card>
@@ -195,6 +206,7 @@ import { releaseColor } from '@/helpers/utils'
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { SwapIcon } from '@/assets/icons'
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -223,6 +235,14 @@ const props = defineProps({
   },
   installed: {
     type: Boolean,
+    required: true,
+  },
+  installing: {
+    type: Boolean,
+    required: true,
+  },
+  installedVersion: {
+    type: String,
     required: true,
   },
 })

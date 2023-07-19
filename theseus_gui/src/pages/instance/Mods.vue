@@ -65,7 +65,7 @@
         </template>
         <template #filter_update>
           <UpdatedIcon />
-          Select Updatable
+          Select updatable
         </template>
       </DropdownButton>
       <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
@@ -155,21 +155,16 @@
             <TrashIcon />
           </Button>
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <Button
-            v-else
-            v-tooltip="'Update project'"
-            :disabled="!mod.outdated"
-            icon-only
-            @click="updateProject(mod)"
-          >
-            <UpdatedIcon v-if="mod.outdated" />
-            <CheckIcon v-else />
+          <Button v-else :disabled="!mod.outdated" icon-only @click="updateProject(mod)">
+            <UpdatedIcon v-if="mod.outdated" v-tooltip="'Update project'" />
+            <CheckIcon v-else v-tooltip="'Updated'" />
           </Button>
           <input
             id="switch-1"
             autocomplete="off"
             type="checkbox"
             class="switch stylized-toggle"
+            :disabled="mod.toggleInProgress"
             :checked="!mod.disabled"
             @change="toggleDisableMod(mod)"
           />
@@ -454,7 +449,6 @@ async function updateProject(mod) {
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
-
   mixpanel.track('InstanceProjectDisable', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
