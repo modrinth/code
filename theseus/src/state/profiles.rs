@@ -5,7 +5,7 @@ use crate::event::emit::{emit_profile, emit_warning};
 use crate::event::ProfilePayloadType;
 use crate::prelude::JavaVersion;
 use crate::state::projects::Project;
-use crate::state::{self, ModrinthVersion, ProjectMetadata, ProjectType};
+use crate::state::{ModrinthVersion, ProjectMetadata, ProjectType};
 use crate::util::fetch::{
     fetch, fetch_json, write, write_cached_icon, IoSemaphore,
 };
@@ -377,21 +377,6 @@ impl Profile {
             )
             .await?;
 
-        // Infer metadata from inferred downloaded project immediately, to avoid having to wait for the next sync
-        let synced_projects = state::infer_data_from_files(
-            self.clone(),
-            vec![path.clone()],
-            state.directories.caches_dir(),
-            &state.io_semaphore,
-            &state.fetch_semaphore,
-        )
-        .await?;
-        let mut new_profiles = state.profiles.write().await;
-        if let Some(profile) = new_profiles.0.get_mut(&self.path) {
-            for (path, project) in synced_projects {
-                profile.projects.insert(path, project);
-            }
-        }
         Ok((path, version))
     }
 
