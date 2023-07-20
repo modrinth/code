@@ -169,6 +169,11 @@ pub enum LoadingBarType {
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
+    PackImport {
+        profile_path: PathBuf,
+        instance_path: PathBuf,
+        instance_name: Option<String>,
+    },
     MinecraftDownload {
         profile_path: PathBuf,
         profile_name: String,

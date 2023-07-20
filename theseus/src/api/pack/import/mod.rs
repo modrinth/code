@@ -1,10 +1,12 @@
 use std::path::{Path, PathBuf};
 
 use io::IOError;
+use serde::{Deserialize, Serialize};
 
 use crate::{
-    event::LoadingBarId,
+    event::{emit::init_or_edit_loading, LoadingBarId},
     util::{fetch, io},
+    LoadingBarType,
 };
 
 pub mod atlauncher;
@@ -12,9 +14,8 @@ pub mod curseforge;
 pub mod gdlauncher;
 pub mod mmc;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 pub enum ImportLauncherType {
-    Modrinth,
     MultiMC,
     PrismLauncher,
     ATLauncher,
@@ -29,9 +30,6 @@ pub async fn get_importable_instances(
 ) -> crate::Result<Vec<String>> {
     // Some launchers have a different folder structure for instances
     let instances_folder = match launcher_type {
-        ImportLauncherType::Modrinth => {
-            todo!()
-        }
         ImportLauncherType::GDLauncher
         | ImportLauncherType::MultiMC
         | ImportLauncherType::PrismLauncher
@@ -66,6 +64,8 @@ pub async fn get_importable_instances(
     Ok(instances)
 }
 
+#[theseus_macros::debug_pin]
+#[tracing::instrument]
 pub async fn import_instance(
     profile_path: PathBuf,
     launcher_type: ImportLauncherType,
@@ -73,10 +73,21 @@ pub async fn import_instance(
     instance_folder: String,
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
+    let existing_loading_bar = Some(
+        init_or_edit_loading(
+            existing_loading_bar,
+            LoadingBarType::PackImport {
+                profile_path: profile_path.clone(),
+                instance_path: base_path.clone(),
+                instance_name: Some(instance_folder.clone()),
+            },
+            100.0,
+            "Downloading java version",
+        )
+        .await?,
+    );
+
     match launcher_type {
-        ImportLauncherType::Modrinth => {
-            todo!()
-        }
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
                 base_path,       // path to base mmc folder
@@ -118,68 +129,36 @@ pub async fn import_instance(
     Ok(())
 }
 
-pub async fn guess_launcher(
-    filepath: &Path,
-) -> crate::Result<ImportLauncherType> {
-    // search filepath for each launcher type
-    // if found, return that launcher type
-    // if not found, return unknown
-    let mut found_type = ImportLauncherType::Unknown;
-
-    // search path as string for mmc
-    if filepath
-        .to_string_lossy()
-        .to_lowercase()
-        .contains("multimc")
-    {
-        found_type = ImportLauncherType::MultiMC;
+/// Returns the default path for the given launcher type
+/// None if it can't be found or doesn't exist
+pub fn get_default_launcher_path(
+    r#type: ImportLauncherType,
+) -> Option<PathBuf> {
+    let path = match r#type {
+        ImportLauncherType::MultiMC => None, // multimc data is *in* app dir
+        ImportLauncherType::PrismLauncher => {
+            Some(dirs::data_dir()?.join("PrismLauncher"))
+        }
+        ImportLauncherType::ATLauncher => {
+            Some(dirs::data_dir()?.join("ATLauncher"))
+        }
+        ImportLauncherType::GDLauncher => {
+            Some(dirs::data_dir()?.join("gdlauncher_next"))
+        }
+        ImportLauncherType::Curseforge => {
+            Some(dirs::home_dir()?.join("curseforge").join("minecraft"))
+        }
+        ImportLauncherType::Unknown => None,
+    };
+    let path = path?;
+    if path.exists() {
+        Some(path)
+    } else {
+        None
     }
-
-    // search path as string for prism
-    if filepath.to_string_lossy().to_lowercase().contains("prism") {
-        found_type = ImportLauncherType::PrismLauncher;
-    }
-
-    // search path as string for atlauncher
-    if filepath
-        .to_string_lossy()
-        .to_lowercase()
-        .contains("atlauncher")
-    {
-        found_type = ImportLauncherType::ATLauncher;
-    }
-
-    // search path as string for curseforge
-    if filepath
-        .to_string_lossy()
-        .to_lowercase()
-        .contains("curseforge")
-    {
-        found_type = ImportLauncherType::Curseforge;
-    }
-
-    // search path as string for modrinth
-    if filepath
-        .to_string_lossy()
-        .to_lowercase()
-        .contains("modrinth")
-    {
-        found_type = ImportLauncherType::Modrinth;
-    }
-
-    // search path as string for gdlauncher
-    if filepath
-        .to_string_lossy()
-        .to_lowercase()
-        .contains("gdlauncher")
-    {
-        found_type = ImportLauncherType::GDLauncher;
-    }
-
-    Ok(found_type)
 }
 
-// Checks if this PathBuf is a valid instance for the given launcher type
+/// Checks if this PathBuf is a valid instance for the given launcher type
 #[theseus_macros::debug_pin]
 #[tracing::instrument]
 pub async fn is_valid_importable_instance(
@@ -187,9 +166,6 @@ pub async fn is_valid_importable_instance(
     r#type: ImportLauncherType,
 ) -> bool {
     match r#type {
-        ImportLauncherType::Modrinth => {
-            todo!()
-        }
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::is_valid_mmc(instance_path).await
         }

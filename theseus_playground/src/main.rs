@@ -54,7 +54,7 @@ async fn main() -> theseus::Result<()> {
     const ATLAUNCHER_FOLDER: &str = r"/home/thesuzerain/ATLauncher";
     const PRISM_FOLDER: &str = r"/home/thesuzerain/.local/share/PrismLauncher";
     const MMC_FOLDER: &str = r"/home/thesuzerain/MultiMC";
-    const CURSEFORGE_FOLDER: &str = r"/home/thesuzerain/curseforge";
+    const CURSEFORGE_FOLDER: &str = r"/home/thesuzerain/curseforge/minecraft";
     const GD_LAUNCHER_FOLDER: &str = r"/home/thesuzerain/gdlauncher_next";
 
     test_batch_import(ATLAUNCHER_FOLDER, ImportLauncherType::ATLauncher)
@@ -66,7 +66,7 @@ async fn main() -> theseus::Result<()> {
     test_batch_import(GD_LAUNCHER_FOLDER, ImportLauncherType::GDLauncher)
         .await?;
 
-    // Iterate through all filenames in PRISM_FOLDER/instances
+    println!("Done all!");
     Ok(())
 }
 
