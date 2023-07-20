@@ -6,12 +6,8 @@
 use std::path::PathBuf;
 
 use theseus::pack::import::ImportLauncherType;
-use theseus::pack::import::atlauncher::import_atlauncher;
-use theseus::pack::import::curseforge::import_curseforge;
 use theseus::pack::install_from::CreatePackProfile;
 use theseus::prelude::*;
-
-use tokio::fs;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -61,19 +57,25 @@ async fn main() -> theseus::Result<()> {
     const CURSEFORGE_FOLDER: &str = r"/home/thesuzerain/curseforge";
     const GD_LAUNCHER_FOLDER: &str = r"/home/thesuzerain/gdlauncher_next";
 
-
-    test_batch_import(ATLAUNCHER_FOLDER, ImportLauncherType::ATLauncher).await?;
+    test_batch_import(ATLAUNCHER_FOLDER, ImportLauncherType::ATLauncher)
+        .await?;
     test_batch_import(PRISM_FOLDER, ImportLauncherType::PrismLauncher).await?;
     test_batch_import(MMC_FOLDER, ImportLauncherType::MultiMC).await?;
-    test_batch_import(CURSEFORGE_FOLDER, ImportLauncherType::Curseforge).await?;
-    test_batch_import(GD_LAUNCHER_FOLDER, ImportLauncherType::GDLauncher).await?;
+    test_batch_import(CURSEFORGE_FOLDER, ImportLauncherType::Curseforge)
+        .await?;
+    test_batch_import(GD_LAUNCHER_FOLDER, ImportLauncherType::GDLauncher)
+        .await?;
 
     // Iterate through all filenames in PRISM_FOLDER/instances
     Ok(())
 }
 
-async fn test_batch_import(folder: &str, r#type : ImportLauncherType) -> theseus::Result<()> {
-    let instances = pack::import::get_importable_instances(r#type, folder.into()).await?;
+async fn test_batch_import(
+    folder: &str,
+    r#type: ImportLauncherType,
+) -> theseus::Result<()> {
+    let instances =
+        pack::import::get_importable_instances(r#type, folder.into()).await?;
     for instance in instances {
         println!("\n\n\nImporting {} for {:?}", instance, r#type);
         let profile_path = profile_create::profile_create_from_creator(
@@ -82,9 +84,15 @@ async fn test_batch_import(folder: &str, r#type : ImportLauncherType) -> theseus
         .await
         .unwrap();
 
-        pack::import::import_instance(profile_path, r#type, PathBuf::from(folder), instance, None).await?;
+        pack::import::import_instance(
+            profile_path,
+            r#type,
+            PathBuf::from(folder),
+            instance,
+            None,
+        )
+        .await?;
         println!("Completoooo");
-
     }
     println!("Done batch import.");
 

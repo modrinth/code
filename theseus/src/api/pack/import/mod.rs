@@ -1,8 +1,11 @@
 use std::path::{Path, PathBuf};
 
-use tokio::fs;
+use io::IOError;
 
-use crate::{util::fetch, event::LoadingBarId};
+use crate::{
+    event::LoadingBarId,
+    util::{fetch, io},
+};
 
 pub mod atlauncher;
 pub mod curseforge;
@@ -17,33 +20,38 @@ pub enum ImportLauncherType {
     ATLauncher,
     GDLauncher,
     Curseforge,
-    Unknown
+    Unknown,
 }
 
-pub async fn get_importable_instances(   
+pub async fn get_importable_instances(
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
 ) -> crate::Result<Vec<String>> {
-
     // Some launchers have a different folder structure for instances
     let instances_folder = match launcher_type {
         ImportLauncherType::Modrinth => {
             todo!()
-        },
-        ImportLauncherType::GDLauncher | ImportLauncherType::MultiMC |  ImportLauncherType::PrismLauncher | ImportLauncherType::ATLauncher => {
-            base_path.join("instances")
-        },
-        ImportLauncherType::Curseforge => {
-            base_path.join("Instances")
-        },
+        }
+        ImportLauncherType::GDLauncher
+        | ImportLauncherType::MultiMC
+        | ImportLauncherType::PrismLauncher
+        | ImportLauncherType::ATLauncher => base_path.join("instances"),
+        ImportLauncherType::Curseforge => base_path.join("Instances"),
         ImportLauncherType::Unknown => {
             todo!()
         }
     };
-    println!("Searching {:?} - instances_folder: {:?}", launcher_type, instances_folder);
+    println!(
+        "Searching {:?} - instances_folder: {:?}",
+        launcher_type, instances_folder
+    );
     let mut instances = Vec::new();
-    let mut dir = fs::read_dir(instances_folder).await?;
-    while let Some(entry) = dir.next_entry().await? {
+    let mut dir = io::read_dir(&instances_folder).await?;
+    while let Some(entry) = dir
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, &instances_folder))?
+    {
         let path = entry.path();
         if path.is_dir() {
             // Check instance is valid of this launcher type
@@ -63,43 +71,46 @@ pub async fn import_instance(
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
-    existing_loading_bar: Option<LoadingBarId>
+    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     match launcher_type {
         ImportLauncherType::Modrinth => {
             todo!()
-        },
-        ImportLauncherType::MultiMC |  ImportLauncherType::PrismLauncher => {
+        }
+        ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
-                base_path,  // path to base mmc folder
+                base_path,       // path to base mmc folder
                 instance_folder, // instance folder in mmc_base_path
-                profile_path,   // path to profile
+                profile_path,    // path to profile
                 existing_loading_bar,
-            ).await?;
-        },
+            )
+            .await?;
+        }
         ImportLauncherType::ATLauncher => {
             atlauncher::import_atlauncher(
-                base_path,  // path to atlauncher folder
+                base_path,       // path to atlauncher folder
                 instance_folder, // instance folder in atlauncher
-                profile_path,   // path to profile
+                profile_path,    // path to profile
                 existing_loading_bar,
-            ).await?;
-        },
+            )
+            .await?;
+        }
         ImportLauncherType::GDLauncher => {
             gdlauncher::import_gdlauncher(
-                base_path.join("instances").join(instance_folder),  // path to gdlauncher folder
-                profile_path,   // path to profile
+                base_path.join("instances").join(instance_folder), // path to gdlauncher folder
+                profile_path, // path to profile
                 existing_loading_bar,
-            ).await?;
-        },
+            )
+            .await?;
+        }
         ImportLauncherType::Curseforge => {
-        
             curseforge::import_curseforge(
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
-                profile_path,   // path to profile
+                profile_path, // path to profile
                 existing_loading_bar,
-            ).await?;
-        },
+            )
+            .await?;
+        }
         ImportLauncherType::Unknown => {
             todo!()
         }
@@ -107,14 +118,20 @@ pub async fn import_instance(
     Ok(())
 }
 
-pub async fn guess_launcher(filepath : &Path) -> crate::Result<ImportLauncherType> {
+pub async fn guess_launcher(
+    filepath: &Path,
+) -> crate::Result<ImportLauncherType> {
     // search filepath for each launcher type
     // if found, return that launcher type
     // if not found, return unknown
     let mut found_type = ImportLauncherType::Unknown;
 
     // search path as string for mmc
-    if filepath.to_string_lossy().to_lowercase().contains("multimc") {
+    if filepath
+        .to_string_lossy()
+        .to_lowercase()
+        .contains("multimc")
+    {
         found_type = ImportLauncherType::MultiMC;
     }
 
@@ -124,22 +141,38 @@ pub async fn guess_launcher(filepath : &Path) -> crate::Result<ImportLauncherTyp
     }
 
     // search path as string for atlauncher
-    if filepath.to_string_lossy().to_lowercase().contains("atlauncher") {
+    if filepath
+        .to_string_lossy()
+        .to_lowercase()
+        .contains("atlauncher")
+    {
         found_type = ImportLauncherType::ATLauncher;
     }
 
     // search path as string for curseforge
-    if filepath.to_string_lossy().to_lowercase().contains("curseforge") {
+    if filepath
+        .to_string_lossy()
+        .to_lowercase()
+        .contains("curseforge")
+    {
         found_type = ImportLauncherType::Curseforge;
     }
 
     // search path as string for modrinth
-    if filepath.to_string_lossy().to_lowercase().contains("modrinth") {
+    if filepath
+        .to_string_lossy()
+        .to_lowercase()
+        .contains("modrinth")
+    {
         found_type = ImportLauncherType::Modrinth;
     }
 
     // search path as string for gdlauncher
-    if filepath.to_string_lossy().to_lowercase().contains("gdlauncher") {
+    if filepath
+        .to_string_lossy()
+        .to_lowercase()
+        .contains("gdlauncher")
+    {
         found_type = ImportLauncherType::GDLauncher;
     }
 
@@ -149,23 +182,26 @@ pub async fn guess_launcher(filepath : &Path) -> crate::Result<ImportLauncherTyp
 // Checks if this PathBuf is a valid instance for the given launcher type
 #[theseus_macros::debug_pin]
 #[tracing::instrument]
-pub async fn is_valid_importable_instance(instance_path : PathBuf, r#type : ImportLauncherType) -> bool {
+pub async fn is_valid_importable_instance(
+    instance_path: PathBuf,
+    r#type: ImportLauncherType,
+) -> bool {
     match r#type {
         ImportLauncherType::Modrinth => {
             todo!()
-        },
-        ImportLauncherType::MultiMC |  ImportLauncherType::PrismLauncher => {
+        }
+        ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::is_valid_mmc(instance_path).await
-        },
+        }
         ImportLauncherType::ATLauncher => {
             atlauncher::is_valid_atlauncher(instance_path).await
-        },
+        }
         ImportLauncherType::GDLauncher => {
             gdlauncher::is_valid_gdlauncher(instance_path).await
-        },
+        }
         ImportLauncherType::Curseforge => {
             curseforge::is_valid_curseforge(instance_path).await
-        },
+        }
         ImportLauncherType::Unknown => {
             todo!()
         }
@@ -206,8 +242,12 @@ async fn copy_dotminecraft(
     dotminecraft: PathBuf,
 ) -> crate::Result<()> {
     // std fs copy every file in dotminecraft to profile_path
-    for entry in std::fs::read_dir(dotminecraft)? {
-        let entry = entry?;
+    let mut dir = io::read_dir(&dotminecraft).await?;
+    while let Some(entry) = dir
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, &dotminecraft))?
+    {
         let path = entry.path();
         copy_dir_to(
             &path,
@@ -230,16 +270,20 @@ async fn copy_dotminecraft(
 #[tracing::instrument]
 async fn copy_dir_to(src: &Path, dst: &Path) -> crate::Result<()> {
     if !src.is_dir() {
-        fs::copy(src, dst).await?;
+        io::copy(src, dst).await?;
         return Ok(());
     }
 
     // Create the destination directory
-    fs::create_dir_all(&dst).await?;
+    io::create_dir_all(&dst).await?;
 
     // Iterate over the directory
-    let mut dir = fs::read_dir(src).await?;
-    while let Some(child) = dir.next_entry().await? {
+    let mut dir = io::read_dir(&src).await?;
+    while let Some(child) = dir
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, src))?
+    {
         let src_child = child.path();
         let dst_child = dst.join(src_child.file_name().ok_or_else(|| {
             crate::ErrorKind::InputError(format!(
@@ -248,12 +292,12 @@ async fn copy_dir_to(src: &Path, dst: &Path) -> crate::Result<()> {
             ))
         })?);
 
-        if child.metadata().await?.is_dir() {
+        if src_child.is_dir() {
             // Recurse into sub-directory
             copy_dir_to(&src_child, &dst_child).await?;
         } else {
             // Copy file
-            fs::copy(&src_child, &dst_child).await?;
+            io::copy(&src_child, &dst_child).await?;
         }
     }
 

@@ -3,14 +3,17 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use crate::{event::LoadingBarId, prelude::ModLoader, state::ProfileInstallStage, State};
+use crate::{
+    event::LoadingBarId, prelude::ModLoader, state::ProfileInstallStage,
+    util::io, State,
+};
 
-use super::{copy_dir_to, recache_icon, copy_dotminecraft};
+use super::{copy_dotminecraft, recache_icon};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GDLauncherConfig {
-    pub background : Option<String>,
+    pub background: Option<String>,
     pub loader: GDLauncherLoader,
     // pub mods: Vec<GDLauncherMod>,
 }
@@ -18,37 +21,48 @@ pub struct GDLauncherConfig {
 #[serde(rename_all = "camelCase")]
 pub struct GDLauncherLoader {
     pub loader_type: ModLoader,
-    pub loader_version : Option<String>,
+    pub loader_version: Option<String>,
     pub mc_version: String,
     pub source: Option<String>,
     pub source_name: Option<String>,
 }
 
 // Check if folder has a config.json that parses
-pub async fn is_valid_gdlauncher(instance_folder : PathBuf) -> bool {
+pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
     let config: String =
         fs::read_to_string(&instance_folder.join("config.json"))
             .await
             .unwrap_or("".to_string());
-    let config: Result<GDLauncherConfig, serde_json::Error> = serde_json::from_str::<GDLauncherConfig>(&config);
+    let config: Result<GDLauncherConfig, serde_json::Error> =
+        serde_json::from_str::<GDLauncherConfig>(&config);
     config.is_ok()
 }
 
-pub async fn import_gdlauncher(    gdlauncher_instance_folder: PathBuf, // instance's folder
-    profile_path: PathBuf,         // path to profile
+pub async fn import_gdlauncher(
+    gdlauncher_instance_folder: PathBuf, // instance's folder
+    profile_path: PathBuf,               // path to profile
     existing_loading_bar: Option<LoadingBarId>,
-) -> crate::Result<()> { 
-    
+) -> crate::Result<()> {
     // Load config.json
     let config: String =
-        fs::read_to_string(&gdlauncher_instance_folder.join("config.json"))
+        io::read_to_string(&gdlauncher_instance_folder.join("config.json"))
             .await?;
-    let config: GDLauncherConfig = serde_json::from_str::<GDLauncherConfig>(&config)?;
+    let config: GDLauncherConfig =
+        serde_json::from_str::<GDLauncherConfig>(&config)?;
     let override_title: Option<String> = config.loader.source_name.clone();
-    let backup_name = format!("GDLauncher-{}", gdlauncher_instance_folder.file_name().map(|a| a.to_string_lossy().to_string()).unwrap_or("Unknown".to_string()));
-    
-// Re-cache icon
-    let icon = config.background.clone().map(|b| gdlauncher_instance_folder.join(b));
+    let backup_name = format!(
+        "GDLauncher-{}",
+        gdlauncher_instance_folder
+            .file_name()
+            .map(|a| a.to_string_lossy().to_string())
+            .unwrap_or("Unknown".to_string())
+    );
+
+    // Re-cache icon
+    let icon = config
+        .background
+        .clone()
+        .map(|b| gdlauncher_instance_folder.join(b));
     let icon = if let Some(icon) = icon {
         recache_icon(icon).await?
     } else {
@@ -70,36 +84,32 @@ pub async fn import_gdlauncher(    gdlauncher_instance_folder: PathBuf, // insta
         None
     };
 
-// Set profile data to created default profile
-crate::api::profile::edit(&profile_path, |prof| {
-    prof.metadata.name = override_title
-        .clone()
-        .unwrap_or_else(|| backup_name.to_string());
-    prof.install_stage = ProfileInstallStage::PackInstalling;
-    prof.metadata.icon = icon.clone();
-    prof.metadata.game_version = game_version.clone();
-    prof.metadata.loader_version = loader_version.clone();
-    prof.metadata.loader = mod_loader;
+    // Set profile data to created default profile
+    crate::api::profile::edit(&profile_path, |prof| {
+        prof.metadata.name = override_title
+            .clone()
+            .unwrap_or_else(|| backup_name.to_string());
+        prof.install_stage = ProfileInstallStage::PackInstalling;
+        prof.metadata.icon = icon.clone();
+        prof.metadata.game_version = game_version.clone();
+        prof.metadata.loader_version = loader_version.clone();
+        prof.metadata.loader = mod_loader;
 
-    async { Ok(()) }
-})
-.await?;
+        async { Ok(()) }
+    })
+    .await?;
 
+    // Copy in contained folders as overrides
+    copy_dotminecraft(profile_path.clone(), gdlauncher_instance_folder).await?;
 
-// Copy in contained folders as overrides
-copy_dotminecraft(profile_path.clone(), gdlauncher_instance_folder).await?;
+    if let Some(profile_val) =
+        crate::api::profile::get(&profile_path, None).await?
+    {
+        crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
+            .await?;
 
-if let Some(profile_val) =
-    crate::api::profile::get(&profile_path, None).await?
-{
-    crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
-        .await?;
-
-    State::sync().await?;
-}
+        State::sync().await?;
+    }
 
     Ok(())
-
-
 }
-

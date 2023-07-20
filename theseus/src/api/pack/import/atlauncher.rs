@@ -12,6 +12,7 @@ use crate::{
     },
     prelude::ModLoader,
     state::{LinkedData, ProfileInstallStage},
+    util::io,
     State,
 };
 
@@ -127,7 +128,7 @@ pub async fn import_atlauncher(
 
     // Load instance.json
     let atinstance: String =
-        fs::read_to_string(&atlauncher_instance_path.join("instance.json"))
+        io::read_to_string(&atlauncher_instance_path.join("instance.json"))
             .await?;
     let atinstance: ATInstance =
         serde_json::from_str::<ATInstance>(&atinstance)?;
@@ -173,7 +174,7 @@ pub async fn import_atlauncher(
         existing_loading_bar,
     )
     .await?;
-println!("Done.");
+    println!("Done.");
 
     Ok(())
 }

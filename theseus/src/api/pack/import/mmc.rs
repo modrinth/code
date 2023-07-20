@@ -9,6 +9,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
+    util::io,
     State,
 };
 
@@ -128,14 +129,14 @@ pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
         Ok(mmc_pack) => mmc_pack,
         Err(_) => return false,
     };
-    
-    load_instance_cfg(&instance_cfg).await.is_ok() &&
-    serde_json::from_str::<MMCPack>(&mmc_pack).is_ok()
+
+    load_instance_cfg(&instance_cfg).await.is_ok()
+        && serde_json::from_str::<MMCPack>(&mmc_pack).is_ok()
 }
 
 // Loading the INI (instance.cfg) file
 async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
-    let instance_cfg = fs::read_to_string(file_path).await?;
+    let instance_cfg = io::read_to_string(file_path).await?;
     let instance_cfg_enum: MMCInstanceEnum =
         serde_ini::from_str::<MMCInstanceEnum>(&instance_cfg)?;
     match instance_cfg_enum {
@@ -157,7 +158,7 @@ pub async fn import_mmc(
         .join(instance_folder.clone());
 
     let mmc_pack =
-        fs::read_to_string(&mmc_instance_path.join("mmc-pack.json")).await?;
+        io::read_to_string(&mmc_instance_path.join("mmc-pack.json")).await?;
     let mmc_pack: MMCPack = serde_json::from_str::<MMCPack>(&mmc_pack)?;
 
     let instance_cfg =
