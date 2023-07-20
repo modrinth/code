@@ -124,7 +124,8 @@ pub async fn install_minecraft(
     State::sync().await?;
 
     let state = State::get().await?;
-    let instance_path = &io::canonicalize(&profile.get_profile_full_path().await?)?;
+    let instance_path =
+        &io::canonicalize(&profile.get_profile_full_path().await?)?;
     let metadata = state.metadata.read().await;
 
     let version = metadata

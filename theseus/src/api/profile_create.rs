@@ -77,8 +77,7 @@ pub async fn profile_create(
     let result = async {
         if let Some(ref icon) = icon {
             let bytes =
-                io::read(state.directories.caches_dir().join(icon))
-                    .await?;
+                io::read(state.directories.caches_dir().join(icon)).await?;
             profile
                 .set_icon(
                     &state.directories.caches_dir(),

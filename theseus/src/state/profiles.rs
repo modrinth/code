@@ -54,9 +54,10 @@ pub struct ProfilePathId(PathBuf);
 impl ProfilePathId {
     // Create a new ProfilePathId from a full file path
     pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
-        let path: PathBuf = canonicalize(path)?;
-        let profiles_dir =
-            canonicalize(State::get().await?.directories.profiles_dir().await)?;
+        let path: PathBuf = io::canonicalize(path)?;
+        let profiles_dir = io::canonicalize(
+            State::get().await?.directories.profiles_dir().await,
+        )?;
         path.strip_prefix(profiles_dir)
             .ok()
             .and_then(|p| p.file_name())
@@ -101,9 +102,10 @@ pub struct ProjectPathId(pub PathBuf);
 impl ProjectPathId {
     // Create a new ProjectPathId from a full file path
     pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
-        let path: PathBuf = canonicalize(path)?;
-        let profiles_dir: PathBuf =
-            canonicalize(State::get().await?.directories.profiles_dir().await)?;
+        let path: PathBuf = io::canonicalize(path)?;
+        let profiles_dir: PathBuf = io::canonicalize(
+            State::get().await?.directories.profiles_dir().await,
+        )?;
         path.strip_prefix(profiles_dir)
             .ok()
             .map(|p| p.components().skip(1).collect::<PathBuf>())

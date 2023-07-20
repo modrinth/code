@@ -1,7 +1,7 @@
 use crate::{
     util::io::{self, IOError},
-    {state::ProfilePathId, State,
-}};
+    {state::ProfilePathId, State},
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]

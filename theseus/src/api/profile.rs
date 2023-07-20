@@ -668,7 +668,7 @@ pub async fn get_potential_override_folders(
     while let Some(entry) = read_dir
         .next_entry()
         .await
-        .map_err(|e| IOError::with_path(e, &profile_path))?
+        .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
         let path: PathBuf = entry.path();
         if path.is_dir() {
@@ -677,7 +677,7 @@ pub async fn get_potential_override_folders(
             while let Some(entry) = read_dir
                 .next_entry()
                 .await
-                .map_err(|e| IOError::with_path(e, &profile_path))?
+                .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
                 let path: PathBuf = entry.path();
                 let name = path.strip_prefix(&profile_base_dir)?.to_path_buf();
@@ -744,11 +744,12 @@ pub async fn run_credentials(
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
+            let full_path = path.get_full_path().await?;
             let result = Command::new(command)
                 .args(&cmd.collect::<Vec<&str>>())
-                .current_dir(path.get_full_path().await?)
+                .current_dir(&full_path)
                 .spawn()
-                .map_err(|e| IOError::with_path(e, path))?
+                .map_err(|e| IOError::with_path(e, &full_path))?
                 .wait()
                 .await
                 .map_err(IOError::from)?;

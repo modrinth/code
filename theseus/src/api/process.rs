@@ -2,12 +2,15 @@
 
 use uuid::Uuid;
 
-use crate::{state::{MinecraftChild, ProfilePathId}, util::io::IOError};
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
     },
     State,
+};
+use crate::{
+    state::{MinecraftChild, ProfilePathId},
+    util::io::IOError,
 };
 
 // Gets whether a child process stored in the state by UUID has finished

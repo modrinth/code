@@ -2,11 +2,13 @@
 
 use std::path::PathBuf;
 
-use tokio::{fs, sync::RwLock};
+use io::IOError;
+use tokio::sync::RwLock;
 
 use crate::{
     prelude::DirectoryInfo,
     state::{self, Profiles},
+    util::io,
 };
 pub use crate::{
     state::{
@@ -106,8 +108,12 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
     state_write.directories = DirectoryInfo::init(&settings)?;
 
     // Move all files over from state_write.directories.config_dir to new_config_dir
-    let mut entries = fs::read_dir(old_config_dir).await?;
-    while let Some(entry) = entries.next_entry().await? {
+    let mut entries = io::read_dir(&old_config_dir).await?;
+    while let Some(entry) = entries
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, &old_config_dir))?
+    {
         let entry_path = entry.path();
         if let Some(file_name) = entry_path.file_name() {
             // Ignore settings.json
@@ -124,7 +130,7 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
             }
 
             let new_path = new_config_dir.join(file_name);
-            fs::rename(entry_path, new_path).await?;
+            io::rename(entry_path, new_path).await?;
         }
     }
 
