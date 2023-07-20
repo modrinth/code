@@ -40,7 +40,7 @@
     </div>
     <div v-else class="status">
       <span class="circle stopped" />
-      <span class="running-text"> No running instances </span>
+      <span class="running-text"> No instances running </span>
     </div>
   </div>
   <transition name="download">

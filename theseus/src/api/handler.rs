@@ -1,8 +1,11 @@
 use std::path::PathBuf;
 
-use crate::event::{
-    emit::{emit_command, emit_warning},
-    CommandPayload,
+use crate::{
+    event::{
+        emit::{emit_command, emit_warning},
+        CommandPayload,
+    },
+    util::io,
 };
 
 /// Handles external functions (such as through URL deep linkage)
@@ -46,7 +49,7 @@ pub async fn parse_command(
     } else {
         // We assume anything else is a filepath to an .mrpack file
         let path = PathBuf::from(command_string);
-        let path = path.canonicalize()?;
+        let path = io::canonicalize(path)?;
         if let Some(ext) = path.extension() {
             if ext == "mrpack" {
                 return Ok(CommandPayload::RunMRPack { path });

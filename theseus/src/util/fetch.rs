@@ -9,10 +9,9 @@ use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::time;
 use tokio::sync::{RwLock, Semaphore};
-use tokio::{
-    fs::{self, File},
-    io::AsyncWriteExt,
-};
+use tokio::{fs::File, io::AsyncWriteExt};
+
+use super::io::{self, IOError};
 
 #[derive(Debug)]
 pub struct IoSemaphore(pub RwLock<Semaphore>);
@@ -193,7 +192,7 @@ where
     let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
 
-    let json = fs::read(path).await?;
+    let json = io::read(path).await?;
     let json = serde_json::from_slice::<T>(&json)?;
 
     Ok(json)
@@ -209,11 +208,15 @@ pub async fn write<'a>(
     let _permit = io_semaphore.acquire().await?;
 
     if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).await?;
+        io::create_dir_all(parent).await?;
     }
 
-    let mut file = File::create(path).await?;
-    file.write_all(bytes).await?;
+    let mut file = File::create(path)
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
+    file.write_all(bytes)
+        .await
+        .map_err(|e| IOError::with_path(e, path))?;
     tracing::trace!("Done writing file {}", path.display());
     Ok(())
 }
@@ -235,7 +238,7 @@ pub async fn write_cached_icon(
 
     write(&path, &bytes, semaphore).await?;
 
-    let path = dunce::canonicalize(path)?;
+    let path = io::canonicalize(path)?;
     Ok(path)
 }
 
