@@ -24,6 +24,16 @@ pub struct GDLauncherLoader {
     pub source_name: Option<String>,
 }
 
+// Check if folder has a config.json that parses
+pub async fn is_valid_gdlauncher(instance_folder : PathBuf) -> bool {
+    let config: String =
+        fs::read_to_string(&instance_folder.join("config.json"))
+            .await
+            .unwrap_or("".to_string());
+    let config: Result<GDLauncherConfig, serde_json::Error> = serde_json::from_str::<GDLauncherConfig>(&config);
+    config.is_ok()
+}
+
 pub async fn import_gdlauncher(    gdlauncher_instance_folder: PathBuf, // instance's folder
     profile_path: PathBuf,         // path to profile
     existing_loading_bar: Option<LoadingBarId>,

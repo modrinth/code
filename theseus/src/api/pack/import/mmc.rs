@@ -118,12 +118,19 @@ pub struct MMCComponentRequirement {
     pub suggests: Option<String>,
 }
 
-// Checks if if its a folder, and the folder contains instance.cfg and mmc-pack.json
+// Checks if if its a folder, and the folder contains instance.cfg and mmc-pack.json, and they both parse
 #[tracing::instrument]
-pub async fn is_mmc(path: PathBuf) -> bool {
-    let instance_cfg = path.join("instance.cfg");
-    let mmc_pack = path.join("mmc-pack.json");
-    instance_cfg.exists() && mmc_pack.exists()
+pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
+    let instance_cfg = instance_folder.join("instance.cfg");
+    let mmc_pack = instance_folder.join("mmc-pack.json");
+
+    let mmc_pack = match fs::read_to_string(&mmc_pack).await {
+        Ok(mmc_pack) => mmc_pack,
+        Err(_) => return false,
+    };
+    
+    load_instance_cfg(&instance_cfg).await.is_ok() &&
+    serde_json::from_str::<MMCPack>(&mmc_pack).is_ok()
 }
 
 // Loading the INI (instance.cfg) file
@@ -176,6 +183,8 @@ pub async fn import_mmc(
     };
 
     // Managed pack
+    let backup_name = "Imported Modpack".to_string();
+
     if instance_cfg.managed_pack.unwrap_or(false) {
         match instance_cfg.managed_pack_type {
             Some(MMCManagedPackType::Modrinth) => {
@@ -185,15 +194,14 @@ pub async fn import_mmc(
                 let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join(".minecraft");
                 import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack, existing_loading_bar).await?;
             }
-            Some(MMCManagedPackType::Flame) => {
-                // For flame managed packs
+            Some(MMCManagedPackType::Flame) | Some(MMCManagedPackType::ATLauncher) => {
+                // For flame/atlauncher managed packs
                 // Treat as unmanaged, but with 'minecraft' folder instead of '.minecraft'
-                let backup_name = "Imported Flame Modpack".to_string();
                 let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join("minecraft");
                 import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack, existing_loading_bar).await?;
             },
             Some(_) => {
-                // For managed packs that aren't modrinth or flame
+                // For managed packs that aren't modrinth, flame, atlauncher
                 // Treat as unmanaged
                 let backup_name = "ImportedModpack".to_string();
                 let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join(".minecraft");

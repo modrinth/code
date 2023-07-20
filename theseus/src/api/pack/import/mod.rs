@@ -24,6 +24,8 @@ pub async fn get_importable_instances(
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
 ) -> crate::Result<Vec<String>> {
+
+    // Some launchers have a different folder structure for instances
     let instances_folder = match launcher_type {
         ImportLauncherType::Modrinth => {
             todo!()
@@ -44,9 +46,12 @@ pub async fn get_importable_instances(
     while let Some(entry) = dir.next_entry().await? {
         let path = entry.path();
         if path.is_dir() {
-            let name = path.file_name();
-            if let Some(name) = name {
-                instances.push(name.to_string_lossy().to_string());
+            // Check instance is valid of this launcher type
+            if is_valid_importable_instance(path.clone(), launcher_type).await {
+                let name = path.file_name();
+                if let Some(name) = name {
+                    instances.push(name.to_string_lossy().to_string());
+                }
             }
         }
     }
@@ -141,6 +146,31 @@ pub async fn guess_launcher(filepath : &Path) -> crate::Result<ImportLauncherTyp
     Ok(found_type)
 }
 
+// Checks if this PathBuf is a valid instance for the given launcher type
+#[theseus_macros::debug_pin]
+#[tracing::instrument]
+pub async fn is_valid_importable_instance(instance_path : PathBuf, r#type : ImportLauncherType) -> bool {
+    match r#type {
+        ImportLauncherType::Modrinth => {
+            todo!()
+        },
+        ImportLauncherType::MultiMC |  ImportLauncherType::PrismLauncher => {
+            mmc::is_valid_mmc(instance_path).await
+        },
+        ImportLauncherType::ATLauncher => {
+            atlauncher::is_valid_atlauncher(instance_path).await
+        },
+        ImportLauncherType::GDLauncher => {
+            gdlauncher::is_valid_gdlauncher(instance_path).await
+        },
+        ImportLauncherType::Curseforge => {
+            curseforge::is_valid_curseforge(instance_path).await
+        },
+        ImportLauncherType::Unknown => {
+            todo!()
+        }
+    }
+}
 
 /// Caches an image file in the filesystem into the cache directory, and returns the path to the cached file.
 #[theseus_macros::debug_pin]

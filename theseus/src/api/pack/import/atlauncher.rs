@@ -102,6 +102,17 @@ pub struct ATLauncherMod {
     pub modrinth_version: Option<ATLauncherModrinthVersion>,
 }
 
+// Check if folder has a instance.json that parses
+pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
+    let instance: String =
+        fs::read_to_string(&instance_folder.join("instance.json"))
+            .await
+            .unwrap_or("".to_string());
+    let instance: Result<ATInstance, serde_json::Error> =
+        serde_json::from_str::<ATInstance>(&instance);
+    instance.is_ok()
+}
+
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn import_atlauncher(

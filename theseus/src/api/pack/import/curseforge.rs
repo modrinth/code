@@ -35,6 +35,16 @@ pub struct MinecraftInstance {
     pub game_version : String, // Minecraft game version. Non-prioritized, use this if Vanilla
 }
 
+// Check if folder has a minecraftinstance.json that parses
+pub async fn is_valid_curseforge(instance_folder : PathBuf) -> bool {
+    let minecraftinstance: String =
+        fs::read_to_string(&instance_folder.join("minecraftinstance.json"))
+            .await
+            .unwrap_or("".to_string());
+    let minecraftinstance: Result<MinecraftInstance, serde_json::Error> = serde_json::from_str::<MinecraftInstance>(&minecraftinstance);
+    minecraftinstance.is_ok()
+}
+
 pub async fn import_curseforge(    curseforge_instance_folder: PathBuf, // instance's folder
     profile_path: PathBuf,         // path to profile
     existing_loading_bar: Option<LoadingBarId>,
