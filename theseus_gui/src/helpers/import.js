@@ -4,6 +4,7 @@
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/tauri'
+import { create } from './profile'
 
 /*
   API for importing instances from other launchers
@@ -31,7 +32,10 @@ export async function get_importable_instances(launcherType, basePath) {
 
 /// Import an instance from a launcher type and base path
 /// eg: import_instance("profile-name-to-go-to", "MultiMC", "C:/MultiMC", "Instance 1")
-export async function import_instance(profilePath, launcherType, basePath, instanceFolder) {
+export async function import_instance(launcherType, basePath, instanceFolder) {
+  // create a basic, empty instance (most properties will be filled in by the import process)
+  const profilePath = await create(instanceFolder, '1.19.4', 'vanilla', 'latest', null)
+
   return await invoke('plugin:import|import_import_instance', {
     profilePath,
     launcherType,

@@ -17,6 +17,7 @@ pub enum ImportLauncherType {
     ATLauncher,
     GDLauncher,
     Curseforge,
+    #[serde(other)]
     Unknown,
 }
 
@@ -108,6 +109,7 @@ pub async fn import_instance(
             .into());
         }
     }
+    tracing::debug!("Completed import.");
     Ok(())
 }
 
