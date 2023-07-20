@@ -63,10 +63,11 @@
       class="thread-summary"
       :raised="raised"
       :link="`/${moderation ? 'moderation' : 'dashboard'}/report/${report.id}`"
+      :auth="auth"
     />
     <div class="reporter-info">
       <ReportIcon class="inline-svg" /> Reported by
-      <span v-if="$auth.user.id === report.reporterUser.id">you</span>
+      <span v-if="auth.user.id === report.reporterUser.id">you</span>
       <nuxt-link v-else :to="`/user/${report.reporterUser.username}`" class="iconified-link">
         <Avatar
           :src="report.reporterUser.avatar_url"
@@ -81,7 +82,7 @@
       <span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
         fromNow(report.created)
       }}</span>
-      <CopyCode v-if="$cosmetics.developerMode" :text="report.id" class="report-id" />
+      <CopyCode v-if="cosmetics.developerMode" :text="report.id" class="report-id" />
     </div>
   </div>
 </template>
@@ -117,7 +118,13 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  auth: {
+    type: Object,
+    required: true,
+  },
 })
+
+const cosmetics = useCosmetics()
 </script>
 
 <style lang="scss" scoped>

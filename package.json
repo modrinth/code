@@ -14,6 +14,7 @@
   "devDependencies": {
     "@formatjs/cli": "^6.1.2",
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
+    "@nuxtjs/turnstile": "^0.5.0",
     "@types/node": "^20.1.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
@@ -44,6 +45,7 @@
     "jszip": "^3.10.1",
     "markdown-it": "^13.0.1",
     "omorphia": "^0.4.31",
+    "qrcode.vue": "^3.4.0",
     "vue-multiselect": "^3.0.0-alpha.2",
     "xss": "^1.0.14"
   },

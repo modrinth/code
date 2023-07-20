@@ -20,8 +20,8 @@ export const initUser = async () => {
   if (auth.user && auth.user.id) {
     try {
       const [notifications, follows] = await Promise.all([
-        useBaseFetch(`user/${auth.user.id}/notifications`, auth.headers),
-        useBaseFetch(`user/${auth.user.id}/follows`, auth.headers),
+        useBaseFetch(`user/${auth.user.id}/notifications`),
+        useBaseFetch(`user/${auth.user.id}/follows`),
       ])
 
       user.notifications = notifications
@@ -41,7 +41,7 @@ export const initUserNotifs = async () => {
 
   if (auth.user && auth.user.id) {
     try {
-      user.notifications = await useBaseFetch(`user/${auth.user.id}/notifications`, auth.headers)
+      user.notifications = await useBaseFetch(`user/${auth.user.id}/notifications`)
     } catch (err) {
       console.error(err)
     }
@@ -54,7 +54,7 @@ export const initUserFollows = async () => {
 
   if (auth.user && auth.user.id) {
     try {
-      user.follows = await useBaseFetch(`user/${auth.user.id}/follows`, auth.headers)
+      user.follows = await useBaseFetch(`user/${auth.user.id}/follows`)
     } catch (err) {
       console.error(err)
     }
@@ -67,7 +67,7 @@ export const initUserProjects = async () => {
 
   if (auth.user && auth.user.id) {
     try {
-      user.projects = await useBaseFetch(`user/${auth.user.id}/projects`, auth.headers)
+      user.projects = await useBaseFetch(`user/${auth.user.id}/projects`)
     } catch (err) {
       console.error(err)
     }
@@ -75,7 +75,6 @@ export const initUserProjects = async () => {
 }
 
 export const userFollowProject = async (project) => {
-  const auth = (await useAuth()).value
   const user = (await useUser()).value
 
   user.follows = user.follows.concat(project)
@@ -84,13 +83,11 @@ export const userFollowProject = async (project) => {
   setTimeout(() => {
     useBaseFetch(`project/${project.id}/follow`, {
       method: 'POST',
-      ...auth.headers,
     })
   })
 }
 
 export const userUnfollowProject = async (project) => {
-  const auth = (await useAuth()).value
   const user = (await useUser()).value
 
   user.follows = user.follows.filter((x) => x.id !== project.id)
@@ -99,7 +96,6 @@ export const userUnfollowProject = async (project) => {
   setTimeout(() => {
     useBaseFetch(`project/${project.id}/follow`, {
       method: 'DELETE',
-      ...auth.headers,
     })
   })
 }
@@ -125,4 +121,46 @@ export const userReadNotifications = async (ids) => {
     }
     return x
   })
+}
+
+export const resendVerifyEmail = async () => {
+  const app = useNuxtApp()
+
+  startLoading()
+  try {
+    await useBaseFetch('auth/email/resend_verify', {
+      method: 'POST',
+    })
+
+    const auth = await useAuth()
+    app.$notify({
+      group: 'main',
+      title: 'Email sent',
+      text: `An email with a link to verify your account has been sent to ${auth.value.user.email}.`,
+      type: 'success',
+    })
+  } catch (err) {
+    app.$notify({
+      group: 'main',
+      title: 'An error occurred',
+      text: err.data.description,
+      type: 'error',
+    })
+  }
+  stopLoading()
+}
+
+export const logout = async () => {
+  startLoading()
+  const auth = await useAuth()
+  try {
+    await useBaseFetch(`session/${auth.value.token}`, {
+      method: 'DELETE',
+    })
+  } catch {}
+
+  await useAuth('none')
+  useCookie('auth-token').value = null
+  await navigateTo('/')
+  stopLoading()
 }

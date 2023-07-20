@@ -106,6 +106,8 @@
         :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
         :all-members="allMembers"
         :update-members="updateMembers"
+        :auth="auth"
+        :tags="tags"
       />
       <NuxtPage
         v-model:project="project"
@@ -149,7 +151,7 @@
       />
     </Head>
     <ModalModeration
-      v-if="$auth.user"
+      v-if="auth.user"
       ref="modalModeration"
       :project="project"
       :status="moderationStatus"
@@ -161,7 +163,7 @@
       </div>
     </Modal>
     <ModalReport
-      v-if="$auth.user"
+      v-if="auth.user"
       ref="modal_project_report"
       :item-id="project.id"
       item-type="project"
@@ -169,7 +171,7 @@
     <div
       :class="{
         'normal-page': true,
-        'alt-layout': $cosmetics.projectLayout,
+        'alt-layout': cosmetics.projectLayout,
       }"
     >
       <div class="normal-page__sidebar">
@@ -229,7 +231,7 @@
               class="categories"
             >
               <Badge
-                v-if="$auth.user && currentMember"
+                v-if="auth.user && currentMember"
                 :type="project.status"
                 class="status-badge"
               />
@@ -287,7 +289,7 @@
             </div>
             <hr class="card-divider" />
             <div class="input-group">
-              <template v-if="$auth.user">
+              <template v-if="auth.user">
                 <button class="iconified-button" @click="$refs.modal_project_report.show()">
                   <ReportIcon aria-hidden="true" />
                   Report
@@ -344,7 +346,7 @@
           />
           <div class="buttons status-buttons">
             <button
-              v-if="$tag.approvedStatuses.includes(project.status)"
+              v-if="tags.approvedStatuses.includes(project.status)"
               class="iconified-button"
               @click="clearMessage"
             >
@@ -354,14 +356,14 @@
           </div>
         </div>
         <div
-          v-if="$auth.user && $tag.staffRoles.includes($auth.user.role)"
+          v-if="auth.user && tags.staffRoles.includes(auth.user.role)"
           class="universal-card moderation-card"
         >
           <h2>Moderation actions</h2>
           <div class="input-stack">
             <button
               v-if="
-                !$tag.approvedStatuses.includes(project.status) || project.status === 'processing'
+                !tags.approvedStatuses.includes(project.status) || project.status === 'processing'
               "
               class="iconified-button brand-button"
               @click="openModerationModal(requestedStatus)"
@@ -372,9 +374,9 @@
             </button>
             <button
               v-if="
-                $tag.approvedStatuses.includes(project.status) ||
+                tags.approvedStatuses.includes(project.status) ||
                 project.status === 'processing' ||
-                ($tag.rejectedStatuses.includes(project.status) && project.status !== 'withheld')
+                (tags.rejectedStatuses.includes(project.status) && project.status !== 'withheld')
               "
               class="iconified-button danger-button"
               @click="openModerationModal('withheld')"
@@ -384,9 +386,9 @@
             </button>
             <button
               v-if="
-                $tag.approvedStatuses.includes(project.status) ||
+                tags.approvedStatuses.includes(project.status) ||
                 project.status === 'processing' ||
-                ($tag.rejectedStatuses.includes(project.status) && project.status !== 'rejected')
+                (tags.rejectedStatuses.includes(project.status) && project.status !== 'rejected')
               "
               class="iconified-button danger-button"
               @click="openModerationModal('rejected')"
@@ -422,6 +424,8 @@
           :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
           :all-members="allMembers"
           :update-members="updateMembers"
+          :auth="auth"
+          :tags="tags"
         />
         <div v-else-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
           {{ project.title }} has been removed from search by Modrinth's moderators. Please use
@@ -447,7 +451,7 @@
             Prism Launcher</a
           >.
         </div>
-        <Promotion v-if="$tag.approvedStatuses.includes(project.status)" />
+        <Promotion v-if="tags.approvedStatuses.includes(project.status)" />
         <div class="navigation-card">
           <NavRow
             :links="[
@@ -485,7 +489,7 @@
               },
             ]"
           />
-          <div v-if="$auth.user && currentMember" class="input-group">
+          <div v-if="auth.user && currentMember" class="input-group">
             <nuxt-link
               :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
               class="iconified-button"
@@ -808,12 +812,15 @@ const data = useNuxtApp()
 const route = useRoute()
 const config = useRuntimeConfig()
 
+const auth = await useAuth()
 const user = await useUser()
+const cosmetics = useCosmetics()
+const tags = useTags()
 
 if (
   !route.params.id ||
   !(
-    data.$tag.projectTypes.find((x) => x.id === route.params.type) ||
+    tags.value.projectTypes.find((x) => x.id === route.params.type) ||
     route.params.type === 'project'
   )
 ) {
@@ -833,28 +840,27 @@ try {
     { data: featuredVersions },
     { data: versions },
   ] = await Promise.all([
-    useAsyncData(
-      `project/${route.params.id}`,
-      () => useBaseFetch(`project/${route.params.id}`, data.$defaultHeaders()),
-      {
-        transform: (project) => {
-          if (project) {
-            project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
+    useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
+      transform: (project) => {
+        if (project) {
+          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
+          project.project_type = data.$getProjectTypeForUrl(
+            project.project_type,
+            project.loaders,
+            tags.value
+          )
 
-            project.project_type = data.$getProjectTypeForUrl(project.project_type, project.loaders)
-
-            if (process.client && history.state && history.state.overrideProjectType) {
-              project.project_type = history.state.overrideProjectType
-            }
+          if (process.client && history.state && history.state.overrideProjectType) {
+            project.project_type = history.state.overrideProjectType
           }
+        }
 
-          return project
-        },
-      }
-    ),
+        return project
+      },
+    }),
     useAsyncData(
       `project/${route.params.id}/members`,
-      () => useBaseFetch(`project/${route.params.id}/members`, data.$defaultHeaders()),
+      () => useBaseFetch(`project/${route.params.id}/members`),
       {
         transform: (members) => {
           members.forEach((it, index) => {
@@ -867,13 +873,13 @@ try {
       }
     ),
     useAsyncData(`project/${route.params.id}/dependencies`, () =>
-      useBaseFetch(`project/${route.params.id}/dependencies`, data.$defaultHeaders())
+      useBaseFetch(`project/${route.params.id}/dependencies`)
     ),
     useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-      useBaseFetch(`project/${route.params.id}/version?featured=true`, data.$defaultHeaders())
+      useBaseFetch(`project/${route.params.id}/version?featured=true`)
     ),
     useAsyncData(`project/${route.params.id}/version`, () =>
-      useBaseFetch(`project/${route.params.id}/version`, data.$defaultHeaders())
+      useBaseFetch(`project/${route.params.id}/version`)
     ),
   ])
 
@@ -910,23 +916,23 @@ if (project.value.project_type !== route.params.type || route.params.id !== proj
 
 const members = ref(allMembers.value.filter((x) => x.accepted))
 const currentMember = ref(
-  data.$auth.user ? allMembers.value.find((x) => x.user.id === data.$auth.user.id) : null
+  auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null
 )
 
 if (
   !currentMember.value &&
-  data.$auth.user &&
-  data.$tag.staffRoles.includes(data.$auth.user.role)
+  auth.value.user &&
+  tags.value.staffRoles.includes(auth.value.user.role)
 ) {
   currentMember.value = {
     team_id: project.team_id,
-    user: data.$auth.user,
-    role: data.$auth.role,
-    permissions: data.$auth.user.role === 'admin' ? 1023 : 12,
+    user: auth.value.user,
+    role: auth.value.role,
+    permissions: auth.value.user.role === 'admin' ? 1023 : 12,
     accepted: true,
     payouts_split: 0,
-    avatar_url: data.$auth.user.avatar_url,
-    name: data.$auth.user.username,
+    avatar_url: auth.value.user.avatar_url,
+    name: auth.value.user.username,
   }
 }
 
@@ -943,7 +949,7 @@ featuredVersions.value = versions.value.filter((version) => featuredIds.includes
 featuredVersions.value.sort((a, b) => {
   const aLatest = a.game_versions[a.game_versions.length - 1]
   const bLatest = b.game_versions[b.game_versions.length - 1]
-  const gameVersions = data.$tag.gameVersions.map((e) => e.version)
+  const gameVersions = tags.value.gameVersions.map((e) => e.version)
   return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest)
 })
 
@@ -967,7 +973,7 @@ const featuredGalleryImage = computed(() => project.value.gallery.find((img) => 
 const requestedStatus = computed(() => project.value.requested_status ?? 'approved')
 
 async function resetProject() {
-  const newProject = await useBaseFetch(`project/${project.value.id}`, data.$defaultHeaders())
+  const newProject = await useBaseFetch(`project/${project.value.id}`)
 
   newProject.actualProjectType = JSON.parse(JSON.stringify(newProject.project_type))
 
@@ -986,7 +992,6 @@ async function clearMessage() {
         moderation_message: null,
         moderation_message_body: null,
       },
-      ...data.$defaultHeaders(),
     })
 
     project.value.moderator_message = null
@@ -1011,7 +1016,6 @@ async function setProcessing() {
       body: {
         status: 'processing',
       },
-      ...data.$defaultHeaders(),
     })
 
     project.value.status = 'processing'
@@ -1048,7 +1052,6 @@ async function patchProject(resData, quiet = false) {
     await useBaseFetch(`project/${project.value.id}`, {
       method: 'PATCH',
       body: resData,
-      ...data.$defaultHeaders(),
     })
 
     for (const key in resData) {
@@ -1099,7 +1102,6 @@ async function patchIcon(icon) {
       {
         method: 'PATCH',
         body: icon,
-        ...data.$defaultHeaders(),
       }
     )
     await resetProject()
@@ -1136,7 +1138,7 @@ function openModerationModal(status) {
 async function updateMembers() {
   allMembers.value = await useAsyncData(
     `project/${route.params.id}/members`,
-    () => useBaseFetch(`project/${route.params.id}/members`, data.$defaultHeaders()),
+    () => useBaseFetch(`project/${route.params.id}/members`),
     {
       transform: (members) => {
         members.forEach((it, index) => {

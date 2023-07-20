@@ -58,7 +58,7 @@
         <nuxt-link :to="getProjectLink(project)" class="title-link">
           {{ project.title }}
         </nuxt-link>
-        <template v-if="$tag.rejectedStatuses.includes(notification.body.new_status)">
+        <template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
           has been <Badge :type="notification.body.new_status" />
         </template>
         <template v-else>
@@ -106,6 +106,7 @@
         :raised="raised"
         :messages="getMessages()"
         class="thread-summary"
+        :auth="auth"
       />
       <div v-else-if="type === 'project_update'" class="version-list">
         <div
@@ -221,7 +222,7 @@
         >
           <CheckIcon /> Mark as read
         </button>
-        <CopyCode v-if="$cosmetics.developerMode" :text="notification.id" />
+        <CopyCode v-if="cosmetics.developerMode" :text="notification.id" />
       </div>
       <div v-else class="input-group">
         <nuxt-link
@@ -253,7 +254,7 @@
         >
           <CheckIcon /> Mark as read
         </button>
-        <CopyCode v-if="$cosmetics.developerMode" :text="notification.id" />
+        <CopyCode v-if="cosmetics.developerMode" :text="notification.id" />
       </div>
     </div>
   </div>
@@ -301,7 +302,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  auth: {
+    type: Object,
+    required: true,
+  },
 })
+
+const cosmetics = useCosmetics()
+const tags = useTags()
 
 const type = computed(() =>
   !props.notification.body || props.notification.body.type === 'legacy_markdown'
@@ -357,7 +365,6 @@ async function performAction(notification, actionIndex) {
     if (actionIndex !== null) {
       await useBaseFetch(`${notification.actions[actionIndex].action_route[1]}`, {
         method: notification.actions[actionIndex].action_route[0].toUpperCase(),
-        ...app.$defaultHeaders(),
       })
     }
   } catch (err) {

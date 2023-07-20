@@ -8,7 +8,7 @@
       <Meta name="og:description" :contcent="metaDescription" />
     </Head>
     <Modal
-      v-if="$auth.user && currentMember"
+      v-if="currentMember"
       ref="modal_edit_item"
       :header="editIndex === -1 ? 'Upload gallery image' : 'Edit gallery item'"
     >
@@ -127,7 +127,7 @@
       </div>
     </Modal>
     <ModalConfirm
-      v-if="$auth.user && currentMember"
+      v-if="currentMember"
       ref="modal_confirm"
       title="Are you sure you want to delete this gallery image?"
       description="This will remove this gallery image forever (like really forever)."
@@ -446,7 +446,6 @@ export default defineNuxtComponent({
         await useBaseFetch(url, {
           method: 'POST',
           body: this.editFile,
-          ...this.$defaultHeaders(),
         })
         await this.updateProject()
 
@@ -484,7 +483,6 @@ export default defineNuxtComponent({
 
         await useBaseFetch(url, {
           method: 'PATCH',
-          ...this.$defaultHeaders(),
         })
 
         await this.updateProject()
@@ -511,7 +509,6 @@ export default defineNuxtComponent({
           )}`,
           {
             method: 'DELETE',
-            ...this.$defaultHeaders(),
           }
         )
 
@@ -528,7 +525,7 @@ export default defineNuxtComponent({
       stopLoading()
     },
     async updateProject() {
-      const project = await useBaseFetch(`project/${this.project.id}`, this.$defaultHeaders())
+      const project = await useBaseFetch(`project/${this.project.id}`)
 
       project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
 

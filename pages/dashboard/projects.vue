@@ -459,7 +459,6 @@ export default defineNuxtComponent({
           {
             method: 'PATCH',
             body: baseData,
-            ...this.$defaultHeaders(),
           }
         )
 

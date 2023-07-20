@@ -113,7 +113,6 @@ export default {
         await useBaseFetch(`project/${this.project.id}`, {
           method: 'PATCH',
           body: data,
-          ...this.$defaultHeaders(),
         })
 
         this.$refs.modal.hide()

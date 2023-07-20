@@ -3,7 +3,7 @@
     :class="{
       'search-page': true,
       'normal-page': true,
-      'alt-layout': $cosmetics.searchLayout,
+      'alt-layout': cosmetics.searchLayout,
     }"
   >
     <Head>
@@ -65,7 +65,7 @@
           >
             <h3
               v-if="
-                $tag.loaders.filter((x) => x.supported_project_types.includes(projectType.actual))
+                tags.loaders.filter((x) => x.supported_project_types.includes(projectType.actual))
                   .length > 0
               "
               class="sidebar-menu-heading"
@@ -73,7 +73,7 @@
               Loaders
             </h3>
             <SearchFilter
-              v-for="loader in $tag.loaders.filter((x) => {
+              v-for="loader in tags.loaders.filter((x) => {
                 if (
                   projectType.id === 'mod' &&
                   !showAllLoaders &&
@@ -83,11 +83,11 @@
                 ) {
                   return false
                 } else if (projectType.id === 'mod' && showAllLoaders) {
-                  return $tag.loaderData.modLoaders.includes(x.name)
+                  return tags.loaderData.modLoaders.includes(x.name)
                 } else if (projectType.id === 'plugin') {
-                  return $tag.loaderData.pluginLoaders.includes(x.name)
+                  return tags.loaderData.pluginLoaders.includes(x.name)
                 } else if (projectType.id === 'datapack') {
-                  return $tag.loaderData.dataPackLoaders.includes(x.name)
+                  return tags.loaderData.dataPackLoaders.includes(x.name)
                 } else {
                   return x.supported_project_types.includes(projectType.actual)
                 }
@@ -113,7 +113,7 @@
           <section v-if="projectType.id === 'plugin'" aria-label="Platform loader filters">
             <h3
               v-if="
-                $tag.loaders.filter((x) => x.supported_project_types.includes(projectType.actual))
+                tags.loaders.filter((x) => x.supported_project_types.includes(projectType.actual))
                   .length > 0
               "
               class="sidebar-menu-heading"
@@ -121,8 +121,8 @@
               Proxies
             </h3>
             <SearchFilter
-              v-for="loader in $tag.loaders.filter((x) =>
-                $tag.loaderData.pluginPlatformLoaders.includes(x.name)
+              v-for="loader in tags.loaders.filter((x) =>
+                tags.loaderData.pluginPlatformLoaders.includes(x.name)
               )"
               :key="loader.name"
               ref="platformFilters"
@@ -167,8 +167,8 @@
             v-model="selectedVersions"
             :options="
               showSnapshots
-                ? $tag.gameVersions.map((x) => x.version)
-                : $tag.gameVersions
+                ? tags.gameVersions.map((x) => x.version)
+                : tags.gameVersions
                     .filter((it) => it.version_type === 'release')
                     .map((x) => x.version)
             "
@@ -195,7 +195,7 @@
     </aside>
     <section class="normal-page__content">
       <div
-        v-if="projectType.id === 'modpack' && $orElse($cosmetics.modpacksAlphaNotice, true)"
+        v-if="projectType.id === 'modpack' && $orElse(cosmetics.modpacksAlphaNotice, true)"
         class="card information"
         aria-label="Information"
       >
@@ -267,7 +267,7 @@
               v-model="maxResults"
               placeholder="Select one"
               class="labeled-control__control"
-              :options="maxResultsForView[$cosmetics.searchDisplayMode[projectType.id]]"
+              :options="maxResultsForView[cosmetics.searchDisplayMode[projectType.id]]"
               :searchable="false"
               :close-on-select="true"
               :show-labels="false"
@@ -276,13 +276,13 @@
             />
           </div>
           <button
-            v-tooltip="$capitalizeString($cosmetics.searchDisplayMode[projectType.id]) + ' view'"
-            :aria-label="$capitalizeString($cosmetics.searchDisplayMode[projectType.id]) + ' view'"
+            v-tooltip="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
+            :aria-label="$capitalizeString(cosmetics.searchDisplayMode[projectType.id]) + ' view'"
             class="square-button"
             @click="cycleSearchDisplayMode()"
           >
-            <GridIcon v-if="$cosmetics.searchDisplayMode[projectType.id] === 'grid'" />
-            <ImageIcon v-else-if="$cosmetics.searchDisplayMode[projectType.id] === 'gallery'" />
+            <GridIcon v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'" />
+            <ImageIcon v-else-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'" />
             <ListIcon v-else />
           </button>
         </div>
@@ -302,7 +302,7 @@
         <div
           id="search-results"
           class="project-list"
-          :class="'display-mode--' + $cosmetics.searchDisplayMode[projectType.id]"
+          :class="'display-mode--' + cosmetics.searchDisplayMode[projectType.id]"
           role="list"
           aria-label="Search results"
         >
@@ -310,7 +310,7 @@
             v-for="result in results?.hits"
             :id="result.slug ? result.slug : result.project_id"
             :key="result.project_id"
-            :display="$cosmetics.searchDisplayMode[projectType.id]"
+            :display="cosmetics.searchDisplayMode[projectType.id]"
             :featured-image="result.featured_gallery ? result.featured_gallery : result.gallery[0]"
             :type="result.project_type"
             :author="result.author"
@@ -366,6 +366,9 @@ const showAllLoaders = ref(false)
 
 const data = useNuxtApp()
 const route = useRoute()
+
+const cosmetics = useCosmetics()
+const tags = useTags()
 
 const query = ref('')
 const facets = ref([])
@@ -444,7 +447,7 @@ if (route.query.o) {
   currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1
 }
 
-projectType.value = data.$tag.projectTypes.find(
+projectType.value = tags.value.projectTypes.find(
   (x) => x.id === route.path.substring(1, route.path.length - 1)
 )
 
@@ -481,15 +484,15 @@ const {
         formattedFacets.push(orFacets.value)
       } else if (projectType.value.id === 'plugin') {
         formattedFacets.push(
-          data.$tag.loaderData.allPluginLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
+          tags.value.loaderData.allPluginLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
         )
       } else if (projectType.value.id === 'mod') {
         formattedFacets.push(
-          data.$tag.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
+          tags.value.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
         )
       } else if (projectType.value.id === 'datapack') {
         formattedFacets.push(
-          data.$tag.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
+          tags.value.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
         )
       }
 
@@ -644,7 +647,7 @@ function getSearchUrl(offset, useObj) {
 const categoriesMap = computed(() => {
   const categories = {}
 
-  for (const category of data.$sortedCategories) {
+  for (const category of data.$sortedCategories()) {
     if (categories[category.header]) {
       categories[category.header].push(category)
     } else {
@@ -747,9 +750,9 @@ function onSearchChangeToTop(newPageNumber) {
 }
 
 function cycleSearchDisplayMode() {
-  data.$cosmetics.searchDisplayMode[projectType.value.id] = data.$cycleValue(
-    data.$cosmetics.searchDisplayMode[projectType.value.id],
-    data.$tag.projectViewModes
+  cosmetics.value.searchDisplayMode[projectType.value.id] = data.$cycleValue(
+    cosmetics.value.searchDisplayMode[projectType.value.id],
+    tags.value.projectViewModes
   )
   saveCosmetics()
   setClosestMaxResults()
@@ -775,7 +778,7 @@ function onMaxResultsChange(newPageNumber) {
 }
 
 function setClosestMaxResults() {
-  const view = data.$cosmetics.searchDisplayMode[projectType.value.id]
+  const view = cosmetics.value.searchDisplayMode[projectType.value.id]
   const maxResultsOptions = maxResultsForView.value[view] ?? [20]
   const currentMax = maxResults.value
   if (!maxResultsOptions.includes(currentMax)) {

@@ -7,11 +7,16 @@
         :link-stack="breadcrumbsStack"
       />
       <h2>Report details</h2>
-      <ReportInfo :report="report" :show-thread="false" :show-message="false" />
+      <ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
     </section>
     <section class="universal-card">
       <h2>Messages</h2>
-      <ConversationThread :thread="thread" :report="report" :update-thread="updateThread" />
+      <ConversationThread
+        :thread="thread"
+        :report="report"
+        :update-thread="updateThread"
+        :auth="auth"
+      />
     </section>
   </div>
 </template>
@@ -30,9 +35,11 @@ const props = defineProps({
     type: Array,
     default: null,
   },
+  auth: {
+    type: Object,
+    required: true,
+  },
 })
-
-const app = useNuxtApp()
 
 const report = ref(null)
 
@@ -41,7 +48,7 @@ await fetchReport().then((result) => {
 })
 
 const { data: rawThread } = await useAsyncData(`thread/${report.value.thread_id}`, () =>
-  useBaseFetch(`thread/${report.value.thread_id}`, app.$defaultHeaders())
+  useBaseFetch(`thread/${report.value.thread_id}`)
 )
 const thread = computed(() => addReportMessage(rawThread.value, report.value))
 
@@ -52,7 +59,7 @@ async function updateThread(newThread) {
 
 async function fetchReport() {
   const { data: rawReport } = await useAsyncData(`report/${props.reportId}`, () =>
-    useBaseFetch(`report/${props.reportId}`, app.$defaultHeaders())
+    useBaseFetch(`report/${props.reportId}`)
   )
   rawReport.value.item_id = rawReport.value.item_id.replace(/"/g, '')
 
@@ -67,7 +74,7 @@ async function fetchReport() {
   let users = []
   if (userIds.length > 0) {
     const { data: usersVal } = await useAsyncData(`users?ids=${JSON.stringify(userIds)}`, () =>
-      useBaseFetch(`users?ids=${JSON.stringify(userIds)}`, app.$defaultHeaders())
+      useBaseFetch(`users?ids=${encodeURIComponent(JSON.stringify(userIds))}`)
     )
     users = usersVal.value
   }
@@ -75,7 +82,7 @@ async function fetchReport() {
   let version = null
   if (versionId) {
     const { data: versionVal } = await useAsyncData(`version/${versionId}`, () =>
-      useBaseFetch(`version/${versionId}`, app.$defaultHeaders())
+      useBaseFetch(`version/${versionId}`)
     )
     version = versionVal.value
   }
@@ -89,7 +96,7 @@ async function fetchReport() {
   let project = null
   if (projectId) {
     const { data: projectVal } = await useAsyncData(`project/${projectId}`, () =>
-      useBaseFetch(`project/${projectId}`, app.$defaultHeaders())
+      useBaseFetch(`project/${projectId}`)
     )
     project = projectVal.value
   }

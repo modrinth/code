@@ -36,7 +36,7 @@
     </p>
     <Categories
       :categories="
-        categories.filter((x) => !hideLoaders || !$tag.loaders.find((y) => y.name === x))
+        categories.filter((x) => !hideLoaders || !tags.loaders.find((y) => y.name === x))
       "
       :type="type"
       class="tags"
@@ -208,6 +208,11 @@ export default {
       required: false,
       default: null,
     },
+  },
+  setup() {
+    const tags = useTags()
+
+    return { tags }
   },
   computed: {
     projectTypeDisplay() {

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$auth.user && showInvitation" class="universal-card information invited">
+  <div v-if="showInvitation" class="universal-card information invited">
     <h2>Invitation to join project</h2>
     <p>
       You've been invited be a member of this project with the role of '{{ currentMember.role }}'.
@@ -15,10 +15,9 @@
   </div>
   <div
     v-if="
-      $auth.user &&
       currentMember &&
       nags.filter((x) => x.condition).length > 0 &&
-      (project.status === 'draft' || $tag.rejectedStatuses.includes(project.status))
+      (project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
     "
     class="author-actions universal-card"
   >
@@ -154,6 +153,14 @@ export default {
     routeName: {
       type: String,
       default: '',
+    },
+    auth: {
+      type: Object,
+      required: true,
+    },
+    tags: {
+      type: Object,
+      required: true,
     },
     setProcessing: {
       type: Function,
@@ -334,7 +341,7 @@ export default {
           },
         },
         {
-          hide: !this.$tag.rejectedStatuses.includes(this.project.status),
+          hide: !this.tags.rejectedStatuses.includes(this.project.status),
           condition: true,
           title: 'Resubmit for review',
           id: 'resubmit-for-review',
@@ -363,8 +370,8 @@ export default {
         )
     },
     showInvitation() {
-      if (this.allMembers && this.$auth) {
-        const member = this.allMembers.find((x) => x.user.id === this.$auth.user.id)
+      if (this.allMembers && this.auth) {
+        const member = this.allMembers.find((x) => x.user.id === this.auth.user.id)
         return member && !member.accepted
       }
       return false

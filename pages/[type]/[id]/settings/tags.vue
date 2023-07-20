@@ -152,13 +152,13 @@ export default defineNuxtComponent({
   },
   data() {
     return {
-      selectedTags: this.$sortedCategories.filter(
+      selectedTags: this.$sortedCategories().filter(
         (x) =>
           x.project_type === this.project.actualProjectType &&
           (this.project.categories.includes(x.name) ||
             this.project.additional_categories.includes(x.name))
       ),
-      featuredTags: this.$sortedCategories.filter(
+      featuredTags: this.$sortedCategories().filter(
         (x) =>
           x.project_type === this.project.actualProjectType &&
           this.project.categories.includes(x.name)
@@ -168,7 +168,7 @@ export default defineNuxtComponent({
   computed: {
     categoryLists() {
       const lists = {}
-      this.$sortedCategories.forEach((x) => {
+      this.$sortedCategories().forEach((x) => {
         if (x.project_type === this.project.actualProjectType) {
           const header = x.header
           if (!lists[header]) {

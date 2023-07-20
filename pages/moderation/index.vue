@@ -38,9 +38,5 @@ useHead({
   title: 'Staff overview - Modrinth',
 })
 
-const app = useNuxtApp()
-
-const { data: stats } = await useAsyncData('statistics', () =>
-  useBaseFetch('statistics', app.$defaultHeaders())
-)
+const { data: stats } = await useAsyncData('statistics', () => useBaseFetch('statistics'))
 </script>

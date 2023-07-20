@@ -323,7 +323,6 @@ export default defineNuxtComponent({
         await useBaseFetch(`team/${this.project.team}/members`, {
           method: 'POST',
           body: data,
-          ...this.$defaultHeaders(),
         })
         this.currentUsername = ''
         await this.updateMembers()
@@ -346,7 +345,6 @@ export default defineNuxtComponent({
           `team/${this.project.team}/members/${this.allTeamMembers[index].user.id}`,
           {
             method: 'DELETE',
-            ...this.$defaultHeaders(),
           }
         )
         await this.updateMembers()
@@ -381,7 +379,6 @@ export default defineNuxtComponent({
           {
             method: 'PATCH',
             body: data,
-            ...this.$defaultHeaders(),
           }
         )
         await this.updateMembers()
@@ -411,7 +408,6 @@ export default defineNuxtComponent({
           body: {
             user_id: this.allTeamMembers[index].user.id,
           },
-          ...this.$defaultHeaders(),
         })
         await this.updateMembers()
       } catch (err) {
@@ -426,9 +422,7 @@ export default defineNuxtComponent({
       stopLoading()
     },
     async updateMembers() {
-      this.allTeamMembers = (
-        await useBaseFetch(`team/${this.project.team}/members`, this.$defaultHeaders())
-      ).map((it) => ({
+      this.allTeamMembers = (await useBaseFetch(`team/${this.project.team}/members`)).map((it) => ({
         avatar_url: it.user.avatar_url,
         name: it.user.username,
         oldRole: it.role,

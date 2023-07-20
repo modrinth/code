@@ -34,6 +34,9 @@ dependencies:
   omorphia:
     specifier: ^0.4.31
     version: 0.4.31
+  qrcode.vue:
+    specifier: ^3.4.0
+    version: 3.4.0(vue@3.3.4)
   vue-multiselect:
     specifier: ^3.0.0-alpha.2
     version: 3.0.0-alpha.2
@@ -48,6 +51,9 @@ devDependencies:
   '@nuxtjs/eslint-config-typescript':
     specifier: ^12.0.0
     version: 12.0.0(eslint@8.41.0)(typescript@5.0.4)
+  '@nuxtjs/turnstile':
+    specifier: ^0.5.0
+    version: 0.5.0
   '@types/node':
     specifier: ^20.1.0
     version: 20.1.0
@@ -1354,6 +1360,17 @@ packages:
       - '@typescript-eslint/parser'
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
+      - supports-color
+    dev: true
+
+  /@nuxtjs/turnstile@0.5.0:
+    resolution: {integrity: sha512-EmEnYNDRavdmv9HXnInHVR5nSvjDG92s6pOrxd+ugqImkrnIQJttSd4DPq9UNhwUI/wLUL7z3VclVyQwNT2O7Q==}
+    dependencies:
+      '@nuxt/kit': 3.6.1
+      defu: 6.1.2
+      pathe: 1.1.1
+    transitivePeerDependencies:
+      - rollup
       - supports-color
     dev: true
 
@@ -6023,6 +6040,14 @@ packages:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
     engines: {node: '>=6'}
     dev: true
+
+  /qrcode.vue@3.4.0(vue@3.3.4):
+    resolution: {integrity: sha512-4XeImbv10Fin16Fl2DArCMhGyAdvIg2jb7vDT+hZiIAMg/6H6mz9nUZr/dR8jBcun5VzNzkiwKhiqOGbloinwA==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      vue: 3.3.4
+    dev: false
 
   /queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}

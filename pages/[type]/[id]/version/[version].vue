@@ -8,7 +8,7 @@
       <Meta name="og:description" :content="metaDescription" />
     </Head>
     <ModalConfirm
-      v-if="$auth.user && currentMember"
+      v-if="currentMember"
       ref="modal_confirm"
       title="Are you sure you want to delete this version?"
       description="This will remove this version forever (like really forever)."
@@ -17,12 +17,12 @@
       @proceed="deleteVersion()"
     />
     <ModalReport
-      v-if="$auth.user"
+      v-if="auth.user"
       ref="modal_version_report"
       :item-id="version.id"
       item-type="version"
     />
-    <Modal v-if="$auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
+    <Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
       <div class="modal-package-mod universal-labels">
         <div class="markdown-body">
           <p>
@@ -116,7 +116,7 @@
           Create
         </button>
         <nuxt-link
-          v-if="$auth.user"
+          v-if="auth.user"
           :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
           class="iconified-button"
         >
@@ -164,7 +164,7 @@
           <ReportIcon aria-hidden="true" />
           Report
         </button>
-        <a v-if="!$auth.user" class="iconified-button" :href="getAuthUrl()" rel="noopener nofollow">
+        <a v-if="!auth.user" class="iconified-button" :href="getAuthUrl()" rel="noopener nofollow">
           <ReportIcon aria-hidden="true" />
           Report
         </a>
@@ -181,7 +181,7 @@
         <button
           v-if="
             currentMember &&
-            version.loaders.some((x) => $tag.loaderData.dataPackLoaders.includes(x))
+            version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))
           "
           class="iconified-button"
           @click="$refs.modal_package_mod.show()"
@@ -390,7 +390,7 @@
         </span>
         <multiselect
           v-if="
-            version.loaders.some((x) => $tag.loaderData.dataPackLoaders.includes(x)) &&
+            version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x)) &&
             isEditing &&
             primaryFile.hashes.sha1 !== file.hashes.sha1
           "
@@ -457,7 +457,7 @@
             <span class="file-size">({{ $formatBytes(file.size) }})</span>
           </span>
           <multiselect
-            v-if="version.loaders.some((x) => $tag.loaderData.dataPackLoaders.includes(x))"
+            v-if="version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))"
             v-model="newFileTypes[index]"
             class="raised-multiselect"
             placeholder="Select file type"
@@ -484,7 +484,7 @@
         </div>
         <div class="additional-files">
           <h4>Upload additional files</h4>
-          <span v-if="version.loaders.some((x) => $tag.loaderData.dataPackLoaders.includes(x))">
+          <span v-if="version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))">
             Used for additional files such as required/optional resource packs
           </span>
           <span v-else>Used for files such as sources or Javadocs.</span>
@@ -566,14 +566,14 @@
             v-if="isEditing"
             v-model="version.loaders"
             :options="
-              $tag.loaders
+              tags.loaders
                 .filter((x) =>
                   x.supported_project_types.includes(project.actualProjectType.toLowerCase())
                 )
                 .map((it) => it.name)
             "
             :custom-label="(value) => $formatCategory(value)"
-            :loading="$tag.loaders.length === 0"
+            :loading="tags.loaders.length === 0"
             :multiple="true"
             :searchable="false"
             :show-no-results="false"
@@ -593,12 +593,12 @@
               v-model="version.game_versions"
               :options="
                 showSnapshots
-                  ? $tag.gameVersions.map((x) => x.version)
-                  : $tag.gameVersions
+                  ? tags.gameVersions.map((x) => x.version)
+                  : tags.gameVersions
                       .filter((it) => it.version_type === 'release')
                       .map((x) => x.version)
               "
-              :loading="$tag.gameVersions.length === 0"
+              :loading="tags.gameVersions.length === 0"
               :multiple="true"
               :searchable="true"
               :show-no-results="false"
@@ -772,6 +772,9 @@ export default defineNuxtComponent({
     const data = useNuxtApp()
     const route = useRoute()
 
+    const auth = await useAuth()
+    const tags = useTags()
+
     const path = route.name.split('-')
     const mode = path[path.length - 1]
 
@@ -828,7 +831,7 @@ export default defineNuxtComponent({
           const inferredData = await inferVersionInfo(
             replaceFile,
             props.project,
-            data.$tag.gameVersions
+            tags.value.gameVersions
           )
 
           version = {
@@ -895,6 +898,8 @@ export default defineNuxtComponent({
     const order = ['required', 'optional', 'incompatible', 'embedded']
 
     return {
+      auth,
+      tags,
       fileTypes: ref(fileTypes),
       oldFileTypes: ref(oldFileTypes),
       isCreating: ref(isCreating),
@@ -1110,7 +1115,6 @@ export default defineNuxtComponent({
             body: formData,
             headers: {
               'Content-Disposition': formData,
-              Authorization: this.$auth.token,
             },
           })
         }
@@ -1135,13 +1139,11 @@ export default defineNuxtComponent({
               }
             }),
           },
-          ...this.$defaultHeaders(),
         })
 
         for (const hash of this.deleteFiles) {
           await useBaseFetch(`version_file/${hash}?version_id=${this.version.id}`, {
             method: 'DELETE',
-            ...this.$defaultHeaders(),
           })
         }
 
@@ -1246,7 +1248,6 @@ export default defineNuxtComponent({
         body: formData,
         headers: {
           'Content-Disposition': formData,
-          Authorization: this.$auth.token,
         },
       })
 
@@ -1263,7 +1264,6 @@ export default defineNuxtComponent({
 
       await useBaseFetch(`version/${this.version.id}`, {
         method: 'DELETE',
-        ...this.$defaultHeaders(),
       })
 
       await this.resetProjectVersions()
@@ -1279,7 +1279,7 @@ export default defineNuxtComponent({
           this.version,
           this.primaryFile,
           this.members,
-          this.$tag.gameVersions,
+          this.tags.gameVersions,
           this.packageLoaders
         )
 
@@ -1324,12 +1324,9 @@ export default defineNuxtComponent({
     },
     async resetProjectVersions() {
       const [versions, featuredVersions, dependencies] = await Promise.all([
-        useBaseFetch(`project/${this.version.project_id}/version`, this.$defaultHeaders()),
-        useBaseFetch(
-          `project/${this.version.project_id}/version?featured=true`,
-          this.$defaultHeaders()
-        ),
-        useBaseFetch(`project/${this.version.project_id}/dependencies`, this.$defaultHeaders()),
+        useBaseFetch(`project/${this.version.project_id}/version`),
+        useBaseFetch(`project/${this.version.project_id}/version?featured=true`),
+        useBaseFetch(`project/${this.version.project_id}/dependencies`),
       ])
 
       const newCreatedVersions = this.$computeVersions(versions, this.members)

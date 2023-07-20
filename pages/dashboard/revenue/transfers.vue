@@ -39,10 +39,9 @@ useHead({
 })
 
 const auth = await useAuth()
-const app = useNuxtApp()
 
 const { data: payouts } = await useAsyncData(`user/${auth.value.user.id}/payouts`, () =>
-  useBaseFetch(`user/${auth.value.user.id}/payouts`, app.$defaultHeaders())
+  useBaseFetch(`user/${auth.value.user.id}/payouts`)
 )
 </script>
 <style lang="scss" scoped>

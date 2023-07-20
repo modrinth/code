@@ -46,7 +46,7 @@
               <UploadIcon />
             </FileInput>
             <button
-              v-else-if="$auth.user && $auth.user.id === user.id"
+              v-else-if="auth.user && auth.user.id === user.id"
               class="iconified-button"
               @click="isEditing = true"
             >
@@ -54,7 +54,7 @@
               Edit
             </button>
             <button
-              v-else-if="$auth.user"
+              v-else-if="auth.user"
               class="iconified-button"
               @click="$refs.modal_report.show()"
             >
@@ -81,7 +81,7 @@
                 @click="
                   () => {
                     isEditing = false
-                    user = JSON.parse(JSON.stringify($auth.user))
+                    user = JSON.parse(JSON.stringify(auth.user))
                     previewImage = null
                     icon = null
                   }
@@ -96,7 +96,7 @@
           </template>
           <template v-else>
             <div class="sidebar__item">
-              <Badge v-if="$tag.staffRoles.includes(user.role)" :type="user.role" />
+              <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
               <Badge v-else-if="projects.length > 0" type="creator" />
             </div>
             <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
@@ -129,16 +129,6 @@
               <UserIcon class="secondary-stat__icon" aria-hidden="true" />
               <span class="secondary-stat__text"> User ID: <CopyCode :text="user.id" /> </span>
             </div>
-            <a
-              v-if="githubUrl"
-              :href="githubUrl"
-              :target="$external()"
-              rel="noopener noreferrer nofollow"
-              class="sidebar__item github-button iconified-button"
-            >
-              <GitHubIcon aria-hidden="true" />
-              View GitHub profile
-            </a>
           </template>
         </div>
       </div>
@@ -161,7 +151,7 @@
           />
           <div class="input-group">
             <NuxtLink
-              v-if="$auth.user && $auth.user.id === user.id"
+              v-if="auth.user && auth.user.id === user.id"
               class="iconified-button"
               to="/dashboard/projects"
             >
@@ -169,13 +159,13 @@
               Manage projects
             </NuxtLink>
             <button
-              v-tooltip="$capitalizeString($cosmetics.searchDisplayMode.user) + ' view'"
-              :aria-label="$capitalizeString($cosmetics.searchDisplayMode.user) + ' view'"
+              v-tooltip="$capitalizeString(cosmetics.searchDisplayMode.user) + ' view'"
+              :aria-label="$capitalizeString(cosmetics.searchDisplayMode.user) + ' view'"
               class="square-button"
               @click="cycleSearchDisplayMode()"
             >
-              <GridIcon v-if="$cosmetics.searchDisplayMode.user === 'grid'" />
-              <ImageIcon v-else-if="$cosmetics.searchDisplayMode.user === 'gallery'" />
+              <GridIcon v-if="cosmetics.searchDisplayMode.user === 'grid'" />
+              <ImageIcon v-else-if="cosmetics.searchDisplayMode.user === 'gallery'" />
               <ListIcon v-else />
             </button>
           </div>
@@ -183,7 +173,7 @@
         <div
           v-if="projects.length > 0"
           class="project-list"
-          :class="'display-mode--' + $cosmetics.searchDisplayMode.user"
+          :class="'display-mode--' + cosmetics.searchDisplayMode.user"
         >
           <ProjectCard
             v-for="project in (route.params.projectType !== undefined
@@ -199,7 +189,7 @@
             :id="project.slug || project.id"
             :key="project.id"
             :name="project.title"
-            :display="$cosmetics.searchDisplayMode.user"
+            :display="cosmetics.searchDisplayMode.user"
             :featured-image="
               project.gallery
                 .slice()
@@ -216,7 +206,7 @@
             :client-side="project.client_side"
             :server-side="project.server_side"
             :status="
-              $auth.user && ($auth.user.id === user.id || $tag.staffRoles.includes($auth.user.role))
+              auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
                 ? project.status
                 : null
             "
@@ -226,7 +216,7 @@
         </div>
         <div v-else class="error">
           <UpToDate class="icon" /><br />
-          <span v-if="$auth.user && $auth.user.id === user.id" class="text">
+          <span v-if="auth.user && auth.user.id === user.id" class="text">
             You don't have any projects.<br />
             Would you like to
             <a class="link" @click.prevent="$refs.modal_creation.show()"> create one</a>?
@@ -242,7 +232,6 @@ import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Badge from '~/components/ui/Badge.vue'
 import Promotion from '~/components/ads/Promotion.vue'
 
-import GitHubIcon from '~/assets/images/utils/github.svg'
 import ReportIcon from '~/assets/images/utils/report.svg'
 import SunriseIcon from '~/assets/images/utils/sunrise.svg'
 import DownloadIcon from '~/assets/images/utils/download.svg'
@@ -266,23 +255,25 @@ import Avatar from '~/components/ui/Avatar.vue'
 
 const data = useNuxtApp()
 const route = useRoute()
+const auth = await useAuth()
+const cosmetics = useCosmetics()
+const tags = useTags()
 
 let user, projects
 try {
   ;[{ data: user }, { data: projects }] = await Promise.all([
-    useAsyncData(`user/${route.params.id}`, () =>
-      useBaseFetch(`user/${route.params.id}`, data.$defaultHeaders())
-    ),
+    useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
     useAsyncData(
       `user/${route.params.id}/projects`,
-      () => useBaseFetch(`user/${route.params.id}/projects`, data.$defaultHeaders()),
+      () => useBaseFetch(`user/${route.params.id}/projects`),
       {
         transform: (projects) => {
           for (const project of projects) {
             project.categories = project.categories.concat(project.loaders)
             project.project_type = data.$getProjectTypeForUrl(
               project.project_type,
-              project.categories
+              project.categories,
+              tags.value
             )
           }
 
@@ -306,12 +297,6 @@ if (!user.value) {
     message: 'User not found',
   })
 }
-
-let githubUrl
-try {
-  const githubUser = await $fetch(`https://api.github.com/user/` + user.value.github_id)
-  githubUrl = ref(githubUser.html_url)
-} catch {}
 
 if (user.value.username !== route.params.id) {
   await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 })
@@ -369,13 +354,12 @@ async function saveChanges() {
   try {
     if (icon.value) {
       await useBaseFetch(
-        `user/${data.$auth.user.id}/icon?ext=${
+        `user/${auth.value.user.id}/icon?ext=${
           icon.value.type.split('/')[icon.value.type.split('/').length - 1]
         }`,
         {
           method: 'PATCH',
           body: icon.value,
-          ...data.$defaultHeaders(),
         }
       )
     }
@@ -384,16 +368,15 @@ async function saveChanges() {
       email: user.value.email,
       bio: user.value.bio,
     }
-    if (user.value.username !== data.$auth.user.username) {
+    if (user.value.username !== auth.value.user.username) {
       reqData.username = user.value.username
     }
 
-    await useBaseFetch(`user/${data.$auth.user.id}`, {
+    await useBaseFetch(`user/${auth.value.user.id}`, {
       method: 'PATCH',
       body: reqData,
-      ...data.$defaultHeaders(),
     })
-    await useAuth(data.$auth.token)
+    await useAuth(auth.value.token)
 
     isEditing.value = false
   } catch (err) {
@@ -409,9 +392,9 @@ async function saveChanges() {
 }
 
 function cycleSearchDisplayMode() {
-  data.$cosmetics.searchDisplayMode.user = data.$cycleValue(
-    data.$cosmetics.searchDisplayMode.user,
-    data.$tag.projectViewModes
+  cosmetics.value.searchDisplayMode.user = data.$cycleValue(
+    cosmetics.value.searchDisplayMode.user,
+    tags.value.projectViewModes
   )
   saveCosmetics()
 }
@@ -502,10 +485,6 @@ export default defineNuxtComponent({
 
 .date {
   cursor: default;
-}
-
-.github-button {
-  display: inline-flex;
 }
 
 .inputs {

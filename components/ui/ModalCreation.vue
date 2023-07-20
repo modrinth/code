@@ -10,7 +10,7 @@
       <Chips
         id="project-type"
         v-model="projectType"
-        :items="$tag.projectTypes.map((x) => x.display)"
+        :items="tags.projectTypes.map((x) => x.display)"
       />
       <label for="name">
         <span class="label__title">Name<span class="required">*</span></span>
@@ -86,9 +86,14 @@ export default {
       default: '',
     },
   },
+  setup() {
+    const tags = useTags()
+
+    return { tags }
+  },
   data() {
     return {
-      projectType: this.$tag.projectTypes[0].display,
+      projectType: this.tags.projectTypes[0].display,
       name: '',
       slug: '',
       description: '',
@@ -100,7 +105,7 @@ export default {
       this.$refs.modal.hide()
     },
     getProjectType() {
-      return this.$tag.projectTypes.find((x) => this.projectType === x.display)
+      return this.tags.projectTypes.find((x) => this.projectType === x.display)
     },
     getClientSide() {
       switch (this.getProjectType().id) {
@@ -137,6 +142,8 @@ export default {
 
       const formData = new FormData()
 
+      const auth = await useAuth()
+
       formData.append(
         'data',
         JSON.stringify({
@@ -148,8 +155,8 @@ export default {
           initial_versions: [],
           team_members: [
             {
-              user_id: this.$auth.user.id,
-              name: this.$auth.user.username,
+              user_id: auth.value.user.id,
+              name: auth.value.user.username,
               role: 'Owner',
             },
           ],
@@ -167,7 +174,6 @@ export default {
           body: formData,
           headers: {
             'Content-Disposition': formData,
-            Authorization: this.$auth.token,
           },
         })
 
@@ -193,7 +199,7 @@ export default {
       stopLoading()
     },
     show() {
-      this.projectType = this.$tag.projectTypes[0].display
+      this.projectType = this.tags.projectTypes[0].display
       this.name = ''
       this.slug = ''
       this.description = ''

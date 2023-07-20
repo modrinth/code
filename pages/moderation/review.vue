@@ -103,7 +103,7 @@ const TIME_24H = 86400000
 const TIME_48H = TIME_24H * 2
 
 const { data: projects } = await useAsyncData('moderation/projects?count=1000', () =>
-  useBaseFetch('moderation/projects?count=1000', app.$defaultHeaders())
+  useBaseFetch('moderation/projects?count=1000')
 )
 const members = ref([])
 const projectType = ref('all')
@@ -145,37 +145,30 @@ const projectTypes = computed(() => {
 if (projects.value) {
   const teamIds = projects.value.map((x) => x.team)
 
-  await useAsyncData(
-    'teams?ids=' + JSON.stringify(teamIds),
-    () => useBaseFetch('teams?ids=' + JSON.stringify(teamIds), app.$defaultHeaders()),
-    {
-      transform: (result) => {
-        if (result) {
-          members.value = result
+  const url = `teams?ids=${encodeURIComponent(JSON.stringify(teamIds))}`
+  const { data: result } = await useAsyncData(url, () => useBaseFetch(url))
 
-          projects.value = projects.value.map((project) => {
-            project.owner = members.value
-              .flat()
-              .find((x) => x.team_id === project.team && x.role === 'Owner').user
-            project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE
-            project.age_warning = ''
-            if (project.age > TIME_24H * 2) {
-              project.age_warning = 'danger'
-            } else if (project.age > TIME_24H) {
-              project.age_warning = 'warning'
-            }
-            project.inferred_project_type = app.$getProjectTypeForUrl(
-              project.project_type,
-              project.loaders
-            )
-            return project
-          })
-        }
+  if (result.value) {
+    members.value = result.value
 
-        return result
-      },
-    }
-  )
+    projects.value = projects.value.map((project) => {
+      project.owner = members.value
+        .flat()
+        .find((x) => x.team_id === project.team && x.role === 'Owner').user
+      project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE
+      project.age_warning = ''
+      if (project.age > TIME_24H * 2) {
+        project.age_warning = 'danger'
+      } else if (project.age > TIME_24H) {
+        project.age_warning = 'warning'
+      }
+      project.inferred_project_type = app.$getProjectTypeForUrl(
+        project.project_type,
+        project.loaders
+      )
+      return project
+    })
+  }
 }
 </script>
 <style lang="scss" scoped>

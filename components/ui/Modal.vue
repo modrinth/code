@@ -3,7 +3,7 @@
     <div
       :class="{
         shown: actuallyShown,
-        noblur: !$orElse($cosmetics.advancedRendering, true),
+        noblur: !$orElse(cosmetics.advancedRendering, true),
       }"
       class="modal-overlay"
       @click="hide"
@@ -37,6 +37,11 @@ export default {
       type: String,
       default: null,
     },
+  },
+  setup() {
+    const cosmetics = useCosmetics()
+
+    return { cosmetics }
   },
   data() {
     return {

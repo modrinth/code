@@ -903,6 +903,8 @@ tr.button-transparent {
   cursor: pointer;
   width: fit-content;
   height: fit-content;
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+    outline 0.2s ease-in-out;
 
   text-decoration: none;
 

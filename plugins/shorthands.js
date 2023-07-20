@@ -1,29 +1,10 @@
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const tagStore = nuxtApp.$tag
-  const authStore = nuxtApp.$auth
-
-  nuxtApp.provide('defaultHeaders', () => {
-    const obj = { headers: {} }
-
-    if (process.server) {
-      const config = useRuntimeConfig()
-      if (config.rateLimitKey) {
-        obj.headers['x-ratelimit-key'] = config.rateLimitKey || ''
-      }
-    }
-
-    if (authStore.user) {
-      obj.headers.Authorization = authStore.token
-    }
-
-    return obj
-  })
   nuxtApp.provide('formatNumber', formatNumber)
   nuxtApp.provide('capitalizeString', capitalizeString)
   nuxtApp.provide('formatMoney', formatMoney)
-  nuxtApp.provide('formatVersion', (versionsArray) => formatVersions(versionsArray, tagStore))
+  nuxtApp.provide('formatVersion', (versionsArray) => formatVersions(versionsArray))
   nuxtApp.provide('orElse', (first, otherwise) => first ?? otherwise)
   nuxtApp.provide('external', () => {
     const cosmeticsStore = useCosmetics().value
@@ -95,15 +76,17 @@ export default defineNuxtPlugin((nuxtApp) => {
       .sort((a, b) => nuxtApp.$dayjs(b.date_published) - nuxtApp.$dayjs(a.date_published))
   })
   nuxtApp.provide('getProjectTypeForDisplay', (type, categories) => {
+    const tagStore = useTags()
+
     if (type === 'mod') {
       const isPlugin = categories.some((category) => {
-        return tagStore.loaderData.allPluginLoaders.includes(category)
+        return tagStore.value.loaderData.allPluginLoaders.includes(category)
       })
       const isMod = categories.some((category) => {
-        return tagStore.loaderData.modLoaders.includes(category)
+        return tagStore.value.loaderData.modLoaders.includes(category)
       })
       const isDataPack = categories.some((category) => {
-        return tagStore.loaderData.dataPackLoaders.includes(category)
+        return tagStore.value.loaderData.dataPackLoaders.includes(category)
       })
 
       if (isMod && isPlugin && isDataPack) {
@@ -123,25 +106,29 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     return type
   })
-  nuxtApp.provide('getProjectTypeForUrl', (type, loaders) =>
-    getProjectTypeForUrlShorthand(nuxtApp, type, loaders)
+  nuxtApp.provide('getProjectTypeForUrl', (type, loaders, tags) =>
+    getProjectTypeForUrlShorthand(type, loaders, tags)
   )
   nuxtApp.provide('cycleValue', cycleValue)
-  const sortedCategories = tagStore.categories.slice().sort((a, b) => {
-    const headerCompare = a.header.localeCompare(b.header)
-    if (headerCompare !== 0) {
-      return headerCompare
-    }
-    if (a.header === 'resolutions' && b.header === 'resolutions') {
-      return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-    } else if (a.header === 'performance impact' && b.header === 'performance impact') {
-      const x = ['potato', 'low', 'medium', 'high', 'screenshot']
+  nuxtApp.provide('sortedCategories', () => {
+    const tagStore = useTags()
 
-      return x.indexOf(a.name) - x.indexOf(b.name)
-    }
-    return 0
+    return tagStore.value.categories.slice().sort((a, b) => {
+      const headerCompare = a.header.localeCompare(b.header)
+      if (headerCompare !== 0) {
+        return headerCompare
+      }
+      if (a.header === 'resolutions' && b.header === 'resolutions') {
+        return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
+      } else if (a.header === 'performance impact' && b.header === 'performance impact') {
+        const x = ['potato', 'low', 'medium', 'high', 'screenshot']
+
+        return x.indexOf(a.name) - x.indexOf(b.name)
+      }
+      return 0
+    })
   })
-  nuxtApp.provide('sortedCategories', sortedCategories)
+  nuxtApp.provide('notify', (notif) => addNotification(notif))
 })
 export const formatNumber = (number, abbreviate = true) => {
   const x = +number
@@ -257,8 +244,9 @@ export const formatProjectStatus = (name) => {
   return capitalizeString(name)
 }
 
-export const formatVersions = (versionArray, tag) => {
-  const allVersions = tag.gameVersions.slice().reverse()
+export const formatVersions = (versionArray) => {
+  const tag = useTags()
+  const allVersions = tag.value.gameVersions.slice().reverse()
   const allReleases = allVersions.filter((x) => x.version_type === 'release')
 
   const intervals = []

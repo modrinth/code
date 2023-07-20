@@ -68,6 +68,7 @@
         :project="project"
         :set-status="setStatus"
         :current-member="currentMember"
+        :auth="auth"
       />
     </section>
   </div>
@@ -104,9 +105,10 @@ const props = defineProps({
 const emit = defineEmits(['update:project'])
 
 const app = useNuxtApp()
+const auth = await useAuth()
 
 const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
-  useBaseFetch(`thread/${props.project.thread_id}`, app.$defaultHeaders())
+  useBaseFetch(`thread/${props.project.thread_id}`)
 )
 async function setStatus(status) {
   startLoading()
@@ -117,12 +119,11 @@ async function setStatus(status) {
     await useBaseFetch(`project/${props.project.id}`, {
       method: 'PATCH',
       body: data,
-      ...app.$defaultHeaders(),
     })
     const project = props.project
     project.status = status
     emit('update:project', project)
-    thread.value = await useBaseFetch(`thread/${thread.value.id}`, app.$defaultHeaders())
+    thread.value = await useBaseFetch(`thread/${thread.value.id}`)
   } catch (err) {
     app.$notify({
       group: 'main',

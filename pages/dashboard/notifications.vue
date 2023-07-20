@@ -36,6 +36,7 @@
           v-model:notifications="allNotifs"
           class="universal-card recessed"
           :notification="notification"
+          :auth="auth"
           raised
         />
       </template>
@@ -54,6 +55,8 @@ import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 useHead({
   title: 'Notifications - Modrinth',
 })
+
+const auth = await useAuth()
 
 const route = useRoute()
 const router = useRouter()

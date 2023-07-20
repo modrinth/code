@@ -1,4 +1,6 @@
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
+  await useAuth()
+  await useUser()
   const themeStore = useTheme()
 
   nuxtApp.hook('app:mounted', () => {

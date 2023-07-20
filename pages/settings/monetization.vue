@@ -184,7 +184,6 @@ export default defineNuxtComponent({
         await useBaseFetch(`user/${this.auth.user.id}`, {
           method: 'PATCH',
           body: data,
-          ...this.$defaultHeaders(),
         })
         await useAuth(this.auth.token)
 

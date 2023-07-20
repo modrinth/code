@@ -8,6 +8,7 @@
         :key="thread.id"
         :thread="thread"
         :link="getLink(thread)"
+        :auth="auth"
       />
     </section>
   </div>
@@ -19,11 +20,8 @@ useHead({
   title: 'Moderation inbox - Modrinth',
 })
 
-const app = useNuxtApp()
-
-const { data: inbox } = await useAsyncData('thread/inbox', () =>
-  useBaseFetch('thread/inbox', app.$defaultHeaders())
-)
+const auth = await useAuth()
+const { data: inbox } = await useAsyncData('thread/inbox', () => useBaseFetch('thread/inbox'))
 
 function getLink(thread) {
   if (thread.report_id) {

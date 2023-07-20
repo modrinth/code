@@ -98,8 +98,9 @@ const props = defineProps({
 })
 const emit = defineEmits(['switch-page'])
 
-const data = useNuxtApp()
 const route = useRoute()
+
+const tags = useTags()
 
 const tempLoaders = new Set()
 let tempVersions = new Set()
@@ -119,7 +120,7 @@ tempVersions = Array.from(tempVersions)
 
 const loaderFilters = shallowRef(Array.from(tempLoaders))
 const gameVersionFilters = shallowRef(
-  data.$tag.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version))
+  tags.value.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version))
 )
 const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels))
 const includeSnapshots = ref(route.query.s === 'true')

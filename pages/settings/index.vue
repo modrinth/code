@@ -34,7 +34,7 @@
         </label>
         <input
           id="search-layout-toggle"
-          v-model="$cosmetics.searchLayout"
+          v-model="cosmetics.searchLayout"
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
@@ -49,7 +49,7 @@
         </label>
         <input
           id="project-layout-toggle"
-          v-model="$cosmetics.projectLayout"
+          v-model="cosmetics.projectLayout"
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
@@ -71,8 +71,8 @@
         </label>
         <Multiselect
           :id="projectType + '-search-display-mode'"
-          v-model="$cosmetics.searchDisplayMode[projectType.id]"
-          :options="$tag.projectViewModes"
+          v-model="cosmetics.searchDisplayMode[projectType.id]"
+          :options="tags.projectViewModes"
           :custom-label="$capitalizeString"
           :searchable="false"
           :close-on-select="true"
@@ -94,7 +94,7 @@
         </label>
         <input
           id="advanced-rendering"
-          v-model="$cosmetics.advancedRendering"
+          v-model="cosmetics.advancedRendering"
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
@@ -107,7 +107,7 @@
         </label>
         <input
           id="modpacks-alpha-notice"
-          v-model="$cosmetics.modpacksAlphaNotice"
+          v-model="cosmetics.modpacksAlphaNotice"
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
@@ -124,7 +124,7 @@
         </label>
         <input
           id="external-links-new-tab"
-          v-model="$cosmetics.externalLinksNewTab"
+          v-model="cosmetics.externalLinksNewTab"
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
@@ -141,9 +141,15 @@ export default defineNuxtComponent({
   components: {
     Multiselect,
   },
+  setup() {
+    const cosmetics = useCosmetics()
+    const tags = useTags()
+
+    return { cosmetics, tags }
+  },
   data() {
     return {
-      searchDisplayMode: this.$cosmetics.searchDisplayMode,
+      searchDisplayMode: this.cosmetics.searchDisplayMode,
     }
   },
   head: {
@@ -151,7 +157,7 @@ export default defineNuxtComponent({
   },
   computed: {
     listTypes() {
-      const types = this.$tag.projectTypes.map((type) => {
+      const types = this.tags.projectTypes.map((type) => {
         return {
           id: type.id,
           name: this.$formatProjectType(type.id) + ' search',

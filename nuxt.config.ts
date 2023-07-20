@@ -294,11 +294,14 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ['@vintl/nuxt'],
+  modules: ['@vintl/nuxt', '@nuxtjs/turnstile'],
   vintl: {
     defaultLocale: 'en-US',
     storage: 'cookie',
     parserless: 'only-prod',
+  },
+  turnstile: {
+    siteKey: '0x4AAAAAAAHWfmKCm7cUG869',
   },
   nitro: {
     moduleSideEffects: ['@vintl/compact-number/locale-data'],

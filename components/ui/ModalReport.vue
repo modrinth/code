@@ -23,7 +23,7 @@
       <Multiselect
         id="report-type"
         v-model="reportType"
-        :options="$tag.reportTypes"
+        :options="tags.reportTypes"
         :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
         :multiple="false"
         :searchable="false"
@@ -82,6 +82,11 @@ export default {
       default: '',
     },
   },
+  setup() {
+    const tags = useTags()
+
+    return { tags }
+  },
   data() {
     return {
       reportType: '',
@@ -110,7 +115,6 @@ export default {
         await useBaseFetch('report', {
           method: 'POST',
           body: data,
-          ...this.$defaultHeaders(),
         })
 
         this.$refs.modal.hide()
