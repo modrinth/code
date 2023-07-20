@@ -25,7 +25,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Avatar } from 'omorphia'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
@@ -737,7 +737,7 @@ const showLoaders = computed(
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
-  <InstanceInstallModal ref="modInstallModal" />
+  <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 </template>
 

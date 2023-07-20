@@ -105,6 +105,7 @@ const finishOnboarding = async () => {
     </suspense>
   </div>
   <div v-else class="container">
+    <StickyTitleBar v-if="phase === 9"/>
     <div v-if="phase < 9" class="nav-container expanded">
       <div class="nav-section">
         <FakeAccountsCard :show-demo="phase === 3">
@@ -112,7 +113,7 @@ const finishOnboarding = async () => {
             :progress-function="nextPhase"
             :progress="phase"
             title="Signing in"
-            description="The Modrinth App uses your Modrinth account to allow you to launch Minecraft. You can sign in with your Modrinth account here, and switch between multiple accounts."
+            description="The Modrinth App uses your Microsoft account to allow you to launch Minecraft. You can sign in with your Microsoft account here, and switch between multiple accounts."
           />
         </FakeAccountsCard>
         <div class="pages-list">
