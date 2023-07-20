@@ -2,7 +2,8 @@ use crate::api::Result;
 use std::path::PathBuf;
 use theseus::{
     pack::{
-        install_from::{CreatePackLocation, CreatePackProfile}, install_mrpack::install_zipped_mrpack,
+        install_from::{CreatePackLocation, CreatePackProfile},
+        install_mrpack::install_zipped_mrpack,
     },
     prelude::*,
 };

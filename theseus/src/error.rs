@@ -9,7 +9,7 @@ pub enum ErrorKind {
 
     #[error("Serialization error (INI): {0}")]
     INIError(#[from] serde_ini::de::Error),
-    
+
     #[error("Serialization error (JSON): {0}")]
     JSONError(#[from] serde_json::Error),
 

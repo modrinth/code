@@ -2,7 +2,9 @@ use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType, ProfileInstallStage};
+use crate::state::{
+    LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
+};
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, write_cached_icon,
 };
@@ -160,7 +162,7 @@ pub fn get_profile_from_pack(
                 name: file_name,
                 ..Default::default()
             }
-        },
+        }
     }
 }
 
@@ -259,14 +261,17 @@ pub async fn generate_pack_from_version_id(
     };
     emit_loading(&loading_bar, 10.0, None).await?;
 
-    Ok(CreatePack {file, description: CreatePackDescription {
-        icon,
-        override_title: None,
-        project_id: Some(project_id),
-        version_id: Some(version_id),
-        existing_loading_bar: Some(loading_bar),
-        profile,
-    }})
+    Ok(CreatePack {
+        file,
+        description: CreatePackDescription {
+            icon,
+            override_title: None,
+            project_id: Some(project_id),
+            version_id: Some(version_id),
+            existing_loading_bar: Some(loading_bar),
+            profile,
+        },
+    })
 }
 
 #[tracing::instrument]
@@ -276,25 +281,32 @@ pub async fn generate_pack_from_file(
     profile: PathBuf,
 ) -> crate::Result<CreatePack> {
     let file = fs::read(&path).await?;
-    Ok(CreatePack { file: bytes::Bytes::from(file), description: CreatePackDescription {
-        icon: None,
-        override_title: None,
-        project_id: None,
-        version_id: None,
-        existing_loading_bar: None,
-        profile,
-    }})
+    Ok(CreatePack {
+        file: bytes::Bytes::from(file),
+        description: CreatePackDescription {
+            icon: None,
+            override_title: None,
+            project_id: None,
+            version_id: None,
+            existing_loading_bar: None,
+            profile,
+        },
+    })
 }
 
 /// Sets generated profile attributes to the pack ones (using profile::edit)
 /// This includes the pack name, icon, game version, loader version, and loader
 #[theseus_macros::debug_pin]
-pub async fn set_profile_information(profile_path: PathBuf, description: &CreatePackDescription, backup_name: &str, dependencies: &HashMap<PackDependency, String>) -> crate::Result<()> {
+pub async fn set_profile_information(
+    profile_path: PathBuf,
+    description: &CreatePackDescription,
+    backup_name: &str,
+    dependencies: &HashMap<PackDependency, String>,
+) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
     let mut loader_version = None;
-    println!("here1");
-
+    println!("here1 {:?}", dependencies);
 
     for (key, value) in dependencies {
         match key {
@@ -314,7 +326,6 @@ pub async fn set_profile_information(profile_path: PathBuf, description: &Create
         }
     }
 
-    
     let game_version = if let Some(game_version) = game_version {
         game_version
     } else {
@@ -334,7 +345,7 @@ pub async fn set_profile_information(profile_path: PathBuf, description: &Create
             loader_version.cloned(),
         )
         .await?
-    } else { 
+    } else {
         None
     };
     println!("her5 - {:?}", game_version);
@@ -342,8 +353,10 @@ pub async fn set_profile_information(profile_path: PathBuf, description: &Create
     println!("her5 - {:?}", description.override_title);
     // Sets values in profile
     crate::api::profile::edit(&profile_path, |prof| {
-        prof.metadata.name =
-        description.override_title.clone().unwrap_or_else(|| backup_name.to_string());
+        prof.metadata.name = description
+            .override_title
+            .clone()
+            .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
         prof.metadata.linked_data = Some(LinkedData {
             project_id: description.project_id.clone(),
@@ -358,4 +371,4 @@ pub async fn set_profile_information(profile_path: PathBuf, description: &Create
     })
     .await?;
     Ok(())
- }
+}

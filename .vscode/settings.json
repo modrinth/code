@@ -56,4 +56,5 @@
   "rust-analyzer.linkedProjects": [
     "./theseus/Cargo.toml"
   ],
+  "rust-analyzer.showUnlinkedFileNotification": false,
 }

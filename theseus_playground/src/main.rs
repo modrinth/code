@@ -3,12 +3,15 @@
     windows_subsystem = "windows"
 )]
 
-use dunce::canonicalize;
-use theseus::jre::autodetect_java_globals;
+use std::path::PathBuf;
+
+use theseus::pack::import::ImportLauncherType;
+use theseus::pack::import::atlauncher::import_atlauncher;
+use theseus::pack::import::curseforge::import_curseforge;
+use theseus::pack::install_from::CreatePackProfile;
 use theseus::prelude::*;
 
-use theseus::profile_create::profile_create;
-use tokio::time::{sleep, Duration};
+use tokio::fs;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -35,95 +38,54 @@ async fn main() -> theseus::Result<()> {
     let _log_guard = theseus::start_logger();
 
     // Initialize state
-    let st = State::get().await?;
-    //State::update();
+    let state = crate::State::get().await?;
 
-    // Autodetect java globals
-    let jres = jre::get_all_jre().await?;
-    let java_8 = jre::find_filtered_jres("1.8", jres.clone(), false).await?;
-    let java_17 = jre::find_filtered_jres("1.78", jres.clone(), false).await?;
-    let java_18plus =
-        jre::find_filtered_jres("1.18", jres.clone(), true).await?;
-    let java_globals =
-        autodetect_java_globals(java_8, java_17, java_18plus).await?;
-    st.settings.write().await.java_globals = java_globals;
-
-    st.settings.write().await.max_concurrent_downloads = 50;
-    st.settings.write().await.hooks.post_exit =
-        Some("echo This is after Minecraft runs- global setting!".to_string());
-    // Changed the settings, so need to reset the semaphore
-    st.reset_fetch_semaphore().await;
-
-    //
-    // st.settings
-    //     .write()
-    //     .await
-    //     .java_globals
-    //     .insert(JAVA_8_KEY.to_string(), check_jre(path).await?.unwrap());
-    // Clear profiles
-    println!("Clearing profiles.");
+    // Set java globals to auto detected ones
     {
-        let h = profile::list(None).await?;
-        for (path, _) in h.into_iter() {
-            profile::remove(&path).await?;
-        }
+        let jres = crate::jre::get_all_jre().await?;
+        let java_8 =
+            crate::jre::find_filtered_jres("1.8", jres.clone(), false).await?;
+        let java_17 =
+            crate::jre::find_filtered_jres("1.17", jres.clone(), false).await?;
+        let java_18plus =
+            crate::jre::find_filtered_jres("1.18", jres.clone(), true).await?;
+        let java_globals =
+            crate::jre::autodetect_java_globals(java_8, java_17, java_18plus)
+                .await?;
+        state.settings.write().await.java_globals = java_globals;
     }
+    const ATLAUNCHER_FOLDER: &str = r"/home/thesuzerain/ATLauncher";
+    const PRISM_FOLDER: &str = r"/home/thesuzerain/.local/share/PrismLauncher";
+    const MMC_FOLDER: &str = r"/home/thesuzerain/MultiMC";
+    const CURSEFORGE_FOLDER: &str = r"/home/thesuzerain/curseforge";
+    const GD_LAUNCHER_FOLDER: &str = r"/home/thesuzerain/gdlauncher_next";
 
-    println!("Creating/adding profile.");
 
-    let name = "Example".to_string();
-    let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Vanilla;
-    let loader_version = "stable".to_string();
+    test_batch_import(ATLAUNCHER_FOLDER, ImportLauncherType::ATLauncher).await?;
+    test_batch_import(PRISM_FOLDER, ImportLauncherType::PrismLauncher).await?;
+    test_batch_import(MMC_FOLDER, ImportLauncherType::MultiMC).await?;
+    test_batch_import(CURSEFORGE_FOLDER, ImportLauncherType::Curseforge).await?;
+    test_batch_import(GD_LAUNCHER_FOLDER, ImportLauncherType::GDLauncher).await?;
 
-    let profile_path = profile_create(
-        name.clone(),
-        game_version,
-        modloader,
-        Some(loader_version),
-        None,
-        None,
-        None,
-        None,
-    )
-    .await?;
+    // Iterate through all filenames in PRISM_FOLDER/instances
+    Ok(())
+}
 
-    State::sync().await?;
+async fn test_batch_import(folder: &str, r#type : ImportLauncherType) -> theseus::Result<()> {
+    let instances = pack::import::get_importable_instances(r#type, folder.into()).await?;
+    for instance in instances {
+        println!("\n\n\nImporting {} for {:?}", instance, r#type);
+        let profile_path = profile_create::profile_create_from_creator(
+            CreatePackProfile::default(),
+        )
+        .await
+        .unwrap();
 
-    // Attempt to run game
-    if auth::users().await?.is_empty() {
-        println!("No users found, authenticating.");
-        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
+        pack::import::import_instance(profile_path, r#type, PathBuf::from(folder), instance, None).await?;
+        println!("Completoooo");
+
     }
-
-    println!("running");
-    // Run a profile, running minecraft and store the RwLock to the process
-    let proc_lock = profile::run(&canonicalize(&profile_path)?).await?;
-    let uuid = proc_lock.read().await.uuid;
-    let pid = proc_lock.read().await.current_child.read().await.id();
-
-    println!("Minecraft UUID: {}", uuid);
-    println!("Minecraft PID: {:?}", pid);
-
-    // Wait 5 seconds
-    println!("Waiting 5 seconds to gather logs...");
-    sleep(Duration::from_secs(5)).await;
-    let stdout = process::get_output_by_uuid(&uuid).await?;
-    println!("Logs after 5sec <<< {stdout} >>> end stdout");
-
-    println!(
-        "All running process UUID {:?}",
-        process::get_all_running_uuids().await?
-    );
-    println!(
-        "All running process paths {:?}",
-        process::get_all_running_profile_paths().await?
-    );
-
-    // hold the lock to the process until it ends
-    println!("Waiting for process to end...");
-    let mut proc = proc_lock.write().await;
-    process::wait_for(&mut proc).await?;
+    println!("Done batch import.");
 
     Ok(())
 }

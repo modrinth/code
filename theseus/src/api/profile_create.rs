@@ -132,8 +132,20 @@ pub async fn profile_create(
     }
 }
 
-pub async fn profile_create_from_creator(profile : CreatePackProfile)  -> crate::Result<PathBuf> {
-    profile_create(profile.name, profile.game_version, profile.modloader, profile.loader_version, profile.icon, profile.icon_url, profile.linked_data, profile.skip_install_profile).await
+pub async fn profile_create_from_creator(
+    profile: CreatePackProfile,
+) -> crate::Result<PathBuf> {
+    profile_create(
+        profile.name,
+        profile.game_version,
+        profile.modloader,
+        profile.loader_version,
+        profile.icon,
+        profile.icon_url,
+        profile.linked_data,
+        profile.skip_install_profile,
+    )
+    .await
 }
 
 #[tracing::instrument]
