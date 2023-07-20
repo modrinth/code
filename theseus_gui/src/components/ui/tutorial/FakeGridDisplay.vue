@@ -73,7 +73,7 @@ defineProps({
           class="mod-image"
         />
         <div class="project-info">
-          <p class="title">Example Profile {{project}}</p>
+          <p class="title">Example Profile</p>
           <p class="description">
             Forge/Fabric
             1.20.1

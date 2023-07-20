@@ -87,6 +87,10 @@ input {
 }
 
 .windows {
+  .fake-appbar {
+    height: 2.5rem !important;
+  }
+
   .window-controls {
     display: flex !important;
   }
@@ -124,4 +128,10 @@ input {
 
 .highlighted {
   box-shadow: 0 0 1rem var(--color-brand) !important;
+}
+
+.gecko {
+  background-color: var(--color-raised-bg);
+  box-shadow: none !important;
+
 }

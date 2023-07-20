@@ -1,22 +1,44 @@
+<script setup>
+// the objects should look like this
+/*
+ * {
+ *   "title": "Just Enough Items (JEI)",
+ *   "url": "https://modrinth.com/mod/jei",
+ * }
+ */
+import {computed, ref} from "vue";
+import {Button, ChevronRightIcon, ChevronLeftIcon} from "omorphia";
+
+const props = defineProps({
+  logo: {
+    type: Boolean,
+    default: false,
+  },
+  gallery: {
+    type: Array,
+    required: true,
+  },
+})
+
+const page = ref(1)
+const image = computed(() => props.gallery[page.value - 1])
+</script>
+
 <template>
-  <Modal
-    ref="onboardingModal"
-    :closable="false"
-  >
-    <div class="modal-body">
-      <div v-if="page === 1" key="1" class="content">
-        <svg
-          class="app-logo"
-          viewBox="0 0 1215 175"
-          xml:space="preserve"
-          style="
+  <div class="gallery-image">
+    <svg
+      v-if="logo"
+      class="app-logo"
+      viewBox="0 0 1215 175"
+      xml:space="preserve"
+      style="
             fill-rule: evenodd;
             clip-rule: evenodd;
             stroke-linejoin: round;
             stroke-miterlimit: 2;
           "
-          color="var(--color-contrast)"
-        >
+      color="var(--color-contrast)"
+    >
           <g transform="matrix(1,0,0,1,-3395.45,-1175)">
             <g transform="matrix(0.632704,0,0,0.161619,3395.45,1175)">
               <rect
@@ -69,268 +91,105 @@
               </g>
             </g>
           </g>
-        </svg>
-        <div class="markdown-body">
-          <p>
-            Welcome to the Modrinth App: a desktop application that allows you to easily install and
-            manage Minecraft modpacks.
-          </p>
-          <p>
-            Please keep in mind that this is an <strong>early alpha</strong>. Many features are
-            subject to change and there may be various issues you may come across.
-          </p>
-          <p>
-            If you do come across any issues or have a feature request, please report it on our
-            <a href="https://github.com/modrinth/theseus/issues">GitHub Issues page</a>. Please make
-            sure that your issue has not already been reported before creating a new issue!
-          </p>
-          <p>
-            For support, please join our <a href="https://discord.gg/EUHuJHt">Discord</a> and select
-            the Test Subject role. Ask your questions in the relevant thread and we will do our best
-            to help you!
-          </p>
-        </div>
-      </div>
-      <div v-else-if="page === 2" key="2" class="content">
-        <div class="markdown-body">
-          <p>
-            The Modrinth App requires a Minecraft account. Click the sign in button below and you
-            will be prompted to log into your Microsoft account.
-          </p>
-          <p>
-            <span>
-              If you do not have a Minecraft account already, visit
-              <a href="https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc">
-                the Minecraft website
-              </a>
-              to purchase the game.
-            </span>
-          </p>
-        </div>
-
-        <div class="center-grow">
-          <AccountsCard ref="accountsCard" mode="isolated" @change="fetchSettings" />
-        </div>
-      </div>
-      <div v-else-if="page === 3" key="3" class="content">
-        <div class="markdown-body">
-          <p>
-            The Modrinth App requires a Java installation to run Minecraft. You can let us
-            automatically install Java for you or select an existing installation below.
-          </p>
-        </div>
-        <Chips
-          v-model="javaSelectionType"
-          :items="['automatically install', 'use existing installation']"
-        />
-        <div v-if="javaSelectionType === 'use existing installation'" class="settings-group">
-          <h3>Java location</h3>
-          <JavaSelector v-model="settings.java_globals.JAVA_17" compact />
-        </div>
-        <div v-else class="center-grow">
-          <div v-if="javaLoadingEvent">
-            <ProgressBar :progress="Math.floor(javaLoadingEvent.fraction * 100)" />
-            <div class="row">
-              {{ Math.floor(javaLoadingEvent.fraction * 100) }}% {{ javaLoadingEvent.message }}
-            </div>
-          </div>
-          <Button v-else @click="autoInstallJava"> <PlayIcon /> Begin java installation </Button>
-        </div>
-      </div>
-      <div class="button-row">
-        <Button v-if="page !== 1" @click="page--"> Back </Button>
+        </svg >
+    <div class="image-wrapper">
+      <img :src="image.url" :alt="image.title" />
+      <div class="text">
+        <h3>{{image.title}}</h3>
+        <p>
+          {{image.subtitle}}
+        </p>
         <div class="page-indicator">
-          <span class="circle" :class="{ active: page === 1 }" @click="page = 1" />
-          <span class="circle" :class="{ active: page === 2 }" @click="page = 2" />
-          <span class="circle" :class="{ active: page === 3 }" @click="page = 3" />
+          <Button :disabled="page === 1" icon-only @click="page--">
+            <ChevronLeftIcon />
+          </Button>
+          <div>
+            <span v-for="index in gallery.length" :key="index" class="circle" :class="{ active: page === index }" @click="page = index" />
+          </div>
+          <Button :disabled="page === 2" icon-only @click="page++">
+            <ChevronRightIcon />
+          </Button>
         </div>
-        <Button class="forward" color="primary" @click="pageTurn()">
-          {{ page === 3 ? 'Finish' : 'Continue' }}
-        </Button>
       </div>
     </div>
-  </Modal>
+    <slot/>
+  </div>
 </template>
 
-<script setup>
-import { Button, Chips, Modal, PlayIcon } from 'omorphia'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
-import JavaSelector from '@/components/ui/JavaSelector.vue'
-import { handleError } from '@/store/notifications.js'
-import { get, set } from '@/helpers/settings.js'
-import { auto_install_java, get_jre } from '@/helpers/jre.js'
-import { loading_listener } from '@/helpers/events.js'
-import ProgressBar from '@/components/ui/ProgressBar.vue'
-import mixpanel from 'mixpanel-browser'
-
-const onboardingModal = ref(null)
-const accountsCard = ref(null)
-const page = ref(1)
-
-const props = defineProps({
-  accounts: {
-    type: Object,
-    default: () => {},
-  },
-  finish: {
-    type: Function,
-    default: () => {},
-  },
-})
-
-async function fetchSettings() {
-  const fetchSettings = await get().catch(handleError)
-
-  if (!fetchSettings.java_globals.JAVA_17)
-    fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
-
-  settings.value = fetchSettings
-  if (props.accounts) {
-    await props.accounts.refreshValues()
-  }
-}
-const settings = ref(null)
-await fetchSettings()
-
-watch([settings, settings.value], async () => {
-  const setSettings = JSON.parse(JSON.stringify(settings.value))
-
-  if (setSettings.java_globals.JAVA_17?.path === '') {
-    setSettings.java_globals.JAVA_17 = undefined
-  }
-  if (setSettings.java_globals.JAVA_17?.path) {
-    setSettings.java_globals.JAVA_17.path = setSettings.java_globals.JAVA_17.path.replace(
-      'java.exe',
-      'javaw.exe'
-    )
-  }
-
-  await set(setSettings)
-  if (accountsCard.value) {
-    await accountsCard.value.refreshValues()
-  }
-})
-
-onMounted(() => {
-  onboardingModal.value.show()
-})
-
-async function pageTurn() {
-  if (page.value === 3) {
-    onboardingModal.value.hide()
-    props.finish()
-    return
-  }
-  page.value++
-  mixpanel.track('OnboardingPage', { page: page.value })
-
-  if (accountsCard.value) {
-    await accountsCard.value.refreshValues()
-  }
-}
-
-const javaSelectionType = ref('automatically install')
-
-async function autoInstallJava() {
-  const path = await auto_install_java(17).catch(handleError)
-  if (!settings.value.java_globals) settings.value.java_globals = {}
-  const version = await get_jre(path).catch(handleError)
-  // weird vue bug, ignore
-  settings.value.java_globals.JAVA_17 = version
-  settings.value.java_globals.JAVA_17 = version
-  mixpanel.track('OnboardingAutoInstallJava')
-}
-
-const javaLoadingEvent = ref(null)
-const unlistenLoading = await loading_listener(async (event) => {
-  if (event.event.type === 'java_download') {
-    javaLoadingEvent.value = event
-    if (!event.fraction) {
-      javaLoadingEvent.value.fraction = 1
-    }
-  }
-})
-
-onBeforeUnmount(() => {
-  unlistenLoading()
-})
-</script>
-
 <style scoped lang="scss">
-.modal-body {
+.gallery-image {
   display: flex;
+  position: relative;
+  gap: var(--gap-md);
   flex-direction: column;
-  gap: 1rem;
+  align-items: center;
   padding: var(--gap-xl);
+  max-height: 100vh;
+  max-width: 100vh;
+  margin: auto;
 
-  height: min(70vh, 450px);
-
-  h2 {
-    margin-bottom: 0;
-    margin-top: 0;
-  }
-}
-
-.content {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-
-  .center-grow {
+  .image-wrapper {
+    position: relative;
+    height: 100%;
     width: 100%;
-    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-}
 
-.settings-group {
-  width: 100%;
-  text-align: left;
-}
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: contain;
+    }
 
-.button-row {
-  display: flex;
-  align-items: center;
-  position: relative;
-  width: 100%;
-
-  .back {
-    margin-right: auto;
-  }
-
-  .page-indicator {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-
-    .circle {
-      width: 0.75rem;
-      height: 0.75rem;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 0.5rem;
-      background-color: var(--color-base);
+    .text {
+      position: absolute;
+      bottom: calc(var(--gap-md) * 3);
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      border-radius: var(--gap-lg);
+      padding: var(--gap-sm) var(--gap-md);
+      background-color: rgba(0,0,0, 0.5);
+      //add blur
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      color: var(--color-base);
       transition: all 0.3s ease-in-out;
-      cursor: pointer !important;
-
-      &.active {
-        background-color: var(--color-brand);
-      }
     }
   }
 
-  .forward {
-    margin-left: auto;
+}
+
+.page-indicator {
+  width: 100%;
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-sm);
+
+  .circle {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 0.5rem;
+    background-color: var(--color-base);
+    transition: all 0.3s ease-in-out;
+    cursor: pointer !important;
+
+    &.active {
+      background-color: var(--color-brand);
+    }
   }
 }
 
 .app-logo {
-  width: 20rem;
+  width: 50rem;
   height: auto;
+  display: block;
 }
 </style>

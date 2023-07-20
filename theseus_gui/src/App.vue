@@ -35,6 +35,7 @@ import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from "@/components/ui/URLConfirmModal.vue";
 import OnboardingScreen from "@/components/ui/tutorial/OnboardingScreen.vue";
+import StickyTitleBar from "@/components/ui/tutorial/StickyTitleBar.vue";
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -152,11 +153,12 @@ const accounts = ref(null)
 
 command_listener((e) => {
   console.log(e)
-  urlModal.value.show()
+  urlModal.value.show(e)
 })
 </script>
 
 <template>
+  <StickyTitleBar v-if="videoPlaying"/>
   <video
     v-if="videoPlaying"
     class="video"
@@ -238,7 +240,7 @@ command_listener((e) => {
             'collapsed-button': themeStore.collapsedNavigation,
             'expanded-button': !themeStore.collapsedNavigation,
           }"
-          @click="() => $refs.urlModal.show('sodium')"
+          @click="() => $refs.urlModal.show({'event': 'InstallVersion', 'id': 'K3sXhozi'})"
         >
           <CodeIcon />
           <span v-if="!themeStore.collapsedNavigation" class="no-wrap">Test</span>

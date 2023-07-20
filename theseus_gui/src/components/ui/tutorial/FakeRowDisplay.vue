@@ -68,7 +68,7 @@ defineProps({
             <div
               class="banner no-image"
               :style="{
-                'background-image': `url(${'https://cdn.discordapp.com/attachments/817413688771608587/1119143634319724564/image.png'})`,
+                'background-image': `url(https://cdn.discordapp.com/attachments/817413688771608587/1119143634319724564/image.png)`,
               }"
             >
               <div class="badges">

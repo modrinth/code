@@ -1,11 +1,13 @@
 <template>
   <Card
     class="card button-base"
-    @click="
-      $router.push({
-        path: `/project/${project.project_id ?? project.id}/`,
-        query: { i: props.instance ? props.instance.path : undefined },
-      })
+    @click="() => {
+        emits('open')
+        $router.push({
+          path: `/project/${project.project_id ?? project.id}/`,
+          query: { i: props.instance ? props.instance.path : undefined },
+        })
+      }
     "
   >
     <div class="icon">
@@ -123,6 +125,8 @@ const props = defineProps({
     default: false,
   },
 })
+
+const emits = defineEmits(['open'])
 
 const installing = ref(false)
 const installed = ref(props.installed)
