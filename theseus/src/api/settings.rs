@@ -6,6 +6,7 @@ use io::IOError;
 use tokio::sync::RwLock;
 
 use crate::{
+    event::emit::{emit_loading, init_loading},
     prelude::DirectoryInfo,
     state::{self, Profiles},
     util::io,
@@ -74,17 +75,29 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
         .as_error());
     }
 
+    let loading_bar = init_loading(
+        crate::LoadingBarType::ConfigChange {
+            new_path: new_config_dir.clone(),
+        },
+        100.0,
+        "Changing configuration directory",
+    )
+    .await?;
+
+    tracing::trace!("Changing config dir, taking control of the state");
     // Take control of the state
     let mut state_write = State::get_write().await?;
     let old_config_dir =
         state_write.directories.config_dir.read().await.clone();
 
+    tracing::trace!("Setting configuration setting");
     // Set load config dir setting
     let settings = {
         let mut settings = state_write.settings.write().await;
         settings.loaded_config_dir = Some(new_config_dir.clone());
 
         // Some java paths are hardcoded to within our config dir, so we need to update them
+        tracing::trace!("Updating java keys");
         for key in settings.java_globals.keys() {
             if let Some(java) = settings.java_globals.get_mut(&key) {
                 // If the path is within the old config dir path, update it to the new config dir
@@ -98,16 +111,24 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
                 }
             }
         }
+        tracing::trace!("Syncing settings");
+
         settings
             .sync(&state_write.directories.settings_file())
             .await?;
         settings.clone()
     };
 
+    tracing::trace!("Reinitializing directory");
     // Set new state information
     state_write.directories = DirectoryInfo::init(&settings)?;
+    let total_entries = std::fs::read_dir(&old_config_dir)
+        .map_err(|e| IOError::with_path(e, &old_config_dir))?
+        .count() as f64;
 
     // Move all files over from state_write.directories.config_dir to new_config_dir
+    tracing::trace!("Renaming folder structure");
+    let mut i = 0.0;
     let mut entries = io::read_dir(&old_config_dir).await?;
     while let Some(entry) = entries
         .next_entry()
@@ -131,10 +152,15 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
 
             let new_path = new_config_dir.join(file_name);
             io::rename(entry_path, new_path).await?;
+
+            i += 1.0;
+            emit_loading(&loading_bar, 90.0 * (i / total_entries), None)
+                .await?;
         }
     }
 
     // Reset file watcher
+    tracing::trace!("Reset file watcher");
     let mut file_watcher = state::init_watcher().await?;
 
     // Reset profiles (for filepaths, file watcher, etc)
@@ -142,6 +168,8 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
         Profiles::init(&state_write.directories, &mut file_watcher).await?,
     );
     state_write.file_watcher = RwLock::new(file_watcher);
+
+    emit_loading(&loading_bar, 10.0, None).await?;
 
     // TODO: need to be able to safely error out of this function, reverting the changes
     tracing::info!(
