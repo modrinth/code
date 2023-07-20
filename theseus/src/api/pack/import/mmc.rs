@@ -4,7 +4,6 @@ use serde::{de, Deserialize, Serialize};
 use tokio::fs;
 
 use crate::{
-    event::LoadingBarId,
     pack::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
@@ -56,7 +55,6 @@ fn deserialize_optional_bool<'de, D>(
 where
     D: de::Deserializer<'de>,
 {
-    println!("deserialize_optional_bool");
     let s = Option::<String>::deserialize(deserializer)?;
     match s {
         Some(string) => match string.as_str() {
@@ -151,7 +149,6 @@ pub async fn import_mmc(
     mmc_base_path: PathBuf,  // path to base mmc folder
     instance_folder: String, // instance folder in mmc_base_path
     profile_path: PathBuf,   // path to profile
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     let mmc_instance_path = mmc_base_path
         .join("instances")
@@ -167,7 +164,6 @@ pub async fn import_mmc(
     // Re-cache icon
     let icon = if let Some(icon_key) = instance_cfg.icon_key {
         let icon_path = mmc_base_path.join("icons").join(icon_key);
-        dbg!(&icon_path);
         import::recache_icon(icon_path).await?
     } else {
         None
@@ -179,7 +175,7 @@ pub async fn import_mmc(
         override_title: instance_cfg.name,
         project_id: instance_cfg.managed_pack_id,
         version_id: instance_cfg.managed_pack_version_id,
-        existing_loading_bar: existing_loading_bar.clone(),
+        existing_loading_bar: None,
         profile: profile_path.clone(),
     };
 
@@ -193,20 +189,20 @@ pub async fn import_mmc(
                 // Kept separate as we may in the future want to add special handling for modrinth managed packs
                 let backup_name = "Imported Modrinth Modpack".to_string();
                 let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join(".minecraft");
-                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack, existing_loading_bar).await?;
+                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack).await?;
             }
             Some(MMCManagedPackType::Flame) | Some(MMCManagedPackType::ATLauncher) => {
                 // For flame/atlauncher managed packs
                 // Treat as unmanaged, but with 'minecraft' folder instead of '.minecraft'
                 let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join("minecraft");
-                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack, existing_loading_bar).await?;
+                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack).await?;
             },
             Some(_) => {
                 // For managed packs that aren't modrinth, flame, atlauncher
                 // Treat as unmanaged
                 let backup_name = "ImportedModpack".to_string();
                 let minecraft_folder = mmc_base_path.join("instances").join(instance_folder).join(".minecraft");
-                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack, existing_loading_bar).await?;
+                import_mmc_unmanaged(profile_path, minecraft_folder, backup_name,  description, mmc_pack).await?;
             },
             _ => return Err(crate::ErrorKind::InputError({
                 "Instance is managed, but managed pack type not specified in instance.cfg".to_string()
@@ -225,7 +221,6 @@ pub async fn import_mmc(
             backup_name,
             description,
             mmc_pack,
-            existing_loading_bar,
         )
         .await?;
     }
@@ -238,9 +233,7 @@ async fn import_mmc_unmanaged(
     backup_name: String,
     description: CreatePackDescription,
     mmc_pack: MMCPack,
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
-    println!("import_mmc_unmanaged {:?} ", mmc_pack.components);
     // Pack dependencies stored in mmc-pack.json, we convert to .mrpack pack dependencies
     let dependencies = mmc_pack
         .components
@@ -274,7 +267,6 @@ async fn import_mmc_unmanaged(
             None
         })
         .collect();
-    println!("import_mmc_unmanaged222 {:?} ", dependencies);
 
     // Sets profile information to be that loaded from mmc-pack.json and instance.cfg
     install_from::set_profile_information(
@@ -285,15 +277,13 @@ async fn import_mmc_unmanaged(
     )
     .await?;
 
-    println!("copying from {:?} to {:?}", minecraft_folder, profile_path);
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     copy_dotminecraft(profile_path.clone(), minecraft_folder).await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
-            .await?;
+        crate::launcher::install_minecraft(&profile_val, None).await?;
 
         State::sync().await?;
     }

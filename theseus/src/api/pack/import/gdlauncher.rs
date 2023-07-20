@@ -3,10 +3,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use crate::{
-    event::LoadingBarId, prelude::ModLoader, state::ProfileInstallStage,
-    util::io, State,
-};
+use crate::{prelude::ModLoader, state::ProfileInstallStage, util::io, State};
 
 use super::{copy_dotminecraft, recache_icon};
 
@@ -41,7 +38,6 @@ pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
 pub async fn import_gdlauncher(
     gdlauncher_instance_folder: PathBuf, // instance's folder
     profile_path: PathBuf,               // path to profile
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     // Load config.json
     let config: String =
@@ -105,8 +101,7 @@ pub async fn import_gdlauncher(
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
-            .await?;
+        crate::launcher::install_minecraft(&profile_val, None).await?;
 
         State::sync().await?;
     }

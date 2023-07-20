@@ -3,10 +3,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use crate::{
-    event::LoadingBarId, prelude::ModLoader, state::ProfileInstallStage,
-    util::io, State,
-};
+use crate::{prelude::ModLoader, state::ProfileInstallStage, util::io, State};
 
 use super::copy_dotminecraft;
 
@@ -51,7 +48,6 @@ pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
 pub async fn import_curseforge(
     curseforge_instance_folder: PathBuf, // instance's folder
     profile_path: PathBuf,               // path to profile
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     // TODO: recache curseforge instance icon
     let icon: Option<PathBuf> = None;
@@ -151,8 +147,7 @@ pub async fn import_curseforge(
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
-            .await?;
+        crate::launcher::install_minecraft(&profile_val, None).await?;
 
         State::sync().await?;
     }

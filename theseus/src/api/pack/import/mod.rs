@@ -3,11 +3,7 @@ use std::path::{Path, PathBuf};
 use io::IOError;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    event::{emit::init_or_edit_loading, LoadingBarId},
-    util::{fetch, io},
-    LoadingBarType,
-};
+use crate::util::{fetch, io};
 
 pub mod atlauncher;
 pub mod curseforge;
@@ -24,6 +20,7 @@ pub enum ImportLauncherType {
     Unknown,
 }
 
+// Return a list of importable instances from a launcher type and base path, by iterating through the folder and checking
 pub async fn get_importable_instances(
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
@@ -36,13 +33,12 @@ pub async fn get_importable_instances(
         | ImportLauncherType::ATLauncher => base_path.join("instances"),
         ImportLauncherType::Curseforge => base_path.join("Instances"),
         ImportLauncherType::Unknown => {
-            todo!()
+            return Err(crate::ErrorKind::InputError(
+                "Launcher type Unknown".to_string(),
+            )
+            .into())
         }
     };
-    println!(
-        "Searching {:?} - instances_folder: {:?}",
-        launcher_type, instances_folder
-    );
     let mut instances = Vec::new();
     let mut dir = io::read_dir(&instances_folder).await?;
     while let Some(entry) = dir
@@ -64,6 +60,7 @@ pub async fn get_importable_instances(
     Ok(instances)
 }
 
+// Import an instance from a launcher type and base path
 #[theseus_macros::debug_pin]
 #[tracing::instrument]
 pub async fn import_instance(
@@ -71,29 +68,14 @@ pub async fn import_instance(
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
-    let existing_loading_bar = Some(
-        init_or_edit_loading(
-            existing_loading_bar,
-            LoadingBarType::PackImport {
-                profile_path: profile_path.clone(),
-                instance_path: base_path.clone(),
-                instance_name: Some(instance_folder.clone()),
-            },
-            100.0,
-            "Downloading java version",
-        )
-        .await?,
-    );
-
+    tracing::debug!("Importing instance from {instance_folder}");
     match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
                 base_path,       // path to base mmc folder
                 instance_folder, // instance folder in mmc_base_path
                 profile_path,    // path to profile
-                existing_loading_bar,
             )
             .await?;
         }
@@ -102,7 +84,6 @@ pub async fn import_instance(
                 base_path,       // path to atlauncher folder
                 instance_folder, // instance folder in atlauncher
                 profile_path,    // path to profile
-                existing_loading_bar,
             )
             .await?;
         }
@@ -110,7 +91,6 @@ pub async fn import_instance(
             gdlauncher::import_gdlauncher(
                 base_path.join("instances").join(instance_folder), // path to gdlauncher folder
                 profile_path, // path to profile
-                existing_loading_bar,
             )
             .await?;
         }
@@ -118,12 +98,14 @@ pub async fn import_instance(
             curseforge::import_curseforge(
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
                 profile_path, // path to profile
-                existing_loading_bar,
             )
             .await?;
         }
         ImportLauncherType::Unknown => {
-            todo!()
+            return Err(crate::ErrorKind::InputError(
+                "Launcher type Unknown".to_string(),
+            )
+            .into());
         }
     }
     Ok(())
@@ -178,9 +160,7 @@ pub async fn is_valid_importable_instance(
         ImportLauncherType::Curseforge => {
             curseforge::is_valid_curseforge(instance_path).await
         }
-        ImportLauncherType::Unknown => {
-            todo!()
-        }
+        ImportLauncherType::Unknown => false,
     }
 }
 
@@ -196,7 +176,6 @@ pub async fn recache_icon(
     if let Ok(bytes) = bytes {
         let bytes = bytes::Bytes::from(bytes);
         let cache_dir = &state.directories.caches_dir();
-        dbg!(&cache_dir);
         let semaphore = &state.io_semaphore;
         Ok(Some(
             fetch::write_cached_icon(

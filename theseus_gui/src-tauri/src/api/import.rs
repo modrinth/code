@@ -41,7 +41,6 @@ pub async fn import_import_instance(
         launcher_type,
         base_path,
         instance_folder,
-        None,
     )
     .await?;
     Ok(())

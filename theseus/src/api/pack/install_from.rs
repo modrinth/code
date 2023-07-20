@@ -306,7 +306,6 @@ pub async fn set_profile_information(
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
     let mut loader_version = None;
-    println!("here1 {:?}", dependencies);
 
     for (key, value) in dependencies {
         match key {
@@ -335,8 +334,6 @@ pub async fn set_profile_information(
         .into());
     };
 
-    println!("here4 - {:?}", mod_loader);
-
     let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::profile_create::get_loader_version_from_loader(
@@ -348,9 +345,6 @@ pub async fn set_profile_information(
     } else {
         None
     };
-    println!("her5 - {:?}", game_version);
-    println!("her5 - {:?}", loader_version);
-    println!("her5 - {:?}", description.override_title);
     // Sets values in profile
     crate::api::profile::edit(&profile_path, |prof| {
         prof.metadata.name = description

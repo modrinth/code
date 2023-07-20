@@ -15,6 +15,11 @@ import { invoke } from '@tauri-apps/api/tauri'
   - PrismLauncher
   - Unknown (shouldn't be used, but is used internally if the launcher type isn't recognized)
 
+  For each launcher type, we can get a guess of the default path for the launcher, and a list of importable instances
+  For most launchers, this will be the application's data directory, with two exceptions:
+  - MultiMC: this goes to the app directory (wherever the app is)
+  - Curseforge: this goes to the 'minecraft' subdirectory of the data directory, as Curseforge has multiple games
+
 */
 
 /// Gets a list of importable instances from a launcher type and base path
@@ -48,5 +53,5 @@ export async function is_valid_importable_instance(instanceFolder, launcherType)
 /// null if it can't be found or doesn't exist
 /// eg: get_default_launcher_path("MultiMC")
 export async function get_default_launcher_path(launcherType) {
-  return await invoke('plugin:import|import_get_default_launcher_path', { launcher_type })
+  return await invoke('plugin:import|import_get_default_launcher_path', { launcherType })
 }

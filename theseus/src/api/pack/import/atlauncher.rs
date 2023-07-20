@@ -120,7 +120,6 @@ pub async fn import_atlauncher(
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
     profile_path: PathBuf,         // path to profile
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     let atlauncher_instance_path = atlauncher_base_path
         .join("instances")
@@ -158,7 +157,7 @@ pub async fn import_atlauncher(
         override_title: Some(atinstance.launcher.name.clone()),
         project_id: None,
         version_id: None,
-        existing_loading_bar: existing_loading_bar.clone(),
+        existing_loading_bar: None,
         profile: profile_path.clone(),
     };
 
@@ -171,11 +170,9 @@ pub async fn import_atlauncher(
         backup_name,
         description,
         atinstance,
-        existing_loading_bar,
+        None,
     )
     .await?;
-    println!("Done.");
-
     Ok(())
 }
 

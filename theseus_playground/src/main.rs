@@ -89,7 +89,6 @@ async fn test_batch_import(
             r#type,
             PathBuf::from(folder),
             instance,
-            None,
         )
         .await?;
         println!("Completoooo");
