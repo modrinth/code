@@ -1,6 +1,8 @@
-use crate::State;
+use crate::{
+    util::io::{self, IOError},
+    State,
+};
 use serde::{Deserialize, Serialize};
-use tokio::fs::read_to_string;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Logs {
@@ -36,8 +38,11 @@ pub async fn get_logs(
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
     let mut logs = Vec::new();
     if logs_folder.exists() {
-        for entry in std::fs::read_dir(logs_folder)? {
-            let entry = entry?;
+        for entry in std::fs::read_dir(&logs_folder)
+            .map_err(|e| IOError::with_path(e, &logs_folder))?
+        {
+            let entry =
+                entry.map_err(|e| IOError::with_path(e, &logs_folder))?;
             let path = entry.path();
             if path.is_dir() {
                 if let Some(datetime_string) = path.file_name() {
@@ -79,21 +84,21 @@ pub async fn get_output_by_datetime(
 ) -> crate::Result<String> {
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
-    Ok(
-        read_to_string(logs_folder.join(datetime_string).join("stdout.log"))
-            .await?,
-    )
+    let path = logs_folder.join(datetime_string).join("stdout.log");
+    Ok(io::read_to_string(&path).await?)
 }
 
 #[tracing::instrument]
 pub async fn delete_logs(profile_uuid: uuid::Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
-    for entry in std::fs::read_dir(logs_folder)? {
-        let entry = entry?;
+    for entry in std::fs::read_dir(&logs_folder)
+        .map_err(|e| IOError::with_path(e, &logs_folder))?
+    {
+        let entry = entry.map_err(|e| IOError::with_path(e, &logs_folder))?;
         let path = entry.path();
         if path.is_dir() {
-            std::fs::remove_dir_all(path)?;
+            io::remove_dir_all(&path).await?;
         }
     }
     Ok(())
@@ -106,6 +111,7 @@ pub async fn delete_logs_by_datetime(
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
-    std::fs::remove_dir_all(logs_folder.join(datetime_string))?;
+    let path = logs_folder.join(datetime_string);
+    io::remove_dir_all(&path).await?;
     Ok(())
 }

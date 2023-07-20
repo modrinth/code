@@ -567,7 +567,6 @@ const updateProject = async (mod) => {
 const toggleDisableMod = async (mod) => {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
   mod.disabled = !mod.disabled
-
   mixpanel.track('InstanceProjectDisable', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
