@@ -207,6 +207,7 @@
         :dependencies="dependencies"
         :install="install"
         :installed="installed"
+        :installing="installing"
         :installed-version="installedVersion"
       />
     </div>
@@ -310,7 +311,7 @@ async function fetchProjectData() {
     useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project'),
     useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project'),
     get_categories().catch(handleError),
-    route.query.i ? getInstance(route.query.i, true).catch(handleError) : Promise.resolve(),
+    route.query.i ? getInstance(route.query.i, false).catch(handleError) : Promise.resolve(),
   ])
 
   installed.value =
@@ -344,6 +345,7 @@ const markInstalled = () => {
 async function install(version) {
   installing.value = true
   let queuedVersionData
+  instance.value = await getInstance(instance.value.path, false).catch(handleError)
 
   if (installed.value) {
     await remove_project(

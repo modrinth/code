@@ -1,6 +1,7 @@
 //! Theseus profile management interface
 use crate::pack::install_from::CreatePackProfile;
 use crate::state::LinkedData;
+use crate::util::io::{self, canonicalize};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     prelude::ModLoader,
@@ -10,11 +11,9 @@ pub use crate::{
     State,
 };
 use daedalus::modded::LoaderVersion;
-use dunce::canonicalize;
 use futures::prelude::*;
 
 use std::path::PathBuf;
-use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 use tracing::{info, trace};
 use uuid::Uuid;
@@ -49,7 +48,7 @@ pub async fn profile_create(
             .into());
         }
 
-        if ReadDirStream::new(fs::read_dir(&path).await?)
+        if ReadDirStream::new(io::read_dir(&path).await?)
             .next()
             .await
             .is_some()
@@ -57,7 +56,7 @@ pub async fn profile_create(
             return Err(ProfileCreationError::NotEmptyFolder.into());
         }
     } else {
-        fs::create_dir_all(&path).await?;
+        io::create_dir_all(&path).await?;
     }
 
     info!(
@@ -81,7 +80,7 @@ pub async fn profile_create(
         Profile::new(uuid, name, game_version, path.clone()).await?;
     let result = async {
         if let Some(ref icon) = icon {
-            let bytes = tokio::fs::read(icon).await?;
+            let bytes = io::read(icon).await?;
             profile
                 .set_icon(
                     &state.directories.caches_dir(),
