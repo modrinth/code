@@ -81,7 +81,8 @@ input {
     padding-top: calc(var(--gap-md) + 1.75rem);
   }
 
-  .account-card, .card-section {
+  .account-card,
+  .card-section {
     top: calc(var(--gap-md) + 1.75rem);
   }
 }
@@ -133,5 +134,4 @@ input {
 .gecko {
   background-color: var(--color-raised-bg);
   box-shadow: none !important;
-
 }

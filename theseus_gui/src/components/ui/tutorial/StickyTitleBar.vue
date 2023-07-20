@@ -1,10 +1,9 @@
 <script setup>
-
-import {Button, XIcon} from "omorphia";
-import {appWindow} from "@tauri-apps/api/window";
-import {saveWindowState, StateFlags} from "tauri-plugin-window-state-api";
-import {window} from "@tauri-apps/api";
-import {MinimizeIcon, MaximizeIcon} from "@/assets/icons";
+import { Button, XIcon } from 'omorphia'
+import { appWindow } from '@tauri-apps/api/window'
+import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import { window } from '@tauri-apps/api'
+import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 </script>
 
 <template>
@@ -20,11 +19,11 @@ import {MinimizeIcon, MaximizeIcon} from "@/assets/icons";
         class="titlebar-button close"
         icon-only
         @click="
-                () => {
-                  saveWindowState(StateFlags.ALL)
-                  window.getCurrent().close()
-                }
-              "
+          () => {
+            saveWindowState(StateFlags.ALL)
+            window.getCurrent().close()
+          }
+        "
       >
         <XIcon />
       </Button>
@@ -64,13 +63,15 @@ import {MinimizeIcon, MaximizeIcon} from "@/assets/icons";
     height: 2.25rem;
 
     &.close {
-      &:hover, &:active {
+      &:hover,
+      &:active {
         background-color: var(--color-red);
         color: var(--color-accent-contrast);
       }
     }
 
-    &:hover, &:active {
+    &:hover,
+    &:active {
       background-color: var(--color-button-bg);
       color: var(--color-contrast);
     }

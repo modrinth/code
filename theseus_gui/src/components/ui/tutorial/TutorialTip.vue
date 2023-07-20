@@ -1,7 +1,6 @@
 <script setup>
-
-import ProgressBar from "@/components/ui/ProgressBar.vue";
-import {Button, Card} from "omorphia";
+import ProgressBar from '@/components/ui/ProgressBar.vue'
+import { Button, Card } from 'omorphia'
 
 defineProps({
   progress: {
@@ -10,11 +9,11 @@ defineProps({
   },
   title: {
     type: String,
-    default: "Tutorial",
+    default: 'Tutorial',
   },
   description: {
     type: String,
-    default: "This is a tutorial",
+    default: 'This is a tutorial',
   },
   progressFunction: {
     type: Function,
@@ -26,16 +25,16 @@ defineProps({
 <template>
   <Card class="tutorial-card">
     <h3 class="tutorial-title">
-      {{title}}
+      {{ title }}
     </h3>
     <div class="tutorial-body">
-      {{description}}
+      {{ description }}
     </div>
     <div class="tutorial-footer">
-      {{progress}}/9
-      <ProgressBar :progress="(progress/9) * 100"/>
+      {{ progress }}/9
+      <ProgressBar :progress="(progress / 9) * 100" />
       <Button color="primary" :action="progressFunction">
-        {{progress === 9 ? "Finish" : "Next"}}
+        {{ progress === 9 ? 'Finish' : 'Next' }}
       </Button>
     </div>
   </Card>

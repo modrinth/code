@@ -2,7 +2,11 @@
 import {
   DownloadIcon,
   ChevronRightIcon,
-  formatNumber, CalendarIcon, HeartIcon, Avatar, Card,
+  formatNumber,
+  CalendarIcon,
+  HeartIcon,
+  Avatar,
+  Card,
 } from 'omorphia'
 import { onMounted, onUnmounted, ref } from 'vue'
 
@@ -40,13 +44,23 @@ defineProps({
 
 <template>
   <div class="content">
-    <div v-for="(row, index) in ['Jump back in', 'Popular modpacks', 'Popular mods']" ref="rows" :key="row" class="row">
+    <div
+      v-for="(row, index) in ['Jump back in', 'Popular modpacks', 'Popular mods']"
+      ref="rows"
+      :key="row"
+      class="row"
+    >
       <div class="header">
         <p>{{ row }}</p>
         <ChevronRightIcon />
       </div>
       <section v-if="index < 1" ref="modsRow" class="instances">
-        <Card v-for="project in maxInstancesPerRow" :key="project" class="instance-card-item button-base" :class="{'highlighted' : showInstance}">
+        <Card
+          v-for="project in maxInstancesPerRow"
+          :key="project"
+          class="instance-card-item button-base"
+          :class="{ highlighted: showInstance }"
+        >
           <Avatar
             size="sm"
             src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
@@ -55,16 +69,13 @@ defineProps({
           />
           <div class="project-info">
             <p class="title">Example Profile</p>
-            <p class="description">
-              Forge/Fabric
-              1.20.1
-            </p>
+            <p class="description">Forge/Fabric 1.20.1</p>
           </div>
         </Card>
       </section>
       <section v-else ref="modsRow" class="projects">
         <div v-for="project in maxProjectsPerRow" :key="project" class="wrapper">
-          <Card class="project-card button-base" :class="{'highlighted' : showInstance}">
+          <Card class="project-card button-base" :class="{ highlighted: showInstance }">
             <div
               class="banner no-image"
               :style="{
@@ -88,7 +99,8 @@ defineProps({
               <div
                 class="badges-wrapper no-image"
                 :style="{
-                  background: 'linear-gradient(rgba(' +
+                  background:
+                    'linear-gradient(rgba(' +
                     [27, 217, 106, 0.03].join(',') +
                     '), 65%, rgba(' +
                     [27, 217, 106, 0.3].join(',') +
@@ -96,17 +108,18 @@ defineProps({
                 }"
               ></div>
             </div>
-            <Avatar class="icon" size="sm" src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png" />
+            <Avatar
+              class="icon"
+              size="sm"
+              src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+            />
             <div class="title">
-              <div class="title-text">
-                Example Project
-              </div>
+              <div class="title-text">Example Project</div>
               <div class="author">by Modrinth</div>
             </div>
             <div class="description">
-              An example project hangin on the Rinth.
-              Very cool project, its probably on Forge and Fabric.
-              Probably has a 401k and a family.
+              An example project hangin on the Rinth. Very cool project, its probably on Forge and
+              Fabric. Probably has a 401k and a family.
             </div>
           </Card>
         </div>
@@ -198,7 +211,7 @@ defineProps({
 }
 
 .instance {
- position: relative;
+  position: relative;
 }
 
 .instance-card-item {

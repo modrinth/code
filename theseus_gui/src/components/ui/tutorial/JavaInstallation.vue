@@ -1,12 +1,12 @@
 <script setup>
 import { Card, Button } from 'omorphia'
-import {onBeforeUnmount, ref, watch} from "vue";
-import {get, set} from "@/helpers/settings.js";
-import {handleError} from "@/store/notifications.js";
-import JavaSelector from "@/components/ui/JavaSelector.vue";
-import {auto_install_java, get_jre} from "@/helpers/jre.js";
-import mixpanel from "mixpanel-browser";
-import {loading_listener} from "@/helpers/events.js";
+import { onBeforeUnmount, ref, watch } from 'vue'
+import { get, set } from '@/helpers/settings.js'
+import { handleError } from '@/store/notifications.js'
+import JavaSelector from '@/components/ui/JavaSelector.vue'
+import { auto_install_java, get_jre } from '@/helpers/jre.js'
+import mixpanel from 'mixpanel-browser'
+import { loading_listener } from '@/helpers/events.js'
 
 async function fetchSettings() {
   const fetchSettings = await get().catch(handleError)
@@ -79,8 +79,8 @@ defineProps({
     <h2>Java Installation</h2>
     <div class="markdown-body">
       <p>
-        The Modrinth App requires a Java installation to run Minecraft. You can let us
-        automatically install Java for you or select an existing installation below.
+        The Modrinth App requires a Java installation to run Minecraft. You can let us automatically
+        install Java for you or select an existing installation below.
       </p>
     </div>
     <div class="java-section">
@@ -89,9 +89,9 @@ defineProps({
     </div>
     <div class="bottom-buttons">
       <Button large :disabled="autoInstalling || installedJava" @click="autoInstallJava">
-        {{ installedJava ? 'Installed' : autoInstalling ? 'Installing...' : 'Install Java'}}
+        {{ installedJava ? 'Installed' : autoInstalling ? 'Installing...' : 'Install Java' }}
       </Button>
-      <Button large :disabled="!installedJava" @click="finish" color="primary">Finish</Button>
+      <Button large :disabled="!installedJava" color="primary" @click="finish">Finish</Button>
     </div>
   </Card>
 </template>

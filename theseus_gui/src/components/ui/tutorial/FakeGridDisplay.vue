@@ -1,13 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import {
-  Card,
-  DropdownSelect,
-  SearchIcon,
-  XIcon,
-  Button,
-  Avatar,
-} from 'omorphia'
+import { Card, DropdownSelect, SearchIcon, XIcon, Button, Avatar } from 'omorphia'
 
 const search = ref('')
 const group = ref('Category')
@@ -24,14 +17,13 @@ defineProps({
     default: false,
   },
 })
-
 </script>
 <template>
-  <Card class="header" :class="{'highlighted' : showFilters}">
+  <Card class="header" :class="{ highlighted: showFilters }">
     <div class="iconified-input">
       <SearchIcon />
       <input v-model="search" type="text" placeholder="Search" class="search-input" />
-      <Button @click="() => search = ''">
+      <Button @click="() => (search = '')">
         <XIcon />
       </Button>
     </div>
@@ -65,7 +57,12 @@ defineProps({
   </Card>
   <div class="row">
     <section class="instances">
-      <Card v-for="project in 20" :key="project" class="instance-card-item button-base" :class="{'highlighted' : project === 1 && showInstance}">
+      <Card
+        v-for="project in 20"
+        :key="project"
+        class="instance-card-item button-base"
+        :class="{ highlighted: project === 1 && showInstance }"
+      >
         <Avatar
           size="sm"
           src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
@@ -74,13 +71,10 @@ defineProps({
         />
         <div class="project-info">
           <p class="title">Example Profile</p>
-          <p class="description">
-            Forge/Fabric
-            1.20.1
-          </p>
+          <p class="description">Forge/Fabric 1.20.1</p>
         </div>
       </Card>
-      <slot/>
+      <slot />
     </section>
   </div>
 </template>

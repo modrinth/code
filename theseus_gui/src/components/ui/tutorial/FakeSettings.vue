@@ -33,10 +33,7 @@ const pageOptions = ['Home', 'Library']
             >Change the style of the side navigation bar to a compact version.</span
           >
         </label>
-        <Toggle
-          id="collapsed-nav"
-          :checked="false"
-        />
+        <Toggle id="collapsed-nav" :checked="false" />
       </div>
       <div class="adjacent-input">
         <label for="advanced-rendering">
@@ -46,10 +43,7 @@ const pageOptions = ['Home', 'Library']
             without hardware-accelerated rendering.
           </span>
         </label>
-        <Toggle
-          id="advanced-rendering"
-          :checked="true"
-        />
+        <Toggle id="advanced-rendering" :checked="true" />
       </div>
       <div class="adjacent-input">
         <label for="minimize-launcher">
@@ -58,10 +52,7 @@ const pageOptions = ['Home', 'Library']
             >Minimize the launcher when a Minecraft process starts.</span
           >
         </label>
-        <Toggle
-          id="minimize-launcher"
-          :checked="false"
-        />
+        <Toggle id="minimize-launcher" :checked="false" />
       </div>
       <div class="opening-page">
         <label for="opening-page">
@@ -91,12 +82,7 @@ const pageOptions = ['Home', 'Library']
             lower value if you have a poor internet connection.</span
           >
         </label>
-        <Slider
-          id="max-downloads"
-          :min="1"
-          :max="10"
-          :step="1"
-        />
+        <Slider id="max-downloads" :min="1" :max="10" :step="1" />
       </div>
 
       <div class="adjacent-input">
@@ -107,12 +93,7 @@ const pageOptions = ['Home', 'Library']
             lower value if you are frequently getting I/O errors.</span
           >
         </label>
-        <Slider
-          id="max-writes"
-          :min="1"
-          :max="50"
-          :step="1"
-        />
+        <Slider id="max-writes" :min="1" :max="50" :step="1" />
       </div>
     </Card>
     <Card>
@@ -129,7 +110,7 @@ const pageOptions = ['Home', 'Library']
             customize your experience. Opting out will disable this data collection.
           </span>
         </label>
-        <Toggle id="opt-out-analytics"/>
+        <Toggle id="opt-out-analytics" />
       </div>
     </Card>
     <Card>
@@ -141,11 +122,11 @@ const pageOptions = ['Home', 'Library']
       <label for="java-17">
         <span class="label__title">Java 17 location</span>
       </label>
-      <JavaSelector id="java-17" :version="17" model-value=""/>
+      <JavaSelector id="java-17" :version="17" model-value="" />
       <label for="java-8">
         <span class="label__title">Java 8 location</span>
       </label>
-      <JavaSelector id="java-8" :version="8"  model-value=""/>
+      <JavaSelector id="java-8" :version="8" model-value="" />
       <hr class="card-divider" />
       <label for="java-args">
         <span class="label__title">Java arguments</span>
@@ -175,13 +156,7 @@ const pageOptions = ['Home', 'Library']
             The memory allocated to each instance when it is ran.
           </span>
         </label>
-        <Slider
-          id="max-memory"
-          :min="256"
-          :max="10256"
-          :step="1"
-          unit="mb"
-        />
+        <Slider id="max-memory" :min="256" :max="10256" :step="1" unit="mb" />
       </div>
     </Card>
     <Card>
@@ -207,12 +182,7 @@ const pageOptions = ['Home', 'Library']
           <span class="label__title">Wrapper</span>
           <span class="label__description"> Wrapper command for launching Minecraft. </span>
         </label>
-        <input
-          id="wrapper"
-          autocomplete="off"
-          type="text"
-          placeholder="Enter wrapper command..."
-        />
+        <input id="wrapper" autocomplete="off" type="text" placeholder="Enter wrapper command..." />
       </div>
       <div class="adjacent-input">
         <label for="post-exit">
@@ -238,12 +208,7 @@ const pageOptions = ['Home', 'Library']
           <span class="label__title">Width</span>
           <span class="label__description"> The width of the game window when launched. </span>
         </label>
-        <input
-          id="width"
-          autocomplete="off"
-          type="number"
-          placeholder="Enter width..."
-        />
+        <input id="width" autocomplete="off" type="number" placeholder="Enter width..." />
       </div>
       <div class="adjacent-input">
         <label for="height">

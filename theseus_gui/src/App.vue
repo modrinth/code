@@ -10,9 +10,9 @@ import {
   Button,
   Notifications,
   XIcon,
-  CodeIcon
+  CodeIcon,
 } from 'omorphia'
-import {useLoading, useTheming} from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -21,7 +21,7 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
-import {command_listener, warning_listener} from '@/helpers/events.js'
+import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
@@ -33,9 +33,9 @@ import { window } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
-import URLConfirmModal from "@/components/ui/URLConfirmModal.vue";
-import OnboardingScreen from "@/components/ui/tutorial/OnboardingScreen.vue";
-import StickyTitleBar from "@/components/ui/tutorial/StickyTitleBar.vue";
+import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
+import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
+import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -158,7 +158,7 @@ command_listener((e) => {
 </script>
 
 <template>
-  <StickyTitleBar v-if="videoPlaying"/>
+  <StickyTitleBar v-if="videoPlaying" />
   <video
     v-if="videoPlaying"
     class="video"
@@ -168,7 +168,7 @@ command_listener((e) => {
     @ended="videoPlaying = false"
   />
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
-  <OnboardingScreen v-else-if="showOnboarding" :finish="() => showOnboarding = false"/>
+  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
@@ -240,7 +240,7 @@ command_listener((e) => {
             'collapsed-button': themeStore.collapsedNavigation,
             'expanded-button': !themeStore.collapsedNavigation,
           }"
-          @click="() => $refs.urlModal.show({'event': 'InstallVersion', 'id': 'K3sXhozi'})"
+          @click="() => $refs.urlModal.show({ event: 'InstallVersion', id: 'K3sXhozi' })"
         >
           <CodeIcon />
           <span v-if="!themeStore.collapsedNavigation" class="no-wrap">Test</span>
@@ -306,7 +306,7 @@ command_listener((e) => {
       </div>
     </div>
   </div>
-  <URLConfirmModal ref="urlModal"/>
+  <URLConfirmModal ref="urlModal" />
 </template>
 
 <style lang="scss" scoped>

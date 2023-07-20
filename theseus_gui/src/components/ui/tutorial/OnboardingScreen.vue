@@ -1,97 +1,107 @@
 <script setup>
-import {Button, HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, XIcon, Notifications, LogOutIcon, Modal} from "omorphia";
-import {appWindow} from "@tauri-apps/api/window";
-import {saveWindowState, StateFlags} from "tauri-plugin-window-state-api";
-import Breadcrumbs from "@/components/ui/Breadcrumbs.vue";
-import FakeAppBar from "@/components/ui/tutorial/FakeAppBar.vue";
-import FakeAccountsCard from "@/components/ui/tutorial/FakeAccountsCard.vue";
-import {MinimizeIcon, MaximizeIcon} from "@/assets/icons";
-import ModrinthLoadingIndicator from "@/components/modrinth-loading-indicator.js";
-import FakeSearch from "@/components/ui/tutorial/FakeSearch.vue";
-import FakeGridDisplay from "@/components/ui/tutorial/FakeGridDisplay.vue";
-import FakeRowDisplay from "@/components/ui/tutorial/FakeRowDisplay.vue";
-import {ref} from "vue";
-import {window} from "@tauri-apps/api";
-import TutorialTip from "@/components/ui/tutorial/TutorialTip.vue";
-import FakeSettings from "@/components/ui/tutorial/FakeSettings.vue";
-import {get, set} from "@/helpers/settings.js";
-import mixpanel from "mixpanel-browser";
-import GalleryImage from "@/components/ui/tutorial/GalleryImage.vue";
-import LoginCard from "@/components/ui/tutorial/LoginCard.vue";
-import JavaInstallation from "@/components/ui/tutorial/JavaInstallation.vue";
-import StickyTitleBar from "@/components/ui/tutorial/StickyTitleBar.vue";
+import {
+  Button,
+  HomeIcon,
+  SearchIcon,
+  LibraryIcon,
+  PlusIcon,
+  SettingsIcon,
+  XIcon,
+  Notifications,
+  LogOutIcon,
+  Modal,
+} from 'omorphia'
+import { appWindow } from '@tauri-apps/api/window'
+import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
+import FakeAppBar from '@/components/ui/tutorial/FakeAppBar.vue'
+import FakeAccountsCard from '@/components/ui/tutorial/FakeAccountsCard.vue'
+import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
+import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator.js'
+import FakeSearch from '@/components/ui/tutorial/FakeSearch.vue'
+import FakeGridDisplay from '@/components/ui/tutorial/FakeGridDisplay.vue'
+import FakeRowDisplay from '@/components/ui/tutorial/FakeRowDisplay.vue'
+import { ref } from 'vue'
+import { window } from '@tauri-apps/api'
+import TutorialTip from '@/components/ui/tutorial/TutorialTip.vue'
+import FakeSettings from '@/components/ui/tutorial/FakeSettings.vue'
+import { get, set } from '@/helpers/settings.js'
+import mixpanel from 'mixpanel-browser'
+import GalleryImage from '@/components/ui/tutorial/GalleryImage.vue'
+import LoginCard from '@/components/ui/tutorial/LoginCard.vue'
+import JavaInstallation from '@/components/ui/tutorial/JavaInstallation.vue'
+import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 
-const phase = ref(0);
-const page = ref(1);
-const firstModal = ref(null);
+const phase = ref(0)
+const page = ref(1)
+const firstModal = ref(null)
 
 const props = defineProps({
   finish: {
     type: Function,
-    default: () => {}
-  }
+    default: () => {},
+  },
 })
 
 const nextPhase = () => {
-  phase.value++;
+  phase.value++
   mixpanel.track('TutorialPhase', { page: phase.value })
 }
 
 const beginTutorial = () => {
-  firstModal.value.hide();
-  nextPhase();
+  firstModal.value.hide()
+  nextPhase()
 }
 
 const nextPage = () => {
   if (page.value === 3) {
-    nextPhase();
+    nextPhase()
     setTimeout(() => {
-      firstModal.value.show();
-    }, 100);
-    return;
+      firstModal.value.show()
+    }, 100)
+    return
   }
-  page.value++;
+  page.value++
   mixpanel.track('OnboardingPage', { page: page.value })
 }
 
 const finishOnboarding = async () => {
   mixpanel.track('OnboardingFinish')
-  const settings = await get();
-  settings.onboarded = true;
-  await set(settings);
-  props.finish();
+  const settings = await get()
+  settings.onboarded = true
+  await set(settings)
+  props.finish()
 }
 </script>
 
 <template>
   <div v-if="phase === 0" class="onboarding">
-    <StickyTitleBar/>
+    <StickyTitleBar />
     <suspense v-if="page === 1">
       <GalleryImage
         :gallery="[
-            {
-              url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109353928265809/Screenshot_2023-07-15_at_4.16.18_PM.png',
-              title: 'Discovery',
-              subtitle: 'See the latest and greatest mods and modpacks to play with from Modrinth',
-            },
-            {
-              url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109354238640238/Screenshot_2023-07-15_at_4.17.43_PM.png',
-              title: 'Profile Management',
-              subtitle: 'Play, manage and search through all the amazing profiles downloaded on your computer at any time, even offline!',
-            }
-          ]"
+          {
+            url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109353928265809/Screenshot_2023-07-15_at_4.16.18_PM.png',
+            title: 'Discovery',
+            subtitle: 'See the latest and greatest mods and modpacks to play with from Modrinth',
+          },
+          {
+            url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109354238640238/Screenshot_2023-07-15_at_4.17.43_PM.png',
+            title: 'Profile Management',
+            subtitle:
+              'Play, manage and search through all the amazing profiles downloaded on your computer at any time, even offline!',
+          },
+        ]"
         logo
       >
-      <Button color="primary" @click="nextPage">
-        Get started
-      </Button>
+        <Button color="primary" @click="nextPage"> Get started </Button>
       </GalleryImage>
     </suspense>
     <div v-else-if="page === 2">
-      <LoginCard :next-page="nextPage"/>
+      <LoginCard :next-page="nextPage" />
     </div>
-    <suspense v-else-if="page===3">
-      <JavaInstallation  :finish="nextPage"/>
+    <suspense v-else-if="page === 3">
+      <JavaInstallation :finish="nextPage" />
     </suspense>
   </div>
   <div v-else class="container">
@@ -106,19 +116,19 @@ const finishOnboarding = async () => {
           />
         </FakeAccountsCard>
         <div class="pages-list">
-          <div class="btn expanded-button" :class="{'active': phase < 4}">
+          <div class="btn expanded-button" :class="{ active: phase < 4 }">
             <HomeIcon />
             Home
           </div>
-          <div class="btn expanded-button" :class="{'active': phase === 4 || phase === 5}">
+          <div class="btn expanded-button" :class="{ active: phase === 4 || phase === 5 }">
             <SearchIcon />
             Browse
           </div>
           <div
             class="btn expanded-button"
             :class="{
-              'active': phase === 6 || phase === 7,
-              'highlighted': phase === 6
+              active: phase === 6 || phase === 7,
+              highlighted: phase === 6,
             }"
           >
             <LibraryIcon />
@@ -127,7 +137,7 @@ const finishOnboarding = async () => {
         </div>
       </div>
       <div class="settings pages-list">
-        <Button class="active expanded-button" @click="() => phase = 1">
+        <Button class="active expanded-button" @click="() => (phase = 1)">
           <LogOutIcon />
           Exit Tutorial
         </Button>
@@ -135,7 +145,7 @@ const finishOnboarding = async () => {
           <PlusIcon />
           New instance
         </Button>
-        <div class="btn expanded-button" :class="{'active': phase === 8, 'highlighted': phase === 8}">
+        <div class="btn expanded-button" :class="{ active: phase === 8, highlighted: phase === 8 }">
           <SettingsIcon />
           Settings
         </div>
@@ -177,11 +187,11 @@ const finishOnboarding = async () => {
             class="titlebar-button close"
             icon-only
             @click="
-                () => {
-                  saveWindowState(StateFlags.ALL)
-                  window.getCurrent().close()
-                }
-              "
+              () => {
+                saveWindowState(StateFlags.ALL)
+                window.getCurrent().close()
+              }
+            "
           >
             <XIcon />
           </Button>
@@ -193,16 +203,16 @@ const finishOnboarding = async () => {
           offset-width="var(--sidebar-width)"
         />
         <Notifications ref="notificationsWrapper" />
-        <FakeRowDisplay v-if="phase < 4 || phase > 8" :show-instance="phase===2"/>
-        <FakeGridDisplay v-if="phase === 6 || phase === 7" :show-instances="phase===6" />
+        <FakeRowDisplay v-if="phase < 4 || phase > 8" :show-instance="phase === 2" />
+        <FakeGridDisplay v-if="phase === 6 || phase === 7" :show-instances="phase === 6" />
         <suspense>
-          <FakeSearch v-if="phase === 4 || phase === 5" :show-search="phase===4"/>
+          <FakeSearch v-if="phase === 4 || phase === 5" :show-search="phase === 4" />
         </suspense>
         <FakeSettings v-if="phase === 8" />
       </div>
     </div>
     <Modal ref="firstModal" header="Welcome to the Modrinth App!" :closable="false">
-      <div class="intro-card" >
+      <div class="intro-card">
         <svg
           class="app-logo"
           viewBox="0 0 1215 175"
@@ -267,19 +277,18 @@ const finishOnboarding = async () => {
               </g>
             </g>
           </g>
-        </svg >
+        </svg>
         <p>
-          This is the Modrinth App guide. Key parts are marked with a green shadow. Click "Next" to proceed.
-          You can leave the tutorial anytime using "Exit tutorial" at the bottom left or "Skip tutorial" displayed on this screen.
+          This is the Modrinth App guide. Key parts are marked with a green shadow. Click "Next" to
+          proceed. You can leave the tutorial anytime using "Exit tutorial" at the bottom left or
+          "Skip tutorial" displayed on this screen.
         </p>
         <div class="actions">
           <Button @click="finishOnboarding">
             <LogOutIcon />
             Skip tutorial
           </Button>
-          <Button color="primary" @click="beginTutorial">
-            Next
-          </Button>
+          <Button color="primary" @click="beginTutorial"> Next </Button>
         </div>
       </div>
     </Modal>
@@ -354,13 +363,15 @@ const finishOnboarding = async () => {
     color: var(--color-base);
 
     &.close {
-      &:hover, &:active {
+      &:hover,
+      &:active {
         background-color: var(--color-red);
         color: var(--color-accent-contrast);
       }
     }
 
-    &:hover, &:active {
+    &:hover,
+    &:active {
       background-color: var(--color-button-bg);
       color: var(--color-contrast);
     }
@@ -493,7 +504,6 @@ const finishOnboarding = async () => {
   }
 }
 
-
 .final-tip {
   position: absolute;
   bottom: 50%;
@@ -503,7 +513,8 @@ const finishOnboarding = async () => {
 }
 
 .onboarding {
-  background: top linear-gradient(0deg, #31375f, rgba(8, 14, 55, 0)), url(https://cdn.modrinth.com/landing-new/landing-lower.webp);
+  background: top linear-gradient(0deg, #31375f, rgba(8, 14, 55, 0)),
+    url(https://cdn.modrinth.com/landing-new/landing-lower.webp);
   background-size: cover;
   height: 100vh;
   min-height: 100vh;

@@ -1,7 +1,8 @@
 <template>
   <Card
     class="card button-base"
-    @click="() => {
+    @click="
+      () => {
         emits('open')
         $router.push({
           path: `/project/${project.project_id ?? project.id}/`,

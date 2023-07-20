@@ -1,17 +1,11 @@
 <template>
-  <div
-    ref="button"
-    class="button-base avatar-button expanded"
-    :class="{'highlighted': showDemo}"
-  >
+  <div ref="button" class="button-base avatar-button expanded" :class="{ highlighted: showDemo }">
     <Avatar
       size="xs"
       src="https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png"
     />
     <div class="avatar-text">
-      <div class="text no-select">
-        Modrinth
-      </div>
+      <div class="text no-select">Modrinth</div>
       <p class="accounts-text no-select">
         <UsersIcon />
         Accounts
@@ -20,12 +14,12 @@
   </div>
   <transition name="fade">
     <div v-if="showDemo" class="card-section">
-      <Card
-        ref="card"
-        class="fake-account-card expanded highlighted"
-      >
+      <Card ref="card" class="fake-account-card expanded highlighted">
         <div class="selected account">
-          <Avatar size="xs" src="https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png" />
+          <Avatar
+            size="xs"
+            src="https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png"
+          />
           <div>
             <h4>Modrinth</h4>
             <p>Selected</p>
@@ -39,7 +33,7 @@
           Add account
         </Button>
       </Card>
-      <slot/>
+      <slot />
     </div>
   </transition>
 </template>

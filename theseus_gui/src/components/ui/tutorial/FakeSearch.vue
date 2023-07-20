@@ -1,26 +1,33 @@
 <script setup>
-import {computed, readonly, ref} from 'vue'
+import { computed, readonly, ref } from 'vue'
 import {
   Avatar,
-  Button, CalendarIcon,
-  Card, Categories,
+  Button,
+  CalendarIcon,
+  Card,
+  Categories,
   Checkbox,
   ClearIcon,
-  ClientIcon, DownloadIcon,
-  DropdownSelect, EnvironmentIndicator,
+  ClientIcon,
+  DownloadIcon,
+  DropdownSelect,
+  EnvironmentIndicator,
   formatCategory,
-  formatCategoryHeader, formatNumber, HeartIcon,
+  formatCategoryHeader,
+  formatNumber,
+  HeartIcon,
   NavRow,
   Pagination,
   Promotion,
   SearchFilter,
   SearchIcon,
-  ServerIcon, StarIcon,
+  ServerIcon,
+  StarIcon,
   XIcon,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
-import {handleError} from '@/store/state'
-import {get_categories, get_game_versions, get_loaders} from '@/helpers/tags'
+import { handleError } from '@/store/state'
+import { get_categories, get_game_versions, get_loaders } from '@/helpers/tags'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const loading = ref(false)
@@ -47,9 +54,7 @@ const searchWrapper = ref(null)
 
 const sortedCategories = computed(() => {
   const values = new Map()
-  for (const category of categories.value.filter(
-    (cat) => cat.project_type === 'mod')
-  ) {
+  for (const category of categories.value.filter((cat) => cat.project_type === 'mod')) {
     if (!values.has(category.header)) {
       values.set(category.header, [])
     }
@@ -68,11 +73,11 @@ const pageCount = ref(1)
 
 const selectableProjectTypes = computed(() => {
   return [
-    {label: 'Shaders', href: ``},
-    {label: 'Resource Packs', href: ``},
-    {label: 'Data Packs', href: ``},
-    {label: 'Mods', href: ''},
-    {label: 'Modpacks', href: ''},
+    { label: 'Shaders', href: `` },
+    { label: 'Resource Packs', href: `` },
+    { label: 'Data Packs', href: `` },
+    { label: 'Mods', href: '' },
+    { label: 'Modpacks', href: '' },
   ]
 })
 
@@ -87,13 +92,8 @@ defineProps({
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Card class="search-panel-card" :class="{'highlighted': showSearch}">
-        <Button
-          role="button"
-          disabled
-        >
-          <ClearIcon /> Clear Filters
-        </Button>
+      <Card class="search-panel-card" :class="{ highlighted: showSearch }">
+        <Button role="button" disabled> <ClearIcon /> Clear Filters </Button>
         <div class="loaders">
           <h2>Loaders</h2>
           <div
@@ -171,11 +171,7 @@ defineProps({
         </div>
         <div class="open-source">
           <h2>Open source</h2>
-          <Checkbox
-            v-model="onlyOpenSource"
-            label="Open source only"
-            class="filter-checkbox"
-          />
+          <Checkbox v-model="onlyOpenSource" label="Open source only" class="filter-checkbox" />
         </div>
       </Card>
     </aside>
@@ -184,7 +180,7 @@ defineProps({
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
       </Card>
-      <Card class="search-panel-container" :class="{'highlighted': showSearch}">
+      <Card class="search-panel-container" :class="{ highlighted: showSearch }">
         <div class="iconified-input">
           <SearchIcon aria-hidden="true" />
           <input
@@ -193,7 +189,7 @@ defineProps({
             type="text"
             :placeholder="`Search ${projectType}s...`"
           />
-          <Button @click="() => query = ''">
+          <Button @click="() => (query = '')">
             <XIcon />
           </Button>
         </div>
@@ -218,20 +214,16 @@ defineProps({
           />
         </div>
       </Card>
-      <Pagination
-        :page="currentPage"
-        :count="pageCount"
-        class="pagination-before"
-      />
+      <Pagination :page="currentPage" :count="pageCount" class="pagination-before" />
       <SplashScreen v-if="loading" />
       <section v-else class="project-list display-mode--list instance-results" role="list">
-        <Card
-          v-for="project in 20"
-          :key="project"
-          class="search-card button-base"
-        >
+        <Card v-for="project in 20" :key="project" class="search-card button-base">
           <div class="icon">
-            <Avatar src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png" size="md" class="search-icon" />
+            <Avatar
+              src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+              size="md"
+              class="search-icon"
+            />
           </div>
           <div class="content-wrapper">
             <div class="title joined-text">
@@ -242,7 +234,14 @@ defineProps({
               A very cool project that does cool project things that you can your friends can do.
             </div>
             <div class="tags">
-              <Categories :categories="categories.filter((cat) => cat.project_type === projectType).slice(project / 2, project / 2 + 3)" :type="modpack">
+              <Categories
+                :categories="
+                  categories
+                    .filter((cat) => cat.project_type === projectType)
+                    .slice(project / 2, project / 2 + 3)
+                "
+                :type="modpack"
+              >
                 <EnvironmentIndicator
                   :type-only="true"
                   :client-side="true"
@@ -273,11 +272,7 @@ defineProps({
           </div>
         </Card>
       </section>
-      <pagination
-        :page="currentPage"
-        :count="pageCount"
-        class="pagination-after"
-      />
+      <pagination :page="currentPage" :count="pageCount" class="pagination-after" />
     </div>
   </div>
 </template>

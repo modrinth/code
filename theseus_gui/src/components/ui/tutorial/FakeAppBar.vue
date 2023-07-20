@@ -1,21 +1,11 @@
 <template>
   <div class="action-groups">
-    <Button
-      v-if="showDownload"
-      ref="infoButton"
-      icon-only
-      class="icon-button show-card-icon"
-    >
+    <Button v-if="showDownload" ref="infoButton" icon-only class="icon-button show-card-icon">
       <DownloadIcon />
     </Button>
     <div v-if="showRunning" class="status highlighted">
       <span class="circle running" />
-      <div
-        ref="profileButton"
-        class="running-text"
-      >
-        Example Modpack
-      </div>
+      <div ref="profileButton" class="running-text">Example Modpack</div>
       <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop">
         <StopCircleIcon />
       </Button>
@@ -31,13 +21,9 @@
   <transition name="download">
     <div v-if="showDownload" class="info-section">
       <Card ref="card" class="highlighted info-card">
-        <h3 class="info-title">
-          New Modpack
-        </h3>
+        <h3 class="info-title">New Modpack</h3>
         <ProgressBar :progress="50" />
-        <div class="row">
-          50% Downloading modpack
-        </div>
+        <div class="row">50% Downloading modpack</div>
       </Card>
       <slot name="download" />
     </div>
@@ -50,13 +36,7 @@
 </template>
 
 <script setup>
-import {
-  Button,
-  DownloadIcon,
-  Card,
-  StopCircleIcon,
-  TerminalSquareIcon,
-} from 'omorphia'
+import { Button, DownloadIcon, Card, StopCircleIcon, TerminalSquareIcon } from 'omorphia'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 
 defineProps({
@@ -67,9 +47,8 @@ defineProps({
   showRunning: {
     type: Boolean,
     default: false,
-  }
+  },
 })
-
 </script>
 
 <style scoped lang="scss">

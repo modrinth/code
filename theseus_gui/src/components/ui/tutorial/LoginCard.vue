@@ -1,18 +1,12 @@
 <script setup>
-import {
-  Button,
-  LogInIcon,
-  Modal,
-  ClipboardCopyIcon,
-  GlobeIcon
-} from "omorphia";
-import {authenticate_await_completion, authenticate_begin_flow} from "@/helpers/auth.js";
-import {handleError} from "@/store/notifications.js";
-import mixpanel from "mixpanel-browser";
-import {get, set} from "@/helpers/settings.js";
-import {ref} from "vue";
+import { Button, LogInIcon, Modal, ClipboardCopyIcon, GlobeIcon } from 'omorphia'
+import { authenticate_await_completion, authenticate_begin_flow } from '@/helpers/auth.js'
+import { handleError } from '@/store/notifications.js'
+import mixpanel from 'mixpanel-browser'
+import { get, set } from '@/helpers/settings.js'
+import { ref } from 'vue'
 import QrcodeVue from 'qrcode.vue'
-import {LoginSticker} from "@/assets/images";
+import { LoginSticker } from '@/assets/images'
 
 const loginUrl = ref(null)
 const loginModal = ref()
@@ -39,7 +33,7 @@ async function login() {
     await set(settings.value).catch(handleError)
     mixpanel.track('AccountLogIn')
   } else {
-    props.nextPage();
+    props.nextPage()
   }
 }
 
@@ -63,48 +57,50 @@ const props = defineProps({
 
 <template>
   <div class="logging-in">
-    <LoginSticker class="sticker"/>
+    <LoginSticker class="sticker" />
     <h1>Sign into Minecraft</h1>
     <p>Sign in with your Minecraft account to play with installed mods and modpacks.</p>
     <div class="button-row">
       <Button color="primary" large @click="login">
-        <LogInIcon v-if="!finalizedLogin"/>
+        <LogInIcon v-if="!finalizedLogin" />
         {{ finalizedLogin ? 'Next' : 'Sign in' }}
       </Button>
-      <Button v-if="loginUrl && !finalizedLogin" class="transparent" large @click="loginModal.show()">
+      <Button
+        v-if="loginUrl && !finalizedLogin"
+        class="transparent"
+        large
+        @click="loginModal.show()"
+      >
         Browser didn't open?
       </Button>
     </div>
   </div>
   <Modal ref="loginModal" header="Signing in">
     <div class="modal-body">
-      <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160"/>
+      <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
         <p>
-          Sign into Microsoft with your browser.
-          If your browser didn't open, you can copy and open the link below,
-          or scan the QR code with your device.
+          Sign into Microsoft with your browser. If your browser didn't open, you can copy and open
+          the link below, or scan the QR code with your device.
         </p>
         <div class="iconified-input">
-          <LogInIcon/>
-          <input type="text" :value="loginUrl" readonly/>
+          <LogInIcon />
+          <input type="text" :value="loginUrl" readonly />
           <Button
+            v-tooltip="'Copy link'"
             icon-only
             color="raised"
-            v-tooltip="'Copy link'"
             @click="() => navigator.clipboard.writeText(loginUrl)"
           >
-            <ClipboardCopyIcon/>
+            <ClipboardCopyIcon />
           </Button>
         </div>
         <div class="button-row">
           <Button @click="openUrl">
-            <GlobeIcon/>
+            <GlobeIcon />
             Open link
           </Button>
-          <Button class="transparent" @click="loginModal.hide">
-            Cancel
-          </Button>
+          <Button class="transparent" @click="loginModal.hide"> Cancel </Button>
         </div>
       </div>
     </div>
@@ -125,7 +121,8 @@ const props = defineProps({
   border-radius: var(--radius-lg);
   background-color: var(--color-raised-bg);
 
-  h1, p {
+  h1,
+  p {
     margin: 0;
   }
 
@@ -158,8 +155,9 @@ const props = defineProps({
     flex-direction: column;
     gap: var(--gap-sm);
 
-    h2, p {
-      margin: 0
+    h2,
+    p {
+      margin: 0;
     }
   }
 }

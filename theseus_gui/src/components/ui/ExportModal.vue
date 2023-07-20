@@ -235,6 +235,5 @@ const exportPack = async () => {
   display: flex;
   gap: var(--gap-sm);
   align-items: center;
-
 }
 </style>

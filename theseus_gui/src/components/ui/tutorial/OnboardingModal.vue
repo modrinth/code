@@ -1,8 +1,5 @@
 <template>
-  <Modal
-    ref="onboardingModal"
-    :closable="false"
-  >
+  <Modal ref="onboardingModal" :closable="false">
     <div class="modal-body">
       <div v-if="page === 1" key="1" class="content">
         <svg
