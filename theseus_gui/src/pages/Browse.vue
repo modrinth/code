@@ -272,6 +272,11 @@ async function onSearchChangeToTop(newPageNumber) {
   searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+async function clearSearch() {
+  query.value = ''
+  await onSearchChange(1)
+}
+
 function getSearchUrl(offset, useObj) {
   const queryItems = []
   const obj = {}
@@ -355,6 +360,33 @@ const sortedCategories = computed(() => {
   return values
 })
 
+// Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
+// identifier[0], then if it ties, identifier[1], etc
+async function sortByNameOrNumber(sortable, identifiers) {
+  console.log(sortable)
+  sortable.sort((a, b) => {
+    for (let identifier of identifiers) {
+      let aNum = parseFloat(a[identifier])
+      let bNum = parseFloat(b[identifier])
+      if (isNaN(aNum) && isNaN(bNum)) {
+        // Both are strings, sort alphabetically
+        let stringComp = a[identifier].localeCompare(b[identifier])
+        if (stringComp != 0) return stringComp
+      } else if (!isNaN(aNum) && !isNaN(bNum)) {
+        // Both are numbers, sort numerically
+        let numComp = aNum - bNum
+        if (numComp != 0) return numComp
+      } else {
+        // One is a number and one is a string, numbers go first
+        let numStringComp = isNaN(aNum) ? 1 : -1
+        if (numStringComp != 0) return numStringComp
+      }
+    }
+    return 0
+  })
+  return sortable
+}
+
 async function clearFilters() {
   for (const facet of [...facets.value]) {
     await toggleFacet(facet, true)
@@ -426,7 +458,10 @@ watch(
 )
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories().catch(handleError).then(ref),
+  get_categories()
+    .catch(handleError)
+    .then((s) => sortByNameOrNumber(s, ['header', 'name']))
+    .then(ref),
   get_loaders().catch(handleError).then(ref),
   get_game_versions().catch(handleError).then(ref),
   refreshSearch(),
@@ -473,7 +508,7 @@ const showLoaders = computed(
 </script>
 
 <template>
-  <div class="search-container">
+  <div ref="searchWrapper" class="search-container">
     <aside class="filter-panel">
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
@@ -525,7 +560,7 @@ const showLoaders = computed(
           "
           @click="clearFilters"
         >
-          <ClearIcon /> Clear Filters
+          <ClearIcon /> Clear filters
         </Button>
         <div v-if="showLoaders" class="loaders">
           <h2>Loaders</h2>
@@ -618,7 +653,7 @@ const showLoaders = computed(
         </div>
       </Card>
     </aside>
-    <div ref="searchWrapper" class="search">
+    <div class="search">
       <Promotion class="promotion" />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
@@ -633,7 +668,7 @@ const showLoaders = computed(
             :placeholder="`Search ${projectType}s...`"
             @input="onSearchChange(1)"
           />
-          <Button @click="() => (searchStore.searchInput = '')">
+          <Button @click="() => clearSearch()">
             <XIcon />
           </Button>
         </div>
@@ -698,6 +733,7 @@ const showLoaders = computed(
         class="pagination-after"
         @switch-page="onSearchChangeToTop"
       />
+      <br />
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
@@ -818,6 +854,9 @@ const showLoaders = computed(
 
 .search-container {
   display: flex;
+  height: 100%; /* takes up only the necessary height */
+  overflow-y: auto;
+  scroll-behavior: smooth;
 
   .filter-panel {
     position: fixed;
@@ -846,7 +885,6 @@ const showLoaders = computed(
   }
 
   .search {
-    scroll-behavior: smooth;
     margin: 0 1rem 0.5rem 20.5rem;
     width: calc(100% - 20.5rem);
 

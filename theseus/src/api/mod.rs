@@ -30,7 +30,10 @@ pub mod prelude {
         profile_create, settings,
         state::JavaGlobals,
         state::{ProfilePathId, ProjectPathId},
-        util::jre::JavaVersion,
+        util::{
+            io::{canonicalize, IOError},
+            jre::JavaVersion,
+        },
         State,
     };
 }

@@ -3,7 +3,7 @@
 use super::{auth::Credentials, parse_rule};
 use crate::{
     state::{MemorySettings, WindowSize},
-    util::platform::classpath_separator,
+    util::{io::IOError, platform::classpath_separator},
 };
 use daedalus::{
     get_path_from_artifact,
@@ -393,7 +393,8 @@ pub async fn get_processor_main_class(
     path: String,
 ) -> crate::Result<Option<String>> {
     let main_class = tokio::task::spawn_blocking(move || {
-        let zipfile = std::fs::File::open(&path)?;
+        let zipfile = std::fs::File::open(&path)
+            .map_err(|e| IOError::with_path(e, &path))?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
                 "Cannot read processor at {}",
@@ -413,7 +414,7 @@ pub async fn get_processor_main_class(
         let reader = BufReader::new(file);
 
         for line in reader.lines() {
-            let mut line = line?;
+            let mut line = line.map_err(IOError::from)?;
             line.retain(|c| !c.is_whitespace());
 
             if line.starts_with("Main-Class:") {

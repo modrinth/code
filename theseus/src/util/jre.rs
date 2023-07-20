@@ -1,4 +1,4 @@
-use dunce::canonicalize;
+use super::io;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -270,7 +270,7 @@ pub async fn check_java_at_filepaths(
 pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
-    let Ok(path) = canonicalize(path) else { return None };
+    let Ok(path) = io::canonicalize(path) else { return None };
 
     // Checks for existence of Java at this filepath
     // Adds JAVA_BIN to the end of the path if it is not already there

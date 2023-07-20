@@ -1,6 +1,6 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { RouterView, RouterLink, useRouter } from 'vue-router'
+import { computed, ref, watch } from 'vue'
+import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
 import {
   HomeIcon,
   SearchIcon,
@@ -106,6 +106,8 @@ router.afterEach((to, from, failure) => {
     mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
   }
 })
+const route = useRoute()
+const isOnBrowse = computed(() => route.path.startsWith('/browse'))
 
 const loading = useLoading()
 
@@ -179,6 +181,7 @@ const accounts = ref(null)
               'icon-only': themeStore.collapsedNavigation,
               'collapsed-button': themeStore.collapsedNavigation,
               'expanded-button': !themeStore.collapsedNavigation,
+              'router-link-active': isOnBrowse,
             }"
           >
             <SearchIcon />
@@ -340,7 +343,7 @@ const accounts = ref(null)
       display: flex;
       align-items: center;
       background: var(--color-raised-bg);
-      box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+      box-shadow: inset 0px -3px 0px black;
       text-align: center;
       padding: var(--gap-md);
       height: 3.25rem;

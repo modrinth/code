@@ -9,6 +9,7 @@ use crate::pack::install_from::{
 use crate::prelude::JavaVersion;
 use crate::state::{ProfilePathId, ProjectMetadata, ProjectPathId};
 
+use crate::util::io::{self, IOError};
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
@@ -27,11 +28,7 @@ use std::{
     sync::Arc,
 };
 use tokio::io::AsyncReadExt;
-use tokio::{
-    fs::{self, File},
-    process::Command,
-    sync::RwLock,
-};
+use tokio::{fs::File, process::Command, sync::RwLock};
 
 /// Remove a profile
 #[tracing::instrument]
@@ -129,8 +126,8 @@ pub async fn edit_icon(
 ) -> crate::Result<()> {
     let state = State::get().await?;
 
-    if let Some(icon) = icon_path {
-        let bytes = tokio::fs::read(icon).await?;
+    let res = if let Some(icon) = icon_path {
+        let bytes = io::read(icon).await?;
 
         let mut profiles = state.profiles.write().await;
 
@@ -152,8 +149,6 @@ pub async fn edit_icon(
                     ProfilePayloadType::Edited,
                 )
                 .await?;
-                State::sync().await?;
-
                 Ok(())
             }
             None => {
@@ -170,7 +165,9 @@ pub async fn edit_icon(
         State::sync().await?;
 
         Ok(())
-    }
+    };
+    State::sync().await?;
+    res
 }
 
 // Gets the optimal JRE key for the given profile, using Daedalus
@@ -436,7 +433,7 @@ pub async fn add_project_from_path(
     project_type: Option<String>,
 ) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile_path, None).await? {
-        let file = fs::read(path).await?;
+        let file = io::read(path).await?;
         let file_name = path
             .file_name()
             .unwrap_or_default()
@@ -544,7 +541,9 @@ pub async fn export_mrpack(
 
     let profile_base_path = &profile.get_profile_full_path().await?;
 
-    let mut file = File::create(export_path).await?;
+    let mut file = File::create(&export_path)
+        .await
+        .map_err(|e| IOError::with_path(e, &export_path))?;
     let mut writer = ZipFileWriter::new(&mut file);
 
     // Create mrpack json configuration file
@@ -611,9 +610,13 @@ pub async fn export_mrpack(
 
         // File is not in the config file, add it to the .mrpack zip
         if path.is_file() {
-            let mut file = File::open(&path).await?;
+            let mut file = File::open(&path)
+                .await
+                .map_err(|e| IOError::with_path(e, &path))?;
             let mut data = Vec::new();
-            file.read_to_end(&mut data).await?;
+            file.read_to_end(&mut data)
+                .await
+                .map_err(|e| IOError::with_path(e, &path))?;
             let builder = ZipEntryBuilder::new(
                 format!("overrides/{relative_path}"),
                 Compression::Deflate,
@@ -661,13 +664,21 @@ pub async fn get_potential_override_folders(
     let mut path_list: Vec<PathBuf> = Vec::new();
 
     let profile_base_dir = profile.get_profile_full_path().await?;
-    let mut read_dir = fs::read_dir(&profile_base_dir).await?;
-    while let Some(entry) = read_dir.next_entry().await? {
+    let mut read_dir = io::read_dir(&profile_base_dir).await?;
+    while let Some(entry) = read_dir
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, &profile_path))?
+    {
         let path: PathBuf = entry.path();
         if path.is_dir() {
             // Two layers of files/folders if its a folder
-            let mut read_dir = fs::read_dir(&path).await?;
-            while let Some(entry) = read_dir.next_entry().await? {
+            let mut read_dir = io::read_dir(&path).await?;
+            while let Some(entry) = read_dir
+                .next_entry()
+                .await
+                .map_err(|e| IOError::with_path(e, &profile_path))?
+            {
                 let path: PathBuf = entry.path();
                 let name = path.strip_prefix(&profile_base_dir)?.to_path_buf();
                 if !mrpack_files.contains(&name.to_string_lossy().to_string()) {
@@ -736,9 +747,11 @@ pub async fn run_credentials(
             let result = Command::new(command)
                 .args(&cmd.collect::<Vec<&str>>())
                 .current_dir(path.get_full_path().await?)
-                .spawn()?
+                .spawn()
+                .map_err(|e| IOError::with_path(e, path))?
                 .wait()
-                .await?;
+                .await
+                .map_err(IOError::from)?;
 
             if !result.success() {
                 return Err(crate::ErrorKind::LauncherError(format!(
@@ -949,8 +962,12 @@ pub async fn build_folder(
     path: &Path,
     path_list: &mut Vec<PathBuf>,
 ) -> crate::Result<()> {
-    let mut read_dir = fs::read_dir(path).await?;
-    while let Some(entry) = read_dir.next_entry().await? {
+    let mut read_dir = io::read_dir(path).await?;
+    while let Some(entry) = read_dir
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, path))?
+    {
         let path = entry.path();
         if path.is_dir() {
             build_folder(&path, path_list).await?;

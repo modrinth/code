@@ -101,6 +101,17 @@
     <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
     <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
     <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
+    <template #copy_names><EditIcon />Copy names</template>
+    <template #copy_slugs><HashIcon />Copy slugs</template>
+    <template #copy_links><GlobeIcon />Copy Links</template>
+    <template #toggle><EditIcon />Toggle selected</template>
+    <template #disable><XIcon />Disable selected</template>
+    <template #enable><CheckCircleIcon />Enable selected</template>
+    <template #hide_show><EyeIcon />Show/Hide unselected</template>
+    <template #update_all
+      ><UpdatedIcon />Update {{ selected.length > 0 ? 'selected' : 'all' }}</template
+    >
+    <template #filter_update><UpdatedIcon />Select Updatable</template>
   </ContextMenu>
   <ExportModal ref="exportModal" :instance="instance" />
 </template>
@@ -120,6 +131,12 @@ import {
   ClipboardCopyIcon,
   PlusIcon,
   ExternalIcon,
+  HashIcon,
+  GlobeIcon,
+  EyeIcon,
+  XIcon,
+  CheckCircleIcon,
+  UpdatedIcon,
 } from 'omorphia'
 import { get, run } from '@/helpers/profile'
 import {
@@ -346,6 +363,7 @@ Button {
   flex-direction: row;
   overflow: auto;
   gap: 1rem;
+  min-height: 100%;
 }
 
 .content {

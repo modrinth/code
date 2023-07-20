@@ -1,9 +1,10 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::jre::{JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
+use crate::jre::{self, JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
+use crate::util::io;
 use crate::EventState;
 use crate::{
     process,
@@ -13,10 +14,8 @@ use crate::{
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::VersionInfo;
-use dunce::canonicalize;
 use st::Profile;
 use std::collections::HashMap;
-use std::fs;
 use std::{process::Stdio, sync::Arc};
 use tokio::process::Command;
 use uuid::Uuid;
@@ -125,7 +124,7 @@ pub async fn install_minecraft(
     State::sync().await?;
 
     let state = State::get().await?;
-    let instance_path = &canonicalize(&profile.get_profile_full_path().await?)?;
+    let instance_path = &io::canonicalize(&profile.get_profile_full_path().await?)?;
     let metadata = state.metadata.read().await;
 
     let version = metadata
@@ -160,7 +159,7 @@ pub async fn install_minecraft(
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::OtherError(
-                "No available java installation".to_string(),
+                "Missing correct java installation".to_string(),
             )
         })?;
 
@@ -285,7 +284,7 @@ pub async fn install_minecraft(
     Ok(())
 }
 
-#[tracing::instrument(skip(profile))]
+#[tracing::instrument(skip_all)]
 #[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn launch_minecraft(
@@ -315,7 +314,7 @@ pub async fn launch_minecraft(
     let metadata = state.metadata.read().await;
 
     let instance_path = profile.get_profile_full_path().await?;
-    let instance_path = &canonicalize(instance_path)?;
+    let instance_path = &io::canonicalize(instance_path)?;
 
     let version = metadata
         .minecraft
@@ -348,8 +347,18 @@ pub async fn launch_minecraft(
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(
-                "No available java installation".to_string(),
+                "Missing correct java installation".to_string(),
             )
+        })?;
+
+    // Test jre version
+    let java_version = jre::check_jre(java_version.path.clone().into())
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Java path invalid or non-functional: {}",
+                java_version.path
+            ))
         })?;
 
     let client_path = state
@@ -440,7 +449,7 @@ pub async fn launch_minecraft(
             .await?
             .join(&datetime_string)
     };
-    fs::create_dir_all(&logs_dir)?;
+    io::create_dir_all(&logs_dir).await?;
 
     let stdout_log_path = logs_dir.join("stdout.log");
 

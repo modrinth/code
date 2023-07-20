@@ -9,11 +9,11 @@ use crate::state::{ModrinthVersion, ProjectMetadata, ProjectType};
 use crate::util::fetch::{
     fetch, fetch_json, write, write_cached_icon, IoSemaphore,
 };
+use crate::util::io::{self, IOError};
 use crate::State;
 use chrono::{DateTime, Utc};
 use daedalus::get_hash;
 use daedalus::modded::LoaderVersion;
-use dunce::canonicalize;
 use futures::prelude::*;
 use notify::{RecommendedWatcher, RecursiveMode};
 use notify_debouncer_mini::Debouncer;
@@ -24,7 +24,6 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use tokio::fs;
 use uuid::Uuid;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
@@ -385,8 +384,11 @@ impl Profile {
         let mut read_paths = |path: &str| {
             let new_path = profile_path.join(path);
             if new_path.exists() {
-                for path in std::fs::read_dir(new_path)? {
-                    let path = path?.path();
+                let path = self.path.join(path);
+                for path in std::fs::read_dir(&path)
+                    .map_err(|e| IOError::with_path(e, &path))?
+                {
+                    let path = path.map_err(IOError::from)?.path();
                     if path.is_file() {
                         files.push(path);
                     }
@@ -416,7 +418,7 @@ impl Profile {
         ) -> crate::Result<()> {
             let path = profile_path.join(path);
 
-            fs::create_dir_all(&path).await?;
+            io::create_dir_all(&path).await?;
 
             watcher
                 .watcher()
@@ -609,7 +611,7 @@ impl Profile {
                 self.get_profile_full_path().await?.join(&relative_path);
             let true_new_path =
                 self.get_profile_full_path().await?.join(&new_path);
-            fs::rename(true_path, &true_new_path).await?;
+            io::rename(&true_path, &true_new_path).await?;
 
             let new_project_path_id = ProjectPathId::new(&new_path);
 
@@ -638,7 +640,7 @@ impl Profile {
     ) -> crate::Result<()> {
         let state = State::get().await?;
         if self.projects.contains_key(relative_path) {
-            fs::remove_file(
+            io::remove_file(
                 self.get_profile_full_path()
                     .await?
                     .join(relative_path.0.clone()),
@@ -673,14 +675,16 @@ impl Profiles {
     ) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
         let profiles_dir = dirs.profiles_dir().await;
-        fs::create_dir_all(&profiles_dir).await?;
+        io::create_dir_all(&&profiles_dir).await?;
 
         file_watcher
             .watcher()
             .watch(&profiles_dir, RecursiveMode::NonRecursive)?;
 
-        let mut entries = fs::read_dir(dirs.profiles_dir().await).await?;
-        while let Some(entry) = entries.next_entry().await? {
+        let mut entries = io::read_dir(&dirs.profiles_dir().await).await?;
+        while let Some(entry) =
+            entries.next_entry().await.map_err(IOError::from)?
+        {
             let path = entry.path();
             if path.is_dir() {
                 let prof = match Self::read_profile_from_dir(&path, dirs).await
@@ -694,7 +698,7 @@ impl Profiles {
                     }
                 };
                 if let Some(profile) = prof {
-                    let path = canonicalize(path)?;
+                    let path = io::canonicalize(path)?;
                     Profile::watch_fs(&path, file_watcher).await?;
                     profiles.insert(profile.profile_id(), profile);
                 }
@@ -798,7 +802,7 @@ impl Profiles {
 
         let path = profile_path.get_full_path().await?;
         if path.exists() {
-            fs::remove_dir_all(path).await?;
+            io::remove_dir_all(&path).await?;
         }
 
         Ok(profile)
@@ -817,7 +821,7 @@ impl Profiles {
                     .await?
                     .join(PROFILE_JSON_PATH);
 
-                fs::write(json_path, json).await?;
+                io::write(&json_path, &json).await?;
                 Ok::<_, crate::Error>(())
             })
             .await?;
@@ -829,7 +833,7 @@ impl Profiles {
         path: &Path,
         dirs: &DirectoryInfo,
     ) -> crate::Result<Profile> {
-        let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
+        let json = io::read(&path.join(PROFILE_JSON_PATH)).await?;
         let mut profile = serde_json::from_slice::<Profile>(&json)?;
 
         // Get name from stripped path

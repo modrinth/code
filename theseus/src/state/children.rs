@@ -12,6 +12,7 @@ use tracing::error;
 
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
+use crate::util::io::IOError;
 use crate::EventState;
 use tokio::task::JoinHandle;
 use uuid::Uuid;
@@ -41,10 +42,13 @@ impl Children {
 
     #[tracing::instrument(skip(
         self,
+        uuid,
+        log_path,
         mc_command,
         post_command,
         censor_strings
     ))]
+    #[tracing::instrument(level = "trace", skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn insert_process(
         &mut self,
@@ -56,7 +60,7 @@ impl Children {
         censor_strings: HashMap<String, String>,
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
-        let mut child = mc_command.spawn()?;
+        let mut child = mc_command.spawn().map_err(IOError::from)?;
 
         // Create std watcher threads for stdout and stderr
         let shared_output =
@@ -130,7 +134,12 @@ impl Children {
         // Wait on current Minecraft Child
         let mut mc_exit_status;
         loop {
-            if let Some(t) = current_child.write().await.try_wait()? {
+            if let Some(t) = current_child
+                .write()
+                .await
+                .try_wait()
+                .map_err(IOError::from)?
+            {
                 mc_exit_status = t;
                 break;
             }
@@ -161,7 +170,7 @@ impl Children {
         if let Some(mut m_command) = post_command {
             {
                 let mut current_child = current_child.write().await;
-                let new_child = m_command.spawn()?;
+                let new_child = m_command.spawn().map_err(IOError::from)?;
                 current_pid = new_child.id().ok_or_else(|| {
                     crate::ErrorKind::LauncherError(
                         "Process immediately failed, could not get PID"
@@ -179,7 +188,12 @@ impl Children {
             .await?;
 
             loop {
-                if let Some(t) = current_child.write().await.try_wait()? {
+                if let Some(t) = current_child
+                    .write()
+                    .await
+                    .try_wait()
+                    .map_err(IOError::from)?
+                {
                     mc_exit_status = t;
                     break;
                 }
@@ -215,7 +229,12 @@ impl Children {
     ) -> crate::Result<Option<std::process::ExitStatus>> {
         if let Some(child) = self.get(uuid) {
             let child = child.write().await;
-            let status = child.current_child.write().await.try_wait()?;
+            let status = child
+                .current_child
+                .write()
+                .await
+                .try_wait()
+                .map_err(IOError::from)?;
             Ok(status)
         } else {
             Ok(None)
@@ -229,7 +248,14 @@ impl Children {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
                 let child = child.write().await;
-                if child.current_child.write().await.try_wait()?.is_none() {
+                if child
+                    .current_child
+                    .write()
+                    .await
+                    .try_wait()
+                    .map_err(IOError::from)?
+                    .is_none()
+                {
                     keys.push(key);
                 }
             }
@@ -265,7 +291,14 @@ impl Children {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
                 let child = child.write().await;
-                if child.current_child.write().await.try_wait()?.is_none() {
+                if child
+                    .current_child
+                    .write()
+                    .await
+                    .try_wait()
+                    .map_err(IOError::from)?
+                    .is_none()
+                {
                     profiles.push(child.profile_relative_path.clone());
                 }
             }
@@ -281,7 +314,14 @@ impl Children {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
                 let child = child.write().await;
-                if child.current_child.write().await.try_wait()?.is_none() {
+                if child
+                    .current_child
+                    .write()
+                    .await
+                    .try_wait()
+                    .map_err(IOError::from)?
+                    .is_none()
+                {
                     if let Some(prof) = crate::api::profile::get(
                         &child.profile_relative_path.clone(),
                         None,
@@ -319,7 +359,11 @@ impl SharedOutput {
     ) -> crate::Result<Self> {
         Ok(SharedOutput {
             output: Arc::new(RwLock::new(String::new())),
-            log_file: Arc::new(RwLock::new(File::create(log_file_path).await?)),
+            log_file: Arc::new(RwLock::new(
+                File::create(log_file_path)
+                    .await
+                    .map_err(|e| IOError::with_path(e, log_file_path))?,
+            )),
             censor_strings,
         })
     }
@@ -337,7 +381,12 @@ impl SharedOutput {
         let mut buf_reader = BufReader::new(child_stdout);
         let mut line = String::new();
 
-        while buf_reader.read_line(&mut line).await? > 0 {
+        while buf_reader
+            .read_line(&mut line)
+            .await
+            .map_err(IOError::from)?
+            > 0
+        {
             let val_line = self.censor_log(line.clone());
 
             {
@@ -346,7 +395,10 @@ impl SharedOutput {
             }
             {
                 let mut log_file = self.log_file.write().await;
-                log_file.write_all(val_line.as_bytes()).await?;
+                log_file
+                    .write_all(val_line.as_bytes())
+                    .await
+                    .map_err(IOError::from)?;
             }
 
             line.clear();
@@ -361,7 +413,12 @@ impl SharedOutput {
         let mut buf_reader = BufReader::new(child_stderr);
         let mut line = String::new();
 
-        while buf_reader.read_line(&mut line).await? > 0 {
+        while buf_reader
+            .read_line(&mut line)
+            .await
+            .map_err(IOError::from)?
+            > 0
+        {
             let val_line = self.censor_log(line.clone());
 
             {
@@ -370,7 +427,10 @@ impl SharedOutput {
             }
             {
                 let mut log_file = self.log_file.write().await;
-                log_file.write_all(val_line.as_bytes()).await?;
+                log_file
+                    .write_all(val_line.as_bytes())
+                    .await
+                    .map_err(IOError::from)?;
             }
 
             line.clear();

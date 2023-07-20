@@ -2,7 +2,7 @@
 
 use uuid::Uuid;
 
-use crate::state::{MinecraftChild, ProfilePathId};
+use crate::{state::{MinecraftChild, ProfilePathId}, util::io::IOError};
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
@@ -121,7 +121,13 @@ pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
 // Kill a running child process directly, and wait for it to be killed
 #[tracing::instrument(skip(running))]
 pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
-    running.current_child.write().await.kill().await?;
+    running
+        .current_child
+        .write()
+        .await
+        .kill()
+        .await
+        .map_err(IOError::from)?;
     wait_for(running).await
 }
 

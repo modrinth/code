@@ -8,6 +8,7 @@ use crate::state::{
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, write_cached_icon,
 };
+use crate::util::io;
 use crate::State;
 
 use reqwest::Method;
@@ -15,7 +16,6 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use std::path::PathBuf;
-use tokio::fs;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -266,7 +266,7 @@ pub async fn generate_pack_from_file(
     path: PathBuf,
     profile_path: ProfilePathId,
 ) -> crate::Result<CreatePackDescription> {
-    let file = fs::read(&path).await?;
+    let file = io::read(&path).await?;
     Ok(CreatePackDescription {
         file: bytes::Bytes::from(file),
         icon: None,
