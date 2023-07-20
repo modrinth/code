@@ -539,6 +539,19 @@ pub async fn export_mrpack(
         ))
     })?;
 
+    // remove .DS_Store files from included_overrides
+    let included_overrides = included_overrides
+        .into_iter()
+        .filter(|x| {
+            if let Some(f) = PathBuf::from(x).file_name() {
+                if f.to_string_lossy().starts_with(".DS_Store") {
+                    return false;
+                }
+            }
+            true
+        })
+        .collect::<Vec<_>>();
+
     let profile_base_path = &profile.get_profile_full_path().await?;
 
     let mut file = File::create(&export_path)

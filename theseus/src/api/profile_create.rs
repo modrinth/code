@@ -10,10 +10,8 @@ pub use crate::{
     State,
 };
 use daedalus::modded::LoaderVersion;
-use futures::prelude::*;
-
 use std::path::PathBuf;
-use tokio_stream::wrappers::ReadDirStream;
+
 use tracing::{info, trace};
 use uuid::Uuid;
 
@@ -23,7 +21,7 @@ use uuid::Uuid;
 #[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
-    name: String,         // the name of the profile, and relative path
+    mut name: String, // the name of the profile, and relative path
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
@@ -35,28 +33,30 @@ pub async fn profile_create(
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let uuid = Uuid::new_v4();
-    let path = state.directories.profiles_dir().await.join(&name);
+
+    let mut path = state.directories.profiles_dir().await.join(&name);
     if path.exists() {
-        if !path.is_dir() {
-            return Err(ProfileCreationError::NotFolder.into());
-        }
-        if path.join("profile.json").exists() {
-            return Err(ProfileCreationError::ProfileExistsError(
-                path.join("profile.json"),
-            )
-            .into());
+        let mut new_name;
+        let mut new_path;
+        let mut which = 1;
+        loop {
+            new_name = format!("{name} ({which})");
+            new_path = state.directories.profiles_dir().await.join(&new_name);
+            if !new_path.exists() {
+                break;
+            }
+            which += 1;
         }
 
-        if ReadDirStream::new(io::read_dir(&path).await?)
-            .next()
-            .await
-            .is_some()
-        {
-            return Err(ProfileCreationError::NotEmptyFolder.into());
-        }
-    } else {
-        io::create_dir_all(&path).await?;
+        tracing::debug!(
+            "Folder collision: {}, renaming to: {}",
+            path.display(),
+            new_path.display()
+        );
+        path = new_path;
+        name = new_name;
     }
+    io::create_dir_all(&path).await?;
 
     info!(
         "Creating profile at path {}",
