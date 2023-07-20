@@ -155,7 +155,7 @@
             </Button>
           </section>
           <section v-if="selectedOption === 'Toggle'" class="options">
-            <Button class="transparent" @click="enableALl()">
+            <Button class="transparent" @click="enableAll()">
               <CheckIcon />
               Toggle on
             </Button>
@@ -683,7 +683,7 @@ const toggleSelected = async () => {
   }
 }
 
-const enableALl = async () => {
+const enableAll = async () => {
   for (const project of functionValues.value) {
     if (project.disabled) {
       await toggleDisableMod(project, false)
