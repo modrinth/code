@@ -45,52 +45,72 @@
     </div>
     <div>
       <div class="table">
-        <div class="table-row table-head" :class="{'show-options': selected.length > 0}">
+        <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
           <div class="table-cell table-text">
             <Checkbox v-model="selectAll" class="select-checkbox" />
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
             <Button class="transparent" @click="sortProjects('Name')">
               Name
-              <DropdownIcon v-if="sortColumn === 'Name'" :class="{'down': ascending}"/>
+              <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
             </Button>
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text">
             <Button class="transparent" @click="sortProjects('Version')">
               Version
-              <DropdownIcon v-if="sortColumn === 'Version'" :class="{'down': ascending}"/>
+              <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
             </Button>
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text">
             <Button class="transparent" @click="sortProjects('Author')">
               Author
-              <DropdownIcon v-if="sortColumn === 'Author'" :class="{'down': ascending}"/>
+              <DropdownIcon v-if="sortColumn === 'Author'" :class="{ down: ascending }" />
             </Button>
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
             <Button class="transparent" @click="sortProjects('Enabled')">
               Actions
-              <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{'down': ascending}"/>
+              <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
             </Button>
           </div>
           <div v-else class="options table-cell name-cell">
-            <Button class="transparent share" @click="() => showingOptions = !showingOptions" @mouseover="selectedOption = 'Share'">
-              <MenuIcon :class="{'open': showingOptions}"/>
+            <Button
+              class="transparent share"
+              @click="() => (showingOptions = !showingOptions)"
+              @mouseover="selectedOption = 'Share'"
+            >
+              <MenuIcon :class="{ open: showingOptions }" />
             </Button>
-            <Button class="transparent share" @click="shareNames()" @mouseover="selectedOption = 'Share'">
+            <Button
+              class="transparent share"
+              @click="shareNames()"
+              @mouseover="selectedOption = 'Share'"
+            >
               <ShareIcon />
               Share
             </Button>
-            <Button class="transparent trash" @click="deleteWarning.show()" @mouseover="selectedOption = 'Delete'">
-              <TrashIcon/>
+            <Button
+              class="transparent trash"
+              @click="deleteWarning.show()"
+              @mouseover="selectedOption = 'Delete'"
+            >
+              <TrashIcon />
               Delete
             </Button>
-            <Button class="transparent update" @click="updateAll()" @mouseover="selectedOption = 'Update'">
-              <UpdatedIcon/>
+            <Button
+              class="transparent update"
+              @click="updateAll()"
+              @mouseover="selectedOption = 'Update'"
+            >
+              <UpdatedIcon />
               Update
             </Button>
-            <Button class="transparent" @click="toggleSelected()" @mouseover="selectedOption = 'Toggle'">
-              <ToggleIcon/>
+            <Button
+              class="transparent"
+              @click="toggleSelected()"
+              @mouseover="selectedOption = 'Toggle'"
+            >
+              <ToggleIcon />
               Toggle
             </Button>
           </div>
@@ -98,54 +118,54 @@
         <div v-if="showingOptions && selected.length > 0" class="more-box">
           <section v-if="selectedOption === 'Share'" class="options">
             <Button class="transparent" @click="shareNames()">
-              <TextInputIcon/>
+              <TextInputIcon />
               Share names
             </Button>
             <Button class="transparent" @click="shareUrls()">
-              <GlobeIcon/>
+              <GlobeIcon />
               Share URLs
             </Button>
             <Button class="transparent" @click="shareFileNames()">
-              <FileIcon/>
+              <FileIcon />
               Share file names
             </Button>
             <Button class="transparent" @click="shareMarkdown()">
-              <CodeIcon/>
+              <CodeIcon />
               Share as markdown
             </Button>
           </section>
           <section v-if="selectedOption === 'Delete'" class="options">
             <Button class="transparent" @click="deleteWarning.show()">
-              <TrashIcon/>
+              <TrashIcon />
               Delete selected
             </Button>
             <Button class="transparent" @click="deleteDisabledWarning.show()">
-              <ToggleIcon/>
+              <ToggleIcon />
               Delete disabled
             </Button>
           </section>
           <section v-if="selectedOption === 'Update'" class="options">
             <Button class="transparent" @click="updateAll()">
-              <UpdatedIcon/>
+              <UpdatedIcon />
               Update all
             </Button>
             <Button class="transparent" @click="selectUpdatable()">
-              <CheckIcon/>
+              <CheckIcon />
               Select updatable
             </Button>
           </section>
           <section v-if="selectedOption === 'Toggle'" class="options">
             <Button class="transparent" @click="enableALl()">
-              <CheckIcon/>
+              <CheckIcon />
               Toggle on
             </Button>
             <Button class="transparent" @click="disableAll()">
-              <XIcon/>
+              <XIcon />
               Toggle off
             </Button>
             <Button class="transparent" @click="hideShowAll()">
-              <EyeIcon v-if="hideNonSelected"/>
-              <EyeOffIcon v-else/>
+              <EyeIcon v-if="hideNonSelected" />
+              <EyeOffIcon v-else />
               {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
             </Button>
           </section>
@@ -160,7 +180,7 @@
             <Checkbox
               :model-value="selectionMap.get(mod.path)"
               class="select-checkbox"
-              @update:model-value="newValue => selectionMap.set(mod.path, newValue)"
+              @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
             />
           </div>
           <div class="table-cell table-text name-cell">
@@ -183,7 +203,10 @@
             <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
               <TrashIcon />
             </Button>
-            <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+            <AnimatedLogo
+              v-if="mod.updating"
+              class="btn icon-only updating-indicator"
+            ></AnimatedLogo>
             <Button
               v-else
               v-tooltip="'Update project'"
@@ -236,8 +259,8 @@
     <div class="modal-body">
       <div class="markdown-body">
         <p>
-          Are you sure you want to remove <strong>{{ functionValues.length }} project(s)</strong> from
-          {{ instance.metadata.name }}?
+          Are you sure you want to remove
+          <strong>{{ functionValues.length }} project(s)</strong> from {{ instance.metadata.name }}?
           <br />
           This action <strong>cannot</strong> be undone.
         </p>
@@ -255,8 +278,12 @@
     <div class="modal-body">
       <div class="markdown-body">
         <p>
-          Are you sure you want to remove <strong>{{ Array.from(projects.values()).filter(x => x.disabled).length }} disabled project(s)</strong> from
-          {{ instance.metadata.name }}?
+          Are you sure you want to remove
+          <strong
+            >{{ Array.from(projects.values()).filter((x) => x.disabled).length }} disabled
+            project(s)</strong
+          >
+          from {{ instance.metadata.name }}?
           <br />
           This action <strong>cannot</strong> be undone.
         </p>
@@ -317,7 +344,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from "@/assets/icons";
+import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
 
 const router = useRouter()
 
@@ -388,7 +415,13 @@ const initProjects = (initInstance) => {
 
   const newSelectionMap = new Map()
   for (const project of projects.value) {
-    newSelectionMap.set(project.path, selectionMap.value.get(project.path) ?? selectionMap.value.get(project.path.slice(0, -9)) ?? selectionMap.value.get(project.path + '.disabled') ?? false)
+    newSelectionMap.set(
+      project.path,
+      selectionMap.value.get(project.path) ??
+        selectionMap.value.get(project.path.slice(0, -9)) ??
+        selectionMap.value.get(project.path + '.disabled') ??
+        false
+    )
   }
   selectionMap.value = newSelectionMap
 }
@@ -413,13 +446,19 @@ const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
 
-const selected = computed(() => Array.from(selectionMap.value).filter((args) => {
-  return args[1]
-}).map((args) => {
-  return projects.value.find((x) => x.path === args[0])
-}))
+const selected = computed(() =>
+  Array.from(selectionMap.value)
+    .filter((args) => {
+      return args[1]
+    })
+    .map((args) => {
+      return projects.value.find((x) => x.path === args[0])
+    })
+)
 
-const functionValues = computed(() => selected.value.length > 0 ? selected.value : Array.from(projects.value.values()))
+const functionValues = computed(() =>
+  selected.value.length > 0 ? selected.value : Array.from(projects.value.values())
+)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -885,8 +924,9 @@ listen('tauri://file-drop', async (event) => {
     }
   }
 
-  p, h3 {
-    margin: 0
+  p,
+  h3 {
+    margin: 0;
   }
 }
 </style>

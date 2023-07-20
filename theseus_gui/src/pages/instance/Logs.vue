@@ -38,7 +38,13 @@
         {{ line }} <br />
       </span>
     </div>
-    <ShareModal ref="shareModal" header="Share Log" share-title="Instance Log" share-text="Check out this log from an instance on the Modrinth App" link/>
+    <ShareModal
+      ref="shareModal"
+      header="Share Log"
+      share-title="Instance Log"
+      share-text="Check out this log from an instance on the Modrinth App"
+      link
+    />
   </Card>
 </template>
 
@@ -61,7 +67,7 @@ import { get_output_by_uuid, get_uuids_by_profile_path } from '@/helpers/process
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
-import {ofetch} from "ofetch";
+import { ofetch } from 'ofetch'
 
 dayjs.extend(calendar)
 
@@ -83,7 +89,7 @@ const logContainer = ref(null)
 const interval = ref(null)
 const userScrolled = ref(false)
 const isAutoScrolling = ref(false)
-const shareModal = ref(null);
+const shareModal = ref(null)
 
 async function getLiveLog() {
   if (route.params.id) {
@@ -125,11 +131,11 @@ const copyLog = () => {
 const share = async () => {
   if (logs.value[selectedLogIndex.value]) {
     const url = await ofetch('https://api.mclo.gs/1/log', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: `content=${encodeURIComponent(logs.value[selectedLogIndex.value].stdout)}`
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `content=${encodeURIComponent(logs.value[selectedLogIndex.value].stdout)}`,
     }).catch(handleError)
 
     shareModal.value.show(url.url)
