@@ -70,7 +70,10 @@ async function install(instance) {
   const version = versions.value.find((v) => {
     return (
       v.game_versions.includes(instance.metadata.game_version) &&
-      (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft') || v.loaders.includes('iris') || v.loaders.includes('optifine'))
+      (v.loaders.includes(instance.metadata.loader) ||
+        v.loaders.includes('minecraft') ||
+        v.loaders.includes('iris') ||
+        v.loaders.includes('optifine'))
     )
   })
 
