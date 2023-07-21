@@ -29,7 +29,7 @@ import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import { getVersion } from '@tauri-apps/api/app'
-import { window } from '@tauri-apps/api'
+import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
@@ -93,10 +93,10 @@ const handleClose = async () => {
     }
   }
   await await_sync()
-  window.getCurrent().close()
+  await TauriWindow.getCurrent().close()
 }
 
-window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   await handleClose()
 })
 
@@ -136,8 +136,8 @@ document.querySelector('body').addEventListener('click', function (e) {
             path: target.href,
           },
         })
-        e.preventDefault()
       }
+      e.preventDefault()
       break
     }
     target = target.parentElement
