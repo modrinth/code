@@ -61,12 +61,6 @@
               <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
             </Button>
           </div>
-          <div v-if="selected.length === 0" class="table-cell table-text">
-            <Button class="transparent" @click="sortProjects('Author')">
-              Author
-              <DropdownIcon v-if="sortColumn === 'Author'" :class="{ down: ascending }" />
-            </Button>
-          </div>
           <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
             <Button class="transparent" @click="sortProjects('Enabled')">
               Actions
@@ -187,18 +181,22 @@
             <router-link
               v-if="mod.slug"
               :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
-              class="mod-text"
+              class="mod-content"
             >
               <Avatar :src="mod.icon" />
-              {{ mod.name }}
+              <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
+                <div class="title">{{ mod.name }}</div>
+                <span class="no-wrap">by {{ mod.author }}</span>
+              </div>
             </router-link>
-            <div v-else class="mod-text">
+            <div v-else class="mod-content">
               <Avatar :src="mod.icon" />
-              {{ mod.name }}
+              <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
             </div>
           </div>
-          <div class="table-cell table-text">{{ mod.version }}</div>
-          <div class="table-cell table-text">{{ mod.author }}</div>
+          <div class="table-cell table-text">
+            <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
+          </div>
           <div class="table-cell table-text manage">
             <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
               <TrashIcon />
@@ -225,6 +223,9 @@
               :checked="!mod.disabled"
               @change="toggleDisableMod(mod)"
             />
+            <Button v-tooltip="`Show ${mod.file_name}`" icon-only @click="showInFolder(mod.path)">
+              <FolderOpenIcon />
+            </Button>
           </div>
         </div>
       </div>
@@ -344,6 +345,7 @@ import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { showInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
 
 const router = useRouter()
@@ -765,7 +767,7 @@ listen('tauri://file-drop', async (event) => {
 }
 
 .table-row {
-  grid-template-columns: min-content 2fr 1fr 1fr 11rem;
+  grid-template-columns: min-content 2fr 1fr 13.25rem;
 
   &.show-options {
     grid-template-columns: min-content auto;
@@ -807,6 +809,11 @@ listen('tauri://file-drop', async (event) => {
 
 .name-cell {
   padding-left: 0;
+
+  .btn {
+    margin-left: var(--gap-sm);
+    min-width: unset;
+  }
 }
 
 .dropdown {
@@ -842,6 +849,22 @@ listen('tauri://file-drop', async (event) => {
 
   strong {
     color: var(--color-contrast);
+  }
+}
+
+.mod-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .mod-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .title {
+    color: var(--color-contrast);
+    font-weight: bolder;
   }
 }
 

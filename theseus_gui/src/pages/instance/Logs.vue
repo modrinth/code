@@ -122,14 +122,14 @@ async function setLogs() {
 }
 
 const copyLog = () => {
-  if (logs.value[selectedLogIndex.value]) {
+  if (logs.value.length > 0 && logs.value[selectedLogIndex.value]) {
     navigator.clipboard.writeText(logs.value[selectedLogIndex.value].stdout)
     copied.value = true
   }
 }
 
 const share = async () => {
-  if (logs.value[selectedLogIndex.value]) {
+  if (logs.value.length > 0 && logs.value[selectedLogIndex.value]) {
     const url = await ofetch('https://api.mclo.gs/1/log', {
       method: 'POST',
       headers: {
@@ -146,7 +146,7 @@ watch(selectedLogIndex, async (newIndex) => {
   copied.value = false
   userScrolled.value = false
 
-  if (newIndex !== 0) {
+  if (logs.value.length > 1 && newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_datetime(
       props.instance.path,
