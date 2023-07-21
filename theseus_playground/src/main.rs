@@ -6,7 +6,7 @@
 use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
-use theseus::profile_create::profile_create;
+use theseus::profile::create::profile_create;
 use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run

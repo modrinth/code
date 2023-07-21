@@ -170,6 +170,7 @@ impl State {
         tokio::task::spawn(Metadata::update());
         tokio::task::spawn(Tags::update());
         tokio::task::spawn(Profiles::update_projects());
+        tokio::task::spawn(Profiles::update_modrinth_versions());
         tokio::task::spawn(Settings::update_java());
     }
 

@@ -10,7 +10,7 @@ use paris::*;
 use std::path::{Path, PathBuf};
 use tabled::Tabled;
 use theseus::prelude::*;
-use theseus::profile_create::profile_create;
+use theseus::profile::create::profile_create;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 

@@ -21,6 +21,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_add_project_from_path,
             profile_toggle_disable_project,
             profile_remove_project,
+            profile_update_managed_modrinth,
+            profile_repair_managed_modrinth,
             profile_run,
             profile_run_wait,
             profile_run_credentials,
@@ -105,7 +107,7 @@ pub async fn profile_install(path: &Path) -> Result<()> {
 pub async fn profile_update_all(
     path: &Path,
 ) -> Result<HashMap<PathBuf, PathBuf>> {
-    Ok(profile::update_all(path).await?)
+    Ok(profile::update_all_projects(path).await?)
 }
 
 /// Updates a specified project
@@ -160,6 +162,22 @@ pub async fn profile_remove_project(
 ) -> Result<()> {
     profile::remove_project(path, project_path).await?;
     Ok(())
+}
+
+// Updates a managed Modrinth profile
+#[tauri::command]
+pub async fn profile_update_managed_modrinth(
+    path: &Path,
+) -> Result<()> {
+    Ok(profile::update::update_managed_modrinth(path).await?)
+}
+
+// Repairs a managed Modrinth profile by updating it to the current version
+#[tauri::command]
+pub async fn profile_repair_managed_modrinth(
+    path: &Path,
+) -> Result<()> {
+    Ok(profile::update::repair_managed_modrinth(path).await?)
 }
 
 // Exports a profile to a .mrpack file (export_location should end in .mrpack)

@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::config::MODRINTH_API_URL;
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
@@ -6,9 +7,10 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
-use crate::prelude::JavaVersion;
-use crate::state::ProjectMetadata;
+use crate::prelude::{JavaVersion, ModrinthVersion};
+use crate::state::{ProjectMetadata, Dependency};
 
+use crate::util::fetch::fetch_json;
 use crate::util::io::{self, IOError};
 use crate::{
     auth::{self, refresh},
@@ -21,7 +23,10 @@ pub use crate::{
 };
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
-use std::collections::HashMap;
+use futures::stream;
+use reqwest::Method;
+use std::collections::{HashMap, HashSet};
+use std::path;
 use std::{
     future::Future,
     path::{Path, PathBuf},
@@ -29,6 +34,9 @@ use std::{
 };
 use tokio::io::AsyncReadExt;
 use tokio::{fs::File, process::Command, sync::RwLock};
+
+pub mod create;
+pub mod update;
 
 /// Remove a profile
 #[tracing::instrument]
@@ -238,7 +246,7 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn update_all(
+pub async fn update_all_projects(
     profile_path: &Path,
 ) -> crate::Result<HashMap<PathBuf, PathBuf>> {
     if let Some(profile) = get(profile_path, None).await? {
@@ -492,6 +500,21 @@ pub async fn remove_project(
         State::sync().await?;
 
         Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Gets whether project is a managed modrinth pack
+#[tracing::instrument]
+pub async fn is_managed_modrinth_pack(
+    profile: &Path,
+) -> crate::Result<bool> {
+    if let Some(profile) = get(profile, None).await? {
+        Ok(profile.metadata.linked_data.is_some())
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),

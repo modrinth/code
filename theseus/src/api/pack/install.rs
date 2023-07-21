@@ -4,9 +4,10 @@ use crate::event::emit::{
 };
 use crate::event::LoadingBarType;
 use crate::pack::install_from::{EnvType, PackFile, PackFileHash};
-use crate::state::{LinkedData, ProfileInstallStage, SideType};
+use crate::state::{LinkedData, ProfileInstallStage, SideType, Profiles};
 use crate::util::fetch::{fetch_mirrors, write};
-use crate::State;
+use crate::util::io;
+use crate::{State, profile};
 use async_zip::tokio::read::seek::ZipFileReader;
 
 use std::io::Cursor;
@@ -17,6 +18,9 @@ use super::install_from::{
     CreatePackDescription, CreatePackLocation, PackDependency, PackFormat,
 };
 
+/// Install a pack
+/// Wrapper around install_pack_files that generates a pack creation description, and
+/// attempts to install the pack files. If it fails, it will remove the profile (fail safely) 
 #[theseus_macros::debug_pin]
 pub async fn install_pack(
     location: CreatePackLocation,
@@ -31,26 +35,46 @@ pub async fn install_pack(
             icon_url,
         } => {
             generate_pack_from_version_id(
-                project_id, version_id, title, icon_url, profile,
+                project_id, version_id, title, icon_url, profile.clone(),
             )
             .await?
         }
         CreatePackLocation::FromFile { path } => {
-            generate_pack_from_file(path, profile).await?
+            generate_pack_from_file(path, profile.clone()).await?
         }
     };
 
-    let file = description.file;
-    let icon = description.icon;
-    let override_title = description.override_title;
-    let project_id = description.project_id;
-    let version_id = description.version_id;
-    let existing_loading_bar = description.existing_loading_bar;
-    let profile = description.profile;
+    // Install pack files, and if it fails, fail safely by removing the profile
+    let result = 
+    install_pack_files(description).await;
 
+    // Check existing managed packs for potential updates
+    tokio::task::spawn(Profiles::update_modrinth_versions());
+
+    match result {
+        Ok(profile) => Ok(profile),
+        Err(err) => {
+            let _ = crate::api::profile::remove(&profile).await;
+
+            Err(err)
+        }
+    }
+}
+
+/// Install all pack files from a description
+/// Does not remove the profile if it fails
+#[theseus_macros::debug_pin]
+pub async fn install_pack_files(description : CreatePackDescription)  -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
-    let result = async {
+        let file = description.file;
+        let icon = description.icon;
+        let override_title = description.override_title;
+        let project_id = description.project_id;
+        let version_id = description.version_id;
+        let existing_loading_bar = description.existing_loading_bar;
+        let profile = description.profile;
+    
         let reader: Cursor<&bytes::Bytes> = Cursor::new(&file);
 
         // Create zip reader around file
@@ -119,7 +143,7 @@ pub async fn install_pack(
             };
 
             let loader_version =
-                crate::profile_create::get_loader_version_from_loader(
+                profile::create::get_loader_version_from_loader(
                     game_version.clone(),
                     mod_loader.unwrap_or(ModLoader::Vanilla),
                     loader_version.cloned(),
@@ -143,7 +167,6 @@ pub async fn install_pack(
             .await?;
 
             let profile = profile.clone();
-            let result = async {
                 let loading_bar = init_or_edit_loading(
                     existing_loading_bar,
                     LoadingBarType::PackDownload {
@@ -297,31 +320,115 @@ pub async fn install_pack(
                 }
 
                 Ok::<PathBuf, crate::Error>(profile.clone())
-            }
-            .await;
-
-            match result {
-                Ok(profile) => Ok(profile),
-                Err(err) => {
-                    let _ = crate::api::profile::remove(&profile).await;
-
-                    Err(err)
-                }
-            }
         } else {
             Err(crate::Error::from(crate::ErrorKind::InputError(
                 "No pack manifest found in mrpack".to_string(),
             )))
         }
-    }
-    .await;
 
-    match result {
-        Ok(profile) => Ok(profile),
-        Err(err) => {
-            let _ = crate::api::profile::remove(&profile).await;
+}
 
-            Err(err)
+#[tracing::instrument(skip(mrpack_file))]
+#[theseus_macros::debug_pin]
+pub async fn remove_all_related_files(profile_path : PathBuf, mrpack_file : bytes::Bytes ) -> crate::Result<()> {
+        let reader: Cursor<&bytes::Bytes> = Cursor::new(&mrpack_file);
+
+        // Create zip reader around file
+        let mut zip_reader =
+            ZipFileReader::new(reader).await.map_err(|_| {
+                crate::Error::from(crate::ErrorKind::InputError(
+                    "Failed to read input modpack zip".to_string(),
+                ))
+            })?;
+
+        // Extract index of modrinth.index.json
+        let zip_index_option = zip_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "modrinth.index.json");
+        if let Some(zip_index) = zip_index_option {
+            let mut manifest = String::new();
+            let entry = zip_reader
+                .file()
+                .entries()
+                .get(zip_index)
+                .unwrap()
+                .entry()
+                .clone();
+            let mut reader = zip_reader.entry(zip_index).await?;
+            reader.read_to_string_checked(&mut manifest, &entry).await?;
+
+            let pack: PackFormat = serde_json::from_str(&manifest)?;
+
+            if &*pack.game != "minecraft" {
+                return Err(crate::ErrorKind::InputError(
+                    "Pack does not support Minecraft".to_string(),
+                )
+                .into());
+            }
+
+            // Set install stage to installing, and do not change it back (as files are being removed and are not being reinstalled here)
+            crate::api::profile::edit(&profile_path, |prof| {
+                prof.install_stage = ProfileInstallStage::PackInstalling;
+                async { Ok(()) }
+            })
+            .await?;
+
+
+                let num_files = pack.files.len();
+                use futures::StreamExt;
+                loading_try_for_each_concurrent(
+                    futures::stream::iter(pack.files.into_iter())
+                        .map(Ok::<PackFile, crate::Error>),
+                    None,
+                    None,
+                    0.0,
+                    num_files,
+                    None,
+                    |project| {
+                        let profile_path = profile_path.clone();
+                        async move {
+
+                        // Remove this file if a corresponding one exists in the filesystem
+                        let existing_file = profile_path.join(&project.path);
+                        if existing_file.exists() {
+                            io::remove_file(&existing_file).await?;
+                        }
+
+                            Ok(())
+                        }
+                    },
+                )
+                .await?;
+
+
+                // Iterate over each 'overrides' file and remove it
+                for index in 0..zip_reader.file().entries().len() {
+                    let file = zip_reader
+                        .file()
+                        .entries()
+                        .get(index)
+                        .unwrap()
+                        .entry()
+                        .clone();
+
+                    let file_path = PathBuf::from(file.filename());
+                    if (file.filename().starts_with("overrides")
+                        || file.filename().starts_with("client_overrides"))
+                        && !file.filename().ends_with('/')
+                    {
+                        // Remove this file if a corresponding one exists in the filesystem
+                        let existing_file = profile_path.join(&file_path);
+                        if existing_file.exists() {
+                            io::remove_file(&existing_file).await?;
+                        }
+                    }
+                }
+                Ok(())
+            } else {
+            Err(crate::Error::from(crate::ErrorKind::InputError(
+                "No pack manifest found in mrpack".to_string(),
+            )))
         }
-    }
 }
