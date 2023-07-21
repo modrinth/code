@@ -105,7 +105,7 @@ const finishOnboarding = async () => {
     </suspense>
   </div>
   <div v-else class="container">
-    <StickyTitleBar v-if="phase === 9"/>
+    <StickyTitleBar v-if="phase === 9" />
     <div v-if="phase < 9" class="nav-container expanded">
       <div class="nav-section">
         <FakeAccountsCard :show-demo="phase === 3">

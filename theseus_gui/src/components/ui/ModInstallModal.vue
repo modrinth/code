@@ -26,7 +26,7 @@ import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
-import {useRouter} from "vue-router";
+import { useRouter } from 'vue-router'
 
 const themeStore = useTheming()
 const router = useRouter()
