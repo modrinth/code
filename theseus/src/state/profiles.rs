@@ -63,7 +63,6 @@ pub struct Profile {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hooks: Option<Hooks>,
     pub projects: HashMap<PathBuf, Project>,
-    // #[serde(skip_serializing)] // TODO WYATT PANIC
     #[serde(default)]
     pub modrinth_update_version: Option<String>,
 }

@@ -510,7 +510,11 @@ pub async fn remove_project(
 #[tracing::instrument]
 pub async fn is_managed_modrinth_pack(profile: &Path) -> crate::Result<bool> {
     if let Some(profile) = get(profile, None).await? {
-        Ok(profile.metadata.linked_data.is_some())
+        if let Some(linked_data) = profile.metadata.linked_data {
+            return Ok(linked_data.project_id.is_some()
+                && linked_data.version_id.is_some());
+        }
+        Ok(false)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
