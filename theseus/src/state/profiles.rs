@@ -47,7 +47,7 @@ pub enum ProfileInstallStage {
 }
 
 /// newtype wrapper over a Profile path, to be usable as a clear identifier for the kind of path used
-/// eg: for "a/b/c/profiles/My Mod", the ProfilePathId would be "My Mod"
+/// eg: for "a/b/c/profiles/My Mod", the ProfilePathId would be "My Mod" (a relative path)
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 #[serde(transparent)]
 pub struct ProfilePathId(PathBuf);
