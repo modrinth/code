@@ -65,7 +65,7 @@ pub struct Profile {
     pub projects: HashMap<PathBuf, Project>,
     // #[serde(skip_serializing)] // TODO WYATT PANIC
     #[serde(default)]
-    pub modrinth_update_version : Option<String>
+    pub modrinth_update_version: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -182,7 +182,7 @@ impl Profile {
             memory: None,
             resolution: None,
             hooks: None,
-            modrinth_update_version: None
+            modrinth_update_version: None,
         })
     }
 
@@ -633,45 +633,55 @@ impl Profiles {
                 for (profile_path, profile) in profiles.0.iter() {
                     if let Some(linked_data) = &profile.metadata.linked_data {
                         if let Some(linked_project) = &linked_data.project_id {
-                            modrinth_updatables.push((profile_path.clone(), linked_project.clone()));
+                            modrinth_updatables.push((
+                                profile_path.clone(),
+                                linked_project.clone(),
+                            ));
                         }
                     }
                 }
             }
 
             // Fetch online from Modrinth each latest version
-            future::try_join_all(modrinth_updatables.into_iter().map(|(profile_path, linked_project)| {
-                let profile_path = profile_path.clone();
-                let linked_project = linked_project.clone();
-                let state = state.clone();
-                async move {
+            future::try_join_all(modrinth_updatables.into_iter().map(
+                |(profile_path, linked_project)| {
+                    let profile_path = profile_path;
+                    let linked_project = linked_project;
+                    let state = state.clone();
+                    async move {
+                        let versions: Vec<ModrinthVersion> = fetch_json(
+                            Method::GET,
+                            &format!(
+                                "{}project/{}/version",
+                                MODRINTH_API_URL,
+                                linked_project.clone()
+                            ),
+                            None,
+                            None,
+                            &state.fetch_semaphore,
+                        )
+                        .await?;
 
-                let versions: Vec<ModrinthVersion> = fetch_json(
-                    Method::GET,
-                    &format!("{}project/{}/version", MODRINTH_API_URL, linked_project.clone()),
-                    None,
-                    None,
-                    &state.fetch_semaphore,
-                )
-                .await?;
-
-                // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
-                // so we can just take the first one
-                    let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&profile_path)
-                    {
-                        if let Some(recent_version) = versions.get(0) {
-                            profile.modrinth_update_version = Some(recent_version.id.clone());
-                        } else {
-                            profile.modrinth_update_version = None;
-
+                        // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
+                        // so we can just take the first one
+                        let mut new_profiles = state.profiles.write().await;
+                        if let Some(profile) =
+                            new_profiles.0.get_mut(&profile_path)
+                        {
+                            if let Some(recent_version) = versions.get(0) {
+                                profile.modrinth_update_version =
+                                    Some(recent_version.id.clone());
+                            } else {
+                                profile.modrinth_update_version = None;
+                            }
                         }
+                        drop(new_profiles);
 
+                        Ok::<(), crate::Error>(())
                     }
-                    drop(new_profiles);    
-
-                Ok::<(), crate::Error>(())
-            }})).await?;
+                },
+            ))
+            .await?;
 
             {
                 let profiles = state.profiles.read().await;
@@ -679,7 +689,8 @@ impl Profiles {
             }
 
             Ok::<(), crate::Error>(())
-        }.await;
+        }
+        .await;
 
         match res {
             Ok(()) => {}
@@ -688,7 +699,6 @@ impl Profiles {
             }
         };
     }
-
 
     #[tracing::instrument(skip(self, profile))]
     #[theseus_macros::debug_pin]

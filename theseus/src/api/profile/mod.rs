@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::config::MODRINTH_API_URL;
+
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
@@ -7,10 +7,9 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
-use crate::prelude::{JavaVersion, ModrinthVersion};
-use crate::state::{ProjectMetadata, Dependency};
+use crate::prelude::JavaVersion;
+use crate::state::ProjectMetadata;
 
-use crate::util::fetch::fetch_json;
 use crate::util::io::{self, IOError};
 use crate::{
     auth::{self, refresh},
@@ -23,10 +22,9 @@ pub use crate::{
 };
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
-use futures::stream;
-use reqwest::Method;
-use std::collections::{HashMap, HashSet};
-use std::path;
+
+use std::collections::HashMap;
+
 use std::{
     future::Future,
     path::{Path, PathBuf},
@@ -510,9 +508,7 @@ pub async fn remove_project(
 
 /// Gets whether project is a managed modrinth pack
 #[tracing::instrument]
-pub async fn is_managed_modrinth_pack(
-    profile: &Path,
-) -> crate::Result<bool> {
+pub async fn is_managed_modrinth_pack(profile: &Path) -> crate::Result<bool> {
     if let Some(profile) = get(profile, None).await? {
         Ok(profile.metadata.linked_data.is_some())
     } else {

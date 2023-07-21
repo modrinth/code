@@ -93,7 +93,7 @@ pub struct LoadingBar {
     pub cli_progress_bar: indicatif::ProgressBar,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone)]
 pub struct LoadingBarId(Uuid);
 
 // When Loading bar id is dropped, we should remove it from the hashmap

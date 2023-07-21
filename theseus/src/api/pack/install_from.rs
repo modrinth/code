@@ -98,6 +98,7 @@ pub struct CreatePackProfile {
     pub skip_install_profile: Option<bool>,
 }
 
+#[derive(Clone)]
 pub struct CreatePackDescription {
     pub file: bytes::Bytes,
     pub icon: Option<PathBuf>,

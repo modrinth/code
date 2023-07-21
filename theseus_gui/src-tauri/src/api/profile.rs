@@ -166,17 +166,13 @@ pub async fn profile_remove_project(
 
 // Updates a managed Modrinth profile
 #[tauri::command]
-pub async fn profile_update_managed_modrinth(
-    path: &Path,
-) -> Result<()> {
+pub async fn profile_update_managed_modrinth(path: &Path) -> Result<()> {
     Ok(profile::update::update_managed_modrinth(path).await?)
 }
 
 // Repairs a managed Modrinth profile by updating it to the current version
 #[tauri::command]
-pub async fn profile_repair_managed_modrinth(
-    path: &Path,
-) -> Result<()> {
+pub async fn profile_repair_managed_modrinth(path: &Path) -> Result<()> {
     Ok(profile::update::repair_managed_modrinth(path).await?)
 }
 
