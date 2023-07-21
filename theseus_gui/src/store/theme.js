@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 export const useTheming = defineStore('themeStore', {
   state: () => ({
     themeOptions: ['dark'],
-    collapsedNavigation: false,
     advancedRendering: true,
     selectedTheme: 'dark',
     darkTheme: true,

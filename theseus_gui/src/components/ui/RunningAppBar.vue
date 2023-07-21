@@ -44,7 +44,7 @@
     </div>
   </div>
   <transition name="download">
-    <Card v-if="showCard === true" ref="card" class="info-card">
+    <Card v-if="showCard === true && currentLoadingBars.length > 0" ref="card" class="info-card">
       <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
         <h3 class="info-title">
           {{ loadingBar.title }}
@@ -57,7 +57,7 @@
     </Card>
   </transition>
   <transition name="download">
-    <Card v-if="showProfiles === true" ref="profiles" class="profile-card">
+    <Card v-if="showProfiles === true && currentProcesses.length > 0" ref="profiles" class="profile-card">
       <Button
         v-for="profile in currentProcesses"
         :key="profile.id"

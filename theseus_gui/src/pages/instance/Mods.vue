@@ -61,12 +61,6 @@
               <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
             </Button>
           </div>
-          <div v-if="selected.length === 0" class="table-cell table-text">
-            <Button class="transparent" @click="sortProjects('Author')">
-              Author
-              <DropdownIcon v-if="sortColumn === 'Author'" :class="{ down: ascending }" />
-            </Button>
-          </div>
           <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
             <Button class="transparent" @click="sortProjects('Enabled')">
               Actions
@@ -199,9 +193,6 @@
               <Avatar :src="mod.icon" />
               <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
             </div>
-            <Button v-tooltip="`Show ${mod.file_name}`" class="transparent" icon-only @click="showInFolder(mod.path)">
-              <FolderOpenIcon />
-            </Button>
           </div>
           <div class="table-cell table-text">
             <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
@@ -232,6 +223,9 @@
               :checked="!mod.disabled"
               @change="toggleDisableMod(mod)"
             />
+            <Button v-tooltip="`Show ${mod.file_name}`" icon-only @click="showInFolder(mod.path)">
+              <FolderOpenIcon />
+            </Button>
           </div>
         </div>
       </div>
@@ -773,7 +767,7 @@ listen('tauri://file-drop', async (event) => {
 }
 
 .table-row {
-  grid-template-columns: min-content 2fr 1fr 11rem;
+  grid-template-columns: min-content 2fr 1fr 13.25rem;
 
   &.show-options {
     grid-template-columns: min-content auto;

@@ -153,23 +153,18 @@ const accounts = ref(null)
     <suspense>
       <OnboardingModal ref="testModal" :accounts="accounts" />
     </suspense>
-    <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
+    <div class="nav-container">
       <div class="nav-section">
         <suspense>
           <AccountsCard
             ref="accounts"
-            :mode="themeStore.collapsedNavigation ? 'small' : 'expanded'"
+            mode="small"
           />
         </suspense>
         <div class="pages-list">
           <RouterLink
             to="/"
-            class="btn"
-            :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
-            }"
+            class="btn icon-only collapsed-button"
           >
             <HomeIcon />
             <span v-if="!themeStore.collapsedNavigation">Home</span>
