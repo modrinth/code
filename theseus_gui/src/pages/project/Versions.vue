@@ -89,7 +89,7 @@
           <Button
             :color="installed && version.id === installedVersion ? '' : 'primary'"
             icon-only
-            :disabled="installed && version.id === installedVersion"
+            :disabled="installing || (installed && version.id === installedVersion)"
             @click.stop="() => install(version.id)"
           >
             <DownloadIcon v-if="!installed" />
@@ -190,6 +190,10 @@ const props = defineProps({
   installed: {
     type: Boolean,
     default: null,
+  },
+  installing: {
+    type: Boolean,
+    default: false,
   },
   instance: {
     type: Object,

@@ -6,7 +6,7 @@ use crate::{
         LoadingBarId,
     },
     state::State,
-    util::{fetch::*, platform::OsExt},
+    util::{fetch::*, io, platform::OsExt},
 };
 use daedalus::{
     self as d,
@@ -17,7 +17,7 @@ use daedalus::{
     modded::LoaderVersion,
 };
 use futures::prelude::*;
-use tokio::{fs, sync::OnceCell};
+use tokio::sync::OnceCell;
 
 #[tracing::instrument(skip(st, version))]
 pub async fn download_minecraft(
@@ -71,7 +71,7 @@ pub async fn download_version_info(
         .join(format!("{version_id}.json"));
 
     let res = if path.exists() && !force.unwrap_or(false) {
-        fs::read(path)
+        io::read(path)
             .err_into::<crate::Error>()
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
@@ -152,7 +152,7 @@ pub async fn download_assets_index(
         .join(format!("{}.json", &version.asset_index.id));
 
     let res = if path.exists() {
-        fs::read(path)
+        io::read(path)
             .err_into::<crate::Error>()
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
@@ -245,8 +245,8 @@ pub async fn download_libraries(
     tracing::debug!("Loading libraries");
 
     tokio::try_join! {
-        fs::create_dir_all(st.directories.libraries_dir()),
-        fs::create_dir_all(st.directories.version_natives_dir(version))
+        io::create_dir_all(st.directories.libraries_dir()),
+        io::create_dir_all(st.directories.version_natives_dir(version))
     }?;
     let num_files = libraries.len();
     loading_try_for_each_concurrent(
