@@ -107,25 +107,6 @@ watch(
         />
       </div>
       <div class="adjacent-input">
-        <label for="collapsed-nav">
-          <span class="label__title">Collapsed navigation mode</span>
-          <span class="label__description"
-            >Change the style of the side navigation bar to a compact version.</span
-          >
-        </label>
-        <Toggle
-          id="collapsed-nav"
-          :model-value="themeStore.collapsedNavigation"
-          :checked="themeStore.collapsedNavigation"
-          @update:model-value="
-            (e) => {
-              themeStore.collapsedNavigation = e
-              settings.collapsed_navigation = themeStore.collapsedNavigation
-            }
-          "
-        />
-      </div>
-      <div class="adjacent-input">
         <label for="advanced-rendering">
           <span class="label__title">Advanced rendering</span>
           <span class="label__description">
