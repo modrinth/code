@@ -66,12 +66,19 @@ const profiles = ref([])
 
 async function install(instance) {
   instance.installing = true
+  console.log(versions.value)
   const version = versions.value.find((v) => {
     return (
       v.game_versions.includes(instance.metadata.game_version) &&
-      (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft'))
+      (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft') || v.loaders.includes('iris') || v.loaders.includes('optifine'))
     )
   })
+
+  if (!version) {
+    instance.installing = false
+    handleError('No compatible version found')
+    return
+  }
 
   await installMod(instance.path, version.id).catch(handleError)
   await installVersionDependencies(instance, version)
