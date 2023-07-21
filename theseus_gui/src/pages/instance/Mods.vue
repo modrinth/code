@@ -345,7 +345,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
-import {showInFolder} from "@/helpers/utils.js";
+import { showInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
 
 const router = useRouter()

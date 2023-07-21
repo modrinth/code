@@ -156,16 +156,10 @@ const accounts = ref(null)
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
-          <AccountsCard
-            ref="accounts"
-            mode="small"
-          />
+          <AccountsCard ref="accounts" mode="small" />
         </suspense>
         <div class="pages-list">
-          <RouterLink
-            to="/"
-            class="btn icon-only collapsed-button"
-          >
+          <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
             <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>

@@ -11,14 +11,16 @@
     </Button>
     <div v-if="selectedProfile" class="status">
       <span class="circle running" />
-      <div
-        ref="profileButton"
-        class="running-text"
-      >
+      <div ref="profileButton" class="running-text">
         <router-link :to="`/instance/${encodeURIComponent(selectedProfile.path)}`">
           {{ selectedProfile.metadata.name }}
         </router-link>
-        <div v-if="currentProcesses.length > 1" class="arrow button-base" :class="{ rotate: showProfiles }" @click="toggleProfiles()">
+        <div
+          v-if="currentProcesses.length > 1"
+          class="arrow button-base"
+          :class="{ rotate: showProfiles }"
+          @click="toggleProfiles()"
+        >
           <DropdownIcon />
         </div>
       </div>
@@ -57,7 +59,11 @@
     </Card>
   </transition>
   <transition name="download">
-    <Card v-if="showProfiles === true && currentProcesses.length > 0" ref="profiles" class="profile-card">
+    <Card
+      v-if="showProfiles === true && currentProcesses.length > 0"
+      ref="profiles"
+      class="profile-card"
+    >
       <Button
         v-for="profile in currentProcesses"
         :key="profile.id"

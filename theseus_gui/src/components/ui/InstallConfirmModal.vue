@@ -4,7 +4,7 @@ import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
-import {handleError} from "@/store/state.js";
+import { handleError } from '@/store/state.js'
 
 const themeStore = useTheming()
 
@@ -31,7 +31,12 @@ defineExpose({
 async function install() {
   installing.value = true
   console.log(`Installing ${projectId.value} ${version.value} ${title.value} ${icon.value}`)
-  await pack_install(projectId.value, version.value, title.value, icon.value ? icon.value : null).catch(handleError)
+  await pack_install(
+    projectId.value,
+    version.value,
+    title.value,
+    icon.value ? icon.value : null
+  ).catch(handleError)
   confirmModal.value.hide()
 
   mixpanel.track('PackInstall', {
