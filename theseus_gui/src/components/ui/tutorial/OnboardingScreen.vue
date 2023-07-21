@@ -138,7 +138,7 @@ const finishOnboarding = async () => {
         </div>
       </div>
       <div class="settings pages-list">
-        <Button class="active expanded-button" @click="() => (phase = 1)">
+        <Button class="active expanded-button" @click="finishOnboarding">
           <LogOutIcon />
           Exit Tutorial
         </Button>

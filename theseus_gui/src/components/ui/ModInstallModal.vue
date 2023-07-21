@@ -26,8 +26,10 @@ import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
+import {useRouter} from "vue-router";
 
 const themeStore = useTheming()
+const router = useRouter()
 
 const versions = ref([])
 const project = ref('')
@@ -154,11 +156,11 @@ const createInstance = async () => {
   creatingInstance.value = true
 
   const loader =
-    versions.value[0].loaders[0] !== 'forge' ||
-    versions.value[0].loaders[0] !== 'fabric' ||
+    versions.value[0].loaders[0] !== 'forge' &&
+    versions.value[0].loaders[0] !== 'fabric' &&
     versions.value[0].loaders[0] !== 'quilt'
-      ? versions.value[0].loaders[0]
-      : 'vanilla'
+      ? 'vanilla'
+      : versions.value[0].loaders[0]
 
   const id = await create(
     name.value,
@@ -169,6 +171,8 @@ const createInstance = async () => {
   ).catch(handleError)
 
   await installMod(id, versions.value[0].id).catch(handleError)
+
+  await router.push(`/instance/${encodeURIComponent(id)}/`)
 
   const instance = await get(id, true)
   await installVersionDependencies(instance, versions.value)
