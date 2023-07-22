@@ -201,6 +201,8 @@ export const formatCategory = (name) => {
     return 'BungeeCord'
   } else if (name === 'liteloader') {
     return 'LiteLoader'
+  } else if (name === 'neoforge') {
+    return 'NeoForge'
   } else if (name === 'game-mechanics') {
     return 'Game Mechanics'
   } else if (name === 'worldgen') {
