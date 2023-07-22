@@ -199,7 +199,7 @@ async fn import_atlauncher_unmanaged(
     let game_version = atinstance.id;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
-        crate::profile_create::get_loader_version_from_loader(
+        crate::profile::create::get_loader_version_from_loader(
             game_version.clone(),
             mod_loader,
             Some(atinstance.launcher.loader_version.version.clone()),

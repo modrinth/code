@@ -181,16 +181,16 @@ async fn replace_managed_modrinth(
                 )
             )?
         } else {
-            let mut old_pack_creator: CreatePackDescription =
+            let mut old_pack_creator =
                 old_pack_creator.await?;
-            old_pack_creator.existing_loading_bar = None;
+            old_pack_creator.description.existing_loading_bar = None;
             (old_pack_creator.clone(), old_pack_creator)
         };
 
     // Removal - remove all files that were added by the old pack
     // - remove all installed projects
     // - remove all overrides
-    pack::install::remove_all_related_files(
+    pack::install_mrpack::remove_all_related_files(
         profile_path.clone(),
         old_pack_creator.file,
     )
@@ -201,7 +201,7 @@ async fn replace_managed_modrinth(
     // - install all overrides
     // - edits the profile to update the new data
     // - (functionals almost identically to rteinstalling the pack 'in-place')
-    pack::install::install_pack_files(new_pack_creator).await?;
+    pack::install_mrpack::install_pack_files(new_pack_creator).await?;
 
     Ok(())
 }
