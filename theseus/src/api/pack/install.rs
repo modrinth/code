@@ -4,6 +4,7 @@ use crate::event::emit::{
 };
 use crate::event::LoadingBarType;
 use crate::pack::install_from::{EnvType, PackFile, PackFileHash};
+use crate::prelude::ProfilePathId;
 use crate::state::{LinkedData, ProfileInstallStage, Profiles, SideType};
 use crate::util::fetch::{fetch_mirrors, write};
 use crate::util::io;
@@ -57,7 +58,7 @@ pub async fn install_pack(
     match result {
         Ok(profile) => Ok(profile),
         Err(err) => {
-            let _ = crate::api::profile::remove(&profile).await;
+            let _ = crate::api::profile::remove(&profile_path).await;
 
             Err(err)
         }
@@ -69,7 +70,7 @@ pub async fn install_pack(
 #[theseus_macros::debug_pin]
 pub async fn install_pack_files(
     description: CreatePackDescription,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProfilePathId> {
     let state = &State::get().await?;
 
     let file = description.file;
@@ -173,10 +174,7 @@ pub async fn install_pack_files(
         let loading_bar = init_or_edit_loading(
             existing_loading_bar,
             LoadingBarType::PackDownload {
-                profile_path: profile_path
-                            .get_full_path()
-                            .await?
-                            .clone(),
+                profile_path: profile_path.get_full_path().await?.clone(),
                 pack_name: pack.name.clone(),
                 icon,
                 pack_id: project_id,
@@ -228,9 +226,9 @@ pub async fn install_pack_files(
                         match path {
                             Component::CurDir | Component::Normal(_) => {
                                 let path = profile_path
-                                            .get_full_path()
-                                            .await?
-                                            .join(project.path);
+                                    .get_full_path()
+                                    .await?
+                                    .join(project.path);
                                 write(&path, &file, &state.io_semaphore)
                                     .await?;
                             }
@@ -286,10 +284,7 @@ pub async fn install_pack_files(
 
                 if new_path.file_name().is_some() {
                     write(
-                        &profile_path
-                                    .get_full_path()
-                                    .await?
-                                    .join(new_path),
+                        &profile_path.get_full_path().await?.join(new_path),
                         &content,
                         &state.io_semaphore,
                     )
@@ -328,7 +323,7 @@ pub async fn install_pack_files(
 #[tracing::instrument(skip(mrpack_file))]
 #[theseus_macros::debug_pin]
 pub async fn remove_all_related_files(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     mrpack_file: bytes::Bytes,
 ) -> crate::Result<()> {
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&mrpack_file);
@@ -388,7 +383,8 @@ pub async fn remove_all_related_files(
                 let profile_path = profile_path.clone();
                 async move {
                     // Remove this file if a corresponding one exists in the filesystem
-                    let existing_file = profile_path.join(&project.path);
+                    let existing_file =
+                        profile_path.get_full_path().await?.join(&project.path);
                     if existing_file.exists() {
                         io::remove_file(&existing_file).await?;
                     }
@@ -422,7 +418,8 @@ pub async fn remove_all_related_files(
                 }
 
                 // Remove this file if a corresponding one exists in the filesystem
-                let existing_file = profile_path.join(&new_path);
+                let existing_file =
+                    profile_path.get_full_path().await?.join(&new_path);
                 if existing_file.exists() {
                     io::remove_file(&existing_file).await?;
                 }

@@ -51,6 +51,7 @@ pub enum ProfileInstallStage {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 #[serde(transparent)]
 pub struct ProfilePathId(PathBuf);
+
 impl ProfilePathId {
     // Create a new ProfilePathId from a full file path
     pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
@@ -779,7 +780,8 @@ impl Profiles {
         let res = async {
             let state = State::get().await?;
             // Temporarily store all profiles that have modrinth linked data
-            let mut modrinth_updatables: Vec<(PathBuf, String)> = Vec::new();
+            let mut modrinth_updatables: Vec<(ProfilePathId, String)> =
+                Vec::new();
             {
                 let profiles = state.profiles.read().await;
                 for (profile_path, profile) in profiles.0.iter() {

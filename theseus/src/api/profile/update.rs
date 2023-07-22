@@ -1,7 +1,3 @@
-use std::path::{Path, PathBuf};
-
-use futures::try_join;
-
 use crate::{
     event::{
         emit::{emit_profile, loading_try_for_each_concurrent},
@@ -11,25 +7,27 @@ use crate::{
         self,
         install_from::{generate_pack_from_version_id, CreatePackDescription},
     },
+    prelude::{ProfilePathId, ProjectPathId},
     profile::get,
     state::Project,
     State,
 };
+use futures::try_join;
 
 /// Updates a managed modrinth pack to the cached latest version found in 'modrinth_update_version'
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn update_managed_modrinth(profile_path: &Path) -> crate::Result<()> {
+pub async fn update_managed_modrinth(
+    profile_path: &ProfilePathId,
+) -> crate::Result<()> {
     let profile = get(profile_path, None).await?.ok_or_else(|| {
-        crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
-        )
-        .as_error()
+        crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+            .as_error()
     })?;
 
     let unmanaged_err = || {
         crate::ErrorKind::InputError(
-            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path.display()),
+            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path.to_string()),
         )
     };
 
@@ -75,17 +73,17 @@ pub async fn update_managed_modrinth(profile_path: &Path) -> crate::Result<()> {
 /// Repair a managed modrinth pack by 'updating' it to the current version
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn repair_managed_modrinth(profile_path: &Path) -> crate::Result<()> {
+pub async fn repair_managed_modrinth(
+    profile_path: &ProfilePathId,
+) -> crate::Result<()> {
     let profile = get(profile_path, None).await?.ok_or_else(|| {
-        crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
-        )
-        .as_error()
+        crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+            .as_error()
     })?;
 
     let unmanaged_err = || {
         crate::ErrorKind::InputError(
-            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path.display()),
+            format!("Profile at {} is not a managed modrinth pack, or has been disconnected.", profile_path.to_string()),
         )
     };
 
@@ -96,7 +94,7 @@ pub async fn repair_managed_modrinth(profile_path: &Path) -> crate::Result<()> {
     let stream = futures::stream::iter(
         projects_map
             .into_iter()
-            .map(Ok::<(PathBuf, Project), crate::Error>),
+            .map(Ok::<(ProjectPathId, Project), crate::Error>),
     );
     loading_try_for_each_concurrent(
         stream,
@@ -153,7 +151,7 @@ pub async fn repair_managed_modrinth(profile_path: &Path) -> crate::Result<()> {
 #[tracing::instrument(skip(profile))]
 #[theseus_macros::debug_pin]
 async fn replace_managed_modrinth(
-    profile_path: &Path,
+    profile_path: &ProfilePathId,
     profile: &crate::state::Profile,
     project_id: &String,
     version_id: &String,
@@ -166,7 +164,7 @@ async fn replace_managed_modrinth(
         version_id.clone(),
         profile.metadata.name.clone(),
         None,
-        profile_path.to_path_buf(),
+        profile_path.clone(),
     );
 
     // download in parallel, then join. If new_version_id is None, we don't need to download the new pack, so we clone the old one
@@ -179,7 +177,7 @@ async fn replace_managed_modrinth(
                     new_version_id.clone(),
                     profile.metadata.name.clone(),
                     None,
-                    profile_path.to_path_buf()
+                    profile_path.clone()
                 )
             )?
         } else {
@@ -193,7 +191,7 @@ async fn replace_managed_modrinth(
     // - remove all installed projects
     // - remove all overrides
     pack::install::remove_all_related_files(
-        profile_path.to_path_buf(),
+        profile_path.clone(),
         old_pack_creator.file,
     )
     .await?;

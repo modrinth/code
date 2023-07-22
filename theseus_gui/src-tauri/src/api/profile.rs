@@ -167,20 +167,24 @@ pub async fn profile_remove_project(
 
 // Updates a managed Modrinth profile
 #[tauri::command]
-pub async fn profile_update_managed_modrinth(path: &Path) -> Result<()> {
-    Ok(profile::update::update_managed_modrinth(path).await?)
+pub async fn profile_update_managed_modrinth(
+    path: ProfilePathId,
+) -> Result<()> {
+    Ok(profile::update::update_managed_modrinth(&path).await?)
 }
 
 // Repairs a managed Modrinth profile by updating it to the current version
 #[tauri::command]
-pub async fn profile_repair_managed_modrinth(path: &Path) -> Result<()> {
-    Ok(profile::update::repair_managed_modrinth(path).await?)
+pub async fn profile_repair_managed_modrinth(
+    path: ProfilePathId,
+) -> Result<()> {
+    Ok(profile::update::repair_managed_modrinth(&path).await?)
 }
 
 // Gets if a profile is managed by Modrinth
 #[tauri::command]
-pub async fn profile_is_managed_modrinth(path: &Path) -> Result<bool> {
-    Ok(profile::is_managed_modrinth_pack(path).await?)
+pub async fn profile_is_managed_modrinth(path: ProfilePathId) -> Result<bool> {
+    Ok(profile::is_managed_modrinth_pack(&path).await?)
 }
 
 // Exports a profile to a .mrpack file (export_location should end in .mrpack)
