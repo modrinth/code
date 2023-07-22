@@ -54,7 +54,7 @@ export const useTags = () =>
         'folia',
       ],
       dataPackLoaders: ['datapack'],
-      modLoaders: ['forge', 'fabric', 'quilt', 'liteloader', 'modloader', 'rift'],
+      modLoaders: ['forge', 'fabric', 'quilt', 'liteloader', 'modloader', 'rift', 'neoforge'],
     },
     projectViewModes: ['list', 'grid', 'gallery'],
     approvedStatuses: ['approved', 'archived', 'unlisted', 'private'],

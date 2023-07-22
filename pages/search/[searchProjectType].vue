@@ -79,7 +79,8 @@
                   !showAllLoaders &&
                   x.name !== 'forge' &&
                   x.name !== 'fabric' &&
-                  x.name !== 'quilt'
+                  x.name !== 'quilt' &&
+                  x.name !== 'neoforge'
                 ) {
                   return false
                 } else if (projectType.id === 'mod' && showAllLoaders) {
