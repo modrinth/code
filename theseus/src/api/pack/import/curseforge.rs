@@ -3,7 +3,12 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use tokio::fs;
 
-use crate::{prelude::ModLoader, state::ProfileInstallStage, util::io, State};
+use crate::{
+    prelude::{ModLoader, ProfilePathId},
+    state::ProfileInstallStage,
+    util::io,
+    State,
+};
 
 use super::copy_dotminecraft;
 
@@ -47,7 +52,7 @@ pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
 
 pub async fn import_curseforge(
     curseforge_instance_folder: PathBuf, // instance's folder
-    profile_path: PathBuf,               // path to profile
+    profile_path: ProfilePathId,         // path to profile
 ) -> crate::Result<()> {
     // TODO: recache curseforge instance icon
     let icon: Option<PathBuf> = None;

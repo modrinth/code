@@ -3,7 +3,10 @@ use std::path::{Path, PathBuf};
 use io::IOError;
 use serde::{Deserialize, Serialize};
 
-use crate::util::{fetch, io};
+use crate::{
+    prelude::ProfilePathId,
+    util::{fetch, io},
+};
 
 pub mod atlauncher;
 pub mod curseforge;
@@ -65,7 +68,7 @@ pub async fn get_importable_instances(
 #[theseus_macros::debug_pin]
 #[tracing::instrument]
 pub async fn import_instance(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
@@ -195,9 +198,12 @@ pub async fn recache_icon(
 }
 
 async fn copy_dotminecraft(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     dotminecraft: PathBuf,
 ) -> crate::Result<()> {
+    // Get full path to profile
+    let profile_path = profile_path.get_full_path().await?;
+
     // std fs copy every file in dotminecraft to profile_path
     let mut dir = io::read_dir(&dotminecraft).await?;
     while let Some(entry) = dir

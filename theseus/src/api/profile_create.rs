@@ -1,5 +1,6 @@
 //! Theseus profile management interface
 use crate::pack::install_from::CreatePackProfile;
+use crate::prelude::ProfilePathId;
 use crate::state::LinkedData;
 use crate::util::io::{self, canonicalize};
 use crate::{
@@ -131,7 +132,7 @@ pub async fn profile_create(
 
 pub async fn profile_create_from_creator(
     profile: CreatePackProfile,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProfilePathId> {
     profile_create(
         profile.name,
         profile.game_version,

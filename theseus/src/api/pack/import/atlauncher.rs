@@ -10,7 +10,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::CreatePackDescription,
     },
-    prelude::ModLoader,
+    prelude::{ModLoader, ProfilePathId},
     state::{LinkedData, ProfileInstallStage},
     util::io,
     State,
@@ -119,7 +119,7 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
 pub async fn import_atlauncher(
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
-    profile_path: PathBuf,         // path to profile
+    profile_path: ProfilePathId,   // path to profile
 ) -> crate::Result<()> {
     let atlauncher_instance_path = atlauncher_base_path
         .join("instances")
@@ -158,7 +158,7 @@ pub async fn import_atlauncher(
         project_id: None,
         version_id: None,
         existing_loading_bar: None,
-        profile: profile_path.clone(),
+        profile_path: profile_path.clone(),
     };
 
     let backup_name = format!("ATLauncher-{}", instance_folder);
@@ -177,7 +177,7 @@ pub async fn import_atlauncher(
 }
 
 async fn import_atlauncher_unmanaged(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     minecraft_folder: PathBuf,
     backup_name: String,
     description: CreatePackDescription,

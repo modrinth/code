@@ -2,6 +2,7 @@ use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::prelude::ProfilePathId;
 use crate::state::{
     LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
 };
@@ -298,7 +299,7 @@ pub async fn generate_pack_from_file(
 /// This includes the pack name, icon, game version, loader version, and loader
 #[theseus_macros::debug_pin]
 pub async fn set_profile_information(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     description: &CreatePackDescription,
     backup_name: &str,
     dependencies: &HashMap<PackDependency, String>,

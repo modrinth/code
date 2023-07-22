@@ -5,6 +5,7 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     set_profile_information, EnvType, PackFile, PackFileHash,
 };
+use crate::prelude::ProfilePathId;
 use crate::state::SideType;
 use crate::util::fetch::{fetch_mirrors, write};
 use crate::State;
@@ -22,8 +23,8 @@ use super::install_from::{
 #[theseus_macros::debug_pin]
 pub async fn install_zipped_mrpack(
     location: CreatePackLocation,
-    profile: PathBuf,
-) -> crate::Result<PathBuf> {
+    profile: ProfilePathId,
+) -> crate::Result<ProfilePathId> {
     // Get file from description
     let create_pack: CreatePack = match location {
         CreatePackLocation::FromVersionId {
@@ -48,7 +49,7 @@ pub async fn install_zipped_mrpack(
     let project_id = create_pack.description.project_id;
     let version_id = create_pack.description.version_id;
     let existing_loading_bar = create_pack.description.existing_loading_bar;
-    let profile = create_pack.description.profile;
+    let profile = create_pack.description.profile_path;
 
     let state = &State::get().await?;
 
@@ -99,12 +100,13 @@ pub async fn install_zipped_mrpack(
             )
             .await?;
 
+            let profile_full_path = profile.get_full_path().await?;
             let profile = profile.clone();
             let result = async {
                 let loading_bar = init_or_edit_loading(
                     existing_loading_bar,
                     LoadingBarType::PackDownload {
-                        profile_path: profile.clone(),
+                        profile_path: profile_full_path.clone(),
                         pack_name: pack.name.clone(),
                         icon,
                         pack_id: project_id,
@@ -126,7 +128,7 @@ pub async fn install_zipped_mrpack(
                     num_files,
                     None,
                     |project| {
-                        let profile = profile.clone();
+                        let profile_full_path = profile_full_path.clone();
                         async move {
                             //TODO: Future update: prompt user for optional files in a modpack
                             if let Some(env) = project.env {
@@ -160,7 +162,8 @@ pub async fn install_zipped_mrpack(
                                 match path {
                                     Component::CurDir
                                     | Component::Normal(_) => {
-                                        let path = profile.join(project.path);
+                                        let path = profile_full_path
+                                            .join(project.path);
                                         write(
                                             &path,
                                             &file,
@@ -222,7 +225,7 @@ pub async fn install_zipped_mrpack(
 
                         if new_path.file_name().is_some() {
                             write(
-                                &profile.join(new_path),
+                                &profile_full_path.join(new_path),
                                 &content,
                                 &state.io_semaphore,
                             )
@@ -253,7 +256,7 @@ pub async fn install_zipped_mrpack(
                     State::sync().await?;
                 }
 
-                Ok::<PathBuf, crate::Error>(profile.clone())
+                Ok::<ProfilePathId, crate::Error>(profile.clone())
             }
             .await;
 

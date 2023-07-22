@@ -8,6 +8,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
+    prelude::ProfilePathId,
     util::io,
     State,
 };
@@ -146,9 +147,9 @@ async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn import_mmc(
-    mmc_base_path: PathBuf,  // path to base mmc folder
-    instance_folder: String, // instance folder in mmc_base_path
-    profile_path: PathBuf,   // path to profile
+    mmc_base_path: PathBuf,      // path to base mmc folder
+    instance_folder: String,     // instance folder in mmc_base_path
+    profile_path: ProfilePathId, // path to profile
 ) -> crate::Result<()> {
     let mmc_instance_path = mmc_base_path
         .join("instances")
@@ -176,7 +177,7 @@ pub async fn import_mmc(
         project_id: instance_cfg.managed_pack_id,
         version_id: instance_cfg.managed_pack_version_id,
         existing_loading_bar: None,
-        profile: profile_path.clone(),
+        profile_path: profile_path.clone(),
     };
 
     // Managed pack
@@ -228,7 +229,7 @@ pub async fn import_mmc(
 }
 
 async fn import_mmc_unmanaged(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     minecraft_folder: PathBuf,
     backup_name: String,
     description: CreatePackDescription,

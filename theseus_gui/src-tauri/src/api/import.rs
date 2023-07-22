@@ -4,6 +4,7 @@ use crate::api::Result;
 use theseus::pack::import::ImportLauncherType;
 
 use theseus::pack::import;
+use theseus::prelude::ProfilePathId;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("import")
@@ -31,7 +32,7 @@ pub async fn import_get_importable_instances(
 /// eg: import_instance(ImportLauncherType::MultiMC, PathBuf::from("C:/MultiMC"), "Instance 1")
 #[tauri::command]
 pub async fn import_import_instance(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
