@@ -6,6 +6,9 @@ import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { profile_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
+import { Button, PlusIcon } from 'omorphia'
+import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
+import { NewInstanceImage } from '@/assets/icons'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -23,12 +26,49 @@ onUnmounted(() => unlisten())
 </script>
 
 <template>
-  <GridDisplay label="Instances" :instances="instances" class="display" />
+  <GridDisplay
+    v-if="instances.length > 0"
+    label="Instances"
+    :instances="instances"
+    class="display"
+  />
+  <div v-else class="no-instance">
+    <div class="icon">
+      <NewInstanceImage />
+    </div>
+    <h3>No instances found</h3>
+    <Button color="primary" @click="$refs.installationModal.show()">
+      <PlusIcon />
+      Create new instance
+    </Button>
+    <InstanceCreationModal ref="installationModal" />
+  </div>
 </template>
 
 <style lang="scss" scoped>
 .display {
   background-color: rgb(30, 31, 34);
   min-height: 100%;
+}
+
+.no-instance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--gap-md);
+
+  p,
+  h3 {
+    margin: 0;
+  }
+
+  .icon {
+    svg {
+      width: 10rem;
+      height: 10rem;
+    }
+  }
 }
 </style>

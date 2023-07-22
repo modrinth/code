@@ -11,20 +11,18 @@ pub use crate::{
     State,
 };
 use daedalus::modded::LoaderVersion;
-use futures::prelude::*;
-
 use std::path::PathBuf;
-use tokio_stream::wrappers::ReadDirStream;
+
 use tracing::{info, trace};
 use uuid::Uuid;
 
-// Creates a profile at  the given filepath and adds it to the in-memory state
-// Returns filepath at which it can be accessed in the State
+// Creates a profile of a given name and adds it to the in-memory state
+// Returns relative filepath as ProfilePathId which can be used to access it in the State
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
-    name: String,         // the name of the profile, and relative path
+    mut name: String, // the name of the profile, and relative path
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
@@ -32,32 +30,34 @@ pub async fn profile_create(
     icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProfilePathId> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let uuid = Uuid::new_v4();
-    let path = state.directories.profiles_dir().join(uuid.to_string());
+
+    let mut path = state.directories.profiles_dir().await.join(&name);
     if path.exists() {
-        if !path.is_dir() {
-            return Err(ProfileCreationError::NotFolder.into());
-        }
-        if path.join("profile.json").exists() {
-            return Err(ProfileCreationError::ProfileExistsError(
-                path.join("profile.json"),
-            )
-            .into());
+        let mut new_name;
+        let mut new_path;
+        let mut which = 1;
+        loop {
+            new_name = format!("{name} ({which})");
+            new_path = state.directories.profiles_dir().await.join(&new_name);
+            if !new_path.exists() {
+                break;
+            }
+            which += 1;
         }
 
-        if ReadDirStream::new(io::read_dir(&path).await?)
-            .next()
-            .await
-            .is_some()
-        {
-            return Err(ProfileCreationError::NotEmptyFolder.into());
-        }
-    } else {
-        io::create_dir_all(&path).await?;
+        tracing::debug!(
+            "Folder collision: {}, renaming to: {}",
+            path.display(),
+            new_path.display()
+        );
+        path = new_path;
+        name = new_name;
     }
+    io::create_dir_all(&path).await?;
 
     info!(
         "Creating profile at path {}",
@@ -74,13 +74,11 @@ pub async fn profile_create(
         None
     };
 
-    // Fully canonicalize now that its created for storing purposes
-    let path = canonicalize(&path)?;
-    let mut profile =
-        Profile::new(uuid, name, game_version, path.clone()).await?;
+    let mut profile = Profile::new(uuid, name, game_version).await?;
     let result = async {
         if let Some(ref icon) = icon {
-            let bytes = io::read(icon).await?;
+            let bytes =
+                io::read(state.directories.caches_dir().join(icon)).await?;
             profile
                 .set_icon(
                     &state.directories.caches_dir(),
@@ -101,7 +99,7 @@ pub async fn profile_create(
 
         emit_profile(
             uuid,
-            path.clone(),
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Created,
         )
@@ -117,14 +115,14 @@ pub async fn profile_create(
         }
         State::sync().await?;
 
-        Ok(path)
+        Ok(profile.profile_id())
     }
     .await;
 
     match result {
         Ok(profile) => Ok(profile),
         Err(err) => {
-            let _ = crate::api::profile::remove(&profile.path).await;
+            let _ = crate::api::profile::remove(&profile.profile_id()).await;
 
             Err(err)
         }

@@ -11,14 +11,16 @@
     </Button>
     <div v-if="selectedProfile" class="status">
       <span class="circle running" />
-      <div
-        ref="profileButton"
-        class="running-text"
-        :class="{ clickable: currentProcesses.length > 1 }"
-        @click="toggleProfiles()"
-      >
-        {{ selectedProfile.metadata.name }}
-        <div v-if="currentProcesses.length > 1" class="arrow" :class="{ rotate: showProfiles }">
+      <div ref="profileButton" class="running-text">
+        <router-link :to="`/instance/${encodeURIComponent(selectedProfile.path)}`">
+          {{ selectedProfile.metadata.name }}
+        </router-link>
+        <div
+          v-if="currentProcesses.length > 1"
+          class="arrow button-base"
+          :class="{ rotate: showProfiles }"
+          @click="toggleProfiles()"
+        >
           <DropdownIcon />
         </div>
       </div>
@@ -44,7 +46,7 @@
     </div>
   </div>
   <transition name="download">
-    <Card v-if="showCard === true" ref="card" class="info-card">
+    <Card v-if="showCard === true && currentLoadingBars.length > 0" ref="card" class="info-card">
       <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
         <h3 class="info-title">
           {{ loadingBar.title }}
@@ -57,7 +59,11 @@
     </Card>
   </transition>
   <transition name="download">
-    <Card v-if="showProfiles === true" ref="profiles" class="profile-card">
+    <Card
+      v-if="showProfiles === true && currentProcesses.length > 0"
+      ref="profiles"
+      class="profile-card"
+    >
       <Button
         v-for="profile in currentProcesses"
         :key="profile.id"
@@ -193,6 +199,7 @@ const handleClickOutsideCard = (event) => {
     card.value &&
     card.value.$el !== event.target &&
     !elements.includes(card.value.$el) &&
+    infoButton.value &&
     !infoButton.value.contains(event.target)
   ) {
     showCard.value = false

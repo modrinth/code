@@ -73,7 +73,7 @@ pub enum PackDependency {
     Minecraft,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase", tag = "type")]
 pub enum CreatePackLocation {
     // Create a pack from a modrinth version ID (such as a modpack)
@@ -130,7 +130,7 @@ pub struct CreatePackDescription {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
     pub existing_loading_bar: Option<LoadingBarId>,
-    pub profile: PathBuf,
+    pub profile_path: ProfilePathId,
 }
 
 pub fn get_profile_from_pack(
@@ -173,13 +173,13 @@ pub async fn generate_pack_from_version_id(
     version_id: String,
     title: String,
     icon_url: Option<String>,
-    profile: PathBuf,
+    profile_path: ProfilePathId,
 ) -> crate::Result<CreatePack> {
     let state = State::get().await?;
 
     let loading_bar = init_loading(
         LoadingBarType::PackFileDownload {
-            profile_path: profile.clone(),
+            profile_path: profile_path.get_full_path().await?,
             pack_name: title,
             icon: icon_url,
             pack_version: version_id.clone(),
@@ -269,7 +269,7 @@ pub async fn generate_pack_from_version_id(
             project_id: Some(project_id),
             version_id: Some(version_id),
             existing_loading_bar: Some(loading_bar),
-            profile,
+            profile_path,
         },
     })
 }
@@ -278,7 +278,7 @@ pub async fn generate_pack_from_version_id(
 #[theseus_macros::debug_pin]
 pub async fn generate_pack_from_file(
     path: PathBuf,
-    profile: PathBuf,
+    profile_path: ProfilePathId,
 ) -> crate::Result<CreatePack> {
     let file = io::read(&path).await?;
     Ok(CreatePack {
@@ -289,7 +289,7 @@ pub async fn generate_pack_from_file(
             project_id: None,
             version_id: None,
             existing_loading_bar: None,
-            profile,
+            profile_path,
         },
     })
 }

@@ -57,3 +57,13 @@ export const installVersionDependencies = async (profile, version) => {
     }
   }
 }
+
+export const openLink = (url) => {
+  window.__TAURI_INVOKE__('tauri', {
+    __tauriModule: 'Shell',
+    message: {
+      cmd: 'open',
+      path: url,
+    },
+  })
+}
