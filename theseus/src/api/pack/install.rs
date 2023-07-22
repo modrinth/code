@@ -24,8 +24,8 @@ use super::install_from::{
 #[theseus_macros::debug_pin]
 pub async fn install_pack(
     location: CreatePackLocation,
-    profile: PathBuf,
-) -> crate::Result<PathBuf> {
+    profile_path: ProfilePathId,
+) -> crate::Result<ProfilePathId> {
     // Get file from description
     let description: CreatePackDescription = match location {
         CreatePackLocation::FromVersionId {
@@ -39,12 +39,12 @@ pub async fn install_pack(
                 version_id,
                 title,
                 icon_url,
-                profile.clone(),
+                profile_path.clone(),
             )
             .await?
         }
         CreatePackLocation::FromFile { path } => {
-            generate_pack_from_file(path, profile.clone()).await?
+            generate_pack_from_file(path, profile_path.clone()).await?
         }
     };
 
@@ -78,7 +78,7 @@ pub async fn install_pack_files(
     let project_id = description.project_id;
     let version_id = description.version_id;
     let existing_loading_bar = description.existing_loading_bar;
-    let profile = description.profile;
+    let profile_path = description.profile_path;
 
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&file);
 
@@ -152,7 +152,7 @@ pub async fn install_pack_files(
             loader_version.cloned(),
         )
         .await?;
-        crate::api::profile::edit(&profile, |prof| {
+        crate::api::profile::edit(&profile_path, |prof| {
             prof.metadata.name =
                 override_title.clone().unwrap_or_else(|| pack.name.clone());
             prof.install_stage = ProfileInstallStage::PackInstalling;
@@ -169,11 +169,14 @@ pub async fn install_pack_files(
         })
         .await?;
 
-        let profile = profile.clone();
+        let profile_path = profile_path.clone();
         let loading_bar = init_or_edit_loading(
             existing_loading_bar,
             LoadingBarType::PackDownload {
-                profile_path: profile.clone(),
+                profile_path: profile_path
+                            .get_full_path()
+                            .await?
+                            .clone(),
                 pack_name: pack.name.clone(),
                 icon,
                 pack_id: project_id,
@@ -195,7 +198,7 @@ pub async fn install_pack_files(
             num_files,
             None,
             |project| {
-                let profile = profile.clone();
+                let profile_path = profile_path.clone();
                 async move {
                     //TODO: Future update: prompt user for optional files in a modpack
                     if let Some(env) = project.env {
@@ -224,7 +227,10 @@ pub async fn install_pack_files(
                     if let Some(path) = path {
                         match path {
                             Component::CurDir | Component::Normal(_) => {
-                                let path = profile.join(project.path);
+                                let path = profile_path
+                                            .get_full_path()
+                                            .await?
+                                            .join(project.path);
                                 write(&path, &file, &state.io_semaphore)
                                     .await?;
                             }
@@ -280,7 +286,10 @@ pub async fn install_pack_files(
 
                 if new_path.file_name().is_some() {
                     write(
-                        &profile.join(new_path),
+                        &profile_path
+                                    .get_full_path()
+                                    .await?
+                                    .join(new_path),
                         &content,
                         &state.io_semaphore,
                     )
@@ -300,7 +309,7 @@ pub async fn install_pack_files(
         }
 
         if let Some(profile_val) =
-            crate::api::profile::get(&profile, None).await?
+            crate::api::profile::get(&profile_path, None).await?
         {
             crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
                 .await?;
@@ -308,7 +317,7 @@ pub async fn install_pack_files(
             State::sync().await?;
         }
 
-        Ok::<PathBuf, crate::Error>(profile.clone())
+        Ok::<ProfilePathId, crate::Error>(profile_path.clone())
     } else {
         Err(crate::Error::from(crate::ErrorKind::InputError(
             "No pack manifest found in mrpack".to_string(),

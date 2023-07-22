@@ -28,7 +28,7 @@ impl Tags {
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Self> {
         let mut tags = None;
-        let tags_path = dirs.caches_meta_dir().join("tags.json");
+        let tags_path = dirs.caches_meta_dir().await.join("tags.json");
 
         if let Ok(tags_json) = read_json::<Self>(&tags_path, io_semaphore).await
         {
@@ -60,7 +60,7 @@ impl Tags {
             let tags_fetch = Tags::fetch(&state.fetch_semaphore).await?;
 
             let tags_path =
-                state.directories.caches_meta_dir().join("tags.json");
+                state.directories.caches_meta_dir().await.join("tags.json");
 
             write(
                 &tags_path,

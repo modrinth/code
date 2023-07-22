@@ -221,6 +221,7 @@ pub async fn write<'a>(
     Ok(())
 }
 
+// Writes a icon to the cache and returns the absolute path of the icon within the cache directory
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn write_cached_icon(
     icon_path: &str,

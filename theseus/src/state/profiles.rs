@@ -28,7 +28,7 @@ use uuid::Uuid;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 
-pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
+pub(crate) struct Profiles(pub HashMap<ProfilePathId, Profile>);
 
 #[derive(
     Serialize, Deserialize, Clone, Copy, Debug, Default, Eq, PartialEq,
@@ -46,13 +46,101 @@ pub enum ProfileInstallStage {
     NotInstalled,
 }
 
+/// newtype wrapper over a Profile path, to be usable as a clear identifier for the kind of path used
+/// eg: for "a/b/c/profiles/My Mod", the ProfilePathId would be "My Mod" (a relative path)
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
+#[serde(transparent)]
+pub struct ProfilePathId(PathBuf);
+impl ProfilePathId {
+    // Create a new ProfilePathId from a full file path
+    pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
+        let path: PathBuf = io::canonicalize(path)?;
+        let profiles_dir = io::canonicalize(
+            State::get().await?.directories.profiles_dir().await,
+        )?;
+        path.strip_prefix(profiles_dir)
+            .ok()
+            .and_then(|p| p.file_name())
+            .ok_or_else(|| {
+                crate::ErrorKind::FSError(format!(
+                    "Path {path:?} does not correspond to a profile",
+                    path = path
+                ))
+            })?;
+        Ok(Self(path))
+    }
+
+    // Create a new ProfilePathId from a relative path
+    pub fn new(path: &Path) -> Self {
+        ProfilePathId(PathBuf::from(path))
+    }
+
+    pub async fn get_full_path(&self) -> crate::Result<PathBuf> {
+        let state = State::get().await?;
+        let profiles_dir = state.directories.profiles_dir().await;
+        Ok(profiles_dir.join(&self.0))
+    }
+
+    pub fn check_valid_utf(&self) -> crate::Result<&Self> {
+        self.0
+            .to_str()
+            .ok_or(crate::ErrorKind::UTFError(self.0.clone()).as_error())?;
+        Ok(self)
+    }
+}
+impl std::fmt::Display for ProfilePathId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.display().fmt(f)
+    }
+}
+
+/// newtype wrapper over a Profile path, to be usable as a clear identifier for the kind of path used
+/// eg: for "a/b/c/profiles/My Mod/mods/myproj", the ProjectPathId would be "mods/myproj"
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
+#[serde(transparent)]
+pub struct ProjectPathId(pub PathBuf);
+impl ProjectPathId {
+    // Create a new ProjectPathId from a full file path
+    pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
+        let path: PathBuf = io::canonicalize(path)?;
+        let profiles_dir: PathBuf = io::canonicalize(
+            State::get().await?.directories.profiles_dir().await,
+        )?;
+        path.strip_prefix(profiles_dir)
+            .ok()
+            .map(|p| p.components().skip(1).collect::<PathBuf>())
+            .ok_or_else(|| {
+                crate::ErrorKind::FSError(format!(
+                    "Path {path:?} does not correspond to a profile",
+                    path = path
+                ))
+            })?;
+        Ok(Self(path))
+    }
+
+    pub async fn get_full_path(
+        &self,
+        profile: ProfilePathId,
+    ) -> crate::Result<PathBuf> {
+        let _state = State::get().await?;
+        let profile_dir = profile.get_full_path().await?;
+        Ok(profile_dir.join(&self.0))
+    }
+
+    // Create a new ProjectPathId from a relative path
+    pub fn new(path: &Path) -> Self {
+        ProjectPathId(PathBuf::from(path))
+    }
+}
+
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
     #[serde(default)]
     pub install_stage: ProfileInstallStage,
-    pub path: PathBuf,
+    #[serde(default)]
+    pub path: PathBuf, // Relative path to the profile, to be used in ProfilePathId
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub java: Option<JavaSettings>,
@@ -62,7 +150,7 @@ pub struct Profile {
     pub resolution: Option<WindowSize>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hooks: Option<Hooks>,
-    pub projects: HashMap<PathBuf, Project>,
+    pub projects: HashMap<ProjectPathId, Project>,
     #[serde(default)]
     pub modrinth_update_version: Option<String>,
 }
@@ -150,7 +238,6 @@ impl Profile {
         uuid: Uuid,
         name: String,
         version: String,
-        path: PathBuf,
     ) -> crate::Result<Self> {
         if name.trim().is_empty() {
             return Err(crate::ErrorKind::InputError(String::from(
@@ -162,7 +249,7 @@ impl Profile {
         Ok(Self {
             uuid,
             install_stage: ProfileInstallStage::NotInstalled,
-            path: io::canonicalize(path)?,
+            path: PathBuf::new().join(&name),
             metadata: ProfileMetadata {
                 name,
                 icon: None,
@@ -185,6 +272,12 @@ impl Profile {
         })
     }
 
+    // Gets the ProfilePathId for this profile
+    #[inline]
+    pub fn profile_id(&self) -> ProfilePathId {
+        ProfilePathId::new(&self.path)
+    }
+
     #[tracing::instrument(skip(self, semaphore, icon))]
     pub async fn set_icon<'a>(
         &'a mut self,
@@ -200,7 +293,7 @@ impl Profile {
         Ok(())
     }
 
-    pub fn crash_task(path: PathBuf) {
+    pub fn crash_task(path: ProfilePathId) {
         tokio::task::spawn(async move {
             let res = async {
                 let profile = crate::api::profile::get(&path, None).await?;
@@ -224,38 +317,47 @@ impl Profile {
         });
     }
 
-    pub fn sync_projects_task(path: PathBuf) {
+    pub fn sync_projects_task(profile_path_id: ProfilePathId) {
         tokio::task::spawn(async move {
+            let span =
+                tracing::span!(tracing::Level::INFO, "sync_projects_task");
+            tracing::debug!(
+                parent: &span,
+                "Syncing projects for profile {}",
+                profile_path_id
+            );
             let res = async {
+                let _span = span.enter();
                 let state = State::get().await?;
-                let profile = crate::api::profile::get(&path, None).await?;
+                let profile = crate::api::profile::get(&profile_path_id, None).await?;
 
                 if let Some(profile) = profile {
-                    let paths = profile.get_profile_project_paths()?;
+                    let paths = profile.get_profile_full_project_paths().await?;
 
+                    let caches_dir = state.directories.caches_dir();
                     let projects = crate::state::infer_data_from_files(
                         profile.clone(),
                         paths,
-                        state.directories.caches_dir(),
+                        caches_dir,
                         &state.io_semaphore,
                         &state.fetch_semaphore,
                     )
                     .await?;
 
                     let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&path) {
+                    if let Some(profile) = new_profiles.0.get_mut(&profile_path_id) {
                         profile.projects = projects;
                     }
                     emit_profile(
                         profile.uuid,
-                        profile.path,
+                        profile.get_profile_full_path().await?,
                         &profile.metadata.name,
                         ProfilePayloadType::Synced,
                     )
                     .await?;
                 } else {
                     tracing::warn!(
-                        "Unable to fetch single profile projects: path {path:?} invalid",
+                        "Unable to fetch single profile projects: path {profile_path_id} invalid",
                     );
                 }
                 Ok::<(), crate::Error>(())
@@ -271,10 +373,21 @@ impl Profile {
         });
     }
 
-    pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
+    // Get full path to profile
+    pub async fn get_profile_full_path(&self) -> crate::Result<PathBuf> {
+        let state = State::get().await?;
+        let profiles_dir = state.directories.profiles_dir().await;
+        Ok(profiles_dir.join(&self.path))
+    }
+
+    /// Gets paths to projects as their full paths, not just their relative paths
+    pub async fn get_profile_full_project_paths(
+        &self,
+    ) -> crate::Result<Vec<PathBuf>> {
         let mut files = Vec::new();
+        let profile_path = self.get_profile_full_path().await?;
         let mut read_paths = |path: &str| {
-            let new_path = self.path.join(path);
+            let new_path = profile_path.join(path);
             if new_path.exists() {
                 let path = self.path.join(path);
                 for path in std::fs::read_dir(&path)
@@ -341,7 +454,7 @@ impl Profile {
     pub async fn add_project_version(
         &self,
         version_id: String,
-    ) -> crate::Result<(PathBuf, ModrinthVersion)> {
+    ) -> crate::Result<(ProjectPathId, ModrinthVersion)> {
         let state = State::get().await?;
 
         let version = fetch_json::<ModrinthVersion>(
@@ -390,7 +503,7 @@ impl Profile {
         file_name: &str,
         bytes: bytes::Bytes,
         project_type: Option<ProjectType>,
-    ) -> crate::Result<PathBuf> {
+    ) -> crate::Result<ProjectPathId> {
         let project_type = if let Some(project_type) = project_type {
             project_type
         } else {
@@ -422,16 +535,23 @@ impl Profile {
         };
 
         let state = State::get().await?;
-        let path = self.path.join(project_type.get_folder()).join(file_name);
-        write(&path, &bytes, &state.io_semaphore).await?;
+        let relative_name = PathBuf::new()
+            .join(project_type.get_folder())
+            .join(file_name);
+        let file_path = self
+            .get_profile_full_path()
+            .await?
+            .join(relative_name.clone());
+        let project_path_id = ProjectPathId::new(&relative_name);
+        write(&file_path, &bytes, &state.io_semaphore).await?;
 
         let hash = get_hash(bytes).await?;
         {
             let mut profiles = state.profiles.write().await;
 
-            if let Some(profile) = profiles.0.get_mut(&self.path) {
+            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
                 profile.projects.insert(
-                    path.clone(),
+                    project_path_id.clone(),
                     Project {
                         sha512: hash,
                         disabled: false,
@@ -443,32 +563,40 @@ impl Profile {
             }
         }
 
-        Ok(path)
+        Ok(project_path_id)
     }
 
+    /// Toggle a project's disabled state.
+    /// 'path' should be relative to the profile's path.
     #[tracing::instrument(skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn toggle_disable_project(
         &self,
-        path: &Path,
-    ) -> crate::Result<PathBuf> {
+        relative_path: &ProjectPathId,
+    ) -> crate::Result<ProjectPathId> {
         let state = State::get().await?;
         if let Some(mut project) = {
-            let mut profiles = state.profiles.write().await;
+            let mut profiles: tokio::sync::RwLockWriteGuard<'_, Profiles> =
+                state.profiles.write().await;
 
-            if let Some(profile) = profiles.0.get_mut(&self.path) {
-                profile.projects.remove(path)
+            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
+                profile.projects.remove(relative_path)
             } else {
                 None
             }
         } {
-            let path = path.to_path_buf();
-            let mut new_path = path.clone();
+            // Get relative path from former ProjectPathId
+            let relative_path = relative_path.0.to_path_buf();
+            let mut new_path = relative_path.clone();
 
-            if path.extension().map_or(false, |ext| ext == "disabled") {
+            if relative_path
+                .extension()
+                .map_or(false, |ext| ext == "disabled")
+            {
                 project.disabled = false;
                 new_path.set_file_name(
-                    path.file_name()
+                    relative_path
+                        .file_name()
                         .unwrap_or_default()
                         .to_string_lossy()
                         .replace(".disabled", ""),
@@ -476,24 +604,35 @@ impl Profile {
             } else {
                 new_path.set_file_name(format!(
                     "{}.disabled",
-                    path.file_name().unwrap_or_default().to_string_lossy()
+                    relative_path
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_string_lossy()
                 ));
                 project.disabled = true;
             }
 
-            io::rename(&path, &new_path).await?;
+            let true_path =
+                self.get_profile_full_path().await?.join(&relative_path);
+            let true_new_path =
+                self.get_profile_full_path().await?.join(&new_path);
+            io::rename(&true_path, &true_new_path).await?;
+
+            let new_project_path_id = ProjectPathId::new(&new_path);
 
             let mut profiles = state.profiles.write().await;
-            if let Some(profile) = profiles.0.get_mut(&self.path) {
-                profile.projects.insert(new_path.clone(), project);
+            if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
+                profile
+                    .projects
+                    .insert(new_project_path_id.clone(), project);
                 profile.metadata.date_modified = Utc::now();
             }
 
-            Ok(new_path)
+            Ok(new_project_path_id)
         } else {
             Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
-                path
+                relative_path
             ))
             .into())
         }
@@ -501,24 +640,29 @@ impl Profile {
 
     pub async fn remove_project(
         &self,
-        path: &Path,
+        relative_path: &ProjectPathId,
         dont_remove_arr: Option<bool>,
     ) -> crate::Result<()> {
         let state = State::get().await?;
-        if self.projects.contains_key(path) {
-            io::remove_file(path).await?;
+        if self.projects.contains_key(relative_path) {
+            io::remove_file(
+                self.get_profile_full_path()
+                    .await?
+                    .join(relative_path.0.clone()),
+            )
+            .await?;
             if !dont_remove_arr.unwrap_or(false) {
                 let mut profiles = state.profiles.write().await;
 
-                if let Some(profile) = profiles.0.get_mut(&self.path) {
-                    profile.projects.remove(path);
+                if let Some(profile) = profiles.0.get_mut(&self.profile_id()) {
+                    profile.projects.remove(relative_path);
                     profile.metadata.date_modified = Utc::now();
                 }
             }
         } else {
             return Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
-                path
+                relative_path
             ))
             .into());
         }
@@ -535,14 +679,21 @@ impl Profiles {
         file_watcher: &mut Debouncer<RecommendedWatcher>,
     ) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
-        io::create_dir_all(&dirs.profiles_dir()).await?;
-        let mut entries = io::read_dir(&dirs.profiles_dir()).await?;
+        let profiles_dir = dirs.profiles_dir().await;
+        io::create_dir_all(&&profiles_dir).await?;
+
+        file_watcher
+            .watcher()
+            .watch(&profiles_dir, RecursiveMode::NonRecursive)?;
+
+        let mut entries = io::read_dir(&dirs.profiles_dir().await).await?;
         while let Some(entry) =
             entries.next_entry().await.map_err(IOError::from)?
         {
             let path = entry.path();
             if path.is_dir() {
-                let prof = match Self::read_profile_from_dir(&path).await {
+                let prof = match Self::read_profile_from_dir(&path, dirs).await
+                {
                     Ok(prof) => Some(prof),
                     Err(err) => {
                         tracing::warn!(
@@ -554,7 +705,7 @@ impl Profiles {
                 if let Some(profile) = prof {
                     let path = io::canonicalize(path)?;
                     Profile::watch_fs(&path, file_watcher).await?;
-                    profiles.insert(path, profile);
+                    profiles.insert(profile.profile_id(), profile);
                 }
             }
         }
@@ -573,26 +724,28 @@ impl Profiles {
             {
                 let profiles = state.profiles.read().await;
                 for (_profile_path, profile) in profiles.0.iter() {
-                    let paths = profile.get_profile_project_paths()?;
+                    let paths =
+                        profile.get_profile_full_project_paths().await?;
 
                     files.push((profile.clone(), paths));
                 }
             }
 
+            let caches_dir = state.directories.caches_dir();
             future::try_join_all(files.into_iter().map(
                 |(profile, files)| async {
-                    let profile_path = profile.path.clone();
+                    let profile_name = profile.profile_id();
                     let inferred = super::projects::infer_data_from_files(
                         profile,
                         files,
-                        state.directories.caches_dir(),
+                        caches_dir.clone(),
                         &state.io_semaphore,
                         &state.fetch_semaphore,
                     )
                     .await?;
 
                     let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&profile_path)
+                    if let Some(profile) = new_profiles.0.get_mut(&profile_name)
                     {
                         profile.projects = inferred;
                     }
@@ -704,7 +857,7 @@ impl Profiles {
     pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,
-            profile.path.clone(),
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Added,
         )
@@ -712,30 +865,26 @@ impl Profiles {
 
         let state = State::get().await?;
         let mut file_watcher = state.file_watcher.write().await;
-        Profile::watch_fs(&profile.path, &mut file_watcher).await?;
+        Profile::watch_fs(
+            &profile.get_profile_full_path().await?,
+            &mut file_watcher,
+        )
+        .await?;
 
-        self.0.insert(
-            io::canonicalize(&profile.path)?
-                .to_str()
-                .ok_or(
-                    crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
-                )?
-                .into(),
-            profile,
-        );
+        let profile_name = profile.profile_id();
+        profile_name.check_valid_utf()?;
+        self.0.insert(profile_name, profile);
         Ok(self)
     }
 
     #[tracing::instrument(skip(self))]
     pub async fn remove(
         &mut self,
-        path: &Path,
+        profile_path: &ProfilePathId,
     ) -> crate::Result<Option<Profile>> {
-        let path = PathBuf::from(
-            &io::canonicalize(path)?.to_string_lossy().to_string(),
-        );
-        let profile = self.0.remove(&path);
+        let profile = self.0.remove(profile_path);
 
+        let path = profile_path.get_full_path().await?;
         if path.exists() {
             io::remove_dir_all(&path).await?;
         }
@@ -745,12 +894,15 @@ impl Profiles {
 
     #[tracing::instrument(skip_all)]
     pub async fn sync(&self) -> crate::Result<&Self> {
+        let _state = State::get().await?;
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
-            .try_for_each_concurrent(None, |(path, profile)| async move {
+            .try_for_each_concurrent(None, |(_, profile)| async move {
                 let json = serde_json::to_vec(&profile)?;
 
-                let json_path = Path::new(&path.to_string_lossy().to_string())
+                let json_path = profile
+                    .get_profile_full_path()
+                    .await?
                     .join(PROFILE_JSON_PATH);
 
                 io::write(&json_path, &json).await?;
@@ -761,10 +913,68 @@ impl Profiles {
         Ok(self)
     }
 
-    async fn read_profile_from_dir(path: &Path) -> crate::Result<Profile> {
+    async fn read_profile_from_dir(
+        path: &Path,
+        dirs: &DirectoryInfo,
+    ) -> crate::Result<Profile> {
         let json = io::read(&path.join(PROFILE_JSON_PATH)).await?;
         let mut profile = serde_json::from_slice::<Profile>(&json)?;
-        profile.path = PathBuf::from(path);
+
+        // Get name from stripped path
+        profile.path =
+            PathBuf::from(path.strip_prefix(dirs.profiles_dir().await)?);
+
         Ok(profile)
+    }
+
+    pub fn sync_available_profiles_task(profile_path_id: ProfilePathId) {
+        tokio::task::spawn(async move {
+            let span = tracing::span!(
+                tracing::Level::INFO,
+                "sync_available_profiles_task"
+            );
+            let res = async {
+                let _span = span.enter();
+                let state = State::get().await?;
+                let dirs = &state.directories;
+                let mut profiles = state.profiles.write().await;
+
+                if let Some(profile) = profiles.0.get_mut(&profile_path_id) {
+                    if !profile.get_profile_full_path().await?.exists() {
+                        // if path exists in the state but no longer in the filesystem, remove it from the state list
+                        emit_profile(
+                            profile.uuid,
+                            profile.get_profile_full_path().await?,
+                            &profile.metadata.name,
+                            ProfilePayloadType::Removed,
+                        )
+                        .await?;
+                        tracing::debug!("Removed!");
+                        profiles.0.remove(&profile_path_id);
+                    }
+                } else if profile_path_id.get_full_path().await?.exists() {
+                    // if it exists in the filesystem but no longer in the state, add it to the state list
+                    profiles
+                        .insert(
+                            Self::read_profile_from_dir(
+                                &profile_path_id.get_full_path().await?,
+                                dirs,
+                            )
+                            .await?,
+                        )
+                        .await?;
+                    Profile::sync_projects_task(profile_path_id);
+                }
+                Ok::<(), crate::Error>(())
+            }
+            .await;
+
+            match res {
+                Ok(()) => {}
+                Err(err) => {
+                    tracing::warn!("Unable to fetch all profiles: {err}")
+                }
+            };
+        });
     }
 }

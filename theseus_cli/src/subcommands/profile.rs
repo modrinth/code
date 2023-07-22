@@ -227,7 +227,7 @@ impl<'a> From<&'a Profile> for ProfileRow<'a> {
     fn from(it: &'a Profile) -> Self {
         Self {
             name: &it.metadata.name,
-            path: &it.path,
+            path: Path::new(&it.metadata.name),
             game_version: &it.metadata.game_version,
             loader: &it.metadata.loader,
             loader_version: it
@@ -285,7 +285,8 @@ impl ProfileRemove {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let profile = canonicalize(&self.profile)?;
+        let profile =
+            ProfilePathId::from_fs_path(canonicalize(&self.profile)?).await?;
         info!("Removing profile {} from Theseus", self.profile.display());
 
         if confirm_async(String::from("Do you wish to continue"), true).await? {
@@ -335,7 +336,9 @@ impl ProfileRun {
             .await?;
         let credentials = auth::refresh(id).await?;
 
-        let proc_lock = profile::run_credentials(&path, &credentials).await?;
+        let profile_path_id = ProfilePathId::from_fs_path(path).await?;
+        let proc_lock =
+            profile::run_credentials(&profile_path_id, &credentials).await?;
         let mut proc = proc_lock.write().await;
         process::wait_for(&mut proc).await?;
 
