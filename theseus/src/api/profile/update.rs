@@ -3,10 +3,7 @@ use crate::{
         emit::{emit_profile, loading_try_for_each_concurrent},
         ProfilePayloadType,
     },
-    pack::{
-        self,
-        install_from::{generate_pack_from_version_id, CreatePackDescription},
-    },
+    pack::{self, install_from::generate_pack_from_version_id},
     prelude::{ProfilePathId, ProjectPathId},
     profile::get,
     state::Project,
@@ -181,8 +178,7 @@ async fn replace_managed_modrinth(
                 )
             )?
         } else {
-            let mut old_pack_creator =
-                old_pack_creator.await?;
+            let mut old_pack_creator = old_pack_creator.await?;
             old_pack_creator.description.existing_loading_bar = None;
             (old_pack_creator.clone(), old_pack_creator)
         };
@@ -201,7 +197,7 @@ async fn replace_managed_modrinth(
     // - install all overrides
     // - edits the profile to update the new data
     // - (functionals almost identically to rteinstalling the pack 'in-place')
-    pack::install_mrpack::install_pack_files(new_pack_creator).await?;
+    pack::install_mrpack::install_zipped_mrpack_files(new_pack_creator).await?;
 
     Ok(())
 }
