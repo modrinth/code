@@ -2,16 +2,42 @@
 use std::fs;
 use std::path::PathBuf;
 
+use tokio::sync::RwLock;
+
+use super::{ProfilePathId, Settings};
+
+pub const SETTINGS_FILE_NAME: &str = "settings.json";
+pub const CACHES_FOLDER_NAME: &str = "caches";
+pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
+
 #[derive(Debug)]
 pub struct DirectoryInfo {
-    pub config_dir: PathBuf,
+    pub settings_dir: PathBuf, // Base settings directory- settings.json and icon cache.
+    pub config_dir: RwLock<PathBuf>, // Base config directory- instances, minecraft downloads, etc. Changeable as a setting.
     pub working_dir: PathBuf,
 }
 
 impl DirectoryInfo {
+    // Get the settings directory
+    // init() is not needed for this function
+    pub fn get_initial_settings_dir() -> Option<PathBuf> {
+        Self::env_path("THESEUS_CONFIG_DIR")
+            .or_else(|| Some(dirs::config_dir()?.join("com.modrinth.theseus")))
+    }
+
+    #[inline]
+    pub fn get_initial_settings_file() -> crate::Result<PathBuf> {
+        let settings_dir = Self::get_initial_settings_dir().ok_or(
+            crate::ErrorKind::FSError(
+                "Could not find valid config dir".to_string(),
+            ),
+        )?;
+        Ok(settings_dir.join("settings.json"))
+    }
+
     /// Get all paths needed for Theseus to operate properly
     #[tracing::instrument]
-    pub fn init() -> crate::Result<Self> {
+    pub fn init(settings: &Settings) -> crate::Result<Self> {
         // Working directory
         let working_dir = std::env::current_dir().map_err(|err| {
             crate::ErrorKind::FSError(format!(
@@ -19,143 +45,153 @@ impl DirectoryInfo {
             ))
         })?;
 
-        // Config directory
-        let config_dir = Self::env_path("THESEUS_CONFIG_DIR")
-            .or_else(|| Some(dirs::config_dir()?.join("com.modrinth.theseus")))
-            .ok_or(crate::ErrorKind::FSError(
-                "Could not find valid config dir".to_string(),
-            ))?;
+        let settings_dir = Self::get_initial_settings_dir().ok_or(
+            crate::ErrorKind::FSError(
+                "Could not find valid settings dir".to_string(),
+            ),
+        )?;
 
-        fs::create_dir_all(&config_dir).map_err(|err| {
+        fs::create_dir_all(&settings_dir).map_err(|err| {
             crate::ErrorKind::FSError(format!(
                 "Error creating Theseus config directory: {err}"
             ))
         })?;
 
+        // config directory (for instances, etc.)
+        // by default this is the same as the settings directory
+        let config_dir = settings.loaded_config_dir.clone().ok_or(
+            crate::ErrorKind::FSError(
+                "Could not find valid config dir".to_string(),
+            ),
+        )?;
+
         Ok(Self {
-            config_dir,
+            settings_dir,
+            config_dir: RwLock::new(config_dir),
             working_dir,
         })
     }
 
     /// Get the Minecraft instance metadata directory
     #[inline]
-    pub fn metadata_dir(&self) -> PathBuf {
-        self.config_dir.join("meta")
+    pub async fn metadata_dir(&self) -> PathBuf {
+        self.config_dir.read().await.join("meta")
     }
 
     /// Get the Minecraft java versions metadata directory
     #[inline]
-    pub fn java_versions_dir(&self) -> PathBuf {
-        self.metadata_dir().join("java_versions")
+    pub async fn java_versions_dir(&self) -> PathBuf {
+        self.metadata_dir().await.join("java_versions")
     }
 
     /// Get the Minecraft versions metadata directory
     #[inline]
-    pub fn versions_dir(&self) -> PathBuf {
-        self.metadata_dir().join("versions")
+    pub async fn versions_dir(&self) -> PathBuf {
+        self.metadata_dir().await.join("versions")
     }
 
     /// Get the metadata directory for a given version
     #[inline]
-    pub fn version_dir(&self, version: &str) -> PathBuf {
-        self.versions_dir().join(version)
+    pub async fn version_dir(&self, version: &str) -> PathBuf {
+        self.versions_dir().await.join(version)
     }
 
     /// Get the Minecraft libraries metadata directory
     #[inline]
-    pub fn libraries_dir(&self) -> PathBuf {
-        self.metadata_dir().join("libraries")
+    pub async fn libraries_dir(&self) -> PathBuf {
+        self.metadata_dir().await.join("libraries")
     }
 
     /// Get the Minecraft assets metadata directory
     #[inline]
-    pub fn assets_dir(&self) -> PathBuf {
-        self.metadata_dir().join("assets")
+    pub async fn assets_dir(&self) -> PathBuf {
+        self.metadata_dir().await.join("assets")
     }
 
     /// Get the assets index directory
     #[inline]
-    pub fn assets_index_dir(&self) -> PathBuf {
-        self.assets_dir().join("indexes")
+    pub async fn assets_index_dir(&self) -> PathBuf {
+        self.assets_dir().await.join("indexes")
     }
 
     /// Get the assets objects directory
     #[inline]
-    pub fn objects_dir(&self) -> PathBuf {
-        self.assets_dir().join("objects")
+    pub async fn objects_dir(&self) -> PathBuf {
+        self.assets_dir().await.join("objects")
     }
 
     /// Get the directory for a specific object
     #[inline]
-    pub fn object_dir(&self, hash: &str) -> PathBuf {
-        self.objects_dir().join(&hash[..2]).join(hash)
+    pub async fn object_dir(&self, hash: &str) -> PathBuf {
+        self.objects_dir().await.join(&hash[..2]).join(hash)
     }
 
     /// Get the Minecraft legacy assets metadata directory
     #[inline]
-    pub fn legacy_assets_dir(&self) -> PathBuf {
-        self.metadata_dir().join("resources")
+    pub async fn legacy_assets_dir(&self) -> PathBuf {
+        self.metadata_dir().await.join("resources")
     }
 
     /// Get the Minecraft legacy assets metadata directory
     #[inline]
-    pub fn natives_dir(&self) -> PathBuf {
-        self.metadata_dir().join("natives")
+    pub async fn natives_dir(&self) -> PathBuf {
+        self.metadata_dir().await.join("natives")
     }
 
     /// Get the natives directory for a version of Minecraft
     #[inline]
-    pub fn version_natives_dir(&self, version: &str) -> PathBuf {
-        self.natives_dir().join(version)
+    pub async fn version_natives_dir(&self, version: &str) -> PathBuf {
+        self.natives_dir().await.join(version)
     }
 
     /// Get the directory containing instance icons
     #[inline]
-    pub fn icon_dir(&self) -> PathBuf {
-        self.config_dir.join("icons")
+    pub async fn icon_dir(&self) -> PathBuf {
+        self.config_dir.read().await.join("icons")
     }
 
     /// Get the profiles directory for created profiles
     #[inline]
-    pub fn profiles_dir(&self) -> PathBuf {
-        self.config_dir.join("profiles")
+    pub async fn profiles_dir(&self) -> PathBuf {
+        self.config_dir.read().await.join("profiles")
     }
 
     /// Gets the logs dir for a given profile
     #[inline]
-    pub fn profile_logs_dir(&self, profile: uuid::Uuid) -> PathBuf {
-        self.profiles_dir()
-            .join(profile.to_string())
-            .join("modrinth_logs")
+    pub async fn profile_logs_dir(
+        &self,
+        profile_id: &ProfilePathId,
+    ) -> crate::Result<PathBuf> {
+        Ok(profile_id.get_full_path().await?.join("modrinth_logs"))
     }
 
     #[inline]
-    pub fn launcher_logs_dir(&self) -> PathBuf {
-        self.config_dir.join("launcher_logs")
+    pub fn launcher_logs_dir() -> Option<PathBuf> {
+        Self::get_initial_settings_dir()
+            .map(|d| d.join(LAUNCHER_LOGS_FOLDER_NAME))
     }
 
     /// Get the file containing the global database
     #[inline]
-    pub fn database_file(&self) -> PathBuf {
-        self.config_dir.join("data.bin")
+    pub async fn database_file(&self) -> PathBuf {
+        self.config_dir.read().await.join("data.bin")
     }
 
     /// Get the settings file for Theseus
     #[inline]
     pub fn settings_file(&self) -> PathBuf {
-        self.config_dir.join("settings.json")
+        self.settings_dir.join(SETTINGS_FILE_NAME)
     }
 
     /// Get the cache directory for Theseus
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
-        self.config_dir.join("caches")
+        self.settings_dir.join(CACHES_FOLDER_NAME)
     }
 
     #[inline]
-    pub fn caches_meta_dir(&self) -> PathBuf {
-        self.config_dir.join("caches").join("metadata")
+    pub async fn caches_meta_dir(&self) -> PathBuf {
+        self.caches_dir().join("metadata")
     }
 
     /// Get path from environment variable

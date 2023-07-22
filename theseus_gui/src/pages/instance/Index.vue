@@ -147,13 +147,13 @@ import {
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
 import { PackageIcon } from '@/assets/icons/index.js'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 
@@ -278,6 +278,12 @@ const handleOptionsClick = async (args) => {
 
 const unlistenProfiles = await profile_listener(async (event) => {
   if (event.path === route.params.id) {
+    if (event.event === 'removed') {
+      await router.push({
+        path: '/',
+      })
+      return
+    }
     instance.value = await get(route.params.id).catch(handleError)
   }
 })

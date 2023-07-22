@@ -331,7 +331,6 @@ import {
   CodeIcon,
 } from 'omorphia'
 import { computed, ref, watch } from 'vue'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
@@ -345,6 +344,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { showInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
 

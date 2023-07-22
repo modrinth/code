@@ -35,6 +35,10 @@ impl JavaGlobals {
         self.0.len()
     }
 
+    pub fn keys(&self) -> Vec<String> {
+        self.0.keys().cloned().collect()
+    }
+
     // Validates that every path here is a valid Java version and that the version matches the version stored here
     // If false, when checked, the user should be prompted to reselect the Java version
     pub async fn is_all_valid(&self) -> bool {
