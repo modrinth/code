@@ -118,6 +118,7 @@ fn main() {
     }
     let builder = builder
         .plugin(api::auth::init())
+        .plugin(api::import::init())
         .plugin(api::logs::init())
         .plugin(api::jre::init())
         .plugin(api::metadata::init())
