@@ -3,6 +3,7 @@ use serde::{Serialize, Serializer};
 use thiserror::Error;
 
 pub mod auth;
+pub mod import;
 pub mod jre;
 pub mod logs;
 pub mod metadata;

@@ -7,6 +7,9 @@ pub enum ErrorKind {
     #[error("Filesystem error: {0}")]
     FSError(String),
 
+    #[error("Serialization error (INI): {0}")]
+    INIError(#[from] serde_ini::de::Error),
+
     #[error("Serialization error (JSON): {0}")]
     JSONError(#[from] serde_json::Error),
 
