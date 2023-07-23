@@ -69,14 +69,12 @@ const exportPack = async () => {
       }
     })
   })
-  console.log(filesToExport)
   const outputPath = await open({
     directory: true,
     multiple: false,
   })
 
   if (outputPath) {
-    console.log(outputPath)
     export_profile_mrpack(
       props.instance.path,
       outputPath + `/${nameInput.value} ${versionInput.value}.mrpack`,

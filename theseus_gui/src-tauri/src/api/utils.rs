@@ -122,6 +122,6 @@ pub async fn handle_command(command: String) -> Result<()> {
 #[tauri::command]
 pub async fn await_sync() -> Result<()> {
     State::sync().await?;
-    tracing::info!("State synced");
+    tracing::debug!("State synced");
     Ok(())
 }

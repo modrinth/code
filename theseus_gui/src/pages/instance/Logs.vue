@@ -15,8 +15,8 @@
           <CheckIcon v-else />
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
-        <Button disabled color="primary">
-          <SendIcon />
+        <Button color="primary" @click="share">
+          <ShareIcon />
           Share
         </Button>
         <Button
@@ -38,6 +38,13 @@
         {{ line }} <br />
       </span>
     </div>
+    <ShareModal
+      ref="shareModal"
+      header="Share Log"
+      share-title="Instance Log"
+      share-text="Check out this log from an instance on the Modrinth App"
+      link
+    />
   </Card>
 </template>
 
@@ -48,8 +55,9 @@ import {
   CheckIcon,
   ClipboardCopyIcon,
   DropdownSelect,
-  SendIcon,
+  ShareIcon,
   TrashIcon,
+  ShareModal,
 } from 'omorphia'
 import { delete_logs_by_datetime, get_logs, get_output_by_datetime } from '@/helpers/logs.js'
 import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -59,6 +67,7 @@ import { get_output_by_uuid, get_uuids_by_profile_path } from '@/helpers/process
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
+import { ofetch } from 'ofetch'
 
 dayjs.extend(calendar)
 
@@ -70,6 +79,17 @@ const props = defineProps({
     required: true,
   },
 })
+
+const logs = ref([])
+await setLogs()
+
+const selectedLogIndex = ref(0)
+const copied = ref(false)
+const logContainer = ref(null)
+const interval = ref(null)
+const userScrolled = ref(false)
+const isAutoScrolling = ref(false)
+const shareModal = ref(null)
 
 async function getLiveLog() {
   if (route.params.id) {
@@ -87,7 +107,7 @@ async function getLiveLog() {
 }
 
 async function getLogs() {
-  return (await get_logs(props.instance.uuid, true).catch(handleError)).reverse().map((log) => {
+  return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
     log.name = dayjs(
       log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)
     ).calendar()
@@ -101,16 +121,24 @@ async function setLogs() {
   logs.value = [liveLog, ...allLogs]
 }
 
-const logs = ref([])
-await setLogs()
-
-const selectedLogIndex = ref(0)
-const copied = ref(false)
-
 const copyLog = () => {
-  if (logs.value[selectedLogIndex.value]) {
+  if (logs.value.length > 0 && logs.value[selectedLogIndex.value]) {
     navigator.clipboard.writeText(logs.value[selectedLogIndex.value].stdout)
     copied.value = true
+  }
+}
+
+const share = async () => {
+  if (logs.value.length > 0 && logs.value[selectedLogIndex.value]) {
+    const url = await ofetch('https://api.mclo.gs/1/log', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `content=${encodeURIComponent(logs.value[selectedLogIndex.value].stdout)}`,
+    }).catch(handleError)
+
+    shareModal.value.show(url.url)
   }
 }
 
@@ -118,10 +146,10 @@ watch(selectedLogIndex, async (newIndex) => {
   copied.value = false
   userScrolled.value = false
 
-  if (newIndex !== 0) {
+  if (logs.value.length > 1 && newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_datetime(
-      props.instance.uuid,
+      props.instance.path,
       logs.value[newIndex].datetime_string
     ).catch(handleError)
   }
@@ -136,17 +164,12 @@ const deleteLog = async () => {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_datetime(
-      props.instance.uuid,
+      props.instance.path,
       logs.value[deleteIndex].datetime_string
     ).catch(handleError)
     await setLogs()
   }
 }
-
-const logContainer = ref(null)
-const interval = ref(null)
-const userScrolled = ref(false)
-const isAutoScrolling = ref(false)
 
 function handleUserScroll() {
   if (!isAutoScrolling.value) {

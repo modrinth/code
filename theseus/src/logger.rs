@@ -44,10 +44,10 @@ pub fn start_logger() -> Option<WorkerGuard> {
     use tracing_subscriber::prelude::*;
 
     // Initialize and get logs directory path
-    let path = if let Some(dir) = DirectoryInfo::init().ok() {
-        dir.launcher_logs_dir()
+    let logs_dir = if let Some(d) = DirectoryInfo::launcher_logs_dir() {
+        d
     } else {
-        eprintln!("Could not create logger.");
+        eprintln!("Could not start logger");
         return None;
     };
 
@@ -55,7 +55,7 @@ pub fn start_logger() -> Option<WorkerGuard> {
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("theseus=info"));
 
     let file_appender =
-        RollingFileAppender::new(Rotation::DAILY, path, "theseus.log");
+        RollingFileAppender::new(Rotation::DAILY, logs_dir, "theseus.log");
     let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
 
     let subscriber = tracing_subscriber::registry()

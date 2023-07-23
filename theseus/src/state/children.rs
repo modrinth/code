@@ -1,4 +1,4 @@
-use super::Profile;
+use super::{Profile, ProfilePathId};
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::{collections::HashMap, sync::Arc};
@@ -25,7 +25,7 @@ pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub uuid: Uuid,
-    pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
+    pub profile_relative_path: ProfilePathId,
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
     pub output: SharedOutput,
@@ -53,7 +53,7 @@ impl Children {
     pub async fn insert_process(
         &mut self,
         uuid: Uuid,
-        profile_path: PathBuf,
+        profile_relative_path: ProfilePathId,
         log_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Command to run after minecraft.
@@ -107,7 +107,7 @@ impl Children {
         // Create MinecraftChild
         let mchild = MinecraftChild {
             uuid,
-            profile_path,
+            profile_relative_path,
             current_child,
             output: shared_output,
             manager,
@@ -266,7 +266,7 @@ impl Children {
     // Gets all PID keys of running children with a given profile path
     pub async fn running_keys_with_profile(
         &self,
-        profile_path: &Path,
+        profile_path: ProfilePathId,
     ) -> crate::Result<Vec<Uuid>> {
         let running_keys = self.running_keys().await?;
         let mut keys = Vec::new();
@@ -274,7 +274,7 @@ impl Children {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
                 let child = child.read().await;
-                if child.profile_path == profile_path {
+                if child.profile_relative_path == profile_path {
                     keys.push(key);
                 }
             }
@@ -283,7 +283,9 @@ impl Children {
     }
 
     // Gets all profiles of running children
-    pub async fn running_profile_paths(&self) -> crate::Result<Vec<PathBuf>> {
+    pub async fn running_profile_paths(
+        &self,
+    ) -> crate::Result<Vec<ProfilePathId>> {
         let mut profiles = Vec::new();
         for key in self.keys() {
             if let Some(child) = self.get(&key) {
@@ -297,7 +299,7 @@ impl Children {
                     .map_err(IOError::from)?
                     .is_none()
                 {
-                    profiles.push(child.profile_path.clone());
+                    profiles.push(child.profile_relative_path.clone());
                 }
             }
         }
@@ -321,7 +323,7 @@ impl Children {
                     .is_none()
                 {
                     if let Some(prof) = crate::api::profile::get(
-                        &child.profile_path.clone(),
+                        &child.profile_relative_path.clone(),
                         None,
                     )
                     .await?

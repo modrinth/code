@@ -345,7 +345,9 @@ const markInstalled = () => {
 async function install(version) {
   installing.value = true
   let queuedVersionData
-  instance.value = await getInstance(instance.value.path, false).catch(handleError)
+  if (instance.value) {
+    instance.value = await getInstance(instance.value.path, false).catch(handleError)
+  }
 
   if (installed.value) {
     await remove_project(

@@ -1,5 +1,5 @@
 use crate::api::Result;
-use std::path::PathBuf;
+
 use theseus::{
     pack::{
         install::install_pack,
@@ -20,8 +20,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[tauri::command]
 pub async fn pack_install(
     location: CreatePackLocation,
-    profile: PathBuf,
-) -> Result<PathBuf> {
+    profile: ProfilePathId,
+) -> Result<ProfilePathId> {
     Ok(install_pack(location, profile).await?)
 }
 

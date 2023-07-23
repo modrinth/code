@@ -29,7 +29,7 @@ import { isDev } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
-import { window } from '@tauri-apps/api'
+import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
@@ -100,10 +100,10 @@ const handleClose = async () => {
     }
   }
   await await_sync()
-  window.getCurrent().close()
+  await TauriWindow.getCurrent().close()
 }
 
-window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   await handleClose()
 })
 
@@ -143,8 +143,8 @@ document.querySelector('body').addEventListener('click', function (e) {
             path: target.href,
           },
         })
-        e.preventDefault()
       }
+      e.preventDefault()
       break
     }
     target = target.parentElement
@@ -172,24 +172,13 @@ command_listener((e) => {
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
   <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
-    <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
+    <div class="nav-container">
       <div class="nav-section">
         <suspense>
-          <AccountsCard
-            ref="accounts"
-            :mode="themeStore.collapsedNavigation ? 'small' : 'expanded'"
-          />
+          <AccountsCard ref="accounts" mode="small" />
         </suspense>
         <div class="pages-list">
-          <RouterLink
-            to="/"
-            class="btn"
-            :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
-            }"
-          >
+          <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
             <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>
@@ -263,15 +252,17 @@ command_listener((e) => {
       </div>
     </div>
     <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
-      <div data-tauri-drag-region class="appbar">
-        <section class="navigation-controls">
-          <Breadcrumbs data-tauri-drag-region />
-        </section>
-        <section class="mod-stats">
-          <Suspense>
-            <RunningAppBar data-tauri-drag-region />
-          </Suspense>
-        </section>
+      <div class="appbar-row">
+        <div data-tauri-drag-region class="appbar">
+          <section class="navigation-controls">
+            <Breadcrumbs data-tauri-drag-region />
+          </section>
+          <section class="mod-stats">
+            <Suspense>
+              <RunningAppBar data-tauri-drag-region />
+            </Suspense>
+          </section>
+        </div>
         <section class="window-controls">
           <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
             <MinimizeIcon />
@@ -323,12 +314,16 @@ command_listener((e) => {
   width: min-content;
 }
 
+.appbar-row {
+  display: flex;
+  flex-direction: row;
+}
+
 .window-controls {
   z-index: 20;
   display: none;
   flex-direction: row;
   align-items: center;
-  gap: 0.25rem;
 
   .titlebar-button {
     display: flex;
@@ -338,6 +333,8 @@ command_listener((e) => {
     transition: all ease-in-out 0.1s;
     background-color: var(--color-raised-bg);
     color: var(--color-base);
+    border-radius: 0;
+    height: 3.25rem;
 
     &.close {
       &:hover,
@@ -374,6 +371,7 @@ command_listener((e) => {
     .appbar {
       display: flex;
       align-items: center;
+      flex-grow: 1;
       background: var(--color-raised-bg);
       box-shadow: inset 0px -3px 0px black;
       text-align: center;

@@ -18,15 +18,14 @@ import {
   get,
   list,
 } from '@/helpers/profile'
-import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
+import { tauri } from '@tauri-apps/api'
 
 const themeStore = useTheming()
 const router = useRouter()
@@ -241,7 +240,7 @@ const check_valid = computed(() => {
                 !profile.metadata.icon ||
                 (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
                   ? profile.metadata.icon
-                  : convertFileSrc(profile.metadata?.icon)
+                  : tauri.convertFileSrc(profile.metadata?.icon)
               "
               class="profile-image"
             />

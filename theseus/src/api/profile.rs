@@ -7,7 +7,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::JavaVersion;
-use crate::state::ProjectMetadata;
+use crate::state::{ProfilePathId, ProjectMetadata, ProjectPathId};
 
 use crate::util::io::{self, IOError};
 use crate::{
@@ -32,14 +32,14 @@ use tokio::{fs::File, process::Command, sync::RwLock};
 
 /// Remove a profile
 #[tracing::instrument]
-pub async fn remove(path: &Path) -> crate::Result<()> {
+pub async fn remove(path: &ProfilePathId) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.remove(path).await? {
         emit_profile(
             profile.uuid,
-            profile.path.clone(),
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Removed,
         )
@@ -49,13 +49,14 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
     Ok(())
 }
 
-/// Get a profile by path,
+/// Get a profile by relative path (or, name)
 #[tracing::instrument]
 pub async fn get(
-    path: &Path,
+    path: &ProfilePathId,
     clear_projects: Option<bool>,
 ) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
+
     let profiles = state.profiles.read().await;
     let mut profile = profiles.0.get(path).cloned();
 
@@ -68,9 +69,29 @@ pub async fn get(
     Ok(profile)
 }
 
+/// Get a profile by uuid
+#[tracing::instrument]
+pub async fn get_by_uuid(
+    uuid: uuid::Uuid,
+    clear_projects: Option<bool>,
+) -> crate::Result<Option<Profile>> {
+    let state = State::get().await?;
+
+    let profiles = state.profiles.read().await;
+    let mut profile = profiles.0.values().find(|x| x.uuid == uuid).cloned();
+
+    if clear_projects.unwrap_or(false) {
+        if let Some(profile) = &mut profile {
+            profile.projects = HashMap::new();
+        }
+    }
+
+    Ok(profile)
+}
+
 /// Edit a profile using a given asynchronous closure
 pub async fn edit<Fut>(
-    path: &Path,
+    path: &ProfilePathId,
     action: impl Fn(&mut Profile) -> Fut,
 ) -> crate::Result<()>
 where
@@ -85,7 +106,7 @@ where
 
             emit_profile(
                 profile.uuid,
-                profile.path.clone(),
+                profile.get_profile_full_path().await?,
                 &profile.metadata.name,
                 ProfilePayloadType::Edited,
             )
@@ -93,16 +114,14 @@ where
 
             Ok(())
         }
-        None => Err(crate::ErrorKind::UnmanagedProfileError(
-            path.display().to_string(),
-        )
-        .as_error()),
+        None => Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error()),
     }
 }
 
 /// Edits a profile's icon
 pub async fn edit_icon(
-    path: &Path,
+    path: &ProfilePathId,
     icon_path: Option<&Path>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
@@ -125,17 +144,17 @@ pub async fn edit_icon(
 
                 emit_profile(
                     profile.uuid,
-                    profile.path.clone(),
+                    profile.get_profile_full_path().await?,
                     &profile.metadata.name,
                     ProfilePayloadType::Edited,
                 )
                 .await?;
                 Ok(())
             }
-            None => Err(crate::ErrorKind::UnmanagedProfileError(
-                path.display().to_string(),
-            )
-            .as_error()),
+            None => {
+                Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+                    .as_error())
+            }
         }
     } else {
         edit(path, |profile| {
@@ -155,7 +174,7 @@ pub async fn edit_icon(
 // Generally this would be used for profile_create, to get the optimal JRE key
 // this can be overwritten by the user a profile-by-profile basis
 pub async fn get_optimal_jre_key(
-    path: &Path,
+    path: &ProfilePathId,
 ) -> crate::Result<Option<JavaVersion>> {
     let state = State::get().await?;
 
@@ -193,10 +212,8 @@ pub async fn get_optimal_jre_key(
 
         Ok(version)
     } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(path.display().to_string())
-                .as_error(),
-        )
+        Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error())
     }
 }
 
@@ -204,7 +221,7 @@ pub async fn get_optimal_jre_key(
 #[tracing::instrument]
 pub async fn list(
     clear_projects: Option<bool>,
-) -> crate::Result<HashMap<PathBuf, Profile>> {
+) -> crate::Result<HashMap<ProfilePathId, Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
     Ok(profiles
@@ -223,14 +240,12 @@ pub async fn list(
 
 /// Installs/Repairs a profile
 #[tracing::instrument]
-pub async fn install(path: &Path) -> crate::Result<()> {
+pub async fn install(path: &ProfilePathId) -> crate::Result<()> {
     if let Some(profile) = get(path, None).await? {
         crate::launcher::install_minecraft(&profile, None).await?;
     } else {
-        return Err(crate::ErrorKind::UnmanagedProfileError(
-            path.display().to_string(),
-        )
-        .as_error());
+        return Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
+            .as_error());
     }
     State::sync().await?;
     Ok(())
@@ -239,12 +254,12 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn update_all(
-    profile_path: &Path,
-) -> crate::Result<HashMap<PathBuf, PathBuf>> {
+    profile_path: &ProfilePathId,
+) -> crate::Result<HashMap<ProjectPathId, ProjectPathId>> {
     if let Some(profile) = get(profile_path, None).await? {
         let loading_bar = init_loading(
             LoadingBarType::ProfileUpdate {
-                profile_path: profile.path.clone(),
+                profile_path: profile.get_profile_full_path().await?,
                 profile_name: profile.metadata.name.clone(),
             },
             100.0,
@@ -252,6 +267,7 @@ pub async fn update_all(
         )
         .await?;
 
+        let profile_base_path = profile.get_profile_full_path().await?;
         let keys = profile
             .projects
             .into_iter()
@@ -272,7 +288,7 @@ pub async fn update_all(
 
         use futures::StreamExt;
         loading_try_for_each_concurrent(
-            futures::stream::iter(keys).map(Ok::<PathBuf, crate::Error>),
+            futures::stream::iter(keys).map(Ok::<ProjectPathId, crate::Error>),
             None,
             Some(&loading_bar),
             100.0,
@@ -297,7 +313,7 @@ pub async fn update_all(
 
         emit_profile(
             profile.uuid,
-            profile.path,
+            profile_base_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -306,20 +322,22 @@ pub async fn update_all(
 
         Ok(Arc::try_unwrap(map).unwrap().into_inner())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
         )
-        .as_error())
     }
 }
 
+/// Updates a project to the latest version
+/// Uses and returns the relative path to the project
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn update_project(
-    profile_path: &Path,
-    project_path: &Path,
+    profile_path: &ProfilePathId,
+    project_path: &ProjectPathId,
     skip_send_event: Option<bool>,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile_path, None).await? {
         if let Some(project) = profile.projects.get(project_path) {
             if let ProjectMetadata::Modrinth {
@@ -331,13 +349,13 @@ pub async fn update_project(
                     .add_project_version(update_version.id.clone())
                     .await?;
 
-                if path != project_path {
+                if path != project_path.clone() {
                     profile.remove_project(project_path, Some(true)).await?;
                 }
 
                 let state = State::get().await?;
                 let mut profiles = state.profiles.write().await;
-                if let Some(profile) = profiles.0.get_mut(project_path) {
+                if let Some(profile) = profiles.0.get_mut(profile_path) {
                     let value = profile.projects.remove(project_path);
                     if let Some(mut project) = value {
                         if let ProjectMetadata::Modrinth {
@@ -354,7 +372,7 @@ pub async fn update_project(
                 if !skip_send_event.unwrap_or(false) {
                     emit_profile(
                         profile.uuid,
-                        profile.path,
+                        profile.get_profile_full_path().await?,
                         &profile.metadata.name,
                         ProfilePayloadType::Edited,
                     )
@@ -371,25 +389,26 @@ pub async fn update_project(
         )
         .as_error())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
         )
-        .as_error())
     }
 }
 
 /// Add a project from a version
+/// Returns the relative path to the project as a ProjectPathId
 #[tracing::instrument]
 pub async fn add_project_from_version(
-    profile_path: &Path,
+    profile_path: &ProfilePathId,
     version_id: String,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile_path, None).await? {
         let (path, _) = profile.add_project_version(version_id).await?;
 
         emit_profile(
             profile.uuid,
-            profile.path,
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -398,20 +417,21 @@ pub async fn add_project_from_version(
 
         Ok(path)
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
         )
-        .as_error())
     }
 }
 
 /// Add a project from an FS path
+/// Uses and returns the relative path to the project as a ProjectPathId
 #[tracing::instrument]
 pub async fn add_project_from_path(
-    profile_path: &Path,
+    profile_path: &ProfilePathId,
     path: &Path,
     project_type: Option<String>,
-) -> crate::Result<PathBuf> {
+) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile_path, None).await? {
         let file = io::read(path).await?;
         let file_name = path
@@ -430,7 +450,7 @@ pub async fn add_project_from_path(
 
         emit_profile(
             profile.uuid,
-            profile.path,
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -439,25 +459,27 @@ pub async fn add_project_from_path(
 
         Ok(path)
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
         )
-        .as_error())
     }
 }
 
 /// Toggle whether a project is disabled or not
+/// Project path should be relative to the profile
+/// returns the new state, relative to the profile
 #[tracing::instrument]
 pub async fn toggle_disable_project(
-    profile: &Path,
-    project: &Path,
-) -> crate::Result<PathBuf> {
+    profile: &ProfilePathId,
+    project: &ProjectPathId,
+) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile, None).await? {
         let res = profile.toggle_disable_project(project).await?;
 
         emit_profile(
             profile.uuid,
-            profile.path,
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -466,25 +488,24 @@ pub async fn toggle_disable_project(
 
         Ok(res)
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile.display().to_string(),
-        )
-        .as_error())
+        Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
+            .as_error())
     }
 }
 
 /// Remove a project from a profile
+/// Uses and returns the relative path to the project
 #[tracing::instrument]
 pub async fn remove_project(
-    profile: &Path,
-    project: &Path,
+    profile: &ProfilePathId,
+    project: &ProjectPathId,
 ) -> crate::Result<()> {
     if let Some(profile) = get(profile, None).await? {
         profile.remove_project(project, None).await?;
 
         emit_profile(
             profile.uuid,
-            profile.path,
+            profile.get_profile_full_path().await?,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -493,10 +514,8 @@ pub async fn remove_project(
 
         Ok(())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile.display().to_string(),
-        )
-        .as_error())
+        Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
+            .as_error())
     }
 }
 
@@ -505,7 +524,7 @@ pub async fn remove_project(
 #[tracing::instrument(skip_all)]
 #[theseus_macros::debug_pin]
 pub async fn export_mrpack(
-    profile_path: &Path,
+    profile_path: &ProfilePathId,
     export_path: PathBuf,
     included_overrides: Vec<String>, // which folders to include in the overrides
     version_id: Option<String>,
@@ -516,11 +535,24 @@ pub async fn export_mrpack(
     let profile = get(profile_path, None).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path.display()
+            profile_path
         ))
     })?;
 
-    let profile_base_path = &profile.path;
+    // remove .DS_Store files from included_overrides
+    let included_overrides = included_overrides
+        .into_iter()
+        .filter(|x| {
+            if let Some(f) = PathBuf::from(x).file_name() {
+                if f.to_string_lossy().starts_with(".DS_Store") {
+                    return false;
+                }
+            }
+            true
+        })
+        .collect::<Vec<_>>();
+
+    let profile_base_path = &profile.get_profile_full_path().await?;
 
     let mut file = File::create(&export_path)
         .await
@@ -529,7 +561,7 @@ pub async fn export_mrpack(
 
     // Create mrpack json configuration file
     let version_id = version_id.unwrap_or("1.0.0".to_string());
-    let packfile = create_mrpack_json(&profile, version_id)?;
+    let packfile = create_mrpack_json(&profile, version_id).await?;
     let modrinth_path_list = get_modrinth_pack_list(&packfile);
 
     // Build vec of all files in the folder
@@ -539,7 +571,7 @@ pub async fn export_mrpack(
     // Initialize loading bar
     let loading_bar = init_loading(
         LoadingBarType::ZipExtract {
-            profile_path: profile.path.to_path_buf(),
+            profile_path: profile.get_profile_full_path().await?,
             profile_name: profile.metadata.name.clone(),
         },
         path_list.len() as f64,
@@ -628,25 +660,28 @@ pub async fn export_mrpack(
 // => [folder1, folder2]
 #[tracing::instrument]
 pub async fn get_potential_override_folders(
-    profile_path: PathBuf,
+    profile_path: ProfilePathId,
 ) -> crate::Result<Vec<PathBuf>> {
     // First, get a dummy mrpack json for the files within
     let profile: Profile =
         get(&profile_path, None).await?.ok_or_else(|| {
             crate::ErrorKind::OtherError(format!(
                 "Tried to export a nonexistent or unloaded profile at path {}!",
-                profile_path.display()
+                profile_path
             ))
         })?;
-    let mrpack = create_mrpack_json(&profile, "0".to_string())?;
+    // dummy mrpack to get pack list
+    let mrpack = create_mrpack_json(&profile, "0".to_string()).await?;
     let mrpack_files = get_modrinth_pack_list(&mrpack);
 
     let mut path_list: Vec<PathBuf> = Vec::new();
-    let mut read_dir = io::read_dir(&profile_path).await?;
+
+    let profile_base_dir = profile.get_profile_full_path().await?;
+    let mut read_dir = io::read_dir(&profile_base_dir).await?;
     while let Some(entry) = read_dir
         .next_entry()
         .await
-        .map_err(|e| IOError::with_path(e, &profile_path))?
+        .map_err(|e| IOError::with_path(e, &profile_base_dir))?
     {
         let path: PathBuf = entry.path();
         if path.is_dir() {
@@ -655,17 +690,17 @@ pub async fn get_potential_override_folders(
             while let Some(entry) = read_dir
                 .next_entry()
                 .await
-                .map_err(|e| IOError::with_path(e, &profile_path))?
+                .map_err(|e| IOError::with_path(e, &profile_base_dir))?
             {
                 let path: PathBuf = entry.path();
-                let name = path.strip_prefix(&profile_path)?.to_path_buf();
+                let name = path.strip_prefix(&profile_base_dir)?.to_path_buf();
                 if !mrpack_files.contains(&name.to_string_lossy().to_string()) {
                     path_list.push(name);
                 }
             }
         } else {
             // One layer of files/folders if its a file
-            let name = path.strip_prefix(&profile_path)?.to_path_buf();
+            let name = path.strip_prefix(&profile_base_dir)?.to_path_buf();
             if !mrpack_files.contains(&name.to_string_lossy().to_string()) {
                 path_list.push(name);
             }
@@ -677,7 +712,9 @@ pub async fn get_potential_override_folders(
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
-pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+pub async fn run(
+    path: &ProfilePathId,
+) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
 
     // Get default account and refresh credentials (preferred way to log in)
@@ -702,7 +739,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 #[tracing::instrument(skip(credentials))]
 #[theseus_macros::debug_pin]
 pub async fn run_credentials(
-    path: &Path,
+    path: &ProfilePathId,
     credentials: &auth::Credentials,
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
@@ -710,7 +747,7 @@ pub async fn run_credentials(
     let profile = get(path, None).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to run a nonexistent or unloaded profile at path {}!",
-            path.display()
+            path
         ))
     })?;
 
@@ -720,11 +757,12 @@ pub async fn run_credentials(
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
+            let full_path = path.get_full_path().await?;
             let result = Command::new(command)
                 .args(&cmd.collect::<Vec<&str>>())
-                .current_dir(path)
+                .current_dir(&full_path)
                 .spawn()
-                .map_err(|e| IOError::with_path(e, path))?
+                .map_err(|e| IOError::with_path(e, &full_path))?
                 .wait()
                 .await
                 .map_err(IOError::from)?;
@@ -767,7 +805,9 @@ pub async fn run_credentials(
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
             let mut command = Command::new(command);
-            command.args(&cmd.collect::<Vec<&str>>()).current_dir(path);
+            command
+                .args(&cmd.collect::<Vec<&str>>())
+                .current_dir(path.get_full_path().await?);
             Some(command)
         } else {
             None
@@ -806,7 +846,7 @@ fn get_modrinth_pack_list(packfile: &PackFormat) -> Vec<String> {
 /// Creates a json configuration for a .mrpack zipped file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument(skip_all)]
-pub fn create_mrpack_json(
+pub async fn create_mrpack_json(
     profile: &Profile,
     version_id: String,
 ) -> crate::Result<PackFormat> {
@@ -845,17 +885,15 @@ pub fn create_mrpack_json(
         .map(|(k, v)| (k, sanitize_loader_version_string(&v).to_string()))
         .collect::<HashMap<_, _>>();
 
-    let base_path = &profile.path;
+    let profile_base_path = profile.get_profile_full_path().await?;
     let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path = match mod_path.strip_prefix(base_path) {
-                Ok(path) => path.to_string_lossy().to_string(),
-                Err(e) => {
-                    return Some(Err(e.into()));
-                }
-            };
+            let path: String = profile_base_path
+                .join(mod_path.0.clone())
+                .to_string_lossy()
+                .to_string();
 
             // Only Modrinth projects have a modrinth metadata field for the modrinth.json
             Some(Ok(match project.metadata {
