@@ -87,24 +87,13 @@ const image = computed(() => props.gallery[page.value - 1])
         <p>
           {{ image.subtitle }}
         </p>
-        <div class="page-indicator">
-          <Button :disabled="page === 1" icon-only @click="page--">
-            <ChevronLeftIcon />
-          </Button>
-          <div>
-            <span
-              v-for="index in gallery.length"
-              :key="index"
-              class="circle"
-              :class="{ active: page === index }"
-              @click="page = index"
-            />
-          </div>
-          <Button :disabled="page === 2" icon-only @click="page++">
-            <ChevronRightIcon />
-          </Button>
-        </div>
       </div>
+    <Button :disabled="page === 1" class="left-button" icon-only @click="page--">
+      <ChevronLeftIcon />
+    </Button>
+    <Button :disabled="page === 2" class="right-button" icon-only @click="page++">
+      <ChevronRightIcon />
+    </Button>
     </div>
     <slot />
   </div>
@@ -151,6 +140,26 @@ const image = computed(() => props.gallery[page.value - 1])
       -webkit-backdrop-filter: blur(5px);
       color: var(--color-base);
       transition: all 0.3s ease-in-out;
+    }
+
+    .left-button {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .right-button {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+
+    .btn {
+      background: none;
     }
   }
 }

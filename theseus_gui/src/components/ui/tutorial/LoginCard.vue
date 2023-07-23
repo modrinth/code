@@ -10,31 +10,33 @@ import { LoginSticker } from '@/assets/images'
 
 const loginUrl = ref(null)
 const loginModal = ref()
-const finalizedLogin = ref(false)
+
+const props = defineProps({
+  nextPage: {
+    type: Function,
+    required: true,
+  },
+})
 
 async function login() {
-  if (!finalizedLogin.value) {
-    const url = await authenticate_begin_flow().catch(handleError)
-    loginUrl.value = url
+  const url = await authenticate_begin_flow().catch(handleError)
+  loginUrl.value = url
 
-    await window.__TAURI_INVOKE__('tauri', {
-      __tauriModule: 'Shell',
-      message: {
-        cmd: 'open',
-        path: url,
-      },
-    })
+  await window.__TAURI_INVOKE__('tauri', {
+    __tauriModule: 'Shell',
+    message: {
+      cmd: 'open',
+      path: url,
+    },
+  })
 
-    const loggedIn = await authenticate_await_completion().catch(handleError)
-    finalizedLogin.value = true
-    loginModal.value.hide()
-    const settings = await get().catch(handleError)
-    settings.default_user = loggedIn.id
-    await set(settings.value).catch(handleError)
-    mixpanel.track('AccountLogIn')
-  } else {
-    props.nextPage()
-  }
+  const loggedIn = await authenticate_await_completion().catch(handleError)
+  loginModal.value.hide()
+  props.nextPage()
+  const settings = await get().catch(handleError)
+  settings.default_user = loggedIn.id
+  await set(settings).catch(handleError)
+  await mixpanel.track('AccountLogIn')
 }
 
 const openUrl = async () => {
@@ -47,12 +49,6 @@ const openUrl = async () => {
   })
 }
 
-const props = defineProps({
-  nextPage: {
-    type: Function,
-    required: true,
-  },
-})
 </script>
 
 <template>
@@ -61,12 +57,19 @@ const props = defineProps({
     <h1>Sign into Minecraft</h1>
     <p>Sign in with your Minecraft account to play with installed mods and modpacks.</p>
     <div class="button-row">
+      <Button
+        class="transparent"
+        large
+        @click="nextPage"
+      >
+        Skip
+      </Button>
       <Button color="primary" large @click="login">
         <LogInIcon v-if="!finalizedLogin" />
         {{ finalizedLogin ? 'Next' : 'Sign in' }}
       </Button>
       <Button
-        v-if="loginUrl && !finalizedLogin"
+        v-if="loginUrl"
         class="transparent"
         large
         @click="loginModal.show()"
@@ -113,7 +116,6 @@ const props = defineProps({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 100%;
   vertical-align: center;
   margin: auto;
   gap: var(--gap-xl);

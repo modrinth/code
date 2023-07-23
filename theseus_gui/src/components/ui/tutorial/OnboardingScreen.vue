@@ -21,7 +21,7 @@ import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator.js
 import FakeSearch from '@/components/ui/tutorial/FakeSearch.vue'
 import FakeGridDisplay from '@/components/ui/tutorial/FakeGridDisplay.vue'
 import FakeRowDisplay from '@/components/ui/tutorial/FakeRowDisplay.vue'
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import { window } from '@tauri-apps/api'
 import TutorialTip from '@/components/ui/tutorial/TutorialTip.vue'
 import FakeSettings from '@/components/ui/tutorial/FakeSettings.vue'
@@ -29,8 +29,9 @@ import { get, set } from '@/helpers/settings.js'
 import mixpanel from 'mixpanel-browser'
 import GalleryImage from '@/components/ui/tutorial/GalleryImage.vue'
 import LoginCard from '@/components/ui/tutorial/LoginCard.vue'
-import JavaInstallation from '@/components/ui/tutorial/JavaInstallation.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
+import {auto_install_java, get_jre} from "@/helpers/jre.js";
+import {handleError} from "@/store/notifications.js";
 
 const phase = ref(0)
 const page = ref(1)
@@ -54,7 +55,7 @@ const beginTutorial = () => {
 }
 
 const nextPage = () => {
-  if (page.value === 3) {
+  if (page.value === 2) {
     nextPhase()
     setTimeout(() => {
       firstModal.value.show()
@@ -72,37 +73,51 @@ const finishOnboarding = async () => {
   await set(settings)
   props.finish()
 }
+
+async function fetchSettings() {
+  const fetchSettings = await get().catch(handleError)
+
+  if (!fetchSettings.java_globals.JAVA_17) {
+    const path = await auto_install_java(17).catch(handleError);
+    fetchSettings.java_globals.JAVA_17 = await get_jre(path).catch(handleError)
+  }
+
+  if (!fetchSettings.java_globals.JAVA_8) {
+    const path = await auto_install_java(8).catch(handleError);
+    fetchSettings.java_globals.JAVA_8 = await get_jre(path).catch(handleError)
+  }
+
+  await set(fetchSettings).catch(handleError)
+}
+
+onMounted(async () => {
+  await fetchSettings()
+})
 </script>
 
 <template>
   <div v-if="phase === 0" class="onboarding">
     <StickyTitleBar />
-    <suspense v-if="page === 1">
-      <GalleryImage
-        :gallery="[
-          {
-            url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109353928265809/Screenshot_2023-07-15_at_4.16.18_PM.png',
-            title: 'Discovery',
-            subtitle: 'See the latest and greatest mods and modpacks to play with from Modrinth',
-          },
-          {
-            url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109354238640238/Screenshot_2023-07-15_at_4.17.43_PM.png',
-            title: 'Profile Management',
-            subtitle:
-              'Play, manage and search through all the amazing profiles downloaded on your computer at any time, even offline!',
-          },
-        ]"
-        logo
-      >
-        <Button color="primary" @click="nextPage"> Get started </Button>
-      </GalleryImage>
-    </suspense>
-    <div v-else-if="page === 2">
-      <LoginCard :next-page="nextPage" />
-    </div>
-    <suspense v-else-if="page === 3">
-      <JavaInstallation :finish="nextPage" />
-    </suspense>
+    <GalleryImage
+      v-if="page === 1"
+      :gallery="[
+        {
+          url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109353928265809/Screenshot_2023-07-15_at_4.16.18_PM.png',
+          title: 'Discovery',
+          subtitle: 'See the latest and greatest mods and modpacks to play with from Modrinth',
+        },
+        {
+          url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109354238640238/Screenshot_2023-07-15_at_4.17.43_PM.png',
+          title: 'Profile Management',
+          subtitle:
+            'Play, manage and search through all the amazing profiles downloaded on your computer at any time, even offline!',
+        },
+      ]"
+      logo
+    >
+      <Button color="primary" @click="nextPage"> Get started </Button>
+    </GalleryImage>
+    <LoginCard v-else-if="page === 2" :next-page="nextPage"/>
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />

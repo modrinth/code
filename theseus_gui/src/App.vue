@@ -34,8 +34,9 @@ import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
+// import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
+import OnboardingScreen from "@/components/ui/tutorial/OnboardingScreen.vue";
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -170,7 +171,9 @@ command_listener((e) => {
     @ended="videoPlaying = false"
   />
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
-  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
+  <Suspense v-else-if="showOnboarding">
+    <OnboardingScreen :finish="() => (showOnboarding = false)" />
+  </Suspense>
   <div v-else class="container">
     <div class="nav-container">
       <div class="nav-section">
@@ -289,7 +292,6 @@ command_listener((e) => {
           offset-height="var(--appbar-height)"
           offset-width="var(--sidebar-width)"
         />
-        <Notifications ref="notificationsWrapper" />
         <RouterView v-slot="{ Component }" class="main-view">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -301,6 +303,7 @@ command_listener((e) => {
     </div>
   </div>
   <URLConfirmModal ref="urlModal" />
+  <Notifications ref="notificationsWrapper" />
 </template>
 
 <style lang="scss" scoped>
