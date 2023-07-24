@@ -88,12 +88,12 @@ const image = computed(() => props.gallery[page.value - 1])
           {{ image.subtitle }}
         </p>
       </div>
-    <Button :disabled="page === 1" class="left-button" icon-only @click="page--">
-      <ChevronLeftIcon />
-    </Button>
-    <Button :disabled="page === 2" class="right-button" icon-only @click="page++">
-      <ChevronRightIcon />
-    </Button>
+      <Button :disabled="page === 1" class="left-button" icon-only @click="page--">
+        <ChevronLeftIcon />
+      </Button>
+      <Button :disabled="page === 2" class="right-button" icon-only @click="page++">
+        <ChevronRightIcon />
+      </Button>
     </div>
     <slot />
   </div>

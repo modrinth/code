@@ -48,7 +48,6 @@ const openUrl = async () => {
     },
   })
 }
-
 </script>
 
 <template>
@@ -57,23 +56,12 @@ const openUrl = async () => {
     <h1>Sign into Minecraft</h1>
     <p>Sign in with your Minecraft account to play with installed mods and modpacks.</p>
     <div class="button-row">
-      <Button
-        class="transparent"
-        large
-        @click="nextPage"
-      >
-        Skip
-      </Button>
+      <Button class="transparent" large @click="nextPage"> Skip </Button>
       <Button color="primary" large @click="login">
         <LogInIcon v-if="!finalizedLogin" />
         {{ finalizedLogin ? 'Next' : 'Sign in' }}
       </Button>
-      <Button
-        v-if="loginUrl"
-        class="transparent"
-        large
-        @click="loginModal.show()"
-      >
+      <Button v-if="loginUrl" class="transparent" large @click="loginModal.show()">
         Browser didn't open?
       </Button>
     </div>

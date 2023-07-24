@@ -36,7 +36,7 @@ import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 // import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
-import OnboardingScreen from "@/components/ui/tutorial/OnboardingScreen.vue";
+import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 
 const themeStore = useTheming()
 const urlModal = ref(null)

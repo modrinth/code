@@ -21,7 +21,7 @@ import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator.js
 import FakeSearch from '@/components/ui/tutorial/FakeSearch.vue'
 import FakeGridDisplay from '@/components/ui/tutorial/FakeGridDisplay.vue'
 import FakeRowDisplay from '@/components/ui/tutorial/FakeRowDisplay.vue'
-import {onMounted, ref} from 'vue'
+import { onMounted, ref } from 'vue'
 import { window } from '@tauri-apps/api'
 import TutorialTip from '@/components/ui/tutorial/TutorialTip.vue'
 import FakeSettings from '@/components/ui/tutorial/FakeSettings.vue'
@@ -30,8 +30,9 @@ import mixpanel from 'mixpanel-browser'
 import GalleryImage from '@/components/ui/tutorial/GalleryImage.vue'
 import LoginCard from '@/components/ui/tutorial/LoginCard.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
-import {auto_install_java, get_jre} from "@/helpers/jre.js";
-import {handleError} from "@/store/notifications.js";
+import { auto_install_java, get_jre } from '@/helpers/jre.js'
+import { handleError } from '@/store/notifications.js'
+import ImportingCard from '@/components/ui/tutorial/ImportingCard.vue'
 
 const phase = ref(0)
 const page = ref(1)
@@ -55,7 +56,7 @@ const beginTutorial = () => {
 }
 
 const nextPage = () => {
-  if (page.value === 2) {
+  if (page.value === 3) {
     nextPhase()
     setTimeout(() => {
       firstModal.value.show()
@@ -78,12 +79,12 @@ async function fetchSettings() {
   const fetchSettings = await get().catch(handleError)
 
   if (!fetchSettings.java_globals.JAVA_17) {
-    const path = await auto_install_java(17).catch(handleError);
+    const path = await auto_install_java(17).catch(handleError)
     fetchSettings.java_globals.JAVA_17 = await get_jre(path).catch(handleError)
   }
 
   if (!fetchSettings.java_globals.JAVA_8) {
-    const path = await auto_install_java(8).catch(handleError);
+    const path = await auto_install_java(8).catch(handleError)
     fetchSettings.java_globals.JAVA_8 = await get_jre(path).catch(handleError)
   }
 
@@ -117,7 +118,8 @@ onMounted(async () => {
     >
       <Button color="primary" @click="nextPage"> Get started </Button>
     </GalleryImage>
-    <LoginCard v-else-if="page === 2" :next-page="nextPage"/>
+    <LoginCard v-else-if="page === 2" :next-page="nextPage" />
+    <ImportingCard v-else-if="page === 3" :next-page="nextPage" />
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />
