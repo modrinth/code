@@ -10,7 +10,7 @@ import {
   UpdatedIcon,
 } from 'omorphia'
 import { ref } from 'vue'
-import {get_importable_instances, import_instance} from '@/helpers/import.js'
+import { get_importable_instances, import_instance } from '@/helpers/import.js'
 import { open } from '@tauri-apps/api/dialog'
 import { handleError } from '@/store/state.js'
 
@@ -67,13 +67,19 @@ const setPath = () => {
 }
 
 const next = async () => {
-  loading.value = true;
-  for (const launcher of Array.from(profiles.value.entries()).map(([launcher, profiles]) => ({launcher, path: profileOptions.value.find(option => option.name === launcher).path, profiles}))) {
-    for (const profile of launcher.profiles.filter(profile => profile.selected)) {
-      await import_instance(launcher.launcher, launcher.path, profile.name).catch(handleError).then(() => console.log(`Successfully Imported ${profile.name} from ${launcher.launcher}`))
+  loading.value = true
+  for (const launcher of Array.from(profiles.value.entries()).map(([launcher, profiles]) => ({
+    launcher,
+    path: profileOptions.value.find((option) => option.name === launcher).path,
+    profiles,
+  }))) {
+    for (const profile of launcher.profiles.filter((profile) => profile.selected)) {
+      await import_instance(launcher.launcher, launcher.path, profile.name)
+        .catch(handleError)
+        .then(() => console.log(`Successfully Imported ${profile.name} from ${launcher.launcher}`))
     }
   }
-  loading.value = false;
+  loading.value = false
   props.nextPage()
 }
 </script>
@@ -117,14 +123,19 @@ const next = async () => {
             :model-value="profiles.get(selectedProfileType.name)?.every((child) => child.selected)"
             @update:model-value="
               (newValue) =>
-                profiles.get(selectedProfileType.name)?.forEach((child) => (child.selected = newValue))
+                profiles
+                  .get(selectedProfileType.name)
+                  ?.forEach((child) => (child.selected = newValue))
             "
           />
         </div>
         <div class="name-cell table-cell">Profile name</div>
       </div>
       <div
-        v-if="profiles.get(selectedProfileType.name) && profiles.get(selectedProfileType.name).length > 0"
+        v-if="
+          profiles.get(selectedProfileType.name) &&
+          profiles.get(selectedProfileType.name).length > 0
+        "
         class="table-content"
       >
         <div
@@ -143,7 +154,15 @@ const next = async () => {
       <div v-else class="table-content">No profiles found</div>
     </div>
     <Button :disabled="loading" @click="next">
-      {{ loading ? 'Importing...' : Array.from(profiles.values()).flatMap(e => e).some(e => e.selected) ? 'Import' : 'Skip' }}
+      {{
+        loading
+          ? 'Importing...'
+          : Array.from(profiles.values())
+              .flatMap((e) => e)
+              .some((e) => e.selected)
+          ? 'Import'
+          : 'Skip'
+      }}
     </Button>
   </Card>
 </template>
