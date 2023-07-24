@@ -251,6 +251,7 @@ pub struct EditProfile {
     pub memory: Option<MemorySettings>,
     pub resolution: Option<WindowSize>,
     pub hooks: Option<Hooks>,
+    pub force_fullscreen: Option<SetFullscreen>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -290,6 +291,9 @@ pub async fn profile_edit(
         prof.java = edit_profile.java.clone();
         prof.memory = edit_profile.memory;
         prof.resolution = edit_profile.resolution;
+        if let Some(force_fullscreen) = edit_profile.force_fullscreen {
+            prof.force_fullscreen = force_fullscreen;
+        }
         prof.hooks = edit_profile.hooks.clone();
 
         prof.metadata.date_modified = chrono::Utc::now();

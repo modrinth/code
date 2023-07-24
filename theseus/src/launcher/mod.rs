@@ -291,6 +291,7 @@ pub async fn install_minecraft(
 pub async fn launch_minecraft(
     java_args: &[String],
     env_args: &[(String, String)],
+    mc_set_options: &[(String, String)],
     wrapper: &Option<String>,
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
@@ -440,6 +441,31 @@ pub async fn launch_minecraft(
     }
     command.envs(env_args);
 
+    // Overwrites the minecraft options.txt file with the settings from the profile
+    // Uses 'a:b' syntax which is not quite yaml
+    let options_path = instance_path.join("options.txt");
+    let mut options_string = String::new();
+    let options = io::read_to_string(&options_path).await?;
+    let options = options.split('\n');
+    for option in options {
+        let option = option.split(':').collect::<Vec<_>>();
+        if option.len() == 2 {
+            let key = option[0].trim();
+            let value = option[1].trim();
+            if let Some(value) = mc_set_options
+                .iter()
+                .find(|(k, _)| k == &key)
+                .map(|(_, v)| v)
+            {
+                options_string.push_str(&format!("{}:{}\n", key, value));
+            } else {
+                options_string.push_str(&format!("{}:{}\n", key, value));
+            }
+        }
+    }
+    io::write(&options_path, options_string).await?;
+
+    
     // Get Modrinth logs directories
     let datetime_string =
         chrono::Local::now().format("%Y%m%d_%H%M%S").to_string();

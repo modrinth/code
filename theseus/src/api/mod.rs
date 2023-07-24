@@ -28,7 +28,7 @@ pub mod prelude {
         jre, metadata, pack, process,
         profile::{self, Profile},
         profile_create, settings,
-        state::JavaGlobals,
+        state::{JavaGlobals, SetFullscreen},
         state::{ProfilePathId, ProjectPathId},
         util::{
             io::{canonicalize, IOError},

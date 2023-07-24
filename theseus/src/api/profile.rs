@@ -7,7 +7,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::JavaVersion;
-use crate::state::{ProfilePathId, ProjectMetadata, ProjectPathId};
+use crate::state::{ProfilePathId, ProjectMetadata, ProjectPathId, SetFullscreen};
 
 use crate::util::io::{self, IOError};
 use crate::{
@@ -816,9 +816,21 @@ pub async fn run_credentials(
         None
     };
 
+    // Any options.txt settings that we want set, add here
+    let mut mc_set_options : Vec<(String, String)> = Vec::new();
+    match profile.force_fullscreen {
+        SetFullscreen::LeaveUnset => {},
+        SetFullscreen::SetWindowed => {
+            mc_set_options.push(("fullscreen".to_string(), "false".to_string()));
+        },
+        SetFullscreen::SetFullscreen => {
+            mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
+        },
+    }
     let mc_process = crate::launcher::launch_minecraft(
         java_args,
         env_args,
+        &mc_set_options,
         wrapper,
         &memory,
         &resolution,
