@@ -171,9 +171,7 @@ command_listener((e) => {
     @ended="videoPlaying = false"
   />
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
-  <Suspense v-else-if="showOnboarding">
-    <OnboardingScreen :finish="() => (showOnboarding = false)" />
-  </Suspense>
+  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
     <div class="nav-container">
       <div class="nav-section">
@@ -183,32 +181,21 @@ command_listener((e) => {
         <div class="pages-list">
           <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
-            <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>
           <RouterLink
             to="/browse/modpack"
-            class="btn"
+            class="btn icon-only collapsed-button"
             :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
               'router-link-active': isOnBrowse,
             }"
           >
             <SearchIcon />
-            <span v-if="!themeStore.collapsedNavigation">Browse</span>
           </RouterLink>
           <RouterLink
             to="/library"
-            class="btn"
-            :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
-            }"
+            class="btn icon-only collapsed-button"
           >
             <LibraryIcon />
-            <span v-if="!themeStore.collapsedNavigation">Library</span>
           </RouterLink>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
@@ -217,44 +204,28 @@ command_listener((e) => {
       </div>
       <div class="settings pages-list">
         <Button
-          class="sleek-primary"
-          :class="{
-            'icon-only': themeStore.collapsedNavigation,
-            'collapsed-button': themeStore.collapsedNavigation,
-            'expanded-button': !themeStore.collapsedNavigation,
-          }"
+          class="sleek-primary collapsed-button"
+          icon-only
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
-          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New instance</span>
         </Button>
         <Button
-          class="sleek-primary"
-          :class="{
-            'icon-only': themeStore.collapsedNavigation,
-            'collapsed-button': themeStore.collapsedNavigation,
-            'expanded-button': !themeStore.collapsedNavigation,
-          }"
+          class="sleek-primary collapsed-button"
+          icon-only
           @click="() => $refs.urlModal.show({ event: 'InstallVersion', id: 'K3sXhozi' })"
         >
           <CodeIcon />
-          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">Test</span>
         </Button>
         <RouterLink
           to="/settings"
-          class="btn"
-          :class="{
-            'icon-only': themeStore.collapsedNavigation,
-            'collapsed-button': themeStore.collapsedNavigation,
-            'expanded-button': !themeStore.collapsedNavigation,
-          }"
+          class="btn collapsed-button icon-only"
         >
           <SettingsIcon />
-          <span v-if="!themeStore.collapsedNavigation">Settings</span>
         </RouterLink>
       </div>
     </div>
-    <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
+    <div class="view">
       <div class="appbar-row">
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
@@ -465,11 +436,6 @@ command_listener((e) => {
     max-width: 1.5rem !important;
     max-height: 1.5rem !important;
   }
-}
-
-.expanded-button {
-  width: 100%;
-  padding: var(--gap-md) var(--gap-lg);
 }
 
 .instance-list {
