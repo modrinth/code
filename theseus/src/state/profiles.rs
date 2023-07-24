@@ -390,13 +390,12 @@ impl Profile {
         let mut read_paths = |path: &str| {
             let new_path = profile_path.join(path);
             if new_path.exists() {
-                let path = self.path.join(path);
-                for path in std::fs::read_dir(&path)
-                    .map_err(|e| IOError::with_path(e, &path))?
+                for subpath in std::fs::read_dir(&new_path)
+                    .map_err(|e| IOError::with_path(e, &new_path))?
                 {
-                    let path = path.map_err(IOError::from)?.path();
-                    if path.is_file() {
-                        files.push(path);
+                    let subpath = subpath.map_err(IOError::from)?.path();
+                    if subpath.is_file() {
+                        files.push(subpath);
                     }
                 }
             }

@@ -38,8 +38,10 @@ pub struct MMCInstance {
     #[serde(deserialize_with = "deserialize_optional_bool")]
     pub managed_pack: Option<bool>,
 
+    #[serde(rename = "ManagedPackID")]
     pub managed_pack_id: Option<String>,
     pub managed_pack_type: Option<MMCManagedPackType>,
+    #[serde(rename = "ManagedPackVersionID")]
     pub managed_pack_version_id: Option<String>,
     pub managed_pack_version_name: Option<String>,
 
