@@ -153,14 +153,14 @@ const next = async () => {
       </div>
       <div v-else class="table-content">No profiles found</div>
     </div>
-    <Button :disabled="loading" @click="next">
+    <Button :disabled="loading" color="primary" @click="next">
       {{
         loading
           ? 'Importing...'
           : Array.from(profiles.values())
               .flatMap((e) => e)
               .some((e) => e.selected)
-          ? 'Import'
+          ? `Import ${Array.from(profiles.values()).flatMap((e) => e).filter((e) => e.selected).length} profiles`
           : 'Skip'
       }}
     </Button>
@@ -170,6 +170,7 @@ const next = async () => {
 <style scoped lang="scss">
 .card {
   padding: var(--gap-xl);
+  min-height: unset;
 }
 
 .path-selection {
@@ -204,6 +205,7 @@ const next = async () => {
 
 .table {
   border: 1px solid var(--color-bg);
+  margin-bottom: var(--gap-md);
 }
 
 .table-row {
@@ -212,7 +214,6 @@ const next = async () => {
 
 .table-content {
   max-height: calc(5 * (18px + 2rem));
-  height: calc(5 * (18px + 2rem));
   overflow-y: auto;
 }
 
