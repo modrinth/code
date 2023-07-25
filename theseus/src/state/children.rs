@@ -200,6 +200,13 @@ impl Children {
             }
         }
 
+        {
+            // Clear game played for Discord RPC
+            // May have other active processes, so we clear to the next running process
+            let state = crate::State::get().await?;
+            state.discord_rpc.clear_to_default().await?;
+        }
+
         emit_process(
             uuid,
             current_pid,
