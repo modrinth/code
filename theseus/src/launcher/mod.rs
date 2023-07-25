@@ -2,6 +2,7 @@
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::jre::{self, JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
+use crate::launcher::io::IOError;
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
 use crate::util::io;
@@ -164,6 +165,16 @@ pub async fn install_minecraft(
             )
         })?;
 
+    // Test jre version
+    let java_version = jre::check_jre(java_version.path.clone().into())
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Java path invalid or non-functional: {}",
+                java_version.path
+            ))
+        })?;
+
     // Download minecraft (5-90)
     download::download_minecraft(
         &state,
@@ -246,6 +257,7 @@ pub async fn install_minecraft(
                     )?)
                     .output()
                     .await
+                    .map_err(|e| IOError::with_path(e, &java_version.path))
                     .map_err(|err| {
                         crate::ErrorKind::LauncherError(format!(
                             "Error running processor: {err}",
@@ -454,7 +466,7 @@ pub async fn launch_minecraft(
             let value = option[1].trim();
             if let Some(value) = mc_set_options
                 .iter()
-                .find(|(k, _)| k == &key)
+                .find(|(k, _)| k == key)
                 .map(|(_, v)| v)
             {
                 options_string.push_str(&format!("{}:{}\n", key, value));
@@ -465,7 +477,6 @@ pub async fn launch_minecraft(
     }
     io::write(&options_path, options_string).await?;
 
-    
     // Get Modrinth logs directories
     let datetime_string =
         chrono::Local::now().format("%Y%m%d_%H%M%S").to_string();

@@ -65,45 +65,46 @@ pub async fn get_importable_instances(
 }
 
 // Import an instance from a launcher type and base path
+// Note: this *deletes* the submitted empty profile
 #[theseus_macros::debug_pin]
 #[tracing::instrument]
 pub async fn import_instance(
-    profile_path: ProfilePathId,
+    profile_path: ProfilePathId, // This should be a blank profile
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
 ) -> crate::Result<()> {
     tracing::debug!("Importing instance from {instance_folder}");
-    match launcher_type {
+    let res = match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
-                base_path,       // path to base mmc folder
-                instance_folder, // instance folder in mmc_base_path
-                profile_path,    // path to profile
+                base_path,            // path to base mmc folder
+                instance_folder,      // instance folder in mmc_base_path
+                profile_path.clone(), // path to profile
             )
-            .await?;
+            .await
         }
         ImportLauncherType::ATLauncher => {
             atlauncher::import_atlauncher(
-                base_path,       // path to atlauncher folder
-                instance_folder, // instance folder in atlauncher
-                profile_path,    // path to profile
+                base_path,            // path to atlauncher folder
+                instance_folder,      // instance folder in atlauncher
+                profile_path.clone(), // path to profile
             )
-            .await?;
+            .await
         }
         ImportLauncherType::GDLauncher => {
             gdlauncher::import_gdlauncher(
                 base_path.join("instances").join(instance_folder), // path to gdlauncher folder
-                profile_path, // path to profile
+                profile_path.clone(), // path to profile
             )
-            .await?;
+            .await
         }
         ImportLauncherType::Curseforge => {
             curseforge::import_curseforge(
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
-                profile_path, // path to profile
+                profile_path.clone(), // path to profile
             )
-            .await?;
+            .await
         }
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
@@ -111,7 +112,18 @@ pub async fn import_instance(
             )
             .into());
         }
+    };
+
+    // If import failed, delete the profile
+    match res {
+        Ok(_) => {}
+        Err(e) => {
+            tracing::warn!("Import failed: {:?}", e);
+            let _ = crate::api::profile::remove(&profile_path).await;
+            return Err(e);
+        }
     }
+
     tracing::debug!("Completed import.");
     Ok(())
 }

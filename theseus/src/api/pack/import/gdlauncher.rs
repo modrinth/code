@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
-use tokio::fs;
 
 use crate::{
     prelude::{ModLoader, ProfilePathId},
@@ -32,7 +31,7 @@ pub struct GDLauncherLoader {
 // Check if folder has a config.json that parses
 pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
     let config: String =
-        fs::read_to_string(&instance_folder.join("config.json"))
+        io::read_to_string(&instance_folder.join("config.json"))
             .await
             .unwrap_or("".to_string());
     let config: Result<GDLauncherConfig, serde_json::Error> =

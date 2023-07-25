@@ -1,7 +1,6 @@
 use std::path::{Path, PathBuf};
 
 use serde::{de, Deserialize, Serialize};
-use tokio::fs;
 
 use crate::{
     pack::{
@@ -124,7 +123,7 @@ pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
     let instance_cfg = instance_folder.join("instance.cfg");
     let mmc_pack = instance_folder.join("mmc-pack.json");
 
-    let mmc_pack = match fs::read_to_string(&mmc_pack).await {
+    let mmc_pack = match io::read_to_string(&mmc_pack).await {
         Ok(mmc_pack) => mmc_pack,
         Err(_) => return false,
     };
