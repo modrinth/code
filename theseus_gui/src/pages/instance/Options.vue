@@ -183,11 +183,7 @@
       </h3>
     </div>
     <div class="adjacent-input">
-      <DropdownSelect
-        v-model="forceFullscreen"
-        :options="fullscreenOptions"
-      />
-      
+      <DropdownSelect v-model="forceFullscreen" :options="fullscreenOptions" />
     </div>
     <div class="adjacent-input">
       <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
@@ -490,7 +486,7 @@ watch(
     }
 
     if (forceFullscreen.value) {
-        editProfile.force_fullscreen = forceFullscreen.value
+      editProfile.force_fullscreen = forceFullscreen.value
     }
 
     if (overrideHooks.value) {
