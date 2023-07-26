@@ -46,8 +46,9 @@ impl DiscordGuard {
                     .store(true, std::sync::atomic::Ordering::Relaxed);
                 return true;
             }
+            return false;
         }
-        false
+        true
     }
 
     /// Set the activity to the given message
