@@ -55,7 +55,7 @@ dunce = "1.0.3"
 
 whoami = "1.4.0"
 
-discord-presence = "0.5"
+discord-rich-presence = "0.2.3"
 
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.50.0"

@@ -546,10 +546,10 @@ pub async fn launch_minecraft(
 
     {
         // Add game played to discord rich presence
-        state
+        let _ = state
             .discord_rpc
-            .set_activity(format!("Playing {}", profile.metadata.name))
-            .await?;
+            .set_activity(&format!("Playing {}", profile.metadata.name), true)
+            .await;
     }
 
     // Create Minecraft child by inserting it into the state

@@ -145,6 +145,13 @@ impl Children {
             }
         }
 
+        {
+            // Clear game played for Discord RPC
+            // May have other active processes, so we clear to the next running process
+            let state = crate::State::get().await?;
+            let _ = state.discord_rpc.clear_to_default(true).await;
+        }
+
         // If in tauri, window should show itself again after process exists if it was hidden
         #[cfg(feature = "tauri")]
         {
@@ -198,13 +205,6 @@ impl Children {
                     break;
                 }
             }
-        }
-
-        {
-            // Clear game played for Discord RPC
-            // May have other active processes, so we clear to the next running process
-            let state = crate::State::get().await?;
-            state.discord_rpc.clear_to_default().await?;
         }
 
         emit_process(

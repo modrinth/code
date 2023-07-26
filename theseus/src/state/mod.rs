@@ -163,7 +163,7 @@ impl State {
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
 
-        let discord_rpc = DiscordGuard::init().await;
+        let discord_rpc = DiscordGuard::init().await?;
 
         emit_loading(&loading_bar, 10.0, None).await?;
 
