@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2018"
 
