@@ -6,7 +6,6 @@ use crate::launcher::io::IOError;
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
 use crate::util::io;
-use crate::EventState;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -532,6 +531,8 @@ pub async fn launch_minecraft(
     // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
     #[cfg(feature = "tauri")]
     {
+        use crate::EventState;
+
         let window = EventState::get_main_window().await?;
         if let Some(window) = window {
             let settings = state.settings.read().await;

@@ -13,7 +13,7 @@ use tracing::error;
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
 use crate::util::io::IOError;
-use crate::EventState;
+
 use tokio::task::JoinHandle;
 use uuid::Uuid;
 
@@ -155,7 +155,7 @@ impl Children {
         // If in tauri, window should show itself again after process exists if it was hidden
         #[cfg(feature = "tauri")]
         {
-            let window = EventState::get_main_window().await?;
+            let window = crate::EventState::get_main_window().await?;
             if let Some(window) = window {
                 window.unminimize()?;
             }

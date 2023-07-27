@@ -183,10 +183,14 @@
       </h3>
     </div>
     <div class="adjacent-input">
-      <DropdownSelect v-model="forceFullscreen" :options="fullscreenOptions" />
+      <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
     </div>
     <div class="adjacent-input">
-      <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
+      <label for="fullscreen">
+        <span class="label__title">Fullscreen</span>
+        <span class="label__description"> Make the game start in full screen when launched. </span>
+      </label>
+      <Toggle id="fullscreen" v-model="fullscreen" :disabled="!overrideWindowSettings" />
     </div>
     <div class="adjacent-input">
       <label for="width">
@@ -197,7 +201,7 @@
         id="width"
         v-model="resolution[0]"
         autocomplete="off"
-        :disabled="!overrideWindowSettings"
+        :disabled="!overrideWindowSettings || fullscreen"
         type="number"
         placeholder="Enter width..."
       />
@@ -211,7 +215,7 @@
         id="height"
         v-model="resolution[1]"
         autocomplete="off"
-        :disabled="!overrideWindowSettings"
+        :disabled="!overrideWindowSettings || fullscreen"
         type="number"
         class="input"
         placeholder="Enter height..."
@@ -295,7 +299,7 @@
     </div>
     <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
       <label for="repair-profile">
-        <span class="label__title">Repair modpack</span>
+        <span class="label__title">Reinstall modpack</span>
         <span class="label__description">
           Reinstalls Modrinth modpack and checks for corruption. Use this if your game is not
           launching due to your instance diverging from the Modrinth modpack.
@@ -307,7 +311,7 @@
         :disabled="repairing"
         @click="repairModpack"
       >
-        <HammerIcon /> Repair
+        <DownloadIcon /> Reinstall
       </button>
     </div>
 
@@ -346,7 +350,9 @@ import {
   XIcon,
   SaveIcon,
   HammerIcon,
+  DownloadIcon,
   ModalConfirm,
+  Toggle,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
@@ -445,8 +451,7 @@ const resolution = ref(props.instance.resolution ?? globalSettings.game_resoluti
 const overrideHooks = ref(!!props.instance.hooks)
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
-const fullscreenOptions = ref(['Leave unchanged', 'Set windowed', 'Set fullscreen'])
-const forceFullscreen = ref(props.instance.force_fullscreen)
+const fullscreen = ref(props.instance.fullscreen)
 
 watch(
   [
@@ -463,7 +468,7 @@ watch(
     memory,
     overrideWindowSettings,
     resolution,
-    forceFullscreen,
+    fullscreen,
     overrideHooks,
     hooks,
   ],
@@ -508,11 +513,11 @@ watch(
     }
 
     if (overrideWindowSettings.value) {
-      editProfile.resolution = resolution.value
-    }
+      editProfile.fullscreen = fullscreen.value
 
-    if (forceFullscreen.value) {
-      editProfile.force_fullscreen = forceFullscreen.value
+      if (!fullscreen.value) {
+        editProfile.resolution = resolution.value
+      }
     }
 
     if (overrideHooks.value) {

@@ -149,8 +149,7 @@ pub struct Profile {
     pub memory: Option<MemorySettings>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub resolution: Option<WindowSize>,
-    #[serde(default)]
-    pub force_fullscreen: SetFullscreen,
+    pub fullscreen: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hooks: Option<Hooks>,
     pub projects: HashMap<ProjectPathId, Project>,
@@ -225,21 +224,6 @@ impl ModLoader {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy)]
-pub enum SetFullscreen {
-    #[serde(rename = "Leave unset")]
-    LeaveUnset,
-    #[serde(rename = "Set windowed")]
-    SetWindowed,
-    #[serde(rename = "Set fullscreen")]
-    SetFullscreen,
-}
-impl Default for SetFullscreen {
-    fn default() -> Self {
-        Self::LeaveUnset
-    }
-}
-
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -285,7 +269,7 @@ impl Profile {
             java: None,
             memory: None,
             resolution: None,
-            force_fullscreen: SetFullscreen::LeaveUnset,
+            fullscreen: None,
             hooks: None,
             modrinth_update_version: None,
         })

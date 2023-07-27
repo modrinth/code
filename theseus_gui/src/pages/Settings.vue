@@ -144,7 +144,7 @@ watch(
           "
         />
       </div>
-      <div class="opening-page">
+      <div class="adjacent-input">
         <label for="opening-page">
           <span class="label__title">Default landing page</span>
           <span class="label__description">Change the page to which the launcher opens on.</span>
@@ -330,6 +330,15 @@ watch(
         </h3>
       </div>
       <div class="adjacent-input">
+        <label for="fullscreen">
+          <span class="label__title">Fullscreen</span>
+          <span class="label__description">
+            Make the game start in full screen when launched.
+          </span>
+        </label>
+        <Toggle id="fullscreen" v-model="settings.fullscreen" />
+      </div>
+      <div class="adjacent-input">
         <label for="width">
           <span class="label__title">Width</span>
           <span class="label__description"> The width of the game window when launched. </span>
@@ -337,6 +346,7 @@ watch(
         <input
           id="width"
           v-model="settings.game_resolution[0]"
+          :disabled="settings.fullscreen"
           autocomplete="off"
           type="number"
           placeholder="Enter width..."
@@ -350,6 +360,7 @@ watch(
         <input
           id="height"
           v-model="settings.game_resolution[1]"
+          :disabled="settings.fullscreen"
           autocomplete="off"
           type="number"
           class="input"
