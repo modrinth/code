@@ -197,7 +197,7 @@ const accounts = ref(null)
         </RouterLink>
       </div>
     </div>
-    <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
+    <div class="view">
       <div class="appbar-row">
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
@@ -307,10 +307,6 @@ const accounts = ref(null)
   overflow: hidden;
 
   .view {
-    &.expanded {
-      --sidebar-width: 13rem;
-    }
-
     width: calc(100% - var(--sidebar-width));
 
     .appbar {
@@ -347,14 +343,6 @@ const accounts = ref(null)
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: var(--gap-md);
-
-  &.expanded {
-    --sidebar-width: 13rem;
-
-    width: var(--sidebar-width);
-    max-width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-  }
 }
 
 .pages-list {
