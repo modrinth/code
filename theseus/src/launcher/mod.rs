@@ -466,13 +466,14 @@ pub async fn launch_minecraft(
 
     for (key, value) in mc_set_options {
         let re = Regex::new(&format!(r"^{}:.*$", regex::escape(key)))?;
-        let replaced_string = re
-            .replace_all(&options_string, &format!("{}:{}", key, value))
-            .to_string();
-        if replaced_string == options_string {
+        // check if the regex exists in the file
+        if !re.is_match(&options_string) {
             // The key was not found in the file, so append it
             options_string.push_str(&format!("{}:{}\n", key, value));
         } else {
+            let replaced_string = re
+                .replace_all(&options_string, &format!("{}:{}", key, value))
+                .to_string();
             options_string = replaced_string;
         }
     }
