@@ -94,6 +94,21 @@ export async function remove_project(path, projectPath) {
   return await invoke('plugin:profile|profile_remove_project', { path, projectPath })
 }
 
+// Update a managed Modrinth profile
+export async function update_managed_modrinth(path) {
+  return await invoke('plugin:profile|profile_update_managed_modrinth', { path })
+}
+
+// Repair a managed Modrinth profile
+export async function update_repair_modrinth(path) {
+  return await invoke('plugin:profile|profile_repair_managed_modrinth', { path })
+}
+
+// Gets whether a profile is managed by Modrinth
+export async function is_managed_modrinth(path) {
+  return await invoke('plugin:profile|profile_is_managed_modrinth', { path })
+}
+
 // Export a profile to .mrpack
 /// included_overrides is an array of paths to override folders to include (ie: 'mods', 'resource_packs')
 // Version id is optional (ie: 1.1.5)

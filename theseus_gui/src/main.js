@@ -9,6 +9,8 @@ import FloatingVue from 'floating-vue'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import loadCssMixin from './mixins/macCssFix.js'
 import { get } from '@/helpers/settings'
+import { invoke } from '@tauri-apps/api'
+import { isDev } from './helpers/utils.js'
 
 const pinia = createPinia()
 
@@ -19,6 +21,19 @@ app.use(FloatingVue)
 app.mixin(loadCssMixin)
 
 const mountedApp = app.mount('#app')
+
+const raw_invoke = async (plugin, fn, args) => {
+  return await invoke('plugin:' + plugin + '|' + fn, args)
+}
+isDev()
+  .then((dev) => {
+    if (dev) {
+      window.raw_invoke = raw_invoke
+    }
+  })
+  .catch((err) => {
+    console.error(err)
+  })
 
 initialize_state()
   .then(() => {

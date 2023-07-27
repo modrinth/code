@@ -51,6 +51,7 @@ pub enum ProfileInstallStage {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 #[serde(transparent)]
 pub struct ProfilePathId(PathBuf);
+
 impl ProfilePathId {
     // Create a new ProfilePathId from a full file path
     pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
@@ -151,6 +152,8 @@ pub struct Profile {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hooks: Option<Hooks>,
     pub projects: HashMap<ProjectPathId, Project>,
+    #[serde(default)]
+    pub modrinth_update_version: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -266,6 +269,7 @@ impl Profile {
             memory: None,
             resolution: None,
             hooks: None,
+            modrinth_update_version: None,
         })
     }
 
@@ -386,13 +390,12 @@ impl Profile {
         let mut read_paths = |path: &str| {
             let new_path = profile_path.join(path);
             if new_path.exists() {
-                let path = self.path.join(path);
-                for path in std::fs::read_dir(&path)
-                    .map_err(|e| IOError::with_path(e, &path))?
+                for subpath in std::fs::read_dir(&new_path)
+                    .map_err(|e| IOError::with_path(e, &new_path))?
                 {
-                    let path = path.map_err(IOError::from)?.path();
-                    if path.is_file() {
-                        files.push(path);
+                    let subpath = subpath.map_err(IOError::from)?.path();
+                    if subpath.is_file() {
+                        files.push(subpath);
                     }
                 }
             }
@@ -766,6 +769,86 @@ impl Profiles {
             Ok(()) => {}
             Err(err) => {
                 tracing::warn!("Unable to fetch profile projects: {err}")
+            }
+        };
+    }
+
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
+    pub async fn update_modrinth_versions() {
+        let res = async {
+            let state = State::get().await?;
+            // Temporarily store all profiles that have modrinth linked data
+            let mut modrinth_updatables: Vec<(ProfilePathId, String)> =
+                Vec::new();
+            {
+                let profiles = state.profiles.read().await;
+                for (profile_path, profile) in profiles.0.iter() {
+                    if let Some(linked_data) = &profile.metadata.linked_data {
+                        if let Some(linked_project) = &linked_data.project_id {
+                            modrinth_updatables.push((
+                                profile_path.clone(),
+                                linked_project.clone(),
+                            ));
+                        }
+                    }
+                }
+            }
+
+            // Fetch online from Modrinth each latest version
+            future::try_join_all(modrinth_updatables.into_iter().map(
+                |(profile_path, linked_project)| {
+                    let profile_path = profile_path;
+                    let linked_project = linked_project;
+                    let state = state.clone();
+                    async move {
+                        let versions: Vec<ModrinthVersion> = fetch_json(
+                            Method::GET,
+                            &format!(
+                                "{}project/{}/version",
+                                MODRINTH_API_URL,
+                                linked_project.clone()
+                            ),
+                            None,
+                            None,
+                            &state.fetch_semaphore,
+                        )
+                        .await?;
+
+                        // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
+                        // so we can just take the first one
+                        let mut new_profiles = state.profiles.write().await;
+                        if let Some(profile) =
+                            new_profiles.0.get_mut(&profile_path)
+                        {
+                            if let Some(recent_version) = versions.get(0) {
+                                profile.modrinth_update_version =
+                                    Some(recent_version.id.clone());
+                            } else {
+                                profile.modrinth_update_version = None;
+                            }
+                        }
+                        drop(new_profiles);
+
+                        Ok::<(), crate::Error>(())
+                    }
+                },
+            ))
+            .await?;
+
+            {
+                let profiles = state.profiles.read().await;
+                profiles.sync().await?;
+            }
+
+            Ok::<(), crate::Error>(())
+        }
+        .await;
+
+        match res {
+            Ok(()) => {}
+            Err(err) => {
+                tracing::warn!("Unable to update modrinth versions: {err}")
             }
         };
     }

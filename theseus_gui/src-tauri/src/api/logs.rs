@@ -1,6 +1,8 @@
 use crate::api::Result;
-use theseus::logs::{self, Logs};
-use uuid::Uuid;
+use theseus::{
+    logs::{self, Logs},
+    prelude::ProfilePathId,
+};
 
 /*
 A log is a struct containing the datetime string, stdout, and stderr, as follows:
@@ -27,10 +29,10 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 /// Get all Logs for a profile, sorted by datetime
 #[tauri::command]
 pub async fn logs_get_logs(
-    profile_uuid: Uuid,
+    profile_path: ProfilePathId,
     clear_contents: Option<bool>,
 ) -> Result<Vec<Logs>> {
-    let val = logs::get_logs(profile_uuid, clear_contents).await?;
+    let val = logs::get_logs(profile_path, clear_contents).await?;
 
     Ok(val)
 }
@@ -38,25 +40,25 @@ pub async fn logs_get_logs(
 /// Get a Log struct for a profile by profile id and datetime string
 #[tauri::command]
 pub async fn logs_get_logs_by_datetime(
-    profile_uuid: Uuid,
+    profile_path: ProfilePathId,
     datetime_string: String,
 ) -> Result<Logs> {
-    Ok(logs::get_logs_by_datetime(profile_uuid, datetime_string).await?)
+    Ok(logs::get_logs_by_datetime(profile_path, datetime_string).await?)
 }
 
 /// Get the stdout for a profile by profile id and datetime string
 #[tauri::command]
 pub async fn logs_get_output_by_datetime(
-    profile_uuid: Uuid,
+    profile_path: ProfilePathId,
     datetime_string: String,
 ) -> Result<String> {
     let profile_path = if let Some(p) =
-        crate::profile::get_by_uuid(profile_uuid, None).await?
+        crate::profile::get(&profile_path, None).await?
     {
         p.profile_id()
     } else {
         return Err(theseus::Error::from(
-            theseus::ErrorKind::UnmanagedProfileError(profile_uuid.to_string()),
+            theseus::ErrorKind::UnmanagedProfileError(profile_path.to_string()),
         )
         .into());
     };
@@ -66,15 +68,15 @@ pub async fn logs_get_output_by_datetime(
 
 /// Delete all logs for a profile by profile id
 #[tauri::command]
-pub async fn logs_delete_logs(profile_uuid: Uuid) -> Result<()> {
-    Ok(logs::delete_logs(profile_uuid).await?)
+pub async fn logs_delete_logs(profile_path: ProfilePathId) -> Result<()> {
+    Ok(logs::delete_logs(profile_path).await?)
 }
 
 /// Delete a log for a profile by profile id and datetime string
 #[tauri::command]
 pub async fn logs_delete_logs_by_datetime(
-    profile_uuid: Uuid,
+    profile_path: ProfilePathId,
     datetime_string: String,
 ) -> Result<()> {
-    Ok(logs::delete_logs_by_datetime(profile_uuid, &datetime_string).await?)
+    Ok(logs::delete_logs_by_datetime(profile_path, &datetime_string).await?)
 }
