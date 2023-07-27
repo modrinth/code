@@ -465,7 +465,7 @@ pub async fn launch_minecraft(
     }
 
     for (key, value) in mc_set_options {
-        let re = Regex::new(&format!(r"^{}:.*$", regex::escape(key)))?;
+        let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
         // check if the regex exists in the file
         if !re.is_match(&options_string) {
             // The key was not found in the file, so append it
