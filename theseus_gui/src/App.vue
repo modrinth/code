@@ -171,10 +171,7 @@ const accounts = ref(null)
           >
             <SearchIcon />
           </RouterLink>
-          <RouterLink
-            to="/library"
-            class="btn icon-only collapsed-button"
-          >
+          <RouterLink to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
           <Suspense>
@@ -189,10 +186,7 @@ const accounts = ref(null)
         >
           <PlusIcon />
         </Button>
-        <RouterLink
-          to="/settings"
-          class="btn icon-only collapsed-button"
-        >
+        <RouterLink to="/settings" class="btn icon-only collapsed-button">
           <SettingsIcon />
         </RouterLink>
       </div>
