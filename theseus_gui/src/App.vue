@@ -161,32 +161,21 @@ const accounts = ref(null)
         <div class="pages-list">
           <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
-            <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>
           <RouterLink
             to="/browse/modpack"
-            class="btn"
+            class="btn icon-only collapsed-button"
             :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
               'router-link-active': isOnBrowse,
             }"
           >
             <SearchIcon />
-            <span v-if="!themeStore.collapsedNavigation">Browse</span>
           </RouterLink>
           <RouterLink
             to="/library"
-            class="btn"
-            :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
-            }"
+            class="btn icon-only collapsed-button"
           >
             <LibraryIcon />
-            <span v-if="!themeStore.collapsedNavigation">Library</span>
           </RouterLink>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
@@ -195,28 +184,16 @@ const accounts = ref(null)
       </div>
       <div class="settings pages-list">
         <Button
-          class="sleek-primary"
-          :class="{
-            'icon-only': themeStore.collapsedNavigation,
-            'collapsed-button': themeStore.collapsedNavigation,
-            'expanded-button': !themeStore.collapsedNavigation,
-          }"
+          class="sleek-primary icon-only collapsed-button"
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
-          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New instance</span>
         </Button>
         <RouterLink
           to="/settings"
-          class="btn"
-          :class="{
-            'icon-only': themeStore.collapsedNavigation,
-            'collapsed-button': themeStore.collapsedNavigation,
-            'expanded-button': !themeStore.collapsedNavigation,
-          }"
+          class="btn icon-only collapsed-button"
         >
           <SettingsIcon />
-          <span v-if="!themeStore.collapsedNavigation">Settings</span>
         </RouterLink>
       </div>
     </div>
@@ -430,11 +407,6 @@ const accounts = ref(null)
     max-width: 1.5rem !important;
     max-height: 1.5rem !important;
   }
-}
-
-.expanded-button {
-  width: 100%;
-  padding: var(--gap-md) var(--gap-lg);
 }
 
 .instance-list {
