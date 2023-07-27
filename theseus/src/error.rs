@@ -49,6 +49,9 @@ pub enum ErrorKind {
     #[error("Incorrect Sha1 hash for download: {0} != {1}")]
     HashError(String, String),
 
+    #[error("Regex error: {0}")]
+    RegexError(#[from] regex::Error),
+
     #[error("Paths stored in the database need to be valid UTF-8: {0}")]
     UTFError(std::path::PathBuf),
 

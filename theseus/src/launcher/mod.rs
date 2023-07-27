@@ -455,31 +455,28 @@ pub async fn launch_minecraft(
 
     // Overwrites the minecraft options.txt file with the settings from the profile
     // Uses 'a:b' syntax which is not quite yaml
+    use regex::Regex;
+
     let options_path = instance_path.join("options.txt");
-    let mut options_map = HashMap::new();
+    let mut options_string = String::new();
 
     if options_path.exists() {
-        let options = io::read_to_string(&options_path).await?;
-        let options = options.split('\n');
-        for option in options {
-            let option = option.split(':').collect::<Vec<_>>();
-            if option.len() == 2 {
-                let key = option[0].trim().to_string();
-                let value = option[1].trim().to_string();
-                options_map.insert(key, value);
-            }
-        }
+        options_string = io::read_to_string(&options_path).await?;
     }
 
     for (key, value) in mc_set_options {
-        options_map.insert(key.to_string(), value.to_string());
+        let re = Regex::new(&format!(r"^{}:.*$", regex::escape(key)))?;
+        let replaced_string = re
+            .replace_all(&options_string, &format!("{}:{}", key, value))
+            .to_string();
+        if replaced_string == options_string {
+            // The key was not found in the file, so append it
+            options_string.push_str(&format!("{}:{}\n", key, value));
+        } else {
+            options_string = replaced_string;
+        }
     }
 
-    let options_string = options_map
-        .iter()
-        .map(|(k, v)| format!("{}:{}\n", k, v))
-        .collect::<Vec<_>>()
-        .join("");
     io::write(&options_path, options_string).await?;
 
     // Get Modrinth logs directories
