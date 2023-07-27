@@ -37,6 +37,12 @@ export async function get(path, clearProjects) {
   return await invoke('plugin:profile|profile_get', { path, clearProjects })
 }
 
+// Get a profile's full fs path
+// Returns a path
+export async function get_full_path(path) {
+  return await invoke('plugin:profile|profile_get_full_path', { path })
+}
+
 // Get optimal java version from profile
 // Returns a java version
 export async function get_optimal_jre_key(path) {

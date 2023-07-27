@@ -94,6 +94,19 @@ pub async fn get_by_uuid(
     Ok(profile)
 }
 
+/// Get profile's full path in the filesystem
+#[tracing::instrument]
+pub async fn get_full_path(path: &ProfilePathId) -> crate::Result<PathBuf> {
+    let _ = get(path, Some(true)).await?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to get the full path of a nonexistent or unloaded profile at path {}!",
+            path
+        ))
+    })?;
+    let full_path = io::canonicalize(path.get_full_path().await?)?;
+    Ok(full_path)
+}
+
 /// Edit a profile using a given asynchronous closure
 pub async fn edit<Fut>(
     path: &ProfilePathId,
@@ -261,6 +274,7 @@ pub async fn install(path: &ProfilePathId) -> crate::Result<()> {
 pub async fn update_all_projects(
     profile_path: &ProfilePathId,
 ) -> crate::Result<HashMap<ProjectPathId, ProjectPathId>> {
+    println!("update_all_projects");
     if let Some(profile) = get(profile_path, None).await? {
         let loading_bar = init_loading(
             LoadingBarType::ProfileUpdate {
@@ -271,6 +285,7 @@ pub async fn update_all_projects(
             "Updating profile",
         )
         .await?;
+        println!("getting profile base path");
 
         let profile_base_path = profile.get_profile_full_path().await?;
         let keys = profile
@@ -288,6 +303,7 @@ pub async fn update_all_projects(
             .map(|x| x.0)
             .collect::<Vec<_>>();
         let len = keys.len();
+        println!("going through");
 
         let map = Arc::new(RwLock::new(HashMap::new()));
 
@@ -373,6 +389,7 @@ pub async fn update_project(
                         profile.projects.insert(path.clone(), project);
                     }
                 }
+                drop(profiles);
 
                 if !skip_send_event.unwrap_or(false) {
                     emit_profile(
@@ -408,8 +425,12 @@ pub async fn add_project_from_version(
     profile_path: &ProfilePathId,
     version_id: String,
 ) -> crate::Result<ProjectPathId> {
+    println!("add_project_from_version");
     if let Some(profile) = get(profile_path, None).await? {
-        let (path, _) = profile.add_project_version(version_id).await?;
+        println!("getting profile base path");
+        let (project_path, new_version) =
+            profile.add_project_version(version_id).await?;
+        println!("5 ---{:?} {:?}", project_path, new_version);
 
         emit_profile(
             profile.uuid,
@@ -418,9 +439,26 @@ pub async fn add_project_from_version(
             ProfilePayloadType::Edited,
         )
         .await?;
-        State::sync().await?;
 
-        Ok(path)
+        let state = State::get().await?;
+        let mut profiles = state.profiles.write().await;
+        if let Some(profile) = profiles.0.get_mut(profile_path) {
+            let value = profile.projects.remove(&project_path);
+            if let Some(mut project) = value {
+                if let ProjectMetadata::Modrinth {
+                    ref mut version, ..
+                } = project.metadata
+                {
+                    *version = Box::new(new_version);
+                }
+                profile.projects.insert(project_path.clone(), project);
+            }
+        }
+        drop(profiles);
+
+        State::sync().await?;
+        println!("7");
+        Ok(project_path)
     } else {
         Err(
             crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())

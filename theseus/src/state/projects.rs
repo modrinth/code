@@ -460,9 +460,7 @@ pub async fn infer_data_from_files(
                 .await
                 .is_ok()
             {
-                if let Ok(pack) =
-                    serde_json::from_str::<ForgeModInfo>(&file_str)
-                {
+                if let Ok(pack) = toml::from_str::<ForgeModInfo>(&file_str) {
                     if let Some(pack) = pack.mods.first() {
                         let icon = read_icon_from_file(
                             pack.logo_file.clone(),

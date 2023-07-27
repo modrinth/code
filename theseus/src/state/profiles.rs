@@ -107,7 +107,8 @@ impl ProjectPathId {
         let profiles_dir: PathBuf = io::canonicalize(
             State::get().await?.directories.profiles_dir().await,
         )?;
-        path.strip_prefix(profiles_dir)
+        let path = path
+            .strip_prefix(profiles_dir)
             .ok()
             .map(|p| p.components().skip(1).collect::<PathBuf>())
             .ok_or_else(|| {
@@ -126,6 +127,42 @@ impl ProjectPathId {
         let _state = State::get().await?;
         let profile_dir = profile.get_full_path().await?;
         Ok(profile_dir.join(&self.0))
+    }
+
+    /// Get the full path to the project
+    /// If the path cannot be found, it will attempt to toggle the .disabled extension at the end of the path
+    /// If the path still cannot be found, it will return the original path
+    pub async fn toggle_disabled_if_nonexistent(
+        &self,
+        profile: ProfilePathId,
+    ) -> crate::Result<PathBuf> {
+        let attempt_full_path = self.get_full_path(profile).await?;
+        if attempt_full_path.exists() {
+            Ok(attempt_full_path)
+        } else {
+            // Toggle .disabled at the end of the path (if it has it, remove it, if it doesn't, add it)
+            let mut new_path = attempt_full_path.clone();
+            if self.0.extension().map_or(false, |ext| ext == "disabled") {
+                new_path.set_file_name(
+                    self.0
+                        .file_name()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                        .replace(".disabled", ""),
+                );
+            } else {
+                new_path.set_file_name(format!(
+                    "{}.disabled",
+                    self.0.file_name().unwrap_or_default().to_string_lossy()
+                ));
+            }
+            if new_path.exists() {
+                Ok(new_path)
+            } else {
+                // Neither the original path nor the disabled path exist, so just return the original path
+                Ok(attempt_full_path)
+            }
+        }
     }
 
     // Create a new ProjectPathId from a relative path
@@ -458,7 +495,7 @@ impl Profile {
         version_id: String,
     ) -> crate::Result<(ProjectPathId, ModrinthVersion)> {
         let state = State::get().await?;
-
+        println!("version_id: {}", version_id);
         let version = fetch_json::<ModrinthVersion>(
             Method::GET,
             &format!("{MODRINTH_API_URL}version/{version_id}"),
@@ -467,7 +504,7 @@ impl Profile {
             &state.fetch_semaphore,
         )
         .await?;
-
+        println!("version: {:?}", version);
         let file = if let Some(file) = version.files.iter().find(|x| x.primary)
         {
             file
@@ -480,13 +517,15 @@ impl Profile {
             .into());
         };
 
+        println!("file: 1");
+
         let bytes = fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
             &state.fetch_semaphore,
         )
         .await?;
-
+        println!("file: 2");
         let path = self
             .add_project_bytes(
                 &file.filename,
@@ -494,7 +533,7 @@ impl Profile {
                 ProjectType::get_from_loaders(version.loaders.clone()),
             )
             .await?;
-
+        println!("file: 3");
         Ok((path, version))
     }
 
@@ -569,7 +608,6 @@ impl Profile {
     }
 
     /// Toggle a project's disabled state.
-    /// 'path' should be relative to the profile's path.
     #[tracing::instrument(skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn toggle_disable_project(
@@ -662,11 +700,11 @@ impl Profile {
                 }
             }
         } else {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Project path does not exist: {:?}",
+            // If we are removing a project that doesn't exist, allow it to pass through without error, but warn
+            tracing::warn!(
+                "Attempted to remove non-existent project: {:?}",
                 relative_path
-            ))
-            .into());
+            );
         }
 
         Ok(())

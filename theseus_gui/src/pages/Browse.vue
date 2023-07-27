@@ -654,7 +654,7 @@ const showLoaders = computed(
       </Card>
     </aside>
     <div class="search">
-      <Promotion class="promotion" />
+      <Promotion class="promotion" :external="false" />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
       </Card>

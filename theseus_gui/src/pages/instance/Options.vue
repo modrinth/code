@@ -1,6 +1,6 @@
 <template>
   <ModalConfirm
-    ref="modal_confirm"
+    ref="modal_confirm_delete"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
@@ -8,6 +8,25 @@
     :noblur="!themeStore.advancedRendering"
     @proceed="removeProfile"
   />
+  <ModalConfirm
+    ref="modal_confirm_repair_instance"
+    title="Are you sure you want to repair this instance?"
+    description="Repairing a profile is a potentially destructive action. If you proceed, Minecraft will be reinstalled."
+    :has-to-type="false"
+    proceed-label="Repair instance"
+    :noblur="!themeStore.advancedRendering"
+    @proceed="repairProfile"
+  />
+  <ModalConfirm
+    ref="modal_confirm_repair_modpack"
+    title="Are you sure you want to repair this modpack?"
+    description="Repairing a modpack is a potentially destructive action. If you proceed, all mods will be removed and replaced with those in the Modrinth modpack."
+    :has-to-type="false"
+    proceed-label="Repair modpack"
+    :noblur="!themeStore.advancedRendering"
+    @proceed="repairModpack"
+  />
+
   <Modal
     ref="changeVersionsModal"
     header="Change instance versions"
@@ -292,7 +311,7 @@
         id="repair-profile"
         class="btn btn-highlight"
         :disabled="repairing"
-        @click="repairProfile"
+        @click="$refs.modal_confirm_repair_instance.show()"
       >
         <HammerIcon /> Repair
       </button>
@@ -309,7 +328,7 @@
         id="repair-profile"
         class="btn btn-highlight"
         :disabled="repairing"
-        @click="repairModpack"
+        @click="$refs.modal_confirm_repair_modpack.show()"
       >
         <DownloadIcon /> Reinstall
       </button>
@@ -327,7 +346,7 @@
         id="delete-profile"
         class="btn btn-danger"
         :disabled="removing"
-        @click="$refs.modal_confirm.show()"
+        @click="$refs.modal_confirm_delete.show()"
       >
         <TrashIcon /> Delete
       </button>
