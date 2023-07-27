@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     prelude::ProfilePathId,
+    state::Profiles,
     util::{fetch, io},
 };
 
@@ -123,6 +124,9 @@ pub async fn import_instance(
             return Err(e);
         }
     }
+
+    // Check existing managed packs for potential updates
+    tokio::task::spawn(Profiles::update_modrinth_versions());
 
     tracing::debug!("Completed import.");
     Ok(())

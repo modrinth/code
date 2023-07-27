@@ -31,20 +31,19 @@ impl Logs {
 
 #[tracing::instrument]
 pub async fn get_logs(
-    profile_uuid: uuid::Uuid,
+    profile_path: ProfilePathId,
     clear_contents: Option<bool>,
 ) -> crate::Result<Vec<Logs>> {
     let state = State::get().await?;
-    let profile_path = if let Some(p) =
-        crate::profile::get_by_uuid(profile_uuid, None).await?
-    {
-        p.profile_id()
-    } else {
-        return Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_uuid.to_string(),
-        )
-        .into());
-    };
+    let profile_path =
+        if let Some(p) = crate::profile::get(&profile_path, None).await? {
+            p.profile_id()
+        } else {
+            return Err(crate::ErrorKind::UnmanagedProfileError(
+                profile_path.to_string(),
+            )
+            .into());
+        };
 
     let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
     let mut logs = Vec::new();
@@ -77,19 +76,18 @@ pub async fn get_logs(
 
 #[tracing::instrument]
 pub async fn get_logs_by_datetime(
-    profile_uuid: uuid::Uuid,
+    profile_path: ProfilePathId,
     datetime_string: String,
 ) -> crate::Result<Logs> {
-    let profile_path = if let Some(p) =
-        crate::profile::get_by_uuid(profile_uuid, None).await?
-    {
-        p.profile_id()
-    } else {
-        return Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_uuid.to_string(),
-        )
-        .into());
-    };
+    let profile_path =
+        if let Some(p) = crate::profile::get(&profile_path, None).await? {
+            p.profile_id()
+        } else {
+            return Err(crate::ErrorKind::UnmanagedProfileError(
+                profile_path.to_string(),
+            )
+            .into());
+        };
     Ok(Logs {
         output: Some(
             get_output_by_datetime(&profile_path, &datetime_string).await?,
@@ -111,17 +109,16 @@ pub async fn get_output_by_datetime(
 }
 
 #[tracing::instrument]
-pub async fn delete_logs(profile_uuid: uuid::Uuid) -> crate::Result<()> {
-    let profile_path = if let Some(p) =
-        crate::profile::get_by_uuid(profile_uuid, None).await?
-    {
-        p.profile_id()
-    } else {
-        return Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_uuid.to_string(),
-        )
-        .into());
-    };
+pub async fn delete_logs(profile_path: ProfilePathId) -> crate::Result<()> {
+    let profile_path =
+        if let Some(p) = crate::profile::get(&profile_path, None).await? {
+            p.profile_id()
+        } else {
+            return Err(crate::ErrorKind::UnmanagedProfileError(
+                profile_path.to_string(),
+            )
+            .into());
+        };
 
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
@@ -139,19 +136,18 @@ pub async fn delete_logs(profile_uuid: uuid::Uuid) -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn delete_logs_by_datetime(
-    profile_uuid: uuid::Uuid,
+    profile_path: ProfilePathId,
     datetime_string: &str,
 ) -> crate::Result<()> {
-    let profile_path = if let Some(p) =
-        crate::profile::get_by_uuid(profile_uuid, None).await?
-    {
-        p.profile_id()
-    } else {
-        return Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_uuid.to_string(),
-        )
-        .into());
-    };
+    let profile_path =
+        if let Some(p) = crate::profile::get(&profile_path, None).await? {
+            p.profile_id()
+        } else {
+            return Err(crate::ErrorKind::UnmanagedProfileError(
+                profile_path.to_string(),
+            )
+            .into());
+        };
 
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;

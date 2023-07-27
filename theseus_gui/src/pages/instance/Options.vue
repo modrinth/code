@@ -280,8 +280,8 @@
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
         <span class="label__description">
-          Reinstalls the instance and checks for corruption. Use this if your game is not launching
-          due to launcher-related errors.
+          Reinstalls Minecraft dependencies and checks for corruption. Use this if your game is not
+          launching due to launcher-related errors.
         </span>
       </label>
       <button
@@ -293,6 +293,24 @@
         <HammerIcon /> Repair
       </button>
     </div>
+    <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Repair modpack</span>
+        <span class="label__description">
+          Reinstalls Modrinth modpack and checks for corruption. Use this if your game is not
+          launching due to your instance diverging from the Modrinth modpack.
+        </span>
+      </label>
+      <button
+        id="repair-profile"
+        class="btn btn-highlight"
+        :disabled="repairing"
+        @click="repairModpack"
+      >
+        <HammerIcon /> Repair
+      </button>
+    </div>
+
     <div class="adjacent-input">
       <label for="delete-profile">
         <span class="label__title">Delete instance</span>
@@ -332,7 +350,15 @@ import {
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
-import { edit, edit_icon, get_optimal_jre_key, install, list, remove } from '@/helpers/profile.js'
+import {
+  edit,
+  edit_icon,
+  get_optimal_jre_key,
+  install,
+  list,
+  remove,
+  update_repair_modrinth,
+} from '@/helpers/profile.js'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
@@ -503,6 +529,17 @@ const repairing = ref(false)
 async function repairProfile() {
   repairing.value = true
   await install(props.instance.path).catch(handleError)
+  repairing.value = false
+
+  mixpanel.track('InstanceRepair', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
+}
+
+async function repairModpack() {
+  repairing.value = true
+  await update_repair_modrinth(props.instance.path).catch(handleError)
   repairing.value = false
 
   mixpanel.track('InstanceRepair', {

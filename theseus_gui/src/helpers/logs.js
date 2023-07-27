@@ -17,26 +17,26 @@ pub struct Logs {
 
 /// Get all logs that exist for a given profile
 /// This is returned as an array of Log objects, sorted by datetime_string (the folder name, when the log was created)
-export async function get_logs(profileUuid, clearContents) {
-  return await invoke('plugin:logs|logs_get_logs', { profileUuid, clearContents })
+export async function get_logs(profilePath, clearContents) {
+  return await invoke('plugin:logs|logs_get_logs', { profilePath, clearContents })
 }
 
 /// Get a profile's log by datetime_string (the folder name, when the log was created)
-export async function get_logs_by_datetime(profileUuid, datetimeString) {
-  return await invoke('plugin:logs|logs_get_logs_by_datetime', { profileUuid, datetimeString })
+export async function get_logs_by_datetime(profilePath, datetimeString) {
+  return await invoke('plugin:logs|logs_get_logs_by_datetime', { profilePath, datetimeString })
 }
 
 /// Get a profile's stdout only by datetime_string (the folder name, when the log was created)
-export async function get_output_by_datetime(profileUuid, datetimeString) {
-  return await invoke('plugin:logs|logs_get_output_by_datetime', { profileUuid, datetimeString })
+export async function get_output_by_datetime(profilePath, datetimeString) {
+  return await invoke('plugin:logs|logs_get_output_by_datetime', { profilePath, datetimeString })
 }
 
 /// Delete a profile's log by datetime_string (the folder name, when the log was created)
-export async function delete_logs_by_datetime(profileUuid, datetimeString) {
-  return await invoke('plugin:logs|logs_delete_logs_by_datetime', { profileUuid, datetimeString })
+export async function delete_logs_by_datetime(profilePath, datetimeString) {
+  return await invoke('plugin:logs|logs_delete_logs_by_datetime', { profilePath, datetimeString })
 }
 
 /// Delete all logs for a given profile
-export async function delete_logs(profileUuid) {
-  return await invoke('plugin:logs|logs_delete_logs', { profileUuid })
+export async function delete_logs(profilePath) {
+  return await invoke('plugin:logs|logs_delete_logs', { profilePath })
 }
