@@ -121,7 +121,7 @@ pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
     }
 }
 
-// Kill a running child process directly, and wait for it to be killed
+// Kill a running child process directly
 #[tracing::instrument(skip(running))]
 pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
     running
@@ -131,7 +131,7 @@ pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
         .kill()
         .await
         .map_err(IOError::from)?;
-    wait_for(running).await
+    Ok(())
 }
 
 // Await on the completion of a child process directly

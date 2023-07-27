@@ -2,6 +2,7 @@
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::jre::{self, JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
+use crate::launcher::io::IOError;
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
 use crate::util::io;
@@ -164,6 +165,16 @@ pub async fn install_minecraft(
             )
         })?;
 
+    // Test jre version
+    let java_version = jre::check_jre(java_version.path.clone().into())
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Java path invalid or non-functional: {}",
+                java_version.path
+            ))
+        })?;
+
     // Download minecraft (5-90)
     download::download_minecraft(
         &state,
@@ -246,6 +257,7 @@ pub async fn install_minecraft(
                     )?)
                     .output()
                     .await
+                    .map_err(|e| IOError::with_path(e, &java_version.path))
                     .map_err(|err| {
                         crate::ErrorKind::LauncherError(format!(
                             "Error running processor: {err}",
@@ -291,6 +303,7 @@ pub async fn install_minecraft(
 pub async fn launch_minecraft(
     java_args: &[String],
     env_args: &[(String, String)],
+    mc_set_options: &[(String, String)],
     wrapper: &Option<String>,
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
@@ -440,6 +453,33 @@ pub async fn launch_minecraft(
     }
     command.envs(env_args);
 
+    // Overwrites the minecraft options.txt file with the settings from the profile
+    // Uses 'a:b' syntax which is not quite yaml
+    use regex::Regex;
+
+    let options_path = instance_path.join("options.txt");
+    let mut options_string = String::new();
+
+    if options_path.exists() {
+        options_string = io::read_to_string(&options_path).await?;
+    }
+
+    for (key, value) in mc_set_options {
+        let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
+        // check if the regex exists in the file
+        if !re.is_match(&options_string) {
+            // The key was not found in the file, so append it
+            options_string.push_str(&format!("\n{}:{}", key, value));
+        } else {
+            let replaced_string = re
+                .replace_all(&options_string, &format!("{}:{}", key, value))
+                .to_string();
+            options_string = replaced_string;
+        }
+    }
+
+    io::write(&options_path, options_string).await?;
+
     // Get Modrinth logs directories
     let datetime_string =
         chrono::Local::now().format("%Y%m%d_%H%M%S").to_string();
@@ -499,6 +539,14 @@ pub async fn launch_minecraft(
                 window.minimize()?;
             }
         }
+    }
+
+    {
+        // Add game played to discord rich presence
+        let _ = state
+            .discord_rpc
+            .set_activity(&format!("Playing {}", profile.metadata.name), true)
+            .await;
     }
 
     // Create Minecraft child by inserting it into the state

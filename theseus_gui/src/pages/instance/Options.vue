@@ -183,6 +183,9 @@
       </h3>
     </div>
     <div class="adjacent-input">
+      <DropdownSelect v-model="forceFullscreen" :options="fullscreenOptions" />
+    </div>
+    <div class="adjacent-input">
       <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
     </div>
     <div class="adjacent-input">
@@ -439,9 +442,11 @@ const maxMemory = Math.floor((await get_max_memory().catch(handleError)) / 1024)
 
 const overrideWindowSettings = ref(!!props.instance.resolution)
 const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
-
 const overrideHooks = ref(!!props.instance.hooks)
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
+
+const fullscreenOptions = ref(['Leave unchanged', 'Set windowed', 'Set fullscreen'])
+const forceFullscreen = ref(props.instance.force_fullscreen)
 
 watch(
   [
@@ -458,6 +463,7 @@ watch(
     memory,
     overrideWindowSettings,
     resolution,
+    forceFullscreen,
     overrideHooks,
     hooks,
   ],
@@ -503,6 +509,10 @@ watch(
 
     if (overrideWindowSettings.value) {
       editProfile.resolution = resolution.value
+    }
+
+    if (forceFullscreen.value) {
+      editProfile.force_fullscreen = forceFullscreen.value
     }
 
     if (overrideHooks.value) {

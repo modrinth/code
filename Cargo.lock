@@ -575,7 +575,7 @@ checksum = "d38f2da7a0a2c4ccf0065be06397cc26a81f4e528be095826eee9d4adbb8c60f"
 dependencies = [
  "byteorder",
  "fnv",
- "uuid",
+ "uuid 1.4.0",
 ]
 
 [[package]]
@@ -986,7 +986,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef552e6f588e446098f6ba40d89ac146c8c7b64aade83c051ee00bb5d2bc18d"
 dependencies = [
  "serde",
- "uuid",
+ "uuid 1.4.0",
 ]
 
 [[package]]
@@ -1105,6 +1105,18 @@ dependencies = [
  "libc",
  "redox_users",
  "winapi",
+]
+
+[[package]]
+name = "discord-rich-presence"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "47fc4beffb85ee1461588499073a4d9c20dcc7728c4b13d6b282ab6c508947e5"
+dependencies = [
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "uuid 0.8.2",
 ]
 
 [[package]]
@@ -2522,7 +2534,7 @@ dependencies = [
  "crash-handler",
  "minidumper",
  "thiserror",
- "uuid",
+ "uuid 1.4.0",
 ]
 
 [[package]]
@@ -3810,7 +3822,7 @@ dependencies = [
  "thiserror",
  "time 0.3.22",
  "url",
- "uuid",
+ "uuid 1.4.0",
 ]
 
 [[package]]
@@ -4299,7 +4311,7 @@ dependencies = [
  "serde",
  "tao-macros",
  "unicode-segmentation",
- "uuid",
+ "uuid 1.4.0",
  "windows 0.39.0",
  "windows-implement",
  "x11-dl",
@@ -4382,7 +4394,7 @@ dependencies = [
  "time 0.3.22",
  "tokio",
  "url",
- "uuid",
+ "uuid 1.4.0",
  "webkit2gtk",
  "webview2-com",
  "windows 0.39.0",
@@ -4428,7 +4440,7 @@ dependencies = [
  "tauri-utils",
  "thiserror",
  "time 0.3.22",
- "uuid",
+ "uuid 1.4.0",
  "walkdir",
 ]
 
@@ -4506,7 +4518,7 @@ dependencies = [
  "tauri-utils",
  "thiserror",
  "url",
- "uuid",
+ "uuid 1.4.0",
  "webview2-com",
  "windows 0.39.0",
 ]
@@ -4524,7 +4536,7 @@ dependencies = [
  "raw-window-handle",
  "tauri-runtime",
  "tauri-utils",
- "uuid",
+ "uuid 1.4.0",
  "webkit2gtk",
  "webview2-com",
  "windows 0.39.0",
@@ -4606,6 +4618,7 @@ dependencies = [
  "chrono",
  "daedalus",
  "dirs 5.0.1",
+ "discord-rich-presence",
  "dunce",
  "futures",
  "indicatif",
@@ -4633,7 +4646,7 @@ dependencies = [
  "tracing-error 0.1.2",
  "tracing-subscriber 0.2.25",
  "url",
- "uuid",
+ "uuid 1.4.0",
  "whoami",
  "winreg 0.50.0",
  "zip",
@@ -4661,7 +4674,7 @@ dependencies = [
  "tracing-futures",
  "tracing-subscriber 0.3.17",
  "url",
- "uuid",
+ "uuid 1.4.0",
  "webbrowser",
  "winreg 0.11.0",
 ]
@@ -4695,7 +4708,7 @@ dependencies = [
  "tracing",
  "tracing-error 0.1.2",
  "url",
- "uuid",
+ "uuid 1.4.0",
  "window-shadows",
 ]
 
@@ -4725,7 +4738,7 @@ dependencies = [
  "tracing-error 0.1.2",
  "tracing-subscriber 0.2.25",
  "url",
- "uuid",
+ "uuid 1.4.0",
  "webbrowser",
 ]
 
@@ -5208,6 +5221,15 @@ name = "utf-8"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "09cc8ee72d2a9becf2f2febe0205bbed8fc6615b7cb429ad062dc7b7ddd036a9"
+
+[[package]]
+name = "uuid"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc5cf98d8186244414c848017f0e2676b3fcb46807f6668a97dfe67359a3c4b7"
+dependencies = [
+ "getrandom 0.2.10",
+]
 
 [[package]]
 name = "uuid"

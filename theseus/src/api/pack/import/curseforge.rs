@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
-use tokio::fs;
 
 use crate::{
     prelude::{ModLoader, ProfilePathId},
@@ -42,7 +41,7 @@ pub struct MinecraftInstance {
 // Check if folder has a minecraftinstance.json that parses
 pub async fn is_valid_curseforge(instance_folder: PathBuf) -> bool {
     let minecraftinstance: String =
-        fs::read_to_string(&instance_folder.join("minecraftinstance.json"))
+        io::read_to_string(&instance_folder.join("minecraftinstance.json"))
             .await
             .unwrap_or("".to_string());
     let minecraftinstance: Result<MinecraftInstance, serde_json::Error> =
