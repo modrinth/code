@@ -155,7 +155,9 @@ const next = async () => {
           </div>
         </div>
       </div>
-      <div v-else class="table-content">No profiles found</div>
+      <div v-else class="table-content empty">
+        No profiles found
+      </div>
     </div>
     <div class="button-row">
       <Button class="transparent" @click="prevPage">
@@ -251,4 +253,14 @@ const next = async () => {
     padding: var(--gap-sm) 0;
   }
 }
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bolder;
+  color: var(--color-contrast);
+}
+
 </style>
