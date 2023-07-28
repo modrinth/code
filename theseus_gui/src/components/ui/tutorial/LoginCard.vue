@@ -1,18 +1,21 @@
 <script setup>
-import { Button, LogInIcon, Modal, ClipboardCopyIcon, GlobeIcon } from 'omorphia'
+import { Button, LogInIcon, Modal, ClipboardCopyIcon, GlobeIcon, Card } from 'omorphia'
 import { authenticate_await_completion, authenticate_begin_flow } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { get, set } from '@/helpers/settings.js'
 import { ref } from 'vue'
 import QrcodeVue from 'qrcode.vue'
-import { LoginSticker } from '@/assets/images'
 
 const loginUrl = ref(null)
 const loginModal = ref()
 
 const props = defineProps({
   nextPage: {
+    type: Function,
+    required: true,
+  },
+  prevPage: {
     type: Function,
     required: true,
   },
@@ -51,20 +54,31 @@ const openUrl = async () => {
 </script>
 
 <template>
-  <div class="logging-in">
-    <LoginSticker class="sticker" />
-    <h1>Sign into Minecraft</h1>
-    <p>Sign in with your Minecraft account to play with installed mods and modpacks.</p>
-    <div class="button-row">
-      <Button class="transparent" large @click="nextPage"> Skip </Button>
-      <Button color="primary" large @click="login">
-        <LogInIcon v-if="!finalizedLogin" />
-        {{ finalizedLogin ? 'Next' : 'Sign in' }}
-      </Button>
-      <Button v-if="loginUrl" class="transparent" large @click="loginModal.show()">
-        Browser didn't open?
-      </Button>
-    </div>
+  <div class="login-card">
+    <img src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png" class="logo"  alt="Minecraft art"/>
+    <Card class="logging-in">
+      <h2>Sign into Minecraft</h2>
+      <p>
+        Sign in with your Microsoft account to launch Minecraft with your mods and modpacks.
+        If you don't have a Minecraft account, you can purchase the game on the
+        <a href="https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc" class="link">
+          Minecraft website
+        </a>
+      </p>
+      <div class="action-row">
+        <Button class="transparent" large @click="prevPage"> Back </Button>
+        <div>
+          <Button color="primary" large @click="login">
+            <LogInIcon v-if="!finalizedLogin" />
+            {{ finalizedLogin ? 'Next' : 'Sign in' }}
+          </Button>
+          <Button v-if="loginUrl" class="transparent" @click="loginModal.show()">
+            Browser didn't open?
+          </Button>
+        </div>
+        <Button class="transparent" large @click="nextPage"> Skip </Button>
+      </div>
+    </Card>
   </div>
   <Modal ref="loginModal" header="Signing in">
     <div class="modal-body">
@@ -99,33 +113,63 @@ const openUrl = async () => {
 </template>
 
 <style scoped lang="scss">
+.login-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  padding: var(--gap-lg);
+  width: 30rem;
+
+  img {
+    width: 100%;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+}
+
 .logging-in {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   vertical-align: center;
-  margin: auto;
-  gap: var(--gap-xl);
-  padding: calc(var(--gap-xl) * 2);
-  border-radius: var(--radius-lg);
+  gap: var(--gap-md);
   background-color: var(--color-raised-bg);
+  width: 100%;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 
-  h1,
+  h2,
   p {
     margin: 0;
   }
 
   p {
-    font-size: var(--font-size-lg);
-    width: 30rem;
     text-align: center;
   }
+}
+
+.link {
+  color: var(--color-blue);
+  text-decoration: underline;
 }
 
 .button-row {
   display: flex;
   flex-direction: row;
+}
+
+.action-row {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  margin-top: var(--gap-md);
+
+  .transparent {
+    padding: 0 var(--gap-md);
+  }
 }
 
 .qr-code {

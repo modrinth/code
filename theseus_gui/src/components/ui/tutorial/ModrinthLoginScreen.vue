@@ -8,6 +8,17 @@ import {
   SteamIcon,
   GitLabIcon,
 } from '@/assets/external'
+
+defineProps({
+  nextPage: {
+    type: Function,
+    required: true,
+  },
+  prevPage: {
+    type: Function,
+    required: true,
+  },
+})
 </script>
 
 <template>
@@ -56,9 +67,9 @@ import {
       <a class="button-base"> Forgot password? </a>
     </div>
     <div class="button-row">
-      <Button class="transparent" large> Back </Button>
+      <Button class="transparent" large @click="prevPage"> Back </Button>
       <Button color="primary" large> Login </Button>
-      <Button class="transparent" large> Skip </Button>
+      <Button class="transparent" large @click="nextPage"> Skip </Button>
     </div>
   </Card>
 </template>

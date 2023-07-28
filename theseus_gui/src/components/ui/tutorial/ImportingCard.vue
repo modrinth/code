@@ -16,7 +16,11 @@ import { handleError } from '@/store/state.js'
 
 const props = defineProps({
   nextPage: {
-    type: String,
+    type: Function,
+    required: true,
+  },
+  prevPage: {
+    type: Function,
     required: true,
   },
 })
@@ -153,21 +157,29 @@ const next = async () => {
       </div>
       <div v-else class="table-content">No profiles found</div>
     </div>
-    <Button :disabled="loading" color="primary" @click="next">
-      {{
-        loading
-          ? 'Importing...'
-          : Array.from(profiles.values())
-              .flatMap((e) => e)
-              .some((e) => e.selected)
-          ? `Import ${
-              Array.from(profiles.values())
+    <div class="button-row">
+      <Button class="transparent" @click="prevPage">
+        Back
+      </Button>
+      <Button :disabled="loading || !Array.from(profiles.values()).flatMap((e) => e).some((e) => e.selected)" color="primary" @click="next">
+        {{
+          loading
+            ? 'Importing...'
+            : Array.from(profiles.values())
                 .flatMap((e) => e)
-                .filter((e) => e.selected).length
-            } profiles`
-          : 'Skip'
-      }}
-    </Button>
+                .some((e) => e.selected)
+            ? `Import ${
+                Array.from(profiles.values())
+                  .flatMap((e) => e)
+                  .filter((e) => e.selected).length
+              } profiles`
+            : 'Select profiles to import'
+        }}
+      </Button>
+      <Button class="transparent" @click="nextPage">
+        Next
+      </Button>
+    </div>
   </Card>
 </template>
 
@@ -226,6 +238,17 @@ const next = async () => {
 .select-checkbox {
   button.checkbox {
     border: none;
+  }
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--gap-md);
+
+  .transparent {
+    padding: var(--gap-sm) 0;
   }
 }
 </style>

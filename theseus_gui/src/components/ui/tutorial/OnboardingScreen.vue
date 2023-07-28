@@ -68,6 +68,10 @@ const nextPage = () => {
   mixpanel.track('OnboardingPage', { page: page.value })
 }
 
+const prevPage = () => {
+  page.value--
+}
+
 const finishOnboarding = async () => {
   mixpanel.track('OnboardingFinish')
   const settings = await get()
@@ -117,11 +121,11 @@ onMounted(async () => {
       ]"
       logo
     >
-      <Button color="primary" @click="nextPage"> Get started </Button>
+      <Button color="primary" @click="nextPage" > Get started </Button>
     </GalleryImage>
-    <LoginCard v-else-if="page === 2" :next-page="nextPage" />
-    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" />
-    <ImportingCard v-else-if="page === 4" :next-page="nextPage" />
+    <LoginCard v-else-if="page === 2" :next-page="nextPage" :prev-page="prevPage"/>
+    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" :prev-page="prevPage"/>
+    <ImportingCard v-else-if="page === 4" :next-page="nextPage" :prev-page="prevPage"/>
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />
