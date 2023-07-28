@@ -455,7 +455,6 @@ async function install(version) {
               : true)
         )
         if (compatible) {
-
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
           installedVersion.value = queuedVersionData.id
