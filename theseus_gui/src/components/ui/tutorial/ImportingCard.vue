@@ -160,7 +160,11 @@ const next = async () => {
           : Array.from(profiles.values())
               .flatMap((e) => e)
               .some((e) => e.selected)
-          ? `Import ${Array.from(profiles.values()).flatMap((e) => e).filter((e) => e.selected).length} profiles`
+          ? `Import ${
+              Array.from(profiles.values())
+                .flatMap((e) => e)
+                .filter((e) => e.selected).length
+            } profiles`
           : 'Skip'
       }}
     </Button>
