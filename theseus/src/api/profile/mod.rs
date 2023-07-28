@@ -423,8 +423,7 @@ pub async fn add_project_from_version(
     version_id: String,
 ) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile_path, None).await? {
-        let (project_path, new_version) =
-            profile.add_project_version(version_id).await?;
+        let (project_path, _) = profile.add_project_version(version_id).await?;
 
         emit_profile(
             profile.uuid,
@@ -433,24 +432,6 @@ pub async fn add_project_from_version(
             ProfilePayloadType::Edited,
         )
         .await?;
-
-        let state = State::get().await?;
-        let mut profiles = state.profiles.write().await;
-        if let Some(profile) = profiles.0.get_mut(profile_path) {
-            let value = profile.projects.remove(&project_path);
-            if let Some(mut project) = value {
-                if let ProjectMetadata::Modrinth {
-                    ref mut version, ..
-                } = project.metadata
-                {
-                    *version = Box::new(new_version);
-                }
-                profile.projects.insert(project_path.clone(), project);
-            }
-        }
-        drop(profiles);
-
-        State::sync().await?;
         Ok(project_path)
     } else {
         Err(

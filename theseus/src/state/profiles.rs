@@ -129,42 +129,6 @@ impl ProjectPathId {
         Ok(profile_dir.join(&self.0))
     }
 
-    /// Get the full path to the project
-    /// If the path cannot be found, it will attempt to toggle the .disabled extension at the end of the path
-    /// If the path still cannot be found, it will return the original path
-    pub async fn toggle_disabled_if_nonexistent(
-        &self,
-        profile: ProfilePathId,
-    ) -> crate::Result<PathBuf> {
-        let attempt_full_path = self.get_full_path(profile).await?;
-        if attempt_full_path.exists() {
-            Ok(attempt_full_path)
-        } else {
-            // Toggle .disabled at the end of the path (if it has it, remove it, if it doesn't, add it)
-            let mut new_path = attempt_full_path.clone();
-            if self.0.extension().map_or(false, |ext| ext == "disabled") {
-                new_path.set_file_name(
-                    self.0
-                        .file_name()
-                        .unwrap_or_default()
-                        .to_string_lossy()
-                        .replace(".disabled", ""),
-                );
-            } else {
-                new_path.set_file_name(format!(
-                    "{}.disabled",
-                    self.0.file_name().unwrap_or_default().to_string_lossy()
-                ));
-            }
-            if new_path.exists() {
-                Ok(new_path)
-            } else {
-                // Neither the original path nor the disabled path exist, so just return the original path
-                Ok(attempt_full_path)
-            }
-        }
-    }
-
     // Create a new ProjectPathId from a relative path
     pub fn new(path: &Path) -> Self {
         ProjectPathId(PathBuf::from(path))

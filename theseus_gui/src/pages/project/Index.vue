@@ -455,7 +455,6 @@ async function install(version) {
               : true)
         )
         if (compatible) {
-          console.log('Hello3!')
 
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
