@@ -6,7 +6,7 @@
           <a
             href="https://exaroton.com/?utm_source=modrinth&utm_medium=text&utm_campaign=host&utm_content=top"
             rel="noopener nofollow sponsored"
-            target="_blank"
+            :target="target"
           >
             <ExarotonIcon class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-3" />
             <span>
@@ -18,13 +18,23 @@
         </div>
       </div>
       <div class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-4">
-        <a rel="noopener sponsored" target="_blank" href="https://adrinth.com"> Ads via Adrinth </a>
+        <a rel="noopener sponsored" :target="target" href="https://adrinth.com">
+          Ads via Adrinth
+        </a>
       </div>
     </div>
   </div>
 </template>
 <script setup>
+import { computed } from 'vue'
 import ExarotonIcon from '@/assets/external/exaroton.svg'
+const props = defineProps({
+  external: {
+    type: Boolean,
+    default: true,
+  },
+})
+const target = computed(() => (props.external ? '_blank' : '_self'))
 </script>
 
 <style lang="scss">
