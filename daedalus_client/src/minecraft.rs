@@ -2,8 +2,7 @@ use crate::download_file;
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::get_hash;
 use daedalus::minecraft::{
-    merge_partial_library, Library, PartialLibrary,
-    VersionManifest,
+    merge_partial_library, Library, PartialLibrary, VersionManifest,
 };
 use log::info;
 use serde::Deserialize;
@@ -115,8 +114,7 @@ pub async fn retrieve_data(
 
                 let mut new_libraries = Vec::new();
                 for library in version_info.libraries.clone() {
-                    let mut libs =
-                        patch_library(&patches, library);
+                    let mut libs = patch_library(&patches, library);
                     new_libraries.append(&mut libs)
                 }
                 version_info.libraries = new_libraries;

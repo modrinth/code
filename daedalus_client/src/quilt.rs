@@ -259,18 +259,13 @@ pub async fn retrieve_data(
         version.loaders.sort_by(|x, y| {
             list.loader
                 .iter()
-                .position(|z| {
-                    x.id.split('-').next().unwrap_or_default() == &*z.version
-                })
+                .position(|z| x.id == *z.version)
                 .unwrap_or_default()
                 .cmp(
                     &list
                         .loader
                         .iter()
-                        .position(|z| {
-                            y.id.split('-').next().unwrap_or_default()
-                                == z.version
-                        })
+                        .position(|z| y.id == z.version)
                         .unwrap_or_default(),
                 )
         })
