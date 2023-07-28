@@ -29,6 +29,7 @@ pub async fn import_get_importable_instances(
 }
 
 /// Import an instance from a launcher type and base path
+/// profile_path should be a blank profile for this purpose- if the function fails, it will be deleted
 /// eg: import_instance(ImportLauncherType::MultiMC, PathBuf::from("C:/MultiMC"), "Instance 1")
 #[tauri::command]
 pub async fn import_import_instance(

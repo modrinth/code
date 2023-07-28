@@ -186,6 +186,13 @@
       <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
     </div>
     <div class="adjacent-input">
+      <label for="fullscreen">
+        <span class="label__title">Fullscreen</span>
+        <span class="label__description"> Make the game start in full screen when launched. </span>
+      </label>
+      <Toggle id="fullscreen" v-model="fullscreen" :disabled="!overrideWindowSettings" />
+    </div>
+    <div class="adjacent-input">
       <label for="width">
         <span class="label__title">Width</span>
         <span class="label__description"> The width of the game window when launched. </span>
@@ -194,7 +201,7 @@
         id="width"
         v-model="resolution[0]"
         autocomplete="off"
-        :disabled="!overrideWindowSettings"
+        :disabled="!overrideWindowSettings || fullscreen"
         type="number"
         placeholder="Enter width..."
       />
@@ -208,7 +215,7 @@
         id="height"
         v-model="resolution[1]"
         autocomplete="off"
-        :disabled="!overrideWindowSettings"
+        :disabled="!overrideWindowSettings || fullscreen"
         type="number"
         class="input"
         placeholder="Enter height..."
@@ -277,8 +284,8 @@
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
         <span class="label__description">
-          Reinstalls the instance and checks for corruption. Use this if your game is not launching
-          due to launcher-related errors.
+          Reinstalls Minecraft dependencies and checks for corruption. Use this if your game is not
+          launching due to launcher-related errors.
         </span>
       </label>
       <button
@@ -290,6 +297,24 @@
         <HammerIcon /> Repair
       </button>
     </div>
+    <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Reinstall modpack</span>
+        <span class="label__description">
+          Reinstalls Modrinth modpack and checks for corruption. Use this if your game is not
+          launching due to your instance diverging from the Modrinth modpack.
+        </span>
+      </label>
+      <button
+        id="repair-profile"
+        class="btn btn-highlight"
+        :disabled="repairing"
+        @click="repairModpack"
+      >
+        <DownloadIcon /> Reinstall
+      </button>
+    </div>
+
     <div class="adjacent-input">
       <label for="delete-profile">
         <span class="label__title">Delete instance</span>
@@ -325,11 +350,21 @@ import {
   XIcon,
   SaveIcon,
   HammerIcon,
+  DownloadIcon,
   ModalConfirm,
+  Toggle,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
-import { edit, edit_icon, get_optimal_jre_key, install, list, remove } from '@/helpers/profile.js'
+import {
+  edit,
+  edit_icon,
+  get_optimal_jre_key,
+  install,
+  list,
+  remove,
+  update_repair_modrinth,
+} from '@/helpers/profile.js'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
@@ -413,9 +448,10 @@ const maxMemory = Math.floor((await get_max_memory().catch(handleError)) / 1024)
 
 const overrideWindowSettings = ref(!!props.instance.resolution)
 const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
-
 const overrideHooks = ref(!!props.instance.hooks)
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
+
+const fullscreen = ref(props.instance.fullscreen)
 
 watch(
   [
@@ -432,6 +468,7 @@ watch(
     memory,
     overrideWindowSettings,
     resolution,
+    fullscreen,
     overrideHooks,
     hooks,
   ],
@@ -476,7 +513,11 @@ watch(
     }
 
     if (overrideWindowSettings.value) {
-      editProfile.resolution = resolution.value
+      editProfile.fullscreen = fullscreen.value
+
+      if (!fullscreen.value) {
+        editProfile.resolution = resolution.value
+      }
     }
 
     if (overrideHooks.value) {
@@ -493,6 +534,17 @@ const repairing = ref(false)
 async function repairProfile() {
   repairing.value = true
   await install(props.instance.path).catch(handleError)
+  repairing.value = false
+
+  mixpanel.track('InstanceRepair', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
+}
+
+async function repairModpack() {
+  repairing.value = true
+  await update_repair_modrinth(props.instance.path).catch(handleError)
   repairing.value = false
 
   mixpanel.track('InstanceRepair', {

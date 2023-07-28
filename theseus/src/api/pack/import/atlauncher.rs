@@ -1,7 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
-use tokio::fs;
 
 use crate::{
     event::LoadingBarId,
@@ -106,7 +105,7 @@ pub struct ATLauncherMod {
 // Check if folder has a instance.json that parses
 pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
     let instance: String =
-        fs::read_to_string(&instance_folder.join("instance.json"))
+        io::read_to_string(&instance_folder.join("instance.json"))
             .await
             .unwrap_or("".to_string());
     let instance: Result<ATInstance, serde_json::Error> =
@@ -199,7 +198,7 @@ async fn import_atlauncher_unmanaged(
     let game_version = atinstance.id;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
-        crate::profile_create::get_loader_version_from_loader(
+        crate::profile::create::get_loader_version_from_loader(
             game_version.clone(),
             mod_loader,
             Some(atinstance.launcher.loader_version.version.clone()),

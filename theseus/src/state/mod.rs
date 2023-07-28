@@ -48,6 +48,9 @@ pub use self::java_globals::*;
 mod safe_processes;
 pub use self::safe_processes::*;
 
+mod discord;
+pub use self::discord::*;
+
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<RwLock<State>> = OnceCell::const_new();
@@ -80,6 +83,9 @@ pub struct State {
     pub(crate) tags: RwLock<Tags>,
     /// Launcher processes that should be safely exited on shutdown
     pub(crate) safety_processes: RwLock<SafeProcesses>,
+
+    /// Discord RPC
+    pub discord_rpc: DiscordGuard,
 
     /// File watcher debouncer
     pub(crate) file_watcher: RwLock<Debouncer<RecommendedWatcher>>,
@@ -156,6 +162,9 @@ impl State {
         let children = Children::new();
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
+
+        let discord_rpc = DiscordGuard::init().await?;
+
         emit_loading(&loading_bar, 10.0, None).await?;
 
         Ok::<RwLock<Self>, crate::Error>(RwLock::new(Self {
@@ -175,6 +184,7 @@ impl State {
             children: RwLock::new(children),
             auth_flow: RwLock::new(auth_flow),
             tags: RwLock::new(tags),
+            discord_rpc,
             safety_processes: RwLock::new(safety_processes),
             file_watcher: RwLock::new(file_watcher),
         }))
@@ -185,6 +195,7 @@ impl State {
         tokio::task::spawn(Metadata::update());
         tokio::task::spawn(Tags::update());
         tokio::task::spawn(Profiles::update_projects());
+        tokio::task::spawn(Profiles::update_modrinth_versions());
         tokio::task::spawn(Settings::update_java());
     }
 

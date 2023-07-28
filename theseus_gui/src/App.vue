@@ -190,10 +190,7 @@ command_listener((e) => {
           >
             <SearchIcon />
           </RouterLink>
-          <RouterLink
-            to="/library"
-            class="btn icon-only collapsed-button"
-          >
+          <RouterLink to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
           <Suspense>
@@ -209,10 +206,7 @@ command_listener((e) => {
         >
           <PlusIcon />
         </Button>
-        <RouterLink
-          to="/settings"
-          class="btn collapsed-button icon-only"
-        >
+        <RouterLink to="/settings" class="btn icon-only collapsed-button">
           <SettingsIcon />
         </RouterLink>
       </div>
@@ -328,10 +322,6 @@ command_listener((e) => {
   overflow: hidden;
 
   .view {
-    &.expanded {
-      --sidebar-width: 13rem;
-    }
-
     width: calc(100% - var(--sidebar-width));
 
     .appbar {
@@ -368,14 +358,6 @@ command_listener((e) => {
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: var(--gap-md);
-
-  &.expanded {
-    --sidebar-width: 13rem;
-
-    width: var(--sidebar-width);
-    max-width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
-  }
 }
 
 .pages-list {

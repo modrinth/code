@@ -1,5 +1,5 @@
 //! Theseus error type
-use crate::{profile_create, util};
+use crate::{profile, util};
 use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]
@@ -49,6 +49,9 @@ pub enum ErrorKind {
     #[error("Incorrect Sha1 hash for download: {0} != {1}")]
     HashError(String, String),
 
+    #[error("Regex error: {0}")]
+    RegexError(#[from] regex::Error),
+
     #[error("Paths stored in the database need to be valid UTF-8: {0}")]
     UTFError(std::path::PathBuf),
 
@@ -68,7 +71,7 @@ pub enum ErrorKind {
     UnmanagedProfileError(String),
 
     #[error("Could not create profile: {0}")]
-    ProfileCreationError(#[from] profile_create::ProfileCreationError),
+    ProfileCreationError(#[from] profile::create::ProfileCreationError),
 
     #[error("User is not logged in, no credentials available!")]
     NoCredentialsError,

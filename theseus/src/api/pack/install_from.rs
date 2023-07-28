@@ -119,6 +119,7 @@ impl Default for CreatePackProfile {
     }
 }
 
+#[derive(Clone)]
 pub struct CreatePack {
     pub file: bytes::Bytes,
     pub description: CreatePackDescription,
@@ -337,7 +338,7 @@ pub async fn set_profile_information(
 
     let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
     let loader_version = if mod_loader != ModLoader::Vanilla {
-        crate::profile_create::get_loader_version_from_loader(
+        crate::profile::create::get_loader_version_from_loader(
             game_version.clone(),
             mod_loader,
             loader_version.cloned(),

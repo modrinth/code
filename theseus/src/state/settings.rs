@@ -18,6 +18,8 @@ const CURRENT_FORMAT_VERSION: u32 = 1;
 pub struct Settings {
     pub theme: Theme,
     pub memory: MemorySettings,
+    #[serde(default)]
+    pub force_fullscreen: bool,
     pub game_resolution: WindowSize,
     pub custom_java_args: Vec<String>,
     pub custom_env_args: Vec<(String, String)>,
@@ -64,6 +66,7 @@ impl Settings {
             Ok(Self {
                 theme: Theme::Dark,
                 memory: MemorySettings::default(),
+                force_fullscreen: false,
                 game_resolution: WindowSize::default(),
                 custom_java_args: Vec::new(),
                 custom_env_args: Vec::new(),

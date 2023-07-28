@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
@@ -6,8 +7,8 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
-use crate::prelude::JavaVersion;
-use crate::state::{ProfilePathId, ProjectMetadata, ProjectPathId};
+use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
+use crate::state::ProjectMetadata;
 
 use crate::util::io::{self, IOError};
 use crate::{
@@ -21,7 +22,9 @@ pub use crate::{
 };
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
+
 use std::collections::HashMap;
+
 use std::{
     future::Future,
     path::{Path, PathBuf},
@@ -29,6 +32,9 @@ use std::{
 };
 use tokio::io::AsyncReadExt;
 use tokio::{fs::File, process::Command, sync::RwLock};
+
+pub mod create;
+pub mod update;
 
 /// Remove a profile
 #[tracing::instrument]
@@ -56,7 +62,6 @@ pub async fn get(
     clear_projects: Option<bool>,
 ) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
-
     let profiles = state.profiles.read().await;
     let mut profile = profiles.0.get(path).cloned();
 
@@ -253,7 +258,7 @@ pub async fn install(path: &ProfilePathId) -> crate::Result<()> {
 
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn update_all(
+pub async fn update_all_projects(
     profile_path: &ProfilePathId,
 ) -> crate::Result<HashMap<ProjectPathId, ProjectPathId>> {
     if let Some(profile) = get(profile_path, None).await? {
@@ -513,6 +518,23 @@ pub async fn remove_project(
         State::sync().await?;
 
         Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
+            .as_error())
+    }
+}
+
+/// Gets whether project is a managed modrinth pack
+#[tracing::instrument]
+pub async fn is_managed_modrinth_pack(
+    profile: &ProfilePathId,
+) -> crate::Result<bool> {
+    if let Some(profile) = get(profile, None).await? {
+        if let Some(linked_data) = profile.metadata.linked_data {
+            return Ok(linked_data.project_id.is_some()
+                && linked_data.version_id.is_some());
+        }
+        Ok(false)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
             .as_error())
@@ -816,9 +838,19 @@ pub async fn run_credentials(
         None
     };
 
+    // Any options.txt settings that we want set, add here
+    let mc_set_options: Vec<(String, String)> = vec![(
+        "fullscreen".to_string(),
+        profile
+            .fullscreen
+            .unwrap_or(settings.force_fullscreen)
+            .to_string(),
+    )];
+
     let mc_process = crate::launcher::launch_minecraft(
         java_args,
         env_args,
+        &mc_set_options,
         wrapper,
         &memory,
         &resolution,

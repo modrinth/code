@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2018"
 
@@ -54,6 +54,8 @@ lazy_static = "1.4.0"
 dunce = "1.0.3"
 
 whoami = "1.4.0"
+
+discord-rich-presence = "0.2.3"
 
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.50.0"

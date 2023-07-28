@@ -46,11 +46,9 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     ];
     for java_path in java_paths {
         let Ok(java_subpaths) = std::fs::read_dir(java_path) else {continue };
-        for java_subpath in java_subpaths {
-            if let Ok(java_subpath) = java_subpath {
-                let path = java_subpath.path();
-                jre_paths.insert(path.join("bin"));
-            }
+        for java_subpath in java_subpaths.flatten() {
+            let path = java_subpath.path();
+            jre_paths.insert(path.join("bin"));
         }
     }
 
@@ -93,19 +91,17 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 pub fn get_paths_from_jre_winregkey(jre_key: RegKey) -> HashSet<PathBuf> {
     let mut jre_paths = HashSet::new();
 
-    for subkey in jre_key.enum_keys() {
-        if let Ok(subkey) = subkey {
-            if let Ok(subkey) = jre_key.open_subkey(subkey) {
-                let subkey_value_names =
-                    [r"JavaHome", r"InstallationPath", r"\\hotspot\\MSI"];
+    for subkey in jre_key.enum_keys().flatten() {
+        if let Ok(subkey) = jre_key.open_subkey(subkey) {
+            let subkey_value_names =
+                [r"JavaHome", r"InstallationPath", r"\\hotspot\\MSI"];
 
-                for subkey_value in subkey_value_names {
-                    let path: Result<String, std::io::Error> =
-                        subkey.get_value(subkey_value);
-                    let Ok(path) = path else {continue};
+            for subkey_value in subkey_value_names {
+                let path: Result<String, std::io::Error> =
+                    subkey.get_value(subkey_value);
+                let Ok(path) = path else {continue};
 
-                    jre_paths.insert(PathBuf::from(path).join("bin"));
-                }
+                jre_paths.insert(PathBuf::from(path).join("bin"));
             }
         }
     }
