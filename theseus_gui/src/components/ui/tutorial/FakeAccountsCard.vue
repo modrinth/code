@@ -1,16 +1,8 @@
 <template>
-  <div ref="button" class="button-base avatar-button expanded" :class="{ highlighted: showDemo }">
+  <div ref="button" class="button-base avatar-button" :class="{ highlighted: showDemo }">
     <Avatar
-      size="xs"
       src="https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png"
     />
-    <div class="avatar-text">
-      <div class="text no-select">Modrinth</div>
-      <p class="accounts-text no-select">
-        <UsersIcon />
-        Accounts
-      </p>
-    </div>
   </div>
   <transition name="fade">
     <div v-if="showDemo" class="card-section">
@@ -39,7 +31,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon } from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon } from 'omorphia'
 
 defineProps({
   showDemo: {
@@ -79,7 +71,7 @@ defineProps({
 .card-section {
   position: absolute;
   top: 0.5rem;
-  left: 13.5rem;
+  left: 5.5rem;
   z-index: 9;
   display: flex;
   flex-direction: column;

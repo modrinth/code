@@ -123,7 +123,7 @@ onMounted(async () => {
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />
-    <div v-if="phase < 9" class="nav-container expanded">
+    <div v-if="phase < 9" class="nav-container">
       <div class="nav-section">
         <FakeAccountsCard :show-demo="phase === 3">
           <TutorialTip
@@ -134,42 +134,36 @@ onMounted(async () => {
           />
         </FakeAccountsCard>
         <div class="pages-list">
-          <div class="btn expanded-button" :class="{ active: phase < 4 }">
+          <div class="btn icon-only" :class="{ active: phase < 4 }">
             <HomeIcon />
-            Home
           </div>
-          <div class="btn expanded-button" :class="{ active: phase === 4 || phase === 5 }">
+          <div class="btn icon-only" :class="{ active: phase === 4 || phase === 5 }">
             <SearchIcon />
-            Browse
           </div>
           <div
-            class="btn expanded-button"
+            class="btn icon-only"
             :class="{
               active: phase === 6 || phase === 7,
               highlighted: phase === 6,
             }"
           >
             <LibraryIcon />
-            Library
           </div>
         </div>
       </div>
       <div class="settings pages-list">
-        <Button class="active expanded-button" @click="finishOnboarding">
+        <Button class="active" icon-only @click="finishOnboarding">
           <LogOutIcon />
-          Exit Tutorial
         </Button>
-        <Button class="sleek-primary expanded-button">
+        <Button class="sleek-primary" icon-only>
           <PlusIcon />
-          New instance
         </Button>
-        <div class="btn expanded-button" :class="{ active: phase === 8, highlighted: phase === 8 }">
+        <Button icon-only :class="{ active: phase === 8, highlighted: phase === 8 }">
           <SettingsIcon />
-          Settings
-        </div>
+        </Button>
       </div>
     </div>
-    <div v-if="phase < 9" class="view expanded">
+    <div v-if="phase < 9" class="view">
       <div data-tauri-drag-region class="appbar">
         <section class="navigation-controls">
           <Breadcrumbs data-tauri-drag-region />
@@ -398,7 +392,7 @@ onMounted(async () => {
 
 .container {
   --appbar-height: 3.25rem;
-  --sidebar-width: 13rem;
+  --sidebar-width: 4.5rem;
 
   height: 100vh;
   display: flex;
@@ -443,7 +437,7 @@ onMounted(async () => {
   max-width: var(--sidebar-width);
   min-width: var(--sidebar-width);
 
-  --sidebar-width: 13rem;
+  --sidebar-width: 4.5rem;
 }
 
 .pages-list {
@@ -455,10 +449,19 @@ onMounted(async () => {
   gap: 0.5rem;
 
   .btn {
-    width: 100%;
-    padding: var(--gap-md) var(--gap-lg);
     background-color: var(--color-raised-bg);
+    height: 3rem !important;
+    width: 3rem !important;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
     box-shadow: none;
+
+    svg {
+      width: 1.5rem !important;
+      height: 1.5rem !important;
+      max-width: 1.5rem !important;
+      max-height: 1.5rem !important;
+    }
 
     &.active {
       background-color: var(--color-button-bg);

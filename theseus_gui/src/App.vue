@@ -10,7 +10,6 @@ import {
   Button,
   Notifications,
   XIcon,
-  CodeIcon,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -209,13 +208,6 @@ command_listener((e) => {
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
-        </Button>
-        <Button
-          class="sleek-primary collapsed-button"
-          icon-only
-          @click="() => $refs.urlModal.show({ event: 'InstallVersion', id: 'K3sXhozi' })"
-        >
-          <CodeIcon />
         </Button>
         <RouterLink
           to="/settings"

@@ -171,6 +171,7 @@ const next = async () => {
 .card {
   padding: var(--gap-xl);
   min-height: unset;
+  overflow-y: auto;
 }
 
 .path-selection {
@@ -214,6 +215,7 @@ const next = async () => {
 
 .table-content {
   max-height: calc(5 * (18px + 2rem));
+  height: calc(5 * (18px + 2rem));
   overflow-y: auto;
 }
 
