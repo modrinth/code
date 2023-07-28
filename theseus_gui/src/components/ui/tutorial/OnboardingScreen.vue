@@ -33,6 +33,7 @@ import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import { auto_install_java, get_jre } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
 import ImportingCard from '@/components/ui/tutorial/ImportingCard.vue'
+import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 
 const phase = ref(0)
 const page = ref(1)
@@ -56,7 +57,7 @@ const beginTutorial = () => {
 }
 
 const nextPage = () => {
-  if (page.value === 3) {
+  if (page.value === 4) {
     nextPhase()
     setTimeout(() => {
       firstModal.value.show()
@@ -119,7 +120,8 @@ onMounted(async () => {
       <Button color="primary" @click="nextPage"> Get started </Button>
     </GalleryImage>
     <LoginCard v-else-if="page === 2" :next-page="nextPage" />
-    <ImportingCard v-else-if="page === 3" :next-page="nextPage" />
+    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" />
+    <ImportingCard v-else-if="page === 4" :next-page="nextPage" />
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />
@@ -546,5 +548,6 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: var(--gap-xl);
+  padding-top: calc(2.5rem + var(--gap-lg));
 }
 </style>
