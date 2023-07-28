@@ -495,7 +495,6 @@ impl Profile {
         version_id: String,
     ) -> crate::Result<(ProjectPathId, ModrinthVersion)> {
         let state = State::get().await?;
-        println!("version_id: {}", version_id);
         let version = fetch_json::<ModrinthVersion>(
             Method::GET,
             &format!("{MODRINTH_API_URL}version/{version_id}"),
@@ -504,7 +503,6 @@ impl Profile {
             &state.fetch_semaphore,
         )
         .await?;
-        println!("version: {:?}", version);
         let file = if let Some(file) = version.files.iter().find(|x| x.primary)
         {
             file
@@ -517,15 +515,12 @@ impl Profile {
             .into());
         };
 
-        println!("file: 1");
-
         let bytes = fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
             &state.fetch_semaphore,
         )
         .await?;
-        println!("file: 2");
         let path = self
             .add_project_bytes(
                 &file.filename,
@@ -533,7 +528,6 @@ impl Profile {
                 ProjectType::get_from_loaders(version.loaders.clone()),
             )
             .await?;
-        println!("file: 3");
         Ok((path, version))
     }
 

@@ -274,7 +274,6 @@ pub async fn install(path: &ProfilePathId) -> crate::Result<()> {
 pub async fn update_all_projects(
     profile_path: &ProfilePathId,
 ) -> crate::Result<HashMap<ProjectPathId, ProjectPathId>> {
-    println!("update_all_projects");
     if let Some(profile) = get(profile_path, None).await? {
         let loading_bar = init_loading(
             LoadingBarType::ProfileUpdate {
@@ -285,7 +284,6 @@ pub async fn update_all_projects(
             "Updating profile",
         )
         .await?;
-        println!("getting profile base path");
 
         let profile_base_path = profile.get_profile_full_path().await?;
         let keys = profile
@@ -303,7 +301,6 @@ pub async fn update_all_projects(
             .map(|x| x.0)
             .collect::<Vec<_>>();
         let len = keys.len();
-        println!("going through");
 
         let map = Arc::new(RwLock::new(HashMap::new()));
 
@@ -425,12 +422,9 @@ pub async fn add_project_from_version(
     profile_path: &ProfilePathId,
     version_id: String,
 ) -> crate::Result<ProjectPathId> {
-    println!("add_project_from_version");
     if let Some(profile) = get(profile_path, None).await? {
-        println!("getting profile base path");
         let (project_path, new_version) =
             profile.add_project_version(version_id).await?;
-        println!("5 ---{:?} {:?}", project_path, new_version);
 
         emit_profile(
             profile.uuid,
@@ -457,7 +451,6 @@ pub async fn add_project_from_version(
         drop(profiles);
 
         State::sync().await?;
-        println!("7");
         Ok(project_path)
     } else {
         Err(

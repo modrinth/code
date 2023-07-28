@@ -2,11 +2,9 @@ use super::io;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::env;
-use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 use std::{collections::HashSet, path::Path};
-use tempfile::NamedTempFile;
 use tokio::task::JoinError;
 
 use crate::State;
@@ -280,20 +278,17 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
         return None;
     };
 
-    let mut file = NamedTempFile::new().ok()?;
-    file.write_all(include_bytes!("../../library/JavaInfo.class"))
-        .ok()?;
+    let bytes = include_bytes!("../../library/JavaInfo.class");
+    let tempdir: PathBuf = tempfile::tempdir().ok()?.into_path();
+    if !tempdir.exists() {
+        return None;
+    }
+    let file_path = tempdir.join("JavaInfo.class");
+    io::write(&file_path, bytes).await.ok()?;
 
-    let original_path = file.path().to_path_buf();
-    let mut new_path = original_path.clone();
-    new_path.set_file_name("JavaInfo");
-    new_path.set_extension("class");
-    tokio::fs::rename(&original_path, &new_path).await.ok()?;
-
-    // Run java checker on java binary
     let output = Command::new(&java)
         .arg("-cp")
-        .arg(file.path().parent().unwrap())
+        .arg(file_path.parent().unwrap())
         .arg("JavaInfo")
         .output()
         .ok()?;
