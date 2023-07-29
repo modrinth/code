@@ -101,7 +101,9 @@
         "title": "Modrinth App",
         "width": 1280,
         "minHeight": 630,
-        "minWidth": 1100
+        "minWidth": 1100,
+        "visible": false,
+        "decorations": false
       }
     ]
   }

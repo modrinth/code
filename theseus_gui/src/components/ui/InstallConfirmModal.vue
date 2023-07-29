@@ -31,14 +31,13 @@ defineExpose({
 async function install() {
   installing.value = true
   console.log(`Installing ${projectId.value} ${version.value} ${title.value} ${icon.value}`)
+  confirmModal.value.hide()
   await pack_install(
     projectId.value,
     version.value,
     title.value,
     icon.value ? icon.value : null
   ).catch(handleError)
-  confirmModal.value.hide()
-
   mixpanel.track('PackInstall', {
     id: projectId.value,
     version_id: version.value,

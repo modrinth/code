@@ -272,10 +272,22 @@ pub async fn infer_data_from_files(
 
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
     for path in paths {
+        if !path.exists() {
+            continue;
+        }
+        if let Some(ext) = path.extension() {
+            // Ignore txt configuration files
+           if ext == "txt" {
+                continue;
+           } 
+        }
+        
+        
         let mut file = tokio::fs::File::open(path.clone())
             .await
             .map_err(|e| IOError::with_path(e, &path))?;
 
+            
         let mut buffer = Vec::new();
         file.read_to_end(&mut buffer).await.map_err(IOError::from)?;
 

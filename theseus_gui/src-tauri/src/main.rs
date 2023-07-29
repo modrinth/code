@@ -84,16 +84,12 @@ fn main() {
             }
             #[cfg(target_os = "macos")]
             {
+                win.set_decorations(true).unwrap();
+
                 use macos::window_ext::WindowExt;
                 win.set_transparent_titlebar(true);
                 win.position_traffic_lights(9.0, 16.0);
-            }
-            #[cfg(not(target_os = "macos"))]
-            {
-                win.set_decorations(false).unwrap();
-            }
-            #[cfg(target_os = "macos")]
-            {
+
                 macos::delegate::register_open_file(|filename| {
                     tauri::async_runtime::spawn(api::utils::handle_command(
                         filename,
@@ -101,6 +97,9 @@ fn main() {
                 })
                 .unwrap();
             }
+
+            // Show app now that we are setup
+            win.show().unwrap();
 
             Ok(())
         });
@@ -129,7 +128,7 @@ fn main() {
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())
-        .invoke_handler(tauri::generate_handler![initialize_state, is_dev]);
+        .invoke_handler(tauri::generate_handler![initialize_state, is_dev, toggle_decorations]);
 
     builder
         .run(tauri::generate_context!())
