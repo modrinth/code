@@ -26,14 +26,14 @@ fn is_dev() -> bool {
     cfg!(debug_assertions)
 }
 
-
 // Toggles decorations
 #[tauri::command]
-async fn toggle_decorations(b : bool, window: tauri::Window) -> api::Result<()> {
+async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     window.set_decorations(b).map_err(|e| {
-        theseus::Error::from(theseus::ErrorKind::OtherError(
-            format!("Failed to toggle decorations: {}", e),
-        ))
+        theseus::Error::from(theseus::ErrorKind::OtherError(format!(
+            "Failed to toggle decorations: {}",
+            e
+        )))
     })?;
     println!("Toggled decorations!");
     Ok(())
@@ -141,7 +141,11 @@ fn main() {
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())
-        .invoke_handler(tauri::generate_handler![initialize_state, is_dev, toggle_decorations]);
+        .invoke_handler(tauri::generate_handler![
+            initialize_state,
+            is_dev,
+            toggle_decorations
+        ]);
 
     builder
         .run(tauri::generate_context!())
