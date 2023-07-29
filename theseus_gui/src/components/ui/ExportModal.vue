@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import { export_profile_mrpack, get_potential_override_folders } from '@/helpers/profile.js'
 import { open } from '@tauri-apps/api/dialog'
 import { handleError } from '@/store/notifications.js'
+import { sep } from '@tauri-apps/api/path'
 
 const props = defineProps({
   instance: {
@@ -33,11 +34,11 @@ const initFiles = async () => {
     filePaths
       .map((folder) => ({
         path: folder,
-        name: folder.split('/').pop(),
+        name: folder.split(sep).pop(),
         selected: false,
       }))
       .forEach((pathData) => {
-        const parent = pathData.path.split('/').slice(0, -1).join('/')
+        const parent = pathData.path.split(sep).slice(0, -1).join(sep)
         if (parent !== '') {
           if (newFolders.has(parent)) {
             newFolders.get(parent).push(pathData)

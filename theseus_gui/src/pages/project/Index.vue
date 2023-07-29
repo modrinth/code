@@ -350,15 +350,19 @@ async function install(version) {
   }
 
   if (installed.value) {
-    await remove_project(
-      instance.value.path,
-      Object.entries(instance.value.projects)
-        .map(([key, value]) => ({
-          key,
-          value,
-        }))
-        .find((p) => p.value.metadata?.version?.project_id === data.value.id).key
-    )
+    const old_project = Object.entries(instance.value.projects)
+      .map(([key, value]) => ({
+        key,
+        value,
+      }))
+      .find((p) => p.value.metadata?.version?.project_id === data.value.id)
+    if (!old_project) {
+      // Switching too fast, old project is not recognized as a Modrinth project yet
+      installing.value = false
+      return
+    }
+
+    await remove_project(instance.value.path, old_project.key)
   }
 
   if (version) {

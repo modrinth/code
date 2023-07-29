@@ -272,6 +272,16 @@ pub async fn infer_data_from_files(
 
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
     for path in paths {
+        if !path.exists() {
+            continue;
+        }
+        if let Some(ext) = path.extension() {
+            // Ignore txt configuration files
+            if ext == "txt" {
+                continue;
+            }
+        }
+
         let mut file = tokio::fs::File::open(path.clone())
             .await
             .map_err(|e| IOError::with_path(e, &path))?;
@@ -460,9 +470,7 @@ pub async fn infer_data_from_files(
                 .await
                 .is_ok()
             {
-                if let Ok(pack) =
-                    serde_json::from_str::<ForgeModInfo>(&file_str)
-                {
+                if let Ok(pack) = toml::from_str::<ForgeModInfo>(&file_str) {
                     if let Some(pack) = pack.mods.first() {
                         let icon = read_icon_from_file(
                             pack.logo_file.clone(),

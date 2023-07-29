@@ -27,7 +27,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
-import { showInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { install as pack_install } from '@/helpers/pack.js'
 import { useTheming } from '@/store/state.js'
@@ -155,7 +155,7 @@ const handleOptionsClick = async (args) => {
       deleteConfirmModal.value.show()
       break
     case 'open_folder':
-      await showInFolder(args.item.path)
+      await showProfileInFolder(args.item.path)
       break
     case 'copy_path':
       await navigator.clipboard.writeText(args.item.path)

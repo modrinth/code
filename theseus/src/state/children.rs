@@ -143,6 +143,8 @@ impl Children {
                 mc_exit_status = t;
                 break;
             }
+            // sleep for 10ms
+            tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
         }
 
         {
@@ -204,6 +206,9 @@ impl Children {
                     mc_exit_status = t;
                     break;
                 }
+                // sleep for 10ms
+                tokio::time::sleep(tokio::time::Duration::from_millis(10))
+                    .await;
             }
         }
 

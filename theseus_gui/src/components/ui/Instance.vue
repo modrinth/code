@@ -14,7 +14,7 @@ import {
 import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
-import { showInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import mixpanel from 'mixpanel-browser'
 
@@ -155,7 +155,7 @@ const stop = async (e, context) => {
 }
 
 const openFolder = async () => {
-  await showInFolder(props.instance.path)
+  await showProfileInFolder(props.instance.path)
 }
 
 const addContent = async () => {

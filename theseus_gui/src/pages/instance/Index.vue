@@ -51,7 +51,7 @@
           <Button
             v-tooltip="'Open instance folder'"
             class="instance-button"
-            @click="showInFolder(instance.path)"
+            @click="showProfileInFolder(instance.path)"
           >
             <FolderOpenIcon />
             Folder
@@ -148,7 +148,7 @@ import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
-import { showInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import mixpanel from 'mixpanel-browser'
 import { PackageIcon } from '@/assets/icons/index.js'
@@ -268,7 +268,7 @@ const handleOptionsClick = async (args) => {
       })
       break
     case 'open_folder':
-      await showInFolder(instance.value.path)
+      await showProfileInFolder(instance.value.path)
       break
     case 'copy_path':
       await navigator.clipboard.writeText(instance.value.path)
