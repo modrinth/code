@@ -1,5 +1,6 @@
 //! Project management + inference
 
+use crate::State;
 use crate::config::MODRINTH_API_URL;
 use crate::state::Profile;
 use crate::util::fetch::{
@@ -136,6 +137,40 @@ pub struct Dependency {
     pub project_id: Option<String>,
     pub file_name: Option<String>,
     pub dependency_type: DependencyType,
+}
+
+
+impl Dependency {
+    // As Modrinth doesn't always provide the project ID, we have to infer it from the version ID
+    pub async fn populate(&mut self) -> crate::Result<()> {
+        let mut dep = self;
+        let state = State::get().await?;
+
+        // If we have a version ID but no project ID, we can infer the project ID from the version ID
+        if dep.project_id.is_none() && dep.version_id.is_some() {
+            let url = format!(
+                "{}version/{}",
+                MODRINTH_API_URL, dep.version_id.clone().unwrap()
+            );
+
+            // Fetch modrinth version from API
+            let modrinth_version = fetch_json::<ModrinthVersion>(
+                Method::GET,
+                &url,
+                None,
+                None,
+                &state.fetch_semaphore,
+            ).await;
+
+            // Allow graceful failure
+            if let Ok(modrinth_version) = modrinth_version {
+                dep.project_id = Some(modrinth_version.project_id);
+            } else {
+                tracing::warn!("Failed to fetch modrinth version: {:?}", modrinth_version);
+            }
+        }
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

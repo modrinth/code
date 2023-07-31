@@ -28,7 +28,7 @@ pub mod prelude {
         profile::{self, create, Profile},
         settings,
         state::JavaGlobals,
-        state::{ProfilePathId, ProjectPathId},
+        state::{ProfilePathId, ProjectPathId, Dependency},
         util::{
             io::{canonicalize, IOError},
             jre::JavaVersion,
