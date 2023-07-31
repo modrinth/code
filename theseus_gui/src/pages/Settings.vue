@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Checkbox } from 'omorphia'
+import { Card, Slider, DropdownSelect, Checkbox, Toggle } from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
