@@ -929,13 +929,11 @@ pub async fn create_mrpack_json(
         .map(|(k, v)| (k, sanitize_loader_version_string(&v).to_string()))
         .collect::<HashMap<_, _>>();
 
-    let profile_base_path = profile.get_profile_full_path().await?;
     let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path: String = profile_base_path
-                .join(mod_path.0.clone())
+            let path: String = mod_path.0.clone()
                 .to_string_lossy()
                 .to_string();
 
@@ -1034,4 +1032,10 @@ pub async fn build_folder(
         }
     }
     Ok(())
+}
+
+pub fn sanitize_profile_name(input : &str) -> String {
+    input.replace(r"/", "_")
+    .replace(r"\", "_")
+    .to_string()
 }

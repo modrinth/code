@@ -351,6 +351,7 @@ import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
+import { install_from_file } from '@/helpers/pack'
 
 const router = useRouter()
 
@@ -769,10 +770,18 @@ watch(selectAll, () => {
 })
 
 listen('tauri://file-drop', async (event) => {
-  for (const file of event.payload) {
+  if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
+    await install_from_file(event.payload[0]).catch(handleError)
+    mixpanel.track('InstanceCreate', {
+      source: 'FileDrop',
+    })
+  } else {
+    for (const file of event.payload) {
     await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
   }
   initProjects(await get(props.instance.path).catch(handleError))
+  }
+
 })
 </script>
 
