@@ -77,3 +77,7 @@ export const openLink = (url) => {
     },
   })
 }
+
+export const refreshOffline = async () => {
+  return await invoke('plugin:utils|refresh_offline', { })
+}

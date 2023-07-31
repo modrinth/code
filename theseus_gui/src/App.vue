@@ -24,7 +24,7 @@ import { warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev } from '@/helpers/utils.js'
+import { isDev, refreshOffline } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import OnboardingModal from '@/components/OnboardingModal.vue'
@@ -37,6 +37,9 @@ import { confirm } from '@tauri-apps/api/dialog'
 const themeStore = useTheming()
 
 const isLoading = ref(true)
+const isOffline = ref(false)
+
+
 defineExpose({
   initialize: async () => {
     isLoading.value = false
@@ -62,6 +65,8 @@ defineExpose({
     } else {
       document.getElementsByTagName('html')[0].classList.add('windows')
     }
+
+    isOffline.value = await refreshOffline()
 
     await warning_listener((e) =>
       notificationsWrapper.value.addNotification({
@@ -162,7 +167,8 @@ const accounts = ref(null)
           <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
           </RouterLink>
-          <RouterLink
+          <div v-if="!isOffline">
+            <RouterLink
             to="/browse/modpack"
             class="btn icon-only collapsed-button"
             :class="{
@@ -171,6 +177,7 @@ const accounts = ref(null)
           >
             <SearchIcon />
           </RouterLink>
+          </div>
           <RouterLink to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>

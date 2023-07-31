@@ -58,6 +58,7 @@ impl Metadata {
     #[theseus_macros::debug_pin]
     pub async fn init(
         dirs: &DirectoryInfo,
+        fetch_online : bool,
         io_semaphore: &IoSemaphore,
     ) -> crate::Result<Self> {
         let mut metadata = None;
@@ -68,6 +69,7 @@ impl Metadata {
         {
             metadata = Some(metadata_json);
         } else {
+            if fetch_online {
             let res = async {
                 let metadata_fetch = Self::fetch().await?;
 
@@ -88,6 +90,7 @@ impl Metadata {
                 Err(err) => {
                     tracing::warn!("Unable to fetch launcher metadata: {err}")
                 }
+            }
             }
         }
 

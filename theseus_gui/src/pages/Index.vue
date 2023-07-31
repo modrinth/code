@@ -8,6 +8,7 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
+import { refreshOffline } from '@/helpers/utils'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -19,6 +20,8 @@ const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
 const recentInstances = shallowRef([])
+
+const isOffline = await refreshOffline();
 
 const getInstances = async () => {
   const profiles = await list(true).catch(handleError)
@@ -40,17 +43,19 @@ const getFeaturedModpacks = async () => {
     `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
     'featured modpacks'
   )
-  featuredModpacks.value = response.hits
+  if (response) featuredModpacks.value = response.hits
 }
 const getFeaturedMods = async () => {
   const response = await useFetch(
     'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
     'featured mods'
   )
-  featuredMods.value = response.hits
+  if (response) featuredMods.value = response.hits
 }
 
 await getInstances()
+
+if (!isOffline)
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 const unlisten = await profile_listener(async (e) => {

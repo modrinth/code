@@ -7,7 +7,7 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::time;
+use std::time::{self, Duration};
 use tokio::sync::{RwLock, Semaphore};
 use tokio::{fs::File, io::AsyncWriteExt};
 
@@ -180,6 +180,22 @@ pub async fn fetch_mirrors(
     }
 
     unreachable!()
+}
+
+/// Using labrinth API, checks if an internet response can be found, with a timeout in seconds
+#[tracing::instrument(skip(semaphore))]
+#[theseus_macros::debug_pin]
+pub async fn check_internet(semaphore: &FetchSemaphore, timeout : u64) -> bool {
+    let result = fetch(
+        "https://api.modrinth.com",
+        None,
+        semaphore,
+    );
+    let result = tokio::time::timeout(Duration::from_secs(timeout), result).await;
+    match result {
+        Ok(Ok(_)) => true,
+        _ => false,
+    }
 }
 
 pub async fn read_json<T>(

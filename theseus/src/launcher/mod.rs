@@ -542,6 +542,7 @@ pub async fn launch_minecraft(
         }
     }
 
+    if !state.offline.read().await.clone()
     {
         // Add game played to discord rich presence
         let _ = state
