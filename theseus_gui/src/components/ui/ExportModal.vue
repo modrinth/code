@@ -74,10 +74,6 @@ const exportPack = async () => {
     directory: true,
     multiple: false,
   })
-  console.log(`may`)
-  console.log(props.instance)
-  console.log(props.instance.path)
-  console.log(outputPath + `/${nameInput.value} ${versionInput.value}.mrpack`)
 
   if (outputPath) {
     export_profile_mrpack(

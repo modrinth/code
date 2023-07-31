@@ -363,7 +363,6 @@ const sortedCategories = computed(() => {
 // Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
 // identifier[0], then if it ties, identifier[1], etc
 async function sortByNameOrNumber(sortable, identifiers) {
-  console.log(sortable)
   sortable.sort((a, b) => {
     for (let identifier of identifiers) {
       let aNum = parseFloat(a[identifier])

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Toggle } from 'omorphia'
+import { Card, Slider, DropdownSelect, Checkbox } from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
@@ -333,10 +333,10 @@ watch(
         <label for="fullscreen">
           <span class="label__title">Fullscreen</span>
           <span class="label__description">
-            Make the game start in full screen when launched.
+            Overwrites the option.txt file to start in full screen when launched.
           </span>
         </label>
-        <Toggle id="fullscreen" v-model="settings.fullscreen" />
+        <Checkbox id="fullscreen" v-model="settings.force_fullscreen" />
       </div>
       <div class="adjacent-input">
         <label for="width">
@@ -346,7 +346,7 @@ watch(
         <input
           id="width"
           v-model="settings.game_resolution[0]"
-          :disabled="settings.fullscreen"
+          :disabled="!settings.force_fullscreen"
           autocomplete="off"
           type="number"
           placeholder="Enter width..."
@@ -360,7 +360,7 @@ watch(
         <input
           id="height"
           v-model="settings.game_resolution[1]"
-          :disabled="settings.fullscreen"
+          :disabled="!settings.force_fullscreen"
           autocomplete="off"
           type="number"
           class="input"

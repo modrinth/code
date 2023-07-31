@@ -851,14 +851,13 @@ pub async fn run_credentials(
     };
 
     // Any options.txt settings that we want set, add here
-    let mc_set_options: Vec<(String, String)> = vec![(
-        "fullscreen".to_string(),
-        profile
-            .fullscreen
-            .unwrap_or(settings.force_fullscreen)
-            .to_string(),
-    )];
-
+    let mut mc_set_options: Vec<(String, String)> = vec![];
+    if let Some(fullscreen) = profile.fullscreen { // Profile fullscreen setting takes priority
+        mc_set_options.push(("fullscreen".to_string(), fullscreen.to_string()));
+    } else if settings.force_fullscreen { // If global settings wants to force a fullscreen, do it
+        mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
+    }
+    
     let mc_process = crate::launcher::launch_minecraft(
         java_args,
         env_args,

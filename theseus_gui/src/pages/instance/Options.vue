@@ -190,7 +190,7 @@
         <span class="label__title">Fullscreen</span>
         <span class="label__description"> Make the game start in full screen when launched. </span>
       </label>
-      <Toggle id="fullscreen" v-model="fullscreen" :disabled="!overrideWindowSettings" />
+      <Checkbox id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
     </div>
     <div class="adjacent-input">
       <label for="width">
@@ -201,7 +201,7 @@
         id="width"
         v-model="resolution[0]"
         autocomplete="off"
-        :disabled="!overrideWindowSettings || fullscreen"
+        :disabled="!overrideWindowSettings || fullscreenSetting"
         type="number"
         placeholder="Enter width..."
       />
@@ -215,7 +215,7 @@
         id="height"
         v-model="resolution[1]"
         autocomplete="off"
-        :disabled="!overrideWindowSettings || fullscreen"
+        :disabled="!overrideWindowSettings || fullscreenSetting"
         type="number"
         class="input"
         placeholder="Enter height..."
@@ -352,7 +352,6 @@ import {
   HammerIcon,
   DownloadIcon,
   ModalConfirm,
-  Toggle,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
@@ -446,12 +445,12 @@ const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
 const maxMemory = Math.floor((await get_max_memory().catch(handleError)) / 1024)
 
-const overrideWindowSettings = ref(!!props.instance.resolution)
+const overrideWindowSettings = ref(!!props.instance.resolution || !!props.instance.fullscreen)
 const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
 const overrideHooks = ref(!!props.instance.hooks)
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
-const fullscreen = ref(props.instance.fullscreen)
+const fullscreenSetting = ref(!!props.instance.fullscreen)
 
 watch(
   [
@@ -468,7 +467,7 @@ watch(
     memory,
     overrideWindowSettings,
     resolution,
-    fullscreen,
+    fullscreenSetting,
     overrideHooks,
     hooks,
   ],
@@ -513,12 +512,13 @@ watch(
     }
 
     if (overrideWindowSettings.value) {
-      editProfile.fullscreen = fullscreen.value
+      editProfile.fullscreen = fullscreenSetting.value
 
-      if (!fullscreen.value) {
+      if (!fullscreenSetting.value) {
         editProfile.resolution = resolution.value
       }
-    }
+    } 
+
 
     if (overrideHooks.value) {
       editProfile.hooks = hooks.value
