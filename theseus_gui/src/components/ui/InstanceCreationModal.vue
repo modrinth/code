@@ -3,7 +3,7 @@
     <div class="modal-header">
       <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>
-    <hr class="card-divider"/>
+    <hr class="card-divider" />
     <div v-if="creationType === 'custom'" class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
@@ -121,22 +121,24 @@
           <div class="toggle-all table-cell">
             <Checkbox
               class="select-checkbox"
-              :model-value="profiles.get(selectedProfileType.name)?.every((child) => child.selected)"
+              :model-value="
+                profiles.get(selectedProfileType.name)?.every((child) => child.selected)
+              "
               @update:model-value="
-              (newValue) =>
-                profiles
-                  .get(selectedProfileType.name)
-                  ?.forEach((child) => (child.selected = newValue))
-            "
+                (newValue) =>
+                  profiles
+                    .get(selectedProfileType.name)
+                    ?.forEach((child) => (child.selected = newValue))
+              "
             />
           </div>
           <div class="name-cell table-cell">Profile name</div>
         </div>
         <div
           v-if="
-          profiles.get(selectedProfileType.name) &&
-          profiles.get(selectedProfileType.name).length > 0
-        "
+            profiles.get(selectedProfileType.name) &&
+            profiles.get(selectedProfileType.name).length > 0
+          "
           class="table-content"
         >
           <div
@@ -152,24 +154,31 @@
             </div>
           </div>
         </div>
-        <div v-else class="table-content empty">
-          No profiles found
-        </div>
+        <div v-else class="table-content empty">No profiles found</div>
       </div>
       <div class="button-row">
-        <Button :disabled="loading || !Array.from(profiles.values()).flatMap((e) => e).some((e) => e.selected)" color="primary" @click="next">
+        <Button
+          :disabled="
+            loading ||
+            !Array.from(profiles.values())
+              .flatMap((e) => e)
+              .some((e) => e.selected)
+          "
+          color="primary"
+          @click="next"
+        >
           {{
             loading
               ? 'Importing...'
               : Array.from(profiles.values())
-                .flatMap((e) => e)
-                .some((e) => e.selected)
-                ? `Import ${
+                  .flatMap((e) => e)
+                  .some((e) => e.selected)
+              ? `Import ${
                   Array.from(profiles.values())
                     .flatMap((e) => e)
                     .filter((e) => e.selected).length
                 } profiles`
-                : 'Select profiles to import'
+              : 'Select profiles to import'
           }}
         </Button>
       </div>
@@ -189,7 +198,9 @@ import {
   CodeIcon,
   Checkbox,
   FolderOpenIcon,
-  InfoIcon, FolderSearchIcon, UpdatedIcon,
+  InfoIcon,
+  FolderSearchIcon,
+  UpdatedIcon,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
@@ -208,7 +219,7 @@ import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
-import {get_importable_instances, import_instance} from "@/helpers/import.js";
+import { get_importable_instances, import_instance } from '@/helpers/import.js'
 
 const themeStore = useTheming()
 
@@ -375,65 +386,65 @@ listen('tauri://file-drop', async (event) => {
 })
 
 const profiles = ref(
-    new Map([
-        ['MultiMC', []],
-        ['GDLauncher', []],
-        ['ATLauncher', []],
-        ['Curseforge', []],
-        ['PrismLauncher', []],
-    ])
+  new Map([
+    ['MultiMC', []],
+    ['GDLauncher', []],
+    ['ATLauncher', []],
+    ['Curseforge', []],
+    ['PrismLauncher', []],
+  ])
 )
 
 const loading = ref(false)
 
 const selectedProfileType = ref('MultiMC')
 const profileOptions = ref([
-    { name: 'MultiMC', path: '' },
-    { name: 'GDLauncher', path: '' },
-    { name: 'ATLauncher', path: '' },
-    { name: 'Curseforge', path: '' },
-    { name: 'PrismLauncher', path: '' },
+  { name: 'MultiMC', path: '' },
+  { name: 'GDLauncher', path: '' },
+  { name: 'ATLauncher', path: '' },
+  { name: 'Curseforge', path: '' },
+  { name: 'PrismLauncher', path: '' },
 ])
 
 const selectLauncherPath = async () => {
-    selectedProfileType.value.path = await open({ multiple: false, directory: true })
+  selectedProfileType.value.path = await open({ multiple: false, directory: true })
 
-    if (selectedProfileType.value.path) {
-        await reload()
-    }
+  if (selectedProfileType.value.path) {
+    await reload()
+  }
 }
 
 const reload = async () => {
-    const instances = await get_importable_instances(
-        selectedProfileType.value.name,
-        selectedProfileType.value.path
-    ).catch(handleError)
-    profiles.value.set(
-        selectedProfileType.value.name,
-        instances.map((name) => ({ name, selected: false }))
-    )
+  const instances = await get_importable_instances(
+    selectedProfileType.value.name,
+    selectedProfileType.value.path
+  ).catch(handleError)
+  profiles.value.set(
+    selectedProfileType.value.name,
+    instances.map((name) => ({ name, selected: false }))
+  )
 }
 
 const setPath = () => {
-    profileOptions.value.find((profile) => profile.name === selectedProfileType.value.name).path =
-        selectedProfileType.value.path
+  profileOptions.value.find((profile) => profile.name === selectedProfileType.value.name).path =
+    selectedProfileType.value.path
 }
 
 const next = async () => {
-    loading.value = true
-    for (const launcher of Array.from(profiles.value.entries()).map(([launcher, profiles]) => ({
-        launcher,
-        path: profileOptions.value.find((option) => option.name === launcher).path,
-        profiles,
-    }))) {
-        for (const profile of launcher.profiles.filter((profile) => profile.selected)) {
-            await import_instance(launcher.launcher, launcher.path, profile.name)
-                .catch(handleError)
-                .then(() => console.log(`Successfully Imported ${profile.name} from ${launcher.launcher}`))
-            profile.selected = false
-        }
+  loading.value = true
+  for (const launcher of Array.from(profiles.value.entries()).map(([launcher, profiles]) => ({
+    launcher,
+    path: profileOptions.value.find((option) => option.name === launcher).path,
+    profiles,
+  }))) {
+    for (const profile of launcher.profiles.filter((profile) => profile.selected)) {
+      await import_instance(launcher.launcher, launcher.path, profile.name)
+        .catch(handleError)
+        .then(() => console.log(`Successfully Imported ${profile.name} from ${launcher.launcher}`))
+      profile.selected = false
     }
-    loading.value = false
+  }
+  loading.value = false
 }
 </script>
 

@@ -155,15 +155,20 @@ const next = async () => {
           </div>
         </div>
       </div>
-      <div v-else class="table-content empty">
-        No profiles found
-      </div>
+      <div v-else class="table-content empty">No profiles found</div>
     </div>
     <div class="button-row">
-      <Button class="transparent" @click="prevPage">
-        Back
-      </Button>
-      <Button :disabled="loading || !Array.from(profiles.values()).flatMap((e) => e).some((e) => e.selected)" color="primary" @click="next">
+      <Button class="transparent" @click="prevPage"> Back </Button>
+      <Button
+        :disabled="
+          loading ||
+          !Array.from(profiles.values())
+            .flatMap((e) => e)
+            .some((e) => e.selected)
+        "
+        color="primary"
+        @click="next"
+      >
         {{
           loading
             ? 'Importing...'
@@ -178,9 +183,7 @@ const next = async () => {
             : 'Select profiles to import'
         }}
       </Button>
-      <Button class="transparent" @click="nextPage">
-        Next
-      </Button>
+      <Button class="transparent" @click="nextPage"> Next </Button>
     </div>
   </Card>
 </template>
@@ -262,5 +265,4 @@ const next = async () => {
   font-weight: bolder;
   color: var(--color-contrast);
 }
-
 </style>

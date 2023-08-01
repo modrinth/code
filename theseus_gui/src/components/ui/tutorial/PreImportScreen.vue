@@ -1,6 +1,6 @@
 <script setup>
-import {Button, Card, ModrinthIcon} from 'omorphia'
-import {ATLauncherIcon, PrismIcon} from "@/assets/external/index.js";
+import { Button, Card, ModrinthIcon } from 'omorphia'
+import { ATLauncherIcon, PrismIcon } from '@/assets/external/index.js'
 
 defineProps({
   nextPage: {
@@ -20,24 +20,24 @@ defineProps({
 
 <template>
   <Card class="import-card">
-    <div class="base-ellipsis ellipsis-1"/>
-    <div class="base-ellipsis ellipsis-2"/>
-    <div class="base-ellipsis ellipsis-3"/>
-    <div class="base-ellipsis ellipsis-4"/>
+    <div class="base-ellipsis ellipsis-1" />
+    <div class="base-ellipsis ellipsis-2" />
+    <div class="base-ellipsis ellipsis-3" />
+    <div class="base-ellipsis ellipsis-4" />
     <div class="logo">
-      <ModrinthIcon/>
+      <ModrinthIcon />
     </div>
     <div class="launcher-stamp top-left">
-      <ATLauncherIcon/>
+      <ATLauncherIcon />
     </div>
     <div class="launcher-stamp top-right">
-      <PrismIcon/>
+      <PrismIcon />
     </div>
     <div class="launcher-stamp bottom-left">
-      <img src="@/assets/external/gdlauncher.png" alt="GDLauncher"/>
+      <img src="@/assets/external/gdlauncher.png" alt="GDLauncher" />
     </div>
     <div class="launcher-stamp bottom-right">
-      <img src="@/assets/external/multimc.webp" alt="MultiMC"/>
+      <img src="@/assets/external/multimc.webp" alt="MultiMC" />
     </div>
     <div class="info-section">
       <h2>Importing</h2>
@@ -47,15 +47,9 @@ defineProps({
         </p>
       </div>
       <div class="button-row">
-        <Button class="transparent" @click="prevPage">
-          Back
-        </Button>
-        <Button color="primary" @click="importPage">
-          Import
-        </Button>
-        <Button class="transparent" @click="nextPage">
-          Next
-        </Button>
+        <Button class="transparent" @click="prevPage"> Back </Button>
+        <Button color="primary" @click="importPage"> Import </Button>
+        <Button class="transparent" @click="nextPage"> Next </Button>
       </div>
     </div>
   </Card>
@@ -146,7 +140,8 @@ defineProps({
     right: 5.5rem;
   }
 
-  svg, img {
+  svg,
+  img {
     width: 100%;
     height: 100%;
   }

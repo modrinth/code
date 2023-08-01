@@ -36,9 +36,7 @@ defineProps({
       {{ description }}
     </div>
     <div class="tutorial-footer">
-      <Button v-if="previousFunction" class="transparent" @click="previousFunction">
-        Back
-      </Button>
+      <Button v-if="previousFunction" class="transparent" @click="previousFunction"> Back </Button>
       {{ progress }}/9
       <ProgressBar :progress="(progress / 9) * 100" />
       <Button color="primary" :action="progressFunction">

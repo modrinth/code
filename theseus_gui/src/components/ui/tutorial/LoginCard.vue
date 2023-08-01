@@ -55,13 +55,20 @@ const openUrl = async () => {
 
 <template>
   <div class="login-card">
-    <img src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png" class="logo"  alt="Minecraft art"/>
+    <img
+      src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+      class="logo"
+      alt="Minecraft art"
+    />
     <Card class="logging-in">
       <h2>Sign into Minecraft</h2>
       <p>
-        Sign in with your Microsoft account to launch Minecraft with your mods and modpacks.
-        If you don't have a Minecraft account, you can purchase the game on the
-        <a href="https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc" class="link">
+        Sign in with your Microsoft account to launch Minecraft with your mods and modpacks. If you
+        don't have a Minecraft account, you can purchase the game on the
+        <a
+          href="https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc"
+          class="link"
+        >
           Minecraft website
         </a>
       </p>

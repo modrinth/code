@@ -33,7 +33,7 @@ import { auto_install_java, get_jre } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
 import ImportingCard from '@/components/ui/tutorial/ImportingCard.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import PreImportScreen from "@/components/ui/tutorial/PreImportScreen.vue";
+import PreImportScreen from '@/components/ui/tutorial/PreImportScreen.vue'
 
 const phase = ref(0)
 const page = ref(1)
@@ -116,12 +116,17 @@ onMounted(async () => {
       ]"
       logo
     >
-      <Button color="primary" @click="nextPage" > Get started </Button>
+      <Button color="primary" @click="nextPage"> Get started </Button>
     </GalleryImage>
-    <LoginCard v-else-if="page === 2" :next-page="nextPage" :prev-page="prevPage"/>
-    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" :prev-page="prevPage"/>
-    <PreImportScreen v-else-if="page === 4" :next-page="endOnboarding" :prev-page="prevPage" :import-page="nextPage"/>
-    <ImportingCard v-else-if="page === 5" :next-page="endOnboarding" :prev-page="prevPage"/>
+    <LoginCard v-else-if="page === 2" :next-page="nextPage" :prev-page="prevPage" />
+    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" :prev-page="prevPage" />
+    <PreImportScreen
+      v-else-if="page === 4"
+      :next-page="endOnboarding"
+      :prev-page="prevPage"
+      :import-page="nextPage"
+    />
+    <ImportingCard v-else-if="page === 5" :next-page="endOnboarding" :prev-page="prevPage" />
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />
@@ -130,7 +135,7 @@ onMounted(async () => {
         <FakeAccountsCard :show-demo="phase === 3">
           <TutorialTip
             :progress-function="nextPhase"
-:previous-function="prevPhase"
+            :previous-function="prevPhase"
             :progress="phase"
             title="Signing in"
             description="The Modrinth App uses your Microsoft account to allow you to launch Minecraft. You can sign in with your Microsoft account here, and switch between multiple accounts."
@@ -176,7 +181,7 @@ onMounted(async () => {
             <template #running>
               <TutorialTip
                 :progress-function="nextPhase"
-:previous-function="prevPhase"
+                :previous-function="prevPhase"
                 :progress="phase"
                 title="Playing modpacks"
                 description="When you launch a modpack, you can manage it directly in the title bar here. You can stop the modpack, view the logs, and see all currently running packs."
@@ -185,7 +190,7 @@ onMounted(async () => {
             <template #download>
               <TutorialTip
                 :progress-function="nextPhase"
-:previous-function="prevPhase"
+                :previous-function="prevPhase"
                 :progress="phase"
                 title="Installing modpacks"
                 description="When you download a modpack, Modrinth App will automatically install it for you. You can view the progress of the installation here."
@@ -237,12 +242,12 @@ onMounted(async () => {
       description="This is the Modrinth App guide. Key parts are marked with a green shadow. Click 'Next' to
       proceed. You can leave the tutorial anytime using the Exit button above the plus button on the bottom left."
     />
-    <div v-if="phase === 1" class="whole-page-shadow"/>
+    <div v-if="phase === 1" class="whole-page-shadow" />
     <TutorialTip
       v-if="phase === 2"
       class="sticky-tip"
       :progress-function="nextPhase"
-:previous-function="prevPhase"
+      :previous-function="prevPhase"
       :progress="phase"
       title="Home page"
       description="This is the home page. Here you can see all the latest modpacks, mods, and other content on Modrinth. You can also see a few of your installed modpacks here."
@@ -251,7 +256,7 @@ onMounted(async () => {
       v-if="phase === 4"
       class="sticky-tip"
       :progress-function="nextPhase"
-:previous-function="prevPhase"
+      :previous-function="prevPhase"
       :progress="phase"
       title="Searching for content"
       description="You can search for content on Modrinth by navigating to the search page. You can search for mods, modpacks, and more, and install them directly from here."
@@ -260,7 +265,7 @@ onMounted(async () => {
       v-if="phase === 6"
       class="sticky-tip"
       :progress-function="nextPhase"
-:previous-function="prevPhase"
+      :previous-function="prevPhase"
       :progress="phase"
       title="Modpack library"
       description="You can view all your installed modpacks in the library. You can launch any modpack from here, or click the card to view more information about it."
@@ -269,7 +274,7 @@ onMounted(async () => {
       v-if="phase === 8"
       class="sticky-tip"
       :progress-function="nextPhase"
-:previous-function="prevPhase"
+      :previous-function="prevPhase"
       :progress="phase"
       title="Settings"
       description="You can view and change the settings for the Modrinth App here. You can change the appearance, set and download new Java versions, and more."
@@ -505,5 +510,4 @@ onMounted(async () => {
   -webkit-backdrop-filter: brightness(0.5);
   z-index: 9;
 }
-
 </style>
