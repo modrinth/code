@@ -74,7 +74,7 @@ fn main() {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
-        .plugin(tauri_plugin_window_state::Builder::default().build())
+        // .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
             // Register deep link handler, allowing reading of modrinth:// links
             if let Err(e) = tauri_plugin_deep_link::register(
@@ -97,8 +97,6 @@ fn main() {
             }
             #[cfg(target_os = "macos")]
             {
-                win.set_decorations(true).unwrap();
-
                 use macos::window_ext::WindowExt;
                 win.set_transparent_titlebar(true);
                 win.position_traffic_lights(9.0, 16.0);

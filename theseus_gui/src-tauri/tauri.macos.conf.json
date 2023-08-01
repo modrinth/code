@@ -1,0 +1,19 @@
+{
+  "tauri": {
+    "windows": [
+      {
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "fullscreen": false,
+        "height": 650,
+        "resizable": true,
+        "title": "Modrinth App",
+        "width": 1280,
+        "minHeight": 630,
+        "minWidth": 1100,
+        "visible": false,
+        "decorations": true
+      }
+    ]
+  }
+}
