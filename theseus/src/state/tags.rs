@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
 use crate::util::fetch::{
-    fetch_json, read_json, write, FetchSemaphore, IoSemaphore, self,
+    fetch_json, read_json, write, FetchSemaphore, IoSemaphore,
 };
 
 // Serializeable struct for all tags to be fetched together by the frontend
@@ -24,7 +24,7 @@ impl Tags {
     #[theseus_macros::debug_pin]
     pub async fn init(
         dirs: &DirectoryInfo,
-        fetch_online : bool,
+        fetch_online: bool,
         io_semaphore: &IoSemaphore,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Self> {

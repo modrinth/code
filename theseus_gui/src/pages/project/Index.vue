@@ -265,9 +265,9 @@ import {
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRoute } from 'vue-router'
-import { ref, shallowRef, watch } from 'vue'
-import { installVersionDependencies } from '@/helpers/utils'
+import { useRoute, useRouter } from 'vue-router'
+import { onUnmounted, ref, shallowRef, watch } from 'vue'
+import { installVersionDependencies, isOffline } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -276,7 +276,8 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
+import { offline_listener } from '@/helpers/events'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -296,6 +297,18 @@ const instance = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
+
+const offline = ref(await isOffline())
+const router = useRouter()
+// Immediately return to home page if offline
+if (offline.value) {
+  await router.push('/')
+}
+const unlisten = await offline_listener((e) => {
+  if (e) {
+    router.push('/')
+  }
+})
 
 async function fetchProjectData() {
   ;[
@@ -325,7 +338,7 @@ async function fetchProjectData() {
     : null
 }
 
-await fetchProjectData()
+if (!offline.value) await fetchProjectData()
 
 watch(
   () => route.params.id,
@@ -392,7 +405,7 @@ async function install(version) {
         data.value.icon_url
       ).catch(handleError)
 
-      mixpanel.track('PackInstall', {
+      mixpanel_track('PackInstall', {
         id: data.value.id,
         version_id: queuedVersionData.id,
         title: data.value.title,
@@ -434,7 +447,7 @@ async function install(version) {
           await installMod(instance.value.path, selectedVersion.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
           installedVersion.value = selectedVersion.id
-          mixpanel.track('ProjectInstall', {
+          mixpanel_track('ProjectInstall', {
             loader: instance.value.metadata.loader,
             game_version: instance.value.metadata.game_version,
             id: data.value.id,
@@ -458,7 +471,7 @@ async function install(version) {
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
           installedVersion.value = queuedVersionData.id
-          mixpanel.track('ProjectInstall', {
+          mixpanel_track('ProjectInstall', {
             loader: instance.value.metadata.loader,
             game_version: instance.value.metadata.game_version,
             id: data.value.id,
@@ -524,6 +537,10 @@ const handleOptionsClick = (args) => {
       break
   }
 }
+
+onUnmounted(() => {
+  unlisten()
+})
 </script>
 
 <style scoped lang="scss">

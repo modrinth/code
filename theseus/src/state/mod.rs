@@ -1,19 +1,17 @@
 //! Theseus state management system
-use crate::event::emit::{emit_loading, init_loading_unsafe};
+use crate::event::emit::{emit_loading, emit_offline, init_loading_unsafe};
 use std::path::PathBuf;
 
 use crate::event::LoadingBarType;
 use crate::loading_join;
 
 use crate::state::users::Users;
-use crate::util::fetch::{FetchSemaphore, IoSemaphore, fetch, self};
-use futures::try_join;
+use crate::util::fetch::{self, FetchSemaphore, IoSemaphore};
 use notify::RecommendedWatcher;
 use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
-use serde::Deserialize;
-use tokio::join;
 use std::sync::Arc;
 use std::time::Duration;
+use tokio::join;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
 use futures::{channel::mpsc::channel, SinkExt, StreamExt};
@@ -153,10 +151,15 @@ impl State {
 
         let is_offline = !fetch::check_internet(&fetch_semaphore, 3).await;
 
-        let metadata_fut = Metadata::init(&directories, !is_offline, &io_semaphore);
+        let metadata_fut =
+            Metadata::init(&directories, !is_offline, &io_semaphore);
         let profiles_fut = Profiles::init(&directories, &mut file_watcher);
-        let tags_fut = 
-            Tags::init(&directories, !is_offline, &io_semaphore, &fetch_semaphore);
+        let tags_fut = Tags::init(
+            &directories,
+            !is_offline,
+            &io_semaphore,
+            &fetch_semaphore,
+        );
         let users_fut = Users::init(&directories, &io_semaphore);
         // Launcher data
         let (metadata, profiles, tags, users) = loading_join! {
@@ -203,17 +206,16 @@ impl State {
     pub fn update() {
         tokio::task::spawn(async {
             if let Ok(state) = crate::State::get().await {
-                if !state.offline.read().await.clone() {
-                    
+                if !*state.offline.read().await {
                     let res1 = Profiles::update_modrinth_versions();
                     let res2 = Tags::update();
                     let res3 = Metadata::update();
                     let res4 = Profiles::update_projects();
                     let res5 = Settings::update_java();
-            
-                    let _ = join!(res1, res2, res3, res4, res5) ;
+
+                    let _ = join!(res1, res2, res3, res4, res5);
                 }
-            } 
+            }
         });
     }
 
@@ -284,15 +286,20 @@ impl State {
     }
 
     /// Refreshes whether or not the launcher should be offline, by whether or not there is an internet connection
-    pub async fn refresh_offline(&self) {
+    pub async fn refresh_offline(&self) -> crate::Result<()> {
         let is_online = fetch::check_internet(&self.fetch_semaphore, 3).await;
-        
+
         let mut offline = self.offline.write().await;
+
+        if *offline != is_online {
+            return Ok(());
+        }
+
+        emit_offline(!is_online).await?;
         *offline = !is_online;
+        Ok(())
     }
-
 }
-
 
 pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
     let (mut tx, mut rx) = channel(1);

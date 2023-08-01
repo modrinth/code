@@ -16,7 +16,7 @@ import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 
 const props = defineProps({
   instance: {
@@ -93,7 +93,7 @@ const install = async (e) => {
       ).catch(handleError)
       modLoading.value = false
 
-      mixpanel.track('PackInstall', {
+      mixpanel_track('PackInstall', {
         id: props.instance.project_id,
         version_id: versions[0].id,
         title: props.instance.title,
@@ -125,7 +125,7 @@ const play = async (e, context) => {
   modLoading.value = false
   playing.value = true
 
-  mixpanel.track('InstancePlay', {
+  mixpanel_track('InstancePlay', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
     source: context,
@@ -145,7 +145,7 @@ const stop = async (e, context) => {
     uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
   } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
 
-  mixpanel.track('InstanceStop', {
+  mixpanel_track('InstanceStop', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
     source: context,

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, readonly, shallowRef, watch } from 'vue'
+import { computed, nextTick, ref, readonly, shallowRef, watch, onUnmounted } from 'vue'
 import {
   Pagination,
   Checkbox,
@@ -31,6 +31,8 @@ import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningM
 import { useFetch } from '@/helpers/fetch.js'
 import { check_installed, get as getInstance } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { isOffline } from '@/helpers/utils'
+import { offline_listener } from '@/helpers/events'
 
 const router = useRouter()
 const route = useRoute()
@@ -363,7 +365,6 @@ const sortedCategories = computed(() => {
 // Sorts alphabetically, but correctly identifies 8x, 128x, 256x, etc
 // identifier[0], then if it ties, identifier[1], etc
 async function sortByNameOrNumber(sortable, identifiers) {
-  console.log(sortable)
   sortable.sort((a, b) => {
     for (let identifier of identifiers) {
       let aNum = parseFloat(a[identifier])
@@ -505,6 +506,19 @@ const showLoaders = computed(
       instanceContext.value === null) ||
     ignoreInstanceLoaders.value
 )
+
+const offline = ref(await isOffline())
+// Immediately return to home page if offline
+if (offline.value) {
+  await router.push('/')
+}
+const unlisten = await offline_listener((e) => {
+  if (e) {
+    router.push('/')
+  }
+})
+
+onUnmounted(() => unlisten())
 </script>
 
 <template>

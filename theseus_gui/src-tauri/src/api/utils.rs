@@ -128,19 +128,22 @@ pub async fn await_sync() -> Result<()> {
     Ok(())
 }
 
-// Check if theseus is currently in offline mode, without a refresh attempt
+/// Check if theseus is currently in offline mode, without a refresh attempt
 #[tauri::command]
 pub async fn is_offline() -> Result<bool> {
     let state = State::get().await?;
-    let offline = state.offline.read().await.clone();
+    let offline = *state.offline.read().await;
+
+    // Spawn a refresh attempt in the background (don't wait for it to finish as an emit will be sent when it is done)
+    tokio::spawn(refresh_offline());
     Ok(offline)
 }
 
-// Refreshes whether or not theseus is in offline mode, and returns the new value
+/// Refreshes whether or not theseus is in offline mode, and returns the new value
 #[tauri::command]
 pub async fn refresh_offline() -> Result<bool> {
     let state = State::get().await?;
-    let offline = state.refresh_offline().await;
-    let offline = state.offline.read().await.clone();
+    state.refresh_offline().await?;
+    let offline = *state.offline.read().await;
     Ok(offline)
 }

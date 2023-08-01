@@ -3,12 +3,12 @@ import { ref, onUnmounted, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
-import { profile_listener } from '@/helpers/events'
+import { offline_listener, profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
-import { refreshOffline } from '@/helpers/utils'
+import { isOffline } from '@/helpers/utils'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -21,7 +21,7 @@ breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
 const recentInstances = shallowRef([])
 
-const isOffline = await refreshOffline();
+const offline = ref(await isOffline())
 
 const getInstances = async () => {
   const profiles = await list(true).catch(handleError)
@@ -55,17 +55,26 @@ const getFeaturedMods = async () => {
 
 await getInstances()
 
-if (!isOffline)
-await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+if (!offline.value) await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
-const unlisten = await profile_listener(async (e) => {
+const unlistenProfile = await profile_listener(async (e) => {
   await getInstances()
   if (e.event === 'created' || e.event === 'removed') {
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }
 })
 
-onUnmounted(() => unlisten())
+const unlistenOffline = await offline_listener(async (b) => {
+  offline.value = b
+  if (!b) {
+    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+  }
+})
+
+onUnmounted(() => {
+  unlistenProfile()
+  unlistenOffline()
+})
 </script>
 
 <template>

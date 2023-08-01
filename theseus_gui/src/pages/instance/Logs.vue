@@ -15,7 +15,7 @@
           <CheckIcon v-else />
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
-        <Button color="primary" @click="share">
+        <Button v-if="!offline" color="primary" @click="share">
           <ShareIcon />
           Share
         </Button>
@@ -77,6 +77,10 @@ const props = defineProps({
   instance: {
     type: Object,
     required: true,
+  },
+  offline: {
+    type: Boolean,
+    default: false,
   },
 })
 

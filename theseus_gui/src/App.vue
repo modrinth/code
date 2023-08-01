@@ -20,12 +20,17 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
-import { warning_listener } from '@/helpers/events.js'
+import { offline_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, refreshOffline } from '@/helpers/utils.js'
-import mixpanel from 'mixpanel-browser'
+import { isDev, isOffline } from '@/helpers/utils.js'
+import {
+  mixpanel_track,
+  mixpanel_init,
+  mixpanel_opt_out_tracking,
+  mixpanel_is_loaded,
+} from '@/helpers/mixpanel'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import OnboardingModal from '@/components/OnboardingModal.vue'
 import { getVersion } from '@tauri-apps/api/app'
@@ -37,8 +42,7 @@ import { confirm } from '@tauri-apps/api/dialog'
 const themeStore = useTheming()
 
 const isLoading = ref(true)
-const isOffline = ref(false)
-
+const offline = ref(false)
 
 defineExpose({
   initialize: async () => {
@@ -52,11 +56,11 @@ defineExpose({
     themeStore.collapsedNavigation = collapsed_navigation
     themeStore.advancedRendering = advanced_rendering
 
-    mixpanel.init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+    mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
     if (opt_out_analytics) {
-      mixpanel.opt_out_tracking()
+      mixpanel_opt_out_tracking()
     }
-    mixpanel.track('Launched', { version, dev, onboarded })
+    mixpanel_track('Launched', { version, dev, onboarded })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -66,7 +70,10 @@ defineExpose({
       document.getElementsByTagName('html')[0].classList.add('windows')
     }
 
-    isOffline.value = await refreshOffline()
+    offline.value = await isOffline()
+    await offline_listener((b) => {
+      offline.value = b
+    })
 
     await warning_listener((e) =>
       notificationsWrapper.value.addNotification({
@@ -107,8 +114,8 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-  if (mixpanel.__loaded) {
-    mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
+  if (mixpanel_is_loaded()) {
+    mixpanel_track('PageView', { path: to.path, fromPath: from.path, failed: failure })
   }
 })
 const route = useRoute()
@@ -167,16 +174,16 @@ const accounts = ref(null)
           <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
           </RouterLink>
-          <div v-if="!isOffline">
+          <div v-if="!offline">
             <RouterLink
-            to="/browse/modpack"
-            class="btn icon-only collapsed-button"
-            :class="{
-              'router-link-active': isOnBrowse,
-            }"
-          >
-            <SearchIcon />
-          </RouterLink>
+              to="/browse/modpack"
+              class="btn icon-only collapsed-button"
+              :class="{
+                'router-link-active': isOnBrowse,
+              }"
+            >
+              <SearchIcon />
+            </RouterLink>
           </div>
           <RouterLink to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
@@ -188,6 +195,7 @@ const accounts = ref(null)
       </div>
       <div class="settings pages-list">
         <Button
+          v-if="!offline"
           class="sleek-primary icon-only collapsed-button"
           @click="() => $refs.installationModal.show()"
         >

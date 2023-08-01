@@ -83,7 +83,7 @@
     </label>
     <input id="profile-name" v-model="title" autocomplete="off" maxlength="80" type="text" />
 
-    <div class="adjacent-input">
+    <div v-if="!offline" class="adjacent-input">
       <label for="edit-versions">
         <span class="label__title">Edit mod loader/game versions</span>
         <span class="label__description">
@@ -280,7 +280,7 @@
         <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
-    <div class="adjacent-input">
+    <div v-if="!offline" class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
         <span class="label__description">
@@ -297,7 +297,7 @@
         <HammerIcon /> Repair
       </button>
     </div>
-    <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
+    <div v-if="props.instance.modrinth_update_version && !offline" class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Reinstall modpack</span>
         <span class="label__description">
@@ -374,7 +374,7 @@ import { open } from '@tauri-apps/api/dialog'
 import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 
 const router = useRouter()
@@ -383,6 +383,10 @@ const props = defineProps({
   instance: {
     type: Object,
     required: true,
+  },
+  offline: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -404,7 +408,7 @@ const availableGroups = ref([
 async function resetIcon() {
   icon.value = null
   await edit_icon(props.instance.path, null).catch(handleError)
-  mixpanel.track('InstanceRemoveIcon')
+  mixpanel_track('InstanceRemoveIcon')
 }
 
 async function setIcon() {
@@ -423,7 +427,7 @@ async function setIcon() {
   icon.value = value
   await edit_icon(props.instance.path, icon.value).catch(handleError)
 
-  mixpanel.track('InstanceSetIcon')
+  mixpanel_track('InstanceSetIcon')
 }
 
 const globalSettings = await get().catch(handleError)
@@ -536,7 +540,7 @@ async function repairProfile() {
   await install(props.instance.path).catch(handleError)
   repairing.value = false
 
-  mixpanel.track('InstanceRepair', {
+  mixpanel_track('InstanceRepair', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
   })
@@ -547,7 +551,7 @@ async function repairModpack() {
   await update_repair_modrinth(props.instance.path).catch(handleError)
   repairing.value = false
 
-  mixpanel.track('InstanceRepair', {
+  mixpanel_track('InstanceRepair', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
   })
@@ -559,7 +563,7 @@ async function removeProfile() {
   await remove(props.instance.path).catch(handleError)
   removing.value = false
 
-  mixpanel.track('InstanceRemove', {
+  mixpanel_track('InstanceRemove', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
   })

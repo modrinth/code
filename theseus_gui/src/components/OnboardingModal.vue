@@ -163,7 +163,7 @@ import { get, set } from '@/helpers/settings.js'
 import { auto_install_java, get_jre } from '@/helpers/jre.js'
 import { loading_listener } from '@/helpers/events.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 
 const onboardingModal = ref(null)
 const accountsCard = ref(null)
@@ -219,11 +219,11 @@ async function pageTurn() {
   if (page.value === 3) {
     settings.value.onboarded = true
     onboardingModal.value.hide()
-    mixpanel.track('OnboardingFinish')
+    mixpanel_track('OnboardingFinish')
     return
   }
   page.value++
-  mixpanel.track('OnboardingPage', { page: page.value })
+  mixpanel_track('OnboardingPage', { page: page.value })
 
   if (accountsCard.value) {
     await accountsCard.value.refreshValues()
@@ -240,7 +240,7 @@ async function autoInstallJava() {
   settings.value.java_globals.JAVA_17 = version
   settings.value.java_globals.JAVA_17 = version
   set(settings.value)
-  mixpanel.track('OnboardingAutoInstallJava')
+  mixpanel_track('OnboardingAutoInstallJava')
 }
 
 const javaLoadingEvent = ref(null)

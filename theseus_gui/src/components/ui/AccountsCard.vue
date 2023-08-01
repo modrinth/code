@@ -74,7 +74,7 @@ import {
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 
 defineProps({
   mode: {
@@ -123,7 +123,7 @@ async function login() {
   await setAccount(loggedIn)
   await refreshValues()
   await window.close()
-  mixpanel.track('AccountLogIn')
+  mixpanel_track('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -135,7 +135,7 @@ const logout = async (id) => {
   } else {
     emit('change')
   }
-  mixpanel.track('AccountLogOut')
+  mixpanel_track('AccountLogOut')
 }
 
 let showCard = ref(false)
