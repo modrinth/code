@@ -397,7 +397,7 @@ async function clearFilters() {
   onlyOpenSource.value = false
   selectedVersions.value = []
   selectedEnvironments.value = []
-  await onSearchChange(1)
+  await onSearchChangeToTop(1)
 }
 
 async function toggleFacet(elementName, doNotSendRequest = false) {
@@ -410,7 +410,7 @@ async function toggleFacet(elementName, doNotSendRequest = false) {
   }
 
   if (!doNotSendRequest) {
-    await onSearchChange(1)
+    await onSearchChangeToTop(1)
   }
 }
 
@@ -423,7 +423,7 @@ async function toggleOrFacet(elementName, doNotSendRequest) {
   }
 
   if (!doNotSendRequest) {
-    await onSearchChange(1)
+    await onSearchChangeToTop(1)
   }
 }
 
@@ -436,7 +436,7 @@ function toggleEnv(environment, sendRequest) {
   }
 
   if (!sendRequest) {
-    onSearchChange(1)
+    onSearchChangeToTop(1)
   }
 }
 
@@ -600,7 +600,7 @@ const showLoaders = computed(
             :clear-search-on-select="false"
             :show-labels="false"
             placeholder="Choose versions..."
-            @update:model-value="onSearchChange(1)"
+            @update:model-value="onSearchChangeToTop(1)"
           />
         </div>
         <div
@@ -647,7 +647,7 @@ const showLoaders = computed(
             v-model="onlyOpenSource"
             label="Open source only"
             class="filter-checkbox"
-            @update:model-value="onSearchChange(1)"
+            @update:model-value="onSearchChangeToTop(1)"
           />
         </div>
       </Card>
