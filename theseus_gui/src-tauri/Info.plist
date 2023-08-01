@@ -59,5 +59,10 @@
     			</dict>
     		</dict>
     	</array>
+		<key>NSCameraUsageDescription</key>
+		<string>A Minecraft mod wants to access your camera.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>A Minecraft mod wants to access your microphone.</string>
+
     </dict>
 </plist>
