@@ -166,7 +166,6 @@ command_listener((e) => {
     class="video"
     src="@/assets/video.mp4"
     autoplay
-    muted
     @ended="videoPlaying = false"
   />
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
@@ -470,10 +469,12 @@ command_listener((e) => {
   height: 100%;
   gap: 1rem;
 }
+
 .video {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
+  margin-top: 2.25rem;
+  width: 100vw;
+  height: calc(100vh - 2.25rem);
+  object-fit: cover;
   border-radius: var(--radius-md);
 }
 </style>

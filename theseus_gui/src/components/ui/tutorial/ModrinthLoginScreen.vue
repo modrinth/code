@@ -69,7 +69,7 @@ defineProps({
     <div class="button-row">
       <Button class="transparent" large @click="prevPage"> Back </Button>
       <Button color="primary" large> Login </Button>
-      <Button class="transparent" large @click="nextPage"> Skip </Button>
+      <Button class="transparent" large @click="nextPage"> Next </Button>
     </div>
   </Card>
 </template>

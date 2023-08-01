@@ -344,7 +344,7 @@ defineProps({
       padding: var(--gap-sm);
       gap: var(--gap-xs);
       display: flex;
-      z-index: 10;
+      z-index: 1;
       flex-direction: row;
       justify-content: flex-end;
       align-items: flex-end;

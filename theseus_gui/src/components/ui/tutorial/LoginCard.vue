@@ -67,7 +67,7 @@ const openUrl = async () => {
       </p>
       <div class="action-row">
         <Button class="transparent" large @click="prevPage"> Back </Button>
-        <div>
+        <div class="sign-in-pair">
           <Button color="primary" large @click="login">
             <LogInIcon v-if="!finalizedLogin" />
             {{ finalizedLogin ? 'Next' : 'Sign in' }}
@@ -76,7 +76,7 @@ const openUrl = async () => {
             Browser didn't open?
           </Button>
         </div>
-        <Button class="transparent" large @click="nextPage"> Skip </Button>
+        <Button class="transparent" large @click="nextPage"> Next </Button>
       </div>
     </Card>
   </div>
@@ -201,5 +201,12 @@ const openUrl = async () => {
   max-width: 25rem;
   height: auto;
   margin-bottom: var(--gap-lg);
+}
+
+.sign-in-pair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  align-items: center;
 }
 </style>

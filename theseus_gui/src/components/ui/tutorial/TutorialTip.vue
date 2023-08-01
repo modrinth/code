@@ -19,6 +19,11 @@ defineProps({
     type: Function,
     default: () => {},
   },
+  previousFunction: {
+    type: Function,
+    required: false,
+    default: null,
+  },
 })
 </script>
 
@@ -31,6 +36,9 @@ defineProps({
       {{ description }}
     </div>
     <div class="tutorial-footer">
+      <Button v-if="previousFunction" class="transparent" @click="previousFunction">
+        Back
+      </Button>
       {{ progress }}/9
       <ProgressBar :progress="(progress / 9) * 100" />
       <Button color="primary" :action="progressFunction">
@@ -46,7 +54,7 @@ defineProps({
   flex-direction: column;
   gap: var(--gap-md);
   border: 1px solid var(--color-button-bg);
-  width: 20rem;
+  width: 22rem;
 }
 
 .tutorial-title {
@@ -58,5 +66,9 @@ defineProps({
   flex-direction: row;
   align-items: center;
   gap: var(--gap-sm);
+
+  .transparent {
+    border: 1px solid var(--color-button-bg);
+  }
 }
 </style>
