@@ -126,6 +126,11 @@ export async function fetchNotifications() {
 
 export function groupNotifications(notifications, includeRead = false) {
   const grouped = []
+
+  for (const notification of notifications) {
+    notification.grouped_notifs = []
+  }
+
   for (const notification of notifications.filter((notif) => includeRead || !notif.read)) {
     // Group notifications of the same thread or project id
     if (notification.body) {

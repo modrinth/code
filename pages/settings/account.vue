@@ -255,9 +255,9 @@
         </div>
         <p></p>
         <div class="input-group push-right">
-          <button class="iconified-button brand-button" @click="$refs.manageProvidersModal.hide()">
-            <CheckIcon />
-            Finish editing
+          <button class="iconified-button" @click="$refs.manageProvidersModal.hide()">
+            <XIcon />
+            Close
           </button>
         </div>
       </div>

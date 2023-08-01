@@ -142,6 +142,9 @@ const route = useRoute()
   }
 
   @media screen and (max-width: 25.5rem) {
+    width: auto;
+    margin: 1rem;
+
     .third-party .btn {
       grid-column: 1 / 3;
     }

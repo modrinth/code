@@ -33,7 +33,11 @@
       type="password"
       placeholder="Confirm password"
     />
-    <Checkbox v-model="subscribe" class="subscribe-btn" label="Subscribe updates about Modrinth" />
+    <Checkbox
+      v-model="subscribe"
+      class="subscribe-btn"
+      label="Subscribe to updates about Modrinth"
+    />
     <p>
       By creating an account, you agree to Modrinth's
       <nuxt-link to="/legal/terms" class="text-link">terms</nuxt-link> and
@@ -43,7 +47,7 @@
       Create account <RightArrowIcon />
     </button>
     <p>
-      Already have an account yet?
+      Already have an account?
       <nuxt-link
         class="text-link"
         :to="`/auth/sign-in${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`"

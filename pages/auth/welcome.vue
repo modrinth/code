@@ -5,7 +5,11 @@
       Thank you for creating an account. You can now follow and create projects, receive updates
       about your favorite projects, and more!
     </p>
-    <Checkbox v-model="subscribe" class="subscribe-btn" label="Subscribe updates about Modrinth" />
+    <Checkbox
+      v-model="subscribe"
+      class="subscribe-btn"
+      label="Subscribe to updates about Modrinth"
+    />
     <button class="btn btn-primary continue-btn" @click="continueSignUp">Continue</button>
     <p>
       By creating an account, you agree to Modrinth's

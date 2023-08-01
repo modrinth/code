@@ -25,7 +25,7 @@
         <nuxt-link to="/mods" class="iconified-button brand-button"> Discover mods </nuxt-link>
         <nuxt-link
           v-if="!auth.user"
-          to="sign-up"
+          to="/auth/sign-up"
           class="iconified-button outline-button"
           rel="noopener nofollow"
         >
