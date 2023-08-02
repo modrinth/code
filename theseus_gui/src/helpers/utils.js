@@ -36,7 +36,10 @@ export const releaseColor = (releaseType) => {
 }
 
 export const installVersionDependencies = async (profile, version) => {
-  const duplicates = await check_duplicate_nonversional_dependencies(profile.path, version.dependencies);
+  const duplicates = await check_duplicate_nonversional_dependencies(
+    profile.path,
+    version.dependencies
+  )
   for (const dep of version.dependencies) {
     // if duplicates has a version that matches, skip
     if (duplicates.find((d) => d.version_id === dep.version_id)) continue

@@ -517,8 +517,7 @@ watch(
       if (!fullscreenSetting.value) {
         editProfile.resolution = resolution.value
       }
-    } 
-
+    }
 
     if (overrideHooks.value) {
       editProfile.hooks = hooks.value

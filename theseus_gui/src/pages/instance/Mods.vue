@@ -777,11 +777,10 @@ listen('tauri://file-drop', async (event) => {
     })
   } else {
     for (const file of event.payload) {
-    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+      await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+    }
+    initProjects(await get(props.instance.path).catch(handleError))
   }
-  initProjects(await get(props.instance.path).catch(handleError))
-  }
-
 })
 </script>
 

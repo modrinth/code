@@ -105,40 +105,43 @@ pub async fn profile_check_installed(
 }
 
 #[tauri::command]
-pub async fn profile_get_installed_duplicate_nonversional_dependencies(    
+pub async fn profile_get_installed_duplicate_nonversional_dependencies(
     path: ProfilePathId,
-    mut dependencies : Vec<Dependency>
+    mut dependencies: Vec<Dependency>,
 ) -> Result<Vec<Dependency>> {
-
     use futures::prelude::*;
 
     // Not all dependencies have a project id, so we need to check if the project id is None and populate it
     // using try_for_each_concurrent, and running .populate() on each dependency
-    let stream = futures::stream::iter(dependencies.iter_mut()).map(Ok::<_, theseus::Error>);    
+    let stream = futures::stream::iter(dependencies.iter_mut())
+        .map(Ok::<_, theseus::Error>);
 
-    stream.try_for_each_concurrent(None, |dependency| {
-        async move {
+    stream
+        .try_for_each_concurrent(None, |dependency| async move {
             dependency.populate().await?;
             Ok(())
-        }
-    }).await?;
+        })
+        .await?;
 
     // Iterate over all projects in the profile, and check if any of the dependencies are installed with a different version
     let mut duplicates = Vec::new();
     let profile = profile_get(path, None).await?;
     if let Some(profile) = profile {
         profile.projects.into_iter().for_each(|(_, project)| {
-            if let ProjectMetadata::Modrinth { project, version, .. } = &project.metadata
+            if let ProjectMetadata::Modrinth {
+                project, version, ..
+            } = &project.metadata
             {
                 dependencies.iter().for_each(|dependency| {
-                    if dependency.version_id != Some(version.id.clone()) && dependency.project_id == Some(project.id.clone())
+                    if dependency.version_id != Some(version.id.clone())
+                        && dependency.project_id == Some(project.id.clone())
                     {
                         duplicates.push(dependency.clone());
                     }
                 })
-            } 
+            }
         });
-    } 
+    }
     Ok(duplicates)
 }
 

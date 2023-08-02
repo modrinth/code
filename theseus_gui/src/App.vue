@@ -88,7 +88,10 @@ const handleClose = async () => {
   // State should respond immeiately if it's safe to close
   // If not, code is deadlocked or worse, so wait 2 seconds and then ask the user to confirm closing
   // (Exception: if the user is changing config directory, which takes control of the state, and it's taking a significant amount of time for some reason)
-  const isSafe = await Promise.race([check_safe_loading_bars_complete(), new Promise((r) => setTimeout(r, 2000))  ])
+  const isSafe = await Promise.race([
+    check_safe_loading_bars_complete(),
+    new Promise((r) => setTimeout(r, 2000)),
+  ])
   if (!isSafe) {
     const response = await confirmClose()
     if (!response) {

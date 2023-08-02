@@ -1,12 +1,12 @@
 //! Project management + inference
 
-use crate::State;
 use crate::config::MODRINTH_API_URL;
 use crate::state::Profile;
 use crate::util::fetch::{
     fetch_json, write_cached_icon, FetchSemaphore, IoSemaphore,
 };
 use crate::util::io::IOError;
+use crate::State;
 use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
 use futures::StreamExt;
@@ -50,7 +50,7 @@ impl ProjectType {
         }
     }
 
-    pub fn get_from_parent_folder(path : PathBuf) -> Option<Self> {
+    pub fn get_from_parent_folder(path: PathBuf) -> Option<Self> {
         // Get parent folder
         let path = path.parent()?.file_name()?;
         match path.to_str()? {
@@ -70,7 +70,6 @@ impl ProjectType {
             ProjectType::ShaderPack => "shaderpack",
         }
     }
-
 
     pub fn get_folder(&self) -> &'static str {
         match self {
@@ -161,7 +160,6 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
-
 impl Dependency {
     // As Modrinth doesn't always provide the project ID, we have to infer it from the version ID
     pub async fn populate(&mut self) -> crate::Result<()> {
@@ -172,7 +170,8 @@ impl Dependency {
         if dep.project_id.is_none() && dep.version_id.is_some() {
             let url = format!(
                 "{}version/{}",
-                MODRINTH_API_URL, dep.version_id.clone().unwrap()
+                MODRINTH_API_URL,
+                dep.version_id.clone().unwrap()
             );
 
             // Fetch modrinth version from API
@@ -182,13 +181,17 @@ impl Dependency {
                 None,
                 None,
                 &state.fetch_semaphore,
-            ).await;
+            )
+            .await;
 
             // Allow graceful failure
             if let Ok(modrinth_version) = modrinth_version {
                 dep.project_id = Some(modrinth_version.project_id);
             } else {
-                tracing::warn!("Failed to fetch modrinth version: {:?}", modrinth_version);
+                tracing::warn!(
+                    "Failed to fetch modrinth version: {:?}",
+                    modrinth_version
+                );
             }
         }
         Ok(())
@@ -810,7 +813,8 @@ pub async fn infer_data_from_files(
                     .await?;
 
                     // Guess the project type from the filepath
-                    let project_type = ProjectType::get_from_parent_folder(path.clone());
+                    let project_type =
+                        ProjectType::get_from_parent_folder(path.clone());
                     return_projects.push((
                         path.clone(),
                         Project {
@@ -823,7 +827,8 @@ pub async fn infer_data_from_files(
                                 authors: Vec::new(),
                                 version: None,
                                 icon,
-                                project_type: project_type.map(|x| x.get_name().to_string()),
+                                project_type: project_type
+                                    .map(|x| x.get_name().to_string()),
                             },
                         },
                     ));

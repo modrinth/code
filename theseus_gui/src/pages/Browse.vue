@@ -251,23 +251,18 @@ async function onSearchChange(newPageNumber) {
 
   const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
 
-  console.log("here: "+JSON.stringify(obj)+"---"+JSON.stringify(route.query)) 
   // Only replace in router if the query is different
   if (JSON.stringify(obj) != JSON.stringify(route.query)) {
     await router.replace({ path: route.path, query: obj })
     breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
   }
-  console.log("after")
 }
 
 const searchWrapper = ref(null)
 async function onSearchChangeToTop(newPageNumber) {
   await onSearchChange(newPageNumber)
-  console.log("onSearchChangeToTop-1")
   await nextTick()
-  console.log("onSearchChangeToTop-2")
   searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
-  console.log("onSearchChangeToTop-3")
 }
 
 async function clearSearch() {
@@ -440,8 +435,8 @@ function toggleEnv(environment, sendRequest) {
 watch(
   () => route.params.projectType,
   async (newType) => {
-      // Check if the newType is not the same as the current value
-      if (!newType || newType === projectType.value) return
+    // Check if the newType is not the same as the current value
+    if (!newType || newType === projectType.value) return
 
     projectType.value = newType
     breadcrumbs.setContext({ name: 'Browse', link: `/browse/${projectType.value}` })
@@ -451,8 +446,6 @@ watch(
 
     loading.value = true
     await clearFilters()
-      console.log("done -5")
-
     loading.value = false
   }
 )

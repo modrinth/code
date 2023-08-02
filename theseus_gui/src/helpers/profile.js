@@ -60,7 +60,10 @@ export async function check_installed(path, projectId) {
 }
 
 export async function check_duplicate_nonversional_dependencies(path, dependencies) {
-  return await invoke('plugin:profile|profile_get_installed_duplicate_nonversional_dependencies', { path, dependencies })
+  return await invoke('plugin:profile|profile_get_installed_duplicate_nonversional_dependencies', {
+    path,
+    dependencies,
+  })
 }
 
 // Installs/Repairs a profile

@@ -852,12 +852,14 @@ pub async fn run_credentials(
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];
-    if let Some(fullscreen) = profile.fullscreen { // Profile fullscreen setting takes priority
+    if let Some(fullscreen) = profile.fullscreen {
+        // Profile fullscreen setting takes priority
         mc_set_options.push(("fullscreen".to_string(), fullscreen.to_string()));
-    } else if settings.force_fullscreen { // If global settings wants to force a fullscreen, do it
+    } else if settings.force_fullscreen {
+        // If global settings wants to force a fullscreen, do it
         mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
     }
-    
+
     let mc_process = crate::launcher::launch_minecraft(
         java_args,
         env_args,
@@ -932,9 +934,7 @@ pub async fn create_mrpack_json(
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path: String = mod_path.0.clone()
-                .to_string_lossy()
-                .to_string();
+            let path: String = mod_path.0.clone().to_string_lossy().to_string();
 
             // Only Modrinth projects have a modrinth metadata field for the modrinth.json
             Some(Ok(match project.metadata {
@@ -1033,8 +1033,6 @@ pub async fn build_folder(
     Ok(())
 }
 
-pub fn sanitize_profile_name(input : &str) -> String {
-    input.replace(r"/", "_")
-    .replace(r"\", "_")
-    .to_string()
+pub fn sanitize_profile_name(input: &str) -> String {
+    input.replace(['/', '\\'], "_")
 }

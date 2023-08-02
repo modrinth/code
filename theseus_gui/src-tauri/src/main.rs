@@ -35,7 +35,6 @@ async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
             e
         )))
     })?;
-    println!("Toggled decorations!");
     Ok(())
 }
 
@@ -74,7 +73,7 @@ fn main() {
             app.emit_all("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
-        // .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
             // Register deep link handler, allowing reading of modrinth:// links
             if let Err(e) = tauri_plugin_deep_link::register(
