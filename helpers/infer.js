@@ -1,6 +1,7 @@
 import TOML from '@ltd/j-toml'
 import JSZip from 'jszip'
 import yaml from 'js-yaml'
+import { satisfies } from 'semver'
 
 export const inferVersionInfo = async function (rawFile, project, gameVersions) {
   function versionType(number) {
@@ -17,50 +18,87 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
     }
   }
 
-  // TODO: This func does not handle accurate semver parsing. We should eventually
-  function gameVersionRange(gameVersionString, gameVersions) {
-    if (!gameVersionString) {
+  function getGameVersionsMatchingSemverRange(range, gameVersions) {
+    if (!range) {
       return []
     }
+    const ranges = Array.isArray(range) ? range : [range]
+    return gameVersions.filter((version) => {
+      const semverVersion = version.split('.').length === 2 ? `${version}.0` : version // add patch version if missing (e.g. 1.16 -> 1.16.0)
+      return ranges.some((v) => satisfies(semverVersion, v))
+    })
+  }
 
-    // Truncate characters after `-` & `+`
-    const gameString = gameVersionString.replace(/-|\+.*$/g, '')
+  function getGameVersionsMatchingMavenRange(range, gameVersions) {
+    if (!range) {
+      return []
+    }
+    const ranges = []
 
-    let prefix = ''
-    if (gameString.includes('~')) {
-      // Include minor versions
-      // ~1.2.3 -> 1.2
-      prefix = gameString.replace('~', '').split('.').slice(0, 2).join('.')
-    } else if (gameString.includes('>=')) {
-      // Include minor versions
-      // >=1.2.3 -> 1.2
-      prefix = gameString.replace('>=', '').split('.').slice(0, 2).join('.')
-    } else if (gameString.includes('^')) {
-      // Include major versions
-      // ^1.2.3 -> 1
-      prefix = gameString.replace('^', '').split('.')[0]
-    } else if (gameString.includes('x')) {
-      // Include versions that match `x.x.x`
-      // 1.2.x -> 1.2
-      prefix = gameString.replace(/\.x$/, '')
-    } else {
-      // Include exact version
-      // 1.2.3 -> 1.2.3
-      prefix = gameString
+    while (range.startsWith('[') || range.startsWith('(')) {
+      let index = range.indexOf(')')
+      const index2 = range.indexOf(']')
+      if (index === -1 || (index2 !== -1 && index2 < index)) {
+        index = index2
+      }
+      if (index === -1) break
+      ranges.push(range.substring(0, index + 1))
+      range = range.substring(index + 1).trim()
+      if (range.startsWith(',')) {
+        range = range.substring(1).trim()
+      }
     }
 
-    const simplified = gameVersions
-      .filter((it) => it.version_type === 'release')
-      .map((it) => it.version)
-    return simplified.filter((version) => version.startsWith(prefix))
+    if (range) {
+      ranges.push(range)
+    }
+
+    const LESS_THAN_EQUAL = /^\(,(.*)]$/
+    const LESS_THAN = /^\(,(.*)\)$/
+    const EQUAL = /^\[(.*)]$/
+    const GREATER_THAN_EQUAL = /^\[(.*),\)$/
+    const GREATER_THAN = /^\((.*),\)$/
+    const BETWEEN = /^\((.*),(.*)\)$/
+    const BETWEEN_EQUAL = /^\[(.*),(.*)]$/
+    const BETWEEN_LESS_THAN_EQUAL = /^\((.*),(.*)]$/
+    const BETWEEN_GREATER_THAN_EQUAL = /^\[(.*),(.*)\)$/
+
+    const semverRanges = []
+
+    for (const range of ranges) {
+      let result
+      if ((result = range.match(LESS_THAN_EQUAL))) {
+        semverRanges.push(`<=${result[1]}`)
+      } else if ((result = range.match(LESS_THAN))) {
+        semverRanges.push(`<${result[1]}`)
+      } else if ((result = range.match(EQUAL))) {
+        semverRanges.push(`${result[1]}`)
+      } else if ((result = range.match(GREATER_THAN_EQUAL))) {
+        semverRanges.push(`>=${result[1]}`)
+      } else if ((result = range.match(GREATER_THAN))) {
+        semverRanges.push(`>${result[1]}`)
+      } else if ((result = range.match(BETWEEN))) {
+        semverRanges.push(`>${result[1]} <${result[2]}`)
+      } else if ((result = range.match(BETWEEN_EQUAL))) {
+        semverRanges.push(`>=${result[1]} <=${result[2]}`)
+      } else if ((result = range.match(BETWEEN_LESS_THAN_EQUAL))) {
+        semverRanges.push(`>${result[1]} <=${result[2]}`)
+      } else if ((result = range.match(BETWEEN_GREATER_THAN_EQUAL))) {
+        semverRanges.push(`>=${result[1]} <${result[2]}`)
+      }
+    }
+    return getGameVersionsMatchingSemverRange(semverRanges, gameVersions)
   }
+
+  const simplifiedGameVersions = gameVersions
+    .filter((it) => it.version_type === 'release')
+    .map((it) => it.version)
 
   const inferFunctions = {
     // Forge 1.13+
     'META-INF/mods.toml': async (file, zip) => {
       const metadata = TOML.parse(file, { joiner: '\n' })
 
-      // TODO: Parse minecraft version ranges
       if (metadata.mods && metadata.mods.length > 0) {
         let versionNum = metadata.mods[0].version
 
@@ -80,11 +118,23 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           }
         }
 
+        let gameVersions = []
+        const mcDependencies = Object.values(metadata.dependencies)
+          .flat()
+          .filter((dependency) => dependency.modId === 'minecraft')
+        if (mcDependencies.length > 0) {
+          gameVersions = getGameVersionsMatchingMavenRange(
+            mcDependencies[0].versionRange,
+            simplifiedGameVersions
+          )
+        }
+
         return {
           name: `${project.title} ${versionNum}`,
           version_number: versionNum,
           version_type: versionType(versionNum),
           loaders: ['forge'],
+          game_versions: gameVersions,
         }
       } else {
         return {}
@@ -99,9 +149,9 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
         version_number: metadata.version,
         version_type: versionType(metadata.version),
         loaders: ['forge'],
-        game_versions: gameVersions
-          .filter((x) => x.version.startsWith(metadata.mcversion) && x.version_type === 'release')
-          .map((x) => x.version),
+        game_versions: simplifiedGameVersions.filter((version) =>
+          version.startsWith(metadata.mcversion)
+        ),
       }
     },
     // Fabric
@@ -114,7 +164,7 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
         loaders: ['fabric'],
         version_type: versionType(metadata.version),
         game_versions: metadata.depends
-          ? gameVersionRange(metadata.depends.minecraft, gameVersions)
+          ? getGameVersionsMatchingSemverRange(metadata.depends.minecraft, simplifiedGameVersions)
           : [],
       }
     },
@@ -128,11 +178,11 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
         loaders: ['quilt'],
         version_type: versionType(metadata.quilt_loader.version),
         game_versions: metadata.quilt_loader.depends
-          ? gameVersionRange(
+          ? getGameVersionsMatchingSemverRange(
               metadata.quilt_loader.depends.find((x) => x.id === 'minecraft')
                 ? metadata.quilt_loader.depends.find((x) => x.id === 'minecraft').versions
                 : [],
-              gameVersions
+              simplifiedGameVersions
             )
           : [],
       }
