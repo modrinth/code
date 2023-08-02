@@ -7,10 +7,9 @@
           You can type an extended description of your mod here. This editor supports
           <a
             class="text-link"
-            href="https://guides.github.com/features/mastering-markdown/"
+            href="https://docs.modrinth.com/docs/tutorials/markdown/"
             target="_blank"
-            rel="noopener"
-            >Markdown</a
+            >Markdown formatting</a
           >. HTML can also be used inside your description, not including styles, scripts, and
           iframes (though YouTube iframes are allowed).
           <span class="label__subdescription">

@@ -5,9 +5,9 @@
         <p>
           Modding should be safe for everyone, so we take abuse and malicious intent seriously at
           Modrinth. We want to hear about harmful content on the site that violates our
-          <nuxt-link to="/legal/terms"> ToS </nuxt-link> and
-          <nuxt-link to="/legal/rules"> Rules </nuxt-link>. Rest assured, we’ll keep your
-          identifying information private.
+          <nuxt-link class="text-link" to="/legal/terms">ToS</nuxt-link> and
+          <nuxt-link class="text-link" to="/legal/rules">Rules</nuxt-link>. Rest assured, we’ll keep
+          your identifying information private.
         </p>
         <p v-if="itemType === 'project' || itemType === 'version'">
           Please <strong>do not</strong> use this to report bugs with the project itself. This form
@@ -33,7 +33,15 @@
       />
       <label class="report-label" for="additional-information">
         <strong>Additional information</strong>
-        <span> Include links and images if possible. Markdown formatting is supported. </span>
+        <span>
+          Include links and images if possible. This editor supports
+          <a
+            class="text-link"
+            href="https://docs.modrinth.com/docs/tutorials/markdown/"
+            target="_blank"
+            >Markdown formatting</a
+          >.
+        </span>
       </label>
       <div class="textarea-wrapper">
         <Chips v-model="bodyViewType" class="separator" :items="['source', 'preview']" />

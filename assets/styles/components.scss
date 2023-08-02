@@ -524,25 +524,16 @@
 
 .text-link {
   color: var(--color-link);
-  text-decoration: underline;
 
   &:focus-visible,
   &:hover {
     color: var(--color-link-hover);
     cursor: pointer;
+    text-decoration: underline;
   }
 
   &:active {
     color: var(--color-link-active);
-  }
-
-  &.no-underline {
-    text-decoration: none;
-
-    &:hover,
-    &:focus-visible {
-      text-decoration: underline;
-    }
   }
 }
 

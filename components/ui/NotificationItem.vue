@@ -119,7 +119,7 @@
           <VersionIcon />
           <nuxt-link
             :to="getVersionLink(notif.extra_data.project, notif.extra_data.version)"
-            class="text-link no-underline"
+            class="text-link"
           >
             {{ notif.extra_data.version.name }}
           </nuxt-link>
