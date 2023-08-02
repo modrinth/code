@@ -139,24 +139,19 @@ if (route.query.o) {
 
 async function refreshSearch() {
   const base = 'https://api.modrinth.com/v2/'
-  console.log('refreshing search')
 
   const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
-  console.log('params', params)
   if (query.value.length > 0) {
     params.push(`query=${query.value.replace(/ /g, '+')}`)
   }
-  console.log('params 2')
   if (instanceContext.value) {
     if (!ignoreInstanceLoaders.value && projectType.value === 'mod') {
       orFacets.value = [`categories:${encodeURIComponent(instanceContext.value.metadata.loader)}`]
     }
-    console.log('params 3')
     if (!ignoreInstanceGameVersions.value) {
       selectedVersions.value = [instanceContext.value.metadata.game_version]
     }
   }
-  console.log('refreshing search 2')
   if (
     facets.value.length > 0 ||
     orFacets.value.length > 0 ||
@@ -164,12 +159,10 @@ async function refreshSearch() {
     selectedEnvironments.value.length > 0 ||
     projectType.value
   ) {
-    console.log('refreshing search 3')
     let formattedFacets = []
     for (const facet of facets.value) {
       formattedFacets.push([facet])
     }
-    console.log('refreshing search 4')
     // loaders specifier
     if (orFacets.value.length > 0) {
       formattedFacets.push(orFacets.value)
@@ -188,14 +181,12 @@ async function refreshSearch() {
       }
       formattedFacets.push(versionFacets)
     }
-    console.log('refreshing search 5')
     if (onlyOpenSource.value) {
       formattedFacets.push(['open_source:true'])
     }
 
     if (selectedEnvironments.value.length > 0) {
       let environmentFacets = []
-      console.log('refreshing search 6')
       const includesClient = selectedEnvironments.value.includes('client')
       const includesServer = selectedEnvironments.value.includes('server')
       if (includesClient && includesServer) {
@@ -214,7 +205,6 @@ async function refreshSearch() {
           ]
         }
       }
-      console.log('refreshing search 7')
 
       formattedFacets = [...formattedFacets, ...environmentFacets]
     }
@@ -227,33 +217,27 @@ async function refreshSearch() {
 
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
   }
-  console.log('refreshing search 8')
   const offset = (currentPage.value - 1) * maxResults.value
   if (currentPage.value !== 1) {
     params.push(`offset=${offset}`)
   }
-  console.log('refreshing search 9')
   let url = 'search'
   if (params.length > 0) {
     for (let i = 0; i < params.length; i++) {
       url += i === 0 ? `?${params[i]}` : `&${params[i]}`
     }
   }
-  console.log('refreshing search 10')
 
   let val = `${base}${url}`
 
   const rawResults = await useFetch(val, 'search results')
-  console.log('refreshing search 11')
   if (instanceContext.value) {
     for (let val of rawResults.hits) {
-      console.log('refreshing search 12')
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )
     }
   }
-  console.log('refreshing search 13')
   results.value = rawResults
 }
 
@@ -263,19 +247,27 @@ async function onSearchChange(newPageNumber) {
   if (query.value === null) {
     return
   }
-
   await refreshSearch()
 
   const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
-  await router.replace({ path: route.path, query: obj })
-  breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
+
+  console.log("here: "+JSON.stringify(obj)+"---"+JSON.stringify(route.query)) 
+  // Only replace in router if the query is different
+  if (JSON.stringify(obj) != JSON.stringify(route.query)) {
+    await router.replace({ path: route.path, query: obj })
+    breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
+  }
+  console.log("after")
 }
 
 const searchWrapper = ref(null)
 async function onSearchChangeToTop(newPageNumber) {
   await onSearchChange(newPageNumber)
+  console.log("onSearchChangeToTop-1")
   await nextTick()
+  console.log("onSearchChangeToTop-2")
   searchWrapper.value.scrollTo({ top: 0, behavior: 'smooth' })
+  console.log("onSearchChangeToTop-3")
 }
 
 async function clearSearch() {
@@ -399,7 +391,6 @@ async function clearFilters() {
   for (const facet of [...orFacets.value]) {
     await toggleOrFacet(facet, true)
   }
-
   onlyOpenSource.value = false
   selectedVersions.value = []
   selectedEnvironments.value = []
@@ -449,7 +440,9 @@ function toggleEnv(environment, sendRequest) {
 watch(
   () => route.params.projectType,
   async (newType) => {
-    if (!newType) return
+      // Check if the newType is not the same as the current value
+      if (!newType || newType === projectType.value) return
+
     projectType.value = newType
     breadcrumbs.setContext({ name: 'Browse', link: `/browse/${projectType.value}` })
 
@@ -458,6 +451,8 @@ watch(
 
     loading.value = true
     await clearFilters()
+      console.log("done -5")
+
     loading.value = false
   }
 )

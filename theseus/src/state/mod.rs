@@ -116,8 +116,8 @@ impl State {
             .await)
     }
 
-    #[tracing::instrument]
-    #[theseus_macros::debug_pin]
+    // #[tracing::instrument]
+    // #[theseus_macros::debug_pin]
     async fn initialize_state() -> crate::Result<RwLock<State>> {
         let loading_bar = init_loading_unsafe(
             LoadingBarType::StateInit,

@@ -50,6 +50,28 @@ impl ProjectType {
         }
     }
 
+    pub fn get_from_parent_folder(path : PathBuf) -> Option<Self> {
+        // Get parent folder
+        let path = path.parent()?.file_name()?;
+        match path.to_str()? {
+            "mods" => Some(ProjectType::Mod),
+            "datapacks" => Some(ProjectType::DataPack),
+            "resourcepacks" => Some(ProjectType::ResourcePack),
+            "shaderpacks" => Some(ProjectType::ShaderPack),
+            _ => None,
+        }
+    }
+
+    pub fn get_name(&self) -> &'static str {
+        match self {
+            ProjectType::Mod => "mod",
+            ProjectType::DataPack => "datapack",
+            ProjectType::ResourcePack => "resourcepack",
+            ProjectType::ShaderPack => "shaderpack",
+        }
+    }
+
+
     pub fn get_folder(&self) -> &'static str {
         match self {
             ProjectType::Mod => "mods",
@@ -474,6 +496,8 @@ pub async fn infer_data_from_files(
             ));
             continue;
         };
+
+        // Forge
         let zip_index_option = zip_file_reader
             .file()
             .entries()
@@ -547,6 +571,7 @@ pub async fn infer_data_from_files(
             }
         }
 
+        // Forge
         let zip_index_option = zip_file_reader
             .file()
             .entries()
@@ -607,6 +632,7 @@ pub async fn infer_data_from_files(
             }
         }
 
+        // Fabric
         let zip_index_option = zip_file_reader
             .file()
             .entries()
@@ -676,6 +702,7 @@ pub async fn infer_data_from_files(
             }
         }
 
+        // Quilt
         let zip_index_option = zip_file_reader
             .file()
             .entries()
@@ -752,6 +779,7 @@ pub async fn infer_data_from_files(
             }
         }
 
+        // Other
         let zip_index_option = zip_file_reader
             .file()
             .entries()
@@ -780,6 +808,9 @@ pub async fn infer_data_from_files(
                         io_semaphore,
                     )
                     .await?;
+
+                    // Guess the project type from the filepath
+                    let project_type = ProjectType::get_from_parent_folder(path.clone());
                     return_projects.push((
                         path.clone(),
                         Project {
@@ -792,7 +823,7 @@ pub async fn infer_data_from_files(
                                 authors: Vec::new(),
                                 version: None,
                                 icon,
-                                project_type: None,
+                                project_type: project_type.map(|x| x.get_name().to_string()),
                             },
                         },
                     ));
@@ -813,7 +844,6 @@ pub async fn infer_data_from_files(
     }
 
     // Project paths should be relative
-    let _profile_base_path = profile.get_profile_full_path().await?;
     let mut corrected_hashmap = HashMap::new();
     let mut stream = tokio_stream::iter(return_projects);
     while let Some((h, v)) = stream.next().await {
