@@ -346,7 +346,7 @@ watch(
         <input
           id="width"
           v-model="settings.game_resolution[0]"
-          :disabled="!settings.force_fullscreen"
+          :disabled="settings.force_fullscreen"
           autocomplete="off"
           type="number"
           placeholder="Enter width..."
@@ -360,7 +360,7 @@ watch(
         <input
           id="height"
           v-model="settings.game_resolution[1]"
-          :disabled="!settings.force_fullscreen"
+          :disabled="settings.force_fullscreen"
           autocomplete="off"
           type="number"
           class="input"
