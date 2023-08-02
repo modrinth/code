@@ -164,10 +164,10 @@
           <ReportIcon aria-hidden="true" />
           Report
         </button>
-        <a v-if="!auth.user" class="iconified-button" :href="getAuthUrl()" rel="noopener nofollow">
+        <nuxt-link v-if="!auth.user" class="iconified-button" to="/auth/sign-in">
           <ReportIcon aria-hidden="true" />
           Report
-        </a>
+        </nuxt-link>
         <nuxt-link
           v-if="currentMember"
           class="action iconified-button"

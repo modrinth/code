@@ -305,14 +305,14 @@
                 </button>
               </template>
               <template v-else>
-                <a class="iconified-button" :href="getAuthUrl()" rel="noopener nofollow">
+                <nuxt-link class="iconified-button" to="/auth/sign-in">
                   <ReportIcon aria-hidden="true" />
                   Report
-                </a>
-                <a class="iconified-button" :href="getAuthUrl()" rel="noopener nofollow">
+                </nuxt-link>
+                <nuxt-link class="iconified-button" to="/auth/sign-in">
                   <HeartIcon aria-hidden="true" />
                   Follow
-                </a>
+                </nuxt-link>
               </template>
             </div>
           </div>

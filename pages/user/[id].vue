@@ -61,10 +61,10 @@
               <ReportIcon aria-hidden="true" />
               Report
             </button>
-            <a v-else class="iconified-button" :href="getAuthUrl()" rel="noopener nofollow">
+            <nuxt-link v-else class="iconified-button" to="/auth/sign-in">
               <ReportIcon aria-hidden="true" />
               Report
-            </a>
+            </nuxt-link>
           </div>
           <template v-if="isEditing">
             <div class="inputs universal-labels">
