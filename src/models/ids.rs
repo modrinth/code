@@ -19,7 +19,6 @@ pub use super::users::UserId;
 ///
 /// This method panics if `n` is 0 or greater than 11, since a `u64`
 /// can only represent up to 11 character base62 strings
-#[allow(dead_code)]
 #[inline]
 pub fn random_base62(n: usize) -> u64 {
     random_base62_rng(&mut rand::thread_rng(), n)

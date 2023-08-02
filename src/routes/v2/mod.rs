@@ -1,4 +1,5 @@
 mod admin;
+mod analytics;
 mod moderation;
 mod notifications;
 pub(crate) mod project_creation;
@@ -14,10 +15,12 @@ mod version_file;
 mod versions;
 
 pub use super::ApiError;
+use crate::util::cors::default_cors;
 
 pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         actix_web::web::scope("v2")
+            .wrap(default_cors())
             .configure(admin::config)
             .configure(crate::auth::session::config)
             .configure(crate::auth::flows::config)
@@ -36,4 +39,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(version_file::config)
             .configure(versions::config),
     );
+
+    cfg.configure(analytics::config);
 }

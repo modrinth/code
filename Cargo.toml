@@ -16,6 +16,8 @@ actix-web = "4.3.1"
 actix-rt = "2.8.0"
 actix-multipart = "0.6.0"
 actix-cors = "0.6.4"
+actix-ws = "0.2.5"
+actix-files = "0.6.2"
 
 tokio = { version = "1.29.1", features = ["sync"] }
 tokio-stream = "0.1.14"
@@ -29,6 +31,8 @@ lazy_static = "1.4.0"
 meilisearch-sdk = "0.22.0"
 rust-s3 = "0.33.0"
 reqwest = { version = "0.11.18", features = ["json", "multipart"] }
+hyper = { version = "0.14", features = ["full"] }
+hyper-tls = "0.5.0"
 
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
@@ -72,6 +76,12 @@ sqlx = { version = "0.6.3", features = ["offline", "runtime-tokio-rustls", "post
 rust_decimal = { version = "1.30.0", features = ["serde-with-float", "serde-with-str"] }
 redis = { version = "0.23.0", features = ["tokio-comp", "ahash", "r2d2"]}
 deadpool-redis = "0.12.0"
+clickhouse = { version = "0.11.2", features = ["uuid", "time"] }
+uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
+
+maxminddb = "0.23.0"
+flate2 = "1.0.25"
+tar = "0.4.38"
 
 sentry = { version = "0.31.5", features = ["profiling"] }
 sentry-actix = "0.31.5"

@@ -27,6 +27,10 @@ services:
       - '6379:6379'
     volumes:
       - redis-data:/data
+  clickhouse:
+    image: clickhouse/clickhouse-server
+    ports:
+      - "8123:8123"
 volumes:
   meilisearch-data:
   db-data:

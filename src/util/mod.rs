@@ -1,4 +1,5 @@
 pub mod captcha;
+pub mod cors;
 pub mod env;
 pub mod ext;
 pub mod guards;

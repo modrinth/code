@@ -1,9 +1,12 @@
+use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
+use crate::util::env::parse_var;
 use base64::Engine;
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use sqlx::PgPool;
 use std::collections::HashMap;
 
 pub struct PayoutsQueue {
@@ -196,4 +199,211 @@ impl PayoutsQueue {
 
         Ok(Decimal::ZERO)
     }
+}
+
+pub async fn process_payout(
+    pool: &PgPool,
+    redis: &deadpool_redis::Pool,
+    client: &clickhouse::Client,
+) -> Result<(), ApiError> {
+    let start: DateTime<Utc> = DateTime::from_utc(
+        Utc::now()
+            .date_naive()
+            .and_hms_nano_opt(0, 0, 0, 0)
+            .unwrap_or_default(),
+        Utc,
+    );
+
+    let results = sqlx::query!(
+        "SELECT EXISTS(SELECT 1 FROM payouts_values WHERE created = $1)",
+        start,
+    )
+    .fetch_one(pool)
+    .await?;
+
+    if results.exists.unwrap_or(false) {
+        return Ok(());
+    }
+
+    let end = start + Duration::days(1);
+    #[derive(Deserialize, clickhouse::Row)]
+    struct ProjectMultiplier {
+        pub page_views: u64,
+        pub project_id: u64,
+    }
+
+    let (views_values, views_sum, downloads_values, downloads_sum) = futures::future::try_join4(
+        client
+            .query(
+                r#"
+                SELECT COUNT(id) page_views, project_id
+                FROM views
+                WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)
+                GROUP BY project_id
+                ORDER BY page_views DESC
+                "#,
+            )
+            .bind(start.timestamp())
+            .bind(end.timestamp())
+            .fetch_all::<ProjectMultiplier>(),
+        client
+            .query("SELECT COUNT(id) FROM views WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)")
+            .bind(start.timestamp())
+            .bind(end.timestamp())
+            .fetch_one::<u64>(),
+        client
+            .query(
+                r#"
+                SELECT COUNT(id) page_views, project_id
+                FROM downloads
+                WHERE (recorded BETWEEN ? AND ?) AND (user_id != 0)
+                GROUP BY project_id
+                ORDER BY page_views DESC
+                "#,
+            )
+            .bind(start.timestamp())
+            .bind(end.timestamp())
+            .fetch_all::<ProjectMultiplier>(),
+        client
+            .query("SELECT COUNT(id) FROM downloads WHERE (recorded BETWEEN ? AND ?) AND (user_id != 0)")
+            .bind(start.timestamp())
+            .bind(end.timestamp())
+            .fetch_one::<u64>(),
+    )
+        .await?;
+
+    let mut transaction = pool.begin().await?;
+
+    struct PayoutMultipliers {
+        sum: u64,
+        values: HashMap<u64, u64>,
+    }
+
+    let mut views_values = views_values
+        .into_iter()
+        .map(|x| (x.project_id, x.page_views))
+        .collect::<HashMap<u64, u64>>();
+    let downloads_values = downloads_values
+        .into_iter()
+        .map(|x| (x.project_id, x.page_views))
+        .collect::<HashMap<u64, u64>>();
+    views_values.extend(downloads_values);
+    let multipliers: PayoutMultipliers = PayoutMultipliers {
+        sum: downloads_sum + views_sum,
+        values: views_values,
+    };
+
+    struct Project {
+        // user_id, payouts_split
+        team_members: Vec<(i64, Decimal)>,
+    }
+
+    let mut projects_map: HashMap<i64, Project> = HashMap::new();
+
+    use futures::TryStreamExt;
+
+    sqlx::query!(
+        "
+        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split
+        FROM mods m
+        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE
+        WHERE m.id = ANY($1) AND m.monetization_status = $2
+        ",
+        &multipliers
+            .values
+            .keys()
+            .map(|x| *x as i64)
+            .collect::<Vec<i64>>(),
+        MonetizationStatus::Monetized.as_str(),
+    )
+    .fetch_many(&mut *transaction)
+    .try_for_each(|e| {
+        if let Some(row) = e.right() {
+            if let Some(project) = projects_map.get_mut(&row.id) {
+                project.team_members.push((row.user_id, row.payouts_split));
+            } else {
+                projects_map.insert(
+                    row.id,
+                    Project {
+                        team_members: vec![(row.user_id, row.payouts_split)],
+                    },
+                );
+            }
+        }
+
+        futures::future::ready(Ok(()))
+    })
+    .await?;
+
+    let amount = Decimal::from(parse_var::<u64>("PAYOUTS_BUDGET").unwrap_or(0));
+
+    let days = Decimal::from(28);
+    let weekdays = Decimal::from(20);
+    let weekend_bonus = Decimal::from(5) / Decimal::from(4);
+
+    let weekday_amount = amount / (weekdays + (weekend_bonus) * (days - weekdays));
+    let weekend_amount = weekday_amount * weekend_bonus;
+
+    let payout = match start.weekday() {
+        Weekday::Sat | Weekday::Sun => weekend_amount,
+        _ => weekday_amount,
+    };
+
+    for (id, project) in projects_map {
+        if let Some(value) = &multipliers.values.get(&(id as u64)) {
+            let project_multiplier: Decimal =
+                Decimal::from(**value) / Decimal::from(multipliers.sum);
+
+            let sum_splits: Decimal = project.team_members.iter().map(|x| x.1).sum();
+
+            let mut clear_cache_users = Vec::new();
+
+            if sum_splits > Decimal::ZERO {
+                for (user_id, split) in project.team_members {
+                    let payout: Decimal = payout * project_multiplier * (split / sum_splits);
+
+                    if payout > Decimal::ZERO {
+                        sqlx::query!(
+                            "
+                            INSERT INTO payouts_values (user_id, mod_id, amount, created)
+                            VALUES ($1, $2, $3, $4)
+                            ",
+                            user_id,
+                            id,
+                            payout,
+                            start
+                        )
+                        .execute(&mut *transaction)
+                        .await?;
+
+                        sqlx::query!(
+                            "
+                            UPDATE users
+                            SET balance = balance + $1
+                            WHERE id = $2
+                            ",
+                            payout,
+                            user_id
+                        )
+                        .execute(&mut *transaction)
+                        .await?;
+                        clear_cache_users.push(user_id);
+                    }
+                }
+            }
+
+            crate::database::models::User::clear_caches(
+                &clear_cache_users
+                    .into_iter()
+                    .map(|x| (crate::database::models::UserId(x), None))
+                    .collect::<Vec<_>>(),
+                redis,
+            )
+            .await?;
+        }
+    }
+
+    transaction.commit().await?;
+
+    Ok(())
 }

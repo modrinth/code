@@ -16,7 +16,7 @@ const FLOWS_NAMESPACE: &str = "flows";
 pub enum Flow {
     OAuth {
         user_id: Option<UserId>,
-        url: String,
+        url: Option<String>,
         provider: AuthProvider,
     },
     Login2FA {
@@ -32,6 +32,10 @@ pub enum Flow {
     ConfirmEmail {
         user_id: UserId,
         confirm_email: String,
+    },
+    MinecraftAuth,
+    MicrosoftLogin {
+        access_token: String,
     },
 }
 

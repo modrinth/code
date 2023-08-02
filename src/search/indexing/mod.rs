@@ -30,31 +30,10 @@ pub enum IndexingError {
 // assumes a max average size of 1KiB per project to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000;
 
-#[derive(Debug)]
-pub struct IndexingSettings {
-    pub index_local: bool,
-}
-
-impl IndexingSettings {
-    #[allow(dead_code)]
-    pub fn from_env() -> Self {
-        //FIXME: what?
-        let index_local = true;
-
-        Self { index_local }
-    }
-}
-
-pub async fn index_projects(
-    pool: PgPool,
-    settings: IndexingSettings,
-    config: &SearchConfig,
-) -> Result<(), IndexingError> {
+pub async fn index_projects(pool: PgPool, config: &SearchConfig) -> Result<(), IndexingError> {
     let mut docs_to_add: Vec<UploadSearchProject> = vec![];
 
-    if settings.index_local {
-        docs_to_add.append(&mut index_local(pool.clone()).await?);
-    }
+    docs_to_add.append(&mut index_local(pool.clone()).await?);
 
     // Write Indices
     add_projects(docs_to_add, config).await?;
@@ -74,7 +53,6 @@ async fn create_index(
         .await?;
 
     match client.get_index(name).await {
-        // TODO: update index settings on startup (or delete old indices on startup)
         Ok(index) => {
             index
                 .set_settings(&default_settings())

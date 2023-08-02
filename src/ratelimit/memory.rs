@@ -30,17 +30,6 @@ impl MemoryStore {
             inner: Arc::new(DashMap::<String, (usize, Duration)>::new()),
         }
     }
-
-    #[allow(dead_code)]
-    /// Create a new hashmap with the provided capacity
-    pub fn with_capacity(capacity: usize) -> Self {
-        debug!("Creating new MemoryStore");
-        MemoryStore {
-            inner: Arc::new(DashMap::<String, (usize, Duration)>::with_capacity(
-                capacity,
-            )),
-        }
-    }
 }
 
 /// Actor for memory store

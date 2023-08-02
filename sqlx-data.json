@@ -960,6 +960,26 @@
     },
     "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.accepted = TRUE\n            WHERE tm.user_id = $1\n            ORDER BY m.downloads DESC\n            "
   },
+  "2265be690ec4c6b03fd142bb8b81a5ebec67d09a08c05e9dba122f5acf2fc98a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "SELECT EXISTS(SELECT 1 FROM payouts_values WHERE created = $1)"
+  },
   "232d7d0319c20dd5fff29331b067d6c6373bcff761a77958a2bb5f59068a83a5": {
     "describe": {
       "columns": [],
@@ -993,38 +1013,6 @@
       }
     },
     "query": "\n            SELECT id FROM loaders\n            WHERE loader = $1\n            "
-  },
-  "2534464b06d567078bcfaa94e0c5e37729db111f5b46c4035cabe72634104b2e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "payouts_split",
-          "ordinal": 2,
-          "type_info": "Numeric"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n            FROM mods m\n            INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n            WHERE m.id = ANY($1)\n            "
   },
   "294f264382ad55475b51776cd5d306c4867e8e6966ab79921bba69dc023f8337": {
     "describe": {
@@ -3787,38 +3775,6 @@
     },
     "query": "\n            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted, tm.payouts_split, tm.ordering FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = TRUE\n            WHERE m.id = $1\n            "
   },
-  "a3e27b758ca441fa82f6bcd42915b92fb23a7db19a7eb27db7ed92eeba4b566e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "mod_id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "times_depended",
-          "ordinal": 2,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT mv.mod_id, m.id, COUNT(m.id) times_depended FROM versions mv\n            INNER JOIN dependencies d ON d.dependent_id = mv.id\n            INNER JOIN versions v ON d.dependency_id = v.id\n            INNER JOIN mods m ON v.mod_id = m.id OR d.mod_dependency_id = m.id\n            WHERE mv.mod_id = ANY($1)\n            group by mv.mod_id, m.id;\n            "
-  },
   "a440cb2567825c3cc540c9b0831ee840f6e2a6394e89a851b83fc78220594cf2": {
     "describe": {
       "columns": [],
@@ -4162,6 +4118,39 @@
       }
     },
     "query": "\n            INSERT INTO mods (\n                id, team_id, title, description, body,\n                published, downloads, icon_url, issues_url,\n                source_url, wiki_url, status, requested_status, discord_url,\n                client_side, server_side, license_url, license,\n                slug, project_type, color, monetization_status\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8, $9,\n                $10, $11, $12, $13, $14,\n                $15, $16, $17, $18,\n                LOWER($19), $20, $21, $22\n            )\n            "
+  },
+  "b768d9db6c785d6a701324ea746794d33e94121403163a774b6ef775640fd3d3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "payouts_split",
+          "ordinal": 2,
+          "type_info": "Numeric"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n        WHERE m.id = ANY($1) AND m.monetization_status = $2\n        "
   },
   "b903ac4e686ef85ba28d698c668da07860e7f276b261d8f2cebb74e73b094970": {
     "describe": {
@@ -5549,45 +5538,6 @@
       }
     },
     "query": "\n                    UPDATE versions\n                    SET featured = $1\n                    WHERE (id = $2)\n                    "
-  },
-  "e6f1fe134d6af8f0ff888459275fdefd250b2d776961ad3452ed0684f4fdc1b9": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "payouts_split",
-          "ordinal": 2,
-          "type_info": "Numeric"
-        },
-        {
-          "name": "project_type",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array",
-          "Text"
-        ]
-      }
-    },
-    "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split, pt.name project_type\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.id = ANY($1) AND m.monetization_status = $2\n        "
   },
   "e6f5a150cbd3bd6b9bde9e5cdad224a45c96d678b69ec12508e81246710e3f6d": {
     "describe": {

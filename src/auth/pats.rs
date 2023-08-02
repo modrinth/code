@@ -180,6 +180,12 @@ pub async fn edit_pat(
             let mut transaction = pool.begin().await?;
 
             if let Some(scopes) = &info.scopes {
+                if scopes.restricted() {
+                    return Err(ApiError::InvalidInput(
+                        "Invalid scopes requested!".to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE pats
@@ -206,6 +212,12 @@ pub async fn edit_pat(
                 .await?;
             }
             if let Some(expires) = &info.expires {
+                if expires < &Utc::now() {
+                    return Err(ApiError::InvalidInput(
+                        "Expire date must be in the future!".to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE pats
