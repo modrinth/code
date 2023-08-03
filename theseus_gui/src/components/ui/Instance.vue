@@ -15,7 +15,7 @@ import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import mixpanel from 'mixpanel-browser'
 
 const props = defineProps({
@@ -227,7 +227,7 @@ onUnmounted(() => unlisten())
     </div>
     <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
-    <InstanceInstallModal ref="modInstallModal" />
+    <ModInstallModal ref="modInstallModal" />
   </div>
 </template>
 

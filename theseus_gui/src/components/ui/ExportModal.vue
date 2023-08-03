@@ -236,5 +236,6 @@ const exportPack = async () => {
 .button-row {
   display: flex;
   gap: var(--gap-sm);
+  align-items: center;
 }
 </style>

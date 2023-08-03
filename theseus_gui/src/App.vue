@@ -20,30 +20,39 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
-import { warning_listener } from '@/helpers/events.js'
+import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
 import { isDev } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
-import OnboardingModal from '@/components/OnboardingModal.vue'
 import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
+import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
+// import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
+import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
+import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 
 const themeStore = useTheming()
-
+const urlModal = ref(null)
 const isLoading = ref(true)
+const videoPlaying = ref(true)
+const showOnboarding = ref(false)
+
+const onboardingVideo = ref()
+
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded } =
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
       await get()
     const dev = await isDev()
     const version = await getVersion()
+    showOnboarding.value = !onboarded_new
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -53,7 +62,7 @@ defineExpose({
     if (opt_out_analytics) {
       mixpanel.opt_out_tracking()
     }
-    mixpanel.track('Launched', { version, dev, onboarded })
+    mixpanel.track('Launched', { version, dev, onboarded_new })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -70,6 +79,10 @@ defineExpose({
         type: 'warn',
       })
     )
+
+    if (showOnboarding.value) {
+      onboardingVideo.value.play()
+    }
   },
 })
 
@@ -151,14 +164,26 @@ document.querySelector('body').addEventListener('click', function (e) {
 })
 
 const accounts = ref(null)
+
+command_listener((e) => {
+  console.log(e)
+  urlModal.value.show(e)
+})
 </script>
 
 <template>
-  <SplashScreen v-if="isLoading" app-loading />
+  <StickyTitleBar v-if="videoPlaying" />
+  <video
+    v-if="videoPlaying"
+    ref="onboardingVideo"
+    class="video"
+    src="@/assets/video.mp4"
+    autoplay
+    @ended="videoPlaying = false"
+  />
+  <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
+  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
-    <suspense>
-      <OnboardingModal ref="testModal" :accounts="accounts" />
-    </suspense>
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
@@ -187,7 +212,8 @@ const accounts = ref(null)
       </div>
       <div class="settings pages-list">
         <Button
-          class="sleek-primary icon-only collapsed-button"
+          class="sleek-primary collapsed-button"
+          icon-only
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
@@ -235,7 +261,6 @@ const accounts = ref(null)
           offset-height="var(--appbar-height)"
           offset-width="var(--sidebar-width)"
         />
-        <Notifications ref="notificationsWrapper" />
         <RouterView v-slot="{ Component }" class="main-view">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
@@ -246,6 +271,8 @@ const accounts = ref(null)
       </div>
     </div>
   </div>
+  <URLConfirmModal ref="urlModal" />
+  <Notifications ref="notificationsWrapper" />
 </template>
 
 <style lang="scss" scoped>
@@ -454,5 +481,13 @@ const accounts = ref(null)
   width: 100%;
   height: 100%;
   gap: 1rem;
+}
+
+.video {
+  margin-top: 2.25rem;
+  width: 100vw;
+  height: calc(100vh - 2.25rem);
+  object-fit: cover;
+  border-radius: var(--radius-md);
 }
 </style>

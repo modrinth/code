@@ -1001,6 +1001,7 @@ listen('tauri://file-drop', async (event) => {
 .select-checkbox {
   button.checkbox {
     border: none;
+    margin: 0;
   }
 }
 </style>
