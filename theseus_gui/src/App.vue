@@ -225,8 +225,8 @@ command_listener((e) => {
         <Button
           class="sleek-primary collapsed-button"
           icon-only
-          @click="() => $refs.installationModal.show()"
           :disabled="offline"
+          @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
         </Button>
