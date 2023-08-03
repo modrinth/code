@@ -81,7 +81,7 @@ const exportPack = async () => {
   if (outputPath) {
     export_profile_mrpack(
       props.instance.path,
-      outputPath + `/${props.instance.path} ${versionInput.value}.mrpack`,
+      outputPath + `/${nameInput.value} ${versionInput.value}.mrpack`,
       filesToExport,
       versionInput.value
     ).catch((err) => handleError(err))

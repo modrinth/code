@@ -623,24 +623,22 @@ pub async fn export_mrpack(
 
         // Get highest level folder pair ('a/b' in 'a/b/c', 'a' in 'a')
         // We only go one layer deep for the sake of not having a huge list of overrides
-        let topmost_two = relative_path
-            .iter()
-            .take(2)
-            .map(|os| os.to_string_lossy().to_string())
-            .collect::<Vec<_>>();
+        let topmost_two = relative_path.iter().take(2).collect::<Vec<_>>();
 
         // a,b => a/b
         // a => a
         let topmost = match topmost_two.len() {
-            2 => topmost_two.join("/"),
-            1 => topmost_two[0].clone(),
+            2 => PathBuf::from(topmost_two[0]).join(topmost_two[1]),
+            1 => PathBuf::from(topmost_two[0]),
             _ => {
                 return Err(crate::ErrorKind::OtherError(
                     "No topmost folder found".to_string(),
                 )
                 .into())
             }
-        };
+        }
+        .to_string_lossy()
+        .to_string();
 
         if !included_overrides.contains(&topmost) {
             continue;

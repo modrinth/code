@@ -772,15 +772,15 @@ watch(selectAll, () => {
 listen('tauri://file-drop', async (event) => {
   if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
     await install_from_file(event.payload[0]).catch(handleError)
-    mixpanel.track('InstanceCreate', {
-      source: 'FileDrop',
-    })
   } else {
     for (const file of event.payload) {
       await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
     }
     initProjects(await get(props.instance.path).catch(handleError))
   }
+  mixpanel.track('InstanceCreate', {
+    source: 'FileDrop',
+  })
 })
 </script>
 

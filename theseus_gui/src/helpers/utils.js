@@ -2,7 +2,6 @@ import {
   add_project_from_version as installMod,
   check_installed,
   get_full_path,
-  check_duplicate_nonversional_dependencies,
 } from '@/helpers/profile'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
@@ -36,14 +35,7 @@ export const releaseColor = (releaseType) => {
 }
 
 export const installVersionDependencies = async (profile, version) => {
-  const duplicates = await check_duplicate_nonversional_dependencies(
-    profile.path,
-    version.dependencies
-  )
   for (const dep of version.dependencies) {
-    // if duplicates has a version that matches, skip
-    if (duplicates.find((d) => d.version_id === dep.version_id)) continue
-
     if (dep.dependency_type !== 'required') continue
     // disallow fabric api install on quilt
     if (dep.project_id === 'P7dR8mSH' && profile.metadata.loader === 'quilt') continue
