@@ -623,24 +623,22 @@ pub async fn export_mrpack(
 
         // Get highest level folder pair ('a/b' in 'a/b/c', 'a' in 'a')
         // We only go one layer deep for the sake of not having a huge list of overrides
-        let topmost_two = relative_path
-            .iter()
-            .take(2)
-            .map(|os| os.to_string_lossy().to_string())
-            .collect::<Vec<_>>();
+        let topmost_two = relative_path.iter().take(2).collect::<Vec<_>>();
 
         // a,b => a/b
         // a => a
         let topmost = match topmost_two.len() {
-            2 => topmost_two.join("/"),
-            1 => topmost_two[0].clone(),
+            2 => PathBuf::from(topmost_two[0]).join(topmost_two[1]),
+            1 => PathBuf::from(topmost_two[0]),
             _ => {
                 return Err(crate::ErrorKind::OtherError(
                     "No topmost folder found".to_string(),
                 )
                 .into())
             }
-        };
+        }
+        .to_string_lossy()
+        .to_string();
 
         if !included_overrides.contains(&topmost) {
             continue;
@@ -851,13 +849,14 @@ pub async fn run_credentials(
     };
 
     // Any options.txt settings that we want set, add here
-    let mc_set_options: Vec<(String, String)> = vec![(
-        "fullscreen".to_string(),
-        profile
-            .fullscreen
-            .unwrap_or(settings.force_fullscreen)
-            .to_string(),
-    )];
+    let mut mc_set_options: Vec<(String, String)> = vec![];
+    if let Some(fullscreen) = profile.fullscreen {
+        // Profile fullscreen setting takes priority
+        mc_set_options.push(("fullscreen".to_string(), fullscreen.to_string()));
+    } else if settings.force_fullscreen {
+        // If global settings wants to force a fullscreen, do it
+        mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
+    }
 
     let mc_process = crate::launcher::launch_minecraft(
         java_args,
@@ -929,15 +928,11 @@ pub async fn create_mrpack_json(
         .map(|(k, v)| (k, sanitize_loader_version_string(&v).to_string()))
         .collect::<HashMap<_, _>>();
 
-    let profile_base_path = profile.get_profile_full_path().await?;
     let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path: String = profile_base_path
-                .join(mod_path.0.clone())
-                .to_string_lossy()
-                .to_string();
+            let path: String = mod_path.0.clone().to_string_lossy().to_string();
 
             // Only Modrinth projects have a modrinth metadata field for the modrinth.json
             Some(Ok(match project.metadata {
@@ -1034,4 +1029,8 @@ pub async fn build_folder(
         }
     }
     Ok(())
+}
+
+pub fn sanitize_profile_name(input: &str) -> String {
+    input.replace(['/', '\\'], "_")
 }

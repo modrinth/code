@@ -1,6 +1,7 @@
 //! Theseus profile management interface
 use crate::pack::install_from::CreatePackProfile;
 use crate::prelude::ProfilePathId;
+use crate::profile;
 use crate::state::LinkedData;
 use crate::util::io::{self, canonicalize};
 use crate::{
@@ -32,11 +33,14 @@ pub async fn profile_create(
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
 ) -> crate::Result<ProfilePathId> {
+    name = profile::sanitize_profile_name(&name);
+
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let uuid = Uuid::new_v4();
 
     let mut path = state.directories.profiles_dir().await.join(&name);
+
     if path.exists() {
         let mut new_name;
         let mut new_path;

@@ -213,7 +213,7 @@
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
-  <InstanceInstallModal ref="modInstallModal" />
+  <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarning" />
   <ContextMenu ref="options" @option-clicked="handleOptionsClick">
     <template #install> <DownloadIcon /> Install </template>
@@ -269,7 +269,7 @@ import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies, isOffline } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'

@@ -9,8 +9,9 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 lazy_static! {
-    static ref HYDRA_URL: Url = Url::parse("https://hydra.modrinth.com")
-        .expect("Hydra URL parse failed");
+    static ref HYDRA_URL: Url =
+        Url::parse("https://staging-api.modrinth.com/v2/auth/minecraft/")
+            .expect("Hydra URL parse failed");
 }
 
 // Socket messages
@@ -39,6 +40,7 @@ struct TokenJSON {
     token: String,
     refresh_token: String,
     expires_after: u32,
+    flow: String,
 }
 
 #[derive(Deserialize)]
@@ -65,11 +67,10 @@ pub struct HydraAuthFlow<S: AsyncRead + AsyncWrite + Unpin> {
 
 impl HydraAuthFlow<ws::tokio::ConnectStream> {
     pub async fn new() -> crate::Result<Self> {
-        let sock_url = wrap_ref_builder!(
-            it = HYDRA_URL.clone() =>
-            { it.set_scheme("wss").ok() }
-        );
-        let (socket, _) = ws::tokio::connect_async(sock_url.clone()).await?;
+        let (socket, _) = ws::tokio::connect_async(
+            "wss://staging-api.modrinth.com/v2/auth/minecraft/ws",
+        )
+        .await?;
         Ok(Self { socket })
     }
 
@@ -87,7 +88,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             .into_data();
         let code = ErrorJSON::unwrap::<LoginCodeJSON>(&code_resp)?;
         Ok(wrap_ref_builder!(
-            it = HYDRA_URL.join("login")? =>
+            it = HYDRA_URL.join("init")? =>
             { it.query_pairs_mut().append_pair("id", &code.login_code); }
         ))
     }
@@ -133,7 +134,7 @@ pub async fn refresh_credentials(
 ) -> crate::Result<()> {
     let resp = fetch_json::<TokenJSON>(
         Method::POST,
-        HYDRA_URL.join("/refresh")?.as_str(),
+        "https://staging-api.modrinth.com/v2/auth/minecraft/refresh",
         None,
         Some(serde_json::json!({ "refresh_token": credentials.refresh_token })),
         semaphore,

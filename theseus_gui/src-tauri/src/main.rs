@@ -35,7 +35,6 @@ async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
             e
         )))
     })?;
-    println!("Toggled decorations!");
     Ok(())
 }
 
@@ -97,8 +96,6 @@ fn main() {
             }
             #[cfg(target_os = "macos")]
             {
-                win.set_decorations(true).unwrap();
-
                 use macos::window_ext::WindowExt;
                 win.set_transparent_titlebar(true);
                 win.position_traffic_lights(9.0, 16.0);

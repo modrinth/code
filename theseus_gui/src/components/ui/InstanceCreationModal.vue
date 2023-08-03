@@ -1,8 +1,9 @@
 <template>
   <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
     <div class="modal-header">
-      <Chips v-model="creationType" :items="['custom', 'from file']" />
+      <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>
+    <hr class="card-divider" />
     <div v-if="creationType === 'custom'" class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
@@ -82,9 +83,105 @@
         </Button>
       </div>
     </div>
-    <div v-else class="modal-body">
+    <div v-else-if="creationType === 'from file'" class="modal-body">
       <Button @click="openFile"> <FolderOpenIcon /> Import from file </Button>
       <div class="info"><InfoIcon /> Or drag and drop your .mrpack file</div>
+    </div>
+    <div v-else class="modal-body">
+      <Chips
+        v-model="selectedProfileType"
+        :items="profileOptions"
+        :format-label="(profile) => profile?.name"
+      />
+      <div class="path-selection">
+        <h3>{{ selectedProfileType.name }} path</h3>
+        <div class="path-input">
+          <div class="iconified-input">
+            <FolderOpenIcon />
+            <input
+              v-model="selectedProfileType.path"
+              type="text"
+              placeholder="Path to launcher"
+              @change="setPath"
+            />
+            <Button @click="() => (selectedLauncherPath = '')">
+              <XIcon />
+            </Button>
+          </div>
+          <Button icon-only @click="selectLauncherPath">
+            <FolderSearchIcon />
+          </Button>
+          <Button icon-only @click="reload">
+            <UpdatedIcon />
+          </Button>
+        </div>
+      </div>
+      <div class="table">
+        <div class="table-head table-row">
+          <div class="toggle-all table-cell">
+            <Checkbox
+              class="select-checkbox"
+              :model-value="
+                profiles.get(selectedProfileType.name)?.every((child) => child.selected)
+              "
+              @update:model-value="
+                (newValue) =>
+                  profiles
+                    .get(selectedProfileType.name)
+                    ?.forEach((child) => (child.selected = newValue))
+              "
+            />
+          </div>
+          <div class="name-cell table-cell">Profile name</div>
+        </div>
+        <div
+          v-if="
+            profiles.get(selectedProfileType.name) &&
+            profiles.get(selectedProfileType.name).length > 0
+          "
+          class="table-content"
+        >
+          <div
+            v-for="(profile, index) in profiles.get(selectedProfileType.name)"
+            :key="index"
+            class="table-row"
+          >
+            <div class="checkbox-cell table-cell">
+              <Checkbox v-model="profile.selected" class="select-checkbox" />
+            </div>
+            <div class="name-cell table-cell">
+              {{ profile.name }}
+            </div>
+          </div>
+        </div>
+        <div v-else class="table-content empty">No profiles found</div>
+      </div>
+      <div class="button-row">
+        <Button
+          :disabled="
+            loading ||
+            !Array.from(profiles.values())
+              .flatMap((e) => e)
+              .some((e) => e.selected)
+          "
+          color="primary"
+          @click="next"
+        >
+          {{
+            loading
+              ? 'Importing...'
+              : Array.from(profiles.values())
+                  .flatMap((e) => e)
+                  .some((e) => e.selected)
+              ? `Import ${
+                  Array.from(profiles.values())
+                    .flatMap((e) => e)
+                    .filter((e) => e.selected).length
+                } profiles`
+              : 'Select profiles to import'
+          }}
+        </Button>
+      </div>
     </div>
   </Modal>
 </template>
@@ -102,6 +199,8 @@ import {
   Checkbox,
   FolderOpenIcon,
   InfoIcon,
+  FolderSearchIcon,
+  UpdatedIcon,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
@@ -120,6 +219,7 @@ import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
+import { get_importable_instances, import_instance } from '@/helpers/import.js'
 
 const themeStore = useTheming()
 
@@ -284,6 +384,68 @@ listen('tauri://file-drop', async (event) => {
     })
   }
 })
+
+const profiles = ref(
+  new Map([
+    ['MultiMC', []],
+    ['GDLauncher', []],
+    ['ATLauncher', []],
+    ['Curseforge', []],
+    ['PrismLauncher', []],
+  ])
+)
+
+const loading = ref(false)
+
+const selectedProfileType = ref('MultiMC')
+const profileOptions = ref([
+  { name: 'MultiMC', path: '' },
+  { name: 'GDLauncher', path: '' },
+  { name: 'ATLauncher', path: '' },
+  { name: 'Curseforge', path: '' },
+  { name: 'PrismLauncher', path: '' },
+])
+
+const selectLauncherPath = async () => {
+  selectedProfileType.value.path = await open({ multiple: false, directory: true })
+
+  if (selectedProfileType.value.path) {
+    await reload()
+  }
+}
+
+const reload = async () => {
+  const instances = await get_importable_instances(
+    selectedProfileType.value.name,
+    selectedProfileType.value.path
+  ).catch(handleError)
+  profiles.value.set(
+    selectedProfileType.value.name,
+    instances.map((name) => ({ name, selected: false }))
+  )
+}
+
+const setPath = () => {
+  profileOptions.value.find((profile) => profile.name === selectedProfileType.value.name).path =
+    selectedProfileType.value.path
+}
+
+const next = async () => {
+  loading.value = true
+  for (const launcher of Array.from(profiles.value.entries()).map(([launcher, profiles]) => ({
+    launcher,
+    path: profileOptions.value.find((option) => option.name === launcher).path,
+    profiles,
+  }))) {
+    for (const profile of launcher.profiles.filter((profile) => profile.selected)) {
+      await import_instance(launcher.launcher, launcher.path, profile.name)
+        .catch(handleError)
+        .then(() => console.log(`Successfully Imported ${profile.name} from ${launcher.launcher}`))
+      profile.selected = false
+    }
+  }
+  loading.value = false
+}
 </script>
 
 <style lang="scss" scoped>
@@ -362,5 +524,78 @@ listen('tauri://file-drop', async (event) => {
   align-items: center;
   padding: var(--gap-lg);
   padding-bottom: 0;
+}
+
+.path-selection {
+  padding: var(--gap-xl);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+
+  h3 {
+    margin: 0;
+  }
+
+  .path-input {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    flex-direction: row;
+    gap: var(--gap-sm);
+
+    .iconified-input {
+      flex-grow: 1;
+      :deep(input) {
+        width: 100%;
+        flex-basis: auto;
+      }
+    }
+  }
+}
+
+.table {
+  border: 1px solid var(--color-bg);
+}
+
+.table-row {
+  grid-template-columns: min-content auto;
+}
+
+.table-content {
+  max-height: calc(5 * (18px + 2rem));
+  height: calc(5 * (18px + 2rem));
+  overflow-y: auto;
+}
+
+.select-checkbox {
+  button.checkbox {
+    border: none;
+  }
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--gap-md);
+
+  .transparent {
+    padding: var(--gap-sm) 0;
+  }
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bolder;
+  color: var(--color-contrast);
+}
+
+.card-divider {
+  margin: var(--gap-md) var(--gap-lg) 0 var(--gap-lg);
 }
 </style>

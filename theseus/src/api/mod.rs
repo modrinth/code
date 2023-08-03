@@ -13,9 +13,10 @@ pub mod tags;
 
 pub mod data {
     pub use crate::state::{
-        DirectoryInfo, Hooks, JavaSettings, MemorySettings, ModLoader,
-        ModrinthProject, ModrinthTeamMember, ModrinthUser, ModrinthVersion,
-        ProfileMetadata, ProjectMetadata, Settings, Theme, WindowSize,
+        DirectoryInfo, Hooks, JavaSettings, LinkedData, MemorySettings,
+        ModLoader, ModrinthProject, ModrinthTeamMember, ModrinthUser,
+        ModrinthVersion, ProfileMetadata, ProjectMetadata, Settings, Theme,
+        WindowSize,
     };
 }
 
@@ -28,7 +29,7 @@ pub mod prelude {
         profile::{self, create, Profile},
         settings,
         state::JavaGlobals,
-        state::{ProfilePathId, ProjectPathId},
+        state::{Dependency, ProfilePathId, ProjectPathId},
         util::{
             io::{canonicalize, IOError},
             jre::JavaVersion,

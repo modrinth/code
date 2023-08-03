@@ -2,10 +2,13 @@
   <Card
     class="card button-base"
     @click="
-      $router.push({
-        path: `/project/${project.project_id}/`,
-        query: { i: props.instance ? props.instance.path : undefined },
-      })
+      () => {
+        emits('open')
+        $router.push({
+          path: `/project/${project.project_id ?? project.id}/`,
+          query: { i: props.instance ? props.instance.path : undefined },
+        })
+      }
     "
   >
     <div class="icon">
@@ -14,7 +17,7 @@
     <div class="content-wrapper">
       <div class="title joined-text">
         <h2>{{ project.title }}</h2>
-        <span>by {{ project.author }}</span>
+        <span v-if="project.author">by {{ project.author }}</span>
       </div>
       <div class="description">
         {{ project.description }}
@@ -42,14 +45,14 @@
       </div>
       <div class="badge">
         <HeartIcon />
-        {{ formatNumber(project.follows) }}
+        {{ formatNumber(project.follows ?? project.followers) }}
       </div>
       <div class="badge">
         <CalendarIcon />
-        {{ formatCategory(dayjs(project.date_modified).fromNow()) }}
+        {{ formatCategory(dayjs(project.date_modified ?? project.updated).fromNow()) }}
       </div>
     </div>
-    <div class="install">
+    <div v-if="project.author" class="install">
       <Button color="primary" :disabled="installed || installing" @click.stop="install()">
         <DownloadIcon v-if="!installed" />
         <CheckIcon v-else />
@@ -123,6 +126,8 @@ const props = defineProps({
     default: false,
   },
 })
+
+const emits = defineEmits(['open'])
 
 const installing = ref(false)
 const installed = ref(props.installed)

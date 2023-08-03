@@ -294,6 +294,7 @@ pub struct EditProfileMetadata {
     pub game_version: Option<String>,
     pub loader: Option<ModLoader>,
     pub loader_version: Option<LoaderVersion>,
+    pub linked_data: Option<LinkedData>,
     pub groups: Option<Vec<String>>,
 }
 
@@ -316,6 +317,7 @@ pub async fn profile_edit(
                 prof.metadata.loader = loader;
             }
             prof.metadata.loader_version = metadata.loader_version;
+            prof.metadata.linked_data = metadata.linked_data;
 
             if let Some(groups) = metadata.groups {
                 prof.metadata.groups = groups;

@@ -25,7 +25,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { Avatar } from 'omorphia'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
@@ -141,21 +141,17 @@ async function refreshSearch() {
   const base = 'https://api.modrinth.com/v2/'
 
   const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
-
   if (query.value.length > 0) {
     params.push(`query=${query.value.replace(/ /g, '+')}`)
   }
-
   if (instanceContext.value) {
     if (!ignoreInstanceLoaders.value && projectType.value === 'mod') {
       orFacets.value = [`categories:${encodeURIComponent(instanceContext.value.metadata.loader)}`]
     }
-
     if (!ignoreInstanceGameVersions.value) {
       selectedVersions.value = [instanceContext.value.metadata.game_version]
     }
   }
-
   if (
     facets.value.length > 0 ||
     orFacets.value.length > 0 ||
@@ -167,7 +163,6 @@ async function refreshSearch() {
     for (const facet of facets.value) {
       formattedFacets.push([facet])
     }
-
     // loaders specifier
     if (orFacets.value.length > 0) {
       formattedFacets.push(orFacets.value)
@@ -186,14 +181,12 @@ async function refreshSearch() {
       }
       formattedFacets.push(versionFacets)
     }
-
     if (onlyOpenSource.value) {
       formattedFacets.push(['open_source:true'])
     }
 
     if (selectedEnvironments.value.length > 0) {
       let environmentFacets = []
-
       const includesClient = selectedEnvironments.value.includes('client')
       const includesServer = selectedEnvironments.value.includes('server')
       if (includesClient && includesServer) {
@@ -224,14 +217,11 @@ async function refreshSearch() {
 
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
   }
-
   const offset = (currentPage.value - 1) * maxResults.value
   if (currentPage.value !== 1) {
     params.push(`offset=${offset}`)
   }
-
   let url = 'search'
-
   if (params.length > 0) {
     for (let i = 0; i < params.length; i++) {
       url += i === 0 ? `?${params[i]}` : `&${params[i]}`
@@ -257,12 +247,15 @@ async function onSearchChange(newPageNumber) {
   if (query.value === null) {
     return
   }
-
   await refreshSearch()
 
   const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
-  await router.replace({ path: route.path, query: obj })
-  breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
+
+  // Only replace in router if the query is different
+  if (JSON.stringify(obj) != JSON.stringify(route.query)) {
+    await router.replace({ path: route.path, query: obj })
+    breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
+  }
 }
 
 const searchWrapper = ref(null)
@@ -393,11 +386,10 @@ async function clearFilters() {
   for (const facet of [...orFacets.value]) {
     await toggleOrFacet(facet, true)
   }
-
   onlyOpenSource.value = false
   selectedVersions.value = []
   selectedEnvironments.value = []
-  await onSearchChange(1)
+  await onSearchChangeToTop(1)
 }
 
 async function toggleFacet(elementName, doNotSendRequest = false) {
@@ -410,7 +402,7 @@ async function toggleFacet(elementName, doNotSendRequest = false) {
   }
 
   if (!doNotSendRequest) {
-    await onSearchChange(1)
+    await onSearchChangeToTop(1)
   }
 }
 
@@ -423,7 +415,7 @@ async function toggleOrFacet(elementName, doNotSendRequest) {
   }
 
   if (!doNotSendRequest) {
-    await onSearchChange(1)
+    await onSearchChangeToTop(1)
   }
 }
 
@@ -436,14 +428,16 @@ function toggleEnv(environment, sendRequest) {
   }
 
   if (!sendRequest) {
-    onSearchChange(1)
+    onSearchChangeToTop(1)
   }
 }
 
 watch(
   () => route.params.projectType,
   async (newType) => {
-    if (!newType) return
+    // Check if the newType is not the same as the current value
+    if (!newType || newType === projectType.value) return
+
     projectType.value = newType
     breadcrumbs.setContext({ name: 'Browse', link: `/browse/${projectType.value}` })
 
@@ -600,7 +594,7 @@ const showLoaders = computed(
             :clear-search-on-select="false"
             :show-labels="false"
             placeholder="Choose versions..."
-            @update:model-value="onSearchChange(1)"
+            @update:model-value="onSearchChangeToTop(1)"
           />
         </div>
         <div
@@ -647,7 +641,7 @@ const showLoaders = computed(
             v-model="onlyOpenSource"
             label="Open source only"
             class="filter-checkbox"
-            @update:model-value="onSearchChange(1)"
+            @update:model-value="onSearchChangeToTop(1)"
           />
         </div>
       </Card>
@@ -736,7 +730,7 @@ const showLoaders = computed(
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
-  <InstanceInstallModal ref="modInstallModal" />
+  <ModInstallModal ref="modInstallModal" />
   <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 </template>
 

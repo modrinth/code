@@ -155,7 +155,7 @@ pub fn get_profile_from_pack(
         },
         CreatePackLocation::FromFile { path } => {
             let file_name = path
-                .file_name()
+                .file_stem()
                 .unwrap_or_default()
                 .to_string_lossy()
                 .to_string();
