@@ -43,14 +43,16 @@ const isLoading = ref(true)
 const videoPlaying = ref(true)
 const showOnboarding = ref(false)
 
+const onboardingVideo = ref()
+
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded } =
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
       await get()
     const dev = await isDev()
     const version = await getVersion()
-    showOnboarding.value = true
+    showOnboarding.value = !onboarded_new
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -60,7 +62,7 @@ defineExpose({
     if (opt_out_analytics) {
       mixpanel.opt_out_tracking()
     }
-    mixpanel.track('Launched', { version, dev, onboarded })
+    mixpanel.track('Launched', { version, dev, onboarded_new })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -77,6 +79,10 @@ defineExpose({
         type: 'warn',
       })
     )
+
+    if (showOnboarding.value) {
+      onboardingVideo.value.play()
+    }
   },
 })
 
@@ -163,6 +169,7 @@ command_listener((e) => {
   <StickyTitleBar v-if="videoPlaying" />
   <video
     v-if="videoPlaying"
+    ref="onboardingVideo"
     class="video"
     src="@/assets/video.mp4"
     autoplay

@@ -32,7 +32,7 @@ import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import { auto_install_java, get_jre } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
 import ImportingCard from '@/components/ui/tutorial/ImportingCard.vue'
-import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
+// import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import PreImportScreen from '@/components/ui/tutorial/PreImportScreen.vue'
 
 const phase = ref(0)
@@ -70,7 +70,7 @@ const prevPage = () => {
 const finishOnboarding = async () => {
   mixpanel.track('OnboardingFinish')
   const settings = await get()
-  settings.onboarded = true
+  settings.onboarded_new = true
   await set(settings)
   props.finish()
 }
@@ -119,14 +119,14 @@ onMounted(async () => {
       <Button color="primary" @click="nextPage"> Get started </Button>
     </GalleryImage>
     <LoginCard v-else-if="page === 2" :next-page="nextPage" :prev-page="prevPage" />
-    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" :prev-page="prevPage" />
+    <!--    <ModrinthLoginScreen v-else-if="page === 3" :next-page="nextPage" :prev-page="prevPage" />-->
     <PreImportScreen
-      v-else-if="page === 4"
+      v-else-if="page === 3"
       :next-page="endOnboarding"
       :prev-page="prevPage"
       :import-page="nextPage"
     />
-    <ImportingCard v-else-if="page === 5" :next-page="endOnboarding" :prev-page="prevPage" />
+    <ImportingCard v-else-if="page === 4" :next-page="endOnboarding" :prev-page="prevPage" />
   </div>
   <div v-else class="container">
     <StickyTitleBar v-if="phase === 9" />
