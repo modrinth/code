@@ -93,8 +93,8 @@
             </Button>
             <Button
               class="transparent update"
-              @click="updateAll()"
               :disabled="offline"
+              @click="updateAll()"
               @mouseover="selectedOption = 'Update'"
             >
               <UpdatedIcon />
@@ -140,7 +140,7 @@
             </Button>
           </section>
           <section v-if="selectedOption === 'Update'" class="options">
-            <Button class="transparent" @click="updateAll()" :disabled="offline">
+            <Button class="transparent" :disabled="offline" @click="updateAll()">
               <UpdatedIcon />
               Update all
             </Button>
@@ -794,7 +794,7 @@ listen('tauri://file-drop', async (event) => {
     }
     initProjects(await get(props.instance.path).catch(handleError))
   }
-  mixpanel.track('InstanceCreate', {
+  mixpanel_track('InstanceCreate', {
     source: 'FileDrop',
   })
 })
