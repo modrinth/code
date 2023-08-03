@@ -478,6 +478,7 @@ watch(
         name: title.value.trim().substring(0, 16) ?? 'Instance',
         groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
         loader_version: props.instance.metadata.loader_version,
+        linked_data: props.instance.metadata.linked_data,
       },
       java: {},
     }
