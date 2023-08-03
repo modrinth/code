@@ -18,7 +18,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ProjectCard from '@/components/ui/ProjectCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
@@ -269,7 +269,7 @@ onUnmounted(() => {
     <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
   </ContextMenu>
   <InstallConfirmModal ref="confirmModal" />
-  <InstanceInstallModal ref="modInstallModal" />
+  <ModInstallModal ref="modInstallModal" />
 </template>
 <style lang="scss" scoped>
 .content {

@@ -74,12 +74,17 @@ input {
     padding-top: calc(var(--gap-md) + 1.75rem);
   }
 
-  .account-card {
+  .account-card,
+  .card-section {
     top: calc(var(--gap-md) + 1.75rem);
   }
 }
 
 .windows {
+  .fake-appbar {
+    height: 2.5rem !important;
+  }
+
   .window-controls {
     display: flex !important;
   }
@@ -113,4 +118,13 @@ input {
   background-color: var(--color-button-bg);
   border-radius: var(--radius-lg);
   border: 3px solid var(--color-bg);
+}
+
+.highlighted {
+  box-shadow: 0 0 1rem var(--color-brand) !important;
+}
+
+.gecko {
+  background-color: var(--color-raised-bg);
+  box-shadow: none !important;
 }
