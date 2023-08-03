@@ -107,7 +107,8 @@ impl ProjectPathId {
         let profiles_dir: PathBuf = io::canonicalize(
             State::get().await?.directories.profiles_dir().await,
         )?;
-        path.strip_prefix(profiles_dir)
+        let path = path
+            .strip_prefix(profiles_dir)
             .ok()
             .map(|p| p.components().skip(1).collect::<PathBuf>())
             .ok_or_else(|| {
@@ -458,7 +459,6 @@ impl Profile {
         version_id: String,
     ) -> crate::Result<(ProjectPathId, ModrinthVersion)> {
         let state = State::get().await?;
-
         let version = fetch_json::<ModrinthVersion>(
             Method::GET,
             &format!("{MODRINTH_API_URL}version/{version_id}"),
@@ -467,7 +467,6 @@ impl Profile {
             &state.fetch_semaphore,
         )
         .await?;
-
         let file = if let Some(file) = version.files.iter().find(|x| x.primary)
         {
             file
@@ -486,7 +485,6 @@ impl Profile {
             &state.fetch_semaphore,
         )
         .await?;
-
         let path = self
             .add_project_bytes(
                 &file.filename,
@@ -494,7 +492,6 @@ impl Profile {
                 ProjectType::get_from_loaders(version.loaders.clone()),
             )
             .await?;
-
         Ok((path, version))
     }
 
@@ -569,7 +566,6 @@ impl Profile {
     }
 
     /// Toggle a project's disabled state.
-    /// 'path' should be relative to the profile's path.
     #[tracing::instrument(skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn toggle_disable_project(
@@ -662,11 +658,11 @@ impl Profile {
                 }
             }
         } else {
-            return Err(crate::ErrorKind::InputError(format!(
-                "Project path does not exist: {:?}",
+            // If we are removing a project that doesn't exist, allow it to pass through without error, but warn
+            tracing::warn!(
+                "Attempted to remove non-existent project: {:?}",
                 relative_path
-            ))
-            .into());
+            );
         }
 
         Ok(())

@@ -27,7 +27,7 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
-import { showInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { install as pack_install } from '@/helpers/pack.js'
 import { useTheming } from '@/store/state.js'
@@ -155,7 +155,7 @@ const handleOptionsClick = async (args) => {
       deleteConfirmModal.value.show()
       break
     case 'open_folder':
-      await showInFolder(args.item.path)
+      await showProfileInFolder(args.item.path)
       break
     case 'copy_path':
       await navigator.clipboard.writeText(args.item.path)
@@ -205,7 +205,7 @@ const calculateCardsPerRow = () => {
   const containerWidthInRem =
     containerWidth / parseFloat(getComputedStyle(document.documentElement).fontSize)
   maxInstancesPerRow.value = Math.floor((containerWidthInRem + 1) / 11)
-  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 17)
+  maxProjectsPerRow.value = Math.floor((containerWidthInRem + 1) / 19)
 }
 
 onMounted(() => {
@@ -335,7 +335,7 @@ onUnmounted(() => {
   .projects {
     display: grid;
     width: 100%;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
     grid-gap: 1rem;
 
     .item {

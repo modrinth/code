@@ -12,6 +12,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_remove,
             profile_get,
             profile_get_optimal_jre_key,
+            profile_get_full_path,
             profile_list,
             profile_check_installed,
             profile_install,
@@ -52,6 +53,14 @@ pub async fn profile_get(
     clear_projects: Option<bool>,
 ) -> Result<Option<Profile>> {
     let res = profile::get(&path, clear_projects).await?;
+    Ok(res)
+}
+
+// Get a profile's full path
+// invoke('plugin:profile|profile_get_full_path',path)
+#[tauri::command]
+pub async fn profile_get_full_path(path: ProfilePathId) -> Result<PathBuf> {
+    let res = profile::get_full_path(&path).await?;
     Ok(res)
 }
 

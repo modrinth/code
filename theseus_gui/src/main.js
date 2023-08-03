@@ -23,7 +23,11 @@ app.mixin(loadCssMixin)
 const mountedApp = app.mount('#app')
 
 const raw_invoke = async (plugin, fn, args) => {
-  return await invoke('plugin:' + plugin + '|' + fn, args)
+  if (plugin == '') {
+    return await invoke(fn, args)
+  } else {
+    return await invoke('plugin:' + plugin + '|' + fn, args)
+  }
 }
 isDev()
   .then((dev) => {

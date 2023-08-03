@@ -94,6 +94,19 @@ pub async fn get_by_uuid(
     Ok(profile)
 }
 
+/// Get profile's full path in the filesystem
+#[tracing::instrument]
+pub async fn get_full_path(path: &ProfilePathId) -> crate::Result<PathBuf> {
+    let _ = get(path, Some(true)).await?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to get the full path of a nonexistent or unloaded profile at path {}!",
+            path
+        ))
+    })?;
+    let full_path = io::canonicalize(path.get_full_path().await?)?;
+    Ok(full_path)
+}
+
 /// Edit a profile using a given asynchronous closure
 pub async fn edit<Fut>(
     path: &ProfilePathId,
@@ -373,6 +386,7 @@ pub async fn update_project(
                         profile.projects.insert(path.clone(), project);
                     }
                 }
+                drop(profiles);
 
                 if !skip_send_event.unwrap_or(false) {
                     emit_profile(
@@ -409,7 +423,7 @@ pub async fn add_project_from_version(
     version_id: String,
 ) -> crate::Result<ProjectPathId> {
     if let Some(profile) = get(profile_path, None).await? {
-        let (path, _) = profile.add_project_version(version_id).await?;
+        let (project_path, _) = profile.add_project_version(version_id).await?;
 
         emit_profile(
             profile.uuid,
@@ -418,9 +432,7 @@ pub async fn add_project_from_version(
             ProfilePayloadType::Edited,
         )
         .await?;
-        State::sync().await?;
-
-        Ok(path)
+        Ok(project_path)
     } else {
         Err(
             crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())

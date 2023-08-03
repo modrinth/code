@@ -59,7 +59,7 @@ pub fn show_in_folder(path: String) -> Result<()> {
         #[cfg(target_os = "windows")]
         {
             Command::new("explorer")
-                .args(["/select,", &path]) // The comma after select is not a typo
+                .args([&path]) // The comma after select is not a typo
                 .spawn()?;
         }
 
@@ -86,7 +86,7 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
         #[cfg(target_os = "macos")]
         {
-            Command::new("open").args(["-R", &path]).spawn()?;
+            Command::new("open").args([&path]).spawn()?;
         }
 
         Ok::<(), theseus::Error>(())

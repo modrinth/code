@@ -223,7 +223,11 @@
               :checked="!mod.disabled"
               @change="toggleDisableMod(mod)"
             />
-            <Button v-tooltip="`Show ${mod.file_name}`" icon-only @click="showInFolder(mod.path)">
+            <Button
+              v-tooltip="`Show ${mod.file_name}`"
+              icon-only
+              @click="showProfileInFolder(mod.path)"
+            >
               <FolderOpenIcon />
             </Button>
           </div>
@@ -345,7 +349,7 @@ import mixpanel from 'mixpanel-browser'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { showInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
 
 const router = useRouter()
@@ -605,17 +609,39 @@ const updateProject = async (mod) => {
   })
 }
 
+let locks = {}
+
 const toggleDisableMod = async (mod) => {
-  mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
-  mod.disabled = !mod.disabled
-  mixpanel.track('InstanceProjectDisable', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
-    id: mod.id,
-    name: mod.name,
-    project_type: mod.project_type,
-    disabled: mod.disabled,
-  })
+  // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
+  if (!locks[mod.id]) {
+    locks[mod.id] = ref(null)
+  }
+
+  let lock = locks[mod.id]
+
+  while (lock.value) {
+    await lock.value
+  }
+
+  lock.value = toggle_disable_project(props.instance.path, mod.path)
+    .then((newPath) => {
+      mod.path = newPath
+      mod.disabled = !mod.disabled
+      mixpanel.track('InstanceProjectDisable', {
+        loader: props.instance.metadata.loader,
+        game_version: props.instance.metadata.game_version,
+        id: mod.id,
+        name: mod.name,
+        project_type: mod.project_type,
+        disabled: mod.disabled,
+      })
+    })
+    .catch(handleError)
+    .finally(() => {
+      lock.value = null
+    })
+
+  await lock.value
 }
 
 const removeMod = async (mod) => {
