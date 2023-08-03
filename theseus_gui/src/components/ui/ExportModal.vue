@@ -6,6 +6,7 @@ import { export_profile_mrpack, get_potential_override_folders } from '@/helpers
 import { open } from '@tauri-apps/api/dialog'
 import { handleError } from '@/store/notifications.js'
 import { sep } from '@tauri-apps/api/path'
+import { useTheming } from '@/store/theme'
 
 const props = defineProps({
   instance: {
@@ -26,6 +27,8 @@ const nameInput = ref(props.instance.metadata.name)
 const versionInput = ref('1.0.0')
 const files = ref([])
 const folders = ref([])
+
+const themeStore = useTheming()
 
 const initFiles = async () => {
   const newFolders = new Map()
@@ -88,7 +91,7 @@ const exportPack = async () => {
 </script>
 
 <template>
-  <Modal ref="exportModal" header="Export modpack">
+  <Modal ref="exportModal" header="Export modpack" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
       <div class="labeled_input">
         <p>Modpack Name</p>
