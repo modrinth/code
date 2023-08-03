@@ -265,8 +265,8 @@ import {
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRoute, useRouter } from 'vue-router'
-import { onUnmounted, ref, shallowRef, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies, isOffline } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
@@ -277,7 +277,6 @@ import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import { offline_listener } from '@/helpers/events'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -299,16 +298,6 @@ const installed = ref(false)
 const installedVersion = ref(null)
 
 const offline = ref(await isOffline())
-const router = useRouter()
-// Immediately return to home page if offline
-if (offline.value) {
-  await router.push('/')
-}
-const unlisten = await offline_listener((e) => {
-  if (e) {
-    router.push('/')
-  }
-})
 
 async function fetchProjectData() {
   ;[
@@ -537,10 +526,6 @@ const handleOptionsClick = (args) => {
       break
   }
 }
-
-onUnmounted(() => {
-  unlisten()
-})
 </script>
 
 <style scoped lang="scss">

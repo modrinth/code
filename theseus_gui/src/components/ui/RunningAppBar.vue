@@ -15,10 +15,6 @@
         <span> Offline </span>
       </div>
     </div>
-    <div v-else class="status">
-      <span class="circle running" />
-      <span class="running-text"> Online </span>
-    </div>
     <div v-if="selectedProfile" class="status">
       <span class="circle running" />
       <div ref="profileButton" class="running-text">

@@ -176,6 +176,9 @@ impl State {
 
         let discord_rpc = DiscordGuard::init().await?;
 
+        // Starts a loop of checking if we are online, and updating
+        Self::offine_check_loop();
+
         emit_loading(&loading_bar, 10.0, None).await?;
 
         Ok::<RwLock<Self>, crate::Error>(RwLock::new(Self {
@@ -200,6 +203,21 @@ impl State {
             safety_processes: RwLock::new(safety_processes),
             file_watcher: RwLock::new(file_watcher),
         }))
+    }
+
+    /// Starts a loop of checking if we are online, and updating
+    pub fn offine_check_loop() {
+        tokio::task::spawn(async {
+            loop {
+                let state = Self::get().await;
+                if let Ok(state) = state {
+                    let _ = state.refresh_offline().await;
+                }
+
+                // Wait 5 seconds
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
     }
 
     /// Updates state with data from the web, if we are online

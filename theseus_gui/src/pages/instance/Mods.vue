@@ -92,9 +92,9 @@
               Delete
             </Button>
             <Button
-              v-if="!offline"
               class="transparent update"
               @click="updateAll()"
+              :disabled="offline"
               @mouseover="selectedOption = 'Update'"
             >
               <UpdatedIcon />
@@ -139,8 +139,8 @@
               Delete disabled
             </Button>
           </section>
-          <section v-if="selectedOption === 'Update' && !offline" class="options">
-            <Button class="transparent" @click="updateAll()">
+          <section v-if="selectedOption === 'Update'" class="options">
+            <Button class="transparent" @click="updateAll()" :disabled="offline">
               <UpdatedIcon />
               Update all
             </Button>
@@ -180,8 +180,9 @@
           </div>
           <div class="table-cell table-text name-cell">
             <router-link
-              v-if="mod.slug && !offline"
+              v-if="mod.slug"
               :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
+              :disabled="offline"
               class="mod-content"
             >
               <Avatar :src="mod.icon" />
@@ -202,22 +203,20 @@
             <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
               <TrashIcon />
             </Button>
-            <div v-if="!offline">
-              <AnimatedLogo
-                v-if="mod.updating"
-                class="btn icon-only updating-indicator"
-              ></AnimatedLogo>
-              <Button
-                v-else
-                v-tooltip="'Update project'"
-                :disabled="!mod.outdated"
-                icon-only
-                @click="updateProject(mod)"
-              >
-                <UpdatedIcon v-if="mod.outdated" />
-                <CheckIcon v-else />
-              </Button>
-            </div>
+            <AnimatedLogo
+              v-if="mod.updating"
+              class="btn icon-only updating-indicator"
+            ></AnimatedLogo>
+            <Button
+              v-else
+              v-tooltip="'Update project'"
+              :disabled="!mod.outdated || offline"
+              icon-only
+              @click="updateProject(mod)"
+            >
+              <UpdatedIcon v-if="mod.outdated" />
+              <CheckIcon v-else />
+            </Button>
             <input
               id="switch-1"
               autocomplete="off"

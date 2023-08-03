@@ -133,9 +133,6 @@ pub async fn await_sync() -> Result<()> {
 pub async fn is_offline() -> Result<bool> {
     let state = State::get().await?;
     let offline = *state.offline.read().await;
-
-    // Spawn a refresh attempt in the background (don't wait for it to finish as an emit will be sent when it is done)
-    tokio::spawn(refresh_offline());
     Ok(offline)
 }
 

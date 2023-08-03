@@ -113,7 +113,7 @@
     <template #disable><XIcon />Disable selected</template>
     <template #enable><CheckCircleIcon />Enable selected</template>
     <template #hide_show><EyeIcon />Show/Hide unselected</template>
-    <template #update_all v-if="!offline"
+    <template #update_all
       ><UpdatedIcon />Update {{ selected.length > 0 ? 'selected' : 'all' }}</template
     >
     <template #filter_update><UpdatedIcon />Select Updatable</template>

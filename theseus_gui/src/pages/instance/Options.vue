@@ -83,14 +83,19 @@
     </label>
     <input id="profile-name" v-model="title" autocomplete="off" maxlength="80" type="text" />
 
-    <div v-if="!offline" class="adjacent-input">
+    <div class="adjacent-input">
       <label for="edit-versions">
         <span class="label__title">Edit mod loader/game versions</span>
         <span class="label__description">
           Allows you to change the mod loader, loader version, or game version of the instance.
         </span>
       </label>
-      <button id="edit-versions" class="btn" @click="$refs.changeVersionsModal.show()">
+      <button
+        id="edit-versions"
+        class="btn"
+        @click="$refs.changeVersionsModal.show()"
+        :disabled="offline"
+      >
         <EditIcon />
         Edit versions
       </button>
@@ -280,7 +285,7 @@
         <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
-    <div v-if="!offline" class="adjacent-input">
+    <div class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
         <span class="label__description">
@@ -291,13 +296,13 @@
       <button
         id="repair-profile"
         class="btn btn-highlight"
-        :disabled="repairing"
+        :disabled="repairing || offline"
         @click="repairProfile"
       >
         <HammerIcon /> Repair
       </button>
     </div>
-    <div v-if="props.instance.modrinth_update_version && !offline" class="adjacent-input">
+    <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Reinstall modpack</span>
         <span class="label__description">
@@ -308,7 +313,7 @@
       <button
         id="repair-profile"
         class="btn btn-highlight"
-        :disabled="repairing"
+        :disabled="repairing || offline"
         @click="repairModpack"
       >
         <DownloadIcon /> Reinstall

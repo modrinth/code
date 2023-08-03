@@ -174,17 +174,16 @@ const accounts = ref(null)
           <RouterLink to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
           </RouterLink>
-          <div v-if="!offline">
-            <RouterLink
-              to="/browse/modpack"
-              class="btn icon-only collapsed-button"
-              :class="{
-                'router-link-active': isOnBrowse,
-              }"
-            >
-              <SearchIcon />
-            </RouterLink>
-          </div>
+          <RouterLink
+            to="/browse/modpack"
+            class="btn icon-only collapsed-button"
+            :disabled="offline"
+            :class="{
+              'router-link-active': isOnBrowse,
+            }"
+          >
+            <SearchIcon />
+          </RouterLink>
           <RouterLink to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
@@ -195,9 +194,9 @@ const accounts = ref(null)
       </div>
       <div class="settings pages-list">
         <Button
-          v-if="!offline"
           class="sleek-primary icon-only collapsed-button"
           @click="() => $refs.installationModal.show()"
+          :disabled="offline"
         >
           <PlusIcon />
         </Button>
