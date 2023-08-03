@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onUnmounted, shallowRef } from 'vue'
+import { ref, onUnmounted, shallowRef, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
@@ -55,7 +55,9 @@ const getFeaturedMods = async () => {
 
 await getInstances()
 
-if (!offline.value) await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+if (!offline.value) {
+  await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+}
 
 const unlistenProfile = await profile_listener(async (e) => {
   await getInstances()
@@ -71,6 +73,15 @@ const unlistenOffline = await offline_listener(async (b) => {
   }
 })
 
+// computed sums of recentInstances, featuredModpacks, featuredMods, treating them as arrays if they are not
+const total = computed(() => {
+  return (
+    (recentInstances.value?.length ?? 0) +
+    (featuredModpacks.value?.length ?? 0) +
+    (featuredMods.value?.length ?? 0)
+  )
+})
+
 onUnmounted(() => {
   unlistenProfile()
   unlistenOffline()
@@ -80,6 +91,7 @@ onUnmounted(() => {
 <template>
   <div class="page-container">
     <RowDisplay
+      v-if="total > 0"
       :instances="[
         {
           label: 'Jump back in',

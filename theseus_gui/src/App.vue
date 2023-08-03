@@ -38,7 +38,6 @@ import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-// import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 
@@ -208,7 +207,6 @@ command_listener((e) => {
           <RouterLink
             to="/browse/modpack"
             class="btn icon-only collapsed-button"
-            :disabled="offline"
             :class="{
               'router-link-active': isOnBrowse,
             }"
