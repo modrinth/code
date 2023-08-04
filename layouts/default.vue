@@ -549,6 +549,7 @@ export default defineNuxtComponent({
         display: flex;
         justify-content: space-between;
         color: var(--color-text-dark);
+        z-index: 5;
 
         a {
           align-items: center;
@@ -580,6 +581,7 @@ export default defineNuxtComponent({
       section.nav-group {
         display: flex;
         flex-grow: 5;
+        z-index: 5;
 
         section.nav {
           flex-grow: 5;
