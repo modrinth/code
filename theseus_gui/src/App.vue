@@ -24,7 +24,7 @@ import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev } from '@/helpers/utils.js'
+import { isDev, getOS } from '@/helpers/utils.js'
 import mixpanel from 'mixpanel-browser'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
@@ -50,7 +50,9 @@ defineExpose({
     isLoading.value = false
     const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
       await get()
-    videoPlaying.value = !onboarded_new
+    const os = await getOS()
+    // video should play if the user is not on linux, and has not onboarded
+    videoPlaying.value = !onboarded_new && os !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !onboarded_new
