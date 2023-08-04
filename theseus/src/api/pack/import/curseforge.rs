@@ -9,7 +9,7 @@ use crate::{
     State,
 };
 
-use super::copy_dotminecraft;
+use super::{copy_dotminecraft, recache_icon};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -35,6 +35,7 @@ pub struct FlameModLoader {
 #[serde(rename_all = "camelCase")]
 pub struct MinecraftInstance {
     pub name: Option<String>,
+    pub profile_image_path: Option<PathBuf>,
     pub game_version: String, // Minecraft game version. Non-prioritized, use this if Vanilla
 }
 
@@ -53,9 +54,6 @@ pub async fn import_curseforge(
     curseforge_instance_folder: PathBuf, // instance's folder
     profile_path: ProfilePathId,         // path to profile
 ) -> crate::Result<()> {
-    // TODO: recache curseforge instance icon
-    let icon: Option<PathBuf> = None;
-
     // Load minecraftinstance.json
     let minecraft_instance: String = io::read_to_string(
         &curseforge_instance_folder.join("minecraftinstance.json"),
@@ -71,6 +69,14 @@ pub async fn import_curseforge(
             .map(|a| a.to_string_lossy().to_string())
             .unwrap_or("Unknown".to_string())
     );
+
+    // Recache Curseforge Icon if it exists
+    let icon = if let Some(icon_path) = minecraft_instance.profile_image_path.clone() {
+        recache_icon(icon_path).await?
+    } else {
+        None
+    };
+
 
     // Curseforge vanilla profile may not have a manifest.json, so we allow it to not exist
     if curseforge_instance_folder.join("manifest.json").exists() {

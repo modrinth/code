@@ -57,7 +57,7 @@ pub async fn update_managed_modrinth(
 
     emit_profile(
         profile.uuid,
-        profile.path,
+        profile_path,
         &profile.metadata.name,
         ProfilePayloadType::Edited,
     )
@@ -133,7 +133,7 @@ pub async fn repair_managed_modrinth(
 
     emit_profile(
         profile.uuid,
-        profile.path,
+        profile_path,
         &profile.metadata.name,
         ProfilePayloadType::Edited,
     )
