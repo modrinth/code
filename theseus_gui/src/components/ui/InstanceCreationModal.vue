@@ -274,7 +274,6 @@ defineExpose({
 
 const unlistener = ref(null)
 const hide = () => {
-  console.log('hiding nicely')
   isShowing.value = false
   modal.value.hide()
   if (unlistener.value) {
@@ -473,8 +472,6 @@ const reload = async () => {
   } else {
     profiles.value.set(selectedProfileType.value.name, [])
   }
-
-  console.log(instances)
 }
 
 const setPath = () => {

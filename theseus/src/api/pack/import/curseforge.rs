@@ -83,7 +83,6 @@ pub async fn import_curseforge(
     let state = State::get().await?;
     // Recache Curseforge Icon if it exists
     let mut icon = None;
-    println!("{:?}", minecraft_instance);
 
     if let Some(icon_path) = minecraft_instance.profile_image_path.clone() {
         icon = recache_icon(icon_path).await?;
@@ -91,7 +90,6 @@ pub async fn import_curseforge(
         thumbnail_url: Some(thumbnail_url),
     }) = minecraft_instance.installed_modpack.clone()
     {
-        println!("Downloading icon from {}", thumbnail_url);
         let icon_bytes =
             fetch(&thumbnail_url, None, &state.fetch_semaphore).await?;
         let filename = thumbnail_url.rsplit('/').last();
