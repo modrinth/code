@@ -40,7 +40,7 @@ import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
-const videoPlaying = ref(true)
+const videoPlaying = ref(false)
 const showOnboarding = ref(false)
 
 const onboardingVideo = ref()
@@ -50,6 +50,7 @@ defineExpose({
     isLoading.value = false
     const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
       await get()
+    videoPlaying.value = !onboarded_new
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !onboarded_new

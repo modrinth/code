@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    fmt,
+    path::{Path, PathBuf},
+};
 
 use io::IOError;
 use serde::{Deserialize, Serialize};
@@ -24,6 +27,19 @@ pub enum ImportLauncherType {
     #[serde(other)]
     Unknown,
 }
+// impl display
+impl fmt::Display for ImportLauncherType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ImportLauncherType::MultiMC => write!(f, "MultiMC"),
+            ImportLauncherType::PrismLauncher => write!(f, "PrismLauncher"),
+            ImportLauncherType::ATLauncher => write!(f, "ATLauncher"),
+            ImportLauncherType::GDLauncher => write!(f, "GDLauncher"),
+            ImportLauncherType::Curseforge => write!(f, "Curseforge"),
+            ImportLauncherType::Unknown => write!(f, "Unknown"),
+        }
+    }
+}
 
 // Return a list of importable instances from a launcher type and base path, by iterating through the folder and checking
 pub async fn get_importable_instances(
@@ -31,12 +47,12 @@ pub async fn get_importable_instances(
     base_path: PathBuf,
 ) -> crate::Result<Vec<String>> {
     // Some launchers have a different folder structure for instances
-    let instances_folder = match launcher_type {
+    let instances_subfolder = match launcher_type {
         ImportLauncherType::GDLauncher
         | ImportLauncherType::MultiMC
         | ImportLauncherType::PrismLauncher
-        | ImportLauncherType::ATLauncher => base_path.join("instances"),
-        ImportLauncherType::Curseforge => base_path.join("Instances"),
+        | ImportLauncherType::ATLauncher => "instances",
+        ImportLauncherType::Curseforge => "Instances",
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),
@@ -44,8 +60,13 @@ pub async fn get_importable_instances(
             .into())
         }
     };
+    let instances_folder = base_path.join(instances_subfolder);
     let mut instances = Vec::new();
-    let mut dir = io::read_dir(&instances_folder).await?;
+    let mut dir = io::read_dir(&instances_folder).await.map_err(| _ | {
+        crate::ErrorKind::InputError(format!(
+            "Invalid {launcher_type} launcher path, could not find '{instances_subfolder}' subfolder."
+        ))
+    })?;
     while let Some(entry) = dir
         .next_entry()
         .await

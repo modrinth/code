@@ -1,6 +1,6 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Checkbox, Toggle } from 'omorphia'
+import { Card, Slider, DropdownSelect, Toggle } from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
@@ -336,7 +336,16 @@ watch(
             Overwrites the option.txt file to start in full screen when launched.
           </span>
         </label>
-        <Checkbox id="fullscreen" v-model="settings.force_fullscreen" />
+        <Toggle
+          id="fullscreen"
+          :model-value="settings.force_fullscreen"
+          :checked="settings.force_fullscreen"
+          @update:model-value="
+            (e) => {
+              settings.force_fullscreen = e
+            }
+          "
+        />
       </div>
       <div class="adjacent-input">
         <label for="width">
