@@ -1,4 +1,8 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
 
 dependencies:
   '@tauri-apps/api':
@@ -27,7 +31,7 @@ dependencies:
     version: 3.4.0(vue@3.3.4)
   tauri-plugin-window-state-api:
     specifier: github:tauri-apps/tauri-plugin-window-state#v1
-    version: github.com/tauri-apps/tauri-plugin-window-state/347c792535d2623fc21f66590d06f4c8dadd85ba
+    version: github.com/tauri-apps/tauri-plugin-window-state/5ea9eb0d4a9affd17269f92c0085935046be3f4a
   vite-svg-loader:
     specifier: ^4.0.0
     version: 4.0.0
@@ -1808,8 +1812,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  github.com/tauri-apps/tauri-plugin-window-state/347c792535d2623fc21f66590d06f4c8dadd85ba:
-    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-window-state/tar.gz/347c792535d2623fc21f66590d06f4c8dadd85ba}
+  github.com/tauri-apps/tauri-plugin-window-state/5ea9eb0d4a9affd17269f92c0085935046be3f4a:
+    resolution: {tarball: https://codeload.github.com/tauri-apps/tauri-plugin-window-state/tar.gz/5ea9eb0d4a9affd17269f92c0085935046be3f4a}
     name: tauri-plugin-window-state-api
     version: 0.0.0
     dependencies:

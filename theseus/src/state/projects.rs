@@ -1,7 +1,7 @@
 //! Project management + inference
 
 use crate::config::MODRINTH_API_URL;
-use crate::state::Profile;
+use crate::state::{ModrinthUser, Profile};
 use crate::util::fetch::{
     fetch_json, write_cached_icon, FetchSemaphore, IoSemaphore,
 };
@@ -166,18 +166,6 @@ pub struct ModrinthTeamMember {
     pub user: ModrinthUser,
     pub role: String,
     pub ordering: i64,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ModrinthUser {
-    pub id: String,
-    pub github_id: Option<u64>,
-    pub username: String,
-    pub name: Option<String>,
-    pub avatar_url: Option<String>,
-    pub bio: Option<String>,
-    pub created: DateTime<Utc>,
-    pub role: String,
 }
 
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]

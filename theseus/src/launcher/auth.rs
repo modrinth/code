@@ -40,7 +40,6 @@ struct TokenJSON {
     token: String,
     refresh_token: String,
     expires_after: u32,
-    flow: String,
 }
 
 #[derive(Deserialize)]
