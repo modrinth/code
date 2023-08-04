@@ -23,7 +23,7 @@ pub struct ModrinthUser {
     pub role: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthCredentials {
     pub session: String,
     pub expires_at: DateTime<Utc>,
@@ -38,6 +38,7 @@ pub enum ModrinthCredentialsResult {
     Credentials { creds: ModrinthCredentials },
 }
 
+#[derive(Debug)]
 pub struct CredentialsStore(pub Option<ModrinthCredentials>);
 
 impl CredentialsStore {
@@ -77,8 +78,28 @@ impl CredentialsStore {
         Ok(self)
     }
 
+    #[tracing::instrument]
+    pub async fn update_creds() {
+        let res = async {
+            let state = State::get().await?;
+            let mut creds_write = state.credentials.write().await;
+
+            refresh_credentials(&mut creds_write, &state.fetch_semaphore)
+                .await?;
+
+            Ok::<(), crate::Error>(())
+        }
+        .await;
+
+        match res {
+            Ok(()) => {}
+            Err(err) => {
+                tracing::warn!("Unable to update credentials: {err}")
+            }
+        };
+    }
+
     pub async fn logout(&mut self) -> crate::Result<&Self> {
-        // TODO delete session if exists
         self.0 = None;
         self.save().await?;
         Ok(self)
@@ -210,6 +231,7 @@ pub async fn login_password(
         None,
         None,
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
     let value = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
@@ -260,6 +282,7 @@ pub async fn login_2fa(
         None,
         None,
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
 
@@ -290,6 +313,7 @@ pub async fn create_account(
         None,
         None,
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
     let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
@@ -297,26 +321,57 @@ pub async fn create_account(
     get_creds_from_res(response, semaphore).await
 }
 
-pub async fn refresh_credentials(
-    credentials: &mut ModrinthCredentials,
+pub async fn login_minecraft(
+    flow: &str,
     semaphore: &FetchSemaphore,
-) -> crate::Result<()> {
-    let token = &credentials.session;
+) -> crate::Result<ModrinthCredentialsResult> {
     let resp = fetch_advanced(
         Method::POST,
-        "https://staging-api.modrinth.com/v2/session/refresh",
+        "https://staging-api.modrinth.com/v2/auth/login/minecraft",
         None,
+        Some(serde_json::json!({
+            "flow": flow,
+        })),
         None,
-        Some(("Authorization", token)),
         None,
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
-    let value = serde_json::from_slice::<Session>(&resp)?;
 
-    credentials.user = fetch_info(&value.session, semaphore).await?;
-    credentials.session = value.session;
-    credentials.expires_at = Utc::now() + Duration::weeks(2);
+    let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
+
+    get_result_from_res("session", response, semaphore).await
+}
+
+pub async fn refresh_credentials(
+    credentials_store: &mut CredentialsStore,
+    semaphore: &FetchSemaphore,
+) -> crate::Result<()> {
+    if let Some(ref mut credentials) = credentials_store.0 {
+        let token = &credentials.session;
+        let resp = fetch_advanced(
+            Method::POST,
+            "https://staging-api.modrinth.com/v2/session/refresh",
+            None,
+            None,
+            Some(("Authorization", token)),
+            None,
+            semaphore,
+            &CredentialsStore(None),
+        )
+        .await
+        .ok()
+        .and_then(|resp| serde_json::from_slice::<Session>(&resp).ok());
+
+        if let Some(value) = resp {
+            credentials.user = fetch_info(&value.session, semaphore).await?;
+            credentials.session = value.session;
+            credentials.expires_at = Utc::now() + Duration::weeks(2);
+        } else if credentials.expires_at < Utc::now() {
+            credentials_store.0 = None;
+        }
+    }
 
     Ok(())
 }
@@ -333,6 +388,7 @@ async fn fetch_info(
         Some(("Authorization", token)),
         None,
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
     let value = serde_json::from_slice(&result)?;

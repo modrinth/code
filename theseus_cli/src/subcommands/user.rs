@@ -52,7 +52,7 @@ impl UserAdd {
 
         let credentials = flow.await??;
         State::sync().await?;
-        success!("Logged in user {}.", credentials.username);
+        success!("Logged in user {}.", credentials.0.username);
         Ok(())
     }
 }

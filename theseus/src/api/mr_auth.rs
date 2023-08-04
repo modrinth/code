@@ -3,6 +3,7 @@ use crate::state::{
 };
 use crate::ErrorKind;
 
+#[tracing::instrument]
 pub async fn authenticate_begin_flow(provider: &str) -> crate::Result<String> {
     let state = crate::State::get().await?;
 
@@ -15,6 +16,7 @@ pub async fn authenticate_begin_flow(provider: &str) -> crate::Result<String> {
     Ok(url)
 }
 
+#[tracing::instrument]
 pub async fn authenticate_await_complete_flow(
 ) -> crate::Result<ModrinthCredentialsResult> {
     let state = crate::State::get().await?;
@@ -37,6 +39,7 @@ pub async fn authenticate_await_complete_flow(
     }
 }
 
+#[tracing::instrument]
 pub async fn cancel_flow() -> crate::Result<()> {
     let state = crate::State::get().await?;
     let mut write = state.modrinth_auth_flow.write().await;
@@ -69,6 +72,7 @@ pub async fn login_password(
     Ok(creds)
 }
 
+#[tracing::instrument]
 pub async fn login_2fa(
     code: &str,
     flow: &str,
@@ -83,6 +87,23 @@ pub async fn login_2fa(
     Ok(creds)
 }
 
+#[tracing::instrument]
+pub async fn login_minecraft(
+    flow: &str,
+) -> crate::Result<ModrinthCredentialsResult> {
+    let state = crate::State::get().await?;
+    let creds =
+        crate::state::login_minecraft(flow, &state.fetch_semaphore).await?;
+
+    if let ModrinthCredentialsResult::Credentials { creds } = &creds {
+        let mut write = state.credentials.write().await;
+        write.login(creds.clone()).await?;
+    }
+
+    Ok(creds)
+}
+
+#[tracing::instrument]
 pub async fn create_account(
     username: &str,
     email: &str,
@@ -107,15 +128,13 @@ pub async fn create_account(
     Ok(creds)
 }
 
+#[tracing::instrument]
 pub async fn refresh() -> crate::Result<()> {
     let state = crate::State::get().await?;
 
     let mut write = state.credentials.write().await;
-
-    if let Some(ref mut write) = write.0 {
-        crate::state::refresh_credentials(write, &state.fetch_semaphore)
-            .await?;
-    }
+    crate::state::refresh_credentials(&mut write, &state.fetch_semaphore)
+        .await?;
 
     Ok(())
 }

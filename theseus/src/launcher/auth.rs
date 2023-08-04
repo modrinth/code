@@ -1,4 +1,5 @@
 //! Authentication flow based on Hydra
+use crate::state::CredentialsStore;
 use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
 use async_tungstenite as ws;
 use chrono::{prelude::*, Duration};
@@ -40,6 +41,7 @@ struct TokenJSON {
     token: String,
     refresh_token: String,
     expires_after: u32,
+    flow: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -95,7 +97,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
     pub async fn extract_credentials(
         &mut self,
         semaphore: &FetchSemaphore,
-    ) -> crate::Result<Credentials> {
+    ) -> crate::Result<(Credentials, Option<String>)> {
         // Minecraft bearer token
         let token_resp = self
             .socket
@@ -116,14 +118,17 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
         let info = fetch_info(&token.token, semaphore).await?;
 
         // Return structure from response
-        Ok(Credentials {
-            username: info.name,
-            id: info.id,
-            refresh_token: token.refresh_token,
-            access_token: token.token,
-            expires,
-            _ctor_scope: std::marker::PhantomData,
-        })
+        Ok((
+            Credentials {
+                username: info.name,
+                id: info.id,
+                refresh_token: token.refresh_token,
+                access_token: token.token,
+                expires,
+                _ctor_scope: std::marker::PhantomData,
+            },
+            token.flow,
+        ))
     }
 }
 
@@ -137,6 +142,7 @@ pub async fn refresh_credentials(
         None,
         Some(serde_json::json!({ "refresh_token": credentials.refresh_token })),
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
 
@@ -161,6 +167,7 @@ async fn fetch_info(
         Some(("Authorization", &format!("Bearer {token}"))),
         None,
         semaphore,
+        &CredentialsStore(None),
     )
     .await?;
     let value = serde_json::from_slice(&result)?;

@@ -154,8 +154,12 @@ impl State {
 
         let metadata_fut = Metadata::init(&directories, &io_semaphore);
         let profiles_fut = Profiles::init(&directories, &mut file_watcher);
-        let tags_fut =
-            Tags::init(&directories, &io_semaphore, &fetch_semaphore);
+        let tags_fut = Tags::init(
+            &directories,
+            &io_semaphore,
+            &fetch_semaphore,
+            &CredentialsStore(None),
+        );
         let users_fut = Users::init(&directories, &io_semaphore);
         let creds_fut = CredentialsStore::init(&directories, &io_semaphore);
         // Launcher data
@@ -207,7 +211,7 @@ impl State {
         tokio::task::spawn(Tags::update());
         tokio::task::spawn(Profiles::update_projects());
         tokio::task::spawn(Profiles::update_modrinth_versions());
-        tokio::task::spawn(Settings::update_java());
+        tokio::task::spawn(CredentialsStore::update_creds());
     }
 
     #[tracing::instrument]

@@ -28,7 +28,8 @@ pub async fn auth_authenticate_begin_flow() -> Result<url::Url> {
 /// This completes the authentication flow quasi-synchronously, returning the sign-in credentials
 /// (and also adding the credentials to the state)
 #[tauri::command]
-pub async fn auth_authenticate_await_completion() -> Result<Credentials> {
+pub async fn auth_authenticate_await_completion(
+) -> Result<(Credentials, Option<String>)> {
     Ok(auth::authenticate_await_complete_flow().await?)
 }
 

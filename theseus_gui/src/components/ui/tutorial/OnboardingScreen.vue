@@ -45,6 +45,8 @@ const props = defineProps({
   },
 })
 
+const flow = ref('')
+
 const nextPhase = () => {
   phase.value++
   mixpanel.track('TutorialPhase', { page: phase.value })
@@ -54,9 +56,13 @@ const prevPhase = () => {
   phase.value--
 }
 
-const nextPage = () => {
+const nextPage = (newFlow) => {
   page.value++
   mixpanel.track('OnboardingPage', { page: page.value })
+
+  if (newFlow) {
+    flow.value = newFlow
+  }
 }
 
 const endOnboarding = () => {
@@ -124,6 +130,7 @@ onMounted(async () => {
       :modal="false"
       :next-page="nextPage"
       :prev-page="prevPage"
+      :flow="flow"
     />
     <PreImportScreen
       v-else-if="page === 4"

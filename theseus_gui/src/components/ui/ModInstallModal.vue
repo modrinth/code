@@ -65,7 +65,6 @@ const profiles = ref([])
 
 async function install(instance) {
   instance.installing = true
-  console.log(versions.value)
   const version = versions.value.find((v) => {
     return (
       v.game_versions.includes(instance.metadata.game_version) &&

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
+use crate::state::CredentialsStore;
 use crate::util::fetch::{
     fetch_json, read_json, write, FetchSemaphore, IoSemaphore,
 };
@@ -26,6 +27,7 @@ impl Tags {
         dirs: &DirectoryInfo,
         io_semaphore: &IoSemaphore,
         fetch_semaphore: &FetchSemaphore,
+        credentials: &CredentialsStore,
     ) -> crate::Result<Self> {
         let mut tags = None;
         let tags_path = dirs.caches_meta_dir().await.join("tags.json");
@@ -34,7 +36,7 @@ impl Tags {
         {
             tags = Some(tags_json);
         } else {
-            match Self::fetch(fetch_semaphore).await {
+            match Self::fetch(fetch_semaphore, credentials).await {
                 Ok(tags_fetch) => tags = Some(tags_fetch),
                 Err(err) => {
                     tracing::warn!("Unable to fetch launcher tags: {err}")
@@ -57,7 +59,11 @@ impl Tags {
     pub async fn update() {
         let res = async {
             let state = crate::State::get().await?;
-            let tags_fetch = Tags::fetch(&state.fetch_semaphore).await?;
+
+            let creds = state.credentials.read().await;
+            let tags_fetch =
+                Tags::fetch(&state.fetch_semaphore, &creds).await?;
+            drop(creds);
 
             let tags_path =
                 state.directories.caches_meta_dir().await.join("tags.json");
@@ -122,7 +128,10 @@ impl Tags {
     }
 
     // Fetches the tags from the Modrinth API and stores them in the database
-    pub async fn fetch(semaphore: &FetchSemaphore) -> crate::Result<Self> {
+    pub async fn fetch(
+        semaphore: &FetchSemaphore,
+        credentials: &CredentialsStore,
+    ) -> crate::Result<Self> {
         let categories = format!("{MODRINTH_API_URL}tag/category");
         let loaders = format!("{MODRINTH_API_URL}tag/loader");
         let game_versions = format!("{MODRINTH_API_URL}tag/game_version");
@@ -136,6 +145,7 @@ impl Tags {
             None,
             None,
             semaphore,
+            credentials,
         );
         let loaders_fut = fetch_json::<Vec<Loader>>(
             Method::GET,
@@ -143,6 +153,7 @@ impl Tags {
             None,
             None,
             semaphore,
+            credentials,
         );
         let game_versions_fut = fetch_json::<Vec<GameVersion>>(
             Method::GET,
@@ -150,6 +161,7 @@ impl Tags {
             None,
             None,
             semaphore,
+            credentials,
         );
         let donation_platforms_fut = fetch_json::<Vec<DonationPlatform>>(
             Method::GET,
@@ -157,6 +169,7 @@ impl Tags {
             None,
             None,
             semaphore,
+            credentials,
         );
         let report_types_fut = fetch_json::<Vec<String>>(
             Method::GET,
@@ -164,6 +177,7 @@ impl Tags {
             None,
             None,
             semaphore,
+            credentials,
         );
 
         let (

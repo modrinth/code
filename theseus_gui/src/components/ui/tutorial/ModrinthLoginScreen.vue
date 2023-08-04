@@ -14,6 +14,8 @@ import {
   login_2fa,
   create_account,
   login_pass,
+  get as getCreds,
+  login_minecraft,
 } from '@/helpers/mr_auth.js'
 import { handleError, useNotifications } from '@/store/state.js'
 import { onMounted, ref } from 'vue'
@@ -31,9 +33,12 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  flow: {
+    type: String,
+    default: null,
+  },
 })
 
-console.log(props.modal)
 const loggingIn = ref(true)
 const twoFactorFlow = ref(null)
 const twoFactorCode = ref('')
@@ -110,6 +115,19 @@ async function createAccount() {
   if (creds && creds.session) {
     props.nextPage()
   }
+}
+
+async function goToNextPage() {
+  const creds = await getCreds().catch(handleError)
+  if (!creds) {
+    try {
+      await login_minecraft(props.flow)
+    } catch {
+      /* empty */
+    }
+  }
+
+  props.nextPage()
 }
 
 onMounted(() => {
@@ -203,7 +221,7 @@ onMounted(() => {
       <Button v-if="twoFactorCode" color="primary" large @click="signIn2fa"> Login </Button>
       <Button v-else-if="loggingIn" color="primary" large @click="signIn"> Login </Button>
       <Button v-else color="primary" large @click="createAccount"> Create account </Button>
-      <Button class="transparent" large @click="nextPage">
+      <Button class="transparent" large @click="goToNextPage">
         {{ modal ? 'Continue' : 'Next' }}
       </Button>
     </div>

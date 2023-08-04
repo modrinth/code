@@ -51,7 +51,7 @@ defineExpose({
       await get()
     const dev = await isDev()
     const version = await getVersion()
-    showOnboarding.value = !onboarded_new
+    showOnboarding.value = true
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation

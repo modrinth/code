@@ -1,6 +1,7 @@
 //! Functions for fetching infromation from the Internet
 use crate::event::emit::emit_loading;
 use crate::event::LoadingBarId;
+use crate::state::CredentialsStore;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use reqwest::Method;
@@ -41,8 +42,19 @@ pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
+    credentials: &CredentialsStore,
 ) -> crate::Result<Bytes> {
-    fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore).await
+    fetch_advanced(
+        Method::GET,
+        url,
+        sha1,
+        None,
+        None,
+        None,
+        semaphore,
+        credentials,
+    )
+    .await
 }
 
 #[tracing::instrument(skip(json_body, semaphore))]
@@ -52,13 +64,22 @@ pub async fn fetch_json<T>(
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
     semaphore: &FetchSemaphore,
+    credentials: &CredentialsStore,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
-    let result =
-        fetch_advanced(method, url, sha1, json_body, None, None, semaphore)
-            .await?;
+    let result = fetch_advanced(
+        method,
+        url,
+        sha1,
+        json_body,
+        None,
+        None,
+        semaphore,
+        credentials,
+    )
+    .await?;
     let value = serde_json::from_slice(&result)?;
     Ok(value)
 }
@@ -66,6 +87,7 @@ where
 /// Downloads a file with retry and checksum functionality
 #[tracing::instrument(skip(json_body, semaphore))]
 #[theseus_macros::debug_pin]
+#[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
     method: Method,
     url: &str,
@@ -74,6 +96,7 @@ pub async fn fetch_advanced(
     header: Option<(&str, &str)>,
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
+    credentials: &CredentialsStore,
 ) -> crate::Result<Bytes> {
     let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
@@ -87,6 +110,12 @@ pub async fn fetch_advanced(
 
         if let Some(header) = header {
             req = req.header(header.0, header.1);
+        }
+
+        if url.starts_with("https://cdn.modrinth.com") {
+            if let Some(creds) = &credentials.0 {
+                req = req.header("Authorization", &creds.session);
+            }
         }
 
         let result = req.send().await;
@@ -163,6 +192,7 @@ pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
+    credentials: &CredentialsStore,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
         return Err(crate::ErrorKind::InputError(
@@ -172,7 +202,7 @@ pub async fn fetch_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch(mirror, sha1, semaphore).await;
+        let result = fetch(mirror, sha1, semaphore, credentials).await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;

@@ -1,5 +1,6 @@
 //! Downloader for Minecraft data
 
+use crate::state::CredentialsStore;
 use crate::{
     event::{
         emit::{emit_loading, loading_try_for_each_concurrent},
@@ -127,6 +128,7 @@ pub async fn download_client(
             &client_download.url,
             Some(&client_download.sha1),
             &st.fetch_semaphore,
+            &CredentialsStore(None),
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -206,7 +208,7 @@ pub async fn download_assets(
                     async {
                         if !resource_path.exists() {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore))
+                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore, &CredentialsStore(None)))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched asset with hash {hash}");
@@ -216,7 +218,7 @@ pub async fn download_assets(
                     async {
                         if with_legacy {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore))
+                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore, &CredentialsStore(None)))
                                 .await?;
                             let resource_path = st.directories.legacy_assets_dir().await.join(
                                 name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
@@ -273,7 +275,7 @@ pub async fn download_libraries(
                                 artifact: Some(ref artifact),
                                 ..
                             }) => {
-                                let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore)
+                                let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore, &CredentialsStore(None))
                                     .await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
                                 tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
@@ -288,7 +290,7 @@ pub async fn download_libraries(
                                     &artifact_path
                                 ].concat();
 
-                                let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
+                                let bytes = fetch(&url, None, &st.fetch_semaphore, &CredentialsStore(None)).await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
                                 tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
                                 Ok::<_, crate::Error>(())
@@ -314,7 +316,7 @@ pub async fn download_libraries(
                             );
 
                             if let Some(native) = classifiers.get(&parsed_key) {
-                                let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore).await?;
+                                let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore, &CredentialsStore(None)).await?;
                                 let reader = std::io::Cursor::new(&data);
                                 if let Ok(mut archive) = zip::ZipArchive::new(reader) {
                                     match archive.extract(st.directories.version_natives_dir(version).await) {
