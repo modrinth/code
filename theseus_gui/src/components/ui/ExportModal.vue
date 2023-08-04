@@ -188,7 +188,6 @@ const exportPack = async () => {
 }
 
 .select-checkbox {
-
   button.checkbox {
     border: none;
   }

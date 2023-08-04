@@ -219,7 +219,11 @@ import mixpanel from 'mixpanel-browser'
 import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
-import { get_default_launcher_path, get_importable_instances, import_instance } from '@/helpers/import.js'
+import {
+  get_default_launcher_path,
+  get_importable_instances,
+  import_instance,
+} from '@/helpers/import.js'
 
 const themeStore = useTheming()
 
@@ -251,8 +255,7 @@ defineExpose({
     isShowing.value = true
     modal.value.show()
 
-
-   unlistener.value = await listen('tauri://file-drop', async (event) => {
+    unlistener.value = await listen('tauri://file-drop', async (event) => {
       // Only if modal is showing
       if (!isShowing.value) return
       if (creationType.value !== 'from file') return
@@ -265,14 +268,13 @@ defineExpose({
       }
     })
 
-
     mixpanel.track('InstanceCreateStart', { source: 'CreationModal' })
   },
 })
 
-const unlistener = ref(null);
+const unlistener = ref(null)
 const hide = () => {
-  console.log("hiding nicely")
+  console.log('hiding nicely')
   isShowing.value = false
   modal.value.hide()
   if (unlistener.value) {
@@ -286,9 +288,6 @@ onUnmounted(() => {
     unlistener.value = null
   }
 })
-
-
-
 
 const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
   await Promise.all([
@@ -411,7 +410,6 @@ const openFile = async () => {
   })
 }
 
-
 const profiles = ref(
   new Map([
     ['MultiMC', []],
@@ -440,10 +438,8 @@ const promises = profileOptions.value.map(async (option) => {
 
   // Try catch to allow failure and simply ignore default path attempt
   try {
-    const instances = await get_importable_instances(
-      option.name,
-      path)
-  
+    const instances = await get_importable_instances(option.name, path)
+
     if (!instances) return
     profileOptions.value.find((profile) => profile.name === option.name).path = path
     profiles.value.set(
@@ -455,7 +451,6 @@ const promises = profileOptions.value.map(async (option) => {
   }
 })
 await Promise.all(promises)
-
 
 const selectLauncherPath = async () => {
   selectedProfileType.value.path = await open({ multiple: false, directory: true })
@@ -472,9 +467,10 @@ const reload = async () => {
   ).catch(handleError)
   if (instances) {
     profiles.value.set(
-    selectedProfileType.value.name,
-    instances.map((name) => ({ name, selected: false }))
-  ) } else {
+      selectedProfileType.value.name,
+      instances.map((name) => ({ name, selected: false }))
+    )
+  } else {
     profiles.value.set(selectedProfileType.value.name, [])
   }
 

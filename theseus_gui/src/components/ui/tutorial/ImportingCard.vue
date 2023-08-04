@@ -10,7 +10,11 @@ import {
   UpdatedIcon,
 } from 'omorphia'
 import { ref } from 'vue'
-import { get_default_launcher_path, get_importable_instances, import_instance } from '@/helpers/import.js'
+import {
+  get_default_launcher_path,
+  get_importable_instances,
+  import_instance,
+} from '@/helpers/import.js'
 import { open } from '@tauri-apps/api/dialog'
 import { handleError } from '@/store/state.js'
 
@@ -46,7 +50,6 @@ const profileOptions = ref([
   { name: 'PrismLauncher', path: '' },
 ])
 
-
 // Attempt to get import profiles on default paths
 const promises = profileOptions.value.map(async (option) => {
   const path = await get_default_launcher_path(option.name).catch(handleError)
@@ -54,10 +57,8 @@ const promises = profileOptions.value.map(async (option) => {
 
   // Try catch to allow failure and simply ignore default path attempt
   try {
-    const instances = await get_importable_instances(
-      option.name,
-      path)
-  
+    const instances = await get_importable_instances(option.name, path)
+
     if (!instances) return
     profileOptions.value.find((profile) => profile.name === option.name).path = path
     profiles.value.set(

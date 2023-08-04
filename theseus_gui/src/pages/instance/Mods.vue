@@ -768,13 +768,12 @@ watch(selectAll, () => {
   }
 })
 
-
 const unlisten = await listen('tauri://file-drop', async (event) => {
-    for (const file of event.payload) {
-      if (file.endsWith('.mrpack')) continue
-      await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
-    }
-    initProjects(await get(props.instance.path).catch(handleError))
+  for (const file of event.payload) {
+    if (file.endsWith('.mrpack')) continue
+    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+  }
+  initProjects(await get(props.instance.path).catch(handleError))
 })
 onUnmounted(() => {
   unlisten()
