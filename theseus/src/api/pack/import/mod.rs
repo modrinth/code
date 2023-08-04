@@ -9,7 +9,10 @@ use serde::{Deserialize, Serialize};
 use crate::{
     prelude::ProfilePathId,
     state::Profiles,
-    util::{fetch, io},
+    util::{
+        fetch::{self, IoSemaphore},
+        io,
+    },
 };
 
 pub mod atlauncher;
@@ -237,6 +240,7 @@ pub async fn recache_icon(
 async fn copy_dotminecraft(
     profile_path: ProfilePathId,
     dotminecraft: PathBuf,
+    io_semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
     // Get full path to profile
     let profile_path = profile_path.get_full_path().await?;
@@ -257,6 +261,7 @@ async fn copy_dotminecraft(
                     &path.display()
                 ))
             })?),
+            io_semaphore,
         )
         .await?;
     }
@@ -268,9 +273,13 @@ async fn copy_dotminecraft(
 #[theseus_macros::debug_pin]
 #[async_recursion::async_recursion]
 #[tracing::instrument]
-async fn copy_dir_to(src: &Path, dst: &Path) -> crate::Result<()> {
+async fn copy_dir_to(
+    src: &Path,
+    dst: &Path,
+    io_semaphore: &IoSemaphore,
+) -> crate::Result<()> {
     if !src.is_dir() {
-        io::copy(src, dst).await?;
+        fetch::copy(src, dst, io_semaphore).await?;
         return Ok(());
     }
 
@@ -294,10 +303,10 @@ async fn copy_dir_to(src: &Path, dst: &Path) -> crate::Result<()> {
 
         if src_child.is_dir() {
             // Recurse into sub-directory
-            copy_dir_to(&src_child, &dst_child).await?;
+            copy_dir_to(&src_child, &dst_child, io_semaphore).await?;
         } else {
             // Copy file
-            io::copy(&src_child, &dst_child).await?;
+            fetch::copy(&src_child, &dst_child, io_semaphore).await?;
         }
     }
 

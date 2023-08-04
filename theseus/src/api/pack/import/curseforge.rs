@@ -5,7 +5,10 @@ use serde::{Deserialize, Serialize};
 use crate::{
     prelude::{ModLoader, ProfilePathId},
     state::ProfileInstallStage,
-    util::io,
+    util::{
+        fetch::{fetch, write_cached_icon},
+        io,
+    },
     State,
 };
 
@@ -31,12 +34,19 @@ pub struct FlameModLoader {
     pub primary: bool,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct MinecraftInstance {
     pub name: Option<String>,
     pub profile_image_path: Option<PathBuf>,
+    pub installed_modpack: Option<InstalledModpack>,
     pub game_version: String, // Minecraft game version. Non-prioritized, use this if Vanilla
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+
+pub struct InstalledModpack {
+    pub thumbnail_url: Option<String>,
 }
 
 // Check if folder has a minecraftinstance.json that parses
@@ -70,13 +80,33 @@ pub async fn import_curseforge(
             .unwrap_or("Unknown".to_string())
     );
 
+    let state = State::get().await?;
     // Recache Curseforge Icon if it exists
-    let icon = if let Some(icon_path) = minecraft_instance.profile_image_path.clone() {
-        recache_icon(icon_path).await?
-    } else {
-        None
-    };
+    let mut icon = None;
+    println!("{:?}", minecraft_instance);
 
+    if let Some(icon_path) = minecraft_instance.profile_image_path.clone() {
+        icon = recache_icon(icon_path).await?;
+    } else if let Some(InstalledModpack {
+        thumbnail_url: Some(thumbnail_url),
+    }) = minecraft_instance.installed_modpack.clone()
+    {
+        println!("Downloading icon from {}", thumbnail_url);
+        let icon_bytes =
+            fetch(&thumbnail_url, None, &state.fetch_semaphore).await?;
+        let filename = thumbnail_url.rsplit('/').last();
+        if let Some(filename) = filename {
+            icon = Some(
+                write_cached_icon(
+                    filename,
+                    &state.directories.caches_dir(),
+                    icon_bytes,
+                    &state.io_semaphore,
+                )
+                .await?,
+            );
+        }
+    }
 
     // Curseforge vanilla profile may not have a manifest.json, so we allow it to not exist
     if curseforge_instance_folder.join("manifest.json").exists() {
@@ -152,7 +182,13 @@ pub async fn import_curseforge(
     }
 
     // Copy in contained folders as overrides
-    copy_dotminecraft(profile_path.clone(), curseforge_instance_folder).await?;
+    let state = State::get().await?;
+    copy_dotminecraft(
+        profile_path.clone(),
+        curseforge_instance_folder,
+        &state.io_semaphore,
+    )
+    .await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?

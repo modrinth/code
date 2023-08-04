@@ -71,7 +71,11 @@
           <UploadIcon />
           Select icon
         </button>
-        <button  :disabled="!(!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon))" class="btn" @click="resetIcon">
+        <button
+          :disabled="!(!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon))"
+          class="btn"
+          @click="resetIcon"
+        >
           <TrashIcon />
           Remove icon
         </button>

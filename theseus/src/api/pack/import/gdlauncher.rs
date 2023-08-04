@@ -100,7 +100,13 @@ pub async fn import_gdlauncher(
     .await?;
 
     // Copy in contained folders as overrides
-    copy_dotminecraft(profile_path.clone(), gdlauncher_instance_folder).await?;
+    let state = State::get().await?;
+    copy_dotminecraft(
+        profile_path.clone(),
+        gdlauncher_instance_folder,
+        &state.io_semaphore,
+    )
+    .await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?

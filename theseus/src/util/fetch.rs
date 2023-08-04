@@ -221,6 +221,30 @@ pub async fn write<'a>(
     Ok(())
 }
 
+pub async fn copy(
+    src: impl AsRef<std::path::Path>,
+    dest: impl AsRef<std::path::Path>,
+    semaphore: &IoSemaphore,
+) -> crate::Result<()> {
+    let src: &Path = src.as_ref();
+    let dest = dest.as_ref();
+
+    let io_semaphore = semaphore.0.read().await;
+    let _permit = io_semaphore.acquire().await?;
+
+    if let Some(parent) = dest.parent() {
+        io::create_dir_all(parent).await?;
+    }
+
+    io::copy(src, dest).await?;
+    tracing::trace!(
+        "Done copying file {} to {}",
+        src.display(),
+        dest.display()
+    );
+    Ok(())
+}
+
 // Writes a icon to the cache and returns the absolute path of the icon within the cache directory
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn write_cached_icon(

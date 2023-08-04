@@ -1,6 +1,8 @@
 // IO error
 // A wrapper around the tokio IO functions that adds the path to the error message, instead of the uninformative std::io::Error.
 
+use std::path::Path;
+
 #[derive(Debug, thiserror::Error)]
 pub enum IOError {
     #[error("{source}, path: {path}")]
@@ -140,7 +142,7 @@ pub async fn copy(
     from: impl AsRef<std::path::Path>,
     to: impl AsRef<std::path::Path>,
 ) -> Result<u64, IOError> {
-    let from = from.as_ref();
+    let from: &Path = from.as_ref();
     let to = to.as_ref();
     tokio::fs::copy(from, to)
         .await

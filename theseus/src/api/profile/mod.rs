@@ -162,7 +162,7 @@ pub async fn edit_icon(
 
                 emit_profile(
                     profile.uuid,
-                    &path,
+                    path,
                     &profile.metadata.name,
                     ProfilePayloadType::Edited,
                 )
@@ -330,7 +330,7 @@ pub async fn update_all_projects(
 
         emit_profile(
             profile.uuid,
-            &profile_path,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -392,7 +392,7 @@ pub async fn update_project(
                 if !skip_send_event.unwrap_or(false) {
                     emit_profile(
                         profile.uuid,
-                        &profile_path,
+                        profile_path,
                         &profile.metadata.name,
                         ProfilePayloadType::Edited,
                     )
@@ -428,7 +428,7 @@ pub async fn add_project_from_version(
 
         emit_profile(
             profile.uuid,
-            &profile_path,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -468,7 +468,7 @@ pub async fn add_project_from_path(
 
         emit_profile(
             profile.uuid,
-            &profile_path,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -497,7 +497,7 @@ pub async fn toggle_disable_project(
 
         emit_profile(
             profile.uuid,
-            &profile_path,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -506,8 +506,10 @@ pub async fn toggle_disable_project(
 
         Ok(res)
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-            .as_error())
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
+        )
     }
 }
 
@@ -532,8 +534,10 @@ pub async fn remove_project(
 
         Ok(())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
-            .as_error())
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
+        )
     }
 }
 
@@ -1033,5 +1037,5 @@ pub async fn build_folder(
 }
 
 pub fn sanitize_profile_name(input: &str) -> String {
-    input.replace(['/', '\\'], "_")
+    input.replace(['/', '\\', ':'], "_")
 }
