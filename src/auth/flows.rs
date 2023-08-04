@@ -1197,6 +1197,7 @@ pub async fn login_from_minecraft(
         access_token: token,
     }) = flow
     {
+        Flow::remove(&login.flow, &redis).await?;
         let provider = AuthProvider::Microsoft;
         let oauth_user = provider.get_user(&token).await?;
         let user_id_opt = provider.get_user_id(&oauth_user.id, &**client).await?;

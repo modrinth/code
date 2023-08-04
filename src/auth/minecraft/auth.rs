@@ -64,6 +64,12 @@ pub async fn route(
         x.value_mut().clone()
     };
 
+    ws_conn_try!(
+        "Removing login flow" StatusCode::INTERNAL_SERVER_ERROR,
+        Flow::remove(code, &redis).await
+        => ws_conn
+    );
+
     let access_token = ws_conn_try!(
         "OAuth token exchange" StatusCode::INTERNAL_SERVER_ERROR,
         stages::access_token::fetch_token(
@@ -122,7 +128,7 @@ pub async fn route(
             let flow = &ws_conn_try!(
                 "Error creating microsoft login request flow." StatusCode::INTERNAL_SERVER_ERROR,
                 Flow::MicrosoftLogin {
-                    access_token: bearer_token.clone(),
+                    access_token: access_token.access_token.clone(),
                 }
                 .insert(Duration::hours(1), &redis)
                 .await

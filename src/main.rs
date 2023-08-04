@@ -9,7 +9,6 @@ use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
 use crate::ratelimit::middleware::RateLimiter;
 use crate::util::cors::default_cors;
 use crate::util::env::{parse_strings_from_var, parse_var};
-use actix_files::Files;
 use actix_web::{web, App, HttpServer};
 use chrono::{DateTime, Utc};
 use deadpool_redis::{Config, Runtime};
@@ -414,10 +413,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(clickhouse.clone()))
             .app_data(web::Data::new(reader.clone()))
             .app_data(active_sockets.clone())
-            .configure(routes::root_config)
             .configure(routes::v2::config)
             .configure(routes::v3::config)
-            .service(Files::new("/", "assets/"))
+            .configure(routes::root_config)
             .default_service(web::get().wrap(default_cors()).to(routes::not_found))
     })
     .bind(dotenvy::var("BIND_ADDR").unwrap())?

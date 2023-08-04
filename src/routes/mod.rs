@@ -1,5 +1,6 @@
 use crate::file_hosting::FileHostingError;
 use crate::util::cors::default_cors;
+use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse};
 use futures::FutureExt;
@@ -15,7 +16,6 @@ mod updates;
 pub use self::not_found::not_found;
 
 pub fn root_config(cfg: &mut web::ServiceConfig) {
-    cfg.route("", web::get().wrap(default_cors()).to(index::index_get));
     cfg.service(
         web::scope("maven")
             .wrap(default_cors())
@@ -38,6 +38,12 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
                 ))
             }.boxed_local()
         })
+    );
+    cfg.service(
+        web::scope("")
+            .wrap(default_cors())
+            .service(index::index_get)
+            .service(Files::new("/", "assets/")),
     );
 }
 
