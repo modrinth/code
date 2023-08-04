@@ -639,8 +639,8 @@ const isChanged = computed(() => {
   return (
     loader.value != props.instance.metadata.loader ||
     gameVersion.value != props.instance.metadata.game_version ||
-    selectableLoaderVersions.value[loaderVersionIndex.value] !=
-      props.instance.metadata.loader_version
+    JSON.stringify(selectableLoaderVersions.value[loaderVersionIndex.value]) !=
+      JSON.stringify(props.instance.metadata.loader_version)
   )
 })
 
