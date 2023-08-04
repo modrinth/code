@@ -12,7 +12,7 @@
             <UploadIcon />
             Select icon
           </Button>
-          <Button @click="reset_icon">
+          <Button :disabled="!display_icon" @click="reset_icon">
             <XIcon />
             Remove icon
           </Button>

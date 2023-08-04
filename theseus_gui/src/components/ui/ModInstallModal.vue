@@ -264,7 +264,7 @@ const check_valid = computed(() => {
                 <UploadIcon />
                 <span class="no-wrap"> Select icon </span>
               </Button>
-              <Button @click="reset_icon()">
+              <Button  :disabled="!display_icon" @click="reset_icon()">
                 <XIcon />
                 <span class="no-wrap"> Remove icon </span>
               </Button>
