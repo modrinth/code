@@ -34,6 +34,7 @@ RUN update-ca-certificates
 
 COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth
 COPY --from=build /usr/src/labrinth/migrations/* /labrinth/migrations/
+COPY --from=build /usr/src/labrinth/assets /labrinth/assets
 COPY --from=build /wait /wait
 WORKDIR /labrinth
 
