@@ -35,9 +35,10 @@ async function login() {
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
   loginModal.value.hide()
-  props.nextPage()
+
+  props.nextPage(loggedIn[1])
   const settings = await get().catch(handleError)
-  settings.default_user = loggedIn.id
+  settings.default_user = loggedIn[0].id
   await set(settings).catch(handleError)
   await mixpanel.track('AccountLogIn')
 }
@@ -83,7 +84,7 @@ const openUrl = async () => {
             Browser didn't open?
           </Button>
         </div>
-        <Button class="transparent" large @click="nextPage"> Next </Button>
+        <Button class="transparent" large @click="nextPage()"> Next </Button>
       </div>
     </Card>
   </div>

@@ -192,12 +192,14 @@ pub async fn generate_pack_from_version_id(
     .await?;
 
     emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
+    let creds = state.credentials.read().await;
     let version: ModrinthVersion = fetch_json(
         Method::GET,
         &format!("{}version/{}", MODRINTH_API_URL, version_id),
         None,
         None,
         &state.fetch_semaphore,
+        &creds,
     )
     .await?;
     emit_loading(&loading_bar, 10.0, None).await?;
@@ -225,6 +227,7 @@ pub async fn generate_pack_from_version_id(
         None,
         Some((&loading_bar, 70.0)),
         &state.fetch_semaphore,
+        &creds,
     )
     .await?;
     emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
@@ -235,13 +238,16 @@ pub async fn generate_pack_from_version_id(
         None,
         None,
         &state.fetch_semaphore,
+        &creds,
     )
     .await?;
 
     emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
-        let icon_bytes = fetch(&icon_url, None, &state.fetch_semaphore).await?;
+        let icon_bytes =
+            fetch(&icon_url, None, &state.fetch_semaphore, &creds).await?;
+        drop(creds);
 
         let filename = icon_url.rsplit('/').next();
 

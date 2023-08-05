@@ -1,10 +1,12 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Toggle } from 'omorphia'
+import { Card, Slider, DropdownSelect, Toggle, Modal, LogOutIcon, LogInIcon } from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
+import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
+import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 
 const pageOptions = ['Home', 'Library']
@@ -76,10 +78,54 @@ watch(
   },
   { deep: true }
 )
+
+const credentials = ref(await getCreds().catch(handleError))
+const loginScreenModal = ref()
+
+async function logOut() {
+  await logout().catch(handleError)
+  credentials.value = await getCreds().catch(handleError)
+}
+
+async function signInAfter() {
+  loginScreenModal.value.hide()
+  credentials.value = await getCreds().catch(handleError)
+}
 </script>
 
 <template>
   <div class="settings-page">
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Account</span>
+        </h3>
+      </div>
+      <Modal
+        ref="loginScreenModal"
+        class="login-screen-modal"
+        :noblur="!themeStore.advancedRendering"
+      >
+        <ModrinthLoginScreen
+          :modal="true"
+          :prev-page="$refs.loginScreenModal.show()"
+          :next-page="signInAfter"
+        />
+      </Modal>
+      <div class="adjacent-input">
+        <label for="theme">
+          <span class="label__title">Manage account</span>
+          <span v-if="credentials" class="label__description">
+            You are currently logged in as {{ credentials.user.username }}.
+          </span>
+          <span v-else> Sign in to your Modrinth account. </span>
+        </label>
+        <button v-if="credentials" class="btn" @click="logOut"><LogOutIcon /> Sign out</button>
+        <button v-else class="btn" @click="$refs.loginScreenModal.show()">
+          <LogInIcon /> Sign in
+        </button>
+      </div>
+    </Card>
     <Card>
       <div class="label">
         <h3>
@@ -396,5 +442,17 @@ watch(
 
 .card-divider {
   margin: 1rem 0;
+}
+
+:deep {
+  .login-screen-modal {
+    .modal-container .modal-body {
+      width: auto;
+
+      .content {
+        background: none;
+      }
+    }
+  }
 }
 </style>

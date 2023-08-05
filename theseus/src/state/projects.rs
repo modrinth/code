@@ -1,7 +1,7 @@
 //! Project management + inference
 
 use crate::config::MODRINTH_API_URL;
-use crate::state::Profile;
+use crate::state::{CredentialsStore, ModrinthUser, Profile};
 use crate::util::fetch::{
     fetch_json, write_cached_icon, FetchSemaphore, IoSemaphore,
 };
@@ -168,18 +168,6 @@ pub struct ModrinthTeamMember {
     pub ordering: i64,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ModrinthUser {
-    pub id: String,
-    pub github_id: Option<u64>,
-    pub username: String,
-    pub name: Option<String>,
-    pub avatar_url: Option<String>,
-    pub bio: Option<String>,
-    pub created: DateTime<Utc>,
-    pub role: String,
-}
-
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
@@ -289,6 +277,7 @@ pub async fn infer_data_from_files(
     cache_dir: PathBuf,
     io_semaphore: &IoSemaphore,
     fetch_semaphore: &FetchSemaphore,
+    credentials: &CredentialsStore,
 ) -> crate::Result<HashMap<ProjectPathId, Project>> {
     let mut file_path_hashes = HashMap::new();
 
@@ -327,6 +316,7 @@ pub async fn infer_data_from_files(
                 "algorithm": "sha512",
             })),
             fetch_semaphore,
+            credentials,
         ),
         fetch_json::<HashMap<String, ModrinthVersion>>(
             Method::POST,
@@ -339,6 +329,7 @@ pub async fn infer_data_from_files(
                 "game_versions": [profile.metadata.game_version]
             })),
             fetch_semaphore,
+            credentials,
         )
     )?;
 
@@ -357,6 +348,7 @@ pub async fn infer_data_from_files(
         None,
         None,
         fetch_semaphore,
+        credentials,
     )
     .await?;
 
@@ -374,6 +366,7 @@ pub async fn infer_data_from_files(
         None,
         None,
         fetch_semaphore,
+        credentials,
     )
     .await?
     .into_iter()

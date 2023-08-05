@@ -52,6 +52,9 @@ pub use self::safe_processes::*;
 mod discord;
 pub use self::discord::*;
 
+mod mr_auth;
+pub use self::mr_auth::*;
+
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<RwLock<State>> = OnceCell::const_new();
@@ -77,16 +80,20 @@ pub struct State {
     pub settings: RwLock<Settings>,
     /// Reference to minecraft process children
     pub children: RwLock<Children>,
-    /// Authentication flow
-    pub auth_flow: RwLock<AuthTask>,
     /// Launcher profile metadata
     pub(crate) profiles: RwLock<Profiles>,
-    /// Launcher user account info
-    pub(crate) users: RwLock<Users>,
     /// Launcher tags
     pub(crate) tags: RwLock<Tags>,
     /// Launcher processes that should be safely exited on shutdown
     pub(crate) safety_processes: RwLock<SafeProcesses>,
+    /// Launcher user account info
+    pub(crate) users: RwLock<Users>,
+    /// Authentication flow
+    pub auth_flow: RwLock<AuthTask>,
+    /// Modrinth Credentials Store
+    pub credentials: RwLock<CredentialsStore>,
+    /// Modrinth auth flow
+    pub modrinth_auth_flow: RwLock<Option<ModrinthAuthFlow>>,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -159,15 +166,18 @@ impl State {
             !is_offline,
             &io_semaphore,
             &fetch_semaphore,
+            &CredentialsStore(None),
         );
         let users_fut = Users::init(&directories, &io_semaphore);
+        let creds_fut = CredentialsStore::init(&directories, &io_semaphore);
         // Launcher data
-        let (metadata, profiles, tags, users) = loading_join! {
+        let (metadata, profiles, tags, users, creds) = loading_join! {
             Some(&loading_bar), 70.0, Some("Loading metadata");
             metadata_fut,
             profiles_fut,
             tags_fut,
             users_fut,
+            creds_fut,
         }?;
 
         let children = Children::new();
@@ -198,10 +208,12 @@ impl State {
             users: RwLock::new(users),
             children: RwLock::new(children),
             auth_flow: RwLock::new(auth_flow),
+            credentials: RwLock::new(creds),
             tags: RwLock::new(tags),
             discord_rpc,
             safety_processes: RwLock::new(safety_processes),
             file_watcher: RwLock::new(file_watcher),
+            modrinth_auth_flow: RwLock::new(None),
         }))
     }
 
@@ -222,6 +234,11 @@ impl State {
 
     /// Updates state with data from the web, if we are online
     pub fn update() {
+        tokio::task::spawn(Metadata::update());
+        tokio::task::spawn(Tags::update());
+        tokio::task::spawn(Profiles::update_projects());
+        tokio::task::spawn(Profiles::update_modrinth_versions());
+        tokio::task::spawn(CredentialsStore::update_creds());
         tokio::task::spawn(async {
             if let Ok(state) = crate::State::get().await {
                 if !*state.offline.read().await {
@@ -230,8 +247,9 @@ impl State {
                     let res3 = Metadata::update();
                     let res4 = Profiles::update_projects();
                     let res5 = Settings::update_java();
+                    let res6 = CredentialsStore::update_creds();
 
-                    let _ = join!(res1, res2, res3, res4, res5);
+                    let _ = join!(res1, res2, res3, res4, res5, res6);
                 }
             }
         });

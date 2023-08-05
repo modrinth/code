@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+use crate::state::CredentialsStore;
 use crate::{
     prelude::{ModLoader, ProfilePathId},
     state::ProfileInstallStage,
@@ -90,8 +91,13 @@ pub async fn import_curseforge(
         thumbnail_url: Some(thumbnail_url),
     }) = minecraft_instance.installed_modpack.clone()
     {
-        let icon_bytes =
-            fetch(&thumbnail_url, None, &state.fetch_semaphore).await?;
+        let icon_bytes = fetch(
+            &thumbnail_url,
+            None,
+            &state.fetch_semaphore,
+            &CredentialsStore(None),
+        )
+        .await?;
         let filename = thumbnail_url.rsplit('/').last();
         if let Some(filename) = filename {
             icon = Some(
