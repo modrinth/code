@@ -6,6 +6,10 @@
         v-model="selectedProjectType"
         :items="Object.keys(selectableProjectTypes)"
       />
+      <Button v-if="canUpdatePack" color="secondary" @click="updateModpack">
+        <UpdatedIcon/>
+        Update modpack
+      </Button>
     </div>
     <div class="card-row">
       <div class="iconified-input">
@@ -341,10 +345,10 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
-  get,
+  get, is_managed_modrinth,
   remove_project,
   toggle_disable_project,
-  update_all,
+  update_all, update_managed_modrinth,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
@@ -381,6 +385,7 @@ const props = defineProps({
 const projects = ref([])
 const selectionMap = ref(new Map())
 const showingOptions = ref(false)
+const canUpdatePack = ref(await is_managed_modrinth(props.instance.path))
 
 const initProjects = (initInstance) => {
   projects.value = []
@@ -777,6 +782,10 @@ const handleContentOptionClick = async (args) => {
   }
 }
 
+const updateModpack = async () => {
+  await update_managed_modrinth(props.instance.path).catch(handleError)
+}
+
 watch(selectAll, () => {
   for (const [key, value] of Array.from(selectionMap.value)) {
     if (value !== selectAll.value) {
@@ -792,6 +801,7 @@ const unlisten = await listen('tauri://file-drop', async (event) => {
   }
   initProjects(await get(props.instance.path).catch(handleError))
 })
+
 onUnmounted(() => {
   unlisten()
 })

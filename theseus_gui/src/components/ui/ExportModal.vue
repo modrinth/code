@@ -188,6 +188,8 @@ const exportPack = async () => {
 }
 
 .select-checkbox {
+  gap: var(--gap-sm);
+
   button.checkbox {
     border: none;
   }
