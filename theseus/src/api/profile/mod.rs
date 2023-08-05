@@ -914,10 +914,12 @@ pub async fn try_update_playtime(path: &ProfilePathId) -> crate::Result<()> {
             }
         }
 
+        let creds = state.credentials.read().await;
         fetch::post_json(
             &format!("{MODRINTH_API_URL}analytics/playtime"),
             serde_json::to_value(hashmap)?,
             &state.fetch_semaphore,
+            &creds,
         )
         .await
     } else {

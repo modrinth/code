@@ -237,15 +237,22 @@ async function refreshSearch() {
 
   let val = `${base}${url}`
 
-  const rawResults = await useFetch(val, 'search results')
+  const rawResults = await useFetch(val, 'search results', offline.value)
+  results.value = rawResults
+  if (!rawResults) {
+    results.value = {
+      hits: [],
+      total_hits: 0,
+      limit: 1,
+    }
+  }
   if (instanceContext.value) {
-    for (let val of rawResults.hits) {
+    for (let val of results.value) {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )
     }
   }
-  results.value = rawResults
 }
 
 async function onSearchChange(newPageNumber) {
@@ -510,7 +517,7 @@ onUnmounted(() => unlistenOffline())
 </script>
 
 <template>
-  <div v-if="!offline" ref="searchWrapper" class="search-container">
+  <div ref="searchWrapper" class="search-container">
     <aside class="filter-panel">
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
@@ -704,7 +711,10 @@ onUnmounted(() => unlistenOffline())
         class="pagination-before"
         @switch-page="onSearchChange"
       />
-      <SplashScreen v-if="loading || offline" />
+      <SplashScreen v-if="loading" />
+      <section v-else-if="offline && results.total_hits == 0" class="offline">
+        You are currently offline. Connect to the internet to browse Modrinth!
+      </section>
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <SearchCard
           v-for="result in results.hits"
@@ -889,6 +899,11 @@ onUnmounted(() => unlistenOffline())
   .search {
     margin: 0 1rem 0.5rem 20.5rem;
     width: calc(100% - 20.5rem);
+
+    .offline {
+      margin: 1rem;
+      text-align: center;
+    }
 
     .loading {
       margin: 2rem;

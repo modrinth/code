@@ -234,6 +234,7 @@ pub async fn post_json<T>(
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
+    credentials: &CredentialsStore,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
@@ -241,12 +242,12 @@ where
     let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
 
-    let result = REQWEST_CLIENT
-        .post(url)
-        .json(&json_body)
-        .send()
-        .await?
-        .error_for_status()?;
+    let mut req = REQWEST_CLIENT.post(url).json(&json_body);
+    if let Some(creds) = &credentials.0 {
+        req = req.header("Authorization", &creds.session);
+    }
+
+    let result = req.send().await?.error_for_status()?;
 
     let value = result.json().await?;
     Ok(value)

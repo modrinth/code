@@ -41,23 +41,31 @@ const getInstances = async () => {
 const getFeaturedModpacks = async () => {
   const response = await useFetch(
     `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
-    'featured modpacks'
+    'featured modpacks',
+    offline.value
   )
-  if (response) featuredModpacks.value = response.hits
+  if (response) {
+    featuredModpacks.value = response.hits
+  } else {
+    featuredModpacks.value = []
+  }
 }
 const getFeaturedMods = async () => {
   const response = await useFetch(
     'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
-    'featured mods'
+    'featured mods',
+    offline.value
   )
-  if (response) featuredMods.value = response.hits
+  if (response) {
+    featuredMods.value = response.hits
+  } else {
+    featuredModpacks.value = []
+  }
 }
 
 await getInstances()
 
-if (!offline.value) {
-  await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-}
+await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 const unlistenProfile = await profile_listener(async (e) => {
   await getInstances()

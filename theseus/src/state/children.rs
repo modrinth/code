@@ -193,16 +193,21 @@ impl Children {
                 e
             );
         }
+
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
-        if let Err(e) = profile::try_update_playtime(&associated_profile).await
-        {
-            tracing::warn!(
-                "Failed to update playtime for profile {}: {}",
-                associated_profile,
-                e
-            );
-        }
+        // Sent in another thread as first call may take a couple seconds and hold up process ending
+        tokio::spawn(async move {
+            if let Err(e) =
+                profile::try_update_playtime(&associated_profile).await
+            {
+                tracing::warn!(
+                    "Failed to update playtime for profile {}: {}",
+                    associated_profile,
+                    e
+                );
+            }
+        });
 
         {
             // Clear game played for Discord RPC
