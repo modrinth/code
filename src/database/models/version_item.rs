@@ -49,8 +49,8 @@ impl DependencyBuilder {
         } else if let Some(version_id) = self.version_id {
             sqlx::query!(
                 "
-                    SELECT mod_id FROM versions WHERE id = $1
-                    ",
+                SELECT mod_id FROM versions WHERE id = $1
+                ",
                 version_id as VersionId,
             )
             .fetch_optional(&mut *transaction)
@@ -67,8 +67,8 @@ impl DependencyBuilder {
             ",
             version_id as VersionId,
             self.dependency_type,
-            project_id.map(|x| x.0),
             self.version_id.map(|x| x.0),
+            project_id.map(|x| x.0),
             self.file_name,
         )
         .execute(&mut *transaction)

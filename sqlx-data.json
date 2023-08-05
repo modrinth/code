@@ -1694,6 +1694,26 @@
     },
     "query": "\n                    UPDATE mods\n                    SET server_side = $1\n                    WHERE (id = $2)\n                    "
   },
+  "4c20de487460718c8c523fce28716900f5195d12397eba09a3c437d194ff2b2e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "mod_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                SELECT mod_id FROM versions WHERE id = $1\n                "
+  },
   "4c58727309e5c79cc0505e57aeba0c977f308429f97b0ed296ab3bc0ebebb435": {
     "describe": {
       "columns": [],
@@ -1895,26 +1915,6 @@
       }
     },
     "query": "\n                    SELECT id FROM mods\n                    WHERE status = $1 AND queued < NOW() - INTERVAL '40 hours'\n                    ORDER BY updated ASC\n                    "
-  },
-  "57743e20646dab2bcc02fe555d6b8ddb999697b7e95ec732d1a1a9e2bfdb8181": {
-    "describe": {
-      "columns": [
-        {
-          "name": "mod_id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    SELECT mod_id FROM versions WHERE id = $1\n                    "
   },
   "5944eb30a2bc0381c4d15eb1cf6ccf6e146a54381f2da8ab224960430e951976": {
     "describe": {
