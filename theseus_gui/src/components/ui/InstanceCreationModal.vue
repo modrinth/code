@@ -181,6 +181,7 @@
               : 'Select profiles to import'
           }}
         </Button>
+        <ProgressBar v-if="loading" :progress="(importedProfiles / (totalProfiles + 0.0001)) * 100" />
       </div>
     </div>
   </Modal>
@@ -224,6 +225,7 @@ import {
   get_importable_instances,
   import_instance,
 } from '@/helpers/import.js'
+import ProgressBar from "@/components/ui/ProgressBar.vue";
 
 const themeStore = useTheming()
 
@@ -420,6 +422,8 @@ const profiles = ref(
 )
 
 const loading = ref(false)
+const importedProfiles = ref(0);
+const totalProfiles = ref(0);
 
 const selectedProfileType = ref('MultiMC')
 const profileOptions = ref([
@@ -480,6 +484,10 @@ const setPath = () => {
 }
 
 const next = async () => {
+  importedProfiles.value = 0;
+  totalProfiles.value = Array.from(profiles.value.values())
+    .map((profiles) => profiles.filter((profile) => profile.selected).length)
+    .reduce((a, b) => a + b, 0);
   loading.value = true
   for (const launcher of Array.from(profiles.value.entries()).map(([launcher, profiles]) => ({
     launcher,
@@ -491,6 +499,7 @@ const next = async () => {
         .catch(handleError)
         .then(() => console.log(`Successfully Imported ${profile.name} from ${launcher.launcher}`))
       profile.selected = false
+      importedProfiles.value++;
     }
   }
   loading.value = false
@@ -628,6 +637,7 @@ const next = async () => {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   gap: var(--gap-md);
 
   .transparent {
