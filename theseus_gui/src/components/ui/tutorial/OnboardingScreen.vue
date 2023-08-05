@@ -76,7 +76,7 @@ const prevPage = () => {
 const finishOnboarding = async () => {
   mixpanel.track('OnboardingFinish')
   const settings = await get()
-  settings.onboarded_new = true
+  settings.fully_onboarded = true
   await set(settings)
   props.finish()
 }

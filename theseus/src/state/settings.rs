@@ -41,7 +41,7 @@ pub struct Settings {
     #[serde(default)]
     pub advanced_rendering: bool,
     #[serde(default)]
-    pub onboarded_new: bool,
+    pub fully_onboarded: bool,
     #[serde(default = "DirectoryInfo::get_initial_settings_dir")]
     pub loaded_config_dir: Option<PathBuf>,
 }
@@ -82,7 +82,7 @@ impl Settings {
                 developer_mode: false,
                 opt_out_analytics: false,
                 advanced_rendering: true,
-                onboarded_new: false,
+                fully_onboarded: false,
 
                 // By default, the config directory is the same as the settings directory
                 loaded_config_dir: DirectoryInfo::get_initial_settings_dir(),

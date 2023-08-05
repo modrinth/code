@@ -216,7 +216,12 @@ pub async fn fetch_mirrors(
 #[tracing::instrument(skip(semaphore))]
 #[theseus_macros::debug_pin]
 pub async fn check_internet(semaphore: &FetchSemaphore, timeout: u64) -> bool {
-    let result = fetch("https://api.modrinth.com", None, semaphore);
+    let result = fetch(
+        "https://api.modrinth.com",
+        None,
+        semaphore,
+        &CredentialsStore(None),
+    );
     let result =
         tokio::time::timeout(Duration::from_secs(timeout), result).await;
     matches!(result, Ok(Ok(_)))

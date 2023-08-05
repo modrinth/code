@@ -45,7 +45,6 @@ const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
 
-
 const videoPlaying = ref(false)
 const offline = ref(false)
 const showOnboarding = ref(false)
@@ -55,14 +54,14 @@ const onboardingVideo = ref()
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
       await get()
     const os = await getOS()
     // video should play if the user is not on linux, and has not onboarded
-    videoPlaying.value = !onboarded_new && os !== 'Linux'
+    videoPlaying.value = !fully_onboarded && os !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
-    showOnboarding.value = !onboarded_new
+    showOnboarding.value = !fully_onboarded
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -72,7 +71,7 @@ defineExpose({
     if (opt_out_analytics) {
       mixpanel_opt_out_tracking()
     }
-    mixpanel_track('Launched', { version, dev, onboarded_new })
+    mixpanel_track('Launched', { version, dev, fully_onboarded })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 

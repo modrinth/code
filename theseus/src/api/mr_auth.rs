@@ -25,7 +25,7 @@ pub async fn authenticate_await_complete_flow(
     if let Some(ref mut flow) = *write {
         let creds = flow.extract_credentials(&state.fetch_semaphore).await?;
 
-        if let ModrinthCredentialsResult::Credentials { creds } = &creds {
+        if let ModrinthCredentialsResult::Credentials(creds) = &creds {
             let mut write = state.credentials.write().await;
             write.login(creds.clone()).await?;
         }
@@ -64,7 +64,7 @@ pub async fn login_password(
     )
     .await?;
 
-    if let ModrinthCredentialsResult::Credentials { creds } = &creds {
+    if let ModrinthCredentialsResult::Credentials(creds) = &creds {
         let mut write = state.credentials.write().await;
         write.login(creds.clone()).await?;
     }
@@ -95,7 +95,7 @@ pub async fn login_minecraft(
     let creds =
         crate::state::login_minecraft(flow, &state.fetch_semaphore).await?;
 
-    if let ModrinthCredentialsResult::Credentials { creds } = &creds {
+    if let ModrinthCredentialsResult::Credentials(creds) = &creds {
         let mut write = state.credentials.write().await;
         write.login(creds.clone()).await?;
     }

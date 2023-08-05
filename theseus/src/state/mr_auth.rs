@@ -1,3 +1,4 @@
+use crate::config::MODRINTH_API_URL;
 use crate::state::DirectoryInfo;
 use crate::util::fetch::{
     fetch_advanced, read_json, write, FetchSemaphore, IoSemaphore,
@@ -35,7 +36,7 @@ pub struct ModrinthCredentials {
 #[serde(rename_all = "snake_case")]
 pub enum ModrinthCredentialsResult {
     TwoFactorRequired { flow: String },
-    Credentials { creds: ModrinthCredentials },
+    Credentials(ModrinthCredentials),
 }
 
 #[derive(Debug)]
@@ -115,7 +116,7 @@ pub struct ModrinthAuthFlow {
 impl ModrinthAuthFlow {
     pub async fn new(provider: &str) -> crate::Result<Self> {
         let (socket, _) = async_tungstenite::tokio::connect_async(format!(
-            "wss://staging-api.modrinth.com/v2/auth/ws?provider={provider}"
+            "wss://api.modrinth.com/v2/auth/ws?provider={provider}"
         ))
         .await?;
         Ok(Self { socket })
@@ -186,13 +187,13 @@ async fn get_result_from_res(
     } else if let Some(code) = response.get(code_key).and_then(|x| x.as_str()) {
         let info = fetch_info(code, semaphore).await?;
 
-        Ok(ModrinthCredentialsResult::Credentials {
-            creds: ModrinthCredentials {
+        Ok(ModrinthCredentialsResult::Credentials(
+            ModrinthCredentials {
                 session: code.to_string(),
                 expires_at: Utc::now() + Duration::weeks(2),
                 user: info,
             },
-        })
+        ))
     } else if let Some(error) =
         response.get("description").and_then(|x| x.as_str())
     {
@@ -221,7 +222,7 @@ pub async fn login_password(
 ) -> crate::Result<ModrinthCredentialsResult> {
     let resp = fetch_advanced(
         Method::POST,
-        "https://staging-api.modrinth.com/v2/auth/login",
+        &format!("https://{MODRINTH_API_URL}auth/login"),
         None,
         Some(serde_json::json!({
             "username": username,
@@ -273,7 +274,7 @@ pub async fn login_2fa(
 ) -> crate::Result<ModrinthCredentials> {
     let resp = fetch_advanced(
         Method::POST,
-        "https://staging-api.modrinth.com/v2/auth/login/2fa",
+        &format!("{MODRINTH_API_URL}auth/login/2fa"),
         None,
         Some(serde_json::json!({
             "code": code,
@@ -301,7 +302,7 @@ pub async fn create_account(
 ) -> crate::Result<ModrinthCredentials> {
     let resp = fetch_advanced(
         Method::POST,
-        "https://staging-api.modrinth.com/v2/auth/create",
+        &format!("{MODRINTH_API_URL}auth/create"),
         None,
         Some(serde_json::json!({
             "username": username,
@@ -327,7 +328,7 @@ pub async fn login_minecraft(
 ) -> crate::Result<ModrinthCredentialsResult> {
     let resp = fetch_advanced(
         Method::POST,
-        "https://staging-api.modrinth.com/v2/auth/login/minecraft",
+        &format!("{MODRINTH_API_URL}auth/login/minecraft"),
         None,
         Some(serde_json::json!({
             "flow": flow,
@@ -352,7 +353,7 @@ pub async fn refresh_credentials(
         let token = &credentials.session;
         let resp = fetch_advanced(
             Method::POST,
-            "https://staging-api.modrinth.com/v2/session/refresh",
+            &format!("{MODRINTH_API_URL}session/refresh"),
             None,
             None,
             Some(("Authorization", token)),
@@ -382,7 +383,7 @@ async fn fetch_info(
 ) -> crate::Result<ModrinthUser> {
     let result = fetch_advanced(
         Method::GET,
-        "https://staging-api.modrinth.com/v2/user",
+        &format!("{MODRINTH_API_URL}user"),
         None,
         None,
         Some(("Authorization", token)),

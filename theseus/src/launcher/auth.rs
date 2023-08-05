@@ -1,4 +1,5 @@
 //! Authentication flow based on Hydra
+use crate::config::MODRINTH_API_URL;
 use crate::state::CredentialsStore;
 use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
 use async_tungstenite as ws;
@@ -11,7 +12,7 @@ use url::Url;
 
 lazy_static! {
     static ref HYDRA_URL: Url =
-        Url::parse("https://staging-api.modrinth.com/v2/auth/minecraft/")
+        Url::parse(&format!("{MODRINTH_API_URL}auth/minecraft/"))
             .expect("Hydra URL parse failed");
 }
 
@@ -69,7 +70,7 @@ pub struct HydraAuthFlow<S: AsyncRead + AsyncWrite + Unpin> {
 impl HydraAuthFlow<ws::tokio::ConnectStream> {
     pub async fn new() -> crate::Result<Self> {
         let (socket, _) = ws::tokio::connect_async(
-            "wss://staging-api.modrinth.com/v2/auth/minecraft/ws",
+            "wss://api.modrinth.com/v2/auth/minecraft/ws",
         )
         .await?;
         Ok(Self { socket })
@@ -138,7 +139,7 @@ pub async fn refresh_credentials(
 ) -> crate::Result<()> {
     let resp = fetch_json::<TokenJSON>(
         Method::POST,
-        "https://staging-api.modrinth.com/v2/auth/minecraft/refresh",
+        &format!("{MODRINTH_API_URL}auth/minecraft/refresh"),
         None,
         Some(serde_json::json!({ "refresh_token": credentials.refresh_token })),
         semaphore,
