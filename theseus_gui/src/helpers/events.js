@@ -92,3 +92,15 @@ export async function command_listener(callback) {
 export async function warning_listener(callback) {
   return await listen('warning', (event) => callback(event.payload))
 }
+
+/// Payload for the 'offline' event
+/*
+  OfflinePayload {
+    offline: bool, true or false
+  }
+*/
+export async function offline_listener(callback) {
+  return await listen('offline', (event) => {
+    return callback(event.payload)
+  })
+}

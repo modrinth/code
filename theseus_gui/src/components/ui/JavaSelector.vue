@@ -49,7 +49,7 @@ import { find_jre_17_jres, get_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { handleError } from '@/store/state.js'
 
 const props = defineProps({
@@ -88,7 +88,7 @@ async function testJava() {
   testingJava.value = false
   testingJavaSuccess.value = !!result
 
-  mixpanel.track('JavaTest', {
+  mixpanel_track('JavaTest', {
     path: props.modelValue ? props.modelValue.path : '',
     success: !!result,
   })
@@ -110,7 +110,7 @@ async function handleJavaFileInput() {
         architecture: 'x86',
       }
 
-      mixpanel.track('JavaManualSelect', {
+      mixpanel_track('JavaManualSelect', {
         path: filePath,
         version: props.version,
       })

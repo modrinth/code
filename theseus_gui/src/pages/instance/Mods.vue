@@ -93,6 +93,7 @@
             </Button>
             <Button
               class="transparent update"
+              :disabled="offline"
               @click="updateAll()"
               @mouseover="selectedOption = 'Update'"
             >
@@ -139,7 +140,7 @@
             </Button>
           </section>
           <section v-if="selectedOption === 'Update'" class="options">
-            <Button class="transparent" @click="updateAll()">
+            <Button class="transparent" :disabled="offline" @click="updateAll()">
               <UpdatedIcon />
               Update all
             </Button>
@@ -181,6 +182,7 @@
             <router-link
               v-if="mod.slug"
               :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
+              :disabled="offline"
               class="mod-content"
             >
               <Avatar :src="mod.icon" />
@@ -208,7 +210,7 @@
             <Button
               v-else
               v-tooltip="'Update project'"
-              :disabled="!mod.outdated"
+              :disabled="!mod.outdated || offline"
               icon-only
               @click="updateProject(mod)"
             >
@@ -345,7 +347,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -368,6 +370,12 @@ const props = defineProps({
       return {}
     },
   },
+  offline: {
+    type: Boolean,
+    default() {
+      return false
+    },
+  },
 })
 
 const projects = ref([])
@@ -376,8 +384,9 @@ const showingOptions = ref(false)
 
 const initProjects = (initInstance) => {
   projects.value = []
+  if (!initInstance || !initInstance.projects) return
   for (const [path, project] of Object.entries(initInstance.projects)) {
-    if (project.metadata.type === 'modrinth') {
+    if (project.metadata.type === 'modrinth' && !props.offline) {
       let owner = project.metadata.members.find((x) => x.role === 'Owner')
       projects.value.push({
         path,
@@ -439,6 +448,13 @@ watch(
   () => props.instance.projects,
   () => {
     initProjects(props.instance)
+  }
+)
+
+watch(
+  () => props.offline,
+  () => {
+    if (props.instance) initProjects(props.instance)
   }
 )
 
@@ -576,7 +592,7 @@ const updateAll = async () => {
     projects.value[project].updating = false
   }
 
-  mixpanel.track('InstanceUpdateAll', {
+  mixpanel_track('InstanceUpdateAll', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
     count: setProjects.length,
@@ -601,7 +617,7 @@ const updateProject = async (mod) => {
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
 
-  mixpanel.track('InstanceProjectUpdate', {
+  mixpanel_track('InstanceProjectUpdate', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
     id: mod.id,
@@ -628,7 +644,7 @@ const toggleDisableMod = async (mod) => {
     .then((newPath) => {
       mod.path = newPath
       mod.disabled = !mod.disabled
-      mixpanel.track('InstanceProjectDisable', {
+      mixpanel_track('InstanceProjectDisable', {
         loader: props.instance.metadata.loader,
         game_version: props.instance.metadata.game_version,
         id: mod.id,
@@ -649,7 +665,7 @@ const removeMod = async (mod) => {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
-  mixpanel.track('InstanceProjectRemove', {
+  mixpanel_track('InstanceProjectRemove', {
     loader: props.instance.metadata.loader,
     game_version: props.instance.metadata.game_version,
     id: mod.id,
@@ -778,7 +794,7 @@ listen('tauri://file-drop', async (event) => {
     }
     initProjects(await get(props.instance.path).catch(handleError))
   }
-  mixpanel.track('InstanceCreate', {
+  mixpanel_track('InstanceCreate', {
     source: 'FileDrop',
   })
 })

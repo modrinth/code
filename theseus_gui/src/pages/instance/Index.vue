@@ -86,7 +86,12 @@
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
-            <component :is="Component" :instance="instance" :options="options"></component>
+            <component
+              :is="Component"
+              :instance="instance"
+              :options="options"
+              :offline="offline"
+            ></component>
           </Suspense>
         </template>
       </RouterView>
@@ -144,13 +149,13 @@ import {
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import { process_listener, profile_listener } from '@/helpers/events'
+import { offline_listener, process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import { isOffline, showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { PackageIcon } from '@/assets/icons/index.js'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -170,6 +175,8 @@ breadcrumbs.setContext({
   query: route.query,
 })
 
+const offline = ref(await isOffline())
+
 const loadingBar = useLoading()
 
 const uuid = ref(null)
@@ -183,7 +190,7 @@ const startInstance = async (context) => {
   loading.value = false
   playing.value = true
 
-  mixpanel.track('InstanceStart', {
+  mixpanel_track('InstanceStart', {
     loader: instance.value.metadata.loader,
     game_version: instance.value.metadata.game_version,
     source: context,
@@ -211,7 +218,7 @@ const stopInstance = async (context) => {
     uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
   } else await kill_by_uuid(uuid.value).catch(handleError)
 
-  mixpanel.track('InstanceStop', {
+  mixpanel_track('InstanceStop', {
     loader: instance.value.metadata.loader,
     game_version: instance.value.metadata.game_version,
     source: context,
@@ -292,9 +299,14 @@ const unlistenProcesses = await process_listener((e) => {
   if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
 
+const unlistenOffline = await offline_listener((b) => {
+  offline.value = b
+})
+
 onUnmounted(() => {
   unlistenProcesses()
   unlistenProfiles()
+  unlistenOffline()
 })
 </script>
 

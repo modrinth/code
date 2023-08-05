@@ -12,6 +12,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             safety_check_safe_loading_bars,
             get_opening_command,
             await_sync,
+            is_offline,
+            refresh_offline
         ])
         .build()
 }
@@ -124,4 +126,21 @@ pub async fn await_sync() -> Result<()> {
     State::sync().await?;
     tracing::debug!("State synced");
     Ok(())
+}
+
+/// Check if theseus is currently in offline mode, without a refresh attempt
+#[tauri::command]
+pub async fn is_offline() -> Result<bool> {
+    let state = State::get().await?;
+    let offline = *state.offline.read().await;
+    Ok(offline)
+}
+
+/// Refreshes whether or not theseus is in offline mode, and returns the new value
+#[tauri::command]
+pub async fn refresh_offline() -> Result<bool> {
+    let state = State::get().await?;
+    state.refresh_offline().await?;
+    let offline = *state.offline.read().await;
+    Ok(offline)
 }

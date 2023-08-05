@@ -5,7 +5,7 @@ import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 
 const pageOptions = ['Home', 'Library']
 
@@ -30,9 +30,9 @@ watch(
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
     if (setSettings.opt_out_analytics) {
-      mixpanel.opt_out_tracking()
+      mixpanel_opt_out_tracking()
     } else {
-      mixpanel.opt_in_tracking()
+      mixpanel_opt_in_tracking()
     }
 
     if (setSettings.java_globals.JAVA_8?.path === '') {
