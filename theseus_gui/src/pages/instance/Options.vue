@@ -97,8 +97,8 @@
       <button
         id="edit-versions"
         class="btn"
-        @click="$refs.changeVersionsModal.show()"
         :disabled="offline"
+        @click="$refs.changeVersionsModal.show()"
       >
         <EditIcon />
         Edit versions

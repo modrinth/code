@@ -25,7 +25,12 @@ import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
 import { isDev, getOS, isOffline } from '@/helpers/utils.js'
-import mixpanel from 'mixpanel-browser'
+import {
+  mixpanel_track,
+  mixpanel_init,
+  mixpanel_opt_out_tracking,
+  mixpanel_is_loaded,
+} from '@/helpers/mixpanel'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
