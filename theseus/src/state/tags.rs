@@ -25,6 +25,7 @@ impl Tags {
     #[theseus_macros::debug_pin]
     pub async fn init(
         dirs: &DirectoryInfo,
+        fetch_online: bool,
         io_semaphore: &IoSemaphore,
         fetch_semaphore: &FetchSemaphore,
         credentials: &CredentialsStore,
@@ -35,7 +36,7 @@ impl Tags {
         if let Ok(tags_json) = read_json::<Self>(&tags_path, io_semaphore).await
         {
             tags = Some(tags_json);
-        } else {
+        } else if fetch_online {
             match Self::fetch(fetch_semaphore, credentials).await {
                 Ok(tags_fetch) => tags = Some(tags_fetch),
                 Err(err) => {

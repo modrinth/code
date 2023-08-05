@@ -12,7 +12,7 @@
             <UploadIcon />
             Select icon
           </Button>
-          <Button @click="reset_icon">
+          <Button :disabled="!display_icon" @click="reset_icon">
             <XIcon />
             Remove icon
           </Button>
@@ -73,7 +73,7 @@
           <CodeIcon />
           {{ showAdvanced ? 'Hide advanced' : 'Show advanced' }}
         </Button>
-        <Button @click="$refs.modal.hide()">
+        <Button @click="hide()">
           <XIcon />
           Cancel
         </Button>
@@ -202,7 +202,7 @@ import {
   FolderSearchIcon,
   UpdatedIcon,
 } from 'omorphia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
@@ -215,11 +215,15 @@ import {
 } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
-import { get_importable_instances, import_instance } from '@/helpers/import.js'
+import {
+  get_default_launcher_path,
+  get_importable_instances,
+  import_instance,
+} from '@/helpers/import.js'
 
 const themeStore = useTheming()
 
@@ -234,9 +238,10 @@ const showAdvanced = ref(false)
 const creating = ref(false)
 const showSnapshots = ref(false)
 const creationType = ref('from file')
+const isShowing = ref(false)
 
 defineExpose({
-  show: () => {
+  show: async () => {
     game_version.value = ''
     specified_loader_version.value = ''
     profile_name.value = ''
@@ -247,10 +252,40 @@ defineExpose({
     loader_version.value = 'stable'
     icon.value = null
     display_icon.value = null
+    isShowing.value = true
     modal.value.show()
 
-    mixpanel.track('InstanceCreateStart', { source: 'CreationModal' })
+    unlistener.value = await listen('tauri://file-drop', async (event) => {
+      // Only if modal is showing
+      if (!isShowing.value) return
+      if (creationType.value !== 'from file') return
+      hide()
+      if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
+        await install_from_file(event.payload[0]).catch(handleError)
+        mixpanel_track('InstanceCreate', {
+          source: 'CreationModalFileDrop',
+        })
+      }
+    })
+
+    mixpanel_track('InstanceCreateStart', { source: 'CreationModal' })
   },
+})
+
+const unlistener = ref(null)
+const hide = () => {
+  isShowing.value = false
+  modal.value.hide()
+  if (unlistener.value) {
+    unlistener.value()
+    unlistener.value = null
+  }
+}
+onUnmounted(() => {
+  if (unlistener.value) {
+    unlistener.value()
+    unlistener.value = null
+  }
 })
 
 const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
@@ -303,7 +338,7 @@ const create_instance = async () => {
     loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
   const loaderVersion = loader.value === 'vanilla' ? null : loader_version_value ?? 'stable'
 
-  modal.value.hide()
+  hide()
   creating.value = false
 
   await create(
@@ -314,7 +349,7 @@ const create_instance = async () => {
     icon.value
   ).catch(handleError)
 
-  mixpanel.track('InstanceCreate', {
+  mixpanel_track('InstanceCreate', {
     profile_name: profile_name.value,
     game_version: game_version.value,
     loader: loader.value,
@@ -366,24 +401,13 @@ const toggle_advanced = () => {
 const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
-
-  modal.value.hide()
+  hide()
   await install_from_file(newProject).catch(handleError)
 
-  mixpanel.track('InstanceCreate', {
+  mixpanel_track('InstanceCreate', {
     source: 'CreationModalFileOpen',
   })
 }
-
-listen('tauri://file-drop', async (event) => {
-  modal.value.hide()
-  if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
-    await install_from_file(event.payload[0]).catch(handleError)
-    mixpanel.track('InstanceCreate', {
-      source: 'CreationModalFileDrop',
-    })
-  }
-})
 
 const profiles = ref(
   new Map([
@@ -406,6 +430,27 @@ const profileOptions = ref([
   { name: 'PrismLauncher', path: '' },
 ])
 
+// Attempt to get import profiles on default paths
+const promises = profileOptions.value.map(async (option) => {
+  const path = await get_default_launcher_path(option.name).catch(handleError)
+  if (!path || path === '') return
+
+  // Try catch to allow failure and simply ignore default path attempt
+  try {
+    const instances = await get_importable_instances(option.name, path)
+
+    if (!instances) return
+    profileOptions.value.find((profile) => profile.name === option.name).path = path
+    profiles.value.set(
+      option.name,
+      instances.map((name) => ({ name, selected: false }))
+    )
+  } catch (error) {
+    // Allow failure silently
+  }
+})
+await Promise.all(promises)
+
 const selectLauncherPath = async () => {
   selectedProfileType.value.path = await open({ multiple: false, directory: true })
 
@@ -419,10 +464,14 @@ const reload = async () => {
     selectedProfileType.value.name,
     selectedProfileType.value.path
   ).catch(handleError)
-  profiles.value.set(
-    selectedProfileType.value.name,
-    instances.map((name) => ({ name, selected: false }))
-  )
+  if (instances) {
+    profiles.value.set(
+      selectedProfileType.value.name,
+      instances.map((name) => ({ name, selected: false }))
+    )
+  } else {
+    profiles.value.set(selectedProfileType.value.name, [])
+  }
 }
 
 const setPath = () => {

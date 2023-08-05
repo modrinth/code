@@ -9,7 +9,7 @@ use crate::prelude::ProfilePathId;
 use crate::state::{ProfileInstallStage, Profiles, SideType};
 use crate::util::fetch::{fetch_mirrors, write};
 use crate::util::io;
-use crate::State;
+use crate::{profile, State};
 use async_zip::tokio::read::seek::ZipFileReader;
 
 use std::io::Cursor;
@@ -82,6 +82,7 @@ pub async fn install_zipped_mrpack_files(
     let version_id = create_pack.description.version_id;
     let existing_loading_bar = create_pack.description.existing_loading_bar;
     let profile_path = create_pack.description.profile_path;
+    let icon_exists = icon.is_some();
 
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&file);
 
@@ -189,7 +190,7 @@ pub async fn install_zipped_mrpack_files(
                                 let path = profile_path
                                     .get_full_path()
                                     .await?
-                                    .join(project.path);
+                                    .join(&project.path);
                                 write(&path, &file, &state.io_semaphore)
                                     .await?;
                             }
@@ -262,6 +263,14 @@ pub async fn install_zipped_mrpack_files(
                 )
                 .await?;
             }
+        }
+
+        // If the icon doesn't exist, we expect icon.png to be a potential icon.
+        // If it doesn't exist, and an override to icon.png exists, cache and use that
+        let potential_icon =
+            profile_path.get_full_path().await?.join("icon.png");
+        if !icon_exists && potential_icon.exists() {
+            profile::edit_icon(&profile_path, Some(&potential_icon)).await?;
         }
 
         if let Some(profile_val) =

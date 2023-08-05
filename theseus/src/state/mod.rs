@@ -1,16 +1,17 @@
 //! Theseus state management system
-use crate::event::emit::{emit_loading, init_loading_unsafe};
+use crate::event::emit::{emit_loading, emit_offline, init_loading_unsafe};
 use std::path::PathBuf;
 
 use crate::event::LoadingBarType;
 use crate::loading_join;
 
 use crate::state::users::Users;
-use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use crate::util::fetch::{self, FetchSemaphore, IoSemaphore};
 use notify::RecommendedWatcher;
 use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
 use std::sync::Arc;
 use std::time::Duration;
+use tokio::join;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
 use futures::{channel::mpsc::channel, SinkExt, StreamExt};
@@ -58,6 +59,9 @@ pub use self::mr_auth::*;
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<RwLock<State>> = OnceCell::const_new();
 pub struct State {
+    /// Whether or not the launcher is currently operating in 'offline mode'
+    pub offline: RwLock<bool>,
+
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
 
@@ -152,10 +156,14 @@ impl State {
         )));
         emit_loading(&loading_bar, 10.0, None).await?;
 
-        let metadata_fut = Metadata::init(&directories, &io_semaphore);
+        let is_offline = !fetch::check_internet(&fetch_semaphore, 3).await;
+
+        let metadata_fut =
+            Metadata::init(&directories, !is_offline, &io_semaphore);
         let profiles_fut = Profiles::init(&directories, &mut file_watcher);
         let tags_fut = Tags::init(
             &directories,
+            !is_offline,
             &io_semaphore,
             &fetch_semaphore,
             &CredentialsStore(None),
@@ -178,9 +186,13 @@ impl State {
 
         let discord_rpc = DiscordGuard::init().await?;
 
+        // Starts a loop of checking if we are online, and updating
+        Self::offine_check_loop();
+
         emit_loading(&loading_bar, 10.0, None).await?;
 
         Ok::<RwLock<Self>, crate::Error>(RwLock::new(Self {
+            offline: RwLock::new(is_offline),
             directories,
             fetch_semaphore,
             fetch_semaphore_max: RwLock::new(
@@ -205,13 +217,42 @@ impl State {
         }))
     }
 
-    /// Updates state with data from the web
+    /// Starts a loop of checking if we are online, and updating
+    pub fn offine_check_loop() {
+        tokio::task::spawn(async {
+            loop {
+                let state = Self::get().await;
+                if let Ok(state) = state {
+                    let _ = state.refresh_offline().await;
+                }
+
+                // Wait 5 seconds
+                tokio::time::sleep(Duration::from_secs(5)).await;
+            }
+        });
+    }
+
+    /// Updates state with data from the web, if we are online
     pub fn update() {
         tokio::task::spawn(Metadata::update());
         tokio::task::spawn(Tags::update());
         tokio::task::spawn(Profiles::update_projects());
         tokio::task::spawn(Profiles::update_modrinth_versions());
         tokio::task::spawn(CredentialsStore::update_creds());
+        tokio::task::spawn(async {
+            if let Ok(state) = crate::State::get().await {
+                if !*state.offline.read().await {
+                    let res1 = Profiles::update_modrinth_versions();
+                    let res2 = Tags::update();
+                    let res3 = Metadata::update();
+                    let res4 = Profiles::update_projects();
+                    let res5 = Settings::update_java();
+                    let res6 = CredentialsStore::update_creds();
+
+                    let _ = join!(res1, res2, res3, res4, res5, res6);
+                }
+            }
+        });
     }
 
     #[tracing::instrument]
@@ -278,6 +319,21 @@ impl State {
         io_semaphore.close();
         *total_permits = settings.max_concurrent_downloads as u32;
         *io_semaphore = Semaphore::new(settings.max_concurrent_downloads);
+    }
+
+    /// Refreshes whether or not the launcher should be offline, by whether or not there is an internet connection
+    pub async fn refresh_offline(&self) -> crate::Result<()> {
+        let is_online = fetch::check_internet(&self.fetch_semaphore, 3).await;
+
+        let mut offline = self.offline.write().await;
+
+        if *offline != is_online {
+            return Ok(());
+        }
+
+        emit_offline(!is_online).await?;
+        *offline = !is_online;
+        Ok(())
     }
 }
 

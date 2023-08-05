@@ -85,7 +85,7 @@ import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 dayjs.extend(relativeTime)
 
 const props = defineProps({
@@ -165,7 +165,7 @@ async function install() {
         props.project.icon_url
       ).catch(handleError)
 
-      mixpanel.track('PackInstall', {
+      mixpanel_track('PackInstall', {
         id: props.project.project_id,
         version_id: queuedVersionData.id,
         title: props.project.title,
@@ -196,7 +196,7 @@ async function install() {
         await installMod(props.instance.path, queuedVersionData.id).catch(handleError)
         await installVersionDependencies(props.instance, queuedVersionData)
 
-        mixpanel.track('ProjectInstall', {
+        mixpanel_track('ProjectInstall', {
           loader: props.instance.metadata.loader,
           game_version: props.instance.metadata.game_version,
           id: props.project.project_id,

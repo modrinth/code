@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use theseus::{handler, prelude::CommandPayload, State};
 
 use crate::api::Result;
@@ -6,14 +7,35 @@ use std::{env, process::Command};
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
         .invoke_handler(tauri::generate_handler![
+            get_os,
             should_disable_mouseover,
             show_in_folder,
             progress_bars_list,
             safety_check_safe_loading_bars,
             get_opening_command,
             await_sync,
+            is_offline,
+            refresh_offline
         ])
         .build()
+}
+
+/// Gets OS
+#[tauri::command]
+pub fn get_os() -> OS {
+    #[cfg(target_os = "windows")]
+    let os = OS::Windows;
+    #[cfg(target_os = "linux")]
+    let os = OS::Linux;
+    #[cfg(target_os = "macos")]
+    let os = OS::MacOS;
+    os
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum OS {
+    Windows,
+    Linux,
+    MacOS,
 }
 
 // Lists active progress bars
@@ -124,4 +146,21 @@ pub async fn await_sync() -> Result<()> {
     State::sync().await?;
     tracing::debug!("State synced");
     Ok(())
+}
+
+/// Check if theseus is currently in offline mode, without a refresh attempt
+#[tauri::command]
+pub async fn is_offline() -> Result<bool> {
+    let state = State::get().await?;
+    let offline = *state.offline.read().await;
+    Ok(offline)
+}
+
+/// Refreshes whether or not theseus is in offline mode, and returns the new value
+#[tauri::command]
+pub async fn refresh_offline() -> Result<bool> {
+    let state = State::get().await?;
+    state.refresh_offline().await?;
+    let offline = *state.offline.read().await;
+    Ok(offline)
 }

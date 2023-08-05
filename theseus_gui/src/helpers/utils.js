@@ -11,6 +11,11 @@ export async function isDev() {
   return await invoke('is_dev')
 }
 
+// One of 'Windows', 'Linux', 'MacOS'
+export async function getOS() {
+  return await invoke('plugin:utils|get_os')
+}
+
 export async function showInFolder(path) {
   return await invoke('plugin:utils|show_in_folder', { path })
 }
@@ -76,4 +81,13 @@ export const openLink = (url) => {
       path: url,
     },
   })
+}
+
+export const refreshOffline = async () => {
+  return await invoke('plugin:utils|refresh_offline', {})
+}
+
+// returns true/false
+export const isOffline = async () => {
+  return await invoke('plugin:utils|is_offline', {})
 }

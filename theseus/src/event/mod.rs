@@ -5,6 +5,7 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
+use crate::prelude::ProfilePathId;
 use crate::state::SafeProcesses;
 
 pub mod emit;
@@ -195,6 +196,11 @@ pub struct LoadingPayload {
 }
 
 #[derive(Serialize, Clone)]
+pub struct OfflinePayload {
+    pub offline: bool,
+}
+
+#[derive(Serialize, Clone)]
 pub struct WarningPayload {
     pub message: String,
 }
@@ -235,6 +241,7 @@ pub enum ProcessPayloadType {
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
     pub uuid: Uuid,
+    pub profile_path_id: ProfilePathId,
     pub path: PathBuf,
     pub name: String,
     pub event: ProfilePayloadType,

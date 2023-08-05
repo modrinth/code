@@ -31,7 +31,7 @@ import { showProfileInFolder } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
 import { install as pack_install } from '@/helpers/pack.js'
 import { useTheming } from '@/store/state.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 
 const router = useRouter()
 
@@ -125,7 +125,7 @@ const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
       await run(args.item.path).catch(handleError)
-      mixpanel.track('InstanceStart', {
+      mixpanel_track('InstanceStart', {
         loader: args.item.metadata.loader,
         game_version: args.item.metadata.game_version,
       })
@@ -134,7 +134,7 @@ const handleOptionsClick = async (args) => {
       for (const u of await get_uuids_by_profile_path(args.item.path).catch(handleError)) {
         await kill_by_uuid(u).catch(handleError)
       }
-      mixpanel.track('InstanceStop', {
+      mixpanel_track('InstanceStop', {
         loader: args.item.metadata.loader,
         game_version: args.item.metadata.game_version,
       })

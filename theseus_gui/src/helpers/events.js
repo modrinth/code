@@ -62,7 +62,8 @@ export async function process_listener(callback) {
     ProfilePayload {
         uuid: unique identification of the process in the state (currently identified by path, but that will change)
         name: name of the profile
-        path: path to profile
+        profile_path: relative path to profile (used for path identification)
+        path: path to profile (used for opening the profile in the OS file explorer)
         event: event type ("Created", "Added", "Edited", "Removed")
     }
 */
@@ -91,4 +92,16 @@ export async function command_listener(callback) {
 */
 export async function warning_listener(callback) {
   return await listen('warning', (event) => callback(event.payload))
+}
+
+/// Payload for the 'offline' event
+/*
+  OfflinePayload {
+    offline: bool, true or false
+  }
+*/
+export async function offline_listener(callback) {
+  return await listen('offline', (event) => {
+    return callback(event.payload)
+  })
 }
