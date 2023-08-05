@@ -85,7 +85,14 @@
     <label for="project-name">
       <span class="label__title">Name</span>
     </label>
-    <input id="profile-name" v-model="title" autocomplete="off" maxlength="80" type="text" />
+    <input
+      id="profile-name"
+      v-model="title"
+      autocomplete="off"
+      maxlength="80"
+      type="text"
+      :disabled="instance.metadata.linked_data"
+    />
 
     <div class="adjacent-input">
       <label for="edit-versions">
@@ -289,6 +296,17 @@
         <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
+    <div v-if="instance.metadata.linked_data" class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Unpair instance</span>
+        <span class="label__description">
+          Removes the link to an external modpack on the instance. This allows you to edit modpacks
+          you download through the browse page but you will not be able to update the instance from
+          a new version of a modpack if you do this.
+        </span>
+      </label>
+      <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
+    </div>
     <div class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
@@ -297,14 +315,14 @@
           launching due to launcher-related errors.
         </span>
       </label>
-      <button
+      <Button
         id="repair-profile"
-        class="btn btn-highlight"
+        color="highlight"
         :disabled="repairing || offline"
         @click="repairProfile"
       >
         <HammerIcon /> Repair
-      </button>
+      </Button>
     </div>
     <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
       <label for="repair-profile">
@@ -314,16 +332,15 @@
           launching due to your instance diverging from the Modrinth modpack.
         </span>
       </label>
-      <button
+      <Button
         id="repair-profile"
-        class="btn btn-highlight"
+        color="highlight"
         :disabled="repairing || offline"
         @click="repairModpack"
       >
         <DownloadIcon /> Reinstall
-      </button>
+      </Button>
     </div>
-
     <div class="adjacent-input">
       <label for="delete-profile">
         <span class="label__title">Delete instance</span>
@@ -332,14 +349,14 @@
           no way to recover it.
         </span>
       </label>
-      <button
+      <Button
         id="delete-profile"
-        class="btn btn-danger"
+        color="danger"
         :disabled="removing"
         @click="$refs.modal_confirm.show()"
       >
         <TrashIcon /> Delete
-      </button>
+      </Button>
     </div>
   </Card>
 </template>
@@ -361,6 +378,7 @@ import {
   HammerIcon,
   DownloadIcon,
   ModalConfirm,
+  Button,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
@@ -465,6 +483,8 @@ const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
 const fullscreenSetting = ref(!!props.instance.fullscreen)
 
+const unlinkModpack = ref(false)
+
 watch(
   [
     title,
@@ -483,6 +503,7 @@ watch(
     fullscreenSetting,
     overrideHooks,
     hooks,
+    unlinkModpack,
   ],
   async () => {
     const editProfile = {
@@ -537,12 +558,20 @@ watch(
       editProfile.hooks = hooks.value
     }
 
+    if (unlinkModpack.value) {
+      editProfile.metadata.linked_data = null
+    }
+
     await edit(props.instance.path, editProfile)
   },
   { deep: true }
 )
 
 const repairing = ref(false)
+
+async function unpairProfile() {
+  unlinkModpack.value = true
+}
 
 async function repairProfile() {
   repairing.value = true

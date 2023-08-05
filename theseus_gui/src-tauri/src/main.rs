@@ -142,7 +142,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
-            toggle_decorations
+            toggle_decorations,
         ]);
 
     builder

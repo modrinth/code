@@ -220,7 +220,7 @@ defineProps({
         <Card v-for="project in 20" :key="project" class="search-card button-base">
           <div class="icon">
             <Avatar
-              src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+              src="https://launcher-files.modrinth.com/assets/default_profile.png"
               size="md"
               class="search-icon"
             />

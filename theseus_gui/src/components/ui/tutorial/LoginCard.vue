@@ -57,7 +57,7 @@ const openUrl = async () => {
 <template>
   <div class="login-card">
     <img
-      src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+      src="https://launcher-files.modrinth.com/assets/default_profile.png"
       class="logo"
       alt="Minecraft art"
     />

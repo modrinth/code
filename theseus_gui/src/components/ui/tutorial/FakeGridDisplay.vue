@@ -65,7 +65,7 @@ defineProps({
       >
         <Avatar
           size="sm"
-          src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+          src="https://launcher-files.modrinth.com/assets/default_profile.png"
           alt="Mod card"
           class="mod-image"
         />

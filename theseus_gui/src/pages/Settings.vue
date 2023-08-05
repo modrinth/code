@@ -1,13 +1,26 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Toggle, Modal, LogOutIcon, LogInIcon } from 'omorphia'
+import {
+  Card,
+  Slider,
+  DropdownSelect,
+  Toggle,
+  Modal,
+  LogOutIcon,
+  LogInIcon,
+  Button,
+  BoxIcon,
+  FolderSearchIcon,
+  UpdatedIcon,
+} from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
-import { get, set } from '@/helpers/settings'
+import { change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
+import { open } from '@tauri-apps/api/dialog'
 
 const pageOptions = ['Home', 'Library']
 
@@ -24,6 +37,7 @@ fetchSettings.javaArgs = fetchSettings.custom_java_args.join(' ')
 fetchSettings.envArgs = fetchSettings.custom_env_args.map((x) => x.join('=')).join(' ')
 
 const settings = ref(fetchSettings)
+const settingsDir = ref(settings.value.loaded_config_dir)
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
 watch(
@@ -91,6 +105,19 @@ async function signInAfter() {
   loginScreenModal.value.hide()
   credentials.value = await getCreds().catch(handleError)
 }
+
+async function findLauncherDir() {
+  const newDir = await open({ multiple: false, directory: true })
+
+  if (newDir) {
+    settingsDir.value = newDir
+    await refreshDir()
+  }
+}
+
+async function refreshDir() {
+  await change_config_dir(settingsDir.value)
+}
 </script>
 
 <template>
@@ -98,7 +125,7 @@ async function signInAfter() {
     <Card>
       <div class="label">
         <h3>
-          <span class="label__title size-card-header">Account</span>
+          <span class="label__title size-card-header">General settings</span>
         </h3>
       </div>
       <Modal
@@ -124,6 +151,25 @@ async function signInAfter() {
         <button v-else class="btn" @click="$refs.loginScreenModal.show()">
           <LogInIcon /> Sign in
         </button>
+      </div>
+      <label for="theme">
+        <span class="label__title">App directory</span>
+        <span class="label__description">
+          The directory where the launcher stores all of its files.
+        </span>
+      </label>
+      <div class="app-directory">
+        <div class="iconified-input">
+          <BoxIcon />
+          <input id="appDir" v-model="settingsDir" type="text" class="input" />
+          <Button @click="findLauncherDir">
+            <FolderSearchIcon />
+          </Button>
+        </div>
+        <Button large @click="refreshDir">
+          <UpdatedIcon />
+          Refresh
+        </Button>
       </div>
     </Card>
     <Card>
@@ -452,6 +498,21 @@ async function signInAfter() {
       .content {
         background: none;
       }
+    }
+  }
+}
+
+.app-directory {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-sm);
+
+  .iconified-input {
+    flex-grow: 1;
+
+    input {
+      flex-basis: auto;
     }
   }
 }

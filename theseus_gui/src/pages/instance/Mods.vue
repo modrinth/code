@@ -1,11 +1,19 @@
 <template>
-  <Card v-if="projects.length > 0" class="mod-card">
+  <Card
+    v-if="projects.length > 0"
+    class="mod-card"
+    :class="{ static: instance.metadata.linked_data }"
+  >
     <div class="second-row">
       <Chips
         v-if="Object.keys(selectableProjectTypes).length > 1"
         v-model="selectedProjectType"
         :items="Object.keys(selectableProjectTypes)"
       />
+      <Button v-if="canUpdatePack" color="secondary" @click="updateModpack">
+        <UpdatedIcon />
+        Update modpack
+      </Button>
     </div>
     <div class="card-row">
       <div class="iconified-input">
@@ -46,7 +54,7 @@
     <div>
       <div class="table">
         <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
-          <div class="table-cell table-text">
+          <div v-if="!instance.metadata.linked_data" class="table-cell table-text">
             <Checkbox v-model="selectAll" class="select-checkbox" />
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
@@ -55,19 +63,23 @@
               <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
             </Button>
           </div>
-          <div v-if="selected.length === 0" class="table-cell table-text">
+          <div v-if="selected.length === 0" class="table-cell table-text version">
             <Button class="transparent" @click="sortProjects('Version')">
               Version
               <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
             </Button>
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-            <Button class="transparent" @click="sortProjects('Enabled')">
+            <Button
+              v-if="!instance.metadata.linked_data"
+              class="transparent"
+              @click="sortProjects('Enabled')"
+            >
               Actions
               <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
             </Button>
           </div>
-          <div v-else class="options table-cell name-cell">
+          <div v-else-if="!instance.metadata.linked_data" class="options table-cell name-cell">
             <Button
               class="transparent share"
               @click="() => (showingOptions = !showingOptions)"
@@ -110,7 +122,10 @@
             </Button>
           </div>
         </div>
-        <div v-if="showingOptions && selected.length > 0" class="more-box">
+        <div
+          v-if="showingOptions && selected.length > 0 && !instance.metadata.linked_data"
+          class="more-box"
+        >
           <section v-if="selectedOption === 'Share'" class="options">
             <Button class="transparent" @click="shareNames()">
               <TextInputIcon />
@@ -171,7 +186,7 @@
           class="table-row"
           @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
         >
-          <div class="table-cell table-text">
+          <div v-if="!instance.metadata.linked_data" class="table-cell table-text checkbox">
             <Checkbox
               :model-value="selectionMap.get(mod.path)"
               class="select-checkbox"
@@ -196,19 +211,24 @@
               <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
             </div>
           </div>
-          <div class="table-cell table-text">
+          <div class="table-cell table-text version">
             <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
           </div>
           <div class="table-cell table-text manage">
-            <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
+            <Button
+              v-if="!instance.metadata.linked_data"
+              v-tooltip="'Remove project'"
+              icon-only
+              @click="removeMod(mod)"
+            >
               <TrashIcon />
             </Button>
             <AnimatedLogo
-              v-if="mod.updating"
+              v-if="mod.updating && !instance.metadata.linked_data"
               class="btn icon-only updating-indicator"
             ></AnimatedLogo>
             <Button
-              v-else
+              v-else-if="!instance.metadata.linked_data"
               v-tooltip="'Update project'"
               :disabled="!mod.outdated || offline"
               icon-only
@@ -218,6 +238,7 @@
               <CheckIcon v-else />
             </Button>
             <input
+              v-if="!instance.metadata.linked_data"
               id="switch-1"
               autocomplete="off"
               type="checkbox"
@@ -341,9 +362,11 @@ import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
   get,
+  is_managed_modrinth,
   remove_project,
   toggle_disable_project,
   update_all,
+  update_managed_modrinth,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
@@ -380,6 +403,7 @@ const props = defineProps({
 const projects = ref([])
 const selectionMap = ref(new Map())
 const showingOptions = ref(false)
+const canUpdatePack = ref(await is_managed_modrinth(props.instance.path))
 
 const initProjects = (initInstance) => {
   projects.value = []
@@ -776,6 +800,10 @@ const handleContentOptionClick = async (args) => {
   }
 }
 
+const updateModpack = async () => {
+  await update_managed_modrinth(props.instance.path).catch(handleError)
+}
+
 watch(selectAll, () => {
   for (const [key, value] of Array.from(selectionMap.value)) {
     if (value !== selectAll.value) {
@@ -791,6 +819,7 @@ const unlisten = await listen('tauri://file-drop', async (event) => {
   }
   initProjects(await get(props.instance.path).catch(handleError))
 })
+
 onUnmounted(() => {
   unlisten()
 })
@@ -824,6 +853,26 @@ onUnmounted(() => {
       align-items: center;
       gap: var(--gap-md);
     }
+  }
+}
+
+.static {
+  .table-row {
+    grid-template-areas: 'manage name version';
+    grid-template-columns: 4.25rem 1fr 1fr;
+  }
+
+  .name-cell {
+    grid-area: name;
+  }
+
+  .version {
+    grid-area: version;
+  }
+
+  .manage {
+    justify-content: center;
+    grid-area: manage;
   }
 }
 
