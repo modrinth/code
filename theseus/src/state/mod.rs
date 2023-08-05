@@ -398,7 +398,10 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                             Profile::crash_task(profile_path_id);
                         } else if !visited_paths.contains(&new_path) {
                             if subfile {
-                                Profile::sync_projects_task(profile_path_id);
+                                Profile::sync_projects_task(
+                                    profile_path_id,
+                                    false,
+                                );
                                 visited_paths.push(new_path);
                             } else {
                                 Profiles::sync_available_profiles_task(

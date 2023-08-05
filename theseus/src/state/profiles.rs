@@ -330,7 +330,7 @@ impl Profile {
         });
     }
 
-    pub fn sync_projects_task(profile_path_id: ProfilePathId) {
+    pub fn sync_projects_task(profile_path_id: ProfilePathId, force: bool) {
         tokio::task::spawn(async move {
             let span =
                 tracing::span!(tracing::Level::INFO, "sync_projects_task");
@@ -345,32 +345,34 @@ impl Profile {
                 let profile = crate::api::profile::get(&profile_path_id, None).await?;
 
                 if let Some(profile) = profile {
-                    let paths = profile.get_profile_full_project_paths().await?;
+                    if profile.install_stage != ProfileInstallStage::PackInstalling || force {
+                        let paths = profile.get_profile_full_project_paths().await?;
 
-                    let caches_dir = state.directories.caches_dir();
-                    let creds = state.credentials.read().await;
-                    let projects = crate::state::infer_data_from_files(
-                        profile.clone(),
-                        paths,
-                        caches_dir,
-                        &state.io_semaphore,
-                        &state.fetch_semaphore,
-                        &creds,
-                    )
-                    .await?;
-                    drop(creds);
+                        let caches_dir = state.directories.caches_dir();
+                        let creds = state.credentials.read().await;
+                        let projects = crate::state::infer_data_from_files(
+                            profile.clone(),
+                            paths,
+                            caches_dir,
+                            &state.io_semaphore,
+                            &state.fetch_semaphore,
+                            &creds,
+                        )
+                            .await?;
+                        drop(creds);
 
-                    let mut new_profiles = state.profiles.write().await;
-                    if let Some(profile) = new_profiles.0.get_mut(&profile_path_id) {
-                        profile.projects = projects;
+                        let mut new_profiles = state.profiles.write().await;
+                        if let Some(profile) = new_profiles.0.get_mut(&profile_path_id) {
+                            profile.projects = projects;
+                        }
+                        emit_profile(
+                            profile.uuid,
+                            &profile_path_id,
+                            &profile.metadata.name,
+                            ProfilePayloadType::Synced,
+                        )
+                            .await?;
                     }
-                    emit_profile(
-                        profile.uuid,
-                        &profile_path_id,
-                        &profile.metadata.name,
-                        ProfilePayloadType::Synced,
-                    )
-                    .await?;
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {profile_path_id} invalid",
@@ -986,7 +988,7 @@ impl Profiles {
                             .await?,
                         )
                         .await?;
-                    Profile::sync_projects_task(profile_path_id);
+                    Profile::sync_projects_task(profile_path_id, false);
                 }
                 Ok::<(), crate::Error>(())
             }
