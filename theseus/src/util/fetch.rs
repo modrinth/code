@@ -182,6 +182,32 @@ pub async fn fetch_mirrors(
     unreachable!()
 }
 
+/// Posts a JSON to a URL
+#[tracing::instrument(skip(json_body, semaphore))]
+#[theseus_macros::debug_pin]
+pub async fn post_json<T>(
+    url: &str,
+    json_body: serde_json::Value,
+    semaphore: &FetchSemaphore,
+) -> crate::Result<T>
+where
+    T: DeserializeOwned,
+{
+    let io_semaphore = semaphore.0.read().await;
+    let _permit = io_semaphore.acquire().await?;
+
+    let result = REQWEST_CLIENT
+        .post(url)
+        .json(&json_body)
+        .send()
+        .await?.error_for_status()?;
+
+    let value = result
+        .json()
+        .await?;
+    Ok(value)
+}
+
 pub async fn read_json<T>(
     path: &Path,
     semaphore: &IoSemaphore,

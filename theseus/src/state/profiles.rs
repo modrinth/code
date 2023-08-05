@@ -183,6 +183,10 @@ pub struct ProfileMetadata {
     pub date_modified: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_played: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub submitted_time_played: u64,
+    #[serde(default)]
+    pub recent_time_played: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -265,6 +269,8 @@ impl Profile {
                 date_created: Utc::now(),
                 date_modified: Utc::now(),
                 last_played: None,
+                submitted_time_played: 0,
+                recent_time_played: 0,
             },
             projects: HashMap::new(),
             java: None,
