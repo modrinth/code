@@ -13,6 +13,13 @@
         "minWidth": 1100,
         "visible": false,
         "decorations": true
+      },
+      {
+        "width": 400,
+        "height": 200,
+        "decorations": false,
+        "url": "splashscreen.html",
+        "label": "splashscreen"
       }
     ]
   }

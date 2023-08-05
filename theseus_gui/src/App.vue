@@ -24,7 +24,7 @@ import { offline_listener, command_listener, warning_listener } from '@/helpers/
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS, isOffline } from '@/helpers/utils.js'
+import { isDev, getOS, isOffline, closeSplashscreen } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
@@ -97,6 +97,8 @@ defineExpose({
     if (showOnboarding.value) {
       onboardingVideo.value.play()
     }
+
+    await closeSplashscreen()
   },
 })
 
