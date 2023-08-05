@@ -78,6 +78,7 @@ import {
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
+import { get as getCreds, login_minecraft } from '@/helpers/mr_auth'
 import { mixpanel_track } from '@/helpers/mixpanel'
 
 defineProps({
@@ -124,8 +125,20 @@ async function login() {
   })
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
-  await setAccount(loggedIn)
-  await refreshValues()
+
+  if (loggedIn && loggedIn[0]) {
+    await setAccount(loggedIn[0])
+    await refreshValues()
+
+    const creds = await getCreds().catch(handleError)
+    if (!creds) {
+      try {
+        await login_minecraft(loggedIn[1])
+      } catch (err) {
+        /* empty */
+      }
+    }
+  }
   await window.close()
   mixpanel_track('AccountLogIn')
 }

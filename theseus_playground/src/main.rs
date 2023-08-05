@@ -24,8 +24,8 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
     let credentials = auth::authenticate_await_complete_flow().await?;
     State::sync().await?;
 
-    println!("Logged in user {}.", credentials.username);
-    Ok(credentials)
+    println!("Logged in user {}.", credentials.0.username);
+    Ok(credentials.0)
 }
 
 #[tokio::main]

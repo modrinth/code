@@ -348,14 +348,17 @@ impl Profile {
                     let paths = profile.get_profile_full_project_paths().await?;
 
                     let caches_dir = state.directories.caches_dir();
+                    let creds = state.credentials.read().await;
                     let projects = crate::state::infer_data_from_files(
                         profile.clone(),
                         paths,
                         caches_dir,
                         &state.io_semaphore,
                         &state.fetch_semaphore,
+                        &creds,
                     )
                     .await?;
+                    drop(creds);
 
                     let mut new_profiles = state.profiles.write().await;
                     if let Some(profile) = new_profiles.0.get_mut(&profile_path_id) {
@@ -468,14 +471,17 @@ impl Profile {
         version_id: String,
     ) -> crate::Result<(ProjectPathId, ModrinthVersion)> {
         let state = State::get().await?;
+        let creds = state.credentials.read().await;
         let version = fetch_json::<ModrinthVersion>(
             Method::GET,
             &format!("{MODRINTH_API_URL}version/{version_id}"),
             None,
             None,
             &state.fetch_semaphore,
+            &creds,
         )
         .await?;
+        drop(creds);
         let file = if let Some(file) = version.files.iter().find(|x| x.primary)
         {
             file
@@ -488,12 +494,15 @@ impl Profile {
             .into());
         };
 
+        let creds = state.credentials.read().await;
         let bytes = fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
             &state.fetch_semaphore,
+            &creds,
         )
         .await?;
+        drop(creds);
         let path = self
             .add_project_bytes(
                 &file.filename,
@@ -742,14 +751,17 @@ impl Profiles {
             future::try_join_all(files.into_iter().map(
                 |(profile, files)| async {
                     let profile_name = profile.profile_id();
+                    let creds = state.credentials.read().await;
                     let inferred = super::projects::infer_data_from_files(
                         profile,
                         files,
                         caches_dir.clone(),
                         &state.io_semaphore,
                         &state.fetch_semaphore,
+                        &creds,
                     )
                     .await?;
+                    drop(creds);
 
                     let mut new_profiles = state.profiles.write().await;
                     if let Some(profile) = new_profiles.0.get_mut(&profile_name)
@@ -809,6 +821,7 @@ impl Profiles {
                     let linked_project = linked_project;
                     let state = state.clone();
                     async move {
+                        let creds = state.credentials.read().await;
                         let versions: Vec<ModrinthVersion> = fetch_json(
                             Method::GET,
                             &format!(
@@ -819,8 +832,10 @@ impl Profiles {
                             None,
                             None,
                             &state.fetch_semaphore,
+                            &creds,
                         )
                         .await?;
+                        drop(creds);
 
                         // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
                         // so we can just take the first one

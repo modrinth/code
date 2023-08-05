@@ -20,7 +20,8 @@ pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
 /// This completes the authentication flow quasi-synchronously, returning the credentials
 /// This can be used in conjunction with 'authenticate_begin_flow'
 /// to call authenticate and call the flow from the frontend.
-pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
+pub async fn authenticate_await_complete_flow(
+) -> crate::Result<(Credentials, Option<String>)> {
     let credentials = AuthTask::await_auth_completion().await?;
     Ok(credentials)
 }
@@ -38,7 +39,7 @@ pub async fn cancel_flow() -> crate::Result<()> {
 #[theseus_macros::debug_pin]
 pub async fn authenticate(
     browser_url: oneshot::Sender<url::Url>,
-) -> crate::Result<Credentials> {
+) -> crate::Result<(Credentials, Option<String>)> {
     let mut flow = inner::HydraAuthFlow::new().await?;
     let state = State::get().await?;
 
@@ -52,12 +53,12 @@ pub async fn authenticate(
     let credentials = flow.extract_credentials(&state.fetch_semaphore).await?;
     {
         let mut users = state.users.write().await;
-        users.insert(&credentials).await?;
+        users.insert(&credentials.0).await?;
     }
 
     if state.settings.read().await.default_user.is_none() {
         let mut settings = state.settings.write().await;
-        settings.default_user = Some(credentials.id);
+        settings.default_user = Some(credentials.0.id);
     }
 
     Ok(credentials)
@@ -79,8 +80,17 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     })?;
 
     let fetch_semaphore = &state.fetch_semaphore;
-    if Utc::now() > credentials.expires {
-        inner::refresh_credentials(&mut credentials, fetch_semaphore).await?;
+    if Utc::now() > credentials.expires
+        && inner::refresh_credentials(&mut credentials, fetch_semaphore)
+            .await
+            .is_err()
+    {
+        users.remove(credentials.id).await?;
+
+        return Err(crate::ErrorKind::OtherError(
+            "Please re-authenticate with your Minecraft account!".to_string(),
+        )
+        .as_error());
     }
     users.insert(&credentials).await?;
 

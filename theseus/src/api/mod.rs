@@ -4,6 +4,7 @@ pub mod handler;
 pub mod jre;
 pub mod logs;
 pub mod metadata;
+pub mod mr_auth;
 pub mod pack;
 pub mod process;
 pub mod profile;
@@ -14,9 +15,9 @@ pub mod tags;
 pub mod data {
     pub use crate::state::{
         DirectoryInfo, Hooks, JavaSettings, LinkedData, MemorySettings,
-        ModLoader, ModrinthProject, ModrinthTeamMember, ModrinthUser,
-        ModrinthVersion, ProfileMetadata, ProjectMetadata, Settings, Theme,
-        WindowSize,
+        ModLoader, ModrinthCredentials, ModrinthCredentialsResult,
+        ModrinthProject, ModrinthTeamMember, ModrinthUser, ModrinthVersion,
+        ProfileMetadata, ProjectMetadata, Settings, Theme, WindowSize,
     };
 }
 
