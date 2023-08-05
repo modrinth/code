@@ -1,23 +1,23 @@
 <template>
-  <div class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF">
-    <div class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-0">
-      <div class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-1">
-        <div class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-2">
+  <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD">
+    <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-0">
+      <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-1">
+        <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2">
           <a
-            href="https://exaroton.com/?utm_source=modrinth&utm_medium=text&utm_campaign=host&utm_content=top"
+            href="https://bisecthosting.com/modrinth"
             rel="noopener nofollow sponsored"
             :target="target"
           >
-            <ExarotonIcon class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-3" />
+            <BisectIcon class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-3" />
             <span>
               <span> Host your Minecraft server on </span>
-              <strong>exaroton</strong>
-              <span> - only pay while the server is running - billed per second. </span>
+              <strong>BisectHosting</strong>
+              <span> - get 25% your first month with code <strong>MODRINTH</strong>. </span>
             </span>
           </a>
         </div>
       </div>
-      <div class="MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-4">
+      <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-4">
         <a rel="noopener sponsored" :target="target" href="https://adrinth.com">
           Ads via Adrinth
         </a>
@@ -27,7 +27,7 @@
 </template>
 <script setup>
 import { computed } from 'vue'
-import ExarotonIcon from '@/assets/external/exaroton.svg'
+import BisectIcon from '@/assets/external/bh.svg'
 const props = defineProps({
   external: {
     type: Boolean,
@@ -38,23 +38,23 @@ const target = computed(() => (props.external ? '_blank' : '_self'))
 </script>
 
 <style lang="scss">
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD {
   position: relative;
   margin-bottom: var(--gap-md);
   background: var(--color-ad);
   border: 3px solid var(--color-ad-raised);
   border-radius: var(--radius-lg);
 }
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-0 {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-0 {
   font-size: 14px;
   line-height: 1.3em;
 }
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-1 {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-1 {
   color: var(--color-base);
   padding: 1em;
   text-align: left;
 }
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-2 a {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2 a {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -64,16 +64,16 @@ const target = computed(() => (props.external ? '_blank' : '_self'))
     text-decoration: none;
   }
 }
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-2 a b,
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-2 a strong {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2 a b,
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2 a strong {
   color: #088cdb;
 }
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-3 {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-3 {
   padding-top: 1px;
   height: 1.2rem;
   width: auto;
 }
-.MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-4 a {
+.GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-4 a {
   position: absolute;
   bottom: -2px;
   right: -2px;
@@ -97,10 +97,10 @@ const target = computed(() => (props.external ? '_blank' : '_self'))
   }
 }
 @media screen and (max-width: 800px) {
-  .MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-2 {
+  .GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2 {
     margin-bottom: 0.5rem;
   }
-  .MYYLVTXBPUVWMLVBPVSDLHADDRYFBF-2 a {
+  .GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2 a {
     align-items: flex-start;
     flex-direction: column;
   }
