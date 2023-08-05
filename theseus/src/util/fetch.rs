@@ -213,18 +213,15 @@ pub async fn fetch_mirrors(
 }
 
 /// Using labrinth API, checks if an internet response can be found, with a timeout in seconds
-#[tracing::instrument(skip(semaphore))]
+#[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn check_internet(semaphore: &FetchSemaphore, timeout: u64) -> bool {
-    let result = fetch(
-        "https://api.modrinth.com",
-        None,
-        semaphore,
-        &CredentialsStore(None),
-    );
-    let result =
-        tokio::time::timeout(Duration::from_secs(timeout), result).await;
-    matches!(result, Ok(Ok(_)))
+pub async fn check_internet(timeout: u64) -> bool {
+    REQWEST_CLIENT
+        .get("https://launcher-files.modrinth.com/detect.txt")
+        .timeout(Duration::from_secs(timeout))
+        .send()
+        .await
+        .is_ok()
 }
 
 /// Posts a JSON to a URL
