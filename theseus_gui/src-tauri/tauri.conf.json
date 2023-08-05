@@ -83,7 +83,7 @@
       }
     },
     "security": {
-      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com https://mixpanel.com https://*.mixpanel.com https://*.cloudflare.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost; script-src https://*.cloudflare.com; frame-src https://*.cloudflare.com"
+      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com https://mixpanel.com https://*.mixpanel.com https://*.cloudflare.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost; script-src https://*.cloudflare.com; frame-src https://*.cloudflare.com; style-src unsafe-inline"
     },
     "updater": {
       "active": true,
@@ -96,11 +96,11 @@
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "fullscreen": false,
-        "height": 650,
+        "height": 800,
         "resizable": true,
         "title": "Modrinth App",
         "width": 1280,
-        "minHeight": 630,
+        "minHeight": 700,
         "minWidth": 1100,
         "visible": false,
         "decorations": false
