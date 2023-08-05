@@ -83,15 +83,18 @@ const finishOnboarding = async () => {
 
 async function fetchSettings() {
   const fetchSettings = await get().catch(handleError)
+  if (!fetchSettings.java_globals) {
+    fetchSettings.java_globals = {}
+  }
 
   if (!fetchSettings.java_globals.JAVA_17) {
-    const path = await auto_install_java(17).catch(handleError)
-    fetchSettings.java_globals.JAVA_17 = await get_jre(path).catch(handleError)
+    const path1 = await auto_install_java(17).catch(handleError)
+    fetchSettings.java_globals.JAVA_17 = await get_jre(path1).catch(handleError)
   }
 
   if (!fetchSettings.java_globals.JAVA_8) {
-    const path = await auto_install_java(8).catch(handleError)
-    fetchSettings.java_globals.JAVA_8 = await get_jre(path).catch(handleError)
+    const path2 = await auto_install_java(8).catch(handleError)
+    fetchSettings.java_globals.JAVA_8 = await get_jre(path2).catch(handleError)
   }
 
   await set(fetchSettings).catch(handleError)

@@ -2,7 +2,7 @@ import { ofetch } from 'ofetch'
 import { handleError } from '@/store/state.js'
 import { getVersion } from '@tauri-apps/api/app'
 
-export const useFetch = async (url, item) => {
+export const useFetch = async (url, item, isSilent) => {
   try {
     const version = await getVersion()
 
@@ -10,7 +10,9 @@ export const useFetch = async (url, item) => {
       headers: { 'User-Agent': `modrinth/theseus/${version} (support@modrinth.com)` },
     })
   } catch (err) {
-    handleError({ message: `Error fetching ${item}` })
+    if (!isSilent) {
+      handleError({ message: `Error fetching ${item}` })
+    }
     console.error(err)
   }
 }

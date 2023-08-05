@@ -156,7 +156,7 @@ impl State {
         )));
         emit_loading(&loading_bar, 10.0, None).await?;
 
-        let is_offline = !fetch::check_internet(&fetch_semaphore, 3).await;
+        let is_offline = !fetch::check_internet(3).await;
 
         let metadata_fut =
             Metadata::init(&directories, !is_offline, &io_semaphore);
@@ -185,6 +185,10 @@ impl State {
         let safety_processes = SafeProcesses::new();
 
         let discord_rpc = DiscordGuard::init().await?;
+        {
+            // Add default Idling to discord rich presence
+            let _ = discord_rpc.set_activity("Idling...", true).await;
+        }
 
         // Starts a loop of checking if we are online, and updating
         Self::offine_check_loop();
@@ -323,7 +327,7 @@ impl State {
 
     /// Refreshes whether or not the launcher should be offline, by whether or not there is an internet connection
     pub async fn refresh_offline(&self) -> crate::Result<()> {
-        let is_online = fetch::check_internet(&self.fetch_semaphore, 3).await;
+        let is_online = fetch::check_internet(3).await;
 
         let mut offline = self.offline.write().await;
 
@@ -341,7 +345,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
     let (mut tx, mut rx) = channel(1);
 
     let file_watcher = new_debouncer(
-        Duration::from_secs_f32(0.25),
+        Duration::from_secs_f32(2.0),
         None,
         move |res: DebounceEventResult| {
             futures::executor::block_on(async {
@@ -394,7 +398,10 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                             Profile::crash_task(profile_path_id);
                         } else if !visited_paths.contains(&new_path) {
                             if subfile {
-                                Profile::sync_projects_task(profile_path_id);
+                                Profile::sync_projects_task(
+                                    profile_path_id,
+                                    false,
+                                );
                                 visited_paths.push(new_path);
                             } else {
                                 Profiles::sync_available_profiles_task(

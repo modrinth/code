@@ -103,6 +103,7 @@ pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
+    let sync_projects = existing_loading_bar.is_some();
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::MinecraftDownload {
@@ -122,6 +123,10 @@ pub async fn install_minecraft(
     })
     .await?;
     State::sync().await?;
+
+    if sync_projects {
+        Profile::sync_projects_task(profile.profile_id(), true);
+    }
 
     let state = State::get().await?;
     let instance_path =

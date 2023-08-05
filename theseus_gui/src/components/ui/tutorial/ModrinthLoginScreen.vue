@@ -211,7 +211,7 @@ onMounted(() => {
       <div class="link-row">
         <a v-if="loggingIn" class="button-base" @click="loggingIn = false"> Create account </a>
         <a v-else class="button-base" @click="loggingIn = true">Sign in</a>
-        <a class="button-base" href="https://staging.modrinth.com/auth/reset-password">
+        <a class="button-base" href="https://modrinth.com/auth/reset-password">
           Forgot password?
         </a>
       </div>

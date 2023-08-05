@@ -222,7 +222,7 @@ pub async fn login_password(
 ) -> crate::Result<ModrinthCredentialsResult> {
     let resp = fetch_advanced(
         Method::POST,
-        &format!("https://{MODRINTH_API_URL}auth/login"),
+        &format!("{MODRINTH_API_URL}auth/login"),
         None,
         Some(serde_json::json!({
             "username": username,

@@ -99,6 +99,7 @@ impl DiscordGuard {
         Ok(())
     }
 
+    /*
     /// Clear the activity
     pub async fn clear_activity(
         &self,
@@ -137,7 +138,7 @@ impl DiscordGuard {
             res.map_err(could_not_clear_err)?;
         }
         Ok(())
-    }
+    }*/
 
     /// Clear the activity, but if there is a running profile, set the activity to that instead
     pub async fn clear_to_default(
@@ -160,7 +161,7 @@ impl DiscordGuard {
             )
             .await?;
         } else {
-            self.clear_activity(reconnect_if_fail).await?;
+            self.set_activity("Idling...", reconnect_if_fail).await?;
         }
         Ok(())
     }
