@@ -11,10 +11,6 @@ export async function isDev() {
   return await invoke('is_dev')
 }
 
-export async function closeSplashscreen() {
-  return await invoke('close_splashscreen')
-}
-
 // One of 'Windows', 'Linux', 'MacOS'
 export async function getOS() {
   return await invoke('plugin:utils|get_os')
