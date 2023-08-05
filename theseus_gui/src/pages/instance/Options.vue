@@ -85,7 +85,14 @@
     <label for="project-name">
       <span class="label__title">Name</span>
     </label>
-    <input id="profile-name" v-model="title" autocomplete="off" maxlength="80" type="text" :disabled="instance.metadata.linked_data"/>
+    <input
+      id="profile-name"
+      v-model="title"
+      autocomplete="off"
+      maxlength="80"
+      type="text"
+      :disabled="instance.metadata.linked_data"
+    />
 
     <div class="adjacent-input">
       <label for="edit-versions">
@@ -289,22 +296,17 @@
         <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
-      <div v-if="instance.metadata.linked_data" class="adjacent-input">
-        <label for="repair-profile">
-          <span class="label__title">Unpair instance</span>
-          <span class="label__description">
-            Removes the link to an external modpack on the instance. This allows you to edit modpacks you download through
-            the browse page but you will not be able to update the instance from a new version of a
-            modpack if you do this.
-          </span>
-        </label>
-        <Button
-          id="repair-profile"
-          @click="unpairProfile"
-        >
-            <XIcon /> Unpair
-        </Button>
-      </div>
+    <div v-if="instance.metadata.linked_data" class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Unpair instance</span>
+        <span class="label__description">
+          Removes the link to an external modpack on the instance. This allows you to edit modpacks
+          you download through the browse page but you will not be able to update the instance from
+          a new version of a modpack if you do this.
+        </span>
+      </label>
+      <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
+    </div>
     <div class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
@@ -361,21 +363,22 @@
 
 <script setup>
 import {
-    Card,
-    Slider,
-    TrashIcon,
-    Checkbox,
-    UploadIcon,
-    Avatar,
-    EditIcon,
-    Modal,
-    Chips,
-    DropdownSelect,
-    XIcon,
-    SaveIcon,
-    HammerIcon,
-    DownloadIcon,
-    ModalConfirm, Button,
+  Card,
+  Slider,
+  TrashIcon,
+  Checkbox,
+  UploadIcon,
+  Avatar,
+  EditIcon,
+  Modal,
+  Chips,
+  DropdownSelect,
+  XIcon,
+  SaveIcon,
+  HammerIcon,
+  DownloadIcon,
+  ModalConfirm,
+  Button,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
@@ -500,7 +503,7 @@ watch(
     fullscreenSetting,
     overrideHooks,
     hooks,
-    unlinkModpack
+    unlinkModpack,
   ],
   async () => {
     const editProfile = {

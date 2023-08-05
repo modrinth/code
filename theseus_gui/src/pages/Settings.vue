@@ -1,14 +1,26 @@
 <script setup>
 import { ref, watch } from 'vue'
-import {Card, Slider, DropdownSelect, Toggle, Modal, LogOutIcon, LogInIcon, Button, BoxIcon, FolderSearchIcon, UpdatedIcon} from 'omorphia'
+import {
+  Card,
+  Slider,
+  DropdownSelect,
+  Toggle,
+  Modal,
+  LogOutIcon,
+  LogInIcon,
+  Button,
+  BoxIcon,
+  FolderSearchIcon,
+  UpdatedIcon,
+} from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
-import {change_config_dir, get, set} from '@/helpers/settings'
+import { change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
-import {open} from "@tauri-apps/api/dialog";
+import { open } from '@tauri-apps/api/dialog'
 
 const pageOptions = ['Home', 'Library']
 
@@ -149,12 +161,7 @@ async function refreshDir() {
       <div class="app-directory">
         <div class="iconified-input">
           <BoxIcon />
-          <input
-              id="appDir"
-              v-model="settingsDir"
-              type="text"
-              class="input"
-          />
+          <input id="appDir" v-model="settingsDir" type="text" class="input" />
           <Button @click="findLauncherDir">
             <FolderSearchIcon />
           </Button>

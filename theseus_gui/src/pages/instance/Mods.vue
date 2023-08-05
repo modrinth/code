@@ -1,5 +1,9 @@
 <template>
-  <Card v-if="projects.length > 0" class="mod-card" :class="{ 'static': instance.metadata.linked_data }">
+  <Card
+    v-if="projects.length > 0"
+    class="mod-card"
+    :class="{ static: instance.metadata.linked_data }"
+  >
     <div class="second-row">
       <Chips
         v-if="Object.keys(selectableProjectTypes).length > 1"
@@ -7,7 +11,7 @@
         :items="Object.keys(selectableProjectTypes)"
       />
       <Button v-if="canUpdatePack" color="secondary" @click="updateModpack">
-        <UpdatedIcon/>
+        <UpdatedIcon />
         Update modpack
       </Button>
     </div>
@@ -66,7 +70,11 @@
             </Button>
           </div>
           <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-            <Button v-if="!instance.metadata.linked_data" class="transparent" @click="sortProjects('Enabled')">
+            <Button
+              v-if="!instance.metadata.linked_data"
+              class="transparent"
+              @click="sortProjects('Enabled')"
+            >
               Actions
               <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
             </Button>
@@ -114,7 +122,10 @@
             </Button>
           </div>
         </div>
-        <div v-if="showingOptions && selected.length > 0 && !instance.metadata.linked_data" class="more-box">
+        <div
+          v-if="showingOptions && selected.length > 0 && !instance.metadata.linked_data"
+          class="more-box"
+        >
           <section v-if="selectedOption === 'Share'" class="options">
             <Button class="transparent" @click="shareNames()">
               <TextInputIcon />
@@ -204,7 +215,12 @@
             <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
           </div>
           <div class="table-cell table-text manage">
-            <Button v-if="!instance.metadata.linked_data" v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
+            <Button
+              v-if="!instance.metadata.linked_data"
+              v-tooltip="'Remove project'"
+              icon-only
+              @click="removeMod(mod)"
+            >
               <TrashIcon />
             </Button>
             <AnimatedLogo
@@ -345,10 +361,12 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
-  get, is_managed_modrinth,
+  get,
+  is_managed_modrinth,
   remove_project,
   toggle_disable_project,
-  update_all, update_managed_modrinth,
+  update_all,
+  update_managed_modrinth,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
