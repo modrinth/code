@@ -7,7 +7,7 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::time;
+use std::time::{self, Duration};
 use tokio::sync::{RwLock, Semaphore};
 use tokio::{fs::File, io::AsyncWriteExt};
 
@@ -182,6 +182,16 @@ pub async fn fetch_mirrors(
     unreachable!()
 }
 
+/// Using labrinth API, checks if an internet response can be found, with a timeout in seconds
+#[tracing::instrument(skip(semaphore))]
+#[theseus_macros::debug_pin]
+pub async fn check_internet(semaphore: &FetchSemaphore, timeout: u64) -> bool {
+    let result = fetch("https://api.modrinth.com", None, semaphore);
+    let result =
+        tokio::time::timeout(Duration::from_secs(timeout), result).await;
+    matches!(result, Ok(Ok(_)))
+}
+
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
 #[theseus_macros::debug_pin]
@@ -243,6 +253,30 @@ pub async fn write<'a>(
         .await
         .map_err(|e| IOError::with_path(e, path))?;
     tracing::trace!("Done writing file {}", path.display());
+    Ok(())
+}
+
+pub async fn copy(
+    src: impl AsRef<std::path::Path>,
+    dest: impl AsRef<std::path::Path>,
+    semaphore: &IoSemaphore,
+) -> crate::Result<()> {
+    let src: &Path = src.as_ref();
+    let dest = dest.as_ref();
+
+    let io_semaphore = semaphore.0.read().await;
+    let _permit = io_semaphore.acquire().await?;
+
+    if let Some(parent) = dest.parent() {
+        io::create_dir_all(parent).await?;
+    }
+
+    io::copy(src, dest).await?;
+    tracing::trace!(
+        "Done copying file {} to {}",
+        src.display(),
+        dest.display()
+    );
     Ok(())
 }
 

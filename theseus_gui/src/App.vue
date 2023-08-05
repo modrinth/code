@@ -20,12 +20,17 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
-import { command_listener, warning_listener } from '@/helpers/events.js'
+import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev } from '@/helpers/utils.js'
-import mixpanel from 'mixpanel-browser'
+import { isDev, getOS, isOffline } from '@/helpers/utils.js'
+import {
+  mixpanel_track,
+  mixpanel_init,
+  mixpanel_opt_out_tracking,
+  mixpanel_is_loaded,
+} from '@/helpers/mixpanel'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
@@ -33,14 +38,15 @@ import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-// import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
-const videoPlaying = ref(true)
+
+const videoPlaying = ref(false)
+const offline = ref(false)
 const showOnboarding = ref(false)
 
 const onboardingVideo = ref()
@@ -50,6 +56,9 @@ defineExpose({
     isLoading.value = false
     const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
       await get()
+    const os = await getOS()
+    // video should play if the user is not on linux, and has not onboarded
+    videoPlaying.value = !onboarded_new && os !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !onboarded_new
@@ -58,11 +67,11 @@ defineExpose({
     themeStore.collapsedNavigation = collapsed_navigation
     themeStore.advancedRendering = advanced_rendering
 
-    mixpanel.init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+    mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
     if (opt_out_analytics) {
-      mixpanel.opt_out_tracking()
+      mixpanel_opt_out_tracking()
     }
-    mixpanel.track('Launched', { version, dev, onboarded_new })
+    mixpanel_track('Launched', { version, dev, onboarded_new })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -71,6 +80,11 @@ defineExpose({
     } else {
       document.getElementsByTagName('html')[0].classList.add('windows')
     }
+
+    offline.value = await isOffline()
+    await offline_listener((b) => {
+      offline.value = b
+    })
 
     await warning_listener((e) =>
       notificationsWrapper.value.addNotification({
@@ -121,8 +135,8 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-  if (mixpanel.__loaded) {
-    mixpanel.track('PageView', { path: to.path, fromPath: from.path, failed: failure })
+  if (mixpanel_is_loaded()) {
+    mixpanel_track('PageView', { path: to.path, fromPath: from.path, failed: failure })
   }
 })
 const route = useRoute()
@@ -214,6 +228,7 @@ command_listener((e) => {
         <Button
           class="sleek-primary collapsed-button"
           icon-only
+          :disabled="offline"
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />

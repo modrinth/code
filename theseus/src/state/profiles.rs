@@ -309,7 +309,10 @@ impl Profile {
                 let profile = crate::api::profile::get(&path, None).await?;
 
                 if let Some(profile) = profile {
-                    emit_warning(&format!("Profile {} has crashed! Visit the logs page to see a crash report.", profile.metadata.name)).await?;
+                    // Hide warning if profile is not yet installed
+                    if profile.install_stage == ProfileInstallStage::Installed {
+                        emit_warning(&format!("Profile {} has crashed! Visit the logs page to see a crash report.", profile.metadata.name)).await?;
+                    }
                 }
 
                 Ok::<(), crate::Error>(())
@@ -360,7 +363,7 @@ impl Profile {
                     }
                     emit_profile(
                         profile.uuid,
-                        profile.get_profile_full_path().await?,
+                        &profile_path_id,
                         &profile.metadata.name,
                         ProfilePayloadType::Synced,
                     )
@@ -862,7 +865,7 @@ impl Profiles {
     pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,
-            profile.get_profile_full_path().await?,
+            &profile.profile_id(),
             &profile.metadata.name,
             ProfilePayloadType::Added,
         )
@@ -949,7 +952,7 @@ impl Profiles {
                         // if path exists in the state but no longer in the filesystem, remove it from the state list
                         emit_profile(
                             profile.uuid,
-                            profile.get_profile_full_path().await?,
+                            &profile_path_id,
                             &profile.metadata.name,
                             ProfilePayloadType::Removed,
                         )

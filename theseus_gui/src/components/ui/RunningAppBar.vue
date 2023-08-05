@@ -9,6 +9,12 @@
     >
       <DownloadIcon />
     </Button>
+    <div v-if="offline" class="status">
+      <span class="circle stopped" />
+      <div class="running-text clickable" @click="refreshInternet()">
+        <span> Offline </span>
+      </div>
+    </div>
     <div v-if="selectedProfile" class="status">
       <span class="circle running" />
       <div ref="profileButton" class="running-text">
@@ -107,12 +113,13 @@ import {
   kill_by_uuid as killProfile,
   get_uuids_by_profile_path as getProfileProcesses,
 } from '@/helpers/process'
-import { loading_listener, process_listener } from '@/helpers/events'
+import { loading_listener, process_listener, offline_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
+import { refreshOffline, isOffline } from '@/helpers/utils.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 
 const router = useRouter()
 const card = ref(null)
@@ -126,7 +133,17 @@ const showProfiles = ref(false)
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
 const selectedProfile = ref(currentProcesses.value[0])
 
+const offline = ref(await isOffline().catch(handleError))
+const refreshInternet = async () => {
+  offline.value = await refreshOffline().catch(handleError)
+}
+
 const unlistenProcess = await process_listener(async () => {
+  await refresh()
+})
+
+const unlistenRefresh = await offline_listener(async (b) => {
+  offline.value = b
   await refresh()
 })
 
@@ -142,7 +159,7 @@ const stop = async (path) => {
     const processes = await getProfileProcesses(path ?? selectedProfile.value.path)
     await killProfile(processes[0])
 
-    mixpanel.track('InstanceStop', {
+    mixpanel_track('InstanceStop', {
       loader: currentProcesses.value[0].metadata.loader,
       game_version: currentProcesses.value[0].metadata.game_version,
       source: 'AppBar',
@@ -240,6 +257,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutsideProfile)
   unlistenProcess()
   unlistenLoading()
+  unlistenRefresh()
 })
 </script>
 

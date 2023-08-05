@@ -4,10 +4,10 @@ use crate::{
         CommandPayload, EventError, LoadingBar, LoadingBarType,
         ProcessPayloadType, ProfilePayloadType,
     },
+    prelude::ProfilePathId,
     state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
-use std::path::PathBuf;
 
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -233,6 +233,22 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
     Ok(())
 }
 
+// emit_offline(bool)
+// This is used to emit an event to the frontend that the app is offline after a refresh (or online)
+#[allow(dead_code)]
+#[allow(unused_variables)]
+pub async fn emit_offline(offline: bool) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get().await?;
+        event_state
+            .app
+            .emit_all("offline", offline)
+            .map_err(EventError::from)?;
+    }
+    Ok(())
+}
+
 // emit_command(CommandPayload::Something { something })
 // ie: installing a pack, opening an .mrpack, etc
 // Generally used for url deep links and file opens that we we want to handle in the frontend
@@ -282,12 +298,13 @@ pub async fn emit_process(
 #[allow(unused_variables)]
 pub async fn emit_profile(
     uuid: Uuid,
-    path: PathBuf,
+    profile_path_id: &ProfilePathId,
     name: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
+        let path = profile_path_id.get_full_path().await?;
         let event_state = crate::EventState::get().await?;
         event_state
             .app
@@ -295,6 +312,7 @@ pub async fn emit_profile(
                 "profile",
                 ProfilePayload {
                     uuid,
+                    profile_path_id: profile_path_id.clone(),
                     path,
                     name: name.to_string(),
                     event,

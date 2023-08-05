@@ -48,7 +48,7 @@ pub async fn remove(path: &ProfilePathId) -> crate::Result<()> {
     if let Some(profile) = profiles.remove(path).await? {
         emit_profile(
             profile.uuid,
-            profile.get_profile_full_path().await?,
+            path,
             &profile.metadata.name,
             ProfilePayloadType::Removed,
         )
@@ -127,7 +127,7 @@ where
 
             emit_profile(
                 profile.uuid,
-                profile.get_profile_full_path().await?,
+                path,
                 &profile.metadata.name,
                 ProfilePayloadType::Edited,
             )
@@ -165,7 +165,7 @@ pub async fn edit_icon(
 
                 emit_profile(
                     profile.uuid,
-                    profile.get_profile_full_path().await?,
+                    path,
                     &profile.metadata.name,
                     ProfilePayloadType::Edited,
                 )
@@ -288,7 +288,6 @@ pub async fn update_all_projects(
         )
         .await?;
 
-        let profile_base_path = profile.get_profile_full_path().await?;
         let keys = profile
             .projects
             .into_iter()
@@ -334,7 +333,7 @@ pub async fn update_all_projects(
 
         emit_profile(
             profile.uuid,
-            profile_base_path,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -381,10 +380,12 @@ pub async fn update_project(
                     if let Some(mut project) = value {
                         if let ProjectMetadata::Modrinth {
                             ref mut version,
+                            ref mut update_version,
                             ..
                         } = project.metadata
                         {
                             *version = Box::new(new_version);
+                            *update_version = None;
                         }
                         profile.projects.insert(path.clone(), project);
                     }
@@ -394,7 +395,7 @@ pub async fn update_project(
                 if !skip_send_event.unwrap_or(false) {
                     emit_profile(
                         profile.uuid,
-                        profile.get_profile_full_path().await?,
+                        profile_path,
                         &profile.metadata.name,
                         ProfilePayloadType::Edited,
                     )
@@ -430,7 +431,7 @@ pub async fn add_project_from_version(
 
         emit_profile(
             profile.uuid,
-            profile.get_profile_full_path().await?,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -470,7 +471,7 @@ pub async fn add_project_from_path(
 
         emit_profile(
             profile.uuid,
-            profile.get_profile_full_path().await?,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -491,15 +492,15 @@ pub async fn add_project_from_path(
 /// returns the new state, relative to the profile
 #[tracing::instrument]
 pub async fn toggle_disable_project(
-    profile: &ProfilePathId,
+    profile_path: &ProfilePathId,
     project: &ProjectPathId,
 ) -> crate::Result<ProjectPathId> {
-    if let Some(profile) = get(profile, None).await? {
+    if let Some(profile) = get(profile_path, None).await? {
         let res = profile.toggle_disable_project(project).await?;
 
         emit_profile(
             profile.uuid,
-            profile.get_profile_full_path().await?,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -508,8 +509,10 @@ pub async fn toggle_disable_project(
 
         Ok(res)
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
-            .as_error())
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
+        )
     }
 }
 
@@ -517,15 +520,15 @@ pub async fn toggle_disable_project(
 /// Uses and returns the relative path to the project
 #[tracing::instrument]
 pub async fn remove_project(
-    profile: &ProfilePathId,
+    profile_path: &ProfilePathId,
     project: &ProjectPathId,
 ) -> crate::Result<()> {
-    if let Some(profile) = get(profile, None).await? {
+    if let Some(profile) = get(profile_path, None).await? {
         profile.remove_project(project, None).await?;
 
         emit_profile(
             profile.uuid,
-            profile.get_profile_full_path().await?,
+            profile_path,
             &profile.metadata.name,
             ProfilePayloadType::Edited,
         )
@@ -534,8 +537,10 @@ pub async fn remove_project(
 
         Ok(())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
-            .as_error())
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
+                .as_error(),
+        )
     }
 }
 
@@ -1092,5 +1097,5 @@ pub async fn build_folder(
 }
 
 pub fn sanitize_profile_name(input: &str) -> String {
-    input.replace(['/', '\\'], "_")
+    input.replace(['/', '\\', ':'], "_")
 }

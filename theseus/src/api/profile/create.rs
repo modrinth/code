@@ -104,7 +104,7 @@ pub async fn profile_create(
 
         emit_profile(
             uuid,
-            profile.get_profile_full_path().await?,
+            &profile.profile_id(),
             &profile.metadata.name,
             ProfilePayloadType::Created,
         )

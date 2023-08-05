@@ -22,7 +22,7 @@ import { open } from '@tauri-apps/api/dialog'
 import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
 import { tauri } from '@tauri-apps/api'
@@ -57,7 +57,7 @@ defineExpose({
 
     profiles.value = await getData()
 
-    mixpanel.track('ProjectInstallStart', { source: 'ProjectInstallModal' })
+    mixpanel_track('ProjectInstallStart', { source: 'ProjectInstallModal' })
   },
 })
 
@@ -65,7 +65,6 @@ const profiles = ref([])
 
 async function install(instance) {
   instance.installing = true
-  console.log(versions.value)
   const version = versions.value.find((v) => {
     return (
       v.game_versions.includes(instance.metadata.game_version) &&
@@ -88,7 +87,7 @@ async function install(instance) {
   instance.installedMod = true
   instance.installing = false
 
-  mixpanel.track('ProjectInstall', {
+  mixpanel_track('ProjectInstall', {
     loader: instance.metadata.loader,
     game_version: instance.metadata.game_version,
     id: project.value,
@@ -137,7 +136,7 @@ const toggleCreation = () => {
 
   if (!alreadySentCreation.value) {
     alreadySentCreation.value = false
-    mixpanel.track('InstanceCreateStart', { source: 'ProjectInstallModal' })
+    mixpanel_track('InstanceCreateStart', { source: 'ProjectInstallModal' })
   }
 }
 
@@ -186,7 +185,7 @@ const createInstance = async () => {
   const instance = await get(id, true)
   await installVersionDependencies(instance, versions.value)
 
-  mixpanel.track('InstanceCreate', {
+  mixpanel_track('InstanceCreate', {
     profile_name: name.value,
     game_version: versions.value[0].game_versions[0],
     loader: loader,
@@ -195,7 +194,7 @@ const createInstance = async () => {
     source: 'ProjectInstallModal',
   })
 
-  mixpanel.track('ProjectInstall', {
+  mixpanel_track('ProjectInstall', {
     loader: loader,
     game_version: versions.value[0].game_versions[0],
     id: project.value,
@@ -264,7 +263,7 @@ const check_valid = computed(() => {
                 <UploadIcon />
                 <span class="no-wrap"> Select icon </span>
               </Button>
-              <Button @click="reset_icon()">
+              <Button :disabled="!display_icon" @click="reset_icon()">
                 <XIcon />
                 <span class="no-wrap"> Remove icon </span>
               </Button>

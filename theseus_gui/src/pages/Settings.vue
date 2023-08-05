@@ -1,11 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Checkbox, Toggle } from 'omorphia'
+import { Card, Slider, DropdownSelect, Toggle } from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 
 const pageOptions = ['Home', 'Library']
 
@@ -30,9 +30,9 @@ watch(
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
     if (setSettings.opt_out_analytics) {
-      mixpanel.opt_out_tracking()
+      mixpanel_opt_out_tracking()
     } else {
-      mixpanel.opt_in_tracking()
+      mixpanel_opt_in_tracking()
     }
 
     if (setSettings.java_globals.JAVA_8?.path === '') {
@@ -336,7 +336,16 @@ watch(
             Overwrites the option.txt file to start in full screen when launched.
           </span>
         </label>
-        <Checkbox id="fullscreen" v-model="settings.force_fullscreen" />
+        <Toggle
+          id="fullscreen"
+          :model-value="settings.force_fullscreen"
+          :checked="settings.force_fullscreen"
+          @update:model-value="
+            (e) => {
+              settings.force_fullscreen = e
+            }
+          "
+        />
       </div>
       <div class="adjacent-input">
         <label for="width">
