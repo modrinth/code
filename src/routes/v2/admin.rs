@@ -104,7 +104,7 @@ pub async fn count_download(
     let url = url::Url::parse(&download_body.url)
         .map_err(|_| ApiError::InvalidInput("invalid download URL specified!".to_string()))?;
 
-    let ip = super::analytics::convert_to_ip_v6(&download_body.ip)
+    let ip = crate::routes::analytics::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
     analytics_queue
@@ -135,7 +135,7 @@ pub async fn count_download(
                 .headers
                 .clone()
                 .into_iter()
-                .filter(|x| !super::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase()))
+                .filter(|x| !crate::routes::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase()))
                 .collect(),
         })
         .await;

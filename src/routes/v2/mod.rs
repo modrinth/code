@@ -1,5 +1,4 @@
 mod admin;
-mod analytics;
 mod moderation;
 mod notifications;
 pub(crate) mod project_creation;
@@ -39,6 +38,4 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(version_file::config)
             .configure(versions::config),
     );
-
-    cfg.configure(analytics::config);
 }

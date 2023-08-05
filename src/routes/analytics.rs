@@ -6,7 +6,6 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::env::parse_strings_from_var;
 use crate::AnalyticsQueue;
-use actix_cors::Cors;
 use actix_web::{post, web};
 use actix_web::{HttpRequest, HttpResponse};
 use chrono::Utc;
@@ -17,32 +16,6 @@ use std::net::{AddrParseError, IpAddr, Ipv4Addr, Ipv6Addr};
 use std::sync::Arc;
 use url::Url;
 use uuid::Uuid;
-
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("v2/analytics")
-            .wrap(
-                Cors::default()
-                    .allowed_origin_fn(|origin, _req_head| {
-                        let allowed_origins =
-                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").unwrap_or_default();
-
-                        allowed_origins.contains(&"*".to_string())
-                            || allowed_origins
-                                .contains(&origin.to_str().unwrap_or_default().to_string())
-                    })
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![
-                        actix_web::http::header::AUTHORIZATION,
-                        actix_web::http::header::ACCEPT,
-                        actix_web::http::header::CONTENT_TYPE,
-                    ])
-                    .max_age(3600),
-            )
-            .service(page_view_ingest)
-            .service(playtime_ingest),
-    );
-}
 
 pub const FILTERED_HEADERS: &[&str] = &[
     "authorization",

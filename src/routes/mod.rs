@@ -1,9 +1,12 @@
+use actix_cors::Cors;
 use crate::file_hosting::FileHostingError;
 use crate::util::cors::default_cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse};
 use futures::FutureExt;
+use crate::routes::analytics::{page_view_ingest, playtime_ingest};
+use crate::util::env::parse_strings_from_var;
 
 pub mod v2;
 pub mod v3;
@@ -12,6 +15,7 @@ mod index;
 mod maven;
 mod not_found;
 mod updates;
+mod analytics;
 
 pub use self::not_found::not_found;
 
@@ -25,6 +29,29 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
         web::scope("updates")
             .wrap(default_cors())
             .configure(updates::config),
+    );
+    cfg.service(
+        web::scope("analytics")
+            .wrap(
+                Cors::default()
+                    .allowed_origin_fn(|origin, _req_head| {
+                        let allowed_origins =
+                            parse_strings_from_var("ANALYTICS_ALLOWED_ORIGINS").unwrap_or_default();
+
+                        allowed_origins.contains(&"*".to_string())
+                            || allowed_origins
+                            .contains(&origin.to_str().unwrap_or_default().to_string())
+                    })
+                    .allowed_methods(vec!["GET", "POST"])
+                    .allowed_headers(vec![
+                        actix_web::http::header::AUTHORIZATION,
+                        actix_web::http::header::ACCEPT,
+                        actix_web::http::header::CONTENT_TYPE,
+                    ])
+                    .max_age(3600),
+            )
+            .service(page_view_ingest)
+            .service(playtime_ingest),
     );
     cfg.service(
         web::scope("api/v1")
