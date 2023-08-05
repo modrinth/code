@@ -305,7 +305,7 @@ pub async fn get_update_from_hash(
 
                         bool
                     })
-                    .sorted_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published))
+                    .sorted_by(|a, b| a.inner.date_published.cmp(&b.inner.date_published))
                     .collect::<Vec<_>>();
 
             if let Some(first) = versions.pop() {
@@ -484,6 +484,7 @@ pub async fn update_files(
         for file in files.iter().filter(|x| x.project_id == project.inner.id) {
             let version = all_versions
                 .iter()
+                .filter(|x| x.inner.project_id == file.project_id)
                 .filter(|x| {
                     let mut bool = true;
 
@@ -589,6 +590,7 @@ pub async fn update_individual_files(
                 if let Some(query_file) = update_data.hashes.iter().find(|x| &x.hash == hash) {
                     let version = all_versions
                         .iter()
+                        .filter(|x| x.inner.project_id == file.project_id)
                         .filter(|x| {
                             let mut bool = true;
 

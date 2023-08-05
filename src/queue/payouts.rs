@@ -207,7 +207,7 @@ pub async fn process_payout(
     client: &clickhouse::Client,
 ) -> Result<(), ApiError> {
     let start: DateTime<Utc> = DateTime::from_utc(
-        Utc::now()
+        (Utc::now() - Duration::days(1))
             .date_naive()
             .and_hms_nano_opt(0, 0, 0, 0)
             .unwrap_or_default(),
