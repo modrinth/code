@@ -44,7 +44,7 @@ import {
   get_all_jre,
 } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 
 const themeStore = useTheming()
@@ -79,7 +79,7 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
   emit('submit', javaInstall)
   detectJavaModal.value.hide()
-  mixpanel.track('JavaAutoDetect', {
+  mixpanel_track('JavaAutoDetect', {
     path: javaInstall.path,
     version: javaInstall.version,
   })

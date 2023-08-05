@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, readonly, shallowRef, watch } from 'vue'
+import { computed, nextTick, ref, readonly, shallowRef, watch, onUnmounted } from 'vue'
 import {
   Pagination,
   Checkbox,
@@ -31,9 +31,16 @@ import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningM
 import { useFetch } from '@/helpers/fetch.js'
 import { check_installed, get as getInstance } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { isOffline } from '@/helpers/utils'
+import { offline_listener } from '@/helpers/events'
 
 const router = useRouter()
 const route = useRoute()
+
+const offline = ref(await isOffline())
+const unlistenOffline = await offline_listener((b) => {
+  offline.value = b
+})
 
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
@@ -498,10 +505,12 @@ const showLoaders = computed(
       instanceContext.value === null) ||
     ignoreInstanceLoaders.value
 )
+
+onUnmounted(() => unlistenOffline())
 </script>
 
 <template>
-  <div ref="searchWrapper" class="search-container">
+  <div v-if="!offline" ref="searchWrapper" class="search-container">
     <aside class="filter-panel">
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
@@ -695,7 +704,7 @@ const showLoaders = computed(
         class="pagination-before"
         @switch-page="onSearchChange"
       />
-      <SplashScreen v-if="loading" />
+      <SplashScreen v-if="loading || offline" />
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <SearchCard
           v-for="result in results.hits"

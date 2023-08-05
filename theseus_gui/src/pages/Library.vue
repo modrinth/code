@@ -1,14 +1,15 @@
 <script setup>
-import { onUnmounted, shallowRef } from 'vue'
+import { onUnmounted, ref, shallowRef } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { profile_listener } from '@/helpers/events.js'
+import { offline_listener, profile_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { Button, PlusIcon } from 'omorphia'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
+import { isOffline } from '@/helpers/utils'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -18,11 +19,19 @@ breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 const profiles = await list(true).catch(handleError)
 const instances = shallowRef(Object.values(profiles))
 
-const unlisten = await profile_listener(async () => {
+const offline = ref(await isOffline())
+const unlistenOffline = await offline_listener((b) => {
+  offline.value = b
+})
+
+const unlistenProfile = await profile_listener(async () => {
   const profiles = await list(true).catch(handleError)
   instances.value = Object.values(profiles)
 })
-onUnmounted(() => unlisten())
+onUnmounted(() => {
+  unlistenProfile()
+  unlistenOffline()
+})
 </script>
 
 <template>
@@ -37,7 +46,7 @@ onUnmounted(() => unlisten())
       <NewInstanceImage />
     </div>
     <h3>No instances found</h3>
-    <Button color="primary" @click="$refs.installationModal.show()">
+    <Button color="primary" :disabled="offline" @click="$refs.installationModal.show()">
       <PlusIcon />
       Create new instance
     </Button>

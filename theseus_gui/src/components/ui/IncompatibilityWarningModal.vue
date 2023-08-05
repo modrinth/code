@@ -59,7 +59,7 @@ import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } fr
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
 import { handleError, useTheming } from '@/store/state.js'
-import mixpanel from 'mixpanel-browser'
+import { mixpanel_track } from '@/helpers/mixpanel'
 
 const themeStore = useTheming()
 
@@ -94,7 +94,7 @@ defineExpose({
     incompatibleModal.value.show()
     markInstalled = extMarkInstalled
 
-    mixpanel.track('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
+    mixpanel_track('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
   },
 })
 
@@ -105,7 +105,7 @@ const install = async () => {
   markInstalled()
   incompatibleModal.value.hide()
 
-  mixpanel.track('ProjectInstall', {
+  mixpanel_track('ProjectInstall', {
     loader: instance.value.metadata.loader,
     game_version: instance.value.metadata.game_version,
     id: project.value,
