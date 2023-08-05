@@ -876,13 +876,10 @@ pub async fn run_credentials(
     Ok(mc_process)
 }
 
-
 /// Update playtime- sending a request to the server to update the playtime
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn try_update_playtime(
-    path: &ProfilePathId,
-) -> crate::Result<()> {
+pub async fn try_update_playtime(path: &ProfilePathId) -> crate::Result<()> {
     let state = State::get().await?;
 
     let profile = get(path, None).await?.ok_or_else(|| {
@@ -895,7 +892,8 @@ pub async fn try_update_playtime(
 
     let res = if updated_recent_playtime > 0 {
         // Create update struct to send to Labrinth
-        let modrinth_pack_version_id = profile.metadata.linked_data.and_then(|l| l.version_id);
+        let modrinth_pack_version_id =
+            profile.metadata.linked_data.and_then(|l| l.version_id);
         let playtime_update_json = json!({
             "seconds": updated_recent_playtime,
             "loader": profile.metadata.loader.to_string(),
@@ -904,20 +902,19 @@ pub async fn try_update_playtime(
         });
         // Copy this struct for every Modrinth project in the profile
         let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
-        for (_,project) in profile.projects {
-            if let ProjectMetadata::Modrinth { version, .. } = project.metadata {
+        for (_, project) in profile.projects {
+            if let ProjectMetadata::Modrinth { version, .. } = project.metadata
+            {
                 hashmap.insert(version.id, playtime_update_json.clone());
             }
         }
 
         fetch::post_json(
-            &format!(
-                "{MODRINTH_API_URL}analytics/playtime"
-            ),
+            &format!("{MODRINTH_API_URL}analytics/playtime"),
             serde_json::to_value(hashmap)?,
             &state.fetch_semaphore,
-        ).await
-
+        )
+        .await
     } else {
         Ok(())
     };
@@ -929,11 +926,11 @@ pub async fn try_update_playtime(
             profile.metadata.submitted_time_played += updated_recent_playtime;
             profile.metadata.recent_time_played = 0;
         }
-    } 
+    }
     // Sync either way
     State::sync().await?;
 
-    Ok(res?)
+    res
 }
 
 fn get_modrinth_pack_list(packfile: &PackFormat) -> Vec<String> {

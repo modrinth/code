@@ -200,11 +200,10 @@ where
         .post(url)
         .json(&json_body)
         .send()
-        .await?.error_for_status()?;
+        .await?
+        .error_for_status()?;
 
-    let value = result
-        .json()
-        .await?;
+    let value = result.json().await?;
     Ok(value)
 }
 

@@ -5,7 +5,7 @@ use std::path::PathBuf;
 
 use crate::event::emit::{emit_loading, init_loading};
 use crate::util::fetch::{fetch_advanced, fetch_json};
-use crate::util::io;
+
 use crate::util::jre::extract_java_majorminor_version;
 use crate::{
     state::JavaGlobals,
@@ -113,10 +113,6 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
         .await?;
 
         let path = state.directories.java_versions_dir().await;
-
-        if path.exists() {
-            io::remove_dir_all(&path).await?;
-        }
 
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
             .map_err(|_| {

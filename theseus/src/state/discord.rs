@@ -161,11 +161,7 @@ impl DiscordGuard {
             )
             .await?;
         } else {
-            self.set_activity(
-                &format!("Idling..."),
-                reconnect_if_fail,
-            )
-            .await?;
+            self.set_activity("Idling...", reconnect_if_fail).await?;
         }
         Ok(())
     }

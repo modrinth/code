@@ -1,4 +1,5 @@
 use super::{Profile, ProfilePathId};
+use chrono::{DateTime, Utc};
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::{collections::HashMap, sync::Arc};
@@ -9,7 +10,6 @@ use tokio::process::Command;
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 use tracing::error;
-use chrono::{DateTime, Utc};
 
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
@@ -117,7 +117,7 @@ impl Children {
             current_child,
             output: shared_output,
             manager,
-            last_updated_playtime
+            last_updated_playtime,
         };
 
         let mchild = Arc::new(RwLock::new(mchild));
@@ -139,7 +139,6 @@ impl Children {
     ) -> crate::Result<ExitStatus> {
         let current_child = current_child.clone();
 
-
         // Wait on current Minecraft Child
         let mut mc_exit_status;
         let mut last_updated_playtime = Utc::now();
@@ -157,38 +156,53 @@ impl Children {
             tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
 
             // Auto-update playtime every minute
-            let diff = Utc::now().signed_duration_since(last_updated_playtime).num_seconds();
+            let diff = Utc::now()
+                .signed_duration_since(last_updated_playtime)
+                .num_seconds();
             if diff >= 60 {
-               if  let Err(e) = profile::edit(
-                    &associated_profile,
-                    |mut prof| {
+                if let Err(e) =
+                    profile::edit(&associated_profile, |mut prof| {
                         prof.metadata.recent_time_played += diff as u64;
-                        async {Ok(())}
-                    },
-                ).await {
-                    tracing::warn!("Failed to update playtime for profile {}: {}", associated_profile, e);
+                        async { Ok(()) }
+                    })
+                    .await
+                {
+                    tracing::warn!(
+                        "Failed to update playtime for profile {}: {}",
+                        associated_profile,
+                        e
+                    );
                 }
                 last_updated_playtime = Utc::now();
             }
         }
 
         // Now fully complete- update playtime one last time
-        let diff = Utc::now().signed_duration_since(last_updated_playtime).num_seconds();
-        if  let Err(e) = profile::edit(
-            &associated_profile,
-            |mut prof| {
-                prof.metadata.recent_time_played += diff as u64;
-                async {Ok(())}
-            },
-        ).await {
-            tracing::warn!("Failed to update playtime for profile {}: {}", associated_profile, e);
+        let diff = Utc::now()
+            .signed_duration_since(last_updated_playtime)
+            .num_seconds();
+        if let Err(e) = profile::edit(&associated_profile, |mut prof| {
+            prof.metadata.recent_time_played += diff as u64;
+            async { Ok(()) }
+        })
+        .await
+        {
+            tracing::warn!(
+                "Failed to update playtime for profile {}: {}",
+                associated_profile,
+                e
+            );
         }
         // Publish play time update
         // Allow failure, it will be stored locally and sent next time
-        if let Err(e) = profile::try_update_playtime(&associated_profile).await {
-            tracing::warn!("Failed to update playtime for profile {}: {}", associated_profile, e);
+        if let Err(e) = profile::try_update_playtime(&associated_profile).await
+        {
+            tracing::warn!(
+                "Failed to update playtime for profile {}: {}",
+                associated_profile,
+                e
+            );
         }
-
 
         {
             // Clear game played for Discord RPC

@@ -166,11 +166,9 @@ impl State {
         let discord_rpc = DiscordGuard::init().await?;
         {
             // Add default Idling to discord rich presence
-            let _ = discord_rpc
-                .set_activity("Idling...", true)
-                .await;
+            let _ = discord_rpc.set_activity("Idling...", true).await;
         }
-    
+
         emit_loading(&loading_bar, 10.0, None).await?;
 
         Ok::<RwLock<Self>, crate::Error>(RwLock::new(Self {
