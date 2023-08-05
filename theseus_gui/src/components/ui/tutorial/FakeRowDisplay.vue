@@ -63,7 +63,7 @@ defineProps({
         >
           <Avatar
             size="sm"
-            src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+            src="https://launcher-files.modrinth.com/assets/maze-bg.png"
             alt="Mod card"
             class="mod-image"
           />
@@ -79,7 +79,7 @@ defineProps({
             <div
               class="banner no-image"
               :style="{
-                'background-image': `url(https://cdn.discordapp.com/attachments/817413688771608587/1119143634319724564/image.png)`,
+                'background-image': `url(https://launcher-files.modrinth.com/assets/maze-bg.png)`,
               }"
             >
               <div class="badges">
@@ -111,7 +111,7 @@ defineProps({
             <Avatar
               class="icon"
               size="sm"
-              src="https://cdn.discordapp.com/attachments/1115781524047020123/1119319322028949544/Modrinth_icon.png"
+              src="https://launcher-files.modrinth.com/assets/default_profile.png"
             />
             <div class="title">
               <div class="title-text">Example Project</div>

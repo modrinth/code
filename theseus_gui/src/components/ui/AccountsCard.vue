@@ -11,7 +11,7 @@
       :src="
         selectedAccount
           ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
-          : 'https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png'
+          : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
     <div v-show="mode === 'expanded'" class="avatar-text">

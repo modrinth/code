@@ -1,7 +1,7 @@
 <template>
   <div ref="button" class="button-base avatar-button" :class="{ highlighted: showDemo }">
     <Avatar
-      src="https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png"
+      src="https://launcher-files.modrinth.com/assets/steve_head.png"
     />
   </div>
   <transition name="fade">
@@ -10,7 +10,7 @@
         <div class="selected account">
           <Avatar
             size="xs"
-            src="https://cdn.discordapp.com/attachments/817413688771608587/1129829843425570867/unnamed.png"
+            src="https://launcher-files.modrinth.com/assets/steve_head.png"
           />
           <div>
             <h4>Modrinth</h4>

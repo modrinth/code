@@ -119,7 +119,7 @@ const install = async (e) => {
           'background-image': `url(${
             project.featured_gallery ??
             project.gallery[0] ??
-            'https://cdn.discordapp.com/attachments/817413688771608587/1119143634319724564/image.png'
+            'https://launcher-files.modrinth.com/assets/maze-bg.png'
           })`,
           'no-image': !project.featured_gallery && !project.gallery[0],
         }"
