@@ -24,7 +24,7 @@ import { offline_listener, command_listener, warning_listener } from '@/helpers/
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, isOffline } from '@/helpers/utils.js'
+import { isDev, getOS, isOffline } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
@@ -44,9 +44,9 @@ import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
-const offline = ref(false)
 
-const videoPlaying = ref(true)
+const videoPlaying = ref(false)
+const offline = ref(false)
 const showOnboarding = ref(false)
 
 const onboardingVideo = ref()
@@ -56,6 +56,9 @@ defineExpose({
     isLoading.value = false
     const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, onboarded_new } =
       await get()
+    const os = await getOS()
+    // video should play if the user is not on linux, and has not onboarded
+    videoPlaying.value = !onboarded_new && os !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !onboarded_new

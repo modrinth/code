@@ -4,10 +4,10 @@ use crate::{
         CommandPayload, EventError, LoadingBar, LoadingBarType,
         ProcessPayloadType, ProfilePayloadType,
     },
+    prelude::ProfilePathId,
     state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
-use std::path::PathBuf;
 
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -298,12 +298,13 @@ pub async fn emit_process(
 #[allow(unused_variables)]
 pub async fn emit_profile(
     uuid: Uuid,
-    path: PathBuf,
+    profile_path_id: &ProfilePathId,
     name: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
+        let path = profile_path_id.get_full_path().await?;
         let event_state = crate::EventState::get().await?;
         event_state
             .app
@@ -311,6 +312,7 @@ pub async fn emit_profile(
                 "profile",
                 ProfilePayload {
                     uuid,
+                    profile_path_id: profile_path_id.clone(),
                     path,
                     name: name.to_string(),
                     event,

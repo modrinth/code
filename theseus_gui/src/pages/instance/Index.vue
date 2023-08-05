@@ -284,7 +284,7 @@ const handleOptionsClick = async (args) => {
 }
 
 const unlistenProfiles = await profile_listener(async (event) => {
-  if (event.path === route.params.id) {
+  if (event.profile_path_id === route.params.id) {
     if (event.event === 'removed') {
       await router.push({
         path: '/',

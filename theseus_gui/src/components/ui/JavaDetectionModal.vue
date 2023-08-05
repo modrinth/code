@@ -99,6 +99,8 @@ function setJavaInstall(javaInstall) {
       align-items: center;
       justify-content: center;
     }
+
+    padding: 0.5rem;
   }
 }
 

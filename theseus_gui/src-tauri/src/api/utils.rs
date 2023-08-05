@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use theseus::{handler, prelude::CommandPayload, State};
 
 use crate::api::Result;
@@ -6,6 +7,7 @@ use std::{env, process::Command};
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
         .invoke_handler(tauri::generate_handler![
+            get_os,
             should_disable_mouseover,
             show_in_folder,
             progress_bars_list,
@@ -16,6 +18,24 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             refresh_offline
         ])
         .build()
+}
+
+/// Gets OS
+#[tauri::command]
+pub fn get_os() -> OS {
+    #[cfg(target_os = "windows")]
+    let os = OS::Windows;
+    #[cfg(target_os = "linux")]
+    let os = OS::Linux;
+    #[cfg(target_os = "macos")]
+    let os = OS::MacOS;
+    os
+}
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum OS {
+    Windows,
+    Linux,
+    MacOS,
 }
 
 // Lists active progress bars

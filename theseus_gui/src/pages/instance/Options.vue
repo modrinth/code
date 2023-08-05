@@ -42,7 +42,7 @@
         </button>
         <button
           class="btn btn-primary"
-          :disabled="!isValid || editing"
+          :disabled="!isValid || !isChanged || editing"
           @click="saveGvLoaderEdits()"
         >
           <SaveIcon />
@@ -71,7 +71,11 @@
           <UploadIcon />
           Select icon
         </button>
-        <button class="btn" @click="resetIcon">
+        <button
+          :disabled="!(!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon))"
+          class="btn"
+          @click="resetIcon"
+        >
           <TrashIcon />
           Remove icon
         </button>
@@ -93,8 +97,8 @@
       <button
         id="edit-versions"
         class="btn"
-        @click="$refs.changeVersionsModal.show()"
         :disabled="offline"
+        @click="$refs.changeVersionsModal.show()"
       >
         <EditIcon />
         Edit versions
@@ -637,6 +641,15 @@ const isValid = computed(() => {
   return (
     selectableGameVersions.value.includes(gameVersion.value) &&
     (loaderVersionIndex.value >= 0 || loader.value === 'vanilla')
+  )
+})
+
+const isChanged = computed(() => {
+  return (
+    loader.value != props.instance.metadata.loader ||
+    gameVersion.value != props.instance.metadata.game_version ||
+    JSON.stringify(selectableLoaderVersions.value[loaderVersionIndex.value]) !=
+      JSON.stringify(props.instance.metadata.loader_version)
   )
 })
 

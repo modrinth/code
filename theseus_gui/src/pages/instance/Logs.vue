@@ -15,7 +15,7 @@
           <CheckIcon v-else />
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
-        <Button color="primary" :disabled="offline" @click="share">
+        <Button color="primary" :disabled="offline || !logs[selectedLogIndex]" @click="share">
           <ShareIcon />
           Share
         </Button>

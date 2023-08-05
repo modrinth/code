@@ -336,7 +336,7 @@ import {
   ShareModal,
   CodeIcon,
 } from 'omorphia'
-import { computed, ref, watch } from 'vue'
+import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
@@ -353,7 +353,6 @@ import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
-import { install_from_file } from '@/helpers/pack'
 
 const router = useRouter()
 
@@ -785,18 +784,15 @@ watch(selectAll, () => {
   }
 })
 
-listen('tauri://file-drop', async (event) => {
-  if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
-    await install_from_file(event.payload[0]).catch(handleError)
-  } else {
-    for (const file of event.payload) {
-      await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
-    }
-    initProjects(await get(props.instance.path).catch(handleError))
+const unlisten = await listen('tauri://file-drop', async (event) => {
+  for (const file of event.payload) {
+    if (file.endsWith('.mrpack')) continue
+    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
   }
-  mixpanel_track('InstanceCreate', {
-    source: 'FileDrop',
-  })
+  initProjects(await get(props.instance.path).catch(handleError))
+})
+onUnmounted(() => {
+  unlisten()
 })
 </script>
 
