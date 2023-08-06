@@ -24,7 +24,6 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_remove_project,
             profile_update_managed_modrinth,
             profile_repair_managed_modrinth,
-            profile_is_managed_modrinth,
             profile_run,
             profile_run_wait,
             profile_run_credentials,
@@ -188,12 +187,6 @@ pub async fn profile_repair_managed_modrinth(
     path: ProfilePathId,
 ) -> Result<()> {
     Ok(profile::update::repair_managed_modrinth(&path).await?)
-}
-
-// Gets if a profile is managed by Modrinth
-#[tauri::command]
-pub async fn profile_is_managed_modrinth(path: ProfilePathId) -> Result<bool> {
-    Ok(profile::is_managed_modrinth_pack(&path).await?)
 }
 
 // Exports a profile to a .mrpack file (export_location should end in .mrpack)

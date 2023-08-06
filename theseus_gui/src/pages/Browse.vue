@@ -238,6 +238,7 @@ async function refreshSearch() {
   let val = `${base}${url}`
 
   const rawResults = await useFetch(val, 'search results', offline.value)
+  console.log(rawResults)
   results.value = rawResults
   if (!rawResults) {
     results.value = {
@@ -247,7 +248,7 @@ async function refreshSearch() {
     }
   }
   if (instanceContext.value) {
-    for (let val of results.value) {
+    for (let val of results.value.hits) {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )
