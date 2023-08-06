@@ -4,7 +4,6 @@ use log::info;
 use super::IndexingError;
 use crate::database::models::ProjectId;
 use crate::search::UploadSearchProject;
-use serde::Deserialize;
 use sqlx::postgres::PgPool;
 
 pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, IndexingError> {
@@ -22,8 +21,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
-            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', mdep.id, 'dep_type', d.dependency_type)) filter (where mdep.id is not null) dependencies
+            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -33,8 +31,6 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id
             LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id
             LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            LEFT OUTER JOIN dependencies d ON d.dependent_id = v.id
-            LEFT OUTER JOIN mods mdep ON mdep.id = d.mod_dependency_id
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
@@ -72,21 +68,6 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
                         _ => false,
                     };
 
-                    #[derive(Deserialize)]
-                    struct TempDependency {
-                        id: ProjectId,
-                        dep_type: String
-                    }
-
-                    let dependencies = serde_json::from_value::<Vec<TempDependency>>(
-                        m.dependencies.unwrap_or_default(),
-                    )
-                        .ok()
-                        .unwrap_or_default()
-                        .into_iter()
-                        .map(|x| format!("{}-{}", crate::models::ids::ProjectId::from(x.id), x.dep_type))
-                        .collect();
-
                     UploadSearchProject {
                         project_id: project_id.to_string(),
                         title: m.title,
@@ -112,7 +93,6 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
                         open_source,
                         color: m.color.map(|x| x as u32),
                         featured_gallery: m.featured_gallery.unwrap_or_default().first().cloned(),
-                        dependencies,
                     }
                 }))
             })

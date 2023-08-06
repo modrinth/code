@@ -181,7 +181,6 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery",
     "featured_gallery",
     "color",
-    "dependencies",
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] = &["title", "description", "author", "slug"];
@@ -202,7 +201,6 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "project_id",
     "open_source",
     "color",
-    "dependencies",
 ];
 
 const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =

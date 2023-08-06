@@ -135,7 +135,9 @@ pub async fn count_download(
                 .headers
                 .clone()
                 .into_iter()
-                .filter(|x| !crate::routes::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase()))
+                .filter(|x| {
+                    !crate::routes::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase())
+                })
                 .collect(),
         })
         .await;

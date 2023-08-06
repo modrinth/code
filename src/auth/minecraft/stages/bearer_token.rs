@@ -21,7 +21,7 @@ pub async fn fetch_bearer(token: &str, uhs: &str) -> Result<String, Authenticati
         .get("access_token")
         .and_then(serde_json::Value::as_str)
         .map(String::from)
-        .ok_or(AuthenticationError::Custom(
-            format!("Response didn't contain valid bearer token. body: {body}"),
-        ))
+        .ok_or(AuthenticationError::Custom(format!(
+            "Response didn't contain valid bearer token. body: {body}"
+        )))
 }

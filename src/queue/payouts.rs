@@ -349,14 +349,13 @@ pub async fn process_payout(
         _ => weekday_amount,
     };
 
+    let mut clear_cache_users = Vec::new();
     for (id, project) in projects_map {
         if let Some(value) = &multipliers.values.get(&(id as u64)) {
             let project_multiplier: Decimal =
                 Decimal::from(**value) / Decimal::from(multipliers.sum);
 
             let sum_splits: Decimal = project.team_members.iter().map(|x| x.1).sum();
-
-            let mut clear_cache_users = Vec::new();
 
             if sum_splits > Decimal::ZERO {
                 for (user_id, split) in project.team_members {
@@ -387,20 +386,23 @@ pub async fn process_payout(
                         )
                         .execute(&mut *transaction)
                         .await?;
+
                         clear_cache_users.push(user_id);
                     }
                 }
             }
-
-            crate::database::models::User::clear_caches(
-                &clear_cache_users
-                    .into_iter()
-                    .map(|x| (crate::database::models::UserId(x), None))
-                    .collect::<Vec<_>>(),
-                redis,
-            )
-            .await?;
         }
+    }
+
+    if !clear_cache_users.is_empty() {
+        crate::database::models::User::clear_caches(
+            &clear_cache_users
+                .into_iter()
+                .map(|x| (crate::database::models::UserId(x), None))
+                .collect::<Vec<_>>(),
+            redis,
+        )
+        .await?;
     }
 
     transaction.commit().await?;

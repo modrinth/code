@@ -99,8 +99,6 @@ pub struct UploadSearchProject {
     pub modified_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
-    /// format: {project_id}-{dep_type}
-    pub dependencies: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -136,8 +134,6 @@ pub struct ResultSearchProject {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
-    /// format: {project_id}-{dep_type}
-    pub dependencies: Vec<String>,
 }
 
 pub async fn search_for_project(

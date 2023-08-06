@@ -1,21 +1,21 @@
-use actix_cors::Cors;
 use crate::file_hosting::FileHostingError;
+use crate::routes::analytics::{page_view_ingest, playtime_ingest};
 use crate::util::cors::default_cors;
+use crate::util::env::parse_strings_from_var;
+use actix_cors::Cors;
 use actix_files::Files;
 use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse};
 use futures::FutureExt;
-use crate::routes::analytics::{page_view_ingest, playtime_ingest};
-use crate::util::env::parse_strings_from_var;
 
 pub mod v2;
 pub mod v3;
 
+mod analytics;
 mod index;
 mod maven;
 mod not_found;
 mod updates;
-mod analytics;
 
 pub use self::not_found::not_found;
 
@@ -40,7 +40,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
 
                         allowed_origins.contains(&"*".to_string())
                             || allowed_origins
-                            .contains(&origin.to_str().unwrap_or_default().to_string())
+                                .contains(&origin.to_str().unwrap_or_default().to_string())
                     })
                     .allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![
