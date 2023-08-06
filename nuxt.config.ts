@@ -8,7 +8,6 @@ import { globIterate } from 'glob'
 import { match as matchLocale } from '@formatjs/intl-localematcher'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
-const STAGING_ARIADNE_URL = 'https://staging-ariadne.modrinth.com/v1/'
 
 const preloadedFonts = [
   'inter/Inter-Regular.woff2',
@@ -264,7 +263,6 @@ export default defineNuxtConfig({
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
     public: {
       apiBaseUrl: getApiUrl(),
-      ariadneBaseUrl: getAriadneUrl(),
       siteUrl: getDomain(),
 
       owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
@@ -311,11 +309,6 @@ export default defineNuxtConfig({
 function getApiUrl() {
   // @ts-ignore
   return process.env.BROWSER_BASE_URL ?? globalThis.BROWSER_BASE_URL ?? STAGING_API_URL
-}
-
-function getAriadneUrl() {
-  // @ts-ignore
-  return process.env.BROWSER_ARIADNE_URL ?? globalThis.BROWSER_ARIADNE_URL ?? STAGING_ARIADNE_URL
 }
 
 function getDomain() {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="markdown-body">
     <h1>Security Notice</h1>
 
     <p>

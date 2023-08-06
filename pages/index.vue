@@ -190,9 +190,10 @@
           <div class="blob-text">
             <h3>Play with your favorite launcher</h3>
             <p>
-              Modrinth's open-source API lets launchers add deep integration with Modrinth. We're
-              already supported by some of the most popular launchers like ATLauncher, MultiMC, and
-              Prism Launcher.
+              Modrinth's open-source API lets launchers add deep integration with Modrinth. You can
+              use Modrinth through
+              <nuxt-link class="title-link" to="/app">our own app</nuxt-link> and some of the most
+              popular launchers like ATLauncher, MultiMC, and Prism Launcher.
             </p>
           </div>
           <div class="blob-demonstration gradient-border">
@@ -218,19 +219,9 @@
                 >
                   <PrismLauncherLogo />
                 </a>
-                <a
-                  rel="noopener"
-                  href="https://multimc.org/"
-                  class="graphic gradient-border"
-                  title="MultiMC"
-                >
-                  <img
-                    src="~/assets/images/external/multimc.webp"
-                    alt="multimc launcher logo"
-                    width="68"
-                    height="68"
-                  />
-                </a>
+                <nuxt-link to="/app" class="graphic gradient-border">
+                  <ModrinthIcon />
+                </nuxt-link>
                 <a
                   rel="noopener"
                   href="https://atlauncher.com/"

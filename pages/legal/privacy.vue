@@ -1,8 +1,54 @@
 <template>
-  <div>
+  <div class="markdown-body">
     <h1>Privacy Policy</h1>
 
-    <p><em>Last edited: March 8, 2023</em></p>
+    <p><em>Last edited: August 5, 2023</em></p>
+
+    <h2>Introduction</h2>
+    <p>
+      <a href="https://modrinth.com">Modrinth</a> is part of Rinth, Inc. ("Company", "us", "we",
+      "our"). This privacy policy explains how we collect data, process it, and your rights relative
+      to your data.
+    </p>
+    <p>
+      This policy describes the types of information we may collect from you or that you may provide
+      when you use www.modrinth.com, api.modrinth.com, or the Modrinth App ("Service" or "Website"),
+      and our practices for collecting, using, maintaining, protecting, and disclosing that
+      information.
+    </p>
+    <p>This policy applies to information we collect:</p>
+    <ul>
+      <li>On this Website.</li>
+      <li>In email, text, and other electronic messages between you and this Website.</li>
+      <li>
+        Through mobile and desktop applications you download from this Website, which provide
+        dedicated non-browser-based interaction between you and this Website.
+      </li>
+      <li>
+        When you interact with our advertising and applications on third-party websites and
+        services, if those applications or advertising include links to this policy.
+      </li>
+    </ul>
+    <p>It does not apply to information collected by:</p>
+    <ul>
+      <li>
+        Us offline or through any other means, including on any other website operated by Company or
+        any third party (including our affiliates and subsidiaries); or
+      </li>
+      <li>
+        Any third party (including our affiliates and subsidiaries), including through any
+        application or content (including advertising) that may link to or be accessible from or on
+        the Website
+      </li>
+    </ul>
+    <p>
+      Please read this policy carefully to understand our policies and practices regarding your
+      information and how we will treat it. If you do not agree with our policies and practices,
+      your choice is not to use our Website. By accessing or using this Website, you agree to this
+      privacy policy. This policy may change from time to time (see Changes to the Privacy Policy).
+      Your continued use of this Website after we make changes is deemed to be acceptance of those
+      changes, so please check the policy periodically for updates.
+    </p>
 
     <h2>Foreword</h2>
 
@@ -21,12 +67,6 @@
       </li>
     </ul>
 
-    <p>
-      <a href="https://modrinth.com">Modrinth</a> is part of Rinth, Inc. ("us", "we", "our"). This
-      privacy policy explains how we collect data, process it, and your rights relative to your
-      data.
-    </p>
-
     <p>Rinth, Inc. is the data controller for data collected through Modrinth.</p>
 
     <h2>What data do we collect?</h2>
@@ -38,7 +78,7 @@
       <li>Your username</li>
       <li>Your display name</li>
       <li>Your profile picture</li>
-      <li>Your GitHub ID</li>
+      <li>Your OAuth application data (ex: GitHub or Discord ID)</li>
     </ul>
     <p>
       This data is used to identify you and display your profile. It will be linked to your
@@ -55,6 +95,30 @@
       <li>Some additional metadata about your connection (HTTP headers)</li>
     </ul>
     <p>This data is used to monitor automated access to our service and deliver statistics.</p>
+
+    <h3>Playtime data</h3>
+    <p>When you use the Modrinth App to play Modrinth projects, we collect:</p>
+    <ul>
+      <li>Your IP address</li>
+      <li>Your user ID</li>
+      <li>The amount of time the project was played for</li>
+      <li>The project played</li>
+      <li>
+        Some additional metadata about the projects you're playing (loaders and game versions)
+      </li>
+    </ul>
+    <p>This data is used to deliver statistics.</p>
+
+    <h3>Usage data</h3>
+    <p>When you interact with the Modrinth App or the Website, we collect through MixPanel:</p>
+    <ul>
+      <li>Your IP address</li>
+      <li>Your anonymized user ID</li>
+      <li>The time the interaction happened</li>
+      <li>Some additional metadata about the device you are on</li>
+      <li>Some additional metadata about each interaction</li>
+    </ul>
+    <p>This data is used to deliver statistics.</p>
 
     <h3>Creator Monetization Program data</h3>
     <p>
@@ -87,6 +151,9 @@
         <a href="https://www.cloudflare.com/en-gb/gdpr/introduction/"> Cloudflare </a>
       </li>
       <li><a href="https://sentry.io/trust/privacy/">Sentry</a></li>
+      <li><a href="https://mixpanel.com/legal/privacy-policy">MixPanel</a></li>
+      <li><a href="https://www.beehiiv.com/privacy">BeeHiiv</a></li>
+      <li><a href="https://www.paypal.com/us/legalhub/privacy-full">PayPal</a></li>
     </ul>
     <p>
       Data that we specifically collect isn't shared with any other third party. We do not sell any
@@ -182,6 +249,19 @@
     <p>
       By using our website, you hereby consent to our Privacy Policy and agree to its Terms and
       Conditions.
+    </p>
+
+    <h2>California Privacy Rights</h2>
+    <p>
+      If you are a California resident, California law may provide you with additional rights
+      regarding our use of your personal information. To learn more about your California privacy
+      rights, visit <nuxt-link to="/legal/ccpa">this page</nuxt-link>.
+    </p>
+    <p>
+      California's "Shine the Light" law (Civil Code Section § 1798.83) permits users of our App
+      that are California residents to request certain information regarding our disclosure of
+      personal information to third parties for their direct marketing purposes. To make such a
+      request, please send an email to support@modrinth.com.
     </p>
 
     <h2>Changes to the Privacy Policy</h2>

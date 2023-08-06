@@ -228,9 +228,9 @@
   </div>
 </template>
 <script setup>
+import { Promotion } from 'omorphia'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Badge from '~/components/ui/Badge.vue'
-import Promotion from '~/components/ads/Promotion.vue'
 
 import ReportIcon from '~/assets/images/utils/report.svg'
 import SunriseIcon from '~/assets/images/utils/sunrise.svg'

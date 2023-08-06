@@ -32,8 +32,8 @@ dependencies:
     specifier: ^13.0.1
     version: 13.0.1(patch_hash=3vlxaukqep4gvqytxeznhg6wbq)
   omorphia:
-    specifier: ^0.4.31
-    version: 0.4.31
+    specifier: ^0.4.35
+    version: 0.4.35
   qrcode.vue:
     specifier: ^3.4.0
     version: 3.4.0(vue@3.3.4)
@@ -5410,13 +5410,14 @@ packages:
     resolution: {integrity: sha512-9CIOSq5945rI045GFtcO3uudyOkYVY1nyfFxVQp+9BRgslr8jPNiSSrsFGg/BNTUFOLqx0P5tng6G32brIPw0w==}
     dev: true
 
-  /omorphia@0.4.31:
-    resolution: {integrity: sha512-xeb9bD42VFRDKCkKz678hBYCIS//Atd4/hx6/YmboJLMEIjIJfS2Ocf9G53G52XkfS4DWs9CIzKz71NDh86kxQ==}
+  /omorphia@0.4.35:
+    resolution: {integrity: sha512-ZxA6sJKWZbiG49l/gTG25cxAvTcIfVSLhuIV2e+LSY0nwkZO4EFvxhzGNz0exR3lVs+OdDCdJyb1U2QYMVbVrA==}
     dependencies:
       dayjs: 1.11.7
       floating-vue: 2.0.0-beta.20(vue@3.3.4)
       highlight.js: 11.8.0
       markdown-it: 13.0.1(patch_hash=3vlxaukqep4gvqytxeznhg6wbq)
+      qrcode.vue: 3.4.0(vue@3.3.4)
       vue: 3.3.4
       vue-router: 4.2.2(vue@3.3.4)
       vue-select: 4.0.0-beta.6(vue@3.3.4)

@@ -35,6 +35,18 @@ const rows = shallowRef([
   homepageProjects.slice(val * 4, val * 5),
 ])
 
+const { data: launcherUpdates } = await useAsyncData('launcherUpdates', () =>
+  $fetch('https://launcher-files.modrinth.com/updates.json')
+)
+console.log(launcherUpdates)
+
+console.log(launcherUpdates.value)
+macLinks.appleSilicon = launcherUpdates.value.platforms['darwin-aarch64'].install_urls[0]
+macLinks.intel = launcherUpdates.value.platforms['darwin-x86_64'].install_urls[0]
+windowsLink.value = launcherUpdates.value.platforms['windows-x86_64'].install_urls[0]
+linuxLinks.appImage = launcherUpdates.value.platforms['linux-x86_64'].install_urls[1]
+linuxLinks.deb = launcherUpdates.value.platforms['linux-x86_64'].install_urls[0]
+
 onMounted(() => {
   os.value = navigator?.platform.toString()
   os.value = os.value?.includes('Mac')
@@ -44,16 +56,6 @@ onMounted(() => {
     : os.value?.includes('Linux')
     ? 'Linux'
     : null
-
-  fetch('https://launcher-files.modrinth.com/updates.json')
-    .then((res) => res.json())
-    .then((data) => {
-      macLinks.appleSilicon = data.platforms['darwin-aarch64'].install_urls[0]
-      macLinks.intel = data.platforms['darwin-x86_64'].install_urls[0]
-      windowsLink.value = data.platforms['windows-x86_64'].url
-      linuxLinks.appImage = data.platforms['linux-x86_64'].install_urls[1]
-      linuxLinks.deb = data.platforms['linux-x86_64'].install_urls[0]
-    })
 
   if (os.value === 'Windows') {
     downloadLauncher = () => {
@@ -118,7 +120,7 @@ useSeoMeta({
     <div class="landing-hero">
       <h1 class="main-header">
         Download Modrinth <br v-if="os" />
-        app
+        App
         {{ os ? `for ${os}` : '' }}
       </h1>
       <h2 class="main-subheader">
@@ -126,13 +128,6 @@ useSeoMeta({
         mods, and keep them up to date, all in one neat little package.
       </h2>
       <div class="button-group">
-        <button
-          v-if="os !== 'Mac'"
-          class="iconified-button outline-button btn btn-large"
-          @click="scrollToSection"
-        >
-          More Download Options
-        </button>
         <button
           v-if="os"
           class="iconified-button brand-button btn btn-large"
@@ -190,6 +185,9 @@ useSeoMeta({
             />
           </svg>
           Download the Modrinth App
+        </button>
+        <button class="iconified-button outline-button btn btn-large" @click="scrollToSection">
+          More Download Options
         </button>
       </div>
       <img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="cube maze" />

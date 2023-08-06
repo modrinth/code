@@ -195,27 +195,6 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <div
-        v-if="projectType.id === 'modpack' && $orElse(cosmetics.modpacksAlphaNotice, true)"
-        class="card information"
-        aria-label="Information"
-      >
-        Modpack support is currently in alpha, and modpacks can only be created and installed
-        through third party tools. Our documentation includes instructions on
-        <a href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/" :target="$external()"
-          >playing modpacks</a
-        >
-        with
-        <a rel="noopener" href="https://atlauncher.com/about" :target="$external()">ATLauncher</a>,
-        <a rel="noopener" href="https://multimc.org/" :target="$external()">MultiMC</a>, and
-        <a rel="noopener" href="https://prismlauncher.org" :target="$external()"> Prism Launcher</a
-        >. Pack creators can reference our documentation on
-        <a href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/" :target="$external()"
-          >creating modpacks</a
-        >. Join us on
-        <a rel="noopener" href="https://discord.gg/EUHuJHt" :target="$external()">Discord</a>
-        for support.
-      </div>
       <Promotion />
       <div class="card search-controls">
         <div class="search-filter-container">
@@ -344,6 +323,7 @@
 </template>
 <script setup>
 import { Multiselect } from 'vue-multiselect'
+import { Promotion } from 'omorphia'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Pagination from '~/components/ui/Pagination.vue'
 import SearchFilter from '~/components/ui/search/SearchFilter.vue'
@@ -359,8 +339,6 @@ import FilterIcon from '~/assets/images/utils/filter.svg'
 import GridIcon from '~/assets/images/utils/grid.svg'
 import ListIcon from '~/assets/images/utils/list.svg'
 import ImageIcon from '~/assets/images/utils/image.svg'
-
-import Promotion from '~/components/ads/Promotion.vue'
 
 const sidebarMenuOpen = ref(false)
 const showAllLoaders = ref(false)
