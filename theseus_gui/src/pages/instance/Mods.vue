@@ -10,9 +10,14 @@
         v-model="selectedProjectType"
         :items="Object.keys(selectableProjectTypes)"
       />
-      <Button v-if="canUpdatePack" color="secondary" @click="updateModpack">
+      <Button
+        v-if="canUpdatePack"
+        :disabled="updatingModpack"
+        color="secondary"
+        @click="updateModpack"
+      >
         <UpdatedIcon />
-        Update modpack
+        {{ updatingModpack ? 'Updating' : 'Update modpack' }}
       </Button>
     </div>
     <div class="card-row">
@@ -362,7 +367,6 @@ import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
   get,
-  is_managed_modrinth,
   remove_project,
   toggle_disable_project,
   update_all,
@@ -403,8 +407,14 @@ const props = defineProps({
 const projects = ref([])
 const selectionMap = ref(new Map())
 const showingOptions = ref(false)
-const canUpdatePack = ref(await is_managed_modrinth(props.instance.path))
+const canUpdatePack = computed(() => {
+  return (
+    props.instance.metadata.linked_data &&
+    props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
+  )
+})
 
+console.log(props.instance)
 const initProjects = (initInstance) => {
   projects.value = []
   if (!initInstance || !initInstance.projects) return
@@ -800,8 +810,11 @@ const handleContentOptionClick = async (args) => {
   }
 }
 
+const updatingModpack = ref(false)
 const updateModpack = async () => {
+  updatingModpack.value = true
   await update_managed_modrinth(props.instance.path).catch(handleError)
+  updatingModpack.value = false
 }
 
 watch(selectAll, () => {

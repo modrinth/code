@@ -543,23 +543,6 @@ pub async fn remove_project(
     }
 }
 
-/// Gets whether project is a managed modrinth pack
-#[tracing::instrument]
-pub async fn is_managed_modrinth_pack(
-    profile: &ProfilePathId,
-) -> crate::Result<bool> {
-    if let Some(profile) = get(profile, None).await? {
-        if let Some(linked_data) = profile.metadata.linked_data {
-            return Ok(linked_data.project_id.is_some()
-                && linked_data.version_id.is_some());
-        }
-        Ok(false)
-    } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(profile.to_string())
-            .as_error())
-    }
-}
-
 /// Exports the profile to a Modrinth-formatted .mrpack file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument(skip_all)]
