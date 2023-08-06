@@ -238,7 +238,6 @@ async function refreshSearch() {
   let val = `${base}${url}`
 
   const rawResults = await useFetch(val, 'search results', offline.value)
-  console.log(rawResults)
   results.value = rawResults
   if (!rawResults) {
     results.value = {
