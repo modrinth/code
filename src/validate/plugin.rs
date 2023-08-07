@@ -32,11 +32,14 @@ impl super::Validator for PluginYmlValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.by_name("plugin.yml").is_err() {
+        if !archive
+            .file_names()
+            .any(|name| name == "plugin.yml" || name == "paper-plugin.yml")
+        {
             return Ok(ValidationResult::Warning(
-                "No plugin.yml present for plugin file.",
+                "No plugin.yml or paper-plugin.yml present for plugin file.",
             ));
-        }
+        };
 
         Ok(ValidationResult::Pass)
     }
