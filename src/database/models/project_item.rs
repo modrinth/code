@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 const PROJECTS_NAMESPACE: &str = "projects";
 const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies";
-const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
+const DEFAULT_EXPIRY: i64 = 3600; // 60 minutes
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct DonationUrl {
