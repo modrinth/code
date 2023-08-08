@@ -476,6 +476,12 @@ pub async fn version_edit(
                     .execute(&mut *transaction)
                     .await?;
                 }
+
+                database::models::Project::update_game_versions(
+                    version_item.inner.project_id,
+                    &mut transaction,
+                )
+                .await?;
             }
 
             if let Some(loaders) = &new_version.loaders {
@@ -509,6 +515,12 @@ pub async fn version_edit(
                     .execute(&mut *transaction)
                     .await?;
                 }
+
+                database::models::Project::update_loaders(
+                    version_item.inner.project_id,
+                    &mut transaction,
+                )
+                .await?;
             }
 
             if let Some(featured) = &new_version.featured {
