@@ -136,7 +136,7 @@ impl super::Validator for SpongeValidator {
     ) -> Result<ValidationResult, ValidationError> {
         if !archive
             .file_names()
-            .any(|name| name == "sponge_plugins.json" || name == "mcmod.info")
+            .any(|name| name == "sponge_plugins.json" || name == "mcmod.info" || name == "META-INF/sponge_plugins.json")
         {
             return Ok(ValidationResult::Warning(
                 "No sponge_plugins.json or mcmod.info present for Sponge plugin.",
