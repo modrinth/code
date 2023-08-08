@@ -30,19 +30,11 @@ impl super::Validator for ForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.by_name("META-INF/mods.toml").is_err() {
-            return Ok(ValidationResult::Warning(
-                "No mods.toml present for Forge file.",
-            ));
-        }
-
-        if !archive.file_names().any(|name| name.ends_with(".class")) {
-            return Ok(ValidationResult::Warning(
-                "Forge mod file is a source file!",
-            ));
-        }
-
-        //TODO: Check if file is a dev JAR?
+        // if archive.by_name("META-INF/mods.toml").is_err() {
+        //     return Ok(ValidationResult::Warning(
+        //         "No mods.toml present for Forge file.",
+        //     ));
+        // }
 
         Ok(ValidationResult::Pass)
     }
@@ -86,12 +78,6 @@ impl super::Validator for LegacyForgeValidator {
                 "Forge mod file does not contain mcmod.info!",
             ));
         };
-
-        if !archive.file_names().any(|name| name.ends_with(".class")) {
-            return Ok(ValidationResult::Warning(
-                "Forge mod file is a source file!",
-            ));
-        }
 
         //TODO: Check if file is a dev JAR?
 
