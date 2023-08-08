@@ -135,8 +135,8 @@ async fn version_create_inner(
     let mut initial_version_data = None;
     let mut version_builder = None;
 
-    let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
-    let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
+    let all_game_versions = models::categories::GameVersion::list(&mut *transaction, redis).await?;
+    let all_loaders = models::categories::Loader::list(&mut *transaction, redis).await?;
 
     let user = get_user_from_headers(
         &req,
@@ -561,7 +561,8 @@ async fn upload_file_to_version_inner(
     .await?
     .name;
 
-    let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
+    let all_game_versions =
+        models::categories::GameVersion::list(&mut *transaction, &redis).await?;
 
     let mut error = None;
     while let Some(item) = payload.next().await {

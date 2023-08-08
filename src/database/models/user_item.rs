@@ -185,8 +185,10 @@ impl User {
 
             for user in users {
                 if let Some(user) = user.and_then(|x| serde_json::from_str::<User>(&x).ok()) {
-                    remaining_strings
-                        .retain(|x| &to_base62(user.id.0 as u64) != x && &user.username != x);
+                    remaining_strings.retain(|x| {
+                        &to_base62(user.id.0 as u64) != x
+                            && user.username.to_lowercase() != x.to_lowercase()
+                    });
                     found_users.push(user);
                     continue;
                 }

@@ -716,7 +716,7 @@ impl Version {
 
             for (key, mut files) in save_files {
                 cmd("SET")
-                    .arg(format!("{}:{}", VERSIONS_NAMESPACE, key))
+                    .arg(format!("{}:{}", VERSION_FILES_NAMESPACE, key))
                     .arg(serde_json::to_string(&files)?)
                     .arg("EX")
                     .arg(DEFAULT_EXPIRY)

@@ -115,8 +115,13 @@ pub async fn version_list(
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
             let (loaders, game_versions) = futures::future::try_join(
-                database::models::categories::Loader::list(&**pool),
-                database::models::categories::GameVersion::list_filter(None, Some(true), &**pool),
+                database::models::categories::Loader::list(&**pool, &redis),
+                database::models::categories::GameVersion::list_filter(
+                    None,
+                    Some(true),
+                    &**pool,
+                    &redis,
+                ),
             )
             .await?;
 

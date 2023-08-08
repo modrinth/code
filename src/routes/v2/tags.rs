@@ -30,8 +30,11 @@ pub struct CategoryData {
 }
 
 #[get("category")]
-pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = Category::list(&**pool)
+pub async fn category_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let results = Category::list(&**pool, &redis)
         .await?
         .into_iter()
         .map(|x| CategoryData {
@@ -53,8 +56,11 @@ pub struct LoaderData {
 }
 
 #[get("loader")]
-pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let mut results = Loader::list(&**pool)
+pub async fn loader_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let mut results = Loader::list(&**pool, &redis)
         .await?
         .into_iter()
         .map(|x| LoaderData {
@@ -88,11 +94,12 @@ pub struct GameVersionQuery {
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
+    redis: web::Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, ApiError> {
     let results: Vec<GameVersionQueryData> = if query.type_.is_some() || query.major.is_some() {
-        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool).await?
+        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool, &redis).await?
     } else {
-        GameVersion::list(&**pool).await?
+        GameVersion::list(&**pool, &redis).await?
     }
     .into_iter()
     .map(|x| GameVersionQueryData {
@@ -163,8 +170,11 @@ pub struct DonationPlatformQueryData {
 }
 
 #[get("donation_platform")]
-pub async fn donation_platform_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results: Vec<DonationPlatformQueryData> = DonationPlatform::list(&**pool)
+pub async fn donation_platform_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let results: Vec<DonationPlatformQueryData> = DonationPlatform::list(&**pool, &redis)
         .await?
         .into_iter()
         .map(|x| DonationPlatformQueryData {
@@ -176,19 +186,28 @@ pub async fn donation_platform_list(pool: web::Data<PgPool>) -> Result<HttpRespo
 }
 
 #[get("report_type")]
-pub async fn report_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = ReportType::list(&**pool).await?;
+pub async fn report_type_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let results = ReportType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
 }
 
 #[get("project_type")]
-pub async fn project_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = ProjectType::list(&**pool).await?;
+pub async fn project_type_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let results = ProjectType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
 }
 
 #[get("side_type")]
-pub async fn side_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = SideType::list(&**pool).await?;
+pub async fn side_type_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let results = SideType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
 }

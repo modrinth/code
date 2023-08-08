@@ -72,10 +72,11 @@ const PLUGIN_LOADERS: &[&str] = &[
 pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
+    redis: &deadpool_redis::Pool,
     webhook_url: String,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    let all_game_versions = GameVersion::list(pool).await?;
+    let all_game_versions = GameVersion::list(pool, redis).await?;
 
     let row =
         sqlx::query!(

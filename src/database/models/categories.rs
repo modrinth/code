@@ -3,7 +3,11 @@ use super::DatabaseError;
 use chrono::DateTime;
 use chrono::Utc;
 use futures::TryStreamExt;
-use serde::Deserialize;
+use redis::cmd;
+use serde::{Deserialize, Serialize};
+
+const TAGS_NAMESPACE: &str = "tags";
+const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
 pub struct ProjectType {
     pub id: ProjectTypeId,
@@ -15,6 +19,7 @@ pub struct SideType {
     pub name: String,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Loader {
     pub id: LoaderId,
     pub loader: String,
@@ -22,7 +27,7 @@ pub struct Loader {
     pub supported_project_types: Vec<String>,
 }
 
-#[derive(Clone, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct GameVersion {
     pub id: GameVersionId,
     pub version: String,
@@ -32,6 +37,7 @@ pub struct GameVersion {
     pub major: bool,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Category {
     pub id: CategoryId,
     pub category: String,
@@ -45,6 +51,7 @@ pub struct ReportType {
     pub report_type: String,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct DonationPlatform {
     pub id: DonationPlatformId,
     pub short: String,
@@ -91,10 +98,24 @@ impl Category {
         Ok(result.map(|r| CategoryId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<Category>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<Category>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:category", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<Category>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type
@@ -115,6 +136,14 @@ impl Category {
         })
         .try_collect::<Vec<Category>>()
         .await?;
+
+        cmd("SET")
+            .arg(format!("{}:category", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
 
         Ok(result)
     }
@@ -138,10 +167,24 @@ impl Loader {
         Ok(result.map(|r| LoaderId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<Loader>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<Loader>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:loader", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<Loader>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT l.id id, l.loader loader, l.icon icon,
@@ -168,6 +211,14 @@ impl Loader {
         })
         .try_collect::<Vec<_>>()
         .await?;
+
+        cmd("SET")
+            .arg(format!("{}:loader", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
 
         Ok(result)
     }
@@ -205,10 +256,24 @@ impl GameVersion {
         Ok(result.map(|r| GameVersionId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<GameVersion>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<GameVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:game_version", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<GameVersion>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major FROM game_versions gv
@@ -226,6 +291,14 @@ impl GameVersion {
         .try_collect::<Vec<GameVersion>>()
         .await?;
 
+        cmd("SET")
+            .arg(format!("{}:game_version", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
+
         Ok(result)
     }
 
@@ -233,75 +306,27 @@ impl GameVersion {
         version_type_option: Option<&str>,
         major_option: Option<bool>,
         exec: E,
+        redis: &deadpool_redis::Pool,
     ) -> Result<Vec<GameVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let result;
+        let result = Self::list(exec, redis)
+            .await?
+            .into_iter()
+            .filter(|x| {
+                let mut bool = true;
 
-        if let Some(version_type) = version_type_option {
-            if let Some(major) = major_option {
-                result = sqlx::query!(
-                    "
-                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv
-                    WHERE major = $1 AND type = $2
-                    ORDER BY created DESC
-                    ",
-                    major,
-                    version_type
-                )
-                .fetch_many(exec)
-                    .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
-                        id: GameVersionId(c.id),
-                        version: c.version_,
-                        type_: c.type_,
-                        created: c.created,
-                        major: c.major,
-                    })) })
-                .try_collect::<Vec<GameVersion>>()
-                .await?;
-            } else {
-                result = sqlx::query!(
-                    "
-                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv
-                    WHERE type = $1
-                    ORDER BY created DESC
-                    ",
-                    version_type
-                )
-                .fetch_many(exec)
-                    .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
-                        id: GameVersionId(c.id),
-                        version: c.version_,
-                        type_: c.type_,
-                        created: c.created,
-                        major: c.major,
-                    })) })
-                .try_collect::<Vec<GameVersion>>()
-                .await?;
-            }
-        } else if let Some(major) = major_option {
-            result = sqlx::query!(
-                "
-                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv
-                WHERE major = $1
-                ORDER BY created DESC
-                ",
-                major
-            )
-            .fetch_many(exec)
-                .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
-                    id: GameVersionId(c.id),
-                    version: c.version_,
-                    type_: c.type_,
-                    created: c.created,
-                    major: c.major,
-                })) })
-            .try_collect::<Vec<GameVersion>>()
-            .await?;
-        } else {
-            result = Vec::new();
-        }
+                if let Some(version_type) = version_type_option {
+                    bool &= &*x.type_ == version_type;
+                }
+                if let Some(major) = major_option {
+                    bool &= x.major == major;
+                }
+
+                bool
+            })
+            .collect();
 
         Ok(result)
     }
@@ -381,10 +406,24 @@ impl DonationPlatform {
         Ok(result.map(|r| DonationPlatformId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<DonationPlatform>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<DonationPlatform>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:donation_platform", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<DonationPlatform>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT id, short, name FROM donation_platforms
@@ -400,6 +439,14 @@ impl DonationPlatform {
         })
         .try_collect::<Vec<DonationPlatform>>()
         .await?;
+
+        cmd("SET")
+            .arg(format!("{}:donation_platform", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
 
         Ok(result)
     }
@@ -423,10 +470,24 @@ impl ReportType {
         Ok(result.map(|r| ReportTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<String>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:report_type", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<String>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT name FROM report_types
@@ -436,6 +497,14 @@ impl ReportType {
         .try_filter_map(|e| async { Ok(e.right().map(|c| c.name)) })
         .try_collect::<Vec<String>>()
         .await?;
+
+        cmd("SET")
+            .arg(format!("{}:report_type", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
 
         Ok(result)
     }
@@ -459,10 +528,24 @@ impl ProjectType {
         Ok(result.map(|r| ProjectTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<String>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:project_type", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<String>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT name FROM project_types
@@ -472,6 +555,14 @@ impl ProjectType {
         .try_filter_map(|e| async { Ok(e.right().map(|c| c.name)) })
         .try_collect::<Vec<String>>()
         .await?;
+
+        cmd("SET")
+            .arg(format!("{}:project_type", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
 
         Ok(result)
     }
@@ -495,10 +586,24 @@ impl SideType {
         Ok(result.map(|r| SideTypeId(r.id)))
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+        redis: &deadpool_redis::Pool,
+    ) -> Result<Vec<String>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.get().await?;
+        let res = cmd("GET")
+            .arg(format!("{}:side_type", TAGS_NAMESPACE))
+            .query_async::<_, Option<String>>(&mut redis)
+            .await?
+            .and_then(|x| serde_json::from_str::<Vec<String>>(&x).ok());
+
+        if let Some(res) = res {
+            return Ok(res);
+        }
+
         let result = sqlx::query!(
             "
             SELECT name FROM side_types
@@ -508,6 +613,14 @@ impl SideType {
         .try_filter_map(|e| async { Ok(e.right().map(|c| c.name)) })
         .try_collect::<Vec<String>>()
         .await?;
+
+        cmd("SET")
+            .arg(format!("{}:side_type", TAGS_NAMESPACE))
+            .arg(serde_json::to_string(&result)?)
+            .arg("EX")
+            .arg(DEFAULT_EXPIRY)
+            .query_async::<_, ()>(&mut redis)
+            .await?;
 
         Ok(result)
     }

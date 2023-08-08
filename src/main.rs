@@ -79,9 +79,17 @@ async fn main() -> std::io::Result<()> {
         .expect("Database connection failed");
 
     // Redis connector
-    let redis_cfg = Config::from_url(dotenvy::var("REDIS_URL").expect("Redis URL not set"));
-    let redis_pool = redis_cfg
-        .create_pool(Some(Runtime::Tokio1))
+    let redis_pool = Config::from_url(dotenvy::var("REDIS_URL").expect("Redis URL not set"))
+        .builder()
+        .expect("Error building Redis pool")
+        .max_size(
+            dotenvy::var("DATABASE_MAX_CONNECTIONS")
+                .ok()
+                .and_then(|x| x.parse().ok())
+                .unwrap_or(10000),
+        )
+        .runtime(Runtime::Tokio1)
+        .build()
         .expect("Redis connection failed");
 
     let storage_backend = dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
@@ -175,6 +183,7 @@ async fn main() -> std::io::Result<()> {
 
     // Reminding moderators to review projects which have been in the queue longer than 40hr
     let pool_ref = pool.clone();
+    let redis_ref = redis_pool.clone();
     let webhook_message_sent = Arc::new(Mutex::new(Vec::<(
         database::models::ProjectId,
         DateTime<Utc>,
@@ -182,6 +191,7 @@ async fn main() -> std::io::Result<()> {
 
     scheduler.run(std::time::Duration::from_secs(10 * 60), move || {
         let pool_ref = pool_ref.clone();
+        let redis_ref = redis_ref.clone();
         let webhook_message_sent_ref = webhook_message_sent.clone();
         info!("Checking reviewed projects submitted more than 40hrs ago");
 
@@ -217,6 +227,7 @@ async fn main() -> std::io::Result<()> {
                         util::webhook::send_discord_webhook(
                             project.into(),
                             &pool_ref,
+                            &redis_ref,
                             webhook_url,
                             Some("<@&783155186491195394> This project has been in the queue for over 40 hours!".to_string()),
                         )

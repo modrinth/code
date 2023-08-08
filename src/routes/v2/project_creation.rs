@@ -367,8 +367,8 @@ async fn project_create_inner(
     let mut versions_map = std::collections::HashMap::new();
     let mut gallery_urls = Vec::new();
 
-    let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
-    let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
+    let all_game_versions = models::categories::GameVersion::list(&mut *transaction, redis).await?;
+    let all_loaders = models::categories::Loader::list(&mut *transaction, redis).await?;
 
     {
         // The first multipart field must be named "data" and contain a
@@ -836,9 +836,15 @@ async fn project_create_inner(
 
         if status == ProjectStatus::Processing {
             if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
-                crate::util::webhook::send_discord_webhook(response.id, pool, webhook_url, None)
-                    .await
-                    .ok();
+                crate::util::webhook::send_discord_webhook(
+                    response.id,
+                    pool,
+                    redis,
+                    webhook_url,
+                    None,
+                )
+                .await
+                .ok();
             }
         }
 

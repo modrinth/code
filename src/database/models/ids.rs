@@ -161,13 +161,13 @@ pub struct DonationPlatformId(pub i32);
 #[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
-#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Deserialize, Serialize)]
 #[sqlx(transparent)]
 pub struct GameVersionId(pub i32);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct LoaderId(pub i32);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct CategoryId(pub i32);
 

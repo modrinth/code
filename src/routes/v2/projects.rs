@@ -504,6 +504,7 @@ pub async fn project_edit(
                         crate::util::webhook::send_discord_webhook(
                             project_item.inner.id.into(),
                             &pool,
+                            &redis,
                             webhook_url,
                             None,
                         )
@@ -530,6 +531,7 @@ pub async fn project_edit(
                         crate::util::webhook::send_discord_webhook(
                             project_item.inner.id.into(),
                             &pool,
+                            &redis,
                             webhook_url,
                             None,
                         )
@@ -1251,8 +1253,9 @@ pub async fn projects_edit(
     let team_members =
         database::models::TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
 
-    let categories = database::models::categories::Category::list(&**pool).await?;
-    let donation_platforms = database::models::categories::DonationPlatform::list(&**pool).await?;
+    let categories = database::models::categories::Category::list(&**pool, &redis).await?;
+    let donation_platforms =
+        database::models::categories::DonationPlatform::list(&**pool, &redis).await?;
 
     let mut transaction = pool.begin().await?;
 
