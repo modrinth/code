@@ -204,6 +204,22 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           .map((x) => x.version),
       }
     },
+    // Paper 1.19.3+
+    'paper-plugin.yml': (file) => {
+      const metadata = yaml.load(file)
+
+      return {
+        name: `${project.title} ${metadata.version}`,
+        version_number: metadata.version,
+        version_type: versionType(metadata.version),
+        loaders: ['paper'],
+        game_versions: gameVersions
+          .filter(
+            (x) => x.version.startsWith(metadata['api-version']) && x.version_type === 'release'
+          )
+          .map((x) => x.version),
+      }
+    },
     // Bungeecord + Waterfall
     'bungee.yml': (file) => {
       const metadata = yaml.load(file)
