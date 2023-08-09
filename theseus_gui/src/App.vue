@@ -254,8 +254,6 @@ command_listener((e) => {
             </Suspense>
           </section>
         </div>
-
-
         <section v-if="!nativeDecorations" class="window-controls">
           <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
             <MinimizeIcon />
@@ -276,8 +274,6 @@ command_listener((e) => {
             <XIcon />
           </Button>
         </section>
-
-
       </div>
       <div class="router-view">
         <ModrinthLoadingIndicator
