@@ -177,6 +177,20 @@ document.querySelector('body').addEventListener('click', function (e) {
   }
 })
 
+document.querySelector('body').addEventListener('auxclick', function (e) {
+  // disables middle click -> new tab
+  if (e.button === 1) {
+    e.preventDefault()
+    // instead do a left click
+    const event = new MouseEvent('click', {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+    })
+    e.target.dispatchEvent(event)
+  }
+})
+
 const accounts = ref(null)
 
 command_listener((e) => {

@@ -87,7 +87,6 @@
               v-if="dependency.link"
               class="btn dependency"
               :to="dependency.link"
-              @click="testTest"
             >
               <Avatar size="sm" :src="dependency.icon" />
               <div>

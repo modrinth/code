@@ -840,12 +840,16 @@ impl Profiles {
                         drop(creds);
 
                         // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
-                        // so we can just take the first one
+                        // so we can just take the first one for which the loader matches
                         let mut new_profiles = state.profiles.write().await;
                         if let Some(profile) =
                             new_profiles.0.get_mut(&profile_path)
                         {
-                            if let Some(recent_version) = versions.get(0) {
+                            let loader = profile.metadata.loader;
+                            let recent_version = versions
+                                .iter()
+                                .find(|x| x.loaders.contains(&loader.as_api_str().to_string()));
+                            if let Some(recent_version) = recent_version {
                                 profile.modrinth_update_version =
                                     Some(recent_version.id.clone());
                             } else {
