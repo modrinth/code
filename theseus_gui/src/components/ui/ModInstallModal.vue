@@ -242,6 +242,7 @@ const check_valid = computed(() => {
                   : tauri.convertFileSrc(profile.metadata?.icon)
               "
               class="profile-image"
+              loading="lazy"
             />
             {{ profile.metadata.name }}
           </Button>
@@ -257,7 +258,7 @@ const check_valid = computed(() => {
       <Card v-if="showCreation" class="creation-card">
         <div class="creation-container">
           <div class="creation-icon">
-            <Avatar size="md" class="icon" :src="display_icon" />
+            <Avatar size="md" class="icon" :src="display_icon" loading="lazy" />
             <div class="creation-icon__description">
               <Button @click="upload_icon()">
                 <UploadIcon />

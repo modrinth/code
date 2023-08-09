@@ -1,9 +1,5 @@
 <template>
-  <Card
-    v-if="projects.length > 0"
-    class="mod-card"
-    :class="{ static: instance.metadata.linked_data }"
-  >
+  <Card class="mod-card">
     <div class="second-row">
       <Chips
         v-if="Object.keys(selectableProjectTypes).length > 1"
@@ -56,209 +52,216 @@
         </DropdownButton>
       </span>
     </div>
-    <div>
-      <div class="table">
-        <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
-          <div v-if="!instance.metadata.linked_data" class="table-cell table-text">
-            <Checkbox v-model="selectAll" class="select-checkbox" />
-          </div>
-          <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
-            <Button class="transparent" @click="sortProjects('Name')">
-              Name
-              <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
-            </Button>
-          </div>
-          <div v-if="selected.length === 0" class="table-cell table-text version">
-            <Button class="transparent" @click="sortProjects('Version')">
-              Version
-              <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
-            </Button>
-          </div>
-          <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-            <Button
-              v-if="!instance.metadata.linked_data"
-              class="transparent"
-              @click="sortProjects('Enabled')"
-            >
-              Actions
-              <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
-            </Button>
-          </div>
-          <div v-else-if="!instance.metadata.linked_data" class="options table-cell name-cell">
-            <Button
-              class="transparent share"
-              @click="() => (showingOptions = !showingOptions)"
-              @mouseover="selectedOption = 'Share'"
-            >
-              <MenuIcon :class="{ open: showingOptions }" />
-            </Button>
-            <Button
-              class="transparent share"
-              @click="shareNames()"
-              @mouseover="selectedOption = 'Share'"
-            >
-              <ShareIcon />
-              Share
-            </Button>
-            <Button
-              class="transparent trash"
-              @click="deleteWarning.show()"
-              @mouseover="selectedOption = 'Delete'"
-            >
-              <TrashIcon />
-              Delete
-            </Button>
-            <Button
-              class="transparent update"
-              :disabled="offline"
-              @click="updateAll()"
-              @mouseover="selectedOption = 'Update'"
-            >
-              <UpdatedIcon />
-              Update
-            </Button>
-            <Button
-              class="transparent"
-              @click="toggleSelected()"
-              @mouseover="selectedOption = 'Toggle'"
-            >
-              <ToggleIcon />
-              Toggle
-            </Button>
-          </div>
+  </Card>
+  <Pagination
+    :page="currentPage"
+    :count="Math.ceil(search.length / 20)"
+    class="pagination-before"
+    :link-function="(page) => `?page=${page}`"
+    @switch-page="switchPage"
+  />
+  <Card v-if="projects.length > 0" :class="{ static: instance.metadata.linked_data }">
+    <div class="table">
+      <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
+        <div v-if="!instance.metadata.linked_data" class="table-cell table-text">
+          <Checkbox v-model="selectAll" class="select-checkbox" />
         </div>
-        <div
-          v-if="showingOptions && selected.length > 0 && !instance.metadata.linked_data"
-          class="more-box"
-        >
-          <section v-if="selectedOption === 'Share'" class="options">
-            <Button class="transparent" @click="shareNames()">
-              <TextInputIcon />
-              Share names
-            </Button>
-            <Button class="transparent" @click="shareUrls()">
-              <GlobeIcon />
-              Share URLs
-            </Button>
-            <Button class="transparent" @click="shareFileNames()">
-              <FileIcon />
-              Share file names
-            </Button>
-            <Button class="transparent" @click="shareMarkdown()">
-              <CodeIcon />
-              Share as markdown
-            </Button>
-          </section>
-          <section v-if="selectedOption === 'Delete'" class="options">
-            <Button class="transparent" @click="deleteWarning.show()">
-              <TrashIcon />
-              Delete selected
-            </Button>
-            <Button class="transparent" @click="deleteDisabledWarning.show()">
-              <ToggleIcon />
-              Delete disabled
-            </Button>
-          </section>
-          <section v-if="selectedOption === 'Update'" class="options">
-            <Button class="transparent" :disabled="offline" @click="updateAll()">
-              <UpdatedIcon />
-              Update all
-            </Button>
-            <Button class="transparent" @click="selectUpdatable()">
-              <CheckIcon />
-              Select updatable
-            </Button>
-          </section>
-          <section v-if="selectedOption === 'Toggle'" class="options">
-            <Button class="transparent" @click="enableAll()">
-              <CheckIcon />
-              Toggle on
-            </Button>
-            <Button class="transparent" @click="disableAll()">
-              <XIcon />
-              Toggle off
-            </Button>
-            <Button class="transparent" @click="hideShowAll()">
-              <EyeIcon v-if="hideNonSelected" />
-              <EyeOffIcon v-else />
-              {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
-            </Button>
-          </section>
+        <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
+          <Button class="transparent" @click="sortProjects('Name')">
+            Name
+            <DropdownIcon v-if="sortColumn === 'Name'" :class="{ down: ascending }" />
+          </Button>
         </div>
-        <div
-          v-for="mod in search"
-          :key="mod.file_name"
-          class="table-row"
-          @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
-        >
-          <div v-if="!instance.metadata.linked_data" class="table-cell table-text checkbox">
-            <Checkbox
-              :model-value="selectionMap.get(mod.path)"
-              class="select-checkbox"
-              @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
-            />
-          </div>
-          <div class="table-cell table-text name-cell">
-            <router-link
-              v-if="mod.slug"
-              :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
-              :disabled="offline"
-              class="mod-content"
-            >
-              <Avatar :src="mod.icon" />
-              <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
-                <div class="title">{{ mod.name }}</div>
-                <span class="no-wrap">by {{ mod.author }}</span>
-              </div>
-            </router-link>
-            <div v-else class="mod-content">
-              <Avatar :src="mod.icon" />
-              <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
+        <div v-if="selected.length === 0" class="table-cell table-text version">
+          <Button class="transparent" @click="sortProjects('Version')">
+            Version
+            <DropdownIcon v-if="sortColumn === 'Version'" :class="{ down: ascending }" />
+          </Button>
+        </div>
+        <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
+          <Button
+            v-if="!instance.metadata.linked_data"
+            class="transparent"
+            @click="sortProjects('Enabled')"
+          >
+            Actions
+            <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
+          </Button>
+        </div>
+        <div v-else-if="!instance.metadata.linked_data" class="options table-cell name-cell">
+          <Button
+            class="transparent share"
+            @click="() => (showingOptions = !showingOptions)"
+            @mouseover="selectedOption = 'Share'"
+          >
+            <MenuIcon :class="{ open: showingOptions }" />
+          </Button>
+          <Button
+            class="transparent share"
+            @click="shareNames()"
+            @mouseover="selectedOption = 'Share'"
+          >
+            <ShareIcon />
+            Share
+          </Button>
+          <Button
+            class="transparent trash"
+            @click="deleteWarning.show()"
+            @mouseover="selectedOption = 'Delete'"
+          >
+            <TrashIcon />
+            Delete
+          </Button>
+          <Button
+            class="transparent update"
+            :disabled="offline"
+            @click="updateAll()"
+            @mouseover="selectedOption = 'Update'"
+          >
+            <UpdatedIcon />
+            Update
+          </Button>
+          <Button
+            class="transparent"
+            @click="toggleSelected()"
+            @mouseover="selectedOption = 'Toggle'"
+          >
+            <ToggleIcon />
+            Toggle
+          </Button>
+        </div>
+      </div>
+      <div
+        v-if="showingOptions && selected.length > 0 && !instance.metadata.linked_data"
+        class="more-box"
+      >
+        <section v-if="selectedOption === 'Share'" class="options">
+          <Button class="transparent" @click="shareNames()">
+            <TextInputIcon />
+            Share names
+          </Button>
+          <Button class="transparent" @click="shareUrls()">
+            <GlobeIcon />
+            Share URLs
+          </Button>
+          <Button class="transparent" @click="shareFileNames()">
+            <FileIcon />
+            Share file names
+          </Button>
+          <Button class="transparent" @click="shareMarkdown()">
+            <CodeIcon />
+            Share as markdown
+          </Button>
+        </section>
+        <section v-if="selectedOption === 'Delete'" class="options">
+          <Button class="transparent" @click="deleteWarning.show()">
+            <TrashIcon />
+            Delete selected
+          </Button>
+          <Button class="transparent" @click="deleteDisabledWarning.show()">
+            <ToggleIcon />
+            Delete disabled
+          </Button>
+        </section>
+        <section v-if="selectedOption === 'Update'" class="options">
+          <Button class="transparent" :disabled="offline" @click="updateAll()">
+            <UpdatedIcon />
+            Update all
+          </Button>
+          <Button class="transparent" @click="selectUpdatable()">
+            <CheckIcon />
+            Select updatable
+          </Button>
+        </section>
+        <section v-if="selectedOption === 'Toggle'" class="options">
+          <Button class="transparent" @click="enableAll()">
+            <CheckIcon />
+            Toggle on
+          </Button>
+          <Button class="transparent" @click="disableAll()">
+            <XIcon />
+            Toggle off
+          </Button>
+          <Button class="transparent" @click="hideShowAll()">
+            <EyeIcon v-if="hideNonSelected" />
+            <EyeOffIcon v-else />
+            {{ hideNonSelected ? 'Show' : 'Hide' }} untoggled
+          </Button>
+        </section>
+      </div>
+      <div
+        v-for="mod in search.slice((currentPage - 1) * 20, currentPage * 20)"
+        :key="mod.file_name"
+        class="table-row"
+        @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
+      >
+        <div v-if="!instance.metadata.linked_data" class="table-cell table-text checkbox">
+          <Checkbox
+            :model-value="selectionMap.get(mod.path)"
+            class="select-checkbox"
+            @update:model-value="(newValue) => selectionMap.set(mod.path, newValue)"
+          />
+        </div>
+        <div class="table-cell table-text name-cell">
+          <router-link
+            v-if="mod.slug"
+            :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
+            :disabled="offline"
+            class="mod-content"
+          >
+            <Avatar :src="mod.icon" loading="lazy" />
+            <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
+              <div class="title">{{ mod.name }}</div>
+              <span class="no-wrap">by {{ mod.author }}</span>
             </div>
+          </router-link>
+          <div v-else class="mod-content">
+            <Avatar :src="mod.icon" loading="lazy" />
+            <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
           </div>
-          <div class="table-cell table-text version">
-            <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
-          </div>
-          <div class="table-cell table-text manage">
-            <Button
-              v-if="!instance.metadata.linked_data"
-              v-tooltip="'Remove project'"
-              icon-only
-              @click="removeMod(mod)"
-            >
-              <TrashIcon />
-            </Button>
-            <AnimatedLogo
-              v-if="mod.updating && !instance.metadata.linked_data"
-              class="btn icon-only updating-indicator"
-            ></AnimatedLogo>
-            <Button
-              v-else-if="!instance.metadata.linked_data"
-              v-tooltip="'Update project'"
-              :disabled="!mod.outdated || offline"
-              icon-only
-              @click="updateProject(mod)"
-            >
-              <UpdatedIcon v-if="mod.outdated" />
-              <CheckIcon v-else />
-            </Button>
-            <input
-              v-if="!instance.metadata.linked_data"
-              id="switch-1"
-              autocomplete="off"
-              type="checkbox"
-              class="switch stylized-toggle"
-              :checked="!mod.disabled"
-              @change="toggleDisableMod(mod)"
-            />
-            <Button
-              v-tooltip="`Show ${mod.file_name}`"
-              icon-only
-              @click="showProfileInFolder(mod.path)"
-            >
-              <FolderOpenIcon />
-            </Button>
-          </div>
+        </div>
+        <div class="table-cell table-text version">
+          <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
+        </div>
+        <div class="table-cell table-text manage">
+          <Button
+            v-if="!instance.metadata.linked_data"
+            v-tooltip="'Remove project'"
+            icon-only
+            @click="removeMod(mod)"
+          >
+            <TrashIcon />
+          </Button>
+          <AnimatedLogo
+            v-if="mod.updating && !instance.metadata.linked_data"
+            class="btn icon-only updating-indicator"
+          ></AnimatedLogo>
+          <Button
+            v-else-if="!instance.metadata.linked_data"
+            v-tooltip="'Update project'"
+            :disabled="!mod.outdated || offline"
+            icon-only
+            @click="updateProject(mod)"
+          >
+            <UpdatedIcon v-if="mod.outdated" />
+            <CheckIcon v-else />
+          </Button>
+          <input
+            v-if="!instance.metadata.linked_data"
+            id="switch-1"
+            autocomplete="off"
+            type="checkbox"
+            class="switch stylized-toggle"
+            :checked="!mod.disabled"
+            @change="toggleDisableMod(mod)"
+          />
+          <Button
+            v-tooltip="`Show ${mod.file_name}`"
+            icon-only
+            @click="showProfileInFolder(mod.path)"
+          >
+            <FolderOpenIcon />
+          </Button>
         </div>
       </div>
     </div>
@@ -361,6 +364,7 @@ import {
   EyeOffIcon,
   ShareModal,
   CodeIcon,
+  Pagination,
 } from 'omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -501,6 +505,7 @@ const selectedOption = ref('Share')
 const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
+const currentPage = ref(1)
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -833,6 +838,10 @@ const unlisten = await listen('tauri://file-drop', async (event) => {
   initProjects(await get(props.instance.path).catch(handleError))
 })
 
+const switchPage = (page) => {
+  currentPage.value = page
+}
+
 onUnmounted(() => {
   unlisten()
 })
@@ -907,6 +916,7 @@ onUnmounted(() => {
   gap: var(--gap-sm);
   justify-content: center;
   overflow: hidden;
+  margin-bottom: 0;
 }
 
 .text-combo {

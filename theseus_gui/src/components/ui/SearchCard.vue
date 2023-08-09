@@ -12,7 +12,7 @@
     "
   >
     <div class="icon">
-      <Avatar :src="project.icon_url" size="md" class="search-icon" />
+      <Avatar :src="project.icon_url" size="md" class="search-icon" loading="lazy" />
     </div>
     <div class="content-wrapper">
       <div class="title joined-text">

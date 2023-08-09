@@ -223,6 +223,7 @@ defineProps({
               src="https://launcher-files.modrinth.com/assets/default_profile.png"
               size="md"
               class="search-icon"
+              loading="lazy"
             />
           </div>
           <div class="content-wrapper">

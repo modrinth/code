@@ -10,6 +10,7 @@
               ? instance.metadata.icon
               : convertFileSrc(instance.metadata?.icon)
           "
+          loading="lazy"
         />
         <div class="instance-info">
           <h2 class="name">{{ instance.metadata.name }}</h2>

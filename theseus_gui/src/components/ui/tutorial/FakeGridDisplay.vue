@@ -68,6 +68,7 @@ defineProps({
           src="https://launcher-files.modrinth.com/assets/default_profile.png"
           alt="Mod card"
           class="mod-image"
+          loading="lazy"
         />
         <div class="project-info">
           <p class="title">Example Profile</p>

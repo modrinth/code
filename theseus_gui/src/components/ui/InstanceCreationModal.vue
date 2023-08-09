@@ -6,7 +6,7 @@
     <hr class="card-divider" />
     <div v-if="creationType === 'custom'" class="modal-body">
       <div class="image-upload">
-        <Avatar :src="display_icon" size="md" :rounded="true" />
+        <Avatar :src="display_icon" size="md" :rounded="true" loading="lazy" />
         <div class="image-input">
           <Button @click="upload_icon()">
             <UploadIcon />

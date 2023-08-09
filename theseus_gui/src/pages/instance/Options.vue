@@ -65,6 +65,7 @@
         :src="!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon)"
         size="md"
         class="project__icon"
+        loading="lazy"
       />
       <div class="input-stack">
         <button id="instance-icon" class="btn" @click="setIcon">

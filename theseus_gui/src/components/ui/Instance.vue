@@ -185,7 +185,12 @@ onUnmounted(() => unlisten())
 
 <template>
   <div class="instance">
-    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
+    <Card
+      class="instance-card-item button-base"
+      loading="lazy"
+      @click="seeInstance"
+      @mouseenter="checkProcess"
+    >
       <Avatar
         size="sm"
         :src="

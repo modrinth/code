@@ -13,6 +13,7 @@
           ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
+      loading="lazy"
     />
     <div v-show="mode === 'expanded'" class="avatar-text">
       <div class="text no-select">
@@ -32,7 +33,11 @@
       :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
     >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`" />
+        <Avatar
+          size="xs"
+          :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`"
+          loading="lazy"
+        />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
@@ -50,7 +55,11 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="`https://mc-heads.net/avatar/${account.id}/128`" class="icon" />
+            <Avatar
+              :src="`https://mc-heads.net/avatar/${account.id}/128`"
+              class="icon"
+              loading="lazy"
+            />
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
