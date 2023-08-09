@@ -786,7 +786,7 @@ useSeoMeta({
       <div class="section-subheader">
         <div class="section-subheader-title">Download the Modrinth App</div>
         <div class="section-subheader-description">
-          Our desktop app is available accross all platforms, <br />
+          Our desktop app is available across all platforms, <br />
           choose your desired version.
         </div>
       </div>
