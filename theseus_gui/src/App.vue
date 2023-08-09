@@ -65,7 +65,7 @@ defineExpose({
     showOnboarding.value = !fully_onboarded
 
     nativeDecorations.value = native_decorations
-    if (os !== "mac") appWindow.setDecorations(native_decorations)
+    if (os !== "MacOS") appWindow.setDecorations(native_decorations)
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation

@@ -237,7 +237,7 @@ async function refreshDir() {
           "
         />
       </div>
-      <div v-if="getOS() != 'mac'" class="adjacent-input">
+      <div v-if="getOS() != 'MacOS'" class="adjacent-input">
         <label for="native-decorations">
           <span class="label__title">Native decorations</span>
           <span class="label__description"
