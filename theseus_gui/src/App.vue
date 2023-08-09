@@ -48,13 +48,14 @@ const isLoading = ref(true)
 const videoPlaying = ref(false)
 const offline = ref(false)
 const showOnboarding = ref(false)
+const nativeDecorations = ref(false)
 
 const onboardingVideo = ref()
 
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
+    const { native_decorations, theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
       await get()
     const os = await getOS()
     // video should play if the user is not on linux, and has not onboarded
@@ -62,6 +63,9 @@ defineExpose({
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !fully_onboarded
+
+    nativeDecorations.value = native_decorations
+    if (os !== "mac") appWindow.setDecorations(native_decorations)
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
@@ -250,7 +254,9 @@ command_listener((e) => {
             </Suspense>
           </section>
         </div>
-        <section class="window-controls">
+
+
+        <section v-if="!nativeDecorations" class="window-controls">
           <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
             <MinimizeIcon />
           </Button>
@@ -270,6 +276,8 @@ command_listener((e) => {
             <XIcon />
           </Button>
         </section>
+
+
       </div>
       <div class="router-view">
         <ModrinthLoadingIndicator

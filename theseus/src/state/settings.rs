@@ -33,6 +33,8 @@ pub struct Settings {
     #[serde(default)]
     pub hide_on_process: bool,
     #[serde(default)]
+    pub native_decorations: bool,
+    #[serde(default)]
     pub default_page: DefaultPage,
     #[serde(default)]
     pub developer_mode: bool,
@@ -78,6 +80,7 @@ impl Settings {
                 version: CURRENT_FORMAT_VERSION,
                 collapsed_navigation: false,
                 hide_on_process: false,
+                native_decorations: false,
                 default_page: DefaultPage::Home,
                 developer_mode: false,
                 opt_out_analytics: false,
