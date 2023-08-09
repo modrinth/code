@@ -107,10 +107,29 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
     let instance: String =
         io::read_to_string(&instance_folder.join("instance.json"))
             .await
-            .unwrap_or("".to_string());
+            .unwrap_or_else( |e| {
+                // TODO: remove temporary logging in future update
+                if !instance_folder.exists() {
+                    tracing::warn!("Instance folder does not exist: {}", instance_folder.display());
+                    return "".to_string();
+                } else {
+                    tracing::warn!(
+                        "Could not read existing instance.json at {}: {}",
+                        instance_folder.display(),
+                        e
+                )  
+                }
+                ; "".to_string()});
     let instance: Result<ATInstance, serde_json::Error> =
         serde_json::from_str::<ATInstance>(&instance);
-    instance.is_ok()
+    if let Err(e) = instance {
+        tracing::warn!("Could not parse instance.json at {}: {}",
+            instance_folder.display()
+        , e);
+        false
+    } else {
+        true
+    }
 }
 
 #[tracing::instrument]
