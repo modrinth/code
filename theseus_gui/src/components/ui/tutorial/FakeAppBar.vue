@@ -1,7 +1,7 @@
 <template>
   <div class="action-groups">
     <Button color="danger" outline @click="exit">
-      <LogOutIcon/>
+      <LogOutIcon />
       Exit tutorial
     </Button>
     <Button v-if="showDownload" ref="infoButton" icon-only class="icon-button show-card-icon">
@@ -40,7 +40,14 @@
 </template>
 
 <script setup>
-import { Button, DownloadIcon, Card, StopCircleIcon, TerminalSquareIcon, LogOutIcon } from 'omorphia'
+import {
+  Button,
+  DownloadIcon,
+  Card,
+  StopCircleIcon,
+  TerminalSquareIcon,
+  LogOutIcon,
+} from 'omorphia'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 
 defineProps({

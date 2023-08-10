@@ -159,7 +159,10 @@ onMounted(async () => {
           <div class="btn icon-only" :class="{ active: phase < 4 }">
             <HomeIcon />
           </div>
-          <div class="btn icon-only" :class="{ active: phase === 4 || phase === 5, highlighted: phase === 4 }">
+          <div
+            class="btn icon-only"
+            :class="{ active: phase === 4 || phase === 5, highlighted: phase === 4 }"
+          >
             <SearchIcon />
           </div>
           <div
@@ -188,7 +191,11 @@ onMounted(async () => {
           <Breadcrumbs data-tauri-drag-region />
         </section>
         <section class="mod-stats">
-          <FakeAppBar :show-running="phase === 7" :show-download="phase === 5" :exit="finishOnboarding">
+          <FakeAppBar
+            :show-running="phase === 7"
+            :show-download="phase === 5"
+            :exit="finishOnboarding"
+          >
             <template #running>
               <TutorialTip
                 :progress-function="nextPhase"

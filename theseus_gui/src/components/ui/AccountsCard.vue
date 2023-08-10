@@ -68,10 +68,10 @@
           <LogInIcon />
           <input type="text" :value="loginUrl" readonly />
           <Button
-              v-tooltip="'Copy link'"
-              icon-only
-              color="raised"
-              @click="() => navigator.clipboard.writeText(loginUrl)"
+            v-tooltip="'Copy link'"
+            icon-only
+            color="raised"
+            @click="() => navigator.clipboard.writeText(loginUrl)"
           >
             <ClipboardCopyIcon />
           </Button>
@@ -86,11 +86,20 @@
       </div>
     </div>
   </Modal>
-
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon, Modal, GlobeIcon, ClipboardCopyIcon } from 'omorphia'
+import {
+  Avatar,
+  Button,
+  Card,
+  PlusIcon,
+  TrashIcon,
+  LogInIcon,
+  Modal,
+  GlobeIcon,
+  ClipboardCopyIcon,
+} from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
@@ -102,7 +111,7 @@ import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
 import { get as getCreds, login_minecraft } from '@/helpers/mr_auth'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import QrcodeVue from "qrcode.vue";
+import QrcodeVue from 'qrcode.vue'
 
 defineProps({
   mode: {
@@ -379,5 +388,4 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: row;
 }
-
 </style>

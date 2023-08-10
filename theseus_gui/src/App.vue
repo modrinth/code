@@ -54,10 +54,8 @@ const onboardingVideo = ref()
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering } =
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
       await get()
-
-    const fully_onboarded = false;
     const os = await getOS()
     // video should play if the user is not on linux, and has not onboarded
     videoPlaying.value = !fully_onboarded && os !== 'Linux'
