@@ -1,57 +1,60 @@
 <template>
   <Card v-if="projects.length > 0" class="mod-card">
-    <div class="second-row">
-      <Chips
-        v-if="Object.keys(selectableProjectTypes).length > 1"
-        v-model="selectedProjectType"
-        :items="Object.keys(selectableProjectTypes)"
+    <div class="dropdown-input">
+      <DropdownSelect
+          v-model="selectedProjectType"
+          :options="Object.keys(selectableProjectTypes)"
+          default-value="All"
+          name="project-type-dropdown"
+          color="primary"
       />
-      <Button
-        v-if="canUpdatePack"
-        :disabled="updatingModpack"
-        color="secondary"
-        @click="updateModpack"
-      >
-        <UpdatedIcon />
-        {{ updatingModpack ? 'Updating' : 'Update modpack' }}
-      </Button>
-    </div>
-    <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
         <input
-          v-model="searchFilter"
-          type="text"
-          :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
+            v-model="searchFilter"
+            type="text"
+            :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
             ? 'projects'
             : selectedProjectType.toLowerCase()
           ).slice(0, search.length === 1 ? -1 : 64)}...`"
-          class="text-input"
-          autocomplete="off"
+            class="text-input"
+            autocomplete="off"
         />
         <Button @click="() => (searchFilter = '')">
           <XIcon />
         </Button>
       </div>
-      <span class="manage">
-        <DropdownButton
-          :options="['search', 'from_file']"
-          default-value="search"
-          name="add-content-dropdown"
-          color="primary"
-          @option-click="handleContentOptionClick"
-        >
-          <template #search>
-            <SearchIcon />
-            <span class="no-wrap"> Add content </span>
-          </template>
-          <template #from_file>
-            <FolderOpenIcon />
-            <span class="no-wrap"> Add from file </span>
-          </template>
-        </DropdownButton>
-      </span>
     </div>
+    <Button
+      v-if="canUpdatePack"
+      :disabled="updatingModpack"
+      color="secondary"
+      large
+      @click="updateModpack"
+    >
+      <UpdatedIcon />
+      {{ updatingModpack ? 'Updating' : 'Update modpack' }}
+    </Button>
+    <Button large v-else @click="exportModal.show()">
+      <PackageIcon />
+      Export modpack
+    </Button>
+    <DropdownButton
+      :options="['search', 'from_file']"
+      default-value="search"
+      name="add-content-dropdown"
+      color="primary"
+      @option-click="handleContentOptionClick"
+    >
+      <template #search>
+        <SearchIcon />
+        <span class="no-wrap"> Add content </span>
+      </template>
+      <template #from_file>
+        <FolderOpenIcon />
+        <span class="no-wrap"> Add from file </span>
+      </template>
+    </DropdownButton>
   </Card>
   <Pagination
     v-if="projects.length > 0"
@@ -343,6 +346,7 @@
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
   />
+  <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
 </template>
 <script setup>
 import {
@@ -354,7 +358,6 @@ import {
   SearchIcon,
   UpdatedIcon,
   AnimatedLogo,
-  Chips,
   FolderOpenIcon,
   Checkbox,
   formatProjectType,
@@ -370,6 +373,7 @@ import {
   ShareModal,
   CodeIcon,
   Pagination,
+  DropdownSelect
 } from 'omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -388,7 +392,8 @@ import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
+import {MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon} from '@/assets/icons'
+import ExportModal from '@/components/ui/ExportModal.vue'
 
 const router = useRouter()
 
@@ -422,6 +427,7 @@ const canUpdatePack = computed(() => {
     props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
   )
 })
+const exportModal = ref(null)
 
 console.log(props.instance)
 const initProjects = (initInstance) => {
@@ -917,11 +923,48 @@ onUnmounted(() => {
 
 .mod-card {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: var(--gap-sm);
-  justify-content: center;
-  overflow: hidden;
+  justify-content: flex-start;
   margin-bottom: 0.5rem;
+  white-space: nowrap;
+
+  :deep(.dropdown-row) {
+    .btn {
+      height: 2.5rem;
+      font-weight: 600;
+    }
+  }
+
+  .dropdown-input {
+    flex-grow: 1;
+
+    .iconified-input {
+      width: 100%;
+
+      input {
+        flex-basis: unset;
+      }
+    }
+
+    :deep(.animated-dropdown) {
+      .render-down {
+        border-radius: var(--radius-md) 0 0 var(--radius-md) !important;
+      }
+
+      .options-wrapper {
+        margin-top: 0.25rem;
+        width: unset;
+        border-radius: var(--radius-md);
+      }
+
+      .options {
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color);
+      }
+    }
+  }
 }
 
 .list-card {
@@ -1095,6 +1138,12 @@ onUnmounted(() => {
   button.checkbox {
     border: none;
     margin: 0;
+  }
+}
+
+.dropdown-input {
+  .selected {
+    height: 2.5rem;
   }
 }
 </style>
