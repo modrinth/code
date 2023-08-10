@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
+use crate::prelude::Profile;
 use crate::state::CredentialsStore;
 use crate::{
     prelude::{ModLoader, ProfilePathId},
@@ -199,6 +200,15 @@ pub async fn import_curseforge(
     {
         crate::launcher::install_minecraft(&profile_val, None).await?;
 
+        { 
+        let state = State::get().await?;
+        let mut file_watcher = state.file_watcher.write().await;
+        Profile::watch_fs(
+            &profile_val.get_profile_full_path().await?,
+            &mut file_watcher,
+        )
+        .await?;
+    }
         State::sync().await?;
     }
 

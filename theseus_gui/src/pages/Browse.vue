@@ -246,7 +246,7 @@ async function refreshSearch() {
     }
   }
   if (instanceContext.value) {
-    for (let val of results.value.hits) {
+    for (val of rawResults.hits) {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )

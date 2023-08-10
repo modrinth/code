@@ -345,7 +345,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
     let (mut tx, mut rx) = channel(1);
 
     let file_watcher = new_debouncer(
-        Duration::from_secs_f32(2.0),
+        Duration::from_secs_f32(10.0),
         None,
         move |res: DebounceEventResult| {
             futures::executor::block_on(async {
@@ -353,19 +353,22 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
             })
         },
     )?;
-
     tokio::task::spawn(async move {
-        while let Some(res) = rx.next().await {
+        let span =
+        tracing::span!(tracing::Level::INFO, "init_watcher");
+    tracing::info!(
+        parent: &span,
+        "Initting watcher"
+    );
+    while let Some(res) = rx.next().await {
+        let _span = span.enter();
+        tracing::info!("Watching...");
             match res {
                 Ok(mut events) => {
                     let mut visited_paths = Vec::new();
                     // sort events by e.path
                     events.sort_by(|a, b| a.path.cmp(&b.path));
                     events.iter().for_each(|e| {
-                        tracing::debug!(
-                            "File watcher event: {:?}",
-                            serde_json::to_string(&e.path).unwrap()
-                        );
                         let mut new_path = PathBuf::new();
                         let mut components_iterator = e.path.components();
                         let mut found = false;
@@ -398,6 +401,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                             Profile::crash_task(profile_path_id);
                         } else if !visited_paths.contains(&new_path) {
                             if subfile {
+                                tracing::info!("Syncing profile from event: {:?} - {subfile} - {:?}", new_path, e);
                                 Profile::sync_projects_task(
                                     profile_path_id,
                                     false,

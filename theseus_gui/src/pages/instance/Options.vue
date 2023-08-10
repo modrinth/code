@@ -204,7 +204,7 @@
     <div class="adjacent-input">
       <label for="fullscreen">
         <span class="label__title">Fullscreen</span>
-        <span class="label__description"> Make the game start in full screen when launched. </span>
+        <span class="label__description"> Make the game start in full screen when launched (using options.txt). </span>
       </label>
       <Checkbox id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
     </div>

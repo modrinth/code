@@ -32,6 +32,7 @@ pub async fn profile_create(
     icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
+    no_watch: Option<bool>,
 ) -> crate::Result<ProfilePathId> {
     name = profile::sanitize_profile_name(&name);
 
@@ -112,7 +113,7 @@ pub async fn profile_create(
 
         {
             let mut profiles = state.profiles.write().await;
-            profiles.insert(profile.clone()).await?;
+            profiles.insert(profile.clone(), no_watch.unwrap_or_default()).await?;
         }
 
         if !skip_install_profile.unwrap_or(false) {
@@ -146,6 +147,7 @@ pub async fn profile_create_from_creator(
         profile.icon_url,
         profile.linked_data,
         profile.skip_install_profile,
+        profile.no_watch,
     )
     .await
 }

@@ -425,7 +425,7 @@ async function refreshDir() {
         <label for="fullscreen">
           <span class="label__title">Fullscreen</span>
           <span class="label__description">
-            Overwrites the option.txt file to start in full screen when launched.
+            Overwrites the options.txt file to start in full screen when launched.
           </span>
         </label>
         <Toggle

@@ -65,7 +65,7 @@ pub enum EnvType {
     Server,
 }
 
-#[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Hash, PartialEq, Eq, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum PackDependency {
     Forge,
@@ -101,6 +101,7 @@ pub struct CreatePackProfile {
     pub icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     pub linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     pub skip_install_profile: Option<bool>,
+    pub no_watch: Option<bool>,
 }
 
 // default
@@ -115,6 +116,7 @@ impl Default for CreatePackProfile {
             icon_url: None,
             linked_data: None,
             skip_install_profile: Some(true),
+            no_watch: Some(false),
         }
     }
 }

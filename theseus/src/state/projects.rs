@@ -281,6 +281,7 @@ pub async fn infer_data_from_files(
 ) -> crate::Result<HashMap<ProjectPathId, Project>> {
     let mut file_path_hashes = HashMap::new();
 
+    tracing::info!("Inferring data from {} files", paths.len());
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
     for path in paths {
         if !path.exists() {

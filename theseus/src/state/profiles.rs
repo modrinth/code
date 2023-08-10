@@ -331,20 +331,21 @@ impl Profile {
     }
 
     pub fn sync_projects_task(profile_path_id: ProfilePathId, force: bool) {
+        let span =
+        tracing::span!(tracing::Level::INFO, "sync_projects_task", ?profile_path_id, ?force);
         tokio::task::spawn(async move {
-            let span =
-                tracing::span!(tracing::Level::INFO, "sync_projects_task");
-            tracing::debug!(
-                parent: &span,
-                "Syncing projects for profile {}",
-                profile_path_id
-            );
             let res = async {
                 let _span = span.enter();
                 let state = State::get().await?;
                 let profile = crate::api::profile::get(&profile_path_id, None).await?;
 
                 if let Some(profile) = profile {
+                    tracing::info!(
+                        "Syncing projects for profile {}, installation stage {:?}, forced: {}",
+                        profile_path_id,
+                        profile.install_stage,
+                        force
+                    );
                     if profile.install_stage != ProfileInstallStage::PackInstalling || force {
                         let paths = profile.get_profile_full_project_paths().await?;
 
@@ -883,7 +884,7 @@ impl Profiles {
 
     #[tracing::instrument(skip(self, profile))]
     #[theseus_macros::debug_pin]
-    pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
+    pub async fn insert(&mut self, profile: Profile, no_watch : bool) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,
             &profile.profile_id(),
@@ -892,13 +893,16 @@ impl Profiles {
         )
         .await?;
 
-        let state = State::get().await?;
-        let mut file_watcher = state.file_watcher.write().await;
-        Profile::watch_fs(
-            &profile.get_profile_full_path().await?,
-            &mut file_watcher,
-        )
-        .await?;
+        tracing::info!("Inserting with nowatch: {no_watch}");
+        if !no_watch {
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
 
         let profile_name = profile.profile_id();
         profile_name.check_valid_utf()?;
@@ -988,8 +992,10 @@ impl Profiles {
                             Self::read_profile_from_dir(
                                 &profile_path_id.get_full_path().await?,
                                 dirs,
+                                
                             )
                             .await?,
+                            false
                         )
                         .await?;
                     Profile::sync_projects_task(profile_path_id, false);

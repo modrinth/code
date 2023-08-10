@@ -9,7 +9,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::CreatePackDescription,
     },
-    prelude::{ModLoader, ProfilePathId},
+    prelude::{ModLoader, ProfilePathId, Profile},
     state::{LinkedData, ProfileInstallStage},
     util::io,
     State,
@@ -33,8 +33,6 @@ pub struct ATLauncher {
     pub modrinth_project: Option<ATLauncherModrinthProject>,
     pub modrinth_version: Option<ATLauncherModrinthVersion>,
     pub modrinth_manifest: Option<pack::install_from::PackFormat>,
-
-    pub mods: Vec<ATLauncherMod>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -57,13 +55,9 @@ pub struct ATLauncherModrinthProject {
     pub slug: String,
     pub project_type: String,
     pub team: String,
-    pub title: String,
-    pub description: String,
-    pub body: String,
     pub client_side: Option<String>,
     pub server_side: Option<String>,
     pub categories: Vec<String>,
-    pub icon_url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -261,7 +255,15 @@ async fn import_atlauncher_unmanaged(
     {
         crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
             .await?;
-
+        { 
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile_val.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
         State::sync().await?;
     }
     Ok(())

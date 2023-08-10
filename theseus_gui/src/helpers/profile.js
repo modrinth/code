@@ -16,13 +16,14 @@ import { invoke } from '@tauri-apps/api/tauri'
     - icon is a path to an image file, which will be copied into the profile directory
 */
 
-export async function create(name, gameVersion, modloader, loaderVersion, icon) {
+export async function create(name, gameVersion, modloader, loaderVersion, icon, noWatch) {
   return await invoke('plugin:profile_create|profile_create', {
     name,
     gameVersion,
     modloader,
     loaderVersion,
     icon,
+    noWatch,
   })
 }
 

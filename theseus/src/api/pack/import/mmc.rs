@@ -7,7 +7,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
-    prelude::ProfilePathId,
+    prelude::{ProfilePathId, Profile},
     util::io,
     State,
 };
@@ -292,7 +292,15 @@ async fn import_mmc_unmanaged(
         crate::api::profile::get(&profile_path, None).await?
     {
         crate::launcher::install_minecraft(&profile_val, None).await?;
-
+        { 
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile_val.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
         State::sync().await?;
     }
     Ok(())
