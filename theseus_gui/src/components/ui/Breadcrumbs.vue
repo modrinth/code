@@ -1,5 +1,14 @@
 <template>
   <div class="breadcrumbs">
+    <Button
+      v-if="breadcrumbs.length > 1"
+      class="breadcrumbs__back transparent"
+      color="primary"
+      icon-only
+      @click="$router.back()"
+    >
+      <LeftArrowIcon />
+    </Button>
     {{ breadcrumbData.resetToNames(breadcrumbs) }}
     <div v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name" class="breadcrumbs__item">
       <router-link
@@ -25,7 +34,7 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon } from 'omorphia'
+import { ChevronRightIcon, Button, LeftArrowIcon } from 'omorphia'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
@@ -58,6 +67,22 @@ const breadcrumbs = computed(() => {
     .chevron,
     a {
       margin: auto 0;
+    }
+  }
+
+  .breadcrumbs__back {
+    margin: auto 0;
+    color: var(--color-base);
+    padding: 0.5rem;
+    height: unset;
+    width: unset;
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+      min-width: 1rem;
+      min-height: 1rem;
+      margin: 0;
     }
   }
 }

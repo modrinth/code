@@ -56,7 +56,7 @@
       </Button>
     </Card>
   </transition>
-  <Modal ref="loginModal" header="Signing in">
+  <Modal class="modal" ref="loginModal" header="Signing in">
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
@@ -387,5 +387,9 @@ onBeforeUnmount(() => {
 .button-row {
   display: flex;
   flex-direction: row;
+}
+
+.modal {
+  position: absolute;
 }
 </style>
