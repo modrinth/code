@@ -190,24 +190,6 @@ pub async fn edit_icon(
     res
 }
 
-pub async fn complete_installation(    path: &ProfilePathId,
-) -> crate::Result<()> {
-    edit(path, |prof| {
-
-        prof.install_stage = ProfileInstallStage::Installed;
-        async { Ok(()) }
-    }).await?;
-    
-    let state = State::get().await?;
-    let mut file_watcher = state.file_watcher.write().await;
-    Profile::watch_fs(
-        &path.get_full_path().await?,
-        &mut file_watcher,
-    )
-    .await?;
-
-    Ok(())
-}
 
 // Gets the optimal JRE key for the given profile, using Daedalus
 // Generally this would be used for profile_create, to get the optimal JRE key

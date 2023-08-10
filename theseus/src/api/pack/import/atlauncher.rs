@@ -182,7 +182,6 @@ pub async fn import_atlauncher(
         backup_name,
         description,
         atinstance,
-        None,
     )
     .await?;
     Ok(())
@@ -194,7 +193,6 @@ async fn import_atlauncher_unmanaged(
     backup_name: String,
     description: CreatePackDescription,
     atinstance: ATInstance,
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     let mod_loader = format!(
         "\"{}\"",
@@ -241,19 +239,24 @@ async fn import_atlauncher_unmanaged(
     })
     .await?;
 
+    
+
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
-    copy_dotminecraft(
+    let loading_bar = copy_dotminecraft(
         profile_path.clone(),
         minecraft_folder,
         &state.io_semaphore,
+        None
     )
     .await?;
+
+
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
             .await?;
         { 
             let state = State::get().await?;

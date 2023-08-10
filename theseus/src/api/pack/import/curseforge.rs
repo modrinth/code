@@ -188,17 +188,18 @@ pub async fn import_curseforge(
 
     // Copy in contained folders as overrides
     let state = State::get().await?;
-    copy_dotminecraft(
+    let loading_bar = copy_dotminecraft(
         profile_path.clone(),
         curseforge_instance_folder,
         &state.io_semaphore,
+        None,
     )
     .await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, None).await?;
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar)).await?;
 
         { 
         let state = State::get().await?;

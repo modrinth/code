@@ -281,17 +281,18 @@ async fn import_mmc_unmanaged(
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
-    copy_dotminecraft(
+    let loading_bar = copy_dotminecraft(
         profile_path.clone(),
         minecraft_folder,
         &state.io_semaphore,
+        None,
     )
     .await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, None).await?;
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar)).await?;
         { 
             let state = State::get().await?;
             let mut file_watcher = state.file_watcher.write().await;

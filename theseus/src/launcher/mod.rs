@@ -124,6 +124,7 @@ pub async fn install_minecraft(
     .await?;
     State::sync().await?;
 
+    tracing::warn!("Syncing projects for {}: {}", profile.profile_id(), sync_projects);
     if sync_projects {
         Profile::sync_projects_task(profile.profile_id(), true);
     }
@@ -188,6 +189,7 @@ pub async fn install_minecraft(
     )
     .await?;
 
+    println!("processors");
     if let Some(processors) = &version_info.processors {
         let client_path = state
             .directories
