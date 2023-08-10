@@ -321,10 +321,7 @@
             </svg>
           </div>
           <h3>Monetization</h3>
-          <p>
-            Get paid 100% of the ad revenue from your project pages and withdraw your funds at any
-            time
-          </p>
+          <p>Get paid ad revenue from your project pages and withdraw your funds at any time</p>
         </div>
         <div class="feature gradient-border">
           <div class="icon gradient-border">

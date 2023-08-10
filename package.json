@@ -44,7 +44,7 @@
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
     "markdown-it": "^13.0.1",
-    "omorphia": "^0.4.35",
+    "omorphia": "^0.4.37",
     "qrcode.vue": "^3.4.0",
     "semver": "^7.5.4",
     "vue-multiselect": "^3.0.0-alpha.2",

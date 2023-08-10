@@ -12,97 +12,106 @@
         </NuxtLink>
       </div>
     </section>
-    <section class="universal-card dashboard-notifications">
-      <div class="header__row">
-        <h2 class="header__title">Notifications</h2>
-        <nuxt-link v-if="notifications.length > 0" class="goto-link" to="/dashboard/notifications">
-          See all <ChevronRightIcon />
-        </nuxt-link>
-      </div>
-      <template v-if="notifications.length > 0">
-        <NotificationItem
-          v-for="notification in notifications"
-          :key="notification.id"
-          v-model:notifications="allNotifs"
-          class="universal-card recessed"
-          :notification="notification"
-          :auth="auth"
-          raised
-          compact
-        />
-        <nuxt-link
-          v-if="extraNotifs > 0"
-          class="goto-link view-more-notifs"
-          to="/dashboard/notifications"
-        >
-          View {{ extraNotifs }} more notification{{ extraNotifs === 1 ? '' : 's' }}
-          <ChevronRightIcon />
-        </nuxt-link>
-      </template>
-      <div v-else class="universal-body">
-        <p>You have no unread notifications.</p>
-        <nuxt-link class="iconified-button" to="/dashboard/notifications">
-          <HistoryIcon /> View notification history
-        </nuxt-link>
-      </div>
-    </section>
-    <section class="universal-card dashboard-analytics">
-      <h2>Analytics</h2>
-      <div class="grid-display">
-        <div class="grid-display__item">
-          <div class="label">Total downloads</div>
-          <div class="value">
-            {{ $formatNumber(projects.reduce((agg, x) => agg + x.downloads, 0)) }}
-          </div>
-          <span
-            >from
-            {{ downloadsProjectCount }}
-            project{{ downloadsProjectCount === 1 ? '' : 's' }}</span
-          >
-          <!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
-          <!--            >View breakdown-->
-          <!--            <ChevronRightIcon-->
-          <!--              class="featured-header-chevron"-->
-          <!--              aria-hidden="true"-->
-          <!--          /></NuxtLink>-->
-        </div>
-        <div class="grid-display__item">
-          <div class="label">Total followers</div>
-          <div class="value">
-            {{ $formatNumber(projects.reduce((agg, x) => agg + x.followers, 0)) }}
-          </div>
-          <span>
-            <span
-              >from {{ followersProjectCount }} project{{
-                followersProjectCount === 1 ? '' : 's'
-              }}</span
-            ></span
-          >
-        </div>
-        <div class="grid-display__item">
-          <div class="label">Total revenue</div>
-          <div class="value">
-            {{ $formatMoney(payouts.all_time, true) }}
-          </div>
-          <span>{{ $formatMoney(payouts.last_month, true) }} in the last month</span>
-        </div>
-        <div class="grid-display__item">
-          <div class="label">Current balance</div>
-          <div class="value">
-            {{ $formatMoney(auth.user.payout_data.balance, true) }}
-          </div>
-          <NuxtLink
-            v-if="auth.user.payout_data.balance >= minWithdraw"
+    <div class="dashboard-notifications">
+      <section class="universal-card">
+        <div class="header__row">
+          <h2 class="header__title">Notifications</h2>
+          <nuxt-link
+            v-if="notifications.length > 0"
             class="goto-link"
-            to="/dashboard/revenue"
+            to="/dashboard/notifications"
           >
-            Withdraw earnings
-            <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
-          </NuxtLink>
-          <span v-else>${{ minWithdraw }} is the withdraw minimum</span>
+            See all <ChevronRightIcon />
+          </nuxt-link>
         </div>
-      </div>
-    </section>
+        <template v-if="notifications.length > 0">
+          <NotificationItem
+            v-for="notification in notifications"
+            :key="notification.id"
+            v-model:notifications="allNotifs"
+            class="universal-card recessed"
+            :notification="notification"
+            :auth="auth"
+            raised
+            compact
+          />
+          <nuxt-link
+            v-if="extraNotifs > 0"
+            class="goto-link view-more-notifs"
+            to="/dashboard/notifications"
+          >
+            View {{ extraNotifs }} more notification{{ extraNotifs === 1 ? '' : 's' }}
+            <ChevronRightIcon />
+          </nuxt-link>
+        </template>
+        <div v-else class="universal-body">
+          <p>You have no unread notifications.</p>
+          <nuxt-link class="iconified-button" to="/dashboard/notifications">
+            <HistoryIcon /> View notification history
+          </nuxt-link>
+        </div>
+      </section>
+    </div>
+
+    <div class="dashboard-analytics">
+      <section class="universal-card">
+        <h2>Analytics</h2>
+        <div class="grid-display">
+          <div class="grid-display__item">
+            <div class="label">Total downloads</div>
+            <div class="value">
+              {{ $formatNumber(projects.reduce((agg, x) => agg + x.downloads, 0)) }}
+            </div>
+            <span
+              >from
+              {{ downloadsProjectCount }}
+              project{{ downloadsProjectCount === 1 ? '' : 's' }}</span
+            >
+            <!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
+            <!--            >View breakdown-->
+            <!--            <ChevronRightIcon-->
+            <!--              class="featured-header-chevron"-->
+            <!--              aria-hidden="true"-->
+            <!--          /></NuxtLink>-->
+          </div>
+          <div class="grid-display__item">
+            <div class="label">Total followers</div>
+            <div class="value">
+              {{ $formatNumber(projects.reduce((agg, x) => agg + x.followers, 0)) }}
+            </div>
+            <span>
+              <span
+                >from {{ followersProjectCount }} project{{
+                  followersProjectCount === 1 ? '' : 's'
+                }}</span
+              ></span
+            >
+          </div>
+          <div class="grid-display__item">
+            <div class="label">Total revenue</div>
+            <div class="value">
+              {{ $formatMoney(payouts.all_time, true) }}
+            </div>
+            <span>{{ $formatMoney(payouts.last_month, true) }} in the last month</span>
+          </div>
+          <div class="grid-display__item">
+            <div class="label">Current balance</div>
+            <div class="value">
+              {{ $formatMoney(auth.user.payout_data.balance, true) }}
+            </div>
+            <NuxtLink
+              v-if="auth.user.payout_data.balance >= minWithdraw"
+              class="goto-link"
+              to="/dashboard/revenue"
+            >
+              Withdraw earnings
+              <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
+            </NuxtLink>
+            <span v-else>${{ minWithdraw }} is the withdraw minimum</span>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 <script setup>

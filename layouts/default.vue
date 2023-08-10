@@ -476,6 +476,10 @@ export default defineNuxtComponent({
     },
   },
   mounted() {
+    if (process.client && window) {
+      window.history.scrollRestoration = 'auto'
+    }
+
     this.runAnalytics()
   },
   methods: {

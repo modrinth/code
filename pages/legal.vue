@@ -25,6 +25,9 @@
           <NavStackItem link="/legal/cmp" label="Rewards Program Terms">
             <CurrencyIcon />
           </NavStackItem>
+          <NavStackItem link="/legal/cmp-info" label="Rewards Program Info">
+            <InfoIcon />
+          </NavStackItem>
         </NavStack>
       </aside>
     </div>

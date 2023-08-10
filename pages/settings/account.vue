@@ -179,7 +179,7 @@
               id="verify-code"
               v-model="twoFactorCode"
               maxlength="6"
-              type="number"
+              type="text"
               placeholder="Enter code..."
             />
             <p v-if="twoFactorIncorrect" class="known-errors">The code entered is incorrect!</p>
@@ -511,7 +511,7 @@ async function verifyTwoFactorCode() {
     const res = await useBaseFetch('auth/2fa', {
       method: 'POST',
       body: {
-        code: twoFactorCode.value ? twoFactorCode.value.toString() : '',
+        code: twoFactorCode.value ? twoFactorCode.value : '',
         flow: twoFactorFlow.value,
       },
     })
