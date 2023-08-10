@@ -124,7 +124,7 @@ import { refreshOffline, isOffline } from '@/helpers/utils.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import {BugIcon} from "@/assets/icons";
+import { BugIcon } from '@/assets/icons'
 
 const router = useRouter()
 const card = ref(null)

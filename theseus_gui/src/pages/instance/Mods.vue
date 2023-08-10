@@ -2,23 +2,23 @@
   <Card v-if="projects.length > 0" class="mod-card">
     <div class="dropdown-input">
       <DropdownSelect
-          v-model="selectedProjectType"
-          :options="Object.keys(selectableProjectTypes)"
-          default-value="All"
-          name="project-type-dropdown"
-          color="primary"
+        v-model="selectedProjectType"
+        :options="Object.keys(selectableProjectTypes)"
+        default-value="All"
+        name="project-type-dropdown"
+        color="primary"
       />
       <div class="iconified-input">
         <SearchIcon />
         <input
-            v-model="searchFilter"
-            type="text"
-            :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
+          v-model="searchFilter"
+          type="text"
+          :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
             ? 'projects'
             : selectedProjectType.toLowerCase()
           ).slice(0, search.length === 1 ? -1 : 64)}...`"
-            class="text-input"
-            autocomplete="off"
+          class="text-input"
+          autocomplete="off"
         />
         <Button @click="() => (searchFilter = '')">
           <XIcon />
@@ -35,7 +35,7 @@
       <UpdatedIcon />
       {{ updatingModpack ? 'Updating' : 'Update modpack' }}
     </Button>
-    <Button large v-else @click="exportModal.show()">
+    <Button v-else large @click="exportModal.show()">
       <PackageIcon />
       Export modpack
     </Button>
@@ -373,7 +373,7 @@ import {
   ShareModal,
   CodeIcon,
   Pagination,
-  DropdownSelect
+  DropdownSelect,
 } from 'omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -392,7 +392,7 @@ import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import {MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon} from '@/assets/icons'
+import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 
 const router = useRouter()
