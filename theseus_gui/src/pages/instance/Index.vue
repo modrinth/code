@@ -7,7 +7,7 @@
           :src="
             !instance.metadata.icon ||
             (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
-              ? instance.metadata.icon
+              ? 'https://launcher-files.modrinth.com/assets/default_profile.png'
               : convertFileSrc(instance.metadata?.icon)
           "
         />
@@ -82,7 +82,7 @@
       </Card>
     </div>
     <div class="content">
-      <Promotion />
+      <Promotion query-param="?r=launcher" />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">

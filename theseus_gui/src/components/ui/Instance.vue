@@ -192,9 +192,9 @@ onUnmounted(() => unlisten())
           props.instance.metadata
             ? !props.instance.metadata.icon ||
               (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
-              ? props.instance.metadata.icon
+              ? 'https://launcher-files.modrinth.com/assets/default_profile.png'
               : convertFileSrc(props.instance.metadata?.icon)
-            : props.instance.icon_url
+            : 'https://launcher-files.modrinth.com/assets/default_profile.png'
         "
         alt="Mod card"
         class="mod-image"

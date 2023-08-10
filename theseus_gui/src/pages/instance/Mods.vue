@@ -54,6 +54,7 @@
     </div>
   </Card>
   <Pagination
+    v-if="projects.length > 0"
     :page="currentPage"
     :count="Math.ceil(search.length / 20)"
     class="pagination-before"

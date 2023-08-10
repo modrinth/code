@@ -2,6 +2,7 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
+    v-tooltip="'Minecraft accounts'"
     class="button-base avatar-button"
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
@@ -14,15 +15,6 @@
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
-    <div v-show="mode === 'expanded'" class="avatar-text">
-      <div class="text no-select">
-        {{ selectedAccount ? selectedAccount.username : 'Offline' }}
-      </div>
-      <p class="accounts-text no-select">
-        <UsersIcon />
-        Accounts
-      </p>
-    </div>
   </div>
   <transition name="fade">
     <Card
@@ -67,7 +59,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
