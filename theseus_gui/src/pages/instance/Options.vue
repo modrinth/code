@@ -21,7 +21,7 @@
       <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" render-up />
+          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" name="Game Version Dropdown" render-up />
           <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
         </div>
       </div>
@@ -31,6 +31,7 @@
           :model-value="selectableLoaderVersions[loaderVersionIndex]"
           :options="selectableLoaderVersions"
           :display-name="(option) => option?.id"
+          name="Version selector"
           render-up
           @change="(value) => (loaderVersionIndex = value.index)"
         />
@@ -425,11 +426,9 @@ const groups = ref(props.instance.metadata.groups)
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
-  ...new Set(
-    instancesList.reduce((acc, obj) => {
+  ...instancesList.reduce((acc, obj) => {
       return acc.concat(obj.metadata.groups)
     }, [])
-  ),
 ])
 
 async function resetIcon() {

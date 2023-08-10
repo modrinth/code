@@ -308,8 +308,8 @@ async function refreshDir() {
           <span class="label__title">Disable analytics</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
-            customize your experience. By enabling this option, you opt out and your data will no longer
-            be collected.
+            customize your experience. By enabling this option, you opt out and your data will no
+            longer be collected.
           </span>
         </label>
         <Toggle id="opt-out-analytics" v-model="settings.opt_out_analytics" />

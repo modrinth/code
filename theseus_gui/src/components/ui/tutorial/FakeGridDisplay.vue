@@ -32,6 +32,7 @@ defineProps({
       <DropdownSelect
         v-model="sortBy"
         class="sort-dropdown"
+        name="Sort Dropdown"
         :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
         placeholder="Select..."
       />
@@ -41,6 +42,7 @@ defineProps({
       <DropdownSelect
         v-model="filters"
         class="filter-dropdown"
+        name="Filter Dropdown"
         :options="['All profiles', 'Custom instances', 'Downloaded modpacks']"
         placeholder="Select..."
       />
@@ -50,6 +52,7 @@ defineProps({
       <DropdownSelect
         v-model="group"
         class="group-dropdown"
+        name="Group dropdown"
         :options="['Category', 'Loader', 'Game version', 'None']"
         placeholder="Select..."
       />

@@ -2,7 +2,7 @@
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
       <Card v-if="instance" class="small-instance">
-        <div class="instance" @click="router.push(`/instance/${encodeURIComponent(instance.path)}`)">
+        <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
           <Avatar
             :src="
               !instance.metadata.icon ||
@@ -23,7 +23,7 @@
               {{ instance.metadata.game_version }}
             </span>
           </div>
-        </div>
+        </router-link>
       </Card>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar size="lg" :src="data.icon_url" loading="lazy" />
@@ -38,6 +38,7 @@
               (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
             )
           "
+          type="ignored"
         >
           <EnvironmentIndicator
             :client-side="data.client_side"
@@ -266,7 +267,7 @@ import {
 } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import {useRoute, useRouter} from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies, isOffline } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
@@ -280,7 +281,6 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 
 const route = useRoute()
-const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)

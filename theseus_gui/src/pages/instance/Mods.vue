@@ -60,8 +60,8 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Card v-if="projects.length > 0" :class="{ static: instance.metadata.linked_data }">
-    <div class="table">
+  <Card class="list-card" :class="{ static: instance.metadata.linked_data }">
+    <div v-if="projects.length > 0" class="table">
       <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
         <div v-if="!instance.metadata.linked_data" class="table-cell table-text">
           <Checkbox v-model="selectAll" class="select-checkbox" />
@@ -265,32 +265,32 @@
         </div>
       </div>
     </div>
+    <div v-else class="empty-prompt">
+      <div class="empty-icon">
+        <AddProjectImage />
+      </div>
+      <h3>No projects found</h3>
+      <p class="empty-subtitle">Add a project to get started</p>
+      <div class="empty-action">
+        <DropdownButton
+          :options="['search', 'from_file']"
+          default-value="search"
+          name="add-content-dropdown-from-empty"
+          color="primary"
+          @option-click="handleContentOptionClick"
+        >
+          <template #search>
+            <SearchIcon />
+            <span class="no-wrap"> Add content </span>
+          </template>
+          <template #from_file>
+            <FolderOpenIcon />
+            <span class="no-wrap"> Add from file </span>
+          </template>
+        </DropdownButton>
+      </div>
+    </div>
   </Card>
-  <div v-else class="empty-prompt">
-    <div class="empty-icon">
-      <AddProjectImage />
-    </div>
-    <h3>No projects found</h3>
-    <p class="empty-subtitle">Add a project to get started</p>
-    <div class="empty-action">
-      <DropdownButton
-        :options="['search', 'from_file']"
-        default-value="search"
-        name="add-content-dropdown-from-empty"
-        color="primary"
-        @option-click="handleContentOptionClick"
-      >
-        <template #search>
-          <SearchIcon />
-          <span class="no-wrap"> Add content </span>
-        </template>
-        <template #from_file>
-          <FolderOpenIcon />
-          <span class="no-wrap"> Add from file </span>
-        </template>
-      </DropdownButton>
-    </div>
-  </div>
   <Modal ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
@@ -916,7 +916,11 @@ onUnmounted(() => {
   gap: var(--gap-sm);
   justify-content: center;
   overflow: hidden;
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+
+.list-card {
+  margin-top: 0.5rem;
 }
 
 .text-combo {

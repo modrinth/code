@@ -56,6 +56,7 @@ const orFacets = ref([])
 const selectedVersions = ref([])
 const onlyOpenSource = ref(false)
 const showSnapshots = ref(false)
+const hideAlreadyInstalled = ref(false)
 const selectedEnvironments = ref([])
 const sortTypes = readonly([
   { display: 'Relevance', name: 'relevance' },
@@ -251,6 +252,10 @@ async function refreshSearch() {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )
+    }
+
+    if (hideAlreadyInstalled.value) {
+      results.value.hits = results.value.hits.filter((x) => !x.installed)
     }
   }
 }
@@ -553,6 +558,13 @@ onUnmounted(() => unlistenOffline())
         <Checkbox
           v-model="ignoreInstanceLoaders"
           label="Override loaders"
+          class="filter-checkbox"
+          @update:model-value="onSearchChangeToTop(1)"
+          @click.prevent.stop
+        />
+        <Checkbox
+          v-model="hideAlreadyInstalled"
+          label="Hide already installed"
           class="filter-checkbox"
           @update:model-value="onSearchChangeToTop(1)"
           @click.prevent.stop

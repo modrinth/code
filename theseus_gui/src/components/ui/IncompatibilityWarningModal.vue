@@ -25,6 +25,7 @@
               v-model="selectedVersion"
               :options="versions"
               placeholder="Select version"
+              name="Version select"
               :display-name="
                 (version) =>
                   `${version?.name} (${version?.loaders

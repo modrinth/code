@@ -246,7 +246,7 @@ command_listener((e) => {
           </section>
           <section class="mod-stats">
             <Suspense>
-              <RunningAppBar data-tauri-drag-region />
+              <RunningAppBar />
             </Suspense>
           </section>
         </div>
@@ -276,7 +276,7 @@ command_listener((e) => {
           offset-height="var(--appbar-height)"
           offset-width="var(--sidebar-width)"
         />
-        <RouterView v-slot="{ Component }" class="main-view">
+        <RouterView v-slot="{ Component }">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
               <component :is="Component"></component>
