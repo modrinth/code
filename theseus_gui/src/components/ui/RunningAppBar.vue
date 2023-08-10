@@ -1,6 +1,6 @@
 <template>
   <div class="action-groups">
-    <a href="https://github.com/modrinth/theseus" class="link">
+    <a href="https://github.com/modrinth/theseus/issues" class="link">
       <BugIcon />
       <span> Report a bug </span>
     </a>
