@@ -4,7 +4,7 @@
       <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-1">
         <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2">
           <a
-            href="https://bisecthosting.com/modrinth"
+            :href="`https://bisecthosting.com/modrinth${queryParam}`"
             rel="noopener nofollow sponsored"
             :target="target"
           >
@@ -12,7 +12,7 @@
             <span>
               <span> Host your Minecraft server on </span>
               <strong>BisectHosting</strong>
-              <span> - get 25% your first month with code <strong>MODRINTH</strong>. </span>
+              <span> - get 25% off your first month with code <strong>MODRINTH</strong>. </span>
             </span>
           </a>
         </div>
@@ -32,6 +32,10 @@ const props = defineProps({
   external: {
     type: Boolean,
     default: true,
+  },
+  queryParam: {
+    type: String,
+    default: '',
   },
 })
 const target = computed(() => (props.external ? '_blank' : '_self'))

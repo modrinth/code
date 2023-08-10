@@ -21,10 +21,6 @@ export default {
         return []
       },
     },
-    type: {
-      type: String,
-      required: true,
-    },
   },
   methods: {
     formatCategory,

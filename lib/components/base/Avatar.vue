@@ -60,7 +60,7 @@ export default {
     },
     loading: {
       type: String,
-      default: 'eager',
+      default: 'lazy',
     },
   },
   data() {

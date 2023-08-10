@@ -143,6 +143,7 @@ const toggleDropdown = () => {
 const selectOption = (option, index) => {
   radioValue.value = option
   emit('change', { option, index })
+  emit('option-click', { option: selectedOption.value })
   dropdownVisible.value = false
 }
 
@@ -196,6 +197,10 @@ onBeforeUnmount(() => {
       &.render-down {
         border-radius: var(--radius-md) 0 0 0;
       }
+    }
+
+    .btn {
+      height: 2.25rem;
     }
   }
 
