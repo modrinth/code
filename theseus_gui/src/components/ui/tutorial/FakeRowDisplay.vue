@@ -66,7 +66,6 @@ defineProps({
             src="https://launcher-files.modrinth.com/assets/maze-bg.png"
             alt="Mod card"
             class="mod-image"
-            loading="lazy"
           />
           <div class="project-info">
             <p class="title">Example Profile</p>
@@ -113,7 +112,6 @@ defineProps({
               class="icon"
               size="sm"
               src="https://launcher-files.modrinth.com/assets/default_profile.png"
-              loading="lazy"
             />
             <div class="title">
               <div class="title-text">Example Project</div>

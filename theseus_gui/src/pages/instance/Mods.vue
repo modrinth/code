@@ -1,5 +1,5 @@
 <template>
-  <Card class="mod-card">
+  <Card v-if="projects.length > 0" class="mod-card">
     <div class="second-row">
       <Chips
         v-if="Object.keys(selectableProjectTypes).length > 1"
@@ -60,8 +60,12 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Card class="list-card" :class="{ static: instance.metadata.linked_data }">
-    <div v-if="projects.length > 0" class="table">
+  <Card
+    v-if="projects.length > 0"
+    class="list-card"
+    :class="{ static: instance.metadata.linked_data }"
+  >
+    <div class="table">
       <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
         <div v-if="!instance.metadata.linked_data" class="table-cell table-text">
           <Checkbox v-model="selectAll" class="select-checkbox" />
@@ -209,14 +213,14 @@
             :disabled="offline"
             class="mod-content"
           >
-            <Avatar :src="mod.icon" loading="lazy" />
+            <Avatar :src="mod.icon" />
             <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
               <div class="title">{{ mod.name }}</div>
               <span class="no-wrap">by {{ mod.author }}</span>
             </div>
           </router-link>
           <div v-else class="mod-content">
-            <Avatar :src="mod.icon" loading="lazy" />
+            <Avatar :src="mod.icon" />
             <span v-tooltip="`${mod.name}`" class="title">{{ mod.name }}</span>
           </div>
         </div>
@@ -265,32 +269,32 @@
         </div>
       </div>
     </div>
-    <div v-else class="empty-prompt">
-      <div class="empty-icon">
-        <AddProjectImage />
-      </div>
-      <h3>No projects found</h3>
-      <p class="empty-subtitle">Add a project to get started</p>
-      <div class="empty-action">
-        <DropdownButton
-          :options="['search', 'from_file']"
-          default-value="search"
-          name="add-content-dropdown-from-empty"
-          color="primary"
-          @option-click="handleContentOptionClick"
-        >
-          <template #search>
-            <SearchIcon />
-            <span class="no-wrap"> Add content </span>
-          </template>
-          <template #from_file>
-            <FolderOpenIcon />
-            <span class="no-wrap"> Add from file </span>
-          </template>
-        </DropdownButton>
-      </div>
-    </div>
   </Card>
+  <div v-else class="empty-prompt">
+    <div class="empty-icon">
+      <AddProjectImage />
+    </div>
+    <h3>No projects found</h3>
+    <p class="empty-subtitle">Add a project to get started</p>
+    <div class="empty-action">
+      <DropdownButton
+        :options="['search', 'from_file']"
+        default-value="search"
+        name="add-content-dropdown-from-empty"
+        color="primary"
+        @option-click="handleContentOptionClick"
+      >
+        <template #search>
+          <SearchIcon />
+          <span class="no-wrap"> Add content </span>
+        </template>
+        <template #from_file>
+          <FolderOpenIcon />
+          <span class="no-wrap"> Add from file </span>
+        </template>
+      </DropdownButton>
+    </div>
+  </div>
   <Modal ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">

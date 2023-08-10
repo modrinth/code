@@ -1,16 +1,12 @@
 <template>
   <div ref="button" class="button-base avatar-button" :class="{ highlighted: showDemo }">
-    <Avatar src="https://launcher-files.modrinth.com/assets/steve_head.png" loading="lazy" />
+    <Avatar src="https://launcher-files.modrinth.com/assets/steve_head.png" />
   </div>
   <transition name="fade">
     <div v-if="showDemo" class="card-section">
       <Card ref="card" class="fake-account-card expanded highlighted">
         <div class="selected account">
-          <Avatar
-            size="xs"
-            src="https://launcher-files.modrinth.com/assets/steve_head.png"
-            loading="lazy"
-          />
+          <Avatar size="xs" src="https://launcher-files.modrinth.com/assets/steve_head.png" />
           <div>
             <h4>Modrinth</h4>
             <p>Selected</p>

@@ -21,7 +21,12 @@
       <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" name="Game Version Dropdown" render-up />
+          <DropdownSelect
+            v-model="gameVersion"
+            :options="selectableGameVersions"
+            name="Game Version Dropdown"
+            render-up
+          />
           <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
         </div>
       </div>
@@ -66,7 +71,6 @@
         :src="!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon)"
         size="md"
         class="project__icon"
-        loading="lazy"
       />
       <div class="input-stack">
         <button id="instance-icon" class="btn" @click="setIcon">
@@ -427,8 +431,8 @@ const groups = ref(props.instance.metadata.groups)
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
   ...instancesList.reduce((acc, obj) => {
-      return acc.concat(obj.metadata.groups)
-    }, [])
+    return acc.concat(obj.metadata.groups)
+  }, []),
 ])
 
 async function resetIcon() {

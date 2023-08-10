@@ -89,13 +89,13 @@
               :to="dependency.link"
               @click="testTest"
             >
-              <Avatar size="sm" :src="dependency.icon" loading="lazy" />
+              <Avatar size="sm" :src="dependency.icon" />
               <div>
                 <span class="title"> {{ dependency.title }} </span> <br />
                 <span> {{ dependency.subtitle }} </span>
               </div>
             </router-link>
-            <div v-else class="dependency disabled" disabled="" loading="lazy">
+            <div v-else class="dependency disabled" disabled="">
               <Avatar size="sm" :src="dependency.icon" />
               <div class="text">
                 <div class="title">{{ dependency.title }}</div>
@@ -166,7 +166,7 @@
               rel="external"
               class="metadata-value btn author"
             >
-              <Avatar size="sm" :src="author.user.avatar_url" circle loading="lazy" />
+              <Avatar size="sm" :src="author.user.avatar_url" circle />
               <span>
                 <strong>
                   {{ author.user.username }}

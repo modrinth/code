@@ -12,7 +12,6 @@
             "
             :alt="instance.metadata.name"
             size="sm"
-            loading="lazy"
           />
           <div class="small-instance_info">
             <span class="title">{{ instance.metadata.name }}</span>
@@ -26,7 +25,7 @@
         </router-link>
       </Card>
       <Card class="sidebar-card" @contextmenu.prevent.stop="handleRightClick">
-        <Avatar size="lg" :src="data.icon_url" loading="lazy" />
+        <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
           <h2 class="name">{{ data.title }}</h2>
           {{ data.description }}

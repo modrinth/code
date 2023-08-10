@@ -148,7 +148,7 @@ const install = async (e) => {
           }"
         ></div>
       </div>
-      <Avatar class="icon" size="sm" :src="project.icon_url" loading="lazy" />
+      <Avatar class="icon" size="sm" :src="project.icon_url" />
       <div class="title">
         <div class="title-text">
           {{ project.title }}

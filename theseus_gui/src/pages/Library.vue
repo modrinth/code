@@ -35,11 +35,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <GridDisplay
-    v-if="instances.length > 0"
-    label="Instances"
-    :instances="instances"
-  />
+  <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
   <div v-else class="no-instance">
     <div class="icon">
       <NewInstanceImage />
@@ -54,7 +50,6 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped>
-
 .no-instance {
   display: flex;
   flex-direction: column;

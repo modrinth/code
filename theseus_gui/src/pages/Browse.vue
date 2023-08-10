@@ -535,7 +535,6 @@ onUnmounted(() => unlistenOffline())
             "
             :alt="instanceContext.metadata.name"
             size="sm"
-            loading="lazy"
           />
           <div class="small-instance_info">
             <span class="title">{{ instanceContext.metadata.name }}</span>
