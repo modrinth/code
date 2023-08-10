@@ -55,6 +55,7 @@
             <input
               id="account-input"
               v-model="account"
+              class="account-input"
               :placeholder="`Enter your ${$formatWallet(selectedWallet)} ${formatAccountType(
                 accountType
               ).toLowerCase()}...`"
@@ -62,8 +63,18 @@
             />
             <span v-if="accountType === 'phone'"> Format: +18888888888 or +1-888-888-8888 </span>
           </div>
+          <div class="rewards-checkbox">
+            <Checkbox v-model="agreed">
+              I agree to the
+              <nuxt-link to="/legal/cmp" class="goto-link">Rewards Program Terms</nuxt-link>
+            </Checkbox>
+          </div>
           <div class="input-group">
-            <button class="iconified-button brand-button" @click="updatePayoutData(false)">
+            <button
+              :disabled="!agreed"
+              class="iconified-button brand-button"
+              @click="updatePayoutData(false)"
+            >
               <SaveIcon /> Save information
             </button>
             <button
@@ -90,6 +101,7 @@
 </template>
 
 <script>
+import { Checkbox } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import Chips from '~/components/ui/Chips.vue'
 import SaveIcon from '~/assets/images/utils/save.svg'
@@ -107,6 +119,7 @@ export default defineNuxtComponent({
     EditIcon,
     ChartIcon,
     SettingsIcon,
+    Checkbox,
   },
   async setup() {
     definePageMeta({
@@ -117,6 +130,7 @@ export default defineNuxtComponent({
   },
   data() {
     return {
+      agreed: false,
       editing: false,
       enrolled:
         this.auth.user.payout_data.payout_wallet &&
@@ -202,4 +216,20 @@ export default defineNuxtComponent({
   },
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.multiselect {
+  max-width: 15rem;
+}
+
+.account-input {
+  flex: 1;
+}
+
+.rewards-checkbox {
+  margin-bottom: 0.75rem;
+
+  a {
+    margin-left: 0.5ch;
+  }
+}
+</style>

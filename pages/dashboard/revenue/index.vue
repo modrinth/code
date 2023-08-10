@@ -54,6 +54,13 @@
       </div>
     </section>
     <section class="universal-card">
+      <h2>About the program</h2>
+      <p>
+        By uploading projects to Modrinth and withdrawing money from your account, you agree to the
+        <nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link>. For more
+        information on how the rewards system works, see our information page
+        <nuxt-link to="/legal/cmp-info" class="text-link">here</nuxt-link>.
+      </p>
       <h2>Processing fees</h2>
       <p>
         To avoid paying unnecessary fee deductions, you may want to wait to transfer your money out
