@@ -56,7 +56,7 @@
       </Button>
     </Card>
   </transition>
-  <Modal class="modal" ref="loginModal" header="Signing in">
+  <Modal ref="loginModal" class="modal" header="Signing in">
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">

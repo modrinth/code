@@ -424,9 +424,7 @@ const isPackLinked = computed(() => {
   return props.instance.metadata.linked_data
 })
 const canUpdatePack = computed(() => {
-  return (
-    props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
-  )
+  return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
 })
 const exportModal = ref(null)
 
