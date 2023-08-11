@@ -26,16 +26,15 @@
       </div>
     </div>
     <Button
-      v-if="canUpdatePack"
-      :disabled="updatingModpack"
+      v-if="isPackLinked"
+      :disabled="updatingModpack || !canUpdatePack"
       color="secondary"
-      large
       @click="updateModpack"
     >
       <UpdatedIcon />
       {{ updatingModpack ? 'Updating' : 'Update modpack' }}
     </Button>
-    <Button v-else large @click="exportModal.show()">
+    <Button v-else @click="exportModal.show()">
       <PackageIcon />
       Export modpack
     </Button>
@@ -421,9 +420,11 @@ const props = defineProps({
 const projects = ref([])
 const selectionMap = ref(new Map())
 const showingOptions = ref(false)
+const isPackLinked = computed(() => {
+  return props.instance.metadata.linked_data
+})
 const canUpdatePack = computed(() => {
   return (
-    props.instance.metadata.linked_data &&
     props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
   )
 })
@@ -929,12 +930,16 @@ onUnmounted(() => {
   justify-content: flex-start;
   margin-bottom: 0.5rem;
   white-space: nowrap;
+  align-items: center;
 
   :deep(.dropdown-row) {
     .btn {
-      height: 2.5rem;
-      font-weight: 600;
+      height: 2.5rem !important;
     }
+  }
+
+  .btn {
+    height: 2.5rem;
   }
 
   .dropdown-input {

@@ -206,6 +206,7 @@
         :versions="versions"
         :members="members"
         :dependencies="dependencies"
+        :instance="instance"
         :install="install"
         :installed="installed"
         :installing="installing"

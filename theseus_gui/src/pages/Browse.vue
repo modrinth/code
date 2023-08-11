@@ -253,10 +253,6 @@ async function refreshSearch() {
         (x) => (val.installed = x)
       )
     }
-
-    if (hideAlreadyInstalled.value) {
-      results.value.hits = results.value.hits.filter((x) => !x.installed)
-    }
   }
 }
 
@@ -724,12 +720,12 @@ onUnmounted(() => unlistenOffline())
         @switch-page="onSearchChange"
       />
       <SplashScreen v-if="loading" />
-      <section v-else-if="offline && results.total_hits == 0" class="offline">
+      <section v-else-if="offline && results.total_hits === 0" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
       </section>
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <SearchCard
-          v-for="result in results.hits"
+          v-for="result in results.hits.filter((x) => !x.installed || !hideAlreadyInstalled)"
           :key="result?.project_id"
           :project="result"
           :instance="instanceContext"
