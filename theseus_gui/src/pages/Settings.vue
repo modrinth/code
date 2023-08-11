@@ -311,7 +311,16 @@ async function refreshDir() {
             customize your experience. Opting out will disable this data collection.
           </span>
         </label>
-        <Toggle id="opt-out-analytics" v-model="settings.opt_out_analytics" />
+        <Toggle
+          id="opt-out-analytics"
+          :model-value="settings.opt_out_analytics"
+          :checked="settings.opt_out_analytics"
+          @update:model-value="
+            (e) => {
+              settings.opt_out_analytics = e
+            }
+          "
+        />
       </div>
     </Card>
     <Card>

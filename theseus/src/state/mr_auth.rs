@@ -113,6 +113,12 @@ pub struct ModrinthAuthFlow {
     >,
 }
 
+impl Drop for ModrinthAuthFlow {
+    fn drop(&mut self) {
+        let _ = self.close();
+    }
+}
+
 impl ModrinthAuthFlow {
     pub async fn new(provider: &str) -> crate::Result<Self> {
         let (socket, _) = async_tungstenite::tokio::connect_async(format!(
