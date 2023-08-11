@@ -461,9 +461,12 @@ pub async fn launch_minecraft(
     // Uses 'a:b' syntax which is not quite yaml
     use regex::Regex;
 
-    let options_path = instance_path.join("options.txt");
-    if options_path.exists() {
-        let mut options_string = io::read_to_string(&options_path).await?;
+    if !mc_set_options.is_empty() {
+        let options_path = instance_path.join("options.txt");
+        let mut options_string = String::new();
+        if options_path.exists() {
+            options_string = io::read_to_string(&options_path).await?;
+        }
         for (key, value) in mc_set_options {
             let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
             // check if the regex exists in the file

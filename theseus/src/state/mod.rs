@@ -345,7 +345,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
     let (mut tx, mut rx) = channel(1);
 
     let file_watcher = new_debouncer(
-        Duration::from_secs_f32(10.0),
+        Duration::from_secs_f32(2.0),
         None,
         move |res: DebounceEventResult| {
             futures::executor::block_on(async {

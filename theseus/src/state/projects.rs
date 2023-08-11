@@ -16,7 +16,6 @@ use serde_json::json;
 use sha2::Digest;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use std::time::Duration;
 use tokio::io::AsyncReadExt;
 
 use super::ProjectPathId;
@@ -308,9 +307,6 @@ pub async fn infer_data_from_files(
             }
             hasher.update(&buffer[..bytes_read]);
         }
-
-        // slight sleep to lessen cpu load
-        tokio::time::sleep(Duration::from_nanos(10)).await;
 
         let hash = format!("{:x}", hasher.finalize());
         file_path_hashes.insert(hash, path.clone());
