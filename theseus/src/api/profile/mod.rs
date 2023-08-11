@@ -1049,9 +1049,7 @@ fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
         // If two or more, take the second
         // If one, take the first
         // If none, take the whole thing
-        PackDependency::Forge
-        | PackDependency::FabricLoader
-        | PackDependency::Minecraft => {
+        PackDependency::Forge => {
             let mut split: std::str::Split<'_, char> = s.split('-');
             match split.next() {
                 Some(first) => match split.next() {
@@ -1061,8 +1059,10 @@ fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
                 None => s,
             }
         }
-        // For quilt, we take the whole thing, as it functions like: 0.20.0-beta.11 (and should not be split here)
-        PackDependency::QuiltLoader => s,
+        // For quilt, etc we take the whole thing, as it functions like: 0.20.0-beta.11 (and should not be split here)
+        PackDependency::QuiltLoader
+        | PackDependency::FabricLoader
+        | PackDependency::Minecraft => s,
     }
 }
 

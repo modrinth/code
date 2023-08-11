@@ -115,7 +115,7 @@ pub struct ModrinthAuthFlow {
 
 impl Drop for ModrinthAuthFlow {
     fn drop(&mut self) {
-        let _ = self.close();
+        self.close();
     }
 }
 
