@@ -3,13 +3,12 @@ use std::{collections::HashMap, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    event::LoadingBarId,
     pack::{
         self,
         import::{self, copy_dotminecraft},
         install_from::CreatePackDescription,
     },
-    prelude::{ModLoader, ProfilePathId, Profile},
+    prelude::{ModLoader, Profile, ProfilePathId},
     state::{LinkedData, ProfileInstallStage},
     util::io,
     State,
@@ -101,25 +100,31 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
     let instance: String =
         io::read_to_string(&instance_folder.join("instance.json"))
             .await
-            .unwrap_or_else( |e| {
+            .unwrap_or_else(|e| {
                 // TODO: remove temporary logging in future update
                 if !instance_folder.exists() {
-                    tracing::warn!("Instance folder does not exist: {}", instance_folder.display());
+                    tracing::warn!(
+                        "Instance folder does not exist: {}",
+                        instance_folder.display()
+                    );
                     return "".to_string();
                 } else {
                     tracing::warn!(
                         "Could not read existing instance.json at {}: {}",
                         instance_folder.display(),
                         e
-                )  
-                }
-                ; "".to_string()});
+                    )
+                };
+                "".to_string()
+            });
     let instance: Result<ATInstance, serde_json::Error> =
         serde_json::from_str::<ATInstance>(&instance);
     if let Err(e) = instance {
-        tracing::warn!("Could not parse instance.json at {}: {}",
-            instance_folder.display()
-        , e);
+        tracing::warn!(
+            "Could not parse instance.json at {}: {}",
+            instance_folder.display(),
+            e
+        );
         false
     } else {
         true
@@ -239,26 +244,22 @@ async fn import_atlauncher_unmanaged(
     })
     .await?;
 
-    
-
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
         profile_path.clone(),
         minecraft_folder,
         &state.io_semaphore,
-        None
+        None,
     )
     .await?;
-
-
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
         crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
             .await?;
-        { 
+        {
             let state = State::get().await?;
             let mut file_watcher = state.file_watcher.write().await;
             Profile::watch_fs(

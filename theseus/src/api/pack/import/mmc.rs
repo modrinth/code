@@ -7,7 +7,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
-    prelude::{ProfilePathId, Profile},
+    prelude::{Profile, ProfilePathId},
     util::io,
     State,
 };
@@ -119,7 +119,6 @@ pub struct MMCComponentRequirement {
     pub suggests: Option<String>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 #[serde(untagged)]
@@ -137,7 +136,7 @@ struct MMCLauncherGeneral {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 pub struct MMCLauncher {
-    instance_dir : String,
+    instance_dir: String,
 }
 
 // Checks if if its a folder, and the folder contains instance.cfg and mmc-pack.json, and they both parse
@@ -323,8 +322,9 @@ async fn import_mmc_unmanaged(
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, Some(loading_bar)).await?;
-        { 
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
+            .await?;
+        {
             let state = State::get().await?;
             let mut file_watcher = state.file_watcher.write().await;
             Profile::watch_fs(

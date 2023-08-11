@@ -282,8 +282,6 @@ pub async fn infer_data_from_files(
 ) -> crate::Result<HashMap<ProjectPathId, Project>> {
     let mut file_path_hashes = HashMap::new();
 
-    tracing::info!("Inferring data from {} files", paths.len());
-
     for path in paths {
         if !path.exists() {
             continue;
@@ -303,7 +301,8 @@ pub async fn infer_data_from_files(
         let mut hasher = sha2::Sha512::new(); // Hasher
 
         loop {
-            let bytes_read = file.read(&mut buffer).await.map_err(IOError::from)?;
+            let bytes_read =
+                file.read(&mut buffer).await.map_err(IOError::from)?;
             if bytes_read == 0 {
                 break;
             }

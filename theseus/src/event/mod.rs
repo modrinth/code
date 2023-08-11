@@ -188,7 +188,7 @@ pub enum LoadingBarType {
     CopyProfile {
         import_location: PathBuf,
         profile_name: String,
-    }
+    },
 }
 
 #[derive(Serialize, Clone)]

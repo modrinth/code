@@ -203,8 +203,7 @@ const filteredResults = computed(() => {
   // For 'name', we intuitively expect the sorting to apply to the name of the group first, not just the name of the instance
   // ie: Category A should come before B, even if the first instance in B comes before the first instance in A
   if (sortBy.value === 'Name') {
-    
-    const sortedEntries = [...instanceMap.entries()].sort((a,b) => {
+    const sortedEntries = [...instanceMap.entries()].sort((a, b) => {
       // None should always be first
       if (a[0] === 'None' && b[0] !== 'None') {
         return -1

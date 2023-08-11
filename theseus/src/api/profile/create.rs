@@ -113,7 +113,9 @@ pub async fn profile_create(
 
         {
             let mut profiles = state.profiles.write().await;
-            profiles.insert(profile.clone(), no_watch.unwrap_or_default()).await?;
+            profiles
+                .insert(profile.clone(), no_watch.unwrap_or_default())
+                .await?;
         }
 
         if !skip_install_profile.unwrap_or(false) {

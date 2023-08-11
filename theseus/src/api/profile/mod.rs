@@ -7,8 +7,8 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
-use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId, ModLoader};
-use crate::state::{ProjectMetadata, ProfileInstallStage};
+use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
+use crate::state::ProjectMetadata;
 
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
@@ -189,7 +189,6 @@ pub async fn edit_icon(
     State::sync().await?;
     res
 }
-
 
 // Gets the optimal JRE key for the given profile, using Daedalus
 // Generally this would be used for profile_create, to get the optimal JRE key
@@ -1044,13 +1043,15 @@ pub async fn create_mrpack_json(
     })
 }
 
-fn sanitize_loader_version_string(s: &str, loader : PackDependency) -> &str {
+fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
     match loader {
         // Split on '-'
         // If two or more, take the second
         // If one, take the first
         // If none, take the whole thing
-        PackDependency::Forge | PackDependency::FabricLoader | PackDependency::Minecraft => {
+        PackDependency::Forge
+        | PackDependency::FabricLoader
+        | PackDependency::Minecraft => {
             let mut split: std::str::Split<'_, char> = s.split('-');
             match split.next() {
                 Some(first) => match split.next() {
@@ -1059,7 +1060,7 @@ fn sanitize_loader_version_string(s: &str, loader : PackDependency) -> &str {
                 },
                 None => s,
             }
-        },
+        }
         // For quilt, we take the whole thing, as it functions like: 0.20.0-beta.11 (and should not be split here)
         PackDependency::QuiltLoader => s,
     }

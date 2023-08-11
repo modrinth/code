@@ -169,6 +169,5 @@ td:first-child {
   :deep(.animated-dropdown .options) {
     max-height: 13.375rem;
   }
-
 }
 </style>

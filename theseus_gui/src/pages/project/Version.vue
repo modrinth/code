@@ -83,11 +83,7 @@
         <Card v-if="displayDependencies.length > 0">
           <h2>Dependencies</h2>
           <div v-for="dependency in displayDependencies" :key="dependency.title">
-            <router-link
-              v-if="dependency.link"
-              class="btn dependency"
-              :to="dependency.link"
-            >
+            <router-link v-if="dependency.link" class="btn dependency" :to="dependency.link">
               <Avatar size="sm" :src="dependency.icon" />
               <div>
                 <span class="title"> {{ dependency.title }} </span> <br />

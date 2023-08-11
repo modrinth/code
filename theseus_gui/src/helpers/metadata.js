@@ -9,9 +9,8 @@ export async function get_game_versions() {
 // Gets the fabric versions from daedalus
 // Returns Manifest
 export async function get_fabric_versions() {
-
   const c = await invoke('plugin:metadata|metadata_get_fabric_versions')
-  console.log('Getting fabric versions',c)
+  console.log('Getting fabric versions', c)
   return c
 }
 
@@ -19,15 +18,14 @@ export async function get_fabric_versions() {
 // Returns Manifest
 export async function get_forge_versions() {
   const c = await invoke('plugin:metadata|metadata_get_forge_versions')
-  console.log('Getting forge versions',c)
+  console.log('Getting forge versions', c)
   return c
-
 }
 
 // Gets the quilt versions from daedalus
 // Returns Manifest
 export async function get_quilt_versions() {
   const c = await invoke('plugin:metadata|metadata_get_quilt_versions')
-  console.log('Getting quilt versions',c)
+  console.log('Getting quilt versions', c)
   return c
 }

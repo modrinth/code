@@ -331,8 +331,12 @@ impl Profile {
     }
 
     pub fn sync_projects_task(profile_path_id: ProfilePathId, force: bool) {
-        let span =
-        tracing::span!(tracing::Level::INFO, "sync_projects_task", ?profile_path_id, ?force);
+        let span = tracing::span!(
+            tracing::Level::INFO,
+            "sync_projects_task",
+            ?profile_path_id,
+            ?force
+        );
         tokio::task::spawn(async move {
             let res = async {
                 let _span = span.enter();
@@ -340,12 +344,6 @@ impl Profile {
                 let profile = crate::api::profile::get(&profile_path_id, None).await?;
 
                 if let Some(profile) = profile {
-                    tracing::info!(
-                        "Syncing projects for profile {}, installation stage {:?}, forced: {}",
-                        profile_path_id,
-                        profile.install_stage,
-                        force
-                    );
                     if profile.install_stage != ProfileInstallStage::PackInstalling || force {
                         let paths = profile.get_profile_full_project_paths().await?;
 
@@ -847,9 +845,10 @@ impl Profiles {
                             new_profiles.0.get_mut(&profile_path)
                         {
                             let loader = profile.metadata.loader;
-                            let recent_version = versions
-                                .iter()
-                                .find(|x| x.loaders.contains(&loader.as_api_str().to_string()));
+                            let recent_version = versions.iter().find(|x| {
+                                x.loaders
+                                    .contains(&loader.as_api_str().to_string())
+                            });
                             if let Some(recent_version) = recent_version {
                                 profile.modrinth_update_version =
                                     Some(recent_version.id.clone());
@@ -884,7 +883,11 @@ impl Profiles {
 
     #[tracing::instrument(skip(self, profile))]
     #[theseus_macros::debug_pin]
-    pub async fn insert(&mut self, profile: Profile, no_watch : bool) -> crate::Result<&Self> {
+    pub async fn insert(
+        &mut self,
+        profile: Profile,
+        no_watch: bool,
+    ) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,
             &profile.profile_id(),
@@ -893,7 +896,6 @@ impl Profiles {
         )
         .await?;
 
-        tracing::info!("Inserting with nowatch: {no_watch}");
         if !no_watch {
             let state = State::get().await?;
             let mut file_watcher = state.file_watcher.write().await;
@@ -992,10 +994,9 @@ impl Profiles {
                             Self::read_profile_from_dir(
                                 &profile_path_id.get_full_path().await?,
                                 dirs,
-                                
                             )
                             .await?,
-                            false
+                            false,
                         )
                         .await?;
                     Profile::sync_projects_task(profile_path_id, false);

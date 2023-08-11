@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    prelude::{ModLoader, ProfilePathId, Profile},
+    prelude::{ModLoader, Profile, ProfilePathId},
     state::ProfileInstallStage,
     util::io,
     State,
@@ -112,8 +112,9 @@ pub async fn import_gdlauncher(
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, Some(loading_bar)).await?;
-        { 
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
+            .await?;
+        {
             let state = State::get().await?;
             let mut file_watcher = state.file_watcher.write().await;
             Profile::watch_fs(

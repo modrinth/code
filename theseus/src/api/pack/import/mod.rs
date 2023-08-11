@@ -7,12 +7,16 @@ use io::IOError;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    event::{
+        emit::{emit_loading, init_or_edit_loading},
+        LoadingBarId,
+    },
     prelude::ProfilePathId,
     state::Profiles,
     util::{
         fetch::{self, IoSemaphore},
         io,
-    }, event::{LoadingBarId, emit::{init_or_edit_loading, emit_loading}},
+    },
 };
 
 pub mod atlauncher;
@@ -51,11 +55,20 @@ pub async fn get_importable_instances(
 ) -> crate::Result<Vec<String>> {
     // Some launchers have a different folder structure for instances
     let instances_subfolder = match launcher_type {
-        ImportLauncherType::GDLauncher
-        | ImportLauncherType::ATLauncher => "instances".to_string(),
+        ImportLauncherType::GDLauncher | ImportLauncherType::ATLauncher => {
+            "instances".to_string()
+        }
         ImportLauncherType::Curseforge => "Instances".to_string(),
-        ImportLauncherType::MultiMC => mmc::get_instances_subpath(base_path.clone().join("multimc.cfg")).await.unwrap_or_else(|| "instances".to_string()),
-        ImportLauncherType::PrismLauncher => mmc::get_instances_subpath(base_path.clone().join("prismlauncher.cfg")).await.unwrap_or_else(|| "instances".to_string()),
+        ImportLauncherType::MultiMC => {
+            mmc::get_instances_subpath(base_path.clone().join("multimc.cfg"))
+                .await
+                .unwrap_or_else(|| "instances".to_string())
+        }
+        ImportLauncherType::PrismLauncher => mmc::get_instances_subpath(
+            base_path.clone().join("prismlauncher.cfg"),
+        )
+        .await
+        .unwrap_or_else(|| "instances".to_string()),
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),
@@ -251,28 +264,36 @@ async fn copy_dotminecraft(
     let subfiles = get_all_subfiles(&dotminecraft).await?;
     let total_subfiles = subfiles.len() as u64;
 
-    let loading_bar = init_or_edit_loading(existing_loading_bar, crate::LoadingBarType::CopyProfile { import_location: dotminecraft.clone(), profile_name: profile_path_id.to_string() }, total_subfiles as f64, "Copying files in profile").await?;
+    let loading_bar = init_or_edit_loading(
+        existing_loading_bar,
+        crate::LoadingBarType::CopyProfile {
+            import_location: dotminecraft.clone(),
+            profile_name: profile_path_id.to_string(),
+        },
+        total_subfiles as f64,
+        "Copying files in profile",
+    )
+    .await?;
 
     // Copy each file
     for src_child in subfiles {
-        let dst_child = src_child.strip_prefix(&dotminecraft).map_err(|_| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid file: {}",
-                &src_child.display()
-            ))
-        })?;
+        let dst_child =
+            src_child.strip_prefix(&dotminecraft).map_err(|_| {
+                crate::ErrorKind::InputError(format!(
+                    "Invalid file: {}",
+                    &src_child.display()
+                ))
+            })?;
         let dst_child = profile_path.join(dst_child);
 
         // sleep for cpu for 1 millisecond
         tokio::time::sleep(std::time::Duration::from_millis(1)).await;
-        
-        
+
         fetch::copy(&src_child, &dst_child, io_semaphore).await?;
 
         emit_loading(&loading_bar, 1.0, None).await?;
-
     }
-    Ok(loading_bar)   
+    Ok(loading_bar)
 }
 
 /// Recursively get a list of all subfiles in src
@@ -297,4 +318,3 @@ async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {
     }
     Ok(files)
 }
-

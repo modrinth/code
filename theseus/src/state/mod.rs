@@ -354,15 +354,10 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
         },
     )?;
     tokio::task::spawn(async move {
-        let span =
-        tracing::span!(tracing::Level::INFO, "init_watcher");
-    tracing::info!(
-        parent: &span,
-        "Initting watcher"
-    );
-    while let Some(res) = rx.next().await {
-        let _span = span.enter();
-        tracing::info!("Watching...");
+        let span = tracing::span!(tracing::Level::INFO, "init_watcher");
+        tracing::info!(parent: &span, "Initting watcher");
+        while let Some(res) = rx.next().await {
+            let _span = span.enter();
             match res {
                 Ok(mut events) => {
                     let mut visited_paths = Vec::new();
@@ -401,7 +396,6 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                             Profile::crash_task(profile_path_id);
                         } else if !visited_paths.contains(&new_path) {
                             if subfile {
-                                tracing::info!("Syncing profile from event: {:?} - {subfile} - {:?}", new_path, e);
                                 Profile::sync_projects_task(
                                     profile_path_id,
                                     false,
