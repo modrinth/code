@@ -52,10 +52,10 @@ pub async fn get_importable_instances(
     // Some launchers have a different folder structure for instances
     let instances_subfolder = match launcher_type {
         ImportLauncherType::GDLauncher
-        | ImportLauncherType::MultiMC
-        | ImportLauncherType::PrismLauncher
-        | ImportLauncherType::ATLauncher => "instances",
-        ImportLauncherType::Curseforge => "Instances",
+        | ImportLauncherType::ATLauncher => "instances".to_string(),
+        ImportLauncherType::Curseforge => "Instances".to_string(),
+        ImportLauncherType::MultiMC => mmc::get_instances_subpath(base_path.clone().join("multimc.cfg")).await.unwrap_or_else(|| "instances".to_string()),
+        ImportLauncherType::PrismLauncher => mmc::get_instances_subpath(base_path.clone().join("prismlauncher.cfg")).await.unwrap_or_else(|| "instances".to_string()),
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),
@@ -63,7 +63,8 @@ pub async fn get_importable_instances(
             .into())
         }
     };
-    let instances_folder = base_path.join(instances_subfolder);
+
+    let instances_folder = base_path.join(&instances_subfolder);
     let mut instances = Vec::new();
     let mut dir = io::read_dir(&instances_folder).await.map_err(| _ | {
         crate::ErrorKind::InputError(format!(

@@ -189,7 +189,6 @@ pub async fn install_minecraft(
     )
     .await?;
 
-    println!("processors");
     if let Some(processors) = &version_info.processors {
         let client_path = state
             .directories

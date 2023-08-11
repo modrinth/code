@@ -128,3 +128,11 @@ input {
   background-color: var(--color-raised-bg);
   box-shadow: none !important;
 }
+
+img {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
