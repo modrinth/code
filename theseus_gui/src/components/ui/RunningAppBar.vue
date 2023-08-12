@@ -1,8 +1,8 @@
 <template>
   <div class="action-groups">
-    <a href="https://github.com/modrinth/theseus/issues" class="link">
-      <BugIcon />
-      <span> Report a bug </span>
+    <a href="https://discord.gg/modrinth" class="link">
+      <ChatIcon />
+      <span> Get support </span>
     </a>
     <Button
       v-if="currentLoadingBars.length > 0"
@@ -124,7 +124,7 @@ import { refreshOffline, isOffline } from '@/helpers/utils.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import { BugIcon } from '@/assets/icons'
+import { ChatIcon } from '@/assets/icons'
 
 const router = useRouter()
 const card = ref(null)

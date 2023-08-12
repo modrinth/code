@@ -27,6 +27,7 @@
     </div>
     <Button
       v-if="isPackLinked"
+      v-tooltip="'Modpack is up to date'"
       :disabled="updatingModpack || !canUpdatePack"
       color="secondary"
       @click="updateModpack"
@@ -39,6 +40,7 @@
       Export modpack
     </Button>
     <DropdownButton
+      v-if="!isPackLinked"
       :options="['search', 'from_file']"
       default-value="search"
       name="add-content-dropdown"

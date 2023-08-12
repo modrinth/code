@@ -29,7 +29,7 @@ import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
-import { check_installed, get as getInstance } from '@/helpers/profile.js'
+import {check_installed, get, get as getInstance} from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { isOffline } from '@/helpers/utils'
 import { offline_listener } from '@/helpers/events'
@@ -144,6 +144,9 @@ if (route.query.m) {
 if (route.query.o) {
   currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1
 }
+if (route.query.ai) {
+  hideAlreadyInstalled.value = route.query.ai === 'true'
+}
 
 async function refreshSearch() {
   const base = 'https://api.modrinth.com/v2/'
@@ -221,6 +224,12 @@ async function refreshSearch() {
       formattedFacets.push([
         `project_type:${projectType.value === 'datapack' ? 'mod' : projectType.value}`,
       ])
+    }
+
+    if(hideAlreadyInstalled.value) {
+        const installedMods = await get(instanceContext.value.path, false).then(x => Object.values(x.projects).filter(x => x.metadata.project).map(x => x.metadata.project.id))
+        installedMods.map(x => [`project_id != ${x}`]).forEach(x => formattedFacets.push(x))
+        console.log(`facets=${JSON.stringify(formattedFacets)}`)
     }
 
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
@@ -340,6 +349,10 @@ function getSearchUrl(offset, useObj) {
   if (ignoreInstanceLoaders.value) {
     queryItems.push('il=true')
     obj.il = true
+  }
+  if (hideAlreadyInstalled.value) {
+    queryItems.push('ai=true')
+    obj.ai = true
   }
 
   let url = `${route.path}`
@@ -725,7 +738,7 @@ onUnmounted(() => unlistenOffline())
       </section>
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <SearchCard
-          v-for="result in results.hits.filter((x) => !x.installed || !hideAlreadyInstalled)"
+          v-for="result in results.hits"
           :key="result?.project_id"
           :project="result"
           :instance="instanceContext"

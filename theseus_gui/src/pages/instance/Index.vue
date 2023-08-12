@@ -7,7 +7,7 @@
           :src="
             !instance.metadata.icon ||
             (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
-              ? 'https://launcher-files.modrinth.com/assets/default_profile.png'
+              ? instance.metadata.icon
               : convertFileSrc(instance.metadata?.icon)
           "
         />
