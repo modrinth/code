@@ -212,7 +212,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   top: 0.5rem;
   left: 5.5rem;
-  z-index: 9;
+  z-index: 11;
   gap: 0.5rem;
   padding: 1rem;
   border: 1px solid var(--color-button-bg);
@@ -220,6 +220,18 @@ onBeforeUnmount(() => {
   user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
+  max-height: 98vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar-track {
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
+
+  &::-webkit-scrollbar {
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
 
   &.hidden {
     display: none;
