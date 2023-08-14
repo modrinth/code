@@ -1,17 +1,9 @@
 <template>
   <div class="breadcrumbs">
-    <Button
-      class="breadcrumbs__back transparent"
-      icon-only
-      @click="$router.back()"
-    >
+    <Button class="breadcrumbs__back transparent" icon-only @click="$router.back()">
       <ChevronLeftIcon />
     </Button>
-    <Button
-      class="breadcrumbs__forward transparent"
-      icon-only
-      @click="$router.forward()"
-    >
+    <Button class="breadcrumbs__forward transparent" icon-only @click="$router.forward()">
       <ChevronRightIcon />
     </Button>
     {{ breadcrumbData.resetToNames(breadcrumbs) }}
@@ -75,7 +67,8 @@ const breadcrumbs = computed(() => {
     }
   }
 
-  .breadcrumbs__back, .breadcrumbs__forward {
+  .breadcrumbs__back,
+  .breadcrumbs__forward {
     margin: auto 0;
     color: var(--color-base);
     height: unset;

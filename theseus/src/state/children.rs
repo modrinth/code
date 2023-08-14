@@ -160,12 +160,11 @@ impl Children {
                 .signed_duration_since(last_updated_playtime)
                 .num_seconds();
             if diff >= 60 {
-                if let Err(e) =
-                    profile::edit(&associated_profile, |mut prof| {
-                        prof.metadata.recent_time_played += diff as u64;
-                        async { Ok(()) }
-                    })
-                    .await
+                if let Err(e) = profile::edit(&associated_profile, |prof| {
+                    prof.metadata.recent_time_played += diff as u64;
+                    async { Ok(()) }
+                })
+                .await
                 {
                     tracing::warn!(
                         "Failed to update playtime for profile {}: {}",
@@ -181,7 +180,7 @@ impl Children {
         let diff = Utc::now()
             .signed_duration_since(last_updated_playtime)
             .num_seconds();
-        if let Err(e) = profile::edit(&associated_profile, |mut prof| {
+        if let Err(e) = profile::edit(&associated_profile, |prof| {
             prof.metadata.recent_time_played += diff as u64;
             async { Ok(()) }
         })

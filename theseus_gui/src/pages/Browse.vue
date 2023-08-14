@@ -29,7 +29,7 @@ import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
-import {check_installed, get, get as getInstance} from '@/helpers/profile.js'
+import { check_installed, get, get as getInstance } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { isOffline } from '@/helpers/utils'
 import { offline_listener } from '@/helpers/events'
@@ -226,10 +226,14 @@ async function refreshSearch() {
       ])
     }
 
-    if(hideAlreadyInstalled.value) {
-        const installedMods = await get(instanceContext.value.path, false).then(x => Object.values(x.projects).filter(x => x.metadata.project).map(x => x.metadata.project.id))
-        installedMods.map(x => [`project_id != ${x}`]).forEach(x => formattedFacets.push(x))
-        console.log(`facets=${JSON.stringify(formattedFacets)}`)
+    if (hideAlreadyInstalled.value) {
+      const installedMods = await get(instanceContext.value.path, false).then((x) =>
+        Object.values(x.projects)
+          .filter((x) => x.metadata.project)
+          .map((x) => x.metadata.project.id)
+      )
+      installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
+      console.log(`facets=${JSON.stringify(formattedFacets)}`)
     }
 
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
