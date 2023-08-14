@@ -185,12 +185,21 @@ interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveLog()
 
-    if (selectedLogIndex.value === 0 && !userScrolled.value) {
-      await nextTick()
-      isAutoScrolling.value = true
-      logContainer.value.scrollTop =
-        logContainer.value.scrollHeight - logContainer.value.offsetHeight
-      setTimeout(() => (isAutoScrolling.value = false), 50)
+    // Allow resetting of userScrolled if the user scrolls to the bottom
+    if (selectedLogIndex.value === 0) {
+      if (
+        logContainer.value.scrollTop + logContainer.value.offsetHeight >=
+        logContainer.value.scrollHeight - 10
+      )
+        userScrolled.value = false
+
+      if (!userScrolled.value) {
+        await nextTick()
+        isAutoScrolling.value = true
+        logContainer.value.scrollTop =
+          logContainer.value.scrollHeight - logContainer.value.offsetHeight
+        setTimeout(() => (isAutoScrolling.value = false), 50)
+      }
     }
   }
 }, 250)

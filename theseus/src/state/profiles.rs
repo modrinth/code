@@ -331,14 +331,13 @@ impl Profile {
     }
 
     pub fn sync_projects_task(profile_path_id: ProfilePathId, force: bool) {
+        let span = tracing::span!(
+            tracing::Level::INFO,
+            "sync_projects_task",
+            ?profile_path_id,
+            ?force
+        );
         tokio::task::spawn(async move {
-            let span =
-                tracing::span!(tracing::Level::INFO, "sync_projects_task");
-            tracing::debug!(
-                parent: &span,
-                "Syncing projects for profile {}",
-                profile_path_id
-            );
             let res = async {
                 let _span = span.enter();
                 let state = State::get().await?;
@@ -840,12 +839,17 @@ impl Profiles {
                         drop(creds);
 
                         // Versions are pre-sorted in labrinth (by versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));)
-                        // so we can just take the first one
+                        // so we can just take the first one for which the loader matches
                         let mut new_profiles = state.profiles.write().await;
                         if let Some(profile) =
                             new_profiles.0.get_mut(&profile_path)
                         {
-                            if let Some(recent_version) = versions.get(0) {
+                            let loader = profile.metadata.loader;
+                            let recent_version = versions.iter().find(|x| {
+                                x.loaders
+                                    .contains(&loader.as_api_str().to_string())
+                            });
+                            if let Some(recent_version) = recent_version {
                                 profile.modrinth_update_version =
                                     Some(recent_version.id.clone());
                             } else {
@@ -879,7 +883,11 @@ impl Profiles {
 
     #[tracing::instrument(skip(self, profile))]
     #[theseus_macros::debug_pin]
-    pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
+    pub async fn insert(
+        &mut self,
+        profile: Profile,
+        no_watch: bool,
+    ) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,
             &profile.profile_id(),
@@ -888,13 +896,15 @@ impl Profiles {
         )
         .await?;
 
-        let state = State::get().await?;
-        let mut file_watcher = state.file_watcher.write().await;
-        Profile::watch_fs(
-            &profile.get_profile_full_path().await?,
-            &mut file_watcher,
-        )
-        .await?;
+        if !no_watch {
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
 
         let profile_name = profile.profile_id();
         profile_name.check_valid_utf()?;
@@ -986,6 +996,7 @@ impl Profiles {
                                 dirs,
                             )
                             .await?,
+                            false,
                         )
                         .await?;
                     Profile::sync_projects_task(profile_path_id, false);

@@ -237,22 +237,22 @@ async function refreshSearch() {
 
   let val = `${base}${url}`
 
-  const rawResults = await useFetch(val, 'search results', offline.value)
-  results.value = rawResults
+  let rawResults = await useFetch(val, 'search results', offline.value)
   if (!rawResults) {
-    results.value = {
+    rawResults = {
       hits: [],
       total_hits: 0,
       limit: 1,
     }
   }
   if (instanceContext.value) {
-    for (let val of results.value.hits) {
+    for (val of rawResults.hits) {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )
     }
   }
+  results.value = rawResults
 }
 
 async function onSearchChange(newPageNumber) {
@@ -262,7 +262,6 @@ async function onSearchChange(newPageNumber) {
     return
   }
   await refreshSearch()
-
   const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
 
   // Only replace in router if the query is different

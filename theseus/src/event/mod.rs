@@ -185,6 +185,10 @@ pub enum LoadingBarType {
     ConfigChange {
         new_path: PathBuf,
     },
+    CopyProfile {
+        import_location: PathBuf,
+        profile_name: String,
+    },
 }
 
 #[derive(Serialize, Clone)]

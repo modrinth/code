@@ -320,7 +320,7 @@ pub async fn download_libraries(
                                 let reader = std::io::Cursor::new(&data);
                                 if let Ok(mut archive) = zip::ZipArchive::new(reader) {
                                     match archive.extract(st.directories.version_natives_dir(version).await) {
-                                        Ok(_) => tracing::info!("Fetched native {}", &library.name),
+                                        Ok(_) => tracing::debug!("Fetched native {}", &library.name),
                                         Err(err) => tracing::error!("Failed extracting native {}. err: {}", &library.name, err)
                                     }
                                 } else {

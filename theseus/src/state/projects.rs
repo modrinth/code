@@ -281,7 +281,6 @@ pub async fn infer_data_from_files(
 ) -> crate::Result<HashMap<ProjectPathId, Project>> {
     let mut file_path_hashes = HashMap::new();
 
-    // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
     for path in paths {
         if !path.exists() {
             continue;
@@ -297,10 +296,19 @@ pub async fn infer_data_from_files(
             .await
             .map_err(|e| IOError::with_path(e, &path))?;
 
-        let mut buffer = Vec::new();
-        file.read_to_end(&mut buffer).await.map_err(IOError::from)?;
+        let mut buffer = [0u8; 4096]; // Buffer to read chunks
+        let mut hasher = sha2::Sha512::new(); // Hasher
 
-        let hash = format!("{:x}", sha2::Sha512::digest(&buffer));
+        loop {
+            let bytes_read =
+                file.read(&mut buffer).await.map_err(IOError::from)?;
+            if bytes_read == 0 {
+                break;
+            }
+            hasher.update(&buffer[..bytes_read]);
+        }
+
+        let hash = format!("{:x}", hasher.finalize());
         file_path_hashes.insert(hash, path.clone());
     }
 
