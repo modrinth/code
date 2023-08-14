@@ -222,7 +222,7 @@ onBeforeUnmount(() => {
   -webkit-user-select: none;
   max-height: 98vh;
   overflow-y: auto;
-  
+
   &::-webkit-scrollbar-track {
     border-top-right-radius: 1rem;
     border-bottom-right-radius: 1rem;
