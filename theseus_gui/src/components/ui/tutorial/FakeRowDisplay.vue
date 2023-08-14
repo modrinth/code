@@ -63,7 +63,7 @@ defineProps({
         >
           <Avatar
             size="sm"
-            src="https://launcher-files.modrinth.com/assets/maze-bg.png"
+            src="https://launcher-files.modrinth.com/assets/default_profile.png"
             alt="Mod card"
             class="mod-image"
           />

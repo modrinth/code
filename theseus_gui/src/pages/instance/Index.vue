@@ -72,17 +72,10 @@
             Options
           </RouterLink>
         </div>
-        <hr class="card-divider" />
-        <div class="pages-list">
-          <Button class="transparent" @click="exportModal.show()">
-            <PackageIcon />
-            Export modpack
-          </Button>
-        </div>
       </Card>
     </div>
     <div class="content">
-      <Promotion />
+      <Promotion query-param="?r=launcher" />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
@@ -118,7 +111,6 @@
     >
     <template #filter_update><UpdatedIcon />Select Updatable</template>
   </ContextMenu>
-  <ExportModal ref="exportModal" :instance="instance" />
 </template>
 <script setup>
 import {
@@ -156,15 +148,12 @@ import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { isOffline, showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import { PackageIcon } from '@/assets/icons/index.js'
-import ExportModal from '@/components/ui/ExportModal.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
-const exportModal = ref(null)
 
 const instance = ref(await get(route.params.id).catch(handleError))
 

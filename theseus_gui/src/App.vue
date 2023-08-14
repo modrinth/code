@@ -218,10 +218,11 @@ command_listener((e) => {
           <AccountsCard ref="accounts" mode="small" />
         </suspense>
         <div class="pages-list">
-          <RouterLink to="/" class="btn icon-only collapsed-button">
+          <RouterLink v-tooltip="'Home'" to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
           </RouterLink>
           <RouterLink
+            v-tooltip="'Browse'"
             to="/browse/modpack"
             class="btn icon-only collapsed-button"
             :class="{
@@ -230,7 +231,7 @@ command_listener((e) => {
           >
             <SearchIcon />
           </RouterLink>
-          <RouterLink to="/library" class="btn icon-only collapsed-button">
+          <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
           <Suspense>
@@ -240,6 +241,7 @@ command_listener((e) => {
       </div>
       <div class="settings pages-list">
         <Button
+          v-tooltip="'Create profile'"
           class="sleek-primary collapsed-button"
           icon-only
           :disabled="offline"
@@ -247,7 +249,7 @@ command_listener((e) => {
         >
           <PlusIcon />
         </Button>
-        <RouterLink to="/settings" class="btn icon-only collapsed-button">
+        <RouterLink v-tooltip="'Settings'" to="/settings" class="btn icon-only collapsed-button">
           <SettingsIcon />
         </RouterLink>
       </div>
@@ -260,7 +262,7 @@ command_listener((e) => {
           </section>
           <section class="mod-stats">
             <Suspense>
-              <RunningAppBar data-tauri-drag-region />
+              <RunningAppBar />
             </Suspense>
           </section>
         </div>
@@ -290,7 +292,7 @@ command_listener((e) => {
           offset-height="var(--appbar-height)"
           offset-width="var(--sidebar-width)"
         />
-        <RouterView v-slot="{ Component }" class="main-view">
+        <RouterView v-slot="{ Component }">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
               <component :is="Component"></component>

@@ -8,7 +8,6 @@ import {
   SettingsIcon,
   XIcon,
   Notifications,
-  LogOutIcon,
 } from 'omorphia'
 import { appWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
@@ -160,7 +159,10 @@ onMounted(async () => {
           <div class="btn icon-only" :class="{ active: phase < 4 }">
             <HomeIcon />
           </div>
-          <div class="btn icon-only" :class="{ active: phase === 4 || phase === 5 }">
+          <div
+            class="btn icon-only"
+            :class="{ active: phase === 4 || phase === 5, highlighted: phase === 4 }"
+          >
             <SearchIcon />
           </div>
           <div
@@ -175,9 +177,6 @@ onMounted(async () => {
         </div>
       </div>
       <div class="settings pages-list">
-        <Button class="active" icon-only @click="finishOnboarding">
-          <LogOutIcon />
-        </Button>
         <Button class="sleek-primary" icon-only>
           <PlusIcon />
         </Button>
@@ -192,7 +191,11 @@ onMounted(async () => {
           <Breadcrumbs data-tauri-drag-region />
         </section>
         <section class="mod-stats">
-          <FakeAppBar :show-running="phase === 7" :show-download="phase === 5">
+          <FakeAppBar
+            :show-running="phase === 7"
+            :show-download="phase === 5"
+            :exit="finishOnboarding"
+          >
             <template #running>
               <TutorialTip
                 :progress-function="nextPhase"
@@ -428,12 +431,6 @@ onMounted(async () => {
 
     &.sleek-primary {
       background-color: var(--color-brand-highlight);
-      transition: all ease-in-out 0.1s;
-    }
-
-    &.sleek-exit {
-      background-color: var(--color-red);
-      color: var(--color-accent-contrast);
       transition: all ease-in-out 0.1s;
     }
   }

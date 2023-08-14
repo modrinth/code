@@ -2,6 +2,7 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
+    v-tooltip="'Minecraft accounts'"
     class="button-base avatar-button"
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
@@ -14,15 +15,6 @@
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
-    <div v-show="mode === 'expanded'" class="avatar-text">
-      <div class="text no-select">
-        {{ selectedAccount ? selectedAccount.username : 'Offline' }}
-      </div>
-      <p class="accounts-text no-select">
-        <UsersIcon />
-        Accounts
-      </p>
-    </div>
   </div>
   <transition name="fade">
     <Card
@@ -64,10 +56,50 @@
       </Button>
     </Card>
   </transition>
+  <Modal ref="loginModal" class="modal" header="Signing in">
+    <div class="modal-body">
+      <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
+      <div class="modal-text">
+        <p>
+          Sign into Microsoft with your browser. If your browser didn't open, you can copy and open
+          the link below, or scan the QR code with your device.
+        </p>
+        <div class="iconified-input">
+          <LogInIcon />
+          <input type="text" :value="loginUrl" readonly />
+          <Button
+            v-tooltip="'Copy link'"
+            icon-only
+            color="raised"
+            @click="() => navigator.clipboard.writeText(loginUrl)"
+          >
+            <ClipboardCopyIcon />
+          </Button>
+        </div>
+        <div class="button-row">
+          <Button @click="openUrl">
+            <GlobeIcon />
+            Open link
+          </Button>
+          <Button class="transparent" @click="loginModal.hide"> Cancel </Button>
+        </div>
+      </div>
+    </div>
+  </Modal>
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
+import {
+  Avatar,
+  Button,
+  Card,
+  PlusIcon,
+  TrashIcon,
+  LogInIcon,
+  Modal,
+  GlobeIcon,
+  ClipboardCopyIcon,
+} from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
@@ -76,10 +108,10 @@ import {
   authenticate_await_completion,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
-import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
 import { get as getCreds, login_minecraft } from '@/helpers/mr_auth'
 import { mixpanel_track } from '@/helpers/mixpanel'
+import QrcodeVue from 'qrcode.vue'
 
 defineProps({
   mode: {
@@ -93,6 +125,9 @@ const emit = defineEmits(['change'])
 
 const settings = ref({})
 const accounts = ref([])
+const loginUrl = ref('')
+const loginModal = ref(null)
+
 async function refreshValues() {
   settings.value = await get().catch(handleError)
   accounts.value = await users().catch(handleError)
@@ -118,11 +153,17 @@ async function setAccount(account) {
 
 async function login() {
   const url = await authenticate_begin_flow().catch(handleError)
+  loginUrl.value = url
 
-  const window = new WebviewWindow('loginWindow', {
-    title: 'Modrinth App',
-    url: url,
+  await window.__TAURI_INVOKE__('tauri', {
+    __tauriModule: 'Shell',
+    message: {
+      cmd: 'open',
+      path: url,
+    },
   })
+
+  loginModal.value.show()
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
 
@@ -139,7 +180,8 @@ async function login() {
       }
     }
   }
-  await window.close()
+
+  loginModal.value.hide()
   mixpanel_track('AccountLogIn')
 }
 
@@ -328,5 +370,38 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.25rem;
   margin: 0;
+}
+
+.qr-code {
+  background-color: white !important;
+  border-radius: var(--radius-md);
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-lg);
+  align-items: center;
+  padding: var(--gap-lg);
+
+  .modal-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+
+    h2,
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.modal {
+  position: absolute;
 }
 </style>

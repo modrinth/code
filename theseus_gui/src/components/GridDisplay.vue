@@ -245,6 +245,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="sortBy"
         class="sort-dropdown"
+        name="Sort Dropdown"
         :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
         placeholder="Select..."
       />
@@ -254,6 +255,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="filters"
         class="filter-dropdown"
+        name="Filter Dropdown"
         :options="['All profiles', 'Custom instances', 'Downloaded modpacks']"
         placeholder="Select..."
       />
@@ -263,6 +265,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="group"
         class="group-dropdown"
+        name="Group Dropdown"
         :options="['Category', 'Loader', 'Game version', 'None']"
         placeholder="Select..."
       />

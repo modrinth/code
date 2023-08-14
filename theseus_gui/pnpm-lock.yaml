@@ -21,8 +21,8 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   omorphia:
-    specifier: ^0.4.35
-    version: 0.4.35
+    specifier: ^0.4.38
+    version: 0.4.38
   pinia:
     specifier: ^2.1.3
     version: 2.1.3(vue@3.3.4)
@@ -1348,8 +1348,8 @@ packages:
       ufo: 1.1.2
     dev: false
 
-  /omorphia@0.4.35:
-    resolution: {integrity: sha512-ZxA6sJKWZbiG49l/gTG25cxAvTcIfVSLhuIV2e+LSY0nwkZO4EFvxhzGNz0exR3lVs+OdDCdJyb1U2QYMVbVrA==}
+  /omorphia@0.4.38:
+    resolution: {integrity: sha512-V0vEarmAart6Gf5WuPUZ58TuIiQf7rI5HJpmYU7FVbtdvZ3q08VqyKZflCddbeBSFQ4/N+A+sNr/ELf/jz+Cug==}
     dependencies:
       dayjs: 1.11.7
       floating-vue: 2.0.0-beta.20(vue@3.3.4)
