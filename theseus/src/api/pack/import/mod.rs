@@ -7,6 +7,10 @@ use io::IOError;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    event::{
+        emit::{emit_loading, init_or_edit_loading},
+        LoadingBarId,
+    },
     prelude::ProfilePathId,
     state::Profiles,
     util::{
@@ -51,11 +55,20 @@ pub async fn get_importable_instances(
 ) -> crate::Result<Vec<String>> {
     // Some launchers have a different folder structure for instances
     let instances_subfolder = match launcher_type {
-        ImportLauncherType::GDLauncher
-        | ImportLauncherType::MultiMC
-        | ImportLauncherType::PrismLauncher
-        | ImportLauncherType::ATLauncher => "instances",
-        ImportLauncherType::Curseforge => "Instances",
+        ImportLauncherType::GDLauncher | ImportLauncherType::ATLauncher => {
+            "instances".to_string()
+        }
+        ImportLauncherType::Curseforge => "Instances".to_string(),
+        ImportLauncherType::MultiMC => {
+            mmc::get_instances_subpath(base_path.clone().join("multimc.cfg"))
+                .await
+                .unwrap_or_else(|| "instances".to_string())
+        }
+        ImportLauncherType::PrismLauncher => mmc::get_instances_subpath(
+            base_path.clone().join("prismlauncher.cfg"),
+        )
+        .await
+        .unwrap_or_else(|| "instances".to_string()),
         ImportLauncherType::Unknown => {
             return Err(crate::ErrorKind::InputError(
                 "Launcher type Unknown".to_string(),
@@ -63,7 +76,8 @@ pub async fn get_importable_instances(
             .into())
         }
     };
-    let instances_folder = base_path.join(instances_subfolder);
+
+    let instances_folder = base_path.join(&instances_subfolder);
     let mut instances = Vec::new();
     let mut dir = io::read_dir(&instances_folder).await.map_err(| _ | {
         crate::ErrorKind::InputError(format!(
@@ -238,55 +252,61 @@ pub async fn recache_icon(
 }
 
 async fn copy_dotminecraft(
-    profile_path: ProfilePathId,
+    profile_path_id: ProfilePathId,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,
-) -> crate::Result<()> {
+    existing_loading_bar: Option<LoadingBarId>,
+) -> crate::Result<LoadingBarId> {
     // Get full path to profile
-    let profile_path = profile_path.get_full_path().await?;
+    let profile_path = profile_path_id.get_full_path().await?;
 
-    // std fs copy every file in dotminecraft to profile_path
-    let mut dir = io::read_dir(&dotminecraft).await?;
-    while let Some(entry) = dir
-        .next_entry()
-        .await
-        .map_err(|e| IOError::with_path(e, &dotminecraft))?
-    {
-        let path = entry.path();
-        copy_dir_to(
-            &path,
-            &profile_path.join(path.file_name().ok_or_else(|| {
+    // Gets all subfiles recursively in src
+    let subfiles = get_all_subfiles(&dotminecraft).await?;
+    let total_subfiles = subfiles.len() as u64;
+
+    let loading_bar = init_or_edit_loading(
+        existing_loading_bar,
+        crate::LoadingBarType::CopyProfile {
+            import_location: dotminecraft.clone(),
+            profile_name: profile_path_id.to_string(),
+        },
+        total_subfiles as f64,
+        "Copying files in profile",
+    )
+    .await?;
+
+    // Copy each file
+    for src_child in subfiles {
+        let dst_child =
+            src_child.strip_prefix(&dotminecraft).map_err(|_| {
                 crate::ErrorKind::InputError(format!(
                     "Invalid file: {}",
-                    &path.display()
+                    &src_child.display()
                 ))
-            })?),
-            io_semaphore,
-        )
-        .await?;
+            })?;
+        let dst_child = profile_path.join(dst_child);
+
+        // sleep for cpu for 1 millisecond
+        tokio::time::sleep(std::time::Duration::from_millis(1)).await;
+
+        fetch::copy(&src_child, &dst_child, io_semaphore).await?;
+
+        emit_loading(&loading_bar, 1.0, None).await?;
     }
-    Ok(())
+    Ok(loading_bar)
 }
 
-/// Recursively fs::copy every file in src to dest
+/// Recursively get a list of all subfiles in src
 /// uses async recursion
 #[theseus_macros::debug_pin]
 #[async_recursion::async_recursion]
 #[tracing::instrument]
-async fn copy_dir_to(
-    src: &Path,
-    dst: &Path,
-    io_semaphore: &IoSemaphore,
-) -> crate::Result<()> {
+async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {
     if !src.is_dir() {
-        fetch::copy(src, dst, io_semaphore).await?;
-        return Ok(());
+        return Ok(vec![src.to_path_buf()]);
     }
 
-    // Create the destination directory
-    io::create_dir_all(&dst).await?;
-
-    // Iterate over the directory
+    let mut files = Vec::new();
     let mut dir = io::read_dir(&src).await?;
     while let Some(child) = dir
         .next_entry()
@@ -294,21 +314,7 @@ async fn copy_dir_to(
         .map_err(|e| IOError::with_path(e, src))?
     {
         let src_child = child.path();
-        let dst_child = dst.join(src_child.file_name().ok_or_else(|| {
-            crate::ErrorKind::InputError(format!(
-                "Invalid file: {}",
-                &src_child.display()
-            ))
-        })?);
-
-        if src_child.is_dir() {
-            // Recurse into sub-directory
-            copy_dir_to(&src_child, &dst_child, io_semaphore).await?;
-        } else {
-            // Copy file
-            fetch::copy(&src_child, &dst_child, io_semaphore).await?;
-        }
+        files.append(&mut get_all_subfiles(&src_child).await?);
     }
-
-    Ok(())
+    Ok(files)
 }

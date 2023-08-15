@@ -3,13 +3,12 @@ use std::{collections::HashMap, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    event::LoadingBarId,
     pack::{
         self,
         import::{self, copy_dotminecraft},
         install_from::CreatePackDescription,
     },
-    prelude::{ModLoader, ProfilePathId},
+    prelude::{ModLoader, Profile, ProfilePathId},
     state::{LinkedData, ProfileInstallStage},
     util::io,
     State,
@@ -33,8 +32,6 @@ pub struct ATLauncher {
     pub modrinth_project: Option<ATLauncherModrinthProject>,
     pub modrinth_version: Option<ATLauncherModrinthVersion>,
     pub modrinth_manifest: Option<pack::install_from::PackFormat>,
-
-    pub mods: Vec<ATLauncherMod>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -57,13 +54,9 @@ pub struct ATLauncherModrinthProject {
     pub slug: String,
     pub project_type: String,
     pub team: String,
-    pub title: String,
-    pub description: String,
-    pub body: String,
     pub client_side: Option<String>,
     pub server_side: Option<String>,
     pub categories: Vec<String>,
-    pub icon_url: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -110,7 +103,16 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
             .unwrap_or("".to_string());
     let instance: Result<ATInstance, serde_json::Error> =
         serde_json::from_str::<ATInstance>(&instance);
-    instance.is_ok()
+    if let Err(e) = instance {
+        tracing::warn!(
+            "Could not parse instance.json at {}: {}",
+            instance_folder.display(),
+            e
+        );
+        false
+    } else {
+        true
+    }
 }
 
 #[tracing::instrument]
@@ -169,7 +171,6 @@ pub async fn import_atlauncher(
         backup_name,
         description,
         atinstance,
-        None,
     )
     .await?;
     Ok(())
@@ -181,7 +182,6 @@ async fn import_atlauncher_unmanaged(
     backup_name: String,
     description: CreatePackDescription,
     atinstance: ATInstance,
-    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     let mod_loader = format!(
         "\"{}\"",
@@ -230,19 +230,28 @@ async fn import_atlauncher_unmanaged(
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
-    copy_dotminecraft(
+    let loading_bar = copy_dotminecraft(
         profile_path.clone(),
         minecraft_folder,
         &state.io_semaphore,
+        None,
     )
     .await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, existing_loading_bar)
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
             .await?;
-
+        {
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile_val.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
         State::sync().await?;
     }
     Ok(())

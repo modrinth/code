@@ -200,6 +200,25 @@ const filteredResults = computed(() => {
     return instanceMap.set('None', instances)
   }
 
+  // For 'name', we intuitively expect the sorting to apply to the name of the group first, not just the name of the instance
+  // ie: Category A should come before B, even if the first instance in B comes before the first instance in A
+  if (sortBy.value === 'Name') {
+    const sortedEntries = [...instanceMap.entries()].sort((a, b) => {
+      // None should always be first
+      if (a[0] === 'None' && b[0] !== 'None') {
+        return -1
+      }
+      if (a[0] !== 'None' && b[0] === 'None') {
+        return 1
+      }
+      return a[0].localeCompare(b[0])
+    })
+    instanceMap.clear()
+    sortedEntries.forEach((entry) => {
+      instanceMap.set(entry[0], entry[1])
+    })
+  }
+
   return instanceMap
 })
 </script>
@@ -226,6 +245,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="sortBy"
         class="sort-dropdown"
+        name="Sort Dropdown"
         :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
         placeholder="Select..."
       />
@@ -235,6 +255,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="filters"
         class="filter-dropdown"
+        name="Filter Dropdown"
         :options="['All profiles', 'Custom instances', 'Downloaded modpacks']"
         placeholder="Select..."
       />
@@ -244,6 +265,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="group"
         class="group-dropdown"
+        name="Group Dropdown"
         :options="['Category', 'Loader', 'Game version', 'None']"
         placeholder="Select..."
       />
@@ -265,7 +287,7 @@ const filteredResults = computed(() => {
       <Instance
         v-for="(instance, index) in instanceSection.value"
         ref="instanceComponents"
-        :key="instance.id"
+        :key="instance.path"
         :instance="instance"
         @contextmenu.prevent.stop="(event) => handleRightClick(event, instanceComponents[index])"
       />

@@ -37,6 +37,7 @@
               (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
             )
           "
+          type="ignored"
         >
           <EnvironmentIndicator
             :client-side="data.client_side"
@@ -167,7 +168,7 @@
       </Card>
     </div>
     <div v-if="data" class="content-container">
-      <Promotion />
+      <Promotion query-param="?r=launcher" />
       <Card class="tabs">
         <NavRow
           v-if="data.gallery.length > 0"
@@ -205,6 +206,7 @@
         :versions="versions"
         :members="members"
         :dependencies="dependencies"
+        :instance="instance"
         :install="install"
         :installed="installed"
         :installing="installing"

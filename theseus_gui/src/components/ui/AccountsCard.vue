@@ -2,6 +2,7 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
+    v-tooltip="'Minecraft accounts'"
     class="button-base avatar-button"
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
@@ -14,15 +15,6 @@
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
-    <div v-show="mode === 'expanded'" class="avatar-text">
-      <div class="text no-select">
-        {{ selectedAccount ? selectedAccount.username : 'Offline' }}
-      </div>
-      <p class="accounts-text no-select">
-        <UsersIcon />
-        Accounts
-      </p>
-    </div>
   </div>
   <transition name="fade">
     <Card
@@ -64,11 +56,11 @@
       </Button>
     </Card>
   </transition>
-  <Modal ref="loginModal" header="Microsoft Login" :noblur="!themeStore.advancedRendering">
-    <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
-
+  <Modal ref="loginModal" class="modal" header="Signing in">
     <div class="modal-body">
-      <div>Enter the following code on the opened Microsoft page:</div>
+      <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
+      <div class="modal-text">
+        <div>Enter the following code on the opened Microsoft page:</div>
       <div class="code">
         <Card>{{ loginCode }}</Card>
         <Button
@@ -81,6 +73,26 @@
         </Button>
       </div>
       <div>Didn't work? <a class="link" :href="loginUrl">Open it again!</a></div>
+        <div class="iconified-input">
+          <LogInIcon />
+          <input type="text" :value="loginUrl" readonly />
+          <Button
+            v-tooltip="'Copy link'"
+            icon-only
+            color="raised"
+            @click="() => navigator.clipboard.writeText(loginUrl)"
+          >
+            <ClipboardCopyIcon />
+          </Button>
+        </div>
+        <div class="button-row">
+          <Button @click="openUrl">
+            <GlobeIcon />
+            Open link
+          </Button>
+          <Button class="transparent" @click="loginModal.hide"> Cancel </Button>
+        </div>
+      </div>
     </div>
   </Modal>
 </template>
@@ -92,9 +104,9 @@ import {
   Card,
   PlusIcon,
   TrashIcon,
-  UsersIcon,
   LogInIcon,
   Modal,
+  GlobeIcon,
   ClipboardCopyIcon,
 } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
@@ -105,9 +117,9 @@ import {
   authenticate_await_completion,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
-import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError, useTheming } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
+import QrcodeVue from 'qrcode.vue'
 
 defineProps({
   mode: {
@@ -127,6 +139,9 @@ const loginUrl = ref(null)
 
 const settings = ref({})
 const accounts = ref([])
+const loginUrl = ref('')
+const loginModal = ref(null)
+
 async function refreshValues() {
   settings.value = await get().catch(handleError)
   accounts.value = await users().catch(handleError)
@@ -160,10 +175,15 @@ async function login() {
   loginModal.value.show()
   loginCode.value = loginSuccess.user_code
   loginUrl.value = loginSuccess.verification_uri
-  const window = new WebviewWindow('loginWindow', {
-    title: 'Modrinth App',
-    url: loginSuccess.verification_uri,
+  await window.__TAURI_INVOKE__('tauri', {
+    __tauriModule: 'Shell',
+    message: {
+      cmd: 'open',
+      path: loginSuccess.verification_uri,
+    },
   })
+
+  loginModal.value.show()
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
   loginModal.value.hide()
@@ -172,7 +192,8 @@ async function login() {
     await setAccount(loggedIn)
     await refreshValues()
   }
-  await window.close()
+
+  loginModal.value.hide()
   mixpanel_track('AccountLogIn')
 }
 
@@ -245,7 +266,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   top: 0.5rem;
   left: 5.5rem;
-  z-index: 9;
+  z-index: 11;
   gap: 0.5rem;
   padding: 1rem;
   border: 1px solid var(--color-button-bg);
@@ -253,6 +274,18 @@ onBeforeUnmount(() => {
   user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
+  max-height: 98vh;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar-track {
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
+
+  &::-webkit-scrollbar {
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+  }
 
   &.hidden {
     display: none;
@@ -351,18 +384,40 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
+.qr-code {
+  background-color: white !important;
+  border-radius: var(--radius-md);
+}
+
 .modal-body {
   display: flex;
-  flex-direction: column;
-  gap: var(--gap-md);
+  flex-direction: row;
+  gap: var(--gap-lg);
   align-items: center;
-  padding: var(--gap-md);
+  padding: var(--gap-lg);
 
-  .link {
-    color: var(--color-blue);
-    text-decoration: underline;
+  .modal-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+
+    h2,
+    p {
+      margin: 0;
+    }
   }
-  .code {
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.modal {
+  position: absolute;
+}
+
+.code {
     color: var(--color-brand);
     padding: 0.05rem 0.1rem;
     // row not column
@@ -374,5 +429,5 @@ onBeforeUnmount(() => {
       padding: 0.5rem 1rem;
     }
   }
-}
+
 </style>

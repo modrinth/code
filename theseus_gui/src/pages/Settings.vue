@@ -308,10 +308,20 @@ async function refreshDir() {
           <span class="label__title">Disable analytics</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
-            customize your experience. Opting out will disable this data collection.
+            customize your experience. By enabling this option, you opt out and your data will no
+            longer be collected.
           </span>
         </label>
-        <Toggle id="opt-out-analytics" v-model="settings.opt_out_analytics" />
+        <Toggle
+          id="opt-out-analytics"
+          :model-value="settings.opt_out_analytics"
+          :checked="settings.opt_out_analytics"
+          @update:model-value="
+            (e) => {
+              settings.opt_out_analytics = e
+            }
+          "
+        />
       </div>
     </Card>
     <Card>
@@ -425,7 +435,7 @@ async function refreshDir() {
         <label for="fullscreen">
           <span class="label__title">Fullscreen</span>
           <span class="label__description">
-            Overwrites the option.txt file to start in full screen when launched.
+            Overwrites the options.txt file to start in full screen when launched.
           </span>
         </label>
         <Toggle

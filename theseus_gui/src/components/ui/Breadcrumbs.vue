@@ -1,5 +1,11 @@
 <template>
   <div class="breadcrumbs">
+    <Button class="breadcrumbs__back transparent" icon-only @click="$router.back()">
+      <ChevronLeftIcon />
+    </Button>
+    <Button class="breadcrumbs__forward transparent" icon-only @click="$router.forward()">
+      <ChevronRightIcon />
+    </Button>
     {{ breadcrumbData.resetToNames(breadcrumbs) }}
     <div v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name" class="breadcrumbs__item">
       <router-link
@@ -25,7 +31,7 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon } from 'omorphia'
+import { ChevronRightIcon, Button, ChevronLeftIcon } from 'omorphia'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
@@ -59,6 +65,18 @@ const breadcrumbs = computed(() => {
     a {
       margin: auto 0;
     }
+  }
+
+  .breadcrumbs__back,
+  .breadcrumbs__forward {
+    margin: auto 0;
+    color: var(--color-base);
+    height: unset;
+    width: unset;
+  }
+
+  .breadcrumbs__forward {
+    margin-right: 1rem;
   }
 }
 

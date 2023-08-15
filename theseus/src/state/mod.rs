@@ -353,19 +353,17 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
             })
         },
     )?;
-
     tokio::task::spawn(async move {
+        let span = tracing::span!(tracing::Level::INFO, "init_watcher");
+        tracing::info!(parent: &span, "Initting watcher");
         while let Some(res) = rx.next().await {
+            let _span = span.enter();
             match res {
                 Ok(mut events) => {
                     let mut visited_paths = Vec::new();
                     // sort events by e.path
                     events.sort_by(|a, b| a.path.cmp(&b.path));
                     events.iter().for_each(|e| {
-                        tracing::debug!(
-                            "File watcher event: {:?}",
-                            serde_json::to_string(&e.path).unwrap()
-                        );
                         let mut new_path = PathBuf::new();
                         let mut components_iterator = e.path.components();
                         let mut found = false;

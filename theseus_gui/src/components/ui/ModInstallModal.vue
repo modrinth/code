@@ -183,7 +183,7 @@ const createInstance = async () => {
   await router.push(`/instance/${encodeURIComponent(id)}/`)
 
   const instance = await get(id, true)
-  await installVersionDependencies(instance, versions.value)
+  await installVersionDependencies(instance, versions.value[0])
 
   mixpanel_track('InstanceCreate', {
     profile_name: name.value,
@@ -204,7 +204,7 @@ const createInstance = async () => {
     source: 'ProjectInstallModal',
   })
 
-  installModal.value.hide()
+  if (installModal.value) installModal.value.hide()
   creatingInstance.value = false
 }
 

@@ -29,7 +29,7 @@ import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
-import { check_installed, get as getInstance } from '@/helpers/profile.js'
+import { check_installed, get, get as getInstance } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { isOffline } from '@/helpers/utils'
 import { offline_listener } from '@/helpers/events'
@@ -56,6 +56,7 @@ const orFacets = ref([])
 const selectedVersions = ref([])
 const onlyOpenSource = ref(false)
 const showSnapshots = ref(false)
+const hideAlreadyInstalled = ref(false)
 const selectedEnvironments = ref([])
 const sortTypes = readonly([
   { display: 'Relevance', name: 'relevance' },
@@ -143,6 +144,9 @@ if (route.query.m) {
 if (route.query.o) {
   currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1
 }
+if (route.query.ai) {
+  hideAlreadyInstalled.value = route.query.ai === 'true'
+}
 
 async function refreshSearch() {
   const base = 'https://api.modrinth.com/v2/'
@@ -222,6 +226,16 @@ async function refreshSearch() {
       ])
     }
 
+    if (hideAlreadyInstalled.value) {
+      const installedMods = await get(instanceContext.value.path, false).then((x) =>
+        Object.values(x.projects)
+          .filter((x) => x.metadata.project)
+          .map((x) => x.metadata.project.id)
+      )
+      installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
+      console.log(`facets=${JSON.stringify(formattedFacets)}`)
+    }
+
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
   }
   const offset = (currentPage.value - 1) * maxResults.value
@@ -237,22 +251,22 @@ async function refreshSearch() {
 
   let val = `${base}${url}`
 
-  const rawResults = await useFetch(val, 'search results', offline.value)
-  results.value = rawResults
+  let rawResults = await useFetch(val, 'search results', offline.value)
   if (!rawResults) {
-    results.value = {
+    rawResults = {
       hits: [],
       total_hits: 0,
       limit: 1,
     }
   }
   if (instanceContext.value) {
-    for (let val of results.value.hits) {
+    for (val of rawResults.hits) {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
         (x) => (val.installed = x)
       )
     }
   }
+  results.value = rawResults
 }
 
 async function onSearchChange(newPageNumber) {
@@ -262,7 +276,6 @@ async function onSearchChange(newPageNumber) {
     return
   }
   await refreshSearch()
-
   const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
 
   // Only replace in router if the query is different
@@ -339,6 +352,10 @@ function getSearchUrl(offset, useObj) {
   if (ignoreInstanceLoaders.value) {
     queryItems.push('il=true')
     obj.il = true
+  }
+  if (hideAlreadyInstalled.value) {
+    queryItems.push('ai=true')
+    obj.ai = true
   }
 
   let url = `${route.path}`
@@ -556,6 +573,13 @@ onUnmounted(() => unlistenOffline())
           @update:model-value="onSearchChangeToTop(1)"
           @click.prevent.stop
         />
+        <Checkbox
+          v-model="hideAlreadyInstalled"
+          label="Hide already installed"
+          class="filter-checkbox"
+          @update:model-value="onSearchChangeToTop(1)"
+          @click.prevent.stop
+        />
       </Card>
       <Card class="search-panel-card">
         <Button
@@ -663,7 +687,7 @@ onUnmounted(() => unlistenOffline())
       </Card>
     </aside>
     <div class="search">
-      <Promotion class="promotion" :external="false" />
+      <Promotion class="promotion" :external="false" query-param="?r=launcher" />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
       </Card>
@@ -712,7 +736,7 @@ onUnmounted(() => unlistenOffline())
         @switch-page="onSearchChange"
       />
       <SplashScreen v-if="loading" />
-      <section v-else-if="offline && results.total_hits == 0" class="offline">
+      <section v-else-if="offline && results.total_hits === 0" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
       </section>
       <section v-else class="project-list display-mode--list instance-results" role="list">

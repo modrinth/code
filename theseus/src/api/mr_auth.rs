@@ -7,10 +7,13 @@ use crate::ErrorKind;
 pub async fn authenticate_begin_flow(provider: &str) -> crate::Result<String> {
     let state = crate::State::get().await?;
 
+    // Don't start an uncompleteable new flow if there's an existing locked one
+    let mut write: tokio::sync::RwLockWriteGuard<'_, Option<ModrinthAuthFlow>> =
+        state.modrinth_auth_flow.write().await;
+
     let mut flow = ModrinthAuthFlow::new(provider).await?;
     let url = flow.prepare_login_url().await?;
 
-    let mut write = state.modrinth_auth_flow.write().await;
     *write = Some(flow);
 
     Ok(url)

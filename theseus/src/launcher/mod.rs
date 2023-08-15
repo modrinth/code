@@ -461,28 +461,28 @@ pub async fn launch_minecraft(
     // Uses 'a:b' syntax which is not quite yaml
     use regex::Regex;
 
-    let options_path = instance_path.join("options.txt");
-    let mut options_string = String::new();
-
-    if options_path.exists() {
-        options_string = io::read_to_string(&options_path).await?;
-    }
-
-    for (key, value) in mc_set_options {
-        let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
-        // check if the regex exists in the file
-        if !re.is_match(&options_string) {
-            // The key was not found in the file, so append it
-            options_string.push_str(&format!("\n{}:{}", key, value));
-        } else {
-            let replaced_string = re
-                .replace_all(&options_string, &format!("{}:{}", key, value))
-                .to_string();
-            options_string = replaced_string;
+    if !mc_set_options.is_empty() {
+        let options_path = instance_path.join("options.txt");
+        let mut options_string = String::new();
+        if options_path.exists() {
+            options_string = io::read_to_string(&options_path).await?;
         }
-    }
+        for (key, value) in mc_set_options {
+            let re = Regex::new(&format!(r"(?m)^{}:.*$", regex::escape(key)))?;
+            // check if the regex exists in the file
+            if !re.is_match(&options_string) {
+                // The key was not found in the file, so append it
+                options_string.push_str(&format!("\n{}:{}", key, value));
+            } else {
+                let replaced_string = re
+                    .replace_all(&options_string, &format!("{}:{}", key, value))
+                    .to_string();
+                options_string = replaced_string;
+            }
+        }
 
-    io::write(&options_path, options_string).await?;
+        io::write(&options_path, options_string).await?;
+    }
 
     // Get Modrinth logs directories
     let datetime_string =

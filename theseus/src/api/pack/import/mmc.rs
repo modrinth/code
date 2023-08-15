@@ -7,7 +7,7 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
-    prelude::ProfilePathId,
+    prelude::{Profile, ProfilePathId},
     util::io,
     State,
 };
@@ -119,6 +119,26 @@ pub struct MMCComponentRequirement {
     pub suggests: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "PascalCase")]
+#[serde(untagged)]
+enum MMCLauncherEnum {
+    General(MMCLauncherGeneral),
+    Instance(MMCLauncher),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "PascalCase")]
+struct MMCLauncherGeneral {
+    pub general: MMCLauncher,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "PascalCase")]
+pub struct MMCLauncher {
+    instance_dir: String,
+}
+
 // Checks if if its a folder, and the folder contains instance.cfg and mmc-pack.json, and they both parse
 #[tracing::instrument]
 pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
@@ -134,9 +154,19 @@ pub async fn is_valid_mmc(instance_folder: PathBuf) -> bool {
         && serde_json::from_str::<MMCPack>(&mmc_pack).is_ok()
 }
 
+#[tracing::instrument]
+pub async fn get_instances_subpath(config: PathBuf) -> Option<String> {
+    let launcher = io::read_to_string(&config).await.ok()?;
+    let launcher: MMCLauncherEnum = serde_ini::from_str(&launcher).ok()?;
+    match launcher {
+        MMCLauncherEnum::General(p) => Some(p.general.instance_dir),
+        MMCLauncherEnum::Instance(p) => Some(p.instance_dir),
+    }
+}
+
 // Loading the INI (instance.cfg) file
 async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
-    let instance_cfg = io::read_to_string(file_path).await?;
+    let instance_cfg: String = io::read_to_string(file_path).await?;
     let instance_cfg_enum: MMCInstanceEnum =
         serde_ini::from_str::<MMCInstanceEnum>(&instance_cfg)?;
     match instance_cfg_enum {
@@ -281,18 +311,28 @@ async fn import_mmc_unmanaged(
 
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
-    copy_dotminecraft(
+    let loading_bar = copy_dotminecraft(
         profile_path.clone(),
         minecraft_folder,
         &state.io_semaphore,
+        None,
     )
     .await?;
 
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, None).await?;
-
+        crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
+            .await?;
+        {
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile_val.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
         State::sync().await?;
     }
     Ok(())

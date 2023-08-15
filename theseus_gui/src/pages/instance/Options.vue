@@ -21,7 +21,12 @@
       <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" render-up />
+          <DropdownSelect
+            v-model="gameVersion"
+            :options="selectableGameVersions"
+            name="Game Version Dropdown"
+            render-up
+          />
           <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
         </div>
       </div>
@@ -31,6 +36,7 @@
           :model-value="selectableLoaderVersions[loaderVersionIndex]"
           :options="selectableLoaderVersions"
           :display-name="(option) => option?.id"
+          name="Version selector"
           render-up
           @change="(value) => (loaderVersionIndex = value.index)"
         />
@@ -204,7 +210,9 @@
     <div class="adjacent-input">
       <label for="fullscreen">
         <span class="label__title">Fullscreen</span>
-        <span class="label__description"> Make the game start in full screen when launched. </span>
+        <span class="label__description">
+          Make the game start in full screen when launched (using options.txt).
+        </span>
       </label>
       <Checkbox id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
     </div>
@@ -424,11 +432,9 @@ const groups = ref(props.instance.metadata.groups)
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
-  ...new Set(
-    instancesList.reduce((acc, obj) => {
-      return acc.concat(obj.metadata.groups)
-    }, [])
-  ),
+  ...instancesList.reduce((acc, obj) => {
+    return acc.concat(obj.metadata.groups)
+  }, []),
 ])
 
 async function resetIcon() {

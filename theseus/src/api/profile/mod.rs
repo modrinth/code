@@ -974,7 +974,7 @@ pub async fn create_mrpack_json(
     // But the values are sanitized to only include the version number
     let dependencies = dependencies
         .into_iter()
-        .map(|(k, v)| (k, sanitize_loader_version_string(&v).to_string()))
+        .map(|(k, v)| (k, sanitize_loader_version_string(&v, k).to_string()))
         .collect::<HashMap<_, _>>();
 
     let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
@@ -1043,18 +1043,26 @@ pub async fn create_mrpack_json(
     })
 }
 
-fn sanitize_loader_version_string(s: &str) -> &str {
-    // Split on '-'
-    // If two or more, take the second
-    // If one, take the first
-    // If none, take the whole thing
-    let mut split: std::str::Split<'_, char> = s.split('-');
-    match split.next() {
-        Some(first) => match split.next() {
-            Some(second) => second,
-            None => first,
-        },
-        None => s,
+fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
+    match loader {
+        // Split on '-'
+        // If two or more, take the second
+        // If one, take the first
+        // If none, take the whole thing
+        PackDependency::Forge => {
+            let mut split: std::str::Split<'_, char> = s.split('-');
+            match split.next() {
+                Some(first) => match split.next() {
+                    Some(second) => second,
+                    None => first,
+                },
+                None => s,
+            }
+        }
+        // For quilt, etc we take the whole thing, as it functions like: 0.20.0-beta.11 (and should not be split here)
+        PackDependency::QuiltLoader
+        | PackDependency::FabricLoader
+        | PackDependency::Minecraft => s,
     }
 }
 
