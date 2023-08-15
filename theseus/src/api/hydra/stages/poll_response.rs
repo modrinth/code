@@ -56,7 +56,7 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
                     })?;
                 match failure.error.as_str() {
                     "authorization_pending" => {
-                        tokio::time::sleep(std::time::Duration::from_secs(5))
+                        tokio::time::sleep(std::time::Duration::from_secs(2))
                             .await;
                     }
                     "authorization_declined" => {

@@ -61,18 +61,18 @@
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
         <div>Enter the following code on the opened Microsoft page:</div>
-      <div class="code">
-        <Card>{{ loginCode }}</Card>
-        <Button
-          v-tooltip="'Copy link'"
-          icon-only
-          color="raised"
-          @click="() => clipboardWrite(loginCode)"
-        >
-          <ClipboardCopyIcon />
-        </Button>
-      </div>
-      <div>Didn't work? <a class="link" :href="loginUrl">Open it again!</a></div>
+        <div class="code">
+          <Card>{{ loginCode }}</Card>
+          <Button
+            v-tooltip="'Copy link'"
+            icon-only
+            color="raised"
+            @click="() => clipboardWrite(loginCode)"
+          >
+            <ClipboardCopyIcon />
+          </Button>
+        </div>
+        <div>Didn't work? <a class="link" :href="loginUrl">Open it again!</a></div>
         <div class="iconified-input">
           <LogInIcon />
           <input type="text" :value="loginUrl" readonly />
@@ -80,7 +80,7 @@
             v-tooltip="'Copy link'"
             icon-only
             color="raised"
-            @click="() => navigator.clipboard.writeText(loginUrl)"
+            @click="() => clipboardWrite(loginUrl)"
           >
             <ClipboardCopyIcon />
           </Button>
@@ -117,7 +117,7 @@ import {
   authenticate_await_completion,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
-import { handleError, useTheming } from '@/store/state.js'
+import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
 
@@ -131,11 +131,7 @@ defineProps({
 
 const emit = defineEmits(['change'])
 
-const themeStore = useTheming()
-
-const loginModal = ref(null)
 const loginCode = ref(null)
-const loginUrl = ref(null)
 
 const settings = ref({})
 const accounts = ref([])
@@ -182,8 +178,6 @@ async function login() {
       path: loginSuccess.verification_uri,
     },
   })
-
-  loginModal.value.show()
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
   loginModal.value.hide()
@@ -418,16 +412,15 @@ onBeforeUnmount(() => {
 }
 
 .code {
-    color: var(--color-brand);
-    padding: 0.05rem 0.1rem;
-    // row not column
-    display: flex;
+  color: var(--color-brand);
+  padding: 0.05rem 0.1rem;
+  // row not column
+  display: flex;
 
-    .card {
-      background: var(--color-base);
-      color: var(--color-contrast);
-      padding: 0.5rem 1rem;
-    }
+  .card {
+    background: var(--color-base);
+    color: var(--color-contrast);
+    padding: 0.5rem 1rem;
   }
-
+}
 </style>
