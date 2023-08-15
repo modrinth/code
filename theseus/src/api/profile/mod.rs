@@ -1089,5 +1089,5 @@ pub async fn build_folder(
 }
 
 pub fn sanitize_profile_name(input: &str) -> String {
-    input.replace(['/', '\\', ':'], "_")
+    input.replace(['/', '\\', "?", "*", ':', '\'', '\"', '|', '<', '>'], "_")
 }
