@@ -15,17 +15,18 @@ use tokio::time::{sleep, Duration};
 // 3) call the authenticate_await_complete_flow() function to get the credentials (like you would in the frontend)
 pub async fn authenticate_run() -> theseus::Result<Credentials> {
     println!("A browser window will now open, follow the login flow there.");
-    let url = auth::authenticate_begin_flow().await?;
+    let login = auth::authenticate_begin_flow().await?;
 
-    println!("URL {}", url.as_str());
-    webbrowser::open(url.as_str())
-        .map_err(|e| IOError::with_path(e, url.as_str()))?;
+    println!("URL {}", login.verification_uri.as_str());
+    println!("Code {}", login.user_code.as_str());
+    webbrowser::open(login.verification_uri.as_str())
+        .map_err(|e| IOError::with_path(e, login.verification_uri.as_str()))?;
 
     let credentials = auth::authenticate_await_complete_flow().await?;
     State::sync().await?;
 
-    println!("Logged in user {}.", credentials.0.username);
-    Ok(credentials.0)
+    println!("Logged in user {}.", credentials.username);
+    Ok(credentials)
 }
 
 #[tokio::main]

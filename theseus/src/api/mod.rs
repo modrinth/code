@@ -1,6 +1,7 @@
 //! API for interacting with Theseus
 pub mod auth;
 pub mod handler;
+pub mod hydra;
 pub mod jre;
 pub mod logs;
 pub mod metadata;

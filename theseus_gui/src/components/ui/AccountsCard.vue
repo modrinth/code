@@ -64,10 +64,39 @@
       </Button>
     </Card>
   </transition>
+  <Modal ref="loginModal" header="Microsoft Login" :noblur="!themeStore.advancedRendering">
+    <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
+
+    <div class="modal-body">
+      <div>Enter the following code on the opened Microsoft page:</div>
+      <div class="code">
+        <Card>{{ loginCode }}</Card>
+        <Button
+          v-tooltip="'Copy link'"
+          icon-only
+          color="raised"
+          @click="() => clipboardWrite(loginCode)"
+        >
+          <ClipboardCopyIcon />
+        </Button>
+      </div>
+      <div>Didn't work? <a class="link" :href="loginUrl">Open it again!</a></div>
+    </div>
+  </Modal>
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
+import {
+  Avatar,
+  Button,
+  Card,
+  PlusIcon,
+  TrashIcon,
+  UsersIcon,
+  LogInIcon,
+  Modal,
+  ClipboardCopyIcon,
+} from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
@@ -77,8 +106,7 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
-import { handleError } from '@/store/state.js'
-import { get as getCreds, login_minecraft } from '@/helpers/mr_auth'
+import { handleError, useTheming } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 
 defineProps({
@@ -90,6 +118,12 @@ defineProps({
 })
 
 const emit = defineEmits(['change'])
+
+const themeStore = useTheming()
+
+const loginModal = ref(null)
+const loginCode = ref(null)
+const loginUrl = ref(null)
 
 const settings = ref({})
 const accounts = ref([])
@@ -116,28 +150,27 @@ async function setAccount(account) {
   emit('change')
 }
 
-async function login() {
-  const url = await authenticate_begin_flow().catch(handleError)
+const clipboardWrite = async (a) => {
+  navigator.clipboard.writeText(a)
+}
 
+async function login() {
+  const loginSuccess = await authenticate_begin_flow().catch(handleError)
+
+  loginModal.value.show()
+  loginCode.value = loginSuccess.user_code
+  loginUrl.value = loginSuccess.verification_uri
   const window = new WebviewWindow('loginWindow', {
     title: 'Modrinth App',
-    url: url,
+    url: loginSuccess.verification_uri,
   })
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
+  loginModal.value.hide()
 
-  if (loggedIn && loggedIn[0]) {
-    await setAccount(loggedIn[0])
+  if (loggedIn) {
+    await setAccount(loggedIn)
     await refreshValues()
-
-    const creds = await getCreds().catch(handleError)
-    if (!creds) {
-      try {
-        await login_minecraft(loggedIn[1])
-      } catch (err) {
-        /* empty */
-      }
-    }
   }
   await window.close()
   mixpanel_track('AccountLogIn')
@@ -316,5 +349,30 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.25rem;
   margin: 0;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  align-items: center;
+  padding: var(--gap-md);
+
+  .link {
+    color: var(--color-blue);
+    text-decoration: underline;
+  }
+  .code {
+    color: var(--color-brand);
+    padding: 0.05rem 0.1rem;
+    // row not column
+    display: flex;
+
+    .card {
+      background: var(--color-base);
+      color: var(--color-contrast);
+      padding: 0.5rem 1rem;
+    }
+  }
 }
 </style>

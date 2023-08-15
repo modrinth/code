@@ -15,7 +15,9 @@ import { invoke } from '@tauri-apps/api/tauri'
 
 /// Authenticate a user with Hydra - part 1
 /// This begins the authentication flow quasi-synchronously
-/// This returns a URL to be opened in a browser
+/// This returns a DeviceLoginSuccess object, with two relevant fields:
+///  - verification_uri: the URL to go to to complete the flow
+///  - user_code: the code to enter on the verification_uri page
 export async function authenticate_begin_flow() {
   return await invoke('plugin:auth|auth_authenticate_begin_flow')
 }
