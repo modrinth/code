@@ -11,7 +11,7 @@ import {
   Notifications,
   XIcon,
 } from 'omorphia'
-import { useLoading, useTheming } from '@/store/state'
+import { useLoading, useTheming, useLogs } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -42,6 +42,7 @@ import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 
 const themeStore = useTheming()
+const logStore = useLogs()
 const urlModal = ref(null)
 const isLoading = ref(true)
 
@@ -54,7 +55,7 @@ const onboardingVideo = ref()
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
+    const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded, logs } =
       await get()
     const os = await getOS()
     // video should play if the user is not on linux, and has not onboarded
@@ -66,6 +67,8 @@ defineExpose({
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
     themeStore.advancedRendering = advanced_rendering
+
+    logStore.logsColored = logs.colored
 
     mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
     if (opt_out_analytics) {

@@ -13,7 +13,7 @@ import {
   FolderSearchIcon,
   UpdatedIcon,
 } from 'omorphia'
-import { handleError, useTheming } from '@/store/state'
+import { handleError, useTheming, useLogs } from '@/store/state'
 import { change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
@@ -25,6 +25,8 @@ import { open } from '@tauri-apps/api/dialog'
 const pageOptions = ['Home', 'Library']
 
 const themeStore = useTheming()
+
+const logStore = useLogs()
 
 const fetchSettings = await get().catch(handleError)
 
@@ -194,6 +196,23 @@ async function refreshDir() {
             (e) => {
               themeStore.setThemeState(e.option.toLowerCase())
               settings.theme = themeStore.selectedTheme
+            }
+          "
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="colored-logs">
+          <span class="label__title">Colored logs</span>
+          <span class="label__description"> Enables colored logs in the log viewer. </span>
+        </label>
+        <Toggle
+          id="colored-logs"
+          :model-value="settings.logs.colored"
+          :checked="settings.logs.colored"
+          @update:model-value="
+            (e) => {
+              logStore.logsColored = e
+              settings.logs.colored = logStore.logsColored
             }
           "
         />

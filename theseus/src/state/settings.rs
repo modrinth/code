@@ -17,6 +17,7 @@ const CURRENT_FORMAT_VERSION: u32 = 1;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Settings {
     pub theme: Theme,
+    pub logs: LogSettings,
     pub memory: MemorySettings,
     #[serde(default)]
     pub force_fullscreen: bool,
@@ -65,6 +66,7 @@ impl Settings {
         } else {
             Ok(Self {
                 theme: Theme::Dark,
+                logs: LogSettings::default(),
                 memory: MemorySettings::default(),
                 force_fullscreen: false,
                 game_resolution: WindowSize::default(),
@@ -145,6 +147,19 @@ pub enum Theme {
     Dark,
     Light,
     Oled,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+pub struct LogSettings {
+    pub colored: bool,
+}
+
+impl Default for LogSettings {
+    fn default() -> Self {
+        Self {
+            colored: true,
+        }
+    }
 }
 
 /// Minecraft memory settings
