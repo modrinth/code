@@ -60,37 +60,33 @@
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
-        <div>Enter the following code on the opened Microsoft page:</div>
-        <div class="code">
-          <Card>{{ loginCode }}</Card>
+        <div class="label">Copy this code</div>
+        <div class="code-text">
+          <div class="code">
+            {{ loginCode }}
+          </div>
           <Button
-            v-tooltip="'Copy link'"
+            v-tooltip="'Copy code'"
             icon-only
+            large
             color="raised"
             @click="() => clipboardWrite(loginCode)"
           >
             <ClipboardCopyIcon />
           </Button>
         </div>
-        <div>Didn't work? <a class="link" :href="loginUrl">Open it again!</a></div>
+        <div>And enter it on Microsoft's website to sign in.</div>
         <div class="iconified-input">
           <LogInIcon />
           <input type="text" :value="loginUrl" readonly />
           <Button
-            v-tooltip="'Copy link'"
+            v-tooltip="'Open link'"
             icon-only
             color="raised"
             @click="() => clipboardWrite(loginUrl)"
           >
-            <ClipboardCopyIcon />
-          </Button>
-        </div>
-        <div class="button-row">
-          <Button @click="openUrl">
             <GlobeIcon />
-            Open link
           </Button>
-          <Button class="transparent" @click="loginModal.hide"> Cancel </Button>
         </div>
       </div>
     </div>
@@ -388,16 +384,41 @@ onBeforeUnmount(() => {
   flex-direction: row;
   gap: var(--gap-lg);
   align-items: center;
-  padding: var(--gap-lg);
+  padding: var(--gap-xl);
 
   .modal-text {
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
+    width: 100%;
 
     h2,
     p {
       margin: 0;
+    }
+
+    .code-text {
+      display: flex;
+      flex-direction: row;
+      gap: var(--gap-xs);
+      align-items: center;
+
+      .code {
+        background-color: var(--color-bg);
+        border-radius: var(--radius-md);
+        border: solid 1px var(--color-button-bg);
+        font-family: var(--mono-font);
+        letter-spacing: var(--gap-md);
+        color: var(--color-contrast);
+        font-size: 2rem;
+        font-weight: bold;
+        padding: var(--gap-sm) 0 var(--gap-sm) var(--gap-md);
+      }
+
+      .btn {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
     }
   }
 }
