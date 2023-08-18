@@ -231,6 +231,17 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
         loaders: ['bungeecord'],
       }
     },
+    // Velocity
+    'velocity-plugin.json': (file) => {
+      const metadata = JSON.parse(file)
+
+      return {
+        name: `${project.title} ${metadata.version}`,
+        version_number: metadata.version,
+        version_type: versionType(metadata.version),
+        loaders: ['velocity'],
+      }
+    },
     // Modpacks
     'modrinth.index.json': (file) => {
       const metadata = JSON.parse(file)
