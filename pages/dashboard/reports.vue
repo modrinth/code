@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="universal-card">
-      <h2>Reports you've filed</h2>
+      <h2>Reports</h2>
       <ReportsList :auth="auth" />
     </section>
   </div>
