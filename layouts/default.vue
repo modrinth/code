@@ -94,6 +94,10 @@
                     <SettingsIcon class="icon" />
                     <span class="title">Settings</span>
                   </NuxtLink>
+                  <NuxtLink class="item button-transparent get-the-app" to="/app">
+                    <DownloadIcon class="icon" />
+                    <span class="title">Get Modrinth App</span>
+                  </NuxtLink>
                   <NuxtLink
                     v-if="tags.staffRoles.includes(auth.user.role)"
                     class="item button-transparent"
@@ -330,6 +334,10 @@
         </a>
       </div>
       <div class="buttons">
+        <nuxt-link class="btn btn-outline btn-primary" to="/app">
+          <DownloadIcon aria-hidden="true" />
+          Get Modrinth App
+        </nuxt-link>
         <button class="iconified-button raised-button" @click="changeTheme">
           <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
@@ -1152,6 +1160,10 @@ export default defineNuxtComponent({
   justify-content: center;
   gap: 1rem;
   padding: 0.5rem 1rem;
+}
+
+.get-the-app {
+  color: var(--color-brand) !important;
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
