@@ -1,71 +1,121 @@
 <template>
-  <div class="auth-page-container">
-    <h1>Create your account</h1>
-    <div class="third-party">
+  <div>
+    <h1>Sign up with</h1>
+
+    <section class="third-party">
       <a class="btn discord-btn" :href="getAuthUrl('discord')">
-        <DiscordIcon /> <span>Discord</span>
+        <DiscordIcon />
+        <span>Discord</span>
       </a>
-      <a class="btn github-btn" :href="getAuthUrl('github')"><GitHubIcon /> <span>GitHub</span></a>
-      <a class="btn microsoft-btn" :href="getAuthUrl('microsoft')">
-        <MicrosoftIcon /> <span>Microsoft</span>
+      <a class="btn" :href="getAuthUrl('github')">
+        <GitHubIcon />
+        <span>GitHub</span>
       </a>
-      <a class="btn google-btn" :href="getAuthUrl('google')">
-        <GoogleIcon /> <span>Google</span>
+      <a class="btn" :href="getAuthUrl('microsoft')">
+        <MicrosoftIcon />
+        <span>Microsoft</span>
       </a>
-      <a class="btn apple-btn" :href="getAuthUrl('steam')"><SteamIcon /> <span>Steam</span></a>
-      <a class="btn gitlab-btn" :href="getAuthUrl('gitlab')"> <GitLabIcon /> <span>GitLab</span></a>
-    </div>
-    <div class="text-divider">
-      <div></div>
-      <span>or</span>
-      <div></div>
-    </div>
-    <label for="email" hidden>Email</label>
-    <input id="email" v-model="email" type="text" placeholder="Email" />
-    <label for="username" hidden>Username</label>
-    <input id="username" v-model="username" type="text" placeholder="Username" />
-    <label for="password" hidden>Password</label>
-    <input id="password" v-model="password" type="password" placeholder="Password" />
-    <label for="confirm-password" hidden>Password</label>
-    <input
-      id="confirm-password"
-      v-model="confirmPassword"
-      type="password"
-      placeholder="Confirm password"
-    />
-    <Checkbox
-      v-model="subscribe"
-      class="subscribe-btn"
-      label="Subscribe to updates about Modrinth"
-    />
-    <p>
-      By creating an account, you agree to Modrinth's
-      <nuxt-link to="/legal/terms" class="text-link">terms</nuxt-link> and
-      <nuxt-link to="/legal/privacy" class="text-link">privacy policy</nuxt-link>.
-    </p>
-    <button class="btn btn-primary continue-btn" @click="createAccount">
-      Create account <RightArrowIcon />
-    </button>
-    <p>
-      Already have an account?
-      <nuxt-link
-        class="text-link"
-        :to="`/auth/sign-in${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`"
-      >
-        Sign in.
-      </nuxt-link>
+      <a class="btn" :href="getAuthUrl('google')">
+        <GoogleIcon />
+        <span>Google</span>
+      </a>
+      <a class="btn" :href="getAuthUrl('steam')">
+        <SteamIcon />
+        <span>Steam</span>
+      </a>
+      <a class="btn" :href="getAuthUrl('gitlab')">
+        <GitLabIcon />
+        <span>GitLab</span>
+      </a>
+    </section>
+
+    <h1>Or create an account yourself</h1>
+
+    <section class="auth-form">
+      <div class="iconified-input">
+        <label for="email" hidden>Email</label>
+        <MailIcon />
+        <input
+          id="email"
+          v-model="email"
+          type="text"
+          class="auth-form__input"
+          placeholder="Email"
+        />
+      </div>
+
+      <div class="iconified-input">
+        <label for="username" hidden>Username</label>
+        <UserIcon />
+        <input
+          id="username"
+          v-model="username"
+          type="text"
+          class="auth-form__input"
+          placeholder="Username"
+        />
+      </div>
+
+      <div class="iconified-input">
+        <label for="password" hidden>Password</label>
+        <KeyIcon />
+        <input
+          id="password"
+          v-model="password"
+          class="auth-form__input"
+          type="password"
+          placeholder="Password"
+        />
+      </div>
+
+      <div class="iconified-input">
+        <label for="confirm-password" hidden>Password</label>
+        <KeyIcon />
+        <input
+          id="confirm-password"
+          v-model="confirmPassword"
+          type="password"
+          class="auth-form__input"
+          placeholder="Confirm password"
+        />
+      </div>
+
       <NuxtTurnstile ref="turnstile" v-model="token" class="turnstile" />
-    </p>
+
+      <Checkbox
+        v-model="subscribe"
+        class="subscribe-btn"
+        label="Subscribe to updates about Modrinth"
+      />
+
+      <p>
+        By creating an account, you agree to Modrinth's
+        <NuxtLink to="/legal/terms" class="text-link">Terms</NuxtLink> and
+        <NuxtLink to="/legal/privacy" class="text-link">Privacy Policy</NuxtLink>.
+      </p>
+
+      <button class="btn btn-primary continue-btn centered-btn" @click="createAccount">
+        Create account <RightArrowIcon />
+      </button>
+
+      <div class="auth-form__additional-options">
+        Already have an account?
+        <NuxtLink class="text-link" :to="signInLink">Sign in</NuxtLink>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-import { GitHubIcon, RightArrowIcon, Checkbox } from 'omorphia'
-import DiscordIcon from 'assets/images/utils/discord.svg'
-import GoogleIcon from 'assets/images/utils/google.svg'
-import SteamIcon from 'assets/images/utils/steam.svg'
-import MicrosoftIcon from 'assets/images/utils/microsoft.svg'
-import GitLabIcon from 'assets/images/utils/gitlab.svg'
+import { RightArrowIcon, UserIcon, Checkbox } from 'omorphia'
+import GitHubIcon from 'assets/icons/auth/sso-github.svg'
+import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
+import GoogleIcon from 'assets/icons/auth/sso-google.svg'
+import SteamIcon from 'assets/icons/auth/sso-steam.svg'
+import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
+import KeyIcon from 'assets/icons/auth/key.svg'
+import MailIcon from 'assets/icons/auth/mail.svg'
+import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
 
 useHead({
   title: 'Sign Up - Modrinth',
@@ -86,8 +136,6 @@ if (auth.value.user) {
   await navigateTo('/dashboard')
 }
 
-const data = useNuxtApp()
-
 const turnstile = ref()
 
 const email = ref('')
@@ -97,11 +145,15 @@ const confirmPassword = ref('')
 const token = ref('')
 const subscribe = ref(true)
 
+const signInLink = computed(
+  () => `/auth/sign-in${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`
+)
+
 async function createAccount() {
   startLoading()
   try {
     if (confirmPassword.value !== password.value) {
-      data.$notify({
+      addNotification({
         group: 'main',
         title: 'An error occurred',
         text: 'Passwords do not match!',
@@ -130,7 +182,7 @@ async function createAccount() {
       await navigateTo('/dashboard')
     }
   } catch (err) {
-    data.$notify({
+    addNotification({
       group: 'main',
       title: 'An error occurred',
       text: err.data ? err.data.description : err,
@@ -141,8 +193,3 @@ async function createAccount() {
   stopLoading()
 }
 </script>
-<style lang="scss" scoped>
-.subscribe-btn {
-  margin-block-start: 0 !important;
-}
-</style>

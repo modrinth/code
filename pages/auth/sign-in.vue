@@ -1,5 +1,5 @@
 <template>
-  <div class="auth-page-container">
+  <div>
     <template v-if="flow">
       <label for="two-factor-code">
         <span class="label__title">Enter two-factor code</span>
@@ -13,74 +13,101 @@
         placeholder="Enter code..."
       />
 
-      <button class="btn btn-primary continue-btn" @click="loginTwoFactor">
+      <button class="btn btn-primary continue-btn" @click="begin2FASignIn">
         Sign in <RightArrowIcon />
       </button>
     </template>
     <template v-else>
-      <h1>Continue with</h1>
-      <div class="third-party">
-        <a class="btn discord-btn" :href="getAuthUrl('discord')">
-          <DiscordIcon /> <span>Discord</span>
+      <h1>Sign in with</h1>
+
+      <section class="third-party">
+        <a class="btn" :href="getAuthUrl('discord')">
+          <DiscordIcon />
+          <span>Discord</span>
         </a>
-        <a class="btn github-btn" :href="getAuthUrl('github')"
-          ><GitHubIcon /> <span>GitHub</span></a
-        >
-        <a class="btn microsoft-btn" :href="getAuthUrl('microsoft')">
-          <MicrosoftIcon /> <span>Microsoft</span>
+        <a class="btn" :href="getAuthUrl('github')">
+          <GitHubIcon />
+          <span>GitHub</span>
         </a>
-        <a class="btn google-btn" :href="getAuthUrl('google')">
-          <GoogleIcon /> <span>Google</span>
+        <a class="btn" :href="getAuthUrl('microsoft')">
+          <MicrosoftIcon />
+          <span>Microsoft</span>
         </a>
-        <a class="btn apple-btn" :href="getAuthUrl('steam')"><SteamIcon /> <span>Steam</span></a>
-        <a class="btn gitlab-btn" :href="getAuthUrl('gitlab')">
-          <GitLabIcon /> <span>GitLab</span></a
-        >
-      </div>
-      <div class="text-divider">
-        <div></div>
-        <span>or</span>
-        <div></div>
-      </div>
-      <label for="email" hidden>Email or username</label>
-      <input id="email" v-model="email" type="text" placeholder="Email or username" />
-      <label for="password" hidden>Password</label>
-      <input id="password" v-model="password" type="password" placeholder="Password" />
-      <div class="account-options">
+        <a class="btn" :href="getAuthUrl('google')">
+          <GoogleIcon />
+          <span>Google</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('steam')">
+          <SteamIcon />
+          <span>Steam</span>
+        </a>
+        <a class="btn" :href="getAuthUrl('gitlab')">
+          <GitLabIcon />
+          <span>GitLab</span>
+        </a>
+      </section>
+
+      <h1>Or use a password</h1>
+
+      <section class="auth-form">
+        <div class="iconified-input">
+          <label for="email" hidden>Email or username</label>
+          <MailIcon />
+          <input
+            id="email"
+            v-model="email"
+            type="text"
+            class="auth-form__input"
+            placeholder="Email or username"
+          />
+        </div>
+
+        <div class="iconified-input">
+          <label for="password" hidden>Password</label>
+          <KeyIcon />
+          <input
+            id="password"
+            v-model="password"
+            type="password"
+            class="auth-form__input"
+            placeholder="Password"
+          />
+        </div>
+
         <NuxtTurnstile ref="turnstile" v-model="token" class="turnstile" />
-        <nuxt-link class="text-link" to="/auth/reset-password">Forgot password?</nuxt-link>
-      </div>
-      <button class="btn btn-primary continue-btn" @click="loginPassword()">
-        Continue <RightArrowIcon />
-      </button>
-      <p>
-        Don't have an account yet?
-        <nuxt-link
-          class="text-link"
-          :to="`/auth/sign-up${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`"
-        >
-          Create one.
-        </nuxt-link>
-      </p>
+
+        <button class="btn btn-primary continue-btn centered-btn" @click="beginPasswordSignIn()">
+          Sign in <RightArrowIcon />
+        </button>
+
+        <div class="auth-form__additional-options">
+          <NuxtLink class="text-link" to="/auth/reset-password">Forgot password?</NuxtLink>
+          <p>•</p>
+          <NuxtLink class="text-link" :to="signUpLink"> Create an account</NuxtLink>
+        </div>
+      </section>
     </template>
   </div>
 </template>
 
 <script setup>
-import { GitHubIcon, RightArrowIcon } from 'omorphia'
-import DiscordIcon from 'assets/images/utils/discord.svg'
-import GoogleIcon from 'assets/images/utils/google.svg'
-import SteamIcon from 'assets/images/utils/steam.svg'
-import MicrosoftIcon from 'assets/images/utils/microsoft.svg'
-import GitLabIcon from 'assets/images/utils/gitlab.svg'
+import { RightArrowIcon } from 'omorphia'
+import GitHubIcon from 'assets/icons/auth/sso-github.svg'
+import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
+import GoogleIcon from 'assets/icons/auth/sso-google.svg'
+import SteamIcon from 'assets/icons/auth/sso-steam.svg'
+import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
+import KeyIcon from 'assets/icons/auth/key.svg'
+import MailIcon from 'assets/icons/auth/mail.svg'
+import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
 
 useHead({
   title: 'Sign In - Modrinth',
 })
 
 const auth = await useAuth()
-
 const route = useRoute()
+
 if (route.fullPath.includes('new_account=true')) {
   await navigateTo(
     `/auth/welcome?authToken=${route.query.code}${
@@ -88,14 +115,12 @@ if (route.fullPath.includes('new_account=true')) {
     }`
   )
 } else if (route.query.code) {
-  await loginHandler()
+  await finishSignIn()
 }
 
 if (auth.value.user) {
   await navigateTo('/dashboard')
 }
-
-const data = useNuxtApp()
 
 const turnstile = ref()
 
@@ -105,7 +130,11 @@ const token = ref('')
 
 const flow = ref(route.query.flow)
 
-async function loginPassword() {
+const signUpLink = computed(
+  () => `/auth/sign-up${route.query.redirect ? `?redirect=${route.query.redirect}` : ''}`
+)
+
+async function beginPasswordSignIn() {
   startLoading()
   try {
     const res = await useBaseFetch('auth/login', {
@@ -120,10 +149,10 @@ async function loginPassword() {
     if (res.flow) {
       flow.value = res.flow
     } else {
-      await loginHandler(res.session)
+      await finishSignIn(res.session)
     }
   } catch (err) {
-    data.$notify({
+    addNotification({
       group: 'main',
       title: 'An error occurred',
       text: err.data ? err.data.description : err,
@@ -135,7 +164,7 @@ async function loginPassword() {
 }
 
 const twoFactorCode = ref(null)
-async function loginTwoFactor() {
+async function begin2FASignIn() {
   startLoading()
   try {
     const res = await useBaseFetch('auth/login/2fa', {
@@ -146,9 +175,9 @@ async function loginTwoFactor() {
       },
     })
 
-    await loginHandler(res.session)
+    await finishSignIn(res.session)
   } catch (err) {
-    data.$notify({
+    addNotification({
       group: 'main',
       title: 'An error occurred',
       text: err.data ? err.data.description : err,
@@ -158,7 +187,7 @@ async function loginTwoFactor() {
   }
   stopLoading()
 }
-async function loginHandler(token) {
+async function finishSignIn(token) {
   if (token) {
     await useAuth(token)
     await useUser()
@@ -171,25 +200,3 @@ async function loginHandler(token) {
   }
 }
 </script>
-<style lang="scss" scoped>
-.totp {
-  justify-content: center;
-}
-
-.totp-codes {
-  justify-content: center;
-  display: grid;
-  gap: var(--gap-md);
-  grid-template-columns: repeat(2, 1fr);
-  width: 100%;
-}
-
-.account-options {
-  display: flex;
-  width: 100%;
-  margin-block-start: 0 !important;
-}
-.account-options a {
-  margin-left: auto;
-}
-</style>

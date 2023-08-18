@@ -1,25 +1,33 @@
 <template>
-  <div class="auth-page-container">
+  <div>
     <h1>Welcome to Modrinth!</h1>
-    <p>
-      Thank you for creating an account. You can now follow and create projects, receive updates
-      about your favorite projects, and more!
-    </p>
-    <Checkbox
-      v-model="subscribe"
-      class="subscribe-btn"
-      label="Subscribe to updates about Modrinth"
-    />
-    <button class="btn btn-primary continue-btn" @click="continueSignUp">Continue</button>
-    <p>
-      By creating an account, you agree to Modrinth's
-      <nuxt-link to="/legal/terms" class="text-link">terms</nuxt-link> and
-      <nuxt-link to="/legal/privacy" class="text-link">privacy policy</nuxt-link>.
-    </p>
+
+    <section class="auth-form">
+      <p>
+        Thank you for creating an account. You can now follow and create projects, receive updates
+        about your favorite projects, and more!
+      </p>
+
+      <Checkbox
+        v-model="subscribe"
+        class="subscribe-btn"
+        label="Subscribe to updates about Modrinth"
+      />
+
+      <button class="btn btn-primary continue-btn centered-btn" @click="continueSignUp">
+        Continue <RightArrowIcon />
+      </button>
+
+      <p>
+        By creating an account, you have agreed to Modrinth's
+        <NuxtLink to="/legal/terms" class="text-link">Terms</NuxtLink> and
+        <NuxtLink to="/legal/privacy" class="text-link">Privacy Policy</NuxtLink>.
+      </p>
+    </section>
   </div>
 </template>
 <script setup>
-import { Checkbox } from 'omorphia'
+import { Checkbox, RightArrowIcon } from 'omorphia'
 
 useHead({
   title: 'Welcome - Modrinth',

@@ -381,16 +381,16 @@ import {
   LeftArrowIcon,
   RightArrowIcon,
   CheckIcon,
-  GitHubIcon,
   ExternalIcon,
 } from 'omorphia'
 import QrcodeVue from 'qrcode.vue'
-import DiscordIcon from 'assets/images/utils/discord.svg'
-import GoogleIcon from 'assets/images/utils/google.svg'
-import SteamIcon from 'assets/images/utils/steam.svg'
-import MicrosoftIcon from 'assets/images/utils/microsoft.svg'
-import GitLabIcon from 'assets/images/utils/gitlab.svg'
-import KeyIcon from '~/assets/images/utils/key.svg'
+import GitHubIcon from 'assets/icons/auth/sso-github.svg'
+import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
+import GoogleIcon from 'assets/icons/auth/sso-google.svg'
+import SteamIcon from 'assets/icons/auth/sso-steam.svg'
+import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
+import KeyIcon from 'assets/icons/auth/key.svg'
+import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
 import ModalConfirm from '~/components/ui/ModalConfirm.vue'
 import Modal from '~/components/ui/Modal.vue'
 

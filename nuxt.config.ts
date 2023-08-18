@@ -304,6 +304,9 @@ export default defineNuxtConfig({
   nitro: {
     moduleSideEffects: ['@vintl/compact-number/locale-data'],
   },
+  devtools: {
+    enabled: true,
+  },
 })
 
 function getApiUrl() {
