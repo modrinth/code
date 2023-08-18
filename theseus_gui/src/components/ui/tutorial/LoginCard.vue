@@ -9,6 +9,8 @@ import QrcodeVue from 'qrcode.vue'
 
 const loginUrl = ref(null)
 const loginModal = ref()
+const loginCode = ref(null)
+const finalizedLogin = ref(false)
 
 const props = defineProps({
   nextPage: {
@@ -22,25 +24,28 @@ const props = defineProps({
 })
 
 async function login() {
-  const url = await authenticate_begin_flow().catch(handleError)
-  loginUrl.value = url
+  const loginSuccess = await authenticate_begin_flow().catch(handleError)
+  loginUrl.value = loginSuccess.verification_uri
+  loginCode.value = loginSuccess.user_code
+  loginModal.value.show()
 
   await window.__TAURI_INVOKE__('tauri', {
     __tauriModule: 'Shell',
     message: {
       cmd: 'open',
-      path: url,
+      path: loginSuccess.verification_uri,
     },
   })
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
   loginModal.value.hide()
 
-  props.nextPage(loggedIn[1])
   const settings = await get().catch(handleError)
-  settings.default_user = loggedIn[0].id
+  settings.default_user = loggedIn.id
   await set(settings).catch(handleError)
+  finalizedLogin.value = true
   await mixpanel.track('AccountLogIn')
+  props.nextPage()
 }
 
 const openUrl = async () => {
@@ -51,6 +56,10 @@ const openUrl = async () => {
       path: loginUrl.value,
     },
   })
+}
+
+const clipboardWrite = async (a) => {
+  navigator.clipboard.writeText(a)
 }
 </script>
 
@@ -80,9 +89,6 @@ const openUrl = async () => {
             <LogInIcon v-if="!finalizedLogin" />
             {{ finalizedLogin ? 'Next' : 'Sign in' }}
           </Button>
-          <Button v-if="loginUrl" class="transparent" @click="loginModal.show()">
-            Browser didn't open?
-          </Button>
         </div>
         <Button class="transparent" large @click="nextPage()"> Next </Button>
       </div>
@@ -92,28 +98,28 @@ const openUrl = async () => {
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
-        <p>
-          Sign into Microsoft with your browser. If your browser didn't open, you can copy and open
-          the link below, or scan the QR code with your device.
-        </p>
-        <div class="iconified-input">
-          <LogInIcon />
-          <input type="text" :value="loginUrl" readonly />
+        <div class="label">Copy this code</div>
+        <div class="code-text">
+          <div class="code">
+            {{ loginCode }}
+          </div>
           <Button
-            v-tooltip="'Copy link'"
+            v-tooltip="'Copy code'"
             icon-only
+            large
             color="raised"
-            @click="() => navigator.clipboard.writeText(loginUrl)"
+            @click="() => clipboardWrite(loginCode)"
           >
             <ClipboardCopyIcon />
           </Button>
         </div>
-        <div class="button-row">
-          <Button @click="openUrl">
+        <div>And enter it on Microsoft's website to sign in.</div>
+        <div class="iconified-input">
+          <LogInIcon />
+          <input type="text" :value="loginUrl" readonly />
+          <Button v-tooltip="'Open link'" icon-only color="raised" @click="openUrl">
             <GlobeIcon />
-            Open link
           </Button>
-          <Button class="transparent" @click="loginModal.hide"> Cancel </Button>
         </div>
       </div>
     </div>
@@ -196,11 +202,36 @@ const openUrl = async () => {
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
+    width: 100%;
 
     h2,
     p {
       margin: 0;
     }
+  }
+}
+
+.code-text {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-xs);
+  align-items: center;
+
+  .code {
+    background-color: var(--color-bg);
+    border-radius: var(--radius-md);
+    border: solid 1px var(--color-button-bg);
+    font-family: var(--mono-font);
+    letter-spacing: var(--gap-md);
+    color: var(--color-contrast);
+    font-size: 2rem;
+    font-weight: bold;
+    padding: var(--gap-sm) 0 var(--gap-sm) var(--gap-md);
+  }
+
+  .btn {
+    width: 2.5rem;
+    height: 2.5rem;
   }
 }
 
@@ -216,5 +247,18 @@ const openUrl = async () => {
   flex-direction: column;
   gap: var(--gap-sm);
   align-items: center;
+}
+.code {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--gap-sm);
+
+  .card {
+    background: var(--color-base);
+    color: var(--color-contrast);
+    padding: 0.5rem 1rem;
+    margin-top: 0.5rem;
+  }
 }
 </style>

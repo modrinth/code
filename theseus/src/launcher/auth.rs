@@ -1,55 +1,11 @@
 //! Authentication flow based on Hydra
-use crate::config::MODRINTH_API_URL;
-use crate::state::CredentialsStore;
-use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
-use async_tungstenite as ws;
+
+use crate::hydra;
+use crate::util::fetch::FetchSemaphore;
+
 use chrono::{prelude::*, Duration};
-use futures::prelude::*;
-use lazy_static::lazy_static;
-use reqwest::Method;
+
 use serde::{Deserialize, Serialize};
-use url::Url;
-
-lazy_static! {
-    static ref HYDRA_URL: Url =
-        Url::parse(&format!("{MODRINTH_API_URL}auth/minecraft/"))
-            .expect("Hydra URL parse failed");
-}
-
-// Socket messages
-#[derive(Deserialize)]
-struct ErrorJSON {
-    error: String,
-}
-
-impl ErrorJSON {
-    pub fn unwrap<'a, T: Deserialize<'a>>(data: &'a [u8]) -> crate::Result<T> {
-        if let Ok(err) = serde_json::from_slice::<Self>(data) {
-            Err(crate::ErrorKind::HydraError(err.error).as_error())
-        } else {
-            Ok(serde_json::from_slice::<T>(data)?)
-        }
-    }
-}
-
-#[derive(Deserialize)]
-struct LoginCodeJSON {
-    login_code: String,
-}
-
-#[derive(Deserialize)]
-struct TokenJSON {
-    token: String,
-    refresh_token: String,
-    expires_after: u32,
-    flow: Option<String>,
-}
-
-#[derive(Deserialize)]
-struct ProfileInfoJSON {
-    id: uuid::Uuid,
-    name: String,
-}
 
 // Login information
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -62,116 +18,39 @@ pub struct Credentials {
     _ctor_scope: std::marker::PhantomData<()>,
 }
 
-// Implementation
-pub struct HydraAuthFlow<S: AsyncRead + AsyncWrite + Unpin> {
-    socket: ws::WebSocketStream<S>,
-}
-
-impl HydraAuthFlow<ws::tokio::ConnectStream> {
-    pub async fn new() -> crate::Result<Self> {
-        let (socket, _) = ws::tokio::connect_async(
-            "wss://api.modrinth.com/v2/auth/minecraft/ws",
-        )
-        .await?;
-        Ok(Self { socket })
+impl Credentials {
+    pub fn new(
+        id: uuid::Uuid,
+        username: String,
+        access_token: String,
+        refresh_token: String,
+        expires: DateTime<Utc>,
+    ) -> Self {
+        Self {
+            id,
+            username,
+            access_token,
+            refresh_token,
+            expires,
+            _ctor_scope: std::marker::PhantomData,
+        }
     }
 
-    pub async fn prepare_login_url(&mut self) -> crate::Result<Url> {
-        let code_resp = self
-            .socket
-            .try_next()
-            .await?
-            .ok_or(
-                crate::ErrorKind::WSClosedError(String::from(
-                    "login socket ID",
-                ))
-                .as_error(),
-            )?
-            .into_data();
-        let code = ErrorJSON::unwrap::<LoginCodeJSON>(&code_resp)?;
-        Ok(wrap_ref_builder!(
-            it = HYDRA_URL.join("init")? =>
-            { it.query_pairs_mut().append_pair("id", &code.login_code); }
-        ))
-    }
-
-    pub async fn extract_credentials(
-        &mut self,
-        semaphore: &FetchSemaphore,
-    ) -> crate::Result<(Credentials, Option<String>)> {
-        // Minecraft bearer token
-        let token_resp = self
-            .socket
-            .try_next()
-            .await?
-            .ok_or(
-                crate::ErrorKind::WSClosedError(String::from(
-                    "login socket ID",
-                ))
-                .as_error(),
-            )?
-            .into_data();
-        let token = ErrorJSON::unwrap::<TokenJSON>(&token_resp)?;
-        let expires =
-            Utc::now() + Duration::seconds(token.expires_after.into());
-
-        // Get account credentials
-        let info = fetch_info(&token.token, semaphore).await?;
-
-        // Return structure from response
-        Ok((
-            Credentials {
-                username: info.name,
-                id: info.id,
-                refresh_token: token.refresh_token,
-                access_token: token.token,
-                expires,
-                _ctor_scope: std::marker::PhantomData,
-            },
-            token.flow,
-        ))
+    pub fn is_expired(&self) -> bool {
+        self.expires < Utc::now()
     }
 }
 
 pub async fn refresh_credentials(
     credentials: &mut Credentials,
-    semaphore: &FetchSemaphore,
+    _semaphore: &FetchSemaphore,
 ) -> crate::Result<()> {
-    let resp = fetch_json::<TokenJSON>(
-        Method::POST,
-        &format!("{MODRINTH_API_URL}auth/minecraft/refresh"),
-        None,
-        Some(serde_json::json!({ "refresh_token": credentials.refresh_token })),
-        semaphore,
-        &CredentialsStore(None),
-    )
-    .await?;
+    let res =
+        hydra::refresh::refresh(credentials.refresh_token.clone()).await?;
 
-    credentials.access_token = resp.token;
-    credentials.refresh_token = resp.refresh_token;
-    credentials.expires =
-        Utc::now() + Duration::seconds(resp.expires_after.into());
+    credentials.access_token = res.access_token;
+    credentials.refresh_token = res.refresh_token;
+    credentials.expires = Utc::now() + Duration::seconds(res.expires_in);
 
     Ok(())
-}
-
-// Helpers
-async fn fetch_info(
-    token: &str,
-    semaphore: &FetchSemaphore,
-) -> crate::Result<ProfileInfoJSON> {
-    let result = fetch_advanced(
-        Method::GET,
-        "https://api.minecraftservices.com/minecraft/profile",
-        None,
-        None,
-        Some(("Authorization", &format!("Bearer {token}"))),
-        None,
-        semaphore,
-        &CredentialsStore(None),
-    )
-    .await?;
-    let value = serde_json::from_slice(&result)?;
-
-    Ok(value)
 }

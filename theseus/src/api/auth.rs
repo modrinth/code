@@ -1,7 +1,6 @@
 //! Authentication flow interface
-use crate::{launcher::auth as inner, State};
+use crate::{hydra::init::DeviceLoginSuccess, launcher::auth as inner, State};
 use chrono::Utc;
-use tokio::sync::oneshot;
 
 use crate::state::AuthTask;
 pub use inner::Credentials;
@@ -11,7 +10,7 @@ pub use inner::Credentials;
 /// This can be used in conjunction with 'authenticate_await_complete_flow'
 /// to call authenticate and call the flow from the frontend.
 /// Visit the URL in a browser, then call and await 'authenticate_await_complete_flow'.
-pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
+pub async fn authenticate_begin_flow() -> crate::Result<DeviceLoginSuccess> {
     let url = AuthTask::begin_auth().await?;
     Ok(url)
 }
@@ -20,8 +19,7 @@ pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
 /// This completes the authentication flow quasi-synchronously, returning the credentials
 /// This can be used in conjunction with 'authenticate_begin_flow'
 /// to call authenticate and call the flow from the frontend.
-pub async fn authenticate_await_complete_flow(
-) -> crate::Result<(Credentials, Option<String>)> {
+pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
     let credentials = AuthTask::await_auth_completion().await?;
     Ok(credentials)
 }
@@ -29,39 +27,6 @@ pub async fn authenticate_await_complete_flow(
 /// Cancels the active authentication flow
 pub async fn cancel_flow() -> crate::Result<()> {
     AuthTask::cancel().await
-}
-
-/// Authenticate a user with Hydra
-/// To run this, you need to first spawn this function as a task, then
-/// open a browser to the given URL and finally wait on the spawned future
-/// with the ability to cancel in case the browser is closed before finishing
-#[tracing::instrument]
-#[theseus_macros::debug_pin]
-pub async fn authenticate(
-    browser_url: oneshot::Sender<url::Url>,
-) -> crate::Result<(Credentials, Option<String>)> {
-    let mut flow = inner::HydraAuthFlow::new().await?;
-    let state = State::get().await?;
-
-    let url = flow.prepare_login_url().await?;
-    browser_url.send(url).map_err(|url| {
-        crate::ErrorKind::OtherError(format!(
-            "Error sending browser url to parent: {url}"
-        ))
-    })?;
-
-    let credentials = flow.extract_credentials(&state.fetch_semaphore).await?;
-    {
-        let mut users = state.users.write().await;
-        users.insert(&credentials.0).await?;
-    }
-
-    if state.settings.read().await.default_user.is_none() {
-        let mut settings = state.settings.write().await;
-        settings.default_user = Some(credentials.0.id);
-    }
-
-    Ok(credentials)
 }
 
 /// Refresh some credentials using Hydra, if needed

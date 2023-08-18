@@ -20,7 +20,7 @@ pub struct IoSemaphore(pub RwLock<Semaphore>);
 pub struct FetchSemaphore(pub RwLock<Semaphore>);
 
 lazy_static! {
-    static ref REQWEST_CLIENT: reqwest::Client = {
+    pub static ref REQWEST_CLIENT: reqwest::Client = {
         let mut headers = reqwest::header::HeaderMap::new();
         let header = reqwest::header::HeaderValue::from_str(&format!(
             "modrinth/theseus/{} (support@modrinth.com)",

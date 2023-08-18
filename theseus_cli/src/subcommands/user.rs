@@ -4,7 +4,6 @@ use eyre::Result;
 use paris::*;
 use tabled::Tabled;
 use theseus::prelude::*;
-use tokio::sync::oneshot;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "user")]
@@ -41,18 +40,23 @@ impl UserAdd {
         info!("Adding new user account to Theseus");
         info!("A browser window will now open, follow the login flow there.");
 
-        let (tx, rx) = oneshot::channel::<url::Url>();
-        let flow = tokio::spawn(auth::authenticate(tx));
+        let login = auth::authenticate_begin_flow().await?;
+        let flow = tokio::spawn(auth::authenticate_await_complete_flow());
 
-        let url = rx.await?;
+        info!("Opening browser window at {}", login.verification_uri);
+        info!("Your code is {}", login.user_code);
+
         match self.browser {
-            Some(browser) => webbrowser::open_browser(browser, url.as_str()),
-            None => webbrowser::open(url.as_str()),
+            Some(browser) => webbrowser::open_browser(
+                browser,
+                login.verification_uri.as_str(),
+            ),
+            None => webbrowser::open(login.verification_uri.as_str()),
         }?;
 
         let credentials = flow.await??;
         State::sync().await?;
-        success!("Logged in user {}.", credentials.0.username);
+        success!("Logged in user {}.", credentials.username);
         Ok(())
     }
 }

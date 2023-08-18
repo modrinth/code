@@ -60,28 +60,33 @@
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
-        <p>
-          Sign into Microsoft with your browser. If your browser didn't open, you can copy and open
-          the link below, or scan the QR code with your device.
-        </p>
-        <div class="iconified-input">
-          <LogInIcon />
-          <input type="text" :value="loginUrl" readonly />
+        <div class="label">Copy this code</div>
+        <div class="code-text">
+          <div class="code">
+            {{ loginCode }}
+          </div>
           <Button
-            v-tooltip="'Copy link'"
+            v-tooltip="'Copy code'"
             icon-only
+            large
             color="raised"
-            @click="() => navigator.clipboard.writeText(loginUrl)"
+            @click="() => clipboardWrite(loginCode)"
           >
             <ClipboardCopyIcon />
           </Button>
         </div>
-        <div class="button-row">
-          <Button @click="openUrl">
+        <div>And enter it on Microsoft's website to sign in.</div>
+        <div class="iconified-input">
+          <LogInIcon />
+          <input type="text" :value="loginUrl" readonly />
+          <Button
+            v-tooltip="'Open link'"
+            icon-only
+            color="raised"
+            @click="() => clipboardWrite(loginUrl)"
+          >
             <GlobeIcon />
-            Open link
           </Button>
-          <Button class="transparent" @click="loginModal.hide"> Cancel </Button>
         </div>
       </div>
     </div>
@@ -109,7 +114,6 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
-import { get as getCreds, login_minecraft } from '@/helpers/mr_auth'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
 
@@ -122,6 +126,8 @@ defineProps({
 })
 
 const emit = defineEmits(['change'])
+
+const loginCode = ref(null)
 
 const settings = ref({})
 const accounts = ref([])
@@ -151,34 +157,30 @@ async function setAccount(account) {
   emit('change')
 }
 
-async function login() {
-  const url = await authenticate_begin_flow().catch(handleError)
-  loginUrl.value = url
+const clipboardWrite = async (a) => {
+  navigator.clipboard.writeText(a)
+}
 
+async function login() {
+  const loginSuccess = await authenticate_begin_flow().catch(handleError)
+
+  loginModal.value.show()
+  loginCode.value = loginSuccess.user_code
+  loginUrl.value = loginSuccess.verification_uri
   await window.__TAURI_INVOKE__('tauri', {
     __tauriModule: 'Shell',
     message: {
       cmd: 'open',
-      path: url,
+      path: loginSuccess.verification_uri,
     },
   })
 
-  loginModal.value.show()
-
   const loggedIn = await authenticate_await_completion().catch(handleError)
+  loginModal.value.hide()
 
-  if (loggedIn && loggedIn[0]) {
-    await setAccount(loggedIn[0])
+  if (loggedIn) {
+    await setAccount(loggedIn)
     await refreshValues()
-
-    const creds = await getCreds().catch(handleError)
-    if (!creds) {
-      try {
-        await login_minecraft(loggedIn[1])
-      } catch (err) {
-        /* empty */
-      }
-    }
   }
 
   loginModal.value.hide()
@@ -382,16 +384,41 @@ onBeforeUnmount(() => {
   flex-direction: row;
   gap: var(--gap-lg);
   align-items: center;
-  padding: var(--gap-lg);
+  padding: var(--gap-xl);
 
   .modal-text {
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
+    width: 100%;
 
     h2,
     p {
       margin: 0;
+    }
+
+    .code-text {
+      display: flex;
+      flex-direction: row;
+      gap: var(--gap-xs);
+      align-items: center;
+
+      .code {
+        background-color: var(--color-bg);
+        border-radius: var(--radius-md);
+        border: solid 1px var(--color-button-bg);
+        font-family: var(--mono-font);
+        letter-spacing: var(--gap-md);
+        color: var(--color-contrast);
+        font-size: 2rem;
+        font-weight: bold;
+        padding: var(--gap-sm) 0 var(--gap-sm) var(--gap-md);
+      }
+
+      .btn {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
     }
   }
 }
@@ -403,5 +430,18 @@ onBeforeUnmount(() => {
 
 .modal {
   position: absolute;
+}
+
+.code {
+  color: var(--color-brand);
+  padding: 0.05rem 0.1rem;
+  // row not column
+  display: flex;
+
+  .card {
+    background: var(--color-base);
+    color: var(--color-contrast);
+    padding: 0.5rem 1rem;
+  }
 }
 </style>

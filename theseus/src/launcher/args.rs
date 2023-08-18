@@ -268,8 +268,8 @@ fn parse_minecraft_argument(
         .replace("${auth_player_name}", username)
         // TODO: add auth xuid eventually
         .replace("${auth_xuid}", "0")
-        .replace("${auth_uuid}", &uuid.hyphenated().to_string())
-        .replace("${uuid}", &uuid.hyphenated().to_string())
+        .replace("${auth_uuid}", &uuid.simple().to_string())
+        .replace("${uuid}", &uuid.simple().to_string())
         .replace("${clientid}", "c4502edb-87c6-40cb-b595-64a280cf8906")
         .replace("${user_properties}", "{}")
         .replace("${user_type}", "msa")
