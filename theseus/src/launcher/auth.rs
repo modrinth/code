@@ -7,6 +7,8 @@ use chrono::{prelude::*, Duration};
 
 use serde::{Deserialize, Serialize};
 
+use crate::api::hydra::stages::{bearer_token, xbl_signin, xsts_token};
+
 // Login information
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Credentials {
@@ -45,12 +47,39 @@ pub async fn refresh_credentials(
     credentials: &mut Credentials,
     _semaphore: &FetchSemaphore,
 ) -> crate::Result<()> {
-    let res =
+    let oauth =
         hydra::refresh::refresh(credentials.refresh_token.clone()).await?;
 
-    credentials.access_token = res.access_token;
-    credentials.refresh_token = res.refresh_token;
-    credentials.expires = Utc::now() + Duration::seconds(res.expires_in);
+    let xbl_token = xbl_signin::login_xbl(&oauth.access_token).await?;
+
+    // Get xsts token from xbl token
+    let xsts_response = xsts_token::fetch_token(&xbl_token.token).await?;
+
+    match xsts_response {
+        xsts_token::XSTSResponse::Unauthorized(err) => {
+            return Err(crate::ErrorKind::HydraError(format!(
+                "Error getting XBox Live token: {}",
+                err
+            ))
+            .as_error())
+        }
+        xsts_token::XSTSResponse::Success { token: xsts_token } => {
+            let bearer_token =
+                bearer_token::fetch_bearer(&xsts_token, &xbl_token.uhs)
+                    .await
+                    .map_err(|err| {
+                        crate::ErrorKind::HydraError(format!(
+                            "Error getting bearer token: {}",
+                            err
+                        ))
+                    })?;
+
+            credentials.access_token = bearer_token;
+            credentials.refresh_token = oauth.refresh_token;
+            credentials.expires =
+                Utc::now() + Duration::seconds(oauth.expires_in);
+        }
+    }
 
     Ok(())
 }

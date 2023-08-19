@@ -1,7 +1,7 @@
 pub mod complete;
 pub mod init;
 pub mod refresh;
-mod stages;
+pub(crate) mod stages;
 
 use serde::Deserialize;
 
