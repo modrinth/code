@@ -60,7 +60,6 @@ defineExpose({
 })
 
 const isLinkedData = (item) => {
-  console.log(item)
   if (item.instance != undefined && item.instance.metadata.linked_data) {
     return true
   } else if (item.metadata != undefined && item.metadata.linked_data) {
