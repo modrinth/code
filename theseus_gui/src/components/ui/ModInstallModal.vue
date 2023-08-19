@@ -245,13 +245,30 @@ const check_valid = computed(() => {
             />
             {{ profile.metadata.name }}
           </Button>
-          <Button :disabled="profile.installedMod || profile.installing" @click="install(profile)">
-            <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
-            <CheckIcon v-else-if="profile.installedMod" />
-            {{
-              profile.installing ? 'Installing...' : profile.installedMod ? 'Installed' : 'Install'
-            }}
-          </Button>
+          <div
+            v-tooltip="
+              profile.metadata.linked_data && !profile.installedMod
+                ? 'Unpair an instance to add mods.'
+                : ''
+            "
+          >
+            <Button
+              :disabled="profile.installedMod || profile.installing || profile.metadata.linked_data"
+              @click="install(profile)"
+            >
+              <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
+              <CheckIcon v-else-if="profile.installedMod" />
+              {{
+                profile.installing
+                  ? 'Installing...'
+                  : profile.installedMod
+                  ? 'Installed'
+                  : profile.metadata.linked_data
+                  ? 'Paired'
+                  : 'Install'
+              }}
+            </Button>
+          </div>
         </div>
       </div>
       <Card v-if="showCreation" class="creation-card">

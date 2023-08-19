@@ -65,14 +65,10 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Card
-    v-if="projects.length > 0"
-    class="list-card"
-    :class="{ static: instance.metadata.linked_data }"
-  >
+  <Card v-if="projects.length > 0" class="list-card">
     <div class="table">
       <div class="table-row table-head" :class="{ 'show-options': selected.length > 0 }">
-        <div v-if="!instance.metadata.linked_data" class="table-cell table-text">
+        <div class="table-cell table-text">
           <Checkbox v-model="selectAll" class="select-checkbox" />
         </div>
         <div v-if="selected.length === 0" class="table-cell table-text name-cell actions-cell">
@@ -88,23 +84,21 @@
           </Button>
         </div>
         <div v-if="selected.length === 0" class="table-cell table-text actions-cell">
-          <Button
-            v-if="!instance.metadata.linked_data"
-            class="transparent"
-            @click="sortProjects('Enabled')"
-          >
+          <Button class="transparent" @click="sortProjects('Enabled')">
             Actions
             <DropdownIcon v-if="sortColumn === 'Enabled'" :class="{ down: ascending }" />
           </Button>
         </div>
-        <div v-else-if="!instance.metadata.linked_data" class="options table-cell name-cell">
-          <Button
-            class="transparent share"
-            @click="() => (showingOptions = !showingOptions)"
-            @mouseover="selectedOption = 'Share'"
-          >
-            <MenuIcon :class="{ open: showingOptions }" />
-          </Button>
+        <div v-else class="options table-cell name-cell">
+          <div>
+            <Button
+              class="transparent share"
+              @click="() => (showingOptions = !showingOptions)"
+              @mouseover="selectedOption = 'Share'"
+            >
+              <MenuIcon :class="{ open: showingOptions }" />
+            </Button>
+          </div>
           <Button
             class="transparent share"
             @click="shareNames()"
@@ -113,37 +107,42 @@
             <ShareIcon />
             Share
           </Button>
-          <Button
-            class="transparent trash"
-            @click="deleteWarning.show()"
-            @mouseover="selectedOption = 'Delete'"
-          >
-            <TrashIcon />
-            Delete
-          </Button>
-          <Button
-            class="transparent update"
-            :disabled="offline"
-            @click="updateAll()"
-            @mouseover="selectedOption = 'Update'"
-          >
-            <UpdatedIcon />
-            Update
-          </Button>
-          <Button
-            class="transparent"
-            @click="toggleSelected()"
-            @mouseover="selectedOption = 'Toggle'"
-          >
-            <ToggleIcon />
-            Toggle
-          </Button>
+          <div v-tooltip="isPackLinked ? 'Unpair this instance to remove mods' : ''">
+            <Button
+              :disabled="isPackLinked"
+              class="transparent trash"
+              @click="deleteWarning.show()"
+              @mouseover="selectedOption = 'Delete'"
+            >
+              <TrashIcon />
+              Delete
+            </Button>
+          </div>
+          <div v-tooltip="isPackLinked ? 'Unpair this instance to update mods' : ''">
+            <Button
+              :disabled="isPackLinked || offline"
+              class="transparent update"
+              @click="updateAll()"
+              @mouseover="selectedOption = 'Update'"
+            >
+              <UpdatedIcon />
+              Update
+            </Button>
+          </div>
+          <div v-tooltip="isPackLinked ? 'Unpair this instance to toggle mods' : ''">
+            <Button
+              :disabled="isPackLinked"
+              class="transparent"
+              @click="toggleSelected()"
+              @mouseover="selectedOption = 'Toggle'"
+            >
+              <ToggleIcon />
+              Toggle
+            </Button>
+          </div>
         </div>
       </div>
-      <div
-        v-if="showingOptions && selected.length > 0 && !instance.metadata.linked_data"
-        class="more-box"
-      >
+      <div v-if="showingOptions && selected.length > 0" class="more-box">
         <section v-if="selectedOption === 'Share'" class="options">
           <Button class="transparent" @click="shareNames()">
             <TextInputIcon />
@@ -204,7 +203,7 @@
         class="table-row"
         @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
       >
-        <div v-if="!instance.metadata.linked_data" class="table-cell table-text checkbox">
+        <div class="table-cell table-text checkbox">
           <Checkbox
             :model-value="selectionMap.get(mod.path)"
             class="select-checkbox"
@@ -233,37 +232,39 @@
           <span v-tooltip="`${mod.version}`">{{ mod.version }}</span>
         </div>
         <div class="table-cell table-text manage">
-          <Button
-            v-if="!instance.metadata.linked_data"
-            v-tooltip="'Remove project'"
-            icon-only
-            @click="removeMod(mod)"
-          >
-            <TrashIcon />
-          </Button>
-          <AnimatedLogo
-            v-if="mod.updating && !instance.metadata.linked_data"
-            class="btn icon-only updating-indicator"
-          ></AnimatedLogo>
-          <Button
-            v-else-if="!instance.metadata.linked_data"
-            v-tooltip="'Update project'"
-            :disabled="!mod.outdated || offline"
-            icon-only
-            @click="updateProject(mod)"
-          >
-            <UpdatedIcon v-if="mod.outdated" />
-            <CheckIcon v-else />
-          </Button>
-          <input
-            v-if="!instance.metadata.linked_data"
-            id="switch-1"
-            autocomplete="off"
-            type="checkbox"
-            class="switch stylized-toggle"
-            :checked="!mod.disabled"
-            @change="toggleDisableMod(mod)"
-          />
+          <div v-tooltip="isPackLinked ? 'Unpair this instance to remove mods.' : ''">
+            <Button
+              v-tooltip="'Remove project'"
+              :disabled="isPackLinked"
+              icon-only
+              @click="removeMod(mod)"
+            >
+              <TrashIcon />
+            </Button>
+          </div>
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+          <div v-tooltip="isPackLinked ? 'Unpair this instance to update mods.' : ''">
+            <Button
+              v-tooltip="'Update project'"
+              :disabled="!mod.outdated || offline || isPackLinked"
+              icon-only
+              @click="updateProject(mod)"
+            >
+              <UpdatedIcon v-if="mod.outdated" />
+              <CheckIcon v-else />
+            </Button>
+          </div>
+          <div v-tooltip="isPackLinked ? 'Unpair this instance to toggle mods.' : ''">
+            <input
+              id="switch-1"
+              :disabled="isPackLinked"
+              autocomplete="off"
+              type="checkbox"
+              class="switch stylized-toggle"
+              :checked="!mod.disabled"
+              @change="toggleDisableMod(mod)"
+            />
+          </div>
           <Button
             v-tooltip="`Show ${mod.file_name}`"
             icon-only
