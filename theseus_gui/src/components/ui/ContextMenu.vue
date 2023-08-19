@@ -11,7 +11,11 @@
     >
       <div v-for="(option, index) in options" :key="index" @click.stop="optionClicked(option.name)">
         <hr v-if="option.type === 'divider'" class="divider" />
-        <div v-else class="item clickable" :class="[option.color ?? 'base']">
+        <div
+          v-else-if="!(isLinkedData(item) && option.name === `add_content`)"
+          class="item clickable"
+          :class="[option.color ?? 'base']"
+        >
           <slot :name="option.name" />
         </div>
       </div>
@@ -54,6 +58,15 @@ defineExpose({
     shown.value = true
   },
 })
+
+const isLinkedData = (item) => {
+  if (item.instance != undefined && item.instance.metadata.linked_data) {
+    return true
+  } else if (item.metadata != undefined && item.metadata.linked_data) {
+    return true
+  }
+  return false
+}
 
 const hideContextMenu = () => {
   shown.value = false
