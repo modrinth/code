@@ -230,9 +230,29 @@ a,
 .clickable {
   transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
     outline 0.2s ease-in-out;
+    
+  position: relative;
+
+  &:not([rel~=ugc]) {
+    pointer-events: none;
+  }
 
   &:active:not(&:disabled) {
     scale: 0.95;
+  }
+
+  &:not([rel~=ugc])::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    pointer-events: all;
+  }
+
+  &:active::before {
+    scale: 1.1;
   }
 }
 
@@ -394,6 +414,10 @@ a,
     background: none;
     box-shadow: none;
   }
+
+  &::before {
+    border-radius: var(--radius-md);
+  }
 }
 
 .btn-group {
@@ -487,6 +511,10 @@ a,
       color: var(--color-blue);
       text-decoration: underline;
     }
+  }
+
+  &::before {
+    border-radius: var(--radius-lg);
   }
 
   // TODO: Add back later
@@ -686,6 +714,10 @@ a,
 
   &:hover &:focus {
     background: var(--color-button-bg);
+  }
+
+  &::before {
+    border-radius: var(--radius-max);
   }
 }
 
