@@ -230,7 +230,7 @@ a,
 .clickable {
   transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
     outline 0.2s ease-in-out;
-    
+
   position: relative;
 
   &:not(.markdown-body a) {
