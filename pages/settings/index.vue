@@ -130,6 +130,22 @@
           @change="saveCosmetics"
         />
       </div>
+      <div class="adjacent-input small">
+        <label for="modrinth-app-promos">
+          <span class="label__title">Hide Modrinth App promotions</span>
+          <span class="label__description">
+            Hides the "Get Modrinth App" buttons from primary navigation. The Modrinth App page can
+            still be found on the landing page or in the footer.
+          </span>
+        </label>
+        <input
+          id="modrinth-app-promos"
+          v-model="cosmetics.hideModrinthAppPromos"
+          class="switch stylized-toggle"
+          type="checkbox"
+          @change="saveCosmetics"
+        />
+      </div>
     </section>
   </div>
 </template>

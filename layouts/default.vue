@@ -94,10 +94,6 @@
                     <SettingsIcon class="icon" />
                     <span class="title">Settings</span>
                   </NuxtLink>
-                  <NuxtLink class="item button-transparent get-the-app" to="/app">
-                    <DownloadIcon class="icon" />
-                    <span class="title">Get Modrinth App</span>
-                  </NuxtLink>
                   <NuxtLink
                     v-if="tags.staffRoles.includes(auth.user.role)"
                     class="item button-transparent"
@@ -105,6 +101,14 @@
                   >
                     <ModerationIcon class="icon" />
                     <span class="title">Moderation</span>
+                  </NuxtLink>
+                  <NuxtLink
+                    v-if="!cosmetics.hideModrinthAppPromos"
+                    class="item button-transparent primary-color"
+                    to="/app"
+                  >
+                    <DownloadIcon class="icon" />
+                    <span class="title">Get Modrinth App</span>
                   </NuxtLink>
                   <hr class="divider" />
                   <button class="item button-transparent" @click="logoutUser()">
@@ -118,7 +122,7 @@
                   <LogInIcon /> Sign in
                 </nuxt-link>
                 <nuxt-link
-                  v-if="$route.path !== '/app'"
+                  v-if="$route.path !== '/app' && !cosmetics.hideModrinthAppPromos"
                   class="btn btn-outline btn-primary"
                   to="/app"
                 >
@@ -750,7 +754,7 @@ export default defineNuxtComponent({
                 box-sizing: border-box;
                 color: inherit;
                 display: flex;
-                padding: 0.5rem;
+                padding: 0.5rem 0.75rem;
                 width: 100%;
 
                 .icon {
@@ -762,6 +766,15 @@ export default defineNuxtComponent({
                 &.router-link-exact-active {
                   color: var(--color-button-text-active);
                   background-color: var(--color-button-bg);
+
+                  &.primary-color {
+                    color: var(--color-button-text-active);
+                    background-color: var(--color-brand-highlight);
+                  }
+                }
+
+                &.primary-color {
+                  color: var(--color-brand);
                 }
               }
 
@@ -1160,10 +1173,6 @@ export default defineNuxtComponent({
   justify-content: center;
   gap: 1rem;
   padding: 0.5rem 1rem;
-}
-
-.get-the-app {
-  color: var(--color-brand) !important;
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
