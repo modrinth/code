@@ -249,6 +249,7 @@ a,
     left: 0;
     right: 0;
     pointer-events: all;
+    border-radius: inherit;
   }
 
   &:active::before {
@@ -414,10 +415,6 @@ a,
     background: none;
     box-shadow: none;
   }
-
-  &::before {
-    border-radius: var(--radius-md);
-  }
 }
 
 .btn-group {
@@ -511,10 +508,6 @@ a,
       color: var(--color-blue);
       text-decoration: underline;
     }
-  }
-
-  &::before {
-    border-radius: var(--radius-lg);
   }
 
   // TODO: Add back later
@@ -714,10 +707,6 @@ a,
 
   &:hover &:focus {
     background: var(--color-button-bg);
-  }
-
-  &::before {
-    border-radius: var(--radius-max);
   }
 }
 

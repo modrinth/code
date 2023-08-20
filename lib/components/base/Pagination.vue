@@ -152,10 +152,6 @@ a {
     transform: scale(0.95);
     filter: brightness(0.8);
   }
-
-  &::before {
-    border-radius: 2rem;
-  }
 }
 
 .has-icon {
