@@ -233,7 +233,7 @@ a,
     
   position: relative;
 
-  &:not([rel~=ugc]) {
+  &:not(.markdown-body a) {
     pointer-events: none;
   }
 
@@ -241,7 +241,7 @@ a,
     scale: 0.95;
   }
 
-  &:not([rel~=ugc])::before {
+  &:not(.markdown-body a)::before {
     content: '';
     position: absolute;
     top: 0;
