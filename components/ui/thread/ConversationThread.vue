@@ -116,6 +116,7 @@
               <button
                 v-if="replyBody"
                 class="iconified-button brand-button"
+                :disabled="isApproved(project)"
                 @click="sendReply(requestedStatus)"
               >
                 <CheckIcon /> Approve with reply
