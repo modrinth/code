@@ -4,8 +4,9 @@
 
 <style>
 .auth-container {
-  width: 30rem;
-  margin: 2rem auto;
+  width: 26rem;
+  max-width: calc(100% - 2rem);
+  margin: 1rem auto;
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -79,5 +80,6 @@
   display: flex;
   justify-content: center;
   gap: var(--gap-md);
+  flex-wrap: wrap;
 }
 </style>
