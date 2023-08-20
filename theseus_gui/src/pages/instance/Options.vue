@@ -410,6 +410,9 @@ import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+
+const breadcrumbs = useBreadcrumbs()
 
 const router = useRouter()
 
@@ -569,6 +572,7 @@ watch(
     }
 
     await edit(props.instance.path, editProfile)
+    breadcrumbs.setName('Instance', editProfile.metadata.name)
   },
   { deep: true }
 )
