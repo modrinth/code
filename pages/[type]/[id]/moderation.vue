@@ -9,11 +9,24 @@
           >your project's settings</router-link
         >.
       </p>
-      <p v-else-if="isUnderReview(project)">
-        Project reviews typically take 24 to 48 hours and they will leave a message below if they
-        have any questions or concerns for you. If your review has taken more than 48 hours, check
-        our Discord or social media for moderation delays.
-      </p>
+      <div v-else-if="isUnderReview(project)">
+        <p>
+          Project reviews typically take 24 to 48 hours. Modrinth's moderators will leave a message
+          below if they have any questions or concerns for you.
+
+          <!--
+          If your review has taken more than 48 hours, check our Discord or social media for
+          moderation delays.
+          -->
+        </p>
+
+        <p class="warning">
+          <IssuesIcon /> Due to a high volume of new projects, reviews are currently experiencing
+          extended delays, much greater than usual. Many projects may be under review for a week or
+          more. Please understand that we are working to fix this problem as soon as possible. Our
+          sincerest apologies for the inconvenience!
+        </p>
+      </div>
       <template v-else-if="isRejected(project)">
         <p>
           Your project does not currently meet Modrinth's
@@ -22,8 +35,8 @@
           messages from the moderators below and address their comments before resubmitting.
         </p>
         <p class="warning">
-          Repeated submissions without addressing the moderators' comments may result in an account
-          suspension.
+          <IssuesIcon /> Repeated submissions without addressing the moderators' comments may result
+          in an account suspension.
         </p>
       </template>
       <h3>Current visibility</h3>
@@ -74,8 +87,8 @@
   </div>
 </template>
 <script setup>
+import { Badge, ExitIcon, CheckIcon, IssuesIcon } from 'omorphia'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
-import Badge from '~/components/ui/Badge.vue'
 import {
   getProjectLink,
   isApproved,
@@ -84,8 +97,6 @@ import {
   isRejected,
   isUnderReview,
 } from '~/helpers/projects.js'
-import ExitIcon from 'assets/images/utils/x.svg'
-import CheckIcon from 'assets/images/utils/check.svg'
 
 const props = defineProps({
   project: {
@@ -118,6 +129,10 @@ async function setStatus(status) {
     data.status = status
     await useBaseFetch(`project/${props.project.id}`, {
       method: 'PATCH',
+      body: data,
+    })
+    await useBaseFetch(`thread/${props.project.thread_id}/read`, {
+      method: 'POST',
       body: data,
     })
     const project = props.project
@@ -190,5 +205,6 @@ svg {
 
 .warning {
   color: var(--color-special-orange);
+  font-weight: bold;
 }
 </style>
