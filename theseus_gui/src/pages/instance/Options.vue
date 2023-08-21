@@ -405,7 +405,12 @@ import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
+import {
+  get_fabric_versions,
+  get_forge_versions,
+  get_neoforge_versions,
+  get_quilt_versions,
+} from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
@@ -618,21 +623,28 @@ async function removeProfile() {
 const changeVersionsModal = ref(null)
 const showSnapshots = ref(false)
 
-const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
-  await Promise.all([
-    get_fabric_versions().then(shallowRef).catch(handleError),
-    get_forge_versions().then(shallowRef).catch(handleError),
-    get_quilt_versions().then(shallowRef).catch(handleError),
-    get_game_versions().then(shallowRef).catch(handleError),
-    get_loaders()
-      .then((value) =>
-        value
-          .filter((item) => item.supported_project_types.includes('modpack'))
-          .map((item) => item.name.toLowerCase())
-      )
-      .then(ref)
-      .catch(handleError),
-  ])
+const [
+  fabric_versions,
+  forge_versions,
+  quilt_versions,
+  neoforge_versions,
+  all_game_versions,
+  loaders,
+] = await Promise.all([
+  get_fabric_versions().then(shallowRef).catch(handleError),
+  get_forge_versions().then(shallowRef).catch(handleError),
+  get_quilt_versions().then(shallowRef).catch(handleError),
+  get_neoforge_versions().then(shallowRef).catch(handleError),
+  get_game_versions().then(shallowRef).catch(handleError),
+  get_loaders()
+    .then((value) =>
+      value
+        .filter((item) => item.supported_project_types.includes('modpack'))
+        .map((item) => item.name.toLowerCase())
+    )
+    .then(ref)
+    .catch(handleError),
+])
 loaders.value.unshift('vanilla')
 
 const loader = ref(props.instance.metadata.loader)
@@ -647,6 +659,8 @@ const selectableGameVersions = computed(() => {
         defaultVal &= forge_versions.value.gameVersions.some((x) => item.version === x.id)
       } else if (loader.value === 'quilt') {
         defaultVal &= quilt_versions.value.gameVersions.some((x) => item.version === x.id)
+      } else if (loader.value === 'neoforge') {
+        defaultVal &= neoforge_versions.value.gameVersions.some((x) => item.version === x.id)
       }
 
       return defaultVal
@@ -662,6 +676,9 @@ const selectableLoaderVersions = computed(() => {
       return forge_versions.value.gameVersions.find((item) => item.id === gameVersion.value).loaders
     } else if (loader.value === 'quilt') {
       return quilt_versions.value.gameVersions[0].loaders
+    } else if (loader.value === 'neoforge') {
+      return neoforge_versions.value.gameVersions.find((item) => item.id === gameVersion.value)
+        .loaders
     }
   }
   return []
@@ -683,7 +700,7 @@ const isChanged = computed(() => {
   return (
     loader.value != props.instance.metadata.loader ||
     gameVersion.value != props.instance.metadata.game_version ||
-    JSON.stringify(selectableLoaderVersions.value[loaderVersionIndex.value]) !=
+    JSON.stringify(selectableLoaderVersions.value[loaderVersionIndex.value]) !==
       JSON.stringify(props.instance.metadata.loader_version)
   )
 })

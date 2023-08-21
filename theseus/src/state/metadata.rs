@@ -18,6 +18,7 @@ pub struct Metadata {
     pub forge: LoaderManifest,
     pub fabric: LoaderManifest,
     pub quilt: LoaderManifest,
+    pub neoforge: LoaderManifest,
 }
 
 impl Metadata {
@@ -26,7 +27,7 @@ impl Metadata {
     }
 
     pub async fn fetch() -> crate::Result<Self> {
-        let (minecraft, forge, fabric, quilt) = tokio::try_join! {
+        let (minecraft, forge, fabric, quilt, neoforge) = tokio::try_join! {
             async {
                 let url = Self::get_manifest("minecraft");
                 fetch_version_manifest(Some(&url)).await
@@ -42,6 +43,10 @@ impl Metadata {
             async {
                 let url = Self::get_manifest("quilt");
                 fetch_loader_manifest(&url).await
+            },
+            async {
+                let url = Self::get_manifest("neo");
+                fetch_loader_manifest(&url).await
             }
         }?;
 
@@ -50,6 +55,7 @@ impl Metadata {
             forge,
             fabric,
             quilt,
+            neoforge,
         })
     }
 

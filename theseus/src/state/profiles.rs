@@ -205,6 +205,7 @@ pub enum ModLoader {
     Forge,
     Fabric,
     Quilt,
+    NeoForge,
 }
 
 impl std::fmt::Display for ModLoader {
@@ -214,6 +215,7 @@ impl std::fmt::Display for ModLoader {
             Self::Forge => "Forge",
             Self::Fabric => "Fabric",
             Self::Quilt => "Quilt",
+            Self::NeoForge => "NeoForge",
         })
     }
 }
@@ -225,6 +227,7 @@ impl ModLoader {
             Self::Forge => "forge",
             Self::Fabric => "fabric",
             Self::Quilt => "quilt",
+            Self::NeoForge => "neoforge",
         }
     }
 }
