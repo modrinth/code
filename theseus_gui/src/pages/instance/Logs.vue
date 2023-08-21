@@ -35,6 +35,7 @@
         :key="index"
         class="no-wrap"
       >
+        <span class="line-number">{{ index + 1 }}</span>
         <span :style="{ color: getLineColor(line, true), 'font-weight': getLineWeight(line) }">{{
           getLinePrefix(line)
         }}</span>
@@ -190,7 +191,7 @@ const isLineLevel = (text, level) => {
     return true
   }
 
-  const errorTriggers = ['/ERROR', 'Exception', ':?]', 'Error', '[thread']
+  const errorTriggers = ['/ERROR', 'Exception:', ':?]', 'Error', '[thread', '	at']
   if (level === 'error') {
     for (const trigger of errorTriggers) {
       if (text.includes(trigger)) return true
@@ -336,6 +337,12 @@ onUnmounted(() => {
 
   .no-wrap {
     white-space: pre;
+  }
+
+  .line-number {
+    color: var(--color-accent);
+    margin-right: 0.5rem;
+    opacity: 50%;
   }
 }
 
