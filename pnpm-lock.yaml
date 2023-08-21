@@ -19,6 +19,9 @@ dependencies:
   floating-vue:
     specifier: ^2.0.0-beta.20
     version: 2.0.0-beta.20(vue@3.3.4)
+  fuse.js:
+    specifier: ^6.6.2
+    version: 6.6.2
   highlight.js:
     specifier: ^11.7.0
     version: 11.7.0
@@ -76,8 +79,8 @@ devDependencies:
     specifier: ^2.0.1
     version: 2.0.1(@formatjs/intl@2.7.2)
   '@vintl/nuxt':
-    specifier: ^1.2.3
-    version: 1.2.3(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
+    specifier: ^1.3.0
+    version: 1.3.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
   eslint:
     specifier: ^8.41.0
     version: 8.41.0
@@ -1012,6 +1015,12 @@ packages:
 
   /@formatjs/intl-localematcher@0.2.32:
     resolution: {integrity: sha512-k/MEBstff4sttohyEpXxCmC3MqbUn9VvHGlZ8fauLzkbwXmVrEeyzS+4uhrvAk9DWU9/7otYWxyDox4nT/KVLQ==}
+    dependencies:
+      tslib: 2.6.0
+    dev: true
+
+  /@formatjs/intl-localematcher@0.4.0:
+    resolution: {integrity: sha512-bRTd+rKomvfdS4QDlVJ6TA/Jx1F2h/TBVO5LjvhQ7QPPHp19oPNMIum7W2CMEReq/zPxpmCeB31F9+5gl/qtvw==}
     dependencies:
       tslib: 2.6.0
     dev: true
@@ -2102,10 +2111,11 @@ packages:
       intl-messageformat: 10.3.5
     dev: true
 
-  /@vintl/nuxt@1.2.3(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
-    resolution: {integrity: sha512-7grMFQqWc6S9nUU7q9K+fhRZ/SvPzG4Dll/fcCnDbIzGBgzH+Nni2b+yFuoT0sjmXN3lsksHa+5hxyJDxq9Q0A==}
+  /@vintl/nuxt@1.3.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
+    resolution: {integrity: sha512-gH0Db4XB3RCzOaBQtoBf/Sc9bMneyVtt7RBjrLWzzNf7gN1NJNPlrfdCVAp2si/P7dt06wRegGHaSBuQ3oQQZg==}
     dependencies:
       '@formatjs/intl': 2.7.2(typescript@5.0.4)
+      '@formatjs/intl-localematcher': 0.4.0
       '@nuxt/kit': 3.6.1
       '@vintl/unplugin': 1.2.4(vite@4.3.9)
       '@vintl/vintl': 4.2.1(typescript@5.0.4)(vue@3.3.4)
@@ -4497,6 +4507,11 @@ packages:
   /functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
     dev: true
+
+  /fuse.js@6.6.2:
+    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /gauge@3.0.2:
     resolution: {integrity: sha512-+5J6MS/5XksCuXq++uFRsnUd7Ovu1XenbeuIuNRJxYWjgQbPuFhT14lAvsWfqfAmnwluf1OwMjz39HjfLPci0Q==}

@@ -22,6 +22,9 @@
               <CurrencyIcon />
             </NavStackItem>
           </template>
+          <NavStackItem link="/settings/language" label="Language">
+            <LanguagesIcon />
+          </NavStackItem>
         </NavStack>
       </aside>
     </div>
@@ -39,6 +42,7 @@ import UserIcon from '~/assets/images/utils/user.svg'
 import CurrencyIcon from '~/assets/images/utils/currency.svg'
 import ShieldIcon from '~/assets/images/utils/shield.svg'
 import KeyIcon from '~/assets/images/utils/key.svg'
+import LanguagesIcon from '~/assets/images/utils/languages.svg'
 
 const route = useRoute()
 const auth = await useAuth()

@@ -13,5 +13,53 @@
   },
   "frog.title": {
     "message": "Frog"
+  },
+  "settings.language.categories.auto": {
+    "message": "Automatic"
+  },
+  "settings.language.categories.default": {
+    "message": "Standard languages"
+  },
+  "settings.language.categories.experimental": {
+    "message": "Experimental languages"
+  },
+  "settings.language.categories.fun": {
+    "message": "Fun languages"
+  },
+  "settings.language.categories.search-result": {
+    "message": "Search results"
+  },
+  "settings.language.description": {
+    "message": "Choose your preferred language for the site. Translations are contributed by volunteers <crowdin-link>on Crowdin</crowdin-link>."
+  },
+  "settings.language.languages.automatic": {
+    "message": "Sync with the system language"
+  },
+  "settings.language.languages.language-label": {
+    "message": "{translatedName}. {displayName}"
+  },
+  "settings.language.languages.language-label-applying": {
+    "message": "{label}. Applying..."
+  },
+  "settings.language.languages.language-label-error": {
+    "message": "{label}. Error"
+  },
+  "settings.language.languages.load-failed": {
+    "message": "Cannot load this language. Try again in a bit."
+  },
+  "settings.language.languages.search-field.description": {
+    "message": "Submit to focus the first search result"
+  },
+  "settings.language.languages.search-field.placeholder": {
+    "message": "Search for a language..."
+  },
+  "settings.language.languages.search-results-announcement": {
+    "message": "{matches, plural, =0 {No languages match} one {# language matches} other {# languages match}} your search."
+  },
+  "settings.language.languages.search.no-results": {
+    "message": "No languages match your search."
+  },
+  "settings.language.title": {
+    "message": "Language"
   }
 }

@@ -47,7 +47,18 @@ const meta = {
  * Preferably only the locales that reach a certain threshold of complete
  * translations would be included in this array.
  */
-const ENABLED_LOCALES: string[] = []
+const enabledLocales: string[] = []
+
+/**
+ * Overrides for the categories of the certain locales.
+ */
+const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>> = {
+  'en-x-pirate': 'fun',
+  'en-x-updown': 'fun',
+  'en-x-lolcat': 'fun',
+  'en-x-uwu': 'fun',
+  'ru-x-bandit': 'fun',
+}
 
 export default defineNuxtConfig({
   app: {
@@ -214,7 +225,7 @@ export default defineNuxtConfig({
 
       for await (const localeDir of globIterate('locales/*/', { posix: true })) {
         const tag = basename(localeDir)
-        if (!ENABLED_LOCALES.includes(tag) && opts.defaultLocale !== tag) continue
+        if (!enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
 
         const locale =
           opts.locales.find((locale) => locale.tag === tag) ??
@@ -244,6 +255,11 @@ export default defineNuxtConfig({
           } else {
             ;(locale.resources ??= {})[fileName] = `./${localeFile}`
           }
+        }
+
+        const categoryOverride = localesCategoriesOverrides[tag]
+        if (categoryOverride != null) {
+          ;(locale.meta ??= {}).category = categoryOverride
         }
 
         const cnDataImport = resolveCompactNumberDataImport(tag)
