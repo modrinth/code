@@ -1,7 +1,7 @@
 {
   "name": "omorphia",
   "type": "module",
-  "version": "0.4.38",
+  "version": "0.4.39",
   "files": [
     "dist",
     "lib"
@@ -25,12 +25,14 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "chart.js": "^4.3.3",
     "dayjs": "^1.11.7",
     "floating-vue": "^2.0.0-beta.20",
     "highlight.js": "^11.8.0",
     "markdown-it": "^13.0.1",
     "qrcode.vue": "^3.4.0",
     "vue": "^3.3.4",
+    "vue-chartjs": "^5.2.0",
     "vue-router": "^4.2.1",
     "vue-select": "^4.0.0-beta.6",
     "xss": "^1.0.14"
