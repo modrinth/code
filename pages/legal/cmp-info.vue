@@ -89,9 +89,36 @@
 </template>
 
 <script>
-export default {
+export default defineNuxtComponent({
   name: 'CmpInfo',
-}
+
+  head: {
+    title: 'Rewards Program Information - Modrinth',
+    meta: [
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'The rewards program information of Modrinth, an open source modding platform focused on Minecraft.',
+      },
+      {
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
+        content: 'Rewards Program Information',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Rewards Program Information',
+      },
+      {
+        hid: 'og:url',
+        name: 'og:url',
+        content: 'https://modrinth.com/legal/cmp-info',
+      },
+    ],
+  },
+})
 </script>
 
 <style scoped></style>
