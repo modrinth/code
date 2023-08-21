@@ -335,25 +335,25 @@ async fn main() -> std::io::Result<()> {
         });
     }
 
-    // {
-    //     let pool_ref = pool.clone();
-    //     let redis_ref = redis_pool.clone();
-    //     let client_ref = clickhouse.clone();
-    //     scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
-    //         let pool_ref = pool_ref.clone();
-    //         let redis_ref = redis_ref.clone();
-    //         let client_ref = client_ref.clone();
-    //
-    //         async move {
-    //             info!("Done running payouts");
-    //             let result = process_payout(&pool_ref, &redis_ref, &client_ref).await;
-    //             if let Err(e) = result {
-    //                 warn!("Payouts run failed: {:?}", e);
-    //             }
-    //             info!("Done running payouts");
-    //         }
-    //     });
-    // }
+    {
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        let client_ref = clickhouse.clone();
+        scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
+            let pool_ref = pool_ref.clone();
+            let redis_ref = redis_ref.clone();
+            let client_ref = client_ref.clone();
+
+            async move {
+                info!("Done running payouts");
+                let result = process_payout(&pool_ref, &redis_ref, &client_ref).await;
+                if let Err(e) = result {
+                    warn!("Payouts run failed: {:?}", e);
+                }
+                info!("Done running payouts");
+            }
+        });
+    }
 
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),

@@ -28,7 +28,7 @@ impl super::Validator for ForgeValidator {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        _archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         // if archive.by_name("META-INF/mods.toml").is_err() {
         //     return Ok(ValidationResult::Warning(

@@ -50,9 +50,7 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(resend_verify_email)
             .service(set_email)
             .service(verify_email)
-            .service(subscribe_newsletter)
-            .service(login_from_minecraft)
-            .configure(super::minecraft::config),
+            .service(subscribe_newsletter),
     );
 }
 
@@ -1175,65 +1173,6 @@ pub async fn auth_callback(
     }.await;
 
     Ok(res?)
-}
-
-#[derive(Deserialize)]
-pub struct MinecraftLogin {
-    pub flow: String,
-}
-
-#[post("login/minecraft")]
-pub async fn login_from_minecraft(
-    req: HttpRequest,
-    client: Data<PgPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    redis: Data<deadpool_redis::Pool>,
-    login: web::Json<MinecraftLogin>,
-) -> Result<HttpResponse, AuthenticationError> {
-    let flow = Flow::get(&login.flow, &redis).await?;
-
-    // Extract cookie header from request
-    if let Some(Flow::MicrosoftLogin {
-        access_token: token,
-    }) = flow
-    {
-        Flow::remove(&login.flow, &redis).await?;
-        let provider = AuthProvider::Microsoft;
-        let oauth_user = provider.get_user(&token).await?;
-        let user_id_opt = provider.get_user_id(&oauth_user.id, &**client).await?;
-
-        let mut transaction = client.begin().await?;
-
-        let user_id = if let Some(user_id) = user_id_opt {
-            let user = crate::database::models::User::get_id(user_id, &**client, &redis)
-                .await?
-                .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-
-            if user.totp_secret.is_some() {
-                let flow = Flow::Login2FA { user_id: user.id }
-                    .insert(Duration::minutes(30), &redis)
-                    .await?;
-
-                return Ok(HttpResponse::Ok().json(serde_json::json!({
-                    "error": "2fa_required",
-                    "flow": flow
-                })));
-            }
-
-            user_id
-        } else {
-            oauth_user
-                .create_account(provider, &mut transaction, &client, &file_host, &redis)
-                .await?
-        };
-
-        let session = issue_session(req, user_id, &mut transaction, &redis).await?;
-        Ok(HttpResponse::Ok().json(serde_json::json!({
-            "code": session.session
-        })))
-    } else {
-        Err(AuthenticationError::InvalidCredentials)
-    }
 }
 
 #[derive(Deserialize)]

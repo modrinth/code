@@ -2,7 +2,7 @@ use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
 use base64::Engine;
-use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
+use chrono::{DateTime, Datelike, Duration, Utc, Weekday, NaiveDateTime, NaiveDate, NaiveTime};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -287,7 +287,12 @@ pub async fn process_payout(
         .into_iter()
         .map(|x| (x.project_id, x.page_views))
         .collect::<HashMap<u64, u64>>();
-    views_values.extend(downloads_values);
+
+    for (key, value) in downloads_values.iter() {
+        let counter = views_values.entry(*key).or_insert(0);
+        *counter += *value;
+    }
+
     let multipliers: PayoutMultipliers = PayoutMultipliers {
         sum: downloads_sum + views_sum,
         values: views_values,
