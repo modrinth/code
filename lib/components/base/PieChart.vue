@@ -21,7 +21,7 @@ const props = defineProps({
   },
 })
 
-const decimalToRgba = (decimalColor, alpha = 0.75) => {
+const decimalToRgba = (decimalColor, alpha = 1) => {
   const red = (decimalColor >> 16) & 255
   const green = (decimalColor >> 8) & 255
   const blue = decimalColor & 255
@@ -34,8 +34,8 @@ const chartData = ref({
   datasets: [
     {
       label: props.data.title,
-      backgroundColor: props.data.data.map((project) => decimalToRgba(project.color)),
-      borderColor: getComputedStyle(document.documentElement).getPropertyValue('--color-button-bg'),
+      backgroundColor: props.data.data.map((project) => decimalToRgba(project.color, 0.5)),
+      borderColor: props.data.data.map((project) => decimalToRgba(project.color)),
       data: props.data.data.map((project) => project.data),
       fill: true,
     },

@@ -1,23 +1,18 @@
-<template>
-  <Line :options="chartOptions" :data="chartData" />
-</template>
-
 <script setup>
-import { ref } from 'vue'
-import { Line } from 'vue-chartjs'
+import { defineProps, ref } from 'vue'
+import { Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
-  PointElement,
-  LineElement,
+  Legend,
+  BarElement,
   CategoryScale,
   LinearScale,
-  Filler,
 } from 'chart.js'
 import dayjs from 'dayjs'
 
-ChartJS.register(Title, Tooltip, PointElement, LineElement, CategoryScale, LinearScale, Filler)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 const props = defineProps({
   data: {
@@ -42,8 +37,10 @@ const chartData = ref({
   labels: props.data.labels.map((date) => props.formatLabels(date)),
   datasets: props.data.data.map((project) => ({
     label: project.title,
+    borderColor: decimalToRgba(project.color, 1),
+    borderWidth: 2,
+    borderSkipped: 'bottom',
     backgroundColor: decimalToRgba(project.color, 0.5),
-    borderColor: decimalToRgba(project.color),
     data: project.data,
   })),
 })
@@ -52,6 +49,7 @@ const chartOptions = ref({
   responsive: true,
   scales: {
     x: {
+      stacked: true,
       grid: {
         color: getComputedStyle(document.documentElement).getPropertyValue('--color-button-bg'),
       },
@@ -60,6 +58,7 @@ const chartOptions = ref({
       },
     },
     y: {
+      stacked: true,
       grid: {
         color: getComputedStyle(document.documentElement).getPropertyValue('--color-button-bg'),
       },
@@ -70,8 +69,6 @@ const chartOptions = ref({
   },
   interaction: {
     mode: 'index',
-    intersect: false,
-    axis: 'xy',
   },
   plugins: {
     legend: {
@@ -94,7 +91,7 @@ const chartOptions = ref({
       borderWidth: 1,
       titleColor: getComputedStyle(document.documentElement).getPropertyValue('--color-contrast'),
       titleFont: {
-        size: 14,
+        size: 16,
         family: 'Inter',
       },
       bodyColor: getComputedStyle(document.documentElement).getPropertyValue('--color-base'),
@@ -105,23 +102,14 @@ const chartOptions = ref({
       boxPadding: 8,
       intersect: false,
       padding: 12,
+      displayColors: false,
     },
   },
 })
-
-/*
-The data for the graph should look like this
-
-downloads, views, likes = {
-  dates: [ '2021-01-01', '2021-01-02', '2021-01-03' ], // Last 2 weeks
-  data: [
-    {
-      title: projectName,
-      color: projectColor,
-      data: [ ... ],
-    },
-    ...
-  ]
-}
- */
 </script>
+
+<template>
+  <Bar id="my-chart-id" :options="chartOptions" :data="chartData" />
+</template>
+
+<style scoped lang="scss"></style>
