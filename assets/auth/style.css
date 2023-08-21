@@ -57,3 +57,7 @@ a {
 a:visited {
     color: #4f9cff
 }
+
+img {
+    image-rendering: pixelated;
+}
