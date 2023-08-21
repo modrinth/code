@@ -1000,15 +1000,19 @@ pub async fn ws_init(
 pub async fn auth_callback(
     req: HttpRequest,
     Query(query): Query<HashMap<String, String>>,
-    sockets: Data<RwLock<ActiveSockets>>,
+    active_sockets: Data<RwLock<ActiveSockets>>,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     redis: Data<deadpool_redis::Pool>,
 ) -> Result<HttpResponse, super::templates::ErrorPage> {
-    let res = async move {
-        let state = query
-            .get("state")
-            .ok_or_else(|| AuthenticationError::InvalidCredentials)?.clone();
+    let state_string = query
+        .get("state")
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?
+        .clone();
+
+    let sockets = active_sockets.clone();
+    let state = state_string.clone();
+    let res: Result<HttpResponse, AuthenticationError> = (|| async move {
 
         let flow = Flow::get(&state, &redis).await?;
 
@@ -1170,7 +1174,29 @@ pub async fn auth_callback(
         } else {
             Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
         }
-    }.await;
+    })().await;
+
+    // Because this is callback route, if we have an error, we need to ensure we close the original socket if it exists
+    if let Err(ref e) = res {
+        let db = active_sockets.read().await;
+        let mut x = db.auth_sockets.get_mut(&state_string);
+
+        if let Some(x) = x.as_mut() {
+            let mut ws_conn = x.value_mut().clone();
+
+            ws_conn
+                .text(
+                    serde_json::json!({
+                                "error": &e.error_name(),
+                                "description": &e.to_string(),
+                            }        )
+                    .to_string(),
+                )
+                .await
+                .map_err(|_| AuthenticationError::SocketError)?;
+            let _ = ws_conn.close(None).await;
+        }
+    }
 
     Ok(res?)
 }

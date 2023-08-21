@@ -345,7 +345,7 @@ async fn main() -> std::io::Result<()> {
             let client_ref = client_ref.clone();
 
             async move {
-                info!("Done running payouts");
+                info!("Started running payouts");
                 let result = process_payout(&pool_ref, &redis_ref, &client_ref).await;
                 if let Err(e) = result {
                     warn!("Payouts run failed: {:?}", e);

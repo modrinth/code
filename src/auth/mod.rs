@@ -47,7 +47,7 @@ pub enum AuthenticationError {
     #[error("Invalid state sent, you probably need to get a new websocket")]
     SocketError,
     #[error("Invalid callback URL specified")]
-    Url
+    Url,
 }
 
 impl actix_web::ResponseError for AuthenticationError {
@@ -72,23 +72,29 @@ impl actix_web::ResponseError for AuthenticationError {
 
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
-            error: match self {
-                AuthenticationError::Env(..) => "environment_error",
-                AuthenticationError::Sqlx(..) => "database_error",
-                AuthenticationError::Database(..) => "database_error",
-                AuthenticationError::SerDe(..) => "invalid_input",
-                AuthenticationError::Reqwest(..) => "network_error",
-                AuthenticationError::InvalidCredentials => "invalid_credentials",
-                AuthenticationError::Decoding(..) => "decoding_error",
-                AuthenticationError::Mail(..) => "mail_error",
-                AuthenticationError::InvalidAuthMethod => "invalid_auth_method",
-                AuthenticationError::InvalidClientId => "invalid_client_id",
-                AuthenticationError::Url => "url_error",
-                AuthenticationError::FileHosting(..) => "file_hosting",
-                AuthenticationError::DuplicateUser => "duplicate_user",
-                AuthenticationError::SocketError => "socket",
-            },
+            error: self.error_name(),
             description: &self.to_string(),
         })
+    }
+}
+
+impl AuthenticationError {
+    pub fn error_name(&self) -> &'static str {
+        match self {
+            AuthenticationError::Env(..) => "environment_error",
+            AuthenticationError::Sqlx(..) => "database_error",
+            AuthenticationError::Database(..) => "database_error",
+            AuthenticationError::SerDe(..) => "invalid_input",
+            AuthenticationError::Reqwest(..) => "network_error",
+            AuthenticationError::InvalidCredentials => "invalid_credentials",
+            AuthenticationError::Decoding(..) => "decoding_error",
+            AuthenticationError::Mail(..) => "mail_error",
+            AuthenticationError::InvalidAuthMethod => "invalid_auth_method",
+            AuthenticationError::InvalidClientId => "invalid_client_id",
+            AuthenticationError::Url => "url_error",
+            AuthenticationError::FileHosting(..) => "file_hosting",
+            AuthenticationError::DuplicateUser => "duplicate_user",
+            AuthenticationError::SocketError => "socket",
+        }
     }
 }
