@@ -9,6 +9,7 @@ use tokio::sync::Semaphore;
 mod fabric;
 mod forge;
 mod minecraft;
+mod neo;
 mod quilt;
 
 #[derive(thiserror::Error, Debug)]
@@ -17,6 +18,8 @@ pub enum Error {
     DaedalusError(#[from] daedalus::Error),
     #[error("Error while deserializing JSON")]
     SerdeError(#[from] serde_json::Error),
+    #[error("Error while deserializing XML")]
+    XMLError(#[from] serde_xml_rs::Error),
     #[error("Unable to fetch {item}")]
     FetchError { inner: reqwest::Error, item: String },
     #[error("Error while managing asynchronous tasks")]
@@ -89,6 +92,16 @@ async fn main() {
                 Err(err) => error!("{:?}", err),
             };
             match quilt::retrieve_data(
+                &manifest,
+                &mut uploaded_files,
+                semaphore.clone(),
+            )
+            .await
+            {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
+            match neo::retrieve_data(
                 &manifest,
                 &mut uploaded_files,
                 semaphore.clone(),
