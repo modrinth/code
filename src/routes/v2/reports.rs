@@ -409,6 +409,18 @@ pub async fn report_edit(
             )
             .execute(&mut *transaction)
             .await?;
+
+            sqlx::query!(
+                "
+                UPDATE threads
+                SET show_in_mod_inbox = $1
+                WHERE id = $2
+                ",
+                !(edit_closed || report.closed),
+                report.thread_id.0,
+            )
+            .execute(&mut *transaction)
+            .await?;
         }
 
         transaction.commit().await?;

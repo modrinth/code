@@ -5432,6 +5432,19 @@
     },
     "query": "\n            SELECT name FROM report_types\n            "
   },
+  "e37ecb6dc1509d390bb6f68ba25899d19f693554d8969bbf8f8ee14a78adf0f9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bool",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                UPDATE threads\n                SET show_in_mod_inbox = $1\n                WHERE id = $2\n                "
+  },
   "e3cc1fd070b97c4cc36bdb2f33080d4e0d7f3c3d81312d9d28a8c3c8213ad54b": {
     "describe": {
       "columns": [],
