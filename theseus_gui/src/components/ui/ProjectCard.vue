@@ -12,14 +12,12 @@ import {
 import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useRouter } from 'vue-router'
 import { useFetch } from '@/helpers/fetch.js'
 import { list } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { install as pack_install } from '@/helpers/pack.js'
 dayjs.extend(relativeTime)
 
-const router = useRouter()
 const installing = ref(false)
 
 const props = defineProps({
@@ -111,7 +109,7 @@ const install = async (e) => {
 
 <template>
   <div class="wrapper">
-    <Card class="project-card button-base" @click="router.push(`/project/${project.slug}`)">
+    <Card class="project-card button-base" @click="$router.push(`/project/${project.slug}/`)">
       <div
         class="banner"
         :style="{
