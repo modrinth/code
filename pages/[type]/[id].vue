@@ -1159,8 +1159,7 @@ const collapsedChecklist = ref(false)
       margin-top: calc(-3rem - var(--spacing-card-lg) - 4px);
       margin-left: -4px;
       z-index: 1;
-      border: 4px solid var(--color-raised-bg);
-      border-bottom: none;
+      box-shadow: -2px -2px 0 2px var(--color-raised-bg), 2px -2px 0 2px var(--color-raised-bg);
     }
   }
   .project__header__content {
