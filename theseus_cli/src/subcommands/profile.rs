@@ -364,6 +364,8 @@ fn modloader_from_str(it: &str) -> core::result::Result<ModLoader, String> {
         "vanilla" => Ok(ModLoader::Vanilla),
         "forge" => Ok(ModLoader::Forge),
         "fabric" => Ok(ModLoader::Fabric),
+        "quilt" => Ok(ModLoader::Quilt),
+        "neoforge" => Ok(ModLoader::NeoForge),
         _ => Err(String::from("Invalid modloader: {it}")),
     }
 }

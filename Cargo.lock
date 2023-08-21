@@ -4609,7 +4609,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "async-recursion",
  "async-tungstenite",
@@ -4655,7 +4655,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_cli"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "argh",
  "color-eyre",
@@ -4682,7 +4682,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.5.2"
+version = "0.5.3"
 dependencies = [
  "chrono",
  "cocoa",

@@ -1049,7 +1049,7 @@ fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
         // If two or more, take the second
         // If one, take the first
         // If none, take the whole thing
-        PackDependency::Forge => {
+        PackDependency::Forge | PackDependency::NeoForge => {
             let mut split: std::str::Split<'_, char> = s.split('-');
             match split.next() {
                 Some(first) => match split.next() {

@@ -33,3 +33,11 @@ pub async fn get_quilt_versions() -> crate::Result<Manifest> {
 
     Ok(tags)
 }
+
+#[tracing::instrument]
+pub async fn get_neoforge_versions() -> crate::Result<Manifest> {
+    let state = State::get().await?;
+    let tags = state.metadata.read().await.neoforge.clone();
+
+    Ok(tags)
+}

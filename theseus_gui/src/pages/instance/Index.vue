@@ -61,7 +61,7 @@
         <div class="pages-list">
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
             <BoxIcon />
-            Mods
+            Content
           </RouterLink>
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
             <FileIcon />

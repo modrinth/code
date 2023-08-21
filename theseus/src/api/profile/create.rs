@@ -180,6 +180,7 @@ pub(crate) async fn get_loader_version_from_loader(
         ModLoader::Forge => &metadata.forge,
         ModLoader::Fabric => &metadata.fabric,
         ModLoader::Quilt => &metadata.quilt,
+        ModLoader::NeoForge => &metadata.neoforge,
         _ => {
             return Err(
                 ProfileCreationError::NoManifest(loader.to_string()).into()

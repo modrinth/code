@@ -179,7 +179,7 @@ async function refreshSearch() {
       formattedFacets.push(orFacets.value)
     } else if (projectType.value === 'mod') {
       formattedFacets.push(
-        ['forge', 'fabric', 'quilt'].map((x) => `categories:'${encodeURIComponent(x)}'`)
+        ['forge', 'fabric', 'quilt', 'neoforge'].map((x) => `categories:'${encodeURIComponent(x)}'`)
       )
     } else if (projectType.value === 'datapack') {
       formattedFacets.push(['datapack'].map((x) => `categories:'${encodeURIComponent(x)}'`))
@@ -601,7 +601,7 @@ onUnmounted(() => unlistenOffline())
             v-for="loader in loaders.filter(
               (l) =>
                 (projectType !== 'mod' && l.supported_project_types?.includes(projectType)) ||
-                (projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name))
+                (projectType === 'mod' && ['fabric', 'forge', 'quilt', 'neoforge'].includes(l.name))
             )"
             :key="loader"
           >

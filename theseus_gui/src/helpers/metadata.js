@@ -29,3 +29,11 @@ export async function get_quilt_versions() {
   console.log('Getting quilt versions', c)
   return c
 }
+
+// Gets the neoforge versions from daedalus
+// Returns Manifest
+export async function get_neoforge_versions() {
+  const c = await invoke('plugin:metadata|metadata_get_neoforge_versions')
+  console.log('Getting neoforge versions', c)
+  return c
+}
