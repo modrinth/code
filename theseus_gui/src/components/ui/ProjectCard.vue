@@ -168,6 +168,7 @@ const install = async (e) => {
 .wrapper {
   position: relative;
   aspect-ratio: 1;
+  border-radius: var(--radius-lg);
 
   &:hover {
     .install:enabled {
