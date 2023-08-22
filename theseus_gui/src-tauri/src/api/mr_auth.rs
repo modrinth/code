@@ -10,7 +10,6 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
             cancel_flow,
             login_pass,
             login_2fa,
-            login_minecraft,
             create_account,
             refresh,
             logout,
@@ -47,11 +46,6 @@ pub async fn login_pass(
 #[tauri::command]
 pub async fn login_2fa(code: &str, flow: &str) -> Result<ModrinthCredentials> {
     Ok(theseus::mr_auth::login_2fa(code, flow).await?)
-}
-
-#[tauri::command]
-pub async fn login_minecraft(flow: &str) -> Result<ModrinthCredentialsResult> {
-    Ok(theseus::mr_auth::login_minecraft(flow).await?)
 }
 
 #[tauri::command]

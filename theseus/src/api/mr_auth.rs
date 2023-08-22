@@ -91,22 +91,6 @@ pub async fn login_2fa(
 }
 
 #[tracing::instrument]
-pub async fn login_minecraft(
-    flow: &str,
-) -> crate::Result<ModrinthCredentialsResult> {
-    let state = crate::State::get().await?;
-    let creds =
-        crate::state::login_minecraft(flow, &state.fetch_semaphore).await?;
-
-    if let ModrinthCredentialsResult::Credentials(creds) = &creds {
-        let mut write = state.credentials.write().await;
-        write.login(creds.clone()).await?;
-    }
-
-    Ok(creds)
-}
-
-#[tracing::instrument]
 pub async fn create_account(
     username: &str,
     email: &str,

@@ -1,6 +1,6 @@
 [package]
 name = "theseus"
-version = "0.5.3"
+version = "0.5.4"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2018"
 
@@ -24,7 +24,7 @@ tempfile = "3.5.0"
 urlencoding = "2.1.3"
 
 chrono = { version = "0.4.19", features = ["serde"] }
-daedalus = { version = "0.1.23" }
+daedalus = { version = "0.1.25" }
 dirs = "5.0.1"
 
 regex = "1.5"

@@ -14,8 +14,6 @@ import {
   login_2fa,
   create_account,
   login_pass,
-  get as getCreds,
-  login_minecraft,
 } from '@/helpers/mr_auth.js'
 import { handleError, useNotifications } from '@/store/state.js'
 import { onMounted, ref } from 'vue'
@@ -32,10 +30,6 @@ const props = defineProps({
   modal: {
     type: Boolean,
     required: true,
-  },
-  flow: {
-    type: String,
-    default: null,
   },
 })
 
@@ -118,15 +112,6 @@ async function createAccount() {
 }
 
 async function goToNextPage() {
-  const creds = await getCreds().catch(handleError)
-  if (!creds) {
-    try {
-      await login_minecraft(props.flow)
-    } catch {
-      /* empty */
-    }
-  }
-
   props.nextPage()
 }
 
