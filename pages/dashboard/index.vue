@@ -155,7 +155,7 @@ const extraNotifs = computed(() => allNotifs.length - notifications.value.length
   display: grid;
   grid-template:
     'header header'
-    'notifications analytics' / 1fr 1fr;
+    'notifications analytics' / 1fr auto;
   gap: var(--spacing-card-md);
 
   > .universal-card {

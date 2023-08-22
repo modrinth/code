@@ -39,7 +39,11 @@ export const getProjectLink = (project) => {
 }
 
 export const getVersionLink = (project, version) => {
-  return getProjectLink(project) + '/version/' + version.id
+  if (version) {
+    return getProjectLink(project) + '/version/' + version.id
+  } else {
+    return getProjectLink(project)
+  }
 }
 
 export const isApproved = (project) => {
