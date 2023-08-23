@@ -7,6 +7,9 @@
           <NavStackItem link="/settings" label="Appearance">
             <PaintbrushIcon />
           </NavStackItem>
+          <NavStackItem v-if="isStaging" link="/settings/language" label="Language">
+            <LanguagesIcon />
+          </NavStackItem>
           <template v-if="auth.user">
             <h3>User settings</h3>
             <NavStackItem link="/settings/account" label="Account">
@@ -22,9 +25,6 @@
               <CurrencyIcon />
             </NavStackItem>
           </template>
-          <NavStackItem link="/settings/language" label="Language">
-            <LanguagesIcon />
-          </NavStackItem>
         </NavStack>
       </aside>
     </div>
@@ -46,6 +46,7 @@ import LanguagesIcon from '~/assets/images/utils/languages.svg'
 
 const route = useRoute()
 const auth = await useAuth()
+const isStaging = useRuntimeConfig().public.siteUrl !== 'https://modrinth.com'
 </script>
 
 <style lang="scss" scoped></style>
