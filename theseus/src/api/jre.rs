@@ -92,7 +92,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
     let packages = fetch_json::<Vec<Package>>(
                 Method::GET,
                 &format!(
-                    "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
+                    "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jdk&page_size=1",
                     std::env::consts::ARCH, java_version, std::env::consts::OS
                 ),
                 None,

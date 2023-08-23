@@ -38,7 +38,17 @@ const initFiles = async () => {
       .map((folder) => ({
         path: folder,
         name: folder.split(sep).pop(),
-        selected: false,
+        selected:
+          folder.startsWith('mods') ||
+          folder.startsWith('datapacks') ||
+          folder.startsWith('resourcepacks') ||
+          folder.startsWith('shaderpacks') ||
+          folder.startsWith('config'),
+        disabled:
+          folder === 'profile.json' ||
+          folder.startsWith('modrinth_logs') ||
+          folder.startsWith('.fabric') ||
+          folder.includes('.DS_Store'),
       }))
       .forEach((pathData) => {
         const parent = pathData.path.split(sep).slice(0, -1).join(sep)
@@ -115,7 +125,7 @@ const exportPack = async () => {
       </div>
       <div class="table">
         <div class="table-head">
-          <div class="table-cell">Select files as overrides</div>
+          <div class="table-cell">Select files and folders to include in pack</div>
         </div>
         <div class="table-content">
           <div v-for="[path, children] of folders" :key="path.name" class="table-row">
@@ -125,6 +135,7 @@ const exportPack = async () => {
                   :model-value="children.every((child) => child.selected)"
                   :label="path.name"
                   class="select-checkbox"
+                  :disabled="children.every((x) => x.disabled)"
                   @update:model-value="
                     (newValue) => children.forEach((child) => (child.selected = newValue))
                   "
@@ -137,7 +148,12 @@ const exportPack = async () => {
               </div>
               <div v-if="path.showingMore" class="file-secondary">
                 <div v-for="child in children" :key="child.path" class="file-secondary-row">
-                  <Checkbox v-model="child.selected" :label="child.name" class="select-checkbox" />
+                  <Checkbox
+                    v-model="child.selected"
+                    :label="child.name"
+                    class="select-checkbox"
+                    :disabled="child.disabled"
+                  />
                 </div>
               </div>
             </div>
@@ -145,7 +161,12 @@ const exportPack = async () => {
           <div v-for="file in files" :key="file.path" class="table-row">
             <div class="table-cell file-entry">
               <div class="file-primary">
-                <Checkbox v-model="file.selected" :label="file.name" class="select-checkbox" />
+                <Checkbox
+                  v-model="file.selected"
+                  :label="file.name"
+                  :disabled="file.disabled"
+                  class="select-checkbox"
+                />
               </div>
             </div>
           </div>

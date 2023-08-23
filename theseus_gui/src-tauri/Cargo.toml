@@ -1,6 +1,6 @@
 [package]
 name = "theseus_gui"
-version = "0.5.3"
+version = "0.5.4"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
