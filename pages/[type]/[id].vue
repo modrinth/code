@@ -365,26 +365,22 @@
           :auth="auth"
           :tags="tags"
         />
-        <div v-else-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
+        <MessageBanner v-else-if="project.status === 'withheld'" message-type="warning">
           {{ project.title }} has been removed from search by Modrinth's moderators. Please use
           {{ project.title }} at your own risk.
-        </div>
-        <div v-if="project.status === 'archived'" class="card warning" aria-label="Warning">
+        </MessageBanner>
+        <MessageBanner v-if="project.status === 'archived'" message-type="warning">
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
-        </div>
-        <div
-          v-if="project.project_type === 'modpack'"
-          class="card information"
-          aria-label="Information"
-        >
+        </MessageBanner>
+        <MessageBanner v-if="project.project_type === 'modpack'" message-type="information">
           To install {{ project.title }}, download
           <nuxt-link to="/app">the Modrinth App</nuxt-link>. For instructions with other launchers,
           please see
           <a href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/" :target="$external()"
             >our documentation</a
           >.
-        </div>
+        </MessageBanner>
         <Promotion v-if="tags.approvedStatuses.includes(project.status)" />
         <div class="navigation-card">
           <NavRow
@@ -725,6 +721,7 @@ import Avatar from '~/components/ui/Avatar.vue'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
+import MessageBanner from '~/components/ui/MessageBanner.vue'
 import SettingsIcon from '~/assets/images/utils/settings.svg'
 import UsersIcon from '~/assets/images/utils/users.svg'
 import CategoriesIcon from '~/assets/images/utils/tags.svg'
