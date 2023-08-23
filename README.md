@@ -4,4 +4,4 @@
 
 For contributing information, please see the knossos section of the [Modrinth contributing guide](https://docs.modrinth.com/docs/details/contributing/#knossos-frontend).
 
-For a detailed explanation on how things work in general, check out the [Nuxt.js docs](https://nuxtjs.org).
+For a detailed explanation on how things work in general, check out the [Nuxt.js docs](https://nuxt.com).
