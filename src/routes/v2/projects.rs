@@ -1596,6 +1596,18 @@ pub async fn project_schedule(
             ));
         }
 
+        if !project_item.inner.status.is_approved() {
+            return Err(ApiError::InvalidInput(
+                "This project has not been approved yet. Submit to the queue with the private status to schedule it in the future!".to_string(),
+            ));
+        }
+
+        if project_item.inner.webhook_sent {
+            return Err(ApiError::InvalidInput(
+                "This project already has been published. It cannot be scheduled!".to_string(),
+            ));
+        }
+
         sqlx::query!(
             "
             UPDATE mods
