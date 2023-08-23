@@ -58,6 +58,9 @@ const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>
   'en-x-lolcat': 'fun',
   'en-x-uwu': 'fun',
   'ru-x-bandit': 'fun',
+  ar: 'experimental',
+  he: 'experimental',
+  pes: 'experimental',
 }
 
 export default defineNuxtConfig({
@@ -200,6 +203,8 @@ export default defineNuxtConfig({
     async 'vintl:extendOptions'(opts) {
       opts.locales ??= []
 
+      const isProduction = getDomain() === 'https://modrinth.com'
+
       const resolveCompactNumberDataImport = await (async () => {
         const compactNumberLocales: string[] = []
         const resolvedImports = new Map<string, string>()
@@ -225,7 +230,7 @@ export default defineNuxtConfig({
 
       for await (const localeDir of globIterate('locales/*/', { posix: true })) {
         const tag = basename(localeDir)
-        if (!enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
+        if (isProduction && !enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
 
         const locale =
           opts.locales.find((locale) => locale.tag === tag) ??
@@ -246,8 +251,9 @@ export default defineNuxtConfig({
               })
             }
           } else if (fileName === 'meta.json') {
-            /** @type {Record<string, { message: string }>} */
-            const meta = await fs.readFile(localeFile, 'utf8').then((date) => JSON.parse(date))
+            const meta: Record<string, { message: string }> = await fs
+              .readFile(localeFile, 'utf8')
+              .then((date) => JSON.parse(date))
             locale.meta ??= {}
             for (const key in meta) {
               locale.meta[key] = meta[key].message
