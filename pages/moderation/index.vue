@@ -6,25 +6,25 @@
         <div class="grid-display__item">
           <div class="label">Projects</div>
           <div class="value">
-            {{ formatNumber(stats.projects) }}
+            {{ formatNumber(stats.projects, false) }}
           </div>
         </div>
         <div class="grid-display__item">
           <div class="label">Versions</div>
           <div class="value">
-            {{ formatNumber(stats.versions) }}
+            {{ formatNumber(stats.versions, false) }}
           </div>
         </div>
         <div class="grid-display__item">
           <div class="label">Files</div>
           <div class="value">
-            {{ formatNumber(stats.files) }}
+            {{ formatNumber(stats.files, false) }}
           </div>
         </div>
         <div class="grid-display__item">
           <div class="label">Authors</div>
           <div class="value">
-            {{ formatNumber(stats.authors) }}
+            {{ formatNumber(stats.authors, false) }}
           </div>
         </div>
       </div>
