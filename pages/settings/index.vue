@@ -101,19 +101,6 @@
         />
       </div>
       <div class="adjacent-input small">
-        <label for="modpacks-alpha-notice">
-          <span class="label__title">Modpacks alpha notice</span>
-          <span class="label__description">Shows a banner stating that modpacks are in alpha.</span>
-        </label>
-        <input
-          id="modpacks-alpha-notice"
-          v-model="cosmetics.modpacksAlphaNotice"
-          class="switch stylized-toggle"
-          type="checkbox"
-          @change="saveCosmetics"
-        />
-      </div>
-      <div class="adjacent-input small">
         <label for="external-links-new-tab">
           <span class="label__title">Open external links in new tab</span>
           <span class="label__description">
