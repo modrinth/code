@@ -414,7 +414,7 @@ export default defineNuxtComponent({
         method: 'DELETE',
       })
       await initUserProjects()
-      await this.$router.push('/dashboard/review')
+      await this.$router.push('/dashboard/projects')
       this.$notify({
         group: 'main',
         title: 'Project deleted',
