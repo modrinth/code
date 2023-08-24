@@ -187,11 +187,6 @@ export default {
     }
   }
 
-  .button-group {
-    margin-top: var(--spacing-card-md);
-    justify-content: right;
-  }
-
   strong {
     color: var(--color-text-dark);
     font-weight: 500;

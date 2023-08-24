@@ -500,10 +500,6 @@ export default defineNuxtComponent({
   }
 }
 
-.button-group:first-child {
-  margin-left: auto;
-}
-
 .textarea-wrapper {
   height: 10rem;
 }

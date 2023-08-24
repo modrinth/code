@@ -804,10 +804,5 @@ export default defineNuxtComponent({
       background-color: #000000;
     }
   }
-
-  .button-group {
-    margin-left: auto;
-    margin-top: 1.5rem;
-  }
 }
 </style>

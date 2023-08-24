@@ -123,10 +123,5 @@ export default {
       max-width: 100%;
     }
   }
-
-  .button-group {
-    margin-left: auto;
-    margin-top: 1.5rem;
-  }
 }
 </style>

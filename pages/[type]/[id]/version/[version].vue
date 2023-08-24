@@ -1596,10 +1596,5 @@ export default defineNuxtComponent({
   .multiselect {
     max-width: 20rem;
   }
-
-  .button-group {
-    margin-left: auto;
-    margin-top: 1.5rem;
-  }
 }
 </style>

@@ -276,4 +276,8 @@ export default defineNuxtComponent({
     max-width: 26rem;
   }
 }
+
+.multiselect {
+  max-width: 15rem;
+}
 </style>
