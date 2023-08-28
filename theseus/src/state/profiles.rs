@@ -129,6 +129,18 @@ impl ProjectPathId {
         Ok(profile_dir.join(&self.0))
     }
 
+    // Gets inner path in unix convention as a String
+    // ie: 'mods\myproj' -> 'mods/myproj'
+    // Used for exporting to mrpack, which should have a singular convention
+    pub fn get_inner_path_unix(&self) -> crate::Result<String> {
+        Ok(self
+            .0
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy().to_string())
+            .collect::<Vec<_>>()
+            .join("/"))
+    }
+
     // Create a new ProjectPathId from a relative path
     pub fn new(path: &Path) -> Self {
         ProjectPathId(PathBuf::from(path))

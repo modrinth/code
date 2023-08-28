@@ -51,7 +51,9 @@ async function deleteProfile() {
   }
 }
 
-const handleRightClick = (event, item) => {
+const handleRightClick = (event, sectionKey, index) => {
+  const globalIndex = sectionStartingIndexes.value[sectionKey] + index
+  const item = instanceComponents.value[globalIndex]
   const baseOptions = [
     { name: 'add_content' },
     { type: 'divider' },
@@ -221,6 +223,18 @@ const filteredResults = computed(() => {
 
   return instanceMap
 })
+
+const sectionStartingIndexes = computed(() => {
+  let currentIndex = 0
+  const indexes = {}
+
+  for (const [key, value] of filteredResults.value) {
+    indexes[key] = currentIndex
+    currentIndex += value.length
+  }
+
+  return indexes
+})
 </script>
 <template>
   <ModalConfirm
@@ -289,7 +303,7 @@ const filteredResults = computed(() => {
         ref="instanceComponents"
         :key="instance.path"
         :instance="instance"
-        @contextmenu.prevent.stop="(event) => handleRightClick(event, instanceComponents[index])"
+        @contextmenu.prevent.stop="(event) => handleRightClick(event, instanceSection.key, index)"
       />
     </section>
   </div>

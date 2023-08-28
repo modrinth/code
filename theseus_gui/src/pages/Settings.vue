@@ -323,6 +323,26 @@ async function refreshDir() {
           "
         />
       </div>
+      <div class="adjacent-input">
+        <label for="disable-discord-rpc">
+          <span class="label__title">Disable Discord RPC</span>
+          <span class="label__description">
+            Disables the Discord Rich Presence integration. 'Modrinth' will no longer show up as a
+            game or app you are using on your Discord profile. This does not disable any
+            instance-specific Discord Rich Presence integrations, such as those added by mods.
+          </span>
+        </label>
+        <Toggle
+          id="disable-discord-rpc"
+          :model-value="settings.disable_discord_rpc"
+          :checked="settings.disable_discord_rpc"
+          @update:model-value="
+            (e) => {
+              settings.disable_discord_rpc = e
+            }
+          "
+        />
+      </div>
     </Card>
     <Card>
       <div class="label">

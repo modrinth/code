@@ -52,7 +52,25 @@ impl DiscordGuard {
     }
 
     /// Set the activity to the given message
+    /// First checks if discord is disabled, and if so, clear the activity instead
     pub async fn set_activity(
+        &self,
+        msg: &str,
+        reconnect_if_fail: bool,
+    ) -> crate::Result<()> {
+        // Check if discord is disabled, and if so, clear the activity instead
+        let state = State::get().await?;
+        let settings = state.settings.read().await;
+        if settings.disable_discord_rpc {
+            Ok(self.clear_activity(true).await?)
+        } else {
+            Ok(self.force_set_activity(msg, reconnect_if_fail).await?)
+        }
+    }
+
+    /// Sets the activity to the given message, regardless of if discord is disabled
+    /// Should not be used except for in the above method, or if it is already known that discord is enabled (specifically for state initialization)
+    pub async fn force_set_activity(
         &self,
         msg: &str,
         reconnect_if_fail: bool,
@@ -99,8 +117,7 @@ impl DiscordGuard {
         Ok(())
     }
 
-    /*
-    /// Clear the activity
+    /// Clear the activity entirely ('disabling' the RPC until the next set_activity)
     pub async fn clear_activity(
         &self,
         reconnect_if_fail: bool,
@@ -138,7 +155,7 @@ impl DiscordGuard {
             res.map_err(could_not_clear_err)?;
         }
         Ok(())
-    }*/
+    }
 
     /// Clear the activity, but if there is a running profile, set the activity to that instead
     pub async fn clear_to_default(
@@ -147,6 +164,15 @@ impl DiscordGuard {
     ) -> crate::Result<()> {
         let state: Arc<tokio::sync::RwLockReadGuard<'_, State>> =
             State::get().await?;
+
+        {
+            let settings = state.settings.read().await;
+            if settings.disable_discord_rpc {
+                println!("Discord is disabled, clearing activity");
+                return self.clear_activity(true).await;
+            }
+        }
+
         if let Some(existing_child) = state
             .children
             .read()

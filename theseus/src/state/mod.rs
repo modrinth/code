@@ -185,9 +185,10 @@ impl State {
         let safety_processes = SafeProcesses::new();
 
         let discord_rpc = DiscordGuard::init().await?;
-        {
+        if !settings.disable_discord_rpc {
             // Add default Idling to discord rich presence
-            let _ = discord_rpc.set_activity("Idling...", true).await;
+            // Force add to avoid recursion
+            let _ = discord_rpc.force_set_activity("Idling...", true).await;
         }
 
         // Starts a loop of checking if we are online, and updating

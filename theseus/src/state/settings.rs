@@ -31,6 +31,8 @@ pub struct Settings {
     pub version: u32,
     pub collapsed_navigation: bool,
     #[serde(default)]
+    pub disable_discord_rpc: bool,
+    #[serde(default)]
     pub hide_on_process: bool,
     #[serde(default)]
     pub default_page: DefaultPage,
@@ -77,6 +79,7 @@ impl Settings {
                 max_concurrent_writes: 10,
                 version: CURRENT_FORMAT_VERSION,
                 collapsed_navigation: false,
+                disable_discord_rpc: false,
                 hide_on_process: false,
                 default_page: DefaultPage::Home,
                 developer_mode: false,

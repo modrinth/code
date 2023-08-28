@@ -39,6 +39,11 @@
       <PackageIcon />
       Export modpack
     </Button>
+    <Button v-if="!isPackLinked && projects.some((m) => m.outdated)" @click="updateAll">
+      <UpdatedIcon />
+      Update all
+    </Button>
+
     <DropdownButton
       v-if="!isPackLinked"
       :options="['search', 'from_file']"
@@ -122,7 +127,7 @@
             <Button
               :disabled="isPackLinked || offline"
               class="transparent update"
-              @click="updateAll()"
+              @click="updateSelected()"
               @mouseover="selectedOption = 'Update'"
             >
               <UpdatedIcon />
@@ -243,7 +248,7 @@
             </Button>
           </div>
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <div v-tooltip="isPackLinked ? 'Unpair this instance to update mods.' : ''">
+          <div v-else v-tooltip="isPackLinked ? 'Unpair this instance to update mods.' : ''">
             <Button
               v-tooltip="'Update project'"
               :disabled="!mod.outdated || offline || isPackLinked"
@@ -661,6 +666,7 @@ const selectUpdatable = () => {
 
 const updateProject = async (mod) => {
   mod.updating = true
+  await new Promise((resolve) => setTimeout(resolve, 0))
   mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
   mod.updating = false
 
@@ -777,6 +783,14 @@ const toggleSelected = async () => {
   for (const project of functionValues.value) {
     await toggleDisableMod(project, !project.disabled)
   }
+}
+
+const updateSelected = async () => {
+  const promises = []
+  for (const project of functionValues.value) {
+    if (project.outdated) promises.push(updateProject(project))
+  }
+  await Promise.all(promises).catch(handleError)
 }
 
 const enableAll = async () => {

@@ -8,7 +8,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
-use crate::state::ProjectMetadata;
+use crate::state::{ProjectMetadata, SideType};
 
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
@@ -951,6 +951,9 @@ pub async fn create_mrpack_json(
         (crate::prelude::ModLoader::Forge, Some(v)) => {
             dependencies.insert(PackDependency::Forge, v.id)
         }
+        (crate::prelude::ModLoader::NeoForge, Some(v)) => {
+            dependencies.insert(PackDependency::NeoForge, v.id)
+        }
         (crate::prelude::ModLoader::Fabric, Some(v)) => {
             dependencies.insert(PackDependency::FabricLoader, v.id)
         }
@@ -981,18 +984,21 @@ pub async fn create_mrpack_json(
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path: String = mod_path.0.clone().to_string_lossy().to_string();
+            let path: String = mod_path.get_inner_path_unix().ok()?;
 
             // Only Modrinth projects have a modrinth metadata field for the modrinth.json
             Some(Ok(match project.metadata {
                 crate::prelude::ProjectMetadata::Modrinth {
-                    ref project,
                     ref version,
                     ..
                 } => {
                     let mut env = HashMap::new();
-                    env.insert(EnvType::Client, project.client_side.clone());
-                    env.insert(EnvType::Server, project.server_side.clone());
+                    // TODO: envtype should be a controllable option (in general or at least .mrpack exporting)
+                    // For now, assume required.
+                    // env.insert(EnvType::Client, project.client_side.clone());
+                    // env.insert(EnvType::Server, project.server_side.clone());
+                    env.insert(EnvType::Client, SideType::Required);
+                    env.insert(EnvType::Server, SideType::Required);
 
                     let primary_file = if let Some(primary_file) =
                         version.files.first()
