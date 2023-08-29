@@ -45,7 +45,12 @@
 
 <script setup>
 import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
-import { find_jre_17_jres, get_jre } from '@/helpers/jre.js'
+import {
+  find_jre_17_jres,
+  find_jre_8_jres,
+  get_jre,
+  extract_version_from_string,
+} from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
@@ -85,8 +90,14 @@ const testingJavaSuccess = ref(null)
 async function testJava() {
   testingJava.value = true
   let result = await get_jre(props.modelValue ? props.modelValue.path : '')
+
   testingJava.value = false
-  testingJavaSuccess.value = !!result
+  if (result) {
+    let [majorVersion, minorVersion] = await extract_version_from_string(result.version)
+    testingJavaSuccess.value = majorVersion == 1 && minorVersion == props.version
+  } else {
+    testingJavaSuccess.value = false
+  }
 
   mixpanel_track('JavaTest', {
     path: props.modelValue ? props.modelValue.path : '',
@@ -125,9 +136,16 @@ async function autoDetect() {
   if (!props.compact) {
     detectJavaModal.value.show(props.version, props.modelValue)
   } else {
-    let versions = await find_jre_17_jres().catch(handleError)
-    if (versions.length > 0) {
-      emit('update:modelValue', versions[0])
+    if (props.version == 8) {
+      let versions = await find_jre_8_jres().catch(handleError)
+      if (versions.length > 0) {
+        emit('update:modelValue', versions[0])
+      }
+    } else {
+      let versions = await find_jre_17_jres().catch(handleError)
+      if (versions.length > 0) {
+        emit('update:modelValue', versions[0])
+      }
     }
   }
 }

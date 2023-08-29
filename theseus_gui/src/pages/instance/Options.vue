@@ -517,66 +517,69 @@ watch(
     unlinkModpack,
   ],
   async () => {
-    const editProfile = {
-      metadata: {
-        name: title.value.trim().substring(0, 32) ?? 'Instance',
-        groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
-        loader_version: props.instance.metadata.loader_version,
-        linked_data: props.instance.metadata.linked_data,
-      },
-      java: {},
-    }
-
-    if (overrideJavaInstall.value) {
-      if (javaInstall.value.path !== '') {
-        editProfile.java.override_version = javaInstall.value
-        editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
-          'java.exe',
-          'javaw.exe'
-        )
-      }
-    }
-
-    if (overrideJavaArgs.value) {
-      if (javaArgs.value !== '') {
-        editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/).filter(Boolean)
-      }
-    }
-
-    if (overrideEnvVars.value) {
-      if (envVars.value !== '') {
-        editProfile.java.custom_env_args = envVars.value
-          .trim()
-          .split(/\s+/)
-          .filter(Boolean)
-          .map((x) => x.split('=').filter(Boolean))
-      }
-    }
-
-    if (overrideMemorySettings.value) {
-      editProfile.memory = memory.value
-    }
-
-    if (overrideWindowSettings.value) {
-      editProfile.fullscreen = fullscreenSetting.value
-
-      if (!fullscreenSetting.value) {
-        editProfile.resolution = resolution.value
-      }
-    }
-
-    if (overrideHooks.value) {
-      editProfile.hooks = hooks.value
-    }
-
-    if (unlinkModpack.value) {
-      editProfile.metadata.linked_data = null
-    }
-
-    await edit(props.instance.path, editProfile)
+    await edit(props.instance.path, editProfileObject.value)
   },
   { deep: true }
 )
+
+const editProfileObject = computed(() => {
+  const editProfile = {
+    metadata: {
+      name: title.value.trim().substring(0, 32) ?? 'Instance',
+      groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
+      loader_version: props.instance.metadata.loader_version,
+      linked_data: props.instance.metadata.linked_data,
+    },
+    java: {},
+  }
+
+  if (overrideJavaInstall.value) {
+    if (javaInstall.value.path !== '') {
+      editProfile.java.override_version = javaInstall.value
+      editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
+        'java.exe',
+        'javaw.exe'
+      )
+    }
+  }
+
+  if (overrideJavaArgs.value) {
+    if (javaArgs.value !== '') {
+      editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/).filter(Boolean)
+    }
+  }
+
+  if (overrideEnvVars.value) {
+    if (envVars.value !== '') {
+      editProfile.java.custom_env_args = envVars.value
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((x) => x.split('=').filter(Boolean))
+    }
+  }
+
+  if (overrideMemorySettings.value) {
+    editProfile.memory = memory.value
+  }
+
+  if (overrideWindowSettings.value) {
+    editProfile.fullscreen = fullscreenSetting.value
+
+    if (!fullscreenSetting.value) {
+      editProfile.resolution = resolution.value
+    }
+  }
+
+  if (overrideHooks.value) {
+    editProfile.hooks = hooks.value
+  }
+
+  if (unlinkModpack.value) {
+    editProfile.metadata.linked_data = null
+  }
+  return editProfile
+})
 
 const repairing = ref(false)
 
@@ -711,12 +714,9 @@ const editing = ref(false)
 async function saveGvLoaderEdits() {
   editing.value = true
 
-  const editProfile = {
-    metadata: {
-      game_version: gameVersion.value,
-      loader: loader.value,
-    },
-  }
+  let editProfile = editProfileObject.value
+  editProfile.metadata.loader = loader.value
+  editProfile.metadata.game_version = gameVersion.value
 
   if (loader.value !== 'vanilla') {
     editProfile.metadata.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value]

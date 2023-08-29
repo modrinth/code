@@ -190,3 +190,9 @@ pub async fn get_max_memory() -> crate::Result<u64> {
         })?
         .total)
 }
+
+pub async fn extract_version_from_string(
+    version: &str,
+) -> crate::Result<(u32, u32)> {
+    Ok(extract_java_majorminor_version(version)?)
+}

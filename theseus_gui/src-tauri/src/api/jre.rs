@@ -14,6 +14,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
             jre_validate_globals,
             jre_get_jre,
             jre_auto_install_java,
+            jre_extract_version_from_string,
             jre_get_max_memory,
         ])
         .build()
@@ -59,6 +60,15 @@ pub async fn jre_validate_globals() -> Result<bool> {
 #[tauri::command]
 pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
     jre::check_jre(path).await.map_err(|e| e.into())
+}
+
+// Extracts the major and minor version from a given java version string
+// Uses rust backend for consistency
+#[tauri::command]
+pub async fn jre_extract_version_from_string(
+    version: String,
+) -> Result<(u32, u32)> {
+    Ok(jre::extract_version_from_string(&version).await?)
 }
 
 // Auto installs java for the given java version

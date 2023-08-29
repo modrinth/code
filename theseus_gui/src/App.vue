@@ -19,7 +19,7 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
-import { useNotifications } from '@/store/notifications.js'
+import { handleError, useNotifications } from '@/store/notifications.js'
 import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
@@ -40,6 +40,7 @@ import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
+import { install_from_file } from './helpers/pack'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -193,9 +194,20 @@ document.querySelector('body').addEventListener('auxclick', function (e) {
 
 const accounts = ref(null)
 
-command_listener((e) => {
+command_listener(async (e) => {
   console.log(e)
-  urlModal.value.show(e)
+  if (e.event === 'RunMRPack') {
+    // RunMRPack should directly install a local mrpack given a path
+    if (e.path.endsWith('.mrpack')) {
+      await install_from_file(e.path).catch(handleError)
+      mixpanel_track('InstanceCreate', {
+        source: 'CreationModalFileDrop',
+      })
+    }
+  } else {
+    // Other commands are URL-based (deep linking)
+    urlModal.value.show(e)
+  }
 })
 </script>
 

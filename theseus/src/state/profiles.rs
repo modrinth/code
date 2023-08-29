@@ -124,7 +124,6 @@ impl ProjectPathId {
         &self,
         profile: ProfilePathId,
     ) -> crate::Result<PathBuf> {
-        let _state = State::get().await?;
         let profile_dir = profile.get_full_path().await?;
         Ok(profile_dir.join(&self.0))
     }

@@ -2,6 +2,7 @@ import {
   add_project_from_version as installMod,
   check_installed,
   get_full_path,
+  get_mod_full_path,
 } from '@/helpers/profile'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
@@ -23,6 +24,11 @@ export async function showInFolder(path) {
 // Opens a profile's folder in the OS file explorer
 export async function showProfileInFolder(path) {
   const fullPath = await get_full_path(path)
+  return await showInFolder(fullPath)
+}
+
+export async function highlightModInProfile(profilePath, projectPath) {
+  const fullPath = await get_mod_full_path(profilePath, projectPath)
   return await showInFolder(fullPath)
 }
 

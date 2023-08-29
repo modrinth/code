@@ -13,6 +13,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get,
             profile_get_optimal_jre_key,
             profile_get_full_path,
+            profile_get_mod_full_path,
             profile_list,
             profile_check_installed,
             profile_install,
@@ -60,6 +61,17 @@ pub async fn profile_get(
 #[tauri::command]
 pub async fn profile_get_full_path(path: ProfilePathId) -> Result<PathBuf> {
     let res = profile::get_full_path(&path).await?;
+    Ok(res)
+}
+
+// Get's a mod's full path
+// invoke('plugin:profile|profile_get_mod_full_path',path)
+#[tauri::command]
+pub async fn profile_get_mod_full_path(
+    path: ProfilePathId,
+    project_path: ProjectPathId,
+) -> Result<PathBuf> {
+    let res = profile::get_mod_full_path(&path, &project_path).await?;
     Ok(res)
 }
 

@@ -273,7 +273,7 @@
           <Button
             v-tooltip="`Show ${mod.file_name}`"
             icon-only
-            @click="showProfileInFolder(mod.path)"
+            @click="highlightModInProfile(instance.path, mod.path)"
           >
             <FolderOpenIcon />
           </Button>
@@ -398,7 +398,7 @@ import { mixpanel_track } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 

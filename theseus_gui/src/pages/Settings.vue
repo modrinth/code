@@ -133,11 +133,7 @@ async function refreshDir() {
         class="login-screen-modal"
         :noblur="!themeStore.advancedRendering"
       >
-        <ModrinthLoginScreen
-          :modal="true"
-          :prev-page="$refs.loginScreenModal.show()"
-          :next-page="signInAfter"
-        />
+        <ModrinthLoginScreen :modal="true" :prev-page="signInAfter" :next-page="signInAfter" />
       </Modal>
       <div class="adjacent-input">
         <label for="theme">

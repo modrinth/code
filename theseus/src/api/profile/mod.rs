@@ -109,6 +109,26 @@ pub async fn get_full_path(path: &ProfilePathId) -> crate::Result<PathBuf> {
     Ok(full_path)
 }
 
+/// Get mod's full path in the filesystem
+#[tracing::instrument]
+pub async fn get_mod_full_path(
+    profile_path: &ProfilePathId,
+    project_path: &ProjectPathId,
+) -> crate::Result<PathBuf> {
+    if get(profile_path, Some(true)).await?.is_some() {
+        let full_path = io::canonicalize(
+            project_path.get_full_path(profile_path.clone()).await?,
+        )?;
+        return Ok(full_path);
+    }
+
+    Err(crate::ErrorKind::OtherError(format!(
+        "Tried to get the full path of a nonexistent or unloaded project at path {}!",
+        project_path.get_full_path(profile_path.clone()).await?.display()
+    ))
+    .into())
+}
+
 /// Edit a profile using a given asynchronous closure
 pub async fn edit<Fut>(
     path: &ProfilePathId,

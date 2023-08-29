@@ -44,6 +44,12 @@ export async function get_full_path(path) {
   return await invoke('plugin:profile|profile_get_full_path', { path })
 }
 
+// Get's a mod's full fs path
+// Returns a path
+export async function get_mod_full_path(path, projectPath) {
+  return await invoke('plugin:profile|profile_get_mod_full_path', { path, projectPath })
+}
+
 // Get optimal java version from profile
 // Returns a java version
 export async function get_optimal_jre_key(path) {

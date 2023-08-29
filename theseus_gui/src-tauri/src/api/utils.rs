@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use theseus::{handler, prelude::CommandPayload, State};
 
 use crate::api::Result;
-use std::{env, process::Command};
+use std::{env, path::PathBuf, process::Command};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -76,13 +76,19 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(path: String) -> Result<()> {
+pub fn show_in_folder(path: PathBuf) -> Result<()> {
     {
         #[cfg(target_os = "windows")]
         {
-            Command::new("explorer")
-                .args([&path]) // The comma after select is not a typo
-                .spawn()?;
+            if path.is_dir() {
+                Command::new("explorer")
+                    .args([&path]) // The comma after select is not a typo
+                    .spawn()?;
+            } else {
+                Command::new("explorer")
+                    .args(["/select,", &path.to_string_lossy()]) // The comma after select is not a typo
+                    .spawn()?;
+            }
         }
 
         #[cfg(target_os = "linux")]
@@ -108,7 +114,11 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
         #[cfg(target_os = "macos")]
         {
-            Command::new("open").args([&path]).spawn()?;
+            if path.is_dir() {
+                Command::new("open").args([&path]).spawn()?;
+            } else {
+                Command::new("open").args(["-R", &path]).spawn()?;
+            }
         }
 
         Ok::<(), theseus::Error>(())

@@ -452,15 +452,16 @@ impl SharedOutput {
         child_stdout: ChildStdout,
     ) -> crate::Result<()> {
         let mut buf_reader = BufReader::new(child_stdout);
-        let mut line = String::new();
 
+        let mut buf = Vec::new();
         while buf_reader
-            .read_line(&mut line)
+            .read_until(b'\n', &mut buf)
             .await
             .map_err(IOError::from)?
             > 0
         {
-            let val_line = self.censor_log(line.clone());
+            let line = String::from_utf8_lossy(&buf).to_string();
+            let val_line = self.censor_log(line);
 
             {
                 let mut output = self.output.write().await;
@@ -473,8 +474,7 @@ impl SharedOutput {
                     .await
                     .map_err(IOError::from)?;
             }
-
-            line.clear();
+            buf.clear();
         }
         Ok(())
     }
@@ -484,15 +484,16 @@ impl SharedOutput {
         child_stderr: ChildStderr,
     ) -> crate::Result<()> {
         let mut buf_reader = BufReader::new(child_stderr);
-        let mut line = String::new();
 
+        let mut buf = Vec::new();
         while buf_reader
-            .read_line(&mut line)
+            .read_until(b'\n', &mut buf)
             .await
             .map_err(IOError::from)?
             > 0
         {
-            let val_line = self.censor_log(line.clone());
+            let line = String::from_utf8_lossy(&buf).to_string();
+            let val_line = self.censor_log(line);
 
             {
                 let mut output = self.output.write().await;
@@ -506,7 +507,7 @@ impl SharedOutput {
                     .map_err(IOError::from)?;
             }
 
-            line.clear();
+            buf.clear();
         }
         Ok(())
     }

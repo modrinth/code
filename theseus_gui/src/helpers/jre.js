@@ -77,3 +77,10 @@ export async function auto_install_java(javaVersion) {
 export async function get_max_memory() {
   return await invoke('plugin:jre|jre_get_max_memory')
 }
+
+// extract java version from a string
+// uses Rust backend for consistency
+// returns: (major, minor)
+export async function extract_version_from_string(version) {
+  return await invoke('plugin:jre|jre_extract_version_from_string', { version })
+}
