@@ -72,26 +72,6 @@ pub async fn get_uuids_by_profile_path(
     children.running_keys_with_profile(profile_path).await
 }
 
-// Gets output of a child process stored in the state by UUID, as a string
-#[tracing::instrument]
-pub async fn get_output_by_uuid(uuid: &Uuid) -> crate::Result<String> {
-    let state = State::get().await?;
-    // Get stdout from child
-    let children = state.children.read().await;
-
-    // Extract child or return crate::Error
-    if let Some(child) = children.get(uuid) {
-        let child = child.read().await;
-        Ok(child.output.get_output().await?)
-    } else {
-        Err(crate::ErrorKind::LauncherError(format!(
-            "No child process by UUID {}",
-            uuid
-        ))
-        .as_error())
-    }
-}
-
 // Kill a child process stored in the state by UUID, as a string
 #[tracing::instrument]
 pub async fn kill_by_uuid(uuid: &Uuid) -> crate::Result<()> {

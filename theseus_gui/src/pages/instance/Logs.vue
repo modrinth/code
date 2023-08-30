@@ -59,17 +59,24 @@ import {
   TrashIcon,
   ShareModal,
 } from 'omorphia'
-import { delete_logs_by_datetime, get_logs, get_output_by_datetime } from '@/helpers/logs.js'
+import {
+  delete_logs_by_filename,
+  get_logs,
+  get_output_by_filename,
+  get_latest_log_cursor,
+} from '@/helpers/logs.js'
 import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
-import calendar from 'dayjs/plugin/calendar'
-import { get_output_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
+import isToday from 'dayjs/plugin/isToday'
+import isYesterday from 'dayjs/plugin/isYesterday'
+import { get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
 
-dayjs.extend(calendar)
+dayjs.extend(isToday)
+dayjs.extend(isYesterday)
 
 const route = useRoute()
 
@@ -83,6 +90,9 @@ const props = defineProps({
     default: false,
   },
 })
+
+const currentLiveLog = ref(null)
+const currentLiveLogCursor = ref(0)
 
 const logs = ref([])
 await setLogs()
@@ -102,9 +112,17 @@ async function getLiveLog() {
     if (uuids.length === 0) {
       returnValue = 'No live game detected. \nStart your game to proceed'
     } else {
-      returnValue = await get_output_by_uuid(uuids[0]).catch(handleError)
+      const logCursor = await get_latest_log_cursor(
+        props.instance.path,
+        currentLiveLogCursor.value
+      ).catch(handleError)
+      if (logCursor.new_file) {
+        currentLiveLog.value = ''
+      }
+      currentLiveLog.value = currentLiveLog.value + logCursor.output
+      currentLiveLogCursor.value = logCursor.cursor
+      returnValue = currentLiveLog.value
     }
-
     return { name: 'Live Log', stdout: returnValue, live: true }
   }
   return null
@@ -112,9 +130,21 @@ async function getLiveLog() {
 
 async function getLogs() {
   return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
-    log.name = dayjs(
-      log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)
-    ).calendar()
+    if (log.filename == 'latest.log') {
+      log.name = 'Latest Log'
+    } else {
+      let filename = log.filename.split('.')[0]
+      let day = dayjs(filename.slice(0, 10))
+      if (day.isToday()) {
+        log.name = 'Today'
+      } else if (day.isYesterday()) {
+        log.name = 'Yesterday'
+      } else {
+        log.name = day.format('MMMM D, YYYY')
+      }
+      // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
+      log.name = log.name + filename.slice(10)
+    }
     log.stdout = 'Loading...'
     return log
   })
@@ -152,9 +182,9 @@ watch(selectedLogIndex, async (newIndex) => {
 
   if (logs.value.length > 1 && newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
-    logs.value[newIndex].stdout = await get_output_by_datetime(
+    logs.value[newIndex].stdout = await get_output_by_filename(
       props.instance.path,
-      logs.value[newIndex].datetime_string
+      logs.value[newIndex].filename
     ).catch(handleError)
   }
 })
@@ -167,10 +197,9 @@ const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
-    await delete_logs_by_datetime(
-      props.instance.path,
-      logs.value[deleteIndex].datetime_string
-    ).catch(handleError)
+    await delete_logs_by_filename(props.instance.path, logs.value[deleteIndex].filename).catch(
+      handleError
+    )
     await setLogs()
   }
 }
@@ -206,9 +235,13 @@ interval.value = setInterval(async () => {
 
 const unlistenProcesses = await process_listener(async (e) => {
   if (e.event === 'launched') {
+    currentLiveLog.value = ''
+    currentLiveLogCursor.value = 0
     selectedLogIndex.value = 0
   }
   if (e.event === 'finished') {
+    currentLiveLog.value = ''
+    currentLiveLogCursor.value = 0
     userScrolled.value = false
     await setLogs()
     selectedLogIndex.value = 1

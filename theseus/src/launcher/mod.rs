@@ -406,7 +406,6 @@ pub async fn launch_minecraft(
         ))
         .as_error());
     }
-
     command
         .args(
             args::get_jvm_arguments(
@@ -447,8 +446,8 @@ pub async fn launch_minecraft(
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
 
     // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
     #[cfg(target_os = "macos")]
@@ -483,20 +482,6 @@ pub async fn launch_minecraft(
 
         io::write(&options_path, options_string).await?;
     }
-
-    // Get Modrinth logs directories
-    let datetime_string =
-        chrono::Local::now().format("%Y%m%d_%H%M%S").to_string();
-    let logs_dir = {
-        let st = State::get().await?;
-        st.directories
-            .profile_logs_dir(&profile.profile_id())
-            .await?
-            .join(&datetime_string)
-    };
-    io::create_dir_all(&logs_dir).await?;
-
-    let stdout_log_path = logs_dir.join("stdout.log");
 
     crate::api::profile::edit(&profile.profile_id(), |prof| {
         prof.metadata.last_played = Some(Utc::now());
@@ -562,7 +547,6 @@ pub async fn launch_minecraft(
         .insert_process(
             Uuid::new_v4(),
             profile.profile_id(),
-            stdout_log_path,
             command,
             post_exit_hook,
             censor_strings,

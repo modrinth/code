@@ -1,15 +1,10 @@
 use super::{Profile, ProfilePathId};
 use chrono::{DateTime, Utc};
-use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::{collections::HashMap, sync::Arc};
-use tokio::fs::File;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::Child;
 use tokio::process::Command;
-use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
-use tracing::error;
 
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
@@ -30,7 +25,6 @@ pub struct MinecraftChild {
     pub profile_relative_path: ProfilePathId,
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
-    pub output: SharedOutput,
     pub last_updated_playtime: DateTime<Utc>, // The last time we updated the playtime for the associated profile
 }
 
@@ -46,7 +40,6 @@ impl Children {
     #[tracing::instrument(skip(
         self,
         uuid,
-        log_path,
         mc_command,
         post_command,
         censor_strings
@@ -57,33 +50,12 @@ impl Children {
         &mut self,
         uuid: Uuid,
         profile_relative_path: ProfilePathId,
-        log_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Command to run after minecraft.
         censor_strings: HashMap<String, String>,
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
-        let mut child = mc_command.spawn().map_err(IOError::from)?;
-
-        // Create std watcher threads for stdout and stderr
-        let shared_output =
-            SharedOutput::build(&log_path, censor_strings).await?;
-        if let Some(child_stdout) = child.stdout.take() {
-            let stdout_clone = shared_output.clone();
-            tokio::spawn(async move {
-                if let Err(e) = stdout_clone.read_stdout(child_stdout).await {
-                    error!("Stdout process died with error: {}", e);
-                }
-            });
-        }
-        if let Some(child_stderr) = child.stderr.take() {
-            let stderr_clone = shared_output.clone();
-            tokio::spawn(async move {
-                if let Err(e) = stderr_clone.read_stderr(child_stderr).await {
-                    error!("Stderr process died with error: {}", e);
-                }
-            });
-        }
+        let child = mc_command.spawn().map_err(IOError::from)?;
 
         // Slots child into manager
         let pid = child.id().ok_or_else(|| {
@@ -115,7 +87,6 @@ impl Children {
             uuid,
             profile_relative_path,
             current_child,
-            output: shared_output,
             manager,
             last_updated_playtime,
         };
@@ -413,110 +384,5 @@ impl Children {
 impl Default for Children {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-// SharedOutput, a wrapper around a String that can be read from and written to concurrently
-// Designed to be used with ChildStdout and ChildStderr in a tokio thread to have a simple String storage for the output of a child process
-#[derive(Debug, Clone)]
-pub struct SharedOutput {
-    output: Arc<RwLock<String>>,
-    log_file: Arc<RwLock<File>>,
-    censor_strings: HashMap<String, String>,
-}
-
-impl SharedOutput {
-    async fn build(
-        log_file_path: &Path,
-        censor_strings: HashMap<String, String>,
-    ) -> crate::Result<Self> {
-        Ok(SharedOutput {
-            output: Arc::new(RwLock::new(String::new())),
-            log_file: Arc::new(RwLock::new(
-                File::create(log_file_path)
-                    .await
-                    .map_err(|e| IOError::with_path(e, log_file_path))?,
-            )),
-            censor_strings,
-        })
-    }
-
-    // Main entry function to a created SharedOutput, returns the log as a String
-    pub async fn get_output(&self) -> crate::Result<String> {
-        let output = self.output.read().await;
-        Ok(output.clone())
-    }
-
-    async fn read_stdout(
-        &self,
-        child_stdout: ChildStdout,
-    ) -> crate::Result<()> {
-        let mut buf_reader = BufReader::new(child_stdout);
-
-        let mut buf = Vec::new();
-        while buf_reader
-            .read_until(b'\n', &mut buf)
-            .await
-            .map_err(IOError::from)?
-            > 0
-        {
-            let line = String::from_utf8_lossy(&buf).to_string();
-            let val_line = self.censor_log(line);
-
-            {
-                let mut output = self.output.write().await;
-                output.push_str(&val_line);
-            }
-            {
-                let mut log_file = self.log_file.write().await;
-                log_file
-                    .write_all(val_line.as_bytes())
-                    .await
-                    .map_err(IOError::from)?;
-            }
-            buf.clear();
-        }
-        Ok(())
-    }
-
-    async fn read_stderr(
-        &self,
-        child_stderr: ChildStderr,
-    ) -> crate::Result<()> {
-        let mut buf_reader = BufReader::new(child_stderr);
-
-        let mut buf = Vec::new();
-        while buf_reader
-            .read_until(b'\n', &mut buf)
-            .await
-            .map_err(IOError::from)?
-            > 0
-        {
-            let line = String::from_utf8_lossy(&buf).to_string();
-            let val_line = self.censor_log(line);
-
-            {
-                let mut output = self.output.write().await;
-                output.push_str(&val_line);
-            }
-            {
-                let mut log_file = self.log_file.write().await;
-                log_file
-                    .write_all(val_line.as_bytes())
-                    .await
-                    .map_err(IOError::from)?;
-            }
-
-            buf.clear();
-        }
-        Ok(())
-    }
-
-    fn censor_log(&self, mut val: String) -> String {
-        for (find, replace) in &self.censor_strings {
-            val = val.replace(find, replace);
-        }
-
-        val
     }
 }

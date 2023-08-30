@@ -47,12 +47,6 @@ export async function get_all_running_profiles() {
   return await invoke('plugin:process|process_get_all_running_profiles')
 }
 
-/// Gets process stdout by UUID
-/// Returns String
-export async function get_output_by_uuid(uuid) {
-  return await invoke('plugin:process|process_get_output_by_uuid', { uuid })
-}
-
 /// Kills a process by UUID
 export async function kill_by_uuid(uuid) {
   return await invoke('plugin:process|process_kill_by_uuid', { uuid })
