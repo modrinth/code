@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Modrinth App
-Comment=Modrinth's future game launcher
+Comment=Modrinth's game launcher for creating and playing Modrinth projects
 Exec=modrinth-app
 Icon=com.modrinth.ModrinthApp
 Type=Application
