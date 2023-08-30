@@ -27,6 +27,11 @@ export async function create(name, gameVersion, modloader, loaderVersion, icon, 
   })
 }
 
+// duplicate a profile
+export async function duplicate(path) {
+  return await invoke('plugin:profile_create|profile_duplicate', { path })
+}
+
 // Remove a profile
 export async function remove(path) {
   return await invoke('plugin:profile|profile_remove', { path })

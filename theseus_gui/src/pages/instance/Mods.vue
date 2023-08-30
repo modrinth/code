@@ -306,6 +306,14 @@
       </DropdownButton>
     </div>
   </div>
+  <Pagination
+    v-if="projects.length > 0"
+    :page="currentPage"
+    :count="Math.ceil(search.length / 20)"
+    class="pagination-after"
+    :link-function="(page) => `?page=${page}`"
+    @switch-page="switchPage"
+  />
   <Modal ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
@@ -1165,5 +1173,9 @@ onUnmounted(() => {
   .selected {
     height: 2.5rem;
   }
+}
+
+.pagination-after {
+  margin-bottom: 5rem;
 }
 </style>

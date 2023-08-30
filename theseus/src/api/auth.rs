@@ -1,5 +1,9 @@
 //! Authentication flow interface
-use crate::{hydra::init::DeviceLoginSuccess, launcher::auth as inner, State};
+use crate::{
+    hydra::{self, init::DeviceLoginSuccess},
+    launcher::auth as inner,
+    State,
+};
 use chrono::Utc;
 
 use crate::state::AuthTask;
@@ -57,6 +61,14 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
         )
         .as_error());
     }
+
+    // Update player info from bearer token
+    let player_info = hydra::stages::player_info::fetch_info(&credentials.access_token).await.map_err(|_err| {
+        crate::ErrorKind::HydraError("No Minecraft account for profile. Make sure you own the game and have set a username through the official Minecraft launcher."
+    .to_string())
+    })?;
+
+    credentials.username = player_info.name;
     users.insert(&credentials).await?;
 
     Ok(credentials)

@@ -24,7 +24,7 @@ const unlistenOffline = await offline_listener((b) => {
   offline.value = b
 })
 
-const unlistenProfile = await profile_listener(async () => {
+const unlistenProfile = await profile_listener(async (e) => {
   const profiles = await list(true).catch(handleError)
   instances.value = Object.values(profiles)
 })

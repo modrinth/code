@@ -315,6 +315,17 @@
       </label>
       <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
     </div>
+    <div v-if="instance.install_stage == 'installed'" class="adjacent-input">
+      <label for="duplicate-profile">
+        <span class="label__title">Duplicate instance</span>
+        <span class="label__description">
+          Creates another copy of the instance, including saves, configs, mods, and everything.
+        </span>
+      </label>
+      <Button id="repair-profile" @click="duplicateProfile">
+        <ClipboardCopyIcon /> Duplicate
+      </Button>
+    </div>
     <div class="adjacent-input">
       <label for="repair-profile">
         <span class="label__title">Repair instance</span>
@@ -391,6 +402,7 @@ import {
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
 import {
+  duplicate,
   edit,
   edit_icon,
   get_optimal_jre_key,
@@ -585,6 +597,14 @@ const repairing = ref(false)
 
 async function unpairProfile() {
   unlinkModpack.value = true
+}
+
+async function duplicateProfile() {
+  await duplicate(props.instance.path).catch(handleError)
+  mixpanel_track('InstanceDuplicate', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
 }
 
 async function repairProfile() {

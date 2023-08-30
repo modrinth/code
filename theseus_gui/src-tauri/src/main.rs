@@ -13,6 +13,7 @@ mod error;
 mod macos;
 
 // Should be called in launcher initialization
+#[tracing::instrument(skip_all)]
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;

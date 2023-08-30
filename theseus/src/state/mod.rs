@@ -127,6 +127,10 @@ impl State {
             .await)
     }
 
+    pub fn initialized() -> bool {
+        LAUNCHER_STATE.initialized()
+    }
+
     #[tracing::instrument]
     #[theseus_macros::debug_pin]
     async fn initialize_state() -> crate::Result<RwLock<State>> {
@@ -239,11 +243,6 @@ impl State {
 
     /// Updates state with data from the web, if we are online
     pub fn update() {
-        tokio::task::spawn(Metadata::update());
-        tokio::task::spawn(Tags::update());
-        tokio::task::spawn(Profiles::update_projects());
-        tokio::task::spawn(Profiles::update_modrinth_versions());
-        tokio::task::spawn(CredentialsStore::update_creds());
         tokio::task::spawn(async {
             if let Ok(state) = crate::State::get().await {
                 if !*state.offline.read().await {

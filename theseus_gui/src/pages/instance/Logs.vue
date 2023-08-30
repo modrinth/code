@@ -20,6 +20,15 @@
           Share
         </Button>
         <Button
+          v-if="logs[selectedLogIndex] && logs[selectedLogIndex].live === true"
+          @click="clearLiveLog()"
+        >
+          <TrashIcon />
+          Clear
+        </Button>
+
+        <Button
+          v-else
           :disabled="!logs[selectedLogIndex] || logs[selectedLogIndex].live === true"
           color="danger"
           @click="deleteLog()"
@@ -202,6 +211,11 @@ const deleteLog = async () => {
     )
     await setLogs()
   }
+}
+
+const clearLiveLog = async () => {
+  currentLiveLog.value = ''
+  // does not reset cursor
 }
 
 function handleUserScroll() {

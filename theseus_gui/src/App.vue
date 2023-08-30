@@ -10,6 +10,7 @@ import {
   Button,
   Notifications,
   XIcon,
+  Card,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -21,7 +22,7 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
-import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
+import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
 import { isDev, getOS, isOffline } from '@/helpers/utils.js'
@@ -52,14 +53,17 @@ const showOnboarding = ref(false)
 
 const onboardingVideo = ref()
 
+const failureText = ref(null)
+const os = ref('')
+
 defineExpose({
   initialize: async () => {
     isLoading.value = false
     const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
       await get()
-    const os = await getOS()
     // video should play if the user is not on linux, and has not onboarded
-    videoPlaying.value = !fully_onboarded && os !== 'Linux'
+    os.value = await getOS()
+    videoPlaying.value = !fully_onboarded && os.value !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !fully_onboarded
@@ -98,6 +102,11 @@ defineExpose({
     if (showOnboarding.value) {
       onboardingVideo.value.play()
     }
+  },
+  failure: async (e) => {
+    isLoading.value = false
+    failureText.value = e
+    os.value = await getOS()
   },
 })
 
@@ -221,6 +230,44 @@ command_listener(async (e) => {
     autoplay
     @ended="videoPlaying = false"
   />
+  <div v-if="failureText" class="failure">
+    <div class="appbar-failure">
+      <Button icon-only @click="TauriWindow.getCurrent().close()">
+        <XIcon />
+      </Button>
+    </div>
+    <div class="error-view">
+      <Card class="error-text">
+        Modrinth App failed to load with the following error:
+
+        <div class="error-message">{{ failureText.message }}</div>
+
+        <div>This may be because of a corrupted file, or because it is missing crucial files.</div>
+        <div>
+          First, try ensuring you are connected to the internet, and then try restarting the app,
+        </div>
+        <div>so that any needed files can be downloaded.</div>
+        <div>
+          You can contact support here:
+          <span class="file-path-message">
+            <a href="https://discord.gg/modrinth" class="link">
+              <ChatIcon /> https://discord.gg/modrinth</a
+            ></span
+          >
+        </div>
+
+        <span>You can find more detailed launcher logs at: </span>
+        <div class="file-path-message">
+          <span v-if="os == 'MacOS'"
+            >~/Library/Application Support/com.modrinth.theseus/launcher_logs</span
+          >
+          <span v-if="os == 'Windows'">C:\Users\(you)\AppData\Roaming\com.modrinth.theseus</span>
+          <span v-if="os == 'Linux'">/home/(you)/.config/com.modrinth.theseus</span>
+        </div>
+      </Card>
+    </div>
+    <SplashScreen class="splash-view" />
+  </div>
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
   <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
@@ -401,6 +448,55 @@ command_listener(async (e) => {
       overflow-x: hidden;
       background-color: var(--color-bg);
     }
+  }
+}
+
+.failure {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #16181c;
+
+  .appbar-failure {
+    display: flex; /* Change to flex to align items horizontally */
+    justify-content: flex-end; /* Align items to the right */
+    height: 3.25rem;
+    //no select
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .error-view {
+    display: flex; /* Change to flex to align items horizontally */
+    justify-content: center;
+    width: 100%;
+
+    .error-text {
+      background-color: #ced2d9;
+      display: flex;
+      gap: 0.25rem;
+      flex-direction: column;
+
+      .error-message {
+        color: #8f0608;
+        text-align: center;
+        margin: 0.5rem;
+      }
+      .file-path-message {
+        color: #015c22;
+        text-align: center;
+        margin: 0.5rem;
+      }
+    }
+  }
+
+  .splash-view {
+    width: 100%;
+    overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    pointer-events: none;
   }
 }
 

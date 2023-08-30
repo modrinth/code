@@ -1,13 +1,13 @@
 //! Theseus profile management interface
 use crate::pack::install_from::CreatePackProfile;
 use crate::prelude::ProfilePathId;
-use crate::profile;
 use crate::state::LinkedData;
 use crate::util::io::{self, canonicalize};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     prelude::ModLoader,
 };
+use crate::{pack, profile, ErrorKind};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -152,6 +152,65 @@ pub async fn profile_create_from_creator(
         profile.no_watch,
     )
     .await
+}
+
+pub async fn profile_create_from_duplicate(
+    copy_from: ProfilePathId,
+) -> crate::Result<ProfilePathId> {
+    let profile = profile::get(&copy_from, None).await?.ok_or_else(|| {
+        ErrorKind::UnmanagedProfileError(copy_from.to_string())
+    })?;
+
+    let profile_path_id = profile_create(
+        profile.metadata.name,
+        profile.metadata.game_version,
+        profile.metadata.loader,
+        profile.metadata.loader_version.map(|it| it.id),
+        profile.metadata.icon,
+        profile.metadata.icon_url,
+        profile.metadata.linked_data,
+        Some(true),
+        Some(true),
+    )
+    .await?;
+
+    // Copy it over using the import system (essentially importing from the same profile)
+    let state = State::get().await?;
+    let bar = pack::import::copy_dotminecraft(
+        profile_path_id.clone(),
+        copy_from.get_full_path().await?,
+        &state.io_semaphore,
+        None,
+    )
+    .await?;
+
+    if let Some(profile_val) =
+        crate::api::profile::get(&profile_path_id, None).await?
+    {
+        crate::launcher::install_minecraft(&profile_val, Some(bar)).await?;
+        {
+            let state = State::get().await?;
+            let mut file_watcher = state.file_watcher.write().await;
+            Profile::watch_fs(
+                &profile_val.get_profile_full_path().await?,
+                &mut file_watcher,
+            )
+            .await?;
+        }
+
+        // emit profile edited
+        emit_profile(
+            profile_val.uuid,
+            &profile_val.profile_id(),
+            &profile_val.metadata.name,
+            ProfilePayloadType::Edited,
+        )
+        .await?;
+
+        State::sync().await?;
+    }
+
+    Ok(profile_path_id)
 }
 
 #[tracing::instrument]

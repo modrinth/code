@@ -51,8 +51,8 @@ pub struct Settings {
 impl Settings {
     #[tracing::instrument]
     pub async fn init(file: &Path) -> crate::Result<Self> {
-        if file.exists() {
-            fs::read(&file)
+        let settings = if file.exists() {
+            let loaded_settings = fs::read(&file)
                 .await
                 .map_err(|err| {
                     crate::ErrorKind::FSError(format!(
@@ -63,8 +63,23 @@ impl Settings {
                 .and_then(|it| {
                     serde_json::from_slice::<Settings>(&it)
                         .map_err(crate::Error::from)
-                })
+                });
+            // settings is corrupted. Back up the file and create a new one
+            if let Err(ref err) = loaded_settings {
+                tracing::error!("Failed to load settings file: {err}. ");
+                let backup_file = file.with_extension("json.bak");
+                tracing::error!("Corrupted settings file will be backed up as {}, and a new settings file will be created.", backup_file.display());
+                let _ = fs::rename(file, backup_file).await;
+            }
+            loaded_settings.ok()
         } else {
+            None
+        };
+
+        if let Some(settings) = settings {
+            Ok(settings)
+        } else {
+            // Create new settings file
             Ok(Self {
                 theme: Theme::Dark,
                 memory: MemorySettings::default(),
