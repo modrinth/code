@@ -312,7 +312,7 @@ pub async fn launch_minecraft(
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
-    post_exit_hook: Option<Command>,
+    post_exit_hook: Option<String>,
     profile: &Profile,
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
@@ -544,7 +544,7 @@ pub async fn launch_minecraft(
     // This also spawns the process and prepares the subsequent processes
     let mut state_children = state.children.write().await;
     state_children
-        .insert_process(
+        .insert_new_process(
             Uuid::new_v4(),
             profile.profile_id(),
             command,

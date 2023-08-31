@@ -17,8 +17,10 @@ mod macos;
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
-    State::get().await?;
+    let s = State::get().await?;
     State::update();
+
+    s.children.write().await.rescue_cache().await?;
     Ok(())
 }
 

@@ -184,7 +184,6 @@ impl State {
             creds_fut,
         }?;
 
-        let children = Children::new();
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
 
@@ -194,6 +193,8 @@ impl State {
             // Force add to avoid recursion
             let _ = discord_rpc.force_set_activity("Idling...", true).await;
         }
+
+        let children = Children::new();
 
         // Starts a loop of checking if we are online, and updating
         Self::offine_check_loop();

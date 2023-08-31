@@ -217,7 +217,6 @@ const selectProfile = (profile) => {
 
 const handleClickOutsideCard = (event) => {
   const elements = document.elementsFromPoint(event.clientX, event.clientY)
-  console.log('infoButton', infoButton.value)
   if (
     card.value &&
     card.value.$el !== event.target &&

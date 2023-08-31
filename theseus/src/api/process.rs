@@ -2,15 +2,12 @@
 
 use uuid::Uuid;
 
+use crate::state::{MinecraftChild, ProfilePathId};
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
     },
     State,
-};
-use crate::{
-    state::{MinecraftChild, ProfilePathId},
-    util::io::IOError,
 };
 
 // Gets whether a child process stored in the state by UUID has finished
@@ -26,7 +23,7 @@ pub async fn get_exit_status_by_uuid(
 ) -> crate::Result<Option<i32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    Ok(children.exit_status(uuid).await?.and_then(|f| f.code()))
+    children.exit_status(uuid).await
 }
 
 // Gets the UUID of each stored process in the state
@@ -104,13 +101,7 @@ pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
 // Kill a running child process directly
 #[tracing::instrument(skip(running))]
 pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
-    running
-        .current_child
-        .write()
-        .await
-        .kill()
-        .await
-        .map_err(IOError::from)?;
+    running.current_child.write().await.kill().await?;
     Ok(())
 }
 

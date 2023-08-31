@@ -840,23 +840,12 @@ pub async fn run_credentials(
         .unwrap_or(&settings.custom_env_args);
 
     // Post post exit hooks
-    let post_exit_hook =
-        &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
-
-    let post_exit_hook = if let Some(hook) = post_exit_hook {
-        let mut cmd = hook.split(' ');
-        if let Some(command) = cmd.next() {
-            let mut command = Command::new(command);
-            command
-                .args(&cmd.collect::<Vec<&str>>())
-                .current_dir(path.get_full_path().await?);
-            Some(command)
-        } else {
-            None
-        }
-    } else {
-        None
-    };
+    let post_exit_hook = profile
+        .hooks
+        .as_ref()
+        .unwrap_or(&settings.hooks)
+        .post_exit
+        .clone();
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];
