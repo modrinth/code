@@ -144,15 +144,19 @@ async function getLogs() {
     } else {
       let filename = log.filename.split('.')[0]
       let day = dayjs(filename.slice(0, 10))
-      if (day.isToday()) {
-        log.name = 'Today'
-      } else if (day.isYesterday()) {
-        log.name = 'Yesterday'
+      if (day.isValid()) {
+        if (day.isToday()) {
+          log.name = 'Today'
+        } else if (day.isYesterday()) {
+          log.name = 'Yesterday'
+        } else {
+          log.name = day.format('MMMM D, YYYY')
+        }
+        // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
+        log.name = log.name + filename.slice(10)
       } else {
-        log.name = day.format('MMMM D, YYYY')
+        log.name = filename
       }
-      // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
-      log.name = log.name + filename.slice(10)
     }
     log.stdout = 'Loading...'
     return log

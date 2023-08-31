@@ -91,9 +91,12 @@ pub async fn get_logs(
         for entry in std::fs::read_dir(&logs_folder)
             .map_err(|e| IOError::with_path(e, &logs_folder))?
         {
-            let entry =
+            let entry: std::fs::DirEntry =
                 entry.map_err(|e| IOError::with_path(e, &logs_folder))?;
             let path = entry.path();
+            if !path.is_file() {
+                continue;
+            }
             if let Some(file_name) = path.file_name() {
                 let file_name = file_name.to_string_lossy().to_string();
 
@@ -160,7 +163,7 @@ pub async fn get_output_by_filename(
                 result.push_str(&String::from_utf8_lossy(&contents));
             }
             return Ok(CensoredString::censor(result, &credentials));
-        } else {
+        } else if ext == "log" {
             let mut result = String::new();
             let mut contents = [0; 1024];
             let mut file = std::fs::File::open(&path)
@@ -176,9 +179,9 @@ pub async fn get_output_by_filename(
             return Ok(CensoredString::censor(result, &credentials));
         }
     }
-    Err(crate::ErrorKind::InputError(format!(
-        "File {} has no extension",
-        file_name
+    Err(crate::ErrorKind::OtherError(format!(
+        "File extension not supported: {}",
+        path.display()
     ))
     .into())
 }
