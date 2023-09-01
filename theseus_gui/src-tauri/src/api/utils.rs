@@ -96,14 +96,14 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
             use std::fs::metadata;
             use std::path::PathBuf;
 
-            if path.contains(',') {
+            if path.to_string_lossy().to_string().contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
                 let new_path = match metadata(&path)?.is_dir() {
                     true => path,
                     false => {
                         let mut path2 = PathBuf::from(path);
                         path2.pop();
-                        path2.to_string_lossy().to_string()
+                        path2
                     }
                 };
                 Command::new("xdg-open").arg(&new_path).spawn()?;
