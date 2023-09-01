@@ -733,7 +733,15 @@ impl Profiles {
                         None
                     }
                 };
+
                 if let Some(profile) = prof {
+                    // Clear out modrinth_logs of all files in profiles folder (these are legacy)
+                    // TODO: should be removed in a future build
+                    let modrinth_logs = path.join("modrinth_logs");
+                    if modrinth_logs.exists() {
+                        let _ = std::fs::remove_dir_all(modrinth_logs);
+                    }
+
                     let path = io::canonicalize(path)?;
                     Profile::watch_fs(&path, file_watcher).await?;
                     profiles.insert(profile.profile_id(), profile);

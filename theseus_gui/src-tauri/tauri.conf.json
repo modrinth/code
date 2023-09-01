@@ -64,7 +64,7 @@
       "identifier": "com.modrinth.theseus",
       "longDescription": "",
       "macOS": {
-        "entitlements": null,
+        "entitlements": "App.entitlements",
         "exceptionDomain": "",
         "frameworks": [],
         "providerShortName": null,
