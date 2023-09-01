@@ -151,6 +151,7 @@ pub async fn install_zipped_mrpack_files(
                 .map(Ok::<PackFile, crate::Error>),
             None,
             Some(&loading_bar),
+
             70.0,
             num_files,
             None,
@@ -182,15 +183,20 @@ pub async fn install_zipped_mrpack_files(
                     .await?;
                     drop(creds);
 
+                    // Convert windows path to unix path.
+                    // .mrpacks no longer generate windows paths, but this is here for backwards compatibility before this was fixed
+                    // https://github.com/modrinth/theseus/issues/595
+                    let project_path = project.path.replace("\\", "/");
+
                     let path =
-                        std::path::Path::new(&project.path).components().next();
+                        std::path::Path::new(&project_path).components().next();
                     if let Some(path) = path {
                         match path {
                             Component::CurDir | Component::Normal(_) => {
                                 let path = profile_path
                                     .get_full_path()
                                     .await?
-                                    .join(&project.path);
+                                    .join(&project_path);
                                 write(&path, &file, &state.io_semaphore)
                                     .await?;
                             }
