@@ -56,13 +56,12 @@
         <span class="no-wrap"> Add from file </span>
       </template>
     </DropdownButton>
-    <br>
     <div class="inline-option">
           <span>Show per page</span>
           <DropdownSelect
             v-model="maxResults"
             name="Max results"
-            :options="[5, 10, 15, 20, 50, 100]"
+            :options="dropdownPageOptions"
             :default-value="maxResults"
             :model-value="maxResults"
             class="limit-dropdown"
@@ -532,7 +531,7 @@ const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
-const maxResults = ref(20)
+
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -622,6 +621,24 @@ const updateSort = (projects) => {
       })
   }
 }
+
+const maxResults = ref(search.value.length < 20 ? search.value.length : 20);
+
+const dropdownPageOptions = computed(() => {
+  const baseOptions = [5, 10, 15, 20, 50, 100];
+  return [
+    ...baseOptions.filter(option => option <= search.value.length),
+    search.value.length
+  ];
+});
+
+watch(search, (newSearch) => {
+  if (newSearch.length < maxResults.value) {
+    maxResults.value = newSearch.length;
+  } else {
+    maxResults.value = 20;
+  }
+})
 
 const sortProjects = (filter) => {
   if (sortColumn.value === filter) {
