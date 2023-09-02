@@ -11,6 +11,7 @@
         maxlength="11"
         type="text"
         placeholder="Enter code..."
+        @keyup.enter="begin2FASignIn"
       />
 
       <button class="btn btn-primary continue-btn" @click="begin2FASignIn">
