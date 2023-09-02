@@ -43,10 +43,6 @@ const messages = defineMessages({
     id: 'settings.language.languages.load-failed',
     defaultMessage: 'Cannot load this language. Try again in a bit.',
   },
-  languageLabel: {
-    id: 'settings.language.languages.language-label',
-    defaultMessage: '{translatedName}. {displayName}',
-  },
   languageLabelApplying: {
     id: 'settings.language.languages.language-label-applying',
     defaultMessage: '{label}. Applying...',
@@ -275,10 +271,7 @@ function onItemClick(e: MouseEvent, locale: Locale) {
 function getItemLabel(locale: Locale) {
   const label = locale.auto
     ? formatMessage(messages.automaticLocale)
-    : formatMessage(messages.languageLabel, {
-        translatedName: locale.translatedName,
-        displayName: locale.displayName,
-      })
+    : `${locale.translatedName}. ${locale.displayName}`
 
   if ($changingTo.value === locale.tag) {
     return formatMessage(messages.languageLabelApplying, { label })
