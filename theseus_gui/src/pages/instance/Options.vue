@@ -191,7 +191,7 @@
       <Slider
         v-model="memory.maximum"
         :disabled="!overrideMemorySettings"
-        :min="64"
+        :min="8"
         :max="maxMemory"
         :step="1"
         unit="mb"

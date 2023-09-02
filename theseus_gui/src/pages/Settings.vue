@@ -388,7 +388,7 @@ async function refreshDir() {
         <Slider
           id="max-memory"
           v-model="settings.memory.maximum"
-          :min="64"
+          :min="8"
           :max="maxMemory"
           :step="1"
           unit="mb"
