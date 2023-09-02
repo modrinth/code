@@ -56,11 +56,24 @@
         <span class="no-wrap"> Add from file </span>
       </template>
     </DropdownButton>
+    <br>
+    <div class="inline-option">
+          <span>Show per page</span>
+          <DropdownSelect
+            v-model="maxResults"
+            name="Max results"
+            :options="[5, 10, 15, 20, 50, 100]"
+            :default-value="maxResults"
+            :model-value="maxResults"
+            class="limit-dropdown"
+            @change="updateMaxPagination"
+          />
+        </div>
   </Card>
   <Pagination
     v-if="projects.length > 0"
     :page="currentPage"
-    :count="Math.ceil(search.length / 20)"
+    :count="Math.ceil(search.length / maxResults)"
     class="pagination-before"
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
@@ -198,7 +211,7 @@
         </section>
       </div>
       <div
-        v-for="mod in search.slice((currentPage - 1) * 20, currentPage * 20)"
+        v-for="mod in search.slice((currentPage - 1) * maxResults, currentPage * maxResults)"
         :key="mod.file_name"
         class="table-row"
         @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
@@ -519,6 +532,7 @@ const shareModal = ref(null)
 const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
+const maxResults = ref(20)
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -835,6 +849,13 @@ const updateModpack = async () => {
   updatingModpack.value = false
 }
 
+const updateMaxPagination = async () => {
+  const max = Math.ceil(search.value.length / maxResults.value)
+  if (currentPage.value > max) {
+    currentPage.value = max
+  }
+}
+
 watch(selectAll, () => {
   for (const [key, value] of Array.from(selectionMap.value)) {
     if (value !== selectAll.value) {
@@ -941,6 +962,22 @@ onUnmounted(() => {
 
   .btn {
     height: 2.5rem;
+  }
+
+  .inline-option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    // width: 100%;
+
+    .sort-dropdown {
+      max-width: 12.25rem;
+    }
+
+    .limit-dropdown {
+      width: 5rem;
+    }
   }
 
   .dropdown-input {
