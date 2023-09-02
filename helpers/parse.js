@@ -25,6 +25,7 @@ export const configuredXss = new xss.FilterXSS({
     whiteList: {
       'image-rendering': /^pixelated$/,
       'text-align': /^center|left|right$/,
+      float: /^left|right$/,
     },
   },
   onIgnoreTagAttr: (tag, name, value) => {
