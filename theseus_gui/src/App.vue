@@ -366,6 +366,7 @@ command_listener((e) => {
 
   .view {
     width: calc(100% - var(--sidebar-width));
+    background-color: var(--color-raised-bg);
 
     .appbar {
       display: flex;
@@ -388,6 +389,7 @@ command_listener((e) => {
       overflow: auto;
       overflow-x: hidden;
       background-color: var(--color-bg);
+      border-top-left-radius: var(--radius-md);
     }
   }
 }
