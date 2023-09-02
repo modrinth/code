@@ -8,7 +8,10 @@
   >
     <Head>
       <Title>Search {{ $formatProjectType(projectType.display) }}s - Modrinth</Title>
-      <Meta name="og:title" :content="`Search ${$formatProjectType(projectType.display)}s`" />
+      <Meta
+        name="og:title"
+        :content="`Search ${$formatProjectType(projectType.display)}s ${query ? '| ' + query : ''}`"
+      />
       <Meta name="description" :content="metaDescription" />
       <Meta
         name="apple-mobile-web-app-title"
