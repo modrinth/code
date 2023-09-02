@@ -46,7 +46,7 @@
         </template>
         <div v-else class="universal-body">
           <p>You have no unread notifications.</p>
-          <nuxt-link class="iconified-button" to="/dashboard/notifications">
+          <nuxt-link class="iconified-button" to="/dashboard/notifications/history">
             <HistoryIcon /> View notification history
           </nuxt-link>
         </div>
