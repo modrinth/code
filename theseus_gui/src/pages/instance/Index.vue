@@ -67,10 +67,6 @@
             <FileIcon />
             Logs
           </RouterLink>
-          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/modpack`" class="btn">
-            <ModrinthIcon />
-            Modpack
-          </RouterLink>
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
             <SettingsIcon />
             Options
@@ -142,7 +138,6 @@ import {
   CheckCircleIcon,
   UpdatedIcon,
 } from 'omorphia'
-import { ModrinthIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,

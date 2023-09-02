@@ -298,6 +298,87 @@
       />
     </div>
   </Card>
+  <Card v-if="instance.metadata.linked_data">
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Modpack</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <label for="general-modpack-info">
+        <span class="label__description">
+          <strong>Modpack: </strong> {{ instance.metadata.name }}
+        </span>
+        <span class="label__description">
+          <strong>Version: </strong>
+          {{
+            installedVersionData.name.charAt(0).toUpperCase() + installedVersionData.name.slice(1)
+          }}
+        </span>
+      </label>
+    </div>
+    <div v-if="!instance.locked" class="adjacent-input">
+      <Card class="unlocked-instance">
+        This is an unlocked instance. There may be unexpected behaviour unintended by the modpack
+        creator.
+      </Card>
+    </div>
+    <div v-else class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Unlock instance</span>
+        <span class="label__description">
+          Allows modifications to the instance, which allows you to add projects to the modpack. The
+          pack will remain linked, and you can still change versions. Only mods listed in the
+          modpack will be modified on version changes.
+        </span>
+      </label>
+      <Button id="repair-profile" @click="unlockProfile"> <XIcon /> Unlock </Button>
+    </div>
+
+    <div class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Unpair instance</span>
+        <span class="label__description">
+          Removes the link to an external Modrinth modpack on the instance. This allows you to edit
+          modpacks you download through the browse page but you will not be able to update the
+          instance from a new version of a modpack if you do this.
+        </span>
+      </label>
+      <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
+    </div>
+
+    <div class="adjacent-input">
+      <label for="change-modpack-version">
+        <span class="label__title">Change modpack version</span>
+        <span class="label__description">
+          Changes to another version of the modpack, allowing upgrading or downgrading. This will
+          replace all files marked as relevant to the modpack.
+        </span>
+      </label>
+
+      <Button :disabled="inProgress || installing" @click="modpackVersionModal.show()">
+        <EditIcon />
+        Change modpack version
+      </Button>
+    </div>
+    <div class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Reinstall modpack</span>
+        <span class="label__description">
+          Removes all projects and reinstalls Modrinth modpack. Use this to fix unexpected behaviour
+          if your instance is diverging from the Modrinth modpack. This also re-locks the instance.
+        </span>
+      </label>
+      <Button
+        id="repair-profile"
+        color="highlight"
+        :disabled="installing || inProgress || offline"
+        @click="repairModpack"
+      >
+        <DownloadIcon /> Reinstall
+      </Button>
+    </div>
+  </Card>
   <Card>
     <div class="label">
       <h3>
@@ -311,7 +392,11 @@
           Creates another copy of the instance, including saves, configs, mods, and everything.
         </span>
       </label>
-      <Button id="repair-profile" @click="duplicateProfile">
+      <Button
+        id="repair-profile"
+        :disabled:="installing || inProgress || offline"
+        @click="duplicateProfile"
+      >
         <ClipboardCopyIcon /> Duplicate
       </Button>
     </div>
@@ -326,7 +411,7 @@
       <Button
         id="repair-profile"
         color="highlight"
-        :disabled="repairing || offline"
+        :disabled="installing || inProgress || repairing || offline"
         @click="repairProfile"
       >
         <HammerIcon /> Repair
@@ -350,6 +435,12 @@
       </Button>
     </div>
   </Card>
+  <ModpackVersionModal
+    v-if="instance.metadata.linked_data"
+    ref="modpackVersionModal"
+    :instance="instance"
+    :versions="props.versions"
+  />
 </template>
 
 <script setup>
@@ -381,6 +472,7 @@ import {
   install,
   list,
   remove,
+  update_repair_modrinth,
 } from '@/helpers/profile.js'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
@@ -398,6 +490,7 @@ import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
+import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 
 const router = useRouter()
 
@@ -410,6 +503,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  versions: {
+    type: Array,
+    required: true,
+  },
 })
 
 const themeStore = useTheming()
@@ -417,6 +514,8 @@ const themeStore = useTheming()
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
 const groups = ref(props.instance.metadata.groups)
+
+const modpackVersionModal = ref(null)
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
@@ -478,6 +577,13 @@ const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 const fullscreenSetting = ref(!!props.instance.fullscreen)
 
 const unlinkModpack = ref(false)
+
+const inProgress = ref(false)
+const installing = computed(() => props.instance.install_stage !== 'installed')
+const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
+const installedVersionData = computed(() =>
+  props.versions.find((version) => version.id === installedVersion.value)
+)
 
 watch(
   [
@@ -578,6 +684,32 @@ async function repairProfile() {
   repairing.value = true
   await install(props.instance.path).catch(handleError)
   repairing.value = false
+
+  mixpanel_track('InstanceRepair', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
+}
+
+async function unpairProfile() {
+  const editProfile = props.instance
+  editProfile.metadata.linked_data = null
+  editProfile.locked = false
+  await edit(props.instance.path, editProfile)
+  installedVersion.value = null
+  installedVersionData.value = null
+}
+
+async function unlockProfile() {
+  const editProfile = props.instance
+  editProfile.locked = false
+  await edit(props.instance.path, editProfile)
+}
+
+async function repairModpack() {
+  inProgress.value = true
+  await update_repair_modrinth(props.instance.path).catch(handleError)
+  inProgress.value = false
 
   mixpanel_track('InstanceRepair', {
     loader: props.instance.metadata.loader,
@@ -747,5 +879,10 @@ async function saveGvLoaderEdits() {
 
 :deep(button.checkbox) {
   border: none;
+}
+
+.unlocked-instance {
+  background-color: var(--color-gray);
+  color: black;
 }
 </style>

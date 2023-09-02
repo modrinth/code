@@ -35,6 +35,10 @@
       <UpdatedIcon />
       {{ updatingModpack ? 'Updating' : 'Update modpack' }}
     </Button>
+    <Button v-else @click="exportModal.show()">
+      <PackageIcon />
+      Export modpack
+    </Button>
     <Button v-if="!isPackLocked && projects.some((m) => m.outdated)" @click="updateAll">
       <UpdatedIcon />
       Update all
@@ -354,6 +358,7 @@
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
   />
+  <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
 </template>
 <script setup>
 import {
@@ -399,7 +404,8 @@ import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { highlightModInProfile } from '@/helpers/utils.js'
-import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage } from '@/assets/icons'
+import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
+import ExportModal from '@/components/ui/ExportModal.vue'
 
 const router = useRouter()
 
@@ -433,6 +439,7 @@ const isPackLocked = computed(() => {
 const canUpdatePack = computed(() => {
   return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
 })
+const exportModal = ref(null)
 
 const initProjects = (initInstance) => {
   projects.value = []

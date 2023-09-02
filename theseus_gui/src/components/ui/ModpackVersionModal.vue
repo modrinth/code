@@ -1,0 +1,460 @@
+<script setup>
+import { Button, Modal, formatNumber, CheckIcon } from 'omorphia'
+import { computed, ref, watch } from 'vue'
+import { useTheming } from '@/store/theme'
+import { update_managed_modrinth_version } from '@/helpers/profile'
+import { releaseColor } from '@/helpers/utils'
+import { SwapIcon } from '@/assets/icons/index.js'
+import Multiselect from 'vue-multiselect'
+
+const props = defineProps({
+  versions: {
+    type: Array,
+    required: true,
+  },
+  instance: {
+    type: Object,
+    default: null,
+  },
+})
+
+defineExpose({
+  show: () => {
+    modpackVersionModal.value.show()
+  },
+})
+
+const filterVersions = ref([])
+const filterLoader = ref(props.instance ? [props.instance?.metadata?.loader] : [])
+const filterGameVersions = ref(props.instance ? [props.instance?.metadata?.game_version] : [])
+
+const currentPage = ref(1)
+
+const clearFilters = () => {
+  filterVersions.value = []
+  filterLoader.value = []
+  filterGameVersions.value = []
+}
+
+const filteredVersions = computed(() => {
+  return props.versions.filter(
+    (projectVersion) =>
+      (filterGameVersions.value.length === 0 ||
+        filterGameVersions.value.some((gameVersion) =>
+          projectVersion.game_versions.includes(gameVersion)
+        )) &&
+      (filterLoader.value.length === 0 ||
+        filterLoader.value.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (filterVersions.value.length === 0 ||
+        filterVersions.value.includes(projectVersion.version_type))
+  )
+})
+
+const modpackVersionModal = ref(null)
+const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
+
+const installedVersionData = computed(() =>
+  filteredVersions.value.find((version) => version.id === installedVersion.value)
+)
+const installing = computed(() => props.instance.install_stage !== 'installed')
+const inProgress = ref(false)
+
+const themeStore = useTheming()
+
+const switchVersion = async (versionId) => {
+  inProgress.value = true
+  await update_managed_modrinth_version(props.instance.path, versionId)
+  inProgress.value = false
+}
+
+function switchPage(page) {
+  currentPage.value = page
+}
+
+//watch all the filters and if a value changes, reset to page 1
+watch([filterVersions, filterLoader, filterGameVersions], () => {
+  currentPage.value = 1
+})
+</script>
+
+<template>
+  <Modal
+    ref="modpackVersionModal"
+    class="export-modal"
+    header="Modpack version"
+    :noblur="!themeStore.advancedRendering"
+  >
+    <div class="modal-body">
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header"
+            >{{ instance.metadata.name }} -
+            {{
+              installedVersionData.name.charAt(0).toUpperCase() + installedVersionData.name.slice(1)
+            }}</span
+          >
+        </h3>
+      </div>
+
+      <Card v-if="instance.metadata.linked_data" class="filter-header">
+        <div class="manage">
+          <multiselect
+            v-model="filterLoader"
+            :options="
+              versions
+                .flatMap((value) => value.loaders)
+                .filter((value, index, self) => self.indexOf(value) === index)
+            "
+            :multiple="true"
+            :searchable="true"
+            :show-no-results="false"
+            :close-on-select="false"
+            :clear-search-on-select="false"
+            :show-labels="false"
+            :selectable="() => versions.length <= 6"
+            placeholder="Filter loader..."
+            :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
+          />
+          <multiselect
+            v-model="filterGameVersions"
+            :options="
+              versions
+                .flatMap((value) => value.game_versions)
+                .filter((value, index, self) => self.indexOf(value) === index)
+            "
+            :multiple="true"
+            :searchable="true"
+            :show-no-results="false"
+            :close-on-select="false"
+            :clear-search-on-select="false"
+            :show-labels="false"
+            :selectable="() => versions.length <= 6"
+            placeholder="Filter versions..."
+            :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
+          />
+          <multiselect
+            v-model="filterVersions"
+            :options="
+              versions
+                .map((value) => value.version_type)
+                .filter((value, index, self) => self.indexOf(value) === index)
+            "
+            :multiple="true"
+            :searchable="true"
+            :show-no-results="false"
+            :close-on-select="false"
+            :clear-search-on-select="false"
+            :show-labels="false"
+            :selectable="() => versions.length <= 6"
+            placeholder="Filter release channel..."
+            :custom-label="(option) => option.charAt(0).toUpperCase() + option.slice(1)"
+          />
+        </div>
+        <Button
+          class="no-wrap clear-filters"
+          :disabled="
+            filterVersions.length === 0 &&
+            filterLoader.length === 0 &&
+            filterGameVersions.length === 0
+          "
+          :action="clearFilters"
+        >
+          <ClearIcon />
+          Clear filters
+        </Button>
+      </Card>
+      <Pagination
+        v-if="instance.metadata.linked_data"
+        :page="currentPage"
+        :count="Math.ceil(filteredVersions.length / 20)"
+        class="pagination-before"
+        :link-function="(page) => `?page=${page}`"
+        @switch-page="switchPage"
+      />
+      <Card v-if="instance.metadata.linked_data" class="mod-card">
+        <div class="table">
+          <div class="table-row with-columns table-head">
+            <div class="table-cell table-text download-cell" />
+            <div class="name-cell table-cell table-text">Name</div>
+            <div class="table-cell table-text">Supports</div>
+            <div class="table-cell table-text">Stats</div>
+          </div>
+          <div
+            v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
+            :key="version.id"
+            class="table-row with-columns selectable"
+            @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
+          >
+            <div class="table-cell table-text">
+              <Button
+                :color="version.id === installedVersion ? '' : 'primary'"
+                icon-only
+                :disabled="inProgress || installing || version.id === installedVersion"
+                @click.stop="() => switchVersion(version.id)"
+              >
+                <SwapIcon v-if="version.id !== installedVersion" />
+                <CheckIcon v-else />
+              </Button>
+            </div>
+            <div class="name-cell table-cell table-text">
+              <div class="version-link">
+                {{ version.name.charAt(0).toUpperCase() + version.name.slice(1) }}
+                <div class="version-badge">
+                  <div class="channel-indicator">
+                    <Badge
+                      :color="releaseColor(version.version_type)"
+                      :type="
+                        version.version_type.charAt(0).toUpperCase() + version.version_type.slice(1)
+                      "
+                    />
+                  </div>
+                  <div>
+                    {{ version.version_number }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="table-cell table-text stacked-text">
+              <span>
+                {{
+                  version.loaders
+                    .map((str) => str.charAt(0).toUpperCase() + str.slice(1))
+                    .join(', ')
+                }}
+              </span>
+              <span>
+                {{ version.game_versions.join(', ') }}
+              </span>
+            </div>
+            <div class="table-cell table-text stacked-text">
+              <div>
+                <span> Published on </span>
+                <strong>
+                  {{
+                    new Date(version.date_published).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  }}
+                </strong>
+              </div>
+              <div>
+                <strong>
+                  {{ formatNumber(version.downloads) }}
+                </strong>
+                <span> Downloads </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </Modal>
+</template>
+
+<style scoped lang="scss">
+.filter-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+// .table-row {
+//   grid-template-columns: min-content 1fr 1fr 1.5fr;
+//   // background-color: red;
+//   // color: red;
+// }
+
+.with-columns {
+  grid-template-columns: min-content 1fr 1fr 1.5fr;
+}
+
+.manage {
+  display: flex;
+  gap: 0.5rem;
+  flex-grow: 1;
+
+  .multiselect {
+    flex-grow: 1;
+  }
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-raised-bg);
+}
+
+.mod-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.text-combo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.select {
+  width: 100% !important;
+  max-width: 20rem;
+}
+
+.version-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .version-badge {
+    display: flex;
+    flex-wrap: wrap;
+
+    .channel-indicator {
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+.stacked-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+.download-cell {
+  width: 4rem;
+  padding: 1rem;
+}
+
+.filter-checkbox {
+  :deep(.checkbox) {
+    border: none;
+  }
+}
+
+.unlocked-instance {
+  background-color: var(--color-gray);
+  color: black;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--gap-sm);
+  align-items: center;
+}
+
+.modal-body {
+  padding: var(--gap-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+.labeled_input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+
+  p {
+    margin: 0;
+  }
+}
+
+.select-checkbox {
+  gap: var(--gap-sm);
+
+  button.checkbox {
+    border: none;
+  }
+
+  &.dropdown {
+    margin-left: auto;
+  }
+}
+
+.table-content {
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+.table {
+  border: 1px solid var(--color-bg);
+}
+
+.file-entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.file-primary {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.file-secondary {
+  margin-left: var(--gap-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  height: 100%;
+  vertical-align: center;
+}
+
+.file-secondary-row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.push-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+.row-wise {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.textarea-wrapper {
+  // margin-top: 1rem;
+  height: 12rem;
+  textarea {
+    max-height: 12rem;
+  }
+  .preview {
+    overflow-y: auto;
+  }
+}
+
+.input-widen {
+  // stretch across space
+  flex-grow: 1;
+}
+
+//deep export-modal->modal-container->modal-body
+// this code gets those in the deep to make it wider:
+// uses a deep selector to get the modal-body
+.export-modal {
+  :deep(.modal-container .modal-body) {
+    width: 60rem;
+  }
+}
+</style>
