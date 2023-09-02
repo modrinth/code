@@ -373,7 +373,6 @@ command_listener((e) => {
       align-items: center;
       flex-grow: 1;
       background: var(--color-raised-bg);
-      box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
       text-align: center;
       padding: var(--gap-md);
       height: 3.25rem;
@@ -389,7 +388,7 @@ command_listener((e) => {
       overflow: auto;
       overflow-x: hidden;
       background-color: var(--color-bg);
-      border-top-left-radius: var(--radius-md);
+      border-top-left-radius: var(--radius-xl);
     }
   }
 }
