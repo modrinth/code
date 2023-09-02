@@ -263,12 +263,6 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   margin-bottom: 0.5rem;
 }
 
-// .table-row {
-//   grid-template-columns: min-content 1fr 1fr 1.5fr;
-//   // background-color: red;
-//   // color: red;
-// }
-
 .with-columns {
   grid-template-columns: min-content 1fr 1fr 1.5fr;
 }
@@ -298,17 +292,6 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   margin-top: 0.5rem;
 }
 
-.text-combo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.select {
-  width: 100% !important;
-  max-width: 20rem;
-}
-
 .version-link {
   display: flex;
   flex-direction: column;
@@ -336,25 +319,6 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   padding: 1rem;
 }
 
-.filter-checkbox {
-  :deep(.checkbox) {
-    border: none;
-  }
-}
-
-.unlocked-instance {
-  background-color: var(--color-gray);
-  color: black;
-}
-
-.button-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: var(--gap-sm);
-  align-items: center;
-}
-
 .modal-body {
   padding: var(--gap-xl);
   display: flex;
@@ -362,91 +326,8 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   gap: var(--gap-md);
 }
 
-.labeled_input {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-sm);
-
-  p {
-    margin: 0;
-  }
-}
-
-.select-checkbox {
-  gap: var(--gap-sm);
-
-  button.checkbox {
-    border: none;
-  }
-
-  &.dropdown {
-    margin-left: auto;
-  }
-}
-
-.table-content {
-  max-height: 18rem;
-  overflow-y: auto;
-}
-
 .table {
   border: 1px solid var(--color-bg);
-}
-
-.file-entry {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-sm);
-}
-
-.file-primary {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-sm);
-}
-
-.file-secondary {
-  margin-left: var(--gap-xl);
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-sm);
-  height: 100%;
-  vertical-align: center;
-}
-
-.file-secondary-row {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-sm);
-}
-
-.push-right {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-}
-.row-wise {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.textarea-wrapper {
-  // margin-top: 1rem;
-  height: 12rem;
-  textarea {
-    max-height: 12rem;
-  }
-  .preview {
-    overflow-y: auto;
-  }
-}
-
-.input-widen {
-  // stretch across space
-  flex-grow: 1;
 }
 
 //deep export-modal->modal-container->modal-body
