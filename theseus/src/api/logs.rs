@@ -252,6 +252,14 @@ pub async fn get_latest_log_cursor(
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
     let path = logs_folder.join("latest.log");
+    if !path.exists() {
+        // Allow silent failure if latest.log doesn't exist (as the instance may have been launched, but not yet created the file)
+        return Ok(LatestLogCursor {
+            cursor: 0,
+            new_file: false,
+            output: CensoredString("".to_string()),
+        });
+    }
 
     let mut file = File::open(&path)
         .await

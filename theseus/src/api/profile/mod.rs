@@ -8,7 +8,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
-use crate::state::{ProjectMetadata, SideType};
+use crate::state::{ProfileExportCache, ProjectMetadata, SideType};
 
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
@@ -572,6 +572,8 @@ pub async fn export_mrpack(
     export_path: PathBuf,
     included_overrides: Vec<String>, // which folders to include in the overrides
     version_id: Option<String>,
+    description: Option<String>,
+    name: Option<String>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let io_semaphore = state.io_semaphore.0.read().await;
@@ -582,6 +584,18 @@ pub async fn export_mrpack(
             profile_path
         ))
     })?;
+
+    // cache results in profile for next export
+    crate::profile::edit(profile_path, |profile| {
+        profile.export_cache = ProfileExportCache {
+            name: name.clone(),
+            description: description.clone(),
+            version: version_id.clone(),
+            overrides: included_overrides.clone(),
+        };
+        async { Ok(()) }
+    })
+    .await?;
 
     // remove .DS_Store files from included_overrides
     let included_overrides = included_overrides
@@ -605,7 +619,8 @@ pub async fn export_mrpack(
 
     // Create mrpack json configuration file
     let version_id = version_id.unwrap_or("1.0.0".to_string());
-    let packfile = create_mrpack_json(&profile, version_id).await?;
+    let packfile =
+        create_mrpack_json(&profile, version_id, description).await?;
     let modrinth_path_list = get_modrinth_pack_list(&packfile);
 
     // Build vec of all files in the folder
@@ -713,7 +728,7 @@ pub async fn get_potential_override_folders(
             ))
         })?;
     // dummy mrpack to get pack list
-    let mrpack = create_mrpack_json(&profile, "0".to_string()).await?;
+    let mrpack = create_mrpack_json(&profile, "0".to_string(), None).await?;
     let mrpack_files = get_modrinth_pack_list(&mrpack);
 
     let mut path_list: Vec<PathBuf> = Vec::new();
@@ -950,6 +965,7 @@ fn get_modrinth_pack_list(packfile: &PackFormat) -> Vec<String> {
 pub async fn create_mrpack_json(
     profile: &Profile,
     version_id: String,
+    description: Option<String>,
 ) -> crate::Result<PackFormat> {
     // Add loader version to dependencies
     let mut dependencies = HashMap::new();
@@ -1052,7 +1068,7 @@ pub async fn create_mrpack_json(
         format_version: 1,
         version_id,
         name: profile.metadata.name.clone(),
-        summary: None,
+        summary: description,
         files,
         dependencies,
     })

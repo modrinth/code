@@ -38,13 +38,34 @@
         </Button>
       </div>
     </div>
+    <div class="button-row">
+      <input
+        id="text-filter"
+        v-model="searchFilter"
+        autocomplete="off"
+        type="text"
+        class="text-filter"
+        placeholder="Type to filter logs..."
+      />
+      <div class="filter-group">
+        <SearchFilter
+          v-for="level in levels"
+          :key="level"
+          :active-filters="levelFilters"
+          :display-name="level"
+          :facet-name="level.toLowerCase()"
+          class="filter-checkbox"
+          @toggle="toggleLevelFilter"
+        />
+      </div>
+    </div>
     <div ref="logContainer" class="log-text">
       <span
-        v-for="(line, index) in logs[selectedLogIndex]?.stdout.split('\n')"
+        v-for="(processedLine, index) in processedLogs.filter((l) => shouldDisplay(l))"
         :key="index"
-        class="no-wrap"
+        :class="processedLine.class"
       >
-        {{ line }} <br />
+        {{ processedLine.line }}<br />
       </span>
     </div>
     <ShareModal
@@ -65,6 +86,7 @@ import {
   ClipboardCopyIcon,
   DropdownSelect,
   ShareIcon,
+  SearchFilter,
   TrashIcon,
   ShareModal,
 } from 'omorphia'
@@ -74,7 +96,7 @@ import {
   get_output_by_filename,
   get_latest_log_cursor,
 } from '@/helpers/logs.js'
-import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
@@ -98,10 +120,15 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  playing: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const currentLiveLog = ref(null)
 const currentLiveLogCursor = ref(0)
+const emptyText = ['No live game detected.', 'Start your game to proceed']
 
 const logs = ref([])
 await setLogs()
@@ -114,12 +141,73 @@ const userScrolled = ref(false)
 const isAutoScrolling = ref(false)
 const shareModal = ref(null)
 
+const levels = ['Fatal', 'Error', 'Warn', 'Info', 'Debug', 'Trace']
+const levelFilters = ref(levels.map((level) => level.toLowerCase()))
+const searchFilter = ref('')
+
+function toggleLevelFilter(filter) {
+  const index = levelFilters.value.indexOf(filter)
+  if (index === -1) {
+    levelFilters.value.push(filter)
+  } else {
+    levelFilters.value.splice(index, 1)
+  }
+}
+function shouldDisplay(line) {
+  if (line.forceShow) {
+    return true
+  }
+  if (!levelFilters.value.includes(line.level.toLowerCase())) {
+    return false
+  }
+  if (searchFilter.value !== '') {
+    if (!line.line.toLowerCase().includes(searchFilter.value.toLowerCase())) {
+      return false
+    }
+  }
+  return true
+}
+
+const processedLogs = computed(() => {
+  const lines = logs.value[selectedLogIndex.value]?.stdout.split('\n') || []
+  const processed = []
+  let currentClass = ''
+  const regex = /\[(\d{2}:\d{2}:\d{2})\] \[.*\/([a-zA-Z]+)\]/
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const match = line.match(regex)
+    let level = ''
+    let timestamp = ''
+    if (match) {
+      timestamp = match[1] // Captured timestamp
+      level = match[2] // Captured log level, could be any alphabetic string
+      if (level === 'WARN') {
+        currentClass = 'yellow-color'
+      } else if (level === 'ERROR' || level === 'FATAL') {
+        currentClass = 'red-color'
+      } else if (level === 'INFO' || level === 'DEBUG' || level === 'TRACE') {
+        currentClass = ''
+      }
+    }
+
+    let forceShow = false
+    if (!match && emptyText.includes(line) && selectedLogIndex.value === 0) {
+      forceShow = true
+    }
+
+    processed.push({ line, class: currentClass + ' no-wrap', timestamp, level, forceShow })
+  }
+
+  return processed
+})
+
 async function getLiveLog() {
   if (route.params.id) {
     const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
     let returnValue
     if (uuids.length === 0) {
-      returnValue = 'No live game detected. \nStart your game to proceed'
+      returnValue = emptyText.join('\n')
     } else {
       const logCursor = await get_latest_log_cursor(
         props.instance.path,
@@ -203,7 +291,11 @@ watch(selectedLogIndex, async (newIndex) => {
 })
 
 if (logs.value.length >= 1) {
-  selectedLogIndex.value = 1
+  if (props.playing) {
+    selectedLogIndex.value = 0
+  } else {
+    selectedLogIndex.value = 1
+  }
 }
 
 const deleteLog = async () => {
@@ -315,5 +407,28 @@ onUnmounted(() => {
   .no-wrap {
     white-space: pre;
   }
+}
+
+.red-color {
+  color: red;
+}
+.yellow-color {
+  color: yellow;
+}
+.filter-checkbox {
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+
+  svg {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+  }
+}
+.filter-group {
+  display: flex;
+  padding: 0.6rem;
+  flex-direction: row;
+  gap: 0.5rem;
 }
 </style>

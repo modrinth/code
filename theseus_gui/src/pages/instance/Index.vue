@@ -67,6 +67,10 @@
             <FileIcon />
             Logs
           </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/modpack`" class="btn">
+            <ModrinthIcon />
+            Modpack
+          </RouterLink>
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
             <SettingsIcon />
             Options
@@ -84,6 +88,9 @@
               :instance="instance"
               :options="options"
               :offline="offline"
+              :playing="playing"
+              :versions="modrinthVersions"
+              :installed="instance.install_stage !== 'installed'"
             ></component>
           </Suspense>
         </template>
@@ -135,6 +142,7 @@ import {
   CheckCircleIcon,
   UpdatedIcon,
 } from 'omorphia'
+import { ModrinthIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
@@ -149,6 +157,7 @@ import { isOffline, showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { useFetch } from '@/helpers/fetch'
 
 const route = useRoute()
 
@@ -195,6 +204,15 @@ const checkProcess = async () => {
 
   playing.value = false
   uuid.value = null
+}
+
+// Get information on associated modrinth versions, if any
+const modrinthVersions = ref([])
+if (instance.value.metadata.linked_data) {
+  modrinthVersions.value = await useFetch(
+    `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
+    'project'
+  )
 }
 
 await checkProcess()

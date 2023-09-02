@@ -52,7 +52,7 @@ pub async fn install_zipped_mrpack(
     };
 
     // Install pack files, and if it fails, fail safely by removing the profile
-    let result = install_zipped_mrpack_files(create_pack).await;
+    let result = install_zipped_mrpack_files(create_pack, false).await;
 
     // Check existing managed packs for potential updates
     tokio::task::spawn(Profiles::update_modrinth_versions());
@@ -72,6 +72,7 @@ pub async fn install_zipped_mrpack(
 #[theseus_macros::debug_pin]
 pub async fn install_zipped_mrpack_files(
     create_pack: CreatePack,
+    ignore_lock: bool,
 ) -> crate::Result<ProfilePathId> {
     let state = &State::get().await?;
 
@@ -126,6 +127,7 @@ pub async fn install_zipped_mrpack_files(
             &description,
             &pack.name,
             &pack.dependencies,
+            ignore_lock,
         )
         .await?;
 
@@ -151,7 +153,6 @@ pub async fn install_zipped_mrpack_files(
                 .map(Ok::<PackFile, crate::Error>),
             None,
             Some(&loading_bar),
-
             70.0,
             num_files,
             None,
@@ -186,7 +187,7 @@ pub async fn install_zipped_mrpack_files(
                     // Convert windows path to unix path.
                     // .mrpacks no longer generate windows paths, but this is here for backwards compatibility before this was fixed
                     // https://github.com/modrinth/theseus/issues/595
-                    let project_path = project.path.replace("\\", "/");
+                    let project_path = project.path.replace('\\', "/");
 
                     let path =
                         std::path::Path::new(&project_path).components().next();

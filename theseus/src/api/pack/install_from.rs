@@ -313,6 +313,7 @@ pub async fn set_profile_information(
     description: &CreatePackDescription,
     backup_name: &str,
     dependencies: &HashMap<PackDependency, String>,
+    ignore_lock: bool, // do not change locked status
 ) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
@@ -371,6 +372,13 @@ pub async fn set_profile_information(
             project_id: description.project_id.clone(),
             version_id: description.version_id.clone(),
         });
+
+        if !ignore_lock {
+            prof.locked = Some(
+                description.project_id.is_some()
+                    && description.version_id.is_some(),
+            );
+        }
         prof.metadata.icon = description.icon.clone();
         prof.metadata.game_version = game_version.clone();
         prof.metadata.loader_version = loader_version.clone();

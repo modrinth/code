@@ -167,6 +167,11 @@ pub struct Profile {
     pub projects: HashMap<ProjectPathId, Project>,
     #[serde(default)]
     pub modrinth_update_version: Option<String>,
+    #[serde(default)]
+    pub locked: Option<bool>,
+
+    #[serde(default)]
+    pub export_cache: ProfileExportCache,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -204,6 +209,14 @@ pub struct ProfileMetadata {
 pub struct LinkedData {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+pub struct ProfileExportCache {
+    pub name: Option<String>,
+    pub version: Option<String>,
+    pub overrides: Vec<String>,
+    pub description: Option<String>,
 }
 
 #[derive(
@@ -293,6 +306,8 @@ impl Profile {
             fullscreen: None,
             hooks: None,
             modrinth_update_version: None,
+            locked: None,
+            export_cache: ProfileExportCache::default(),
         })
     }
 
@@ -734,12 +749,25 @@ impl Profiles {
                     }
                 };
 
-                if let Some(profile) = prof {
+                if let Some(mut profile) = prof {
                     // Clear out modrinth_logs of all files in profiles folder (these are legacy)
                     // TODO: should be removed in a future build
                     let modrinth_logs = path.join("modrinth_logs");
                     if modrinth_logs.exists() {
                         let _ = std::fs::remove_dir_all(modrinth_logs);
+                    }
+
+                    // For profiles that have locked = None, we assume a legacy profile that hasn't been set yet
+                    if profile.locked.is_none() {
+                        if let Some(ref linked_data) =
+                            profile.metadata.linked_data
+                        {
+                            // If there is a linked project and version, then we assume the profile is locked, as edits have been previously forbidden
+                            profile.locked = Some(
+                                linked_data.project_id.is_some()
+                                    && linked_data.version_id.is_some(),
+                            );
+                        }
                     }
 
                     let path = io::canonicalize(path)?;

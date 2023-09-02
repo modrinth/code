@@ -6,7 +6,7 @@ use crate::{
     pack::{self, install_from::generate_pack_from_version_id},
     prelude::{ProfilePathId, ProjectPathId},
     profile::get,
-    state::Project,
+    state::{ProfileInstallStage, Project},
     State,
 };
 use futures::try_join;
@@ -14,8 +14,9 @@ use futures::try_join;
 /// Updates a managed modrinth pack to the cached latest version found in 'modrinth_update_version'
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn update_managed_modrinth(
+pub async fn update_managed_modrinth_version(
     profile_path: &ProfilePathId,
+    new_version_id: &String,
 ) -> crate::Result<()> {
     let profile = get(profile_path, None).await?.ok_or_else(|| {
         crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
@@ -39,19 +40,14 @@ pub async fn update_managed_modrinth(
     let version_id =
         linked_data.version_id.as_ref().ok_or_else(unmanaged_err)?;
 
-    // extract modrinth_update_version, returning Ok(()) if it is none
-    let modrinth_update_version = match profile.modrinth_update_version {
-        Some(ref x) if x != version_id => x,
-        _ => return Ok(()), // No update version, or no update needed, return Ok(())
-    };
-
     // Replace the pack with the new version
     replace_managed_modrinth(
         profile_path,
         &profile,
         project_id,
         version_id,
-        Some(modrinth_update_version),
+        Some(new_version_id),
+        true, // switching versions should ignore the lock
     )
     .await?;
 
@@ -128,6 +124,7 @@ pub async fn repair_managed_modrinth(
         project_id,
         version_id,
         None,
+        false, // do not ignore lock, as repairing can reset the lock
     )
     .await?;
 
@@ -153,7 +150,14 @@ async fn replace_managed_modrinth(
     project_id: &String,
     version_id: &String,
     new_version_id: Option<&String>,
+    ignore_lock: bool,
 ) -> crate::Result<()> {
+    crate::profile::edit(profile_path, |mut profile| {
+        profile.install_stage = ProfileInstallStage::Installing;
+        async { Ok(()) }
+    })
+    .await?;
+
     // Fetch .mrpacks for both old and new versions
     // TODO: this will need to be updated if we revert the hacky pack method we needed for compiler speed
     let old_pack_creator = generate_pack_from_version_id(
@@ -197,7 +201,11 @@ async fn replace_managed_modrinth(
     // - install all overrides
     // - edits the profile to update the new data
     // - (functionals almost identically to rteinstalling the pack 'in-place')
-    pack::install_mrpack::install_zipped_mrpack_files(new_pack_creator).await?;
+    pack::install_mrpack::install_zipped_mrpack_files(
+        new_pack_creator,
+        ignore_lock,
+    )
+    .await?;
 
     Ok(())
 }

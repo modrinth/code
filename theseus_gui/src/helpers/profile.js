@@ -112,9 +112,9 @@ export async function remove_project(path, projectPath) {
   return await invoke('plugin:profile|profile_remove_project', { path, projectPath })
 }
 
-// Update a managed Modrinth profile
-export async function update_managed_modrinth(path) {
-  return await invoke('plugin:profile|profile_update_managed_modrinth', { path })
+// Update a managed Modrinth profile to a specific version
+export async function update_managed_modrinth_version(path, versionId) {
+  return await invoke('plugin:profile|profile_update_managed_modrinth_version', { path, versionId })
 }
 
 // Repair a managed Modrinth profile
@@ -125,12 +125,21 @@ export async function update_repair_modrinth(path) {
 // Export a profile to .mrpack
 /// included_overrides is an array of paths to override folders to include (ie: 'mods', 'resource_packs')
 // Version id is optional (ie: 1.1.5)
-export async function export_profile_mrpack(path, exportLocation, includedOverrides, versionId) {
+export async function export_profile_mrpack(
+  path,
+  exportLocation,
+  includedOverrides,
+  versionId,
+  description,
+  name
+) {
   return await invoke('plugin:profile|profile_export_mrpack', {
     path,
     exportLocation,
     includedOverrides,
     versionId,
+    description,
+    name,
   })
 }
 

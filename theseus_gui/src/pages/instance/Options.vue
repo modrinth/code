@@ -191,7 +191,7 @@
       <Slider
         v-model="memory.maximum"
         :disabled="!overrideMemorySettings"
-        :min="256"
+        :min="64"
         :max="maxMemory"
         :step="1"
         unit="mb"
@@ -304,17 +304,6 @@
         <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
-    <div v-if="instance.metadata.linked_data" class="adjacent-input">
-      <label for="repair-profile">
-        <span class="label__title">Unpair instance</span>
-        <span class="label__description">
-          Removes the link to an external modpack on the instance. This allows you to edit modpacks
-          you download through the browse page but you will not be able to update the instance from
-          a new version of a modpack if you do this.
-        </span>
-      </label>
-      <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
-    </div>
     <div v-if="instance.install_stage == 'installed'" class="adjacent-input">
       <label for="duplicate-profile">
         <span class="label__title">Duplicate instance</span>
@@ -341,23 +330,6 @@
         @click="repairProfile"
       >
         <HammerIcon /> Repair
-      </Button>
-    </div>
-    <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
-      <label for="repair-profile">
-        <span class="label__title">Reinstall modpack</span>
-        <span class="label__description">
-          Reinstalls Modrinth modpack and checks for corruption. Use this if your game is not
-          launching due to your instance diverging from the Modrinth modpack.
-        </span>
-      </label>
-      <Button
-        id="repair-profile"
-        color="highlight"
-        :disabled="repairing || offline"
-        @click="repairModpack"
-      >
-        <DownloadIcon /> Reinstall
       </Button>
     </div>
     <div class="adjacent-input">
@@ -395,8 +367,8 @@ import {
   XIcon,
   SaveIcon,
   HammerIcon,
-  DownloadIcon,
   ModalConfirm,
+  ClipboardCopyIcon,
   Button,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
@@ -409,7 +381,6 @@ import {
   install,
   list,
   remove,
-  update_repair_modrinth,
 } from '@/helpers/profile.js'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
@@ -595,10 +566,6 @@ const editProfileObject = computed(() => {
 
 const repairing = ref(false)
 
-async function unpairProfile() {
-  unlinkModpack.value = true
-}
-
 async function duplicateProfile() {
   await duplicate(props.instance.path).catch(handleError)
   mixpanel_track('InstanceDuplicate', {
@@ -610,17 +577,6 @@ async function duplicateProfile() {
 async function repairProfile() {
   repairing.value = true
   await install(props.instance.path).catch(handleError)
-  repairing.value = false
-
-  mixpanel_track('InstanceRepair', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
-  })
-}
-
-async function repairModpack() {
-  repairing.value = true
-  await update_repair_modrinth(props.instance.path).catch(handleError)
   repairing.value = false
 
   mixpanel_track('InstanceRepair', {

@@ -219,6 +219,10 @@ async fn import_atlauncher_unmanaged(
             project_id: description.project_id.clone(),
             version_id: description.version_id.clone(),
         });
+        prof.locked = Some(
+            description.project_id.is_some()
+                && description.version_id.is_some(),
+        );
         prof.metadata.icon = description.icon.clone();
         prof.metadata.game_version = game_version.clone();
         prof.metadata.loader_version = loader_version.clone();

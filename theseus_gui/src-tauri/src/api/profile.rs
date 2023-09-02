@@ -23,7 +23,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_add_project_from_path,
             profile_toggle_disable_project,
             profile_remove_project,
-            profile_update_managed_modrinth,
+            profile_update_managed_modrinth_version,
             profile_repair_managed_modrinth,
             profile_run,
             profile_run_wait,
@@ -185,12 +185,16 @@ pub async fn profile_remove_project(
     Ok(())
 }
 
-// Updates a managed Modrinth profile
+// Updates a managed Modrinth profile to a version of version_id
 #[tauri::command]
-pub async fn profile_update_managed_modrinth(
+pub async fn profile_update_managed_modrinth_version(
     path: ProfilePathId,
+    version_id: String,
 ) -> Result<()> {
-    Ok(profile::update::update_managed_modrinth(&path).await?)
+    Ok(
+        profile::update::update_managed_modrinth_version(&path, &version_id)
+            .await?,
+    )
 }
 
 // Repairs a managed Modrinth profile by updating it to the current version
@@ -209,12 +213,16 @@ pub async fn profile_export_mrpack(
     export_location: PathBuf,
     included_overrides: Vec<String>,
     version_id: Option<String>,
+    description: Option<String>,
+    name: Option<String>, // only used to cache
 ) -> Result<()> {
     profile::export_mrpack(
         &path,
         export_location,
         included_overrides,
         version_id,
+        description,
+        name,
     )
     .await?;
     Ok(())
@@ -290,6 +298,7 @@ pub struct EditProfile {
     pub memory: Option<MemorySettings>,
     pub resolution: Option<WindowSize>,
     pub hooks: Option<Hooks>,
+    pub locked: Option<bool>,
     pub fullscreen: Option<bool>,
 }
 
@@ -328,6 +337,8 @@ pub async fn profile_edit(
                 prof.metadata.groups = groups;
             }
         }
+
+        prof.locked = edit_profile.locked;
 
         prof.java = edit_profile.java.clone();
         prof.memory = edit_profile.memory;
