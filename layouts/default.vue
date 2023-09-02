@@ -236,7 +236,7 @@
               to="/dashboard/notifications"
               class="tab button-animation"
               :class="{
-                bubble: user.notifications.length > 0,
+                bubble: user.notifications.some((notif) => !notif.read),
                 'no-active': isMobileMenuOpen || isBrowseMenuOpen,
               }"
               title="Notifications"
