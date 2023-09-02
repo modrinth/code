@@ -1426,11 +1426,14 @@ export default defineNuxtComponent({
         }
 
         .dep-type {
-          text-transform: capitalize;
           color: var(--color-text-secondary);
 
           &.incompatible {
             color: var(--color-red);
+          }
+
+          &::first-letter {
+            text-transform: capitalize;
           }
         }
       }
