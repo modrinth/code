@@ -893,7 +893,6 @@ onUnmounted(() => unlistenOffline())
   height: 100%; /* takes up only the necessary height */
   overflow-y: auto;
   scroll-behavior: smooth;
-  border-top-left-radius: var(--radius-md);
 
   .filter-panel {
     position: fixed;
