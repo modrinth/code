@@ -60,6 +60,7 @@
           v-model="oldPassword"
           maxlength="2048"
           type="password"
+          autocomplete="current-password"
           :placeholder="`${removePasswordMode ? 'Confirm' : 'Old'} password`"
         />
         <template v-if="!removePasswordMode">
@@ -69,6 +70,7 @@
             v-model="newPassword"
             maxlength="2048"
             type="password"
+            autocomplete="new-password"
             placeholder="New password"
           />
           <label for="confirm-new-password"
@@ -79,6 +81,7 @@
             v-model="confirmNewPassword"
             maxlength="2048"
             type="password"
+            autocomplete="new-password"
             placeholder="Confirm new password"
           />
         </template>

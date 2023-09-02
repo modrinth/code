@@ -58,6 +58,7 @@
             id="email"
             v-model="email"
             type="text"
+            autocomplete="username"
             class="auth-form__input"
             placeholder="Email or username"
           />
@@ -70,6 +71,7 @@
             id="password"
             v-model="password"
             type="password"
+            autocomplete="current-password"
             class="auth-form__input"
             placeholder="Password"
           />

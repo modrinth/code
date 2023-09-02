@@ -16,6 +16,7 @@
             id="email"
             v-model="email"
             type="text"
+            autocomplete="username"
             class="auth-form__input"
             placeholder="Email"
           />
@@ -35,6 +36,7 @@
             id="password"
             v-model="newPassword"
             type="password"
+            autocomplete="new-password"
             class="auth-form__input"
             placeholder="Password"
           />
@@ -47,6 +49,7 @@
             id="confirm-password"
             v-model="confirmNewPassword"
             type="password"
+            autocomplete="new-password"
             class="auth-form__input"
             placeholder="Confirm password"
           />
