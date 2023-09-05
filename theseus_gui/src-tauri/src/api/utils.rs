@@ -117,7 +117,9 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
             if path.is_dir() {
                 Command::new("open").args([&path]).spawn()?;
             } else {
-                Command::new("open").args(["-R", &path]).spawn()?;
+                Command::new("open")
+                    .args(["-R", &path.as_os_str().to_string_lossy()])
+                    .spawn()?;
             }
         }
 
