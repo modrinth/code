@@ -456,7 +456,7 @@ command_listener(async (e) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: #16181c;
+  background-color: var(--color-contrast);
 
   .appbar-failure {
     display: flex; /* Change to flex to align items horizontally */
@@ -473,18 +473,18 @@ command_listener(async (e) => {
     width: 100%;
 
     .error-text {
-      background-color: #ced2d9;
+      background-color: var(--color-bg);
       display: flex;
       gap: 0.25rem;
       flex-direction: column;
 
       .error-message {
-        color: #8f0608;
+        color: var(--color-red);
         text-align: center;
         margin: 0.5rem;
       }
       .file-path-message {
-        color: #015c22;
+        color: var(--color-green);
         text-align: center;
         margin: 0.5rem;
       }

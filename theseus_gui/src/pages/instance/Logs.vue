@@ -48,15 +48,14 @@
         placeholder="Type to filter logs..."
       />
       <div class="filter-group">
-        <SearchFilter
+        <Checkbox
           v-for="level in levels"
-          :key="level"
-          :active-filters="levelFilters"
-          :display-name="level"
-          :facet-name="level.toLowerCase()"
+          :key="level.toLowerCase()"
+          v-model="levelFilters[level.toLowerCase()]"
           class="filter-checkbox"
-          @toggle="toggleLevelFilter"
-        />
+        >
+          {{ level }}</Checkbox
+        >
       </div>
     </div>
     <div ref="logContainer" class="log-text">
@@ -86,7 +85,7 @@ import {
   ClipboardCopyIcon,
   DropdownSelect,
   ShareIcon,
-  SearchFilter,
+  Checkbox,
   TrashIcon,
   ShareModal,
 } from 'omorphia'
@@ -142,22 +141,17 @@ const isAutoScrolling = ref(false)
 const shareModal = ref(null)
 
 const levels = ['Fatal', 'Error', 'Warn', 'Info', 'Debug', 'Trace']
-const levelFilters = ref(levels.map((level) => level.toLowerCase()))
+const levelFilters = ref({})
+levels.forEach((level) => {
+  levelFilters.value[level.toLowerCase()] = true
+})
 const searchFilter = ref('')
 
-function toggleLevelFilter(filter) {
-  const index = levelFilters.value.indexOf(filter)
-  if (index === -1) {
-    levelFilters.value.push(filter)
-  } else {
-    levelFilters.value.splice(index, 1)
-  }
-}
 function shouldDisplay(line) {
   if (line.forceShow) {
     return true
   }
-  if (!levelFilters.value.includes(line.level.toLowerCase())) {
+  if (!levelFilters.value[line.level.toLowerCase()]) {
     return false
   }
   if (searchFilter.value !== '') {
@@ -290,12 +284,10 @@ watch(selectedLogIndex, async (newIndex) => {
   }
 })
 
-if (logs.value.length >= 1) {
-  if (props.playing) {
-    selectedLogIndex.value = 0
-  } else {
-    selectedLogIndex.value = 1
-  }
+if (logs.value.length > 1 && !props.playing) {
+  selectedLogIndex.value = 1
+} else {
+  selectedLogIndex.value = 0
 }
 
 const deleteLog = async () => {

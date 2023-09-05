@@ -45,12 +45,7 @@
 
 <script setup>
 import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
-import {
-  find_jre_17_jres,
-  find_jre_8_jres,
-  get_jre,
-  extract_version_from_string,
-} from '@/helpers/jre.js'
+import { find_jre_17_jres, find_jre_8_jres, get_jre, test_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
@@ -89,19 +84,16 @@ const testingJava = ref(false)
 const testingJavaSuccess = ref(null)
 async function testJava() {
   testingJava.value = true
-  let result = await get_jre(props.modelValue ? props.modelValue.path : '')
-
+  testingJavaSuccess.value = await test_jre(
+    props.modelValue ? props.modelValue.path : '',
+    1,
+    props.version
+  )
   testingJava.value = false
-  if (result) {
-    let [majorVersion, minorVersion] = await extract_version_from_string(result.version)
-    testingJavaSuccess.value = majorVersion == 1 && minorVersion == props.version
-  } else {
-    testingJavaSuccess.value = false
-  }
 
   mixpanel_track('JavaTest', {
     path: props.modelValue ? props.modelValue.path : '',
-    success: !!result,
+    success: testingJavaSuccess.value,
   })
 
   setTimeout(() => {

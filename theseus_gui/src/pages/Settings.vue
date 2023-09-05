@@ -330,13 +330,8 @@ async function refreshDir() {
         </label>
         <Toggle
           id="disable-discord-rpc"
-          :model-value="settings.disable_discord_rpc"
+          v-model="settings.disable_discord_rpc"
           :checked="settings.disable_discord_rpc"
-          @update:model-value="
-            (e) => {
-              settings.disable_discord_rpc = e
-            }
-          "
         />
       </div>
     </Card>

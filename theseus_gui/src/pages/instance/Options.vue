@@ -9,6 +9,56 @@
     @proceed="removeProfile"
   />
   <Modal
+    ref="modalConfirmUnlock"
+    header="Are you sure you want to unlock this instance?"
+    :noblur="!themeStore.advancedRendering"
+  >
+    <div class="modal-delete">
+      <div
+        class="markdown-body"
+        v-html="
+          'If you proceed, you will not be able to re-lock it without using the `Reinstall modpack` button.'
+        "
+      />
+      <div class="input-group push-right">
+        <button class="btn" @click="$refs.modalConfirmUnlock.hide()">
+          <XIcon />
+          Cancel
+        </button>
+        <button class="btn btn-danger" :disabled="action_disabled" @click="unlockProfile">
+          <LockIcon />
+          Unlock
+        </button>
+      </div>
+    </div>
+  </Modal>
+
+  <Modal
+    ref="modalConfirmUnpair"
+    header="Are you sure you want to unpair this instance?"
+    :noblur="!themeStore.advancedRendering"
+  >
+    <div class="modal-delete">
+      <div
+        class="markdown-body"
+        v-html="
+          'If you proceed, you will not be able to re-pair it without creating an entirely new instance.'
+        "
+      />
+      <div class="input-group push-right">
+        <button class="btn" @click="$refs.modalConfirmUnpair.hide()">
+          <XIcon />
+          Cancel
+        </button>
+        <button class="btn btn-danger" :disabled="action_disabled" @click="unpairProfile">
+          <XIcon />
+          Unpair
+        </button>
+      </div>
+    </div>
+  </Modal>
+
+  <Modal
     ref="changeVersionsModal"
     header="Change instance versions"
     :noblur="!themeStore.advancedRendering"
@@ -324,7 +374,7 @@
       </Card>
     </div>
     <div v-else class="adjacent-input">
-      <label for="repair-profile">
+      <label for="unlock-profile">
         <span class="label__title">Unlock instance</span>
         <span class="label__description">
           Allows modifications to the instance, which allows you to add projects to the modpack. The
@@ -332,11 +382,13 @@
           modpack will be modified on version changes.
         </span>
       </label>
-      <Button id="repair-profile" @click="unlockProfile"> <XIcon /> Unlock </Button>
+      <Button id="unlock-profile" @click="$refs.modalConfirmUnlock.show()">
+        <LockIcon /> Unlock
+      </Button>
     </div>
 
     <div class="adjacent-input">
-      <label for="repair-profile">
+      <label for="unpair-profile">
         <span class="label__title">Unpair instance</span>
         <span class="label__description">
           Removes the link to an external Modrinth modpack on the instance. This allows you to edit
@@ -344,7 +396,9 @@
           instance from a new version of a modpack if you do this.
         </span>
       </label>
-      <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
+      <Button id="unpair-profile" @click="$refs.modalConfirmUnpair.show()">
+        <XIcon /> Unpair
+      </Button>
     </div>
 
     <div class="adjacent-input">
@@ -356,13 +410,17 @@
         </span>
       </label>
 
-      <Button :disabled="inProgress || installing" @click="modpackVersionModal.show()">
-        <EditIcon />
+      <Button
+        id="change-modpack-version"
+        :disabled="inProgress || installing"
+        @click="modpackVersionModal.show()"
+      >
+        <SwapIcon />
         Change modpack version
       </Button>
     </div>
     <div class="adjacent-input">
-      <label for="repair-profile">
+      <label for="repair-modpack">
         <span class="label__title">Reinstall modpack</span>
         <span class="label__description">
           Removes all projects and reinstalls Modrinth modpack. Use this to fix unexpected behaviour
@@ -370,7 +428,7 @@
         </span>
       </label>
       <Button
-        id="repair-profile"
+        id="repair-modpack"
         color="highlight"
         :disabled="installing || inProgress || offline"
         @click="repairModpack"
@@ -457,11 +515,15 @@ import {
   DropdownSelect,
   XIcon,
   SaveIcon,
+  LockIcon,
   HammerIcon,
   ModalConfirm,
+  DownloadIcon,
   ClipboardCopyIcon,
   Button,
 } from 'omorphia'
+import { SwapIcon } from '@/assets/icons'
+
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
 import {
@@ -550,6 +612,9 @@ async function setIcon() {
 }
 
 const globalSettings = await get().catch(handleError)
+
+const modalConfirmUnlock = ref(null)
+const modalConfirmUnpair = ref(null)
 
 const javaSettings = props.instance.java ?? {}
 
@@ -698,12 +763,14 @@ async function unpairProfile() {
   await edit(props.instance.path, editProfile)
   installedVersion.value = null
   installedVersionData.value = null
+  modalConfirmUnpair.value.hide()
 }
 
 async function unlockProfile() {
   const editProfile = props.instance
   editProfile.locked = false
   await edit(props.instance.path, editProfile)
+  modalConfirmUnlock.value.hide()
 }
 
 async function repairModpack() {
@@ -882,7 +949,37 @@ async function saveGvLoaderEdits() {
 }
 
 .unlocked-instance {
-  background-color: var(--color-gray);
-  color: black;
+  background-color: var(--color-bg);
+}
+
+.modal-delete {
+  padding: var(--gap-lg);
+  display: flex;
+  flex-direction: column;
+
+  .markdown-body {
+    margin-bottom: 1rem;
+  }
+
+  .confirmation-label {
+    margin-bottom: 0.5rem;
+  }
+
+  .confirmation-text {
+    padding-right: 0.25ch;
+    margin: 0 0.25rem;
+  }
+
+  .confirmation-input {
+    input {
+      width: 20rem;
+      max-width: 100%;
+    }
+  }
+
+  .button-group {
+    margin-left: auto;
+    margin-top: 1.5rem;
+  }
 }
 </style>

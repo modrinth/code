@@ -18,7 +18,7 @@ impl DiscordGuard {
     /// If it fails, it will still return a DiscordGuard, but the client will be unconnected
     pub async fn init() -> crate::Result<DiscordGuard> {
         let mut dipc =
-            DiscordIpcClient::new("1084015525241311292").map_err(|e| {
+            DiscordIpcClient::new("1123683254248148992").map_err(|e| {
                 crate::ErrorKind::OtherError(format!(
                     "Could not create Discord client {}",
                     e,

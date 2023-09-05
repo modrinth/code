@@ -170,13 +170,13 @@ pub async fn profile_create_from_duplicate(
     })?;
 
     let profile_path_id = profile_create(
-        profile.metadata.name,
-        profile.metadata.game_version,
+        profile.metadata.name.clone(),
+        profile.metadata.game_version.clone(),
         profile.metadata.loader,
-        profile.metadata.loader_version.map(|it| it.id),
-        profile.metadata.icon,
-        profile.metadata.icon_url,
-        profile.metadata.linked_data,
+        profile.metadata.loader_version.clone().map(|it| it.id),
+        profile.metadata.icon.clone(),
+        profile.metadata.icon_url.clone(),
+        profile.metadata.linked_data.clone(),
         Some(true),
         Some(true),
     )
@@ -192,32 +192,26 @@ pub async fn profile_create_from_duplicate(
     )
     .await?;
 
-    if let Some(profile_val) =
-        crate::api::profile::get(&profile_path_id, None).await?
+    crate::launcher::install_minecraft(&profile, Some(bar)).await?;
     {
-        crate::launcher::install_minecraft(&profile_val, Some(bar)).await?;
-        {
-            let state = State::get().await?;
-            let mut file_watcher = state.file_watcher.write().await;
-            Profile::watch_fs(
-                &profile_val.get_profile_full_path().await?,
-                &mut file_watcher,
-            )
-            .await?;
-        }
-
-        // emit profile edited
-        emit_profile(
-            profile_val.uuid,
-            &profile_val.profile_id(),
-            &profile_val.metadata.name,
-            ProfilePayloadType::Edited,
+        let state = State::get().await?;
+        let mut file_watcher = state.file_watcher.write().await;
+        Profile::watch_fs(
+            &profile.get_profile_full_path().await?,
+            &mut file_watcher,
         )
         .await?;
-
-        State::sync().await?;
     }
 
+    // emit profile edited
+    emit_profile(
+        profile.uuid,
+        &profile.profile_id(),
+        &profile.metadata.name,
+        ProfilePayloadType::Edited,
+    )
+    .await?;
+    State::sync().await?;
     Ok(profile_path_id)
 }
 

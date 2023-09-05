@@ -180,6 +180,20 @@ pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
     Ok(jre::check_java_at_filepath(&path).await)
 }
 
+// Test JRE at a given path
+pub async fn test_jre(
+    path: PathBuf,
+    major_version: u32,
+    minor_version: u32,
+) -> crate::Result<bool> {
+    let jre = match jre::check_java_at_filepath(&path).await {
+        Some(jre) => jre,
+        None => return Ok(false),
+    };
+    let (major, minor) = extract_java_majorminor_version(&jre.version)?;
+    Ok(major == major_version && minor == minor_version)
+}
+
 // Gets maximum memory in KiB.
 pub async fn get_max_memory() -> crate::Result<u64> {
     Ok(sys_info::mem_info()
@@ -189,10 +203,4 @@ pub async fn get_max_memory() -> crate::Result<u64> {
             ))
         })?
         .total)
-}
-
-pub async fn extract_version_from_string(
-    version: &str,
-) -> crate::Result<(u32, u32)> {
-    Ok(extract_java_majorminor_version(version)?)
 }

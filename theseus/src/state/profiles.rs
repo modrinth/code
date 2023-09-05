@@ -169,9 +169,6 @@ pub struct Profile {
     pub modrinth_update_version: Option<String>,
     #[serde(default)]
     pub locked: Option<bool>,
-
-    #[serde(default)]
-    pub export_cache: ProfileExportCache,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -209,14 +206,6 @@ pub struct ProfileMetadata {
 pub struct LinkedData {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, Default)]
-pub struct ProfileExportCache {
-    pub name: Option<String>,
-    pub version: Option<String>,
-    pub overrides: Vec<String>,
-    pub description: Option<String>,
 }
 
 #[derive(
@@ -307,7 +296,6 @@ impl Profile {
             hooks: None,
             modrinth_update_version: None,
             locked: None,
-            export_cache: ProfileExportCache::default(),
         })
     }
 

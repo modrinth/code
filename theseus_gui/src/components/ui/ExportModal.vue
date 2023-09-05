@@ -1,7 +1,7 @@
 <script setup>
-import { Button, Checkbox, Modal, SendIcon, XIcon, PlusIcon } from 'omorphia'
+import { Button, Checkbox, Modal, XIcon, PlusIcon } from 'omorphia'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
-import { ref, toRef } from 'vue'
+import { ref } from 'vue'
 import { export_profile_mrpack, get_potential_override_folders } from '@/helpers/profile.js'
 import { open } from '@tauri-apps/api/dialog'
 import { handleError } from '@/store/notifications.js'
@@ -72,31 +72,6 @@ const initFiles = async () => {
     },
     value,
   ])
-
-  if (props.instance.export_cache) {
-    const export_cache = toRef(props.instance.export_cache).value
-    if (export_cache.name) {
-      nameInput.value = export_cache.name
-    }
-    if (export_cache.version) {
-      versionInput.value = export_cache.version
-    }
-    if (export_cache.description) {
-      exportDescription.value = export_cache.description
-    }
-    for (const file of export_cache.overrides) {
-      files.value.forEach((f) => {
-        if (f.path === file) f.selected = true
-      })
-      folders.value.forEach((args) => {
-        args[1].forEach((child) => {
-          if (child.path === file) {
-            child.selected = true
-          }
-        })
-      })
-    }
-  }
 }
 
 await initFiles()
@@ -157,10 +132,7 @@ const exportPack = async () => {
           <p>Description</p>
 
           <div class="textarea-wrapper">
-            <textarea
-              v-model="exportDescription"
-              placeholder="My super-special modpack is the best of them all!"
-            />
+            <textarea v-model="exportDescription" placeholder="Enter modpack description..." />
           </div>
         </div>
       </div>
@@ -228,10 +200,6 @@ const exportPack = async () => {
         <Button @click="exportModal.hide">
           <XIcon />
           Cancel
-        </Button>
-        <Button disabled>
-          <SendIcon />
-          Share
         </Button>
         <Button color="primary" @click="exportPack">
           <PackageIcon />

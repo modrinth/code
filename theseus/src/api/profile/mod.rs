@@ -8,7 +8,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
-use crate::state::{ProfileExportCache, ProjectMetadata, SideType};
+use crate::state::{ProjectMetadata, SideType};
 
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
@@ -573,7 +573,7 @@ pub async fn export_mrpack(
     included_overrides: Vec<String>, // which folders to include in the overrides
     version_id: Option<String>,
     description: Option<String>,
-    name: Option<String>,
+    _name: Option<String>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let io_semaphore = state.io_semaphore.0.read().await;
@@ -584,18 +584,6 @@ pub async fn export_mrpack(
             profile_path
         ))
     })?;
-
-    // cache results in profile for next export
-    crate::profile::edit(profile_path, |profile| {
-        profile.export_cache = ProfileExportCache {
-            name: name.clone(),
-            description: description.clone(),
-            version: version_id.clone(),
-            overrides: included_overrides.clone(),
-        };
-        async { Ok(()) }
-    })
-    .await?;
 
     // remove .DS_Store files from included_overrides
     let included_overrides = included_overrides
