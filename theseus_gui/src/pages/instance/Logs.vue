@@ -64,7 +64,12 @@
         :key="index"
         :class="processedLine.class"
       >
-        {{ processedLine.line }}<br />
+        <span class="line-number">{{ index + 1 }}</span>
+        <span :style="{ color: getLineColor(line, true), 'font-weight': getLineWeight(line) }">{{
+          getLinePrefix(line)
+        }}</span>
+        <span :style="{ color: getLineColor(line, false) }">{{ processedLine.getLineText(line) }}</span>
+       <br />
       </span>
     </div>
     <ShareModal
@@ -101,6 +106,7 @@ import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
 import { get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
+import { useLogs } from '@/store/logs'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
@@ -304,6 +310,73 @@ const deleteLog = async () => {
 const clearLiveLog = async () => {
   currentLiveLog.value = ''
   // does not reset cursor
+}
+
+const isLineLevel = (text, level) => {
+  if ((text.includes('/INFO') || text.includes('[System] [CHAT]')) && level === 'info') {
+    return true
+  }
+
+  if (text.includes('/WARN') && level === 'warn') {
+    return true
+  }
+
+  const errorTriggers = ['/ERROR', 'Exception:', ':?]', 'Error', '[thread', '	at']
+  if (level === 'error') {
+    for (const trigger of errorTriggers) {
+      if (text.includes(trigger)) return true
+    }
+  }
+
+  if (text.trim()[0] === '#' && level === 'comment') {
+    return true
+  }
+  return false
+}
+
+const getLineWeight = (text) => {
+  if (!logsColored || isLineLevel(text, 'info')) {
+    return 'normal'
+  }
+
+  if (isLineLevel(text, 'error') || isLineLevel(text, 'warn')) {
+    return 'bold'
+  }
+}
+
+const getLineColor = (text, prefix) => {
+  if (!logsColored || text.includes('[System] [CHAT]')) {
+    return 'white'
+  }
+  if (isLineLevel(text, 'info') && prefix) {
+    return '#00a8ff'
+  }
+  if (isLineLevel(text, 'warn')) {
+    return '#ff6625'
+  }
+  if (isLineLevel(text, 'error')) {
+    return '#f62451'
+  }
+  if (isLineLevel(text, 'comment')) {
+    return '#1dd1a1'
+  }
+}
+
+const getLinePrefix = (text) => {
+  if (text.includes(']:')) {
+    return text.split(']:')[0] + ']:'
+  }
+}
+
+const getLineText = (text) => {
+  if (text.includes(']:')) {
+    if (text.split(']:').length > 2) {
+      return text.split(']:').slice(1).join(']:')
+    }
+    return text.split(']:')[1]
+  } else {
+    return text
+  }
 }
 
 function handleUserScroll() {
