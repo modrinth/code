@@ -204,7 +204,6 @@ document.querySelector('body').addEventListener('auxclick', function (e) {
 const accounts = ref(null)
 
 command_listener(async (e) => {
-  console.log(e)
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {

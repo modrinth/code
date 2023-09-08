@@ -161,6 +161,7 @@ pub async fn get_output_by_filename(
                 > 0
             {
                 result.push_str(&String::from_utf8_lossy(&contents));
+                contents = [0; 1024];
             }
             return Ok(CensoredString::censor(result, &credentials));
         } else if ext == "log" {
@@ -175,8 +176,10 @@ pub async fn get_output_by_filename(
                 > 0
             {
                 result.push_str(&String::from_utf8_lossy(&contents));
+                contents = [0; 1024];
             }
-            return Ok(CensoredString::censor(result, &credentials));
+            let result = CensoredString::censor(result, &credentials);
+            return Ok(result);
         }
     }
     Err(crate::ErrorKind::OtherError(format!(

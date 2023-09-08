@@ -58,14 +58,23 @@
         >
       </div>
     </div>
-    <div ref="logContainer" class="log-text">
-      <span
-        v-for="(processedLine, index) in processedLogs.filter((l) => shouldDisplay(l))"
-        :key="index"
-        :class="processedLine.class"
+    <div class="log-text">
+      <RecycleScroller
+        v-slot="{ item }"
+        class="scroller"
+        :items="displayProcessedLogs"
+        direction="vertical"
+        :item-size="20"
+        key-field="id"
+        ref="logContainer"
       >
-        {{ processedLine.line }}<br />
-      </span>
+        <div class="user no-wrap">
+          <span :style="{ color: item.prefixColor, 'font-weight': item.weight }">{{
+            item.prefix
+          }}</span>
+          <span :style="{ color: item.textColor }">{{ item.text }}</span>
+        </div>
+      </RecycleScroller>
     </div>
     <ShareModal
       ref="shareModal"
@@ -105,6 +114,9 @@ import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
 
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)
 
@@ -132,6 +144,8 @@ const emptyText = ['No live game detected.', 'Start your game to proceed']
 const logs = ref([])
 await setLogs()
 
+const logsColored = true
+
 const selectedLogIndex = ref(0)
 const copied = ref(false)
 const logContainer = ref(null)
@@ -147,52 +161,56 @@ levels.forEach((level) => {
 })
 const searchFilter = ref('')
 
-function shouldDisplay(line) {
-  if (line.forceShow) {
+function shouldDisplay(processedLine) {
+  if (!processedLine.level) {
     return true
   }
-  if (!levelFilters.value[line.level.toLowerCase()]) {
+  if (!levelFilters.value[processedLine.level.toLowerCase()]) {
     return false
   }
   if (searchFilter.value !== '') {
-    if (!line.line.toLowerCase().includes(searchFilter.value.toLowerCase())) {
+    if (!processedLine.text.toLowerCase().includes(searchFilter.value.toLowerCase())) {
       return false
     }
   }
   return true
 }
 
+// Selects from the processed logs which ones should be displayed (shouldDisplay)
+// In addition, splits each line by \n. Each split line is given the same properties as the original line
+const displayProcessedLogs = computed(() => {
+  return processedLogs.value.filter((l) => shouldDisplay(l))
+})
+
 const processedLogs = computed(() => {
-  const lines = logs.value[selectedLogIndex.value]?.stdout.split('\n') || []
+  // split based on newline and timestamp lookahead
+  // (not just newline because of multiline messages)
+  const splitPattern = /\n(?=\[\d\d:\d\d:\d\d\])/
+  const lines = logs.value[selectedLogIndex.value]?.stdout.split(splitPattern) || []
   const processed = []
-  let currentClass = ''
-  const regex = /\[(\d{2}:\d{2}:\d{2})\] \[.*\/([a-zA-Z]+)\]/
-
+  let id = 0
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const match = line.match(regex)
-    let level = ''
-    let timestamp = ''
-    if (match) {
-      timestamp = match[1] // Captured timestamp
-      level = match[2] // Captured log level, could be any alphabetic string
-      if (level === 'WARN') {
-        currentClass = 'yellow-color'
-      } else if (level === 'ERROR' || level === 'FATAL') {
-        currentClass = 'red-color'
-      } else if (level === 'INFO' || level === 'DEBUG' || level === 'TRACE') {
-        currentClass = ''
-      }
-    }
-
-    let forceShow = false
-    if (!match && emptyText.includes(line) && selectedLogIndex.value === 0) {
-      forceShow = true
-    }
-
-    processed.push({ line, class: currentClass + ' no-wrap', timestamp, level, forceShow })
+    // Then split off of \n.
+    // Lines that are not the first have prefix = null
+    const text = getLineText(lines[i])
+    const prefix = getLinePrefix(lines[i])
+    const prefixColor = getLineColor(lines[i], true)
+    const textColor = getLineColor(lines[i], false)
+    const weight = getLineWeight(lines[i])
+    const level = getLineLevel(lines[i])
+    text.split('\n').forEach((line, index) => {
+      processed.push({
+        id: id,
+        text: line,
+        prefix: index === 0 ? prefix : null,
+        prefixColor: prefixColor,
+        textColor: textColor,
+        weight: weight,
+        level: level,
+      })
+      id += 1
+    })
   }
-
   return processed
 })
 
@@ -306,6 +324,81 @@ const clearLiveLog = async () => {
   // does not reset cursor
 }
 
+const isLineLevel = (text, level) => {
+  if ((text.includes('/INFO') || text.includes('[System] [CHAT]')) && level === 'info') {
+    return true
+  }
+
+  if (text.includes('/WARN') && level === 'warn') {
+    return true
+  }
+
+  const errorTriggers = ['/ERROR', 'Exception:', ':?]', 'Error', '[thread', '	at']
+  if (level === 'error') {
+    for (const trigger of errorTriggers) {
+      if (text.includes(trigger)) return true
+    }
+  }
+
+  if (text.trim()[0] === '#' && level === 'comment') {
+    return true
+  }
+  return false
+}
+
+const getLineWeight = (text) => {
+  if (!logsColored || isLineLevel(text, 'info')) {
+    return 'normal'
+  }
+
+  if (isLineLevel(text, 'error') || isLineLevel(text, 'warn')) {
+    return 'bold'
+  }
+}
+
+const getLineLevel = (text) => {
+  for (const level of levels) {
+    if (isLineLevel(text, level.toLowerCase())) {
+      return level
+    }
+  }
+}
+
+const getLineColor = (text, prefix) => {
+  if (!logsColored || text.includes('[System] [CHAT]')) {
+    return 'white'
+  }
+  if (isLineLevel(text, 'info') && prefix) {
+    return '#00a8ff'
+  }
+  if (isLineLevel(text, 'warn')) {
+    return '#ff6625'
+  }
+  if (isLineLevel(text, 'error')) {
+    return '#f62451'
+  }
+  if (isLineLevel(text, 'comment')) {
+    return '#1dd1a1'
+  }
+}
+
+const getLinePrefix = (text) => {
+  if (text.includes(']:')) {
+    return text.split(']:')[0] + ']:'
+  }
+}
+
+const getLineText = (text) => {
+  if (text.includes(']:')) {
+    if (text.split(']:').length > 2) {
+      return text.split(']:').slice(1).join(']:')
+    }
+    return text.split(']:')[1]
+  } else {
+    return text
+  }
+}
+
 function handleUserScroll() {
   if (!isAutoScrolling.value) {
     userScrolled.value = true
@@ -316,19 +409,14 @@ interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveLog()
 
+    const scroll = logContainer.value.getScroll()
     // Allow resetting of userScrolled if the user scrolls to the bottom
     if (selectedLogIndex.value === 0) {
-      if (
-        logContainer.value.scrollTop + logContainer.value.offsetHeight >=
-        logContainer.value.scrollHeight - 10
-      )
-        userScrolled.value = false
-
+      if (scroll.end >= logContainer.value.$el.scrollHeight - 10) userScrolled.value = false
       if (!userScrolled.value) {
         await nextTick()
         isAutoScrolling.value = true
-        logContainer.value.scrollTop =
-          logContainer.value.scrollHeight - logContainer.value.offsetHeight
+        logContainer.value.scrollToItem(displayProcessedLogs.value.length - 1)
         setTimeout(() => (isAutoScrolling.value = false), 50)
       }
     }
@@ -351,11 +439,11 @@ const unlistenProcesses = await process_listener(async (e) => {
 })
 
 onMounted(() => {
-  logContainer.value.addEventListener('scroll', handleUserScroll)
+  logContainer.value.$el.addEventListener('scroll', handleUserScroll)
 })
 
 onBeforeUnmount(() => {
-  logContainer.value.removeEventListener('scroll', handleUserScroll)
+  logContainer.value.$el.removeEventListener('scroll', handleUserScroll)
 })
 onUnmounted(() => {
   clearInterval(interval.value)
@@ -392,7 +480,9 @@ onUnmounted(() => {
   color: var(--color-contrast);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  overflow: auto;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  overflow-y: hidden; /* Disables vertical scrolling on this wrapper */
+  white-space: nowrap; /* Keeps content on a single line */
   white-space: normal;
   color-scheme: dark;
 
@@ -401,12 +491,6 @@ onUnmounted(() => {
   }
 }
 
-.red-color {
-  color: red;
-}
-.yellow-color {
-  color: yellow;
-}
 .filter-checkbox {
   margin-bottom: 0.3rem;
   font-size: 1rem;
@@ -422,5 +506,21 @@ onUnmounted(() => {
   padding: 0.6rem;
   flex-direction: row;
   gap: 0.5rem;
+}
+
+:deep(.vue-recycle-scroller__item-wrapper) {
+  overflow: visible; /* Enables horizontal scrolling */
+}
+
+.scroller {
+  height: 100%;
+}
+
+.user {
+  height: 32%;
+  padding: 0 12px;
+  display: flex;
+
+  align-items: center;
 }
 </style>
