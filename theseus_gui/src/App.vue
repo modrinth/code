@@ -12,7 +12,7 @@ import {
   XIcon,
   Card,
 } from 'omorphia'
-import { useLoading, useTheming, useLogs } from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -44,7 +44,6 @@ import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 
 const themeStore = useTheming()
-const logStore = useLogs()
 const urlModal = ref(null)
 const isLoading = ref(true)
 
@@ -72,8 +71,6 @@ defineExpose({
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation
     themeStore.advancedRendering = advanced_rendering
-
-    logStore.logsColored = logs.colored
 
     mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
     if (opt_out_analytics) {
@@ -207,7 +204,6 @@ document.querySelector('body').addEventListener('auxclick', function (e) {
 const accounts = ref(null)
 
 command_listener(async (e) => {
-  console.log(e)
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {

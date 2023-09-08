@@ -60,16 +60,17 @@
     </div>
     <div ref="logContainer" class="log-text">
       <span
-        v-for="(processedLine, index) in processedLogs.filter((l) => shouldDisplay(l))"
+        v-for="(processedLine, index) in displayProcessedLogs"
         :key="index"
-        :class="processedLine.class"
       >
-        <span class="line-number">{{ index + 1 }}</span>
-        <span :style="{ color: getLineColor(line, true), 'font-weight': getLineWeight(line) }">{{
-          getLinePrefix(line)
-        }}</span>
-        <span :style="{ color: getLineColor(line, false) }">{{ processedLine.getLineText(line) }}</span>
-       <br />
+      {{ index }} 
+        <span v-for="(line, index) in processedLine.text.split('\n')" :key="index" class="no-wrap">
+          <span v-if="index == 0" :style="{ color: processedLine.prefixColor, 'font-weight': processedLine.weight }">{{
+            processedLine.prefix
+          }}</span>
+          <span :style="{ color: processedLine.textColor }">{{ line }}</span>
+          <br />
+          </span>
       </span>
     </div>
     <ShareModal
@@ -106,7 +107,6 @@ import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
 import { get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
-import { useLogs } from '@/store/logs'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
@@ -138,6 +138,8 @@ const emptyText = ['No live game detected.', 'Start your game to proceed']
 const logs = ref([])
 await setLogs()
 
+const logsColored = true
+
 const selectedLogIndex = ref(0)
 const copied = ref(false)
 const logContainer = ref(null)
@@ -153,50 +155,40 @@ levels.forEach((level) => {
 })
 const searchFilter = ref('')
 
-function shouldDisplay(line) {
-  if (line.forceShow) {
+function shouldDisplay(processedLine) {
+  if (!processedLine.level) {
     return true
   }
-  if (!levelFilters.value[line.level.toLowerCase()]) {
+  if(!levelFilters.value[processedLine.level.toLowerCase()]) {
     return false
   }
   if (searchFilter.value !== '') {
-    if (!line.line.toLowerCase().includes(searchFilter.value.toLowerCase())) {
+    if (!processedLine.text.toLowerCase().includes(searchFilter.value.toLowerCase())) {
       return false
     }
   }
   return true
 }
 
+const displayProcessedLogs = computed(() => {
+  return processedLogs.value.filter((l) => shouldDisplay(l))
+})
+
 const processedLogs = computed(() => {
-  const lines = logs.value[selectedLogIndex.value]?.stdout.split('\n') || []
+  // split based on newline and timestamp lookahead
+  // (not just newline because of multiline messages)
+  const splitPattern = /\n(?=\[\d\d:\d\d:\d\d\])/;
+  const lines = logs.value[selectedLogIndex.value]?.stdout.split(splitPattern) || []
   const processed = []
-  let currentClass = ''
-  const regex = /\[(\d{2}:\d{2}:\d{2})\] \[.*\/([a-zA-Z]+)\]/
-
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const match = line.match(regex)
-    let level = ''
-    let timestamp = ''
-    if (match) {
-      timestamp = match[1] // Captured timestamp
-      level = match[2] // Captured log level, could be any alphabetic string
-      if (level === 'WARN') {
-        currentClass = 'yellow-color'
-      } else if (level === 'ERROR' || level === 'FATAL') {
-        currentClass = 'red-color'
-      } else if (level === 'INFO' || level === 'DEBUG' || level === 'TRACE') {
-        currentClass = ''
-      }
-    }
-
-    let forceShow = false
-    if (!match && emptyText.includes(line) && selectedLogIndex.value === 0) {
-      forceShow = true
-    }
-
-    processed.push({ line, class: currentClass + ' no-wrap', timestamp, level, forceShow })
+    processed.push({
+      text: getLineText(lines[i]),
+      prefix: getLinePrefix(lines[i]),
+      prefixColor: getLineColor(lines[i], true),
+      textColor: getLineColor(lines[i], false),
+      weight: getLineWeight(lines[i]),
+      level: getLineLevel(lines[i]),
+    })
   }
 
   return processed
@@ -341,6 +333,14 @@ const getLineWeight = (text) => {
 
   if (isLineLevel(text, 'error') || isLineLevel(text, 'warn')) {
     return 'bold'
+  }
+}
+
+const getLineLevel = (text) => {
+  for (const level of levels) {
+    if (isLineLevel(text, level.toLowerCase())) {
+      return level
+    }
   }
 }
 
