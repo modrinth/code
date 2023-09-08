@@ -61,12 +61,12 @@
     <div class="log-text">
       <RecycleScroller
         v-slot="{ item }"
+        ref="logContainer"
         class="scroller"
         :items="displayProcessedLogs"
         direction="vertical"
         :item-size="20"
         key-field="id"
-        ref="logContainer"
       >
         <div class="user no-wrap">
           <span :style="{ color: item.prefixColor, 'font-weight': item.weight }">{{
@@ -154,7 +154,7 @@ const userScrolled = ref(false)
 const isAutoScrolling = ref(false)
 const shareModal = ref(null)
 
-const levels = ['Fatal', 'Error', 'Warn', 'Info', 'Debug', 'Trace']
+const levels = ['Comment', 'Error', 'Warn', 'Info', 'Debug', 'Trace']
 const levelFilters = ref({})
 levels.forEach((level) => {
   levelFilters.value[level.toLowerCase()] = true
@@ -165,6 +165,7 @@ function shouldDisplay(processedLine) {
   if (!processedLine.level) {
     return true
   }
+
   if (!levelFilters.value[processedLine.level.toLowerCase()]) {
     return false
   }
@@ -185,7 +186,8 @@ const displayProcessedLogs = computed(() => {
 const processedLogs = computed(() => {
   // split based on newline and timestamp lookahead
   // (not just newline because of multiline messages)
-  const splitPattern = /\n(?=\[\d\d:\d\d:\d\d\])/
+  const splitPattern = /\n(?=(?:#|\[\d\d:\d\d:\d\d\]))/
+
   const lines = logs.value[selectedLogIndex.value]?.stdout.split(splitPattern) || []
   const processed = []
   let id = 0
@@ -333,6 +335,14 @@ const isLineLevel = (text, level) => {
     return true
   }
 
+  if (text.includes('/DEBUG') && level === 'debug') {
+    return true
+  }
+
+  if (text.includes('/TRACE') && level === 'trace') {
+    return true
+  }
+
   const errorTriggers = ['/ERROR', 'Exception:', ':?]', 'Error', '[thread', '	at']
   if (level === 'error') {
     for (const trigger of errorTriggers) {
@@ -347,7 +357,12 @@ const isLineLevel = (text, level) => {
 }
 
 const getLineWeight = (text) => {
-  if (!logsColored || isLineLevel(text, 'info')) {
+  if (
+    !logsColored ||
+    isLineLevel(text, 'info') ||
+    isLineLevel(text, 'debug') ||
+    isLineLevel(text, 'trace')
+  ) {
     return 'normal'
   }
 
@@ -365,20 +380,24 @@ const getLineLevel = (text) => {
 }
 
 const getLineColor = (text, prefix) => {
-  if (!logsColored || text.includes('[System] [CHAT]')) {
-    return 'white'
+  if (isLineLevel(text, 'comment')) {
+    return 'var(--color-green)'
   }
-  if (isLineLevel(text, 'info') && prefix) {
-    return '#00a8ff'
+
+  if (!logsColored || text.includes('[System] [CHAT]')) {
+    return 'var(--color-white)'
+  }
+  if (
+    (isLineLevel(text, 'info') || isLineLevel(text, 'debug') || isLineLevel(text, 'trace')) &&
+    prefix
+  ) {
+    return 'var(--color-blue)'
   }
   if (isLineLevel(text, 'warn')) {
-    return '#ff6625'
+    return 'var(--color-orange)'
   }
   if (isLineLevel(text, 'error')) {
-    return '#f62451'
-  }
-  if (isLineLevel(text, 'comment')) {
-    return '#1dd1a1'
+    return 'var(--color-red)'
   }
 }
 
