@@ -253,8 +253,9 @@ impl State {
                     let res4 = Profiles::update_projects();
                     let res5 = Settings::update_java();
                     let res6 = CredentialsStore::update_creds();
+                    let res7 = Settings::update_default_user();
 
-                    let _ = join!(res1, res2, res3, res4, res5, res6);
+                    let _ = join!(res1, res2, res3, res4, res5, res6, res7);
                 }
             }
         });
