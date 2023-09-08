@@ -174,9 +174,7 @@ pub struct LogSettings {
 
 impl Default for LogSettings {
     fn default() -> Self {
-        Self {
-            colored: true,
-        }
+        Self { colored: true }
     }
 }
 
