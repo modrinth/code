@@ -2,7 +2,7 @@ blank_issues_enabled: true
 contact_links:
   - name: Discord
     about: Ask questions on our Discord Server.
-    url: https://discord.gg/modrinth-734077874708938864
+    url: https://discord.modrinth.com
   - name: Roadmap
     about: View our Roadmap. Please do not open issues for items on our roadmap.
     url: https://roadmap.modrinth.com
