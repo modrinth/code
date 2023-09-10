@@ -1,6 +1,6 @@
 <template>
   <div class="action-groups">
-    <a href="https://discord.gg/modrinth" class="link">
+    <a href="https://discord.modrinth.com" class="link">
       <ChatIcon />
       <span> Get support </span>
     </a>
