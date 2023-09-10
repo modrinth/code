@@ -504,7 +504,7 @@ async function saveChanges() {
     console.error(err)
     data.$notify({
       group: 'main',
-      title: commonMessages.errorNotificationTitle,
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data.description,
       type: 'error',
     })
