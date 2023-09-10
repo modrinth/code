@@ -330,7 +330,7 @@
       </div>
       <div class="links links-3" role="region" aria-label="Interact">
         <h4 aria-hidden="true">Interact</h4>
-        <a rel="noopener" :target="$external()" href="https://discord.gg/EUHuJHt"> Discord </a>
+        <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>
         <a rel="noopener" :target="$external()" href="https://twitter.com/modrinth"> Twitter </a>
         <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>
         <a rel="noopener" :target="$external()" href="https://crowdin.com/project/modrinth">
