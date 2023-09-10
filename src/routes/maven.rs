@@ -1,11 +1,11 @@
-use crate::auth::{get_user_from_headers, is_authorized_version};
+use crate::database::models::categories::Loader;
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
 use crate::models::pats::Scopes;
 use crate::models::projects::{ProjectId, VersionId};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::{auth::is_authorized, database};
+use crate::{auth::{is_authorized, is_authorized_version, get_user_from_headers}, database};
 use actix_web::{get, route, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use std::collections::HashSet;
@@ -72,11 +72,7 @@ pub async fn maven_metadata(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
-    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
-
-    let data = if let Some(data) = project_data {
-        data
-    } else {
+    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
@@ -91,7 +87,7 @@ pub async fn maven_metadata(
     .map(|x| x.1)
     .ok();
 
-    if !is_authorized(&data.inner, &user_option, &pool).await? {
+    if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
@@ -102,7 +98,7 @@ pub async fn maven_metadata(
         WHERE mod_id = $1 AND status = ANY($2)
         ORDER BY date_published ASC
         ",
-        data.inner.id as database::models::ids::ProjectId,
+        project.inner.id as database::models::ids::ProjectId,
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_listed())
             .map(|x| x.to_string())
@@ -130,7 +126,7 @@ pub async fn maven_metadata(
         new_versions.push(value);
     }
 
-    let project_id: ProjectId = data.inner.id.into();
+    let project_id: ProjectId = project.inner.id.into();
 
     let respdata = Metadata {
         group_id: "maven.modrinth".to_string(),
@@ -144,7 +140,7 @@ pub async fn maven_metadata(
             versions: Versions {
                 versions: new_versions,
             },
-            last_updated: data.inner.updated.format("%Y%m%d%H%M%S").to_string(),
+            last_updated: project.inner.updated.format("%Y%m%d%H%M%S").to_string(),
         },
     };
 
@@ -153,8 +149,65 @@ pub async fn maven_metadata(
         .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?))
 }
 
+async fn find_version(
+    project: &QueryProject,
+    vcoords: &String,
+    pool: &PgPool,
+    redis: &deadpool_redis::Pool,
+) -> Result<Option<QueryVersion>, ApiError> {
+    let id_option = crate::models::ids::base62_impl::parse_base62(vcoords)
+        .ok()
+        .map(|x| x as i64);
+
+    let all_versions = database::models::Version::get_many(&project.versions, pool, redis).await?;
+
+    let exact_matches = all_versions
+        .iter()
+        .filter(|x| &x.inner.version_number == vcoords || Some(x.inner.id.0) == id_option)
+        .collect::<Vec<_>>();
+
+    if exact_matches.len() == 1 {
+        return Ok(Some(exact_matches[0].clone()));
+    }
+
+    // Try to parse version filters from version coords.
+    let Some((vnumber, filter)) = vcoords.rsplit_once('-') else {
+        return Ok(exact_matches.get(0).map(|x| (*x).clone()));
+    };
+
+    let db_loaders: HashSet<String> = Loader::list(pool, redis)
+        .await?
+        .into_iter()
+        .map(|x| x.loader)
+        .collect();
+
+    let (loaders, game_versions) = filter
+        .split(',')
+        .map(String::from)
+        .partition::<Vec<_>, _>(|el| db_loaders.contains(el));
+
+    let matched = all_versions
+        .into_iter()
+        .filter(|x| {
+            let mut bool = x.inner.version_number == vnumber;
+
+            if !loaders.is_empty() {
+                bool &= x.loaders.iter().any(|y| loaders.contains(y));
+            }
+            if !game_versions.is_empty() {
+                bool &= x.game_versions.iter().any(|y| game_versions.contains(y));
+            }
+
+            bool
+        })
+        .collect::<Vec<_>>();
+
+    Ok(matched.get(0).cloned())
+}
+
 fn find_file<'a>(
     project_id: &str,
+    vcoords: &str,
     project: &QueryProject,
     version: &'a QueryVersion,
     file: &str,
@@ -169,15 +222,7 @@ fn find_file<'a>(
         _ => return None,
     };
 
-    let version_id: VersionId = version.inner.id.into();
-
-    if file
-        == format!(
-            "{}-{}.{}",
-            &project_id, &version.inner.version_number, fileext
-        )
-        || file == format!("{}-{}.{}", &project_id, &version_id, fileext)
-    {
+    if file == format!("{}-{}.{}", &project_id, &vcoords, fileext) {
         version
             .files
             .iter()
@@ -201,11 +246,7 @@ pub async fn version_file(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
-
-    let project = if let Some(data) = project_data {
-        data
-    } else {
+    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
@@ -224,30 +265,7 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(&vnum)
-        .ok()
-        .map(|x| x as i64);
-
-    let vid = if let Some(vid) = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC",
-        project.inner.id as database::models::ids::ProjectId,
-        vnum,
-        id_option
-    )
-    .fetch_optional(&**pool)
-    .await?
-    {
-        vid
-    } else {
-        return Ok(HttpResponse::NotFound().body(""));
-    };
-
-    let version = if let Some(version) =
-        database::models::Version::get(database::models::ids::VersionId(vid.id), &**pool, &redis)
-            .await?
-    {
-        version
-    } else {
+    let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
@@ -255,10 +273,7 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
-    let version_id: VersionId = version.inner.id.into();
-    if file == format!("{}-{}.pom", &project_id, &version.inner.version_number)
-        || file == format!("{}-{}.pom", &project_id, version_id)
-    {
+    if file == format!("{}-{}.pom", &project_id, &vnum) {
         let respdata = MavenPom {
             schema_location:
                 "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
@@ -274,7 +289,7 @@ pub async fn version_file(
         return Ok(HttpResponse::Ok()
             .content_type("text/xml")
             .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?));
-    } else if let Some(selected_file) = find_file(&project_id, &project, &version, &file) {
+    } else if let Some(selected_file) = find_file(&project_id, &vnum, &project, &version, &file) {
         return Ok(HttpResponse::TemporaryRedirect()
             .append_header(("location", &*selected_file.url))
             .body(""));
@@ -292,11 +307,7 @@ pub async fn version_file_sha1(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
-
-    let project = if let Some(data) = project_data {
-        data
-    } else {
+    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
@@ -315,34 +326,15 @@ pub async fn version_file_sha1(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(&vnum)
-        .ok()
-        .map(|x| x as i64);
-
-    let vid = if let Some(vid) = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC",
-        project.inner.id as database::models::ids::ProjectId,
-        vnum,
-        id_option
-    )
-    .fetch_optional(&**pool)
-    .await?
-    {
-        vid
-    } else {
+    let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let version = if let Some(version) =
-        database::models::Version::get(database::models::ids::VersionId(vid.id), &**pool, &redis)
-            .await?
-    {
-        version
-    } else {
+    if !is_authorized_version(&version.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
-    };
+    }
 
-    Ok(find_file(&project_id, &project, &version, &file)
+    Ok(find_file(&project_id, &vnum, &project, &version, &file)
         .and_then(|file| file.hashes.get("sha1"))
         .map(|hash_str| HttpResponse::Ok().body(hash_str.clone()))
         .unwrap_or_else(|| HttpResponse::NotFound().body("")))
@@ -357,11 +349,7 @@ pub async fn version_file_sha512(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
-    let project_data = database::models::Project::get(&project_id, &**pool, &redis).await?;
-
-    let project = if let Some(data) = project_data {
-        data
-    } else {
+    let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
@@ -380,30 +368,7 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(&vnum)
-        .ok()
-        .map(|x| x as i64);
-
-    let vid = if let Some(vid) = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC",
-        project.inner.id as database::models::ids::ProjectId,
-        vnum,
-        id_option
-    )
-    .fetch_optional(&**pool)
-    .await?
-    {
-        vid
-    } else {
-        return Ok(HttpResponse::NotFound().body(""));
-    };
-
-    let version = if let Some(version) =
-        database::models::Version::get(database::models::ids::VersionId(vid.id), &**pool, &redis)
-            .await?
-    {
-        version
-    } else {
+    let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
         return Ok(HttpResponse::NotFound().body(""));
     };
 
@@ -411,7 +376,7 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
-    Ok(find_file(&project_id, &project, &version, &file)
+    Ok(find_file(&project_id, &vnum, &project, &version, &file)
         .and_then(|file| file.hashes.get("sha512"))
         .map(|hash_str| HttpResponse::Ok().body(hash_str.clone()))
         .unwrap_or_else(|| HttpResponse::NotFound().body("")))

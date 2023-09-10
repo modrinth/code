@@ -4590,28 +4590,6 @@
     },
     "query": "\n            INSERT INTO reports (\n                id, report_type_id, mod_id, version_id, user_id,\n                body, reporter\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7\n            )\n            "
   },
-  "c44e260a1f7712b14ac521fd301fea1b3f92238da62aeaf819997aecc365be43": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Text",
-          "Int8"
-        ]
-      }
-    },
-    "query": "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC"
-  },
   "c49cda8215982b699d7aee14614763c9b5b997489581293fc2ae3604697867fe": {
     "describe": {
       "columns": [
