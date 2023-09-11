@@ -349,17 +349,8 @@ pub async fn version_edit(
             &**pool,
         )
         .await?;
-        let permissions;
 
-        if user.role.is_admin() {
-            permissions = Some(Permissions::ALL)
-        } else if let Some(member) = team_member {
-            permissions = Some(member.permissions)
-        } else if user.role.is_mod() {
-            permissions = Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY)
-        } else {
-            permissions = None
-        }
+        let permissions = Permissions::get_permissions_by_role(&user.role, &team_member);
 
         if let Some(perms) = permissions {
             if !perms.contains(Permissions::UPLOAD_VERSION) {

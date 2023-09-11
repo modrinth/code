@@ -45,6 +45,23 @@ impl Default for Permissions {
     }
 }
 
+impl Permissions {
+    pub fn get_permissions_by_role(
+        role: &crate::models::users::Role,
+        team_member: &Option<crate::database::models::TeamMember>,
+    ) -> Option<Self> {
+        if role.is_admin() {
+            Some(Permissions::ALL)
+        } else if let Some(member) = team_member {
+            Some(member.permissions)
+        } else if role.is_mod() {
+            Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY | Permissions::UPLOAD_VERSION)
+        } else {
+            None
+        }
+    }
+}
+
 /// A member of a team
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TeamMember {
