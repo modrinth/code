@@ -7,6 +7,7 @@ import {
   LibraryIcon,
   PlusIcon,
   SettingsIcon,
+  FileIcon,
   Button,
   Notifications,
   XIcon,
@@ -25,7 +26,7 @@ import { offline_listener, command_listener, warning_listener } from '@/helpers/
 import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS, isOffline } from '@/helpers/utils.js'
+import { isDev, getOS, isOffline, showLauncherLogsFolder } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
@@ -42,6 +43,9 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
+
+import 'omorphia/dist/style.css'
+import '@/assets/stylesheets/global.scss'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -106,7 +110,6 @@ defineExpose({
   failure: async (e) => {
     isLoading.value = false
     failureText.value = e
-    os.value = await getOS()
   },
 })
 
@@ -229,43 +232,49 @@ command_listener(async (e) => {
     autoplay
     @ended="videoPlaying = false"
   />
-  <div v-if="failureText" class="failure">
-    <div class="appbar-failure">
+  <div v-if="failureText" class="failure dark-mode">
+    <div class="appbar-failure dark-mode">
       <Button icon-only @click="TauriWindow.getCurrent().close()">
         <XIcon />
       </Button>
     </div>
-    <div class="error-view">
+    <div class="error-view dark-mode">
       <Card class="error-text">
-        Modrinth App failed to load with the following error:
-
-        <div class="error-message">{{ failureText.message }}</div>
-
-        <div>This may be because of a corrupted file, or because it is missing crucial files.</div>
-        <div>
-          First, try ensuring you are connected to the internet, and then try restarting the app,
+        <div class="label">
+          <h3>
+            <span class="label__title size-card-header">Failed to initialize</span>
+          </h3>
         </div>
-        <div>so that any needed files can be downloaded.</div>
-        <div>
-          You can contact support here:
-          <span class="file-path-message">
-            <a href="https://discord.gg/modrinth" class="link">
-              <ChatIcon /> https://discord.gg/modrinth</a
-            ></span
-          >
+        <div class="error-div">
+          Modrinth App failed to load correctly. This may be because of a corrupted file, or because
+          the app is missing crucial files.
         </div>
+        <div class="error-div">You may be able to fix it one of the following ways:</div>
+        <ul class="error-div">
+          <li>Ennsuring you are connected to the internet, then try restarting the app.</li>
+          <li>Redownloading the app.</li>
+        </ul>
+        <div class="error-div">
+          If it still does not work, you can seek support using the link below. You should provide
+          the following error, as well as any recent launcher logs in the folder below.
+        </div>
+        <div class="error-div">The following error was provided:</div>
 
-        <span>You can find more detailed launcher logs at: </span>
-        <div class="file-path-message">
-          <span v-if="os == 'MacOS'"
-            >~/Library/Application Support/com.modrinth.theseus/launcher_logs</span
+        <Card class="error-message">
+          {{ failureText.message }}
+        </Card>
+
+        <div class="button-row push-right">
+          <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
+
+          <Button
+            ><a href="https://discord.gg/modrinth" class="link"
+              ><ChatIcon /> <span> Get support </span></a
+            ></Button
           >
-          <span v-if="os == 'Windows'">C:\Users\(you)\AppData\Roaming\com.modrinth.theseus</span>
-          <span v-if="os == 'Linux'">/home/(you)/.config/com.modrinth.theseus</span>
         </div>
       </Card>
     </div>
-    <SplashScreen class="splash-view" />
   </div>
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
   <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
@@ -455,7 +464,7 @@ command_listener(async (e) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: var(--color-contrast);
+  background-color: var(--color-bg);
 
   .appbar-failure {
     display: flex; /* Change to flex to align items horizontally */
@@ -470,32 +479,31 @@ command_listener(async (e) => {
     display: flex; /* Change to flex to align items horizontally */
     justify-content: center;
     width: 100%;
+    background-color: var(--color-bg);
+
+    color: var(--color-base);
+
+    .card {
+      background-color: var(--color-raised-bg);
+    }
 
     .error-text {
-      background-color: var(--color-bg);
       display: flex;
+      max-width: 60%;
       gap: 0.25rem;
       flex-direction: column;
 
-      .error-message {
-        color: var(--color-red);
-        text-align: center;
+      .error-div {
+        // spaced out
         margin: 0.5rem;
       }
-      .file-path-message {
-        color: var(--color-green);
+
+      .error-message {
         text-align: center;
         margin: 0.5rem;
+        background-color: var(--color-button-bg);
       }
     }
-  }
-
-  .splash-view {
-    width: 100%;
-    overflow: hidden;
-    position: absolute;
-    bottom: 0;
-    pointer-events: none;
   }
 }
 
@@ -627,5 +635,16 @@ command_listener(async (e) => {
   height: calc(100vh - 2.25rem);
   object-fit: cover;
   border-radius: var(--radius-md);
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--gap-md);
+
+  .transparent {
+    padding: var(--gap-sm) 0;
+  }
 }
 </style>

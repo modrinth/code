@@ -298,7 +298,6 @@ pub struct EditProfile {
     pub memory: Option<MemorySettings>,
     pub resolution: Option<WindowSize>,
     pub hooks: Option<Hooks>,
-    pub locked: Option<bool>,
     pub fullscreen: Option<bool>,
 }
 
@@ -337,8 +336,6 @@ pub async fn profile_edit(
                 prof.metadata.groups = groups;
             }
         }
-
-        prof.locked = edit_profile.locked;
 
         prof.java = edit_profile.java.clone();
         prof.memory = edit_profile.memory;

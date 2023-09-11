@@ -102,13 +102,11 @@ pub async fn profile_create(
         }
 
         profile.metadata.linked_data = linked_data;
-        if let Some(linked_data) = &profile.metadata.linked_data {
-            profile.locked = Some(
+        if let Some(linked_data) = &mut profile.metadata.linked_data {
+            linked_data.locked = Some(
                 linked_data.project_id.is_some()
                     && linked_data.version_id.is_some(),
             );
-        } else {
-            profile.locked = Some(false);
         }
 
         emit_profile(

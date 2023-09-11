@@ -1,3 +1,4 @@
+use crate::config::MODRINTH_API_URL;
 use crate::event::emit::{
     emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
 };
@@ -5,13 +6,16 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     set_profile_information, EnvType, PackFile, PackFileHash,
 };
-use crate::prelude::ProfilePathId;
+use crate::prelude::{ModrinthVersion, ProfilePathId, ProjectMetadata};
 use crate::state::{ProfileInstallStage, Profiles, SideType};
-use crate::util::fetch::{fetch_mirrors, write};
+use crate::util::fetch::{fetch_json, fetch_mirrors, write};
 use crate::util::io;
 use crate::{profile, State};
 use async_zip::tokio::read::seek::ZipFileReader;
+use reqwest::Method;
+use serde_json::json;
 
+use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
 
@@ -43,6 +47,7 @@ pub async fn install_zipped_mrpack(
                 title,
                 icon_url,
                 profile_path.clone(),
+                None,
             )
             .await?
         }
@@ -344,31 +349,65 @@ pub async fn remove_all_related_files(
         })
         .await?;
 
-        let num_files = pack.files.len();
-        use futures::StreamExt;
-        loading_try_for_each_concurrent(
-            futures::stream::iter(pack.files.into_iter())
-                .map(Ok::<PackFile, crate::Error>),
-            None,
-            None,
-            0.0,
-            num_files,
-            None,
-            |project| {
-                let profile_path = profile_path.clone();
-                async move {
-                    // Remove this file if a corresponding one exists in the filesystem
-                    let existing_file =
-                        profile_path.get_full_path().await?.join(&project.path);
-                    if existing_file.exists() {
-                        io::remove_file(&existing_file).await?;
-                    }
+        // First, remove all modrinth projects by their version hashes
+        // Remove all modrinth projects by their version hashes
+        // We need to do a fetch to get the project ids from Modrinth
+        let state = State::get().await?;
+        let all_hashes = pack
+            .files
+            .iter()
+            .filter_map(|f| Some(f.hashes.get(&PackFileHash::Sha512)?.clone()))
+            .collect::<Vec<_>>();
+        let creds = state.credentials.read().await;
 
-                    Ok(())
-                }
-            },
+        // First, get project info by hash
+        let files_url = format!("{}version_files", MODRINTH_API_URL);
+
+        let hash_projects = fetch_json::<HashMap<String, ModrinthVersion>>(
+            Method::POST,
+            &files_url,
+            None,
+            Some(json!({
+                "hashes": all_hashes,
+                "algorithm": "sha512",
+            })),
+            &state.fetch_semaphore,
+            &creds,
         )
         .await?;
+        let to_remove = hash_projects
+            .into_values()
+            .map(|p| p.project_id)
+            .collect::<Vec<_>>();
+        let profile =
+            profile::get(&profile_path, None).await?.ok_or_else(|| {
+                crate::ErrorKind::UnmanagedProfileError(
+                    profile_path.to_string(),
+                )
+            })?;
+        for (project_id, project) in &profile.projects {
+            if let ProjectMetadata::Modrinth { project, .. } = &project.metadata
+            {
+                if to_remove.contains(&project.id) {
+                    let path = profile
+                        .get_profile_full_path()
+                        .await?
+                        .join(project_id.0.clone());
+                    if path.exists() {
+                        io::remove_file(&path).await?;
+                    }
+                }
+            }
+        }
+
+        // Iterate over all Modrinth project file paths in the json, and remove them
+        // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
+        for file in pack.files {
+            let path = profile_path.get_full_path().await?.join(file.path);
+            if path.exists() {
+                io::remove_file(&path).await?;
+            }
+        }
 
         // Iterate over each 'overrides' file and remove it
         for index in 0..zip_reader.file().entries().len() {

@@ -132,15 +132,6 @@ export default new createRouter({
             breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Logs' }],
           },
         },
-        {
-          path: 'modpack',
-          name: 'Modpack',
-          component: Instance.Modpack,
-          meta: {
-            useRootContext: true,
-            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Modpack' }],
-          },
-        },
       ],
     },
   ],

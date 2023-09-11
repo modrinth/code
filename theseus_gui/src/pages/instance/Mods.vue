@@ -28,12 +28,12 @@
     <Button
       v-if="isPackLocked"
       v-tooltip="'Modpack is up to date'"
-      :disabled="updatingModpack || !canUpdatePack"
+      :disabled="installing || !canUpdatePack"
       color="secondary"
-      @click="updateModpack"
+      @click="modpackVersionModal.show()"
     >
       <UpdatedIcon />
-      {{ updatingModpack ? 'Updating' : 'Update modpack' }}
+      {{ installing ? 'Updating' : 'Update modpack' }}
     </Button>
     <Button v-else @click="exportModal.show()">
       <PackageIcon />
@@ -359,6 +359,12 @@
     share-text="Check out the projects I'm using in my modpack!"
   />
   <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
+  <ModpackVersionModal
+    v-if="instance.metadata.linked_data"
+    ref="modpackVersionModal"
+    :instance="instance"
+    :versions="props.versions"
+  />
 </template>
 <script setup>
 import {
@@ -395,7 +401,6 @@ import {
   remove_project,
   toggle_disable_project,
   update_all,
-  update_managed_modrinth_version,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
@@ -406,6 +411,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
+import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 
 const router = useRouter()
 
@@ -428,13 +434,17 @@ const props = defineProps({
       return false
     },
   },
+  versions: {
+    type: Array,
+    required: true,
+  },
 })
 
 const projects = ref([])
 const selectionMap = ref(new Map())
 const showingOptions = ref(false)
 const isPackLocked = computed(() => {
-  return props.instance.metadata.linked_data && props.instance.locked
+  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
 })
 const canUpdatePack = computed(() => {
   return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
@@ -516,6 +526,9 @@ watch(
     if (props.instance) initProjects(props.instance)
   }
 )
+
+const modpackVersionModal = ref(null)
+const installing = computed(() => props.instance.install_stage !== 'installed')
 
 const searchFilter = ref('')
 const selectAll = ref(false)
@@ -844,16 +857,6 @@ const handleContentOptionClick = async (args) => {
     }
     initProjects(await get(props.instance.path).catch(handleError))
   }
-}
-
-const updatingModpack = ref(false)
-const updateModpack = async () => {
-  updatingModpack.value = true
-  await update_managed_modrinth_version(
-    props.instance.path,
-    props.instance.modrinth_update_version
-  ).catch(handleError)
-  updatingModpack.value = false
 }
 
 watch(selectAll, () => {

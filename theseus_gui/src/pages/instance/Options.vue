@@ -367,7 +367,7 @@
         </span>
       </label>
     </div>
-    <div v-if="!instance.locked" class="adjacent-input">
+    <div v-if="!isPackLocked" class="adjacent-input">
       <Card class="unlocked-instance">
         This is an unlocked instance. There may be unexpected behaviour unintended by the modpack
         creator.
@@ -427,12 +427,7 @@
           if your instance is diverging from the Modrinth modpack. This also re-locks the instance.
         </span>
       </label>
-      <Button
-        id="repair-modpack"
-        color="highlight"
-        :disabled="installing || inProgress || offline"
-        @click="repairModpack"
-      >
+      <Button id="repair-modpack" color="highlight" :disabled="offline" @click="repairModpack">
         <DownloadIcon /> Reinstall
       </Button>
     </div>
@@ -759,7 +754,6 @@ async function repairProfile() {
 async function unpairProfile() {
   const editProfile = props.instance
   editProfile.metadata.linked_data = null
-  editProfile.locked = false
   await edit(props.instance.path, editProfile)
   installedVersion.value = null
   installedVersionData.value = null
@@ -768,10 +762,14 @@ async function unpairProfile() {
 
 async function unlockProfile() {
   const editProfile = props.instance
-  editProfile.locked = false
+  editProfile.metadata.linked_data.locked = false
   await edit(props.instance.path, editProfile)
   modalConfirmUnlock.value.hide()
 }
+
+const isPackLocked = computed(() => {
+  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
+})
 
 async function repairModpack() {
   inProgress.value = true

@@ -1,17 +1,17 @@
 use crate::{
     event::{
-        emit::{emit_profile, loading_try_for_each_concurrent},
+        emit::{emit_profile, init_loading, loading_try_for_each_concurrent},
         ProfilePayloadType,
     },
     pack::{self, install_from::generate_pack_from_version_id},
     prelude::{ProfilePathId, ProjectPathId},
     profile::get,
     state::{ProfileInstallStage, Project},
-    State,
+    LoadingBarType, State,
 };
 use futures::try_join;
 
-/// Updates a managed modrinth pack to the cached latest version found in 'modrinth_update_version'
+/// Updates a managed modrinth pack to the version specified by new_version_id
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn update_managed_modrinth_version(
@@ -160,29 +160,51 @@ async fn replace_managed_modrinth(
 
     // Fetch .mrpacks for both old and new versions
     // TODO: this will need to be updated if we revert the hacky pack method we needed for compiler speed
-    let old_pack_creator = generate_pack_from_version_id(
-        project_id.clone(),
-        version_id.clone(),
-        profile.metadata.name.clone(),
-        None,
-        profile_path.clone(),
-    );
 
-    // download in parallel, then join. If new_version_id is None, we don't need to download the new pack, so we clone the old one
     let (old_pack_creator, new_pack_creator) =
         if let Some(new_version_id) = new_version_id {
+            let shared_loading_bar = init_loading(
+                LoadingBarType::PackFileDownload {
+                    profile_path: profile_path.get_full_path().await?,
+                    pack_name: profile.metadata.name.clone(),
+                    icon: None,
+                    pack_version: version_id.clone(),
+                },
+                200.0, // These two downloads will share the same loading bar
+                "Downloading pack file",
+            )
+            .await?;
+
+            // download in parallel, then join.
             try_join!(
-                old_pack_creator,
+                generate_pack_from_version_id(
+                    project_id.clone(),
+                    version_id.clone(),
+                    profile.metadata.name.clone(),
+                    None,
+                    profile_path.clone(),
+                    Some(shared_loading_bar.clone())
+                ),
                 generate_pack_from_version_id(
                     project_id.clone(),
                     new_version_id.clone(),
                     profile.metadata.name.clone(),
                     None,
-                    profile_path.clone()
+                    profile_path.clone(),
+                    Some(shared_loading_bar)
                 )
             )?
         } else {
-            let mut old_pack_creator = old_pack_creator.await?;
+            // If new_version_id is None, we don't need to download the new pack, so we clone the old one
+            let mut old_pack_creator = generate_pack_from_version_id(
+                project_id.clone(),
+                version_id.clone(),
+                profile.metadata.name.clone(),
+                None,
+                profile_path.clone(),
+                None,
+            )
+            .await?;
             old_pack_creator.description.existing_loading_bar = None;
             (old_pack_creator.clone(), old_pack_creator)
         };

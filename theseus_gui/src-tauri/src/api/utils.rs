@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
-use theseus::{handler, prelude::CommandPayload, State};
+use theseus::{
+    handler,
+    prelude::{CommandPayload, DirectoryInfo},
+    State,
+};
 
 use crate::api::Result;
 use std::{env, path::PathBuf, process::Command};
@@ -10,6 +14,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_os,
             should_disable_mouseover,
             show_in_folder,
+            show_launcher_logs_folder,
             progress_bars_list,
             safety_check_safe_loading_bars,
             get_opening_command,
@@ -127,6 +132,14 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
     }?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub fn show_launcher_logs_folder() -> Result<()> {
+    let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
+    // failure to get folder just opens filesystem
+    // (ie: if in debug mode only and launcher_logs never created)
+    show_in_folder(path)
 }
 
 // Get opening command

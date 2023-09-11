@@ -21,6 +21,10 @@ export async function showInFolder(path) {
   return await invoke('plugin:utils|show_in_folder', { path })
 }
 
+export async function showLauncherLogsFolder() {
+  return await invoke('plugin:utils|show_launcher_logs_folder', {})
+}
+
 // Opens a profile's folder in the OS file explorer
 export async function showProfileInFolder(path) {
   const fullPath = await get_full_path(path)
