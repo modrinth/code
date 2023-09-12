@@ -107,6 +107,7 @@ defineExpose({
   failure: async (e) => {
     isLoading.value = false
     failureText.value = e
+    os.value = await getOS()
   },
 })
 
@@ -122,6 +123,10 @@ const confirmClose = async () => {
 }
 
 const handleClose = async () => {
+  if (failureText.value != null) {
+    await TauriWindow.getCurrent().close()
+    return
+  }
   // State should respond immeiately if it's safe to close
   // If not, code is deadlocked or worse, so wait 2 seconds and then ask the user to confirm closing
   // (Exception: if the user is changing config directory, which takes control of the state, and it's taking a significant amount of time for some reason)
@@ -137,6 +142,16 @@ const handleClose = async () => {
   }
   await await_sync()
   await TauriWindow.getCurrent().close()
+}
+
+const openSupport = async () => {
+  window.__TAURI_INVOKE__('tauri', {
+    __tauriModule: 'Shell',
+    message: {
+      cmd: 'open',
+      path: 'https://discord.gg/modrinth',
+    },
+  })
 }
 
 TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
@@ -231,7 +246,7 @@ command_listener(async (e) => {
   />
   <div v-if="failureText" class="failure dark-mode">
     <div class="appbar-failure dark-mode">
-      <Button icon-only @click="TauriWindow.getCurrent().close()">
+      <Button v-if="os != 'MacOS'" icon-only @click="TauriWindow.getCurrent().close()">
         <XIcon />
       </Button>
     </div>
@@ -264,11 +279,7 @@ command_listener(async (e) => {
         <div class="button-row push-right">
           <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
 
-          <Button
-            ><a href="https://discord.gg/modrinth" class="link"
-              ><ChatIcon /> <span> Get support </span></a
-            ></Button
-          >
+          <Button @click="openSupport"><ChatIcon />Get support</Button>
         </div>
       </Card>
     </div>
