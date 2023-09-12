@@ -48,7 +48,7 @@ impl ChildType {
             ChildType::TokioChild(child) => Ok(child
                 .try_wait()
                 .map_err(IOError::from)?
-                .and_then(|x| x.code())),
+                .map(|x| x.code().unwrap_or(0))),
             ChildType::RescuedPID(pid) => {
                 let mut system = sysinfo::System::new();
                 if !system.refresh_process(sysinfo::Pid::from_u32(*pid)) {

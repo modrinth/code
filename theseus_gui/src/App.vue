@@ -44,9 +44,6 @@ import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 
-import 'omorphia/dist/style.css'
-import '@/assets/stylesheets/global.scss'
-
 const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)

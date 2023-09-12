@@ -152,7 +152,7 @@ async fn replace_managed_modrinth(
     new_version_id: Option<&String>,
     ignore_lock: bool,
 ) -> crate::Result<()> {
-    crate::profile::edit(profile_path, |mut profile| {
+    crate::profile::edit(profile_path, |profile| {
         profile.install_stage = ProfileInstallStage::Installing;
         async { Ok(()) }
     })

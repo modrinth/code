@@ -187,8 +187,8 @@ impl State {
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
 
-        let discord_rpc = DiscordGuard::init().await?;
-        if !settings.disable_discord_rpc {
+        let discord_rpc = DiscordGuard::init(is_offline).await?;
+        if !settings.disable_discord_rpc && !is_offline {
             // Add default Idling to discord rich presence
             // Force add to avoid recursion
             let _ = discord_rpc.force_set_activity("Idling...", true).await;
