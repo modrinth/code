@@ -446,6 +446,7 @@ const isPackLocked = computed(() => {
   return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
 })
 const canUpdatePack = computed(() => {
+  if (!props.instance.metadata.linked_data) return false
   return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
 })
 const exportModal = ref(null)
