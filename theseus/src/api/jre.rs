@@ -7,6 +7,7 @@ use crate::event::emit::{emit_loading, init_loading};
 use crate::state::CredentialsStore;
 use crate::util::fetch::{fetch_advanced, fetch_json};
 
+use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
 use crate::{
     state::JavaGlobals,
@@ -92,7 +93,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
     let packages = fetch_json::<Vec<Package>>(
                 Method::GET,
                 &format!(
-                    "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jdk&page_size=1",
+                    "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
                     std::env::consts::ARCH, java_version, std::env::consts::OS
                 ),
                 None,
@@ -123,6 +124,17 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                     "Failed to read java zip".to_string(),
                 ))
             })?;
+
+        // removes the old installation of java
+        if let Some(file) = archive.file_names().next() {
+            if let Some(dir) = file.split("/").next() {
+                let path = path.join(dir);
+
+                if path.exists() {
+                    io::remove_dir_all(path).await?;
+                }
+            }
+        }
 
         emit_loading(&loading_bar, 0.0, Some("Extracting java")).await?;
         archive.extract(&path).map_err(|_| {
