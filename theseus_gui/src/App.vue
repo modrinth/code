@@ -507,7 +507,6 @@ command_listener(async (e) => {
       }
 
       .error-message {
-        text-align: center;
         margin: 0.5rem;
         background-color: var(--color-button-bg);
       }

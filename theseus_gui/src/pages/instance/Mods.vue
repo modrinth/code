@@ -26,16 +26,15 @@
       </div>
     </div>
     <Button
-      v-if="isPackLocked"
-      v-tooltip="'Modpack is up to date'"
-      :disabled="installing || !canUpdatePack"
+      v-if="canUpdatePack"
+      :disabled="installing"
       color="secondary"
       @click="modpackVersionModal.show()"
     >
       <UpdatedIcon />
       {{ installing ? 'Updating' : 'Update modpack' }}
     </Button>
-    <Button v-else @click="exportModal.show()">
+    <Button v-else-if="!isPackLocked" @click="exportModal.show()">
       <PackageIcon />
       Export modpack
     </Button>
