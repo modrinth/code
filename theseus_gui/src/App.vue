@@ -7,9 +7,11 @@ import {
   LibraryIcon,
   PlusIcon,
   SettingsIcon,
+  FileIcon,
   Button,
   Notifications,
   XIcon,
+  Card,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -19,12 +21,12 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
-import { useNotifications } from '@/store/notifications.js'
+import { handleError, useNotifications } from '@/store/notifications.js'
 import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
-import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
+import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS, isOffline } from '@/helpers/utils.js'
+import { isDev, getOS, isOffline, showLauncherLogsFolder } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
@@ -40,6 +42,7 @@ import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
+import { install_from_file } from './helpers/pack'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -51,14 +54,17 @@ const showOnboarding = ref(false)
 
 const onboardingVideo = ref()
 
+const failureText = ref(null)
+const os = ref('')
+
 defineExpose({
   initialize: async () => {
     isLoading.value = false
     const { theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
       await get()
-    const os = await getOS()
     // video should play if the user is not on linux, and has not onboarded
-    videoPlaying.value = !fully_onboarded && os !== 'Linux'
+    os.value = await getOS()
+    videoPlaying.value = !fully_onboarded && os.value !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !fully_onboarded
@@ -98,6 +104,11 @@ defineExpose({
       onboardingVideo.value.play()
     }
   },
+  failure: async (e) => {
+    isLoading.value = false
+    failureText.value = e
+    os.value = await getOS()
+  },
 })
 
 const confirmClose = async () => {
@@ -112,6 +123,10 @@ const confirmClose = async () => {
 }
 
 const handleClose = async () => {
+  if (failureText.value != null) {
+    await TauriWindow.getCurrent().close()
+    return
+  }
   // State should respond immeiately if it's safe to close
   // If not, code is deadlocked or worse, so wait 2 seconds and then ask the user to confirm closing
   // (Exception: if the user is changing config directory, which takes control of the state, and it's taking a significant amount of time for some reason)
@@ -127,6 +142,16 @@ const handleClose = async () => {
   }
   await await_sync()
   await TauriWindow.getCurrent().close()
+}
+
+const openSupport = async () => {
+  window.__TAURI_INVOKE__('tauri', {
+    __tauriModule: 'Shell',
+    message: {
+      cmd: 'open',
+      path: 'https://discord.gg/modrinth',
+    },
+  })
 }
 
 TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
@@ -193,9 +218,19 @@ document.querySelector('body').addEventListener('auxclick', function (e) {
 
 const accounts = ref(null)
 
-command_listener((e) => {
-  console.log(e)
-  urlModal.value.show(e)
+command_listener(async (e) => {
+  if (e.event === 'RunMRPack') {
+    // RunMRPack should directly install a local mrpack given a path
+    if (e.path.endsWith('.mrpack')) {
+      await install_from_file(e.path).catch(handleError)
+      mixpanel_track('InstanceCreate', {
+        source: 'CreationModalFileDrop',
+      })
+    }
+  } else {
+    // Other commands are URL-based (deep linking)
+    urlModal.value.show(e)
+  }
 })
 </script>
 
@@ -209,6 +244,46 @@ command_listener((e) => {
     autoplay
     @ended="videoPlaying = false"
   />
+  <div v-if="failureText" class="failure dark-mode">
+    <div class="appbar-failure dark-mode">
+      <Button v-if="os != 'MacOS'" icon-only @click="TauriWindow.getCurrent().close()">
+        <XIcon />
+      </Button>
+    </div>
+    <div class="error-view dark-mode">
+      <Card class="error-text">
+        <div class="label">
+          <h3>
+            <span class="label__title size-card-header">Failed to initialize</span>
+          </h3>
+        </div>
+        <div class="error-div">
+          Modrinth App failed to load correctly. This may be because of a corrupted file, or because
+          the app is missing crucial files.
+        </div>
+        <div class="error-div">You may be able to fix it one of the following ways:</div>
+        <ul class="error-div">
+          <li>Ennsuring you are connected to the internet, then try restarting the app.</li>
+          <li>Redownloading the app.</li>
+        </ul>
+        <div class="error-div">
+          If it still does not work, you can seek support using the link below. You should provide
+          the following error, as well as any recent launcher logs in the folder below.
+        </div>
+        <div class="error-div">The following error was provided:</div>
+
+        <Card class="error-message">
+          {{ failureText.message }}
+        </Card>
+
+        <div class="button-row push-right">
+          <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
+
+          <Button @click="openSupport"><ChatIcon />Get support</Button>
+        </div>
+      </Card>
+    </div>
+  </div>
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
   <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
@@ -393,6 +468,53 @@ command_listener((e) => {
   }
 }
 
+.failure {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--color-bg);
+
+  .appbar-failure {
+    display: flex; /* Change to flex to align items horizontally */
+    justify-content: flex-end; /* Align items to the right */
+    height: 3.25rem;
+    //no select
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .error-view {
+    display: flex; /* Change to flex to align items horizontally */
+    justify-content: center;
+    width: 100%;
+    background-color: var(--color-bg);
+
+    color: var(--color-base);
+
+    .card {
+      background-color: var(--color-raised-bg);
+    }
+
+    .error-text {
+      display: flex;
+      max-width: 60%;
+      gap: 0.25rem;
+      flex-direction: column;
+
+      .error-div {
+        // spaced out
+        margin: 0.5rem;
+      }
+
+      .error-message {
+        margin: 0.5rem;
+        background-color: var(--color-button-bg);
+      }
+    }
+  }
+}
+
 .nav-container {
   display: flex;
   flex-direction: column;
@@ -521,5 +643,16 @@ command_listener((e) => {
   height: calc(100vh - 2.25rem);
   object-fit: cover;
   border-radius: var(--radius-md);
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--gap-md);
+
+  .transparent {
+    padding: var(--gap-sm) 0;
+  }
 }
 </style>

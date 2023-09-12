@@ -306,6 +306,7 @@ async fn import_mmc_unmanaged(
         &description,
         &backup_name,
         &dependencies,
+        false,
     )
     .await?;
 

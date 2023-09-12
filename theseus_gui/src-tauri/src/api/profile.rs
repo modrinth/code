@@ -13,6 +13,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_get,
             profile_get_optimal_jre_key,
             profile_get_full_path,
+            profile_get_mod_full_path,
             profile_list,
             profile_check_installed,
             profile_install,
@@ -22,7 +23,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_add_project_from_path,
             profile_toggle_disable_project,
             profile_remove_project,
-            profile_update_managed_modrinth,
+            profile_update_managed_modrinth_version,
             profile_repair_managed_modrinth,
             profile_run,
             profile_run_wait,
@@ -60,6 +61,17 @@ pub async fn profile_get(
 #[tauri::command]
 pub async fn profile_get_full_path(path: ProfilePathId) -> Result<PathBuf> {
     let res = profile::get_full_path(&path).await?;
+    Ok(res)
+}
+
+// Get's a mod's full path
+// invoke('plugin:profile|profile_get_mod_full_path',path)
+#[tauri::command]
+pub async fn profile_get_mod_full_path(
+    path: ProfilePathId,
+    project_path: ProjectPathId,
+) -> Result<PathBuf> {
+    let res = profile::get_mod_full_path(&path, &project_path).await?;
     Ok(res)
 }
 
@@ -173,12 +185,16 @@ pub async fn profile_remove_project(
     Ok(())
 }
 
-// Updates a managed Modrinth profile
+// Updates a managed Modrinth profile to a version of version_id
 #[tauri::command]
-pub async fn profile_update_managed_modrinth(
+pub async fn profile_update_managed_modrinth_version(
     path: ProfilePathId,
+    version_id: String,
 ) -> Result<()> {
-    Ok(profile::update::update_managed_modrinth(&path).await?)
+    Ok(
+        profile::update::update_managed_modrinth_version(&path, &version_id)
+            .await?,
+    )
 }
 
 // Repairs a managed Modrinth profile by updating it to the current version
@@ -197,12 +213,16 @@ pub async fn profile_export_mrpack(
     export_location: PathBuf,
     included_overrides: Vec<String>,
     version_id: Option<String>,
+    description: Option<String>,
+    name: Option<String>, // only used to cache
 ) -> Result<()> {
     profile::export_mrpack(
         &path,
         export_location,
         included_overrides,
         version_id,
+        description,
+        name,
     )
     .await?;
     Ok(())

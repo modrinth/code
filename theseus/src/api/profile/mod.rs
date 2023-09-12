@@ -8,7 +8,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
-use crate::state::ProjectMetadata;
+use crate::state::{ProjectMetadata, SideType};
 
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
@@ -107,6 +107,26 @@ pub async fn get_full_path(path: &ProfilePathId) -> crate::Result<PathBuf> {
     })?;
     let full_path = io::canonicalize(path.get_full_path().await?)?;
     Ok(full_path)
+}
+
+/// Get mod's full path in the filesystem
+#[tracing::instrument]
+pub async fn get_mod_full_path(
+    profile_path: &ProfilePathId,
+    project_path: &ProjectPathId,
+) -> crate::Result<PathBuf> {
+    if get(profile_path, Some(true)).await?.is_some() {
+        let full_path = io::canonicalize(
+            project_path.get_full_path(profile_path.clone()).await?,
+        )?;
+        return Ok(full_path);
+    }
+
+    Err(crate::ErrorKind::OtherError(format!(
+        "Tried to get the full path of a nonexistent or unloaded project at path {}!",
+        project_path.get_full_path(profile_path.clone()).await?.display()
+    ))
+    .into())
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -552,6 +572,8 @@ pub async fn export_mrpack(
     export_path: PathBuf,
     included_overrides: Vec<String>, // which folders to include in the overrides
     version_id: Option<String>,
+    description: Option<String>,
+    _name: Option<String>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let io_semaphore = state.io_semaphore.0.read().await;
@@ -585,7 +607,8 @@ pub async fn export_mrpack(
 
     // Create mrpack json configuration file
     let version_id = version_id.unwrap_or("1.0.0".to_string());
-    let packfile = create_mrpack_json(&profile, version_id).await?;
+    let packfile =
+        create_mrpack_json(&profile, version_id, description).await?;
     let modrinth_path_list = get_modrinth_pack_list(&packfile);
 
     // Build vec of all files in the folder
@@ -693,7 +716,7 @@ pub async fn get_potential_override_folders(
             ))
         })?;
     // dummy mrpack to get pack list
-    let mrpack = create_mrpack_json(&profile, "0".to_string()).await?;
+    let mrpack = create_mrpack_json(&profile, "0".to_string(), None).await?;
     let mrpack_files = get_modrinth_pack_list(&mrpack);
 
     let mut path_list: Vec<PathBuf> = Vec::new();
@@ -820,23 +843,12 @@ pub async fn run_credentials(
         .unwrap_or(&settings.custom_env_args);
 
     // Post post exit hooks
-    let post_exit_hook =
-        &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
-
-    let post_exit_hook = if let Some(hook) = post_exit_hook {
-        let mut cmd = hook.split(' ');
-        if let Some(command) = cmd.next() {
-            let mut command = Command::new(command);
-            command
-                .args(&cmd.collect::<Vec<&str>>())
-                .current_dir(path.get_full_path().await?);
-            Some(command)
-        } else {
-            None
-        }
-    } else {
-        None
-    };
+    let post_exit_hook = profile
+        .hooks
+        .as_ref()
+        .unwrap_or(&settings.hooks)
+        .post_exit
+        .clone();
 
     // Any options.txt settings that we want set, add here
     let mut mc_set_options: Vec<(String, String)> = vec![];
@@ -941,6 +953,7 @@ fn get_modrinth_pack_list(packfile: &PackFormat) -> Vec<String> {
 pub async fn create_mrpack_json(
     profile: &Profile,
     version_id: String,
+    description: Option<String>,
 ) -> crate::Result<PackFormat> {
     // Add loader version to dependencies
     let mut dependencies = HashMap::new();
@@ -950,6 +963,9 @@ pub async fn create_mrpack_json(
     ) {
         (crate::prelude::ModLoader::Forge, Some(v)) => {
             dependencies.insert(PackDependency::Forge, v.id)
+        }
+        (crate::prelude::ModLoader::NeoForge, Some(v)) => {
+            dependencies.insert(PackDependency::NeoForge, v.id)
         }
         (crate::prelude::ModLoader::Fabric, Some(v)) => {
             dependencies.insert(PackDependency::FabricLoader, v.id)
@@ -981,18 +997,21 @@ pub async fn create_mrpack_json(
         .projects
         .iter()
         .filter_map(|(mod_path, project)| {
-            let path: String = mod_path.0.clone().to_string_lossy().to_string();
+            let path: String = mod_path.get_inner_path_unix().ok()?;
 
             // Only Modrinth projects have a modrinth metadata field for the modrinth.json
             Some(Ok(match project.metadata {
                 crate::prelude::ProjectMetadata::Modrinth {
-                    ref project,
                     ref version,
                     ..
                 } => {
                     let mut env = HashMap::new();
-                    env.insert(EnvType::Client, project.client_side.clone());
-                    env.insert(EnvType::Server, project.server_side.clone());
+                    // TODO: envtype should be a controllable option (in general or at least .mrpack exporting)
+                    // For now, assume required.
+                    // env.insert(EnvType::Client, project.client_side.clone());
+                    // env.insert(EnvType::Server, project.server_side.clone());
+                    env.insert(EnvType::Client, SideType::Required);
+                    env.insert(EnvType::Server, SideType::Required);
 
                     let primary_file = if let Some(primary_file) =
                         version.files.first()
@@ -1037,7 +1056,7 @@ pub async fn create_mrpack_json(
         format_version: 1,
         version_id,
         name: profile.metadata.name.clone(),
-        summary: None,
+        summary: description,
         files,
         dependencies,
     })

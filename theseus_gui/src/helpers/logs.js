@@ -6,37 +6,50 @@
 import { invoke } from '@tauri-apps/api/tauri'
 
 /*
-A log is a struct containing the datetime string, stdout, and stderr, as follows:
+A log is a struct containing the filename string, stdout, and stderr, as follows:
 
 pub struct Logs {
-    pub datetime_string:  String,
+    pub filename:  String,
     pub stdout: String,
     pub stderr: String,
 }
 */
 
 /// Get all logs that exist for a given profile
-/// This is returned as an array of Log objects, sorted by datetime_string (the folder name, when the log was created)
+/// This is returned as an array of Log objects, sorted by filename (the folder name, when the log was created)
 export async function get_logs(profilePath, clearContents) {
   return await invoke('plugin:logs|logs_get_logs', { profilePath, clearContents })
 }
 
-/// Get a profile's log by datetime_string (the folder name, when the log was created)
-export async function get_logs_by_datetime(profilePath, datetimeString) {
-  return await invoke('plugin:logs|logs_get_logs_by_datetime', { profilePath, datetimeString })
+/// Get a profile's log by filename
+export async function get_logs_by_filename(profilePath, filename) {
+  return await invoke('plugin:logs|logs_get_logs_by_filename', { profilePath, filename })
 }
 
-/// Get a profile's stdout only by datetime_string (the folder name, when the log was created)
-export async function get_output_by_datetime(profilePath, datetimeString) {
-  return await invoke('plugin:logs|logs_get_output_by_datetime', { profilePath, datetimeString })
+/// Get a profile's log text only by filename
+export async function get_output_by_filename(profilePath, filename) {
+  return await invoke('plugin:logs|logs_get_output_by_filename', { profilePath, filename })
 }
 
-/// Delete a profile's log by datetime_string (the folder name, when the log was created)
-export async function delete_logs_by_datetime(profilePath, datetimeString) {
-  return await invoke('plugin:logs|logs_delete_logs_by_datetime', { profilePath, datetimeString })
+/// Delete a profile's log by filename
+export async function delete_logs_by_filename(profilePath, filename) {
+  return await invoke('plugin:logs|logs_delete_logs_by_filename', { profilePath, filename })
 }
 
 /// Delete all logs for a given profile
 export async function delete_logs(profilePath) {
   return await invoke('plugin:logs|logs_delete_logs', { profilePath })
+}
+
+/// Get the latest log for a given profile and cursor (startpoint to read withi nthe file)
+/// Returns:
+/*
+  {
+    cursor: u64
+    output: String
+    new_file: bool <- the cursor was too far, meaning that the file was likely rotated/reset. This signals to the frontend to clear the log and start over with this struct.
+  }
+*/
+export async function get_latest_log_cursor(profilePath, cursor) {
+  return await invoke('plugin:logs|logs_get_latest_log_cursor', { profilePath, cursor })
 }

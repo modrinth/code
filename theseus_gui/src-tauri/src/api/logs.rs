@@ -1,14 +1,14 @@
 use crate::api::Result;
 use theseus::{
-    logs::{self, Logs},
+    logs::{self, CensoredString, LatestLogCursor, Logs},
     prelude::ProfilePathId,
 };
 
 /*
-A log is a struct containing the datetime string, stdout, and stderr, as follows:
+A log is a struct containing the filename string, stdout, and stderr, as follows:
 
 pub struct Logs {
-    pub datetime_string:  String,
+    pub filename:  String,
     pub stdout: String,
     pub stderr: String,
 }
@@ -18,15 +18,16 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("logs")
         .invoke_handler(tauri::generate_handler![
             logs_get_logs,
-            logs_get_logs_by_datetime,
-            logs_get_output_by_datetime,
+            logs_get_logs_by_filename,
+            logs_get_output_by_filename,
             logs_delete_logs,
-            logs_delete_logs_by_datetime,
+            logs_delete_logs_by_filename,
+            logs_get_latest_log_cursor,
         ])
         .build()
 }
 
-/// Get all Logs for a profile, sorted by datetime
+/// Get all Logs for a profile, sorted by filename
 #[tauri::command]
 pub async fn logs_get_logs(
     profile_path: ProfilePathId,
@@ -37,21 +38,21 @@ pub async fn logs_get_logs(
     Ok(val)
 }
 
-/// Get a Log struct for a profile by profile id and datetime string
+/// Get a Log struct for a profile by profile id and filename string
 #[tauri::command]
-pub async fn logs_get_logs_by_datetime(
+pub async fn logs_get_logs_by_filename(
     profile_path: ProfilePathId,
-    datetime_string: String,
+    filename: String,
 ) -> Result<Logs> {
-    Ok(logs::get_logs_by_datetime(profile_path, datetime_string).await?)
+    Ok(logs::get_logs_by_filename(profile_path, filename).await?)
 }
 
-/// Get the stdout for a profile by profile id and datetime string
+/// Get the stdout for a profile by profile id and filename string
 #[tauri::command]
-pub async fn logs_get_output_by_datetime(
+pub async fn logs_get_output_by_filename(
     profile_path: ProfilePathId,
-    datetime_string: String,
-) -> Result<String> {
+    filename: String,
+) -> Result<CensoredString> {
     let profile_path = if let Some(p) =
         crate::profile::get(&profile_path, None).await?
     {
@@ -63,7 +64,7 @@ pub async fn logs_get_output_by_datetime(
         .into());
     };
 
-    Ok(logs::get_output_by_datetime(&profile_path, &datetime_string).await?)
+    Ok(logs::get_output_by_filename(&profile_path, &filename).await?)
 }
 
 /// Delete all logs for a profile by profile id
@@ -72,11 +73,20 @@ pub async fn logs_delete_logs(profile_path: ProfilePathId) -> Result<()> {
     Ok(logs::delete_logs(profile_path).await?)
 }
 
-/// Delete a log for a profile by profile id and datetime string
+/// Delete a log for a profile by profile id and filename string
 #[tauri::command]
-pub async fn logs_delete_logs_by_datetime(
+pub async fn logs_delete_logs_by_filename(
     profile_path: ProfilePathId,
-    datetime_string: String,
+    filename: String,
 ) -> Result<()> {
-    Ok(logs::delete_logs_by_datetime(profile_path, &datetime_string).await?)
+    Ok(logs::delete_logs_by_filename(profile_path, &filename).await?)
+}
+
+/// Get live log from a cursor
+#[tauri::command]
+pub async fn logs_get_latest_log_cursor(
+    profile_path: ProfilePathId,
+    cursor: u64, // 0 to start at beginning of file
+) -> Result<LatestLogCursor> {
+    Ok(logs::get_latest_log_cursor(profile_path, cursor).await?)
 }

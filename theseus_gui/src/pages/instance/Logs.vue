@@ -20,6 +20,15 @@
           Share
         </Button>
         <Button
+          v-if="logs[selectedLogIndex] && logs[selectedLogIndex].live === true"
+          @click="clearLiveLog()"
+        >
+          <TrashIcon />
+          Clear
+        </Button>
+
+        <Button
+          v-else
           :disabled="!logs[selectedLogIndex] || logs[selectedLogIndex].live === true"
           color="danger"
           @click="deleteLog()"
@@ -29,14 +38,43 @@
         </Button>
       </div>
     </div>
-    <div ref="logContainer" class="log-text">
-      <span
-        v-for="(line, index) in logs[selectedLogIndex]?.stdout.split('\n')"
-        :key="index"
-        class="no-wrap"
+    <div class="button-row">
+      <input
+        id="text-filter"
+        v-model="searchFilter"
+        autocomplete="off"
+        type="text"
+        class="text-filter"
+        placeholder="Type to filter logs..."
+      />
+      <div class="filter-group">
+        <Checkbox
+          v-for="level in levels"
+          :key="level.toLowerCase()"
+          v-model="levelFilters[level.toLowerCase()]"
+          class="filter-checkbox"
+        >
+          {{ level }}</Checkbox
+        >
+      </div>
+    </div>
+    <div class="log-text">
+      <RecycleScroller
+        v-slot="{ item }"
+        ref="logContainer"
+        class="scroller"
+        :items="displayProcessedLogs"
+        direction="vertical"
+        :item-size="20"
+        key-field="id"
       >
-        {{ line }} <br />
-      </span>
+        <div class="user no-wrap">
+          <span :style="{ color: item.prefixColor, 'font-weight': item.weight }">{{
+            item.prefix
+          }}</span>
+          <span :style="{ color: item.textColor }">{{ item.text }}</span>
+        </div>
+      </RecycleScroller>
     </div>
     <ShareModal
       ref="shareModal"
@@ -56,20 +94,31 @@ import {
   ClipboardCopyIcon,
   DropdownSelect,
   ShareIcon,
+  Checkbox,
   TrashIcon,
   ShareModal,
 } from 'omorphia'
-import { delete_logs_by_datetime, get_logs, get_output_by_datetime } from '@/helpers/logs.js'
-import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+  delete_logs_by_filename,
+  get_logs,
+  get_output_by_filename,
+  get_latest_log_cursor,
+} from '@/helpers/logs.js'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
-import calendar from 'dayjs/plugin/calendar'
-import { get_output_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
+import isToday from 'dayjs/plugin/isToday'
+import isYesterday from 'dayjs/plugin/isYesterday'
+import { get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
 
-dayjs.extend(calendar)
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+
+dayjs.extend(isToday)
+dayjs.extend(isYesterday)
 
 const route = useRoute()
 
@@ -82,10 +131,20 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  playing: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const currentLiveLog = ref(null)
+const currentLiveLogCursor = ref(0)
+const emptyText = ['No live game detected.', 'Start your game to proceed']
 
 const logs = ref([])
 await setLogs()
+
+const logsColored = true
 
 const selectedLogIndex = ref(0)
 const copied = ref(false)
@@ -95,16 +154,86 @@ const userScrolled = ref(false)
 const isAutoScrolling = ref(false)
 const shareModal = ref(null)
 
+const levels = ['Comment', 'Error', 'Warn', 'Info', 'Debug', 'Trace']
+const levelFilters = ref({})
+levels.forEach((level) => {
+  levelFilters.value[level.toLowerCase()] = true
+})
+const searchFilter = ref('')
+
+function shouldDisplay(processedLine) {
+  if (!processedLine.level) {
+    return true
+  }
+
+  if (!levelFilters.value[processedLine.level.toLowerCase()]) {
+    return false
+  }
+  if (searchFilter.value !== '') {
+    if (!processedLine.text.toLowerCase().includes(searchFilter.value.toLowerCase())) {
+      return false
+    }
+  }
+  return true
+}
+
+// Selects from the processed logs which ones should be displayed (shouldDisplay)
+// In addition, splits each line by \n. Each split line is given the same properties as the original line
+const displayProcessedLogs = computed(() => {
+  return processedLogs.value.filter((l) => shouldDisplay(l))
+})
+
+const processedLogs = computed(() => {
+  // split based on newline and timestamp lookahead
+  // (not just newline because of multiline messages)
+  const splitPattern = /\n(?=(?:#|\[\d\d:\d\d:\d\d\]))/
+
+  const lines = logs.value[selectedLogIndex.value]?.stdout.split(splitPattern) || []
+  const processed = []
+  let id = 0
+  for (let i = 0; i < lines.length; i++) {
+    // Then split off of \n.
+    // Lines that are not the first have prefix = null
+    const text = getLineText(lines[i])
+    const prefix = getLinePrefix(lines[i])
+    const prefixColor = getLineColor(lines[i], true)
+    const textColor = getLineColor(lines[i], false)
+    const weight = getLineWeight(lines[i])
+    const level = getLineLevel(lines[i])
+    text.split('\n').forEach((line, index) => {
+      processed.push({
+        id: id,
+        text: line,
+        prefix: index === 0 ? prefix : null,
+        prefixColor: prefixColor,
+        textColor: textColor,
+        weight: weight,
+        level: level,
+      })
+      id += 1
+    })
+  }
+  return processed
+})
+
 async function getLiveLog() {
   if (route.params.id) {
     const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
     let returnValue
     if (uuids.length === 0) {
-      returnValue = 'No live game detected. \nStart your game to proceed'
+      returnValue = emptyText.join('\n')
     } else {
-      returnValue = await get_output_by_uuid(uuids[0]).catch(handleError)
+      const logCursor = await get_latest_log_cursor(
+        props.instance.path,
+        currentLiveLogCursor.value
+      ).catch(handleError)
+      if (logCursor.new_file) {
+        currentLiveLog.value = ''
+      }
+      currentLiveLog.value = currentLiveLog.value + logCursor.output
+      currentLiveLogCursor.value = logCursor.cursor
+      returnValue = currentLiveLog.value
     }
-
     return { name: 'Live Log', stdout: returnValue, live: true }
   }
   return null
@@ -112,9 +241,25 @@ async function getLiveLog() {
 
 async function getLogs() {
   return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
-    log.name = dayjs(
-      log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)
-    ).calendar()
+    if (log.filename == 'latest.log') {
+      log.name = 'Latest Log'
+    } else {
+      let filename = log.filename.split('.')[0]
+      let day = dayjs(filename.slice(0, 10))
+      if (day.isValid()) {
+        if (day.isToday()) {
+          log.name = 'Today'
+        } else if (day.isYesterday()) {
+          log.name = 'Yesterday'
+        } else {
+          log.name = day.format('MMMM D, YYYY')
+        }
+        // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
+        log.name = log.name + filename.slice(10)
+      } else {
+        log.name = filename
+      }
+    }
     log.stdout = 'Loading...'
     return log
   })
@@ -152,26 +297,124 @@ watch(selectedLogIndex, async (newIndex) => {
 
   if (logs.value.length > 1 && newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
-    logs.value[newIndex].stdout = await get_output_by_datetime(
+    logs.value[newIndex].stdout = await get_output_by_filename(
       props.instance.path,
-      logs.value[newIndex].datetime_string
+      logs.value[newIndex].filename
     ).catch(handleError)
   }
 })
 
-if (logs.value.length >= 1) {
+if (logs.value.length > 1 && !props.playing) {
   selectedLogIndex.value = 1
+} else {
+  selectedLogIndex.value = 0
 }
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
-    await delete_logs_by_datetime(
-      props.instance.path,
-      logs.value[deleteIndex].datetime_string
-    ).catch(handleError)
+    await delete_logs_by_filename(props.instance.path, logs.value[deleteIndex].filename).catch(
+      handleError
+    )
     await setLogs()
+  }
+}
+
+const clearLiveLog = async () => {
+  currentLiveLog.value = ''
+  // does not reset cursor
+}
+
+const isLineLevel = (text, level) => {
+  if ((text.includes('/INFO') || text.includes('[System] [CHAT]')) && level === 'info') {
+    return true
+  }
+
+  if (text.includes('/WARN') && level === 'warn') {
+    return true
+  }
+
+  if (text.includes('/DEBUG') && level === 'debug') {
+    return true
+  }
+
+  if (text.includes('/TRACE') && level === 'trace') {
+    return true
+  }
+
+  const errorTriggers = ['/ERROR', 'Exception:', ':?]', 'Error', '[thread', '	at']
+  if (level === 'error') {
+    for (const trigger of errorTriggers) {
+      if (text.includes(trigger)) return true
+    }
+  }
+
+  if (text.trim()[0] === '#' && level === 'comment') {
+    return true
+  }
+  return false
+}
+
+const getLineWeight = (text) => {
+  if (
+    !logsColored ||
+    isLineLevel(text, 'info') ||
+    isLineLevel(text, 'debug') ||
+    isLineLevel(text, 'trace')
+  ) {
+    return 'normal'
+  }
+
+  if (isLineLevel(text, 'error') || isLineLevel(text, 'warn')) {
+    return 'bold'
+  }
+}
+
+const getLineLevel = (text) => {
+  for (const level of levels) {
+    if (isLineLevel(text, level.toLowerCase())) {
+      return level
+    }
+  }
+}
+
+const getLineColor = (text, prefix) => {
+  if (isLineLevel(text, 'comment')) {
+    return 'var(--color-green)'
+  }
+
+  if (!logsColored || text.includes('[System] [CHAT]')) {
+    return 'var(--color-white)'
+  }
+  if (
+    (isLineLevel(text, 'info') || isLineLevel(text, 'debug') || isLineLevel(text, 'trace')) &&
+    prefix
+  ) {
+    return 'var(--color-blue)'
+  }
+  if (isLineLevel(text, 'warn')) {
+    return 'var(--color-orange)'
+  }
+  if (isLineLevel(text, 'error')) {
+    return 'var(--color-red)'
+  }
+}
+
+const getLinePrefix = (text) => {
+  if (text.includes(']:')) {
+    return text.split(']:')[0] + ']:'
+  }
+}
+
+const getLineText = (text) => {
+  if (text.includes(']:')) {
+    if (text.split(']:').length > 2) {
+      return text.split(']:').slice(1).join(']:')
+    }
+    return text.split(']:')[1]
+  } else {
+    return text
   }
 }
 
@@ -185,19 +428,14 @@ interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveLog()
 
+    const scroll = logContainer.value.getScroll()
     // Allow resetting of userScrolled if the user scrolls to the bottom
     if (selectedLogIndex.value === 0) {
-      if (
-        logContainer.value.scrollTop + logContainer.value.offsetHeight >=
-        logContainer.value.scrollHeight - 10
-      )
-        userScrolled.value = false
-
+      if (scroll.end >= logContainer.value.$el.scrollHeight - 10) userScrolled.value = false
       if (!userScrolled.value) {
         await nextTick()
         isAutoScrolling.value = true
-        logContainer.value.scrollTop =
-          logContainer.value.scrollHeight - logContainer.value.offsetHeight
+        logContainer.value.scrollToItem(displayProcessedLogs.value.length - 1)
         setTimeout(() => (isAutoScrolling.value = false), 50)
       }
     }
@@ -206,9 +444,13 @@ interval.value = setInterval(async () => {
 
 const unlistenProcesses = await process_listener(async (e) => {
   if (e.event === 'launched') {
+    currentLiveLog.value = ''
+    currentLiveLogCursor.value = 0
     selectedLogIndex.value = 0
   }
   if (e.event === 'finished') {
+    currentLiveLog.value = ''
+    currentLiveLogCursor.value = 0
     userScrolled.value = false
     await setLogs()
     selectedLogIndex.value = 1
@@ -216,11 +458,11 @@ const unlistenProcesses = await process_listener(async (e) => {
 })
 
 onMounted(() => {
-  logContainer.value.addEventListener('scroll', handleUserScroll)
+  logContainer.value.$el.addEventListener('scroll', handleUserScroll)
 })
 
 onBeforeUnmount(() => {
-  logContainer.value.removeEventListener('scroll', handleUserScroll)
+  logContainer.value.$el.removeEventListener('scroll', handleUserScroll)
 })
 onUnmounted(() => {
   clearInterval(interval.value)
@@ -257,12 +499,47 @@ onUnmounted(() => {
   color: var(--color-contrast);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  overflow: auto;
+  overflow-x: auto; /* Enables horizontal scrolling */
+  overflow-y: hidden; /* Disables vertical scrolling on this wrapper */
+  white-space: nowrap; /* Keeps content on a single line */
   white-space: normal;
   color-scheme: dark;
 
   .no-wrap {
     white-space: pre;
   }
+}
+
+.filter-checkbox {
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+
+  svg {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+  }
+}
+.filter-group {
+  display: flex;
+  padding: 0.6rem;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+:deep(.vue-recycle-scroller__item-wrapper) {
+  overflow: visible; /* Enables horizontal scrolling */
+}
+
+.scroller {
+  height: 100%;
+}
+
+.user {
+  height: 32%;
+  padding: 0 12px;
+  display: flex;
+
+  align-items: center;
 }
 </style>

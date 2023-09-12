@@ -31,6 +31,8 @@ pub struct Settings {
     pub version: u32,
     pub collapsed_navigation: bool,
     #[serde(default)]
+    pub disable_discord_rpc: bool,
+    #[serde(default)]
     pub hide_on_process: bool,
     #[serde(default)]
     pub default_page: DefaultPage,
@@ -49,8 +51,10 @@ pub struct Settings {
 impl Settings {
     #[tracing::instrument]
     pub async fn init(file: &Path) -> crate::Result<Self> {
-        if file.exists() {
-            fs::read(&file)
+        let mut rescued = false;
+
+        let settings = if file.exists() {
+            let loaded_settings = fs::read(&file)
                 .await
                 .map_err(|err| {
                     crate::ErrorKind::FSError(format!(
@@ -61,9 +65,25 @@ impl Settings {
                 .and_then(|it| {
                     serde_json::from_slice::<Settings>(&it)
                         .map_err(crate::Error::from)
-                })
+                });
+            // settings is corrupted. Back up the file and create a new one
+            if let Err(ref err) = loaded_settings {
+                tracing::error!("Failed to load settings file: {err}. ");
+                let backup_file = file.with_extension("json.bak");
+                tracing::error!("Corrupted settings file will be backed up as {}, and a new settings file will be created.", backup_file.display());
+                let _ = fs::rename(file, backup_file).await;
+                rescued = true;
+            }
+            loaded_settings.ok()
         } else {
-            Ok(Self {
+            None
+        };
+
+        if let Some(settings) = settings {
+            Ok(settings)
+        } else {
+            // Create new settings file
+            let settings = Self {
                 theme: Theme::Dark,
                 memory: MemorySettings::default(),
                 force_fullscreen: false,
@@ -77,16 +97,21 @@ impl Settings {
                 max_concurrent_writes: 10,
                 version: CURRENT_FORMAT_VERSION,
                 collapsed_navigation: false,
+                disable_discord_rpc: false,
                 hide_on_process: false,
                 default_page: DefaultPage::Home,
                 developer_mode: false,
                 opt_out_analytics: false,
                 advanced_rendering: true,
-                fully_onboarded: false,
+                fully_onboarded: rescued, // If we rescued the settings file, we should consider the user fully onboarded
 
                 // By default, the config directory is the same as the settings directory
                 loaded_config_dir: DirectoryInfo::get_initial_settings_dir(),
-            })
+            };
+            if rescued {
+                settings.sync(file).await?;
+            }
+            Ok(settings)
         }
     }
 
@@ -120,6 +145,32 @@ impl Settings {
             Ok(()) => {}
             Err(err) => {
                 tracing::warn!("Unable to update launcher java: {err}")
+            }
+        };
+    }
+
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
+    pub async fn update_default_user() {
+        let res = async {
+            let state = State::get().await?;
+            let settings_read = state.settings.read().await;
+
+            if settings_read.default_user.is_none() {
+                drop(settings_read);
+                let users = state.users.read().await;
+                let user = users.0.iter().next().map(|(id, _)| *id);
+                state.settings.write().await.default_user = user;
+            }
+
+            Ok::<(), crate::Error>(())
+        }
+        .await;
+
+        match res {
+            Ok(()) => {}
+            Err(err) => {
+                tracing::warn!("Unable to update default user: {err}")
             }
         };
     }

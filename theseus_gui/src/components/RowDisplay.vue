@@ -25,7 +25,7 @@ import {
   kill_by_uuid,
 } from '@/helpers/process.js'
 import { handleError } from '@/store/notifications.js'
-import { remove, run } from '@/helpers/profile.js'
+import { duplicate, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { useFetch } from '@/helpers/fetch.js'
@@ -70,11 +70,16 @@ async function deleteProfile() {
   }
 }
 
+async function duplicateProfile(p) {
+  await duplicate(p).catch(handleError)
+}
+
 const handleInstanceRightClick = async (event, passedInstance) => {
   const baseOptions = [
     { name: 'add_content' },
     { type: 'divider' },
     { name: 'edit' },
+    { name: 'duplicate' },
     { name: 'open_folder' },
     { name: 'copy_path' },
     { type: 'divider' },
@@ -149,6 +154,9 @@ const handleOptionsClick = async (args) => {
       await router.push({
         path: `/instance/${encodeURIComponent(args.item.path)}/`,
       })
+      break
+    case 'duplicate':
+      if (args.item.install_stage == 'installed') await duplicateProfile(args.item.path)
       break
     case 'delete':
       currentDeleteInstance.value = args.item.path
@@ -237,7 +245,7 @@ onUnmounted(() => {
       <section v-if="row.instances[0].metadata" ref="modsRow" class="instances">
         <Instance
           v-for="instance in row.instances.slice(0, maxInstancesPerRow)"
-          :key="instance?.project_id || instance?.id"
+          :key="(instance?.project_id || instance?.id) + instance.install_stage"
           :instance="instance"
           @contextmenu.prevent.stop="(event) => handleInstanceRightClick(event, instance)"
         />
@@ -263,6 +271,7 @@ onUnmounted(() => {
     <template #edit> <EyeIcon /> View instance </template>
     <template #delete> <TrashIcon /> Delete </template>
     <template #open_folder> <FolderOpenIcon /> Open folder </template>
+    <template #duplicate> <ClipboardCopyIcon /> Duplicate instance</template>
     <template #copy_path> <ClipboardCopyIcon /> Copy path </template>
     <template #install> <DownloadIcon /> Install </template>
     <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>

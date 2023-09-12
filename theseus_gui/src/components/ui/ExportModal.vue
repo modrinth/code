@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Checkbox, Modal, SendIcon, XIcon } from 'omorphia'
+import { Button, Checkbox, Modal, XIcon, PlusIcon } from 'omorphia'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { export_profile_mrpack, get_potential_override_folders } from '@/helpers/profile.js'
@@ -24,9 +24,11 @@ defineExpose({
 
 const exportModal = ref(null)
 const nameInput = ref(props.instance.metadata.name)
+const exportDescription = ref('')
 const versionInput = ref('1.0.0')
 const files = ref([])
 const folders = ref([])
+const showingFiles = ref(false)
 
 const themeStore = useTheming()
 
@@ -93,7 +95,9 @@ const exportPack = async () => {
       props.instance.path,
       outputPath + `/${nameInput.value} ${versionInput.value}.mrpack`,
       filesToExport,
-      versionInput.value
+      versionInput.value,
+      exportDescription.value,
+      nameInput.value
     ).catch((err) => handleError(err))
     exportModal.value.hide()
   }
@@ -123,11 +127,31 @@ const exportPack = async () => {
           </Button>
         </div>
       </div>
+      <div class="adjacent-input">
+        <div class="labeled_input">
+          <p>Description</p>
+
+          <div class="textarea-wrapper">
+            <textarea v-model="exportDescription" placeholder="Enter modpack description..." />
+          </div>
+        </div>
+      </div>
+
       <div class="table">
         <div class="table-head">
-          <div class="table-cell">Select files and folders to include in pack</div>
+          <div class="table-cell row-wise">
+            Select files and folders to include in pack
+            <Button
+              class="sleek-primary collapsed-button"
+              icon-only
+              @click="() => (showingFiles = !showingFiles)"
+            >
+              <PlusIcon v-if="!showingFiles" />
+              <XIcon v-else />
+            </Button>
+          </div>
         </div>
-        <div class="table-content">
+        <div v-if="showingFiles" class="table-content">
           <div v-for="[path, children] of folders" :key="path.name" class="table-row">
             <div class="table-cell file-entry">
               <div class="file-primary">
@@ -176,10 +200,6 @@ const exportPack = async () => {
         <Button @click="exportModal.hide">
           <XIcon />
           Cancel
-        </Button>
-        <Button disabled>
-          <SendIcon />
-          Share
         </Button>
         <Button color="primary" @click="exportPack">
           <PackageIcon />
@@ -260,5 +280,23 @@ const exportPack = async () => {
   display: flex;
   gap: var(--gap-sm);
   align-items: center;
+}
+
+.row-wise {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.textarea-wrapper {
+  // margin-top: 1rem;
+  height: 12rem;
+  textarea {
+    max-height: 12rem;
+  }
+  .preview {
+    overflow-y: auto;
+  }
 }
 </style>

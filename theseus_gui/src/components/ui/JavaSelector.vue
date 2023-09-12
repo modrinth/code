@@ -18,6 +18,14 @@
       "
     />
     <span class="installation-buttons">
+      <Button
+        v-if="props.version"
+        :disabled="props.disabled || installingJava"
+        @click="reinstallJava"
+      >
+        <DownloadIcon />
+        {{ installingJava ? 'Installing...' : 'Install recommended' }}
+      </Button>
       <Button :disabled="props.disabled" @click="autoDetect">
         <SearchIcon />
         Auto detect
@@ -44,8 +52,22 @@
 </template>
 
 <script setup>
-import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
-import { find_jre_17_jres, get_jre } from '@/helpers/jre.js'
+import {
+  Button,
+  SearchIcon,
+  PlayIcon,
+  CheckIcon,
+  XIcon,
+  FolderSearchIcon,
+  DownloadIcon,
+} from 'omorphia'
+import {
+  auto_install_java,
+  find_jre_17_jres,
+  find_jre_8_jres,
+  get_jre,
+  test_jre,
+} from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
@@ -82,15 +104,21 @@ const emit = defineEmits(['update:modelValue'])
 
 const testingJava = ref(false)
 const testingJavaSuccess = ref(null)
+
+const installingJava = ref(false)
+
 async function testJava() {
   testingJava.value = true
-  let result = await get_jre(props.modelValue ? props.modelValue.path : '')
+  testingJavaSuccess.value = await test_jre(
+    props.modelValue ? props.modelValue.path : '',
+    1,
+    props.version
+  )
   testingJava.value = false
-  testingJavaSuccess.value = !!result
 
   mixpanel_track('JavaTest', {
     path: props.modelValue ? props.modelValue.path : '',
-    success: !!result,
+    success: testingJavaSuccess.value,
   })
 
   setTimeout(() => {
@@ -109,12 +137,12 @@ async function handleJavaFileInput() {
         version: props.version.toString(),
         architecture: 'x86',
       }
-
-      mixpanel_track('JavaManualSelect', {
-        path: filePath,
-        version: props.version,
-      })
     }
+
+    mixpanel_track('JavaManualSelect', {
+      path: filePath,
+      version: props.version,
+    })
 
     emit('update:modelValue', result)
   }
@@ -125,11 +153,42 @@ async function autoDetect() {
   if (!props.compact) {
     detectJavaModal.value.show(props.version, props.modelValue)
   } else {
-    let versions = await find_jre_17_jres().catch(handleError)
-    if (versions.length > 0) {
-      emit('update:modelValue', versions[0])
+    if (props.version == 8) {
+      let versions = await find_jre_8_jres().catch(handleError)
+      if (versions.length > 0) {
+        emit('update:modelValue', versions[0])
+      }
+    } else {
+      let versions = await find_jre_17_jres().catch(handleError)
+      if (versions.length > 0) {
+        emit('update:modelValue', versions[0])
+      }
     }
   }
+}
+
+async function reinstallJava() {
+  installingJava.value = true
+  const path = await auto_install_java(props.version).catch(handleError)
+  console.log('java path: ' + path)
+  let result = await get_jre(path)
+
+  console.log('java result ' + result)
+  if (!result) {
+    result = {
+      path: path,
+      version: props.version.toString(),
+      architecture: 'x86',
+    }
+  }
+
+  mixpanel_track('JavaReInstall', {
+    path: path,
+    version: props.version,
+  })
+
+  emit('update:modelValue', result)
+  installingJava.value = false
 }
 </script>
 

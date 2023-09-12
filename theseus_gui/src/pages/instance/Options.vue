@@ -9,6 +9,56 @@
     @proceed="removeProfile"
   />
   <Modal
+    ref="modalConfirmUnlock"
+    header="Are you sure you want to unlock this instance?"
+    :noblur="!themeStore.advancedRendering"
+  >
+    <div class="modal-delete">
+      <div
+        class="markdown-body"
+        v-html="
+          'If you proceed, you will not be able to re-lock it without using the `Reinstall modpack` button.'
+        "
+      />
+      <div class="input-group push-right">
+        <button class="btn" @click="$refs.modalConfirmUnlock.hide()">
+          <XIcon />
+          Cancel
+        </button>
+        <button class="btn btn-danger" :disabled="action_disabled" @click="unlockProfile">
+          <LockIcon />
+          Unlock
+        </button>
+      </div>
+    </div>
+  </Modal>
+
+  <Modal
+    ref="modalConfirmUnpair"
+    header="Are you sure you want to unpair this instance?"
+    :noblur="!themeStore.advancedRendering"
+  >
+    <div class="modal-delete">
+      <div
+        class="markdown-body"
+        v-html="
+          'If you proceed, you will not be able to re-pair it without creating an entirely new instance.'
+        "
+      />
+      <div class="input-group push-right">
+        <button class="btn" @click="$refs.modalConfirmUnpair.hide()">
+          <XIcon />
+          Cancel
+        </button>
+        <button class="btn btn-danger" :disabled="action_disabled" @click="unpairProfile">
+          <XIcon />
+          Unpair
+        </button>
+      </div>
+    </div>
+  </Modal>
+
+  <Modal
     ref="changeVersionsModal"
     header="Change instance versions"
     :noblur="!themeStore.advancedRendering"
@@ -191,7 +241,7 @@
       <Slider
         v-model="memory.maximum"
         :disabled="!overrideMemorySettings"
-        :min="256"
+        :min="8"
         :max="maxMemory"
         :step="1"
         unit="mb"
@@ -298,22 +348,110 @@
       />
     </div>
   </Card>
+  <Card v-if="instance.metadata.linked_data">
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Modpack</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <label for="general-modpack-info">
+        <span class="label__description">
+          <strong>Modpack: </strong> {{ instance.metadata.name }}
+        </span>
+        <span class="label__description">
+          <strong>Version: </strong>
+          {{
+            installedVersionData.name.charAt(0).toUpperCase() + installedVersionData.name.slice(1)
+          }}
+        </span>
+      </label>
+    </div>
+    <div v-if="!isPackLocked" class="adjacent-input">
+      <Card class="unlocked-instance">
+        This is an unlocked instance. There may be unexpected behaviour unintended by the modpack
+        creator.
+      </Card>
+    </div>
+    <div v-else class="adjacent-input">
+      <label for="unlock-profile">
+        <span class="label__title">Unlock instance</span>
+        <span class="label__description">
+          Allows modifications to the instance, which allows you to add projects to the modpack. The
+          pack will remain linked, and you can still change versions. Only mods listed in the
+          modpack will be modified on version changes.
+        </span>
+      </label>
+      <Button id="unlock-profile" @click="$refs.modalConfirmUnlock.show()">
+        <LockIcon /> Unlock
+      </Button>
+    </div>
+
+    <div class="adjacent-input">
+      <label for="unpair-profile">
+        <span class="label__title">Unpair instance</span>
+        <span class="label__description">
+          Removes the link to an external Modrinth modpack on the instance. This allows you to edit
+          modpacks you download through the browse page but you will not be able to update the
+          instance from a new version of a modpack if you do this.
+        </span>
+      </label>
+      <Button id="unpair-profile" @click="$refs.modalConfirmUnpair.show()">
+        <XIcon /> Unpair
+      </Button>
+    </div>
+
+    <div class="adjacent-input">
+      <label for="change-modpack-version">
+        <span class="label__title">Change modpack version</span>
+        <span class="label__description">
+          Changes to another version of the modpack, allowing upgrading or downgrading. This will
+          replace all files marked as relevant to the modpack.
+        </span>
+      </label>
+
+      <Button
+        id="change-modpack-version"
+        :disabled="inProgress || installing"
+        @click="modpackVersionModal.show()"
+      >
+        <SwapIcon />
+        Change modpack version
+      </Button>
+    </div>
+    <div class="adjacent-input">
+      <label for="repair-modpack">
+        <span class="label__title">Reinstall modpack</span>
+        <span class="label__description">
+          Removes all projects and reinstalls Modrinth modpack. Use this to fix unexpected behaviour
+          if your instance is diverging from the Modrinth modpack. This also re-locks the instance.
+        </span>
+      </label>
+      <Button id="repair-modpack" color="highlight" :disabled="offline" @click="repairModpack">
+        <DownloadIcon /> Reinstall
+      </Button>
+    </div>
+  </Card>
   <Card>
     <div class="label">
       <h3>
         <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
-    <div v-if="instance.metadata.linked_data" class="adjacent-input">
-      <label for="repair-profile">
-        <span class="label__title">Unpair instance</span>
+    <div v-if="instance.install_stage == 'installed'" class="adjacent-input">
+      <label for="duplicate-profile">
+        <span class="label__title">Duplicate instance</span>
         <span class="label__description">
-          Removes the link to an external modpack on the instance. This allows you to edit modpacks
-          you download through the browse page but you will not be able to update the instance from
-          a new version of a modpack if you do this.
+          Creates another copy of the instance, including saves, configs, mods, and everything.
         </span>
       </label>
-      <Button id="repair-profile" @click="unpairProfile"> <XIcon /> Unpair </Button>
+      <Button
+        id="repair-profile"
+        :disabled:="installing || inProgress || offline"
+        @click="duplicateProfile"
+      >
+        <ClipboardCopyIcon /> Duplicate
+      </Button>
     </div>
     <div class="adjacent-input">
       <label for="repair-profile">
@@ -326,27 +464,10 @@
       <Button
         id="repair-profile"
         color="highlight"
-        :disabled="repairing || offline"
+        :disabled="installing || inProgress || repairing || offline"
         @click="repairProfile"
       >
         <HammerIcon /> Repair
-      </Button>
-    </div>
-    <div v-if="props.instance.modrinth_update_version" class="adjacent-input">
-      <label for="repair-profile">
-        <span class="label__title">Reinstall modpack</span>
-        <span class="label__description">
-          Reinstalls Modrinth modpack and checks for corruption. Use this if your game is not
-          launching due to your instance diverging from the Modrinth modpack.
-        </span>
-      </label>
-      <Button
-        id="repair-profile"
-        color="highlight"
-        :disabled="repairing || offline"
-        @click="repairModpack"
-      >
-        <DownloadIcon /> Reinstall
       </Button>
     </div>
     <div class="adjacent-input">
@@ -367,6 +488,12 @@
       </Button>
     </div>
   </Card>
+  <ModpackVersionModal
+    v-if="instance.metadata.linked_data"
+    ref="modpackVersionModal"
+    :instance="instance"
+    :versions="props.versions"
+  />
 </template>
 
 <script setup>
@@ -383,14 +510,19 @@ import {
   DropdownSelect,
   XIcon,
   SaveIcon,
+  LockIcon,
   HammerIcon,
-  DownloadIcon,
   ModalConfirm,
+  DownloadIcon,
+  ClipboardCopyIcon,
   Button,
 } from 'omorphia'
+import { SwapIcon } from '@/assets/icons'
+
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
 import {
+  duplicate,
   edit,
   edit_icon,
   get_optimal_jre_key,
@@ -415,6 +547,7 @@ import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
+import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 
 const router = useRouter()
 
@@ -427,6 +560,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  versions: {
+    type: Array,
+    required: true,
+  },
 })
 
 const themeStore = useTheming()
@@ -434,6 +571,8 @@ const themeStore = useTheming()
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
 const groups = ref(props.instance.metadata.groups)
+
+const modpackVersionModal = ref(null)
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
@@ -469,6 +608,9 @@ async function setIcon() {
 
 const globalSettings = await get().catch(handleError)
 
+const modalConfirmUnlock = ref(null)
+const modalConfirmUnpair = ref(null)
+
 const javaSettings = props.instance.java ?? {}
 
 const overrideJavaInstall = ref(!!javaSettings.override_version)
@@ -496,6 +638,13 @@ const fullscreenSetting = ref(!!props.instance.fullscreen)
 
 const unlinkModpack = ref(false)
 
+const inProgress = ref(false)
+const installing = computed(() => props.instance.install_stage !== 'installed')
+const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
+const installedVersionData = computed(() =>
+  props.versions.find((version) => version.id === installedVersion.value)
+)
+
 watch(
   [
     title,
@@ -517,71 +666,78 @@ watch(
     unlinkModpack,
   ],
   async () => {
-    const editProfile = {
-      metadata: {
-        name: title.value.trim().substring(0, 32) ?? 'Instance',
-        groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
-        loader_version: props.instance.metadata.loader_version,
-        linked_data: props.instance.metadata.linked_data,
-      },
-      java: {},
-    }
-
-    if (overrideJavaInstall.value) {
-      if (javaInstall.value.path !== '') {
-        editProfile.java.override_version = javaInstall.value
-        editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
-          'java.exe',
-          'javaw.exe'
-        )
-      }
-    }
-
-    if (overrideJavaArgs.value) {
-      if (javaArgs.value !== '') {
-        editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/).filter(Boolean)
-      }
-    }
-
-    if (overrideEnvVars.value) {
-      if (envVars.value !== '') {
-        editProfile.java.custom_env_args = envVars.value
-          .trim()
-          .split(/\s+/)
-          .filter(Boolean)
-          .map((x) => x.split('=').filter(Boolean))
-      }
-    }
-
-    if (overrideMemorySettings.value) {
-      editProfile.memory = memory.value
-    }
-
-    if (overrideWindowSettings.value) {
-      editProfile.fullscreen = fullscreenSetting.value
-
-      if (!fullscreenSetting.value) {
-        editProfile.resolution = resolution.value
-      }
-    }
-
-    if (overrideHooks.value) {
-      editProfile.hooks = hooks.value
-    }
-
-    if (unlinkModpack.value) {
-      editProfile.metadata.linked_data = null
-    }
-
-    await edit(props.instance.path, editProfile)
+    await edit(props.instance.path, editProfileObject.value)
   },
   { deep: true }
 )
 
+const editProfileObject = computed(() => {
+  const editProfile = {
+    metadata: {
+      name: title.value.trim().substring(0, 32) ?? 'Instance',
+      groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
+      loader_version: props.instance.metadata.loader_version,
+      linked_data: props.instance.metadata.linked_data,
+    },
+    java: {},
+  }
+
+  if (overrideJavaInstall.value) {
+    if (javaInstall.value.path !== '') {
+      editProfile.java.override_version = javaInstall.value
+      editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
+        'java.exe',
+        'javaw.exe'
+      )
+    }
+  }
+
+  if (overrideJavaArgs.value) {
+    if (javaArgs.value !== '') {
+      editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/).filter(Boolean)
+    }
+  }
+
+  if (overrideEnvVars.value) {
+    if (envVars.value !== '') {
+      editProfile.java.custom_env_args = envVars.value
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((x) => x.split('=').filter(Boolean))
+    }
+  }
+
+  if (overrideMemorySettings.value) {
+    editProfile.memory = memory.value
+  }
+
+  if (overrideWindowSettings.value) {
+    editProfile.fullscreen = fullscreenSetting.value
+
+    if (!fullscreenSetting.value) {
+      editProfile.resolution = resolution.value
+    }
+  }
+
+  if (overrideHooks.value) {
+    editProfile.hooks = hooks.value
+  }
+
+  if (unlinkModpack.value) {
+    editProfile.metadata.linked_data = null
+  }
+  return editProfile
+})
+
 const repairing = ref(false)
 
-async function unpairProfile() {
-  unlinkModpack.value = true
+async function duplicateProfile() {
+  await duplicate(props.instance.path).catch(handleError)
+  mixpanel_track('InstanceDuplicate', {
+    loader: props.instance.metadata.loader,
+    game_version: props.instance.metadata.game_version,
+  })
 }
 
 async function repairProfile() {
@@ -595,10 +751,30 @@ async function repairProfile() {
   })
 }
 
+async function unpairProfile() {
+  const editProfile = props.instance
+  editProfile.metadata.linked_data = null
+  await edit(props.instance.path, editProfile)
+  installedVersion.value = null
+  installedVersionData.value = null
+  modalConfirmUnpair.value.hide()
+}
+
+async function unlockProfile() {
+  const editProfile = props.instance
+  editProfile.metadata.linked_data.locked = false
+  await edit(props.instance.path, editProfile)
+  modalConfirmUnlock.value.hide()
+}
+
+const isPackLocked = computed(() => {
+  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
+})
+
 async function repairModpack() {
-  repairing.value = true
+  inProgress.value = true
   await update_repair_modrinth(props.instance.path).catch(handleError)
-  repairing.value = false
+  inProgress.value = false
 
   mixpanel_track('InstanceRepair', {
     loader: props.instance.metadata.loader,
@@ -711,12 +887,9 @@ const editing = ref(false)
 async function saveGvLoaderEdits() {
   editing.value = true
 
-  const editProfile = {
-    metadata: {
-      game_version: gameVersion.value,
-      loader: loader.value,
-    },
-  }
+  let editProfile = editProfileObject.value
+  editProfile.metadata.loader = loader.value
+  editProfile.metadata.game_version = gameVersion.value
 
   if (loader.value !== 'vanilla') {
     editProfile.metadata.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value]
@@ -771,5 +944,40 @@ async function saveGvLoaderEdits() {
 
 :deep(button.checkbox) {
   border: none;
+}
+
+.unlocked-instance {
+  background-color: var(--color-bg);
+}
+
+.modal-delete {
+  padding: var(--gap-lg);
+  display: flex;
+  flex-direction: column;
+
+  .markdown-body {
+    margin-bottom: 1rem;
+  }
+
+  .confirmation-label {
+    margin-bottom: 0.5rem;
+  }
+
+  .confirmation-text {
+    padding-right: 0.25ch;
+    margin: 0 0.25rem;
+  }
+
+  .confirmation-input {
+    input {
+      width: 20rem;
+      max-width: 100%;
+    }
+  }
+
+  .button-group {
+    margin-left: auto;
+    margin-top: 1.5rem;
+  }
 }
 </style>

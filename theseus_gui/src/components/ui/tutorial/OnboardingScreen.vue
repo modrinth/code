@@ -295,7 +295,7 @@ onMounted(async () => {
       :previous-function="prevPhase"
       :progress="phase"
       title="Settings"
-      description="You can view and change the settings for the Modrinth App here. You can change the appearance, set and download new Java versions, and more."
+      description="You will be able to view and change the settings for the Modrinth App here. You can change the appearance, set and download new Java versions, and more."
     />
     <TutorialTip
       v-if="phase === 9"

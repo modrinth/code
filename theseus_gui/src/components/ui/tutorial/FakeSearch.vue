@@ -176,7 +176,7 @@ defineProps({
       </Card>
     </aside>
     <div ref="searchWrapper" class="search">
-      <Promotion class="promotion" query-param="?r=launcher" />
+      <Promotion class="promotion" :external="false" query-param="?r=launcher" />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
       </Card>

@@ -20,7 +20,7 @@ import {
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
 import { useTheming } from '@/store/theme.js'
-import { remove } from '@/helpers/profile.js'
+import { duplicate, remove } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 
 const props = defineProps({
@@ -51,11 +51,17 @@ async function deleteProfile() {
   }
 }
 
-const handleRightClick = (event, item) => {
+async function duplicateProfile(p) {
+  await duplicate(p).catch(handleError)
+}
+
+const handleRightClick = (event, profilePathId) => {
+  const item = instanceComponents.value.find((x) => x.instance.path === profilePathId)
   const baseOptions = [
     { name: 'add_content' },
     { type: 'divider' },
     { name: 'edit' },
+    { name: 'duplicate' },
     { name: 'open' },
     { name: 'copy' },
     { type: 'divider' },
@@ -100,6 +106,10 @@ const handleOptionsClick = async (args) => {
     case 'edit':
       await args.item.seeInstance()
       break
+    case 'duplicate':
+      if (args.item.instance.install_stage == 'installed')
+        await duplicateProfile(args.item.instance.path)
+      break
     case 'open':
       await args.item.openFolder()
       break
@@ -131,7 +141,7 @@ const filteredResults = computed(() => {
 
   if (sortBy.value === 'Game version') {
     instances.sort((a, b) => {
-      return a.metadata.name.localeCompare(b.metadata.game_version)
+      return a.metadata.game_version.localeCompare(b.metadata.game_version)
     })
   }
 
@@ -285,11 +295,11 @@ const filteredResults = computed(() => {
     </div>
     <section class="instances">
       <Instance
-        v-for="(instance, index) in instanceSection.value"
+        v-for="instance in instanceSection.value"
         ref="instanceComponents"
-        :key="instance.path"
+        :key="instance.path + instance.install_stage"
         :instance="instance"
-        @contextmenu.prevent.stop="(event) => handleRightClick(event, instanceComponents[index])"
+        @contextmenu.prevent.stop="(event) => handleRightClick(event, instance.path)"
       />
     </section>
   </div>
@@ -298,6 +308,7 @@ const filteredResults = computed(() => {
     <template #stop> <StopCircleIcon /> Stop </template>
     <template #add_content> <PlusIcon /> Add content </template>
     <template #edit> <EyeIcon /> View instance </template>
+    <template #duplicate> <ClipboardCopyIcon /> Duplicate instance</template>
     <template #delete> <TrashIcon /> Delete </template>
     <template #open> <FolderOpenIcon /> Open folder </template>
     <template #copy> <ClipboardCopyIcon /> Copy path </template>

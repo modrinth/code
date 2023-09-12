@@ -7,7 +7,6 @@ use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
 use theseus::profile::create::profile_create;
-use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -106,12 +105,6 @@ async fn main() -> theseus::Result<()> {
 
     println!("Minecraft UUID: {}", uuid);
     println!("Minecraft PID: {:?}", pid);
-
-    // Wait 5 seconds
-    println!("Waiting 5 seconds to gather logs...");
-    sleep(Duration::from_secs(5)).await;
-    let stdout = process::get_output_by_uuid(&uuid).await?;
-    println!("Logs after 5sec <<< {stdout} >>> end stdout");
 
     println!(
         "All running process UUID {:?}",

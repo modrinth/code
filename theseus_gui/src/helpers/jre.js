@@ -59,6 +59,12 @@ export async function get_jre(path) {
   return await invoke('plugin:jre|jre_get_jre', { path })
 }
 
+// Tests JRE version by running 'java -version' on it.
+// Returns true if the version is valid, and matches given (after extraction)
+export async function test_jre(path, majorVersion, minorVersion) {
+  return await invoke('plugin:jre|jre_test_jre', { path, majorVersion, minorVersion })
+}
+
 // Autodetect Java globals, by searching the users computer.
 // Returns a *NEW* JavaGlobals that can be put into Settings
 export async function autodetect_java_globals() {

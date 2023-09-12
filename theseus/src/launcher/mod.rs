@@ -312,7 +312,7 @@ pub async fn launch_minecraft(
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
-    post_exit_hook: Option<Command>,
+    post_exit_hook: Option<String>,
     profile: &Profile,
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
@@ -406,7 +406,6 @@ pub async fn launch_minecraft(
         ))
         .as_error());
     }
-
     command
         .args(
             args::get_jvm_arguments(
@@ -447,14 +446,17 @@ pub async fn launch_minecraft(
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+        .stdout(Stdio::null())
+        .stderr(Stdio::null());
 
     // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
     #[cfg(target_os = "macos")]
     if std::env::var("CARGO").is_ok() {
         command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
     }
+    // Java options should be set in instance options (the existence of _JAVA_OPTIONS overwites them)
+    command.env_remove("_JAVA_OPTIONS");
+
     command.envs(env_args);
 
     // Overwrites the minecraft options.txt file with the settings from the profile
@@ -483,20 +485,6 @@ pub async fn launch_minecraft(
 
         io::write(&options_path, options_string).await?;
     }
-
-    // Get Modrinth logs directories
-    let datetime_string =
-        chrono::Local::now().format("%Y%m%d_%H%M%S").to_string();
-    let logs_dir = {
-        let st = State::get().await?;
-        st.directories
-            .profile_logs_dir(&profile.profile_id())
-            .await?
-            .join(&datetime_string)
-    };
-    io::create_dir_all(&logs_dir).await?;
-
-    let stdout_log_path = logs_dir.join("stdout.log");
 
     crate::api::profile::edit(&profile.profile_id(), |prof| {
         prof.metadata.last_played = Some(Utc::now());
@@ -559,10 +547,9 @@ pub async fn launch_minecraft(
     // This also spawns the process and prepares the subsequent processes
     let mut state_children = state.children.write().await;
     state_children
-        .insert_process(
+        .insert_new_process(
             Uuid::new_v4(),
             profile.profile_id(),
-            stdout_log_path,
             command,
             post_exit_hook,
             censor_strings,

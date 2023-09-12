@@ -251,7 +251,7 @@ pub async fn recache_icon(
     }
 }
 
-async fn copy_dotminecraft(
+pub async fn copy_dotminecraft(
     profile_path_id: ProfilePathId,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,

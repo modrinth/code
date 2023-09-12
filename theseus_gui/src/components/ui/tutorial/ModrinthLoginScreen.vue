@@ -206,9 +206,7 @@ onMounted(() => {
       <Button v-if="twoFactorCode" color="primary" large @click="signIn2fa"> Login </Button>
       <Button v-else-if="loggingIn" color="primary" large @click="signIn"> Login </Button>
       <Button v-else color="primary" large @click="createAccount"> Create account </Button>
-      <Button class="transparent" large @click="goToNextPage">
-        {{ modal ? 'Continue' : 'Next' }}
-      </Button>
+      <Button v-if="!modal" class="transparent" large @click="goToNextPage"> Next </Button>
     </div>
   </Card>
 </template>

@@ -59,5 +59,6 @@ initialize_state()
       })
   })
   .catch((err) => {
-    console.error(err)
+    console.error('Failed to initialize app', err)
+    mountedApp.failure(err)
   })
