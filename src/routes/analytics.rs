@@ -154,7 +154,7 @@ pub async fn page_view_ingest(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct PlaytimeInput {
     seconds: u16,
     loader: String,
@@ -205,10 +205,10 @@ pub async fn playtime_ingest(
                 .add_playtime(Playtime {
                     id: Default::default(),
                     recorded: Utc::now().timestamp_nanos() / 100_000,
-                    seconds: playtime.seconds,
+                    seconds: playtime.seconds as u64,
                     user_id: user.id.0,
-                    project_id: version.inner.id.0 as u64,
-                    version_id: version.inner.project_id.0 as u64,
+                    project_id: version.inner.project_id.0 as u64,
+                    version_id: version.inner.id.0 as u64,
                     loader: playtime.loader,
                     game_version: playtime.game_version,
                     parent: playtime.parent.map(|x| x.0).unwrap_or(0),

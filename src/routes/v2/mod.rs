@@ -1,4 +1,5 @@
 mod admin;
+mod analytics_get;
 mod moderation;
 mod notifications;
 pub(crate) mod project_creation;
@@ -21,6 +22,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         actix_web::web::scope("v2")
             .wrap(default_cors())
             .configure(admin::config)
+            .configure(analytics_get::config)
             .configure(crate::auth::session::config)
             .configure(crate::auth::flows::config)
             .configure(crate::auth::pats::config)

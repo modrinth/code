@@ -1,10 +1,10 @@
 use clickhouse::Row;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::hash::{Hash, Hasher};
 use std::net::Ipv6Addr;
 use uuid::Uuid;
 
-#[derive(Row, Serialize, Clone)]
+#[derive(Row, Serialize, Deserialize, Clone)]
 pub struct Download {
     #[serde(with = "uuid::serde::compact")]
     pub id: Uuid,
@@ -41,7 +41,7 @@ impl Hash for Download {
     }
 }
 
-#[derive(Row, Serialize, Clone)]
+#[derive(Row, Serialize, Deserialize, Clone)]
 pub struct PageView {
     #[serde(with = "uuid::serde::compact")]
     pub id: Uuid,
@@ -76,12 +76,12 @@ impl Hash for PageView {
     }
 }
 
-#[derive(Row, Serialize, Clone)]
+#[derive(Row, Serialize, Deserialize, Clone, Debug)]
 pub struct Playtime {
     #[serde(with = "uuid::serde::compact")]
     pub id: Uuid,
     pub recorded: i64,
-    pub seconds: u16,
+    pub seconds: u64,
 
     // Modrinth User ID for logged in users (unused atm)
     pub user_id: u64,

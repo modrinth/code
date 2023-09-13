@@ -1,6 +1,10 @@
 use hyper::client::HttpConnector;
 use hyper_tls::{native_tls, HttpsConnector};
 
+mod fetch;
+
+pub use fetch::*;
+
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
     let database = dotenvy::var("CLICKHOUSE_DATABASE").unwrap();
 
