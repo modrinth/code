@@ -46,6 +46,7 @@ export default {
           { text: 'Notifications', link: '/components/notifications' },
           { text: 'Share Modal', link: '/components/share-modal' },
           { text: 'Analytics', link: '/components/analytics' },
+          { text: 'Search dropdown', link: '/components/search-dropdown' },
         ],
       },
     ],
