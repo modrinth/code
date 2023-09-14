@@ -58,7 +58,7 @@ impl Report {
 
     pub async fn get<'a, E>(id: ReportId, exec: E) -> Result<Option<QueryReport>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec)
             .await
@@ -70,7 +70,7 @@ impl Report {
         exec: E,
     ) -> Result<Vec<QueryReport>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 

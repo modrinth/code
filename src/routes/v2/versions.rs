@@ -3,12 +3,15 @@ use crate::auth::{
     filter_authorized_versions, get_user_from_headers, is_authorized, is_authorized_version,
 };
 use crate::database;
+use crate::database::models::image_item;
 use crate::models;
 use crate::models::ids::base62_impl::parse_base62;
+use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
 use crate::models::teams::Permissions;
 use crate::queue::session::AuthQueue;
+use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
@@ -672,6 +675,17 @@ pub async fn version_edit(
                 }
             }
 
+            // delete any images no longer in the changelog
+            let checkable_strings: Vec<&str> = vec![&new_version.changelog]
+                .into_iter()
+                .filter_map(|x| x.as_ref().map(|y| y.as_str()))
+                .collect();
+            let context = ImageContext::Version {
+                version_id: Some(version_item.inner.id.into()),
+            };
+
+            img::delete_unused_images(context, checkable_strings, &mut transaction, &redis).await?;
+
             database::models::Version::clear_cache(&version_item, &redis).await?;
             database::models::Project::clear_cache(
                 version_item.inner.project_id,
@@ -823,6 +837,14 @@ pub async fn version_delete(
     }
 
     let mut transaction = pool.begin().await?;
+    let context = ImageContext::Version {
+        version_id: Some(version.inner.id.into()),
+    };
+    let uploaded_images =
+        database::models::Image::get_many_contexted(context, &mut transaction).await?;
+    for image in uploaded_images {
+        image_item::Image::remove(image.id, &mut transaction, &redis).await?;
+    }
 
     let result =
         database::models::Version::remove_full(version.inner.id, &redis, &mut transaction).await?;

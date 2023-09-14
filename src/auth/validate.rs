@@ -24,7 +24,6 @@ where
         get_user_record_from_bearer_token(req, None, executor, redis, session_queue)
             .await?
             .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
-
     let mut auth_providers = Vec::new();
     if db_user.github_id.is_some() {
         auth_providers.push(AuthProvider::GitHub)

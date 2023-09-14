@@ -85,8 +85,17 @@ bitflags::bitflags! {
         // perform analytics action
         const PERFORM_ANALYTICS = 1 << 30;
 
-        const ALL = 0b1111111111111111111111111111111;
-        const NOT_RESTRICTED = 0b00000011111111111111100111;
+        // create a collection
+        const COLLECTION_CREATE = 1 << 31;
+        // read a user's collections
+        const COLLECTION_READ = 1 << 32;
+        // write to a collection
+        const COLLECTION_WRITE = 1 << 33;
+        // delete a collection
+        const COLLECTION_DELETE = 1 << 34;
+
+        const ALL = 0b11111111111111111111111111111111111;
+        const NOT_RESTRICTED = 0b111100000011111111111111100111;
         const NONE = 0b0;
     }
 }

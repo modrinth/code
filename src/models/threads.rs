@@ -1,4 +1,4 @@
-use super::ids::Base62Id;
+use super::ids::{Base62Id, ImageId};
 use crate::models::ids::{ProjectId, ReportId};
 use crate::models::projects::ProjectStatus;
 use crate::models::users::{User, UserId};
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 #[serde(into = "Base62Id")]
 pub struct ThreadId(pub u64);
 
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
 #[serde(from = "Base62Id")]
 #[serde(into = "Base62Id")]
 pub struct ThreadMessageId(pub u64);
@@ -42,6 +42,8 @@ pub enum MessageBody {
         #[serde(default)]
         private: bool,
         replying_to: Option<ThreadMessageId>,
+        #[serde(default)]
+        associated_images: Vec<ImageId>,
     },
     StatusChange {
         new_status: ProjectStatus,

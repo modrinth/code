@@ -1,11 +1,12 @@
 use super::project_creation::{CreateError, UploadedFile};
 use crate::auth::get_user_from_headers;
-use crate::database::models;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
+use crate::database::models::{self, image_item};
 use crate::file_hosting::FileHost;
+use crate::models::images::{Image, ImageContext, ImageId};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
@@ -70,6 +71,10 @@ pub struct InitialVersionData {
     pub status: VersionStatus,
     #[serde(default = "HashMap::new")]
     pub file_types: HashMap<String, Option<FileType>>,
+    // Associations to uploaded images in changelog
+    #[validate(length(max = 10))]
+    #[serde(default)]
+    pub uploaded_images: Vec<ImageId>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -435,6 +440,41 @@ async fn version_create_inner(
 
     let project_id = builder.project_id;
     builder.insert(transaction).await?;
+
+    for image_id in version_data.uploaded_images {
+        if let Some(db_image) =
+            image_item::Image::get(image_id.into(), &mut *transaction, redis).await?
+        {
+            let image: Image = db_image.into();
+            if !matches!(image.context, ImageContext::Report { .. })
+                || image.context.inner_id().is_some()
+            {
+                return Err(CreateError::InvalidInput(format!(
+                    "Image {} is not unused and in the 'version' context",
+                    image_id
+                )));
+            }
+
+            sqlx::query!(
+                "
+                UPDATE uploaded_images
+                SET version_id = $1
+                WHERE id = $2
+                ",
+                version_id.0 as i64,
+                image_id.0 as i64
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            image_item::Image::clear_cache(image.id.into(), redis).await?;
+        } else {
+            return Err(CreateError::InvalidInput(format!(
+                "Image {} does not exist",
+                image_id
+            )));
+        }
+    }
 
     models::Project::update_game_versions(project_id, &mut *transaction).await?;
     models::Project::update_loaders(project_id, &mut *transaction).await?;

@@ -1,5 +1,7 @@
 use thiserror::Error;
 
+pub use super::collections::CollectionId;
+pub use super::images::ImageId;
 pub use super::notifications::NotificationId;
 pub use super::pats::PatId;
 pub use super::projects::{ProjectId, VersionId};
@@ -109,6 +111,7 @@ macro_rules! base62_id_impl {
 base62_id_impl!(ProjectId, ProjectId);
 base62_id_impl!(UserId, UserId);
 base62_id_impl!(VersionId, VersionId);
+base62_id_impl!(CollectionId, CollectionId);
 base62_id_impl!(TeamId, TeamId);
 base62_id_impl!(ReportId, ReportId);
 base62_id_impl!(NotificationId, NotificationId);
@@ -116,6 +119,7 @@ base62_id_impl!(ThreadId, ThreadId);
 base62_id_impl!(ThreadMessageId, ThreadMessageId);
 base62_id_impl!(SessionId, SessionId);
 base62_id_impl!(PatId, PatId);
+base62_id_impl!(ImageId, ImageId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

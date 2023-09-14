@@ -1,4 +1,6 @@
 mod admin;
+mod collections;
+mod images;
 mod analytics_get;
 mod moderation;
 mod notifications;
@@ -30,6 +32,8 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(notifications::config)
             //.configure(pats::config)
             .configure(project_creation::config)
+            .configure(collections::config)
+            .configure(images::config)
             .configure(projects::config)
             .configure(reports::config)
             .configure(statistics::config)

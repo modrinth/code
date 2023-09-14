@@ -212,7 +212,7 @@ impl ThreadMessage {
         exec: E,
     ) -> Result<Option<ThreadMessage>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], exec)
             .await
@@ -224,7 +224,7 @@ impl ThreadMessage {
         exec: E,
     ) -> Result<Vec<ThreadMessage>, sqlx::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
