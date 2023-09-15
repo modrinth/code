@@ -412,11 +412,9 @@ pub async fn thread_send_message(
                     )
                     .await?;
                 }
-
-                project.inner.status == ProjectStatus::Processing && !user.role.is_mod()
-            } else {
-                !user.role.is_mod()
             }
+
+            !user.role.is_mod()
         } else if let Some(report_id) = thread.report_id {
             let report = database::models::report_item::Report::get(report_id, &**pool).await?;
 
