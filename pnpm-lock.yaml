@@ -79,8 +79,8 @@ devDependencies:
     specifier: ^2.0.1
     version: 2.0.1(@formatjs/intl@2.7.2)
   '@vintl/nuxt':
-    specifier: ^1.3.0
-    version: 1.3.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
+    specifier: ^1.5.0
+    version: 1.5.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
   eslint:
     specifier: ^8.41.0
     version: 8.41.0
@@ -2111,21 +2111,22 @@ packages:
       intl-messageformat: 10.3.5
     dev: true
 
-  /@vintl/nuxt@1.3.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
-    resolution: {integrity: sha512-gH0Db4XB3RCzOaBQtoBf/Sc9bMneyVtt7RBjrLWzzNf7gN1NJNPlrfdCVAp2si/P7dt06wRegGHaSBuQ3oQQZg==}
+  /@vintl/nuxt@1.5.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
+    resolution: {integrity: sha512-HZm7ali8WGJ10teywsi+eXGOf2cvffwZYJlb40qnl1z3SnZKCYGM3ACxpb2WVmbcHqcpeGNvLWq1OnRmgfNbwg==}
     dependencies:
       '@formatjs/intl': 2.7.2(typescript@5.0.4)
       '@formatjs/intl-localematcher': 0.4.0
-      '@nuxt/kit': 3.6.1
+      '@nuxt/kit': 3.6.5
       '@vintl/unplugin': 1.2.4(vite@4.3.9)
       '@vintl/vintl': 4.2.1(typescript@5.0.4)(vue@3.3.4)
       astring: 1.8.6
-      consola: 3.2.2
+      consola: 3.2.3
       hash-sum: 2.0.0
       import-meta-resolve: 3.0.0
       pathe: 1.1.1
       picocolors: 1.0.0
       slash: 5.1.0
+      ufo: 1.1.2
       zod: 3.21.4
     transitivePeerDependencies:
       - '@vue/compiler-core'
@@ -2160,7 +2161,7 @@ packages:
       glob: 10.2.7
       import-meta-resolve: 3.0.0
       pathe: 1.1.1
-      unplugin: 1.3.2
+      unplugin: 1.4.0
       vite: 4.3.9(@types/node@20.1.0)(sass@1.58.0)
     transitivePeerDependencies:
       - '@vue/compiler-core'

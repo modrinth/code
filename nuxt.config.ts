@@ -317,8 +317,21 @@ export default defineNuxtConfig({
   modules: ['@vintl/nuxt', '@nuxtjs/turnstile'],
   vintl: {
     defaultLocale: 'en-US',
+    locales: [
+      {
+        tag: 'en-US',
+        meta: {
+          static: {
+            iso: 'en',
+          },
+        },
+      },
+    ],
     storage: 'cookie',
     parserless: 'only-prod',
+    seo: {
+      defaultLocaleHasParameter: false,
+    },
   },
   turnstile: {
     siteKey: '0x4AAAAAAAHWfmKCm7cUG869',
