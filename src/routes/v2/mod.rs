@@ -1,7 +1,7 @@
 mod admin;
+mod analytics_get;
 mod collections;
 mod images;
-mod analytics_get;
 mod moderation;
 mod notifications;
 pub(crate) mod project_creation;

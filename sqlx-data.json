@@ -5971,6 +5971,26 @@
     },
     "query": "\n                    UPDATE versions\n                    SET featured = $1\n                    WHERE (id = $2)\n                    "
   },
+  "e60ea75112db37d3e73812e21b1907716e4762e06aa883af878e3be82e3f87d3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            SELECT c.id FROM collections c\n            WHERE c.user_id = $1\n            "
+  },
   "e6f5a150cbd3bd6b9bde9e5cdad224a45c96d678b69ec12508e81246710e3f6d": {
     "describe": {
       "columns": [

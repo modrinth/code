@@ -14,12 +14,7 @@ impl super::Validator for PluginYmlValidator {
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
-        &[
-            "bukkit",
-            "spigot",
-            "paper",
-            "purpur",
-        ]
+        &["bukkit", "spigot", "paper", "purpur"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {

@@ -1,6 +1,7 @@
 use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
+use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::notifications::Notification;
 use crate::models::pats::Scopes;
 use crate::models::projects::Project;
@@ -30,6 +31,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("user")
             .service(user_get)
             .service(projects_list)
+            .service(collections_list)
             .service(user_delete)
             .service(user_edit)
             .service(user_icon_edit)
@@ -149,6 +151,50 @@ pub async fn projects_list(
                 .into_iter()
                 .filter(|x| can_view_private || x.inner.status.is_searchable())
                 .map(Project::from)
+                .collect();
+
+        Ok(HttpResponse::Ok().json(response))
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+#[get("{user_id}/collections")]
+pub async fn collections_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::COLLECTION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+
+    if let Some(id) = id_option.map(|x| x.id) {
+        let user_id: UserId = id.into();
+
+        let can_view_private = user
+            .map(|y| y.role.is_mod() || y.id == user_id)
+            .unwrap_or(false);
+
+        let project_data = User::get_collections(id, &**pool).await?;
+
+        let response: Vec<_> =
+            crate::database::models::Collection::get_many(&project_data, &**pool, &redis)
+                .await?
+                .into_iter()
+                .filter(|x| can_view_private || matches!(x.status, CollectionStatus::Listed))
+                .map(Collection::from)
                 .collect();
 
         Ok(HttpResponse::Ok().json(response))

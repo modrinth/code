@@ -5,7 +5,10 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{ProjectId, VersionId};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
-use crate::{auth::{is_authorized, is_authorized_version, get_user_from_headers}, database};
+use crate::{
+    auth::{get_user_from_headers, is_authorized, is_authorized_version},
+    database,
+};
 use actix_web::{get, route, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use std::collections::HashSet;

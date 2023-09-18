@@ -68,6 +68,7 @@ impl From<database::models::Collection> for Collection {
 pub enum CollectionStatus {
     Listed,
     Unlisted,
+    Private,
     Rejected,
     Unknown,
 }
@@ -83,6 +84,7 @@ impl CollectionStatus {
         match string {
             "listed" => CollectionStatus::Listed,
             "unlisted" => CollectionStatus::Unlisted,
+            "private" => CollectionStatus::Private,
             "rejected" => CollectionStatus::Rejected,
             _ => CollectionStatus::Unknown,
         }
@@ -91,6 +93,7 @@ impl CollectionStatus {
         match self {
             CollectionStatus::Listed => "listed",
             CollectionStatus::Unlisted => "unlisted",
+            CollectionStatus::Private => "private",
             CollectionStatus::Rejected => "rejected",
             CollectionStatus::Unknown => "unknown",
         }
@@ -100,7 +103,7 @@ impl CollectionStatus {
     pub fn is_hidden(&self) -> bool {
         match self {
             CollectionStatus::Rejected => true,
-
+            CollectionStatus::Private => true,
             CollectionStatus::Listed => false,
             CollectionStatus::Unlisted => false,
             CollectionStatus::Unknown => false,
@@ -110,6 +113,7 @@ impl CollectionStatus {
     pub fn is_approved(&self) -> bool {
         match self {
             CollectionStatus::Listed => true,
+            CollectionStatus::Private => true,
             CollectionStatus::Unlisted => true,
             CollectionStatus::Rejected => false,
             CollectionStatus::Unknown => false,
@@ -119,6 +123,7 @@ impl CollectionStatus {
     pub fn can_be_requested(&self) -> bool {
         match self {
             CollectionStatus::Listed => true,
+            CollectionStatus::Private => true,
             CollectionStatus::Unlisted => true,
             CollectionStatus::Rejected => false,
             CollectionStatus::Unknown => false,
