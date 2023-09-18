@@ -201,6 +201,12 @@ onBeforeUnmount(() => {
 
     .btn {
       height: 2.25rem;
+
+      transition: 0.05s;
+
+      &:not(.render-down):not(.render-up) {
+        transition-delay: 0.2s;
+      }
     }
   }
 
