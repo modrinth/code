@@ -24,6 +24,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("analytics")
             .service(playtimes_get)
             .service(views_get)
+            .service(downloads_get)
             .service(countries_downloads_get)
             .service(countries_views_get),
     );
@@ -198,6 +199,81 @@ pub async fn views_get(
         }
         if let Some(hm) = hm.get_mut(&id_string) {
             hm.insert(views.time.to_string(), views.total_views);
+        }
+    }
+
+    Ok(HttpResponse::Ok().json(hm))
+}
+
+/// Get download data for a set of projects or versions
+/// Data is returned as a hashmap of project/version ids to a hashmap of days to downloads
+/// eg:
+/// {
+///     "4N1tEhnO": {
+///         "20230824": 32
+///    }
+///}
+/// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
+#[get("downloads")]
+pub async fn downloads_get(
+    req: HttpRequest,
+    clickhouse: web::Data<clickhouse::Client>,
+    data: web::Json<GetData>,
+    session_queue: web::Data<AuthQueue>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<deadpool_redis::Pool>,
+) -> Result<HttpResponse, ApiError> {
+    let user_option = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::ANALYTICS]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    let project_ids = data.project_ids.clone();
+    let version_ids = data.version_ids.clone();
+
+    if project_ids.is_some() && version_ids.is_some() {
+        return Err(ApiError::InvalidInput(
+            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
+        ));
+    }
+
+    let start_date = data
+        .start_date
+        .unwrap_or(Utc::now().naive_utc().date() - Duration::weeks(2));
+    let end_date = data.end_date.unwrap_or(Utc::now().naive_utc().date());
+    let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+
+    // Convert String list to list of ProjectIds or VersionIds
+    // - Filter out unauthorized projects/versions
+    // - If no project_ids or version_ids are provided, we default to all projects the user has access to
+    let (project_ids, version_ids) =
+        filter_allowed_ids(project_ids, version_ids, user_option, &pool, &redis).await?;
+
+    // Get the downloads
+    let downloads = crate::clickhouse::fetch_downloads(
+        project_ids,
+        version_ids,
+        start_date,
+        end_date,
+        resolution_minutes,
+        clickhouse.into_inner(),
+    )
+    .await?;
+
+    let mut hm = HashMap::new();
+    for downloads in downloads {
+        let id_string = to_base62(downloads.id);
+        if !hm.contains_key(&id_string) {
+            hm.insert(id_string.clone(), HashMap::new());
+        }
+        if let Some(hm) = hm.get_mut(&id_string) {
+            hm.insert(downloads.time.to_string(), downloads.total_downloads);
         }
     }
 
