@@ -524,6 +524,7 @@ onUnmounted(() => {
   display: flex;
   padding: 0.6rem;
   flex-direction: row;
+  overflow: auto;
   gap: 0.5rem;
 }
 
