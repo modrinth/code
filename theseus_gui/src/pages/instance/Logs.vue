@@ -526,6 +526,13 @@ onUnmounted(() => {
   flex-direction: row;
   overflow: auto;
   gap: 0.5rem;
+
+  &::-webkit-scrollbar-track {
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar {
+    border-radius: 10px;
+  }
 }
 
 :deep(.vue-recycle-scroller__item-wrapper) {
