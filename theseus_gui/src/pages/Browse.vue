@@ -549,7 +549,11 @@ onUnmounted(() => unlistenOffline())
             size="sm"
           />
           <div class="small-instance_info">
-            <span class="title">{{ instanceContext.metadata.name }}</span>
+            <span class="title">{{
+              instanceContext.metadata.name.length > 20
+                ? instanceContext.metadata.name.substring(0, 20) + '...'
+                : instanceContext.metadata.name
+            }}</span>
             <span>
               {{
                 instanceContext.metadata.loader.charAt(0).toUpperCase() +
