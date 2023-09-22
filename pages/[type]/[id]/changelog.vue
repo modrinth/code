@@ -1,12 +1,5 @@
 <template>
   <div class="content">
-    <Head>
-      <Title> {{ project.title }} - Changelog </Title>
-      <Meta name="og:title" :content="`${props.project.title} - Changelog`" />
-      <Meta name="description" :content="metaDescription" />
-      <Meta name="apple-mobile-web-app-title" :content="`${props.project.title} - Changelog`" />
-      <Meta name="og:description" :content="metaDescription" />
-    </Head>
     <VersionFilterControl :versions="props.versions" />
     <Pagination
       :page="currentPage"
@@ -100,9 +93,15 @@ const props = defineProps({
   },
 })
 
-const metaDescription = computed(
-  () => `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`
-)
+const title = `${props.project.title} - Changelog`
+const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+})
 
 const route = useRoute()
 const currentPage = ref(Number(route.query.p ?? 1))

@@ -177,4 +177,3 @@ export default defineNuxtComponent({
   },
 })
 </script>
-<style lang="scss" scoped></style>

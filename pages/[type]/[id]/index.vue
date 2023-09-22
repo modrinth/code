@@ -17,5 +17,3 @@ export default defineNuxtComponent({
   methods: { renderHighlightedString },
 })
 </script>
-
-<style lang="scss" scoped></style>

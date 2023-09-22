@@ -451,35 +451,14 @@
   </div>
 </template>
 
-<script>
-export default defineNuxtComponent({
-  head: {
-    title: 'California Privacy Notice - Modrinth',
-    meta: [
-      {
-        hid: 'description',
-        name: 'description',
-        content:
-          'The California privacy notice of Modrinth, an open source modding platform focused on Minecraft.',
-      },
-      {
-        hid: 'apple-mobile-web-app-title',
-        name: 'apple-mobile-web-app-title',
-        content: 'California Privacy Notice',
-      },
-      {
-        hid: 'og:title',
-        name: 'og:title',
-        content: 'California Privacy Notice',
-      },
-      {
-        hid: 'og:url',
-        name: 'og:url',
-        content: 'https://modrinth.com/legal/ccpa',
-      },
-    ],
-  },
+<script setup>
+const description =
+  'The California Privacy Notice of Modrinth, an open source modding platform focused on Minecraft.'
+
+useSeoMeta({
+  title: 'California Privacy Notice - Modrinth',
+  description,
+  ogTitle: 'California Privacy Notice',
+  ogDescription: description,
 })
 </script>
-
-<style lang="scss" scoped></style>

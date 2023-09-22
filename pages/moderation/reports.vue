@@ -14,4 +14,3 @@ useHead({
   title: 'Reports - Modrinth',
 })
 </script>
-<style lang="scss" scoped></style>

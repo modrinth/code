@@ -391,13 +391,40 @@ const config = useRuntimeConfig()
 const route = useRoute()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 useHead({
-  meta: [{ name: 'og:url', content: link }],
   link: [
     {
       rel: 'canonical',
       href: link,
     },
   ],
+})
+
+const description =
+  'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
+  'Discover and publish projects on Modrinth with a modern, easy to use interface and API.'
+
+useSeoMeta({
+  title: 'Modrinth',
+  description,
+  publisher: 'Rinth, Inc.',
+  themeColor: [
+    { color: '#1bd96a', media: '(prefers-color-scheme:no-preference)' },
+    { color: '#1bd96a', media: '(prefers-color-scheme:dark)' },
+    { color: '#00af5c', media: '(prefers-color-scheme:light)' },
+  ],
+  colorScheme: 'dark light',
+
+  // OpenGraph
+  ogTitle: 'Modrinth',
+  ogSiteName: 'Modrinth',
+  ogDescription: description,
+  ogType: 'website',
+  ogImage: 'https://cdn.modrinth.com/modrinth-new.png',
+  ogUrl: link,
+
+  // Twitter
+  twitterCard: 'summary',
+  twitterSite: '@modrinth',
 })
 
 let developerModeCounter = 0

@@ -38,9 +38,7 @@ const rows = shallowRef([
 const { data: launcherUpdates } = await useAsyncData('launcherUpdates', () =>
   $fetch('https://launcher-files.modrinth.com/updates.json')
 )
-console.log(launcherUpdates)
 
-console.log(launcherUpdates.value)
 macLinks.appleSilicon = launcherUpdates.value.platforms['darwin-aarch64'].install_urls[0]
 macLinks.intel = launcherUpdates.value.platforms['darwin-x86_64'].install_urls[0]
 windowsLink.value = launcherUpdates.value.platforms['windows-x86_64'].install_urls[0]
@@ -99,19 +97,15 @@ const scrollToSection = () => {
   })
 }
 
-useHead({
-  title: 'Download the Modrinth App!',
-  meta: [{ name: 'The Modrinth App', content: 'An open source mod launcher unlike any other.' }],
-})
+const title = 'Download the Modrinth App!'
+const description =
+  'The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.'
 
 useSeoMeta({
-  title: 'The Modrinth App',
-  ogTitle: 'The Modrinth App',
-  description: 'Download the Modrinth App for Windows, Mac, and Linux.',
-  ogDescription:
-    'The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.',
-  ogImage: 'https://cdn.modrinth.com/modrinth-new.png?',
-  twitterCard: 'summary',
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
 })
 </script>
 

@@ -1,12 +1,5 @@
 <template>
   <div class="content">
-    <Head>
-      <Title> {{ project.title }} - Versions </Title>
-      <Meta name="og:title" :content="`${project.title} - Versions`" />
-      <Meta name="description" :content="metaDescription" />
-      <Meta name="apple-mobile-web-app-title" :content="`${project.title} - Versions`" />
-      <Meta name="og:description" :content="metaDescription" />
-    </Head>
     <div v-if="currentMember" class="card header-buttons">
       <FileInput
         :max-size="524288000"
@@ -142,14 +135,20 @@ const props = defineProps({
 })
 
 const data = useNuxtApp()
-const metaDescription = computed(
-  () =>
-    `Download and browse ${props.versions.length} ${
-      props.project.title
-    } versions. ${data.$formatNumber(props.project.downloads)} total downloads. Last updated ${data
-      .$dayjs(props.project.updated)
-      .format('MMM D, YYYY')}.`
-)
+
+const title = `${props.project.title} - Versions`
+const description = `Download and browse ${props.versions.length} ${
+  props.project.title
+} versions. ${data.$formatNumber(props.project.downloads)} total downloads. Last updated ${data
+  .$dayjs(props.project.updated)
+  .format('MMM D, YYYY')}.`
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+})
 
 const route = useRoute()
 const currentPage = ref(Number(route.query.p ?? 1))

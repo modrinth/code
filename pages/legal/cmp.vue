@@ -63,35 +63,14 @@
   </div>
 </template>
 
-<script>
-export default defineNuxtComponent({
-  head: {
-    title: 'Rewards Program Terms - Modrinth',
-    meta: [
-      {
-        hid: 'description',
-        name: 'description',
-        content:
-          'The rewards program terms of Modrinth, an open source modding platform focused on Minecraft.',
-      },
-      {
-        hid: 'apple-mobile-web-app-title',
-        name: 'apple-mobile-web-app-title',
-        content: 'Rewards Program Terms',
-      },
-      {
-        hid: 'og:title',
-        name: 'og:title',
-        content: 'Rewards Program Terms',
-      },
-      {
-        hid: 'og:url',
-        name: 'og:url',
-        content: 'https://modrinth.com/legal/cmp',
-      },
-    ],
-  },
+<script setup>
+const description =
+  'The Rewards Program Terms of Modrinth, an open source modding platform focused on Minecraft.'
+
+useSeoMeta({
+  title: 'Rewards Program Terms - Modrinth',
+  description,
+  ogTitle: 'Rewards Program Terms',
+  ogDescription: description,
 })
 </script>
-
-<style lang="scss" scoped></style>

@@ -7,17 +7,7 @@
     }"
   >
     <Head>
-      <Title>Search {{ $formatProjectType(projectType.display) }}s - Modrinth</Title>
-      <Meta
-        name="og:title"
-        :content="`Search ${$formatProjectType(projectType.display)}s ${query ? '| ' + query : ''}`"
-      />
-      <Meta name="description" :content="metaDescription" />
-      <Meta
-        name="apple-mobile-web-app-title"
-        :content="`Search ${$formatProjectType(projectType.display)}s`"
-      />
-      <Meta name="og:description" :content="metaDescription" />
+      <Title>Search {{ projectType.display }}s - Modrinth</Title>
     </Head>
     <aside
       :class="{
@@ -371,14 +361,20 @@ const maxResults = ref(20)
 const currentPage = ref(1)
 const projectType = ref({ id: 'mod', display: 'mod', actual: 'mod' })
 
-const metaDescription = computed(
-  () =>
-    `Search and browse thousands of Minecraft ${data.$formatProjectType(
-      projectType.value.display
-    )}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${data.$formatProjectType(
-      projectType.value.display
-    )}s.`
+const ogTitle = computed(
+  () => `Search ${projectType.value.display}s${query.value ? ' | ' + query.value : ''}`
 )
+const description = computed(
+  () =>
+    `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`
+)
+
+useSeoMeta({
+  description,
+  ogTitle,
+  ogDescription: description,
+})
+
 if (route.query.q) {
   query.value = route.query.q
 }

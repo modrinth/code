@@ -48,5 +48,3 @@ const route = useRoute()
 const auth = await useAuth()
 const isStaging = useRuntimeConfig().public.siteUrl !== 'https://modrinth.com'
 </script>
-
-<style lang="scss" scoped></style>

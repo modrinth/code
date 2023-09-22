@@ -52,35 +52,14 @@
   </div>
 </template>
 
-<script>
-export default defineNuxtComponent({
-  head: {
-    title: 'Security Notice - Modrinth',
-    meta: [
-      {
-        hid: 'description',
-        name: 'description',
-        content:
-          'The Security Notice of Modrinth, an open source modding platform focused on Minecraft.',
-      },
-      {
-        hid: 'apple-mobile-web-app-title',
-        name: 'apple-mobile-web-app-title',
-        content: 'Security Notice',
-      },
-      {
-        hid: 'og:title',
-        name: 'og:title',
-        content: 'Security Notice',
-      },
-      {
-        hid: 'og:url',
-        name: 'og:url',
-        content: 'https://modrinth.com/legal/security',
-      },
-    ],
-  },
+<script setup>
+const description =
+  'The Security Notice of Modrinth, an open source modding platform focused on Minecraft.'
+
+useSeoMeta({
+  title: 'Security Notice - Modrinth',
+  description,
+  ogTitle: 'Security Notice',
+  ogDescription: description,
 })
 </script>
-
-<style lang="scss" scoped></style>

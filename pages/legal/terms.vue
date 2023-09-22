@@ -583,35 +583,14 @@
   </div>
 </template>
 
-<script>
-export default defineNuxtComponent({
-  head: {
-    title: 'Terms - Modrinth',
-    meta: [
-      {
-        hid: 'description',
-        name: 'description',
-        content:
-          'The Terms and Conditions of Modrinth, an open source modding platform focused on Minecraft.',
-      },
-      {
-        hid: 'apple-mobile-web-app-title',
-        name: 'apple-mobile-web-app-title',
-        content: 'Terms and Conditions',
-      },
-      {
-        hid: 'og:title',
-        name: 'og:title',
-        content: 'Terms and Conditions',
-      },
-      {
-        hid: 'og:url',
-        name: 'og:url',
-        content: 'https://modrinth.com/legal/terms',
-      },
-    ],
-  },
+<script setup>
+const description =
+  'The Terms of Use of Modrinth, an open source modding platform focused on Minecraft.'
+
+useSeoMeta({
+  title: 'Terms of Use - Modrinth',
+  description,
+  ogTitle: 'Terms of Use',
+  ogDescription: description,
 })
 </script>
-
-<style lang="scss" scoped></style>

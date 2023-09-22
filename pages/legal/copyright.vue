@@ -101,35 +101,14 @@
   </div>
 </template>
 
-<script>
-export default defineNuxtComponent({
-  head: {
-    title: 'Copyright - Modrinth',
-    meta: [
-      {
-        hid: 'description',
-        name: 'description',
-        content:
-          'The Copyright Policy of Modrinth, an open source modding platform focused on Minecraft.',
-      },
-      {
-        hid: 'apple-mobile-web-app-title',
-        name: 'apple-mobile-web-app-title',
-        content: 'Copyright Policy',
-      },
-      {
-        hid: 'og:title',
-        name: 'og:title',
-        content: 'Copyright Policy',
-      },
-      {
-        hid: 'og:url',
-        name: 'og:url',
-        content: 'https://modrinth.com/legal/copyright',
-      },
-    ],
-  },
+<script setup>
+const description =
+  'The Copyright Policy of Modrinth, an open source modding platform focused on Minecraft.'
+
+useSeoMeta({
+  title: 'Copyright Policy - Modrinth',
+  description,
+  ogTitle: 'Copyright Policy',
+  ogDescription: description,
 })
 </script>
-
-<style lang="scss" scoped></style>

@@ -1,12 +1,5 @@
 <template>
   <div v-if="version" class="version-page">
-    <Head>
-      <Title>{{ metaTitle }}</Title>
-      <Meta name="og:title" :content="metaTitle" />
-      <Meta name="description" :content="metaDescription" />
-      <Meta name="apple-mobile-web-app-title" :content="metaDescription" />
-      <Meta name="og:description" :content="metaDescription" />
-    </Head>
     <ModalConfirm
       v-if="currentMember"
       ref="modal_confirm"
@@ -894,6 +887,27 @@ export default defineNuxtComponent({
 
     oldFileTypes = version.files.map((x) => fileTypes.find((y) => y.value === x.file_type))
 
+    const title = computed(
+      () => `${isCreating ? 'Create Version' : version.name} - ${props.project.title}`
+    )
+    const description = computed(
+      () =>
+        `Download ${props.project.title} ${
+          version.version_number
+        } on Modrinth. Supports ${data.$formatVersion(version.game_versions)} ${version.loaders
+          .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+          .join(' & ')}. Published on ${data
+          .$dayjs(version.date_published)
+          .format('MMM D, YYYY')}. ${version.downloads} downloads.`
+    )
+
+    useSeoMeta({
+      title,
+      description,
+      ogTitle: title,
+      ogDescription: description,
+    })
+
     const order = ['required', 'optional', 'incompatible', 'embedded']
 
     return {
@@ -908,19 +922,6 @@ export default defineNuxtComponent({
       alternateFile: ref(alternateFile),
       replaceFile: ref(replaceFile),
 
-      metaTitle: computed(
-        () => `${isCreating ? 'Create Version' : version.name} - ${props.project.title}`
-      ),
-      metaDescription: computed(
-        () =>
-          `Download ${props.project.title} ${
-            version.version_number
-          } on Modrinth. Supports ${data.$formatVersion(version.game_versions)} ${version.loaders
-            .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-            .join(' & ')}. Published on ${data
-            .$dayjs(version.date_published)
-            .format('MMM D, YYYY')}. ${version.downloads} downloads.`
-      ),
       deps: computed(() =>
         version.dependencies.sort(
           (a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type)
