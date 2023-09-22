@@ -243,7 +243,7 @@
         :disabled="!overrideMemorySettings"
         :min="8"
         :max="maxMemory"
-        :step="1"
+        :step="64"
         unit="mb"
       />
     </div>
