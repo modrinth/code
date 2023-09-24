@@ -87,6 +87,18 @@
     },
     "query": "\n                    UPDATE mods\n                    SET source_url = $1\n                    WHERE (id = $2)\n                    "
   },
+  "0461463e3e14f6c8ede5571a2905b8171e8caf4ebbd3ec844ef2cebd83980247": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                DELETE FROM reports\n                WHERE user_id = $1 OR reporter = $1\n                "
+  },
   "0472045549758d8eef84592908c438d6222a26926f4b06865b84979fc92564ba": {
     "describe": {
       "columns": [],
@@ -1930,18 +1942,6 @@
       }
     },
     "query": "\n                SELECT mod_id FROM versions WHERE id = $1\n                "
-  },
-  "4c58727309e5c79cc0505e57aeba0c977f308429f97b0ed296ab3bc0ebebb435": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                DELETE FROM reports\n                WHERE user_id = $1\n                "
   },
   "4c9e2190e2a68ffc093a69aaa1fc9384957138f57ac9cd85cbc6179613c13a08": {
     "describe": {
