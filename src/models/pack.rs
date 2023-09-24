@@ -84,6 +84,7 @@ pub enum EnvType {
 #[serde(rename_all = "kebab-case")]
 pub enum PackDependency {
     Forge,
+    Neoforge,
     FabricLoader,
     QuiltLoader,
     Minecraft,
@@ -100,6 +101,7 @@ impl PackDependency {
     pub fn as_str(&self) -> &'static str {
         match self {
             PackDependency::Forge => "forge",
+            PackDependency::Neoforge => "neoforge",
             PackDependency::FabricLoader => "fabric-loader",
             PackDependency::Minecraft => "minecraft",
             PackDependency::QuiltLoader => "quilt-loader",
