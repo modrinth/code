@@ -875,20 +875,6 @@ async fn project_create_inner(
             monetization_status: MonetizationStatus::Monetized,
         };
 
-        if status == ProjectStatus::Processing {
-            if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
-                crate::util::webhook::send_discord_webhook(
-                    response.id,
-                    pool,
-                    redis,
-                    webhook_url,
-                    None,
-                )
-                .await
-                .ok();
-            }
-        }
-
         Ok(HttpResponse::Ok().json(response))
     }
 }

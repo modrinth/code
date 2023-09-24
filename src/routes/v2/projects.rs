@@ -493,18 +493,6 @@ pub async fn project_edit(
                     )
                     .execute(&mut *transaction)
                     .await?;
-
-                    if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
-                        crate::util::webhook::send_discord_webhook(
-                            project_item.inner.id.into(),
-                            &pool,
-                            &redis,
-                            webhook_url,
-                            None,
-                        )
-                        .await
-                        .ok();
-                    }
                 }
 
                 if status.is_approved() && !project_item.inner.status.is_approved() {
@@ -542,6 +530,26 @@ pub async fn project_edit(
                         )
                         .execute(&mut *transaction)
                         .await?;
+                    }
+                }
+
+                if user.role.is_mod() {
+                    if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
+                        crate::util::webhook::send_discord_webhook(
+                            project_item.inner.id.into(),
+                            &pool,
+                            &redis,
+                            webhook_url,
+                            Some(
+                                format!(
+                                    "**[{}]({}/user/{})** changed project status from **{}** to **{}**",
+                                    user.username, dotenvy::var("SITE_URL")?, user.username, &project_item.inner.status, status
+                                )
+                                .to_string(),
+                            ),
+                        )
+                        .await
+                        .ok();
                     }
                 }
 
