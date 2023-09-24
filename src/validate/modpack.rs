@@ -85,9 +85,10 @@ impl super::Validator for ModpackValidator {
             files: archive
                 .file_names()
                 .filter(|x| {
-                    x.starts_with("overrides/mods")
-                        || x.starts_with("client-overrides/mods")
-                        || x.starts_with("server-overrides/mods")
+                    (x.ends_with("jar") || x.ends_with("zip"))
+                        && (x.starts_with("overrides/mods")
+                            || x.starts_with("client-overrides/mods")
+                            || x.starts_with("server-overrides/mods"))
                 })
                 .flat_map(|x| x.rsplit('/').next().map(|x| x.to_string()))
                 .collect::<Vec<String>>(),
