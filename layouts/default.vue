@@ -123,7 +123,7 @@
                 </nuxt-link>
                 <nuxt-link
                   v-if="$route.path !== '/app' && !cosmetics.hideModrinthAppPromos"
-                  class="btn btn-outline btn-primary"
+                  class="btn btn-outline btn-primary app-btn"
                   to="/app"
                 >
                   <DownloadIcon /> Get Modrinth App
@@ -1200,6 +1200,12 @@ export default defineNuxtComponent({
   justify-content: center;
   gap: 1rem;
   padding: 0.5rem 1rem;
+}
+
+@media (max-width: 1200px) {
+  .app-btn {
+    display: none;
+  }
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
