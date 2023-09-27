@@ -576,9 +576,11 @@ const modpackVersionModal = ref(null)
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
-  ...instancesList.reduce((acc, obj) => {
-    return acc.concat(obj.metadata.groups)
-  }, []),
+  ...new Set(
+    instancesList.reduce((acc, obj) => {
+      return acc.concat(obj.metadata.groups)
+    }, [])
+  ),
 ])
 
 async function resetIcon() {
