@@ -1,5 +1,12 @@
 <template>
   <div class="universal-card">
+    <ModalConfirm
+      ref="modal_confirm"
+      title="Are you sure you want to delete this token?"
+      description="This will remove this token forever (like really forever)."
+      proceed-label="Delete this token"
+      @proceed="removePat(deletePatIndex)"
+    />
     <Modal
       ref="patModal"
       :header="`${editPatIndex !== null ? 'Edit' : 'Create'} personal access token`"
@@ -132,7 +139,15 @@
         >
           <EditIcon /> Edit token
         </button>
-        <button class="iconified-button raised-button" @click="removePat(pat.id)">
+        <button
+          class="iconified-button raised-button"
+          @click="
+            () => {
+              deletePatIndex = pat.id
+              $refs.modal_confirm.show()
+            }
+          "
+        >
           <TrashIcon /> Revoke token
         </button>
       </div>
@@ -140,7 +155,16 @@
   </div>
 </template>
 <script setup>
-import { PlusIcon, Modal, XIcon, Checkbox, TrashIcon, EditIcon, SaveIcon } from 'omorphia'
+import {
+  PlusIcon,
+  Modal,
+  XIcon,
+  Checkbox,
+  TrashIcon,
+  EditIcon,
+  SaveIcon,
+  ModalConfirm,
+} from 'omorphia'
 import CopyCode from '~/components/ui/CopyCode.vue'
 
 definePageMeta({
@@ -192,6 +216,8 @@ const editPatIndex = ref(null)
 const name = ref(null)
 const scopesVal = ref(0)
 const expires = ref(null)
+
+const deletePatIndex = ref(null)
 
 const loading = ref(false)
 
