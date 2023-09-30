@@ -18,7 +18,7 @@
             <NavStackItem link="/settings/pats" label="PATs">
               <KeyIcon />
             </NavStackItem>
-            <NavStackItem link="/settings/sessions" label="Sessions">
+            <NavStackItem link="/settings/sessions" :label="formatMessage(messages.sessionsTitle)">
               <ShieldIcon />
             </NavStackItem>
             <NavStackItem link="/settings/monetization" label="Monetization">
@@ -43,6 +43,15 @@ import CurrencyIcon from '~/assets/images/utils/currency.svg'
 import ShieldIcon from '~/assets/images/utils/shield.svg'
 import KeyIcon from '~/assets/images/utils/key.svg'
 import LanguagesIcon from '~/assets/images/utils/languages.svg'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+  sessionsTitle: {
+    id: 'settings.sessions.title',
+    defaultMessage: 'Sessions',
+  },
+})
 
 const route = useRoute()
 const auth = await useAuth()
