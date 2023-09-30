@@ -1,10 +1,11 @@
 <template>
   <div class="markdown-body">
     <h1>Rewards Program Information</h1>
-    <p><em>Last edited: August 9, 2023</em></p>
+    <p><em>Last modified: August 9, 2023</em></p>
     <p>
       This page was created for transparency for how the rewards program works on Modrinth. Feel
-      free to join our Discord or email support@modrinth.com if you have any questions!
+      free to join our Discord or email
+      <a href="mailto:support@modrinth.com">support@modrinth.com</a> if you have any questions!
     </p>
     <p>
       This document is provided for informational purposes only and does not constitute a legal

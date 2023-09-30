@@ -5,12 +5,13 @@
     <p><strong>Last reviewed on: </strong><em>August 5th, 2023</em></p>
     <p>
       This Privacy Notice for California Residents supplements the information contained in the
-      <nuxt-link to="/legal/privacy">Privacy Policy</nuxt-link> of Rinth, Inc. (the “Company,” “we,”
-      “us” or “our”) and applies solely to all visitors, users, and others who reside in the State
+      <nuxt-link to="/legal/privacy">Privacy Policy</nuxt-link> of Rinth, Inc. (the "Company," "we,"
+      "us" or "our") and applies solely to all visitors, users, and others who reside in the State
       of California ("consumers" or "you"). We adopt this notice to comply with the California
       Consumer Privacy Act of 2018 (CCPA), as it may be amended, modified or supplemented from time
       to time, and any terms defined in the CCPA have the same meaning when used in this notice.
     </p>
+
     <h2>Information We Collect</h2>
     <p>
       Our Service collects information that identifies, relates to, describes, references, is
@@ -152,6 +153,7 @@
       </li>
       <li>Indirectly from you. For example, from observing your actions on our Service.</li>
     </ul>
+
     <h2>Use of Personal Information</h2>
     <p>
       We may use or disclose the personal information we collect for one or more of the following
@@ -209,6 +211,7 @@
       information we collected for materially different, unrelated, or incompatible purposes without
       providing you notice.
     </p>
+
     <h2>Sharing Personal Information</h2>
     <p>
       We may disclose your personal information to a third party for a business purpose. When we
@@ -218,9 +221,8 @@
       purchase the personal information we hold from reselling it unless you have received explicit
       notice and an opportunity to opt-out of further sales.
     </p>
-    <p>
-      <strong><i>Disclosures of Personal Information for a Business Purpose</i></strong>
-    </p>
+
+    <h3>Disclosures of Personal Information for a Business Purpose</h3>
     <p>
       In the preceding twelve (12) months, Company has disclosed the following categories of
       personal information for a business purpose:
@@ -237,19 +239,18 @@
     <ul>
       <li>Service providers.</li>
     </ul>
-    <p>
-      <strong><i>Sales of Personal Information</i></strong>
-    </p>
+
+    <h3>Sales of Personal Information</h3>
     <p>In the preceding twelve (12) months, Company has not sold personal information.</p>
+
     <h2>Your Rights and Choices</h2>
     <p>
       The CCPA provides consumers (California residents) with specific rights regarding their
       personal information. This section describes your CCPA rights and explains how to exercise
       those rights.
     </p>
-    <p>
-      <strong><i>Access to Specific Information and Data Portability Rights </i></strong>
-    </p>
+
+    <h3>Access to Specific Information and Data Portability Rights</h3>
     <p>
       You have the right to request that we disclose certain information to you about our collection
       and use of your personal information over the past 12 months. Once we receive and confirm your
@@ -282,9 +283,8 @@
         </li>
       </ul>
     </ul>
-    <p>
-      <strong><i>Deletion Request Rights</i></strong>
-    </p>
+
+    <h3>Deletion Request Rights</h3>
     <p>
       You have the right to request that we delete any of your personal information that we
       collected from you and retained, subject to certain exceptions. Once we receive and confirm
@@ -334,12 +334,12 @@
         in which you provided it.
       </li>
     </ol>
-    <p>
-      <strong><i>Exercising Access, Data Portability, and Deletion Rights</i></strong>
-    </p>
+
+    <h3>Exercising Access, Data Portability, and Deletion Rights</h3>
     <p>
       To exercise the access, data portability, and deletion rights described above, please submit a
-      verifiable consumer request to us by emailing us at support@modrinth.com.
+      verifiable consumer request to us by emailing us at
+      <a href="mailto:support@modrinth.com">support@modrinth.com</a>.
     </p>
     <p>
       Only you, or a person registered with the California Secretary of State that you authorize to
@@ -379,9 +379,8 @@
       For instructions on exercising sale opt-out rights, see
       <i>Personal Information Sales Opt-Out and Opt-In Rights.</i>
     </p>
-    <p>
-      <strong><i>Response Timing and Format</i></strong>
-    </p>
+
+    <h3>Response Timing and Format</h3>
     <p>
       We endeavor to respond to a verifiable consumer request within forty-five (45) days of its
       receipt. If we require more time (up to 90 days), we will inform you of the reason and
@@ -405,7 +404,8 @@
       fee, we will tell you why we made that decision and provide you with a cost estimate before
       completing your request.
     </p>
-    <h3>Non-Discrimination</h3>
+
+    <h2>Non-Discrimination</h2>
     <p>
       We will not discriminate against you for exercising any of your CCPA rights. Unless permitted
       by the CCPA, we will not:
@@ -430,7 +430,7 @@
       describe the program's material aspects. Participation in a financial incentive program
       requires your prior opt in consent, which you may revoke at any time.
     </p>
-    <h3>Changes to Our Privacy Notice</h3>
+    <h2>Changes to Our Privacy Notice</h2>
     <p>
       We reserve the right to amend this privacy notice at our discretion and at any time. When we
       make changes to this privacy notice, we will post the updated notice on the Service and update
@@ -440,13 +440,13 @@
         acceptance of such changes.
       </strong>
     </p>
-    <h3>Contact Information</h3>
+    <h2>Contact Information</h2>
     <p>
       If you have any questions or comments about this notice, the ways in which we collect and use
       your information described below and in the
       <nuxt-link to="/legal/privacy">Privacy Policy</nuxt-link>, your choices and rights regarding
       such use, or wish to exercise your rights under California law, please do not hesitate to
-      contact us at support@modrinth.com.
+      contact us at <a href="mailto:support@modrinth.com">support@modrinth.com</a>.
     </p>
   </div>
 </template>

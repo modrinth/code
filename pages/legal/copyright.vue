@@ -41,7 +41,7 @@
       &emsp;Jai Agrawal<br />
       &emsp;Rinth, Inc.<br />
       &emsp;410 N Scottsdale Road, Suite 1000, Tempe, Arizona, 85281<br />
-      &emsp;support@modrinth.com<br />
+      &emsp;<a href="mailto:support@modrinth.com">support@modrinth.com</a><br />
     </p>
     <p>
       If you fail to comply with all of the requirements of Section 512(c)(3) of the DMCA, your DMCA

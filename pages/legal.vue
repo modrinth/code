@@ -4,7 +4,7 @@
       <aside class="universal-card">
         <h1>Legal</h1>
         <NavStack>
-          <NavStackItem link="/legal/terms" label="Terms and Conditions">
+          <NavStackItem link="/legal/terms" label="Terms of Use">
             <HeartHandshakeIcon />
           </NavStackItem>
           <NavStackItem link="/legal/rules" label="Content Rules">

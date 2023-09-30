@@ -1,7 +1,7 @@
 <template>
   <div class="markdown-body">
-    <h1>Terms and Conditions</h1>
-    <p><em>Last Modified: August 5, 2023 </em></p>
+    <h1>Terms of Use</h1>
+    <p><em>Last modified: September 16, 2023</em></p>
     <h2>Acceptance of the Terms of Use</h2>
     <p>
       These terms of use are entered into by and between You and Rinth, Inc.
@@ -9,7 +9,7 @@
       terms and conditions, together with any documents they expressly incorporate by reference
       (collectively, these "Terms of Use"), govern your access to and use of www.modrinth.com,
       api.modrinth.com, or the Modrinth App, including any content, functionality and services
-      offered on or through www.modrinth.com, api.modrinth.com, or the Modrinth App (the “Service”),
+      offered on or through www.modrinth.com, api.modrinth.com, or the Modrinth App (the "Service"),
       whether as a guest or a registered user.
     </p>
     <p>
@@ -77,7 +77,7 @@
     </p>
     <h2>About the Service</h2>
     <p>
-      The Service allows you to upload and share your gaming content (the “Gaming Content”, to be
+      The Service allows you to upload and share your gaming content (the "Gaming Content", to be
       distinguished from User Contributions, defined below) with other users of our Service. Unlike
       User Contributions, which are owned by the Company, when you use the Service and upload and
       share your Gaming Content, the Company does not claim any right, title or interest in or to
@@ -94,12 +94,14 @@
       When you delete your Gaming Content, you agree that your Gaming Content may continue to be
       used by any users who have previously downloaded your Gaming Content pursuant to the preceding
       license, and you also agree that your Gaming Content may continue to be part of any
-      already-existing Gaming Content “packs” created by other users as part of our Service until
-      such time as such Gaming Content has been deleted by such user(s) as part of such “pack(s)”.
+      already-existing Gaming Content "packs" created by other users as part of our Service until
+      such time as such Gaming Content has been deleted by such user(s) as part of such "pack(s)".
       Otherwise, for the avoidance of doubt, as between the Company and you, you own and will
       continue to own all right, title and interest in and to your Gaming Content.
     </p>
-    <p>All Gaming Content must abide by the Content Standards.</p>
+    <p>
+      All Gaming Content must abide by the <nuxt-link to="/legal/rules">Content Rules</nuxt-link>.
+    </p>
     <h2>API Usage</h2>
     <p>
       As part of our Services, we provide a tool known as Application Programming Interfaces
@@ -130,7 +132,7 @@
     </p>
     <h2>Our Rewards Program</h2>
     <p>
-      Our rewards program (<strong>“Rewards Program”</strong>) provides developers and content
+      Our rewards program (<strong>"Rewards Program"</strong>) provides developers and content
       creators with an opportunity to monetize the projects that they upload to the Service.
     </p>
     <p>
@@ -138,10 +140,10 @@
       impressions displayed solely on your project pages. The funds are directly deposited into your
       account, which you can monitor and access via your creator dashboard. Simply enroll in the
       Rewards Program on your dashboard in order to be able to take advantage of this program.
-      Please review the Rewards Program terms and conditions, as it contains very important language
-      regarding, among other things, your status as an independent contractor, your responsibility
-      to pay taxes, our disclaimers and limitations of liability (in addition to our disclaimers and
-      limitations of liability in these Terms of Use).
+      Please review the <nuxt-link to="/legal/cmp">Rewards Program Terms</nuxt-link>, as it contains
+      very important language regarding, among other things, your status as an independent
+      contractor, your responsibility to pay taxes, our disclaimers and limitations of liability (in
+      addition to our disclaimers and limitations of liability in these Terms of Use).
     </p>
     <h2>Intellectual Property Rights</h2>
     <p>
@@ -186,8 +188,8 @@
         otherwise.
       </li>
       <li>
-        To send, knowingly receive, upload, download, use or re-use any material which does not
-        comply with the Content Standards set out in these Terms of Use.
+        To send, knowingly receive, upload, download, use, or re-use any material which does not
+        comply with the <nuxt-link to="/legal/rules">Content Rules</nuxt-link>.
       </li>
       <li>
         To transmit, or procure the sending of, any advertising or promotional material, including
@@ -246,8 +248,8 @@
       <strong>"User Contributions"</strong>) on or through the Service.
     </p>
     <p>
-      All User Contributions must comply with the <strong>Content Standards</strong> set out in
-      these Terms of Use.
+      All User Contributions and use of Interactive Services must abide by the
+      <nuxt-link to="/legal/rules">Content Rules</nuxt-link>.
     </p>
     <p>
       Any User Contribution you post to the site will be considered non-confidential and
@@ -284,7 +286,7 @@
       <li>
         Take any action with respect to any User Contribution that we deem necessary or appropriate
         in our sole discretion, including if we believe that such User Contribution violates the
-        Terms of Use, including the Content Standards, infringes any intellectual property right or
+        Terms of Use, including the Content Rules, infringes any intellectual property right or
         other right of any person or entity, threatens the personal safety of users of the Service
         or the public or could create liability for the Company.
       </li>
@@ -313,47 +315,6 @@
       responsibility to anyone for performance or nonperformance of the activities described in this
       section.
     </p>
-    <h2>Content Standards</h2>
-    <p>
-      These content standards apply to any and all User Contributions and use of Interactive
-      Services. User Contributions must in their entirety comply with all applicable federal, state,
-      local and international laws and regulations. Without limiting the foregoing, User
-      Contributions must not:
-    </p>
-    <ul>
-      <li>
-        Contain any material which is defamatory, obscene, indecent, abusive, offensive, harassing,
-        violent, hateful, inflammatory or otherwise objectionable.
-      </li>
-      <li>
-        Promote sexually explicit or pornographic material, violence, or discrimination based on
-        race, sex, religion, nationality, disability, sexual orientation or age.
-      </li>
-      <li>
-        Infringe any patent, trademark, trade secret, copyright or other intellectual property or
-        other rights of any other person.
-      </li>
-      <li>
-        Violate the legal rights (including the rights of publicity and privacy) of others or
-        contain any material that could give rise to any civil or criminal liability under
-        applicable laws or regulations or that otherwise may be in conflict with these Terms of Use
-        or our Privacy Policy.
-      </li>
-      <li>Be likely to deceive any person.</li>
-      <li>Promote any illegal activity, or advocate, promote or assist any unlawful act.</li>
-      <li>
-        Cause annoyance, inconvenience or needless anxiety or be likely to upset, embarrass, alarm
-        or annoy any other person.
-      </li>
-      <li>
-        Impersonate any person, or misrepresent your identity or affiliation with any person or
-        organization.
-      </li>
-      <li>
-        Give the impression that they emanate from or are endorsed by us or any other person or
-        entity, if this is not the case.
-      </li>
-    </ul>
     <h2>Copyright Infringement</h2>
     <p>
       If you believe that any User Contributions violate your copyright, please see our Copyright
@@ -420,7 +381,7 @@
     </ul>
     <p>
       The website from which you are linking, or on which you make certain content accessible, must
-      comply in all respects with the content standards set out in these Terms of Use.
+      comply in all respects with the <nuxt-link to="/legal/rules">Content Rules</nuxt-link>.
     </p>
     <p>
       You agree to cooperate with us in causing any unauthorized framing or linking immediately to
@@ -559,10 +520,11 @@
     <h2>Entire Agreement</h2>
     <p>
       The <strong>Terms of Use</strong>, our <strong>Privacy Policy</strong>, our
-      <strong>Copyright Policy</strong> and our <strong>California Privacy Notice</strong> (if
-      applicable) constitute the sole and entire agreement between you and the Company with respect
-      to the Service and supersede all prior and contemporaneous understandings, agreements,
-      representations and warranties, both written and oral, with respect to the Service.
+      <strong>Copyright Policy</strong>, our <strong>Content Guidelines</strong>, and our
+      <strong>California Privacy Notice</strong> (if applicable) constitute the sole and entire
+      agreement between you and the Company with respect to the Service and supersede all prior and
+      contemporaneous understandings, agreements, representations and warranties, both written and
+      oral, with respect to the Service.
     </p>
     <h2>Your Comments and Concerns</h2>
     <p>This website is operated by:</p>
@@ -578,7 +540,8 @@
     </p>
     <p>
       All other feedback, comments, requests for technical support and other communications relating
-      to the Service should be directed to: support@modrinth.com.
+      to the Service should be directed to:
+      <a href="mailto:support@modrinth.com">support@modrinth.com</a>.
     </p>
   </div>
 </template>
