@@ -92,7 +92,12 @@
             Cancel
           </button>
           <template v-if="removePasswordMode">
-            <button type="button" class="iconified-button danger-button" @click="savePassword">
+            <button
+              type="button"
+              class="iconified-button danger-button"
+              :disabled="!oldPassword"
+              @click="savePassword"
+            >
               <TrashIcon />
               Remove password
             </button>
@@ -107,7 +112,16 @@
               <TrashIcon />
               Remove password
             </button>
-            <button type="button" class="iconified-button brand-button" @click="savePassword">
+            <button
+              type="button"
+              class="iconified-button brand-button"
+              :disabled="
+                newPassword.length == 0 ||
+                oldPassword.length == 0 ||
+                newPassword !== confirmNewPassword
+              "
+              @click="savePassword"
+            >
               <SaveIcon />
               Save password
             </button>
