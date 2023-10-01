@@ -908,8 +908,6 @@ export default defineNuxtComponent({
       ogDescription: description,
     })
 
-    const order = ['required', 'optional', 'incompatible', 'embedded']
-
     return {
       auth,
       tags,
@@ -921,12 +919,6 @@ export default defineNuxtComponent({
       primaryFile: ref(primaryFile),
       alternateFile: ref(alternateFile),
       replaceFile: ref(replaceFile),
-
-      deps: computed(() =>
-        version.dependencies.sort(
-          (a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type)
-        )
-      ),
     }
   },
   data() {
@@ -957,6 +949,12 @@ export default defineNuxtComponent({
         this.version.game_versions.length === 0 ||
         (this.version.loaders.length === 0 && this.project.project_type !== 'resourcepack') ||
         (this.newFiles.length === 0 && this.version.files.length === 0 && !this.replaceFile)
+      )
+    },
+    deps() {
+      const order = ['required', 'optional', 'incompatible', 'embedded']
+      return [...this.version.dependencies].sort(
+        (a, b) => order.indexOf(a.dependency_type) - order.indexOf(b.dependency_type)
       )
     },
   },
