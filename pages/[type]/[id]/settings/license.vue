@@ -44,12 +44,12 @@
             :close-on-select="true"
             :show-labels="false"
             :class="{
-              'known-error': license.short === '' && showKnownErrors,
+              'known-error': license?.short === '' && showKnownErrors,
             }"
             :disabled="!hasPermission"
           />
           <Checkbox
-            v-if="license.requiresOnlyOrLater"
+            v-if="license?.requiresOnlyOrLater"
             v-model="allowOrLater"
             :disabled="!hasPermission"
             description="Allow later editions of this license"
@@ -57,7 +57,7 @@
             Allow later editions of this license
           </Checkbox>
           <Checkbox
-            v-if="license.friendly === 'Custom'"
+            v-if="license?.friendly === 'Custom'"
             v-model="nonSpdxLicense"
             :disabled="!hasPermission"
             description="License does not have a SPDX identifier"
@@ -65,7 +65,7 @@
             License does not have a SPDX identifier
           </Checkbox>
           <input
-            v-if="license.friendly === 'Custom'"
+            v-if="license?.friendly === 'Custom'"
             v-model="license.short"
             type="text"
             maxlength="2048"
@@ -88,7 +88,7 @@
         <button
           type="button"
           class="iconified-button brand-button"
-          :disabled="!hasChanges"
+          :disabled="!hasChanges || license === null"
           @click="saveChanges()"
         >
           <SaveIcon />
@@ -253,6 +253,7 @@ export default defineNuxtComponent({
     },
     licenseId() {
       let id = ''
+      if (this.license === null) return id
       if (
         (this.nonSpdxLicense && this.license.friendly === 'Custom') ||
         this.license.short === 'All-Rights-Reserved' ||
