@@ -9,7 +9,7 @@
     "lint:js": "eslint . --ext .js,.vue,.ts",
     "lint": "npm run lint:js && prettier --check .",
     "fix": "eslint . --fix --ext .js,.vue,.ts && prettier --write .",
-    "intl:extract": "formatjs extract \"{,components,composables,layouts,middleware,modules,pages,plugins,utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file locales/en-US/index.json --format crowdin"
+    "intl:extract": "formatjs extract \"{,components,composables,layouts,middleware,modules,pages,plugins,utils}/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore '**/*.d.ts' --ignore 'node_modules' --out-file locales/en-US/index.json --format crowdin --preserve-whitespace"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.1.2",

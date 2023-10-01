@@ -353,7 +353,7 @@ const messages = defineMessages({
   profileNoProjectsAuthLabel: {
     id: 'profile.label.no-projects-auth',
     defaultMessage:
-      "You don't have any projects.\n Would you like to <create-link>create one</create-link>?",
+      "You don't have any projects.\nWould you like to <create-link>create one</create-link>?",
   },
   userNotFoundError: {
     id: 'profile.error.not-found',
