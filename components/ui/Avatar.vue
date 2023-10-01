@@ -34,55 +34,49 @@
   </svg>
 </template>
 
-<script>
-export default {
-  props: {
-    src: {
-      type: String,
-      default: null,
-    },
-    alt: {
-      type: String,
-      default: '',
-    },
-    size: {
-      type: String,
-      default: 'sm',
-      validator(value) {
-        return ['xxs', 'xs', 'sm', 'md', 'lg'].includes(value)
-      },
-    },
-    circle: {
-      type: Boolean,
-      default: false,
-    },
-    noShadow: {
-      type: Boolean,
-      default: false,
-    },
-    loading: {
-      type: String,
-      default: 'eager',
-    },
-    raised: {
-      type: Boolean,
-      default: false,
+<script setup>
+const pixelated = ref(false)
+
+defineProps({
+  src: {
+    type: String,
+    default: null,
+  },
+  alt: {
+    type: String,
+    default: '',
+  },
+  size: {
+    type: String,
+    default: 'sm',
+    validator(value) {
+      return ['xxs', 'xs', 'sm', 'md', 'lg'].includes(value)
     },
   },
-  data() {
-    return {
-      pixelated: false,
-    }
+  circle: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    updatePixelated() {
-      if (this.$refs.img && this.$refs.img.naturalWidth && this.$refs.img.naturalWidth <= 96) {
-        this.pixelated = true
-      } else {
-        this.pixelated = false
-      }
-    },
+  noShadow: {
+    type: Boolean,
+    default: false,
   },
+  loading: {
+    type: String,
+    default: 'eager',
+  },
+  raised: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+function updatePixelated() {
+  if (this.$refs.img && this.$refs.img.naturalWidth && this.$refs.img.naturalWidth <= 96) {
+    this.pixelated = true
+  } else {
+    this.pixelated = false
+  }
 }
 </script>
 
