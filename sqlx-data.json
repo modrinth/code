@@ -536,6 +536,18 @@
     },
     "query": "\n        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)\n        "
   },
+  "10279b5a8383ba8e286f1bfb9a486e3f8b362c46cfc2647c90a83a10e5329569": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        UPDATE threads\n                        SET show_in_mod_inbox = FALSE\n                        WHERE id = $1\n                        "
+  },
   "1209ffc1ffbea89f7060573275dc7325ac4d7b4885b6c1d1ec92998e6012e455": {
     "describe": {
       "columns": [],
@@ -2130,26 +2142,6 @@
       }
     },
     "query": "\n                    UPDATE versions\n                    SET version_number = $1\n                    WHERE (id = $2)\n                    "
-  },
-  "5586d60c8f3d58a31e6635ffb3cb30bac389bf21b190dfd1e64a44e837f3879c": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      }
-    },
-    "query": "\n                    SELECT id FROM mods\n                    WHERE status = $1 AND queued < NOW() - INTERVAL '40 hours'\n                    ORDER BY updated ASC\n                    "
   },
   "5627b3516fc7c3799154098a663b1586aac11b2dc736810f06630ee5d8a54946": {
     "describe": {

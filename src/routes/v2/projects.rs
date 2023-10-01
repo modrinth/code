@@ -493,6 +493,17 @@ pub async fn project_edit(
                     )
                     .execute(&mut *transaction)
                     .await?;
+
+                    sqlx::query!(
+                        "
+                        UPDATE threads
+                        SET show_in_mod_inbox = FALSE
+                        WHERE id = $1
+                        ",
+                        project_item.thread_id as database::models::ids::ThreadId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
                 }
 
                 if status.is_approved() && !project_item.inner.status.is_approved() {
@@ -543,7 +554,11 @@ pub async fn project_edit(
                             Some(
                                 format!(
                                     "**[{}]({}/user/{})** changed project status from **{}** to **{}**",
-                                    user.username, dotenvy::var("SITE_URL")?, user.username, &project_item.inner.status, status
+                                    user.username,
+                                    dotenvy::var("SITE_URL")?,
+                                    user.username,
+                                    &project_item.inner.status.as_friendly_str(),
+                                    status.as_friendly_str(),
                                 )
                                 .to_string(),
                             ),
