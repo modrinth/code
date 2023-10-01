@@ -408,9 +408,9 @@ useSeoMeta({
   description,
   publisher: 'Rinth, Inc.',
   themeColor: [
-    { color: '#1bd96a', media: '(prefers-color-scheme:no-preference)' },
-    { color: '#1bd96a', media: '(prefers-color-scheme:dark)' },
     { color: '#00af5c', media: '(prefers-color-scheme:light)' },
+    { color: '#1bd96a', media: '(prefers-color-scheme:dark)' },
+    { color: '#1bd96a' },
   ],
   colorScheme: 'dark light',
 
