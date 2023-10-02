@@ -20,7 +20,13 @@
       </div>
       <div class="input-row">
         <p class="input-label">Name</p>
-        <input v-model="profile_name" autocomplete="off" class="text-input" type="text" />
+        <input
+          v-model="profile_name"
+          autocomplete="off"
+          class="text-input"
+          type="text"
+          maxlength="100"
+        />
       </div>
       <div class="input-row">
         <p class="input-label">Loader</p>

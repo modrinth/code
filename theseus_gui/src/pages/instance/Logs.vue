@@ -524,11 +524,24 @@ onUnmounted(() => {
   display: flex;
   padding: 0.6rem;
   flex-direction: row;
+  overflow: auto;
   gap: 0.5rem;
+
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+  }
 }
 
 :deep(.vue-recycle-scroller__item-wrapper) {
   overflow: visible; /* Enables horizontal scrolling */
+}
+
+:deep(.vue-recycle-scroller) {
+  &::-webkit-scrollbar-corner {
+    background-color: var(--color-bg);
+    border-radius: 0 0 10px 0;
+  }
 }
 
 .scroller {
