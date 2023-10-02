@@ -21,7 +21,7 @@ pub struct DonationUrl {
 }
 
 impl DonationUrl {
-    pub async fn insert(
+    pub async fn insert_project(
         &self,
         project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -90,6 +90,7 @@ pub struct ProjectBuilder {
     pub project_id: ProjectId,
     pub project_type_id: ProjectTypeId,
     pub team_id: TeamId,
+    pub organization_id: Option<OrganizationId>,
     pub title: String,
     pub description: String,
     pub body: String,
@@ -123,6 +124,7 @@ impl ProjectBuilder {
             id: self.project_id,
             project_type: self.project_type_id,
             team_id: self.team_id,
+            organization_id: self.organization_id,
             title: self.title,
             description: self.description,
             body: self.body,
@@ -165,7 +167,9 @@ impl ProjectBuilder {
         }
 
         for donation in self.donation_urls {
-            donation.insert(self.project_id, &mut *transaction).await?;
+            donation
+                .insert_project(self.project_id, &mut *transaction)
+                .await?;
         }
 
         for gallery in self.gallery_items {
@@ -209,6 +213,7 @@ pub struct Project {
     pub id: ProjectId,
     pub project_type: ProjectTypeId,
     pub team_id: TeamId,
+    pub organization_id: Option<OrganizationId>,
     pub title: String,
     pub description: String,
     pub body: String,
@@ -553,7 +558,7 @@ impl Project {
                 m.icon_url icon_url, m.body body, m.published published,
                 m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
                 m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-                m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
+                m.team_id team_id, m.organization_id organization_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                 cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.webhook_sent, m.color,
                 t.id thread_id, m.monetization_status monetization_status, m.loaders loaders, m.game_versions game_versions,
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
@@ -589,6 +594,7 @@ impl Project {
                             id: ProjectId(id),
                             project_type: ProjectTypeId(m.project_type),
                             team_id: TeamId(m.team_id),
+                            organization_id: m.organization_id.map(OrganizationId),
                             title: m.title.clone(),
                             description: m.description.clone(),
                             downloads: m.downloads,

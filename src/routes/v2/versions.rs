@@ -3,13 +3,13 @@ use crate::auth::{
     filter_authorized_versions, get_user_from_headers, is_authorized, is_authorized_version,
 };
 use crate::database;
-use crate::database::models::image_item;
+use crate::database::models::{image_item, Organization};
 use crate::models;
 use crate::models::ids::base62_impl::parse_base62;
 use crate::models::images::ImageContext;
 use crate::models::pats::Scopes;
 use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
-use crate::models::teams::Permissions;
+use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
@@ -353,10 +353,31 @@ pub async fn version_edit(
         )
         .await?;
 
-        let permissions = Permissions::get_permissions_by_role(&user.role, &team_member);
+        let organization = Organization::get_associated_organization_project_id(
+            version_item.inner.project_id,
+            &**pool,
+        )
+        .await?;
+
+        let organization_team_member = if let Some(organization) = &organization {
+            database::models::TeamMember::get_from_user_id(
+                organization.team_id,
+                user.id.into(),
+                &**pool,
+            )
+            .await?
+        } else {
+            None
+        };
+
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
+        );
 
         if let Some(perms) = permissions {
-            if !perms.contains(Permissions::UPLOAD_VERSION) {
+            if !perms.contains(ProjectPermissions::UPLOAD_VERSION) {
                 return Err(ApiError::CustomAuthentication(
                     "You do not have the permissions to edit this version!".to_string(),
                 ));
@@ -754,11 +775,33 @@ pub async fn version_schedule(
         )
         .await?;
 
-        if !user.role.is_mod()
-            && !team_member
-                .map(|x| x.permissions.contains(Permissions::EDIT_DETAILS))
-                .unwrap_or(false)
-        {
+        let organization_item =
+            database::models::Organization::get_associated_organization_project_id(
+                version_item.inner.project_id,
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::Database)?;
+
+        let organization_team_member = if let Some(organization) = &organization_item {
+            database::models::TeamMember::get_from_user_id(
+                organization.team_id,
+                user.id.into(),
+                &**pool,
+            )
+            .await?
+        } else {
+            None
+        };
+
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
+        )
+        .unwrap_or_default();
+
+        if !user.role.is_mod() && !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to edit this version's scheduling data!".to_string(),
             ));
@@ -819,17 +862,30 @@ pub async fn version_delete(
             &**pool,
         )
         .await
-        .map_err(ApiError::Database)?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "You do not have permission to delete versions in this team".to_string(),
-            )
-        })?;
+        .map_err(ApiError::Database)?;
 
-        if !team_member
-            .permissions
-            .contains(Permissions::DELETE_VERSION)
-        {
+        let organization =
+            Organization::get_associated_organization_project_id(version.inner.project_id, &**pool)
+                .await?;
+
+        let organization_team_member = if let Some(organization) = &organization {
+            database::models::TeamMember::get_from_user_id(
+                organization.team_id,
+                user.id.into(),
+                &**pool,
+            )
+            .await?
+        } else {
+            None
+        };
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
+        )
+        .unwrap_or_default();
+
+        if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to delete versions in this team".to_string(),
             ));

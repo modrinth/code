@@ -4,7 +4,7 @@ use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
-use crate::database::models::{self, image_item};
+use crate::database::models::{self, image_item, Organization};
 use crate::file_hosting::FileHost;
 use crate::models::images::{Image, ImageContext, ImageId};
 use crate::models::notifications::NotificationBody;
@@ -14,7 +14,7 @@ use crate::models::projects::{
     Dependency, DependencyType, FileType, GameVersion, Loader, ProjectId, Version, VersionFile,
     VersionId, VersionStatus, VersionType,
 };
-use crate::models::teams::Permissions;
+use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -215,17 +215,34 @@ async fn version_create_inner(
                     user.id.into(),
                     &mut *transaction,
                 )
-                .await?
-                .ok_or_else(|| {
-                    CreateError::CustomAuthenticationError(
-                        "You don't have permission to upload this version!".to_string(),
-                    )
-                })?;
+                .await?;
 
-                if !team_member
-                    .permissions
-                    .contains(Permissions::UPLOAD_VERSION)
-                {
+                // Get organization attached, if exists, and the member project permissions
+                let organization = models::Organization::get_associated_organization_project_id(
+                    project_id,
+                    &mut *transaction,
+                )
+                .await?;
+
+                let organization_team_member = if let Some(organization) = &organization {
+                    models::TeamMember::get_from_user_id(
+                        organization.team_id,
+                        user.id.into(),
+                        &mut *transaction,
+                    )
+                    .await?
+                } else {
+                    None
+                };
+
+                let permissions = ProjectPermissions::get_permissions_by_role(
+                    &user.role,
+                    &team_member,
+                    &organization_team_member,
+                )
+                .unwrap_or_default();
+
+                if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
                     return Err(CreateError::CustomAuthenticationError(
                         "You don't have permission to upload this version!".to_string(),
                     ));
@@ -572,17 +589,33 @@ async fn upload_file_to_version_inner(
             user.id.into(),
             &mut *transaction,
         )
-        .await?
-        .ok_or_else(|| {
-            CreateError::CustomAuthenticationError(
-                "You don't have permission to upload files to this version!".to_string(),
-            )
-        })?;
+        .await?;
 
-        if !team_member
-            .permissions
-            .contains(Permissions::UPLOAD_VERSION)
-        {
+        let organization = Organization::get_associated_organization_project_id(
+            version.inner.project_id,
+            &**client,
+        )
+        .await?;
+
+        let organization_team_member = if let Some(organization) = &organization {
+            models::TeamMember::get_from_user_id(
+                organization.team_id,
+                user.id.into(),
+                &mut *transaction,
+            )
+            .await?
+        } else {
+            None
+        };
+
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
+        )
+        .unwrap_or_default();
+
+        if !permissions.contains(ProjectPermissions::UPLOAD_VERSION) {
             return Err(CreateError::CustomAuthenticationError(
                 "You don't have permission to upload files to this version!".to_string(),
             ));

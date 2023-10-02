@@ -31,7 +31,26 @@ pub async fn is_authorized(
                 .await?
                 .exists;
 
-                authorized = project_exists.unwrap_or(false);
+                let organization_exists =
+                    if let Some(organization_id) = project_data.organization_id {
+                        sqlx::query!(
+                            "SELECT EXISTS(
+                            SELECT 1 
+                            FROM organizations o JOIN team_members tm ON tm.team_id = o.team_id
+                            WHERE o.id = $1 AND tm.user_id = $2
+                        )",
+                            organization_id as database::models::ids::OrganizationId,
+                            user_id as database::models::ids::UserId,
+                        )
+                        .fetch_one(&***pool)
+                        .await?
+                        .exists
+                    } else {
+                        None
+                    };
+
+                authorized =
+                    project_exists.unwrap_or(false) || organization_exists.unwrap_or(false);
             }
         }
     }
@@ -70,11 +89,16 @@ pub async fn filter_authorized_projects(
                 "
                 SELECT m.id id, m.team_id team_id FROM team_members tm
                 INNER JOIN mods m ON m.team_id = tm.team_id
-                WHERE tm.team_id = ANY($1) AND tm.user_id = $2
+                LEFT JOIN organizations o ON o.team_id = tm.team_id
+                WHERE (tm.team_id = ANY($1) or o.id = ANY($2)) AND tm.user_id = $3
                 ",
                 &check_projects
                     .iter()
                     .map(|x| x.inner.team_id.0)
+                    .collect::<Vec<_>>(),
+                &check_projects
+                    .iter()
+                    .filter_map(|x| x.inner.organization_id.map(|x| x.0))
                     .collect::<Vec<_>>(),
                 user_id as database::models::ids::UserId,
             )

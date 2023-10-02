@@ -4,6 +4,7 @@ pub mod error;
 pub mod ids;
 pub mod images;
 pub mod notifications;
+pub mod organizations;
 pub mod pack;
 pub mod pats;
 pub mod projects;

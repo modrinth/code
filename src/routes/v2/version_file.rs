@@ -6,7 +6,7 @@ use crate::auth::{
 use crate::models::ids::VersionId;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
-use crate::models::teams::Permissions;
+use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::{database, models};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
@@ -185,17 +185,36 @@ pub async fn delete_file(
                 &**pool,
             )
             .await
-            .map_err(ApiError::Database)?
-            .ok_or_else(|| {
-                ApiError::CustomAuthentication(
-                    "You don't have permission to delete this file!".to_string(),
-                )
-            })?;
+            .map_err(ApiError::Database)?;
 
-            if !team_member
-                .permissions
-                .contains(Permissions::DELETE_VERSION)
-            {
+            let organization =
+                database::models::Organization::get_associated_organization_project_id(
+                    row.project_id,
+                    &**pool,
+                )
+                .await
+                .map_err(ApiError::Database)?;
+
+            let organization_team_member = if let Some(organization) = &organization {
+                database::models::TeamMember::get_from_user_id_organization(
+                    organization.id,
+                    user.id.into(),
+                    &**pool,
+                )
+                .await
+                .map_err(ApiError::Database)?
+            } else {
+                None
+            };
+
+            let permissions = ProjectPermissions::get_permissions_by_role(
+                &user.role,
+                &team_member,
+                &organization_team_member,
+            )
+            .unwrap_or_default();
+
+            if !permissions.contains(ProjectPermissions::DELETE_VERSION) {
                 return Err(ApiError::CustomAuthentication(
                     "You don't have permission to delete this file!".to_string(),
                 ));

@@ -94,8 +94,17 @@ bitflags::bitflags! {
         // delete a collection
         const COLLECTION_DELETE = 1 << 34;
 
-        const ALL = 0b11111111111111111111111111111111111;
-        const NOT_RESTRICTED = 0b111100000011111111111111100111;
+        // create an organization
+        const ORGANIZATION_CREATE = 1 << 35;
+        // read a user's organizations
+        const ORGANIZATION_READ = 1 << 36;
+        // write to an organization
+        const ORGANIZATION_WRITE = 1 << 37;
+        // delete an organization
+        const ORGANIZATION_DELETE = 1 << 38;
+
+        const ALL = 0b111111111111111111111111111111111111111;
+        const NOT_RESTRICTED = 0b1111111100000011111111111111100111;
         const NONE = 0b0;
     }
 }

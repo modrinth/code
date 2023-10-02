@@ -1,3 +1,4 @@
+use super::ApiError;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use chrono::{Duration, NaiveDate, Utc};
 use serde::{Deserialize, Serialize};
@@ -16,8 +17,6 @@ use crate::{
     },
     queue::session::AuthQueue,
 };
-
-use super::ApiError;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(

@@ -1,4 +1,5 @@
 use super::ids::Base62Id;
+use super::ids::OrganizationId;
 use super::users::UserId;
 use crate::database::models::notification_item::Notification as DBNotification;
 use crate::database::models::notification_item::NotificationAction as DBNotificationAction;
@@ -40,6 +41,12 @@ pub enum NotificationBody {
         project_id: ProjectId,
         team_id: TeamId,
         invited_by: UserId,
+        role: String,
+    },
+    OrganizationInvite {
+        organization_id: OrganizationId,
+        invited_by: UserId,
+        team_id: TeamId,
         role: String,
     },
     StatusChange {
@@ -101,6 +108,36 @@ impl From<DBNotification> for Notification {
                             action_route: (
                                 "DELETE".to_string(),
                                 format!("team/{team_id}/members/{}", UserId::from(notif.user_id)),
+                            ),
+                        },
+                    ],
+                ),
+                NotificationBody::OrganizationInvite {
+                    organization_id,
+                    role,
+                    team_id,
+                    ..
+                } => (
+                    Some("organization_invite".to_string()),
+                    "You have been invited to join an organization!".to_string(),
+                    format!(
+                        "An invite has been sent for you to be {} of an organization",
+                        role
+                    ),
+                    format!("/organization/{}", organization_id),
+                    vec![
+                        NotificationAction {
+                            title: "Accept".to_string(),
+                            action_route: ("POST".to_string(), format!("team/{team_id}/join")),
+                        },
+                        NotificationAction {
+                            title: "Deny".to_string(),
+                            action_route: (
+                                "DELETE".to_string(),
+                                format!(
+                                    "organization/{organization_id}/members/{}",
+                                    UserId::from(notif.user_id)
+                                ),
                             ),
                         },
                     ],

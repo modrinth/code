@@ -1,4 +1,4 @@
-use super::ids::Base62Id;
+use super::ids::{Base62Id, OrganizationId};
 use super::teams::TeamId;
 use super::users::UserId;
 use crate::database::models::project_item::QueryProject;
@@ -31,6 +31,8 @@ pub struct Project {
     pub project_type: String,
     /// The team of people that has ownership of this project.
     pub team: TeamId,
+    /// The optional organization of people that have ownership of this project.
+    pub organization: Option<OrganizationId>,
     /// The title or name of the project.
     pub title: String,
     /// A short description of the project.
@@ -120,6 +122,7 @@ impl From<QueryProject> for Project {
             slug: m.slug,
             project_type: data.project_type,
             team: m.team_id.into(),
+            organization: m.organization_id.map(|i| i.into()),
             title: m.title,
             description: m.description,
             body: m.body,

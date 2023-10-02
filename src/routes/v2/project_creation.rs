@@ -11,6 +11,7 @@ use crate::models::projects::{
     DonationLink, License, MonetizationStatus, ProjectId, ProjectStatus, SideType, VersionId,
     VersionStatus,
 };
+use crate::models::teams::ProjectPermissions;
 use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
@@ -240,6 +241,9 @@ struct ProjectCreateData {
     #[validate(length(max = 10))]
     #[serde(default)]
     pub uploaded_images: Vec<ImageId>,
+
+    /// The id of the organization to create the project in
+    pub organization_id: Option<models::ids::OrganizationId>,
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
@@ -667,7 +671,9 @@ async fn project_create_inner(
             members: vec![models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
-                permissions: crate::models::teams::Permissions::ALL,
+                // Allow all permissions for project creator, even if attached to a project
+                permissions: ProjectPermissions::all(),
+                organization_permissions: None,
                 accepted: true,
                 payouts_split: Decimal::ONE_HUNDRED,
                 ordering: 0,
@@ -745,6 +751,7 @@ async fn project_create_inner(
             project_id: project_id.into(),
             project_type_id,
             team_id,
+            organization_id: project_create_data.organization_id,
             title: project_create_data.title,
             description: project_create_data.description,
             body: project_create_data.body,
@@ -834,6 +841,7 @@ async fn project_create_inner(
             slug: project_builder.slug.clone(),
             project_type: project_create_data.project_type.clone(),
             team: team_id.into(),
+            organization: project_create_data.organization_id.map(|x| x.into()),
             title: project_builder.title.clone(),
             description: project_builder.description.clone(),
             body: project_builder.body.clone(),

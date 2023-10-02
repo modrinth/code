@@ -63,6 +63,13 @@ generate_ids!(
     TeamId
 );
 generate_ids!(
+    pub generate_organization_id,
+    OrganizationId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)",
+    OrganizationId
+);
+generate_ids!(
     pub generate_collection_id,
     CollectionId,
     8,
@@ -145,16 +152,20 @@ generate_ids!(
     ImageId
 );
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Eq, Hash, PartialEq, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct TeamId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[sqlx(transparent)]
+pub struct OrganizationId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
@@ -257,6 +268,16 @@ impl From<ids::TeamId> for TeamId {
 impl From<TeamId> for ids::TeamId {
     fn from(id: TeamId) -> Self {
         ids::TeamId(id.0 as u64)
+    }
+}
+impl From<ids::OrganizationId> for OrganizationId {
+    fn from(id: ids::OrganizationId) -> Self {
+        OrganizationId(id.0 as i64)
+    }
+}
+impl From<OrganizationId> for ids::OrganizationId {
+    fn from(id: OrganizationId) -> Self {
+        ids::OrganizationId(id.0 as u64)
     }
 }
 impl From<ids::VersionId> for VersionId {

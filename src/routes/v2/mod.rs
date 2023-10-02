@@ -4,6 +4,7 @@ mod collections;
 mod images;
 mod moderation;
 mod notifications;
+mod organizations;
 pub(crate) mod project_creation;
 mod projects;
 mod reports;
@@ -30,6 +31,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(crate::auth::pats::config)
             .configure(moderation::config)
             .configure(notifications::config)
+            .configure(organizations::config)
             //.configure(pats::config)
             .configure(project_creation::config)
             .configure(collections::config)
