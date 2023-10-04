@@ -69,7 +69,7 @@ pub enum EnvType {
 #[serde(rename_all = "kebab-case")]
 pub enum PackDependency {
     Forge,
-    NeoForge,
+    Neoforge,
     FabricLoader,
     QuiltLoader,
     Minecraft,
@@ -335,7 +335,7 @@ pub async fn set_profile_information(
                 mod_loader = Some(ModLoader::Forge);
                 loader_version = Some(value);
             }
-            PackDependency::NeoForge => {
+            PackDependency::Neoforge => {
                 mod_loader = Some(ModLoader::NeoForge);
                 loader_version = Some(value);
             }

@@ -965,7 +965,7 @@ pub async fn create_mrpack_json(
             dependencies.insert(PackDependency::Forge, v.id)
         }
         (crate::prelude::ModLoader::NeoForge, Some(v)) => {
-            dependencies.insert(PackDependency::NeoForge, v.id)
+            dependencies.insert(PackDependency::Neoforge, v.id)
         }
         (crate::prelude::ModLoader::Fabric, Some(v)) => {
             dependencies.insert(PackDependency::FabricLoader, v.id)
@@ -1068,7 +1068,7 @@ fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
         // If two or more, take the second
         // If one, take the first
         // If none, take the whole thing
-        PackDependency::Forge | PackDependency::NeoForge => {
+        PackDependency::Forge | PackDependency::Neoforge => {
             let mut split: std::str::Split<'_, char> = s.split('-');
             match split.next() {
                 Some(first) => match split.next() {
