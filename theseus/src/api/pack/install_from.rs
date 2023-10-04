@@ -66,12 +66,21 @@ pub enum EnvType {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Hash, PartialEq, Eq, Debug)]
-#[serde(rename_all = "kebab-case")]
 pub enum PackDependency {
+    #[serde(rename = "forge")]
     Forge,
+
+    #[serde(rename = "neoforge")]
+    #[serde(alias = "neo-forge")]
     NeoForge,
+
+    #[serde(rename = "fabric-loader")]
     FabricLoader,
+
+    #[serde(rename = "quilt-loader")]
     QuiltLoader,
+
+    #[serde(rename = "minecraft")]
     Minecraft,
 }
 
