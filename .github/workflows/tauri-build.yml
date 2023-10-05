@@ -26,7 +26,7 @@ jobs:
           targets: aarch64-apple-darwin
 
       - name: Rust setup
-        if: "!startsWith(matrix.platform, 'macos')"
+        if: ${{ !startsWith(matrix.platform, 'macos') }}
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -87,11 +87,14 @@ jobs:
       - name: build app
         uses: tauri-apps/tauri-action@v0
         id: build_os
-        if: "!startsWith(matrix.platform, 'macos')"
+        if: ${{ !startsWith(matrix.platform, 'macos') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Run cargo test
+        run: cargo test --package theseus --lib --all-features
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v3
@@ -102,7 +105,7 @@ jobs:
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v3
-        if: "!startsWith(matrix.platform, 'macos')"
+        if: ${{ !startsWith(matrix.platform, 'macos') }}
         with:
           name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
