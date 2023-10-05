@@ -2,10 +2,9 @@
 import { Button, Checkbox, Modal, XIcon, PlusIcon } from 'omorphia'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import { ref } from 'vue'
-import { export_profile_mrpack, get_potential_override_folders } from '@/helpers/profile.js'
+import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
 import { open } from '@tauri-apps/api/dialog'
 import { handleError } from '@/store/notifications.js'
-import { sep } from '@tauri-apps/api/path'
 import { useTheming } from '@/store/theme'
 
 const props = defineProps({
@@ -34,8 +33,9 @@ const themeStore = useTheming()
 
 const initFiles = async () => {
   const newFolders = new Map()
+  const sep = '/';
   files.value = []
-  await get_potential_override_folders(props.instance.path).then((filePaths) =>
+  await get_pack_export_candidates(props.instance.path).then((filePaths) =>
     filePaths
       .map((folder) => ({
         path: folder,

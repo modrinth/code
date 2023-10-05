@@ -151,8 +151,8 @@ export async function export_profile_mrpack(
 // -- file1
 // => [mods, resourcepacks]
 // allows selection for 'included_overrides' in export_profile_mrpack
-export async function get_potential_override_folders(profilePath) {
-  return await invoke('plugin:profile|profile_get_potential_override_folders', { profilePath })
+export async function get_pack_export_candidates(profilePath) {
+  return await invoke('plugin:profile|profile_get_pack_export_candidates', { profilePath })
 }
 
 // Run Minecraft using a pathed profile

@@ -189,10 +189,7 @@ pub async fn install_zipped_mrpack_files(
                     .await?;
                     drop(creds);
 
-                    // Convert windows path to unix path.
-                    // .mrpacks no longer generate windows paths, but this is here for backwards compatibility before this was fixed
-                    // https://github.com/modrinth/theseus/issues/595
-                    let project_path = project.path.replace('\\', "/");
+                    let project_path = project.path.to_string();
 
                     let path =
                         std::path::Path::new(&project_path).components().next();
@@ -403,7 +400,10 @@ pub async fn remove_all_related_files(
         // Iterate over all Modrinth project file paths in the json, and remove them
         // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
         for file in pack.files {
-            let path = profile_path.get_full_path().await?.join(file.path);
+            let path: PathBuf = profile_path
+                .get_full_path()
+                .await?
+                .join(file.path.to_string());
             if path.exists() {
                 io::remove_file(&path).await?;
             }
