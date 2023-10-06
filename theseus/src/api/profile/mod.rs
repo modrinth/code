@@ -639,17 +639,10 @@ pub async fn export_mrpack(
         let relative_path = ProjectPathId::from_fs_path(&path)
             .await?
             .get_inner_path_unix();
-        if packfile.files.iter().any(|f| f.path == relative_path) {
-            continue;
-        }
-        if !included_overrides_set.contains(
-            &relative_path
-                .to_string()
-                .split('/')
-                .take(2)
-                .collect::<Vec<_>>()
-                .join("/"),
-        ) {
+        if packfile.files.iter().any(|f| f.path == relative_path)
+            || !included_overrides_set
+                .contains(&relative_path.get_topmost_two_components())
+        {
             continue;
         }
 
@@ -694,16 +687,15 @@ pub async fn export_mrpack(
 // => [folder1, folder2/innerfolder, folder2/folder2file, file1]
 #[tracing::instrument]
 pub async fn get_pack_export_candidates(
-    profile_path: ProfilePathId,
+    profile_path: &ProfilePathId,
 ) -> crate::Result<Vec<InnerProjectPathUnix>> {
     // First, get a dummy mrpack json for the files within
-    let profile: Profile =
-        get(&profile_path, None).await?.ok_or_else(|| {
-            crate::ErrorKind::OtherError(format!(
-                "Tried to export a nonexistent or unloaded profile at path {}!",
-                profile_path
-            ))
-        })?;
+    let profile: Profile = get(profile_path, None).await?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to export a nonexistent or unloaded profile at path {}!",
+            profile_path
+        ))
+    })?;
 
     let mut path_list: Vec<InnerProjectPathUnix> = Vec::new();
 

@@ -72,8 +72,8 @@ impl ProfilePathId {
     }
 
     // Create a new ProfilePathId from a relative path
-    pub fn new(path: &Path) -> Self {
-        ProfilePathId(PathBuf::from(path))
+    pub fn new(path: impl Into<PathBuf>) -> Self {
+        ProfilePathId(path.into())
     }
 
     pub async fn get_full_path(&self) -> crate::Result<PathBuf> {
@@ -98,6 +98,16 @@ impl std::fmt::Display for ProfilePathId {
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 #[serde(into = "RawProjectPath", from = "RawProjectPath")]
 pub struct InnerProjectPathUnix(pub String);
+
+impl InnerProjectPathUnix {
+    pub fn get_topmost_two_components(&self) -> String {
+        self.to_string()
+            .split('/')
+            .take(2)
+            .collect::<Vec<_>>()
+            .join("/")
+    }
+}
 
 impl std::fmt::Display for InnerProjectPathUnix {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
