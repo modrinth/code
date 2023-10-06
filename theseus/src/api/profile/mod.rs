@@ -1075,16 +1075,3 @@ pub async fn add_all_recursive_folder_paths(
 pub fn sanitize_profile_name(input: &str) -> String {
     input.replace(['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>'], "_")
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::env;
-
-    #[test]
-    fn test_test() {
-        let path = env::current_dir().unwrap().to_string_lossy().to_string();
-        println!("{path}");
-        assert_eq!(path, "nope".to_string());
-    }
-}
