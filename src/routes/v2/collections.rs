@@ -1,7 +1,7 @@
 use crate::auth::checks::{filter_authorized_collections, is_authorized_collection};
 use crate::auth::get_user_from_headers;
-use crate::database;
 use crate::database::models::{collection_item, generate_collection_id, project_item};
+use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::ids::base62_impl::parse_base62;
@@ -11,6 +11,7 @@ use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
+use crate::{database, models};
 use actix_web::web::Data;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
@@ -56,7 +57,7 @@ pub async fn collection_create(
     req: HttpRequest,
     collection_create_data: web::Json<CollectionCreateData>,
     client: Data<PgPool>,
-    redis: Data<deadpool_redis::Pool>,
+    redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let collection_create_data = collection_create_data.into_inner();
@@ -130,7 +131,7 @@ pub async fn collections_get(
     req: HttpRequest,
     web::Query(ids): web::Query<CollectionIds>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
@@ -162,7 +163,7 @@ pub async fn collection_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
@@ -208,19 +209,18 @@ pub async fn collection_edit(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     new_collection: web::Json<EditCollection>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_WRITE]),
     )
-    .await
-    .map(|x| x.1)
-    .ok();
+    .await?
+    .1;
 
     new_collection
         .validate()
@@ -231,7 +231,7 @@ pub async fn collection_edit(
     let result = database::models::Collection::get(id, &**pool, &redis).await?;
 
     if let Some(collection_item) = result {
-        if !is_authorized_collection(&collection_item, &user_option).await? {
+        if !can_modify_collection(&collection_item, &user) {
             return Ok(HttpResponse::Unauthorized().body(""));
         }
 
@@ -268,27 +268,25 @@ pub async fn collection_edit(
         }
 
         if let Some(status) = &new_collection.status {
-            if let Some(user) = user_option {
-                if !(user.role.is_mod()
-                    || collection_item.status.is_approved() && status.can_be_requested())
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set this status!".to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE collections
-                    SET status = $1
-                    WHERE (id = $2)
-                    ",
-                    status.to_string(),
-                    id as database::models::ids::CollectionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
+            if !(user.role.is_mod()
+                || collection_item.status.is_approved() && status.can_be_requested())
+            {
+                return Err(ApiError::CustomAuthentication(
+                    "You don't have permission to set this status!".to_string(),
+                ));
             }
+
+            sqlx::query!(
+                "
+                UPDATE collections
+                SET status = $1
+                WHERE (id = $2)
+                ",
+                status.to_string(),
+                id as database::models::ids::CollectionId,
+            )
+            .execute(&mut *transaction)
+            .await?;
         }
 
         if let Some(new_project_ids) = &new_collection.new_projects {
@@ -348,23 +346,22 @@ pub async fn collection_icon_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
         let cdn_url = dotenvy::var("CDN_URL")?;
-        let user_option = get_user_from_headers(
+        let user = get_user_from_headers(
             &req,
             &**pool,
             &redis,
             &session_queue,
             Some(&[Scopes::COLLECTION_WRITE]),
         )
-        .await
-        .map(|x| x.1)
-        .ok();
+        .await?
+        .1;
 
         let string = info.into_inner().0;
         let id = database::models::CollectionId(parse_base62(&string)? as i64);
@@ -374,7 +371,7 @@ pub async fn collection_icon_edit(
                 ApiError::InvalidInput("The specified collection does not exist!".to_string())
             })?;
 
-        if !is_authorized_collection(&collection_item, &user_option).await? {
+        if !can_modify_collection(&collection_item, &user) {
             return Ok(HttpResponse::Unauthorized().body(""));
         }
 
@@ -434,20 +431,20 @@ pub async fn delete_collection_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_WRITE]),
     )
-    .await
-    .map(|x| x.1)
-    .ok();
+    .await?
+    .1;
+
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
     let collection_item = database::models::Collection::get(id, &**pool, &redis)
@@ -455,7 +452,7 @@ pub async fn delete_collection_icon(
         .ok_or_else(|| {
             ApiError::InvalidInput("The specified collection does not exist!".to_string())
         })?;
-    if !is_authorized_collection(&collection_item, &user_option).await? {
+    if !can_modify_collection(&collection_item, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
     }
 
@@ -493,19 +490,18 @@ pub async fn collection_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
+    let user = get_user_from_headers(
         &req,
         &**pool,
         &redis,
         &session_queue,
         Some(&[Scopes::COLLECTION_DELETE]),
     )
-    .await
-    .map(|x| x.1)
-    .ok();
+    .await?
+    .1;
 
     let string = info.into_inner().0;
     let id = database::models::CollectionId(parse_base62(&string)? as i64);
@@ -514,7 +510,7 @@ pub async fn collection_delete(
         .ok_or_else(|| {
             ApiError::InvalidInput("The specified collection does not exist!".to_string())
         })?;
-    if !is_authorized_collection(&collection, &user_option).await? {
+    if !can_modify_collection(&collection, &user) {
         return Ok(HttpResponse::Unauthorized().body(""));
     }
     let mut transaction = pool.begin().await?;
@@ -530,4 +526,11 @@ pub async fn collection_delete(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
+}
+
+fn can_modify_collection(
+    collection: &database::models::Collection,
+    user: &models::users::User,
+) -> bool {
+    collection.user_id == user.id.into() || user.role.is_mod()
 }

@@ -1,10 +1,5 @@
 use super::ApiError;
-use actix_web::{get, web, HttpRequest, HttpResponse};
-use chrono::{Duration, NaiveDate, Utc};
-use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
-use std::collections::HashMap;
-
+use crate::database::redis::RedisPool;
 use crate::{
     auth::{filter_authorized_projects, filter_authorized_versions, get_user_from_headers},
     database::models::{project_item, user_item, version_item},
@@ -17,6 +12,11 @@ use crate::{
     },
     queue::session::AuthQueue,
 };
+use actix_web::{get, web, HttpRequest, HttpResponse};
+use chrono::{Duration, NaiveDate, Utc};
+use serde::{Deserialize, Serialize};
+use sqlx::PgPool;
+use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -70,7 +70,7 @@ pub async fn playtimes_get(
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -153,7 +153,7 @@ pub async fn views_get(
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -236,7 +236,7 @@ pub async fn downloads_get(
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -322,7 +322,7 @@ pub async fn countries_downloads_get(
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -406,7 +406,7 @@ pub async fn countries_views_get(
     data: web::Query<GetData>,
     session_queue: web::Data<AuthQueue>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_option = get_user_from_headers(
         &req,
@@ -476,7 +476,7 @@ async fn filter_allowed_ids(
     version_ids: Option<Vec<String>>,
     user_option: Option<crate::models::users::User>,
     pool: &web::Data<PgPool>,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
 ) -> Result<(Option<Vec<ProjectId>>, Option<Vec<VersionId>>), ApiError> {
     if project_ids.is_some() && version_ids.is_some() {
         return Err(ApiError::InvalidInput(

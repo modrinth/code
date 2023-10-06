@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::auth::{get_user_from_headers, is_authorized, is_authorized_version};
 use crate::database;
 use crate::database::models::{project_item, report_item, thread_item, version_item};
+use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ThreadMessageId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -41,7 +42,7 @@ pub async fn images_add(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(&data.ext) {

@@ -4,6 +4,7 @@ use crate::database::models::generate_pat_id;
 use crate::auth::get_user_from_headers;
 use crate::routes::ApiError;
 
+use crate::database::redis::RedisPool;
 use actix_web::web::{self, Data};
 use actix_web::{delete, get, patch, post, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
@@ -30,7 +31,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub async fn get_pats(
     req: HttpRequest,
     pool: Data<PgPool>,
-    redis: Data<deadpool_redis::Pool>,
+    redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -73,14 +74,14 @@ pub async fn create_pat(
     req: HttpRequest,
     info: web::Json<NewPersonalAccessToken>,
     pool: Data<PgPool>,
-    redis: Data<deadpool_redis::Pool>,
+    redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     info.0
         .validate()
         .map_err(|err| ApiError::InvalidInput(validation_errors_to_string(err, None)))?;
 
-    if info.scopes.restricted() {
+    if info.scopes.is_restricted() {
         return Err(ApiError::InvalidInput(
             "Invalid scopes requested!".to_string(),
         ));
@@ -159,7 +160,7 @@ pub async fn edit_pat(
     id: web::Path<(String,)>,
     info: web::Json<ModifyPersonalAccessToken>,
     pool: Data<PgPool>,
-    redis: Data<deadpool_redis::Pool>,
+    redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -180,7 +181,7 @@ pub async fn edit_pat(
             let mut transaction = pool.begin().await?;
 
             if let Some(scopes) = &info.scopes {
-                if scopes.restricted() {
+                if scopes.is_restricted() {
                     return Err(ApiError::InvalidInput(
                         "Invalid scopes requested!".to_string(),
                     ));
@@ -248,7 +249,7 @@ pub async fn delete_pat(
     req: HttpRequest,
     id: web::Path<(String,)>,
     pool: Data<PgPool>,
-    redis: Data<deadpool_redis::Pool>,
+    redis: Data<RedisPool>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(

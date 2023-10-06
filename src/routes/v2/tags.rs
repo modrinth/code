@@ -1,6 +1,7 @@
 use super::ApiError;
 use crate::database::models;
 use crate::database::models::categories::{DonationPlatform, ProjectType, ReportType, SideType};
+use crate::database::redis::RedisPool;
 use actix_web::{get, web, HttpResponse};
 use chrono::{DateTime, Utc};
 use models::categories::{Category, GameVersion, Loader};
@@ -32,7 +33,7 @@ pub struct CategoryData {
 #[get("category")]
 pub async fn category_list(
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = Category::list(&**pool, &redis)
         .await?
@@ -58,7 +59,7 @@ pub struct LoaderData {
 #[get("loader")]
 pub async fn loader_list(
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let mut results = Loader::list(&**pool, &redis)
         .await?
@@ -94,7 +95,7 @@ pub struct GameVersionQuery {
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results: Vec<GameVersionQueryData> = if query.type_.is_some() || query.major.is_some() {
         GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool, &redis).await?
@@ -172,7 +173,7 @@ pub struct DonationPlatformQueryData {
 #[get("donation_platform")]
 pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results: Vec<DonationPlatformQueryData> = DonationPlatform::list(&**pool, &redis)
         .await?
@@ -188,7 +189,7 @@ pub async fn donation_platform_list(
 #[get("report_type")]
 pub async fn report_type_list(
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = ReportType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
@@ -197,7 +198,7 @@ pub async fn report_type_list(
 #[get("project_type")]
 pub async fn project_type_list(
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = ProjectType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))
@@ -206,7 +207,7 @@ pub async fn project_type_list(
 #[get("side_type")]
 pub async fn side_type_list(
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let results = SideType::list(&**pool, &redis).await?;
     Ok(HttpResponse::Ok().json(results))

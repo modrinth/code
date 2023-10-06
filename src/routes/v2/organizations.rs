@@ -4,6 +4,7 @@ use std::sync::Arc;
 use crate::auth::{filter_authorized_projects, get_user_from_headers};
 use crate::database::models::team_item::TeamMember;
 use crate::database::models::{generate_organization_id, team_item, Organization};
+use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::base62_impl::parse_base62;
 use crate::models::organizations::OrganizationId;
@@ -39,16 +40,14 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 #[derive(Deserialize, Validate)]
 pub struct NewOrganization {
-    #[validate(length(min = 3, max = 256))]
-    pub description: String,
     #[validate(
         length(min = 3, max = 64),
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
     // Title of the organization, also used as slug
     pub title: String,
-    #[serde(default = "crate::models::teams::ProjectPermissions::default")]
-    pub default_project_permissions: ProjectPermissions,
+    #[validate(length(min = 3, max = 256))]
+    pub description: String,
 }
 
 #[post("organization")]
@@ -56,7 +55,7 @@ pub async fn organization_create(
     req: HttpRequest,
     new_organization: web::Json<NewOrganization>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let current_user = get_user_from_headers(
@@ -143,7 +142,7 @@ pub async fn organization_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
@@ -208,7 +207,7 @@ pub async fn organizations_get(
     req: HttpRequest,
     web::Query(ids): web::Query<OrganizationIds>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = serde_json::from_str::<Vec<&str>>(&ids.ids)?;
@@ -289,7 +288,6 @@ pub struct OrganizationEdit {
     )]
     // Title of the organization, also used as slug
     pub title: Option<String>,
-    pub default_project_permissions: Option<ProjectPermissions>,
 }
 
 #[patch("{id}")]
@@ -298,7 +296,7 @@ pub async fn organizations_edit(
     info: web::Path<(String,)>,
     new_organization: web::Json<OrganizationEdit>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -434,7 +432,7 @@ pub async fn organization_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -498,7 +496,7 @@ pub async fn organization_projects_get(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
@@ -507,7 +505,7 @@ pub async fn organization_projects_get(
         &**pool,
         &redis,
         &session_queue,
-        Some(&[Scopes::ORGANIZATION_READ]),
+        Some(&[Scopes::ORGANIZATION_READ, Scopes::PROJECT_READ]),
     )
     .await
     .map(|x| x.1)
@@ -519,7 +517,7 @@ pub async fn organization_projects_get(
     let project_ids = sqlx::query!(
         "
         SELECT m.id FROM organizations o
-        LEFT JOIN mods m ON m.id = o.id
+        INNER JOIN mods m ON m.organization_id = o.id
         WHERE (o.id = $1 AND $1 IS NOT NULL) OR (o.title = $2 AND $2 IS NOT NULL)
         ",
         possible_organization_id.map(|x| x as i64),
@@ -547,7 +545,7 @@ pub async fn organization_projects_add(
     info: web::Path<(String,)>,
     project_info: web::Json<OrganizationProjectAdd>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let info = info.into_inner().0;
@@ -649,7 +647,7 @@ pub async fn organization_projects_remove(
     req: HttpRequest,
     info: web::Path<(String, String)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (organization_id, project_id) = info.into_inner();
@@ -743,7 +741,7 @@ pub async fn organization_icon_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
@@ -848,7 +846,7 @@ pub async fn delete_organization_icon(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {

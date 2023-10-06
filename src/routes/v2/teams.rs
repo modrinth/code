@@ -2,6 +2,7 @@ use crate::auth::{get_user_from_headers, is_authorized};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{Organization, Team, TeamMember};
+use crate::database::redis::RedisPool;
 use crate::database::Project;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
@@ -37,7 +38,7 @@ pub async fn team_members_get_project(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
@@ -116,7 +117,7 @@ pub async fn team_members_get_organization(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
@@ -182,7 +183,7 @@ pub async fn team_members_get(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
@@ -244,7 +245,7 @@ pub async fn teams_get(
     req: HttpRequest,
     web::Query(ids): web::Query<TeamIds>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     use itertools::Itertools;
@@ -309,7 +310,7 @@ pub async fn join_team(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
@@ -389,7 +390,7 @@ pub async fn add_team_member(
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
     new_member: web::Json<NewTeamMember>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
@@ -452,7 +453,6 @@ pub async fn add_team_member(
             let organization_permissions =
                 OrganizationPermissions::get_permissions_by_role(&current_user.role, &member)
                     .unwrap_or_default();
-            println!("{:?}", organization_permissions);
             if !organization_permissions.contains(OrganizationPermissions::MANAGE_INVITES) {
                 return Err(ApiError::CustomAuthentication(
                     "You don't have permission to invite users to this organization".to_string(),
@@ -571,7 +571,7 @@ pub async fn edit_team_member(
     info: web::Path<(TeamId, UserId)>,
     pool: web::Data<PgPool>,
     edit_member: web::Json<EditTeamMember>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();
@@ -724,7 +724,7 @@ pub async fn transfer_ownership(
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
     new_owner: web::Json<TransferOwnership>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
@@ -822,7 +822,7 @@ pub async fn remove_team_member(
     req: HttpRequest,
     info: web::Path<(TeamId, UserId)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids = info.into_inner();

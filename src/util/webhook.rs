@@ -1,4 +1,5 @@
 use crate::database::models::categories::GameVersion;
+use crate::database::redis::RedisPool;
 use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
 use chrono::{DateTime, Utc};
@@ -72,7 +73,7 @@ const PLUGIN_LOADERS: &[&str] = &[
 pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
     webhook_url: String,
     message: Option<String>,
 ) -> Result<(), ApiError> {

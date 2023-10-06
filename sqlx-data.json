@@ -1,5 +1,26 @@
 {
   "db": "PostgreSQL",
+  "009bce5eee6ed65d9dc0899a4e24da528507a3f00b7ec997fa9ccdd7599655b1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        SELECT m.id FROM organizations o\n        INNER JOIN mods m ON m.organization_id = o.id\n        WHERE (o.id = $1 AND $1 IS NOT NULL) OR (o.title = $2 AND $2 IS NOT NULL)\n        "
+  },
   "010cafcafb6adc25b00e3c81d844736b0245e752a90334c58209d8a02536c800": {
     "describe": {
       "columns": [],
@@ -3669,6 +3690,19 @@
     },
     "query": "\n                SELECT n.id FROM notifications n\n                WHERE n.user_id = $1\n                "
   },
+  "7b6b76f383adcbe2afbd2a2e87e66fd2a0d9d05b68b27823c1395e7cc3b8c0a2": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                UPDATE collections\n                SET status = $1\n                WHERE (id = $2)\n                "
+  },
   "7c0cdacf0898155c94008a96a0b918550df4475b9e3362a926d4d00e001880c1": {
     "describe": {
       "columns": [
@@ -3820,19 +3854,6 @@
       }
     },
     "query": "\n            SELECT name FROM side_types\n            "
-  },
-  "86049f204c9eda5241403d22b5f8ffe13b258ddfffb81a1a9ee8602e21c64723": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    UPDATE collections\n                    SET status = $1\n                    WHERE (id = $2)\n                    "
   },
   "868ee76d507cc9e94cd3c2e44770faff127e2b3c5f49b8100a9a37ac4d7b1f1d": {
     "describe": {
@@ -6130,27 +6151,6 @@
       }
     },
     "query": "\n                    UPDATE versions\n                    SET featured = $1\n                    WHERE (id = $2)\n                    "
-  },
-  "e60561aeefbc2bed1f77ff4bbca763b5be84bd6bc3eff75ca57e3590be286d45": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Text"
-        ]
-      }
-    },
-    "query": "\n        SELECT m.id FROM organizations o\n        LEFT JOIN mods m ON m.id = o.id\n        WHERE (o.id = $1 AND $1 IS NOT NULL) OR (o.title = $2 AND $2 IS NOT NULL)\n        "
   },
   "e60ea75112db37d3e73812e21b1907716e4762e06aa883af878e3be82e3f87d3": {
     "describe": {

@@ -2,7 +2,7 @@ use super::ids::*;
 use crate::database::models::DatabaseError;
 use crate::models::threads::{MessageBody, ThreadType};
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub struct ThreadBuilder {
     pub type_: ThreadType,
@@ -11,7 +11,7 @@ pub struct ThreadBuilder {
     pub report_id: Option<ReportId>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize)]
 pub struct Thread {
     pub id: ThreadId,
 
@@ -30,7 +30,7 @@ pub struct ThreadMessageBuilder {
     pub thread_id: ThreadId,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ThreadMessage {
     pub id: ThreadMessageId,
     pub thread_id: ThreadId,

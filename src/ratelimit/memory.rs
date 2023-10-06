@@ -20,7 +20,7 @@ impl MemoryStore {
     ///
     /// # Example
     /// ```rust
-    /// use actix_ratelimit::MemoryStore;
+    /// use labrinth::ratelimit::memory::MemoryStore;
     ///
     /// let store = MemoryStore::new();
     /// ```

@@ -2,6 +2,7 @@ use crate::auth::flows::AuthProvider;
 use crate::auth::session::get_session_metadata;
 use crate::auth::AuthenticationError;
 use crate::database::models::user_item;
+use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::{Role, User, UserId, UserPayoutData};
 use crate::queue::session::AuthQueue;
@@ -12,7 +13,7 @@ use reqwest::header::{HeaderValue, AUTHORIZATION};
 pub async fn get_user_from_headers<'a, E>(
     req: &HttpRequest,
     executor: E,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
     session_queue: &AuthQueue,
     required_scopes: Option<&[Scopes]>,
 ) -> Result<(Scopes, User), AuthenticationError>
@@ -82,7 +83,7 @@ pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
     req: &HttpRequest,
     token: Option<&str>,
     executor: E,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
     session_queue: &AuthQueue,
 ) -> Result<Option<(Scopes, user_item::User)>, AuthenticationError>
 where
@@ -140,7 +141,7 @@ where
                 session_queue.add_session(session.id, metadata).await;
             }
 
-            user.map(|x| (Scopes::ALL, x))
+            user.map(|x| (Scopes::all(), x))
         }
         Some(("github", _)) | Some(("gho", _)) | Some(("ghp", _)) => {
             let user = AuthProvider::GitHub.get_user(token).await?;
@@ -153,7 +154,7 @@ where
             )
             .await?;
 
-            user.map(|x| (Scopes::NOT_RESTRICTED, x))
+            user.map(|x| ((Scopes::all() ^ Scopes::restricted()), x))
         }
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
@@ -163,13 +164,14 @@ where
 pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     req: &HttpRequest,
     executor: E,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
     session_queue: &AuthQueue,
+    required_scopes: Option<&[Scopes]>,
 ) -> Result<User, AuthenticationError>
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
-    let user = get_user_from_headers(req, executor, redis, session_queue, None)
+    let user = get_user_from_headers(req, executor, redis, session_queue, required_scopes)
         .await?
         .1;
 

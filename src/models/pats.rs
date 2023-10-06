@@ -51,7 +51,7 @@ bitflags::bitflags! {
         const VERSION_READ = 1 << 15;
         // write to a version's data (metadata, files, etc)
         const VERSION_WRITE = 1 << 16;
-        // delete a project
+        // delete a version
         const VERSION_DELETE = 1 << 17;
 
         // create a report
@@ -103,26 +103,26 @@ bitflags::bitflags! {
         // delete an organization
         const ORGANIZATION_DELETE = 1 << 38;
 
-        const ALL = 0b111111111111111111111111111111111111111;
-        const NOT_RESTRICTED = 0b1111111100000011111111111111100111;
         const NONE = 0b0;
     }
 }
 
 impl Scopes {
     // these scopes cannot be specified in a personal access token
-    pub fn restricted(&self) -> bool {
-        self.contains(
-            Scopes::PAT_CREATE
-                | Scopes::PAT_READ
-                | Scopes::PAT_WRITE
-                | Scopes::PAT_DELETE
-                | Scopes::SESSION_READ
-                | Scopes::SESSION_DELETE
-                | Scopes::USER_AUTH_WRITE
-                | Scopes::USER_DELETE
-                | Scopes::PERFORM_ANALYTICS,
-        )
+    pub fn restricted() -> Scopes {
+        Scopes::PAT_CREATE
+            | Scopes::PAT_READ
+            | Scopes::PAT_WRITE
+            | Scopes::PAT_DELETE
+            | Scopes::SESSION_READ
+            | Scopes::SESSION_DELETE
+            | Scopes::USER_AUTH_WRITE
+            | Scopes::USER_DELETE
+            | Scopes::PERFORM_ANALYTICS
+    }
+
+    pub fn is_restricted(&self) -> bool {
+        self.intersects(Self::restricted())
     }
 }
 

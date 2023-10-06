@@ -1,17 +1,16 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
+use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::pats::Scopes;
 use chrono::{DateTime, Utc};
-use redis::cmd;
 use serde::{Deserialize, Serialize};
 
 const PATS_NAMESPACE: &str = "pats";
 const PATS_TOKENS_NAMESPACE: &str = "pats_tokens";
 const PATS_USERS_NAMESPACE: &str = "pats_users";
-const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct PersonalAccessToken {
     pub id: PatId,
     pub name: String,
@@ -55,7 +54,7 @@ impl PersonalAccessToken {
     pub async fn get<'a, E, T: ToString>(
         id: T,
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Option<PersonalAccessToken>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -68,7 +67,7 @@ impl PersonalAccessToken {
     pub async fn get_many_ids<'a, E>(
         pat_ids: &[PatId],
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<PersonalAccessToken>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -83,7 +82,7 @@ impl PersonalAccessToken {
     pub async fn get_many<'a, E, T: ToString>(
         pat_strings: &[T],
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<PersonalAccessToken>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -93,8 +92,6 @@ impl PersonalAccessToken {
         if pat_strings.is_empty() {
             return Ok(Vec::new());
         }
-
-        let mut redis = redis.get().await?;
 
         let mut found_pats = Vec::new();
         let mut remaining_strings = pat_strings
@@ -108,14 +105,11 @@ impl PersonalAccessToken {
             .collect::<Vec<_>>();
 
         pat_ids.append(
-            &mut cmd("MGET")
-                .arg(
-                    pat_strings
-                        .iter()
-                        .map(|x| format!("{}:{}", PATS_TOKENS_NAMESPACE, x.to_string()))
-                        .collect::<Vec<_>>(),
+            &mut redis
+                .multi_get::<i64, _>(
+                    PATS_TOKENS_NAMESPACE,
+                    pat_strings.iter().map(|x| x.to_string()),
                 )
-                .query_async::<_, Vec<Option<i64>>>(&mut redis)
                 .await?
                 .into_iter()
                 .flatten()
@@ -123,16 +117,9 @@ impl PersonalAccessToken {
         );
 
         if !pat_ids.is_empty() {
-            let pats = cmd("MGET")
-                .arg(
-                    pat_ids
-                        .iter()
-                        .map(|x| format!("{}:{}", PATS_NAMESPACE, x))
-                        .collect::<Vec<_>>(),
-                )
-                .query_async::<_, Vec<Option<String>>>(&mut redis)
+            let pats = redis
+                .multi_get::<String, _>(PATS_NAMESPACE, pat_ids)
                 .await?;
-
             for pat in pats {
                 if let Some(pat) =
                     pat.and_then(|x| serde_json::from_str::<PersonalAccessToken>(&x).ok())
@@ -181,20 +168,16 @@ impl PersonalAccessToken {
             .await?;
 
             for pat in db_pats {
-                cmd("SET")
-                    .arg(format!("{}:{}", PATS_NAMESPACE, pat.id.0))
-                    .arg(serde_json::to_string(&pat)?)
-                    .arg("EX")
-                    .arg(DEFAULT_EXPIRY)
-                    .query_async::<_, ()>(&mut redis)
+                redis
+                    .set(PATS_NAMESPACE, pat.id.0, serde_json::to_string(&pat)?, None)
                     .await?;
-
-                cmd("SET")
-                    .arg(format!("{}:{}", PATS_TOKENS_NAMESPACE, pat.access_token))
-                    .arg(pat.id.0)
-                    .arg("EX")
-                    .arg(DEFAULT_EXPIRY)
-                    .query_async::<_, ()>(&mut redis)
+                redis
+                    .set(
+                        PATS_TOKENS_NAMESPACE,
+                        pat.access_token.clone(),
+                        pat.id.0,
+                        None,
+                    )
                     .await?;
                 found_pats.push(pat);
             }
@@ -206,15 +189,13 @@ impl PersonalAccessToken {
     pub async fn get_user_pats<'a, E>(
         user_id: UserId,
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<PatId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.get().await?;
-        let res = cmd("GET")
-            .arg(format!("{}:{}", PATS_USERS_NAMESPACE, user_id.0))
-            .query_async::<_, Option<String>>(&mut redis)
+        let res = redis
+            .get::<String, _>(PATS_USERS_NAMESPACE, user_id.0)
             .await?
             .and_then(|x| serde_json::from_str::<Vec<i64>>(&x).ok());
 
@@ -237,41 +218,34 @@ impl PersonalAccessToken {
         .try_collect::<Vec<PatId>>()
         .await?;
 
-        cmd("SET")
-            .arg(format!("{}:{}", PATS_USERS_NAMESPACE, user_id.0))
-            .arg(serde_json::to_string(&db_pats)?)
-            .arg("EX")
-            .arg(DEFAULT_EXPIRY)
-            .query_async::<_, ()>(&mut redis)
+        redis
+            .set(
+                PATS_USERS_NAMESPACE,
+                user_id.0,
+                serde_json::to_string(&db_pats)?,
+                None,
+            )
             .await?;
-
         Ok(db_pats)
     }
 
     pub async fn clear_cache(
         clear_pats: Vec<(Option<PatId>, Option<String>, Option<UserId>)>,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         if clear_pats.is_empty() {
             return Ok(());
         }
 
-        let mut redis = redis.get().await?;
-        let mut cmd = cmd("DEL");
-
-        for (id, token, user_id) in clear_pats {
-            if let Some(id) = id {
-                cmd.arg(format!("{}:{}", PATS_NAMESPACE, id.0));
-            }
-            if let Some(token) = token {
-                cmd.arg(format!("{}:{}", PATS_TOKENS_NAMESPACE, token));
-            }
-            if let Some(user_id) = user_id {
-                cmd.arg(format!("{}:{}", PATS_USERS_NAMESPACE, user_id.0));
-            }
-        }
-
-        cmd.query_async::<_, ()>(&mut redis).await?;
+        redis
+            .delete_many(clear_pats.into_iter().flat_map(|(id, token, user_id)| {
+                [
+                    (PATS_NAMESPACE, id.map(|i| i.0.to_string())),
+                    (PATS_TOKENS_NAMESPACE, token),
+                    (PATS_USERS_NAMESPACE, user_id.map(|i| i.0.to_string())),
+                ]
+            }))
+            .await?;
 
         Ok(())
     }

@@ -1,12 +1,12 @@
 use super::ids::*;
 use crate::auth::flows::AuthProvider;
 use crate::database::models::DatabaseError;
+use crate::database::redis::RedisPool;
 use chrono::Duration;
 use rand::distributions::Alphanumeric;
 use rand::Rng;
 use rand_chacha::rand_core::SeedableRng;
 use rand_chacha::ChaCha20Rng;
-use redis::cmd;
 use serde::{Deserialize, Serialize};
 
 const FLOWS_NAMESPACE: &str = "flows";
@@ -40,50 +40,32 @@ impl Flow {
     pub async fn insert(
         &self,
         expires: Duration,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<String, DatabaseError> {
-        let mut redis = redis.get().await?;
-
         let flow = ChaCha20Rng::from_entropy()
             .sample_iter(&Alphanumeric)
             .take(32)
             .map(char::from)
             .collect::<String>();
 
-        cmd("SET")
-            .arg(format!("{}:{}", FLOWS_NAMESPACE, flow))
-            .arg(serde_json::to_string(&self)?)
-            .arg("EX")
-            .arg(expires.num_seconds())
-            .query_async::<_, ()>(&mut redis)
+        redis
+            .set(
+                FLOWS_NAMESPACE,
+                &flow,
+                serde_json::to_string(&self)?,
+                Some(expires.num_seconds()),
+            )
             .await?;
-
         Ok(flow)
     }
 
-    pub async fn get(
-        id: &str,
-        redis: &deadpool_redis::Pool,
-    ) -> Result<Option<Flow>, DatabaseError> {
-        let mut redis = redis.get().await?;
-
-        let res = cmd("GET")
-            .arg(format!("{}:{}", FLOWS_NAMESPACE, id))
-            .query_async::<_, Option<String>>(&mut redis)
-            .await?;
-
+    pub async fn get(id: &str, redis: &RedisPool) -> Result<Option<Flow>, DatabaseError> {
+        let res = redis.get::<String, _>(FLOWS_NAMESPACE, id).await?;
         Ok(res.and_then(|x| serde_json::from_str(&x).ok()))
     }
 
-    pub async fn remove(
-        id: &str,
-        redis: &deadpool_redis::Pool,
-    ) -> Result<Option<()>, DatabaseError> {
-        let mut redis = redis.get().await?;
-        let mut cmd = cmd("DEL");
-        cmd.arg(format!("{}:{}", FLOWS_NAMESPACE, id));
-        cmd.query_async::<_, ()>(&mut redis).await?;
-
+    pub async fn remove(id: &str, redis: &RedisPool) -> Result<Option<()>, DatabaseError> {
+        redis.delete(FLOWS_NAMESPACE, id).await?;
         Ok(Some(()))
     }
 }

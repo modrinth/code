@@ -2,6 +2,7 @@ use super::version_creation::InitialVersionData;
 use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::thread_item::ThreadBuilder;
 use crate::database::models::{self, image_item};
+use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::ids::ImageId;
@@ -283,7 +284,7 @@ pub async fn project_create(
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
-    redis: Data<deadpool_redis::Pool>,
+    redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
@@ -354,7 +355,7 @@ async fn project_create_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
     session_queue: &AuthQueue,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to backblaze
@@ -405,7 +406,6 @@ async fn project_create_inner(
                 "`data` field must come before file fields",
             )));
         }
-
         let mut data = Vec::new();
         while let Some(chunk) = field.next().await {
             data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);

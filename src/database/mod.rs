@@ -1,5 +1,6 @@
 pub mod models;
 mod postgres_database;
+pub mod redis;
 pub use models::Image;
 pub use models::Project;
 pub use models::Version;

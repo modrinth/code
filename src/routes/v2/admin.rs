@@ -1,13 +1,14 @@
 use crate::auth::validate::get_user_record_from_bearer_token;
+use crate::database::redis::RedisPool;
 use crate::models::analytics::Download;
 use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::queue::analytics::AnalyticsQueue;
+use crate::queue::download::DownloadQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::util::guards::admin_key_guard;
-use crate::DownloadQueue;
 use actix_web::{patch, web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use serde::Deserialize;
@@ -37,7 +38,7 @@ pub struct DownloadBody {
 pub async fn count_download(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     maxmind: web::Data<Arc<MaxMindIndexer>>,
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,

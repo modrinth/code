@@ -6,6 +6,7 @@ use sqlx::PgPool;
 
 use crate::auth::{filter_authorized_versions, get_user_from_headers, is_authorized};
 use crate::database;
+use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
 use crate::queue::session::AuthQueue;
@@ -32,7 +33,7 @@ pub async fn forge_updates(
     web::Query(neo): web::Query<NeoForge>,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     const ERROR: &str = "The specified project does not exist!";

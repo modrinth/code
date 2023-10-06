@@ -2,6 +2,7 @@ use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database;
 use crate::database::models::image_item;
 use crate::database::models::thread_item::{ThreadBuilder, ThreadMessageBuilder};
+use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::ids::{base62_impl::parse_base62, ProjectId, UserId, VersionId};
 use crate::models::images::{Image, ImageContext};
@@ -44,7 +45,7 @@ pub async fn report_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     mut body: web::Payload,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool.begin().await?;
@@ -235,7 +236,7 @@ fn default_all() -> bool {
 pub async fn reports(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     count: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -310,7 +311,7 @@ pub async fn reports_get(
     req: HttpRequest,
     web::Query(ids): web::Query<ReportIds>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let report_ids: Vec<crate::database::models::ids::ReportId> =
@@ -345,7 +346,7 @@ pub async fn reports_get(
 pub async fn report_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     info: web::Path<(crate::models::reports::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -385,7 +386,7 @@ pub struct EditReport {
 pub async fn report_edit(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     info: web::Path<(crate::models::reports::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
     edit_report: web::Json<EditReport>,
@@ -404,7 +405,7 @@ pub async fn report_edit(
     let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
 
     if let Some(report) = report {
-        if !user.role.is_mod() && report.user_id != Some(user.id.into()) {
+        if !user.role.is_mod() && report.reporter != user.id.into() {
             return Ok(HttpResponse::NotFound().body(""));
         }
 
@@ -492,10 +493,17 @@ pub async fn report_delete(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     info: web::Path<(crate::models::reports::ReportId,)>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(&req, &**pool, &redis, &session_queue).await?;
+    check_is_moderator_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::REPORT_DELETE]),
+    )
+    .await?;
 
     let mut transaction = pool.begin().await?;
 

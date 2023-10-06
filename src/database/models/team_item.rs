@@ -1,12 +1,13 @@
 use super::{ids::*, Organization, Project};
-use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
+use crate::{
+    database::redis::RedisPool,
+    models::teams::{OrganizationPermissions, ProjectPermissions},
+};
 use itertools::Itertools;
-use redis::cmd;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 const TEAMS_NAMESPACE: &str = "teams";
-const DEFAULT_EXPIRY: i64 = 1800;
 
 pub struct TeamBuilder {
     pub members: Vec<TeamMemberBuilder>,
@@ -145,7 +146,7 @@ impl TeamMember {
     pub async fn get_from_team_full<'a, 'b, E>(
         id: TeamId,
         executor: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<TeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -156,7 +157,7 @@ impl TeamMember {
     pub async fn get_from_team_full_many<'a, E>(
         team_ids: &[TeamId],
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<TeamMember>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -169,18 +170,10 @@ impl TeamMember {
 
         let mut team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
-        let mut redis = redis.get().await?;
-
         let mut found_teams = Vec::new();
 
-        let teams = cmd("MGET")
-            .arg(
-                team_ids_parsed
-                    .iter()
-                    .map(|x| format!("{}:{}", TEAMS_NAMESPACE, x))
-                    .collect::<Vec<_>>(),
-            )
-            .query_async::<_, Vec<Option<String>>>(&mut redis)
+        let teams = redis
+            .multi_get::<String, _>(TEAMS_NAMESPACE, team_ids_parsed.clone())
             .await?;
 
         for team_raw in teams {
@@ -232,14 +225,14 @@ impl TeamMember {
             for (id, members) in &teams.into_iter().group_by(|x| x.team_id) {
                 let mut members = members.collect::<Vec<_>>();
 
-                cmd("SET")
-                    .arg(format!("{}:{}", TEAMS_NAMESPACE, id.0))
-                    .arg(serde_json::to_string(&members)?)
-                    .arg("EX")
-                    .arg(DEFAULT_EXPIRY)
-                    .query_async::<_, ()>(&mut redis)
+                redis
+                    .set(
+                        TEAMS_NAMESPACE,
+                        id.0,
+                        serde_json::to_string(&members)?,
+                        None,
+                    )
                     .await?;
-
                 found_teams.append(&mut members);
             }
         }
@@ -247,16 +240,8 @@ impl TeamMember {
         Ok(found_teams)
     }
 
-    pub async fn clear_cache(
-        id: TeamId,
-        redis: &deadpool_redis::Pool,
-    ) -> Result<(), super::DatabaseError> {
-        let mut redis = redis.get().await?;
-        cmd("DEL")
-            .arg(format!("{}:{}", TEAMS_NAMESPACE, id.0))
-            .query_async::<_, ()>(&mut redis)
-            .await?;
-
+    pub async fn clear_cache(id: TeamId, redis: &RedisPool) -> Result<(), super::DatabaseError> {
+        redis.delete(TEAMS_NAMESPACE, id.0).await?;
         Ok(())
     }
 

@@ -1,16 +1,16 @@
 use super::ids::*;
 use super::DatabaseError;
+use crate::database::redis::RedisPool;
 use crate::models::projects::{FileType, VersionStatus};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
-use redis::cmd;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::collections::HashMap;
+use std::iter;
 
 const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
-const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
 #[derive(Clone)]
 pub struct VersionBuilder {
@@ -78,7 +78,7 @@ impl DependencyBuilder {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct VersionFileBuilder {
     pub url: String,
     pub filename: String,
@@ -130,7 +130,7 @@ impl VersionFileBuilder {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct HashBuilder {
     pub algorithm: String,
     pub hash: Vec<u8>,
@@ -263,7 +263,7 @@ impl Version {
 
     pub async fn remove_full(
         id: VersionId,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, DatabaseError> {
         let result = Self::get(id, &mut *transaction, redis).await?;
@@ -398,7 +398,7 @@ impl Version {
     pub async fn get<'a, 'b, E>(
         id: VersionId,
         executor: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Option<QueryVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -411,7 +411,7 @@ impl Version {
     pub async fn get_many<'a, E>(
         version_ids: &[VersionId],
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<QueryVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -424,18 +424,10 @@ impl Version {
 
         let mut version_ids_parsed: Vec<i64> = version_ids.iter().map(|x| x.0).collect();
 
-        let mut redis = redis.get().await?;
-
         let mut found_versions = Vec::new();
 
-        let versions = cmd("MGET")
-            .arg(
-                version_ids_parsed
-                    .iter()
-                    .map(|x| format!("{}:{}", VERSIONS_NAMESPACE, x))
-                    .collect::<Vec<_>>(),
-            )
-            .query_async::<_, Vec<Option<String>>>(&mut redis)
+        let versions = redis
+            .multi_get::<String, _>(VERSIONS_NAMESPACE, version_ids_parsed.clone())
             .await?;
 
         for version in versions {
@@ -588,12 +580,13 @@ impl Version {
                 .await?;
 
             for version in db_versions {
-                cmd("SET")
-                    .arg(format!("{}:{}", VERSIONS_NAMESPACE, version.inner.id.0))
-                    .arg(serde_json::to_string(&version)?)
-                    .arg("EX")
-                    .arg(DEFAULT_EXPIRY)
-                    .query_async::<_, ()>(&mut redis)
+                redis
+                    .set(
+                        VERSIONS_NAMESPACE,
+                        version.inner.id.0,
+                        serde_json::to_string(&version)?,
+                        None,
+                    )
                     .await?;
 
                 found_versions.push(version);
@@ -608,7 +601,7 @@ impl Version {
         hash: String,
         version_id: Option<VersionId>,
         executor: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Option<SingleFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -625,7 +618,7 @@ impl Version {
         algorithm: String,
         hashes: &[String],
         executor: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<SingleFile>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
@@ -638,18 +631,16 @@ impl Version {
 
         let mut file_ids_parsed = hashes.to_vec();
 
-        let mut redis = redis.get().await?;
-
         let mut found_files = Vec::new();
 
-        let files = cmd("MGET")
-            .arg(
+        let files = redis
+            .multi_get::<String, _>(
+                VERSION_FILES_NAMESPACE,
                 file_ids_parsed
                     .iter()
-                    .map(|hash| format!("{}:{}_{}", VERSION_FILES_NAMESPACE, algorithm, hash))
+                    .map(|hash| format!("{}_{}", algorithm, hash))
                     .collect::<Vec<_>>(),
             )
-            .query_async::<_, Vec<Option<String>>>(&mut redis)
             .await?;
 
         for file in files {
@@ -726,12 +717,13 @@ impl Version {
             }
 
             for (key, mut files) in save_files {
-                cmd("SET")
-                    .arg(format!("{}:{}", VERSION_FILES_NAMESPACE, key))
-                    .arg(serde_json::to_string(&files)?)
-                    .arg("EX")
-                    .arg(DEFAULT_EXPIRY)
-                    .query_async::<_, ()>(&mut redis)
+                redis
+                    .set(
+                        VERSION_FILES_NAMESPACE,
+                        key,
+                        serde_json::to_string(&files)?,
+                        None,
+                    )
                     .await?;
 
                 found_files.append(&mut files);
@@ -743,22 +735,19 @@ impl Version {
 
     pub async fn clear_cache(
         version: &QueryVersion,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
-        let mut redis = redis.get().await?;
-
-        let mut cmd = cmd("DEL");
-
-        cmd.arg(format!("{}:{}", VERSIONS_NAMESPACE, version.inner.id.0));
-
-        for file in &version.files {
-            for (algo, hash) in &file.hashes {
-                cmd.arg(format!("{}:{}_{}", VERSION_FILES_NAMESPACE, algo, hash));
-            }
-        }
-
-        cmd.query_async::<_, ()>(&mut redis).await?;
-
+        redis
+            .delete_many(
+                iter::once((VERSIONS_NAMESPACE, Some(version.inner.id.0.to_string()))).chain(
+                    version.files.iter().flat_map(|file| {
+                        file.hashes.iter().map(|(algo, hash)| {
+                            (VERSION_FILES_NAMESPACE, Some(format!("{}_{}", algo, hash)))
+                        })
+                    }),
+                ),
+            )
+            .await?;
         Ok(())
     }
 }

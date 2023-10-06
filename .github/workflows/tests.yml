@@ -4,6 +4,8 @@ on:
   push:
     branches: [master]
   pull_request:
+    branches:
+      - master
 
 env:
   CARGO_TERM_COLOR: always
@@ -21,23 +23,34 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      # Start Docker Compose
+      - name: Start Docker Compose
+        run: docker-compose up -d
+
       - uses: actions-rs/toolchain@v1
         name: Install toolchain
         with:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-      - name: Cache build artifacts
-        id: cache-build
+
+      # Cache dependencies and build artifacts
+      - name: Cache build artifacts and dependencies
         uses: actions/cache@v2
         with:
-          path: target/**
-          key: ${{ runner.os }}-build-cache-${{ matrix.rust }}
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
       - uses: actions-rs/cargo@v1
         with:
           command: build
         env:
           SQLX_OFFLINE: true
+
       - uses: actions-rs/cargo@v1
         with:
           command: test
@@ -51,3 +64,4 @@ jobs:
           S3_REGION: ${{ secrets.S3_REGION }}
           S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
           SQLX_OFFLINE: true
+          DATABASE_URL: postgresql://labrinth:labrinth@localhost/postgres

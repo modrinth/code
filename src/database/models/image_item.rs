@@ -1,11 +1,10 @@
 use super::ids::*;
+use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
 use chrono::{DateTime, Utc};
-use redis::cmd;
 use serde::{Deserialize, Serialize};
 
 const IMAGES_NAMESPACE: &str = "images";
-const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Image {
@@ -58,7 +57,7 @@ impl Image {
     pub async fn remove(
         id: ImageId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
         let image = Self::get(id, &mut *transaction, redis).await?;
 
@@ -161,7 +160,7 @@ impl Image {
     pub async fn get<'a, 'b, E>(
         id: ImageId,
         executor: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Option<Image>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -174,7 +173,7 @@ impl Image {
     pub async fn get_many<'a, E>(
         image_ids: &[ImageId],
         exec: E,
-        redis: &deadpool_redis::Pool,
+        redis: &RedisPool,
     ) -> Result<Vec<Image>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -185,24 +184,15 @@ impl Image {
             return Ok(Vec::new());
         }
 
-        let mut redis = redis.get().await?;
-
         let mut found_images = Vec::new();
         let mut remaining_ids = image_ids.to_vec();
 
         let image_ids = image_ids.iter().map(|x| x.0).collect::<Vec<_>>();
 
         if !image_ids.is_empty() {
-            let images = cmd("MGET")
-                .arg(
-                    image_ids
-                        .iter()
-                        .map(|x| format!("{}:{}", IMAGES_NAMESPACE, x))
-                        .collect::<Vec<_>>(),
-                )
-                .query_async::<_, Vec<Option<String>>>(&mut redis)
+            let images = redis
+                .multi_get::<String, _>(IMAGES_NAMESPACE, image_ids)
                 .await?;
-
             for image in images {
                 if let Some(image) = image.and_then(|x| serde_json::from_str::<Image>(&x).ok()) {
                     remaining_ids.retain(|x| image.id.0 != x.0);
@@ -245,14 +235,14 @@ impl Image {
             .await?;
 
             for image in db_images {
-                cmd("SET")
-                    .arg(format!("{}:{}", IMAGES_NAMESPACE, image.id.0))
-                    .arg(serde_json::to_string(&image)?)
-                    .arg("EX")
-                    .arg(DEFAULT_EXPIRY)
-                    .query_async::<_, ()>(&mut redis)
+                redis
+                    .set(
+                        IMAGES_NAMESPACE,
+                        image.id.0,
+                        serde_json::to_string(&image)?,
+                        None,
+                    )
                     .await?;
-
                 found_images.push(image);
             }
         }
@@ -260,16 +250,8 @@ impl Image {
         Ok(found_images)
     }
 
-    pub async fn clear_cache(
-        id: ImageId,
-        redis: &deadpool_redis::Pool,
-    ) -> Result<(), DatabaseError> {
-        let mut redis = redis.get().await?;
-        let mut cmd = cmd("DEL");
-
-        cmd.arg(format!("{}:{}", IMAGES_NAMESPACE, id.0));
-        cmd.query_async::<_, ()>(&mut redis).await?;
-
+    pub async fn clear_cache(id: ImageId, redis: &RedisPool) -> Result<(), DatabaseError> {
+        redis.delete(IMAGES_NAMESPACE, id.0).await?;
         Ok(())
     }
 }

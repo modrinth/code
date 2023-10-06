@@ -92,3 +92,6 @@ color-thief = "0.2.2"
 woothee = "0.13.0"
 
 lettre = "0.10.4"
+
+[dev-dependencies]
+actix-http = "3.4.0"

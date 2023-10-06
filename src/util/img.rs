@@ -1,11 +1,11 @@
+use crate::database;
+use crate::database::models::image_item;
+use crate::database::redis::RedisPool;
+use crate::models::images::ImageContext;
+use crate::routes::ApiError;
 use color_thief::ColorFormat;
 use image::imageops::FilterType;
 use image::{EncodableLayout, ImageError};
-
-use crate::database;
-use crate::database::models::image_item;
-use crate::models::images::ImageContext;
-use crate::routes::ApiError;
 
 pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
     let image = image::load_from_memory(data)?
@@ -26,7 +26,7 @@ pub async fn delete_unused_images(
     context: ImageContext,
     reference_strings: Vec<&str>,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    redis: &deadpool_redis::Pool,
+    redis: &RedisPool,
 ) -> Result<(), ApiError> {
     let uploaded_images = database::models::Image::get_many_contexted(context, transaction).await?;
 

@@ -1,5 +1,6 @@
 use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::User;
+use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::collections::{Collection, CollectionStatus};
 use crate::models::notifications::Notification;
@@ -46,7 +47,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, mut user) = get_user_from_headers(
@@ -66,17 +67,7 @@ pub async fn user_auth_get(
         user.payout_data = None;
     }
 
-    Ok(HttpResponse::Ok().json(
-        get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Some(&[Scopes::USER_READ]),
-        )
-        .await?
-        .1,
-    ))
+    Ok(HttpResponse::Ok().json(user))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -88,7 +79,7 @@ pub struct UserIds {
 pub async fn users_get(
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_ids = serde_json::from_str::<Vec<String>>(&ids.ids)?;
 
@@ -103,7 +94,7 @@ pub async fn users_get(
 pub async fn user_get(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user_data = User::get(&info.into_inner().0, &**pool, &redis).await?;
 
@@ -120,7 +111,7 @@ pub async fn projects_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -164,7 +155,7 @@ pub async fn collections_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -250,7 +241,7 @@ pub async fn user_edit(
     info: web::Path<(String,)>,
     new_user: web::Json<EditUser>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let (scopes, user) = get_user_from_headers(
@@ -471,7 +462,7 @@ pub async fn user_icon_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
@@ -560,7 +551,7 @@ pub async fn user_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     removal_type: web::Query<RemovalType>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -608,7 +599,7 @@ pub async fn user_follows(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -664,7 +655,7 @@ pub async fn user_notifications(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -712,7 +703,7 @@ pub async fn user_payouts(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -797,7 +788,7 @@ pub async fn user_payouts_request(
     pool: web::Data<PgPool>,
     data: web::Json<PayoutData>,
     payouts_queue: web::Data<Mutex<PayoutsQueue>>,
-    redis: web::Data<deadpool_redis::Pool>,
+    redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let mut payouts_queue = payouts_queue.lock().await;
