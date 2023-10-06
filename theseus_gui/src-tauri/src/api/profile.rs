@@ -233,7 +233,7 @@ pub async fn profile_export_mrpack(
 pub async fn profile_get_pack_export_candidates(
     profile_path: ProfilePathId,
 ) -> Result<Vec<InnerProjectPathUnix>> {
-    let candidates = profile::get_pack_export_candidates(profile_path).await?;
+    let candidates = profile::get_pack_export_candidates(&profile_path).await?;
     Ok(candidates)
 }
 

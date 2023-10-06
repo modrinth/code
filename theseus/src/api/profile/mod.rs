@@ -571,7 +571,7 @@ pub async fn remove_project(
 pub async fn export_mrpack(
     profile_path: &ProfilePathId,
     export_path: PathBuf,
-    included_overrides: Vec<String>, // which folders to include in the overrides
+    included_export_candidates: Vec<String>, // which folders/files to include in the export
     version_id: Option<String>,
     description: Option<String>,
     _name: Option<String>,
@@ -586,8 +586,8 @@ pub async fn export_mrpack(
         ))
     })?;
 
-    // remove .DS_Store files from included_overrides
-    let included_overrides = included_overrides
+    // remove .DS_Store files from included_export_candidates
+    let included_export_candidates = included_export_candidates
         .into_iter()
         .filter(|x| {
             if let Some(f) = PathBuf::from(x).file_name() {
@@ -610,11 +610,11 @@ pub async fn export_mrpack(
     let version_id = version_id.unwrap_or("1.0.0".to_string());
     let mut packfile =
         create_mrpack_json(&profile, version_id, description).await?;
-    let included_overrides_set =
-        HashSet::<_>::from_iter(included_overrides.iter());
-    packfile
-        .files
-        .retain(|f| included_overrides_set.contains(&f.path.to_string()));
+    let included_candidates_set =
+        HashSet::<_>::from_iter(included_export_candidates.iter());
+    packfile.files.retain(|f| {
+        included_candidates_set.contains(&f.path.get_topmost_two_components())
+    });
 
     // Build vec of all files in the folder
     let mut path_list = Vec::new();
@@ -640,7 +640,7 @@ pub async fn export_mrpack(
             .await?
             .get_inner_path_unix();
         if packfile.files.iter().any(|f| f.path == relative_path)
-            || !included_overrides_set
+            || !included_candidates_set
                 .contains(&relative_path.get_topmost_two_components())
         {
             continue;
