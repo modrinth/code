@@ -285,6 +285,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-prom"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f23f332a652836b8f3a6876103c70c9ed436d0e69fa779ab5d7f57b1d5c8d488"
+dependencies = [
+ "actix-web",
+ "futures-core",
+ "pin-project-lite",
+ "prometheus",
+ "regex",
+]
+
+[[package]]
 name = "actix-ws"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2234,6 +2247,7 @@ dependencies = [
  "actix-multipart",
  "actix-rt",
  "actix-web",
+ "actix-web-prom",
  "actix-ws",
  "argon2",
  "async-trait",
@@ -3137,6 +3151,20 @@ dependencies = [
  "libc",
  "nom 2.2.1",
  "rustc_version 0.2.3",
+]
+
+[[package]]
+name = "prometheus"
+version = "0.13.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "449811d15fbdf5ceb5c1144416066429cf82316e2ec8ce0c1f6f8a02e7bbcf8c"
+dependencies = [
+ "cfg-if 1.0.0",
+ "fnv",
+ "lazy_static",
+ "memchr",
+ "parking_lot 0.12.1",
+ "thiserror",
 ]
 
 [[package]]

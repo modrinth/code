@@ -1,4 +1,5 @@
 use actix_web::{App, HttpServer};
+use actix_web_prom::PrometheusMetricsBuilder;
 use env_logger::Env;
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
@@ -88,6 +89,11 @@ async fn main() -> std::io::Result<()> {
 
     let store = MemoryStore::new();
 
+    let prometheus = PrometheusMetricsBuilder::new("labrinth")
+        .endpoint("/metrics")
+        .build()
+        .expect("Failed to create prometheus metrics middleware");
+
     info!("Starting Actix HTTP server!");
 
     let labrinth_config = labrinth::app_setup(
@@ -101,6 +107,7 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
+            .wrap(prometheus.clone())
             .wrap(actix_web::middleware::Compress::default())
             .wrap(
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())

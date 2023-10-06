@@ -18,6 +18,7 @@ actix-multipart = "0.6.0"
 actix-cors = "0.6.4"
 actix-ws = "0.2.5"
 actix-files = "0.6.2"
+actix-web-prom = "0.7.0"
 
 tokio = { version = "1.29.1", features = ["sync"] }
 tokio-stream = "0.1.14"
@@ -37,7 +38,7 @@ hyper-tls = "0.5.0"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "3.0.0"
-chrono = { version = "0.4.26", features = ["serde"]}
+chrono = { version = "0.4.26", features = ["serde"] }
 yaserde = "0.8.0"
 yaserde_derive = "0.8.0"
 xml-rs = "0.8.15"
@@ -72,9 +73,21 @@ log = "0.4.19"
 env_logger = "0.10.0"
 thiserror = "1.0.41"
 
-sqlx = { version = "0.6.3", features = ["offline", "runtime-tokio-rustls", "postgres", "chrono", "macros", "migrate", "decimal", "json"] }
-rust_decimal = { version = "1.30.0", features = ["serde-with-float", "serde-with-str"] }
-redis = { version = "0.23.0", features = ["tokio-comp", "ahash", "r2d2"]}
+sqlx = { version = "0.6.3", features = [
+    "offline",
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "macros",
+    "migrate",
+    "decimal",
+    "json",
+] }
+rust_decimal = { version = "1.30.0", features = [
+    "serde-with-float",
+    "serde-with-str",
+] }
+redis = { version = "0.23.0", features = ["tokio-comp", "ahash", "r2d2"] }
 deadpool-redis = "0.12.0"
 clickhouse = { version = "0.11.2", features = ["uuid", "time"] }
 uuid = { version = "1.2.2", features = ["v4", "fast-rng", "serde"] }
