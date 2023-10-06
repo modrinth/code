@@ -383,7 +383,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
 
                         // At this point, new_path is the path to the profile, and subfile is whether it's a subfile of the profile or not
                         let profile_path_id =
-                            ProfilePathId::new(&PathBuf::from(
+                            ProfilePathId::new(PathBuf::from(
                                 new_path.file_name().unwrap_or_default(),
                             ));
 
