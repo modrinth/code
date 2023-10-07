@@ -741,7 +741,7 @@ const editProfileObject = computed(() => {
   if (overrideHooks.value) {
     editProfile.hooks = hooks.value
   }
-  
+
   if (unlinkModpack.value) {
     editProfile.metadata.linked_data = null
   }
