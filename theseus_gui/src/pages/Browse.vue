@@ -179,7 +179,7 @@ async function refreshSearch() {
       formattedFacets.push(orFacets.value)
     } else if (projectType.value === 'mod') {
       formattedFacets.push(
-        ['forge', 'fabric', 'quilt'].map((x) => `categories:'${encodeURIComponent(x)}'`)
+        ['forge', 'fabric', 'quilt', 'neoforge'].map((x) => `categories:'${encodeURIComponent(x)}'`)
       )
     } else if (projectType.value === 'datapack') {
       formattedFacets.push(['datapack'].map((x) => `categories:'${encodeURIComponent(x)}'`))
@@ -549,7 +549,11 @@ onUnmounted(() => unlistenOffline())
             size="sm"
           />
           <div class="small-instance_info">
-            <span class="title">{{ instanceContext.metadata.name }}</span>
+            <span class="title">{{
+              instanceContext.metadata.name.length > 20
+                ? instanceContext.metadata.name.substring(0, 20) + '...'
+                : instanceContext.metadata.name
+            }}</span>
             <span>
               {{
                 instanceContext.metadata.loader.charAt(0).toUpperCase() +
@@ -601,7 +605,7 @@ onUnmounted(() => unlistenOffline())
             v-for="loader in loaders.filter(
               (l) =>
                 (projectType !== 'mod' && l.supported_project_types?.includes(projectType)) ||
-                (projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name))
+                (projectType === 'mod' && ['fabric', 'forge', 'quilt', 'neoforge'].includes(l.name))
             )"
             :key="loader"
           >

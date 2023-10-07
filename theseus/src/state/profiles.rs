@@ -124,9 +124,20 @@ impl ProjectPathId {
         &self,
         profile: ProfilePathId,
     ) -> crate::Result<PathBuf> {
-        let _state = State::get().await?;
         let profile_dir = profile.get_full_path().await?;
         Ok(profile_dir.join(&self.0))
+    }
+
+    // Gets inner path in unix convention as a String
+    // ie: 'mods\myproj' -> 'mods/myproj'
+    // Used for exporting to mrpack, which should have a singular convention
+    pub fn get_inner_path_unix(&self) -> crate::Result<String> {
+        Ok(self
+            .0
+            .components()
+            .map(|c| c.as_os_str().to_string_lossy().to_string())
+            .collect::<Vec<_>>()
+            .join("/"))
     }
 
     // Create a new ProjectPathId from a relative path
@@ -193,6 +204,15 @@ pub struct ProfileMetadata {
 pub struct LinkedData {
     pub project_id: Option<String>,
     pub version_id: Option<String>,
+
+    #[serde(default = "default_locked")]
+    pub locked: Option<bool>,
+}
+
+// Called if linked_data is present but locked is not
+// Meaning this is a legacy profile, and we should consider it locked
+pub fn default_locked() -> Option<bool> {
+    Some(true)
 }
 
 #[derive(
@@ -205,6 +225,7 @@ pub enum ModLoader {
     Forge,
     Fabric,
     Quilt,
+    NeoForge,
 }
 
 impl std::fmt::Display for ModLoader {
@@ -214,6 +235,7 @@ impl std::fmt::Display for ModLoader {
             Self::Forge => "Forge",
             Self::Fabric => "Fabric",
             Self::Quilt => "Quilt",
+            Self::NeoForge => "NeoForge",
         })
     }
 }
@@ -225,6 +247,7 @@ impl ModLoader {
             Self::Forge => "forge",
             Self::Fabric => "fabric",
             Self::Quilt => "quilt",
+            Self::NeoForge => "neoforge",
         }
     }
 }
@@ -719,7 +742,15 @@ impl Profiles {
                         None
                     }
                 };
+
                 if let Some(profile) = prof {
+                    // Clear out modrinth_logs of all files in profiles folder (these are legacy)
+                    // TODO: should be removed in a future build
+                    let modrinth_logs = path.join("modrinth_logs");
+                    if modrinth_logs.exists() {
+                        let _ = std::fs::remove_dir_all(modrinth_logs);
+                    }
+
                     let path = io::canonicalize(path)?;
                     Profile::watch_fs(&path, file_watcher).await?;
                     profiles.insert(profile.profile_id(), profile);

@@ -66,11 +66,21 @@ pub enum EnvType {
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Hash, PartialEq, Eq, Debug)]
-#[serde(rename_all = "kebab-case")]
 pub enum PackDependency {
+    #[serde(rename = "forge")]
     Forge,
+
+    #[serde(rename = "neoforge")]
+    #[serde(alias = "neo-forge")]
+    NeoForge,
+
+    #[serde(rename = "fabric-loader")]
     FabricLoader,
+
+    #[serde(rename = "quilt-loader")]
     QuiltLoader,
+
+    #[serde(rename = "minecraft")]
     Minecraft,
 }
 
@@ -152,6 +162,7 @@ pub fn get_profile_from_pack(
             linked_data: Some(LinkedData {
                 project_id: Some(project_id),
                 version_id: Some(version_id),
+                locked: Some(true),
             }),
             ..Default::default()
         },
@@ -178,20 +189,29 @@ pub async fn generate_pack_from_version_id(
     title: String,
     icon_url: Option<String>,
     profile_path: ProfilePathId,
+
+    // Existing loading bar. Unlike when existing_loading_bar is used, this one is pre-initialized with PackFileDownload
+    // For example, you might use this if multiple packs are being downloaded at once and you want to use the same loading bar
+    initialized_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<CreatePack> {
     let state = State::get().await?;
 
-    let loading_bar = init_loading(
-        LoadingBarType::PackFileDownload {
-            profile_path: profile_path.get_full_path().await?,
-            pack_name: title,
-            icon: icon_url,
-            pack_version: version_id.clone(),
-        },
-        100.0,
-        "Downloading pack file",
-    )
-    .await?;
+    let loading_bar = if let Some(bar) = initialized_loading_bar {
+        emit_loading(&bar, 0.0, Some("Downloading pack file")).await?;
+        bar
+    } else {
+        init_loading(
+            LoadingBarType::PackFileDownload {
+                profile_path: profile_path.get_full_path().await?,
+                pack_name: title,
+                icon: icon_url,
+                pack_version: version_id.clone(),
+            },
+            100.0,
+            "Downloading pack file",
+        )
+        .await?
+    };
 
     emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
     let creds = state.credentials.read().await;
@@ -312,6 +332,7 @@ pub async fn set_profile_information(
     description: &CreatePackDescription,
     backup_name: &str,
     dependencies: &HashMap<PackDependency, String>,
+    ignore_lock: bool, // do not change locked status
 ) -> crate::Result<()> {
     let mut game_version: Option<&String> = None;
     let mut mod_loader = None;
@@ -321,6 +342,10 @@ pub async fn set_profile_information(
         match key {
             PackDependency::Forge => {
                 mod_loader = Some(ModLoader::Forge);
+                loader_version = Some(value);
+            }
+            PackDependency::NeoForge => {
+                mod_loader = Some(ModLoader::NeoForge);
                 loader_version = Some(value);
             }
             PackDependency::FabricLoader => {
@@ -365,6 +390,14 @@ pub async fn set_profile_information(
         prof.metadata.linked_data = Some(LinkedData {
             project_id: description.project_id.clone(),
             version_id: description.version_id.clone(),
+            locked: if !ignore_lock {
+                Some(
+                    description.project_id.is_some()
+                        && description.version_id.is_some(),
+                )
+            } else {
+                prof.metadata.linked_data.as_ref().and_then(|x| x.locked)
+            },
         });
         prof.metadata.icon = description.icon.clone();
         prof.metadata.game_version = game_version.clone();

@@ -61,7 +61,7 @@
         <div class="pages-list">
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
             <BoxIcon />
-            Mods
+            Content
           </RouterLink>
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
             <FileIcon />
@@ -75,7 +75,7 @@
       </Card>
     </div>
     <div class="content">
-      <Promotion query-param="?r=launcher" />
+      <Promotion :external="false" query-param="?r=launcher" />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
@@ -84,6 +84,9 @@
               :instance="instance"
               :options="options"
               :offline="offline"
+              :playing="playing"
+              :versions="modrinthVersions"
+              :installed="instance.install_stage !== 'installed'"
             ></component>
           </Suspense>
         </template>
@@ -149,6 +152,7 @@ import { isOffline, showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { useFetch } from '@/helpers/fetch'
 
 const route = useRoute()
 
@@ -157,7 +161,13 @@ const breadcrumbs = useBreadcrumbs()
 
 const instance = ref(await get(route.params.id).catch(handleError))
 
-breadcrumbs.setName('Instance', instance.value.metadata.name)
+breadcrumbs.setName(
+  'Instance',
+  instance.value.metadata.name.length > 40
+    ? instance.value.metadata.name.substring(0, 40) + '...'
+    : instance.value.metadata.name
+)
+
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
@@ -195,6 +205,15 @@ const checkProcess = async () => {
 
   playing.value = false
   uuid.value = null
+}
+
+// Get information on associated modrinth versions, if any
+const modrinthVersions = ref([])
+if (!(await isOffline()) && instance.value.metadata.linked_data?.project_id) {
+  modrinthVersions.value = await useFetch(
+    `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
+    'project'
+  )
 }
 
 await checkProcess()
@@ -353,6 +372,8 @@ Button {
 .name {
   font-size: 1.25rem;
   color: var(--color-contrast);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .metadata {

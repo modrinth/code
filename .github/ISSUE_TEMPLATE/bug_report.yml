@@ -26,8 +26,12 @@ body:
     validations:
       required: false
   - type: textarea
+    attributes: 
+      label: System information
+      description: Add any information about what OS you are on (like Windows or Mac), and what version of the app you are using.
+  - type: textarea
     attributes:
       label: Additional context
-      description: Add any other context about the problem here.
+      description: Add any other context about the problem here. This might include logs, screenshots, etc. The more the merrier!
     validations:
       required: false

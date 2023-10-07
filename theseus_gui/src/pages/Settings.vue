@@ -133,11 +133,7 @@ async function refreshDir() {
         class="login-screen-modal"
         :noblur="!themeStore.advancedRendering"
       >
-        <ModrinthLoginScreen
-          :modal="true"
-          :prev-page="$refs.loginScreenModal.show()"
-          :next-page="signInAfter"
-        />
+        <ModrinthLoginScreen :modal="true" :prev-page="signInAfter" :next-page="signInAfter" />
       </Modal>
       <div class="adjacent-input">
         <label for="theme">
@@ -323,6 +319,21 @@ async function refreshDir() {
           "
         />
       </div>
+      <div class="adjacent-input">
+        <label for="disable-discord-rpc">
+          <span class="label__title">Disable Discord RPC</span>
+          <span class="label__description">
+            Disables the Discord Rich Presence integration. 'Modrinth' will no longer show up as a
+            game or app you are using on your Discord profile. This does not disable any
+            instance-specific Discord Rich Presence integrations, such as those added by mods.
+          </span>
+        </label>
+        <Toggle
+          id="disable-discord-rpc"
+          v-model="settings.disable_discord_rpc"
+          :checked="settings.disable_discord_rpc"
+        />
+      </div>
     </Card>
     <Card>
       <div class="label">
@@ -372,9 +383,9 @@ async function refreshDir() {
         <Slider
           id="max-memory"
           v-model="settings.memory.maximum"
-          :min="256"
+          :min="8"
           :max="maxMemory"
-          :step="1"
+          :step="64"
           unit="mb"
         />
       </div>

@@ -18,6 +18,7 @@ pub struct Metadata {
     pub forge: LoaderManifest,
     pub fabric: LoaderManifest,
     pub quilt: LoaderManifest,
+    pub neoforge: LoaderManifest,
 }
 
 impl Metadata {
@@ -26,7 +27,7 @@ impl Metadata {
     }
 
     pub async fn fetch() -> crate::Result<Self> {
-        let (minecraft, forge, fabric, quilt) = tokio::try_join! {
+        let (minecraft, forge, fabric, quilt, neoforge) = tokio::try_join! {
             async {
                 let url = Self::get_manifest("minecraft");
                 fetch_version_manifest(Some(&url)).await
@@ -42,6 +43,10 @@ impl Metadata {
             async {
                 let url = Self::get_manifest("quilt");
                 fetch_loader_manifest(&url).await
+            },
+            async {
+                let url = Self::get_manifest("neo");
+                fetch_loader_manifest(&url).await
             }
         }?;
 
@@ -50,6 +55,7 @@ impl Metadata {
             forge,
             fabric,
             quilt,
+            neoforge,
         })
     }
 
@@ -63,6 +69,8 @@ impl Metadata {
     ) -> crate::Result<Self> {
         let mut metadata = None;
         let metadata_path = dirs.caches_meta_dir().await.join("metadata.json");
+        let metadata_backup_path =
+            dirs.caches_meta_dir().await.join("metadata.json.bak");
 
         if let Ok(metadata_json) =
             read_json::<Metadata>(&metadata_path, io_semaphore).await
@@ -79,6 +87,13 @@ impl Metadata {
                 )
                 .await?;
 
+                write(
+                    &metadata_backup_path,
+                    &serde_json::to_vec(&metadata_fetch).unwrap_or_default(),
+                    io_semaphore,
+                )
+                .await?;
+
                 metadata = Some(metadata_fetch);
                 Ok::<(), crate::Error>(())
             }
@@ -90,6 +105,18 @@ impl Metadata {
                     tracing::warn!("Unable to fetch launcher metadata: {err}")
                 }
             }
+        } else if let Ok(metadata_json) =
+            read_json::<Metadata>(&metadata_backup_path, io_semaphore).await
+        {
+            metadata = Some(metadata_json);
+            std::fs::copy(&metadata_backup_path, &metadata_path).map_err(
+                |err| {
+                    crate::ErrorKind::FSError(format!(
+                        "Error restoring metadata backup: {err}"
+                    ))
+                    .as_error()
+                },
+            )?;
         }
 
         if let Some(meta) = metadata {
@@ -112,6 +139,15 @@ impl Metadata {
                 .caches_meta_dir()
                 .await
                 .join("metadata.json");
+            let metadata_backup_path = state
+                .directories
+                .caches_meta_dir()
+                .await
+                .join("metadata.json.bak");
+
+            if metadata_path.exists() {
+                std::fs::copy(&metadata_path, &metadata_backup_path).unwrap();
+            }
 
             write(
                 &metadata_path,

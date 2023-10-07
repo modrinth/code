@@ -105,7 +105,7 @@ import {
   GlobeIcon,
   ClipboardCopyIcon,
 } from 'omorphia'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
   users,
   remove_user,
@@ -116,6 +116,7 @@ import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
+import { process_listener } from '@/helpers/events'
 
 defineProps({
   mode: {
@@ -214,12 +215,22 @@ const handleClickOutside = (event) => {
   }
 }
 
+const unlisten = await process_listener(async (e) => {
+  if (e.event === 'launched') {
+    await refreshValues()
+  }
+})
+
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  unlisten()
 })
 </script>
 

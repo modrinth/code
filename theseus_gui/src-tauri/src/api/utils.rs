@@ -1,8 +1,12 @@
 use serde::{Deserialize, Serialize};
-use theseus::{handler, prelude::CommandPayload, State};
+use theseus::{
+    handler,
+    prelude::{CommandPayload, DirectoryInfo},
+    State,
+};
 
 use crate::api::Result;
-use std::{env, process::Command};
+use std::{env, path::PathBuf, process::Command};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -10,6 +14,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_os,
             should_disable_mouseover,
             show_in_folder,
+            show_launcher_logs_folder,
             progress_bars_list,
             safety_check_safe_loading_bars,
             get_opening_command,
@@ -76,13 +81,19 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(path: String) -> Result<()> {
+pub fn show_in_folder(path: PathBuf) -> Result<()> {
     {
         #[cfg(target_os = "windows")]
         {
-            Command::new("explorer")
-                .args([&path]) // The comma after select is not a typo
-                .spawn()?;
+            if path.is_dir() {
+                Command::new("explorer")
+                    .args([&path]) // The comma after select is not a typo
+                    .spawn()?;
+            } else {
+                Command::new("explorer")
+                    .args(["/select,", &path.to_string_lossy()]) // The comma after select is not a typo
+                    .spawn()?;
+            }
         }
 
         #[cfg(target_os = "linux")]
@@ -90,14 +101,14 @@ pub fn show_in_folder(path: String) -> Result<()> {
             use std::fs::metadata;
             use std::path::PathBuf;
 
-            if path.contains(',') {
+            if path.to_string_lossy().to_string().contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
                 let new_path = match metadata(&path)?.is_dir() {
                     true => path,
                     false => {
                         let mut path2 = PathBuf::from(path);
                         path2.pop();
-                        path2.to_string_lossy().to_string()
+                        path2
                     }
                 };
                 Command::new("xdg-open").arg(&new_path).spawn()?;
@@ -108,13 +119,27 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
         #[cfg(target_os = "macos")]
         {
-            Command::new("open").args([&path]).spawn()?;
+            if path.is_dir() {
+                Command::new("open").args([&path]).spawn()?;
+            } else {
+                Command::new("open")
+                    .args(["-R", &path.as_os_str().to_string_lossy()])
+                    .spawn()?;
+            }
         }
 
         Ok::<(), theseus::Error>(())
     }?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub fn show_launcher_logs_folder() -> Result<()> {
+    let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
+    // failure to get folder just opens filesystem
+    // (ie: if in debug mode only and launcher_logs never created)
+    show_in_folder(path)
 }
 
 // Get opening command

@@ -162,7 +162,7 @@ impl DirectoryInfo {
         &self,
         profile_id: &ProfilePathId,
     ) -> crate::Result<PathBuf> {
-        Ok(profile_id.get_full_path().await?.join("modrinth_logs"))
+        Ok(profile_id.get_full_path().await?.join("logs"))
     }
 
     #[inline]

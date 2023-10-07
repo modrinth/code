@@ -140,11 +140,15 @@ impl Drop for LoadingBarId {
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
                 bars.remove(&loader_uuid);
             }
-            let _ = SafeProcesses::complete(
-                crate::state::ProcessType::LoadingBar,
-                loader_uuid,
-            )
-            .await;
+            // complete calls state, and since a  LoadingBarId is created in state initialization, we only complete if its already initializaed
+            // to avoid an infinite loop.
+            if crate::State::initialized() {
+                let _ = SafeProcesses::complete(
+                    crate::state::ProcessType::LoadingBar,
+                    loader_uuid,
+                )
+                .await;
+            }
         });
     }
 }

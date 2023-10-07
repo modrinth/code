@@ -32,6 +32,8 @@ impl Tags {
     ) -> crate::Result<Self> {
         let mut tags = None;
         let tags_path = dirs.caches_meta_dir().await.join("tags.json");
+        let tags_path_backup =
+            dirs.caches_meta_dir().await.join("tags.json.bak");
 
         if let Ok(tags_json) = read_json::<Self>(&tags_path, io_semaphore).await
         {
@@ -43,11 +45,28 @@ impl Tags {
                     tracing::warn!("Unable to fetch launcher tags: {err}")
                 }
             }
+        } else if let Ok(tags_json) =
+            read_json::<Self>(&tags_path_backup, io_semaphore).await
+        {
+            tags = Some(tags_json);
+            std::fs::copy(&tags_path_backup, &tags_path).map_err(|err| {
+                crate::ErrorKind::FSError(format!(
+                    "Error restoring tags backup: {err}"
+                ))
+                .as_error()
+            })?;
         }
 
         if let Some(tags_data) = tags {
             write(&tags_path, &serde_json::to_vec(&tags_data)?, io_semaphore)
                 .await?;
+            write(
+                &tags_path_backup,
+                &serde_json::to_vec(&tags_data)?,
+                io_semaphore,
+            )
+            .await?;
+
             Ok(tags_data)
         } else {
             Err(crate::ErrorKind::NoValueFor(String::from("launcher tags"))
@@ -68,6 +87,14 @@ impl Tags {
 
             let tags_path =
                 state.directories.caches_meta_dir().await.join("tags.json");
+            let tags_path_backup = state
+                .directories
+                .caches_meta_dir()
+                .await
+                .join("tags.json.bak");
+            if tags_path.exists() {
+                std::fs::copy(&tags_path, &tags_path_backup).unwrap();
+            }
 
             write(
                 &tags_path,

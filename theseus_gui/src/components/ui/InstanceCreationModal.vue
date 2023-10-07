@@ -20,7 +20,13 @@
       </div>
       <div class="input-row">
         <p class="input-label">Name</p>
-        <input v-model="profile_name" autocomplete="off" class="text-input" type="text" />
+        <input
+          v-model="profile_name"
+          autocomplete="off"
+          class="text-input"
+          type="text"
+          maxlength="100"
+        />
       </div>
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -216,6 +222,7 @@ import {
   get_fabric_versions,
   get_forge_versions,
   get_quilt_versions,
+  get_neoforge_versions,
 } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
@@ -293,21 +300,28 @@ onUnmounted(() => {
   }
 })
 
-const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
-  await Promise.all([
-    get_fabric_versions().then(shallowRef).catch(handleError),
-    get_forge_versions().then(shallowRef).catch(handleError),
-    get_quilt_versions().then(shallowRef).catch(handleError),
-    get_game_versions().then(shallowRef).catch(handleError),
-    get_loaders()
-      .then((value) =>
-        value
-          .filter((item) => item.supported_project_types.includes('modpack'))
-          .map((item) => item.name.toLowerCase())
-      )
-      .then(ref)
-      .catch(handleError),
-  ])
+const [
+  fabric_versions,
+  forge_versions,
+  quilt_versions,
+  neoforge_versions,
+  all_game_versions,
+  loaders,
+] = await Promise.all([
+  get_fabric_versions().then(shallowRef).catch(handleError),
+  get_forge_versions().then(shallowRef).catch(handleError),
+  get_quilt_versions().then(shallowRef).catch(handleError),
+  get_neoforge_versions().then(shallowRef).catch(handleError),
+  get_game_versions().then(shallowRef).catch(handleError),
+  get_loaders()
+    .then((value) =>
+      value
+        .filter((item) => item.supported_project_types.includes('modpack'))
+        .map((item) => item.name.toLowerCase())
+    )
+    .then(ref)
+    .catch(handleError),
+])
 loaders.value.unshift('vanilla')
 
 const game_versions = computed(() => {
@@ -320,6 +334,8 @@ const game_versions = computed(() => {
         defaultVal &= forge_versions.value.gameVersions.some((x) => item.id === x.id)
       } else if (loader.value === 'quilt') {
         defaultVal &= quilt_versions.value.gameVersions.some((x) => item.id === x.id)
+      } else if (loader.value === 'neoforge') {
+        defaultVal &= neoforge_versions.value.gameVersions.some((x) => item.id === x.id)
       }
 
       return defaultVal
@@ -394,6 +410,10 @@ const selectable_versions = computed(() => {
         .loaders.map((item) => item.id)
     } else if (loader.value === 'quilt') {
       return quilt_versions.value.gameVersions[0].loaders.map((item) => item.id)
+    } else if (loader.value === 'neoforge') {
+      return neoforge_versions.value.gameVersions
+        .find((item) => item.id === game_version.value)
+        .loaders.map((item) => item.id)
     }
   }
   return []

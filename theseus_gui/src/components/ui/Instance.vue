@@ -187,7 +187,7 @@ onUnmounted(() => unlisten())
   <div class="instance">
     <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
-        size="sm"
+        size="lg"
         :src="
           props.instance.metadata
             ? !props.instance.metadata.icon ||

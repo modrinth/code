@@ -49,8 +49,17 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
     }
     .await;
 
+    let updated_discord_rpc = {
+        let read = state.settings.read().await;
+        settings.disable_discord_rpc != read.disable_discord_rpc
+    };
+
     {
         *state.settings.write().await = settings;
+    }
+
+    if updated_discord_rpc {
+        state.discord_rpc.clear_to_default(true).await?;
     }
 
     if reset_io {

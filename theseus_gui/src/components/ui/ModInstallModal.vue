@@ -247,13 +247,15 @@ const check_valid = computed(() => {
           </Button>
           <div
             v-tooltip="
-              profile.metadata.linked_data && !profile.installedMod
-                ? 'Unpair an instance to add mods.'
+              profile.metadata.linked_data?.locked && !profile.installedMod
+                ? 'Unpair or unlock an instance to add mods.'
                 : ''
             "
           >
             <Button
-              :disabled="profile.installedMod || profile.installing || profile.metadata.linked_data"
+              :disabled="
+                profile.installedMod || profile.installing || profile.metadata.linked_data?.locked
+              "
               @click="install(profile)"
             >
               <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
@@ -263,7 +265,7 @@ const check_valid = computed(() => {
                   ? 'Installing...'
                   : profile.installedMod
                   ? 'Installed'
-                  : profile.metadata.linked_data
+                  : profile.metadata.linked_data && profile.metadata.linked_data.locked
                   ? 'Paired'
                   : 'Install'
               }}

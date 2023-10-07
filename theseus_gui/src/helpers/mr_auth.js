@@ -24,9 +24,6 @@ export async function login_2fa(code, flow) {
   return await invoke('plugin:mr_auth|login_2fa', { code, flow })
 }
 
-export async function login_minecraft(flow) {
-  return await invoke('plugin:mr_auth|login_minecraft', { flow })
-}
 export async function create_account(username, email, password, challenge, signUpNewsletter) {
   return await invoke('plugin:mr_auth|create_account', {
     username,

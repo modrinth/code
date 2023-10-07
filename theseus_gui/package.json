@@ -1,7 +1,7 @@
 {
   "name": "theseus_gui",
   "private": true,
-  "version": "0.5.3",
+  "version": "0.5.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -25,7 +25,8 @@
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.3.4",
     "vue-multiselect": "^3.0.0-beta.2",
-    "vue-router": "4.2.1"
+    "vue-router": "4.2.1",
+    "vue-virtual-scroller": "2.0.0-beta.8"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^4.0.4",

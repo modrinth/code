@@ -14,7 +14,11 @@
             size="sm"
           />
           <div class="small-instance_info">
-            <span class="title">{{ instance.metadata.name }}</span>
+            <span class="title">{{
+              instance.metadata.name.length > 20
+                ? instance.metadata.name.substring(0, 20) + '...'
+                : instance.metadata.name
+            }}</span>
             <span>
               {{
                 instance.metadata.loader.charAt(0).toUpperCase() + instance.metadata.loader.slice(1)
@@ -168,7 +172,7 @@
       </Card>
     </div>
     <div v-if="data" class="content-container">
-      <Promotion query-param="?r=launcher" />
+      <Promotion :external="false" query-param="?r=launcher" />
       <Card class="tabs">
         <NavRow
           v-if="data.gallery.length > 0"

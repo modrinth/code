@@ -4,12 +4,15 @@ use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile_create")
-        .invoke_handler(tauri::generate_handler![profile_create,])
+        .invoke_handler(tauri::generate_handler![
+            profile_create,
+            profile_duplicate
+        ])
         .build()
 }
 
 // Creates a profile at  the given filepath and adds it to the in-memory state
-// invoke('plugin:profile|profile_add',profile)
+// invoke('plugin:profile_create|profile_add',profile)
 #[tauri::command]
 pub async fn profile_create(
     name: String,         // the name of the profile, and relative path
@@ -31,5 +34,13 @@ pub async fn profile_create(
         no_watch,
     )
     .await?;
+    Ok(res)
+}
+
+// Creates a profile from a duplicate
+// invoke('plugin:profile_create|profile_duplicate',profile)
+#[tauri::command]
+pub async fn profile_duplicate(path: ProfilePathId) -> Result<ProfilePathId> {
+    let res = profile::create::profile_create_from_duplicate(path).await?;
     Ok(res)
 }

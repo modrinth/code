@@ -9,6 +9,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             metadata_get_fabric_versions,
             metadata_get_forge_versions,
             metadata_get_quilt_versions,
+            metadata_get_neoforge_versions,
         ])
         .build()
 }
@@ -35,4 +36,10 @@ pub async fn metadata_get_forge_versions() -> Result<Manifest> {
 #[tauri::command]
 pub async fn metadata_get_quilt_versions() -> Result<Manifest> {
     Ok(theseus::metadata::get_quilt_versions().await?)
+}
+
+/// Gets the quilt versions from daedalus
+#[tauri::command]
+pub async fn metadata_get_neoforge_versions() -> Result<Manifest> {
+    Ok(theseus::metadata::get_neoforge_versions().await?)
 }

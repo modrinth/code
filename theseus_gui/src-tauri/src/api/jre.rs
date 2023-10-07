@@ -13,6 +13,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
             jre_autodetect_java_globals,
             jre_validate_globals,
             jre_get_jre,
+            jre_test_jre,
             jre_auto_install_java,
             jre_get_max_memory,
         ])
@@ -59,6 +60,16 @@ pub async fn jre_validate_globals() -> Result<bool> {
 #[tauri::command]
 pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
     jre::check_jre(path).await.map_err(|e| e.into())
+}
+
+// Tests JRE of a certain version
+#[tauri::command]
+pub async fn jre_test_jre(
+    path: PathBuf,
+    major_version: u32,
+    minor_version: u32,
+) -> Result<bool> {
+    Ok(jre::test_jre(path, major_version, minor_version).await?)
 }
 
 // Auto installs java for the given java version

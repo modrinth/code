@@ -127,6 +127,10 @@ impl State {
             .await)
     }
 
+    pub fn initialized() -> bool {
+        LAUNCHER_STATE.initialized()
+    }
+
     #[tracing::instrument]
     #[theseus_macros::debug_pin]
     async fn initialize_state() -> crate::Result<RwLock<State>> {
@@ -180,15 +184,17 @@ impl State {
             creds_fut,
         }?;
 
-        let children = Children::new();
         let auth_flow = AuthTask::new();
         let safety_processes = SafeProcesses::new();
 
-        let discord_rpc = DiscordGuard::init().await?;
-        {
+        let discord_rpc = DiscordGuard::init(is_offline).await?;
+        if !settings.disable_discord_rpc && !is_offline {
             // Add default Idling to discord rich presence
-            let _ = discord_rpc.set_activity("Idling...", true).await;
+            // Force add to avoid recursion
+            let _ = discord_rpc.force_set_activity("Idling...", true).await;
         }
+
+        let children = Children::new();
 
         // Starts a loop of checking if we are online, and updating
         Self::offine_check_loop();
@@ -238,11 +244,6 @@ impl State {
 
     /// Updates state with data from the web, if we are online
     pub fn update() {
-        tokio::task::spawn(Metadata::update());
-        tokio::task::spawn(Tags::update());
-        tokio::task::spawn(Profiles::update_projects());
-        tokio::task::spawn(Profiles::update_modrinth_versions());
-        tokio::task::spawn(CredentialsStore::update_creds());
         tokio::task::spawn(async {
             if let Ok(state) = crate::State::get().await {
                 if !*state.offline.read().await {
@@ -252,8 +253,9 @@ impl State {
                     let res4 = Profiles::update_projects();
                     let res5 = Settings::update_java();
                     let res6 = CredentialsStore::update_creds();
+                    let res7 = Settings::update_default_user();
 
-                    let _ = join!(res1, res2, res3, res4, res5, res6);
+                    let _ = join!(res1, res2, res3, res4, res5, res6, res7);
                 }
             }
         });

@@ -2,15 +2,12 @@
 
 use uuid::Uuid;
 
+use crate::state::{MinecraftChild, ProfilePathId};
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
     },
     State,
-};
-use crate::{
-    state::{MinecraftChild, ProfilePathId},
-    util::io::IOError,
 };
 
 // Gets whether a child process stored in the state by UUID has finished
@@ -26,7 +23,7 @@ pub async fn get_exit_status_by_uuid(
 ) -> crate::Result<Option<i32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    Ok(children.exit_status(uuid).await?.and_then(|f| f.code()))
+    children.exit_status(uuid).await
 }
 
 // Gets the UUID of each stored process in the state
@@ -72,26 +69,6 @@ pub async fn get_uuids_by_profile_path(
     children.running_keys_with_profile(profile_path).await
 }
 
-// Gets output of a child process stored in the state by UUID, as a string
-#[tracing::instrument]
-pub async fn get_output_by_uuid(uuid: &Uuid) -> crate::Result<String> {
-    let state = State::get().await?;
-    // Get stdout from child
-    let children = state.children.read().await;
-
-    // Extract child or return crate::Error
-    if let Some(child) = children.get(uuid) {
-        let child = child.read().await;
-        Ok(child.output.get_output().await?)
-    } else {
-        Err(crate::ErrorKind::LauncherError(format!(
-            "No child process by UUID {}",
-            uuid
-        ))
-        .as_error())
-    }
-}
-
 // Kill a child process stored in the state by UUID, as a string
 #[tracing::instrument]
 pub async fn kill_by_uuid(uuid: &Uuid) -> crate::Result<()> {
@@ -124,13 +101,7 @@ pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
 // Kill a running child process directly
 #[tracing::instrument(skip(running))]
 pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
-    running
-        .current_child
-        .write()
-        .await
-        .kill()
-        .await
-        .map_err(IOError::from)?;
+    running.current_child.write().await.kill().await?;
     Ok(())
 }
 
