@@ -1,4 +1,5 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es2021": true,
@@ -6,15 +7,27 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:vue/vue3-recommended",
     "plugin:prettier/recommended",
     "prettier"
   ],
   "parserOptions": {
+    "parser": {
+      "js": "espree",
+      "jsx": "espree",
+      "cjs": "espree",
+      "mjs": "espree",
+      "ts": "@typescript-eslint/parser"
+    },
     "ecmaVersion": "latest",
-    "sourceType": "module"
+    "sourceType": "module",
+    "extraFileExtensions": [".vue"],
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
-  "plugins": ["vue"],
+  "plugins": ["@typescript-eslint", "vue"],
   "rules": {
     "no-console": "off",
     "vue/no-v-html": "off",
