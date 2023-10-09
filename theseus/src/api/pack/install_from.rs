@@ -10,7 +10,7 @@ use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, write_cached_icon,
 };
 use crate::util::io;
-use crate::State;
+use crate::{InnerProjectPathUnix, State};
 
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -33,7 +33,7 @@ pub struct PackFormat {
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PackFile {
-    pub path: String,
+    pub path: InnerProjectPathUnix,
     pub hashes: HashMap<PackFileHash, String>,
     pub env: Option<HashMap<EnvType, SideType>>,
     pub downloads: Vec<String>,

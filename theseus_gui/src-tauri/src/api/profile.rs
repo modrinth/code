@@ -3,7 +3,7 @@ use daedalus::modded::LoaderVersion;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use theseus::prelude::*;
+use theseus::{prelude::*, InnerProjectPathUnix};
 use uuid::Uuid;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -32,7 +32,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_edit,
             profile_edit_icon,
             profile_export_mrpack,
-            profile_get_potential_override_folders,
+            profile_get_pack_export_candidates,
         ])
         .build()
 }
@@ -228,20 +228,13 @@ pub async fn profile_export_mrpack(
     Ok(())
 }
 
-// Given a folder path, populate a Vec of all the subfolders
-// Intended to be used for finding potential override folders
-// profile
-// -- folder1
-// -- folder2
-// -- file1
-// => [folder1, folder2]
+/// See [`profile::get_pack_export_candidates`]
 #[tauri::command]
-pub async fn profile_get_potential_override_folders(
+pub async fn profile_get_pack_export_candidates(
     profile_path: ProfilePathId,
-) -> Result<Vec<PathBuf>> {
-    let overrides =
-        profile::get_potential_override_folders(profile_path).await?;
-    Ok(overrides)
+) -> Result<Vec<InnerProjectPathUnix>> {
+    let candidates = profile::get_pack_export_candidates(&profile_path).await?;
+    Ok(candidates)
 }
 
 // Run minecraft using a profile using the default credentials

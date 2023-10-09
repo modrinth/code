@@ -72,8 +72,8 @@ impl ProfilePathId {
     }
 
     // Create a new ProfilePathId from a relative path
-    pub fn new(path: &Path) -> Self {
-        ProfilePathId(PathBuf::from(path))
+    pub fn new(path: impl Into<PathBuf>) -> Self {
+        ProfilePathId(path.into())
     }
 
     pub async fn get_full_path(&self) -> crate::Result<PathBuf> {
@@ -95,6 +95,45 @@ impl std::fmt::Display for ProfilePathId {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
+#[serde(into = "RawProjectPath", from = "RawProjectPath")]
+pub struct InnerProjectPathUnix(pub String);
+
+impl InnerProjectPathUnix {
+    pub fn get_topmost_two_components(&self) -> String {
+        self.to_string()
+            .split('/')
+            .take(2)
+            .collect::<Vec<_>>()
+            .join("/")
+    }
+}
+
+impl std::fmt::Display for InnerProjectPathUnix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl From<RawProjectPath> for InnerProjectPathUnix {
+    fn from(value: RawProjectPath) -> Self {
+        // Convert windows path to unix path.
+        // .mrpacks no longer generate windows paths, but this is here for backwards compatibility before this was fixed
+        // https://github.com/modrinth/theseus/issues/595
+        InnerProjectPathUnix(value.0.replace('\\', "/"))
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(transparent)]
+struct RawProjectPath(pub String);
+
+impl From<InnerProjectPathUnix> for RawProjectPath {
+    fn from(value: InnerProjectPathUnix) -> Self {
+        RawProjectPath(value.0)
+    }
+}
+
 /// newtype wrapper over a Profile path, to be usable as a clear identifier for the kind of path used
 /// eg: for "a/b/c/profiles/My Mod/mods/myproj", the ProjectPathId would be "mods/myproj"
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
@@ -102,11 +141,11 @@ impl std::fmt::Display for ProfilePathId {
 pub struct ProjectPathId(pub PathBuf);
 impl ProjectPathId {
     // Create a new ProjectPathId from a full file path
-    pub async fn from_fs_path(path: PathBuf) -> crate::Result<Self> {
-        let path: PathBuf = io::canonicalize(path)?;
+    pub async fn from_fs_path(path: &PathBuf) -> crate::Result<Self> {
         let profiles_dir: PathBuf = io::canonicalize(
             State::get().await?.directories.profiles_dir().await,
         )?;
+        let path: PathBuf = io::canonicalize(path)?;
         let path = path
             .strip_prefix(profiles_dir)
             .ok()
@@ -131,13 +170,14 @@ impl ProjectPathId {
     // Gets inner path in unix convention as a String
     // ie: 'mods\myproj' -> 'mods/myproj'
     // Used for exporting to mrpack, which should have a singular convention
-    pub fn get_inner_path_unix(&self) -> crate::Result<String> {
-        Ok(self
-            .0
-            .components()
-            .map(|c| c.as_os_str().to_string_lossy().to_string())
-            .collect::<Vec<_>>()
-            .join("/"))
+    pub fn get_inner_path_unix(&self) -> InnerProjectPathUnix {
+        InnerProjectPathUnix(
+            self.0
+                .components()
+                .map(|c| c.as_os_str().to_string_lossy().to_string())
+                .collect::<Vec<_>>()
+                .join("/"),
+        )
     }
 
     // Create a new ProjectPathId from a relative path
