@@ -61,8 +61,14 @@ const os = ref('')
 defineExpose({
   initialize: async () => {
     isLoading.value = false
-    const { native_decorations, theme, opt_out_analytics, collapsed_navigation, advanced_rendering, fully_onboarded } =
-      await get()
+    const {
+      native_decorations,
+      theme,
+      opt_out_analytics,
+      collapsed_navigation,
+      advanced_rendering,
+      fully_onboarded,
+    } = await get()
     // video should play if the user is not on linux, and has not onboarded
     os.value = await getOS()
     videoPlaying.value = !fully_onboarded && os.value !== 'Linux'
@@ -71,7 +77,7 @@ defineExpose({
     showOnboarding.value = !fully_onboarded
 
     nativeDecorations.value = native_decorations
-    if (os !== "MacOS") appWindow.setDecorations(native_decorations)
+    if (os.value !== 'MacOS') appWindow.setDecorations(native_decorations)
 
     themeStore.setThemeState(theme)
     themeStore.collapsedNavigation = collapsed_navigation

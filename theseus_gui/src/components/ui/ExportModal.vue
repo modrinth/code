@@ -292,9 +292,11 @@ const exportPack = async () => {
 .textarea-wrapper {
   // margin-top: 1rem;
   height: 12rem;
+
   textarea {
     max-height: 12rem;
   }
+
   .preview {
     overflow-y: auto;
   }

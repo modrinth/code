@@ -22,6 +22,7 @@ import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vu
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
+import { version } from '../../package.json'
 
 const pageOptions = ['Home', 'Library']
 
@@ -38,6 +39,8 @@ const accessSettings = async () => {
 
   return settings
 }
+
+// const launcherVersion = await get_launcher_version().catch(handleError)
 
 const fetchSettings = await accessSettings().catch(handleError)
 
@@ -154,9 +157,13 @@ async function refreshDir() {
           </span>
           <span v-else> Sign in to your Modrinth account. </span>
         </label>
-        <button v-if="credentials" class="btn" @click="logOut"><LogOutIcon /> Sign out</button>
+        <button v-if="credentials" class="btn" @click="logOut">
+          <LogOutIcon />
+          Sign out
+        </button>
         <button v-else class="btn" @click="$refs.loginScreenModal.show()">
-          <LogInIcon /> Sign in
+          <LogInIcon />
+          Sign in
         </button>
       </div>
       <label for="theme">
@@ -246,9 +253,7 @@ async function refreshDir() {
       <div v-if="getOS() != 'MacOS'" class="adjacent-input">
         <label for="native-decorations">
           <span class="label__title">Native decorations</span>
-          <span class="label__description"
-            >Use system window frame (app restart required).</span
-          >
+          <span class="label__description">Use system window frame (app restart required).</span>
         </label>
         <Toggle
           id="native-decorations"
@@ -517,6 +522,19 @@ async function refreshDir() {
           class="input"
           placeholder="Enter height..."
         />
+      </div>
+    </Card>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">About</span>
+        </h3>
+      </div>
+      <div>
+        <label>
+          <span class="label__title">App version</span>
+          <span class="label__description">Theseus v{{ version }} </span>
+        </label>
       </div>
     </Card>
   </div>
