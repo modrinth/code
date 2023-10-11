@@ -34,10 +34,16 @@ const options = [
 </DemoContainer>
 
 ```vue
-<PopoutMenu class="btn" position="bottom" direction="right">
-Bottom going right
-<template #menu>
-  Menu contents!
-</template>
-</PopoutMenu>
+<OverflowMenu :options="options" class="btn">
+  More options...
+  <template #like>
+    <HeartIcon /> Like
+  </template>
+  <template #report>
+    <ReportIcon /> Report
+  </template>
+  <template #delete>
+    <TrashIcon /> Delete
+  </template>
+</OverflowMenu>
 ```
