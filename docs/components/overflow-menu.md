@@ -17,7 +17,7 @@ const options = [
 ]
 </script>
 
-# Popout Menu
+# Overflow Menu
 <DemoContainer>
   <OverflowMenu :options="options" class="btn">
     More options...
