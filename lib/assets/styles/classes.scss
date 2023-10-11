@@ -266,10 +266,13 @@ a,
   &:focus-visible:not(&:disabled),
   &:hover:not(&:disabled) {
     cursor: pointer;
-    filter: brightness(0.85);
+
+    &:not(.btn-outline.btn-hover-filled, .btn-transparent) {
+      filter: brightness(0.85);
+    }
   }
 
-  &:active:not(&:disabled) {
+  &:active:not(&:disabled, .btn-outline.btn-hover-filled, .btn-transparent) {
     filter: brightness(0.8);
   }
 
@@ -321,86 +324,118 @@ a,
 .btn {
   @extend .button-base;
 
-  --text-color: var(--color-base);
-  --background-color: var(--color-button-bg);
-  --shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  --_text-color: var(--color-base);
+  --_background-color: var(--color-button-bg);
+  --_accent-color: var(--color-base);
+  --_shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
   &.btn-outline,
   &.btn-transparent {
-    --background-color: var(--color-base);
-    --text-color: var(--color-raised-bg);
     box-sizing: border-box;
 
     background-color: transparent;
-    color: var(--background-color);
-    transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out , color 0.2s ease-in-out;
+    box-shadow: none;
+  }
+
+  &.btn-transparent {
+    --_accent-color: var(--color-base);
+    color: var(--_accent-color);
+
+    &.btn-hover-filled-only {
+      color: var(--color-base);
+    }
 
     &:focus-visible:not(&:disabled),
     &:hover:not(&:disabled) {
       background-color: var(--color-button-bg);
-      filter: none;
+
+      &.btn-hover-filled, &.btn-hover-filled-only {
+        color: var(--_text-color);
+        background-color: var(--_background-color);
+      }
     }
   }
 
   &.btn-outline {
-    --background-color: var(--color-contrast);
-    border: 2px solid var(--background-color);
+    --_accent-color: var(--color-contrast);
+    border: 2px solid var(--_accent-color);
     padding-block: calc(var(--gap-sm) - 2px);
-  }
+    color: var(--_background-color);
 
-  &.btn-raised {
-    --shadow: var(--shadow-inset-sm), var(--shadow-raised);
-    --background-color: var(--color-raised-bg);
+    &.btn-hover-filled-only {
+      color: var(--color-contrast);
+      border-color: var(--color-contrast);
+    }
+
+    &:focus-visible:not(&:disabled),
+    &:hover:not(&:disabled) {
+      &.btn-hover-filled, &.btn-hover-filled-only {
+        border-color: var(--_accent-color);
+        color: var(--_text-color);
+        background-color: var(--_background-color);
+      }
+    }
   }
 
   &.btn-danger {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-red);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-red);
+    --_accent-color: var(--color-red);
   }
 
   &.btn-primary {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-brand);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-brand);
+    --_accent-color: var(--color-brand);
   }
 
   &.btn-secondary {
-    --text-color: var(--color-contrast);
-    --background-color: var(--color-brand-highlight);
+    --_text-color: var(--color-contrast);
+    --_background-color: var(--color-brand-highlight);
+    --_accent-color: var(--color-brand-highlight);
   }
 
   &.btn-highlight {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-orange);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-orange);
+    --_accent-color: var(--color-orange);
   }
 
   &.btn-red {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-red);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-red);
+    --_accent-color: var(--color-red);
   }
 
   &.btn-orange {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-orange);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-orange);
+    --_accent-color: var(--color-orange);
   }
 
   &.btn-green {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-green);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-green);
+    --_accent-color: var(--color-green);
   }
 
   &.btn-blue {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-blue);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-blue);
+    --_accent-color: var(--color-blue);
   }
 
   &.btn-purple {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-purple);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-purple);
+    --_accent-color: var(--color-purple);
   }
 
   &.btn-gray {
-    --text-color: var(--color-accent-contrast);
-    --background-color: var(--color-gray);
+    --_text-color: var(--color-accent-contrast);
+    --_background-color: var(--color-gray);
+    --_accent-color: var(--color-gray);
   }
 
   &.btn-large {
@@ -410,9 +445,9 @@ a,
 
   box-sizing: border-box;
 
-  color: var(--text-color);
-  background-color: var(--background-color);
-  box-shadow: var(--shadow);
+  color: var(--_text-color);
+  background-color: var(--_background-color);
+  box-shadow: var(--_shadow);
   border-radius: var(--radius-md);
 
   padding: var(--gap-sm) var(--gap-lg);

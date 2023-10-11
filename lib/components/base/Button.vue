@@ -36,6 +36,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  hoverFilled: {
+    type: Boolean,
+    default: false,
+  },
+  hoverFilledOnly: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const accentedButton = computed(() =>
@@ -61,6 +69,8 @@ const accentedButton = computed(() =>
       'btn-purple': color === 'purple',
       'btn-gray': color === 'gray',
       'btn-transparent': transparent,
+      'btn-hover-filled': hoverFilled,
+      'btn-hover-filled-only': hoverFilledOnly,
       'btn-outline': outline,
       'color-accent-contrast': accentedButton,
     }"
@@ -88,6 +98,8 @@ const accentedButton = computed(() =>
       'btn-purple': color === 'purple',
       'btn-gray': color === 'gray',
       'btn-transparent': transparent,
+      'btn-hover-filled': hoverFilled,
+      'btn-hover-filled-only': hoverFilledOnly,
       'btn-outline': outline,
       'color-accent-contrast': accentedButton,
     }"

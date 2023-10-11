@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
     position: absolute;
     scale: 0.75;
     border: 1px solid var(--color-button-bg);
-    padding: var(--gap-md);
+    padding: var(--gap-sm);
     width: fit-content;
     border-radius: var(--radius-md);
     background-color: var(--color-raised-bg);

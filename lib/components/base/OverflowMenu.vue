@@ -8,21 +8,28 @@
   >
     <slot></slot>
     <template #menu>
-      <Button
-        v-for="option in options"
-        :key="`option-${option.id}`"
-        :color="option.color ? option.color : 'default'"
-        transparent
-        :action="
-          () => {
-            option.action()
-            close()
-          }
-        "
-      >
-        <template v-if="!$slots[option.id]">{{ option.id }}</template>
-        <slot :name="option.id"></slot>
-      </Button>
+      <template v-for="(option, index) in options">
+        <div v-if="option.divider" :key="`divider-${index}`" class="card-divider"></div>
+        <Button
+          v-else
+          :key="`option-${option.id}`"
+          :color="option.color ? option.color : 'default'"
+          :hover-filled="option.hoverFilled"
+          :hover-filled-only="option.hoverFilledOnly"
+          transparent
+          :action="
+            () => {
+              option.action()
+              if (!option.remainOnClick) {
+                close()
+              }
+            }
+          "
+        >
+          <template v-if="!$slots[option.id]">{{ option.id }}</template>
+          <slot :name="option.id"></slot>
+        </Button>
+      </template>
     </template>
   </PopoutMenu>
 </template>

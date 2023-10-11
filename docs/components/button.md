@@ -58,6 +58,38 @@
 <Button color="blue" transparent><GlobeIcon/> Visit website</Button>
 ```
 
+## Hover-filled
+
+<DemoContainer>
+<Button color="green" transparent hoverFilled><PlayIcon /> Play</Button>
+<Button color="red" transparent hoverFilled><TrashIcon /> Delete</Button>
+<Button color="green" outline hoverFilled><PlayIcon /> Play</Button>
+<Button color="red" outline hoverFilled><TrashIcon /> Delete</Button>
+</DemoContainer>
+
+```vue
+<Button color="green" transparent hoverFilled><PlayIcon /> Play</Button>
+<Button color="red" transparent hoverFilled><TrashIcon /> Delete</Button>
+<Button color="green" outline hoverFilled><PlayIcon /> Play</Button>
+<Button color="red" outline hoverFilled><TrashIcon /> Delete</Button>
+```
+
+## Hover-filled-only
+
+<DemoContainer>
+<Button color="green" transparent hoverFilledOnly><PlayIcon /> Play</Button>
+<Button color="red" transparent hoverFilledOnly><TrashIcon /> Delete</Button>
+<Button color="green" outline hoverFilledOnly><PlayIcon /> Play</Button>
+<Button color="red" outline hoverFilledOnly><TrashIcon /> Delete</Button>
+</DemoContainer>
+
+```vue
+<Button color="green" transparent hoverFilledOnly><PlayIcon /> Play</Button>
+<Button color="red" transparent hoverFilledOnly><TrashIcon /> Delete</Button>
+<Button color="green" outline hoverFilledOnly><PlayIcon /> Play</Button>
+<Button color="red" outline hoverFilledOnly><TrashIcon /> Delete</Button>
+```
+
 ## Icon-only
 
 <DemoContainer>

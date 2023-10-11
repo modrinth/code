@@ -1,8 +1,15 @@
-<script setup>
-const options = [
+# Overflow Menu
+<DemoContainer>
+  <OverflowMenu :options="[
   {
-    'id': 'like',
+    'id': 'play',
     'color': 'primary',
+    'action': () => {},
+    'hoverFilledOnly': true
+  },
+  { divider: true },
+  {
+    'id': 'duplicate',
     'action': () => {}
   },
   {
@@ -10,22 +17,30 @@ const options = [
     'action': () => {}
   },
   {
+    'id': 'remain',
+    'action': () => {},
+    'remainOnClick': true,
+  },
+  { divider: true },
+  {
     'id': 'delete',
     'color': 'danger',
-    'action': () => {}
+    'action': () => {},
+    'hoverFilled': true,
   }
-]
-</script>
-
-# Overflow Menu
-<DemoContainer>
-  <OverflowMenu :options="options" class="btn">
+]" class="btn">
     More options...
-    <template #like>
-      <HeartIcon /> Like
+    <template #play>
+      <PlayIcon /> Play
+    </template>
+    <template #duplicate>
+      <CopyIcon /> Duplicate
     </template>
     <template #report>
       <ReportIcon /> Report
+    </template>
+    <template #remain>
+      <ClearIcon /> I shall remain
     </template>
     <template #delete>
       <TrashIcon /> Delete
@@ -34,7 +49,37 @@ const options = [
 </DemoContainer>
 
 ```vue
-<OverflowMenu :options="options" class="btn">
+<OverflowMenu
+  class="btn"
+  :options="[
+    {
+      'id': 'play',
+      'color': 'primary',
+      'action': () => {},
+      'hoverFilledOnly': true
+    },
+    { divider: true },
+    {
+      'id': 'duplicate',
+      'action': () => {}
+    },
+    {
+      'id': 'report',
+      'action': () => {}
+    },
+    {
+      'id': 'remain',
+      'action': () => {},
+      'remainOnClick': true,
+    },
+    { divider: true },
+    {
+      'id': 'delete',
+      'color': 'danger',
+      'action': () => {},
+      'hoverFilled': true,
+    }
+]">
   More options...
   <template #like>
     <HeartIcon /> Like
