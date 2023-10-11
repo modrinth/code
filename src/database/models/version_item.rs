@@ -39,12 +39,59 @@ pub struct DependencyBuilder {
 }
 
 impl DependencyBuilder {
-    pub async fn insert(
-        self,
+    pub async fn insert_many(
+        builders: Vec<Self>,
         version_id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
-        let project_id = if let Some(project_id) = self.project_id {
+        let mut project_ids = Vec::new();
+        for dependency in builders.iter() {
+            project_ids.push(
+                dependency
+                    .try_get_project_id(transaction)
+                    .await?
+                    .map(|id| id.0),
+            );
+        }
+
+        let (version_ids, dependency_types, dependency_ids, filenames): (
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+        ) = builders
+            .into_iter()
+            .map(|d| {
+                (
+                    version_id.0,
+                    d.dependency_type,
+                    d.version_id.map(|v| v.0),
+                    d.file_name,
+                )
+            })
+            .multiunzip();
+        sqlx::query!(
+            "
+            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name)
+            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bigint[], $4::bigint[], $5::varchar[])
+            ",
+            &version_ids[..],
+            &dependency_types[..],
+            &dependency_ids[..] as &[Option<i64>],
+            &project_ids[..] as &[Option<i64>],
+            &filenames[..] as &[Option<String>],
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        Ok(())
+    }
+
+    async fn try_get_project_id(
+        &self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Option<ProjectId>, DatabaseError> {
+        Ok(if let Some(project_id) = self.project_id {
             Some(project_id)
         } else if let Some(version_id) = self.version_id {
             sqlx::query!(
@@ -58,23 +105,7 @@ impl DependencyBuilder {
             .map(|x| ProjectId(x.mod_id))
         } else {
             None
-        };
-
-        sqlx::query!(
-            "
-            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name)
-            VALUES ($1, $2, $3, $4, $5)
-            ",
-            version_id as VersionId,
-            self.dependency_type,
-            self.version_id.map(|x| x.0),
-            project_id.map(|x| x.0),
-            self.file_name,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        Ok(())
+        })
     }
 }
 
@@ -89,42 +120,70 @@ pub struct VersionFileBuilder {
 }
 
 impl VersionFileBuilder {
-    pub async fn insert(
-        self,
+    pub async fn insert_many(
+        version_files: Vec<Self>,
         version_id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<FileId, DatabaseError> {
         let file_id = generate_file_id(&mut *transaction).await?;
 
+        let (file_ids, version_ids, urls, filenames, primary, sizes, file_types): (
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+        ) = version_files
+            .iter()
+            .map(|f| {
+                (
+                    file_id.0,
+                    version_id.0,
+                    f.url.clone(),
+                    f.filename.clone(),
+                    f.primary,
+                    f.size as i32,
+                    f.file_type.map(|x| x.to_string()),
+                )
+            })
+            .multiunzip();
         sqlx::query!(
             "
             INSERT INTO files (id, version_id, url, filename, is_primary, size, file_type)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::varchar[], $4::varchar[], $5::bool[], $6::integer[], $7::varchar[])
             ",
-            file_id as FileId,
-            version_id as VersionId,
-            self.url,
-            self.filename,
-            self.primary,
-            self.size as i32,
-            self.file_type.map(|x| x.as_str()),
+            &file_ids[..],
+            &version_ids[..],
+            &urls[..],
+            &filenames[..],
+            &primary[..],
+            &sizes[..],
+            &file_types[..] as &[Option<String>],
         )
         .execute(&mut *transaction)
         .await?;
 
-        for hash in self.hashes {
-            sqlx::query!(
-                "
-                INSERT INTO hashes (file_id, algorithm, hash)
-                VALUES ($1, $2, $3)
-                ",
-                file_id as FileId,
-                hash.algorithm,
-                hash.hash,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
+        let (file_ids, algorithms, hashes): (Vec<_>, Vec<_>, Vec<_>) = version_files
+            .into_iter()
+            .flat_map(|f| {
+                f.hashes
+                    .into_iter()
+                    .map(|h| (file_id.0, h.algorithm, h.hash))
+            })
+            .multiunzip();
+        sqlx::query!(
+            "
+            INSERT INTO hashes (file_id, algorithm, hash)
+            SELECT * FROM UNNEST($1::bigint[], $2::varchar[], $3::bytea[])
+            ",
+            &file_ids[..],
+            &algorithms[..],
+            &hashes[..],
+        )
+        .execute(&mut *transaction)
+        .await?;
 
         Ok(file_id)
     }
@@ -170,41 +229,91 @@ impl VersionBuilder {
         .execute(&mut *transaction)
         .await?;
 
-        for file in self.files {
-            file.insert(self.version_id, transaction).await?;
-        }
+        let VersionBuilder {
+            dependencies,
+            loaders,
+            game_versions,
+            files,
+            version_id,
+            ..
+        } = self;
+        VersionFileBuilder::insert_many(files, self.version_id, transaction).await?;
 
-        for dependency in self.dependencies {
-            dependency.insert(self.version_id, transaction).await?;
-        }
+        DependencyBuilder::insert_many(dependencies, self.version_id, transaction).await?;
 
-        for loader in self.loaders.clone() {
-            sqlx::query!(
-                "
-                INSERT INTO loaders_versions (loader_id, version_id)
-                VALUES ($1, $2)
-                ",
-                loader as LoaderId,
-                self.version_id as VersionId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
+        let loader_versions = loaders
+            .iter()
+            .map(|l| LoaderVersion::new(*l, version_id))
+            .collect_vec();
+        LoaderVersion::insert_many(loader_versions, &mut *transaction).await?;
 
-        for game_version in self.game_versions.clone() {
-            sqlx::query!(
-                "
-                INSERT INTO game_versions_versions (game_version_id, joining_version_id)
-                VALUES ($1, $2)
-                ",
-                game_version as GameVersionId,
-                self.version_id as VersionId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
+        let game_version_versions = game_versions
+            .iter()
+            .map(|v| VersionVersion::new(*v, version_id))
+            .collect_vec();
+        VersionVersion::insert_many(game_version_versions, &mut *transaction).await?;
 
         Ok(self.version_id)
+    }
+}
+
+#[derive(derive_new::new)]
+pub struct LoaderVersion {
+    pub loader_id: LoaderId,
+    pub version_id: VersionId,
+}
+
+impl LoaderVersion {
+    pub async fn insert_many(
+        items: Vec<Self>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), DatabaseError> {
+        let (loader_ids, version_ids): (Vec<_>, Vec<_>) = items
+            .iter()
+            .map(|l| (l.loader_id.0, l.version_id.0))
+            .unzip();
+        sqlx::query!(
+            "
+            INSERT INTO loaders_versions (loader_id, version_id)
+            SELECT * FROM UNNEST($1::integer[], $2::bigint[])
+            ",
+            &loader_ids[..],
+            &version_ids[..],
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        Ok(())
+    }
+}
+
+#[derive(derive_new::new)]
+pub struct VersionVersion {
+    pub game_version_id: GameVersionId,
+    pub joining_version_id: VersionId,
+}
+
+impl VersionVersion {
+    pub async fn insert_many(
+        items: Vec<Self>,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), DatabaseError> {
+        let (game_version_ids, version_ids): (Vec<_>, Vec<_>) = items
+            .into_iter()
+            .map(|i| (i.game_version_id.0, i.joining_version_id.0))
+            .unzip();
+        sqlx::query!(
+            "
+            INSERT INTO game_versions_versions (game_version_id, joining_version_id)
+            SELECT * FROM UNNEST($1::integer[], $2::bigint[])
+            ",
+            &game_version_ids[..],
+            &version_ids[..],
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        Ok(())
     }
 }
 

@@ -108,40 +108,36 @@ pub async fn count_download(
     let ip = crate::routes::analytics::convert_to_ip_v6(&download_body.ip)
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
-    analytics_queue
-        .add_download(Download {
-            id: Uuid::new_v4(),
-            recorded: Utc::now().timestamp_nanos() / 100_000,
-            domain: url.host_str().unwrap_or_default().to_string(),
-            site_path: url.path().to_string(),
-            user_id: user
-                .and_then(|(scopes, x)| {
-                    if scopes.contains(Scopes::PERFORM_ANALYTICS) {
-                        Some(x.id.0 as u64)
-                    } else {
-                        None
-                    }
-                })
-                .unwrap_or(0),
-            project_id: project_id as u64,
-            version_id: version_id as u64,
-            ip,
-            country: maxmind.query(ip).await.unwrap_or_default(),
-            user_agent: download_body
-                .headers
-                .get("user-agent")
-                .cloned()
-                .unwrap_or_default(),
-            headers: download_body
-                .headers
-                .clone()
-                .into_iter()
-                .filter(|x| {
-                    !crate::routes::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase())
-                })
-                .collect(),
-        })
-        .await;
+    analytics_queue.add_download(Download {
+        id: Uuid::new_v4(),
+        recorded: Utc::now().timestamp_nanos() / 100_000,
+        domain: url.host_str().unwrap_or_default().to_string(),
+        site_path: url.path().to_string(),
+        user_id: user
+            .and_then(|(scopes, x)| {
+                if scopes.contains(Scopes::PERFORM_ANALYTICS) {
+                    Some(x.id.0 as u64)
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(0),
+        project_id: project_id as u64,
+        version_id: version_id as u64,
+        ip,
+        country: maxmind.query(ip).await.unwrap_or_default(),
+        user_agent: download_body
+            .headers
+            .get("user-agent")
+            .cloned()
+            .unwrap_or_default(),
+        headers: download_body
+            .headers
+            .clone()
+            .into_iter()
+            .filter(|x| !crate::routes::analytics::FILTERED_HEADERS.contains(&&*x.0.to_lowercase()))
+            .collect(),
+    });
 
     Ok(HttpResponse::NoContent().body(""))
 }

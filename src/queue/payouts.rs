@@ -355,6 +355,8 @@ pub async fn process_payout(
     };
 
     let mut clear_cache_users = Vec::new();
+    let (mut insert_user_ids, mut insert_project_ids, mut insert_payouts, mut insert_starts) =
+        (Vec::new(), Vec::new(), Vec::new(), Vec::new());
     for (id, project) in projects_map {
         if let Some(value) = &multipliers.values.get(&(id as u64)) {
             let project_multiplier: Decimal =
@@ -367,18 +369,10 @@ pub async fn process_payout(
                     let payout: Decimal = payout * project_multiplier * (split / sum_splits);
 
                     if payout > Decimal::ZERO {
-                        sqlx::query!(
-                            "
-                            INSERT INTO payouts_values (user_id, mod_id, amount, created)
-                            VALUES ($1, $2, $3, $4)
-                            ",
-                            user_id,
-                            id,
-                            payout,
-                            start
-                        )
-                        .execute(&mut *transaction)
-                        .await?;
+                        insert_user_ids.push(user_id);
+                        insert_project_ids.push(id);
+                        insert_payouts.push(payout);
+                        insert_starts.push(start);
 
                         sqlx::query!(
                             "
@@ -398,6 +392,19 @@ pub async fn process_payout(
             }
         }
     }
+
+    sqlx::query!(
+        "
+        INSERT INTO payouts_values (user_id, mod_id, amount, created)
+        SELECT * FROM UNNEST ($1::bigint[], $2::bigint[], $3::numeric[], $4::timestamptz[])
+        ",
+        &insert_user_ids[..],
+        &insert_project_ids[..],
+        &insert_payouts[..],
+        &insert_starts[..]
+    )
+    .execute(&mut *transaction)
+    .await?;
 
     if !clear_cache_users.is_empty() {
         crate::database::models::User::clear_caches(

@@ -41,26 +41,61 @@ impl TeamBuilder {
         .execute(&mut *transaction)
         .await?;
 
-        for member in self.members {
-            let team_member_id = generate_team_member_id(&mut *transaction).await?;
-            sqlx::query!(
-                "
-                INSERT INTO team_members (id, team_id, user_id, role, permissions, organization_permissions, accepted, payouts_split, ordering)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                ",
-                team_member_id as TeamMemberId,
-                team.id as TeamId,
-                member.user_id as UserId,
-                member.role,
-                member.permissions.bits() as i64,
-                member.organization_permissions.map(|p| p.bits() as i64),
-                member.accepted,
-                member.payouts_split,
-                member.ordering,
-            )
-            .execute(&mut *transaction)
-            .await?;
+        let mut team_member_ids = Vec::new();
+        for _ in self.members.iter() {
+            team_member_ids.push(generate_team_member_id(&mut *transaction).await?.0);
         }
+        let TeamBuilder { members } = self;
+        let (
+            team_ids,
+            user_ids,
+            roles,
+            permissions,
+            organization_permissions,
+            accepteds,
+            payouts_splits,
+            orderings,
+        ): (
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+            Vec<_>,
+        ) = members
+            .into_iter()
+            .map(|m| {
+                (
+                    team.id.0,
+                    m.user_id.0,
+                    m.role,
+                    m.permissions.bits() as i64,
+                    m.organization_permissions.map(|p| p.bits() as i64),
+                    m.accepted,
+                    m.payouts_split,
+                    m.ordering,
+                )
+            })
+            .multiunzip();
+        sqlx::query!(
+            "
+            INSERT INTO team_members (id, team_id, user_id, role, permissions, organization_permissions, accepted, payouts_split, ordering)
+            SELECT * FROM UNNEST ($1::int8[], $2::int8[], $3::int8[], $4::varchar[], $5::int8[], $6::int8[], $7::bool[], $8::numeric[], $9::int8[])
+            ",
+            &team_member_ids[..],
+            &team_ids[..],
+            &user_ids[..],
+            &roles[..],
+            &permissions[..],
+            &organization_permissions[..] as &[Option<i64>],
+            &accepteds[..],
+            &payouts_splits[..],
+            &orderings[..],
+        )
+        .execute(&mut *transaction)
+        .await?;
 
         Ok(team_id)
     }

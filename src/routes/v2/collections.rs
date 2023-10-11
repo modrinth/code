@@ -15,6 +15,7 @@ use crate::{database, models};
 use actix_web::web::Data;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -301,6 +302,11 @@ pub async fn collection_edit(
             .execute(&mut *transaction)
             .await?;
 
+            let collection_item_ids = new_project_ids
+                .iter()
+                .map(|_| collection_item.id.0)
+                .collect_vec();
+            let mut validated_project_ids = Vec::new();
             for project_id in new_project_ids {
                 let project = database::models::Project::get(project_id, &**pool, &redis)
                     .await?
@@ -309,20 +315,20 @@ pub async fn collection_edit(
                             "The specified project {project_id} does not exist!"
                         ))
                     })?;
-
-                // Insert- don't throw an error if it already exists
-                sqlx::query!(
-                    "
-                            INSERT INTO collections_mods (collection_id, mod_id)
-                            VALUES ($1, $2)
-                            ON CONFLICT DO NOTHING
-                            ",
-                    collection_item.id as database::models::ids::CollectionId,
-                    project.inner.id as database::models::ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
+                validated_project_ids.push(project.inner.id.0);
             }
+            // Insert- don't throw an error if it already exists
+            sqlx::query!(
+                "
+                        INSERT INTO collections_mods (collection_id, mod_id)
+                        SELECT * FROM UNNEST ($1::int8[], $2::int8[])
+                        ON CONFLICT DO NOTHING
+                        ",
+                &collection_item_ids[..],
+                &validated_project_ids[..],
+            )
+            .execute(&mut *transaction)
+            .await?;
         }
 
         database::models::Collection::clear_cache(collection_item.id, &redis).await?;

@@ -13,6 +13,16 @@ use super::{
     environment::TestEnvironment,
 };
 
+pub const DUMMY_CATEGORIES: &'static [&str] = &[
+    "combat",
+    "decoration",
+    "economy",
+    "food",
+    "magic",
+    "mobs",
+    "optimization",
+];
+
 pub struct DummyData {
     pub alpha_team_id: String,
     pub beta_team_id: String,

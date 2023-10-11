@@ -29,6 +29,7 @@ pub const USER_USER_PAT: &str = "mrp_patuser";
 pub const FRIEND_USER_PAT: &str = "mrp_patfriend";
 pub const ENEMY_USER_PAT: &str = "mrp_patenemy";
 
+#[derive(Clone)]
 pub struct TemporaryDatabase {
     pub pool: PgPool,
     pub redis_pool: RedisPool,
@@ -75,9 +76,13 @@ impl TemporaryDatabase {
             .await
             .expect("Connection to temporary database failed");
 
+        println!("Running migrations on temporary database");
+
         // Performs migrations
         let migrations = sqlx::migrate!("./migrations");
         migrations.run(&pool).await.expect("Migrations failed");
+
+        println!("Migrations complete");
 
         // Gets new Redis pool
         let redis_pool = RedisPool::new(Some(temp_database_name.clone()));

@@ -90,22 +90,20 @@ impl ThreadBuilder {
         .execute(&mut *transaction)
         .await?;
 
-        for member in &self.members {
-            sqlx::query!(
-                "
-                INSERT INTO threads_members (
-                    thread_id, user_id
-                )
-                VALUES (
-                    $1, $2
-                )
-                ",
-                thread_id as ThreadId,
-                *member as UserId,
+        let (thread_ids, members): (Vec<_>, Vec<_>) =
+            self.members.iter().map(|m| (thread_id.0, m.0)).unzip();
+        sqlx::query!(
+            "
+            INSERT INTO threads_members (
+                thread_id, user_id
             )
-            .execute(&mut *transaction)
-            .await?;
-        }
+            SELECT * FROM UNNEST ($1::int8[], $2::int8[])
+            ",
+            &thread_ids[..],
+            &members[..],
+        )
+        .execute(&mut *transaction)
+        .await?;
 
         Ok(thread_id)
     }

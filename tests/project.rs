@@ -1,10 +1,14 @@
+use actix_http::StatusCode;
+use actix_web::dev::ServiceResponse;
 use actix_web::test;
+use common::environment::with_test_environment;
 use labrinth::database::models::project_item::{PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE};
 use labrinth::models::ids::base62_impl::parse_base62;
 use serde_json::json;
 
 use crate::common::database::*;
 
+use crate::common::dummy_data::DUMMY_CATEGORIES;
 use crate::common::{actix::AppendsMultipart, environment::TestEnvironment};
 
 // importing common module.
@@ -403,7 +407,7 @@ pub async fn test_patch_project() {
             "title": "New successful title",
             "description": "New successful description",
             "body": "New successful body",
-            "categories": ["combat"],
+            "categories": [DUMMY_CATEGORIES[0]],
             "license_id": "MIT",
             "issues_url": "https://github.com",
             "discord_url": "https://discord.gg",
@@ -441,7 +445,7 @@ pub async fn test_patch_project() {
     assert_eq!(body["title"], json!("New successful title"));
     assert_eq!(body["description"], json!("New successful description"));
     assert_eq!(body["body"], json!("New successful body"));
-    assert_eq!(body["categories"], json!(["combat"]));
+    assert_eq!(body["categories"], json!([DUMMY_CATEGORIES[0]]));
     assert_eq!(body["license"]["id"], json!("MIT"));
     assert_eq!(body["issues_url"], json!("https://github.com"));
     assert_eq!(body["discord_url"], json!("https://discord.gg"));
@@ -455,6 +459,69 @@ pub async fn test_patch_project() {
 
     // Cleanup test db
     test_env.cleanup().await;
+}
+
+#[actix_rt::test]
+pub async fn test_bulk_edit_categories() {
+    with_test_environment(|test_env| async move {
+        let alpha_project_id = &test_env.dummy.as_ref().unwrap().alpha_project_id;
+        let beta_project_id = &test_env.dummy.as_ref().unwrap().beta_project_id;
+
+        let req = test::TestRequest::patch()
+            .uri(&format!(
+                "/v2/projects?ids={}",
+                urlencoding::encode(&format!("[\"{alpha_project_id}\",\"{beta_project_id}\"]"))
+            ))
+            .append_header(("Authorization", ADMIN_USER_PAT))
+            .set_json(json!({
+                "categories": [DUMMY_CATEGORIES[0], DUMMY_CATEGORIES[3]],
+                "add_categories": [DUMMY_CATEGORIES[1], DUMMY_CATEGORIES[2]],
+                "remove_categories": [DUMMY_CATEGORIES[3]],
+                "additional_categories": [DUMMY_CATEGORIES[4], DUMMY_CATEGORIES[6]],
+                "add_additional_categories": [DUMMY_CATEGORIES[5]],
+                "remove_additional_categories": [DUMMY_CATEGORIES[6]],
+            }))
+            .to_request();
+        let resp = test_env.call(req).await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+
+        let alpha_body = get_project_body(&test_env, &alpha_project_id, ADMIN_USER_PAT).await;
+        assert_eq!(alpha_body["categories"], json!(DUMMY_CATEGORIES[0..=2]));
+        assert_eq!(
+            alpha_body["additional_categories"],
+            json!(DUMMY_CATEGORIES[4..=5])
+        );
+
+        let beta_body = get_project_body(&test_env, &beta_project_id, ADMIN_USER_PAT).await;
+        assert_eq!(beta_body["categories"], alpha_body["categories"]);
+        assert_eq!(
+            beta_body["additional_categories"],
+            alpha_body["additional_categories"],
+        );
+    })
+    .await;
+}
+
+async fn get_project(
+    test_env: &TestEnvironment,
+    project_slug: &str,
+    user_pat: &str,
+) -> ServiceResponse {
+    let req = test::TestRequest::get()
+        .uri(&format!("/v2/project/{project_slug}"))
+        .append_header(("Authorization", user_pat))
+        .to_request();
+    test_env.call(req).await
+}
+
+async fn get_project_body(
+    test_env: &TestEnvironment,
+    project_slug: &str,
+    user_pat: &str,
+) -> serde_json::Value {
+    let resp = get_project(test_env, project_slug, user_pat).await;
+    assert_eq!(resp.status(), StatusCode::OK);
+    test::read_body_json(resp).await
 }
 
 // TODO: Missing routes on projects

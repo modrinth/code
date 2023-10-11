@@ -3,6 +3,19 @@
 use super::{database::TemporaryDatabase, dummy_data};
 use crate::common::setup;
 use actix_web::{dev::ServiceResponse, test, App};
+use futures::Future;
+
+pub async fn with_test_environment<Fut>(f: impl FnOnce(TestEnvironment) -> Fut)
+where
+    Fut: Future<Output = ()>,
+{
+    let test_env = TestEnvironment::build_with_dummy().await;
+    let db = test_env.db.clone();
+
+    f(test_env).await;
+
+    db.cleanup().await;
+}
 
 // A complete test environment, with a test actix app and a database.
 // Must be called in an #[actix_rt::test] context. It also simulates a

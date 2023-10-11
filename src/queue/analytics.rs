@@ -1,6 +1,13 @@
 use crate::models::analytics::{Download, PageView, Playtime};
 use dashmap::DashSet;
 
+#[cfg(test)]
+mod tests;
+
+const VIEWS_TABLENAME: &str = "views";
+const DOWNLOADS_TABLENAME: &str = "downloads";
+const PLAYTIME_TABLENAME: &str = "playtime";
+
 pub struct AnalyticsQueue {
     views_queue: DashSet<PageView>,
     downloads_queue: DashSet<Download>,
@@ -17,53 +24,49 @@ impl AnalyticsQueue {
         }
     }
 
-    pub async fn add_view(&self, page_view: PageView) {
+    pub fn add_view(&self, page_view: PageView) {
         self.views_queue.insert(page_view);
     }
 
-    pub async fn add_download(&self, download: Download) {
+    pub fn add_download(&self, download: Download) {
         self.downloads_queue.insert(download);
     }
 
-    pub async fn add_playtime(&self, playtime: Playtime) {
+    pub fn add_playtime(&self, playtime: Playtime) {
         self.playtime_queue.insert(playtime);
     }
 
     pub async fn index(&self, client: clickhouse::Client) -> Result<(), clickhouse::error::Error> {
-        let views_queue = self.views_queue.clone();
-        self.views_queue.clear();
+        Self::index_queue(&client, &self.views_queue, VIEWS_TABLENAME).await?;
+        Self::index_queue(&client, &self.downloads_queue, DOWNLOADS_TABLENAME).await?;
+        Self::index_queue(&client, &self.playtime_queue, PLAYTIME_TABLENAME).await?;
 
-        let downloads_queue = self.downloads_queue.clone();
-        self.downloads_queue.clear();
+        Ok(())
+    }
 
-        let playtime_queue = self.playtime_queue.clone();
-        self.playtime_queue.clear();
-
-        if !views_queue.is_empty() || !downloads_queue.is_empty() || !playtime_queue.is_empty() {
-            let mut views = client.insert("views")?;
-
-            for view in views_queue {
-                views.write(&view).await?;
-            }
-
-            views.end().await?;
-
-            let mut downloads = client.insert("downloads")?;
-
-            for download in downloads_queue {
-                downloads.write(&download).await?;
-            }
-
-            downloads.end().await?;
-
-            let mut playtimes = client.insert("playtime")?;
-
-            for playtime in playtime_queue {
-                playtimes.write(&playtime).await?;
-            }
-
-            playtimes.end().await?;
+    async fn index_queue<T>(
+        client: &clickhouse::Client,
+        queue: &DashSet<T>,
+        table_name: &str,
+    ) -> Result<(), clickhouse::error::Error>
+    where
+        T: serde::Serialize + Eq + std::hash::Hash + Clone + clickhouse::Row,
+    {
+        if queue.is_empty() {
+            return Ok(());
         }
+
+        let current_queue = queue.clone();
+        queue.clear();
+
+        let mut inserter = client.inserter(table_name)?;
+
+        for row in current_queue {
+            inserter.write(&row).await?;
+            inserter.commit().await?;
+        }
+
+        inserter.end().await?;
 
         Ok(())
     }

@@ -150,7 +150,7 @@ pub async fn page_view_ingest(
         view.user_id = user.id.0;
     }
 
-    analytics_queue.add_view(view).await;
+    analytics_queue.add_view(view);
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -202,19 +202,17 @@ pub async fn playtime_ingest(
         }
 
         if let Some(version) = versions.iter().find(|x| id == x.inner.id.into()) {
-            analytics_queue
-                .add_playtime(Playtime {
-                    id: Default::default(),
-                    recorded: Utc::now().timestamp_nanos() / 100_000,
-                    seconds: playtime.seconds as u64,
-                    user_id: user.id.0,
-                    project_id: version.inner.project_id.0 as u64,
-                    version_id: version.inner.id.0 as u64,
-                    loader: playtime.loader,
-                    game_version: playtime.game_version,
-                    parent: playtime.parent.map(|x| x.0).unwrap_or(0),
-                })
-                .await;
+            analytics_queue.add_playtime(Playtime {
+                id: Default::default(),
+                recorded: Utc::now().timestamp_nanos() / 100_000,
+                seconds: playtime.seconds as u64,
+                user_id: user.id.0,
+                project_id: version.inner.project_id.0 as u64,
+                version_id: version.inner.id.0 as u64,
+                loader: playtime.loader,
+                game_version: playtime.game_version,
+                parent: playtime.parent.map(|x| x.0).unwrap_or(0),
+            });
         }
     }
 

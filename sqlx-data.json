@@ -265,19 +265,6 @@
     },
     "query": "\n                SELECT o.id, o.title, o.team_id, o.description, o.icon_url, o.color\n                FROM organizations o\n                WHERE o.id = ANY($1) OR o.title = ANY($2)\n                GROUP BY o.id;\n                "
   },
-  "05baeb26d9856218e5c6f8856a96788b2a7ac3536ff9412a50552cef1d561a1e": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4"
-        ]
-      }
-    },
-    "query": "\n                        INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                        VALUES ($1, $2, FALSE)\n                        "
-  },
   "061a3e43df9464263aaf1555a27c1f4b6a0f381282f4fa75cc13b1d354857578": {
     "describe": {
       "columns": [
@@ -595,24 +582,6 @@
     },
     "query": "\n                SELECT SUM(pv.amount) amount\n                FROM payouts_values pv\n                WHERE pv.user_id = $1\n                "
   },
-  "0c2addb0d7a87fa558821ff8e943bbb751fb2bdc22d1a5368f61cc7827586840": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Bool",
-          "Int4",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO files (id, version_id, url, filename, is_primary, size, file_type)\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            "
-  },
   "0c6b7e51b0b9115d95b5dbb9bb88a3e266b78ae9375a90261503c2cccd5bdf1b": {
     "describe": {
       "columns": [],
@@ -870,21 +839,6 @@
     },
     "query": "SELECT EXISTS(SELECT 1 FROM threads WHERE id=$1)"
   },
-  "196c8ac2228e199f23eaf980f7ea15b37f76e66bb81da1115a754aad0be756e4": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Numeric",
-          "Timestamptz"
-        ]
-      }
-    },
-    "query": "\n                            INSERT INTO payouts_values (user_id, mod_id, amount, created)\n                            VALUES ($1, $2, $3, $4)\n                            "
-  },
   "19c7498a01f51b8220245a53490916191a153fa1fe14404d39ab2980e3386058": {
     "describe": {
       "columns": [],
@@ -934,6 +888,34 @@
       }
     },
     "query": "\n        UPDATE collections\n        SET icon_url = NULL, color = NULL\n        WHERE (id = $1)\n        "
+  },
+  "1b66b5d566aa6a969bacbb7897af829a569e13a619db295d2e6abcdb89fcac17": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n                        INSERT INTO collections_mods (collection_id, mod_id)\n                        SELECT * FROM UNNEST ($1::int8[], $2::int8[])\n                        ON CONFLICT DO NOTHING\n                        "
+  },
+  "1c30a8a31b031f194f70dc2a3bac8e131513dd7e9d2c46432ca797f6422c6ecf": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array",
+          "NumericArray",
+          "TimestamptzArray"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO payouts_values (user_id, mod_id, amount, created)\n        SELECT * FROM UNNEST ($1::bigint[], $2::bigint[], $3::numeric[], $4::timestamptz[])\n        "
   },
   "1cefe4924d3c1f491739858ce844a22903d2dbe26f255219299f1833a10ce3d7": {
     "describe": {
@@ -1201,6 +1183,24 @@
     },
     "query": "\n                UPDATE team_members\n                SET permissions = $1\n                WHERE (team_id = $2 AND user_id = $3)\n                "
   },
+  "24ae57ca296554a29b414caca866cfe7ab956ea28450d40a564498c3d27b937f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array",
+          "VarcharArray",
+          "VarcharArray",
+          "BoolArray",
+          "Int4Array",
+          "VarcharArray"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO files (id, version_id, url, filename, is_primary, size, file_type)\n            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::varchar[], $4::varchar[], $5::bool[], $6::integer[], $7::varchar[])\n            "
+  },
   "25131559cb73a088000ab6379a769233440ade6c7511542da410065190d203fc": {
     "describe": {
       "columns": [
@@ -1233,18 +1233,6 @@
     },
     "query": "\n            DELETE FROM threads_members\n            WHERE thread_id = $1\n            "
   },
-  "299b8ea6e7a0048fa389cc4432715dc2a09e227d2f08e91167a43372a7ac6e35": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                DELETE FROM mods_categories\n                WHERE joining_mod_id = $1 AND is_additional = FALSE\n                "
-  },
   "29e171bd746ac5dc1fabae4c9f81c3d1df4e69c860b7d0f6a907377664199217": {
     "describe": {
       "columns": [
@@ -1264,19 +1252,6 @@
       }
     },
     "query": "\n            SELECT id FROM reports\n            WHERE closed = FALSE\n            ORDER BY created ASC\n            LIMIT $1;\n            "
-  },
-  "29e657d26f0fb24a766f5b5eb6a94d01d1616884d8ca10e91536e974d5b585a6": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                INSERT INTO loaders_versions (loader_id, version_id)\n                VALUES ($1, $2)\n                "
   },
   "29fcff0f1d36bd1a9e0c8c4005209308f0c5f383e4e52ed8c6b989994ead32df": {
     "describe": {
@@ -1461,6 +1436,19 @@
       }
     },
     "query": "\n            SELECT id FROM users\n            WHERE email = $1\n            "
+  },
+  "3151420021b0c5a85f7c338e67be971915ff89073815e27fa6af5254db22dce8": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4Array",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO loaders_versions (loader_id, version_id)\n            SELECT * FROM UNNEST($1::integer[], $2::bigint[])\n            "
   },
   "320d73cd900a6e00f0e74b7a8c34a7658d16034b01a35558cb42fa9c16185eb5": {
     "describe": {
@@ -1768,31 +1756,6 @@
     },
     "query": "\n                    UPDATE mods\n                    SET title = $1\n                    WHERE (id = $2)\n                    "
   },
-  "3f2f05653552ce8c1be95ce0a922ab41f52f40f8ff6c91c6621481102c8f35e3": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                        VALUES ($1, $2)\n                        "
-  },
-  "3fcfed18cbfb37866e0fa57a4e95efb326864f8219941d1b696add39ed333ad1": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                DELETE FROM mods_categories\n                WHERE joining_mod_id = $1 AND is_additional = TRUE\n                "
-  },
   "40f7c5bec98fe3503d6bd6db2eae5a4edb8d5d6efda9b9dc124f344ae5c60e08": {
     "describe": {
       "columns": [],
@@ -2009,6 +1972,20 @@
     },
     "query": "\n                        UPDATE uploaded_images\n                        SET thread_message_id = $1\n                        WHERE id = $2\n                        "
   },
+  "473db826b691ae1131990ef0927cfe5b63d48829dd41edb7def22248d5668ac7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int4Array",
+          "VarcharArray"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO mods_donations (\n                joining_mod_id, joining_platform_id, url\n            )\n            SELECT * FROM UNNEST($1::bigint[], $2::int[], $3::varchar[])\n            "
+  },
   "4778d2f5994fda2f978fa53e0840c1a9a2582ef0434a5ff7f21706f1dc4edcf4": {
     "describe": {
       "columns": [],
@@ -2054,19 +2031,6 @@
       }
     },
     "query": "\n            SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            LEFT JOIN versions vd ON d.dependency_id = vd.id\n            WHERE v.mod_id = $1\n            "
-  },
-  "489913b3c32631fb329a3259cfe620d65053e2abf425a0d3f1bc01f1cdbdd73d": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                            INSERT INTO collections_mods (collection_id, mod_id)\n                            VALUES ($1, $2)\n                            ON CONFLICT DO NOTHING\n                            "
   },
   "49813a96f007216072d69468aae705d73d5b85dcdd64a22060009b12d947ed5a": {
     "describe": {
@@ -2649,6 +2613,23 @@
     },
     "query": "SELECT id FROM users WHERE gitlab_id = $1"
   },
+  "5d65f89c020ae032f26d742c37afe47876911eb3a16a6852299b98f2a8251fb4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "VarcharArray",
+          "BoolArray",
+          "VarcharArray",
+          "VarcharArray",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO mods_gallery (\n                mod_id, image_url, featured, title, description, ordering\n            )\n            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bool[], $4::varchar[], $5::varchar[], $6::bigint[])\n            "
+  },
   "5d7425cfa91e332bf7cc14aa5c300b997e941c49757606f6b906cb5e060d3179": {
     "describe": {
       "columns": [],
@@ -2724,22 +2705,6 @@
       }
     },
     "query": "\n            UPDATE mods_gallery\n            SET ordering = $2\n            WHERE id = $1\n            "
-  },
-  "5f94e9e767ec4be7f9136b991b4a29373dbe48feb2f61281e3212721095ed675": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar",
-          "Int8",
-          "Int8",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name)\n            VALUES ($1, $2, $3, $4, $5)\n            "
   },
   "60a251aea1efbc7d9357255e520f0ac13f3697fecb84b1e9edd5d9ea61fe0cb0": {
     "describe": {
@@ -3187,19 +3152,6 @@
     },
     "query": "\n            UPDATE mods\n            SET loaders = (\n                SELECT COALESCE(ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null), array[]::varchar[])\n                FROM versions v\n                     INNER JOIN loaders_versions lv ON lv.version_id = v.id\n                     INNER JOIN loaders l on lv.loader_id = l.id\n                WHERE v.mod_id = mods.id AND v.status != ALL($2)\n            )\n            WHERE id = $1\n            "
   },
-  "6c7aeb0db4a4fb3387c37b8d7aca6fdafaa637fd883a44416b56270aeebb7a01": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        INSERT INTO loaders_versions (loader_id, version_id)\n                        VALUES ($1, $2)\n                        "
-  },
   "6c8b8a2f11c0b4e7a5973547fe1611a0fa4ef366d5c8a91d9fb9a1360ea04d46": {
     "describe": {
       "columns": [
@@ -3358,18 +3310,38 @@
     },
     "query": "SELECT EXISTS(SELECT 1 FROM uploaded_images WHERE id=$1)"
   },
-  "70b510956a40583eef8c57dcced71c67f525eee455ae8b09e9b2403668068751": {
+  "7075dc0343dab7c4dd4469b4af095232dcdd056a15d928a6d93556daf6fd327c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array",
+          "Int8Array",
+          "VarcharArray",
+          "Int8Array",
+          "Int8Array",
+          "BoolArray",
+          "NumericArray",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO team_members (id, team_id, user_id, role, permissions, organization_permissions, accepted, payouts_split, ordering)\n            SELECT * FROM UNNEST ($1::int8[], $2::int8[], $3::int8[], $4::varchar[], $5::int8[], $6::int8[], $7::bool[], $8::numeric[], $9::int8[])\n            "
+  },
+  "70c812c6a0d29465569169afde42c74a353a534aeedd5cdd81bceb2a7de6bc78": {
     "describe": {
       "columns": [],
       "nullable": [],
       "parameters": {
         "Left": [
           "Int8",
-          "Int8"
+          "Bool"
         ]
       }
     },
-    "query": "\n                INSERT INTO threads_members (\n                    thread_id, user_id\n                )\n                VALUES (\n                    $1, $2\n                )\n                "
+    "query": "\n            DELETE FROM mods_categories\n            WHERE joining_mod_id = $1 AND is_additional = $2\n            "
   },
   "71abd207410d123f9a50345ddcddee335fea0d0cc6f28762713ee01a36aee8a0": {
     "describe": {
@@ -3743,19 +3715,6 @@
     },
     "query": "\n        SELECT id FROM mods_gallery\n        WHERE image_url = $1\n        "
   },
-  "7cb691738c28e0d1f28c84ba2dbcfa21a6dbd859bcf0f565f90cd7ce2ea5aa1c": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4"
-        ]
-      }
-    },
-    "query": "\n                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                VALUES ($1, $2, FALSE)\n                "
-  },
   "7e030d43f3412e7df63c970f873d0a73dd2deb9857aa6f201ec5eec628eb336c": {
     "describe": {
       "columns": [],
@@ -3807,6 +3766,22 @@
     },
     "query": "\n                DELETE FROM historical_payouts\n                WHERE user_id = $1\n                "
   },
+  "8475c7cb94786576012b16d53a017cb250f0de99b76746d8725798daa3345c5e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "VarcharArray",
+          "Int8Array",
+          "Int8Array",
+          "VarcharArray"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name)\n            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bigint[], $4::bigint[], $5::varchar[])\n            "
+  },
   "85463fa221147ee8d409fc92ed681fa27df683e7c80b8dd8616ae94dc1205c24": {
     "describe": {
       "columns": [],
@@ -3819,23 +3794,6 @@
       }
     },
     "query": "\n                UPDATE versions\n                SET author_id = $1\n                WHERE (author_id = $2)\n                "
-  },
-  "85b40877c48fc4f23039c1b556007f92056a015f160fe1059b0d3b13615af0fb": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar",
-          "Bool",
-          "Varchar",
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO mods_gallery (\n                mod_id, image_url, featured, title, description, ordering\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6\n            )\n            "
   },
   "85c6de008681d9fc9dc51b17330bed09204010813111e66a7ca84bc0e603f537": {
     "describe": {
@@ -4820,6 +4778,20 @@
     },
     "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n        WHERE m.id = ANY($1) AND m.monetization_status = $2\n        "
   },
+  "b86145932b1f919fc82414c303ade80f62d4c1bc155f948359b5f6578c680244": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int4Array",
+          "BoolArray"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n            SELECT * FROM UNNEST ($1::bigint[], $2::int[], $3::bool[])\n            "
+  },
   "b903ac4e686ef85ba28d698c668da07860e7f276b261d8f2cebb74e73b094970": {
     "describe": {
       "columns": [],
@@ -4843,19 +4815,6 @@
       }
     },
     "query": "\n            INSERT INTO teams (id)\n            VALUES ($1)\n            "
-  },
-  "b96ab39ab9624bfcdc8675107544307af9892504c4cbc40e4e7c40a1e4e83e14": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                VALUES ($1, $2)\n                "
   },
   "b971cecafab7046c5952447fd78a6e45856841256d812ce9ae3c07f903c5cc62": {
     "describe": {
@@ -5157,20 +5116,6 @@
     },
     "query": "\n                        UPDATE users\n                        SET payout_wallet = NULL, payout_wallet_type = NULL, payout_address = NULL\n                        WHERE (id = $1)\n                        "
   },
-  "c545a74e902c5c63bca1057b76e94b9547ee21fadbc61964f45837915d5f4608": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO mods_donations (\n                joining_mod_id, joining_platform_id, url\n            )\n            VALUES (\n                $1, $2, $3\n            )\n            "
-  },
   "c55d2132e3e6e92dd50457affab758623dca175dc27a2d3cd4aace9cfdecf789": {
     "describe": {
       "columns": [],
@@ -5217,26 +5162,6 @@
     },
     "query": "\n                    UPDATE mods\n                    SET client_side = $1\n                    WHERE (id = $2)\n                    "
   },
-  "c6060a389343c9f35aea5d931518b85ab7c71b6ba74eae7b4b51d881f1798c6e": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Int8",
-          "Int8",
-          "Bool",
-          "Numeric",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                INSERT INTO team_members (id, team_id, user_id, role, permissions, organization_permissions, accepted, payouts_split, ordering)\n                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)\n                "
-  },
   "c8a27a122160a0896914c786deef9e8193eb240501d30d5ffb4129e2103efd3d": {
     "describe": {
       "columns": [],
@@ -5248,6 +5173,19 @@
       }
     },
     "query": "\n                UPDATE versions\n                SET status = requested_status\n                WHERE status = $1 AND date_published < CURRENT_DATE AND requested_status IS NOT NULL\n                "
+  },
+  "c8c0bf5d298810a7a30caf03d7437af757303fa9aa0f500b83476e65cec7f1e9": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO threads_members (\n                thread_id, user_id\n            )\n            SELECT * FROM UNNEST ($1::int8[], $2::int8[])\n            "
   },
   "c8fde56e5d03eda085519b4407768de7ddf48cae18ce7138a97e8e8fba967e15": {
     "describe": {
@@ -5376,20 +5314,6 @@
     },
     "query": "\n                SELECT id, user_id, session, created, last_login, expires, refresh_expires, os, platform,\n                city, country, ip, user_agent\n                FROM sessions\n                WHERE id = ANY($1) OR session = ANY($2)\n                ORDER BY created DESC\n                "
   },
-  "cb57ae673f1a7e50cc319efddb9bdc82e2251596bcf85aea52e8def343e423b8": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar",
-          "Bytea"
-        ]
-      }
-    },
-    "query": "\n                INSERT INTO hashes (file_id, algorithm, hash)\n                VALUES ($1, $2, $3)\n                "
-  },
   "cb82bb6e22690fd5fee18bbc2975503371814ef1cbf95f32c195bfe7542b2b20": {
     "describe": {
       "columns": [],
@@ -5407,19 +5331,6 @@
       }
     },
     "query": "\n            INSERT INTO team_members (\n                id, team_id, user_id, role, permissions, organization_permissions, accepted\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6, $7\n            )\n            "
-  },
-  "ccce60dc60ca6c4ea1142ab6d0d81bdb1ee9ed97c992695324aec015e0e190bf": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    INSERT INTO collections_mods (collection_id, mod_id)\n                    VALUES ($1, $2)\n                    ON CONFLICT DO NOTHING\n                "
   },
   "ccd913bb2f3006ffe881ce2fc4ef1e721d18fe2eed6ac62627046c955129610c": {
     "describe": {
@@ -5452,19 +5363,6 @@
       }
     },
     "query": "\n            DELETE FROM hashes\n            WHERE file_id = $1\n            "
-  },
-  "cdf20036b29b61da40bf990c9ab04c509297a4d65bc9b136c9fb20f1e97e1149": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4"
-        ]
-      }
-    },
-    "query": "\n                    INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                    VALUES ($1, $2, FALSE)\n                    "
   },
   "ce20a9c53249e255be7312819f505d935d3ab2ee3c21a6422e5b12155c159bd7": {
     "describe": {
@@ -5660,6 +5558,20 @@
     },
     "query": "\n            INSERT INTO notifications (\n                id, user_id, body\n            )\n            VALUES (\n                $1, $2, $3\n            )\n            "
   },
+  "d2e826d4fa4e3e730cc84c97964c0c5fdd25cd49ddff8c593bd9b8a3b4d5ff1e": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "VarcharArray",
+          "ByteaArray"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO hashes (file_id, algorithm, hash)\n            SELECT * FROM UNNEST($1::bigint[], $2::varchar[], $3::bytea[])\n            "
+  },
   "d331ca8f22da418cf654985c822ce4466824beaa00dea64cde90dc651a03024b": {
     "describe": {
       "columns": [],
@@ -5790,19 +5702,6 @@
       }
     },
     "query": "\n            SELECT id, team_id, role AS member_role, permissions, organization_permissions,\n            accepted, payouts_split, role,\n            ordering, user_id\n            FROM team_members\n            WHERE (team_id = ANY($1) AND user_id = $2 AND accepted = TRUE)\n            ORDER BY ordering\n            "
-  },
-  "d59a0ca4725d40232eae8bf5735787e1b76282c390d2a8d07fb34e237a0b2132": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4"
-        ]
-      }
-    },
-    "query": "\n                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                VALUES ($1, $2, TRUE)\n                "
   },
   "d6453e50041b5521fa9e919a9162e533bb9426f8c584d98474c6ad414db715c8": {
     "describe": {
@@ -6505,6 +6404,19 @@
     },
     "query": "\n        SELECT name FROM project_types pt\n        INNER JOIN mods ON mods.project_type = pt.id\n        WHERE mods.id = $1\n        "
   },
+  "efdaae627a24efdf522c913cfd3600d6331e30dffbba8c2d318e44e260ac5f59": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n                INSERT INTO collections_mods (collection_id, mod_id)\n                SELECT * FROM UNNEST($1::bigint[], $2::bigint[])\n                ON CONFLICT DO NOTHING\n            "
+  },
   "f1525930830e17b5ee8feb796d9950dd3741131965f050840fa75423b5a54f01": {
     "describe": {
       "columns": [],
@@ -6723,6 +6635,19 @@
     },
     "query": "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 WHERE m.id = $1)"
   },
+  "fa54ed32004b883daa44eeb413fc2e07b45883608afc6ac91ac6f74736a12256": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int4Array",
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n            SELECT * FROM UNNEST($1::integer[], $2::bigint[])\n            "
+  },
   "fb955ca41b95120f66c98c0b528b1db10c4be4a55e9641bb104d772e390c9bb7": {
     "describe": {
       "columns": [
@@ -6742,19 +6667,6 @@
       }
     },
     "query": "SELECT EXISTS(SELECT 1 FROM notifications WHERE id=$1)"
-  },
-  "fcd15905507769ab7f9839d64d1be3ee3f61cd555aee57dace76f8e53e91d344": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4"
-        ]
-      }
-    },
-    "query": "\n                        INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                        VALUES ($1, $2, TRUE)\n                        "
   },
   "fce67ce3d0c27c64af85fb7d36661513bc5ea2e96fcf12f3a51c97999b01b83c": {
     "describe": {

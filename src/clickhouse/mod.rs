@@ -6,8 +6,12 @@ mod fetch;
 pub use fetch::*;
 
 pub async fn init_client() -> clickhouse::error::Result<clickhouse::Client> {
-    let database = dotenvy::var("CLICKHOUSE_DATABASE").unwrap();
+    init_client_with_database(&dotenvy::var("CLICKHOUSE_DATABASE").unwrap()).await
+}
 
+pub async fn init_client_with_database(
+    database: &str,
+) -> clickhouse::error::Result<clickhouse::Client> {
     let client = {
         let mut http_connector = HttpConnector::new();
         http_connector.enforce_http(false); // allow https URLs

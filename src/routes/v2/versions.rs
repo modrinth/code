@@ -3,6 +3,7 @@ use crate::auth::{
     filter_authorized_versions, get_user_from_headers, is_authorized, is_authorized_version,
 };
 use crate::database;
+use crate::database::models::version_item::{DependencyBuilder, LoaderVersion, VersionVersion};
 use crate::database::models::{image_item, Organization};
 use crate::database::redis::RedisPool;
 use crate::models;
@@ -450,11 +451,12 @@ pub async fn version_edit(
                             })
                             .collect::<Vec<database::models::version_item::DependencyBuilder>>();
 
-                        for dependency in builders {
-                            dependency
-                                .insert(version_item.inner.id, &mut transaction)
-                                .await?;
-                        }
+                        DependencyBuilder::insert_many(
+                            builders,
+                            version_item.inner.id,
+                            &mut transaction,
+                        )
+                        .await?;
                     }
                 }
             }
@@ -469,6 +471,7 @@ pub async fn version_edit(
                 .execute(&mut *transaction)
                 .await?;
 
+                let mut version_versions = Vec::new();
                 for game_version in game_versions {
                     let game_version_id = database::models::categories::GameVersion::get_id(
                         &game_version.0,
@@ -481,17 +484,9 @@ pub async fn version_edit(
                         )
                     })?;
 
-                    sqlx::query!(
-                        "
-                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)
-                        VALUES ($1, $2)
-                        ",
-                        game_version_id as database::models::ids::GameVersionId,
-                        id as database::models::ids::VersionId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
+                    version_versions.push(VersionVersion::new(game_version_id, id));
                 }
+                VersionVersion::insert_many(version_versions, &mut transaction).await?;
 
                 database::models::Project::update_game_versions(
                     version_item.inner.project_id,
@@ -510,6 +505,7 @@ pub async fn version_edit(
                 .execute(&mut *transaction)
                 .await?;
 
+                let mut loader_versions = Vec::new();
                 for loader in loaders {
                     let loader_id =
                         database::models::categories::Loader::get_id(&loader.0, &mut *transaction)
@@ -519,18 +515,9 @@ pub async fn version_edit(
                                     "No database entry for loader provided.".to_string(),
                                 )
                             })?;
-
-                    sqlx::query!(
-                        "
-                        INSERT INTO loaders_versions (loader_id, version_id)
-                        VALUES ($1, $2)
-                        ",
-                        loader_id as database::models::ids::LoaderId,
-                        id as database::models::ids::VersionId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
+                    loader_versions.push(LoaderVersion::new(loader_id, id));
                 }
+                LoaderVersion::insert_many(loader_versions, &mut transaction).await?;
 
                 database::models::Project::update_loaders(
                     version_item.inner.project_id,
