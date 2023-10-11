@@ -2,6 +2,15 @@
   <div class="root-container">
     <div class="slider-component">
       <div class="slide-container">
+        <div class="snap-points">
+          <div
+            class="snap-point"
+            :class="{ green: snapPoint <= currentValue }"
+            v-for="snapPoint in props.snapPoints"
+            v-bind:key="snapPoint"
+            :style="{ left: ((snapPoint - props.min) / (props.max - props.min)) * 100 + '%' }"
+          ></div>
+        </div>
         <input
           ref="input"
           v-model="currentValue"
@@ -19,7 +28,7 @@
             '--min-value': min,
             '--max-value': max,
           }"
-          @input="onInput($refs.input.value)"
+          @input="onInputWithSnap($refs.input.value)"
         />
         <div class="slider-range">
           <span> {{ min }} {{ unit }} </span>
@@ -64,6 +73,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  snapPoints: {
+    type: Array,
+    default: () => [],
+  },
+  snapRange: {
+    type: Number,
+    default: 100,
+  },
   disabled: {
     type: Boolean,
     default: false,
@@ -88,7 +105,22 @@ const inputValueValid = (newValue) => {
   } else {
     currentValue.value = (parsedValue - (props.forceStep ? parsedValue % props.step : 0)).toString()
   }
+
   emit('update:modelValue', parseInt(currentValue.value))
+}
+
+const onInputWithSnap = (value) => {
+  let parsedValue = parseInt(value)
+
+  for (let snapPoint of props.snapPoints) {
+    const distance = Math.abs(snapPoint - parsedValue)
+
+    if (distance < props.snapRange) {
+      parsedValue = snapPoint
+    }
+  }
+
+  inputValueValid(parsedValue)
 }
 
 const onInput = (value) => {
@@ -111,11 +143,15 @@ const onInput = (value) => {
 .slider-component,
 .slide-container {
   width: 100%;
+
+  position: relative;
 }
 
 .slider-component .slide-container .slider {
   -webkit-appearance: none;
   appearance: none;
+  position: relative;
+
   border-radius: var(--radius-sm);
   height: 0.25rem;
   background: linear-gradient(
@@ -144,6 +180,7 @@ const onInput = (value) => {
 }
 
 .slider-component .slide-container .slider::-moz-range-thumb {
+  border: none;
   width: 0.75rem;
   height: 0.75rem;
   background: var(--color-brand);
@@ -162,6 +199,29 @@ const onInput = (value) => {
   width: 1rem;
   height: 1rem;
   transition: 0.2s;
+}
+
+.slider-component .slide-container .snap-points {
+  position: absolute;
+  width: calc(100% - 0.75rem);
+  left: calc(0.75rem / 2);
+  top: calc(1rem / 2);
+
+  .snap-point {
+    position: absolute;
+
+    width: 0.25rem;
+    height: 0.75rem;
+    border-radius: var(--radius-sm);
+
+    background-color: var(--color-base);
+
+    transform: translateX(calc(-0.25rem / 2));
+
+    &.green {
+      background-color: var(--color-brand);
+    }
+  }
 }
 
 .slider-input {
