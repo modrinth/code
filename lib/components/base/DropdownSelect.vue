@@ -210,6 +210,12 @@ const isChildOfDropdown = (element) => {
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
+    transition: 0.05s;
+
+    &:not(.render-down):not(.render-up) {
+      transition-delay: 0.2s;
+    }
+
     &.disabled {
       cursor: not-allowed;
       filter: grayscale(50%);
@@ -232,6 +238,7 @@ const isChildOfDropdown = (element) => {
 
     .arrow {
       transition: transform 0.2s ease;
+
       &.rotate {
         transform: rotate(180deg);
       }

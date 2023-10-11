@@ -316,6 +316,8 @@ const isChildOfDropdown = (element) => {
   box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent !important;
   width: 100%;
 
+  transition: 0.05s;
+
   &:focus {
     &.down {
       border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
@@ -324,6 +326,10 @@ const isChildOfDropdown = (element) => {
     &.up {
       border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
     }
+  }
+
+  &:not(:focus) {
+    transition-delay: 0.2s;
   }
 }
 </style>
