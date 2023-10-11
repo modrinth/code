@@ -68,9 +68,9 @@
 
 ```vue
 <PopoutMenu class="btn" position="bottom" direction="right">
-Bottom going right
-<template #menu>
-  Menu contents!
-</template>
+  Bottom going right
+  <template #menu>
+    Menu contents!
+  </template>
 </PopoutMenu>
 ```
