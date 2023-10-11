@@ -247,7 +247,7 @@ impl SideType {
         }
     }
 
-    pub fn from_str(string: &str) -> SideType {
+    pub fn from_string(string: &str) -> SideType {
         match string {
             "required" => SideType::Required,
             "optional" => SideType::Optional,
@@ -308,7 +308,7 @@ impl std::fmt::Display for ProjectStatus {
 }
 
 impl ProjectStatus {
-    pub fn from_str(string: &str) -> ProjectStatus {
+    pub fn from_string(string: &str) -> ProjectStatus {
         match string {
             "processing" => ProjectStatus::Processing,
             "rejected" => ProjectStatus::Rejected,
@@ -433,7 +433,7 @@ impl std::fmt::Display for MonetizationStatus {
 }
 
 impl MonetizationStatus {
-    pub fn from_str(string: &str) -> MonetizationStatus {
+    pub fn from_string(string: &str) -> MonetizationStatus {
         match string {
             "force-demonetized" => MonetizationStatus::ForceDemonetized,
             "demonetized" => MonetizationStatus::Demonetized,
@@ -537,7 +537,7 @@ impl From<QueryVersion> for Version {
                     version_id: d.version_id.map(|i| VersionId(i.0 as u64)),
                     project_id: d.project_id.map(|i| ProjectId(i.0 as u64)),
                     file_name: d.file_name,
-                    dependency_type: DependencyType::from_str(d.dependency_type.as_str()),
+                    dependency_type: DependencyType::from_string(d.dependency_type.as_str()),
                 })
                 .collect(),
             game_versions: data.game_versions.into_iter().map(GameVersion).collect(),
@@ -570,7 +570,7 @@ impl std::fmt::Display for VersionStatus {
 }
 
 impl VersionStatus {
-    pub fn from_str(string: &str) -> VersionStatus {
+    pub fn from_string(string: &str) -> VersionStatus {
         match string {
             "listed" => VersionStatus::Listed,
             "draft" => VersionStatus::Draft,
@@ -718,7 +718,7 @@ impl DependencyType {
         }
     }
 
-    pub fn from_str(string: &str) -> DependencyType {
+    pub fn from_string(string: &str) -> DependencyType {
         match string {
             "required" => DependencyType::Required,
             "optional" => DependencyType::Optional,
@@ -753,7 +753,7 @@ impl FileType {
         }
     }
 
-    pub fn from_str(string: &str) -> FileType {
+    pub fn from_string(string: &str) -> FileType {
         match string {
             "required-resource-pack" => FileType::RequiredResourcePack,
             "optional-resource-pack" => FileType::OptionalResourcePack,

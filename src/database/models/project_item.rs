@@ -630,10 +630,10 @@ impl Project {
                             license_url: m.license_url.clone(),
                             discord_url: m.discord_url.clone(),
                             client_side: SideTypeId(m.client_side),
-                            status: ProjectStatus::from_str(
+                            status: ProjectStatus::from_string(
                                 &m.status,
                             ),
-                            requested_status: m.requested_status.map(|x| ProjectStatus::from_str(
+                            requested_status: m.requested_status.map(|x| ProjectStatus::from_string(
                                 &x,
                             )),
                             server_side: SideTypeId(m.server_side),
@@ -647,7 +647,7 @@ impl Project {
                             webhook_sent: m.webhook_sent,
                             color: m.color.map(|x| x as u32),
                             queued: m.queued,
-                            monetization_status: MonetizationStatus::from_str(
+                            monetization_status: MonetizationStatus::from_string(
                                 &m.monetization_status,
                             ),
                             loaders: m.loaders,
@@ -685,8 +685,8 @@ impl Project {
                             donation_urls: serde_json::from_value(
                                 m.donations.unwrap_or_default(),
                             ).ok().unwrap_or_default(),
-                            client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
-                            server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
+                            client_side: crate::models::projects::SideType::from_string(&m.client_side_type),
+                            server_side: crate::models::projects::SideType::from_string(&m.server_side_type),
                         thread_id: ThreadId(m.thread_id),
                     }}))
                 })

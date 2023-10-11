@@ -80,7 +80,7 @@ impl std::fmt::Display for CollectionStatus {
 }
 
 impl CollectionStatus {
-    pub fn from_str(string: &str) -> CollectionStatus {
+    pub fn from_string(string: &str) -> CollectionStatus {
         match string {
             "listed" => CollectionStatus::Listed,
             "unlisted" => CollectionStatus::Unlisted,

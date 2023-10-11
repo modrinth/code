@@ -148,7 +148,7 @@ impl Thread {
                 id: ThreadId(x.id),
                 project_id: x.mod_id.map(ProjectId),
                 report_id: x.report_id.map(ReportId),
-                type_: ThreadType::from_str(&x.thread_type),
+                type_: ThreadType::from_string(&x.thread_type),
                 messages: {
                     let mut messages: Vec<ThreadMessage> = serde_json::from_value(
                         x.messages.unwrap_or_default(),

@@ -31,8 +31,6 @@ async fn main() -> std::io::Result<()> {
     let sentry = sentry::init(sentry::ClientOptions {
         release: sentry::release_name!(),
         traces_sample_rate: 0.1,
-        enable_profiling: true,
-        profiles_sample_rate: 0.1,
         ..Default::default()
     });
     if sentry.is_enabled() {

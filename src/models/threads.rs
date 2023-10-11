@@ -78,7 +78,7 @@ impl ThreadType {
         }
     }
 
-    pub fn from_str(string: &str) -> ThreadType {
+    pub fn from_string(string: &str) -> ThreadType {
         match string {
             "report" => ThreadType::Report,
             "project" => ThreadType::Project,

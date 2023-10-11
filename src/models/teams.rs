@@ -1,4 +1,5 @@
 use super::ids::Base62Id;
+use crate::bitflags_serde_impl;
 use crate::models::users::User;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -22,8 +23,7 @@ pub struct Team {
 }
 
 bitflags::bitflags! {
-    #[derive(Serialize, Deserialize)]
-    #[serde(transparent)]
+    #[derive(Copy, Clone, Debug)]
     pub struct ProjectPermissions: u64 {
         const UPLOAD_VERSION = 1 << 0;
         const DELETE_VERSION = 1 << 1;
@@ -39,6 +39,8 @@ bitflags::bitflags! {
         const ALL = 0b1111111111;
     }
 }
+
+bitflags_serde_impl!(ProjectPermissions, u64);
 
 impl Default for ProjectPermissions {
     fn default() -> ProjectPermissions {
@@ -77,8 +79,7 @@ impl ProjectPermissions {
 }
 
 bitflags::bitflags! {
-    #[derive(Serialize, Deserialize)]
-    #[serde(transparent)]
+    #[derive(Copy, Clone, Debug)]
     pub struct OrganizationPermissions: u64 {
         const EDIT_DETAILS = 1 << 0;
         const EDIT_BODY = 1 << 1;
@@ -93,6 +94,8 @@ bitflags::bitflags! {
         const NONE = 0b0;
     }
 }
+
+bitflags_serde_impl!(OrganizationPermissions, u64);
 
 impl Default for OrganizationPermissions {
     fn default() -> OrganizationPermissions {

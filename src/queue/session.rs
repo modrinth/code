@@ -13,6 +13,12 @@ pub struct AuthQueue {
     pat_queue: Mutex<HashSet<PatId>>,
 }
 
+impl Default for AuthQueue {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Batches session accessing transactions every 30 seconds
 impl AuthQueue {
     pub fn new() -> Self {

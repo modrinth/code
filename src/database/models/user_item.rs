@@ -3,7 +3,7 @@ use super::CollectionId;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
-use crate::models::users::{Badges, RecipientType, RecipientWallet};
+use crate::models::users::{Badges, RecipientStatus};
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -35,10 +35,10 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
+
     pub balance: Decimal,
-    pub payout_wallet: Option<RecipientWallet>,
-    pub payout_wallet_type: Option<RecipientType>,
-    pub payout_address: Option<String>,
+    pub trolley_id: Option<String>,
+    pub trolley_account_status: Option<RecipientStatus>,
 }
 
 impl User {
@@ -188,9 +188,9 @@ impl User {
                 SELECT id, name, email,
                     avatar_url, username, bio,
                     created, role, badges,
-                    balance, payout_wallet, payout_wallet_type, payout_address,
+                    balance,
                     github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                    email_verified, password, totp_secret
+                    email_verified, password, totp_secret, trolley_id, trolley_account_status
                 FROM users
                 WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                 ",
@@ -220,13 +220,13 @@ impl User {
                     role: u.role,
                     badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
                     balance: u.balance,
-                    payout_wallet: u.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
-                    payout_wallet_type: u
-                        .payout_wallet_type
-                        .map(|x| RecipientType::from_string(&x)),
-                    payout_address: u.payout_address,
                     password: u.password,
                     totp_secret: u.totp_secret,
+                    trolley_id: u.trolley_id,
+                    trolley_account_status: u
+                        .trolley_account_status
+                        .as_ref()
+                        .map(|x| RecipientStatus::from_string(x)),
                 }))
             })
             .try_collect::<Vec<User>>()
@@ -352,7 +352,7 @@ impl User {
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
         redis
-            .delete_many(user_ids.into_iter().flat_map(|(id, username)| {
+            .delete_many(user_ids.iter().flat_map(|(id, username)| {
                 [
                     (USERS_NAMESPACE, Some(id.0.to_string())),
                     (

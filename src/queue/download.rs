@@ -6,6 +6,12 @@ pub struct DownloadQueue {
     queue: Mutex<Vec<(ProjectId, VersionId)>>,
 }
 
+impl Default for DownloadQueue {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Batches download transactions every thirty seconds
 impl DownloadQueue {
     pub fn new() -> Self {

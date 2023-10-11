@@ -210,7 +210,7 @@ impl Collection {
                         color: m.color.map(|x| x as u32),
                         created: m.created,
                         updated: m.updated,
-                        status: CollectionStatus::from_str(&m.status),
+                        status: CollectionStatus::from_string(&m.status),
                         projects: m
                             .mods
                             .unwrap_or_default()

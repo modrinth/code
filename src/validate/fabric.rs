@@ -20,7 +20,7 @@ impl super::Validator for FabricValidator {
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 18w49a, the first fabric version
-        SupportedGameVersions::PastDate(DateTime::from_utc(
+        SupportedGameVersions::PastDate(DateTime::from_naive_utc_and_offset(
             NaiveDateTime::from_timestamp_opt(1543969469, 0).unwrap(),
             Utc,
         ))

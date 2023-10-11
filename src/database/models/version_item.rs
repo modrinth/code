@@ -590,9 +590,9 @@ impl Version {
                                 downloads: v.downloads,
                                 version_type: v.version_type,
                                 featured: v.featured,
-                                status: VersionStatus::from_str(&v.status),
+                                status: VersionStatus::from_string(&v.status),
                                 requested_status: v.requested_status
-                                    .map(|x| VersionStatus::from_str(&x)),
+                                    .map(|x| VersionStatus::from_string(&x)),
                             },
                             files: {
                                 #[derive(Deserialize)]
@@ -803,7 +803,7 @@ impl Version {
                                 .unwrap_or_default().into_iter().map(|x| (x.algorithm, x.hash)).collect(),
                             primary: f.is_primary,
                             size: f.size as u32,
-                            file_type: f.file_type.map(|x| FileType::from_str(&x)),
+                            file_type: f.file_type.map(|x| FileType::from_string(&x)),
                         }
                     }
                     ))

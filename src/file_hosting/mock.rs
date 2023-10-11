@@ -4,6 +4,7 @@ use bytes::Bytes;
 use chrono::Utc;
 use sha2::Digest;
 
+#[derive(Default)]
 pub struct MockHost(());
 
 impl MockHost {

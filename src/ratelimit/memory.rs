@@ -15,6 +15,12 @@ pub struct MemoryStore {
     inner: Arc<DashMap<String, (usize, Duration)>>,
 }
 
+impl Default for MemoryStore {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl MemoryStore {
     /// Create a new hashmap
     ///

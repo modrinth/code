@@ -70,24 +70,6 @@ async fn user_scopes() {
         .await
         .unwrap();
 
-    // User payout info writing
-    let failure_write_user_payout = Scopes::all() ^ Scopes::PAYOUTS_WRITE; // Failure case should include USER_WRITE
-    let write_user_payout = Scopes::USER_WRITE | Scopes::PAYOUTS_WRITE;
-    let req_gen = || {
-        TestRequest::patch().uri("/v2/user/user").set_json(json!( {
-            "payout_data": {
-                "payout_wallet": "paypal",
-                "payout_wallet_type": "email",
-                "payout_address": "test@modrinth.com"
-            }
-        }))
-    };
-    ScopeTest::new(&test_env)
-        .with_failure_scopes(failure_write_user_payout)
-        .test(req_gen, write_user_payout)
-        .await
-        .unwrap();
-
     // User deletion
     // (The failure is first, and this is the last test for this test function, we can delete it and use the same PAT for both tests)
     let delete_user = Scopes::USER_DELETE;

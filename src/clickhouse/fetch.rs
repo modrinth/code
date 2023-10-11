@@ -76,10 +76,10 @@ pub async fn fetch_playtimes(
         .bind(start_date)
         .bind(end_date);
 
-    if projects.is_some() {
-        query = query.bind(projects.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
-    } else if versions.is_some() {
-        query = query.bind(versions.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
+    if let Some(projects) = projects {
+        query = query.bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
+    } else if let Some(versions) = versions {
+        query = query.bind(versions.iter().map(|x| x.0).collect::<Vec<_>>());
     }
 
     Ok(query.fetch_all().await?)
@@ -123,10 +123,10 @@ pub async fn fetch_views(
         .bind(start_date)
         .bind(end_date);
 
-    if projects.is_some() {
-        query = query.bind(projects.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
-    } else if versions.is_some() {
-        query = query.bind(versions.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
+    if let Some(projects) = projects {
+        query = query.bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
+    } else if let Some(versions) = versions {
+        query = query.bind(versions.iter().map(|x| x.0).collect::<Vec<_>>());
     }
 
     Ok(query.fetch_all().await?)
@@ -170,10 +170,10 @@ pub async fn fetch_downloads(
         .bind(start_date)
         .bind(end_date);
 
-    if projects.is_some() {
-        query = query.bind(projects.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
-    } else if versions.is_some() {
-        query = query.bind(versions.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
+    if let Some(projects) = projects {
+        query = query.bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
+    } else if let Some(versions) = versions {
+        query = query.bind(versions.iter().map(|x| x.0).collect::<Vec<_>>());
     }
 
     Ok(query.fetch_all().await?)
@@ -233,10 +233,10 @@ pub async fn fetch_countries(
             "
         )).bind(start_date).bind(end_date).bind(start_date).bind(end_date);
 
-    if projects.is_some() {
-        query = query.bind(projects.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
-    } else if versions.is_some() {
-        query = query.bind(versions.unwrap().iter().map(|x| x.0).collect::<Vec<_>>());
+    if let Some(projects) = projects {
+        query = query.bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
+    } else if let Some(versions) = versions {
+        query = query.bind(versions.iter().map(|x| x.0).collect::<Vec<_>>());
     }
 
     Ok(query.fetch_all().await?)

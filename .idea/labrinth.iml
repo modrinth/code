@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="CPP_MODULE" version="4">
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/ahash-7eac216debe9f38a/out" isTestSource="false" />
@@ -144,6 +145,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/v_htmlescape-2dcc3d8195b1decd/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/value-bag-61e3e358d251e1a5/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/whoami-7d9ebcbbb2371986/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

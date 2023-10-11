@@ -1,4 +1,5 @@
 use super::ids::Base62Id;
+use crate::bitflags_serde_impl;
 use crate::models::ids::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -10,8 +11,7 @@ use serde::{Deserialize, Serialize};
 pub struct PatId(pub u64);
 
 bitflags::bitflags! {
-    #[derive(Serialize, Deserialize)]
-    #[serde(transparent)]
+    #[derive(Copy, Clone, Debug)]
     pub struct Scopes: u64 {
         // read a user's email
         const USER_READ_EMAIL = 1 << 0;
@@ -106,6 +106,8 @@ bitflags::bitflags! {
         const NONE = 0b0;
     }
 }
+
+bitflags_serde_impl!(Scopes, u64);
 
 impl Scopes {
     // these scopes cannot be specified in a personal access token

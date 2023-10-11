@@ -14,6 +14,12 @@ pub struct AnalyticsQueue {
     playtime_queue: DashSet<Playtime>,
 }
 
+impl Default for AnalyticsQueue {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 // Batches analytics data points + transactions every few minutes
 impl AnalyticsQueue {
     pub fn new() -> Self {

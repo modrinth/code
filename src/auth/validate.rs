@@ -56,16 +56,15 @@ where
         created: db_user.created,
         role: Role::from_string(&db_user.role),
         badges: db_user.badges,
-        payout_data: Some(UserPayoutData {
-            balance: db_user.balance,
-            payout_wallet: db_user.payout_wallet,
-            payout_wallet_type: db_user.payout_wallet_type,
-            payout_address: db_user.payout_address,
-        }),
         auth_providers: Some(auth_providers),
         has_password: Some(db_user.password.is_some()),
         has_totp: Some(db_user.totp_secret.is_some()),
         github_id: None,
+        payout_data: Some(UserPayoutData {
+            balance: db_user.balance,
+            trolley_id: db_user.trolley_id,
+            trolley_status: db_user.trolley_account_status,
+        }),
     };
 
     if let Some(required_scopes) = required_scopes {

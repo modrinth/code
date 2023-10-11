@@ -32,7 +32,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(moderation::config)
             .configure(notifications::config)
             .configure(organizations::config)
-            //.configure(pats::config)
             .configure(project_creation::config)
             .configure(collections::config)
             .configure(images::config)

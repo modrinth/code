@@ -8,7 +8,8 @@ use crate::file_hosting::FileHost;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::ids::random_base62_rng;
 use crate::models::pats::Scopes;
-use crate::models::users::{Badges, Role};
+use crate::models::users::{Badges, RecipientStatus, Role, UserPayoutData};
+use crate::queue::payouts::{AccountUser, PayoutsQueue};
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::ApiError;
@@ -30,7 +31,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use validator::Validate;
 
 pub fn config(cfg: &mut ServiceConfig) {
@@ -51,7 +52,8 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(resend_verify_email)
             .service(set_email)
             .service(verify_email)
-            .service(subscribe_newsletter),
+            .service(subscribe_newsletter)
+            .service(link_trolley),
     );
 }
 
@@ -225,9 +227,8 @@ impl TempUser {
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
                 balance: Decimal::ZERO,
-                payout_wallet: None,
-                payout_wallet_type: None,
-                payout_address: None,
+                trolley_id: None,
+                trolley_account_status: None,
             }
             .insert(transaction)
             .await?;
@@ -1013,7 +1014,7 @@ pub async fn auth_callback(
 
     let sockets = active_sockets.clone();
     let state = state_string.clone();
-    let res: Result<HttpResponse, AuthenticationError> = (|| async move {
+    let res: Result<HttpResponse, AuthenticationError> = async move {
 
         let flow = Flow::get(&state, &redis).await?;
 
@@ -1175,7 +1176,7 @@ pub async fn auth_callback(
         } else {
             Err::<HttpResponse, AuthenticationError>(AuthenticationError::InvalidCredentials)
         }
-    })().await;
+    }.await;
 
     // Because this is callback route, if we have an error, we need to ensure we close the original socket if it exists
     if let Err(ref e) = res {
@@ -1385,9 +1386,8 @@ pub async fn create_account_with_password(
         role: Role::Developer.to_string(),
         badges: Badges::default(),
         balance: Decimal::ZERO,
-        payout_wallet: None,
-        payout_wallet_type: None,
-        payout_address: None,
+        trolley_id: None,
+        trolley_account_status: None,
     }
     .insert(&mut transaction)
     .await?;
@@ -2011,6 +2011,7 @@ pub async fn set_email(
     redis: Data<RedisPool>,
     email: web::Json<SetEmail>,
     session_queue: Data<AuthQueue>,
+    payouts_queue: Data<Mutex<PayoutsQueue>>,
 ) -> Result<HttpResponse, ApiError> {
     email
         .0
@@ -2063,6 +2064,17 @@ pub async fn set_email(
         flow,
         "We need to verify your email address.",
     )?;
+
+    if let Some(UserPayoutData {
+        trolley_id: Some(trolley_id),
+        ..
+    }) = user.payout_data
+    {
+        let queue = payouts_queue.lock().await;
+        queue
+            .update_recipient_email(&trolley_id, &email.email)
+            .await?;
+    }
 
     crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
     transaction.commit().await?;
@@ -2205,4 +2217,60 @@ fn send_email_verify(
         "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
         Some(("Verify email", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_VERIFY_EMAIL_PATH")?, flow))),
     )
+}
+
+#[post("trolley/link")]
+pub async fn link_trolley(
+    req: HttpRequest,
+    pool: Data<PgPool>,
+    redis: Data<RedisPool>,
+    session_queue: Data<AuthQueue>,
+    payouts_queue: Data<Mutex<PayoutsQueue>>,
+    body: web::Json<AccountUser>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PAYOUTS_WRITE]),
+    )
+    .await?
+    .1;
+
+    if let Some(payout_data) = user.payout_data {
+        if payout_data.trolley_id.is_some() {
+            return Err(ApiError::InvalidInput(
+                "User already has a trolley account.".to_string(),
+            ));
+        }
+    }
+
+    if let Some(email) = user.email {
+        let id = payouts_queue.lock().await.register_recipient(&email, body.0).await?;
+
+        let mut transaction = pool.begin().await?;
+
+        sqlx::query!(
+            "
+            UPDATE users
+            SET trolley_id = $1, trolley_account_status = $2
+            WHERE id = $3
+            ",
+            id,
+            RecipientStatus::Incomplete.as_str(),
+            user.id.0 as i64,
+        )
+        .execute(&mut transaction)
+        .await?;
+
+        transaction.commit().await?;
+        crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
+
+        Ok(HttpResponse::NoContent().finish())
+    } else {
+        Err(ApiError::InvalidInput(
+            "User needs to have an email set on account.".to_string(),
+        ))
+    }
 }

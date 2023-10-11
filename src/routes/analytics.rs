@@ -6,10 +6,10 @@ use crate::queue::analytics::AnalyticsQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::util::date::get_current_tenths_of_ms;
 use crate::util::env::parse_strings_from_var;
 use actix_web::{post, web};
 use actix_web::{HttpRequest, HttpResponse};
-use chrono::Utc;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -108,7 +108,7 @@ pub async fn page_view_ingest(
 
     let mut view = PageView {
         id: Uuid::new_v4(),
-        recorded: Utc::now().timestamp_nanos() / 100_000,
+        recorded: get_current_tenths_of_ms(),
         domain: domain.to_string(),
         site_path: url.path().to_string(),
         user_id: 0,
@@ -204,7 +204,7 @@ pub async fn playtime_ingest(
         if let Some(version) = versions.iter().find(|x| id == x.inner.id.into()) {
             analytics_queue.add_playtime(Playtime {
                 id: Default::default(),
-                recorded: Utc::now().timestamp_nanos() / 100_000,
+                recorded: get_current_tenths_of_ms(),
                 seconds: playtime.seconds as u64,
                 user_id: user.id.0,
                 project_id: version.inner.project_id.0 as u64,
