@@ -11,9 +11,9 @@
 </DemoContainer>
 
 ```vue
-<Button><HeartIcon /> Like</Button>
+<Button><BookmarkIcon /> Save</Button>
 <Button color="primary"><UploadIcon /> Upload</Button>
-<Button color="secondary"><EditIcon /> Edit</Button>
+<Button color="secondary"><PlusIcon /> Create new instance</Button>
 <Button color="highlight"><ScaleIcon /> Submit for review</Button>
 <Button color="danger"><TrashIcon /> Delete</Button>
 ```
