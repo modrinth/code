@@ -321,19 +321,30 @@ a,
 .btn {
   @extend .button-base;
 
-  --text-color: var(--color-contrast);
+  --text-color: var(--color-base);
   --background-color: var(--color-button-bg);
   --shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
-  &.btn-outline {
-    --background-color: var(--color-contrast);
+  &.btn-outline,
+  &.btn-transparent {
+    --background-color: var(--color-base);
     --text-color: var(--color-raised-bg);
     box-sizing: border-box;
 
     background-color: transparent;
-    border: 2px solid var(--background-color);
     color: var(--background-color);
+    transition: background-color 0.2s ease-in-out;
 
+    &:focus-visible:not(&:disabled),
+    &:hover:not(&:disabled) {
+      background-color: var(--color-button-bg);
+      filter: none;
+    }
+  }
+
+  &.btn-outline {
+    --background-color: var(--color-contrast);
+    border: 2px solid var(--background-color);
     padding-block: calc(var(--gap-sm) - 2px);
   }
 
@@ -353,12 +364,43 @@ a,
   }
 
   &.btn-secondary {
+    --text-color: var(--color-contrast);
     --background-color: var(--color-brand-highlight);
   }
 
   &.btn-highlight {
     --text-color: var(--color-accent-contrast);
     --background-color: var(--color-orange);
+  }
+
+  &.btn-red {
+    --text-color: var(--color-accent-contrast);
+    --background-color: var(--color-red);
+  }
+
+  &.btn-orange {
+    --text-color: var(--color-accent-contrast);
+    --background-color: var(--color-orange);
+  }
+
+  &.btn-green {
+    --text-color: var(--color-accent-contrast);
+    --background-color: var(--color-green);
+  }
+
+  &.btn-blue {
+    --text-color: var(--color-accent-contrast);
+    --background-color: var(--color-blue);
+  }
+
+  &.btn-purple {
+    --text-color: var(--color-accent-contrast);
+    --background-color: var(--color-purple);
+  }
+
+  &.btn-gray {
+    --text-color: var(--color-accent-contrast);
+    --background-color: var(--color-gray);
   }
 
   &.btn-large {
@@ -373,20 +415,21 @@ a,
   box-shadow: var(--shadow);
   border-radius: var(--radius-md);
 
-  padding-inline: var(--gap-lg);
-  padding-block: var(--gap-sm);
+  padding: var(--gap-sm) var(--gap-lg);
 
   display: flex;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
   width: fit-content;
   height: fit-content;
   text-decoration: none;
+  gap: 0.5rem;
+  line-height: 1.25rem;
 
   svg {
-    width: 1.1rem;
-    height: 1.1rem;
-    margin-right: 0.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   :deep(.external-icon) {
@@ -398,17 +441,7 @@ a,
   }
 
   &.icon-only {
-    padding: 0;
-    height: 2.25rem;
-    width: 2.25rem;
-
-    svg {
-      min-width: 1.25rem;
-      max-width: 1.25rem;
-      min-height: 1.25rem;
-      max-height: 1.25rem;
-      margin: auto;
-    }
+    padding: var(--gap-sm);
   }
 
   &.transparent {
