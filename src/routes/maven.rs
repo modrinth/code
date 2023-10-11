@@ -191,7 +191,7 @@ async fn find_version(
         .partition::<Vec<_>, _>(|el| db_loaders.contains(el));
 
     let matched = all_versions
-        .into_iter()
+        .iter()
         .filter(|x| {
             let mut bool = x.inner.version_number == vnumber;
 
@@ -206,7 +206,7 @@ async fn find_version(
         })
         .collect::<Vec<_>>();
 
-    Ok(matched.get(0).cloned())
+    Ok(matched.get(0).or_else(|| exact_matches.get(0)).copied().cloned())
 }
 
 fn find_file<'a>(
