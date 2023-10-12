@@ -4,10 +4,10 @@
       <div class="slide-container">
         <div class="snap-points">
           <div
+            v-for="snapPoint in props.snapPoints"
+            :key="snapPoint"
             class="snap-point"
             :class="{ green: snapPoint <= currentValue }"
-            v-for="snapPoint in props.snapPoints"
-            v-bind:key="snapPoint"
             :style="{ left: ((snapPoint - props.min) / (props.max - props.min)) * 100 + '%' }"
           ></div>
         </div>

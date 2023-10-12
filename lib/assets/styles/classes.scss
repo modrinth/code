@@ -334,7 +334,8 @@ a,
     box-sizing: border-box;
 
     background-color: transparent;
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out , color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
+      color 0.2s ease-in-out;
     box-shadow: none;
   }
 
@@ -350,7 +351,8 @@ a,
     &:hover:not(&:disabled) {
       background-color: var(--color-button-bg);
 
-      &.btn-hover-filled, &.btn-hover-filled-only {
+      &.btn-hover-filled,
+      &.btn-hover-filled-only {
         color: var(--_text-color);
         background-color: var(--_background-color);
       }
@@ -370,7 +372,8 @@ a,
 
     &:focus-visible:not(&:disabled),
     &:hover:not(&:disabled) {
-      &.btn-hover-filled, &.btn-hover-filled-only {
+      &.btn-hover-filled,
+      &.btn-hover-filled-only {
         border-color: var(--_accent-color);
         color: var(--_text-color);
         background-color: var(--_background-color);
