@@ -1633,12 +1633,6 @@ pub async fn project_schedule(
             ));
         }
 
-        if project_item.inner.webhook_sent {
-            return Err(ApiError::InvalidInput(
-                "This project already has been published. It cannot be scheduled!".to_string(),
-            ));
-        }
-
         sqlx::query!(
             "
             UPDATE mods
