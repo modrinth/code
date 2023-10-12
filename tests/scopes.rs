@@ -92,14 +92,10 @@ pub async fn notifications_scopes() {
 
     // We will invite user 'friend' to project team, and use that as a notification
     // Get notifications
-    let req = TestRequest::post()
-        .uri(&format!("/v2/team/{alpha_team_id}/members"))
-        .append_header(("Authorization", USER_USER_PAT))
-        .set_json(json!( {
-            "user_id": FRIEND_USER_ID // friend
-        }))
-        .to_request();
-    let resp = test_env.call(req).await;
+    let resp = test_env
+        .v2
+        .add_user_to_team(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
+        .await;
     assert_eq!(resp.status(), 204);
 
     // Notification get
@@ -164,14 +160,10 @@ pub async fn notifications_scopes() {
 
     // Mass notification delete
     // We invite mod, get the notification ID, and do mass delete using that
-    let req = test::TestRequest::post()
-        .uri(&format!("/v2/team/{alpha_team_id}/members"))
-        .append_header(("Authorization", USER_USER_PAT))
-        .set_json(json!( {
-            "user_id": MOD_USER_ID // mod
-        }))
-        .to_request();
-    let resp = test_env.call(req).await;
+    let resp = test_env
+        .v2
+        .add_user_to_team(alpha_team_id, MOD_USER_ID, USER_USER_PAT)
+        .await;
     assert_eq!(resp.status(), 204);
     let read_notifications = Scopes::NOTIFICATION_READ;
     let req_gen = || test::TestRequest::get().uri(&format!("/v2/user/{MOD_USER_ID}/notifications"));

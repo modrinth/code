@@ -690,12 +690,7 @@ impl Version {
 
             for version in db_versions {
                 redis
-                    .set(
-                        VERSIONS_NAMESPACE,
-                        version.inner.id.0,
-                        serde_json::to_string(&version)?,
-                        None,
-                    )
+                    .set_serialized_to_json(VERSIONS_NAMESPACE, version.inner.id.0, &version, None)
                     .await?;
 
                 found_versions.push(version);
@@ -827,12 +822,7 @@ impl Version {
 
             for (key, mut files) in save_files {
                 redis
-                    .set(
-                        VERSION_FILES_NAMESPACE,
-                        key,
-                        serde_json::to_string(&files)?,
-                        None,
-                    )
+                    .set_serialized_to_json(VERSION_FILES_NAMESPACE, key, &files, None)
                     .await?;
 
                 found_files.append(&mut files);

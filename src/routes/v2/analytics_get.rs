@@ -488,7 +488,7 @@ async fn filter_allowed_ids(
     if project_ids.is_none() && version_ids.is_none() {
         if let Some(user) = &user_option {
             project_ids = Some(
-                user_item::User::get_projects(user.id.into(), &***pool)
+                user_item::User::get_projects(user.id.into(), &***pool, redis)
                     .await?
                     .into_iter()
                     .map(|x| ProjectId::from(x).to_string())

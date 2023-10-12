@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 const USERS_NAMESPACE: &str = "users";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
-// const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
+const USERS_PROJECTS_NAMESPACE: &str = "users_projects";
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct User {
@@ -234,12 +234,7 @@ impl User {
 
             for user in db_users {
                 redis
-                    .set(
-                        USERS_NAMESPACE,
-                        user.id.0,
-                        serde_json::to_string(&user)?,
-                        None,
-                    )
+                    .set_serialized_to_json(USERS_NAMESPACE, user.id.0, &user, None)
                     .await?;
                 redis
                     .set(
@@ -276,13 +271,22 @@ impl User {
     pub async fn get_projects<'a, E>(
         user_id: UserId,
         exec: E,
-    ) -> Result<Vec<ProjectId>, sqlx::Error>
+        redis: &RedisPool,
+    ) -> Result<Vec<ProjectId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 
-        let projects = sqlx::query!(
+        let cached_projects = redis
+            .get_deserialized_from_json::<Vec<ProjectId>, _>(USERS_PROJECTS_NAMESPACE, user_id.0)
+            .await?;
+
+        if let Some(projects) = cached_projects {
+            return Ok(projects);
+        }
+
+        let db_projects = sqlx::query!(
             "
             SELECT m.id FROM mods m
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.accepted = TRUE
@@ -296,7 +300,11 @@ impl User {
         .try_collect::<Vec<ProjectId>>()
         .await?;
 
-        Ok(projects)
+        redis
+            .set_serialized_to_json(USERS_PROJECTS_NAMESPACE, user_id.0, &db_projects, None)
+            .await?;
+
+        Ok(db_projects)
     }
 
     pub async fn get_collections<'a, E>(
@@ -362,6 +370,21 @@ impl User {
                 ]
             }))
             .await?;
+        Ok(())
+    }
+
+    pub async fn clear_project_cache(
+        user_ids: &[UserId],
+        redis: &RedisPool,
+    ) -> Result<(), DatabaseError> {
+        redis
+            .delete_many(
+                user_ids
+                    .into_iter()
+                    .map(|id| (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))),
+            )
+            .await?;
+
         Ok(())
     }
 

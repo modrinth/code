@@ -261,12 +261,7 @@ impl TeamMember {
                 let mut members = members.collect::<Vec<_>>();
 
                 redis
-                    .set(
-                        TEAMS_NAMESPACE,
-                        id.0,
-                        serde_json::to_string(&members)?,
-                        None,
-                    )
+                    .set_serialized_to_json(TEAMS_NAMESPACE, id.0, &members, None)
                     .await?;
                 found_teams.append(&mut members);
             }

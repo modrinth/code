@@ -1,10 +1,11 @@
-use super::ids::*;
+use super::{ids::*, User};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::projects::{MonetizationStatus, ProjectStatus};
 use chrono::{DateTime, Utc};
+use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
@@ -445,15 +446,20 @@ impl Project {
 
             models::TeamMember::clear_cache(project.inner.team_id, redis).await?;
 
-            sqlx::query!(
+            let affected_user_ids = sqlx::query!(
                 "
                 DELETE FROM team_members
                 WHERE team_id = $1
+                RETURNING user_id
                 ",
                 project.inner.team_id as TeamId,
             )
-            .execute(&mut *transaction)
+            .fetch_many(&mut *transaction)
+            .try_filter_map(|e| async { Ok(e.right().map(|x| UserId(x.user_id))) })
+            .try_collect::<Vec<_>>()
             .await?;
+
+            User::clear_project_cache(&affected_user_ids, redis).await?;
 
             sqlx::query!(
                 "
@@ -520,8 +526,6 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use futures::TryStreamExt;
-
         if project_strings.is_empty() {
             return Ok(Vec::new());
         }
@@ -695,12 +699,7 @@ impl Project {
 
             for project in db_projects {
                 redis
-                    .set(
-                        PROJECTS_NAMESPACE,
-                        project.inner.id.0,
-                        serde_json::to_string(&project)?,
-                        None,
-                    )
+                    .set_serialized_to_json(PROJECTS_NAMESPACE, project.inner.id.0, &project, None)
                     .await?;
                 if let Some(slug) = &project.inner.slug {
                     redis
@@ -729,14 +728,10 @@ impl Project {
     {
         type Dependencies = Vec<(Option<VersionId>, Option<ProjectId>, Option<ProjectId>)>;
 
-        use futures::stream::TryStreamExt;
-
         let dependencies = redis
-            .get::<String, _>(PROJECTS_DEPENDENCIES_NAMESPACE, id.0)
+            .get_deserialized_from_json::<Dependencies, _>(PROJECTS_DEPENDENCIES_NAMESPACE, id.0)
             .await?;
-        if let Some(dependencies) =
-            dependencies.and_then(|x| serde_json::from_str::<Dependencies>(&x).ok())
-        {
+        if let Some(dependencies) = dependencies {
             return Ok(dependencies);
         }
 
@@ -768,12 +763,7 @@ impl Project {
         .await?;
 
         redis
-            .set(
-                PROJECTS_DEPENDENCIES_NAMESPACE,
-                id.0,
-                serde_json::to_string(&dependencies)?,
-                None,
-            )
+            .set_serialized_to_json(PROJECTS_DEPENDENCIES_NAMESPACE, id.0, &dependencies, None)
             .await?;
         Ok(dependencies)
     }

@@ -5,10 +5,13 @@ use std::sync::Arc;
 use self::database::TemporaryDatabase;
 
 pub mod actix;
+pub mod api_v2;
+pub mod asserts;
 pub mod database;
 pub mod dummy_data;
 pub mod environment;
 pub mod pats;
+pub mod request_data;
 pub mod scopes;
 
 // Testing equivalent to 'setup' function, producing a LabrinthConfig

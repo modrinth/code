@@ -269,11 +269,7 @@ async fn test_add_remove_project() {
     let id = body["id"].to_string();
 
     // Remove the project
-    let req = test::TestRequest::delete()
-        .uri("/v2/project/demo")
-        .append_header(("Authorization", USER_USER_PAT))
-        .to_request();
-    let resp = test_env.call(req).await;
+    let resp = test_env.v2.remove_project("demo", USER_USER_PAT).await;
     assert_eq!(resp.status(), 204);
 
     // Confirm that the project is gone from the cache

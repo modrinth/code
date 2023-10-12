@@ -83,9 +83,10 @@ impl<'a> ScopeTest<'a> {
 
         if resp.status().as_u16() != self.expected_failure_code {
             return Err(format!(
-                "Expected failure code {}, got {}",
+                "Expected failure code {}, got {} ({:#?})",
                 self.expected_failure_code,
-                resp.status().as_u16()
+                resp.status().as_u16(),
+                resp.response()
             ));
         }
 
@@ -106,8 +107,9 @@ impl<'a> ScopeTest<'a> {
 
         if !(resp.status().is_success() || resp.status().is_redirection()) {
             return Err(format!(
-                "Expected success code, got {}",
-                resp.status().as_u16()
+                "Expected success code, got {} ({:#?})",
+                resp.status().as_u16(),
+                resp.response()
             ));
         }
 

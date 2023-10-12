@@ -3,16 +3,15 @@ use labrinth::{models::projects::Project, models::projects::Version};
 use serde_json::json;
 use sqlx::Executor;
 
-use crate::common::{
-    actix::AppendsMultipart,
-    database::{MOD_USER_PAT, USER_USER_PAT},
-};
+use crate::common::{actix::AppendsMultipart, database::USER_USER_PAT};
 
 use super::{
     actix::{MultipartSegment, MultipartSegmentData},
     environment::TestEnvironment,
+    request_data::get_public_project_creation_data,
 };
 
+#[allow(dead_code)]
 pub const DUMMY_CATEGORIES: &'static [&str] = &[
     "combat",
     "decoration",
@@ -22,6 +21,14 @@ pub const DUMMY_CATEGORIES: &'static [&str] = &[
     "mobs",
     "optimization",
 ];
+
+#[allow(dead_code)]
+pub enum DummyJarFile {
+    DummyProjectAlpha,
+    DummyProjectBeta,
+    BasicMod,
+    BasicModDifferent,
+}
 
 pub struct DummyData {
     pub alpha_team_id: String,
@@ -75,94 +82,19 @@ pub async fn add_dummy_data(test_env: &TestEnvironment) -> DummyData {
 }
 
 pub async fn add_project_alpha(test_env: &TestEnvironment) -> (Project, Version) {
-    // Adds dummy data to the database with sqlx (projects, versions, threads)
-    // Generate test project data.
-    let json_data = json!(
-        {
-            "title": "Test Project Alpha",
-            "slug": "alpha",
-            "description": "A dummy project for testing with.",
-            "body": "This project is approved, and versions are listed.",
-            "client_side": "required",
-            "server_side": "optional",
-            "initial_versions": [{
-                "file_parts": ["dummy-project-alpha.jar"],
-                "version_number": "1.2.3",
-                "version_title": "start",
-                "dependencies": [],
-                "game_versions": ["1.20.1"] ,
-                "release_channel": "release",
-                "loaders": ["fabric"],
-                "featured": true
-            }],
-            "categories": [],
-            "license_id": "MIT"
-        }
-    );
-
-    // Basic json
-    let json_segment = MultipartSegment {
-        name: "data".to_string(),
-        filename: None,
-        content_type: Some("application/json".to_string()),
-        data: MultipartSegmentData::Text(serde_json::to_string(&json_data).unwrap()),
-    };
-
-    // Basic file
-    let file_segment = MultipartSegment {
-        name: "dummy-project-alpha.jar".to_string(),
-        filename: Some("dummy-project-alpha.jar".to_string()),
-        content_type: Some("application/java-archive".to_string()),
-        data: MultipartSegmentData::Binary(
-            include_bytes!("../../tests/files/dummy-project-alpha.jar").to_vec(),
-        ),
-    };
-
-    // Add a project.
-    let req = TestRequest::post()
-        .uri("/v2/project")
-        .append_header(("Authorization", USER_USER_PAT))
-        .set_multipart(vec![json_segment.clone(), file_segment.clone()])
-        .to_request();
-    let resp = test_env.call(req).await;
-    assert_eq!(resp.status(), 200);
-
-    // Approve as a moderator.
-    let req = TestRequest::patch()
-        .uri("/v2/project/alpha")
-        .append_header(("Authorization", MOD_USER_PAT))
-        .set_json(json!(
-            {
-                "status": "approved"
-            }
+    test_env
+        .v2
+        .add_public_project(get_public_project_creation_data(
+            "alpha",
+            DummyJarFile::DummyProjectAlpha,
         ))
-        .to_request();
-    let resp = test_env.call(req).await;
-    assert_eq!(resp.status(), 204);
-
-    // Get project
-    let req = TestRequest::get()
-        .uri("/v2/project/alpha")
-        .append_header(("Authorization", USER_USER_PAT))
-        .to_request();
-    let resp = test_env.call(req).await;
-    let project: Project = test::read_body_json(resp).await;
-
-    // Get project's versions
-    let req = TestRequest::get()
-        .uri("/v2/project/alpha/version")
-        .append_header(("Authorization", USER_USER_PAT))
-        .to_request();
-    let resp = test_env.call(req).await;
-    let versions: Vec<Version> = test::read_body_json(resp).await;
-    let version = versions.into_iter().next().unwrap();
-
-    (project, version)
+        .await
 }
 
 pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) {
     // Adds dummy data to the database with sqlx (projects, versions, threads)
     // Generate test project data.
+    let jar = DummyJarFile::DummyProjectBeta;
     let json_data = json!(
         {
             "title": "Test Project Beta",
@@ -172,7 +104,7 @@ pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) 
             "client_side": "required",
             "server_side": "optional",
             "initial_versions": [{
-                "file_parts": ["dummy-project-beta.jar"],
+                "file_parts": [jar.filename()],
                 "version_number": "1.2.3",
                 "version_title": "start",
                 "status": "unlisted",
@@ -200,12 +132,10 @@ pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) 
 
     // Basic file
     let file_segment = MultipartSegment {
-        name: "dummy-project-beta.jar".to_string(),
-        filename: Some("dummy-project-beta.jar".to_string()),
+        name: jar.filename(),
+        filename: Some(jar.filename()),
         content_type: Some("application/java-archive".to_string()),
-        data: MultipartSegmentData::Binary(
-            include_bytes!("../../tests/files/dummy-project-beta.jar").to_vec(),
-        ),
+        data: MultipartSegmentData::Binary(jar.bytes()),
     };
 
     // Add a project.
@@ -236,4 +166,31 @@ pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) 
     let version = versions.into_iter().next().unwrap();
 
     (project, version)
+}
+
+impl DummyJarFile {
+    pub fn filename(&self) -> String {
+        match self {
+            DummyJarFile::DummyProjectAlpha => "dummy-project-alpha.jar",
+            DummyJarFile::DummyProjectBeta => "dummy-project-beta.jar",
+            DummyJarFile::BasicMod => "basic-mod.jar",
+            DummyJarFile::BasicModDifferent => "basic-mod-different.jar",
+        }
+        .to_string()
+    }
+
+    pub fn bytes(&self) -> Vec<u8> {
+        match self {
+            DummyJarFile::DummyProjectAlpha => {
+                include_bytes!("../../tests/files/dummy-project-alpha.jar").to_vec()
+            }
+            DummyJarFile::DummyProjectBeta => {
+                include_bytes!("../../tests/files/dummy-project-beta.jar").to_vec()
+            }
+            DummyJarFile::BasicMod => include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
+            DummyJarFile::BasicModDifferent => {
+                include_bytes!("../../tests/files/basic-mod-different.jar").to_vec()
+            }
+        }
+    }
 }

@@ -59,9 +59,24 @@ impl RedisPool {
         Ok(())
     }
 
-    pub async fn get<R, T1>(&self, namespace: &str, id: T1) -> Result<Option<R>, DatabaseError>
+    pub async fn set_serialized_to_json<Id, D>(
+        &self,
+        namespace: &str,
+        id: Id,
+        data: D,
+        expiry: Option<i64>,
+    ) -> Result<(), DatabaseError>
     where
-        T1: Display,
+        Id: Display,
+        D: serde::Serialize,
+    {
+        self.set(namespace, id, serde_json::to_string(&data)?, expiry)
+            .await
+    }
+
+    pub async fn get<R, Id>(&self, namespace: &str, id: Id) -> Result<Option<R>, DatabaseError>
+    where
+        Id: Display,
         R: FromRedisValue,
     {
         let mut redis_connection = self.pool.get().await?;
@@ -71,6 +86,21 @@ impl RedisPool {
             .query_async::<_, Option<R>>(&mut redis_connection)
             .await?;
         Ok(res)
+    }
+
+    pub async fn get_deserialized_from_json<R, Id>(
+        &self,
+        namespace: &str,
+        id: Id,
+    ) -> Result<Option<R>, DatabaseError>
+    where
+        Id: Display,
+        R: for<'a> serde::Deserialize<'a>,
+    {
+        Ok(self
+            .get::<String, Id>(namespace, id)
+            .await?
+            .and_then(|x| serde_json::from_str(&x).ok()))
     }
 
     pub async fn multi_get<R, T1>(
@@ -111,17 +141,20 @@ impl RedisPool {
     pub async fn delete_many(
         &self,
         iter: impl IntoIterator<Item = (&str, Option<String>)>,
-    ) -> Result<(), DatabaseError>
-where {
-        let mut redis_connection = self.pool.get().await?;
-
+    ) -> Result<(), DatabaseError> {
         let mut cmd = cmd("DEL");
+        let mut any = false;
         for (namespace, id) in iter {
             if let Some(id) = id {
                 cmd.arg(format!("{}_{}:{}", self.meta_namespace, namespace, id));
+                any = true;
             }
         }
-        cmd.query_async::<_, ()>(&mut redis_connection).await?;
+
+        if any {
+            let mut redis_connection = self.pool.get().await?;
+            cmd.query_async::<_, ()>(&mut redis_connection).await?;
+        }
 
         Ok(())
     }

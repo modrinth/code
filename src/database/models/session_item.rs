@@ -213,12 +213,7 @@ impl Session {
 
             for session in db_sessions {
                 redis
-                    .set(
-                        SESSIONS_NAMESPACE,
-                        session.id.0,
-                        serde_json::to_string(&session)?,
-                        None,
-                    )
+                    .set_serialized_to_json(SESSIONS_NAMESPACE, session.id.0, &session, None)
                     .await?;
                 redis
                     .set(
@@ -244,9 +239,8 @@ impl Session {
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let res = redis
-            .get::<String, _>(SESSIONS_USERS_NAMESPACE, user_id.0)
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<i64>>(&x).ok());
+            .get_deserialized_from_json::<Vec<i64>, _>(SESSIONS_USERS_NAMESPACE, user_id.0)
+            .await?;
 
         if let Some(res) = res {
             return Ok(res.into_iter().map(SessionId).collect());
@@ -268,12 +262,7 @@ impl Session {
         .await?;
 
         redis
-            .set(
-                SESSIONS_USERS_NAMESPACE,
-                user_id.0,
-                serde_json::to_string(&db_sessions)?,
-                None,
-            )
+            .set_serialized_to_json(SESSIONS_USERS_NAMESPACE, user_id.0, &db_sessions, None)
             .await?;
 
         Ok(db_sessions)

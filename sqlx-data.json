@@ -707,18 +707,6 @@
     },
     "query": "\n                            UPDATE mods\n                            SET webhook_sent = TRUE\n                            WHERE id = $1\n                            "
   },
-  "127691940ca7e542e246dd2a1c9cb391041b30ddf0547d73b49c1dd9dc59d2ae": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            UPDATE notifications\n            SET read = TRUE\n            WHERE id = ANY($1)\n            "
-  },
   "15fac93c76e72348b50f526e1acb183521d94be335ad8b9dfeb0398d4a8a2fc4": {
     "describe": {
       "columns": [],
@@ -2353,18 +2341,6 @@
     },
     "query": "\n            SELECT id FROM threads\n            WHERE report_id = $1\n            "
   },
-  "599df07263a2705e57fc70a7c4f5dc606e1730c281e3b573d2f2a2030bed04e0": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            DELETE FROM notifications\n            WHERE id = ANY($1)\n            "
-  },
   "59e95e832615c375753bfc9a56b07c02d916399adfa52fb11a79b8f7b56ecf8b": {
     "describe": {
       "columns": [
@@ -3720,6 +3696,20 @@
     },
     "query": "\n                    UPDATE pats\n                    SET expires = $1\n                    WHERE id = $2\n                    "
   },
+  "8a9bf48b3d4aa665136568a9bf9ddb8e5d81ed27ce587e26672dfb45a44c7b9c": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8Array",
+          "JsonbArray"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO notifications (\n                id, user_id, body\n            )\n            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::jsonb[])\n            "
+  },
   "8abb317c85f48c7dd9ccf4a7b8fbc0b58ac73f7ae87ff2dfe67009a51089f784": {
     "describe": {
       "columns": [],
@@ -3860,6 +3850,26 @@
       }
     },
     "query": "\n        UPDATE threads\n        SET show_in_mod_inbox = FALSE\n        WHERE id = $1\n        "
+  },
+  "8f74918aa923e516b6b2967b7d1afbd02c8bde5466d22ad60ad735f8358cbf04": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                DELETE FROM team_members\n                WHERE team_id = $1\n                RETURNING user_id\n                "
   },
   "912250d37f13a98a21165c72bfc1eaa8a85b9952dd6750c117dca7fbb1bb8962": {
     "describe": {
@@ -5426,20 +5436,6 @@
     },
     "query": "\n            DELETE FROM threads_messages\n            WHERE thread_id = $1\n            "
   },
-  "d2c046d4bedeb7181ece4e94d7de90c97bd3dd1b0c16070704028923a0c2834a": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Jsonb"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO notifications (\n                id, user_id, body\n            )\n            VALUES (\n                $1, $2, $3\n            )\n            "
-  },
   "d2e826d4fa4e3e730cc84c97964c0c5fdd25cd49ddff8c593bd9b8a3b4d5ff1e": {
     "describe": {
       "columns": [],
@@ -6291,6 +6287,26 @@
     },
     "query": "SELECT id FROM users WHERE discord_id = $1"
   },
+  "ee375e658423156a758cc372400961f627fa5a620a3f61e37ec09fee1d7bb4e3": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            DELETE FROM notifications\n            WHERE id = ANY($1)\n            RETURNING user_id\n            "
+  },
   "eec6d4028d790e57a4d97fc5a200a9ae2b3d2cb60ee83c51fb05180b821558f5": {
     "describe": {
       "columns": [],
@@ -6469,6 +6485,26 @@
       }
     },
     "query": "\n                    UPDATE users\n                    SET bio = $1\n                    WHERE (id = $2)\n                    "
+  },
+  "f775506213dbf4bf0ee05fd53c693412e3baae64b6dc0aead8082059f16755bc": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            UPDATE notifications\n            SET read = TRUE\n            WHERE id = ANY($1)\n            RETURNING user_id\n            "
   },
   "f793e96499ff35f8dc2e420484c2a0cdb54f25ffa27caa081691779ab896a709": {
     "describe": {

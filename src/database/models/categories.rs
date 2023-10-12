@@ -102,10 +102,9 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "category")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<Category>>(&x).ok());
+        let res: Option<Vec<Category>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "category")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -133,12 +132,7 @@ impl Category {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "category",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "category", &result, None)
             .await?;
 
         Ok(result)
@@ -167,10 +161,9 @@ impl Loader {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "loader")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<Loader>>(&x).ok());
+        let res: Option<Vec<Loader>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "loader")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -204,12 +197,7 @@ impl Loader {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "loader",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "loader", &result, None)
             .await?;
 
         Ok(result)
@@ -252,10 +240,9 @@ impl GameVersion {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "game_version")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<GameVersion>>(&x).ok());
+        let res: Option<Vec<GameVersion>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "game_version")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -279,12 +266,7 @@ impl GameVersion {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "game_version",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "game_version", &result, None)
             .await?;
         Ok(result)
     }
@@ -400,10 +382,9 @@ impl DonationPlatform {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "donation_platform")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<DonationPlatform>>(&x).ok());
+        let res: Option<Vec<DonationPlatform>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "donation_platform")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -426,12 +407,7 @@ impl DonationPlatform {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "donation_platform",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "donation_platform", &result, None)
             .await?;
 
         Ok(result)
@@ -460,10 +436,9 @@ impl ReportType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "report_type")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<String>>(&x).ok());
+        let res: Option<Vec<String>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "report_type")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -480,12 +455,7 @@ impl ReportType {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "report_type",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "report_type", &result, None)
             .await?;
 
         Ok(result)
@@ -514,10 +484,9 @@ impl ProjectType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "project_type")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<String>>(&x).ok());
+        let res: Option<Vec<String>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "project_type")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -534,12 +503,7 @@ impl ProjectType {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "project_type",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "project_type", &result, None)
             .await?;
 
         Ok(result)
@@ -568,10 +532,9 @@ impl SideType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let res = redis
-            .get::<String, _>(TAGS_NAMESPACE, "side_type")
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<String>>(&x).ok());
+        let res: Option<Vec<String>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "side_type")
+            .await?;
 
         if let Some(res) = res {
             return Ok(res);
@@ -588,12 +551,7 @@ impl SideType {
         .await?;
 
         redis
-            .set(
-                TAGS_NAMESPACE,
-                "side_type",
-                serde_json::to_string(&result)?,
-                None,
-            )
+            .set_serialized_to_json(TAGS_NAMESPACE, "side_type", &result, None)
             .await?;
 
         Ok(result)

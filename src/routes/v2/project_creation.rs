@@ -1,7 +1,7 @@
 use super::version_creation::InitialVersionData;
 use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models::thread_item::ThreadBuilder;
-use crate::database::models::{self, image_item};
+use crate::database::models::{self, image_item, User};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
@@ -791,6 +791,7 @@ async fn project_create_inner(
         let now = Utc::now();
 
         let id = project_builder_actual.insert(&mut *transaction).await?;
+        User::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {
             if let Some(db_image) =

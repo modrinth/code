@@ -136,7 +136,7 @@ pub async fn projects_list(
             .map(|y| y.role.is_mod() || y.id == user_id)
             .unwrap_or(false);
 
-        let project_data = User::get_projects(id, &**pool).await?;
+        let project_data = User::get_projects(id, &**pool, &redis).await?;
 
         let response: Vec<_> =
             crate::database::Project::get_many_ids(&project_data, &**pool, &redis)
@@ -591,11 +591,13 @@ pub async fn user_notifications(
         }
 
         let mut notifications: Vec<Notification> =
-            crate::database::models::notification_item::Notification::get_many_user(id, &**pool)
-                .await?
-                .into_iter()
-                .map(Into::into)
-                .collect();
+            crate::database::models::notification_item::Notification::get_many_user(
+                id, &**pool, &redis,
+            )
+            .await?
+            .into_iter()
+            .map(Into::into)
+            .collect();
 
         notifications.sort_by(|a, b| b.created.cmp(&a.created));
 

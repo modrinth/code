@@ -187,10 +187,10 @@ impl Organization {
 
             for organization in organizations {
                 redis
-                    .set(
+                    .set_serialized_to_json(
                         ORGANIZATIONS_NAMESPACE,
                         organization.id.0,
-                        serde_json::to_string(&organization)?,
+                        &organization,
                         None,
                     )
                     .await?;

@@ -169,7 +169,7 @@ impl PersonalAccessToken {
 
             for pat in db_pats {
                 redis
-                    .set(PATS_NAMESPACE, pat.id.0, serde_json::to_string(&pat)?, None)
+                    .set_serialized_to_json(PATS_NAMESPACE, pat.id.0, &pat, None)
                     .await?;
                 redis
                     .set(
@@ -195,9 +195,8 @@ impl PersonalAccessToken {
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let res = redis
-            .get::<String, _>(PATS_USERS_NAMESPACE, user_id.0)
-            .await?
-            .and_then(|x| serde_json::from_str::<Vec<i64>>(&x).ok());
+            .get_deserialized_from_json::<Vec<i64>, _>(PATS_USERS_NAMESPACE, user_id.0)
+            .await?;
 
         if let Some(res) = res {
             return Ok(res.into_iter().map(PatId).collect());

@@ -236,12 +236,7 @@ impl Image {
 
             for image in db_images {
                 redis
-                    .set(
-                        IMAGES_NAMESPACE,
-                        image.id.0,
-                        serde_json::to_string(&image)?,
-                        None,
-                    )
+                    .set_serialized_to_json(IMAGES_NAMESPACE, image.id.0, &image, None)
                     .await?;
                 found_images.push(image);
             }

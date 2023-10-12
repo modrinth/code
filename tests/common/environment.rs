@@ -1,7 +1,15 @@
 #![allow(dead_code)]
 
-use super::{database::TemporaryDatabase, dummy_data};
+use std::rc::Rc;
+
+use super::{
+    api_v2::ApiV2,
+    asserts::assert_status,
+    database::{TemporaryDatabase, FRIEND_USER_ID, USER_USER_PAT},
+    dummy_data,
+};
 use crate::common::setup;
+use actix_http::StatusCode;
 use actix_web::{dev::ServiceResponse, test, App};
 use futures::Future;
 
@@ -22,8 +30,9 @@ where
 // temporary sqlx db like #[sqlx::test] would.
 // Use .call(req) on it directly to make a test call as if test::call_service(req) were being used.
 pub struct TestEnvironment {
-    test_app: Box<dyn LocalService>,
+    test_app: Rc<Box<dyn LocalService>>,
     pub db: TemporaryDatabase,
+    pub v2: ApiV2,
 
     pub dummy: Option<dummy_data::DummyData>,
 }
@@ -40,9 +49,12 @@ impl TestEnvironment {
         let db = TemporaryDatabase::create().await;
         let labrinth_config = setup(&db).await;
         let app = App::new().configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()));
-        let test_app = test::init_service(app).await;
+        let test_app: Rc<Box<dyn LocalService>> = Rc::new(Box::new(test::init_service(app).await));
         Self {
-            test_app: Box::new(test_app),
+            v2: ApiV2 {
+                test_app: test_app.clone(),
+            },
+            test_app,
             db,
             dummy: None,
         }
@@ -54,9 +66,21 @@ impl TestEnvironment {
     pub async fn call(&self, req: actix_http::Request) -> ServiceResponse {
         self.test_app.call(req).await.unwrap()
     }
+
+    pub async fn generate_friend_user_notification(&self) {
+        let resp = self
+            .v2
+            .add_user_to_team(
+                &self.dummy.as_ref().unwrap().alpha_team_id,
+                FRIEND_USER_ID,
+                USER_USER_PAT,
+            )
+            .await;
+        assert_status(resp, StatusCode::NO_CONTENT);
+    }
 }
 
-trait LocalService {
+pub trait LocalService {
     fn call(
         &self,
         req: actix_http::Request,

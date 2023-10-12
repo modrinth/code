@@ -225,10 +225,10 @@ impl Collection {
 
             for collection in db_collections {
                 redis
-                    .set(
+                    .set_serialized_to_json(
                         COLLECTIONS_NAMESPACE,
                         collection.id.0,
-                        serde_json::to_string(&collection)?,
+                        &collection,
                         None,
                     )
                     .await?;

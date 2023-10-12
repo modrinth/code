@@ -598,7 +598,7 @@ pub async fn project_edit(
                             new_status: *status,
                         },
                     }
-                    .insert_many(notified_members, &mut transaction)
+                    .insert_many(notified_members, &mut transaction, &redis)
                     .await?;
                 }
 

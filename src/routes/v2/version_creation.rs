@@ -409,7 +409,7 @@ async fn version_create_inner(
             version_id,
         },
     }
-    .insert_many(users, &mut *transaction)
+    .insert_many(users, &mut *transaction, redis)
     .await?;
 
     let response = Version {

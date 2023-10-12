@@ -216,10 +216,10 @@ pub struct FileId(pub i64);
 #[sqlx(transparent)]
 pub struct PatId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct NotificationId(pub i64);
-#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct NotificationActionId(pub i32);
 

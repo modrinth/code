@@ -129,8 +129,12 @@ pub async fn notification_read(
         if data.user_id == user.id.into() || user.role.is_admin() {
             let mut transaction = pool.begin().await?;
 
-            database::models::notification_item::Notification::read(id.into(), &mut transaction)
-                .await?;
+            database::models::notification_item::Notification::read(
+                id.into(),
+                &mut transaction,
+                &redis,
+            )
+            .await?;
 
             transaction.commit().await?;
 
@@ -172,8 +176,12 @@ pub async fn notification_delete(
         if data.user_id == user.id.into() || user.role.is_admin() {
             let mut transaction = pool.begin().await?;
 
-            database::models::notification_item::Notification::remove(id.into(), &mut transaction)
-                .await?;
+            database::models::notification_item::Notification::remove(
+                id.into(),
+                &mut transaction,
+                &redis,
+            )
+            .await?;
 
             transaction.commit().await?;
 
@@ -225,8 +233,12 @@ pub async fn notifications_read(
         }
     }
 
-    database::models::notification_item::Notification::read_many(&notifications, &mut transaction)
-        .await?;
+    database::models::notification_item::Notification::read_many(
+        &notifications,
+        &mut transaction,
+        &redis,
+    )
+    .await?;
 
     transaction.commit().await?;
 
@@ -273,6 +285,7 @@ pub async fn notifications_delete(
     database::models::notification_item::Notification::remove_many(
         &notifications,
         &mut transaction,
+        &redis,
     )
     .await?;
 
