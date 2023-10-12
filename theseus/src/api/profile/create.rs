@@ -163,6 +163,7 @@ pub async fn profile_create_from_creator(
 pub async fn profile_create_from_duplicate(
     copy_from: ProfilePathId,
 ) -> crate::Result<ProfilePathId> {
+    // Original profile
     let profile = profile::get(&copy_from, None).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(copy_from.to_string())
     })?;
@@ -190,7 +191,12 @@ pub async fn profile_create_from_duplicate(
     )
     .await?;
 
-    crate::launcher::install_minecraft(&profile, Some(bar)).await?;
+    let duplicated_profile =
+        profile::get(&profile_path_id, None).await?.ok_or_else(|| {
+            ErrorKind::UnmanagedProfileError(profile_path_id.to_string())
+        })?;
+
+    crate::launcher::install_minecraft(&duplicated_profile, Some(bar)).await?;
     {
         let state = State::get().await?;
         let mut file_watcher = state.file_watcher.write().await;
