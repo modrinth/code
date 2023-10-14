@@ -486,12 +486,45 @@ a,
     background: none;
     box-shadow: none;
   }
+
+  &.btn-dropdown-animation {
+    svg {
+      transition: transform 0.125s ease-in-out;
+    }
+
+    &.popout-open {
+      svg {
+        transform: rotate(180deg);
+      }
+    }
+  }
 }
 
 .btn-group {
   display: flex;
   grid-gap: var(--gap-sm);
   flex-wrap: wrap;
+}
+
+.joined-buttons {
+  display: flex;
+  gap: 1px;
+
+  > :not(:first-child) {
+    &.btn,
+    > .btn {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  > :not(:last-child) {
+    &.btn,
+    > .btn {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
 }
 
 // PROJECT CARDS
