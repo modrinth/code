@@ -1,6 +1,11 @@
 <template>
   <div ref="dropdown" class="popup-container" tabindex="0" :aria-expanded="dropdownVisible">
-    <button v-bind="$attrs" ref="dropdownButton" @click="toggleDropdown">
+    <button
+      v-bind="$attrs"
+      ref="dropdownButton"
+      :class="{ 'popout-open': dropdownVisible }"
+      @click="toggleDropdown"
+    >
       <slot></slot>
     </button>
     <div
