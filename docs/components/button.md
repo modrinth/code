@@ -107,3 +107,53 @@
 <Button icon-only transparent><SunIcon /></Button>
 <Button icon-only transparent><DropdownIcon /></Button>
 ```
+
+## Joined buttons
+
+<DemoContainer>
+<div class="joined-buttons">
+  <Button color="primary"><UploadIcon /> Upload</Button>
+  <OverflowMenu :options="[
+  {
+    'id': 'import',
+    'action': () => {},
+  },
+  {
+    'id': 'edit',
+    'action': () => {}
+  }
+]" class="btn btn-primary btn-dropdown-animation icon-only">
+    <DropdownIcon />
+    <template #import>
+      <ImportIcon /> Import
+    </template>
+    <template #edit>
+      <EditIcon /> Edit
+    </template>
+  </OverflowMenu>
+</div>
+</DemoContainer>
+
+```vue
+<div class="joined-buttons">
+  <Button color="primary"><UploadIcon /> Upload</Button>
+  <OverflowMenu :options="[
+  {
+    'id': 'import',
+    'action': () => {},
+  },
+  {
+    'id': 'edit',
+    'action': () => {}
+  }
+]" class="btn btn-primary btn-dropdown-animation icon-only">
+    <DropdownIcon />
+    <template #import>
+      <ImportIcon /> Import
+    </template>
+    <template #edit>
+      <EditIcon /> Edit
+    </template>
+  </OverflowMenu>
+</div>
+```
