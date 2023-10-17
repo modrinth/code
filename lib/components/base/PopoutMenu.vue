@@ -1,9 +1,10 @@
 <template>
-  <div ref="dropdown" class="popup-container" tabindex="0" :aria-expanded="dropdownVisible">
+  <div ref="dropdown" class="popup-container" tabindex="-1" :aria-expanded="dropdownVisible">
     <button
       v-bind="$attrs"
       ref="dropdownButton"
       :class="{ 'popout-open': dropdownVisible }"
+      tabindex="-1"
       @click="toggleDropdown"
     >
       <slot></slot>
@@ -145,10 +146,19 @@ onBeforeUnmount(() => {
       left: calc(100% + var(--gap-sm) - 1rem);
     }
 
+    &:not(.visible):not(:focus-within) {
+      pointer-events: none;
+
+      *,
+      ::before,
+      ::after {
+        pointer-events: none;
+      }
+    }
+
     &.visible,
     &:focus-within {
       opacity: 1;
-      pointer-events: unset;
       scale: 1;
 
       &.position-bottom-left {
