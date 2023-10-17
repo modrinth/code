@@ -29,7 +29,6 @@ export default {
           { text: 'Pagination', link: '/components/pagination' },
           { text: 'Modal', link: '/components/modal' },
           { text: 'Dropdown Select', link: '/components/dropdown-select' },
-          { text: 'Dropdown Button', link: '/components/dropdown-button' },
           { text: 'Popout Menu', link: '/components/popout-menu' },
           { text: 'Overflow Menu', link: '/components/overflow-menu' },
           { text: 'Project Card', link: '/components/project-card' },
