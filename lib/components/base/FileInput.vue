@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { fileIsValid } from '@/helpers/utils.js'
+import { fileIsValid } from '@'
 import { defineComponent } from 'vue'
 export default defineComponent({
   props: {

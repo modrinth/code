@@ -36,8 +36,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import PopoutMenu from '@/components/base/PopoutMenu.vue'
-import Button from '@/components/base/Button.vue'
+import { Button, PopoutMenu } from '@'
 
 defineProps({
   options: {

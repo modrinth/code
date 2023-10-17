@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Avatar, Button, XIcon, SearchIcon } from '@/components'
+import { Avatar, Button, XIcon, SearchIcon } from '@'
 
 const props = defineProps({
   options: {

@@ -1,5 +1,5 @@
 <script setup>
-import { Button, DropdownIcon } from '@/components'
+import { Button, DropdownIcon } from '@'
 
 import { reactive } from 'vue'
 

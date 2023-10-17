@@ -1,5 +1,5 @@
 <script setup>
-import { Button } from '@/components'
+import { Button } from '@'
 
 defineProps({
   link: {

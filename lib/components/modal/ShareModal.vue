@@ -10,7 +10,7 @@ import {
   TwitterIcon,
   MastodonIcon,
   RedditIcon,
-} from '@/components'
+} from '@'
 import { computed, ref, nextTick } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 

@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup>
-import { CheckIcon, DropdownIcon } from '@/components'
+import { CheckIcon, DropdownIcon } from '@'
 </script>
 <script>
 import { defineComponent } from 'vue'

@@ -50,7 +50,7 @@
   </div>
 </template>
 <script setup>
-import { GapIcon, LeftArrowIcon, RightArrowIcon } from '@/components'
+import { GapIcon, LeftArrowIcon, RightArrowIcon } from '@'
 </script>
 <script>
 import { defineComponent } from 'vue'
@@ -77,7 +77,7 @@ export default defineComponent({
     pages() {
       let pages = []
 
-      if (this.count > 4) {
+      if (this.count > 7) {
         if (this.page + 3 >= this.count) {
           pages = [
             1,
@@ -88,7 +88,7 @@ export default defineComponent({
             this.count - 1,
             this.count,
           ]
-        } else if (this.page > 4) {
+        } else if (this.page > 5) {
           pages = [1, '-', this.page - 1, this.page, this.page + 1, '-', this.count]
         } else {
           pages = [1, 2, 3, 4, 5, '-', this.count]
@@ -103,6 +103,9 @@ export default defineComponent({
   methods: {
     switchPage(newPage) {
       this.$emit('switch-page', newPage)
+      if (newPage !== null && newPage !== '' && !isNaN(newPage)) {
+        this.$emit('switch-page', Math.min(Math.max(newPage, 1), this.count))
+      }
     },
   },
 })

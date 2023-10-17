@@ -1,17 +1,17 @@
 <template>
-  <Modal ref="modal" :header="props.title" :noblur="noblur">
+  <Modal ref="modal" :header="title" :noblur="noblur">
     <div class="modal-delete">
-      <div class="markdown-body" v-html="renderString(props.description)" />
-      <label v-if="props.hasToType" for="confirmation" class="confirmation-label">
+      <div class="markdown-body" v-html="renderString(description)" />
+      <label v-if="hasToType" for="confirmation" class="confirmation-label">
         <span>
           <strong>To verify, type</strong>
-          <em class="confirmation-text">{{ props.confirmationText }}</em>
+          <em class="confirmation-text">{{ confirmationText }}</em>
           <strong>below:</strong>
         </span>
       </label>
       <div class="confirmation-input">
         <input
-          v-if="props.hasToType"
+          v-if="hasToType"
           id="confirmation"
           v-model="confirmation_typed"
           type="text"
@@ -26,7 +26,7 @@
         </button>
         <button class="btn btn-danger" :disabled="action_disabled" @click="proceed">
           <TrashIcon />
-          {{ props.proceedLabel }}
+          {{ proceedLabel }}
         </button>
       </div>
     </div>
@@ -34,8 +34,7 @@
 </template>
 
 <script setup>
-import { renderString } from '@/helpers/parse'
-import { XIcon, TrashIcon, Modal } from '@/components'
+import { Modal, TrashIcon, XIcon, renderString } from '@'
 import { ref } from 'vue'
 
 const props = defineProps({

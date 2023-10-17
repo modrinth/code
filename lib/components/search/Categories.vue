@@ -9,23 +9,16 @@
   </div>
 </template>
 <script setup>
-import { formatCategory } from '@/helpers/utils.js'
-</script>
-<script>
-export default {
-  name: 'Categories',
-  props: {
-    categories: {
-      type: Array,
-      default() {
-        return []
-      },
+import { formatCategory } from '@'
+
+defineProps({
+  categories: {
+    type: Array,
+    default() {
+      return []
     },
   },
-  methods: {
-    formatCategory,
-  },
-}
+})
 </script>
 
 <style lang="scss" scoped>

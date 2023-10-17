@@ -18,8 +18,9 @@
             />
           </g>
         </g>
-      </g></svg
-    ><svg
+      </g>
+    </svg>
+    <svg
       class="rotate inner"
       width="100%"
       height="100%"
@@ -45,9 +46,7 @@
       viewBox="0 0 590 591"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
       xml:space="preserve"
-      xmlns:serif="http://www.serif.com/"
       style="fill-rule: evenodd; clip-rule: evenodd; stroke-linejoin: round; stroke-miterlimit: 2"
     >
       <g transform="matrix(1,0,0,1,652.392,-0.400578)">
@@ -71,12 +70,6 @@
     </svg>
   </div>
 </template>
-
-<script>
-export default {
-  name: 'AnimatedLogo',
-}
-</script>
 
 <style lang="scss" scoped>
 div {

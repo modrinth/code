@@ -1,6 +1,7 @@
 # Analytics
 
 <DemoContainer>
+<client-only>
     <LineChart 
         :data="{
           labels: [
@@ -77,6 +78,7 @@
             ],    
         }"
     />
+</client-only>
 </DemoContainer>
 
 ```vue

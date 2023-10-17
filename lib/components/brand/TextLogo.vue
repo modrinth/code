@@ -7,7 +7,7 @@
     stroke-miterlimit="2"
     clip-rule="evenodd"
     viewBox="0 0 3307 593"
-    :class="{ animate: animate }"
+    :class="{ animate }"
   >
     <path
       fill-rule="nonzero"
@@ -30,16 +30,13 @@
   </svg>
 </template>
 
-<script>
-export default {
-  name: 'TextLogo',
-  props: {
-    animate: {
-      type: Boolean,
-      default: false,
-    },
+<script setup>
+defineProps({
+  animate: {
+    type: Boolean,
+    default: false,
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

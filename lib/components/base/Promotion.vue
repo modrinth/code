@@ -25,9 +25,11 @@
     </div>
   </div>
 </template>
+
 <script setup>
 import { computed } from 'vue'
-import BisectIcon from '@/assets/external/bh.svg'
+import { BisectIcon } from '@'
+
 const props = defineProps({
   external: {
     type: Boolean,
@@ -38,6 +40,7 @@ const props = defineProps({
     default: '',
   },
 })
+
 const target = computed(() => (props.external ? '_blank' : '_self'))
 </script>
 

@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon } from '@/components'
+import { ChevronRightIcon } from '@'
 defineProps({
   linkStack: {
     type: Array,

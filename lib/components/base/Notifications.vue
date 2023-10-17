@@ -115,6 +115,14 @@ function stopTimer(notif) {
       margin: 0;
     }
   }
+
+  @media screen and (max-width: 750px) {
+    bottom: calc(var(--size-mobile-navbar-height, 15px) + 10px) !important;
+
+    &.browse-menu-open {
+      bottom: calc(var(--size-mobile-navbar-height-expanded, 15px) + 10px) !important;
+    }
+  }
 }
 
 .notifs-enter-active,

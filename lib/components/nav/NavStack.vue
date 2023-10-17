@@ -1,7 +1,3 @@
-<script setup>
-defineProps({})
-</script>
-
 <template>
   <div class="omorphia__navstack">
     <slot />

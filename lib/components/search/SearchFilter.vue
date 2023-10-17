@@ -15,50 +15,48 @@
   </Checkbox>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-import Checkbox from '@/components/base/Checkbox.vue'
-export default defineComponent({
-  components: {
-    Checkbox,
+<script setup>
+import { Checkbox } from '@'
+
+defineProps({
+  facetName: {
+    type: String,
+    default: '',
   },
-  props: {
-    facetName: {
-      type: String,
-      default: '',
-    },
-    displayName: {
-      type: String,
-      default: '',
-    },
-    icon: {
-      type: String,
-      default: '',
-    },
-    activeFilters: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
+  displayName: {
+    type: String,
+    default: '',
   },
-  emits: ['toggle'],
-  methods: {
-    toggle() {
-      this.$emit('toggle', this.facetName)
+  icon: {
+    type: String,
+    default: '',
+  },
+  activeFilters: {
+    type: Array,
+    default() {
+      return []
     },
   },
 })
+
+const emit = defineEmits(['toggle'])
+
+function toggle() {
+  emit('toggle', this.facetName)
+}
 </script>
 
 <style lang="scss" scoped>
 .filter {
   margin-bottom: 0.5rem;
+
   :deep(.filter-text) {
     display: flex;
     align-items: center;
+
     .icon {
       height: 1rem;
+
       svg {
         margin-right: 0.25rem;
         width: 1rem;
@@ -66,6 +64,7 @@ export default defineComponent({
       }
     }
   }
+
   span {
     user-select: none;
   }

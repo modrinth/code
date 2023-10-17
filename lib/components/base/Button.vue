@@ -1,5 +1,5 @@
 <script setup>
-import { ExternalIcon, UnknownIcon } from '@/components'
+import { ExternalIcon, UnknownIcon } from '@'
 
 import { computed } from 'vue'
 

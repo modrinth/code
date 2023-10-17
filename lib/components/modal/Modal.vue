@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { XIcon } from '@/components'
+import { XIcon } from '@'
 import { ref } from 'vue'
 
 const props = defineProps({

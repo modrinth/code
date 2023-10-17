@@ -4,7 +4,7 @@
     ref="img"
     :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
       pixelated ? 'pixelated' : ''
-    }`"
+    } ${raised ? 'raised' : ''}`"
     :src="src"
     :alt="alt"
     :loading="loading"
@@ -12,7 +12,9 @@
   />
   <svg
     v-else
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''}`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
+      raised ? 'raised' : ''
+    }`"
     xml:space="preserve"
     fill-rule="evenodd"
     stroke-linecap="round"
@@ -32,51 +34,48 @@
   </svg>
 </template>
 
-<script>
-export default {
-  props: {
-    src: {
-      type: String,
-      default: null,
-    },
-    alt: {
-      type: String,
-      default: '',
-    },
-    size: {
-      type: String,
-      default: 'sm',
-      validator(value) {
-        return ['xs', 'sm', 'md', 'lg', 'none'].includes(value)
-      },
-    },
-    circle: {
-      type: Boolean,
-      default: false,
-    },
-    noShadow: {
-      type: Boolean,
-      default: false,
-    },
-    loading: {
-      type: String,
-      default: 'lazy',
+<script setup>
+import { ref } from 'vue'
+
+const pixelated = ref(false)
+const img = ref(null)
+
+defineProps({
+  src: {
+    type: String,
+    default: null,
+  },
+  alt: {
+    type: String,
+    default: '',
+  },
+  size: {
+    type: String,
+    default: 'sm',
+    validator(value) {
+      return ['xxs', 'xs', 'sm', 'md', 'lg', 'none'].includes(value)
     },
   },
-  data() {
-    return {
-      pixelated: false,
-    }
+  circle: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    updatePixelated() {
-      if (this.$refs.img && this.$refs.img.naturalWidth && this.$refs.img.naturalWidth <= 96) {
-        this.pixelated = true
-      } else {
-        this.pixelated = false
-      }
-    },
+  noShadow: {
+    type: Boolean,
+    default: false,
   },
+  loading: {
+    type: String,
+    default: 'lazy',
+  },
+  raised: {
+    type: Boolean,
+    default: false,
+  },
+})
+
+function updatePixelated() {
+  pixelated.value = !!(img.value && img.value.naturalWidth && img.value.naturalWidth <= 96)
 }
 </script>
 
@@ -90,6 +89,12 @@ export default {
   object-fit: cover;
   max-width: var(--size) !important;
   max-height: var(--size) !important;
+
+  &.size-xxs {
+    --size: 1.25rem;
+    box-shadow: var(--shadow-inset), var(--shadow-card);
+    border-radius: var(--radius-sm);
+  }
 
   &.size-xs {
     --size: 2.5rem;
@@ -127,6 +132,10 @@ export default {
 
   &.pixelated {
     image-rendering: pixelated;
+  }
+
+  &.raised {
+    background-color: var(--color-raised-bg);
   }
 }
 </style>
