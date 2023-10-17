@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::rc::Rc;
+use std::{rc::Rc, sync::Arc};
 
 use super::{
     api_v2::ApiV2,
@@ -17,7 +17,7 @@ pub async fn with_test_environment<Fut>(f: impl FnOnce(TestEnvironment) -> Fut)
 where
     Fut: Future<Output = ()>,
 {
-    let test_env = TestEnvironment::build_with_dummy().await;
+    let test_env = TestEnvironment::build(None).await;
     let db = test_env.db.clone();
 
     f(test_env).await;
@@ -29,27 +29,29 @@ where
 // Must be called in an #[actix_rt::test] context. It also simulates a
 // temporary sqlx db like #[sqlx::test] would.
 // Use .call(req) on it directly to make a test call as if test::call_service(req) were being used.
+#[derive(Clone)]
 pub struct TestEnvironment {
-    test_app: Rc<Box<dyn LocalService>>,
+    test_app: Rc<dyn LocalService>, // Rc as it's not Send
     pub db: TemporaryDatabase,
     pub v2: ApiV2,
 
-    pub dummy: Option<dummy_data::DummyData>,
+    pub dummy: Option<Arc<dummy_data::DummyData>>,
 }
 
 impl TestEnvironment {
-    pub async fn build_with_dummy() -> Self {
-        let mut test_env = Self::build().await;
-        let dummy = dummy_data::add_dummy_data(&test_env).await;
-        test_env.dummy = Some(dummy);
+    pub async fn build(max_connections: Option<u32>) -> Self {
+        let db = TemporaryDatabase::create(max_connections).await;
+        let mut test_env = Self::build_with_db(db).await;
+
+        let dummy = dummy_data::get_dummy_data(&test_env).await;
+        test_env.dummy = Some(Arc::new(dummy));
         test_env
     }
 
-    pub async fn build() -> Self {
-        let db = TemporaryDatabase::create().await;
+    pub async fn build_with_db(db: TemporaryDatabase) -> Self {
         let labrinth_config = setup(&db).await;
         let app = App::new().configure(|cfg| labrinth::app_config(cfg, labrinth_config.clone()));
-        let test_app: Rc<Box<dyn LocalService>> = Rc::new(Box::new(test::init_service(app).await));
+        let test_app: Rc<dyn LocalService> = Rc::new(test::init_service(app).await);
         Self {
             v2: ApiV2 {
                 test_app: test_app.clone(),
@@ -59,6 +61,7 @@ impl TestEnvironment {
             dummy: None,
         }
     }
+
     pub async fn cleanup(self) {
         self.db.cleanup().await;
     }
@@ -71,8 +74,10 @@ impl TestEnvironment {
         let resp = self
             .v2
             .add_user_to_team(
-                &self.dummy.as_ref().unwrap().alpha_team_id,
+                &self.dummy.as_ref().unwrap().project_alpha.team_id,
                 FRIEND_USER_ID,
+                None,
+                None,
                 USER_USER_PAT,
             )
             .await;

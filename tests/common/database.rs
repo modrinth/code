@@ -5,6 +5,8 @@ use sqlx::{postgres::PgPoolOptions, PgPool};
 use std::time::Duration;
 use url::Url;
 
+use crate::common::{dummy_data, environment::TestEnvironment};
+
 // The dummy test database adds a fair bit of 'dummy' data to test with.
 // Some constants are used to refer to that data, and are described here.
 // The rest can be accessed in the TestEnvironment 'dummy' field.
@@ -29,6 +31,8 @@ pub const USER_USER_PAT: &str = "mrp_patuser";
 pub const FRIEND_USER_PAT: &str = "mrp_patfriend";
 pub const ENEMY_USER_PAT: &str = "mrp_patenemy";
 
+const TEMPLATE_DATABASE_NAME: &str = "labrinth_tests_template";
+
 #[derive(Clone)]
 pub struct TemporaryDatabase {
     pub pool: PgPool,
@@ -37,41 +41,32 @@ pub struct TemporaryDatabase {
 }
 
 impl TemporaryDatabase {
-    // Creates a temporary database like sqlx::test does
+    // Creates a temporary database like sqlx::test does (panics)
     // 1. Logs into the main database
     // 2. Creates a new randomly generated database
     // 3. Runs migrations on the new database
     // 4. (Optionally, by using create_with_dummy) adds dummy data to the database
     // If a db is created with create_with_dummy, it must be cleaned up with cleanup.
     // This means that dbs will only 'remain' if a test fails (for examination of the db), and will be cleaned up otherwise.
-    pub async fn create() -> Self {
-        let temp_database_name = generate_random_database_name();
+    pub async fn create(max_connections: Option<u32>) -> Self {
+        let temp_database_name = generate_random_name("labrinth_tests_db_");
         println!("Creating temporary database: {}", &temp_database_name);
 
         let database_url = dotenvy::var("DATABASE_URL").expect("No database URL");
-        let mut url = Url::parse(&database_url).expect("Invalid database URL");
-        let pool = PgPool::connect(&database_url)
-            .await
-            .expect("Connection to database failed");
 
-        // Create the temporary database
-        let create_db_query = format!("CREATE DATABASE {}", &temp_database_name);
+        // Create the temporary (and template datbase, if needed)
+        Self::create_temporary(&database_url, &temp_database_name).await;
 
-        sqlx::query(&create_db_query)
-            .execute(&pool)
-            .await
-            .expect("Database creation failed");
+        // Pool to the temporary database
+        let mut temporary_url = Url::parse(&database_url).expect("Invalid database URL");
 
-        pool.close().await;
-
-        // Modify the URL to switch to the temporary database
-        url.set_path(&format!("/{}", &temp_database_name));
-        let temp_db_url = url.to_string();
+        temporary_url.set_path(&format!("/{}", &temp_database_name));
+        let temp_db_url = temporary_url.to_string();
 
         let pool = PgPoolOptions::new()
             .min_connections(0)
-            .max_connections(4)
-            .max_lifetime(Some(Duration::from_secs(60 * 60)))
+            .max_connections(max_connections.unwrap_or(4))
+            .max_lifetime(Some(Duration::from_secs(60)))
             .connect(&temp_db_url)
             .await
             .expect("Connection to temporary database failed");
@@ -94,7 +89,103 @@ impl TemporaryDatabase {
         }
     }
 
-    // Deletes the temporary database
+    // Creates a template and temporary databse (panics)
+    // 1. Waits to obtain a pg lock on the main database
+    // 2. Creates a new template database called 'TEMPLATE_DATABASE_NAME', if needed
+    // 3. Switches to the template database
+    // 4. Runs migrations on the new database (for most tests, this should not take time)
+    // 5. Creates dummy data on the new db
+    // 6. Creates a temporary database at 'temp_database_name' from the template
+    // 7. Drops lock and all created connections in the function
+    async fn create_temporary(database_url: &str, temp_database_name: &str) {
+        let main_pool = PgPool::connect(database_url)
+            .await
+            .expect("Connection to database failed");
+
+        loop {
+            // Try to acquire an advisory lock
+            let lock_acquired: bool = sqlx::query_scalar("SELECT pg_try_advisory_lock(1)")
+                .fetch_one(&main_pool)
+                .await
+                .unwrap();
+
+            if lock_acquired {
+                // Create the db template if it doesn't exist
+                // Check if template_db already exists
+                let db_exists: Option<i32> = sqlx::query_scalar(&format!(
+                    "SELECT 1 FROM pg_database WHERE datname = '{TEMPLATE_DATABASE_NAME}'"
+                ))
+                .fetch_optional(&main_pool)
+                .await
+                .unwrap();
+                if db_exists.is_none() {
+                    let create_db_query = format!("CREATE DATABASE {TEMPLATE_DATABASE_NAME}");
+                    sqlx::query(&create_db_query)
+                        .execute(&main_pool)
+                        .await
+                        .expect("Database creation failed");
+                }
+
+                // Switch to template
+                let url = dotenvy::var("DATABASE_URL").expect("No database URL");
+                let mut template_url = Url::parse(&url).expect("Invalid database URL");
+                template_url.set_path(&format!("/{}", TEMPLATE_DATABASE_NAME));
+
+                let pool = PgPool::connect(template_url.as_str())
+                    .await
+                    .expect("Connection to database failed");
+
+                // Run migrations on the template
+                let migrations = sqlx::migrate!("./migrations");
+                migrations.run(&pool).await.expect("Migrations failed");
+
+                // Check if dummy data exists- a fake 'dummy_data' table is created if it does
+                let dummy_data_exists: bool =
+                    sqlx::query_scalar("SELECT to_regclass('dummy_data') IS NOT NULL")
+                        .fetch_one(&pool)
+                        .await
+                        .unwrap();
+                if !dummy_data_exists {
+                    // Add dummy data
+                    let temporary_test_env = TestEnvironment::build_with_db(TemporaryDatabase {
+                        pool: pool.clone(),
+                        database_name: TEMPLATE_DATABASE_NAME.to_string(),
+                        redis_pool: RedisPool::new(None),
+                    })
+                    .await;
+                    dummy_data::add_dummy_data(&temporary_test_env).await;
+                }
+                pool.close().await;
+
+                // Switch back to main database (as we cant create from template while connected to it)
+                let pool = PgPool::connect(url.as_str()).await.unwrap();
+
+                // Create the temporary database from the template
+                let create_db_query = format!(
+                    "CREATE DATABASE {} TEMPLATE {}",
+                    &temp_database_name, TEMPLATE_DATABASE_NAME
+                );
+
+                sqlx::query(&create_db_query)
+                    .execute(&pool)
+                    .await
+                    .expect("Database creation failed");
+
+                // Release the advisory lock
+                sqlx::query("SELECT pg_advisory_unlock(1)")
+                    .execute(&main_pool)
+                    .await
+                    .unwrap();
+
+                main_pool.close().await;
+                break;
+            }
+            // Wait for the lock to be released
+            tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+        }
+    }
+
+    // Deletes the temporary database (panics)
     // If a temporary db is created, it must be cleaned up with cleanup.
     // This means that dbs will only 'remain' if a test fails (for examination of the db), and will be cleaned up otherwise.
     pub async fn cleanup(mut self) {
@@ -125,15 +216,9 @@ impl TemporaryDatabase {
     }
 }
 
-fn generate_random_database_name() -> String {
-    // Generate a random database name here
-    // You can use your logic to create a unique name
-    // For example, you can use a random string as you did before
-    // or append a timestamp, etc.
-
-    // We will use a random string starting with "labrinth_tests_db_"
-    // and append a 6-digit number to it.
-    let mut database_name = String::from("labrinth_tests_db_");
-    database_name.push_str(&rand::random::<u64>().to_string()[..6]);
-    database_name
+// Appends a random 8-digit number to the end of the str
+pub fn generate_random_name(str: &str) -> String {
+    let mut str = String::from(str);
+    str.push_str(&rand::random::<u64>().to_string()[..8]);
+    str
 }

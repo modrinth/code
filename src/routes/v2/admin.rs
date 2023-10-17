@@ -120,7 +120,7 @@ pub async fn count_download(
 
     analytics_queue.add_download(Download {
         id: Uuid::new_v4(),
-            recorded: get_current_tenths_of_ms(),
+        recorded: get_current_tenths_of_ms(),
         domain: url.host_str().unwrap_or_default().to_string(),
         site_path: url.path().to_string(),
         user_id: user

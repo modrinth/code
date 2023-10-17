@@ -18,7 +18,7 @@ mod common;
 // - ensure PATs can be deleted
 #[actix_rt::test]
 pub async fn pat_full_test() {
-    let test_env = TestEnvironment::build_with_dummy().await;
+    let test_env = TestEnvironment::build(None).await;
 
     // Create a PAT for a full test
     let req = test::TestRequest::post()
@@ -163,7 +163,7 @@ pub async fn pat_full_test() {
 // Test illegal PAT setting, both in POST and PATCH
 #[actix_rt::test]
 pub async fn bad_pats() {
-    let test_env = TestEnvironment::build_with_dummy().await;
+    let test_env = TestEnvironment::build(None).await;
 
     // Creating a PAT with no name should fail
     let req = test::TestRequest::post()

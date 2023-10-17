@@ -94,8 +94,8 @@ pub async fn organization_create(
         members: vec![team_item::TeamMemberBuilder {
             user_id: current_user.id.into(),
             role: crate::models::teams::OWNER_ROLE.to_owned(),
-            permissions: ProjectPermissions::ALL,
-            organization_permissions: Some(OrganizationPermissions::ALL),
+            permissions: ProjectPermissions::all(),
+            organization_permissions: Some(OrganizationPermissions::all()),
             accepted: true,
             payouts_split: Decimal::ONE_HUNDRED,
             ordering: 0,

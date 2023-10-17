@@ -13,11 +13,11 @@ INSERT INTO users (id, username, name, email, role) VALUES (5, 'enemy', 'Enemy T
 -- Full PATs for each user, with different scopes
 -- These are not legal PATs, as they contain all scopes- they mimic permissions of a logged in user
 -- IDs: 50-54, o p q r s
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (50, 1, 'admin-pat', 'mrp_patadmin', B'11111111111111111111111111111111111'::BIGINT, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (51, 2, 'moderator-pat', 'mrp_patmoderator', B'11111111111111111111111111111111111'::BIGINT, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (52, 3, 'user-pat', 'mrp_patuser', B'11111111111111111111111111111111111'::BIGINT, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (53, 4, 'friend-pat', 'mrp_patfriend', B'11111111111111111111111111111111111'::BIGINT, '2030-08-18 15:48:58.435729+00');
-INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (54, 5, 'enemy-pat', 'mrp_patenemy', B'11111111111111111111111111111111111'::BIGINT, '2030-08-18 15:48:58.435729+00');
+INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (50, 1, 'admin-pat', 'mrp_patadmin', $1, '2030-08-18 15:48:58.435729+00');
+INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (51, 2, 'moderator-pat', 'mrp_patmoderator', $1, '2030-08-18 15:48:58.435729+00');
+INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (52, 3, 'user-pat', 'mrp_patuser', $1, '2030-08-18 15:48:58.435729+00');
+INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (53, 4, 'friend-pat', 'mrp_patfriend', $1, '2030-08-18 15:48:58.435729+00');
+INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (54, 5, 'enemy-pat', 'mrp_patenemy', $1, '2030-08-18 15:48:58.435729+00');
 
 -- -- Sample game versions, loaders, categories
 INSERT INTO game_versions (id, version, type, created)
@@ -44,3 +44,8 @@ INSERT INTO categories (id, category, project_type) VALUES
     (105, 'magic', 2),
     (106, 'mobs', 2),
     (107, 'optimization', 2);
+
+-- Create dummy data table to mark that this file has been run
+CREATE TABLE dummy_data ( 
+    update_id bigint PRIMARY KEY
+ );

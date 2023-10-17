@@ -407,12 +407,10 @@ pub async fn add_team_member(
     )
     .await?
     .1;
-
     let team_association = Team::get_association(team_id, &**pool)
         .await?
         .ok_or_else(|| ApiError::InvalidInput("The team specified does not exist".to_string()))?;
     let member = TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool).await?;
-
     match team_association {
         // If team is associated with a project, check if they have permissions to invite users to that project
         TeamAssociationId::Project(pid) => {
@@ -470,8 +468,8 @@ pub async fn add_team_member(
                 .contains(OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS)
                 && !new_member.permissions.is_empty()
             {
-                return Err(ApiError::InvalidInput(
-                    "You do not have permission to give this user default project permissions."
+                return Err(ApiError::CustomAuthentication(
+                    "You do not have permission to give this user default project permissions. Ensure 'permissions' is set if it is not, and empty (0)."
                         .to_string(),
                 ));
             }
@@ -654,8 +652,8 @@ pub async fn edit_team_member(
                     .unwrap_or_default();
 
             if !organization_permissions.contains(OrganizationPermissions::EDIT_MEMBER) {
-                return Err(ApiError::InvalidInput(
-                    "You don't have permission to edit organization permissions".to_string(),
+                return Err(ApiError::CustomAuthentication(
+                    "You don't have permission to edit members of this team".to_string(),
                 ));
             }
 
@@ -672,7 +670,7 @@ pub async fn edit_team_member(
                 && !organization_permissions
                     .contains(OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS)
             {
-                return Err(ApiError::InvalidInput(
+                return Err(ApiError::CustomAuthentication(
                     "You do not have permission to give this user default project permissions."
                         .to_string(),
                 ));
@@ -884,7 +882,6 @@ pub async fn remove_team_member(
                     // removed by a member with the REMOVE_MEMBER permission.
                     if Some(delete_member.user_id) == member.as_ref().map(|m| m.user_id)
                         || permissions.contains(ProjectPermissions::REMOVE_MEMBER)
-                            && member.as_ref().map(|m| m.accepted).unwrap_or(true)
                     // true as if the permission exists, but the member does not, they are part of an org
                     {
                         TeamMember::delete(id, user_id, &mut transaction).await?;
@@ -896,7 +893,6 @@ pub async fn remove_team_member(
                     }
                 } else if Some(delete_member.user_id) == member.as_ref().map(|m| m.user_id)
                     || permissions.contains(ProjectPermissions::MANAGE_INVITES)
-                        && member.as_ref().map(|m| m.accepted).unwrap_or(true)
                 // true as if the permission exists, but the member does not, they are part of an org
                 {
                     // This is a pending invite rather than a member, so the
@@ -913,49 +909,37 @@ pub async fn remove_team_member(
                 let organization_permissions =
                     OrganizationPermissions::get_permissions_by_role(&current_user.role, &member)
                         .unwrap_or_default();
-                if let Some(member) = member {
-                    // Organization teams requires a TeamMember, so we can 'unwrap'
-                    if delete_member.accepted {
-                        // Members other than the owner can either leave the team, or be
-                        // removed by a member with the REMOVE_MEMBER permission.
-                        if delete_member.user_id == member.user_id
-                            || organization_permissions
-                                .contains(OrganizationPermissions::REMOVE_MEMBER)
-                                && member.accepted
-                        {
-                            TeamMember::delete(id, user_id, &mut transaction).await?;
-                        } else {
-                            return Err(ApiError::CustomAuthentication(
-                            "You do not have permission to remove a member from this organization"
-                                .to_string(),
-                        ));
-                        }
-                    } else if delete_member.user_id == member.user_id
-                        || organization_permissions
-                            .contains(OrganizationPermissions::MANAGE_INVITES)
-                            && member.accepted
+                // Organization teams requires a TeamMember, so we can 'unwrap'
+                if delete_member.accepted {
+                    // Members other than the owner can either leave the team, or be
+                    // removed by a member with the REMOVE_MEMBER permission.
+                    if Some(delete_member.user_id) == member.map(|m| m.user_id)
+                        || organization_permissions.contains(OrganizationPermissions::REMOVE_MEMBER)
                     {
-                        // This is a pending invite rather than a member, so the
-                        // user being invited or team members with the MANAGE_INVITES
-                        // permission can remove it.
                         TeamMember::delete(id, user_id, &mut transaction).await?;
                     } else {
                         return Err(ApiError::CustomAuthentication(
-                            "You do not have permission to cancel an organization invite"
+                            "You do not have permission to remove a member from this organization"
                                 .to_string(),
                         ));
                     }
+                } else if Some(delete_member.user_id) == member.map(|m| m.user_id)
+                    || organization_permissions.contains(OrganizationPermissions::MANAGE_INVITES)
+                {
+                    // This is a pending invite rather than a member, so the
+                    // user being invited or team members with the MANAGE_INVITES
+                    // permission can remove it.
+                    TeamMember::delete(id, user_id, &mut transaction).await?;
                 } else {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have permission to remove a member from this organization"
-                            .to_string(),
+                        "You do not have permission to cancel an organization invite".to_string(),
                     ));
                 }
             }
         }
 
         TeamMember::clear_cache(id, &redis).await?;
-        User::clear_project_cache(&[delete_member.user_id.into()], &redis).await?;
+        User::clear_project_cache(&[delete_member.user_id], &redis).await?;
 
         transaction.commit().await?;
         Ok(HttpResponse::NoContent().body(""))

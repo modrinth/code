@@ -206,7 +206,11 @@ async fn find_version(
         })
         .collect::<Vec<_>>();
 
-    Ok(matched.get(0).or_else(|| exact_matches.get(0)).copied().cloned())
+    Ok(matched
+        .get(0)
+        .or_else(|| exact_matches.get(0))
+        .copied()
+        .cloned())
 }
 
 fn find_file<'a>(

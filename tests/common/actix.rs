@@ -18,11 +18,11 @@ pub enum MultipartSegmentData {
 }
 
 pub trait AppendsMultipart {
-    fn set_multipart(self, data: Vec<MultipartSegment>) -> Self;
+    fn set_multipart(self, data: impl IntoIterator<Item = MultipartSegment>) -> Self;
 }
 
 impl AppendsMultipart for TestRequest {
-    fn set_multipart(self, data: Vec<MultipartSegment>) -> Self {
+    fn set_multipart(self, data: impl IntoIterator<Item = MultipartSegment>) -> Self {
         let (boundary, payload) = generate_multipart(data);
         self.append_header((
             "Content-Type",
@@ -32,7 +32,7 @@ impl AppendsMultipart for TestRequest {
     }
 }
 
-fn generate_multipart(data: Vec<MultipartSegment>) -> (String, Bytes) {
+fn generate_multipart(data: impl IntoIterator<Item = MultipartSegment>) -> (String, Bytes) {
     let mut boundary = String::from("----WebKitFormBoundary");
     boundary.push_str(&rand::random::<u64>().to_string());
     boundary.push_str(&rand::random::<u64>().to_string());

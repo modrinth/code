@@ -380,7 +380,7 @@ impl User {
         redis
             .delete_many(
                 user_ids
-                    .into_iter()
+                    .iter()
                     .map(|id| (USERS_PROJECTS_NAMESPACE, Some(id.0.to_string()))),
             )
             .await?;

@@ -8,12 +8,18 @@ mod common;
 #[actix_rt::test]
 pub async fn get_user_notifications_after_team_invitation_returns_notification() {
     with_test_environment(|test_env| async move {
-        let alpha_team_id = test_env.dummy.as_ref().unwrap().alpha_team_id.clone();
+        let alpha_team_id = test_env
+            .dummy
+            .as_ref()
+            .unwrap()
+            .project_alpha
+            .team_id
+            .clone();
         let api = test_env.v2;
         api.get_user_notifications_deserialized(FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
 
-        api.add_user_to_team(&alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
+        api.add_user_to_team(&alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
 
         let notifications = api

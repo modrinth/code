@@ -11,11 +11,12 @@ pub mod database;
 pub mod dummy_data;
 pub mod environment;
 pub mod pats;
+pub mod permissions;
 pub mod request_data;
 pub mod scopes;
 
 // Testing equivalent to 'setup' function, producing a LabrinthConfig
-// If making a test, you should probably use environment::TestEnvironment::build_with_dummy() (which calls this)
+// If making a test, you should probably use environment::TestEnvironment::build() (which calls this)
 pub async fn setup(db: &TemporaryDatabase) -> LabrinthConfig {
     println!("Setting up labrinth config");
 
