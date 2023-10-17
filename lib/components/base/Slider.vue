@@ -2,14 +2,16 @@
   <div class="root-container">
     <div class="slider-component">
       <div class="slide-container">
-        <div class="snap-points">
-          <div
-            v-for="snapPoint in props.snapPoints"
-            :key="snapPoint"
-            class="snap-point"
-            :class="{ green: snapPoint <= currentValue }"
-            :style="{ left: ((snapPoint - props.min) / (props.max - props.min)) * 100 + '%' }"
-          ></div>
+        <div class="snap-points-wrapper">
+          <div class="snap-points">
+            <div
+              v-for="snapPoint in props.snapPoints"
+              :key="snapPoint"
+              class="snap-point"
+              :class="{ green: snapPoint <= currentValue }"
+              :style="{ left: ((snapPoint - props.min) / (props.max - props.min)) * 100 + '%' }"
+            ></div>
+          </div>
         </div>
         <input
           ref="input"
@@ -136,10 +138,6 @@ const onInput = (value) => {
   width: 100%;
 }
 
-.slide-container .slider {
-  width: 100%;
-}
-
 .slider-component,
 .slide-container {
   width: 100%;
@@ -154,6 +152,8 @@ const onInput = (value) => {
 
   border-radius: var(--radius-sm);
   height: 0.25rem;
+  width: 100%;
+
   background: linear-gradient(
     to right,
     var(--color-brand),
@@ -201,25 +201,37 @@ const onInput = (value) => {
   transition: 0.2s;
 }
 
-.slider-component .slide-container .snap-points {
+.slider-component .slide-container .snap-points-wrapper {
   position: absolute;
-  width: calc(100% - 0.75rem);
-  left: calc(0.75rem / 2);
-  top: calc(1rem / 2);
+  height: 50%;
+  width: 100%;
 
-  .snap-point {
-    position: absolute;
+  .snap-points {
+    position: relative;
+    display: inline-block;
 
-    width: 0.25rem;
+    vertical-align: middle;
+
+    width: calc(100% - 0.75rem);
     height: 0.75rem;
-    border-radius: var(--radius-sm);
 
-    background-color: var(--color-base);
+    left: calc(0.75rem / 2);
 
-    transform: translateX(calc(-0.25rem / 2));
+    .snap-point {
+      position: absolute;
+      display: inline-block;
 
-    &.green {
-      background-color: var(--color-brand);
+      width: 0.25rem;
+      height: 100%;
+      border-radius: var(--radius-sm);
+
+      background-color: var(--color-base);
+
+      transform: translateX(calc(-0.25rem / 2));
+
+      &.green {
+        background-color: var(--color-brand);
+      }
     }
   }
 }
