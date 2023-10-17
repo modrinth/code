@@ -608,6 +608,7 @@ a,
     padding: 1.5rem;
     line-height: 1.5;
     min-height: 0;
+
     a {
       color: var(--color-blue);
       text-decoration: underline;
@@ -946,7 +947,7 @@ a,
     border-collapse: separate;
     border-spacing: 0;
     line-height: 1.5;
-    border: 0.05rem solid var(--color-button-bg);
+    border: 0.1rem solid var(--color-button-bg);
     border-radius: var(--radius-sm);
 
     th {
@@ -956,27 +957,20 @@ a,
     td,
     th {
       padding: 0.4rem 0.85rem;
-      border: 0.05rem solid var(--color-button-bg);
     }
 
     tr:nth-child(2n) {
       background-color: var(--color-accent-contrast);
     }
 
-    th:first-of-type {
-      border-top-left-radius: var(--radius-sm);
+    td:not(:last-of-type),
+    th:not(:last-of-type) {
+      border-right: 0.1rem solid var(--color-button-bg);
     }
 
-    th:last-of-type {
-      border-top-right-radius: var(--radius-sm);
-    }
-
-    tr:last-of-type td:first-of-type {
-      border-bottom-left-radius: var(--radius-sm);
-    }
-
-    tr:last-of-type td:last-of-type {
-      border-bottom-right-radius: var(--radius-sm);
+    tr:not(:last-of-type) td,
+    th {
+      border-bottom: 0.1rem solid var(--color-button-bg);
     }
   }
 
