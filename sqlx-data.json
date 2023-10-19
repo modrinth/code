@@ -1267,6 +1267,41 @@
     },
     "query": "\n                DELETE FROM uploaded_images\n                WHERE id = $1\n                "
   },
+  "2aca8f34773d1028fb5d4cf5d3f2ab65cc3b8cea5f94bb0e1a0f632a787d708f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "mod_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "amount_sum",
+          "ordinal": 1,
+          "type_info": "Numeric"
+        },
+        {
+          "name": "interval_start",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        true,
+        null,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Timestamptz",
+          "Timestamptz",
+          "Interval"
+        ]
+      }
+    },
+    "query": "\n        SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start\n        FROM payouts_values\n        WHERE mod_id = ANY($1) AND created BETWEEN $2 AND $3\n        GROUP by mod_id, interval_start ORDER BY interval_start\n        "
+  },
   "2b8dafe9c3df9fd25235a13868e8e7607decfbe96a413cc576919a1fb510f269": {
     "describe": {
       "columns": [],
