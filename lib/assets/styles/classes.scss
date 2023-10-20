@@ -488,12 +488,12 @@ a,
   }
 
   &.btn-dropdown-animation {
-    svg {
+    svg:last-child {
       transition: transform 0.125s ease-in-out;
     }
 
     &.popout-open {
-      svg {
+      svg:last-child {
         transform: rotate(180deg);
       }
     }
