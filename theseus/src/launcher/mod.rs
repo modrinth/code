@@ -26,7 +26,7 @@ pub mod auth;
 pub mod download;
 
 #[tracing::instrument]
-pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
+pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str, default_value: bool) -> bool {
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
@@ -44,7 +44,7 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
                 || !features.is_quick_play_realms.unwrap_or(true)
                 || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
-        _ => false,
+        _ => default_value,
     };
 
     match rule.action {

@@ -28,7 +28,7 @@ pub fn get_class_paths(
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !rules.iter().any(|x| parse_rule(x, java_arch)) {
+                if !rules.iter().all(|x| parse_rule(x, java_arch, true)) {
                     return None;
                 }
             }
@@ -335,7 +335,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if rules.iter().any(|x| parse_rule(x, java_arch)) {
+                if rules.iter().any(|x| parse_rule(x, java_arch, false)) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(
