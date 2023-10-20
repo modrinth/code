@@ -322,29 +322,6 @@ pub async fn create_account(
     get_creds_from_res(response, semaphore).await
 }
 
-pub async fn login_minecraft(
-    flow: &str,
-    semaphore: &FetchSemaphore,
-) -> crate::Result<ModrinthCredentialsResult> {
-    let resp = fetch_advanced(
-        Method::POST,
-        &format!("{MODRINTH_API_URL}auth/login/minecraft"),
-        None,
-        Some(serde_json::json!({
-            "flow": flow,
-        })),
-        None,
-        None,
-        semaphore,
-        &CredentialsStore(None),
-    )
-    .await?;
-
-    let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
-
-    get_result_from_res("session", response, semaphore).await
-}
-
 pub async fn refresh_credentials(
     credentials_store: &mut CredentialsStore,
     semaphore: &FetchSemaphore,

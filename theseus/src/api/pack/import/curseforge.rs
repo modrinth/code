@@ -199,8 +199,12 @@ pub async fn import_curseforge(
     if let Some(profile_val) =
         crate::api::profile::get(&profile_path, None).await?
     {
-        crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
-            .await?;
+        crate::launcher::install_minecraft(
+            &profile_val,
+            Some(loading_bar),
+            false,
+        )
+        .await?;
 
         {
             let state = State::get().await?;

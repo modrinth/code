@@ -68,10 +68,14 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
         }
 
         // Update player info from bearer token
-        let player_info = hydra::stages::player_info::fetch_info(&credentials.access_token).await.map_err(|_err| {
-            crate::ErrorKind::HydraError("No Minecraft account for your profile. Make sure you own the game and have set a username through the official Minecraft launcher."
-        .to_string())
-        })?;
+        let player_info =
+            hydra::stages::player_info::fetch_info(&credentials.access_token)
+                .await
+                .map_err(|_err| {
+                    crate::ErrorKind::HydraError(
+                        "No Minecraft account for your profile. Please try again or contact support in our Discord for help!".to_string(),
+                    )
+                })?;
 
         credentials.username = player_info.name;
         users.insert(&credentials).await?;

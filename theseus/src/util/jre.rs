@@ -43,7 +43,9 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"C:\Program Files (x86)\Eclipse Adoptium",
     ];
     for java_path in java_paths {
-        let Ok(java_subpaths) = std::fs::read_dir(java_path) else {continue };
+        let Ok(java_subpaths) = std::fs::read_dir(java_path) else {
+            continue;
+        };
         for java_subpath in java_subpaths.flatten() {
             let path = java_subpath.path();
             jre_paths.insert(path.join("bin"));
@@ -97,7 +99,7 @@ pub fn get_paths_from_jre_winregkey(jre_key: RegKey) -> HashSet<PathBuf> {
             for subkey_value in subkey_value_names {
                 let path: Result<String, std::io::Error> =
                     subkey.get_value(subkey_value);
-                let Ok(path) = path else {continue};
+                let Ok(path) = path else { continue };
 
                 jre_paths.insert(PathBuf::from(path).join("bin"));
             }
@@ -264,7 +266,9 @@ pub async fn check_java_at_filepaths(
 pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
-    let Ok(path) = io::canonicalize(path) else { return None };
+    let Ok(path) = io::canonicalize(path) else {
+        return None;
+    };
 
     // Checks for existence of Java at this filepath
     // Adds JAVA_BIN to the end of the path if it is not already there

@@ -117,8 +117,8 @@ pub async fn profile_check_installed(
 /// Installs/Repairs a profile
 /// invoke('plugin:profile|profile_install')
 #[tauri::command]
-pub async fn profile_install(path: ProfilePathId) -> Result<()> {
-    profile::install(&path).await?;
+pub async fn profile_install(path: ProfilePathId, force: bool) -> Result<()> {
+    profile::install(&path, force).await?;
     Ok(())
 }
 

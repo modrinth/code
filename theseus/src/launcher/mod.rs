@@ -102,6 +102,7 @@ pub async fn get_java_version_from_profile(
 pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<LoadingBarId>,
+    repairing: bool,
 ) -> crate::Result<()> {
     let sync_projects = existing_loading_bar.is_some();
     let loading_bar = init_or_edit_loading(
@@ -156,7 +157,7 @@ pub async fn install_minecraft(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
-        None,
+        Some(repairing),
         Some(&loading_bar),
     )
     .await?;
@@ -185,6 +186,7 @@ pub async fn install_minecraft(
         &version_info,
         &loading_bar,
         &java_version.architecture,
+        repairing,
     )
     .await?;
 
@@ -325,7 +327,7 @@ pub async fn launch_minecraft(
     }
 
     if profile.install_stage != ProfileInstallStage::Installed {
-        install_minecraft(profile, None).await?;
+        install_minecraft(profile, None, false).await?;
     }
 
     let state = State::get().await?;

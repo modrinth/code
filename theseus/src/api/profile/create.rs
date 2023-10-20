@@ -125,7 +125,7 @@ pub async fn profile_create(
         }
 
         if !skip_install_profile.unwrap_or(false) {
-            crate::launcher::install_minecraft(&profile, None).await?;
+            crate::launcher::install_minecraft(&profile, None, false).await?;
         }
         State::sync().await?;
 
@@ -190,7 +190,7 @@ pub async fn profile_create_from_duplicate(
     )
     .await?;
 
-    crate::launcher::install_minecraft(&profile, Some(bar)).await?;
+    crate::launcher::install_minecraft(&profile, Some(bar), false).await?;
     {
         let state = State::get().await?;
         let mut file_watcher = state.file_watcher.write().await;
