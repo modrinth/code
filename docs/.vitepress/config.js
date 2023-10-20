@@ -43,6 +43,7 @@ export default {
           { text: 'Toggle', link: '/components/toggle' },
           { text: 'Promotion', link: '/components/promotion' },
           { text: 'Markdown', link: '/components/markdown' },
+          { text: 'Markdown Editor', link: '/components/markdown-editor' },
           { text: 'Copy Code', link: '/components/copy-code' },
           { text: 'Notifications', link: '/components/notifications' },
           { text: 'Share Modal', link: '/components/share-modal' },

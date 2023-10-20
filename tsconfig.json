@@ -19,7 +19,10 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@/*": ["./lib/*"]
+    }
   },
   "include": ["lib/**/*.js", "lib/**/*.ts", "lib/**/*.d.ts", "lib/**/*.tsx", "lib/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]

@@ -25,6 +25,11 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.3.0",
+    "@codemirror/lang-markdown": "^6.2.2",
+    "@codemirror/language": "^6.9.1",
+    "@codemirror/state": "^6.3.0",
+    "@codemirror/view": "^6.21.3",
     "chart.js": "^4.3.3",
     "dayjs": "^1.11.7",
     "floating-vue": "^2.0.0-beta.20",

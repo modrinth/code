@@ -1,24 +1,25 @@
 <template>
   <Checkbox
     class="filter"
-    :model-value="activeFilters.includes(facetName)"
+    :model-value="isActive"
     :description="displayName"
-    @update:model-value="toggle()"
+    @update:model-value="toggle"
   >
     <div class="filter-text">
-      <div v-if="icon" aria-hidden="true" class="icon" v-html="icon" />
+      <div v-if="props.icon" aria-hidden="true" class="icon" v-html="props.icon" />
       <div v-else class="icon">
         <slot />
       </div>
-      <span aria-hidden="true"> {{ displayName }}</span>
+      <span aria-hidden="true"> {{ props.displayName }}</span>
     </div>
   </Checkbox>
 </template>
 
 <script setup>
+import { ref, defineProps, defineEmits, watchEffect } from 'vue'
 import { Checkbox } from '@'
 
-defineProps({
+const props = defineProps({
   facetName: {
     type: String,
     default: '',
@@ -39,10 +40,15 @@ defineProps({
   },
 })
 
+const isActive = ref(props.activeFilters.value.includes(props.facetName))
 const emit = defineEmits(['toggle'])
 
-function toggle() {
-  emit('toggle', this.facetName)
+watchEffect(() => {
+  isActive.value = props.activeFilters.value.includes(props.facetName)
+})
+
+const toggle = () => {
+  emit('toggle', props.facetName)
 }
 </script>
 
