@@ -28,7 +28,7 @@ pub fn get_class_paths(
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !rules.iter().all(|x| parse_rule(x, java_arch, true)) {
+                if rules.iter().all(|x| !parse_rule(x, java_arch, true)) {
                     return None;
                 }
             }
