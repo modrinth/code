@@ -447,7 +447,7 @@ pub async fn fetch_maven_metadata(
         let parts: Vec<&str> = value.split('-').collect();
         if parts.len() == 2 {
             map.entry(parts[0].to_string())
-                .or_insert(Vec::new())
+                .or_default()
                 .push((original, parts[1].to_string()));
         }
     }

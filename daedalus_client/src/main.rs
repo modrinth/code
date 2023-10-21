@@ -147,26 +147,35 @@ fn check_env_vars() -> bool {
 }
 
 lazy_static::lazy_static! {
-    static ref CLIENT : Bucket = Bucket::new(
-        &dotenvy::var("S3_BUCKET_NAME").unwrap(),
-        if &*dotenvy::var("S3_REGION").unwrap() == "r2" {
-            Region::R2 {
-                account_id: dotenvy::var("S3_URL").unwrap(),
-            }
+    static ref CLIENT : Bucket = {
+        let region = dotenvy::var("S3_REGION").unwrap();
+        let b = Bucket::new(
+            &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+            if &*region == "r2" {
+                Region::R2 {
+                    account_id: dotenvy::var("S3_URL").unwrap(),
+                }
+            } else {
+                Region::Custom {
+                    region: region.clone(),
+                    endpoint: dotenvy::var("S3_URL").unwrap(),
+                }
+            },
+            Credentials::new(
+                Some(&*dotenvy::var("S3_ACCESS_TOKEN").unwrap()),
+                Some(&*dotenvy::var("S3_SECRET").unwrap()),
+                None,
+                None,
+                None,
+            ).unwrap(),
+        ).unwrap();
+
+        if region == "path-style" {
+            b.with_path_style()
         } else {
-            Region::Custom {
-                region: dotenvy::var("S3_REGION").unwrap(),
-                endpoint: dotenvy::var("S3_URL").unwrap(),
-            }
-        },
-        Credentials::new(
-            Some(&*dotenvy::var("S3_ACCESS_TOKEN").unwrap()),
-            Some(&*dotenvy::var("S3_SECRET").unwrap()),
-            None,
-            None,
-            None,
-        ).unwrap(),
-    ).unwrap();
+            b
+        }
+    };
 }
 
 pub async fn upload_file_to_bucket(
