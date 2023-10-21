@@ -13,7 +13,7 @@ use crate::{
 };
 use chrono::Utc;
 use daedalus as d;
-use daedalus::minecraft::VersionInfo;
+use daedalus::minecraft::{RuleAction, VersionInfo};
 use st::Profile;
 use std::collections::HashMap;
 use std::{process::Stdio, sync::Arc};
@@ -34,12 +34,17 @@ pub fn parse_rules(
     java_version: &str,
     minecraft_updated: bool,
 ) -> bool {
-    let x = rules
+    let mut x = rules
         .iter()
         .map(|x| parse_rule(x, java_version, minecraft_updated))
         .collect::<Vec<Option<bool>>>();
 
-    println!("{:?}", x);
+    if rules.iter().all(|x| match x.action {
+        RuleAction::Disallow => true,
+        _ => false,
+    }) {
+        x.push(Some(true))
+    }
 
     !(x.iter().any(|x| x == &Some(false)) || x.iter().all(|x| x == &None))
 }
@@ -484,7 +489,6 @@ pub async fn launch_minecraft(
                 *memory,
                 Vec::from(java_args),
                 &java_version.architecture,
-                minecraft_updated,
             )?
             .into_iter()
             .collect::<Vec<_>>(),
@@ -503,7 +507,6 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
-                minecraft_updated,
             )?
             .into_iter()
             .collect::<Vec<_>>(),

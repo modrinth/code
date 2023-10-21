@@ -108,7 +108,6 @@ pub fn get_jvm_arguments(
     memory: MemorySettings,
     custom_args: Vec<String>,
     java_arch: &str,
-    minecraft_updated: bool,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
@@ -127,7 +126,6 @@ pub fn get_jvm_arguments(
                 )
             },
             java_arch,
-            minecraft_updated,
         )?;
     } else {
         parsed_arguments.push(format!(
@@ -208,7 +206,6 @@ pub fn get_minecraft_arguments(
     version_type: &VersionType,
     resolution: WindowSize,
     java_arch: &str,
-    minecraft_updated: bool,
 ) -> crate::Result<Vec<String>> {
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
@@ -231,7 +228,6 @@ pub fn get_minecraft_arguments(
                 )
             },
             java_arch,
-            minecraft_updated,
         )?;
 
         Ok(parsed_arguments)
@@ -330,7 +326,6 @@ fn parse_arguments<F>(
     parsed_arguments: &mut Vec<String>,
     parse_function: F,
     java_arch: &str,
-    minecraft_updated: bool,
 ) -> crate::Result<()>
 where
     F: Fn(&str) -> crate::Result<String>,
