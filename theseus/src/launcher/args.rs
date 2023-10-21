@@ -1,6 +1,7 @@
 //! Minecraft CLI argument logic
 // TODO: Rafactor this section
 use super::{auth::Credentials, parse_rule};
+use crate::launcher::parse_rules;
 use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
@@ -28,8 +29,11 @@ pub fn get_class_paths(
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if rules.iter().any(|x| !parse_rule(x, java_arch, true)) {
+                if !parse_rules(rules, java_arch) {
+                    println!("excluded: {}", library.name);
                     return None;
+                } else {
+                    println!("included: {}", library.name);
                 }
             }
 
@@ -335,7 +339,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if rules.iter().any(|x| parse_rule(x, java_arch, false)) {
+                if parse_rules(rules, java_arch) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(

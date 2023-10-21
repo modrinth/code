@@ -1,5 +1,6 @@
 //! Downloader for Minecraft data
 
+use crate::launcher::parse_rules;
 use crate::state::CredentialsStore;
 use crate::{
     event::{
@@ -264,7 +265,7 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if rules.iter().any(|x| !super::parse_rule(x, java_arch, true)) {
+                    if !parse_rules(rules, java_arch) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }

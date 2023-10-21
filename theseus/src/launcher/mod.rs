@@ -25,8 +25,30 @@ mod args;
 pub mod auth;
 pub mod download;
 
+// All nones -> disallowed
+// 1+ true -> allowed
+// 1+ false -> disallowed
 #[tracing::instrument]
-pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str, default_value: bool) -> bool {
+pub fn parse_rules(rules: &[d::minecraft::Rule], java_version: &str) -> bool {
+    let x = rules
+        .iter()
+        .map(|x| parse_rule(x, java_version))
+        .collect::<Vec<Option<bool>>>();
+
+    println!("{:?}", x);
+
+    !(x.iter().any(|x| x == &Some(false)) || x.iter().all(|x| x == &None))
+}
+
+// if anything is disallowed, it should NOT be included
+// if anything is not disallowed, it shouldn't factor in final result
+// if anything is not allowed, it shouldn't factor in final result
+// if anything is allowed, it should be included
+#[tracing::instrument]
+pub fn parse_rule(
+    rule: &d::minecraft::Rule,
+    java_version: &str,
+) -> Option<bool> {
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
@@ -44,12 +66,24 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str, default_value: 
                 || !features.is_quick_play_realms.unwrap_or(true)
                 || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
-        _ => default_value,
+        _ => return Some(true),
     };
 
     match rule.action {
-        RuleAction::Allow => res,
-        RuleAction::Disallow => !res,
+        RuleAction::Allow => {
+            if res {
+                Some(true)
+            } else {
+                None
+            }
+        }
+        RuleAction::Disallow => {
+            if res {
+                Some(false)
+            } else {
+                None
+            }
+        }
     }
 }
 
