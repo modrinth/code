@@ -150,7 +150,7 @@ pub fn get_jvm_arguments(
         }
     }
     parsed_arguments.push("-Dorg.lwjgl.util.Debug=true".to_string());
-    parsed_arguments.push("-XstartOnFirstThread".to_string());
+    //parsed_arguments.push("-XstartOnFirstThread".to_string());
 
     Ok(parsed_arguments)
 }
@@ -345,7 +345,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if parse_rules(rules, java_arch, minecraft_updated) {
+                if parse_rules(rules, java_arch, true) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(
