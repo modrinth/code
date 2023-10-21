@@ -196,7 +196,8 @@ pub async fn profile_create_from_duplicate(
             ErrorKind::UnmanagedProfileError(profile_path_id.to_string())
         })?;
 
-    crate::launcher::install_minecraft(&duplicated_profile, Some(bar), false).await?;
+    crate::launcher::install_minecraft(&duplicated_profile, Some(bar), false)
+        .await?;
     {
         let state = State::get().await?;
         let mut file_watcher = state.file_watcher.write().await;

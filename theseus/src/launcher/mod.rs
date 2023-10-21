@@ -39,14 +39,14 @@ pub fn parse_rules(
         .map(|x| parse_rule(x, java_version, minecraft_updated))
         .collect::<Vec<Option<bool>>>();
 
-    if rules.iter().all(|x| match x.action {
-        RuleAction::Disallow => true,
-        _ => false,
-    }) {
+    if rules
+        .iter()
+        .all(|x| matches!(x.action, RuleAction::Disallow))
+    {
         x.push(Some(true))
     }
 
-    !(x.iter().any(|x| x == &Some(false)) || x.iter().all(|x| x == &None))
+    !(x.iter().any(|x| x == &Some(false)) || x.iter().all(|x| x.is_none()))
 }
 
 // if anything is disallowed, it should NOT be included

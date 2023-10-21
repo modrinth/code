@@ -246,6 +246,7 @@ pub async fn download_assets(
 
 #[tracing::instrument(skip(st, libraries))]
 #[theseus_macros::debug_pin]
+#[allow(clippy::too_many_arguments)]
 pub async fn download_libraries(
     st: &State,
     libraries: &[Library],
