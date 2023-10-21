@@ -26,15 +26,19 @@ const pageOptions = ['Home', 'Library']
 
 const themeStore = useTheming()
 
-const fetchSettings = await get().catch(handleError)
+const accessSettings = async () => {
+  const settings = await get()
 
-if (!fetchSettings.java_globals.JAVA_8)
-  fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
-if (!fetchSettings.java_globals.JAVA_17)
-  fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
+  if (!settings.java_globals.JAVA_8) settings.java_globals.JAVA_8 = { path: '', version: '' }
+  if (!settings.java_globals.JAVA_17) settings.java_globals.JAVA_17 = { path: '', version: '' }
 
-fetchSettings.javaArgs = fetchSettings.custom_java_args.join(' ')
-fetchSettings.envArgs = fetchSettings.custom_env_args.map((x) => x.join('=')).join(' ')
+  settings.javaArgs = settings.custom_java_args.join(' ')
+  settings.envArgs = settings.custom_env_args.map((x) => x.join('=')).join(' ')
+
+  return settings
+}
+
+const fetchSettings = await accessSettings().catch(handleError)
 
 const settings = ref(fetchSettings)
 const settingsDir = ref(settings.value.loaded_config_dir)
@@ -43,6 +47,10 @@ const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1
 watch(
   settings,
   async (oldSettings, newSettings) => {
+    if (oldSettings.loaded_config_dir !== newSettings.loaded_config_dir) {
+      return
+    }
+
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
     if (setSettings.opt_out_analytics) {
@@ -117,6 +125,8 @@ async function findLauncherDir() {
 
 async function refreshDir() {
   await change_config_dir(settingsDir.value)
+  settings.value = await accessSettings().catch(handleError)
+  settingsDir.value = settings.value.loaded_config_dir
 }
 </script>
 
@@ -385,7 +395,7 @@ async function refreshDir() {
           v-model="settings.memory.maximum"
           :min="8"
           :max="maxMemory"
-          :step="1"
+          :step="64"
           unit="mb"
         />
       </div>

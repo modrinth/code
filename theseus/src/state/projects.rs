@@ -815,7 +815,7 @@ pub async fn infer_data_from_files(
     let mut corrected_hashmap = HashMap::new();
     let mut stream = tokio_stream::iter(return_projects);
     while let Some((h, v)) = stream.next().await {
-        let h = ProjectPathId::from_fs_path(h).await?;
+        let h = ProjectPathId::from_fs_path(&h).await?;
         corrected_hashmap.insert(h, v);
     }
 

@@ -161,7 +161,13 @@ const breadcrumbs = useBreadcrumbs()
 
 const instance = ref(await get(route.params.id).catch(handleError))
 
-breadcrumbs.setName('Instance', instance.value.metadata.name)
+breadcrumbs.setName(
+  'Instance',
+  instance.value.metadata.name.length > 40
+    ? instance.value.metadata.name.substring(0, 40) + '...'
+    : instance.value.metadata.name
+)
+
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
@@ -203,7 +209,7 @@ const checkProcess = async () => {
 
 // Get information on associated modrinth versions, if any
 const modrinthVersions = ref([])
-if (!(await isOffline()) && instance.value.metadata.linked_data) {
+if (!(await isOffline()) && instance.value.metadata.linked_data?.project_id) {
   modrinthVersions.value = await useFetch(
     `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
     'project'
@@ -366,6 +372,8 @@ Button {
 .name {
   font-size: 1.25rem;
   color: var(--color-contrast);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .metadata {

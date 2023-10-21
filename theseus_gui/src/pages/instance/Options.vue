@@ -243,7 +243,7 @@
         :disabled="!overrideMemorySettings"
         :min="8"
         :max="maxMemory"
-        :step="1"
+        :step="64"
         unit="mb"
       />
     </div>
@@ -362,7 +362,10 @@
         <span class="label__description">
           <strong>Version: </strong>
           {{
-            installedVersionData.name.charAt(0).toUpperCase() + installedVersionData.name.slice(1)
+            installedVersionData?.name != null
+              ? installedVersionData.name.charAt(0).toUpperCase() +
+                installedVersionData.name.slice(1)
+              : getLocalVersion(props.instance.path)
           }}
         </span>
       </label>
@@ -401,7 +404,7 @@
       </Button>
     </div>
 
-    <div class="adjacent-input">
+    <div v-if="props.instance.metadata.linked_data.project_id" class="adjacent-input">
       <label for="change-modpack-version">
         <span class="label__title">Change modpack version</span>
         <span class="label__description">
@@ -576,9 +579,11 @@ const modpackVersionModal = ref(null)
 
 const instancesList = Object.values(await list(true))
 const availableGroups = ref([
-  ...instancesList.reduce((acc, obj) => {
-    return acc.concat(obj.metadata.groups)
-  }, []),
+  ...new Set(
+    instancesList.reduce((acc, obj) => {
+      return acc.concat(obj.metadata.groups)
+    }, [])
+  ),
 ])
 
 async function resetIcon() {
@@ -641,9 +646,10 @@ const unlinkModpack = ref(false)
 const inProgress = ref(false)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
-const installedVersionData = computed(() =>
-  props.versions.find((version) => version.id === installedVersion.value)
-)
+const installedVersionData = computed(() => {
+  if (!installedVersion.value) return null
+  return props.versions.find((version) => version.id === installedVersion.value)
+})
 
 watch(
   [
@@ -670,6 +676,15 @@ watch(
   },
   { deep: true }
 )
+
+const getLocalVersion = (path) => {
+  const pathSlice = path.split(' ').slice(-1).toString()
+  // If the path ends in (1), (2), etc. it's a duplicate instance and no version can be obtained.
+  if (/^\(\d\)/.test(pathSlice)) {
+    return 'Unknown'
+  }
+  return pathSlice
+}
 
 const editProfileObject = computed(() => {
   const editProfile = {
