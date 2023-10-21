@@ -10,7 +10,7 @@ use daedalus::{
 };
 use serde::{Deserialize, Serialize};
 
-const METADATA_URL: &str = "http://localhost:9000/meta";
+const METADATA_URL: &str = "https://meta.modrinth.com";
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Metadata {

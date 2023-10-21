@@ -30,10 +30,7 @@ pub fn get_class_paths(
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
                 if !parse_rules(rules, java_arch, minecraft_updated) {
-                    println!("excluded: {}", library.name);
                     return None;
-                } else {
-                    println!("included: {}", library.name);
                 }
             }
 
