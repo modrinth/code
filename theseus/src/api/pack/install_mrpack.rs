@@ -283,8 +283,12 @@ pub async fn install_zipped_mrpack_files(
         }
 
         if let Some(profile_val) = profile::get(&profile_path, None).await? {
-            crate::launcher::install_minecraft(&profile_val, Some(loading_bar))
-                .await?;
+            crate::launcher::install_minecraft(
+                &profile_val,
+                Some(loading_bar),
+                false,
+            )
+            .await?;
 
             State::sync().await?;
         }

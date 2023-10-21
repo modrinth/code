@@ -889,8 +889,6 @@ impl Profiles {
             // Fetch online from Modrinth each latest version
             future::try_join_all(modrinth_updatables.into_iter().map(
                 |(profile_path, linked_project)| {
-                    let profile_path = profile_path;
-                    let linked_project = linked_project;
                     let state = state.clone();
                     async move {
                         let creds = state.credentials.read().await;

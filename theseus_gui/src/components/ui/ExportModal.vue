@@ -33,7 +33,7 @@ const themeStore = useTheming()
 
 const initFiles = async () => {
   const newFolders = new Map()
-  const sep = '/';
+  const sep = '/'
   files.value = []
   await get_pack_export_candidates(props.instance.path).then((filePaths) =>
     filePaths

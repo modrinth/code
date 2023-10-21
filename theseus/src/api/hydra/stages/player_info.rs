@@ -13,7 +13,7 @@ impl Default for PlayerInfo {
     fn default() -> Self {
         Self {
             id: "606e2ff0ed7748429d6ce1d3321c7838".to_string(),
-            name: String::from("???"),
+            name: String::from("Unknown"),
         }
     }
 }

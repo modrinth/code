@@ -72,8 +72,8 @@ export async function check_installed(path, projectId) {
 }
 
 // Installs/Repairs a profile
-export async function install(path) {
-  return await invoke('plugin:profile|profile_install', { path })
+export async function install(path, force) {
+  return await invoke('plugin:profile|profile_install', { path, force })
 }
 
 // Updates all of a profile's projects

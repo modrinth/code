@@ -468,7 +468,7 @@
         id="repair-profile"
         color="highlight"
         :disabled="installing || inProgress || repairing || offline"
-        @click="repairProfile"
+        @click="repairProfile(true)"
       >
         <HammerIcon /> Repair
       </Button>
@@ -755,9 +755,9 @@ async function duplicateProfile() {
   })
 }
 
-async function repairProfile() {
+async function repairProfile(force) {
   repairing.value = true
-  await install(props.instance.path).catch(handleError)
+  await install(props.instance.path, force).catch(handleError)
   repairing.value = false
 
   mixpanel_track('InstanceRepair', {
@@ -910,7 +910,7 @@ async function saveGvLoaderEdits() {
     editProfile.metadata.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value]
   }
   await edit(props.instance.path, editProfile).catch(handleError)
-  await repairProfile()
+  await repairProfile(false)
 
   editing.value = false
   changeVersionsModal.value.hide()

@@ -13,7 +13,7 @@ use crate::{
 };
 use chrono::Utc;
 use daedalus as d;
-use daedalus::minecraft::VersionInfo;
+use daedalus::minecraft::{RuleAction, VersionInfo};
 use st::Profile;
 use std::collections::HashMap;
 use std::{process::Stdio, sync::Arc};
@@ -25,14 +25,48 @@ mod args;
 pub mod auth;
 pub mod download;
 
+// All nones -> disallowed
+// 1+ true -> allowed
+// 1+ false -> disallowed
 #[tracing::instrument]
-pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
+pub fn parse_rules(
+    rules: &[d::minecraft::Rule],
+    java_version: &str,
+    minecraft_updated: bool,
+) -> bool {
+    let mut x = rules
+        .iter()
+        .map(|x| parse_rule(x, java_version, minecraft_updated))
+        .collect::<Vec<Option<bool>>>();
+
+    if rules
+        .iter()
+        .all(|x| matches!(x.action, RuleAction::Disallow))
+    {
+        x.push(Some(true))
+    }
+
+    !(x.iter().any(|x| x == &Some(false)) || x.iter().all(|x| x.is_none()))
+}
+
+// if anything is disallowed, it should NOT be included
+// if anything is not disallowed, it shouldn't factor in final result
+// if anything is not allowed, it shouldn't factor in final result
+// if anything is allowed, it should be included
+#[tracing::instrument]
+pub fn parse_rule(
+    rule: &d::minecraft::Rule,
+    java_version: &str,
+    minecraft_updated: bool,
+) -> Option<bool> {
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
         Rule {
             os: Some(ref os), ..
-        } => crate::util::platform::os_rule(os, java_version),
+        } => {
+            crate::util::platform::os_rule(os, java_version, minecraft_updated)
+        }
         Rule {
             features: Some(ref features),
             ..
@@ -44,12 +78,24 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
                 || !features.is_quick_play_realms.unwrap_or(true)
                 || !features.is_quick_play_singleplayer.unwrap_or(true)
         }
-        _ => false,
+        _ => return Some(true),
     };
 
     match rule.action {
-        RuleAction::Allow => res,
-        RuleAction::Disallow => !res,
+        RuleAction::Allow => {
+            if res {
+                Some(true)
+            } else {
+                None
+            }
+        }
+        RuleAction::Disallow => {
+            if res {
+                Some(false)
+            } else {
+                None
+            }
+        }
     }
 }
 
@@ -102,6 +148,7 @@ pub async fn get_java_version_from_profile(
 pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<LoadingBarId>,
+    repairing: bool,
 ) -> crate::Result<()> {
     let sync_projects = existing_loading_bar.is_some();
     let loading_bar = init_or_edit_loading(
@@ -133,15 +180,23 @@ pub async fn install_minecraft(
         &io::canonicalize(&profile.get_profile_full_path().await?)?;
     let metadata = state.metadata.read().await;
 
-    let version = metadata
+    let version_index = metadata
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version)
+        .position(|it| it.id == profile.metadata.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.metadata.game_version
         )))?;
+    let version = &metadata.minecraft.versions[version_index];
+    let minecraft_updated = version_index
+        <= metadata
+            .minecraft
+            .versions
+            .iter()
+            .position(|x| x.id == "22w16a")
+            .unwrap_or(0);
 
     let version_jar = profile
         .metadata
@@ -156,7 +211,7 @@ pub async fn install_minecraft(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
-        None,
+        Some(repairing),
         Some(&loading_bar),
     )
     .await?;
@@ -185,6 +240,8 @@ pub async fn install_minecraft(
         &version_info,
         &loading_bar,
         &java_version.architecture,
+        repairing,
+        minecraft_updated,
     )
     .await?;
 
@@ -325,7 +382,7 @@ pub async fn launch_minecraft(
     }
 
     if profile.install_stage != ProfileInstallStage::Installed {
-        install_minecraft(profile, None).await?;
+        install_minecraft(profile, None, false).await?;
     }
 
     let state = State::get().await?;
@@ -334,15 +391,23 @@ pub async fn launch_minecraft(
     let instance_path = profile.get_profile_full_path().await?;
     let instance_path = &io::canonicalize(instance_path)?;
 
-    let version = metadata
+    let version_index = metadata
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version)
+        .position(|it| it.id == profile.metadata.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.metadata.game_version
         )))?;
+    let version = &metadata.minecraft.versions[version_index];
+    let minecraft_updated = version_index
+        <= metadata
+            .minecraft
+            .versions
+            .iter()
+            .position(|x| x.id == "22w16a")
+            .unwrap_or(0);
 
     let version_jar = profile
         .metadata
@@ -418,6 +483,7 @@ pub async fn launch_minecraft(
                     version_info.libraries.as_slice(),
                     &client_path,
                     &java_version.architecture,
+                    minecraft_updated,
                 )?,
                 &version_jar,
                 *memory,

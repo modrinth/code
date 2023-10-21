@@ -1,6 +1,6 @@
 //! Minecraft CLI argument logic
-// TODO: Rafactor this section
-use super::{auth::Credentials, parse_rule};
+use super::auth::Credentials;
+use crate::launcher::parse_rules;
 use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},
@@ -23,12 +23,13 @@ pub fn get_class_paths(
     libraries: &[Library],
     client_path: &Path,
     java_arch: &str,
+    minecraft_updated: bool,
 ) -> crate::Result<String> {
     let mut cps = libraries
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !rules.iter().any(|x| parse_rule(x, java_arch)) {
+                if !parse_rules(rules, java_arch, minecraft_updated) {
                     return None;
                 }
             }
@@ -335,7 +336,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if rules.iter().any(|x| parse_rule(x, java_arch)) {
+                if parse_rules(rules, java_arch, true) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(

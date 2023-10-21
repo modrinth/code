@@ -281,9 +281,9 @@ pub async fn list(
 
 /// Installs/Repairs a profile
 #[tracing::instrument]
-pub async fn install(path: &ProfilePathId) -> crate::Result<()> {
+pub async fn install(path: &ProfilePathId, force: bool) -> crate::Result<()> {
     if let Some(profile) = get(path, None).await? {
-        crate::launcher::install_minecraft(&profile, None).await?;
+        crate::launcher::install_minecraft(&profile, None, force).await?;
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error());

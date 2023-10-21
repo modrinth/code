@@ -1,5 +1,6 @@
 //! Downloader for Minecraft data
 
+use crate::launcher::parse_rules;
 use crate::state::CredentialsStore;
 use crate::{
     event::{
@@ -26,11 +27,13 @@ pub async fn download_minecraft(
     version: &GameVersionInfo,
     loading_bar: &LoadingBarId,
     java_arch: &str,
+    force: bool,
+    minecraft_updated: bool,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
     // 5
     let assets_index =
-        download_assets_index(st, version, Some(loading_bar)).await?;
+        download_assets_index(st, version, Some(loading_bar), force).await?;
 
     let amount = if version
         .processors
@@ -45,9 +48,9 @@ pub async fn download_minecraft(
 
     tokio::try_join! {
         // Total loading sums to 90/60
-        download_client(st, version, Some(loading_bar)), // 10
-        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch) // 40
+        download_client(st, version, Some(loading_bar), force), // 10
+        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount, force), // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force, minecraft_updated) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -105,6 +108,7 @@ pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
+    force: bool,
 ) -> crate::Result<()> {
     let version = &version_info.id;
     tracing::debug!("Locating client for version {version}");
@@ -123,7 +127,7 @@ pub async fn download_client(
         .await
         .join(format!("{version}.jar"));
 
-    if !path.exists() {
+    if !path.exists() || force {
         let bytes = fetch(
             &client_download.url,
             Some(&client_download.sha1),
@@ -148,6 +152,7 @@ pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
+    force: bool,
 ) -> crate::Result<AssetsIndex> {
     tracing::debug!("Loading assets index");
     let path = st
@@ -156,7 +161,7 @@ pub async fn download_assets_index(
         .await
         .join(format!("{}.json", &version.asset_index.id));
 
-    let res = if path.exists() {
+    let res = if path.exists() && !force {
         io::read(path)
             .err_into::<crate::Error>()
             .await
@@ -183,6 +188,7 @@ pub async fn download_assets(
     index: &AssetsIndex,
     loading_bar: Option<&LoadingBarId>,
     loading_amount: f64,
+    force: bool,
 ) -> crate::Result<()> {
     tracing::debug!("Loading assets");
     let num_futs = index.objects.len();
@@ -206,7 +212,7 @@ pub async fn download_assets(
                 let fetch_cell = OnceCell::<bytes::Bytes>::new();
                 tokio::try_join! {
                     async {
-                        if !resource_path.exists() {
+                        if !resource_path.exists() || force {
                             let resource = fetch_cell
                                 .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore, &CredentialsStore(None)))
                                 .await?;
@@ -216,13 +222,14 @@ pub async fn download_assets(
                         Ok::<_, crate::Error>(())
                     },
                     async {
-                        if with_legacy {
+                        let resource_path = st.directories.legacy_assets_dir().await.join(
+                            name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
+                        );
+
+                        if with_legacy && !resource_path.exists() || force {
                             let resource = fetch_cell
                                 .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore, &CredentialsStore(None)))
                                 .await?;
-                            let resource_path = st.directories.legacy_assets_dir().await.join(
-                                name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
-                            );
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched legacy asset with hash {hash}");
                         }
@@ -239,6 +246,7 @@ pub async fn download_assets(
 
 #[tracing::instrument(skip(st, libraries))]
 #[theseus_macros::debug_pin]
+#[allow(clippy::too_many_arguments)]
 pub async fn download_libraries(
     st: &State,
     libraries: &[Library],
@@ -246,6 +254,8 @@ pub async fn download_libraries(
     loading_bar: Option<&LoadingBarId>,
     loading_amount: f64,
     java_arch: &str,
+    force: bool,
+    minecraft_updated: bool,
 ) -> crate::Result<()> {
     tracing::debug!("Loading libraries");
 
@@ -258,7 +268,7 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if !rules.iter().any(|x| super::parse_rule(x, java_arch)) {
+                    if !parse_rules(rules, java_arch, minecraft_updated) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
@@ -270,7 +280,7 @@ pub async fn download_libraries(
                         let path = st.directories.libraries_dir().await.join(&artifact_path);
 
                         match library.downloads {
-                            _ if path.exists() => Ok(()),
+                            _ if path.exists() && !force => Ok(()),
                             Some(d::minecraft::LibraryDownloads {
                                 artifact: Some(ref artifact),
                                 ..
