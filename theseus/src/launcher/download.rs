@@ -264,7 +264,7 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if rules.iter().all(|x| !super::parse_rule(x, java_arch, true)) {
+                    if rules.iter().any(|x| !super::parse_rule(x, java_arch, true)) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
