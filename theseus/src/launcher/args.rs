@@ -145,7 +145,6 @@ pub fn get_jvm_arguments(
         }
     }
     parsed_arguments.push("-Dorg.lwjgl.util.Debug=true".to_string());
-    //parsed_arguments.push("-XstartOnFirstThread".to_string());
 
     Ok(parsed_arguments)
 }
