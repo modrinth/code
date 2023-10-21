@@ -29,10 +29,14 @@ pub mod download;
 // 1+ true -> allowed
 // 1+ false -> disallowed
 #[tracing::instrument]
-pub fn parse_rules(rules: &[d::minecraft::Rule], java_version: &str) -> bool {
+pub fn parse_rules(
+    rules: &[d::minecraft::Rule],
+    java_version: &str,
+    minecraft_updated: bool,
+) -> bool {
     let x = rules
         .iter()
-        .map(|x| parse_rule(x, java_version))
+        .map(|x| parse_rule(x, java_version, minecraft_updated))
         .collect::<Vec<Option<bool>>>();
 
     println!("{:?}", x);
@@ -48,13 +52,16 @@ pub fn parse_rules(rules: &[d::minecraft::Rule], java_version: &str) -> bool {
 pub fn parse_rule(
     rule: &d::minecraft::Rule,
     java_version: &str,
+    minecraft_updated: bool,
 ) -> Option<bool> {
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
         Rule {
             os: Some(ref os), ..
-        } => crate::util::platform::os_rule(os, java_version),
+        } => {
+            crate::util::platform::os_rule(os, java_version, minecraft_updated)
+        }
         Rule {
             features: Some(ref features),
             ..
@@ -168,15 +175,23 @@ pub async fn install_minecraft(
         &io::canonicalize(&profile.get_profile_full_path().await?)?;
     let metadata = state.metadata.read().await;
 
-    let version = metadata
+    let version_index = metadata
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version)
+        .position(|it| it.id == profile.metadata.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.metadata.game_version
         )))?;
+    let version = &metadata.minecraft.versions[version_index];
+    let minecraft_updated = version_index
+        <= metadata
+            .minecraft
+            .versions
+            .iter()
+            .position(|x| x.id == "22w16a")
+            .unwrap_or(0);
 
     let version_jar = profile
         .metadata
@@ -221,6 +236,7 @@ pub async fn install_minecraft(
         &loading_bar,
         &java_version.architecture,
         repairing,
+        minecraft_updated,
     )
     .await?;
 
@@ -370,15 +386,23 @@ pub async fn launch_minecraft(
     let instance_path = profile.get_profile_full_path().await?;
     let instance_path = &io::canonicalize(instance_path)?;
 
-    let version = metadata
+    let version_index = metadata
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version)
+        .position(|it| it.id == profile.metadata.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
             profile.metadata.game_version
         )))?;
+    let version = &metadata.minecraft.versions[version_index];
+    let minecraft_updated = version_index
+        <= metadata
+            .minecraft
+            .versions
+            .iter()
+            .position(|x| x.id == "22w16a")
+            .unwrap_or(0);
 
     let version_jar = profile
         .metadata
@@ -454,11 +478,13 @@ pub async fn launch_minecraft(
                     version_info.libraries.as_slice(),
                     &client_path,
                     &java_version.architecture,
+                    minecraft_updated,
                 )?,
                 &version_jar,
                 *memory,
                 Vec::from(java_args),
                 &java_version.architecture,
+                minecraft_updated,
             )?
             .into_iter()
             .collect::<Vec<_>>(),
@@ -477,6 +503,7 @@ pub async fn launch_minecraft(
                 &version.type_,
                 *resolution,
                 &java_version.architecture,
+                minecraft_updated,
             )?
             .into_iter()
             .collect::<Vec<_>>(),

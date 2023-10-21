@@ -56,7 +56,12 @@ pub const ARCH_WIDTH: &str = "64";
 pub const ARCH_WIDTH: &str = "32";
 
 // Platform rule handling
-pub fn os_rule(rule: &OsRule, java_arch: &str) -> bool {
+pub fn os_rule(
+    rule: &OsRule,
+    java_arch: &str,
+    // Minecraft updated over 1.18.2 (supports MacOS Natively)
+    minecraft_updated: bool,
+) -> bool {
     let mut rule_match = true;
 
     if let Some(ref arch) = rule.arch {
@@ -64,8 +69,14 @@ pub fn os_rule(rule: &OsRule, java_arch: &str) -> bool {
     }
 
     if let Some(name) = &rule.name {
-        rule_match &=
-            &Os::native() == name || &Os::native_arch(java_arch) == name;
+        if minecraft_updated
+            && (name != &Os::LinuxArm64 || name != &Os::LinuxArm32)
+        {
+            rule_match &=
+                &Os::native() == name || &Os::native_arch(java_arch) == name;
+        } else {
+            rule_match &= &Os::native_arch(java_arch) == name;
+        }
     }
 
     if let Some(version) = &rule.version {

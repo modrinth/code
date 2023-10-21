@@ -28,6 +28,7 @@ pub async fn download_minecraft(
     loading_bar: &LoadingBarId,
     java_arch: &str,
     force: bool,
+    minecraft_updated: bool,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
     // 5
@@ -49,7 +50,7 @@ pub async fn download_minecraft(
         // Total loading sums to 90/60
         download_client(st, version, Some(loading_bar), force), // 10
         download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount, force), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force) // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch, force, minecraft_updated) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -253,6 +254,7 @@ pub async fn download_libraries(
     loading_amount: f64,
     java_arch: &str,
     force: bool,
+    minecraft_updated: bool,
 ) -> crate::Result<()> {
     tracing::debug!("Loading libraries");
 
@@ -265,7 +267,7 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if !parse_rules(rules, java_arch) {
+                    if !parse_rules(rules, java_arch, minecraft_updated) {
                         tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
