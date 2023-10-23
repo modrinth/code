@@ -392,7 +392,7 @@ import {
   Pagination,
   DropdownSelect,
 } from 'omorphia'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
@@ -878,6 +878,28 @@ const unlisten = await listen('tauri://file-drop', async (event) => {
 const switchPage = (page) => {
   currentPage.value = page
 }
+
+//Automatic Update Request
+const checkUpdateClick = () => {
+  if(isThereQuery("update")){
+    modpackVersionModal.value.show();
+  }
+}
+
+const isThereQuery = (queryRequest) => {
+  const query = window.location.search;
+  const urlParams = new URLSearchParams(query);
+
+  const isUpdate = urlParams.get(queryRequest);
+  if(isUpdate !== null && isUpdate !== undefined){
+    return true;
+  }
+    return false;
+}
+
+onMounted( () => {
+  checkUpdateClick();
+})
 
 onUnmounted(() => {
   unlisten()

@@ -1,22 +1,22 @@
 <script setup>
-import { onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import {computed, onUnmounted, ref, watch} from 'vue'
+import {useRouter} from 'vue-router'
+import {AnimatedLogo, Avatar, Button, Card, DownloadIcon, PlayIcon, StopCircleIcon, UpdatedIcon} from 'omorphia'
+import {convertFileSrc} from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import { install as pack_install } from '@/helpers/pack'
-import { list, run } from '@/helpers/profile'
+import {install as pack_install} from '@/helpers/pack'
+import {list, run} from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import { process_listener } from '@/helpers/events'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/state.js'
-import { showProfileInFolder } from '@/helpers/utils.js'
+import {process_listener} from '@/helpers/events'
+import {useFetch} from '@/helpers/fetch.js'
+import {handleError} from '@/store/state.js'
+import {showProfileInFolder} from '@/helpers/utils.js'
 import ModInstallModal from '@/components/ui/ModInstallModal.vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import {mixpanel_track} from '@/helpers/mixpanel'
 
 const props = defineProps({
   instance: {
@@ -33,24 +33,32 @@ const playing = ref(false)
 
 const uuid = ref(null)
 const modLoading = ref(
-  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
+    props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
 )
 
 watch(
-  () => props.instance,
-  () => {
-    modLoading.value = props.instance.install_stage
-      ? props.instance.install_stage !== 'installed'
-      : false
-  }
+    () => props.instance,
+    () => {
+      modLoading.value = props.instance.install_stage
+          ? props.instance.install_stage !== 'installed'
+          : false
+    }
 )
 
 const router = useRouter()
 
 const seeInstance = async () => {
   const instancePath = props.instance.metadata
-    ? `/instance/${encodeURIComponent(props.instance.path)}/`
-    : `/project/${encodeURIComponent(props.instance.project_id)}/`
+      ? `/instance/${encodeURIComponent(props.instance.path)}/`
+      : `/project/${encodeURIComponent(props.instance.project_id)}/`
+
+  await router.push(instancePath)
+}
+
+const updateInstance = async () => {
+  const instancePath = props.instance.metadata
+      ? `/instance/${encodeURIComponent(props.instance.path)}/?update=yes`
+      : `/project/${encodeURIComponent(props.instance.project_id)}/`
 
   await router.push(instancePath)
 }
@@ -71,25 +79,25 @@ const install = async (e) => {
   e?.stopPropagation()
   modLoading.value = true
   const versions = await useFetch(
-    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
-    'project versions'
+      `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
+      'project versions'
   )
 
   if (props.instance.project_type === 'modpack') {
     const packs = Object.values(await list(true).catch(handleError))
 
     if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
+        packs.length === 0 ||
+        !packs
+            .map((value) => value.metadata)
+            .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
     ) {
       modLoading.value = true
       await pack_install(
-        props.instance.project_id,
-        versions[0].id,
-        props.instance.title,
-        props.instance.icon_url
+          props.instance.project_id,
+          versions[0].id,
+          props.instance.title,
+          props.instance.icon_url
       ).catch(handleError)
       modLoading.value = false
 
@@ -101,17 +109,17 @@ const install = async (e) => {
       })
     } else
       confirmModal.value.show(
-        props.instance.project_id,
-        versions[0].id,
-        props.instance.title,
-        props.instance.icon_url
+          props.instance.project_id,
+          versions[0].id,
+          props.instance.title,
+          props.instance.icon_url
       )
   } else {
     modInstallModal.value.show(
-      props.instance.project_id,
-      versions,
-      props.instance.title,
-      props.instance.project_type
+        props.instance.project_id,
+        versions,
+        props.instance.title,
+        props.instance.project_type
     )
   }
 
@@ -161,7 +169,7 @@ const openFolder = async () => {
 const addContent = async () => {
   await router.push({
     path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-    query: { i: props.instance.path },
+    query: {i: props.instance.path},
   })
 }
 
@@ -171,6 +179,7 @@ defineExpose({
   play,
   stop,
   seeInstance,
+  updateInstance,
   openFolder,
   addContent,
   instance: props.instance,
@@ -181,14 +190,23 @@ const unlisten = await process_listener((e) => {
 })
 
 onUnmounted(() => unlisten())
+
+
+//Check for Update
+const canUpdatePack = computed(() => {
+  if (!props.instance.metadata.linked_data) return false
+  return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
+})
+const installing = computed(() => props.instance.install_stage !== 'installed')
+//End check for Update
 </script>
 
 <template>
   <div class="instance">
     <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
-        size="lg"
-        :src="
+          size="lg"
+          :src="
           props.instance.metadata
             ? !props.instance.metadata.icon ||
               (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
@@ -196,8 +214,8 @@ onUnmounted(() => unlisten())
               : convertFileSrc(props.instance.metadata?.icon)
             : props.instance.icon_url
         "
-        alt="Mod card"
-        class="mod-image"
+          alt="Mod card"
+          class="mod-image"
       />
       <div class="project-info">
         <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
@@ -208,28 +226,51 @@ onUnmounted(() => unlisten())
       </div>
     </Card>
     <div
-      v-if="props.instance.metadata && playing === false && modLoading === false"
-      class="install cta button-base"
-      @click="(e) => play(e, 'InstanceCard')"
+        v-if="props.instance.metadata && playing === false && modLoading === false"
+        class="install cta button-base"
+        @click="(e) => play(e, 'InstanceCard')"
     >
-      <PlayIcon />
+      <PlayIcon/>
     </div>
     <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-      <AnimatedLogo class="loading-indicator" />
+      <AnimatedLogo class="loading-indicator"/>
     </div>
     <div
-      v-else-if="playing === true"
-      class="stop cta button-base"
-      @click="(e) => stop(e, 'InstanceCard')"
-      @mousehover="checkProcess"
+        v-else-if="playing === true"
+        class="stop cta button-base"
+        @click="(e) => stop(e, 'InstanceCard')"
+        @mousehover="checkProcess"
     >
-      <StopCircleIcon />
+      <StopCircleIcon/>
     </div>
     <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
     <ModInstallModal ref="modInstallModal" />
+    <Button
+        v-if="canUpdatePack"
+        :disabled="installing"
+        class="button-home-update"
+        @click="updateInstance"
+    >
+      <UpdatedIcon /></Button>
   </div>
 </template>
+<style lang="scss">
+.button-home-update {
+  width: 3rem !important;
+  height: 3rem !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  margin: 24px !important;
+  background-color: #009f41 !important;
+}
+.button-home-update svg {
+  width: 3rem !important;
+  height: 3rem !important;
+  margin: 0 auto !important;
+}
+</style>
 
 <style lang="scss">
 .loading-indicator {
