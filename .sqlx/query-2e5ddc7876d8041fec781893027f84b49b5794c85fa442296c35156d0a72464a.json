@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO users (\n                id, username, name, email,\n                avatar_url, bio, created,\n                github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                email_verified, password\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7,\n                $8, $9, $10, $11, $12, $13,\n                $14, $15\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Timestamptz",
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Int8",
+        "Varchar",
+        "Bool",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2e5ddc7876d8041fec781893027f84b49b5794c85fa442296c35156d0a72464a"
+}

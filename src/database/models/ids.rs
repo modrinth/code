@@ -21,7 +21,7 @@ macro_rules! generate_ids {
             // Check if ID is unique
             loop {
                 let results = sqlx::query!($select_stmnt, id as i64)
-                    .fetch_one(&mut *con)
+                    .fetch_one(&mut **con)
                     .await?;
 
                 if results.exists.unwrap_or(true) || censor.check(&*to_base62(id)) {

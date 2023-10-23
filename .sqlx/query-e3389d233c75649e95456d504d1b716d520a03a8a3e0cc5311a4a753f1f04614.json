@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                      SELECT EXISTS(SELECT 1 FROM organizations WHERE title = LOWER($1))\n                      ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "e3389d233c75649e95456d504d1b716d520a03a8a3e0cc5311a4a753f1f04614"
+}

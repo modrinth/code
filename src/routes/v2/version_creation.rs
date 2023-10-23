@@ -141,8 +141,9 @@ async fn version_create_inner(
     let mut initial_version_data = None;
     let mut version_builder = None;
 
-    let all_game_versions = models::categories::GameVersion::list(&mut *transaction, redis).await?;
-    let all_loaders = models::categories::Loader::list(&mut *transaction, redis).await?;
+    let all_game_versions =
+        models::categories::GameVersion::list(&mut **transaction, redis).await?;
+    let all_loaders = models::categories::Loader::list(&mut **transaction, redis).await?;
 
     let user = get_user_from_headers(
         &req,
@@ -200,7 +201,7 @@ async fn version_create_inner(
                     "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
                     project_id as models::ProjectId
                 )
-                .fetch_one(&mut *transaction)
+                .fetch_one(&mut **transaction)
                 .await?;
 
                 if !results.exists.unwrap_or(false) {
@@ -214,14 +215,14 @@ async fn version_create_inner(
                 let team_member = models::TeamMember::get_from_user_id_project(
                     project_id,
                     user.id.into(),
-                    &mut *transaction,
+                    &mut **transaction,
                 )
                 .await?;
 
                 // Get organization attached, if exists, and the member project permissions
                 let organization = models::Organization::get_associated_organization_project_id(
                     project_id,
-                    &mut *transaction,
+                    &mut **transaction,
                 )
                 .await?;
 
@@ -229,7 +230,7 @@ async fn version_create_inner(
                     models::TeamMember::get_from_user_id(
                         organization.team_id,
                         user.id.into(),
-                        &mut *transaction,
+                        &mut **transaction,
                     )
                     .await?
                 } else {
@@ -259,7 +260,7 @@ async fn version_create_inner(
                 ",
                     project_id as models::ProjectId,
                 )
-                .fetch_one(&mut *transaction)
+                .fetch_one(&mut **transaction)
                 .await?
                 .name;
 
@@ -332,7 +333,7 @@ async fn version_create_inner(
             ",
                 version.project_id as models::ProjectId,
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await?
             .name;
 
@@ -395,7 +396,7 @@ async fn version_create_inner(
         ",
         builder.project_id as crate::database::models::ids::ProjectId
     )
-    .fetch_many(&mut *transaction)
+    .fetch_many(&mut **transaction)
     .try_filter_map(|e| async { Ok(e.right().map(|m| models::ids::UserId(m.follower_id))) })
     .try_collect::<Vec<models::ids::UserId>>()
     .await?;
@@ -409,7 +410,7 @@ async fn version_create_inner(
             version_id,
         },
     }
-    .insert_many(users, &mut *transaction, redis)
+    .insert_many(users, transaction, redis)
     .await?;
 
     let response = Version {
@@ -461,7 +462,7 @@ async fn version_create_inner(
 
     for image_id in version_data.uploaded_images {
         if let Some(db_image) =
-            image_item::Image::get(image_id.into(), &mut *transaction, redis).await?
+            image_item::Image::get(image_id.into(), &mut **transaction, redis).await?
         {
             let image: Image = db_image.into();
             if !matches!(image.context, ImageContext::Report { .. })
@@ -482,7 +483,7 @@ async fn version_create_inner(
                 version_id.0 as i64,
                 image_id.0 as i64
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             image_item::Image::clear_cache(image.id.into(), redis).await?;
@@ -494,8 +495,8 @@ async fn version_create_inner(
         }
     }
 
-    models::Project::update_game_versions(project_id, &mut *transaction).await?;
-    models::Project::update_loaders(project_id, &mut *transaction).await?;
+    models::Project::update_game_versions(project_id, transaction).await?;
+    models::Project::update_loaders(project_id, transaction).await?;
     models::Project::clear_cache(project_id, None, Some(true), redis).await?;
 
     Ok(HttpResponse::Ok().json(response))
@@ -588,7 +589,7 @@ async fn upload_file_to_version_inner(
         let team_member = models::TeamMember::get_from_user_id_project(
             version.inner.project_id,
             user.id.into(),
-            &mut *transaction,
+            &mut **transaction,
         )
         .await?;
 
@@ -602,7 +603,7 @@ async fn upload_file_to_version_inner(
             models::TeamMember::get_from_user_id(
                 organization.team_id,
                 user.id.into(),
-                &mut *transaction,
+                &mut **transaction,
             )
             .await?
         } else {
@@ -633,12 +634,12 @@ async fn upload_file_to_version_inner(
         ",
         version.inner.project_id as models::ProjectId,
     )
-    .fetch_one(&mut *transaction)
+    .fetch_one(&mut **transaction)
     .await?
     .name;
 
     let all_game_versions =
-        models::categories::GameVersion::list(&mut *transaction, &redis).await?;
+        models::categories::GameVersion::list(&mut **transaction, &redis).await?;
 
     let mut error = None;
     while let Some(item) = payload.next().await {
@@ -725,7 +726,7 @@ async fn upload_file_to_version_inner(
             "At least one file must be specified".to_string(),
         ));
     } else {
-        VersionFileBuilder::insert_many(file_builders, version_id, &mut *transaction).await?;
+        VersionFileBuilder::insert_many(file_builders, version_id, transaction).await?;
     }
 
     // Clear version cache
@@ -785,7 +786,7 @@ pub async fn upload_file(
         "sha1",
         project_id.0 as i64
     )
-    .fetch_one(&mut *transaction)
+    .fetch_one(&mut **transaction)
     .await?
     .exists
     .unwrap_or(false);
@@ -829,7 +830,7 @@ pub async fn upload_file(
                     ",
                 &*hashes
             )
-            .fetch_all(&mut *transaction)
+            .fetch_all(&mut **transaction)
             .await?;
 
             for file in &format.files {

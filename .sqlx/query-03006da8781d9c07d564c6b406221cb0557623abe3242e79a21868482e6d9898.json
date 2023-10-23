@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE versions\n            SET status = $1, date_published = $2\n            WHERE (id = $3)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Timestamptz",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "03006da8781d9c07d564c6b406221cb0557623abe3242e79a21868482e6d9898"
+}

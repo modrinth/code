@@ -1,0 +1,118 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,\n                JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,\n                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n                JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,\n                JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,\n                JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies\n                FROM versions v\n                LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n                LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n                LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n                LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n                LEFT OUTER JOIN files f on v.id = f.version_id\n                LEFT OUTER JOIN hashes h on f.id = h.file_id\n                LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n                WHERE v.id = ANY($1)\n                GROUP BY v.id\n                ORDER BY v.date_published ASC;\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "author_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "version_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "version_number",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "changelog",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "date_published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "version_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "featured",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "requested_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "game_versions",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 13,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 14,
+        "name": "files",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 15,
+        "name": "hashes",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 16,
+        "name": "dependencies",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "a62767e812783e8836a11b22878a4248123f3fe212a876e192f549acd6edcb39"
+}

@@ -50,7 +50,7 @@ impl Report {
             self.body,
             self.reporter as UserId
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -117,7 +117,7 @@ impl Report {
             ",
             id as ReportId
         )
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut **transaction)
         .await?;
 
         if !result.exists.unwrap_or(false) {
@@ -131,7 +131,7 @@ impl Report {
             ",
             id as ReportId
         )
-        .fetch_optional(&mut *transaction)
+        .fetch_optional(&mut **transaction)
         .await?;
 
         if let Some(thread_id) = thread_id {
@@ -145,7 +145,7 @@ impl Report {
             ",
             id as ReportId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(Some(()))

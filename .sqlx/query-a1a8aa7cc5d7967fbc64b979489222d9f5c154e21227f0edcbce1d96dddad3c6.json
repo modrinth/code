@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                    UPDATE team_members\n                    SET user_id = $1\n                    WHERE (user_id = $2 AND role = $3)\n                    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a1a8aa7cc5d7967fbc64b979489222d9f5c154e21227f0edcbce1d96dddad3c6"
+}

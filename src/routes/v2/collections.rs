@@ -82,12 +82,15 @@ pub async fn collection_create(
 
     let collection_id: CollectionId = generate_collection_id(&mut transaction).await?.into();
 
-    let initial_project_ids =
-        project_item::Project::get_many(&collection_create_data.projects, &mut transaction, &redis)
-            .await?
-            .into_iter()
-            .map(|x| x.inner.id.into())
-            .collect::<Vec<ProjectId>>();
+    let initial_project_ids = project_item::Project::get_many(
+        &collection_create_data.projects,
+        &mut *transaction,
+        &redis,
+    )
+    .await?
+    .into_iter()
+    .map(|x| x.inner.id.into())
+    .collect::<Vec<ProjectId>>();
 
     let collection_builder_actual = collection_item::CollectionBuilder {
         collection_id: collection_id.into(),

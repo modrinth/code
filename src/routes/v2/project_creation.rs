@@ -379,8 +379,9 @@ async fn project_create_inner(
     let mut versions_map = std::collections::HashMap::new();
     let mut gallery_urls = Vec::new();
 
-    let all_game_versions = models::categories::GameVersion::list(&mut *transaction, redis).await?;
-    let all_loaders = models::categories::Loader::list(&mut *transaction, redis).await?;
+    let all_game_versions =
+        models::categories::GameVersion::list(&mut **transaction, redis).await?;
+    let all_loaders = models::categories::Loader::list(&mut **transaction, redis).await?;
 
     {
         // The first multipart field must be named "data" and contain a
@@ -427,7 +428,7 @@ async fn project_create_inner(
                 ",
                 slug_project_id as models::ids::ProjectId
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
@@ -443,7 +444,7 @@ async fn project_create_inner(
                 ",
                 create_data.slug
             )
-            .fetch_one(&mut *transaction)
+            .fetch_one(&mut **transaction)
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
@@ -482,7 +483,7 @@ async fn project_create_inner(
 
     let project_type_id = models::categories::ProjectType::get_id(
         project_create_data.project_type.as_str(),
-        &mut *transaction,
+        &mut **transaction,
     )
     .await?
     .ok_or_else(|| {
@@ -647,7 +648,7 @@ async fn project_create_inner(
             let id = models::categories::Category::get_id_project(
                 category,
                 project_type_id,
-                &mut *transaction,
+                &mut **transaction,
             )
             .await?
             .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
@@ -660,7 +661,7 @@ async fn project_create_inner(
             let id = models::categories::Category::get_id_project(
                 category,
                 project_type_id,
-                &mut *transaction,
+                &mut **transaction,
             )
             .await?
             .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
@@ -680,7 +681,7 @@ async fn project_create_inner(
             }],
         };
 
-        let team_id = team.insert(&mut *transaction).await?;
+        let team_id = team.insert(transaction).await?;
 
         let status;
         if project_create_data.is_draft.unwrap_or(false) {
@@ -703,7 +704,7 @@ async fn project_create_inner(
 
         let client_side_id = models::categories::SideType::get_id(
             project_create_data.client_side.as_str(),
-            &mut *transaction,
+            &mut **transaction,
         )
         .await?
         .ok_or_else(|| {
@@ -712,7 +713,7 @@ async fn project_create_inner(
 
         let server_side_id = models::categories::SideType::get_id(
             project_create_data.server_side.as_str(),
-            &mut *transaction,
+            &mut **transaction,
         )
         .await?
         .ok_or_else(|| {
@@ -729,7 +730,7 @@ async fn project_create_inner(
         if let Some(urls) = &project_create_data.donation_urls {
             for url in urls {
                 let platform_id =
-                    models::categories::DonationPlatform::get_id(&url.id, &mut *transaction)
+                    models::categories::DonationPlatform::get_id(&url.id, &mut **transaction)
                         .await?
                         .ok_or_else(|| {
                             CreateError::InvalidInput(format!(
@@ -790,12 +791,12 @@ async fn project_create_inner(
 
         let now = Utc::now();
 
-        let id = project_builder_actual.insert(&mut *transaction).await?;
+        let id = project_builder_actual.insert(transaction).await?;
         User::clear_project_cache(&[current_user.id.into()], redis).await?;
 
         for image_id in project_create_data.uploaded_images {
             if let Some(db_image) =
-                image_item::Image::get(image_id.into(), &mut *transaction, redis).await?
+                image_item::Image::get(image_id.into(), &mut **transaction, redis).await?
             {
                 let image: Image = db_image.into();
                 if !matches!(image.context, ImageContext::Project { .. })
@@ -816,7 +817,7 @@ async fn project_create_inner(
                     id as models::ids::ProjectId,
                     image_id.0 as i64
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
 
                 image_item::Image::clear_cache(image.id.into(), redis).await?;
@@ -834,7 +835,7 @@ async fn project_create_inner(
             project_id: Some(id),
             report_id: None,
         }
-        .insert(&mut *transaction)
+        .insert(transaction)
         .await?;
 
         let response = crate::models::projects::Project {

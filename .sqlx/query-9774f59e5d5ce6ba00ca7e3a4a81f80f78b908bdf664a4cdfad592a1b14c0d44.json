@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                UPDATE historical_payouts\n                                SET status = $1\n                                WHERE payment_id = $2\n                                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9774f59e5d5ce6ba00ca7e3a4a81f80f78b908bdf664a4cdfad592a1b14c0d44"
+}

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO team_members (id, team_id, user_id, role, permissions, organization_permissions, accepted, payouts_split, ordering)\n            SELECT * FROM UNNEST ($1::int8[], $2::int8[], $3::int8[], $4::varchar[], $5::int8[], $6::int8[], $7::bool[], $8::numeric[], $9::int8[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int8Array",
+        "Int8Array",
+        "VarcharArray",
+        "Int8Array",
+        "Int8Array",
+        "BoolArray",
+        "NumericArray",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7075dc0343dab7c4dd4469b4af095232dcdd056a15d928a6d93556daf6fd327c"
+}

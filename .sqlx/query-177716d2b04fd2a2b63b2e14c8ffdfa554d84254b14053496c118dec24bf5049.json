@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE mods\n            SET game_versions = (\n                SELECT COALESCE(ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null), array[]::varchar[])\n                FROM versions v\n                     INNER JOIN game_versions_versions gvv ON v.id = gvv.joining_version_id\n                     INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n                WHERE v.mod_id = mods.id AND v.status != ALL($2)\n            )\n            WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "177716d2b04fd2a2b63b2e14c8ffdfa554d84254b14053496c118dec24bf5049"
+}

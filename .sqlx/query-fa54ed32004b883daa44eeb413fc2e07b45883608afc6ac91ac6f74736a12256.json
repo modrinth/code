@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n            SELECT * FROM UNNEST($1::integer[], $2::bigint[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4Array",
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fa54ed32004b883daa44eeb413fc2e07b45883608afc6ac91ac6f74736a12256"
+}

@@ -77,7 +77,7 @@ impl User {
             self.email_verified,
             self.password,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -394,7 +394,7 @@ impl User {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let user = Self::get_id(id, &mut *transaction, redis).await?;
+        let user = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(delete_user) = user {
             User::clear_caches(&[(id, Some(delete_user.username))], redis).await?;
@@ -411,7 +411,7 @@ impl User {
                     id as UserId,
                     crate::models::teams::OWNER_ROLE
                 )
-                .fetch_many(&mut *transaction)
+                .fetch_many(&mut **transaction)
                 .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
                 .try_collect::<Vec<ProjectId>>()
                 .await?;
@@ -432,7 +432,7 @@ impl User {
                     id as UserId,
                     crate::models::teams::OWNER_ROLE
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
 
@@ -445,7 +445,7 @@ impl User {
                 deleted_user as UserId,
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             use futures::TryStreamExt;
@@ -456,7 +456,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .fetch_many(&mut *transaction)
+            .fetch_many(&mut **transaction)
             .try_filter_map(|e| async { Ok(e.right().map(|m| m.id)) })
             .try_collect::<Vec<i64>>()
             .await?;
@@ -468,7 +468,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -478,7 +478,7 @@ impl User {
                 ",
                 &notifications
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -488,7 +488,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -498,7 +498,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -508,7 +508,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -518,7 +518,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -528,7 +528,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -540,7 +540,7 @@ impl User {
                 id as UserId,
                 deleted_user as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -550,7 +550,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -560,7 +560,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -570,7 +570,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -580,7 +580,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -590,7 +590,7 @@ impl User {
                 ",
                 id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             Ok(Some(()))

@@ -88,7 +88,7 @@ impl Notification {
             &user_ids[..],
             &bodies[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Notification::clear_user_notifications_cache(
@@ -262,7 +262,7 @@ impl Notification {
             ",
             &notification_ids_parsed
         )
-        .fetch_many(&mut *transaction)
+        .fetch_many(&mut **transaction)
         .try_filter_map(|e| async { Ok(e.right().map(|x| UserId(x.user_id))) })
         .try_collect::<Vec<_>>()
         .await?;
@@ -294,7 +294,7 @@ impl Notification {
             ",
             &notification_ids_parsed
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let affected_users = sqlx::query!(
@@ -305,7 +305,7 @@ impl Notification {
             ",
             &notification_ids_parsed
         )
-        .fetch_many(&mut *transaction)
+        .fetch_many(&mut **transaction)
         .try_filter_map(|e| async { Ok(e.right().map(|x| UserId(x.user_id))) })
         .try_collect::<Vec<_>>()
         .await?;

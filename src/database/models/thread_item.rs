@@ -44,7 +44,7 @@ impl ThreadMessageBuilder {
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<ThreadMessageId, DatabaseError> {
-        let thread_message_id = generate_thread_message_id(&mut *transaction).await?;
+        let thread_message_id = generate_thread_message_id(transaction).await?;
 
         sqlx::query!(
             "
@@ -60,7 +60,7 @@ impl ThreadMessageBuilder {
             serde_json::value::to_value(self.body.clone())?,
             self.thread_id as ThreadId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(thread_message_id)
@@ -87,7 +87,7 @@ impl ThreadBuilder {
             self.project_id.map(|x| x.0),
             self.report_id.map(|x| x.0),
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let (thread_ids, members): (Vec<_>, Vec<_>) =
@@ -102,7 +102,7 @@ impl ThreadBuilder {
             &thread_ids[..],
             &members[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(thread_id)
@@ -179,7 +179,7 @@ impl Thread {
             ",
             id as ThreadId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
         sqlx::query!(
             "
@@ -188,7 +188,7 @@ impl Thread {
             ",
             id as ThreadId
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
         sqlx::query!(
             "
@@ -197,7 +197,7 @@ impl Thread {
             ",
             id as ThreadId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(Some(()))
@@ -264,7 +264,7 @@ impl ThreadMessage {
             id as ThreadMessageId,
             serde_json::to_value(MessageBody::Deleted).unwrap_or(serde_json::json!({}))
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(Some(()))

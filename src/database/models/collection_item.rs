@@ -35,7 +35,7 @@ impl CollectionBuilder {
             status: self.status,
             projects: self.projects,
         };
-        collection_struct.insert(&mut *transaction).await?;
+        collection_struct.insert(transaction).await?;
 
         Ok(self.collection_id)
     }
@@ -78,7 +78,7 @@ impl Collection {
             self.icon_url.as_ref(),
             self.status.to_string(),
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let (collection_ids, project_ids): (Vec<_>, Vec<_>) =
@@ -92,7 +92,7 @@ impl Collection {
             &collection_ids[..],
             &project_ids[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -103,7 +103,7 @@ impl Collection {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
-        let collection = Self::get(id, &mut *transaction, redis).await?;
+        let collection = Self::get(id, &mut **transaction, redis).await?;
 
         if let Some(collection) = collection {
             sqlx::query!(
@@ -113,7 +113,7 @@ impl Collection {
                 ",
                 id as CollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -123,7 +123,7 @@ impl Collection {
                 ",
                 id as CollectionId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             models::Collection::clear_cache(collection.id, redis).await?;

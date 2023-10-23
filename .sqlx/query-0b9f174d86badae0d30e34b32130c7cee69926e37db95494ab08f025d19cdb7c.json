@@ -1,0 +1,76 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT c.id id, c.title title, c.description description,\n                c.icon_url icon_url, c.color color, c.created created, c.user_id user_id,\n                c.updated updated, c.status status,\n                ARRAY_AGG(DISTINCT cm.mod_id) filter (where cm.mod_id is not null) mods\n                FROM collections c\n                LEFT JOIN collections_mods cm ON cm.collection_id = c.id\n                WHERE c.id = ANY($1)\n                GROUP BY c.id;\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "color",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 7,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "mods",
+        "type_info": "Int8Array"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "0b9f174d86badae0d30e34b32130c7cee69926e37db95494ab08f025d19cdb7c"
+}

@@ -1517,7 +1517,7 @@ pub async fn bulk_edit_project_categories(
             project_id as db_ids::ProjectId,
             is_additional
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let mut mod_categories = Vec::new();
@@ -1553,7 +1553,7 @@ pub async fn edit_project_categories(
 
     let mut mod_categories = Vec::new();
     for category in categories {
-        let category_id = db_models::categories::Category::get_id(category, &mut *transaction)
+        let category_id = db_models::categories::Category::get_id(category, &mut **transaction)
             .await?
             .ok_or_else(|| {
                 ApiError::InvalidInput(format!("Category {} does not exist.", category.clone()))

@@ -1,0 +1,38 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT l.id id, l.loader loader, l.icon icon,\n            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types\n            FROM loaders l\n            LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id\n            LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id\n            GROUP BY l.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "loader",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "icon",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "5295fba2053675c8414c0b37a59943535b9a438a642ea1c68045e987f05ade13"
+}

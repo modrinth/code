@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE threads\n        SET show_in_mod_inbox = FALSE\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8f5e2a570cf35b2d158182bac37fd40bcec277bbdeddaece5efaa88600048a70"
+}

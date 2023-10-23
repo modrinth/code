@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            DELETE FROM game_versions_versions gvv\n            WHERE gvv.joining_version_id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bee1abe8313d17a56d93b06a31240e338c3973bc7a7374799ced3df5e38d3134"
+}

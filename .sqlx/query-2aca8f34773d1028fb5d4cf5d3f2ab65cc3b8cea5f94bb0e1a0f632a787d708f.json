@@ -1,0 +1,37 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start\n        FROM payouts_values\n        WHERE mod_id = ANY($1) AND created BETWEEN $2 AND $3\n        GROUP by mod_id, interval_start ORDER BY interval_start\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "amount_sum",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 2,
+        "name": "interval_start",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Timestamptz",
+        "Timestamptz",
+        "Interval"
+      ]
+    },
+    "nullable": [
+      true,
+      null,
+      null
+    ]
+  },
+  "hash": "2aca8f34773d1028fb5d4cf5d3f2ab65cc3b8cea5f94bb0e1a0f632a787d708f"
+}

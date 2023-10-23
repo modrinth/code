@@ -27,7 +27,7 @@ impl TeamBuilder {
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<TeamId, super::DatabaseError> {
-        let team_id = generate_team_id(&mut *transaction).await?;
+        let team_id = generate_team_id(transaction).await?;
 
         let team = Team { id: team_id };
 
@@ -38,12 +38,12 @@ impl TeamBuilder {
             ",
             team.id as TeamId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let mut team_member_ids = Vec::new();
         for _ in self.members.iter() {
-            team_member_ids.push(generate_team_member_id(&mut *transaction).await?.0);
+            team_member_ids.push(generate_team_member_id(transaction).await?.0);
         }
         let TeamBuilder { members } = self;
         let (
@@ -94,7 +94,7 @@ impl TeamBuilder {
             &payouts_splits[..],
             &orderings[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(team_id)
@@ -411,7 +411,7 @@ impl TeamMember {
             self.organization_permissions.map(|p| p.bits() as i64),
             self.accepted,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -431,7 +431,7 @@ impl TeamMember {
             user_id as UserId,
             crate::models::teams::OWNER_ROLE,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -460,7 +460,7 @@ impl TeamMember {
                 id as TeamId,
                 user_id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
         }
 
@@ -475,7 +475,7 @@ impl TeamMember {
                 id as TeamId,
                 user_id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
         }
 
@@ -490,7 +490,7 @@ impl TeamMember {
                 id as TeamId,
                 user_id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
         }
 
@@ -505,7 +505,7 @@ impl TeamMember {
                     id as TeamId,
                     user_id as UserId,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
         }
@@ -521,7 +521,7 @@ impl TeamMember {
                 id as TeamId,
                 user_id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
         }
 
@@ -536,7 +536,7 @@ impl TeamMember {
                 id as TeamId,
                 user_id as UserId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
         }
 

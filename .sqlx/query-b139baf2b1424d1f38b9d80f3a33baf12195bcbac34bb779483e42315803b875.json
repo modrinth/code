@@ -1,0 +1,23 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT EXISTS(\n                            SELECT 1 \n                            FROM organizations o JOIN team_members tm ON tm.team_id = o.team_id\n                            WHERE o.id = $1 AND tm.user_id = $2\n                        )",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "exists",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "b139baf2b1424d1f38b9d80f3a33baf12195bcbac34bb779483e42315803b875"
+}

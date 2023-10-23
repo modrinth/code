@@ -804,7 +804,7 @@ impl AuthProvider {
                     user_id as crate::database::models::UserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
             AuthProvider::Discord => {
@@ -817,7 +817,7 @@ impl AuthProvider {
                     user_id as crate::database::models::UserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
             AuthProvider::Microsoft => {
@@ -830,7 +830,7 @@ impl AuthProvider {
                     user_id as crate::database::models::UserId,
                     id,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
             AuthProvider::GitLab => {
@@ -843,7 +843,7 @@ impl AuthProvider {
                     user_id as crate::database::models::UserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
             AuthProvider::Google => {
@@ -856,7 +856,7 @@ impl AuthProvider {
                     user_id as crate::database::models::UserId,
                     id,
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
             AuthProvider::Steam => {
@@ -869,7 +869,7 @@ impl AuthProvider {
                     user_id as crate::database::models::UserId,
                     id.and_then(|x| x.parse::<i64>().ok())
                 )
-                .execute(&mut *transaction)
+                .execute(&mut **transaction)
                 .await?;
             }
         }
@@ -1515,7 +1515,7 @@ async fn validate_2fa_code(
                 user_id as crate::database::models::ids::UserId,
                 code as i64,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             crate::database::models::User::clear_caches(&[(user_id, None)], redis).await?;
@@ -2265,7 +2265,7 @@ pub async fn link_trolley(
             RecipientStatus::Incomplete.as_str(),
             user.id.0 as i64,
         )
-        .execute(&mut transaction)
+        .execute(&mut *transaction)
         .await?;
 
         transaction.commit().await?;

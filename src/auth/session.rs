@@ -112,7 +112,7 @@ pub async fn issue_session(
     .insert(transaction)
     .await?;
 
-    let session = DBSession::get_id(id, &mut *transaction, redis)
+    let session = DBSession::get_id(id, &mut **transaction, redis)
         .await?
         .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
 

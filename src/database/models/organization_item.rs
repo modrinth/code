@@ -46,7 +46,7 @@ impl Organization {
             self.icon_url,
             self.color.map(|x| x as i32),
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -252,7 +252,7 @@ impl Organization {
     ) -> Result<Option<()>, super::DatabaseError> {
         use futures::TryStreamExt;
 
-        let organization = Self::get_id(id, &mut *transaction, redis).await?;
+        let organization = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(organization) = organization {
             let projects: Vec<ProjectId> = sqlx::query!(
@@ -263,7 +263,7 @@ impl Organization {
                 ",
                 id as OrganizationId,
             )
-            .fetch_many(&mut *transaction)
+            .fetch_many(&mut **transaction)
             .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
             .try_collect::<Vec<ProjectId>>()
             .await?;
@@ -282,7 +282,7 @@ impl Organization {
                 ",
                 id as OrganizationId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             TeamMember::clear_cache(organization.team_id, redis).await?;
@@ -294,7 +294,7 @@ impl Organization {
                 ",
                 organization.team_id as TeamId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             sqlx::query!(
@@ -304,7 +304,7 @@ impl Organization {
                 ",
                 organization.team_id as TeamId,
             )
-            .execute(&mut *transaction)
+            .execute(&mut **transaction)
             .await?;
 
             Ok(Some(()))

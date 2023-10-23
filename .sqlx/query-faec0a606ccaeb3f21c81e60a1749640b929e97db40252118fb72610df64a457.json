@@ -1,0 +1,143 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT id, name, email,\n                    avatar_url, username, bio,\n                    created, role, badges,\n                    balance,\n                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                    email_verified, password, totp_secret, trolley_id, trolley_account_status\n                FROM users\n                WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "email",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "bio",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "role",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "badges",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "balance",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 10,
+        "name": "github_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "discord_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 12,
+        "name": "gitlab_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 13,
+        "name": "google_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "steam_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 15,
+        "name": "microsoft_id",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "email_verified",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 17,
+        "name": "password",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 18,
+        "name": "totp_secret",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 19,
+        "name": "trolley_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 20,
+        "name": "trolley_account_status",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "faec0a606ccaeb3f21c81e60a1749640b929e97db40252118fb72610df64a457"
+}

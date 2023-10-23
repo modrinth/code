@@ -1,0 +1,168 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,\n            m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,\n            m.team_id team_id, m.license license, m.slug slug, m.status status_name, m.color color,\n            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, u.username username,\n            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,\n            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,\n            ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,\n            ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null) versions,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ALL($1)\n            LEFT OUTER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id\n            LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id\n            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id\n            INNER JOIN project_types pt ON pt.id = m.project_type\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE\n            INNER JOIN users u ON tm.user_id = u.id\n            WHERE m.status = ANY($2)\n            GROUP BY m.id, cs.id, ss.id, pt.id, u.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "project_type",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 2,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "follows",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "approved",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "team_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 11,
+        "name": "license",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "status_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "color",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 15,
+        "name": "client_side_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "server_side_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "project_type_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 18,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 19,
+        "name": "categories",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 20,
+        "name": "additional_categories",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 21,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 22,
+        "name": "versions",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 23,
+        "name": "gallery",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 24,
+        "name": "featured_gallery",
+        "type_info": "VarcharArray"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "TextArray",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "4514723bdc1eb8a781215075bec51af1cc6fabe88a469338d5a59533eabf80c5"
+}

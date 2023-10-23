@@ -45,7 +45,7 @@ impl PersonalAccessToken {
             self.user_id as UserId,
             self.expires
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -259,7 +259,7 @@ impl PersonalAccessToken {
             ",
             id as PatId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(Some(()))

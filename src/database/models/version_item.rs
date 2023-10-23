@@ -81,7 +81,7 @@ impl DependencyBuilder {
             &project_ids[..] as &[Option<i64>],
             &filenames[..] as &[Option<String>],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -100,7 +100,7 @@ impl DependencyBuilder {
                 ",
                 version_id as VersionId,
             )
-            .fetch_optional(&mut *transaction)
+            .fetch_optional(&mut **transaction)
             .await?
             .map(|x| ProjectId(x.mod_id))
         } else {
@@ -125,7 +125,7 @@ impl VersionFileBuilder {
         version_id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<FileId, DatabaseError> {
-        let file_id = generate_file_id(&mut *transaction).await?;
+        let file_id = generate_file_id(transaction).await?;
 
         let (file_ids, version_ids, urls, filenames, primary, sizes, file_types): (
             Vec<_>,
@@ -162,7 +162,7 @@ impl VersionFileBuilder {
             &sizes[..],
             &file_types[..] as &[Option<String>],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let (file_ids, algorithms, hashes): (Vec<_>, Vec<_>, Vec<_>) = version_files
@@ -182,7 +182,7 @@ impl VersionFileBuilder {
             &algorithms[..],
             &hashes[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(file_id)
@@ -216,7 +216,7 @@ impl VersionBuilder {
             requested_status: self.requested_status,
         };
 
-        version.insert(&mut *transaction).await?;
+        version.insert(transaction).await?;
 
         sqlx::query!(
             "
@@ -226,7 +226,7 @@ impl VersionBuilder {
             ",
             self.project_id as ProjectId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         let VersionBuilder {
@@ -245,13 +245,13 @@ impl VersionBuilder {
             .iter()
             .map(|l| LoaderVersion::new(*l, version_id))
             .collect_vec();
-        LoaderVersion::insert_many(loader_versions, &mut *transaction).await?;
+        LoaderVersion::insert_many(loader_versions, transaction).await?;
 
         let game_version_versions = game_versions
             .iter()
             .map(|v| VersionVersion::new(*v, version_id))
             .collect_vec();
-        VersionVersion::insert_many(game_version_versions, &mut *transaction).await?;
+        VersionVersion::insert_many(game_version_versions, transaction).await?;
 
         Ok(self.version_id)
     }
@@ -280,7 +280,7 @@ impl LoaderVersion {
             &loader_ids[..],
             &version_ids[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -310,7 +310,7 @@ impl VersionVersion {
             &game_version_ids[..],
             &version_ids[..],
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -364,7 +364,7 @@ impl Version {
             self.featured,
             self.status.as_str()
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(())
@@ -375,7 +375,7 @@ impl Version {
         redis: &RedisPool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, DatabaseError> {
-        let result = Self::get(id, &mut *transaction, redis).await?;
+        let result = Self::get(id, &mut **transaction, redis).await?;
 
         let result = if let Some(result) = result {
             result
@@ -392,7 +392,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -402,7 +402,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -412,7 +412,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -426,7 +426,7 @@ impl Version {
             ",
             id as VersionId
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -436,7 +436,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         // Sync dependencies
@@ -447,7 +447,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .fetch_one(&mut *transaction)
+        .fetch_one(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -459,7 +459,7 @@ impl Version {
             id as VersionId,
             project_id.mod_id,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -467,7 +467,7 @@ impl Version {
             DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL
             ",
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         sqlx::query!(
@@ -476,7 +476,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         // delete version
@@ -487,7 +487,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         crate::database::models::Project::update_game_versions(

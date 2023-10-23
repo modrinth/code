@@ -28,7 +28,7 @@ impl SessionBuilder {
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<SessionId, DatabaseError> {
-        let id = generate_session_id(&mut *transaction).await?;
+        let id = generate_session_id(transaction).await?;
 
         sqlx::query!(
             "
@@ -51,7 +51,7 @@ impl SessionBuilder {
             self.ip,
             self.user_agent,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(id)
@@ -302,7 +302,7 @@ impl Session {
             ",
             id as SessionId,
         )
-        .execute(&mut *transaction)
+        .execute(&mut **transaction)
         .await?;
 
         Ok(Some(()))

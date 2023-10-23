@@ -1,0 +1,58 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT t.id, t.thread_type, t.mod_id, t.report_id, t.show_in_mod_inbox,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "thread_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "report_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "show_in_mod_inbox",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "members",
+        "type_info": "Int8Array"
+      },
+      {
+        "ordinal": 6,
+        "name": "messages",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "93c0fdb2bdc9c57602671d50108957654ede51e944944d4af59fe1ba1f6a336e"
+}

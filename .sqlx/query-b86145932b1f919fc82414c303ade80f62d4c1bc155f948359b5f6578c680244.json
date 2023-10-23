@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n            SELECT * FROM UNNEST ($1::bigint[], $2::int[], $3::bool[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "Int4Array",
+        "BoolArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b86145932b1f919fc82414c303ade80f62d4c1bc155f948359b5f6578c680244"
+}

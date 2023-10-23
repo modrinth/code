@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT v.id id, v.mod_id mod_id, file_type FROM files f\n            INNER JOIN versions v ON v.id = f.version_id\n            WHERE f.url = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "file_type",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true
+    ]
+  },
+  "hash": "dd57a6dd89fefedbde796ef02b308ce7dba17ca0c65ffd5f9e35e296a72d4c1c"
+}

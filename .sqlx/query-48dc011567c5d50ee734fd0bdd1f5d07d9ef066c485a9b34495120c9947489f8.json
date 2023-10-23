@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                                INSERT INTO historical_payouts (user_id, amount, status, batch_id, payment_id)\n                                VALUES ($1, $2, $3, $4, $5)\n                                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Numeric",
+        "Varchar",
+        "Text",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "48dc011567c5d50ee734fd0bdd1f5d07d9ef066c485a9b34495120c9947489f8"
+}

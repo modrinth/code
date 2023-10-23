@@ -1,0 +1,77 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT id, team_id, role AS member_role, permissions, organization_permissions,\n                accepted, payouts_split, role,\n                ordering, user_id\n                \n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2)\n            ORDER BY ordering\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "team_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "member_role",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "permissions",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 4,
+        "name": "organization_permissions",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 5,
+        "name": "accepted",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "payouts_split",
+        "type_info": "Numeric"
+      },
+      {
+        "ordinal": 7,
+        "name": "role",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "ordering",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 9,
+        "name": "user_id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "ce20a9c53249e255be7312819f505d935d3ab2ee3c21a6422e5b12155c159bd7"
+}

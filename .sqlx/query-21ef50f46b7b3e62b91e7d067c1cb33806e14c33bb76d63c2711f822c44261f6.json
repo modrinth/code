@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT name FROM project_types pt\n            INNER JOIN mods ON mods.project_type = pt.id\n            WHERE mods.id = $1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "name",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "21ef50f46b7b3e62b91e7d067c1cb33806e14c33bb76d63c2711f822c44261f6"
+}

@@ -98,7 +98,7 @@ pub async fn report_create(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
                 project_id.0 as i64
             )
-            .fetch_one(&mut transaction)
+            .fetch_one(&mut *transaction)
             .await?;
 
             if !result.exists.unwrap_or(false) {
@@ -117,7 +117,7 @@ pub async fn report_create(
                 "SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)",
                 version_id.0 as i64
             )
-            .fetch_one(&mut transaction)
+            .fetch_one(&mut *transaction)
             .await?;
 
             if !result.exists.unwrap_or(false) {
@@ -136,7 +136,7 @@ pub async fn report_create(
                 "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
                 user_id.0 as i64
             )
-            .fetch_one(&mut transaction)
+            .fetch_one(&mut *transaction)
             .await?;
 
             if !result.exists.unwrap_or(false) {

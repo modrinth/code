@@ -73,14 +73,13 @@ log = "0.4.19"
 env_logger = "0.10.0"
 thiserror = "1.0.41"
 
-sqlx = { version = "0.6.3", features = [
-    "offline",
+sqlx = { version = "0.7.2", features = [
     "runtime-tokio-rustls",
     "postgres",
     "chrono",
     "macros",
     "migrate",
-    "decimal",
+    "rust_decimal",
     "json",
 ] }
 rust_decimal = { version = "1.30.0", features = [

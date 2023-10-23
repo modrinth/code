@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO hashes (file_id, algorithm, hash)\n            SELECT * FROM UNNEST($1::bigint[], $2::varchar[], $3::bytea[])\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "VarcharArray",
+        "ByteaArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d2e826d4fa4e3e730cc84c97964c0c5fdd25cd49ddff8c593bd9b8a3b4d5ff1e"
+}
