@@ -2,7 +2,7 @@
   <NuxtLayout>
     <div class="main">
       <div class="error">
-        <Logo404 v-if="error.statusCode === '404'" />
+        <Logo404 v-if="error.statusCode === 404" />
         <h1 v-else>An error occurred!</h1>
         <p>{{ error.message }}</p>
         <div class="button-group">
@@ -22,25 +22,20 @@
   </NuxtLayout>
 </template>
 
-<script>
-import Logo404 from './assets/images/404.svg'
+<script setup>
+import Logo404 from '~/assets/images/404.svg'
 
-export default {
-  components: {
-    Logo404,
-  },
-  props: {
-    error: {
-      type: Object,
-      default() {
-        return {
-          statusCode: 1000,
-          message: 'Unknown error',
-        }
-      },
+defineProps({
+  error: {
+    type: Object,
+    default() {
+      return {
+        statusCode: 1000,
+        message: 'Unknown error',
+      }
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>
