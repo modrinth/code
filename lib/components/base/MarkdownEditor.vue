@@ -460,7 +460,7 @@ function validateURL() {
 }
 
 function cleanUrl(input: string): string {
-  let url
+  let url: URL
 
   // Attempt to validate and parse the URL
   try {
@@ -477,6 +477,12 @@ function cleanUrl(input: string): string {
   // If the scheme is "http", automatically upgrade it to "https"
   if (url.protocol === 'http:') {
     url.protocol = 'https:'
+  }
+
+  // Block certain domains for compliance
+  const blockedDomains = ['forgecdn', 'cdn.discordapp', 'media.discordapp']
+  if (blockedDomains.some((domain) => url.hostname.includes(domain))) {
+    throw new Error('Invalid URL. This domain is not allowed.')
   }
 
   return url.toString()
