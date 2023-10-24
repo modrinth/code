@@ -387,18 +387,26 @@ pub async fn set_profile_information(
             .clone()
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
-        prof.metadata.linked_data = Some(LinkedData {
-            project_id: description.project_id.clone(),
-            version_id: description.version_id.clone(),
-            locked: if !ignore_lock {
-                Some(
-                    description.project_id.is_some()
-                        && description.version_id.is_some(),
-                )
-            } else {
-                prof.metadata.linked_data.as_ref().and_then(|x| x.locked)
-            },
-        });
+
+        let project_id = description.project_id.clone();
+        let version_id = description.version_id.clone();
+
+        prof.metadata.linked_data = if project_id.is_some()
+            && version_id.is_some()
+        {
+            Some(LinkedData {
+                project_id,
+                version_id,
+                locked: if !ignore_lock {
+                    Some(true)
+                } else {
+                    prof.metadata.linked_data.as_ref().and_then(|x| x.locked)
+                },
+            })
+        } else {
+            None
+        };
+
         prof.metadata.icon = description.icon.clone();
         prof.metadata.game_version = game_version.clone();
         prof.metadata.loader_version = loader_version.clone();
