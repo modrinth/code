@@ -76,8 +76,8 @@ devDependencies:
     specifier: ^2.0.4
     version: 2.0.4(@formatjs/intl@2.7.2)
   '@vintl/how-ago':
-    specifier: ^2.0.1
-    version: 2.0.1(@formatjs/intl@2.7.2)
+    specifier: ^3.0.1
+    version: 3.0.1(@formatjs/intl@2.7.2)
   '@vintl/nuxt':
     specifier: ^1.5.0
     version: 1.5.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4)
@@ -976,8 +976,21 @@ packages:
       tslib: 2.6.0
     dev: true
 
+  /@formatjs/ecma402-abstract@1.17.2:
+    resolution: {integrity: sha512-k2mTh0m+IV1HRdU0xXM617tSQTi53tVR2muvYOsBeYcUgEAyxV1FOC7Qj279th3fBVQ+Dj6muvNJZcHSPNdbKg==}
+    dependencies:
+      '@formatjs/intl-localematcher': 0.4.2
+      tslib: 2.6.0
+    dev: true
+
   /@formatjs/fast-memoize@2.0.1:
     resolution: {integrity: sha512-M2GgV+qJn5WJQAYewz7q2Cdl6fobQa69S1AzSM2y0P68ZDbK5cWrJIcPCO395Of1ksftGZoOt4LYCO/j9BKBSA==}
+    dependencies:
+      tslib: 2.6.0
+    dev: true
+
+  /@formatjs/fast-memoize@2.2.0:
+    resolution: {integrity: sha512-hnk/nY8FyrL5YxwP9e4r9dqeM6cAbo8PeU9UjyXojZMNvVad2Z06FAVHyR3Ecw6fza+0GH7vdJgiKIVXTMbSBA==}
     dependencies:
       tslib: 2.6.0
     dev: true
@@ -990,10 +1003,25 @@ packages:
       tslib: 2.6.0
     dev: true
 
+  /@formatjs/icu-messageformat-parser@2.7.0:
+    resolution: {integrity: sha512-7uqC4C2RqOaBQtcjqXsSpGRYVn+ckjhNga5T/otFh6MgxRrCJQqvjfbrGLpX1Lcbxdm5WH3Z2WZqt1+Tm/cn/Q==}
+    dependencies:
+      '@formatjs/ecma402-abstract': 1.17.2
+      '@formatjs/icu-skeleton-parser': 1.6.2
+      tslib: 2.6.0
+    dev: true
+
   /@formatjs/icu-skeleton-parser@1.4.0:
     resolution: {integrity: sha512-Qq347VM616rVLkvN6QsKJELazRyNlbCiN47LdH0Mc5U7E2xV0vatiVhGqd3KFgbc055BvtnUXR7XX60dCGFuWg==}
     dependencies:
       '@formatjs/ecma402-abstract': 1.15.0
+      tslib: 2.6.0
+    dev: true
+
+  /@formatjs/icu-skeleton-parser@1.6.2:
+    resolution: {integrity: sha512-VtB9Slo4ZL6QgtDFJ8Injvscf0xiDd4bIV93SOJTBjUF4xe2nAWOoSjLEtqIG+hlIs1sNrVKAaFo3nuTI4r5ZA==}
+    dependencies:
+      '@formatjs/ecma402-abstract': 1.17.2
       tslib: 2.6.0
     dev: true
 
@@ -1021,6 +1049,12 @@ packages:
 
   /@formatjs/intl-localematcher@0.4.0:
     resolution: {integrity: sha512-bRTd+rKomvfdS4QDlVJ6TA/Jx1F2h/TBVO5LjvhQ7QPPHp19oPNMIum7W2CMEReq/zPxpmCeB31F9+5gl/qtvw==}
+    dependencies:
+      tslib: 2.6.0
+    dev: true
+
+  /@formatjs/intl-localematcher@0.4.2:
+    resolution: {integrity: sha512-BGdtJFmaNJy5An/Zan4OId/yR9Ih1OojFjcduX/xOvq798OgWSyDtd6Qd5jqJXwJs1ipe4Fxu9+cshic5Ox2tA==}
     dependencies:
       tslib: 2.6.0
     dev: true
@@ -2102,13 +2136,13 @@ packages:
       intl-messageformat: 10.3.5
     dev: true
 
-  /@vintl/how-ago@2.0.1(@formatjs/intl@2.7.2):
-    resolution: {integrity: sha512-nPmXpT9whVUL2f2FC54heHC10iA/TQk2FEmkXIdq4n6c1nZvWyod8WEx2TA9RKXfNQydQaEN3OLLce7T1Qs8gg==}
+  /@vintl/how-ago@3.0.1(@formatjs/intl@2.7.2):
+    resolution: {integrity: sha512-np9L5xGtlV2Qtop15IRTeD8yFLCwHZ2tJx9iJnZSWCs8IlWnV7QjXZji0f7IKsK7a+M2LvmXRVIoYUOIhgh23w==}
     peerDependencies:
-      '@formatjs/intl': '>=2.7.1 <=2.7.2'
+      '@formatjs/intl': ^2.7.1
     dependencies:
       '@formatjs/intl': 2.7.2(typescript@5.0.4)
-      intl-messageformat: 10.3.5
+      intl-messageformat: 10.5.4
     dev: true
 
   /@vintl/nuxt@1.5.0(typescript@5.0.4)(vite@4.3.9)(vue@3.3.4):
@@ -4955,6 +4989,7 @@ packages:
   /iconv-lite@0.6.3:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
+    requiresBuild: true
     dependencies:
       safer-buffer: 2.1.2
     dev: true
@@ -5066,6 +5101,15 @@ packages:
       '@formatjs/ecma402-abstract': 1.15.0
       '@formatjs/fast-memoize': 2.0.1
       '@formatjs/icu-messageformat-parser': 2.4.0
+      tslib: 2.6.0
+    dev: true
+
+  /intl-messageformat@10.5.4:
+    resolution: {integrity: sha512-z+hrFdiJ/heRYlzegrdFYqU1m/KOMOVMqNilIArj+PbsuU8TNE7v4TWdQgSoxlxbT4AcZH3Op3/Fu15QTp+W1w==}
+    dependencies:
+      '@formatjs/ecma402-abstract': 1.17.2
+      '@formatjs/fast-memoize': 2.2.0
+      '@formatjs/icu-messageformat-parser': 2.7.0
       tslib: 2.6.0
     dev: true
 
