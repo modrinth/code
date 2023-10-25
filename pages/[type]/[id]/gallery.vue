@@ -119,7 +119,7 @@
         </div>
       </div>
     </Modal>
-    <ModalConfirm
+    <ConfirmModal
       v-if="currentMember"
       ref="modal_confirm"
       title="Are you sure you want to delete this gallery image?"
@@ -287,7 +287,7 @@ import {
   InfoIcon,
   ImageIcon,
   TransferIcon,
-  ModalConfirm,
+  ConfirmModal,
   Modal,
   FileInput,
   DropArea,

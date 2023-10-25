@@ -1,6 +1,6 @@
 <template>
   <div class="universal-card">
-    <ModalConfirm
+    <ConfirmModal
       ref="modal_confirm"
       title="Are you sure you want to delete this token?"
       description="This will remove this token forever (like really forever)."
@@ -163,7 +163,7 @@ import {
   TrashIcon,
   EditIcon,
   SaveIcon,
-  ModalConfirm,
+  ConfirmModal,
 } from 'omorphia'
 import CopyCode from '~/components/ui/CopyCode.vue'
 
