@@ -90,6 +90,7 @@
         v-model="subscribe"
         class="subscribe-btn"
         label="Subscribe to updates about Modrinth"
+        description="Subscribe to updates about Modrinth"
       />
 
       <p>

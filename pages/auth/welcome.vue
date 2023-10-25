@@ -12,6 +12,7 @@
         v-model="subscribe"
         class="subscribe-btn"
         label="Subscribe to updates about Modrinth"
+        description="Subscribe to updates about Modrinth"
       />
 
       <button class="btn btn-primary continue-btn centered-btn" @click="continueSignUp">
