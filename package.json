@@ -1,7 +1,7 @@
 {
   "name": "omorphia",
   "type": "module",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "files": [
     "dist"
   ],
@@ -30,15 +30,15 @@
     "@codemirror/language": "^6.9.1",
     "@codemirror/state": "^6.3.0",
     "@codemirror/view": "^6.21.3",
-    "chart.js": "^4.3.3",
+    "apexcharts": "^3.44.0",
     "dayjs": "^1.11.7",
     "floating-vue": "^2.0.0-beta.20",
     "highlight.js": "^11.8.0",
     "markdown-it": "^13.0.1",
     "qrcode.vue": "^3.4.0",
-    "vue-chartjs": "^5.2.0",
     "vue-router": "^4.2.1",
     "vue-select": "^4.0.0-beta.6",
+    "vue3-apexcharts": "^1.4.4",
     "xss": "^1.0.14"
   },
   "devDependencies": {

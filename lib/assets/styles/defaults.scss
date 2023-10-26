@@ -165,6 +165,13 @@ svg {
   width: 1em;
 }
 
+.chart {
+  svg {
+    height: 100%;
+    width: 100%;
+  }
+}
+
 .button-animation {
   transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
