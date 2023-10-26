@@ -7,7 +7,7 @@
       <div class="iconified-input">
         <AlignLeftIcon />
         <input id="insert-link-label" v-model="linkText" type="text" placeholder="Enter label..." />
-        <Button @click="() => (linkText = '')">
+        <Button class="r-btn" @click="() => (linkText = '')">
           <XIcon />
         </Button>
       </div>
@@ -23,7 +23,7 @@
           placeholder="Enter the link's URL..."
           @input="validateURL"
         />
-        <Button @click="() => (linkUrl = '')">
+        <Button class="r-btn" @click="() => (linkUrl = '')">
           <XIcon />
         </Button>
       </div>
@@ -74,14 +74,31 @@
           type="text"
           placeholder="Describe the image..."
         />
-        <Button @click="() => (linkText = '')">
+        <Button class="r-btn" @click="() => (linkText = '')">
           <XIcon />
         </Button>
       </div>
       <label class="label" for="insert-link-url">
         <span class="label__title">URL<span class="required">*</span></span>
       </label>
-      <div class="iconified-input">
+      <div v-if="props.onImageUpload" class="image-strategy-chips">
+        <Chips v-model="imageUploadOption" :items="['upload', 'link']" />
+      </div>
+      <div
+        v-if="props.onImageUpload && imageUploadOption === 'upload'"
+        class="iconified-input btn-input-alternative"
+      >
+        <FileInput
+          accept="image/png,image/jpeg,image/gif,image/webp"
+          prompt="Upload an image"
+          class="btn"
+          should-always-reset
+          @change="handleImageUpload"
+        >
+          <UploadIcon />
+        </FileInput>
+      </div>
+      <div v-if="!props.onImageUpload || imageUploadOption === 'link'" class="iconified-input">
         <ImageIcon />
         <input
           id="insert-link-url"
@@ -90,7 +107,7 @@
           placeholder="Enter the image URL..."
           @input="validateURL"
         />
-        <Button @click="() => (linkUrl = '')">
+        <Button class="r-btn" @click="() => (linkUrl = '')">
           <XIcon />
         </Button>
       </div>
@@ -141,7 +158,7 @@
           placeholder="Enter YouTube video URL"
           @input="validateURL"
         />
-        <Button @click="() => (linkUrl = '')">
+        <Button class="r-btn" @click="() => (linkUrl = '')">
           <XIcon />
         </Button>
       </div>
@@ -200,7 +217,7 @@
         </template>
       </div>
       <div class="preview">
-        <Toggle id="preview" v-model="previewMode" />
+        <Toggle id="preview" v-model="previewMode" :checked="previewMode" />
         <label class="label" for="preview"> Preview </label>
       </div>
     </div>
@@ -249,24 +266,27 @@ import {
   Button,
   Modal,
   Toggle,
+  FileInput,
+  UploadIcon,
+  Chips,
 } from '@/components'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@/helpers/codemirror'
 import { renderHighlightedString } from '@/helpers/highlight'
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: '',
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  headingButtons: {
-    type: Boolean,
-    default: true,
-  },
-})
+const props = withDefaults(
+  defineProps<{
+    modelValue: string
+    disabled: boolean
+    headingButtons: boolean
+    onImageUpload?: (file: File) => Promise<string>
+  }>(),
+  {
+    modelValue: '',
+    disabled: false,
+    headingButtons: true,
+    onImageUpload: undefined,
+  }
+)
 
 const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
@@ -503,6 +523,22 @@ const linkMarkdown = computed(() => {
   return ''
 })
 
+const handleImageUpload = async (files: FileList) => {
+  if (props.onImageUpload) {
+    const file = files[0]
+    if (file) {
+      try {
+        const url = await props.onImageUpload(file)
+        linkUrl.value = url
+        validateURL()
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  }
+}
+
+const imageUploadOption = ref<string>('upload')
 const imageMarkdown = computed(() => (linkMarkdown.value.length ? `!${linkMarkdown.value}` : ''))
 
 const youtubeRegex =
@@ -528,6 +564,7 @@ function openLinkModal() {
 }
 
 function openImageModal() {
+  linkValidationErrorMessage.value = undefined
   linkText.value = ''
   linkUrl.value = ''
   imageModal.value?.show()
@@ -644,6 +681,32 @@ function openVideoModal() {
 
   .input-group {
     margin-top: var(--gap-lg);
+  }
+}
+
+.image-strategy-chips {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-xs);
+  padding-bottom: var(--gap-md);
+}
+
+.btn-input-alternative {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-xs);
+  padding-bottom: var(--gap-xs);
+
+  .btn {
+    width: 100%;
+    padding-left: 2.5rem;
+    min-height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: start;
   }
 }
 </style>

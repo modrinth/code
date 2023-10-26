@@ -26,7 +26,7 @@ const inputText = ref(null)
       type="text"
       placeholder="Text input"
   />
-  <Button @click="() => inputText = ''">
+  <Button class="r-btn" @click="() => inputText = ''">
     <XIcon/>
   </Button>
 </div>
@@ -65,7 +65,7 @@ const inputText = ref(null)
         type="text"
         placeholder="Text input"
     />
-    <Button @click="() => inputText = ''">
+    <Button class="r-btn" @click="() => inputText = ''">
       <XIcon/>
     </Button>
   </div>
@@ -92,7 +92,7 @@ const value = ref(null)
       type="text"
       placeholder="Text input"
     />
-    <Button @click="() => inputText = ''">
+    <Button class="r-btn" @click="() => inputText = ''">
       <XIcon/>
     </Button>
   </div>

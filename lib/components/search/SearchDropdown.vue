@@ -26,7 +26,7 @@
         @focusout="onBlur"
         @keydown.enter.prevent="$emit('enter')"
       />
-      <Button :disabled="disabled" @click="() => $emit('update:modelValue', '')">
+      <Button :disabled="disabled" class="r-btn" @click="() => $emit('update:modelValue', '')">
         <XIcon />
       </Button>
     </div>

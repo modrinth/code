@@ -129,7 +129,7 @@ defineExpose({
         <div v-if="link" class="iconified-input">
           <LinkIcon />
           <input type="text" :value="url" readonly />
-          <Button v-tooltip="'Copy Text'" @click="copyText">
+          <Button v-tooltip="'Copy Text'" class="r-btn" @click="copyText">
             <ClipboardCopyIcon />
           </Button>
         </div>

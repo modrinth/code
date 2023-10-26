@@ -47,6 +47,7 @@ input[type='url'],
 input[type='number'],
 input[type='password'],
 textarea,
+.input-text-inherit,
 .cm-content {
   border-radius: var(--radius-md);
   box-sizing: border-box;
@@ -146,7 +147,7 @@ input[type='number'] {
     opacity: 0.6;
   }
 
-  .btn {
+  .r-btn {
     @extend .transparent, .icon-only;
 
     position: absolute;
