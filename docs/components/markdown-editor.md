@@ -3,6 +3,7 @@
 import { ref } from "vue";
 
 const description = ref(null);
+const description1 = ref(null);
 const description2 = ref(null);
 const description3 = ref(null);
 
@@ -27,6 +28,20 @@ const description = ref(null)
 <MarkdownEditor v-model="description" />
 ```
 
+## With options
+<DemoContainer>
+  <MarkdownEditor v-model="description1" placeholder="Enter a description" max-length="30" />
+</DemoContainer>
+
+```vue
+<script setup>
+import { ref } from "vue";
+const description = ref(null)
+</script>
+
+<MarkdownEditor v-model="description" placeholder="Enter a description" max-length="30" />
+```
+
 ## With image upload
 <DemoContainer>
   <MarkdownEditor v-model="description2" :on-image-upload="onImageUpload" />
@@ -41,6 +56,9 @@ const description = ref(null)
 const onImageUpload = (file: File): string => {
   // Upload the file to your server and return a URL
   // This example url will not work bc of proxy
+
+  // If the upload fails, throw an error and it will show as
+  // a Validation Error to the user
   return URL.createObjectURL(file).replace("blob:", "");
 };
 </script>

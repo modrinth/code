@@ -70,8 +70,6 @@
   :where(input) {
     box-sizing: border-box;
     max-height: 40px;
-    width: 24rem;
-    flex-basis: 24rem;
 
     &:not(.stylized-toggle) {
       max-width: 100%;

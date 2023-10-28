@@ -223,11 +223,19 @@
     </div>
     <div ref="editorRef" :class="{ hide: previewMode }" />
     <div v-if="!previewMode" class="info-blurb">
-      <InfoIcon />
-      <span>
-        This editor supports
-        <a href="https://docs.modrinth.com/docs/markdown" target="_blank">Markdown formatting</a>.
-      </span>
+      <div class="info-blurb">
+        <InfoIcon />
+        <span
+          >This editor supports
+          <a class="link" href="https://docs.modrinth.com/docs/markdown" target="_blank"
+            >Markdown formatting</a
+          >.</span
+        >
+      </div>
+      <div :class="{ hide: !props.maxLength }" class="max-length-label">
+        <span>Max length: </span>
+        <span>{{ props.maxLength ?? 'Unlimited' }}</span>
+      </div>
     </div>
     <div
       v-if="previewMode"
@@ -242,7 +250,7 @@
 import { type Component, computed, ref, onMounted, onBeforeUnmount } from 'vue'
 
 import { EditorState } from '@codemirror/state'
-import { EditorView, keymap } from '@codemirror/view'
+import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import { markdown } from '@codemirror/lang-markdown'
 import { indentWithTab, historyKeymap, history } from '@codemirror/commands'
 
@@ -268,6 +276,7 @@ import {
   Toggle,
   FileInput,
   UploadIcon,
+  InfoIcon,
   Chips,
 } from '@/components'
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@/helpers/codemirror'
@@ -278,13 +287,21 @@ const props = withDefaults(
     modelValue: string
     disabled: boolean
     headingButtons: boolean
+    /**
+     * @param file The file to upload
+     * @throws If the file is invalid or the upload fails
+     */
     onImageUpload?: (file: File) => Promise<string>
+    placeholder?: string
+    maxLength?: number
   }>(),
   {
     modelValue: '',
     disabled: false,
     headingButtons: true,
     onImageUpload: undefined,
+    placeholder: undefined,
+    maxLength: undefined,
   }
 )
 
@@ -321,7 +338,6 @@ onMounted(() => {
     paste: (ev, view) => {
       // If the user's pasting a url, automatically convert it to a link with the selection as the text or the url itself if no selection content.
       const url = ev.clipboardData?.getData('text/plain')
-
       if (url) {
         try {
           cleanUrl(url)
@@ -336,6 +352,35 @@ onMounted(() => {
         const linkText = selectionText ? selectionText : url
         const linkMarkdown = `[${linkText}](${url})`
         return markdownCommands.replaceSelection(view, linkMarkdown)
+      }
+      // Check if the length of the document is greater than the max length. If it is, prevent the paste.
+      if (props.maxLength && view.state.doc.length > props.maxLength) {
+        ev.preventDefault()
+        return false
+      }
+    },
+    beforeinput: (ev, view) => {
+      if (props.maxLength && view.state.doc.length > props.maxLength) {
+        ev.preventDefault()
+        // Calculate how many characters to remove from the end
+        const excessLength = view.state.doc.length - props.maxLength
+        // Dispatch transaction to remove excess characters
+        view.dispatch({
+          changes: { from: view.state.doc.length - excessLength, to: view.state.doc.length },
+          selection: { anchor: props.maxLength, head: props.maxLength }, // Place cursor at the end
+        })
+        return true
+      }
+    },
+    blur: (_, view) => {
+      if (props.maxLength && view.state.doc.length > props.maxLength) {
+        // Calculate how many characters to remove from the end
+        const excessLength = view.state.doc.length - props.maxLength
+        // Dispatch transaction to remove excess characters
+        view.dispatch({
+          changes: { from: view.state.doc.length - excessLength, to: view.state.doc.length },
+          selection: { anchor: props.maxLength, head: props.maxLength }, // Place cursor at the end
+        })
       }
     },
   })
@@ -353,6 +398,7 @@ onMounted(() => {
         addKeymap: false,
       }),
       keymap.of(historyKeymap),
+      cm_placeholder(props.placeholder || ''),
     ],
   })
 
@@ -532,6 +578,9 @@ const handleImageUpload = async (files: FileList) => {
         linkUrl.value = url
         validateURL()
       } catch (error) {
+        if (error instanceof Error) {
+          linkValidationErrorMessage.value = error.message
+        }
         console.error(error)
       }
     }
@@ -577,7 +626,7 @@ function openVideoModal() {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
 .display-options {
   margin-bottom: var(--gap-sm);
 }
@@ -586,7 +635,6 @@ function openVideoModal() {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  overflow: hidden;
   justify-content: space-between;
   margin-bottom: var(--gap-sm);
   gap: var(--gap-xs);
@@ -635,6 +683,7 @@ function openVideoModal() {
 .info-blurb {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--gap-xs);
 }
 
