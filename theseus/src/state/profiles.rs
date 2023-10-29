@@ -207,6 +207,8 @@ pub struct Profile {
     pub projects: HashMap<ProjectPathId, Project>,
     #[serde(default)]
     pub modrinth_update_version: Option<String>,
+    #[serde(default)]
+    pub disable_discord_rpc: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -342,6 +344,7 @@ impl Profile {
             fullscreen: None,
             hooks: None,
             modrinth_update_version: None,
+            disable_discord_rpc: false,
         })
     }
 

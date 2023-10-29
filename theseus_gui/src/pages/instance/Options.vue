@@ -196,6 +196,22 @@
         "
       />
     </div>
+    <div class="adjacent-input">
+      <label for="disable-discord-rpc">
+        <span class="label__title">Disable Discord RPC</span>
+        <span class="label__description">
+          Disables the Discord Rich Presence integration. 'Modrinth' will no longer show this
+          instance as running. Instance-specific Discord Rich Presence integrations, such as those
+          added by mods can take over.
+        </span>
+      </label>
+      <Toggle
+        id="disable-discord-rpc"
+        v-model="disableDiscordRPC"
+        :disabled="globalSettings.disable_discord_rpc"
+        :checked="disableDiscordRPC"
+      />
+    </div>
   </section>
   <Card>
     <div class="label">
@@ -519,6 +535,7 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
   Button,
+  Toggle,
 } from 'omorphia'
 import { SwapIcon } from '@/assets/icons'
 
@@ -574,6 +591,7 @@ const themeStore = useTheming()
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
 const groups = ref(props.instance.metadata.groups)
+const disableDiscordRPC = ref(props.instance.disable_discord_rpc)
 
 const modpackVersionModal = ref(null)
 
@@ -655,7 +673,7 @@ watch(
   [
     title,
     groups,
-    groups,
+    disableDiscordRPC,
     overrideJavaInstall,
     javaInstall,
     overrideJavaArgs,
@@ -694,6 +712,7 @@ const editProfileObject = computed(() => {
       loader_version: props.instance.metadata.loader_version,
       linked_data: props.instance.metadata.linked_data,
     },
+    disable_discord_rpc: disableDiscordRPC.value,
     java: {},
   }
 

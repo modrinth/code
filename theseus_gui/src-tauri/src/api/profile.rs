@@ -292,6 +292,7 @@ pub struct EditProfile {
     pub resolution: Option<WindowSize>,
     pub hooks: Option<Hooks>,
     pub fullscreen: Option<bool>,
+    pub disable_discord_rpc: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -335,6 +336,7 @@ pub async fn profile_edit(
         prof.resolution = edit_profile.resolution;
         prof.fullscreen = edit_profile.fullscreen;
         prof.hooks = edit_profile.hooks.clone();
+        prof.disable_discord_rpc = edit_profile.disable_discord_rpc;
 
         prof.metadata.date_modified = chrono::Utc::now();
 
