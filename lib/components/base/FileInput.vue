@@ -100,7 +100,7 @@ label {
     border-radius: var(--radius-sm);
     border: dashed 0.3rem var(--color-contrast);
     cursor: pointer;
-    color: var(--color-accent-contrast);
+    color: var(--color-contrast);
   }
 }
 </style>

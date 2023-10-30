@@ -191,6 +191,7 @@ const isChildOfDropdown = (element) => {
 <style lang="scss" scoped>
 .animated-dropdown {
   width: 20rem;
+  min-height: 40px;
   position: relative;
   display: inline-block;
 
@@ -199,6 +200,9 @@ const isChildOfDropdown = (element) => {
   }
 
   .selected {
+    height: 100%;
+    width: 100%;
+
     display: flex;
     align-items: center;
     justify-content: space-between;

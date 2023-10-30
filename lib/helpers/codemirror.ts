@@ -22,6 +22,10 @@ const toggleCodeBlock: Command = ({ state, dispatch }) => {
   return toggleAround(state, dispatch, codeBlockMark, codeBlockMark)
 }
 
+const toggleSpoiler: Command = ({ state, dispatch }) => {
+  return toggleAround(state, dispatch, '||', '||')
+}
+
 const toggleHeader: Command = ({ state, dispatch }) => {
   return toggleLineStart(state, dispatch, '# ')
 }
@@ -342,6 +346,7 @@ const commands = {
   toggleItalic,
   toggleStrikethrough,
   toggleCodeBlock,
+  toggleSpoiler,
   toggleHeader,
   toggleHeader2,
   toggleHeader3,

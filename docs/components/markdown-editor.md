@@ -30,7 +30,7 @@ const description = ref(null)
 
 ## With options
 <DemoContainer>
-  <MarkdownEditor v-model="description1" placeholder="Enter a description" max-length="30" />
+  <MarkdownEditor v-model="description1" placeholder="Enter a description" max-length="800" max-height="400" />
 </DemoContainer>
 
 ```vue
@@ -39,7 +39,7 @@ import { ref } from "vue";
 const description = ref(null)
 </script>
 
-<MarkdownEditor v-model="description" placeholder="Enter a description" max-length="30" />
+<MarkdownEditor v-model="description" placeholder="Enter a description" max-length="800" max-height="400" />
 ```
 
 ## With image upload
