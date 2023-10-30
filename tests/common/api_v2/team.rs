@@ -1,9 +1,12 @@
+use actix_http::StatusCode;
 use actix_web::{dev::ServiceResponse, test};
 use labrinth::models::{
     notifications::Notification,
     teams::{OrganizationPermissions, ProjectPermissions, TeamMember},
 };
 use serde_json::json;
+
+use crate::common::asserts::assert_status;
 
 use super::ApiV2;
 
@@ -114,16 +117,21 @@ impl ApiV2 {
         self.call(req).await
     }
 
+    pub async fn get_user_notifications(&self, user_id: &str, pat: &str) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v2/user/{user_id}/notifications"))
+            .append_header(("Authorization", pat))
+            .to_request();
+        self.call(req).await
+    }
+
     pub async fn get_user_notifications_deserialized(
         &self,
         user_id: &str,
         pat: &str,
     ) -> Vec<Notification> {
-        let req = test::TestRequest::get()
-            .uri(&format!("/v2/user/{user_id}/notifications"))
-            .append_header(("Authorization", pat))
-            .to_request();
-        let resp = self.call(req).await;
+        let resp = self.get_user_notifications(user_id, pat).await;
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 

@@ -1,9 +1,10 @@
 use crate::auth::session::SessionMetadata;
 use crate::database::models::pat_item::PersonalAccessToken;
 use crate::database::models::session_item::Session;
-use crate::database::models::{DatabaseError, PatId, SessionId, UserId};
+use crate::database::models::{DatabaseError, OAuthAccessTokenId, PatId, SessionId, UserId};
 use crate::database::redis::RedisPool;
 use chrono::Utc;
+use itertools::Itertools;
 use sqlx::PgPool;
 use std::collections::{HashMap, HashSet};
 use tokio::sync::Mutex;
@@ -11,6 +12,7 @@ use tokio::sync::Mutex;
 pub struct AuthQueue {
     session_queue: Mutex<HashMap<SessionId, SessionMetadata>>,
     pat_queue: Mutex<HashSet<PatId>>,
+    oauth_access_token_queue: Mutex<HashSet<OAuthAccessTokenId>>,
 }
 
 impl Default for AuthQueue {
@@ -25,6 +27,7 @@ impl AuthQueue {
         AuthQueue {
             session_queue: Mutex::new(HashMap::with_capacity(1000)),
             pat_queue: Mutex::new(HashSet::with_capacity(1000)),
+            oauth_access_token_queue: Mutex::new(HashSet::with_capacity(1000)),
         }
     }
     pub async fn add_session(&self, id: SessionId, metadata: SessionMetadata) {
@@ -35,6 +38,10 @@ impl AuthQueue {
         self.pat_queue.lock().await.insert(id);
     }
 
+    pub async fn add_oauth_access_token(&self, id: crate::database::models::OAuthAccessTokenId) {
+        self.oauth_access_token_queue.lock().await.insert(id);
+    }
+
     pub async fn take_sessions(&self) -> HashMap<SessionId, SessionMetadata> {
         let mut queue = self.session_queue.lock().await;
         let len = queue.len();
@@ -42,8 +49,8 @@ impl AuthQueue {
         std::mem::replace(&mut queue, HashMap::with_capacity(len))
     }
 
-    pub async fn take_pats(&self) -> HashSet<PatId> {
-        let mut queue = self.pat_queue.lock().await;
+    pub async fn take_hashset<T>(queue: &Mutex<HashSet<T>>) -> HashSet<T> {
+        let mut queue = queue.lock().await;
         let len = queue.len();
 
         std::mem::replace(&mut queue, HashSet::with_capacity(len))
@@ -51,9 +58,13 @@ impl AuthQueue {
 
     pub async fn index(&self, pool: &PgPool, redis: &RedisPool) -> Result<(), DatabaseError> {
         let session_queue = self.take_sessions().await;
-        let pat_queue = self.take_pats().await;
+        let pat_queue = Self::take_hashset(&self.pat_queue).await;
+        let oauth_access_token_queue = Self::take_hashset(&self.oauth_access_token_queue).await;
 
-        if !session_queue.is_empty() || !pat_queue.is_empty() {
+        if !session_queue.is_empty()
+            || !pat_queue.is_empty()
+            || !oauth_access_token_queue.is_empty()
+        {
             let mut transaction = pool.begin().await?;
             let mut clear_cache_sessions = Vec::new();
 
@@ -102,29 +113,51 @@ impl AuthQueue {
 
             Session::clear_cache(clear_cache_sessions, redis).await?;
 
-            let mut clear_cache_pats = Vec::new();
-
-            for id in pat_queue {
-                clear_cache_pats.push((Some(id), None, None));
-
-                sqlx::query!(
-                    "
-                    UPDATE pats
-                    SET last_used = $2
-                    WHERE (id = $1)
-                    ",
-                    id as PatId,
-                    Utc::now(),
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
+            let ids = pat_queue.iter().map(|id| id.0).collect_vec();
+            let clear_cache_pats = pat_queue
+                .into_iter()
+                .map(|id| (Some(id), None, None))
+                .collect_vec();
+            sqlx::query!(
+                "
+                UPDATE pats
+                SET last_used = $2
+                WHERE id IN
+                (SELECT * FROM UNNEST($1::bigint[]))
+                ",
+                &ids[..],
+                Utc::now(),
+            )
+            .execute(&mut *transaction)
+            .await?;
 
             PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
+
+            update_oauth_access_token_last_used(oauth_access_token_queue, &mut transaction).await?;
 
             transaction.commit().await?;
         }
 
         Ok(())
     }
+}
+
+async fn update_oauth_access_token_last_used(
+    oauth_access_token_queue: HashSet<OAuthAccessTokenId>,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+) -> Result<(), DatabaseError> {
+    let ids = oauth_access_token_queue.iter().map(|id| id.0).collect_vec();
+    sqlx::query!(
+        "
+        UPDATE oauth_access_tokens
+        SET last_used = $2
+        WHERE id IN
+        (SELECT * FROM UNNEST($1::bigint[]))
+        ",
+        &ids[..],
+        Utc::now()
+    )
+    .execute(&mut **transaction)
+    .await?;
+    Ok(())
 }

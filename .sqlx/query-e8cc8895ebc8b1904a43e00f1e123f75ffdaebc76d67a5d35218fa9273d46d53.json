@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            UPDATE oauth_clients\n            SET name = $1, icon_url = $2, max_scopes = $3\n            WHERE (id = $4)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e8cc8895ebc8b1904a43e00f1e123f75ffdaebc76d67a5d35218fa9273d46d53"
+}

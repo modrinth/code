@@ -29,7 +29,7 @@ impl ApiV2 {
             .set_multipart(creation_data.segment_data)
             .to_request();
         let resp = self.call(req).await;
-        assert_status(resp, StatusCode::OK);
+        assert_status(&resp, StatusCode::OK);
 
         // Approve as a moderator.
         let req = TestRequest::patch()
@@ -42,7 +42,7 @@ impl ApiV2 {
             ))
             .to_request();
         let resp = self.call(req).await;
-        assert_status(resp, StatusCode::NO_CONTENT);
+        assert_status(&resp, StatusCode::NO_CONTENT);
 
         let project = self
             .get_project_deserialized(&creation_data.slug, pat)
@@ -82,16 +82,20 @@ impl ApiV2 {
         test::read_body_json(resp).await
     }
 
+    pub async fn get_user_projects(&self, user_id_or_username: &str, pat: &str) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v2/user/{}/projects", user_id_or_username))
+            .append_header(("Authorization", pat))
+            .to_request();
+        self.call(req).await
+    }
+
     pub async fn get_user_projects_deserialized(
         &self,
         user_id_or_username: &str,
         pat: &str,
     ) -> Vec<Project> {
-        let req = test::TestRequest::get()
-            .uri(&format!("/v2/user/{}/projects", user_id_or_username))
-            .append_header(("Authorization", pat))
-            .to_request();
-        let resp = self.call(req).await;
+        let resp = self.get_user_projects(user_id_or_username, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
     }

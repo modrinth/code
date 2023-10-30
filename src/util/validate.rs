@@ -3,6 +3,8 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use validator::{ValidationErrors, ValidationErrorsKind};
 
+use crate::models::pats::Scopes;
+
 lazy_static! {
     pub static ref RE_URL_SAFE: Regex = Regex::new(r#"^[a-zA-Z0-9!@$()`.+,_"-]*$"#).unwrap();
 }
@@ -86,6 +88,16 @@ pub fn validate_url(value: &str) -> Result<(), validator::ValidationError> {
 
     if url.scheme() != "https" {
         return Err(validator::ValidationError::new("URL must be https"));
+    }
+
+    Ok(())
+}
+
+pub fn validate_no_restricted_scopes(value: &Scopes) -> Result<(), validator::ValidationError> {
+    if value.is_restricted() {
+        return Err(validator::ValidationError::new(
+            "Restricted scopes not allowed",
+        ));
     }
 
     Ok(())

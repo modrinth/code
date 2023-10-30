@@ -1,7 +1,8 @@
 use super::ids::*;
-use crate::auth::flows::AuthProvider;
+use crate::auth::oauth::uris::OAuthRedirectUris;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
+use crate::{auth::flows::AuthProvider, models::pats::Scopes};
 use chrono::Duration;
 use rand::distributions::Alphanumeric;
 use rand::Rng;
@@ -34,6 +35,21 @@ pub enum Flow {
         confirm_email: String,
     },
     MinecraftAuth,
+    InitOAuthAppApproval {
+        user_id: UserId,
+        client_id: OAuthClientId,
+        existing_authorization_id: Option<OAuthClientAuthorizationId>,
+        scopes: Scopes,
+        redirect_uris: OAuthRedirectUris,
+        state: Option<String>,
+    },
+    OAuthAuthorizationCodeSupplied {
+        user_id: UserId,
+        client_id: OAuthClientId,
+        authorization_id: OAuthClientAuthorizationId,
+        scopes: Scopes,
+        original_redirect_uri: Option<String>, // Needed for https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
+    },
 }
 
 impl Flow {
@@ -56,6 +72,22 @@ impl Flow {
 
     pub async fn get(id: &str, redis: &RedisPool) -> Result<Option<Flow>, DatabaseError> {
         redis.get_deserialized_from_json(FLOWS_NAMESPACE, id).await
+    }
+
+    /// Gets the flow and removes it from the cache, but only removes if the flow was present and the predicate returned true
+    /// The predicate should validate that the flow being removed is the correct one, as a security measure
+    pub async fn take_if(
+        id: &str,
+        predicate: impl FnOnce(&Flow) -> bool,
+        redis: &RedisPool,
+    ) -> Result<Option<Flow>, DatabaseError> {
+        let flow = Self::get(id, redis).await?;
+        if let Some(flow) = flow.as_ref() {
+            if predicate(flow) {
+                Self::remove(id, redis).await?;
+            }
+        }
+        Ok(flow)
     }
 
     pub async fn remove(id: &str, redis: &RedisPool) -> Result<Option<()>, DatabaseError> {

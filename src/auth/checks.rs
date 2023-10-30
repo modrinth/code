@@ -8,6 +8,25 @@ use crate::routes::ApiError;
 use actix_web::web;
 use sqlx::PgPool;
 
+pub trait ValidateAuthorized {
+    fn validate_authorized(&self, user_option: Option<&User>) -> Result<(), ApiError>;
+}
+
+pub trait ValidateAllAuthorized {
+    fn validate_all_authorized(self, user_option: Option<&User>) -> Result<(), ApiError>;
+}
+
+impl<'a, T, A> ValidateAllAuthorized for T
+where
+    T: IntoIterator<Item = &'a A>,
+    A: ValidateAuthorized + 'a,
+{
+    fn validate_all_authorized(self, user_option: Option<&User>) -> Result<(), ApiError> {
+        self.into_iter()
+            .try_for_each(|c| c.validate_authorized(user_option))
+    }
+}
+
 pub async fn is_authorized(
     project_data: &Project,
     user_option: &Option<User>,
@@ -154,6 +173,23 @@ pub async fn is_authorized_version(
     }
 
     Ok(authorized)
+}
+
+impl ValidateAuthorized for crate::database::models::OAuthClient {
+    fn validate_authorized(&self, user_option: Option<&User>) -> Result<(), ApiError> {
+        if let Some(user) = user_option {
+            if user.role.is_mod() || user.id == self.created_by.into() {
+                return Ok(());
+            } else {
+                return Err(crate::routes::ApiError::CustomAuthentication(
+                    "You don't have sufficient permissions to interact with this OAuth application"
+                        .to_string(),
+                ));
+            }
+        }
+
+        Ok(())
+    }
 }
 
 pub async fn filter_authorized_versions(

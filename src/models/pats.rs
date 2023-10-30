@@ -103,6 +103,9 @@ bitflags::bitflags! {
         // delete an organization
         const ORGANIZATION_DELETE = 1 << 38;
 
+        // only accessible by modrinth-issued sessions
+        const SESSION_ACCESS = 1 << 39;
+
         const NONE = 0b0;
     }
 }
@@ -118,6 +121,7 @@ impl Scopes {
             | Scopes::PAT_DELETE
             | Scopes::SESSION_READ
             | Scopes::SESSION_DELETE
+            | Scopes::SESSION_ACCESS
             | Scopes::USER_AUTH_WRITE
             | Scopes::USER_DELETE
             | Scopes::PERFORM_ANALYTICS
@@ -125,6 +129,19 @@ impl Scopes {
 
     pub fn is_restricted(&self) -> bool {
         self.intersects(Self::restricted())
+    }
+
+    pub fn parse_from_oauth_scopes(scopes: &str) -> Result<Scopes, bitflags::parser::ParseError> {
+        let scopes = scopes.replace(' ', "|").replace("%20", "|");
+        bitflags::parser::from_str(&scopes)
+    }
+
+    pub fn to_postgres(&self) -> i64 {
+        self.bits() as i64
+    }
+
+    pub fn from_postgres(value: i64) -> Self {
+        Self::from_bits(value as u64).unwrap_or(Scopes::NONE)
     }
 }
 
@@ -159,5 +176,66 @@ impl PersonalAccessToken {
             expires: data.expires,
             last_used: data.last_used,
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use itertools::Itertools;
+
+    #[test]
+    fn test_parse_from_oauth_scopes_well_formed() {
+        let raw = "USER_READ_EMAIL SESSION_READ ORGANIZATION_CREATE";
+        let expected = Scopes::USER_READ_EMAIL | Scopes::SESSION_READ | Scopes::ORGANIZATION_CREATE;
+
+        let parsed = Scopes::parse_from_oauth_scopes(raw).unwrap();
+
+        assert_same_flags(expected, parsed);
+    }
+
+    #[test]
+    fn test_parse_from_oauth_scopes_empty() {
+        let raw = "";
+        let expected = Scopes::empty();
+
+        let parsed = Scopes::parse_from_oauth_scopes(raw).unwrap();
+
+        assert_same_flags(expected, parsed);
+    }
+
+    #[test]
+    fn test_parse_from_oauth_scopes_invalid_scopes() {
+        let raw = "notascope";
+
+        let parsed = Scopes::parse_from_oauth_scopes(raw);
+
+        assert!(parsed.is_err());
+    }
+
+    #[test]
+    fn test_parse_from_oauth_scopes_invalid_separator() {
+        let raw = "USER_READ_EMAIL & SESSION_READ";
+
+        let parsed = Scopes::parse_from_oauth_scopes(raw);
+
+        assert!(parsed.is_err());
+    }
+
+    #[test]
+    fn test_parse_from_oauth_scopes_url_encoded() {
+        let raw = urlencoding::encode("PAT_WRITE COLLECTION_DELETE").to_string();
+        let expected = Scopes::PAT_WRITE | Scopes::COLLECTION_DELETE;
+
+        let parsed = Scopes::parse_from_oauth_scopes(&raw).unwrap();
+
+        assert_same_flags(expected, parsed);
+    }
+
+    fn assert_same_flags(expected: Scopes, actual: Scopes) {
+        assert_eq!(
+            expected.iter_names().map(|(name, _)| name).collect_vec(),
+            actual.iter_names().map(|(name, _)| name).collect_vec()
+        );
     }
 }

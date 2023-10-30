@@ -152,6 +152,38 @@ generate_ids!(
     ImageId
 );
 
+generate_ids!(
+    pub generate_oauth_client_authorization_id,
+    OAuthClientAuthorizationId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM oauth_client_authorizations WHERE id=$1)",
+    OAuthClientAuthorizationId
+);
+
+generate_ids!(
+    pub generate_oauth_client_id,
+    OAuthClientId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM oauth_clients WHERE id=$1)",
+    OAuthClientId
+);
+
+generate_ids!(
+    pub generate_oauth_redirect_id,
+    OAuthRedirectUriId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM oauth_client_redirect_uris WHERE id=$1)",
+    OAuthRedirectUriId
+);
+
+generate_ids!(
+    pub generate_oauth_access_token_id,
+    OAuthAccessTokenId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM oauth_access_tokens WHERE id=$1)",
+    OAuthAccessTokenId
+);
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
@@ -237,6 +269,22 @@ pub struct SessionId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[sqlx(transparent)]
 pub struct ImageId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct OAuthClientId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct OAuthClientAuthorizationId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct OAuthRedirectUriId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct OAuthAccessTokenId(pub i64);
 
 use crate::models::ids;
 
@@ -358,5 +406,25 @@ impl From<SessionId> for ids::SessionId {
 impl From<PatId> for ids::PatId {
     fn from(id: PatId) -> Self {
         ids::PatId(id.0 as u64)
+    }
+}
+impl From<OAuthClientId> for ids::OAuthClientId {
+    fn from(id: OAuthClientId) -> Self {
+        ids::OAuthClientId(id.0 as u64)
+    }
+}
+impl From<ids::OAuthClientId> for OAuthClientId {
+    fn from(id: ids::OAuthClientId) -> Self {
+        Self(id.0 as i64)
+    }
+}
+impl From<OAuthRedirectUriId> for ids::OAuthRedirectUriId {
+    fn from(id: OAuthRedirectUriId) -> Self {
+        ids::OAuthRedirectUriId(id.0 as u64)
+    }
+}
+impl From<OAuthClientAuthorizationId> for ids::OAuthClientAuthorizationId {
+    fn from(id: OAuthClientAuthorizationId) -> Self {
+        ids::OAuthClientAuthorizationId(id.0 as u64)
     }
 }

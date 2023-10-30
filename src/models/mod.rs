@@ -4,6 +4,7 @@ pub mod error;
 pub mod ids;
 pub mod images;
 pub mod notifications;
+pub mod oauth_clients;
 pub mod organizations;
 pub mod pack;
 pub mod pats;

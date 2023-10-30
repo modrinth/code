@@ -4,6 +4,7 @@ use std::{rc::Rc, sync::Arc};
 
 use super::{
     api_v2::ApiV2,
+    api_v3::ApiV3,
     asserts::assert_status,
     database::{TemporaryDatabase, FRIEND_USER_ID, USER_USER_PAT},
     dummy_data,
@@ -34,6 +35,7 @@ pub struct TestEnvironment {
     test_app: Rc<dyn LocalService>, // Rc as it's not Send
     pub db: TemporaryDatabase,
     pub v2: ApiV2,
+    pub v3: ApiV3,
 
     pub dummy: Option<Arc<dummy_data::DummyData>>,
 }
@@ -54,6 +56,9 @@ impl TestEnvironment {
         let test_app: Rc<dyn LocalService> = Rc::new(test::init_service(app).await);
         Self {
             v2: ApiV2 {
+                test_app: test_app.clone(),
+            },
+            v3: ApiV3 {
                 test_app: test_app.clone(),
             },
             test_app,
@@ -81,7 +86,27 @@ impl TestEnvironment {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(resp, StatusCode::NO_CONTENT);
+        assert_status(&resp, StatusCode::NO_CONTENT);
+    }
+
+    pub async fn assert_read_notifications_status(
+        &self,
+        user_id: &str,
+        pat: &str,
+        status_code: StatusCode,
+    ) {
+        let resp = self.v2.get_user_notifications(user_id, pat).await;
+        assert_status(&resp, status_code);
+    }
+
+    pub async fn assert_read_user_projects_status(
+        &self,
+        user_id: &str,
+        pat: &str,
+        status_code: StatusCode,
+    ) {
+        let resp = self.v2.get_user_projects(user_id, pat).await;
+        assert_status(&resp, status_code);
     }
 }
 

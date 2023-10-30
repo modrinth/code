@@ -91,12 +91,7 @@ where
     let token = if let Some(token) = token {
         token
     } else {
-        let headers = req.headers();
-        let token_val: Option<&HeaderValue> = headers.get(AUTHORIZATION);
-        token_val
-            .ok_or_else(|| AuthenticationError::InvalidAuthMethod)?
-            .to_str()
-            .map_err(|_| AuthenticationError::InvalidCredentials)?
+        extract_authorization_header(req)?
     };
 
     let possible_user = match token.split_once('_') {
@@ -142,6 +137,25 @@ where
 
             user.map(|x| (Scopes::all(), x))
         }
+        Some(("mro", _)) => {
+            use crate::database::models::oauth_token_item::OAuthAccessToken;
+
+            let hash = OAuthAccessToken::hash_token(token);
+            let access_token =
+                crate::database::models::oauth_token_item::OAuthAccessToken::get(hash, executor)
+                    .await?
+                    .ok_or(AuthenticationError::InvalidCredentials)?;
+
+            if access_token.expires < Utc::now() {
+                return Err(AuthenticationError::InvalidCredentials);
+            }
+
+            let user = user_item::User::get_id(access_token.user_id, executor, redis).await?;
+
+            session_queue.add_oauth_access_token(access_token.id).await;
+
+            user.map(|u| (access_token.scopes, u))
+        }
         Some(("github", _)) | Some(("gho", _)) | Some(("ghp", _)) => {
             let user = AuthProvider::GitHub.get_user(token).await?;
             let id = AuthProvider::GitHub.get_user_id(&user.id, executor).await?;
@@ -158,6 +172,15 @@ where
         _ => return Err(AuthenticationError::InvalidAuthMethod),
     };
     Ok(possible_user)
+}
+
+pub fn extract_authorization_header(req: &HttpRequest) -> Result<&str, AuthenticationError> {
+    let headers = req.headers();
+    let token_val: Option<&HeaderValue> = headers.get(AUTHORIZATION);
+    token_val
+        .ok_or_else(|| AuthenticationError::InvalidAuthMethod)?
+        .to_str()
+        .map_err(|_| AuthenticationError::InvalidCredentials)
 }
 
 pub async fn check_is_moderator_from_headers<'a, 'b, E>(

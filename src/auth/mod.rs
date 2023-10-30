@@ -1,11 +1,11 @@
 pub mod checks;
 pub mod email;
 pub mod flows;
+pub mod oauth;
 pub mod pats;
 pub mod session;
 mod templates;
 pub mod validate;
-
 pub use checks::{
     filter_authorized_projects, filter_authorized_versions, is_authorized, is_authorized_version,
 };
