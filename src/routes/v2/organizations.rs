@@ -75,8 +75,7 @@ pub async fn organization_create(
     let mut transaction = pool.begin().await?;
 
     // Try title
-    let title_organization_id_option: Option<OrganizationId> =
-        serde_json::from_str(&format!("\"{}\"", new_organization.title)).ok();
+    let title_organization_id_option: Option<u64> = parse_base62(&new_organization.title).ok();
     let mut organization_strings = vec![];
     if let Some(title_organization_id) = title_organization_id_option {
         organization_strings.push(title_organization_id.to_string());
@@ -93,7 +92,7 @@ pub async fn organization_create(
     let team = team_item::TeamBuilder {
         members: vec![team_item::TeamMemberBuilder {
             user_id: current_user.id.into(),
-            role: crate::models::teams::OWNER_ROLE.to_owned(),
+            role: models::teams::OWNER_ROLE.to_owned(),
             permissions: ProjectPermissions::all(),
             organization_permissions: Some(OrganizationPermissions::all()),
             accepted: true,
@@ -218,7 +217,7 @@ pub async fn organizations_get(
         .collect::<Vec<_>>();
 
     let teams_data = TeamMember::get_from_team_full_many(&team_ids, &**pool, &redis).await?;
-    let users = crate::database::models::User::get_many_ids(
+    let users = database::models::User::get_many_ids(
         &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
         &**pool,
         &redis,

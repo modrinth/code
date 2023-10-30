@@ -1,6 +1,6 @@
 use super::ids::{ProjectId, UserId};
 use super::CollectionId;
-use crate::database::models::DatabaseError;
+use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::{Badges, RecipientStatus};
@@ -305,6 +305,31 @@ impl User {
             .await?;
 
         Ok(db_projects)
+    }
+
+    pub async fn get_organizations<'a, E>(
+        user_id: UserId,
+        exec: E,
+    ) -> Result<Vec<OrganizationId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let orgs = sqlx::query!(
+            "
+            SELECT o.id FROM organizations o
+            INNER JOIN team_members tm ON tm.team_id = o.team_id AND tm.accepted = TRUE
+            WHERE tm.user_id = $1
+            ",
+            user_id as UserId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| OrganizationId(m.id))) })
+        .try_collect::<Vec<OrganizationId>>()
+        .await?;
+
+        Ok(orgs)
     }
 
     pub async fn get_collections<'a, E>(

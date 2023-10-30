@@ -162,7 +162,7 @@ impl Organization {
                 "
                 SELECT o.id, o.title, o.team_id, o.description, o.icon_url, o.color
                 FROM organizations o
-                WHERE o.id = ANY($1) OR o.title = ANY($2)
+                WHERE o.id = ANY($1) OR LOWER(o.title) = ANY($2)
                 GROUP BY o.id;
                 ",
                 &organization_ids_parsed,

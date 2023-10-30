@@ -21,6 +21,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::PgPool;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use validator::Validate;
@@ -32,6 +33,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("user")
             .service(user_get)
+            .service(orgs_list)
             .service(projects_list)
             .service(collections_list)
             .service(user_delete)
@@ -191,6 +193,89 @@ pub async fn collections_list(
                 .collect();
 
         Ok(HttpResponse::Ok().json(response))
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+#[get("{user_id}/organizatons")]
+pub async fn orgs_list(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+
+    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
+
+    if let Some(id) = id_option.map(|x| x.id) {
+        let org_data = User::get_organizations(id, &**pool).await?;
+
+        let organizations_data =
+            crate::database::models::organization_item::Organization::get_many_ids(
+                &org_data, &**pool, &redis,
+            )
+            .await?;
+
+        let team_ids = organizations_data
+            .iter()
+            .map(|x| x.team_id)
+            .collect::<Vec<_>>();
+
+        let teams_data = crate::database::models::TeamMember::get_from_team_full_many(
+            &team_ids, &**pool, &redis,
+        )
+        .await?;
+        let users = User::get_many_ids(
+            &teams_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
+            &**pool,
+            &redis,
+        )
+        .await?;
+
+        let mut organizations = vec![];
+        let mut team_groups = HashMap::new();
+        for item in teams_data {
+            team_groups.entry(item.team_id).or_insert(vec![]).push(item);
+        }
+
+        for data in organizations_data {
+            let members_data = team_groups.remove(&data.team_id).unwrap_or(vec![]);
+            let logged_in = user
+                .as_ref()
+                .and_then(|user| {
+                    members_data
+                        .iter()
+                        .find(|x| x.user_id == user.id.into() && x.accepted)
+                })
+                .is_some();
+
+            let team_members: Vec<_> = members_data
+                .into_iter()
+                .filter(|x| logged_in || x.accepted || id == x.user_id)
+                .flat_map(|data| {
+                    users.iter().find(|x| x.id == data.user_id).map(|user| {
+                        crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                    })
+                })
+                .collect();
+
+            let organization = crate::models::organizations::Organization::from(data, team_members);
+            organizations.push(organization);
+        }
+
+        Ok(HttpResponse::Ok().json(organizations))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
