@@ -142,10 +142,13 @@ pub struct ProjectPathId(pub PathBuf);
 impl ProjectPathId {
     // Create a new ProjectPathId from a full file path
     pub async fn from_fs_path(path: &PathBuf) -> crate::Result<Self> {
-        let profiles_dir: PathBuf = io::canonicalize(
+        // This is avoiding dunce::canonicalize deliberately. On Windows, paths will always be convert to UNC,
+        // but this is ok because we are stripping that with the prefix. Using std::fs avoids different behaviors with dunce that
+        // come with too-long paths
+        let profiles_dir: PathBuf = std::fs::canonicalize(
             State::get().await?.directories.profiles_dir().await,
         )?;
-        let path: PathBuf = io::canonicalize(path)?;
+        let path: PathBuf = std::fs::canonicalize(path)?;
         let path = path
             .strip_prefix(profiles_dir)
             .ok()
