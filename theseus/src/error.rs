@@ -34,6 +34,9 @@ pub enum ErrorKind {
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
 
+    #[error("I/O (std) error: {0}")]
+    StdIOError(#[from] std::io::Error),
+
     #[error("Error launching Minecraft: {0}")]
     LauncherError(String),
 
