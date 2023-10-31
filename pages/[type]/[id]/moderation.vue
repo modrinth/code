@@ -11,20 +11,13 @@
       </p>
       <div v-else-if="isUnderReview(project)">
         <p>
-          Project reviews typically take 24 to 48 hours. Modrinth's moderators will leave a message
-          below if they have any questions or concerns for you.
-
-          <!--
-          If your review has taken more than 48 hours, check our Discord or social media for
-          moderation delays.
-          -->
-        </p>
-
-        <p class="warning">
-          <IssuesIcon /> Due to a high volume of new projects, reviews are currently experiencing
-          extended delays, much greater than usual. Many projects may be under review for a week or
-          more. Please understand that we are working to fix this problem as soon as possible. Our
-          sincerest apologies for the inconvenience!
+          Modrinth's team of content moderators work hard to review all submitted projects.
+          Typically, you can expect a new project to be reviewed within 24 to 48 hours. Please keep
+          in mind that larger projects, especially modpacks, may require more time to review.
+          Certain holidays or events may also lead to delays depending on moderator availability.
+          Modrinth's moderators will leave a message below if they have any questions or concerns
+          for you. If your review has taken more than 48 hours, check our Discord or social media
+          for moderation delays.
         </p>
       </div>
       <template v-else-if="isRejected(project)">
