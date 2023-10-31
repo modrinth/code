@@ -198,7 +198,7 @@ pub async fn collections_list(
     }
 }
 
-#[get("{user_id}/organizatons")]
+#[get("{user_id}/organizations")]
 pub async fn orgs_list(
     req: HttpRequest,
     info: web::Path<(String,)>,
