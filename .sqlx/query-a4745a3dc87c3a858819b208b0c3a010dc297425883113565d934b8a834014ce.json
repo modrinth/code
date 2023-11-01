@@ -1,0 +1,25 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO versions (\n                id, mod_id, author_id, name, version_number,\n                changelog, date_published, downloads,\n                version_type, featured, status, ordering\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8,\n                $9, $10, $11, $12\n            )\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Int8",
+        "Int8",
+        "Varchar",
+        "Varchar",
+        "Varchar",
+        "Timestamptz",
+        "Int4",
+        "Varchar",
+        "Bool",
+        "Varchar",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a4745a3dc87c3a858819b208b0c3a010dc297425883113565d934b8a834014ce"
+}

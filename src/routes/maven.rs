@@ -100,7 +100,7 @@ pub async fn maven_metadata(
         SELECT id, version_number, version_type
         FROM versions
         WHERE mod_id = $1 AND status = ANY($2)
-        ORDER BY date_published ASC
+        ORDER BY ordering ASC NULLS LAST, date_published ASC
         ",
         project.inner.id as database::models::ids::ProjectId,
         &*crate::models::projects::VersionStatus::iterator()

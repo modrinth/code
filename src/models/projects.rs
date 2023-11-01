@@ -491,6 +491,8 @@ pub struct Version {
     pub game_versions: Vec<GameVersion>,
     /// The loaders that this version works on
     pub loaders: Vec<Loader>,
+    /// Ordering override, lower is returned first
+    pub ordering: Option<i32>,
 }
 
 impl From<QueryVersion> for Version {
@@ -515,6 +517,7 @@ impl From<QueryVersion> for Version {
                 "alpha" => VersionType::Alpha,
                 _ => VersionType::Release,
             },
+            ordering: v.ordering,
 
             status: v.status,
             requested_status: v.requested_status,
@@ -729,7 +732,7 @@ impl DependencyType {
     }
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum FileType {
     RequiredResourcePack,

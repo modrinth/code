@@ -76,6 +76,9 @@ pub struct InitialVersionData {
     #[validate(length(max = 10))]
     #[serde(default)]
     pub uploaded_images: Vec<ImageId>,
+
+    // The ordering relative to other versions
+    pub ordering: Option<i32>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -316,6 +319,7 @@ async fn version_create_inner(
                     featured: version_create_data.featured,
                     status: version_create_data.status,
                     requested_status: None,
+                    ordering: version_create_data.ordering,
                 });
 
                 return Ok(());
@@ -427,6 +431,7 @@ async fn version_create_inner(
         version_type: version_data.release_channel,
         status: builder.status,
         requested_status: builder.requested_status,
+        ordering: builder.ordering,
         files: builder
             .files
             .iter()

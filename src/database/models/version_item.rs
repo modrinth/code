@@ -28,6 +28,7 @@ pub struct VersionBuilder {
     pub featured: bool,
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
+    pub ordering: Option<i32>,
 }
 
 #[derive(Clone)]
@@ -214,6 +215,7 @@ impl VersionBuilder {
             version_type: self.version_type,
             status: self.status,
             requested_status: self.requested_status,
+            ordering: self.ordering,
         };
 
         version.insert(transaction).await?;
@@ -317,7 +319,7 @@ impl VersionVersion {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct Version {
     pub id: VersionId,
     pub project_id: ProjectId,
@@ -332,6 +334,7 @@ pub struct Version {
     pub featured: bool,
     pub status: VersionStatus,
     pub requested_status: Option<VersionStatus>,
+    pub ordering: Option<i32>,
 }
 
 impl Version {
@@ -344,12 +347,12 @@ impl Version {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog, date_published, downloads,
-                version_type, featured, status
+                version_type, featured, status, ordering
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8,
-                $9, $10, $11
+                $9, $10, $11, $12
             )
             ",
             self.id as VersionId,
@@ -362,7 +365,8 @@ impl Version {
             self.downloads,
             &self.version_type,
             self.featured,
-            self.status.as_str()
+            self.status.as_str(),
+            self.ordering
         )
         .execute(&mut **transaction)
         .await?;
@@ -554,7 +558,7 @@ impl Version {
                 "
                 SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                 v.changelog changelog, v.date_published date_published, v.downloads downloads,
-                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
+                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
                 JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
                 ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
                 JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,
@@ -570,7 +574,7 @@ impl Version {
                 LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
                 WHERE v.id = ANY($1)
                 GROUP BY v.id
-                ORDER BY v.date_published ASC;
+                ORDER BY v.ordering ASC NULLS LAST, v.date_published ASC;
                 ",
                 &version_ids_parsed
             )
@@ -593,6 +597,7 @@ impl Version {
                                 status: VersionStatus::from_string(&v.status),
                                 requested_status: v.requested_status
                                     .map(|x| VersionStatus::from_string(&x)),
+                                ordering: v.ordering,
                             },
                             files: {
                                 #[derive(Deserialize)]
@@ -851,7 +856,7 @@ impl Version {
     }
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct QueryVersion {
     pub inner: Version,
 
@@ -861,7 +866,7 @@ pub struct QueryVersion {
     pub dependencies: Vec<QueryDependency>,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct QueryDependency {
     pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
@@ -869,7 +874,7 @@ pub struct QueryDependency {
     pub dependency_type: String,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Eq)]
 pub struct QueryFile {
     pub id: FileId,
     pub url: String,
@@ -891,4 +896,85 @@ pub struct SingleFile {
     pub primary: bool,
     pub size: u32,
     pub file_type: Option<FileType>,
+}
+
+impl std::cmp::Ord for QueryVersion {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.inner.cmp(&other.inner)
+    }
+}
+
+impl std::cmp::PartialOrd for QueryVersion {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl std::cmp::Ord for Version {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let ordering_order = match (self.ordering, other.ordering) {
+            (None, None) => Ordering::Equal,
+            (None, Some(_)) => Ordering::Greater,
+            (Some(_), None) => Ordering::Less,
+            (Some(a), Some(b)) => a.cmp(&b),
+        };
+
+        match ordering_order {
+            Ordering::Equal => self.date_published.cmp(&other.date_published),
+            ordering => ordering,
+        }
+    }
+}
+
+impl std::cmp::PartialOrd for Version {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use chrono::Months;
+
+    use super::*;
+
+    #[test]
+    fn test_version_sorting() {
+        let versions = vec![
+            get_version(4, None, months_ago(6)),
+            get_version(3, None, months_ago(7)),
+            get_version(2, Some(1), months_ago(6)),
+            get_version(1, Some(0), months_ago(4)),
+            get_version(0, Some(0), months_ago(5)),
+        ];
+
+        let sorted = versions.iter().cloned().sorted().collect_vec();
+
+        let expected_sorted_ids = vec![0, 1, 2, 3, 4];
+        let actual_sorted_ids = sorted.iter().map(|v| v.id.0).collect_vec();
+        assert_eq!(expected_sorted_ids, actual_sorted_ids);
+    }
+
+    fn months_ago(months: u32) -> DateTime<Utc> {
+        Utc::now().checked_sub_months(Months::new(months)).unwrap()
+    }
+
+    fn get_version(id: i64, ordering: Option<i32>, date_published: DateTime<Utc>) -> Version {
+        Version {
+            id: VersionId(id),
+            ordering,
+            date_published,
+            project_id: ProjectId(0),
+            author_id: UserId(0),
+            name: Default::default(),
+            version_number: Default::default(),
+            changelog: Default::default(),
+            changelog_url: Default::default(),
+            downloads: Default::default(),
+            version_type: Default::default(),
+            featured: Default::default(),
+            status: VersionStatus::Listed,
+            requested_status: Default::default(),
+        }
+    }
 }

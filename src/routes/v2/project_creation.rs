@@ -964,6 +964,7 @@ async fn create_initial_version(
         status: VersionStatus::Listed,
         version_type: version_data.release_channel.to_string(),
         requested_status: None,
+        ordering: version_data.ordering,
     };
 
     Ok(version)

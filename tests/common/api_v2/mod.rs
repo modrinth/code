@@ -7,6 +7,7 @@ use std::rc::Rc;
 pub mod organization;
 pub mod project;
 pub mod team;
+pub mod version;
 
 #[derive(Clone)]
 pub struct ApiV2 {
