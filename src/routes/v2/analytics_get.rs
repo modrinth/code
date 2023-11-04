@@ -34,7 +34,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 /// The json data to be passed to fetch analytic data
 /// Either a list of project_ids or version_ids can be used, but not both. Unauthorized projects/versions will be filtered out.
-/// start_date and end_date are optional, and default to two weeks ago, and the maximum date respectively.
+/// start_date and end_date are optional, and default to two weeks ago, and the maximum date respectively
+/// start_date and end_date are inclusive
 /// resolution_minutes is optional. This refers to the window by which we are looking (every day, every minute, etc) and defaults to 1440 (1 day)
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GetData {
@@ -333,6 +334,15 @@ pub async fn revenue_get(
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
     let resolution_minutes = data.resolution_minutes.unwrap_or(60 * 24);
+
+    // Round up/down to nearest duration as we are using pgadmin, does not have rounding in the fetch command
+    // Round start_date down to nearest resolution
+    let diff = start_date.timestamp() % (resolution_minutes as i64 * 60);
+    let start_date = start_date - Duration::seconds(diff);
+
+    // Round end_date up to nearest resolution
+    let diff = end_date.timestamp() % (resolution_minutes as i64 * 60);
+    let end_date = end_date + Duration::seconds((resolution_minutes as i64 * 60) - diff);
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions

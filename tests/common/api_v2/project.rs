@@ -1,10 +1,14 @@
+use std::collections::HashMap;
+
 use actix_http::StatusCode;
 use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
 };
 use bytes::Bytes;
+use chrono::{DateTime, Utc};
 use labrinth::models::projects::{Project, Version};
+use rust_decimal::Decimal;
 use serde_json::json;
 
 use crate::common::{
@@ -189,5 +193,58 @@ impl ApiV2 {
 
             self.call(req).await
         }
+    }
+
+    pub async fn get_analytics_revenue(
+        &self,
+        id_or_slugs: Vec<&str>,
+        start_date: Option<DateTime<Utc>>,
+        end_date: Option<DateTime<Utc>>,
+        resolution_minutes: Option<u32>,
+        pat: &str,
+    ) -> ServiceResponse {
+        let projects_string = serde_json::to_string(&id_or_slugs).unwrap();
+        let projects_string = urlencoding::encode(&projects_string);
+
+        let mut extra_args = String::new();
+        if let Some(start_date) = start_date {
+            let start_date = start_date.to_rfc3339();
+            // let start_date = serde_json::to_string(&start_date).unwrap();
+            let start_date = urlencoding::encode(&start_date);
+            extra_args.push_str(&format!("&start_date={start_date}"));
+        }
+        if let Some(end_date) = end_date {
+            let end_date = end_date.to_rfc3339();
+            // let end_date = serde_json::to_string(&end_date).unwrap();
+            let end_date = urlencoding::encode(&end_date);
+            extra_args.push_str(&format!("&end_date={end_date}"));
+        }
+        if let Some(resolution_minutes) = resolution_minutes {
+            extra_args.push_str(&format!("&resolution_minutes={}", resolution_minutes));
+        }
+
+        let req = test::TestRequest::get()
+            .uri(&format!(
+                "/v2/analytics/revenue?{projects_string}{extra_args}",
+            ))
+            .append_header(("Authorization", pat))
+            .to_request();
+
+        self.call(req).await
+    }
+
+    pub async fn get_analytics_revenue_deserialized(
+        &self,
+        id_or_slugs: Vec<&str>,
+        start_date: Option<DateTime<Utc>>,
+        end_date: Option<DateTime<Utc>>,
+        resolution_minutes: Option<u32>,
+        pat: &str,
+    ) -> HashMap<String, HashMap<i64, Decimal>> {
+        let resp = self
+            .get_analytics_revenue(id_or_slugs, start_date, end_date, resolution_minutes, pat)
+            .await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
     }
 }

@@ -81,7 +81,7 @@ async fn version_ordering_when_unspecified_orders_oldest_first() {
         let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
             env.v2
-                .create_default_version(&alpha_project_id, None, USER_USER_PAT)
+                .create_default_version(alpha_project_id, None, USER_USER_PAT)
                 .await
                 .id,
         );
@@ -105,7 +105,7 @@ async fn version_ordering_when_specified_orders_specified_before_unspecified() {
         let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
             env.v2
-                .create_default_version(&alpha_project_id, Some(10000), USER_USER_PAT)
+                .create_default_version(alpha_project_id, Some(10000), USER_USER_PAT)
                 .await
                 .id,
         );
