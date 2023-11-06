@@ -6,7 +6,6 @@ use crate::models::ids::ProjectId;
 use crate::models::pats::Scopes;
 use crate::models::users::{PayoutStatus, RecipientStatus};
 use crate::queue::analytics::AnalyticsQueue;
-use crate::queue::download::DownloadQueue;
 use crate::queue::maxmind::MaxMindIndexer;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
@@ -53,7 +52,6 @@ pub async fn count_download(
     analytics_queue: web::Data<Arc<AnalyticsQueue>>,
     session_queue: web::Data<AuthQueue>,
     download_body: web::Json<DownloadBody>,
-    download_queue: web::Data<DownloadQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let token = download_body
         .headers
@@ -72,9 +70,9 @@ pub async fn count_download(
         .ok()
         .map(|x| x as i64);
 
-    let (version_id, project_id, file_type) = if let Some(version) = sqlx::query!(
+    let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "
-            SELECT v.id id, v.mod_id mod_id, file_type FROM files f
+            SELECT v.id id, v.mod_id mod_id FROM files f
             INNER JOIN versions v ON v.id = f.version_id
             WHERE f.url = $1
             ",
@@ -83,7 +81,7 @@ pub async fn count_download(
     .fetch_optional(pool.as_ref())
     .await?
     {
-        (version.id, version.mod_id, version.file_type)
+        (version.id, version.mod_id)
     } else if let Some(version) = sqlx::query!(
         "
         SELECT id, mod_id FROM versions
@@ -96,21 +94,12 @@ pub async fn count_download(
     .fetch_optional(pool.as_ref())
     .await?
     {
-        (version.id, version.mod_id, None)
+        (version.id, version.mod_id)
     } else {
         return Err(ApiError::InvalidInput(
             "Specified version does not exist!".to_string(),
         ));
     };
-
-    if file_type.is_none() {
-        download_queue
-            .add(
-                crate::database::models::ProjectId(project_id),
-                crate::database::models::VersionId(version_id),
-            )
-            .await;
-    }
 
     let url = url::Url::parse(&download_body.url)
         .map_err(|_| ApiError::InvalidInput("invalid download URL specified!".to_string()))?;

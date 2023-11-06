@@ -7,7 +7,7 @@ const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
 
 #[derive(Clone)]
 pub struct RedisPool {
-    pool: deadpool_redis::Pool,
+    pub pool: deadpool_redis::Pool,
     meta_namespace: String,
 }
 

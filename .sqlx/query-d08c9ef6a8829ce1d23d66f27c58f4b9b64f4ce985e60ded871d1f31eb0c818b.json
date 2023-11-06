@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE mods\n                SET downloads = downloads + 1\n                WHERE id = ANY($1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d08c9ef6a8829ce1d23d66f27c58f4b9b64f4ce985e60ded871d1f31eb0c818b"
+}

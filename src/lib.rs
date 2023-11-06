@@ -4,7 +4,7 @@ use actix_web::web;
 use database::redis::RedisPool;
 use log::{info, warn};
 use queue::{
-    analytics::AnalyticsQueue, download::DownloadQueue, payouts::PayoutsQueue, session::AuthQueue,
+    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
     socket::ActiveSockets,
 };
 use scheduler::Scheduler;
@@ -49,7 +49,6 @@ pub struct LabrinthConfig {
     pub scheduler: Arc<Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
-    pub download_queue: web::Data<DownloadQueue>,
     pub session_queue: web::Data<AuthQueue>,
     pub payouts_queue: web::Data<Mutex<PayoutsQueue>>,
     pub analytics_queue: Arc<AnalyticsQueue>,
@@ -139,24 +138,6 @@ pub fn app_setup(
 
     scheduler::schedule_versions(&mut scheduler, pool.clone());
 
-    let download_queue = web::Data::new(DownloadQueue::new());
-
-    let pool_ref = pool.clone();
-    let download_queue_ref = download_queue.clone();
-    scheduler.run(std::time::Duration::from_secs(60 * 5), move || {
-        let pool_ref = pool_ref.clone();
-        let download_queue_ref = download_queue_ref.clone();
-
-        async move {
-            info!("Indexing download queue");
-            let result = download_queue_ref.index(&pool_ref).await;
-            if let Err(e) = result {
-                warn!("Indexing download queue failed: {:?}", e);
-            }
-            info!("Done indexing download queue");
-        }
-    });
-
     let session_queue = web::Data::new(AuthQueue::new());
 
     let pool_ref = pool.clone();
@@ -202,13 +183,19 @@ pub fn app_setup(
     {
         let client_ref = clickhouse.clone();
         let analytics_queue_ref = analytics_queue.clone();
-        scheduler.run(std::time::Duration::from_secs(60 * 5), move || {
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        scheduler.run(std::time::Duration::from_secs(15), move || {
             let client_ref = client_ref.clone();
             let analytics_queue_ref = analytics_queue_ref.clone();
+            let pool_ref = pool_ref.clone();
+            let redis_ref = redis_ref.clone();
 
             async move {
                 info!("Indexing analytics queue");
-                let result = analytics_queue_ref.index(client_ref).await;
+                let result = analytics_queue_ref
+                    .index(client_ref, &redis_ref, &pool_ref)
+                    .await;
                 if let Err(e) = result {
                     warn!("Indexing analytics queue failed: {:?}", e);
                 }
@@ -252,7 +239,6 @@ pub fn app_setup(
         maxmind,
         scheduler: Arc::new(scheduler),
         ip_salt,
-        download_queue,
         search_config,
         session_queue,
         payouts_queue,
@@ -282,7 +268,6 @@ pub fn app_config(cfg: &mut web::ServiceConfig, labrinth_config: LabrinthConfig)
     .app_data(web::Data::new(labrinth_config.pool.clone()))
     .app_data(web::Data::new(labrinth_config.file_host.clone()))
     .app_data(web::Data::new(labrinth_config.search_config.clone()))
-    .app_data(labrinth_config.download_queue.clone())
     .app_data(labrinth_config.session_queue.clone())
     .app_data(labrinth_config.payouts_queue.clone())
     .app_data(web::Data::new(labrinth_config.ip_salt.clone()))
