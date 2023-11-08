@@ -1034,13 +1034,17 @@ fn sanitize_loader_version_string(s: &str, loader: PackDependency) -> &str {
         // If one, take the first
         // If none, take the whole thing
         PackDependency::Forge | PackDependency::NeoForge => {
-            let mut split: std::str::Split<'_, char> = s.split('-');
-            match split.next() {
-                Some(first) => match split.next() {
-                    Some(second) => second,
-                    None => first,
-                },
-                None => s,
+            if s.starts_with("1.") {
+                let mut split: std::str::Split<'_, char> = s.split('-');
+                match split.next() {
+                    Some(first) => match split.next() {
+                        Some(second) => second,
+                        None => first,
+                    },
+                    None => s,
+                }
+            } else {
+                s
             }
         }
         // For quilt, etc we take the whole thing, as it functions like: 0.20.0-beta.11 (and should not be split here)

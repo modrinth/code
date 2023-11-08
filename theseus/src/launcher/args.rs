@@ -11,6 +11,7 @@ use daedalus::{
     modded::SidedDataEntry,
 };
 use dunce::canonicalize;
+use std::collections::HashSet;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
@@ -40,9 +41,9 @@ pub fn get_class_paths(
 
             Some(get_lib_path(libraries_path, &library.name, false))
         })
-        .collect::<Result<Vec<_>, _>>()?;
+        .collect::<Result<HashSet<_>, _>>()?;
 
-    cps.push(
+    cps.insert(
         canonicalize(client_path)
             .map_err(|_| {
                 crate::ErrorKind::LauncherError(format!(
@@ -55,7 +56,10 @@ pub fn get_class_paths(
             .to_string(),
     );
 
-    Ok(cps.join(classpath_separator(java_arch)))
+    Ok(cps
+        .into_iter()
+        .collect::<Vec<_>>()
+        .join(classpath_separator(java_arch)))
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(

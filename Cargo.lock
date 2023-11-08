@@ -4685,7 +4685,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "async-recursion",
  "async-tungstenite",
@@ -4733,7 +4733,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_cli"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "argh",
  "color-eyre",
@@ -4760,7 +4760,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "chrono",
  "cocoa",
