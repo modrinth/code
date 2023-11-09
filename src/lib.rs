@@ -4,8 +4,7 @@ use actix_web::web;
 use database::redis::RedisPool;
 use log::{info, warn};
 use queue::{
-    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue,
-    socket::ActiveSockets,
+    analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue, socket::ActiveSockets,
 };
 use scheduler::Scheduler;
 use sqlx::Postgres;

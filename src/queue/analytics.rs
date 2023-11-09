@@ -1,10 +1,10 @@
 use crate::database::models::DatabaseError;
+use crate::database::redis::RedisPool;
 use crate::models::analytics::{Download, PageView, Playtime};
 use crate::routes::ApiError;
 use dashmap::{DashMap, DashSet};
 use redis::cmd;
 use sqlx::PgPool;
-use crate::database::redis::RedisPool;
 
 const DOWNLOADS_NAMESPACE: &str = "downloads";
 
@@ -35,10 +35,13 @@ impl AnalyticsQueue {
     }
 
     pub fn add_download(&self, download: Download) {
-        let octets = download.ip.octets();
-        let ip_stripped = u64::from_be_bytes([
-            octets[0], octets[1], octets[2], octets[3], octets[4], octets[5], octets[6], octets[7],
-        ]);
+        let ip_stripped = if let Some(ip) = download.ip.to_ipv4_mapped() {
+            let octets = ip.octets();
+            u64::from_be_bytes([0, 0, 0, 0, octets[0], octets[1], octets[2], octets[3]])
+        } else {
+            let octets = download.ip.octets();
+            u64::from_be_bytes([0, 0, 0, 0, octets[0], octets[1], octets[2], octets[3]])
+        };
         self.downloads_queue
             .insert(format!("{}-{}", ip_stripped, download.project_id), download);
     }
@@ -151,8 +154,8 @@ impl AnalyticsQueue {
                 WHERE id = ANY($1)",
                 &version_ids
             )
-                .execute(&mut *transaction)
-                .await?;
+            .execute(&mut *transaction)
+            .await?;
 
             sqlx::query!(
                 "UPDATE mods
@@ -160,8 +163,8 @@ impl AnalyticsQueue {
                 WHERE id = ANY($1)",
                 &project_ids
             )
-                .execute(&mut *transaction)
-                .await?;
+            .execute(&mut *transaction)
+            .await?;
 
             transaction.commit().await?;
             downloads.end().await?;
