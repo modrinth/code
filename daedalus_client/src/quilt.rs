@@ -12,7 +12,7 @@ pub async fn retrieve_data(
     uploaded_files: &mut Vec<String>,
     semaphore: Arc<Semaphore>,
 ) -> Result<(), Error> {
-    let mut list = fetch_quilt_versions(None, semaphore.clone()).await?;
+    let list = fetch_quilt_versions(None, semaphore.clone()).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&format_url(&format!(
         "quilt/v{}/manifest.json",
         daedalus::modded::CURRENT_QUILT_FORMAT_VERSION,
@@ -51,9 +51,6 @@ pub async fn retrieve_data(
                 ))
             }
         }
-
-        list.loader
-            .retain(|x| loaders.iter().any(|val| val.1 == x.version))
     }
 
     const DUMMY_GAME_VERSION: &str = "1.19.4-rc2";

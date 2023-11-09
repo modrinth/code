@@ -4,7 +4,7 @@ use crate::minecraft::{
     Argument, ArgumentType, Library, VersionInfo, VersionType,
 };
 use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 
 #[cfg(feature = "bincode")]
@@ -32,6 +32,21 @@ pub struct SidedDataEntry {
     pub server: String,
 }
 
+fn deserialize_date<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+
+    DateTime::parse_from_rfc3339(&s)
+        .map(|dt| dt.with_timezone(&Utc))
+        .or_else(|_| {
+            DateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f")
+                .map(|dt| dt.with_timezone(&Utc))
+        })
+        .map_err(serde::de::Error::custom)
+}
+
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -43,9 +58,11 @@ pub struct PartialVersionInfo {
     pub inherits_from: String,
     /// The time that the version was released
     #[cfg_attr(feature = "bincode", bincode(with_serde))]
+    #[serde(deserialize_with = "deserialize_date")]
     pub release_time: DateTime<Utc>,
     /// The latest time a file in this version was updated
     #[cfg_attr(feature = "bincode", bincode(with_serde))]
+    #[serde(deserialize_with = "deserialize_date")]
     pub time: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// The classpath to the main class to launch the game

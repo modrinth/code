@@ -17,7 +17,7 @@ pub async fn retrieve_data(
     uploaded_files: &mut Vec<String>,
     semaphore: Arc<Semaphore>,
 ) -> Result<(), Error> {
-    let maven_metadata = fetch_maven_metadata(None, semaphore.clone()).await?;
+    let maven_metadata = fetch_maven_metadata(semaphore.clone()).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&format_url(&format!(
         "neo/v{}/manifest.json",
         daedalus::modded::CURRENT_NEOFORGE_FORMAT_VERSION,
@@ -42,10 +42,10 @@ pub async fn retrieve_data(
     for (minecraft_version, loader_versions) in maven_metadata.clone() {
         let mut loaders = Vec::new();
 
-        for (full, loader_version) in loader_versions {
+        for (full, loader_version, new_forge) in loader_versions {
             let version = Version::parse(&loader_version)?;
 
-            loaders.push((full, version))
+            loaders.push((full, version, new_forge.to_string()))
         }
 
         if !loaders.is_empty() {
@@ -53,7 +53,7 @@ pub async fn retrieve_data(
                 let mut loaders_versions = Vec::new();
 
                 {
-                    let loaders_futures = loaders.into_iter().map(|(loader_version_full, _)| async {
+                    let loaders_futures = loaders.into_iter().map(|(loader_version_full, _, new_forge)| async {
                         let versions_mutex = Arc::clone(&old_versions);
                         let visited_assets = Arc::clone(&visited_assets_mutex);
                         let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
@@ -72,13 +72,13 @@ pub async fn retrieve_data(
                             }
 
                             info!("Forge - Installer Start {}", loader_version_full.clone());
-                            let bytes = download_file(&format!("https://maven.neoforged.net/net/neoforged/forge/{0}/forge-{0}-installer.jar", loader_version_full), None, semaphore.clone()).await?;
+                            let bytes = download_file(&format!("https://maven.neoforged.net/net/neoforged/{1}/{0}/{1}-{0}-installer.jar", loader_version_full, if &*new_forge == "true" { "neoforge" } else { "forge" }), None, semaphore.clone()).await?;
 
                             let reader = std::io::Cursor::new(bytes);
 
                             if let Ok(archive) = zip::ZipArchive::new(reader) {
                                     let mut archive_clone = archive.clone();
-                                    let mut profile = tokio::task::spawn_blocking(move || {
+                                let mut profile = tokio::task::spawn_blocking(move || {
                                         let mut install_profile = archive_clone.by_name("install_profile.json")?;
 
                                         let mut contents = String::new();
@@ -404,8 +404,10 @@ pub async fn retrieve_data(
     Ok(())
 }
 
-const DEFAULT_MAVEN_METADATA_URL: &str =
+const DEFAULT_MAVEN_METADATA_URL_1: &str =
     "https://maven.neoforged.net/net/neoforged/forge/maven-metadata.xml";
+const DEFAULT_MAVEN_METADATA_URL_2: &str =
+    "https://maven.neoforged.net/net/neoforged/neoforge/maven-metadata.xml";
 
 #[derive(Debug, Deserialize)]
 struct Metadata {
@@ -423,32 +425,55 @@ struct Versions {
 }
 
 pub async fn fetch_maven_metadata(
-    url: Option<&str>,
     semaphore: Arc<Semaphore>,
-) -> Result<HashMap<String, Vec<(String, String)>>, Error> {
-    let values = serde_xml_rs::from_str::<Metadata>(
-        &String::from_utf8(
-            download_file(
-                url.unwrap_or(DEFAULT_MAVEN_METADATA_URL),
-                None,
-                semaphore,
+) -> Result<HashMap<String, Vec<(String, String, bool)>>, Error> {
+    async fn fetch_values(
+        url: &str,
+        semaphore: Arc<Semaphore>,
+    ) -> Result<Metadata, Error> {
+        Ok(serde_xml_rs::from_str(
+            &String::from_utf8(
+                download_file(url, None, semaphore).await?.to_vec(),
             )
-            .await?
-            .to_vec(),
-        )
-        .unwrap_or_default(),
-    )?;
+            .unwrap_or_default(),
+        )?)
+    }
 
-    let mut map: HashMap<String, Vec<(String, String)>> = HashMap::new();
+    let forge_values =
+        fetch_values(DEFAULT_MAVEN_METADATA_URL_1, semaphore.clone()).await?;
+    let neo_values =
+        fetch_values(DEFAULT_MAVEN_METADATA_URL_2, semaphore).await?;
 
-    for value in values.versioning.versions.version {
+    let mut map: HashMap<String, Vec<(String, String, bool)>> = HashMap::new();
+
+    for value in forge_values.versioning.versions.version {
         let original = value.clone();
 
         let parts: Vec<&str> = value.split('-').collect();
         if parts.len() == 2 {
-            map.entry(parts[0].to_string())
-                .or_default()
-                .push((original, parts[1].to_string()));
+            map.entry(parts[0].to_string()).or_default().push((
+                original,
+                parts[1].to_string(),
+                false,
+            ));
+        }
+    }
+
+    for value in neo_values.versioning.versions.version {
+        let original = value.clone();
+
+        let mut parts = value.split('.');
+
+        if let Some(major) = parts.next() {
+            if let Some(minor) = parts.next() {
+                let game_version = format!("1.{}.{}", major, minor);
+
+                map.entry(game_version.clone()).or_default().push((
+                    original.clone(),
+                    format!("{}-{}", game_version, original),
+                    true,
+                ));
+            }
         }
     }
 

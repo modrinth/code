@@ -141,18 +141,39 @@ pub async fn retrieve_data(
                     let mut cloned_manifest =
                         cloned_manifest_mutex.lock().await;
 
-                    let position = cloned_manifest
+                    if let Some(position) = cloned_manifest
                         .versions
                         .iter()
                         .position(|x| version.id == x.id)
-                        .unwrap();
-                    cloned_manifest.versions[position].url =
-                        format_url(&version_path);
-                    cloned_manifest.versions[position].assets_index_sha1 =
-                        Some(version_info.asset_index.sha1.clone());
-                    cloned_manifest.versions[position].assets_index_url =
-                        Some(format_url(&assets_path));
-                    cloned_manifest.versions[position].sha1 = version_info_hash;
+                    {
+                        cloned_manifest.versions[position].url =
+                            format_url(&version_path);
+                        cloned_manifest.versions[position].assets_index_sha1 =
+                            Some(version_info.asset_index.sha1.clone());
+                        cloned_manifest.versions[position].assets_index_url =
+                            Some(format_url(&assets_path));
+                        cloned_manifest.versions[position].sha1 =
+                            version_info_hash;
+                    } else {
+                        cloned_manifest.versions.insert(
+                            0,
+                            daedalus::minecraft::Version {
+                                id: version_info.id.clone(),
+                                type_: version_info.type_.clone(),
+                                url: format_url(&version_path),
+                                time: version_info.time,
+                                release_time: version_info.release_time,
+                                sha1: version_info_hash,
+                                compliance_level: 1,
+                                assets_index_url: Some(
+                                    version_info.asset_index.sha1.clone(),
+                                ),
+                                assets_index_sha1: Some(
+                                    version_info.asset_index.sha1.clone(),
+                                ),
+                            },
+                        )
+                    }
                 }
 
                 let mut download_assets = false;
