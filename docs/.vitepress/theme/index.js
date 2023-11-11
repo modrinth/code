@@ -3,6 +3,7 @@ import Omorphia from 'omorphia'
 import DemoContainer from './DemoContainer.vue'
 
 import './compat.scss'
+import './style.scss'
 
 export default {
   ...DefaultTheme,

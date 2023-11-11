@@ -7,6 +7,11 @@ export default {
   description: 'A components library used for Modrinth.',
   head: [['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]],
   themeConfig: {
+    logo: { src: '/favicon.svg', width: 24, height: 24 },
+    socialLinks: [{ icon: 'github', link: 'https://github.com/modrinth/omorphia' }],
+    search: {
+      provider: 'local',
+    },
     sidebar: [
       {
         items: [
