@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watchEffect } from 'vue'
+import { defineProps, defineEmits, computed } from 'vue'
 import { Checkbox } from '@'
 
 const props = defineProps({
@@ -40,12 +40,8 @@ const props = defineProps({
   },
 })
 
-const isActive = ref(props.activeFilters.value.includes(props.facetName))
+const isActive = computed(() => props.activeFilters.includes(props.facetName))
 const emit = defineEmits(['toggle'])
-
-watchEffect(() => {
-  isActive.value = props.activeFilters.value.includes(props.facetName)
-})
 
 const toggle = () => {
   emit('toggle', props.facetName)
