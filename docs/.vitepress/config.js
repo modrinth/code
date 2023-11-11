@@ -1,7 +1,11 @@
-import { resolve } from 'path'
+import { resolve, basename } from 'path'
 import svgLoader from 'vite-svg-loader'
 import eslintPlugin from 'vite-plugin-eslint'
+import { icuMessages } from '@vintl/unplugin/vite'
+import virtual from '@rollup/plugin-virtual'
+import { globSync } from 'glob'
 
+/** @type {import('vitepress').SiteConfig} */
 export default {
   title: 'Omorphia',
   description: 'A components library used for Modrinth.',
@@ -80,11 +84,40 @@ export default {
         },
       }),
       eslintPlugin(),
+      icuMessages({
+        filter: (id) => id.endsWith('.json?messages'),
+        pluginsWrapping: true,
+      }),
+      virtual({
+        '@modrinth/omorphia-dev/locales/index.js': (() => {
+          const localeDirs = globSync('../../locales/*', { cwd: __dirname, absolute: true })
+          let output = 'export const localeDefinitions = Object.create(null);\n'
+          for (const localeDir of localeDirs) {
+            const tag = basename(localeDir)
+            output += `localeDefinitions[${JSON.stringify(tag)}] = {\n`
+            output += '\tasync importFunction() {\n'
+            output += `\t\tconst messages = Object.create(null);\n`
+            for (const filePath of globSync('*', { cwd: localeDir, absolute: true })) {
+              const fileName = basename(filePath)
+              if (fileName === 'index.json') {
+                output += `\t\tObject.assign(messages, await import(${JSON.stringify(
+                  `${filePath}?messages`
+                )}).then((mod) => mod['default']));\n`
+              }
+            }
+            output += '\t\treturn { messages }\n'
+            output += '\t},\n'
+            output += '}\n'
+          }
+          return output
+        })(),
+      }),
     ],
     resolve: {
       alias: {
         '@': resolve(__dirname, '../../lib'),
         omorphia: resolve(__dirname, '../../lib'),
+        '@formatjs/icu-messageformat-parser': '@formatjs/icu-messageformat-parser/lib/no-parser',
       },
       dedupe: ['vue'],
     },

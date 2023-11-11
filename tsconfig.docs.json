@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "composite": true,
+
+    "target": "ESNext",
+    "moduleResolution": "Bundler",
+
+    "allowJs": true,
+    "allowArbitraryExtensions": true,
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+
+    "emitDeclarationOnly": true
+  },
+  "include": [
+    "docs/.vitepress/**/*.ts",
+    "docs/.vitepress/**/*.js",
+    "docs/.vitepress/**/*.vue",
+    "locales/*.json"
+  ]
+}

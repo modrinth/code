@@ -3,13 +3,17 @@
   "type": "module",
   "version": "0.6.5",
   "files": [
-    "dist"
+    "dist",
+    "locales"
   ],
   "module": "./dist/omorphia.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/omorphia.js"
+    },
+    "./locales/*": {
+      "import": "./locales/*"
     },
     "./dist/style.css": "./dist/style.css"
   },
@@ -20,7 +24,8 @@
     "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write .",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "intl:extract": "formatjs extract \"lib/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"lib/**/*.d.ts\" --out-file locales/en-US/index.json --preserve-whitespace"
   },
   "dependencies": {
     "@codemirror/commands": "^6.3.0",
@@ -40,13 +45,18 @@
     "xss": "^1.0.14"
   },
   "devDependencies": {
+    "@formatjs/cli": "^6.2.1",
+    "@rollup/plugin-virtual": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
+    "@vintl/unplugin": "^1.5.1",
+    "@vintl/vintl": "^4.3.0",
     "@vitejs/plugin-vue": "^4.2.3",
     "eslint": "^8.41.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.14.1",
+    "glob": "^10.3.10",
     "postcss": "^8.4.31",
     "postcss-prefix-selector": "^1.16.0",
     "prettier": "^2.8.8",
