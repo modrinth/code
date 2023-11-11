@@ -4,13 +4,13 @@
 <DemoContainer>
   <Button :action="() => this.$refs.reportModal.show()">Show Report Modal</Button>
   <Button :action="() => this.$refs.confirmModal.show()">Show Confirm Modal</Button>
-  <ModalReport
+  <ReportModal
   ref="reportModal"
   itemType="project"
   :reportTypes="['cringitude', 'rudeness', 'notgamer', 'windowsuser']"
   >
-  </ModalReport>
-  <ModalConfirm
+  </ReportModal>
+  <ConfirmModal
     ref="confirmModal"
     title="Are you sure you want to delete this version?"
     description="This will remove this version forever (like really forever)."
@@ -18,13 +18,13 @@
     proceed-label="Delete"
     confirmationText="Hello"
   >
-  </ModalConfirm>
+  </ConfirmModal>
 </DemoContainer>
 :::
 
 ```vue
   <Button :action="() => this.$refs.reportModal.modal.show()">Show Modal</Button>
-  <ModalReport
+  <ReportModal
   ref="reportModal"
   itemType="project"
   :reportTypes="['cringitude', 'rudeness', 'notgamer', 'windowsuser']"
