@@ -203,8 +203,8 @@ const handleOptionsClick = async (args) => {
   }
 }
 
-const maxInstancesPerRow = ref(0)
-const maxProjectsPerRow = ref(0)
+const maxInstancesPerRow = ref(1)
+const maxProjectsPerRow = ref(1)
 
 const calculateCardsPerRow = () => {
   // Calculate how many cards fit in one row
