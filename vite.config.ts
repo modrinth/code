@@ -13,7 +13,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'lib/index.ts'),
       name: 'Omorphia',
       fileName: 'omorphia',
-      formats: ['es', 'cjs'],
+      formats: ['es'],
     },
   },
   plugins: [

@@ -5,13 +5,11 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/omorphia.umd.cjs",
   "module": "./dist/omorphia.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/omorphia.js",
-      "require": "./dist/omorphia.cjs"
+      "import": "./dist/omorphia.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
