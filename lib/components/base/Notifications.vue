@@ -129,6 +129,10 @@ function stopTimer(notif) {
 .notifs-leave-active,
 .notifs-move {
   transition: all 0.5s;
+
+  @media (prefers-reduced-motion) {
+    transition: none !important;
+  }
 }
 .notifs-enter-from,
 .notifs-leave-to {

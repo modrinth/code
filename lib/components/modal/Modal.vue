@@ -99,6 +99,10 @@ defineExpose({
   z-index: 19;
   transition: all 0.3s ease-in-out;
 
+  @media (prefers-reduced-motion) {
+    transition: none !important;
+  }
+
   &.shown {
     opacity: 1;
     visibility: visible;
@@ -163,6 +167,10 @@ defineExpose({
     visibility: hidden;
     opacity: 0;
     transition: all 0.25s ease-in-out;
+
+    @media (prefers-reduced-motion) {
+      transition: none !important;
+    }
 
     @media screen and (max-width: 650px) {
       width: calc(100% - 2 * var(--gap-lg));

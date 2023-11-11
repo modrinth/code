@@ -106,6 +106,10 @@ onBeforeUnmount(() => {
     transition: bottom 0.125s ease-in-out, top 0.125s ease-in-out, left 0.125s ease-in-out,
       right 0.125s ease-in-out, opacity 0.125s ease-in-out, scale 0.125s ease-in-out;
 
+    @media (prefers-reduced-motion) {
+      transition: none !important;
+    }
+
     &.position-bottom-left {
       top: calc(100% + var(--gap-sm) - 1rem);
       right: -1rem;

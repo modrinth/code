@@ -129,6 +129,10 @@ a {
   transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
+  @media (prefers-reduced-motion) {
+    transition: none !important;
+  }
+
   &:hover {
     color: inherit;
     text-decoration: none;

@@ -120,6 +120,10 @@ export default defineComponent({
       height: 1rem;
       width: 1rem;
       transition: transform 0.25s ease-in-out;
+
+      @media (prefers-reduced-motion) {
+        transition: none !important;
+      }
     }
 
     &.checked {

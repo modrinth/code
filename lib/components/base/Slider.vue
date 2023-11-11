@@ -115,6 +115,12 @@ const onInput = (value: string) => {
 
 <style lang="scss" scoped>
 .root-container {
+  --transition-speed: 0.2s;
+
+  @media (prefers-reduced-motion) {
+    --transition-speed: 0s;
+  }
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -159,7 +165,7 @@ const onInput = (value: string) => {
   background: var(--color-brand);
   cursor: pointer;
   border-radius: 50%;
-  transition: 0.2s;
+  transition: var(--transition-speed);
 }
 
 .slider-component .slide-container .slider::-moz-range-thumb {
@@ -169,19 +175,19 @@ const onInput = (value: string) => {
   background: var(--color-brand);
   cursor: pointer;
   border-radius: 50%;
-  transition: 0.2s;
+  transition: var(--transition-speed);
 }
 
 .slider-component .slide-container .slider:hover::-webkit-slider-thumb:not(.disabled) {
   width: 1rem;
   height: 1rem;
-  transition: 0.2s;
+  transition: var(--transition-speed);
 }
 
 .slider-component .slide-container .slider:hover::-moz-range-thumb:not(.disabled) {
   width: 1rem;
   height: 1rem;
-  transition: 0.2s;
+  transition: var(--transition-speed);
 }
 
 .slider-component .slide-container .snap-points-wrapper {

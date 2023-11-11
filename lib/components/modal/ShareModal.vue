@@ -251,6 +251,10 @@ defineExpose({
   margin: var(--gap-sm);
   transition: all 0.2s ease-in-out;
   opacity: 0;
+
+  @media (prefers-reduced-motion) {
+    transition: none !important;
+  }
 }
 
 .resizable-textarea-wrapper {

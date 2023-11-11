@@ -90,5 +90,9 @@ onMounted(() => {
     border-radius: 1rem;
     border: 0.25rem dashed var(--color-button-bg);
   }
+
+  @media (prefers-reduced-motion) {
+    transition: none !important;
+  }
 }
 </style>
