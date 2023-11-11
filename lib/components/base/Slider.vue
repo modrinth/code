@@ -5,11 +5,11 @@
         <div class="snap-points-wrapper">
           <div class="snap-points">
             <div
-              v-for="snapPoint in props.snapPoints"
+              v-for="snapPoint in snapPoints"
               :key="snapPoint"
               class="snap-point"
               :class="{ green: snapPoint <= currentValue }"
-              :style="{ left: ((snapPoint - props.min) / (props.max - props.min)) * 100 + '%' }"
+              :style="{ left: ((snapPoint - min) / (max - min)) * 100 + '%' }"
             ></div>
           </div>
         </div>
@@ -30,7 +30,7 @@
             '--min-value': min,
             '--max-value': max,
           }"
-          @input="onInputWithSnap($refs.input.value)"
+          @input="onInputWithSnap(($event.target as HTMLInputElement).value)"
         />
         <div class="slider-range">
           <span> {{ min }} {{ unit }} </span>
@@ -44,74 +44,57 @@
       type="text"
       class="slider-input"
       :disabled="disabled"
-      @change="onInput($refs.value.value)"
+      @change="onInput(($event.target as HTMLInputElement).value)"
     />
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 
-const emit = defineEmits(['update:modelValue'])
+let emit = defineEmits<{ 'update:modelValue': [number] }>()
 
-const props = defineProps({
-  modelValue: {
-    type: Number,
-    default: 0,
-  },
-  min: {
-    type: Number,
-    default: 0,
-  },
-  max: {
-    type: Number,
-    default: 100,
-  },
-  step: {
-    type: Number,
-    default: 10,
-  },
-  forceStep: {
-    type: Boolean,
-    default: true,
-  },
-  snapPoints: {
-    type: Array,
-    default: () => [],
-  },
-  snapRange: {
-    type: Number,
-    default: 100,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  unit: {
-    type: String,
-    default: '',
-  },
-})
-
-let currentValue = ref(Math.max(props.min, props.modelValue).toString())
-
-const inputValueValid = (newValue) => {
-  const parsedValue = parseInt(newValue)
-
-  if (parsedValue < props.min) {
-    currentValue.value = props.min.toString()
-  } else if (parsedValue > props.max) {
-    currentValue.value = props.max.toString()
-  } else if (!parsedValue) {
-    currentValue.value = props.min.toString()
-  } else {
-    currentValue.value = (parsedValue - (props.forceStep ? parsedValue % props.step : 0)).toString()
-  }
-
-  emit('update:modelValue', parseInt(currentValue.value))
+interface Props {
+  modelValue?: number
+  min: number
+  max: number
+  step?: number
+  forceStep?: boolean
+  snapPoints?: number[]
+  snapRange?: number
+  disabled?: boolean
+  unit?: string
 }
 
-const onInputWithSnap = (value) => {
+const props = withDefaults(defineProps<Props>(), {
+  modelValue: 0,
+  min: 0,
+  max: 100,
+  step: 10,
+  forceStep: true,
+  snapPoints: () => [],
+  snapRange: 100,
+  disabled: false,
+  unit: '',
+})
+
+let currentValue = ref(Math.max(props.min, props.modelValue))
+
+const inputValueValid = (newValue: number) => {
+  if (newValue < props.min) {
+    currentValue.value = props.min
+  } else if (newValue > props.max) {
+    currentValue.value = props.max
+  } else if (!newValue) {
+    currentValue.value = props.min
+  } else {
+    currentValue.value = newValue - (props.forceStep ? newValue % props.step : 0)
+  }
+
+  emit('update:modelValue', currentValue.value)
+}
+
+const onInputWithSnap = (value: string) => {
   let parsedValue = parseInt(value)
 
   for (let snapPoint of props.snapPoints) {
@@ -125,8 +108,8 @@ const onInputWithSnap = (value) => {
   inputValueValid(parsedValue)
 }
 
-const onInput = (value) => {
-  inputValueValid(value)
+const onInput = (value: string) => {
+  inputValueValid(parseInt(value))
 }
 </script>
 
