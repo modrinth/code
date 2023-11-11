@@ -132,7 +132,9 @@ impl Scopes {
     }
 
     pub fn parse_from_oauth_scopes(scopes: &str) -> Result<Scopes, bitflags::parser::ParseError> {
-        let scopes = scopes.replace(' ', "|").replace("%20", "|");
+        let scopes = scopes
+            .replace(['+', ' '], "|")
+            .replace("%20", "|");
         bitflags::parser::from_str(&scopes)
     }
 

@@ -15,7 +15,8 @@ use validator::Validate;
 
 use super::ApiError;
 use crate::{
-    auth::checks::ValidateAllAuthorized, models::oauth_clients::DeleteOAuthClientQueryParam,
+    auth::checks::ValidateAllAuthorized,
+    models::{ids::base62_impl::parse_base62, oauth_clients::DeleteOAuthClientQueryParam},
 };
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
@@ -111,13 +112,19 @@ pub async fn get_client(
 #[get("apps")]
 pub async fn get_clients(
     req: HttpRequest,
-    info: web::Json<GetOAuthClientsRequest>,
+    info: web::Query<GetOAuthClientsRequest>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let clients =
-        get_clients_inner(&info.into_inner().ids, req, pool, redis, session_queue).await?;
+    let ids: Vec<_> = info
+        .ids
+        .iter()
+        .map(|id| parse_base62(id).map(ApiOAuthClientId))
+        .collect::<Result<_, _>>()?;
+
+    let clients = get_clients_inner(&ids, req, pool, redis, session_queue).await?;
+
     Ok(HttpResponse::Ok().json(clients))
 }
 

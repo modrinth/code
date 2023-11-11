@@ -42,7 +42,7 @@ async fn oauth_flow_happy_path() {
 
         // Accept the authorization request
         let resp = env.v3.oauth_accept(&flow_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::FOUND);
+        assert_status(&resp, StatusCode::OK);
         let query = get_redirect_location_query_params(&resp);
 
         let auth_code = query.get("code").unwrap();
@@ -105,7 +105,7 @@ async fn oauth_authorize_for_already_authorized_scopes_returns_auth_code() {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::FOUND);
+        assert_status(&resp, StatusCode::OK);
     })
     .await;
 }
@@ -231,10 +231,10 @@ async fn reject_authorize_ends_authorize_flow() {
         let flow_id = get_authorize_accept_flow_id(resp).await;
 
         let resp = env.v3.oauth_reject(&flow_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::FOUND);
+        assert_status(&resp, StatusCode::OK);
 
         let resp = env.v3.oauth_accept(&flow_id, USER_USER_PAT).await;
-        assert_any_status_except(&resp, StatusCode::FOUND);
+        assert_any_status_except(&resp, StatusCode::OK);
     })
     .await;
 }
@@ -249,7 +249,7 @@ async fn accept_authorize_after_already_accepting_fails() {
             .await;
         let flow_id = get_authorize_accept_flow_id(resp).await;
         let resp = env.v3.oauth_accept(&flow_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::FOUND);
+        assert_status(&resp, StatusCode::OK);
 
         let resp = env.v3.oauth_accept(&flow_id, USER_USER_PAT).await;
         assert_status(&resp, StatusCode::BAD_REQUEST);

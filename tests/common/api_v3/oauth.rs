@@ -125,7 +125,7 @@ pub async fn get_authorize_accept_flow_id(response: ServiceResponse) -> String {
 }
 
 pub async fn get_auth_code_from_redirect_params(response: &ServiceResponse) -> String {
-    assert_status(response, StatusCode::FOUND);
+    assert_status(response, StatusCode::OK);
     let query_params = get_redirect_location_query_params(response);
     query_params.get("code").unwrap().to_string()
 }
@@ -140,7 +140,13 @@ pub async fn get_access_token(response: ServiceResponse) -> String {
 pub fn get_redirect_location_query_params(
     response: &ServiceResponse,
 ) -> actix_web::web::Query<HashMap<String, String>> {
-    let redirect_location = response.headers().get(LOCATION).unwrap().to_str().unwrap();
+    let redirect_location = response
+        .headers()
+        .get(LOCATION)
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_string();
     actix_web::web::Query::<HashMap<String, String>>::from_query(
         redirect_location.split_once('?').unwrap().1,
     )

@@ -2,7 +2,7 @@ use super::ValidatedRedirectUri;
 use crate::auth::AuthenticationError;
 use crate::models::error::ApiError;
 use crate::models::ids::DecodingError;
-use actix_web::http::StatusCode;
+use actix_web::http::{header::LOCATION, StatusCode};
 use actix_web::HttpResponse;
 
 #[derive(thiserror::Error, Debug)]
@@ -63,7 +63,7 @@ impl actix_web::ResponseError for OAuthError {
             | OAuthErrorType::ScopesTooBroad
             | OAuthErrorType::AccessDenied => {
                 if self.valid_redirect_uri.is_some() {
-                    StatusCode::FOUND
+                    StatusCode::OK
                 } else {
                     StatusCode::INTERNAL_SERVER_ERROR
                 }
@@ -94,10 +94,9 @@ impl actix_web::ResponseError for OAuthError {
                 redirect_uri = format!("{}&state={}", redirect_uri, state);
             }
 
-            redirect_uri = urlencoding::encode(&redirect_uri).to_string();
-            HttpResponse::Found()
-                .append_header(("Location".to_string(), redirect_uri))
-                .finish()
+            HttpResponse::Ok()
+                .append_header((LOCATION, redirect_uri.clone()))
+                .body(redirect_uri)
         } else {
             HttpResponse::build(self.status_code()).json(ApiError {
                 error: &self.error_type.error_name(),

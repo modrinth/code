@@ -7,19 +7,21 @@ use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
 use crate::database::models::oauth_token_item::OAuthAccessToken;
 use crate::database::models::{
     generate_oauth_access_token_id, generate_oauth_client_authorization_id,
-    OAuthClientAuthorizationId, OAuthClientId,
+    OAuthClientAuthorizationId,
 };
 use crate::database::redis::RedisPool;
 use crate::models;
+use crate::models::ids::OAuthClientId;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
+use actix_web::http::header::LOCATION;
 use actix_web::web::{scope, Data, Query, ServiceConfig};
 use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use chrono::Duration;
 use rand::distributions::Alphanumeric;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha20Rng;
-use reqwest::header::{CACHE_CONTROL, LOCATION, PRAGMA};
+use reqwest::header::{CACHE_CONTROL, PRAGMA};
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 
@@ -75,7 +77,7 @@ pub async fn init_oauth(
     .await?
     .1;
 
-    let client_id = oauth_info.client_id;
+    let client_id = oauth_info.client_id.into();
     let client = DBOAuthClient::get(client_id, &**pool).await?;
 
     if let Some(client) = client {
@@ -118,7 +120,7 @@ pub async fn init_oauth(
             {
                 init_oauth_code_flow(
                     user.id.into(),
-                    client.id,
+                    client.id.into(),
                     existing_authorization.id,
                     requested_scopes,
                     redirect_uris,
@@ -141,7 +143,7 @@ pub async fn init_oauth(
                 .map_err(|e| OAuthError::redirect(e, &oauth_info.state, &redirect_uri))?;
 
                 let access_request = OAuthClientAccessRequest {
-                    client_id: client.id,
+                    client_id: client.id.into(),
                     client_name: client.name,
                     client_icon: client.icon_url,
                     flow_id,
@@ -341,7 +343,7 @@ pub async fn accept_or_reject_client_scopes(
 
             init_oauth_code_flow(
                 user_id,
-                client_id,
+                client_id.into(),
                 auth_id,
                 scopes,
                 redirect_uris,
@@ -396,7 +398,7 @@ async fn init_oauth_code_flow(
 ) -> Result<HttpResponse, OAuthError> {
     let code = Flow::OAuthAuthorizationCodeSupplied {
         user_id,
-        client_id,
+        client_id: client_id.into(),
         authorization_id,
         scopes,
         original_redirect_uri: redirect_uris.original.clone(),
@@ -413,9 +415,9 @@ async fn init_oauth_code_flow(
     let redirect_uri = append_params_to_uri(&redirect_uris.validated.0, &redirect_params);
 
     // IETF RFC 6749 Section 4.1.2 (https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.2)
-    Ok(HttpResponse::Found()
-        .append_header((LOCATION, redirect_uri))
-        .finish())
+    Ok(HttpResponse::Ok()
+        .append_header((LOCATION, redirect_uri.clone()))
+        .body(redirect_uri))
 }
 
 fn append_params_to_uri(uri: &str, params: &[impl AsRef<str>]) -> String {

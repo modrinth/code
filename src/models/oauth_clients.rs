@@ -4,6 +4,7 @@ use super::{
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 
 use crate::database::models::oauth_client_authorization_item::OAuthClientAuthorization as DBOAuthClientAuthorization;
 use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
@@ -64,9 +65,13 @@ pub struct OAuthClientAuthorization {
     pub created: DateTime<Utc>,
 }
 
+#[serde_as]
 #[derive(Deserialize, Serialize)]
 pub struct GetOAuthClientsRequest {
-    pub ids: Vec<OAuthClientId>,
+    #[serde_as(
+        as = "serde_with::StringWithSeparator::<serde_with::formats::CommaSeparator, String>"
+    )]
+    pub ids: Vec<String>,
 }
 
 #[derive(Deserialize, Serialize)]
