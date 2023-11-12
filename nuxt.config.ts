@@ -1,11 +1,12 @@
 import { promises as fs } from 'fs'
 import { pathToFileURL } from 'node:url'
 import svgLoader from 'vite-svg-loader'
-import { resolve, basename } from 'pathe'
+import { resolve, basename, relative } from 'pathe'
 import { defineNuxtConfig } from 'nuxt/config'
 import { $fetch } from 'ofetch'
 import { globIterate } from 'glob'
 import { match as matchLocale } from '@formatjs/intl-localematcher'
+import { consola } from 'consola'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 
@@ -309,6 +310,31 @@ export default defineNuxtConfig({
     parserless: 'only-prod',
     seo: {
       defaultLocaleHasParameter: false,
+    },
+    onParseError({ error, message, messageId, moduleId, parseMessage, parserOptions }) {
+      const errorMessage = String(error)
+      const modulePath = relative(__dirname, moduleId)
+
+      try {
+        const fallback = parseMessage(message, { ...parserOptions, ignoreTag: true })
+
+        consola.warn(
+          `[i18n] ${messageId} in ${modulePath} cannot be parsed normally due to ${errorMessage}. The tags will will not be parsed.`
+        )
+
+        return fallback
+      } catch (err) {
+        const secondaryErrorMessage = String(err)
+
+        const reason =
+          errorMessage === secondaryErrorMessage
+            ? errorMessage
+            : `${errorMessage} and ${secondaryErrorMessage}`
+
+        consola.warn(
+          `[i18n] ${messageId} in ${modulePath} cannot be parsed due to ${reason}. It will be skipped.`
+        )
+      }
     },
   },
   turnstile: {
