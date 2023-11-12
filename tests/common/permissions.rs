@@ -175,6 +175,7 @@ impl<'a> PermissionsTest<'a> {
 
         let resp = test_env.call(request).await;
         if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
+            println!("Body: {:?}", resp.response().body());
             return Err(format!(
                 "Failure permissions test failed. Expected failure codes {} got {}",
                 self.allowed_failure_codes
@@ -206,6 +207,7 @@ impl<'a> PermissionsTest<'a> {
 
         let resp = test_env.call(request).await;
         if !resp.status().is_success() {
+            println!("Body: {:?}", resp.response().body());
             return Err(format!(
                 "Success permissions test failed. Expected success, got {}",
                 resp.status().as_u16()
@@ -673,8 +675,7 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        tokio::try_join!(test_1, test_2, test_3, test_4, test_5, test_6, test_7,)
-            .map_err(|e| e.to_string())?;
+        tokio::try_join!(test_1, test_2, test_3, test_4, test_5, test_6, test_7,).map_err(|e| e)?;
 
         Ok(())
     }
@@ -837,7 +838,7 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        tokio::try_join!(test_1, test_2, test_3,).map_err(|e| e.to_string())?;
+        tokio::try_join!(test_1, test_2, test_3,).map_err(|e| e)?;
 
         Ok(())
     }

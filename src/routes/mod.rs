@@ -11,6 +11,8 @@ use futures::FutureExt;
 pub mod v2;
 pub mod v3;
 
+pub mod v2_reroute;
+
 mod analytics;
 mod index;
 mod maven;
@@ -118,6 +120,8 @@ pub enum ApiError {
     PasswordStrengthCheck(#[from] zxcvbn::ZxcvbnError),
     #[error("{0}")]
     Mail(#[from] crate::auth::email::MailError),
+    #[error("Error while rerouting request: {0}")]
+    Reroute(#[from] reqwest::Error),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -144,6 +148,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::PasswordHashing(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::PasswordStrengthCheck(..) => StatusCode::BAD_REQUEST,
             ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -171,6 +176,7 @@ impl actix_web::ResponseError for ApiError {
                 ApiError::PasswordStrengthCheck(..) => "strength_check_error",
                 ApiError::Mail(..) => "mail_error",
                 ApiError::Clickhouse(..) => "clickhouse_error",
+                ApiError::Reroute(..) => "reroute_error",
             },
             description: &self.to_string(),
         })

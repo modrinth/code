@@ -135,7 +135,7 @@ pub fn app_setup(
         }
     });
 
-    scheduler::schedule_versions(&mut scheduler, pool.clone());
+    scheduler::schedule_versions(&mut scheduler, pool.clone(), redis_pool.clone());
 
     let session_queue = web::Data::new(AuthQueue::new());
 
@@ -159,7 +159,7 @@ pub fn app_setup(
 
     let reader = maxmind.clone();
     {
-        let reader_ref = reader.clone();
+        let reader_ref = reader;
         scheduler.run(std::time::Duration::from_secs(60 * 60 * 24), move || {
             let reader_ref = reader_ref.clone();
 

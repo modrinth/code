@@ -1,25 +1,24 @@
 #![allow(dead_code)]
+use std::io::{Cursor, Write};
+
 use actix_http::StatusCode;
 use actix_web::test::{self, TestRequest};
-use labrinth::{
-    models::projects::Project,
-    models::{
-        oauth_clients::OAuthClient, organizations::Organization, pats::Scopes, projects::Version,
-    },
+use labrinth::models::{
+    oauth_clients::OAuthClient,
+    organizations::Organization,
+    pats::Scopes,
+    v2::projects::{LegacyProject, LegacyVersion},
 };
 use serde_json::json;
 use sqlx::Executor;
+use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
-use crate::common::{actix::AppendsMultipart, database::USER_USER_PAT};
+use crate::common::database::USER_USER_PAT;
+use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 
-use super::{
-    actix::{MultipartSegment, MultipartSegmentData},
-    asserts::assert_status,
-    database::USER_USER_ID,
-    environment::TestEnvironment,
-    get_json_val_str,
-    request_data::get_public_project_creation_data,
-};
+use super::{environment::TestEnvironment, request_data::get_public_project_creation_data};
+
+use super::{asserts::assert_status, database::USER_USER_ID, get_json_val_str};
 
 pub const DUMMY_DATA_UPDATE: i64 = 3;
 
@@ -37,13 +36,107 @@ pub const DUMMY_CATEGORIES: &[&str] = &[
 pub const DUMMY_OAUTH_CLIENT_ALPHA_SECRET: &str = "abcdefghijklmnopqrstuvwxyz";
 
 #[allow(dead_code)]
-pub enum DummyJarFile {
+pub enum TestFile {
     DummyProjectAlpha,
     DummyProjectBeta,
     BasicMod,
     BasicModDifferent,
+    // Randomly generates a valid .jar with a random hash.
+    // Unlike the other dummy jar files, this one is not a static file.
+    // and BasicModRandom.bytes() will return a different file each time.
+    BasicModRandom { filename: String, bytes: Vec<u8> },
+    BasicModpackRandom { filename: String, bytes: Vec<u8> },
 }
 
+impl TestFile {
+    pub fn build_random_jar() -> Self {
+        let filename = format!("random-mod-{}.jar", rand::random::<u64>());
+
+        let fabric_mod_json = serde_json::json!({
+            "schemaVersion": 1,
+            "id": filename,
+            "version": "1.0.1",
+
+            "name": filename,
+            "description": "Does nothing",
+            "authors": [
+              "user"
+            ],
+            "contact": {
+              "homepage": "https://www.modrinth.com",
+              "sources": "https://www.modrinth.com",
+              "issues": "https://www.modrinth.com"
+            },
+
+            "license": "MIT",
+            "icon": "none.png",
+
+            "environment": "client",
+            "entrypoints": {
+              "main": [
+                "io.github.modrinth.Modrinth"
+              ]
+            },
+            "depends": {
+              "minecraft": ">=1.20-"
+            }
+          }
+        )
+        .to_string();
+
+        // Create a simulated zip file
+        let mut cursor = Cursor::new(Vec::new());
+        {
+            let mut zip = ZipWriter::new(&mut cursor);
+            zip.start_file(
+                "fabric.mod.json",
+                FileOptions::default().compression_method(CompressionMethod::Stored),
+            )
+            .unwrap();
+            zip.write_all(fabric_mod_json.as_bytes()).unwrap();
+            zip.finish().unwrap();
+        }
+        let bytes = cursor.into_inner();
+
+        TestFile::BasicModRandom { filename, bytes }
+    }
+
+    pub fn build_random_mrpack() -> Self {
+        let filename = format!("random-modpack-{}.mrpack", rand::random::<u64>());
+
+        let modrinth_index_json = serde_json::json!({
+            "formatVersion": 1,
+            "game": "minecraft",
+            "versionId": "1.20.1-9.6",
+            "name": filename,
+            "files": [],
+            "dependencies": {
+                "fabric-loader": "0.14.22",
+                "minecraft": "1.20.1"
+            }
+        }
+        )
+        .to_string();
+
+        // Create a simulated zip file
+        let mut cursor = Cursor::new(Vec::new());
+        {
+            let mut zip = ZipWriter::new(&mut cursor);
+            zip.start_file(
+                "modrinth.index.json",
+                FileOptions::default().compression_method(CompressionMethod::Stored),
+            )
+            .unwrap();
+            zip.write_all(modrinth_index_json.as_bytes()).unwrap();
+            zip.finish().unwrap();
+        }
+        let bytes = cursor.into_inner();
+
+        TestFile::BasicModpackRandom { filename, bytes }
+    }
+}
+
+#[derive(Clone)]
 #[allow(dead_code)]
 pub enum DummyImage {
     SmallIcon, // 200x200
@@ -77,10 +170,10 @@ pub struct DummyData {
 
 impl DummyData {
     pub fn new(
-        project_alpha: Project,
-        project_alpha_version: Version,
-        project_beta: Project,
-        project_beta_version: Version,
+        project_alpha: LegacyProject,
+        project_alpha_version: LegacyVersion,
+        project_beta: LegacyProject,
+        project_beta_version: LegacyVersion,
         organization_zeta: Organization,
         oauth_client_alpha: OAuthClient,
     ) -> Self {
@@ -210,21 +303,21 @@ pub async fn get_dummy_data(test_env: &TestEnvironment) -> DummyData {
     )
 }
 
-pub async fn add_project_alpha(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn add_project_alpha(test_env: &TestEnvironment) -> (LegacyProject, LegacyVersion) {
     let (project, versions) = test_env
         .v2
         .add_public_project(
-            get_public_project_creation_data("alpha", Some(DummyJarFile::DummyProjectAlpha)),
+            get_public_project_creation_data("alpha", Some(TestFile::DummyProjectAlpha)),
             USER_USER_PAT,
         )
         .await;
     (project, versions.into_iter().next().unwrap())
 }
 
-pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn add_project_beta(test_env: &TestEnvironment) -> (LegacyProject, LegacyVersion) {
     // Adds dummy data to the database with sqlx (projects, versions, threads)
     // Generate test project data.
-    let jar = DummyJarFile::DummyProjectBeta;
+    let jar = TestFile::DummyProjectBeta;
     let json_data = json!(
         {
             "title": "Test Project Beta",
@@ -298,14 +391,14 @@ pub async fn add_organization_zeta(test_env: &TestEnvironment) -> Organization {
     get_organization_zeta(test_env).await
 }
 
-pub async fn get_project_alpha(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn get_project_alpha(test_env: &TestEnvironment) -> (LegacyProject, LegacyVersion) {
     // Get project
     let req = TestRequest::get()
         .uri("/v2/project/alpha")
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
     let resp = test_env.call(req).await;
-    let project: Project = test::read_body_json(resp).await;
+    let project: LegacyProject = test::read_body_json(resp).await;
 
     // Get project's versions
     let req = TestRequest::get()
@@ -313,13 +406,13 @@ pub async fn get_project_alpha(test_env: &TestEnvironment) -> (Project, Version)
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
     let resp = test_env.call(req).await;
-    let versions: Vec<Version> = test::read_body_json(resp).await;
+    let versions: Vec<LegacyVersion> = test::read_body_json(resp).await;
     let version = versions.into_iter().next().unwrap();
 
     (project, version)
 }
 
-pub async fn get_project_beta(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn get_project_beta(test_env: &TestEnvironment) -> (LegacyProject, LegacyVersion) {
     // Get project
     let req = TestRequest::get()
         .uri("/v2/project/beta")
@@ -327,7 +420,8 @@ pub async fn get_project_beta(test_env: &TestEnvironment) -> (Project, Version) 
         .to_request();
     let resp = test_env.call(req).await;
     assert_status(&resp, StatusCode::OK);
-    let project: Project = test::read_body_json(resp).await;
+    let project: serde_json::Value = test::read_body_json(resp).await;
+    let project: LegacyProject = serde_json::from_value(project).unwrap();
 
     // Get project's versions
     let req = TestRequest::get()
@@ -336,7 +430,7 @@ pub async fn get_project_beta(test_env: &TestEnvironment) -> (Project, Version) 
         .to_request();
     let resp = test_env.call(req).await;
     assert_status(&resp, StatusCode::OK);
-    let versions: Vec<Version> = test::read_body_json(resp).await;
+    let versions: Vec<LegacyVersion> = test::read_body_json(resp).await;
     let version = versions.into_iter().next().unwrap();
 
     (project, version)
@@ -362,30 +456,47 @@ pub async fn get_oauth_client_alpha(test_env: &TestEnvironment) -> OAuthClient {
     oauth_clients.into_iter().next().unwrap()
 }
 
-impl DummyJarFile {
+impl TestFile {
     pub fn filename(&self) -> String {
         match self {
-            DummyJarFile::DummyProjectAlpha => "dummy-project-alpha.jar",
-            DummyJarFile::DummyProjectBeta => "dummy-project-beta.jar",
-            DummyJarFile::BasicMod => "basic-mod.jar",
-            DummyJarFile::BasicModDifferent => "basic-mod-different.jar",
+            TestFile::DummyProjectAlpha => "dummy-project-alpha.jar",
+            TestFile::DummyProjectBeta => "dummy-project-beta.jar",
+            TestFile::BasicMod => "basic-mod.jar",
+            TestFile::BasicModDifferent => "basic-mod-different.jar",
+            TestFile::BasicModRandom { filename, .. } => filename,
+            TestFile::BasicModpackRandom { filename, .. } => filename,
         }
         .to_string()
     }
 
     pub fn bytes(&self) -> Vec<u8> {
         match self {
-            DummyJarFile::DummyProjectAlpha => {
+            TestFile::DummyProjectAlpha => {
                 include_bytes!("../../tests/files/dummy-project-alpha.jar").to_vec()
             }
-            DummyJarFile::DummyProjectBeta => {
+            TestFile::DummyProjectBeta => {
                 include_bytes!("../../tests/files/dummy-project-beta.jar").to_vec()
             }
-            DummyJarFile::BasicMod => include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
-            DummyJarFile::BasicModDifferent => {
+            TestFile::BasicMod => include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
+            TestFile::BasicModDifferent => {
                 include_bytes!("../../tests/files/basic-mod-different.jar").to_vec()
             }
+            TestFile::BasicModRandom { bytes, .. } => bytes.clone(),
+            TestFile::BasicModpackRandom { bytes, .. } => bytes.clone(),
         }
+    }
+
+    pub fn project_type(&self) -> String {
+        match self {
+            TestFile::DummyProjectAlpha => "mod",
+            TestFile::DummyProjectBeta => "mod",
+            TestFile::BasicMod => "mod",
+            TestFile::BasicModDifferent => "mod",
+            TestFile::BasicModRandom { .. } => "mod",
+
+            TestFile::BasicModpackRandom { .. } => "modpack",
+        }
+        .to_string()
     }
 }
 

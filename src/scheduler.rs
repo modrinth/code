@@ -38,15 +38,20 @@ impl Drop for Scheduler {
 
 use log::{info, warn};
 
-pub fn schedule_versions(scheduler: &mut Scheduler, pool: sqlx::Pool<sqlx::Postgres>) {
+pub fn schedule_versions(
+    scheduler: &mut Scheduler,
+    pool: sqlx::Pool<sqlx::Postgres>,
+    redis: RedisPool,
+) {
     let version_index_interval =
         std::time::Duration::from_secs(parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800));
 
     scheduler.run(version_index_interval, move || {
         let pool_ref = pool.clone();
+        let redis = redis.clone();
         async move {
             info!("Indexing game versions list from Mojang");
-            let result = update_versions(&pool_ref).await;
+            let result = update_versions(&pool_ref, &redis).await;
             if let Err(e) = result {
                 warn!("Version update failed: {}", e);
             }
@@ -65,7 +70,10 @@ pub enum VersionIndexingError {
     DatabaseError(#[from] crate::database::models::DatabaseError),
 }
 
-use crate::util::env::parse_var;
+use crate::{
+    database::{models::legacy_loader_fields::MinecraftGameVersion, redis::RedisPool},
+    util::env::parse_var,
+};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use tokio_stream::wrappers::IntervalStream;
@@ -84,7 +92,10 @@ struct VersionFormat<'a> {
     release_time: DateTime<Utc>,
 }
 
-async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), VersionIndexingError> {
+async fn update_versions(
+    pool: &sqlx::Pool<sqlx::Postgres>,
+    redis: &RedisPool,
+) -> Result<(), VersionIndexingError> {
     let input = reqwest::get("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json")
         .await?
         .json::<InputFormat>()
@@ -168,7 +179,7 @@ async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), Versio
             _ => "other",
         };
 
-        crate::database::models::categories::GameVersion::builder()
+        MinecraftGameVersion::builder()
             .version(&name)?
             .version_type(type_)?
             .created(
@@ -180,7 +191,7 @@ async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), Versio
                     &version.release_time
                 },
             )
-            .insert(pool)
+            .insert(pool, redis)
             .await?;
     }
 

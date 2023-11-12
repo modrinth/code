@@ -6,6 +6,7 @@ use sqlx::PgPool;
 
 use crate::auth::{filter_authorized_versions, get_user_from_headers, is_authorized};
 use crate::database;
+use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::projects::VersionType;
@@ -95,19 +96,29 @@ pub async fn forge_updates(
     };
 
     for version in versions {
+        // For forge in particular, we will hardcode it to use GameVersions rather than generic loader fields, as this is minecraft-java exclusive
+        // Will have duplicates between game_versions (for non-forge loaders), but that's okay as
+        // before v3 this was stored to the project and not the version
+        let game_versions: Vec<String> = version
+            .fields
+            .iter()
+            .find(|(key, _)| key.as_str() == MinecraftGameVersion::FIELD_NAME)
+            .and_then(|(_, value)| serde_json::from_value::<Vec<String>>(value.clone()).ok())
+            .unwrap_or_default();
+
         if version.version_type == VersionType::Release {
-            for game_version in &version.game_versions {
+            for game_version in &game_versions {
                 response
                     .promos
-                    .entry(format!("{}-recommended", game_version.0))
+                    .entry(format!("{}-recommended", game_version))
                     .or_insert_with(|| version.version_number.clone());
             }
         }
 
-        for game_version in &version.game_versions {
+        for game_version in &game_versions {
             response
                 .promos
-                .entry(format!("{}-latest", game_version.0))
+                .entry(format!("{}-latest", game_version))
                 .or_insert_with(|| version.version_number.clone());
         }
     }

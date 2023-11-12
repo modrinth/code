@@ -7,6 +7,7 @@ use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::cmp::min;
+use std::collections::HashMap;
 use std::fmt::Write;
 use thiserror::Error;
 
@@ -71,6 +72,7 @@ impl SearchConfig {
 /// This contains some extra data that is not returned by search results.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
+    pub version_id: String,
     pub project_id: String,
     pub project_type: String,
     pub slug: Option<String>,
@@ -79,14 +81,10 @@ pub struct UploadSearchProject {
     pub description: String,
     pub categories: Vec<String>,
     pub display_categories: Vec<String>,
-    pub versions: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
     pub icon_url: String,
-    pub latest_version: String,
     pub license: String,
-    pub client_side: String,
-    pub server_side: String,
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     /// RFC 3339 formatted creation date of the project
@@ -99,6 +97,9 @@ pub struct UploadSearchProject {
     pub modified_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
+
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -111,6 +112,7 @@ pub struct SearchResults {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResultSearchProject {
+    pub version_id: String,
     pub project_id: String,
     pub project_type: String,
     pub slug: Option<String>,
@@ -119,7 +121,6 @@ pub struct ResultSearchProject {
     pub description: String,
     pub categories: Vec<String>,
     pub display_categories: Vec<String>,
-    pub versions: Vec<String>,
     pub downloads: i32,
     pub follows: i32,
     pub icon_url: String,
@@ -127,13 +128,24 @@ pub struct ResultSearchProject {
     pub date_created: String,
     /// RFC 3339 formatted modification date of the project
     pub date_modified: String,
-    pub latest_version: String,
     pub license: String,
-    pub client_side: String,
-    pub server_side: String,
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+
+    #[serde(flatten)]
+    pub loader_fields: HashMap<String, Vec<String>>,
+}
+
+pub fn get_sort_index(index: &str) -> Result<(&str, [&str; 1]), SearchError> {
+    Ok(match index {
+        "relevance" => ("projects", ["downloads:desc"]),
+        "downloads" => ("projects_filtered", ["downloads:desc"]),
+        "follows" => ("projects", ["follows:desc"]),
+        "updated" => ("projects", ["date_modified:desc"]),
+        "newest" => ("projects", ["date_created:desc"]),
+        i => return Err(SearchError::InvalidIndex(i.to_string())),
+    })
 }
 
 pub async fn search_for_project(
@@ -146,14 +158,7 @@ pub async fn search_for_project(
     let index = info.index.as_deref().unwrap_or("relevance");
     let limit = info.limit.as_deref().unwrap_or("10").parse()?;
 
-    let sort = match index {
-        "relevance" => ("projects", ["downloads:desc"]),
-        "downloads" => ("projects_filtered", ["downloads:desc"]),
-        "follows" => ("projects", ["follows:desc"]),
-        "updated" => ("projects", ["date_modified:desc"]),
-        "newest" => ("projects", ["date_created:desc"]),
-        i => return Err(SearchError::InvalidIndex(i.to_string())),
-    };
+    let sort = get_sort_index(index)?;
 
     let meilisearch_index = client.get_index(sort.0).await?;
 

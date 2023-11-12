@@ -1,10 +1,7 @@
-use crate::auth::get_user_from_headers;
-use crate::database;
 use crate::database::redis::RedisPool;
 use crate::models::ids::NotificationId;
-use crate::models::notifications::Notification;
-use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
+use crate::routes::v3;
 use crate::routes::ApiError;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -36,36 +33,14 @@ pub async fn notifications_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::NOTIFICATION_READ]),
+    v3::notifications::notifications_get(
+        req,
+        web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
+        pool,
+        redis,
+        session_queue,
     )
-    .await?
-    .1;
-
-    use database::models::notification_item::Notification as DBNotification;
-    use database::models::NotificationId as DBNotificationId;
-
-    let notification_ids: Vec<DBNotificationId> =
-        serde_json::from_str::<Vec<NotificationId>>(ids.ids.as_str())?
-            .into_iter()
-            .map(DBNotificationId::from)
-            .collect();
-
-    let notifications_data: Vec<DBNotification> =
-        database::models::notification_item::Notification::get_many(&notification_ids, &**pool)
-            .await?;
-
-    let notifications: Vec<Notification> = notifications_data
-        .into_iter()
-        .filter(|n| n.user_id == user.id.into() || user.role.is_admin())
-        .map(Notification::from)
-        .collect();
-
-    Ok(HttpResponse::Ok().json(notifications))
+    .await
 }
 
 #[get("{id}")]
@@ -76,30 +51,7 @@ pub async fn notification_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::NOTIFICATION_READ]),
-    )
-    .await?
-    .1;
-
-    let id = info.into_inner().0;
-
-    let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
-
-    if let Some(data) = notification_data {
-        if user.id == data.user_id.into() || user.role.is_admin() {
-            Ok(HttpResponse::Ok().json(Notification::from(data)))
-        } else {
-            Ok(HttpResponse::NotFound().body(""))
-        }
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
+    v3::notifications::notification_get(req, info, pool, redis, session_queue).await
 }
 
 #[patch("{id}")]
@@ -110,43 +62,7 @@ pub async fn notification_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
-    )
-    .await?
-    .1;
-
-    let id = info.into_inner().0;
-
-    let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
-
-    if let Some(data) = notification_data {
-        if data.user_id == user.id.into() || user.role.is_admin() {
-            let mut transaction = pool.begin().await?;
-
-            database::models::notification_item::Notification::read(
-                id.into(),
-                &mut transaction,
-                &redis,
-            )
-            .await?;
-
-            transaction.commit().await?;
-
-            Ok(HttpResponse::NoContent().body(""))
-        } else {
-            Err(ApiError::CustomAuthentication(
-                "You are not authorized to read this notification!".to_string(),
-            ))
-        }
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
+    v3::notifications::notification_read(req, info, pool, redis, session_queue).await
 }
 
 #[delete("{id}")]
@@ -157,43 +73,7 @@ pub async fn notification_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
-    )
-    .await?
-    .1;
-
-    let id = info.into_inner().0;
-
-    let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
-
-    if let Some(data) = notification_data {
-        if data.user_id == user.id.into() || user.role.is_admin() {
-            let mut transaction = pool.begin().await?;
-
-            database::models::notification_item::Notification::remove(
-                id.into(),
-                &mut transaction,
-                &redis,
-            )
-            .await?;
-
-            transaction.commit().await?;
-
-            Ok(HttpResponse::NoContent().body(""))
-        } else {
-            Err(ApiError::CustomAuthentication(
-                "You are not authorized to delete this notification!".to_string(),
-            ))
-        }
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
+    v3::notifications::notification_delete(req, info, pool, redis, session_queue).await
 }
 
 #[patch("notifications")]
@@ -204,45 +84,14 @@ pub async fn notifications_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
+    v3::notifications::notifications_read(
+        req,
+        web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
+        pool,
+        redis,
+        session_queue,
     )
-    .await?
-    .1;
-
-    let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect::<Vec<_>>();
-
-    let mut transaction = pool.begin().await?;
-
-    let notifications_data =
-        database::models::notification_item::Notification::get_many(&notification_ids, &**pool)
-            .await?;
-
-    let mut notifications: Vec<database::models::ids::NotificationId> = Vec::new();
-
-    for notification in notifications_data {
-        if notification.user_id == user.id.into() || user.role.is_admin() {
-            notifications.push(notification.id);
-        }
-    }
-
-    database::models::notification_item::Notification::read_many(
-        &notifications,
-        &mut transaction,
-        &redis,
-    )
-    .await?;
-
-    transaction.commit().await?;
-
-    Ok(HttpResponse::NoContent().body(""))
+    .await
 }
 
 #[delete("notifications")]
@@ -253,43 +102,12 @@ pub async fn notifications_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::NOTIFICATION_WRITE]),
+    v3::notifications::notifications_delete(
+        req,
+        web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
+        pool,
+        redis,
+        session_queue,
     )
-    .await?
-    .1;
-
-    let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect::<Vec<_>>();
-
-    let mut transaction = pool.begin().await?;
-
-    let notifications_data =
-        database::models::notification_item::Notification::get_many(&notification_ids, &**pool)
-            .await?;
-
-    let mut notifications: Vec<database::models::ids::NotificationId> = Vec::new();
-
-    for notification in notifications_data {
-        if notification.user_id == user.id.into() || user.role.is_admin() {
-            notifications.push(notification.id);
-        }
-    }
-
-    database::models::notification_item::Notification::remove_many(
-        &notifications,
-        &mut transaction,
-        &redis,
-    )
-    .await?;
-
-    transaction.commit().await?;
-
-    Ok(HttpResponse::NoContent().body(""))
+    .await
 }

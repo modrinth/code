@@ -9,12 +9,12 @@ pub(crate) mod project_creation;
 mod projects;
 mod reports;
 mod statistics;
-mod tags;
+pub mod tags;
 mod teams;
 mod threads;
 mod users;
 mod version_creation;
-mod version_file;
+pub mod version_file;
 mod versions;
 
 pub use super::ApiError;

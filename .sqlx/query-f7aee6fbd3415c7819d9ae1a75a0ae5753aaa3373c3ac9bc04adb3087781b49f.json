@@ -1,0 +1,148 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,\n                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n                ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,\n                ARRAY_AGG(DISTINCT g.name) filter (where g.name is not null) games,\n                JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,\n                JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,\n                JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies,\n                \n                JSONB_AGG(\n                    DISTINCT jsonb_build_object(\n                    'field_id', vf.field_id,\n                    'int_value', vf.int_value,\n                    'enum_value', vf.enum_value,\n                    'string_value', vf.string_value\n                    )\n                ) filter (where vf.field_id is not null) version_fields,\n                JSONB_AGG(\n                    DISTINCT jsonb_build_object(\n                        'lf_id', lf.id,\n                        'loader_name', l.loader,\n                        'field', lf.field,\n                        'field_type', lf.field_type,\n                        'enum_type', lf.enum_type,\n                        'min_val', lf.min_val,\n                        'max_val', lf.max_val,\n                        'optional', lf.optional\n                    )\n                ) filter (where lf.id is not null) loader_fields,\n                JSONB_AGG(\n                    DISTINCT jsonb_build_object(\n                        'id', lfev.id,\n                        'enum_id', lfev.enum_id,\n                        'value', lfev.value,\n                        'ordering', lfev.ordering,\n                        'created', lfev.created,\n                        'metadata', lfev.metadata\n                    )  \n                ) filter (where lfev.id is not null) loader_field_enum_values\n                                    \n                FROM versions v\n                LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n                LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n                LEFT OUTER JOIN loaders_project_types lpt on l.id = lpt.joining_loader_id\n                LEFT JOIN project_types pt on lpt.joining_project_type_id = pt.id\n                LEFT OUTER JOIN loaders_project_types_games lptg on l.id = lptg.loader_id AND pt.id = lptg.project_type_id\n                LEFT JOIN games g on lptg.game_id = g.id\n                LEFT OUTER JOIN files f on v.id = f.version_id\n                LEFT OUTER JOIN hashes h on f.id = h.file_id\n                LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n                LEFT OUTER JOIN version_fields vf on v.id = vf.version_id\n                LEFT OUTER JOIN loader_fields lf on vf.field_id = lf.id\n                LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id\n                LEFT OUTER JOIN loader_field_enum_values lfev on lfe.id = lfev.enum_id\n\n                WHERE v.id = ANY($1)\n                GROUP BY v.id\n                ORDER BY v.ordering ASC NULLS LAST, v.date_published ASC;\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "author_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 3,
+        "name": "version_name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "version_number",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "changelog",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "date_published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 8,
+        "name": "version_type",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 9,
+        "name": "featured",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 10,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 11,
+        "name": "requested_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "ordering",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 13,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 14,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 15,
+        "name": "games",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 16,
+        "name": "files",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 17,
+        "name": "hashes",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 18,
+        "name": "dependencies",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 19,
+        "name": "version_fields",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 20,
+        "name": "loader_fields",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 21,
+        "name": "loader_field_enum_values",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "f7aee6fbd3415c7819d9ae1a75a0ae5753aaa3373c3ac9bc04adb3087781b49f"
+}

@@ -35,7 +35,7 @@ use crate::{
         pats::Scopes,
     },
     queue::session::AuthQueue,
-    routes::v2::project_creation::CreateError,
+    routes::v3::project_creation::CreateError,
     util::validate::validation_errors_to_string,
 };
 

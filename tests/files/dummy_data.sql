@@ -19,22 +19,43 @@ INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (52, 
 INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (53, 4, 'friend-pat', 'mrp_patfriend', $1, '2030-08-18 15:48:58.435729+00');
 INSERT INTO pats (id, user_id, name, access_token, scopes, expires) VALUES (54, 5, 'enemy-pat', 'mrp_patenemy', $1, '2030-08-18 15:48:58.435729+00');
 
--- -- Sample game versions, loaders, categories
-INSERT INTO game_versions (id, version, type, created)
-VALUES (20000, '1.20.1', 'release', timezone('utc', now()));
+INSERT INTO loaders (id, loader) VALUES (5, 'fabric');
+INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) VALUES (5,1);
 
-INSERT INTO loaders (id, loader) VALUES (1, 'fabric');
-INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) VALUES (1,1);
-INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) VALUES (1,2); 
+INSERT INTO loaders (id, loader) VALUES (6, 'forge');
+INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) VALUES (6,1);
+
+-- Adds dummies to mrpack_loaders
+INSERT INTO loader_field_enum_values (enum_id, value) SELECT id, 'fabric' FROM loader_field_enums WHERE enum_name = 'mrpack_loaders';
+INSERT INTO loader_field_enum_values (enum_id, value) SELECT id, 'forge' FROM loader_field_enums WHERE enum_name = 'mrpack_loaders';
+
+INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id) SELECT joining_loader_id, joining_project_type_id, 1 FROM loaders_project_types WHERE joining_loader_id = 5;
+INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id) SELECT joining_loader_id, joining_project_type_id, 1 FROM loaders_project_types WHERE joining_loader_id = 6;
+
+-- Sample game versions, loaders, categories
+-- Game versions is '2'
+INSERT INTO loader_field_enum_values(enum_id, value, metadata)
+VALUES (2, '1.20.1', '{"type":"release","major":false}');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata)
+VALUES (2, '1.20.2', '{"type":"release","major":false}');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata)
+VALUES (2, '1.20.3', '{"type":"release","major":false}');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata)
+VALUES (2, '1.20.4', '{"type":"beta","major":false}');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata)
+VALUES (2, '1.20.5', '{"type":"release","major":true}');
+
+INSERT INTO loader_fields_loaders(loader_id, loader_field_id) 
+SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field = 'game_versions' OR lf.field = 'client_side' OR lf.field = 'server_side';
 
 INSERT INTO categories (id, category, project_type) VALUES
-    (1, 'combat', 1),
-    (2, 'decoration', 1),
-    (3, 'economy', 1),
-    (4, 'food', 1),
-    (5, 'magic', 1),
-    (6, 'mobs', 1),
-    (7, 'optimization', 1);
+    (51, 'combat', 1),
+    (52, 'decoration', 1),
+    (53, 'economy', 1),
+    (54, 'food', 1),
+    (55, 'magic', 1),
+    (56, 'mobs', 1),
+    (57, 'optimization', 1);
 
 INSERT INTO categories (id, category, project_type) VALUES
     (101, 'combat', 2),

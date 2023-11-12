@@ -1,3 +1,4 @@
+pub mod actix;
 pub mod bitflag;
 pub mod captcha;
 pub mod cors;

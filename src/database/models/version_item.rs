@@ -1,4 +1,5 @@
 use super::ids::*;
+use super::loader_fields::VersionField;
 use super::DatabaseError;
 use crate::database::redis::RedisPool;
 use crate::models::projects::{FileType, VersionStatus};
@@ -9,7 +10,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::iter;
 
-const VERSIONS_NAMESPACE: &str = "versions";
+pub const VERSIONS_NAMESPACE: &str = "versions";
 const VERSION_FILES_NAMESPACE: &str = "versions_files";
 
 #[derive(Clone)]
@@ -22,8 +23,8 @@ pub struct VersionBuilder {
     pub changelog: String,
     pub files: Vec<VersionFileBuilder>,
     pub dependencies: Vec<DependencyBuilder>,
-    pub game_versions: Vec<GameVersionId>,
     pub loaders: Vec<LoaderId>,
+    pub version_fields: Vec<VersionField>,
     pub version_type: String,
     pub featured: bool,
     pub status: VersionStatus,
@@ -234,7 +235,6 @@ impl VersionBuilder {
         let VersionBuilder {
             dependencies,
             loaders,
-            game_versions,
             files,
             version_id,
             ..
@@ -249,17 +249,13 @@ impl VersionBuilder {
             .collect_vec();
         LoaderVersion::insert_many(loader_versions, transaction).await?;
 
-        let game_version_versions = game_versions
-            .iter()
-            .map(|v| VersionVersion::new(*v, version_id))
-            .collect_vec();
-        VersionVersion::insert_many(game_version_versions, transaction).await?;
+        VersionField::insert_many(self.version_fields, transaction).await?;
 
         Ok(self.version_id)
     }
 }
 
-#[derive(derive_new::new)]
+#[derive(derive_new::new, Serialize, Deserialize)]
 pub struct LoaderVersion {
     pub loader_id: LoaderId,
     pub version_id: VersionId,
@@ -280,36 +276,6 @@ impl LoaderVersion {
             SELECT * FROM UNNEST($1::integer[], $2::bigint[])
             ",
             &loader_ids[..],
-            &version_ids[..],
-        )
-        .execute(&mut **transaction)
-        .await?;
-
-        Ok(())
-    }
-}
-
-#[derive(derive_new::new)]
-pub struct VersionVersion {
-    pub game_version_id: GameVersionId,
-    pub joining_version_id: VersionId,
-}
-
-impl VersionVersion {
-    pub async fn insert_many(
-        items: Vec<Self>,
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<(), DatabaseError> {
-        let (game_version_ids, version_ids): (Vec<_>, Vec<_>) = items
-            .into_iter()
-            .map(|i| (i.game_version_id.0, i.joining_version_id.0))
-            .unzip();
-        sqlx::query!(
-            "
-            INSERT INTO game_versions_versions (game_version_id, joining_version_id)
-            SELECT * FROM UNNEST($1::integer[], $2::bigint[])
-            ",
-            &game_version_ids[..],
             &version_ids[..],
         )
         .execute(&mut **transaction)
@@ -401,8 +367,8 @@ impl Version {
 
         sqlx::query!(
             "
-            DELETE FROM game_versions_versions gvv
-            WHERE gvv.joining_version_id = $1
+            DELETE FROM version_fields vf
+            WHERE vf.version_id = $1
             ",
             id as VersionId,
         )
@@ -494,14 +460,11 @@ impl Version {
         .execute(&mut **transaction)
         .await?;
 
-        crate::database::models::Project::update_game_versions(
+        crate::database::models::Project::clear_cache(
             ProjectId(project_id.mod_id),
-            &mut *transaction,
-        )
-        .await?;
-        crate::database::models::Project::update_loaders(
-            ProjectId(project_id.mod_id),
-            &mut *transaction,
+            None,
+            None,
+            redis,
         )
         .await?;
 
@@ -559,19 +522,59 @@ impl Version {
                 SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                 v.changelog changelog, v.date_published date_published, v.downloads downloads,
                 v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
-                JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
                 ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+                ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
+                ARRAY_AGG(DISTINCT g.name) filter (where g.name is not null) games,
                 JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,
                 JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
-                JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
+                JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies,
+                
+                JSONB_AGG(
+                    DISTINCT jsonb_build_object(
+                    'field_id', vf.field_id,
+                    'int_value', vf.int_value,
+                    'enum_value', vf.enum_value,
+                    'string_value', vf.string_value
+                    )
+                ) filter (where vf.field_id is not null) version_fields,
+                JSONB_AGG(
+                    DISTINCT jsonb_build_object(
+                        'lf_id', lf.id,
+                        'loader_name', l.loader,
+                        'field', lf.field,
+                        'field_type', lf.field_type,
+                        'enum_type', lf.enum_type,
+                        'min_val', lf.min_val,
+                        'max_val', lf.max_val,
+                        'optional', lf.optional
+                    )
+                ) filter (where lf.id is not null) loader_fields,
+                JSONB_AGG(
+                    DISTINCT jsonb_build_object(
+                        'id', lfev.id,
+                        'enum_id', lfev.enum_id,
+                        'value', lfev.value,
+                        'ordering', lfev.ordering,
+                        'created', lfev.created,
+                        'metadata', lfev.metadata
+                    )  
+                ) filter (where lfev.id is not null) loader_field_enum_values
+                                    
                 FROM versions v
-                LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-                LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
                 LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
                 LEFT OUTER JOIN loaders l on lv.loader_id = l.id
+                LEFT OUTER JOIN loaders_project_types lpt on l.id = lpt.joining_loader_id
+                LEFT JOIN project_types pt on lpt.joining_project_type_id = pt.id
+                LEFT OUTER JOIN loaders_project_types_games lptg on l.id = lptg.loader_id AND pt.id = lptg.project_type_id
+                LEFT JOIN games g on lptg.game_id = g.id
                 LEFT OUTER JOIN files f on v.id = f.version_id
                 LEFT OUTER JOIN hashes h on f.id = h.file_id
                 LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
+                LEFT OUTER JOIN version_fields vf on v.id = vf.version_id
+                LEFT OUTER JOIN loader_fields lf on vf.field_id = lf.id
+                LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id
+                LEFT OUTER JOIN loader_field_enum_values lfev on lfe.id = lfev.enum_id
+
                 WHERE v.id = ANY($1)
                 GROUP BY v.id
                 ORDER BY v.ordering ASC NULLS LAST, v.date_published ASC;
@@ -664,24 +667,10 @@ impl Version {
 
                                 files
                             },
-                            game_versions: {
-                                #[derive(Deserialize)]
-                                struct GameVersion {
-                                    pub version: String,
-                                    pub created: DateTime<Utc>,
-                                }
-
-                                let mut game_versions: Vec<GameVersion> = serde_json::from_value(
-                                    v.game_versions.unwrap_or_default(),
-                                )
-                                    .ok()
-                                    .unwrap_or_default();
-
-                                game_versions.sort_by(|a, b| a.created.cmp(&b.created));
-
-                                game_versions.into_iter().map(|x| x.version).collect()
-                            },
+                            version_fields: VersionField::from_query_json(v.id, v.loader_fields, v.version_fields, v.loader_field_enum_values),
                             loaders: v.loaders.unwrap_or_default(),
+                            project_types: v.project_types.unwrap_or_default(),
+                            games: v.games.unwrap_or_default(),
                             dependencies: serde_json::from_value(
                                 v.dependencies.unwrap_or_default(),
                             )
@@ -751,7 +740,6 @@ impl Version {
                     .collect::<Vec<_>>(),
             )
             .await?;
-
         for file in files {
             if let Some(mut file) =
                 file.and_then(|x| serde_json::from_str::<Vec<SingleFile>>(&x).ok())
@@ -861,8 +849,10 @@ pub struct QueryVersion {
     pub inner: Version,
 
     pub files: Vec<QueryFile>,
-    pub game_versions: Vec<String>,
+    pub version_fields: Vec<VersionField>,
     pub loaders: Vec<String>,
+    pub project_types: Vec<String>,
+    pub games: Vec<String>,
     pub dependencies: Vec<QueryDependency>,
 }
 

@@ -114,7 +114,6 @@ pub fn generate_authorize_uri(
         optional_query_param("scope", scope),
         optional_query_param("state", state),
     )
-    .to_string()
 }
 
 pub async fn get_authorize_accept_flow_id(response: ServiceResponse) -> String {
