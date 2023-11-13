@@ -1,4 +1,4 @@
-# Icons
+# Avatars
 
 <DemoContainer class="columns">
 <Avatar size="lg" circle src="https://cdn.modrinth.com/user/MpxzqsyW/eb0038489a55e7e7a188a5b50462f0b10dfc1613.jpeg" />
