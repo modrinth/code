@@ -23,45 +23,37 @@
     <slot v-else />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { CheckIcon, DropdownIcon } from '@'
-</script>
-<script>
-import { defineComponent } from 'vue'
 
-export default defineComponent({
-  props: {
-    label: {
-      type: String,
-      default: '',
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    description: {
-      type: String,
-      default: '',
-    },
-    modelValue: Boolean,
-    clickEvent: {
-      type: Function,
-      default: () => {},
-    },
-    collapsingToggleStyle: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  emits: ['update:modelValue'],
-  methods: {
-    toggle() {
-      if (!this.disabled) {
-        this.$emit('update:modelValue', !this.modelValue)
-      }
-    },
-  },
-})
+const emit = defineEmits<{
+  'update:modelValue': [boolean]
+}>()
+
+const props = withDefaults(
+  defineProps<{
+    label: string
+    disabled?: boolean
+    description: string
+    modelValue: boolean
+    clickEvent?: () => void
+    collapsingToggleStyle?: boolean
+  }>(),
+  {
+    label: '',
+    disabled: false,
+    description: '',
+    modelValue: false,
+    clickEvent: () => {},
+    collapsingToggleStyle: false,
+  }
+)
+
+function toggle() {
+  if (!props.disabled) {
+    emit('update:modelValue', !props.modelValue)
+  }
+}
 </script>
 
 <style lang="scss" scoped>
