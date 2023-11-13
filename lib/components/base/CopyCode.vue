@@ -6,35 +6,24 @@
   </button>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref } from 'vue'
 import { CheckIcon, ClipboardCopyIcon } from '@'
 import { useVIntl, defineMessage } from '@vintl/vintl'
+
 const copiedMessage = defineMessage({
   id: 'omorphia.component.copy.action.copy',
   defaultMessage: 'Copy code to clipboard',
 })
 const { formatMessage } = useVIntl()
-</script>
 
-<script>
-export default {
-  props: {
-    text: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      copied: false,
-    }
-  },
-  methods: {
-    async copyText() {
-      await navigator.clipboard.writeText(this.text)
-      this.copied = true
-    },
-  },
+const props = defineProps<{ text: string }>()
+
+const copied = ref(false)
+
+async function copyText() {
+  await navigator.clipboard.writeText(props.text)
+  copied.value = true
 }
 </script>
 
