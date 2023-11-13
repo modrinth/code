@@ -406,18 +406,14 @@ const description =
 useSeoMeta({
   title: 'Modrinth',
   description,
-  publisher: 'Rinth, Inc.',
-  themeColor: [
-    { color: '#00af5c', media: '(prefers-color-scheme:light)' },
-    { color: '#1bd96a', media: '(prefers-color-scheme:dark)' },
-    { color: '#1bd96a' },
-  ],
+  publisher: 'Modrinth',
+  themeColor: [{ color: '#1bd96a' }],
   colorScheme: 'dark light',
 
   // OpenGraph
   ogTitle: 'Modrinth',
   ogSiteName: 'Modrinth',
-  ogDescription: description,
+  ogDescription: 'Discover and publish Minecraft content!',
   ogType: 'website',
   ogImage: 'https://cdn.modrinth.com/modrinth-new.png',
   ogUrl: link,
