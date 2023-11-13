@@ -1,6 +1,6 @@
 import { localeDefinitions } from '@modrinth/omorphia-dev/locales/index.js'
 import { createPlugin } from '@vintl/vintl/plugin'
-import Omorphia from 'omorphia'
+import { plugin as Omorphia } from 'omorphia'
 import DefaultTheme from 'vitepress/theme'
 import { createVNode } from 'vue'
 import DemoContainer from './DemoContainer.vue'
