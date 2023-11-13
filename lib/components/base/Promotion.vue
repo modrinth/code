@@ -26,20 +26,20 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { BisectIcon } from '@'
 
-const props = defineProps({
-  external: {
-    type: Boolean,
-    default: true,
-  },
-  queryParam: {
-    type: String,
-    default: '',
-  },
-})
+const props = withDefaults(
+  defineProps<{
+    external: boolean
+    queryParam: string
+  }>(),
+  {
+    external: true,
+    queryParam: '',
+  }
+)
 
 const target = computed(() => (props.external ? '_blank' : '_self'))
 </script>
