@@ -15,7 +15,7 @@
       :key="'page-' + item + '-' + index"
       :class="{
         'page-number': page !== item,
-        shrink: item > 99,
+        shrink: item !== '-' && item > 99,
       }"
       class="page-number-container"
     >
@@ -49,66 +49,56 @@
     </a>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import { computed } from 'vue'
 import { GapIcon, LeftArrowIcon, RightArrowIcon } from '@'
-</script>
-<script>
-import { defineComponent } from 'vue'
 
-export default defineComponent({
-  props: {
-    page: {
-      type: Number,
-      default: 1,
-    },
-    count: {
-      type: Number,
-      default: 1,
-    },
-    linkFunction: {
-      type: Function,
-      default() {
-        return null
-      },
-    },
-  },
-  emits: ['switch-page'],
-  computed: {
-    pages() {
-      let pages = []
+const emit = defineEmits<{
+  'switch-page': [page: number]
+}>()
 
-      if (this.count > 7) {
-        if (this.page + 3 >= this.count) {
-          pages = [
-            1,
-            '-',
-            this.count - 4,
-            this.count - 3,
-            this.count - 2,
-            this.count - 1,
-            this.count,
-          ]
-        } else if (this.page > 5) {
-          pages = [1, '-', this.page - 1, this.page, this.page + 1, '-', this.count]
-        } else {
-          pages = [1, 2, 3, 4, 5, '-', this.count]
-        }
-      } else {
-        pages = Array.from({ length: this.count }, (_, i) => i + 1)
-      }
+const props = withDefaults(
+  defineProps<{
+    page: number
+    count: number
+    linkFunction: (page: number) => string | undefined
+  }>(),
+  {
+    page: 1,
+    count: 1,
+    linkFunction: (page: number) => void page,
+  }
+)
 
-      return pages
-    },
-  },
-  methods: {
-    switchPage(newPage) {
-      this.$emit('switch-page', newPage)
-      if (newPage !== null && newPage !== '' && !isNaN(newPage)) {
-        this.$emit('switch-page', Math.min(Math.max(newPage, 1), this.count))
-      }
-    },
-  },
+const pages = computed(() => {
+  let pages: ('-' | number)[] = []
+
+  if (props.count > 7) {
+    if (props.page + 3 >= props.count) {
+      pages = [
+        1,
+        '-',
+        props.count - 4,
+        props.count - 3,
+        props.count - 2,
+        props.count - 1,
+        props.count,
+      ]
+    } else if (props.page > 5) {
+      pages = [1, '-', props.page - 1, props.page, props.page + 1, '-', props.count]
+    } else {
+      pages = [1, 2, 3, 4, 5, '-', props.count]
+    }
+  } else {
+    pages = Array.from({ length: props.count }, (_, i) => i + 1)
+  }
+
+  return pages
 })
+
+function switchPage(newPage: number) {
+  emit('switch-page', Math.min(Math.max(newPage, 1), props.count))
+}
 </script>
 
 <style scoped lang="scss">
