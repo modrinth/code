@@ -266,7 +266,7 @@ async fn test_patch_project_team_member() {
     let req = test::TestRequest::post()
         .uri(&format!("/v2/team/{alpha_team_id}/members"))
         .append_header(("Authorization", USER_USER_PAT))
-        .set_json(&json!({
+        .set_json(json!({
             "user_id": FRIEND_USER_ID,
             "permissions": (ProjectPermissions::EDIT_MEMBER | ProjectPermissions::EDIT_BODY).bits(),
         }))
@@ -408,7 +408,7 @@ async fn test_patch_organization_team_member() {
     let req = test::TestRequest::post()
         .uri(&format!("/v2/team/{zeta_team_id}/members"))
         .append_header(("Authorization", USER_USER_PAT))
-        .set_json(&json!({
+        .set_json(json!({
             "user_id": FRIEND_USER_ID,
             "organization_permissions": (OrganizationPermissions::EDIT_MEMBER | OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS).bits(),
         })).to_request();

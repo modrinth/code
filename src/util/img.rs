@@ -13,7 +13,7 @@ pub fn get_color_from_img(data: &[u8]) -> Result<Option<u32>, ImageError> {
         .crop_imm(128, 128, 64, 64);
     let color = color_thief::get_palette(image.to_rgb8().as_bytes(), ColorFormat::Rgb, 10, 2)
         .ok()
-        .and_then(|x| x.get(0).copied())
+        .and_then(|x| x.first().copied())
         .map(|x| (x.r as u32) << 16 | (x.g as u32) << 8 | (x.b as u32));
 
     Ok(color)

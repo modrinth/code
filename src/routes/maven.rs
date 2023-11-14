@@ -179,7 +179,7 @@ async fn find_version(
 
     // Try to parse version filters from version coords.
     let Some((vnumber, filter)) = vcoords.rsplit_once('-') else {
-        return Ok(exact_matches.get(0).map(|x| (*x).clone()));
+        return Ok(exact_matches.first().map(|x| (*x).clone()));
     };
 
     let db_loaders: HashSet<String> = Loader::list(pool, redis)
@@ -221,8 +221,8 @@ async fn find_version(
         .collect::<Vec<_>>();
 
     Ok(matched
-        .get(0)
-        .or_else(|| exact_matches.get(0))
+        .first()
+        .or_else(|| exact_matches.first())
         .copied()
         .cloned())
 }

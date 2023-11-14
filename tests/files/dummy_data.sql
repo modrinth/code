@@ -34,16 +34,22 @@ INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id) SE
 
 -- Sample game versions, loaders, categories
 -- Game versions is '2'
-INSERT INTO loader_field_enum_values(enum_id, value, metadata)
-VALUES (2, '1.20.1', '{"type":"release","major":false}');
-INSERT INTO loader_field_enum_values(enum_id, value, metadata)
-VALUES (2, '1.20.2', '{"type":"release","major":false}');
-INSERT INTO loader_field_enum_values(enum_id, value, metadata)
-VALUES (2, '1.20.3', '{"type":"release","major":false}');
-INSERT INTO loader_field_enum_values(enum_id, value, metadata)
-VALUES (2, '1.20.4', '{"type":"beta","major":false}');
-INSERT INTO loader_field_enum_values(enum_id, value, metadata)
-VALUES (2, '1.20.5', '{"type":"release","major":true}');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, created)
+VALUES (2, '1.20.1', '{"type":"release","major":false}', '2021-08-18 15:48:58.435729+00');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, created)
+VALUES (2, '1.20.2', '{"type":"release","major":false}', '2021-08-18 15:48:59.435729+00');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, created)
+VALUES (2, '1.20.3', '{"type":"release","major":false}', '2021-08-18 15:49:00.435729+00');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, created)
+VALUES (2, '1.20.4', '{"type":"beta","major":false}', '2021-08-18 15:49:01.435729+00');
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, created)
+VALUES (2, '1.20.5', '{"type":"release","major":true}', '2061-08-18 15:49:02.435729+00');
+
+-- Also add 'Ordering_Negative1' and 'Ordering_Positive100' to game versions (to test ordering override)
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, ordering)
+VALUES (2, 'Ordering_Negative1', '{"type":"release","major":false}', -1);
+INSERT INTO loader_field_enum_values(enum_id, value, metadata, ordering)
+VALUES (2, 'Ordering_Positive100', '{"type":"release","major":false}', 100);
 
 INSERT INTO loader_fields_loaders(loader_id, loader_field_id) 
 SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field = 'game_versions' OR lf.field = 'client_side' OR lf.field = 'server_side';

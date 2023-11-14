@@ -34,7 +34,7 @@ pub fn validation_errors_to_string(errors: ValidationErrors, adder: Option<Strin
                     output
                 }
                 ValidationErrorsKind::Field(errors) => {
-                    if let Some(error) = errors.get(0) {
+                    if let Some(error) = errors.first() {
                         if let Some(adder) = adder {
                             output.push_str(&format!(
                                 "Field {} {} failed validation with error: {}",

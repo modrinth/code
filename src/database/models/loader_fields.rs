@@ -341,6 +341,7 @@ impl LoaderFieldEnum {
             SELECT lfe.id, lfe.enum_name, lfe.ordering, lfe.hidable 
             FROM loader_field_enums lfe
             WHERE lfe.enum_name = $1
+            ORDER BY lfe.ordering ASC
             ",
             enum_name
         )
@@ -393,7 +394,7 @@ impl LoaderFieldEnumValue {
 
         let enum_ids = loader_fields
             .iter()
-            .filter_map(|x| get_enum_id(x))
+            .filter_map(get_enum_id)
             .collect::<Vec<_>>();
         let values = Self::list_many(&enum_ids, exec, redis)
             .await?
@@ -444,6 +445,7 @@ impl LoaderFieldEnumValue {
             "
             SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values
             WHERE enum_id = ANY($1)
+            ORDER BY enum_id, ordering, created DESC
             ",
             &remaining_enums
         )
@@ -465,7 +467,7 @@ impl LoaderFieldEnumValue {
         let cachable_enum_sets: Vec<(LoaderFieldEnumId, Vec<LoaderFieldEnumValue>)> = result
             .clone()
             .into_iter()
-            .group_by(|x| x.enum_id)
+            .group_by(|x| x.enum_id) // we sort by enum_id, so this will group all values of the same enum_id together
             .into_iter()
             .map(|(k, v)| (k, v.collect::<Vec<_>>().to_vec()))
             .collect();

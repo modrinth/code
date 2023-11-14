@@ -20,7 +20,7 @@ use super::{environment::TestEnvironment, request_data::get_public_project_creat
 
 use super::{asserts::assert_status, database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 3;
+pub const DUMMY_DATA_UPDATE: i64 = 5;
 
 #[allow(dead_code)]
 pub const DUMMY_CATEGORIES: &[&str] = &[

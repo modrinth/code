@@ -77,7 +77,7 @@ impl LegacyProject {
 
         // V2 versions only have one project type- v3 versions can rarely have multiple.
         // We'll just use the first one.
-        let mut project_type = data.project_types.get(0).cloned().unwrap_or_default();
+        let mut project_type = data.project_types.first().cloned().unwrap_or_default();
         let mut loaders = data.loaders;
 
         if let Some(versions_item) = versions_item {
@@ -174,7 +174,7 @@ impl LegacyProject {
     {
         let version_ids: Vec<_> = data
             .iter()
-            .filter_map(|p| p.versions.get(0).map(|i| (*i).into()))
+            .filter_map(|p| p.versions.first().map(|i| (*i).into()))
             .collect();
         let example_versions = version_item::Version::get_many(&version_ids, exec, redis).await?;
         let mut legacy_projects = Vec::new();
