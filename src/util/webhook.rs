@@ -91,7 +91,7 @@ pub async fn send_discord_webhook(
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-            ARRAY_AGG(DISTINCT g.name) filter (where g.name is not null) games,
+            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery,
             JSONB_AGG(

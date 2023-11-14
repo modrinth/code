@@ -6,6 +6,7 @@ use std::rc::Rc;
 
 pub mod oauth;
 pub mod oauth_clients;
+pub mod tags;
 
 #[derive(Clone)]
 pub struct ApiV3 {

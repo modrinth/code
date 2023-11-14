@@ -423,8 +423,7 @@ async fn version_create_inner(
     let (all_project_types, all_games): (Vec<String>, Vec<String>) =
         loader_structs.iter().fold((vec![], vec![]), |mut acc, x| {
             acc.0.extend_from_slice(&x.supported_project_types);
-            acc.1
-                .extend(x.supported_games.iter().map(|x| x.name().to_string()));
+            acc.1.extend(x.supported_games.clone());
             acc
         });
 

@@ -571,7 +571,7 @@ impl Project {
                 t.id thread_id, m.monetization_status monetization_status,
                 ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
                 ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                ARRAY_AGG(DISTINCT g.name) filter (where g.name is not null) games,
+                ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
                 JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,

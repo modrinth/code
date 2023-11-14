@@ -9,35 +9,71 @@ use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
+const GAMES_LIST_NAMESPACE: &str = "games";
 const LOADER_ID: &str = "loader_id";
 const LOADERS_LIST_NAMESPACE: &str = "loaders";
 const LOADER_FIELDS_NAMESPACE: &str = "loader_fields";
 const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums";
 const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str = "loader_field_enum_values";
 
-#[derive(Clone, Serialize, Deserialize, Debug, Copy)]
-pub enum Game {
-    MinecraftJava,
-    // MinecraftBedrock
-    // Future games
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct Game {
+    pub id: GameId,
+    pub slug: String,
+    pub name: String,
+    pub icon_url: Option<String>,
+    pub banner_url: Option<String>,
 }
 
 impl Game {
-    pub fn name(&self) -> &'static str {
-        match self {
-            Game::MinecraftJava => "minecraft-java",
-            // Game::MinecraftBedrock => "minecraft-bedrock"
-            // Future games
-        }
+    pub async fn get_slug<'a, E>(
+        slug: &str,
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<Option<Game>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        Ok(Self::list(exec, redis)
+            .await?
+            .into_iter()
+            .find(|x| x.slug == slug))
     }
 
-    pub fn from_name(name: &str) -> Option<Game> {
-        match name {
-            "minecraft-java" => Some(Game::MinecraftJava),
-            // "minecraft-bedrock" => Some(Game::MinecraftBedrock)
-            // Future games
-            _ => None,
+    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<Game>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let cached_games: Option<Vec<Game>> = redis
+            .get_deserialized_from_json(GAMES_LIST_NAMESPACE, "games")
+            .await?;
+        if let Some(cached_games) = cached_games {
+            return Ok(cached_games);
         }
+
+        let result = sqlx::query!(
+            "
+            SELECT id, slug, name, icon_url, banner_url FROM games
+            ",
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|x| Game {
+                id: GameId(x.id),
+                slug: x.slug,
+                name: x.name,
+                icon_url: x.icon_url,
+                banner_url: x.banner_url,
+            }))
+        })
+        .try_collect::<Vec<Game>>()
+        .await?;
+
+        redis
+            .set_serialized_to_json(GAMES_LIST_NAMESPACE, "games", &result, None)
+            .await?;
+
+        Ok(result)
     }
 }
 
@@ -47,7 +83,7 @@ pub struct Loader {
     pub loader: String,
     pub icon: String,
     pub supported_project_types: Vec<String>,
-    pub supported_games: Vec<Game>,
+    pub supported_games: Vec<String>, // slugs
 }
 
 impl Loader {
@@ -99,7 +135,7 @@ impl Loader {
             "
             SELECT l.id id, l.loader loader, l.icon icon,
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-            ARRAY_AGG(DISTINCT g.name) filter (where g.name is not null) games
+            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
             FROM loaders l            
             LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id
             LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id
@@ -123,9 +159,6 @@ impl Loader {
                 supported_games: x
                     .games
                     .unwrap_or_default()
-                    .iter()
-                    .filter_map(|x| Game::from_name(x))
-                    .collect(),
             }))
         })
         .try_collect::<Vec<_>>()

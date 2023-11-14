@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use super::ApiError;
 use crate::database::models::categories::{Category, DonationPlatform, ProjectType, ReportType};
 use crate::database::models::loader_fields::{
-    Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
+    Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
 use crate::database::redis::RedisPool;
 use actix_web::{web, HttpResponse};
@@ -16,12 +16,39 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("category", web::get().to(category_list))
             .route("loader", web::get().to(loader_list)),
     )
+    .route("games", web::get().to(games_list))
     .route("loader_fields", web::get().to(loader_fields_list))
     .route("license", web::get().to(license_list))
     .route("license/{id}", web::get().to(license_text))
     .route("donation_platform", web::get().to(donation_platform_list))
     .route("report_type", web::get().to(report_type_list))
     .route("project_type", web::get().to(project_type_list));
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct GameData {
+    pub slug: String,
+    pub name: String,
+    pub icon: Option<String>,
+    pub banner: Option<String>,
+}
+
+pub async fn games_list(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    let results = Game::list(&**pool, &redis)
+        .await?
+        .into_iter()
+        .map(|x| GameData {
+            slug: x.slug,
+            name: x.name,
+            icon: x.icon_url,
+            banner: x.banner_url,
+        })
+        .collect::<Vec<_>>();
+
+    Ok(HttpResponse::Ok().json(results))
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -69,11 +96,7 @@ pub async fn loader_list(
             icon: x.icon,
             name: x.loader,
             supported_project_types: x.supported_project_types,
-            supported_games: x
-                .supported_games
-                .iter()
-                .map(|x| x.name().to_string())
-                .collect(),
+            supported_games: x.supported_games,
         })
         .collect::<Vec<_>>();
 

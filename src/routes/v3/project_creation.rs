@@ -796,7 +796,7 @@ async fn project_create_inner(
                 |(mut project_types, mut games), loader| {
                     if loaders.contains(&loader.id) {
                         project_types.extend(loader.supported_project_types);
-                        games.extend(loader.supported_games.iter().map(|x| x.name().to_string()));
+                        games.extend(loader.supported_games);
                     }
                     (project_types, games)
                 },

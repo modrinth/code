@@ -524,7 +524,7 @@ impl Version {
                 v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
                 ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
                 ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                ARRAY_AGG(DISTINCT g.name) filter (where g.name is not null) games,
+                ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
                 JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,
                 JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
                 JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies,
