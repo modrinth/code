@@ -8,6 +8,8 @@ use crate::{
     util::fetch::REQWEST_CLIENT,
 };
 
+use super::stages::auth_retry;
+
 #[derive(Debug, Deserialize)]
 pub struct OauthSuccess {
     pub token_type: String,
@@ -25,11 +27,14 @@ pub async fn refresh(refresh_token: String) -> crate::Result<OauthSuccess> {
 
     // Poll the URL in a loop until we are successful.
     // On an authorization_pending response, wait 5 seconds and try again.
-    let resp = REQWEST_CLIENT
+    let resp =
+        auth_retry(|| {
+            REQWEST_CLIENT
         .post("https://login.microsoftonline.com/consumers/oauth2/v2.0/token")
         .header("Content-Type", "application/x-www-form-urlencoded")
         .form(&params)
         .send()
+        })
         .await?;
 
     match resp.status() {
