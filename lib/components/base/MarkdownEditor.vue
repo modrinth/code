@@ -643,7 +643,7 @@ function openVideoModal() {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .file-input {
   width: 100%;
   padding: 1.5rem;

@@ -44,7 +44,7 @@ const props = withDefaults(
 const target = computed(() => (props.external ? '_blank' : '_self'))
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD {
   position: relative;
   margin-bottom: var(--gap-md);
