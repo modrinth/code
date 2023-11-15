@@ -561,7 +561,10 @@ import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+
+const breadcrumbs = useBreadcrumbs()
 
 const router = useRouter()
 
@@ -753,6 +756,9 @@ const editProfileObject = computed(() => {
   if (unlinkModpack.value) {
     editProfile.metadata.linked_data = null
   }
+
+  breadcrumbs.setName('Instance', editProfile.metadata.name)
+
   return editProfile
 })
 
