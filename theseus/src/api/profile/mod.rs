@@ -389,6 +389,10 @@ pub async fn update_project(
                     .add_project_version(update_version.id.clone())
                     .await?;
 
+                if project.disabled {
+                    profile.toggle_disable_project(&path).await?;
+                }
+
                 if path != project_path.clone() {
                     profile.remove_project(project_path, Some(true)).await?;
                 }
