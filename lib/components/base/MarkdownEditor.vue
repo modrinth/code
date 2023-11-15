@@ -135,7 +135,7 @@
         <Button :action="() => imageModal?.hide()"><XIcon /> Cancel</Button>
         <Button
           color="primary"
-          :disabled="linkValidationErrorMessage || !linkUrl"
+          :disabled="!canInsertImage"
           :action="
             () => {
               if (editor) markdownCommands.replaceSelection(editor, imageMarkdown)
@@ -607,6 +607,14 @@ const handleImageUpload = async (files: FileList) => {
 const imageUploadOption = ref<string>('upload')
 const imageMarkdown = computed(() => (linkMarkdown.value.length ? `!${linkMarkdown.value}` : ''))
 
+const canInsertImage = computed(() => {
+  // Make sure the image url is valid, there is an image url, and there is alt text
+  // They need to be valid, and not empty
+  return (
+    !linkValidationErrorMessage.value && linkUrl.value?.length > 0 && linkText.value?.length > 0
+  )
+})
+
 const youtubeRegex =
   /^(?:https?:)?(?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9_-]{7,15})(?:[?&][a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*$/
 
@@ -623,22 +631,25 @@ const linkModal = ref<InstanceType<typeof Modal> | null>(null)
 const imageModal = ref<InstanceType<typeof Modal> | null>(null)
 const videoModal = ref<InstanceType<typeof Modal> | null>(null)
 
+function resetModalStates() {
+  linkText.value = ''
+  linkUrl.value = ''
+  linkValidationErrorMessage.value = undefined
+}
+
 function openLinkModal() {
   if (editor) linkText.value = markdownCommands.yankSelection(editor)
-  linkUrl.value = ''
+  resetModalStates()
   linkModal.value?.show()
 }
 
 function openImageModal() {
-  linkValidationErrorMessage.value = undefined
-  linkText.value = ''
-  linkUrl.value = ''
+  resetModalStates()
   imageModal.value?.show()
 }
 
 function openVideoModal() {
-  linkText.value = ''
-  linkUrl.value = ''
+  resetModalStates()
   videoModal.value?.show()
 }
 </script>
