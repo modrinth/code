@@ -4,7 +4,8 @@ html {
   --dark-color-contrast: #ecf9fb;
 
   --color-ad: rgba(125, 75, 162, 0.2);
-  --color-ad-raised: rgba(190, 140, 243, 0.8);
+  --color-ad-raised: rgba(190, 140, 243, 0.5);
+  --color-ad-contrast: black;
   --color-ad-highlight: var(--color-purple);
 
   --gap-xs: 0.25rem;
@@ -39,9 +40,6 @@ html {
   --color-blue: #1f68c0;
   --color-purple: #8e32f3;
   --color-gray: #595b61;
-
-  --color-ad: rgba(125, 75, 162, 0.2);
-  --color-ad-raised: rgba(190, 140, 243, 0.8);
 
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(0, 175, 92, 0.25);

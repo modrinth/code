@@ -98,7 +98,7 @@ const target = computed(() => (props.external ? '_blank' : '_self'))
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.8em;
-  color: var(--color-accent-contrast);
+  color: var(--color-ad-contrast);
   background: var(--color-ad-raised);
   letter-spacing: 0.1ch;
   margin: 0;
