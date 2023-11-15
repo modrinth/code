@@ -103,6 +103,7 @@ import {
   get_logs,
   get_output_by_filename,
   get_latest_log_cursor,
+  get_std_log_cursor,
 } from '@/helpers/logs.js'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
@@ -216,7 +217,7 @@ const processedLogs = computed(() => {
   return processed
 })
 
-async function getLiveLog() {
+async function getLiveLatestLog() {
   if (route.params.id) {
     const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
     let returnValue
@@ -234,7 +235,30 @@ async function getLiveLog() {
       currentLiveLogCursor.value = logCursor.cursor
       returnValue = currentLiveLog.value
     }
-    return { name: 'Live Log', stdout: returnValue, live: true }
+    return { name: 'Latest Log (Live)', stdout: returnValue, live: true }
+  }
+  return null
+}
+
+async function getLiveStdLog() {
+  if (route.params.id) {
+    const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
+    let returnValue
+    if (uuids.length === 0) {
+      returnValue = emptyText.join('\n')
+    } else {
+      const logCursor = await get_std_log_cursor(
+        props.instance.path,
+        currentLiveLogCursor.value
+      ).catch(handleError)
+      if (logCursor.new_file) {
+        currentLiveLog.value = ''
+      }
+      currentLiveLog.value = currentLiveLog.value + logCursor.output
+      currentLiveLogCursor.value = logCursor.cursor
+      returnValue = currentLiveLog.value
+    }
+    return { name: 'Stdout/Stderr (Live)', stdout: returnValue, live: true }
   }
   return null
 }
@@ -243,6 +267,8 @@ async function getLogs() {
   return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
     if (log.filename == 'latest.log') {
       log.name = 'Latest Log'
+    } else if (log.filename == 'latest_stdout.log') {
+      log.name = 'Latest Stdout/Stderr'
     } else {
       let filename = log.filename.split('.')[0]
       let day = dayjs(filename.slice(0, 10))
@@ -266,8 +292,12 @@ async function getLogs() {
 }
 
 async function setLogs() {
-  const [liveLog, allLogs] = await Promise.all([getLiveLog(), getLogs()])
-  logs.value = [liveLog, ...allLogs]
+  const [liveLog, liveStd, allLogs] = await Promise.all([
+    getLiveLatestLog(),
+    getLiveStdLog(),
+    getLogs(),
+  ])
+  logs.value = [liveLog, liveStd, ...allLogs]
 }
 
 const copyLog = () => {
@@ -295,7 +325,7 @@ watch(selectedLogIndex, async (newIndex) => {
   copied.value = false
   userScrolled.value = false
 
-  if (logs.value.length > 1 && newIndex !== 0) {
+  if (logs.value.length > 2 && newIndex >= 2) {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_filename(
       props.instance.path,
@@ -304,8 +334,8 @@ watch(selectedLogIndex, async (newIndex) => {
   }
 })
 
-if (logs.value.length > 1 && !props.playing) {
-  selectedLogIndex.value = 1
+if (logs.value.length > 2 && !props.playing) {
+  selectedLogIndex.value = 2
 } else {
   selectedLogIndex.value = 0
 }
@@ -426,7 +456,7 @@ function handleUserScroll() {
 
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
-    logs.value[0] = await getLiveLog()
+    logs.value[0] = await getLiveLatestLog()
 
     const scroll = logContainer.value.getScroll()
     // Allow resetting of userScrolled if the user scrolls to the bottom
