@@ -264,7 +264,17 @@
           Make the game start in full screen when launched (using options.txt).
         </span>
       </label>
-      <Checkbox id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
+      <Toggle
+        id="fullscreen"
+        :model-value="fullscreenSetting"
+        :checked="fullscreenSetting"
+        :disabled="!overrideWindowSettings"
+        @update:model-value="
+          (e) => {
+            fullscreenSetting = e
+          }
+        "
+      />
     </div>
     <div class="adjacent-input">
       <label for="width">
@@ -519,6 +529,7 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
   Button,
+  Toggle,
 } from 'omorphia'
 import { SwapIcon } from '@/assets/icons'
 
