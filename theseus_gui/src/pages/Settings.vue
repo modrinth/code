@@ -21,6 +21,7 @@ import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
+import { getOS } from '@/helpers/utils.js'
 
 const pageOptions = ['Home', 'Library']
 
@@ -238,6 +239,24 @@ async function refreshDir() {
           @update:model-value="
             (e) => {
               settings.hide_on_process = e
+            }
+          "
+        />
+      </div>
+      <div v-if="getOS() != 'MacOS'" class="adjacent-input">
+        <label for="native-decorations">
+          <span class="label__title">Native decorations</span>
+          <span class="label__description"
+            >Use system window frame (app restart required).</span
+          >
+        </label>
+        <Toggle
+          id="native-decorations"
+          :model-value="settings.native_decorations"
+          :checked="settings.native_decorations"
+          @update:model-value="
+            (e) => {
+              settings.native_decorations = e
             }
           "
         />
