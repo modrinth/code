@@ -3,7 +3,7 @@ use crate::{download_file, Error};
 use crate::minecraft::{
     Argument, ArgumentType, Library, VersionInfo, VersionType,
 };
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, TimeZone, Utc};
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 
@@ -38,12 +38,8 @@ where
 {
     let s = String::deserialize(deserializer)?;
 
-    DateTime::parse_from_rfc3339(&s)
-        .map(|dt| dt.with_timezone(&Utc))
-        .or_else(|_| {
-            DateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S%.f")
-                .map(|dt| dt.with_timezone(&Utc))
-        })
+    serde_json::from_str::<DateTime<Utc>>(&format!("\"{s}\""))
+        .or_else(|_| Utc.datetime_from_str(&s, "%Y-%m-%dT%H:%M:%S%.9f"))
         .map_err(serde::de::Error::custom)
 }
 
