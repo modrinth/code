@@ -23,7 +23,9 @@ const toggleCodeBlock: Command = ({ state, dispatch }) => {
 }
 
 const toggleSpoiler: Command = ({ state, dispatch }) => {
-  return toggleAround(state, dispatch, '||', '||')
+  // Insert details tag with a summary tag at the start
+  const detailsTags = ['\n<details>\n<summary>Spoiler</summary>\n\n', '\n\n</details>\n\n']
+  return toggleAround(state, dispatch, detailsTags[0], detailsTags[1])
 }
 
 const toggleHeader: Command = ({ state, dispatch }) => {

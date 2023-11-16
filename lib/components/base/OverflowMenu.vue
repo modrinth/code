@@ -18,9 +18,20 @@
           :hover-filled-only="option.hoverFilledOnly"
           transparent
           :action="
+            option.action
+              ? () => {
+                  option.action()
+                  if (!option.remainOnClick) {
+                    close()
+                  }
+                }
+              : null
+          "
+          :link="option.link ? option.link : null"
+          :external="option.external ? option.external : false"
+          @click="
             () => {
-              option.action()
-              if (!option.remainOnClick) {
+              if (option.link && !option.remainOnClick) {
                 close()
               }
             }
