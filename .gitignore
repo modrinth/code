@@ -61,3 +61,5 @@ app-playground-data/*
 apps/frontend/.env
 
 .astro
+
+.pnpm-store

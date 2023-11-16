@@ -1,0 +1,20 @@
+services:
+  labrinth:
+    build:
+      dockerfile: ./.devcontainer/backend/Dockerfile
+    command: sleep infinity
+    volumes:
+      - .:/workspace:cached
+    depends_on:
+      - postgres_db
+      - meilisearch
+      - redis
+      - clickhouse
+    environment:
+      DATABASE_URL: postgresql://labrinth:labrinth@postgres_db/labrinth
+      MEILISEARCH_ADDR: http://meilisearch:7700
+      REDIS_URL: redis://redis
+      CLICKHOUSE_URL: http://clickhouse:8123
+  clickhouse:
+    environment:
+      - CLICKHOUSE_SKIP_USER_SETUP=1

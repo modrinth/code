@@ -1,0 +1,66 @@
+{
+  "name": "Modrinth (app, remote)",
+
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+
+  "hostRequirements": {
+    "memory": "12gb"
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/desktop-lite:1": {},
+    "ghcr.io/devcontainers/features/node": {
+      "version": "20",
+      "installYarnUsingApt": false,
+      "pnpmVersion": "none"
+    },
+    "ghcr.io/devcontainers/features/rust:1": {}
+  },
+
+  "containerEnv": {
+    "VNC_RESOLUTION": "1600x1000",
+    "BROWSER_BASE_URL": "https://api.modrinth.com/v2/",
+    "DATABASE_URL": "sqlite://${containerWorkspaceFolder}/apps/app/.data/database.db"
+  },
+
+  "onCreateCommand": "${containerWorkspaceFolder}/.devcontainer/app-shared/setup.sh",
+  "updateContentCommand": "pnpm install --ignore-scripts && (cd apps/app && cargo fetch) && (cd apps/app-playground && cargo fetch)",
+
+  "forwardPorts": [6080, 5901],
+  "portsAttributes": {
+    "6080": {
+      "label": "desktop"
+    },
+    "5901": {
+      "label": "vnc"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Vue.volar",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "EditorConfig.EditorConfig",
+        "tauri-apps.tauri-vscode",
+        "-tamasfe.even-better-toml",
+        "tombi-toml.tombi"
+      ],
+      "settings": {
+        "extensions.ignoreRecommendations": true,
+        "rust-analyzer.files.exclude": ["apps/daedalus_client", "apps/labrinth"]
+      }
+    }
+  },
+
+  "mounts": [
+    {
+      "source": "devcontainer-cargo-cache-modrinth",
+      "target": "/usr/local/cargo",
+      "type": "volume"
+    }
+  ]
+}

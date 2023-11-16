@@ -1,0 +1,36 @@
+{
+  "name": "Modrinth (backend)",
+
+  "dockerComposeFile": ["../../docker-compose.yml", "docker-compose.yml"],
+  "service": "labrinth",
+  "workspaceFolder": "/workspace",
+
+  "hostRequirements": {
+    "memory": "12gb"
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/rust:1": {}
+  },
+
+  "onCreateCommand": "${containerWorkspaceFolder}/.devcontainer/backend/setup.sh",
+  "updateContentCommand": "(cd apps/labrinth && cargo fetch)",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["EditorConfig.EditorConfig", "-tamasfe.even-better-toml", "tombi-toml.tombi"],
+      "settings": {
+        "extensions.ignoreRecommendations": true,
+        "rust-analyzer.files.exclude": ["apps/app", "apps/app-playground", "packages/app-lib"]
+      }
+    }
+  },
+
+  "mounts": [
+    {
+      "source": "devcontainer-cargo-cache-modrinth",
+      "target": "/usr/local/cargo",
+      "type": "volume"
+    }
+  ]
+}
