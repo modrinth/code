@@ -1,11 +1,12 @@
 # Promotion
+The Promotion component is used to serve Adrinth ads.
 :::raw
 <DemoContainer>
-<Promotion theme="dark" />
+<Promotion />
 </DemoContainer>
 :::
 
 
 ```vue
-<Promotion theme="dark" />
+<Promotion :external="true | false" queryParam="?optional-query-param"/>
 ```
