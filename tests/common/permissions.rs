@@ -4,13 +4,11 @@ use itertools::Itertools;
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use serde_json::json;
 
-use crate::common::{
-    database::{generate_random_name, ADMIN_USER_PAT},
-    request_data,
-};
+use crate::common::database::{generate_random_name, ADMIN_USER_PAT};
 
 use super::{
-    database::{USER_USER_ID, USER_USER_PAT},
+    api_v3::request_data,
+    database::{ENEMY_USER_PAT, USER_USER_ID, USER_USER_PAT},
     environment::TestEnvironment,
 };
 
@@ -164,7 +162,48 @@ impl<'a> PermissionsTest<'a> {
         )
         .await;
 
-        // Failure test
+        // Failure test- not logged in
+        let request = req_gen(&PermissionsTestContext {
+            project_id: Some(&project_id),
+            team_id: Some(&team_id),
+            ..test_context
+        })
+        .to_request();
+
+        let resp = test_env.call(request).await;
+        if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
+            return Err(format!(
+                "Failure permissions test failed. Expected failure codes {} got {}",
+                self.allowed_failure_codes
+                    .iter()
+                    .map(|code| code.to_string())
+                    .join(","),
+                resp.status().as_u16()
+            ));
+        }
+
+        // Failure test- logged in on a non-team user
+        let request = req_gen(&PermissionsTestContext {
+            project_id: Some(&project_id),
+            team_id: Some(&team_id),
+            ..test_context
+        })
+        .append_header(("Authorization", ENEMY_USER_PAT))
+        .to_request();
+
+        let resp = test_env.call(request).await;
+        if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
+            return Err(format!(
+                "Failure permissions test failed. Expected failure codes {} got {}",
+                self.allowed_failure_codes
+                    .iter()
+                    .map(|code| code.to_string())
+                    .join(","),
+                resp.status().as_u16()
+            ));
+        }
+
+        // Failure test- logged in with EVERY non-relevant permission
         let request = req_gen(&PermissionsTestContext {
             project_id: Some(&project_id),
             team_id: Some(&team_id),
@@ -175,7 +214,6 @@ impl<'a> PermissionsTest<'a> {
 
         let resp = test_env.call(request).await;
         if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
-            println!("Body: {:?}", resp.response().body());
             return Err(format!(
                 "Failure permissions test failed. Expected failure codes {} got {}",
                 self.allowed_failure_codes
@@ -207,7 +245,6 @@ impl<'a> PermissionsTest<'a> {
 
         let resp = test_env.call(request).await;
         if !resp.status().is_success() {
-            println!("Body: {:?}", resp.response().body());
             return Err(format!(
                 "Success permissions test failed. Expected success, got {}",
                 resp.status().as_u16()
@@ -342,8 +379,9 @@ impl<'a> PermissionsTest<'a> {
             organization_team_id: None,
         };
 
-        // TEST 1: Failure
-        // Random user, unaffiliated with the project, with no permissions
+        // TEST 1: User not logged in - no PAT.
+        // This should always fail, regardless of permissions
+        // (As we are testing permissions-based failures)
         let test_1 = async {
             let (project_id, team_id) = create_dummy_project(test_env).await;
 
@@ -379,18 +417,9 @@ impl<'a> PermissionsTest<'a> {
         };
 
         // TEST 2: Failure
-        // User affiliated with the project, with failure permissions
+        // Random user, unaffiliated with the project, with no permissions
         let test_2 = async {
             let (project_id, team_id) = create_dummy_project(test_env).await;
-            add_user_to_team(
-                self.user_id,
-                self.user_pat,
-                &team_id,
-                Some(failure_project_permissions),
-                None,
-                test_env,
-            )
-            .await;
 
             let request = req_gen(&PermissionsTestContext {
                 project_id: Some(&project_id),
@@ -399,7 +428,6 @@ impl<'a> PermissionsTest<'a> {
             })
             .append_header(("Authorization", self.user_pat))
             .to_request();
-
             let resp = test_env.call(request).await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
@@ -414,9 +442,55 @@ impl<'a> PermissionsTest<'a> {
 
             let p =
                 get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
+            if p != ProjectPermissions::empty() {
+                return Err(format!(
+                    "Test 2 failed. Expected no permissions, got {:?}",
+                    p
+                ));
+            }
+
+            Ok(())
+        };
+
+        // TEST 3: Failure
+        // User affiliated with the project, with failure permissions
+        let test_3 = async {
+            let (project_id, team_id) = create_dummy_project(test_env).await;
+            add_user_to_team(
+                self.user_id,
+                self.user_pat,
+                &team_id,
+                Some(failure_project_permissions),
+                None,
+                test_env,
+            )
+            .await;
+
+            let request = req_gen(&PermissionsTestContext {
+                project_id: Some(&project_id),
+                team_id: Some(&team_id),
+                ..test_context
+            })
+            .append_header(("Authorization", self.user_pat))
+            .to_request();
+
+            let resp = test_env.call(request).await;
+            if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
+                return Err(format!(
+                    "Test 3 failed. Expected failure codes {} got {}",
+                    self.allowed_failure_codes
+                        .iter()
+                        .map(|code| code.to_string())
+                        .join(","),
+                    resp.status().as_u16()
+                ));
+            }
+
+            let p =
+                get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
             if p != failure_project_permissions {
                 return Err(format!(
-                    "Test 2 failed. Expected {:?}, got {:?}",
+                    "Test 3 failed. Expected {:?}, got {:?}",
                     failure_project_permissions, p
                 ));
             }
@@ -424,9 +498,9 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        // TEST 3: Success
+        // TEST 4: Success
         // User affiliated with the project, with the given permissions
-        let test_3 = async {
+        let test_4 = async {
             let (project_id, team_id) = create_dummy_project(test_env).await;
             add_user_to_team(
                 self.user_id,
@@ -449,7 +523,7 @@ impl<'a> PermissionsTest<'a> {
             let resp = test_env.call(request).await;
             if !resp.status().is_success() {
                 return Err(format!(
-                    "Test 3 failed. Expected success, got {}",
+                    "Test 4 failed. Expected success, got {}",
                     resp.status().as_u16()
                 ));
             }
@@ -458,7 +532,7 @@ impl<'a> PermissionsTest<'a> {
                 get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
             if p != success_permissions {
                 return Err(format!(
-                    "Test 3 failed. Expected {:?}, got {:?}",
+                    "Test 4 failed. Expected {:?}, got {:?}",
                     success_permissions, p
                 ));
             }
@@ -466,10 +540,10 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        // TEST 4: Failure
+        // TEST 5: Failure
         // Project has an organization
         // User affiliated with the project's org, with default failure permissions
-        let test_4 = async {
+        let test_5 = async {
             let (project_id, team_id) = create_dummy_project(test_env).await;
             let (organization_id, organization_team_id) = create_dummy_org(test_env).await;
             add_project_to_org(test_env, &project_id, &organization_id).await;
@@ -494,7 +568,7 @@ impl<'a> PermissionsTest<'a> {
             let resp = test_env.call(request).await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
-                    "Test 4 failed. Expected failure codes {} got {}",
+                    "Test 5 failed. Expected failure codes {} got {}",
                     self.allowed_failure_codes
                         .iter()
                         .map(|code| code.to_string())
@@ -507,7 +581,7 @@ impl<'a> PermissionsTest<'a> {
                 get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
             if p != failure_project_permissions {
                 return Err(format!(
-                    "Test 4 failed. Expected {:?}, got {:?}",
+                    "Test 5 failed. Expected {:?}, got {:?}",
                     failure_project_permissions, p
                 ));
             }
@@ -515,55 +589,9 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        // TEST 5: Success
+        // TEST 6: Success
         // Project has an organization
         // User affiliated with the project's org, with the default success
-        let test_5 = async {
-            let (project_id, team_id) = create_dummy_project(test_env).await;
-            let (organization_id, organization_team_id) = create_dummy_org(test_env).await;
-            add_project_to_org(test_env, &project_id, &organization_id).await;
-            add_user_to_team(
-                self.user_id,
-                self.user_pat,
-                &organization_team_id,
-                Some(success_permissions),
-                None,
-                test_env,
-            )
-            .await;
-
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
-            })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
-            if !resp.status().is_success() {
-                return Err(format!(
-                    "Test 5 failed. Expected success, got {}",
-                    resp.status().as_u16()
-                ));
-            }
-
-            let p =
-                get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
-            if p != success_permissions {
-                return Err(format!(
-                    "Test 5 failed. Expected {:?}, got {:?}",
-                    success_permissions, p
-                ));
-            }
-
-            Ok(())
-        };
-
-        // TEST 6: Failure
-        // Project has an organization
-        // User affiliated with the project's org (even can have successful permissions!)
-        // User overwritten on the project team with failure permissions
         let test_6 = async {
             let (project_id, team_id) = create_dummy_project(test_env).await;
             let (organization_id, organization_team_id) = create_dummy_org(test_env).await;
@@ -577,6 +605,52 @@ impl<'a> PermissionsTest<'a> {
                 test_env,
             )
             .await;
+
+            let request = req_gen(&PermissionsTestContext {
+                project_id: Some(&project_id),
+                team_id: Some(&team_id),
+                ..test_context
+            })
+            .append_header(("Authorization", self.user_pat))
+            .to_request();
+
+            let resp = test_env.call(request).await;
+            if !resp.status().is_success() {
+                return Err(format!(
+                    "Test 6 failed. Expected success, got {}",
+                    resp.status().as_u16()
+                ));
+            }
+
+            let p =
+                get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
+            if p != success_permissions {
+                return Err(format!(
+                    "Test 6 failed. Expected {:?}, got {:?}",
+                    success_permissions, p
+                ));
+            }
+
+            Ok(())
+        };
+
+        // TEST 7: Failure
+        // Project has an organization
+        // User affiliated with the project's org (even can have successful permissions!)
+        // User overwritten on the project team with failure permissions
+        let test_7 = async {
+            let (project_id, team_id) = create_dummy_project(test_env).await;
+            let (organization_id, organization_team_id) = create_dummy_org(test_env).await;
+            add_project_to_org(test_env, &project_id, &organization_id).await;
+            add_user_to_team(
+                self.user_id,
+                self.user_pat,
+                &organization_team_id,
+                Some(success_permissions),
+                None,
+                test_env,
+            )
+            .await;
             add_user_to_team(
                 self.user_id,
                 self.user_pat,
@@ -598,7 +672,7 @@ impl<'a> PermissionsTest<'a> {
             let resp = test_env.call(request).await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
-                    "Test 6 failed. Expected failure codes {} got {}",
+                    "Test 7 failed. Expected failure codes {} got {}",
                     self.allowed_failure_codes
                         .iter()
                         .map(|code| code.to_string())
@@ -611,7 +685,7 @@ impl<'a> PermissionsTest<'a> {
                 get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
             if p != failure_project_permissions {
                 return Err(format!(
-                    "Test 6 failed. Expected {:?}, got {:?}",
+                    "Test 7 failed. Expected {:?}, got {:?}",
                     failure_project_permissions, p
                 ));
             }
@@ -619,11 +693,11 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        // TEST 7: Success
+        // TEST 8: Success
         // Project has an organization
         // User affiliated with the project's org with default failure permissions
         // User overwritten to the project with the success permissions
-        let test_7 = async {
+        let test_8 = async {
             let (project_id, team_id) = create_dummy_project(test_env).await;
             let (organization_id, organization_team_id) = create_dummy_org(test_env).await;
             add_project_to_org(test_env, &project_id, &organization_id).await;
@@ -658,7 +732,7 @@ impl<'a> PermissionsTest<'a> {
 
             if !resp.status().is_success() {
                 return Err(format!(
-                    "Test 7 failed. Expected success, got {}",
+                    "Test 8 failed. Expected success, got {}",
                     resp.status().as_u16()
                 ));
             }
@@ -667,7 +741,7 @@ impl<'a> PermissionsTest<'a> {
                 get_project_permissions(self.user_id, self.user_pat, &project_id, test_env).await;
             if p != success_permissions {
                 return Err(format!(
-                    "Test 7 failed. Expected {:?}, got {:?}",
+                    "Test 8 failed. Expected {:?}, got {:?}",
                     success_permissions, p
                 ));
             }
@@ -675,7 +749,8 @@ impl<'a> PermissionsTest<'a> {
             Ok(())
         };
 
-        tokio::try_join!(test_1, test_2, test_3, test_4, test_5, test_6, test_7,).map_err(|e| e)?;
+        tokio::try_join!(test_1, test_2, test_3, test_4, test_5, test_6, test_7, test_8)
+            .map_err(|e| e)?;
 
         Ok(())
     }
@@ -845,7 +920,7 @@ impl<'a> PermissionsTest<'a> {
 }
 
 async fn create_dummy_project(test_env: &TestEnvironment) -> (String, String) {
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     // Create a very simple project
     let slug = generate_random_name("test_project");
@@ -861,7 +936,7 @@ async fn create_dummy_project(test_env: &TestEnvironment) -> (String, String) {
 async fn create_dummy_org(test_env: &TestEnvironment) -> (String, String) {
     // Create a very simple organization
     let name = generate_random_name("test_org");
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     let resp = api
         .create_organization(&name, "Example description.", ADMIN_USER_PAT)
@@ -878,7 +953,7 @@ async fn create_dummy_org(test_env: &TestEnvironment) -> (String, String) {
 }
 
 async fn add_project_to_org(test_env: &TestEnvironment, project_id: &str, organization_id: &str) {
-    let api = &test_env.v2;
+    let api = &test_env.v3;
     let resp = api
         .organization_add_project(organization_id, project_id, ADMIN_USER_PAT)
         .await;
@@ -893,7 +968,7 @@ async fn add_user_to_team(
     organization_permissions: Option<OrganizationPermissions>,
     test_env: &TestEnvironment,
 ) {
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     // Invite user
     let resp = api
@@ -919,7 +994,7 @@ async fn modify_user_team_permissions(
     organization_permissions: Option<OrganizationPermissions>,
     test_env: &TestEnvironment,
 ) {
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     // Send invitation to user
     let resp = api
@@ -938,7 +1013,7 @@ async fn modify_user_team_permissions(
 
 async fn remove_user_from_team(user_id: &str, team_id: &str, test_env: &TestEnvironment) {
     // Send invitation to user
-    let api = &test_env.v2;
+    let api = &test_env.v3;
     let resp = api.remove_from_team(team_id, user_id, ADMIN_USER_PAT).await;
     assert!(resp.status().is_success());
 }
@@ -949,7 +1024,7 @@ async fn get_project_permissions(
     project_id: &str,
     test_env: &TestEnvironment,
 ) -> ProjectPermissions {
-    let resp = test_env.v2.get_project_members(project_id, user_pat).await;
+    let resp = test_env.v3.get_project_members(project_id, user_pat).await;
     let permissions = if resp.status().as_u16() == 200 {
         let value: serde_json::Value = test::read_body_json(resp).await;
         value
@@ -972,7 +1047,7 @@ async fn get_organization_permissions(
     organization_id: &str,
     test_env: &TestEnvironment,
 ) -> OrganizationPermissions {
-    let api = &test_env.v2;
+    let api = &test_env.v3;
     let resp = api
         .get_organization_members(organization_id, user_pat)
         .await;

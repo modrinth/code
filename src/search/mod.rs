@@ -74,7 +74,7 @@ impl SearchConfig {
 pub struct UploadSearchProject {
     pub version_id: String,
     pub project_id: String,
-    pub project_type: String,
+    pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     pub title: String,
@@ -114,7 +114,7 @@ pub struct SearchResults {
 pub struct ResultSearchProject {
     pub version_id: String,
     pub project_id: String,
-    pub project_type: String,
+    pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
     pub title: String,

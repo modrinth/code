@@ -14,7 +14,7 @@ use labrinth::{
     routes::v3::oauth_clients::OAuthClientEdit,
 };
 
-use crate::common::{asserts::assert_status, database::USER_USER_ID_PARSED};
+use common::{asserts::assert_status, database::USER_USER_ID_PARSED};
 
 mod common;
 

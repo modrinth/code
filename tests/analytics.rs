@@ -1,18 +1,16 @@
 use chrono::{DateTime, Duration, Utc};
 use common::database::*;
+use common::environment::TestEnvironment;
 use itertools::Itertools;
 use labrinth::models::ids::base62_impl::parse_base62;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 
-use crate::common::environment::TestEnvironment;
-
-// importing common module.
 mod common;
 
 #[actix_rt::test]
 pub async fn analytics_revenue() {
     let test_env = TestEnvironment::build(None).await;
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     let alpha_project_id = test_env
         .dummy

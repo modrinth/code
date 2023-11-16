@@ -22,7 +22,7 @@ pub async fn index_local(
             SELECT m.id id, v.id version_id, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
             m.team_id team_id, m.license license, m.slug slug, m.status status_name, m.color color,
-            pt.name project_type_name, u.username username,
+            u.username username,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
@@ -79,7 +79,7 @@ pub async fn index_local(
             LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id
             LEFT OUTER JOIN loader_field_enum_values lfev on lfev.enum_id = lfe.id
             WHERE v.status != ANY($1)
-            GROUP BY v.id, m.id, pt.id, u.id;
+            GROUP BY v.id, m.id, u.id;
             ",
             &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
             &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_searchable()).map(|x| x.to_string()).collect::<Vec<String>>(),
@@ -146,7 +146,7 @@ pub async fn index_local(
                         modified_timestamp: m.updated.timestamp(),
                         license,
                         slug: m.slug,
-                        project_type: m.project_type_name,
+                        project_types: m.project_types.unwrap_or_default(),
                         gallery: m.gallery.unwrap_or_default(),
                         display_categories,
                         open_source,

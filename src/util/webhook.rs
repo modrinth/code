@@ -87,7 +87,7 @@ pub async fn send_discord_webhook(
             "
             SELECT m.id id, m.title title, m.description description, m.color color,
             m.icon_url icon_url, m.slug slug,
-            pt.name project_type, u.username username, u.avatar_url avatar_url,
+            u.username username, u.avatar_url avatar_url,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
@@ -142,7 +142,7 @@ pub async fn send_discord_webhook(
             LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id
             LEFT OUTER JOIN loader_field_enum_values lfev on lfev.enum_id = lfe.id
             WHERE m.id = $1
-            GROUP BY m.id, pt.id, u.id;
+            GROUP BY m.id, u.id;
             ",
             project_id.0 as i64,
             &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
@@ -246,7 +246,8 @@ pub async fn send_discord_webhook(
             });
         }
 
-        let mut project_type = project.project_type;
+        let mut project_types: Vec<String> = project.project_types.unwrap_or_default();
+        let mut project_type = project_types.pop().unwrap_or_default(); // TODO: Should this grab a not-first?
 
         if loaders.iter().all(|x| PLUGIN_LOADERS.contains(&&**x)) {
             project_type = "plugin".to_string();

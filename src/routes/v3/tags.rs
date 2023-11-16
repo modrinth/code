@@ -7,6 +7,7 @@ use crate::database::models::loader_fields::{
 };
 use crate::database::redis::RedisPool;
 use actix_web::{web, HttpResponse};
+use itertools::Itertools;
 use serde_json::Value;
 use sqlx::PgPool;
 
@@ -17,7 +18,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("loader", web::get().to(loader_list)),
     )
     .route("games", web::get().to(games_list))
-    .route("loader_fields", web::get().to(loader_fields_list))
+    .route("loader_field", web::get().to(loader_fields_list))
     .route("license", web::get().to(license_list))
     .route("license/{id}", web::get().to(license_text))
     .route("donation_platform", web::get().to(donation_platform_list))
@@ -118,14 +119,20 @@ pub async fn loader_fields_list(
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
     let query = query.into_inner();
-    let loader_field = LoaderField::get_field(&query.loader_field, &**pool, &redis)
+    let all_loader_ids = Loader::list(&**pool, &redis)
         .await?
-        .ok_or_else(|| {
-            ApiError::InvalidInput(format!(
-                "'{}' was not a valid loader field.",
-                query.loader_field
-            ))
-        })?;
+        .into_iter()
+        .map(|x| x.id)
+        .collect_vec();
+    let loader_field =
+        LoaderField::get_field(&query.loader_field, &all_loader_ids, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput(format!(
+                    "'{}' was not a valid loader field.",
+                    query.loader_field
+                ))
+            })?;
 
     let loader_field_enum_id = match loader_field.field_type {
         LoaderFieldType::Enum(enum_id) | LoaderFieldType::ArrayEnum(enum_id) => enum_id,

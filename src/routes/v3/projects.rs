@@ -43,7 +43,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("project")
             .route("{id}", web::get().to(project_get))
             .route("{id}/check", web::get().to(project_get_check))
-            .route("{id}", web::delete().to(project_get))
+            .route("{id}", web::delete().to(project_delete))
             .route("{id}", web::patch().to(project_edit))
             .route("{id}/icon", web::patch().to(project_icon_edit))
             .route("{id}/icon", web::delete().to(delete_project_icon))
@@ -59,7 +59,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
                         "members",
                         web::get().to(super::teams::team_members_get_project),
                     )
-                    .route("versions", web::get().to(super::versions::version_list))
+                    .route("version", web::get().to(super::versions::version_list))
                     .route(
                         "version/{slug}",
                         web::get().to(super::versions::version_project_get),

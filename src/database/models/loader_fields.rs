@@ -295,60 +295,97 @@ pub struct SideType {
 impl LoaderField {
     pub async fn get_field<'a, E>(
         field: &str,
+        loader_ids: &[LoaderId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Option<LoaderField>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let fields = Self::get_fields(exec, redis).await?;
+        let fields = Self::get_fields(loader_ids, exec, redis).await?;
         Ok(fields.into_iter().find(|f| f.field == field))
     }
 
-    // Gets all fields for a given loader
+    // Gets all fields for a given loader(s)
     // Returns all as this there are probably relatively few fields per loader
-    // TODO: in the future, this should be to get all fields in relation to something
-    // - e.g. get all fields for a given game?
     pub async fn get_fields<'a, E>(
+        loader_ids: &[LoaderId],
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<LoaderField>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let cached_fields = redis
-            .get_deserialized_from_json(LOADER_FIELDS_NAMESPACE, 0) // 0 => whatever we search for fields by
-            .await?;
-        if let Some(cached_fields) = cached_fields {
-            return Ok(cached_fields);
+        type RedisLoaderFieldTuple = (LoaderId, Vec<LoaderField>);
+
+        let mut loader_ids = loader_ids.to_vec();
+        let cached_fields: Vec<RedisLoaderFieldTuple> = redis
+            .multi_get::<String, _>(LOADER_FIELDS_NAMESPACE, loader_ids.iter().map(|x| x.0))
+            .await?
+            .into_iter()
+            .flatten()
+            .filter_map(|x: String| serde_json::from_str::<RedisLoaderFieldTuple>(&x).ok())
+            .collect();
+
+        let mut found_loader_fields = vec![];
+        if !cached_fields.is_empty() {
+            for (loader_id, fields) in cached_fields {
+                if loader_ids.contains(&loader_id) {
+                    found_loader_fields.extend(fields);
+                    loader_ids.retain(|x| x != &loader_id);
+                }
+            }
         }
 
-        let result = sqlx::query!(
-            "
-            SELECT lf.id, lf.field, lf.field_type, lf.optional, lf.min_val, lf.max_val, lf.enum_type
-            FROM loader_fields lf
-            ",
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().and_then(|r| {
-                Some(LoaderField {
-                    id: LoaderFieldId(r.id),
-                    field_type: LoaderFieldType::build(&r.field_type, r.enum_type)?,
-                    field: r.field,
-                    optional: r.optional,
-                    min_val: r.min_val,
-                    max_val: r.max_val,
-                })
-            }))
-        })
-        .try_collect::<Vec<LoaderField>>()
-        .await?;
-
-        redis
-            .set_serialized_to_json(LOADER_FIELDS_NAMESPACE, &0, &result, None)
+        if !loader_ids.is_empty() {
+            let result = sqlx::query!(
+                "
+                SELECT DISTINCT lf.id, lf.field, lf.field_type, lf.optional, lf.min_val, lf.max_val, lf.enum_type, lfl.loader_id
+                FROM loader_fields lf
+                LEFT JOIN loader_fields_loaders lfl ON lfl.loader_field_id = lf.id
+                WHERE lfl.loader_id = ANY($1)
+                ",
+                &loader_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+            )
+            .fetch_many(exec)
+            .try_filter_map(|e| async {
+                Ok(e.right().and_then(|r| {
+                    Some((LoaderId(r.loader_id) ,LoaderField {
+                        id: LoaderFieldId(r.id),
+                        field_type: LoaderFieldType::build(&r.field_type, r.enum_type)?,
+                        field: r.field,
+                        optional: r.optional,
+                        min_val: r.min_val,
+                        max_val: r.max_val,
+                    }))
+                }))
+            })
+            .try_collect::<Vec<(LoaderId, LoaderField)>>()
             .await?;
 
+            let result: Vec<RedisLoaderFieldTuple> = result
+                .into_iter()
+                .fold(
+                    HashMap::new(),
+                    |mut acc: HashMap<LoaderId, Vec<LoaderField>>, x| {
+                        acc.entry(x.0).or_default().push(x.1);
+                        acc
+                    },
+                )
+                .into_iter()
+                .collect_vec();
+
+            for (k, v) in result.into_iter() {
+                redis
+                    .set_serialized_to_json(LOADER_FIELDS_NAMESPACE, k.0, (k, &v), None)
+                    .await?;
+                found_loader_fields.extend(v);
+            }
+        }
+        let result = found_loader_fields
+            .into_iter()
+            .unique_by(|x| x.id)
+            .collect();
         Ok(result)
     }
 }
@@ -641,6 +678,41 @@ impl VersionField {
         enum_variants: Vec<LoaderFieldEnumValue>,
     ) -> Result<VersionField, String> {
         let value = VersionFieldValue::parse(&loader_field, value, enum_variants)?;
+
+        // Ensure, if applicable, that the value is within the min/max bounds
+        let countable = match &value {
+            VersionFieldValue::Integer(i) => Some(*i),
+            VersionFieldValue::ArrayInteger(v) => Some(v.len() as i32),
+            VersionFieldValue::Text(_) => None,
+            VersionFieldValue::ArrayText(v) => Some(v.len() as i32),
+            VersionFieldValue::Boolean(_) => None,
+            VersionFieldValue::ArrayBoolean(v) => Some(v.len() as i32),
+            VersionFieldValue::Enum(_, _) => None,
+            VersionFieldValue::ArrayEnum(_, v) => Some(v.len() as i32),
+        };
+
+        if let Some(count) = countable {
+            if let Some(min) = loader_field.min_val {
+                if count < min {
+                    return Err(format!(
+                        "Provided value '{v}' for {field_name} is less than the minimum of {min}",
+                        v = serde_json::to_string(&value).unwrap_or_default(),
+                        field_name = loader_field.field,
+                    ));
+                }
+            }
+
+            if let Some(max) = loader_field.max_val {
+                if count > max {
+                    return Err(format!(
+                        "Provided value '{v}' for {field_name} is greater than the maximum of {max}",
+                        v = serde_json::to_string(&value).unwrap_or_default(),
+                        field_name = loader_field.field,
+                    ));
+                }
+            }
+        }
+
         Ok(VersionField {
             version_id,
             field_id: loader_field.id,

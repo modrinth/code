@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use serde_json::json;
 
-use super::dummy_data::{DummyImage, TestFile};
+use crate::common::dummy_data::{DummyImage, TestFile};
 use labrinth::{
     models::projects::ProjectId,
     util::actix::{MultipartSegment, MultipartSegmentData},
@@ -42,9 +42,16 @@ pub fn get_public_version_creation_data(
     project_id: ProjectId,
     version_number: &str,
     version_jar: TestFile,
+    // closure that takes in a &mut serde_json::Value
+    // and modifies it before it is serialized and sent
+    modify_json: Option<impl FnOnce(&mut serde_json::Value)>,
 ) -> VersionCreationRequestData {
     let mut json_data = get_public_version_creation_data_json(version_number, &version_jar);
     json_data["project_id"] = json!(project_id);
+    if let Some(modify_json) = modify_json {
+        modify_json(&mut json_data);
+    }
+
     let multipart_data = get_public_creation_data_multipart(&json_data, Some(&version_jar));
     VersionCreationRequestData {
         version: version_number.to_string(),
@@ -57,16 +64,25 @@ pub fn get_public_version_creation_data_json(
     version_number: &str,
     version_jar: &TestFile,
 ) -> serde_json::Value {
-    json!({
+    let is_modpack = version_jar.project_type() == "modpack";
+    let mut j = json!({
         "file_parts": [version_jar.filename()],
         "version_number": version_number,
         "version_title": "start",
         "dependencies": [],
-        "game_versions": ["1.20.1"] ,
         "release_channel": "release",
-        "loaders": ["fabric"],
-        "featured": true
-    })
+        "loaders": [if is_modpack { "mrpack" } else { "fabric" }],
+        "featured": true,
+
+        // Loader fields
+        "game_versions": ["1.20.1"],
+        "client_side": "required",
+        "server_side": "optional"
+    });
+    if is_modpack {
+        j["mrpack_loaders"] = json!(["fabric"]);
+    }
+    j
 }
 
 pub fn get_public_project_creation_data_json(
@@ -84,11 +100,8 @@ pub fn get_public_project_creation_data_json(
         {
             "title": format!("Test Project {slug}"),
             "slug": slug,
-            "project_type": version_jar.as_ref().map(|f| f.project_type()).unwrap_or("mod".to_string()),
             "description": "A dummy project for testing with.",
             "body": "This project is approved, and versions are listed.",
-            "client_side": "required",
-            "server_side": "optional",
             "initial_versions": initial_versions,
             "is_draft": is_draft,
             "categories": [],

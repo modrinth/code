@@ -10,7 +10,6 @@ pub mod dummy_data;
 pub mod environment;
 pub mod pats;
 pub mod permissions;
-pub mod request_data;
 pub mod scopes;
 
 // Testing equivalent to 'setup' function, producing a LabrinthConfig

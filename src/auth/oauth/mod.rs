@@ -15,7 +15,7 @@ use crate::models::ids::OAuthClientId;
 use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use actix_web::http::header::LOCATION;
-use actix_web::web::{scope, Data, Query, ServiceConfig};
+use actix_web::web::{Data, Query, ServiceConfig};
 use actix_web::{get, post, web, HttpRequest, HttpResponse};
 use chrono::Duration;
 use rand::distributions::Alphanumeric;
@@ -33,13 +33,10 @@ pub mod errors;
 pub mod uris;
 
 pub fn config(cfg: &mut ServiceConfig) {
-    cfg.service(
-        scope("auth/oauth")
-            .service(init_oauth)
-            .service(accept_client_scopes)
-            .service(reject_client_scopes)
-            .service(request_token),
-    );
+    cfg.service(init_oauth)
+        .service(accept_client_scopes)
+        .service(reject_client_scopes)
+        .service(request_token);
 }
 
 #[derive(Serialize, Deserialize)]

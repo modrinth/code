@@ -67,13 +67,15 @@ pub async fn project_search(
                     facet
                         .into_iter()
                         .map(|facet| {
-                            let version = match facet.split(':').nth(1) {
-                                Some(version) => version,
+                            let val = match facet.split(':').nth(1) {
+                                Some(val) => val,
                                 None => return facet.to_string(),
                             };
 
                             if facet.starts_with("versions:") {
-                                format!("game_versions:{}", version)
+                                format!("game_versions:{}", val)
+                            } else if facet.starts_with("project_type:") {
+                                format!("project_types:{}", val)
                             } else {
                                 facet.to_string()
                             }

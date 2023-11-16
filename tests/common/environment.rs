@@ -25,6 +25,9 @@ where
 
     db.cleanup().await;
 }
+// TODO: This needs to be slightly redesigned in order to do both V2 and v3 tests.
+// TODO: Most tests, since they use API functions, can be applied to both. The ones that weren't are in v2/, but
+// all tests that can be applied to both should use both v2 and v3 (extract api to a trait  with all the API functions and call both).
 
 // A complete test environment, with a test actix app and a database.
 // Must be called in an #[actix_rt::test] context. It also simulates a
@@ -77,7 +80,7 @@ impl TestEnvironment {
 
     pub async fn generate_friend_user_notification(&self) {
         let resp = self
-            .v2
+            .v3
             .add_user_to_team(
                 &self.dummy.as_ref().unwrap().project_alpha.team_id,
                 FRIEND_USER_ID,
@@ -95,7 +98,7 @@ impl TestEnvironment {
         pat: &str,
         status_code: StatusCode,
     ) {
-        let resp = self.v2.get_user_notifications(user_id, pat).await;
+        let resp = self.v3.get_user_notifications(user_id, pat).await;
         assert_status(&resp, status_code);
     }
 
@@ -105,7 +108,7 @@ impl TestEnvironment {
         pat: &str,
         status_code: StatusCode,
     ) {
-        let resp = self.v2.get_user_projects(user_id, pat).await;
+        let resp = self.v3.get_user_projects(user_id, pat).await;
         assert_status(&resp, status_code);
     }
 }

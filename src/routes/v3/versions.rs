@@ -5,7 +5,9 @@ use crate::auth::{
     filter_authorized_versions, get_user_from_headers, is_authorized, is_authorized_version,
 };
 use crate::database;
-use crate::database::models::loader_fields::{LoaderField, LoaderFieldEnumValue, VersionField};
+use crate::database::models::loader_fields::{
+    self, LoaderField, LoaderFieldEnumValue, VersionField,
+};
 use crate::database::models::version_item::{DependencyBuilder, LoaderVersion};
 use crate::database::models::{image_item, Organization};
 use crate::database::redis::RedisPool;
@@ -22,6 +24,7 @@ use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
@@ -384,7 +387,14 @@ pub async fn version_edit_helper(
                     .map(|x| x.to_string())
                     .collect::<Vec<String>>();
 
-                let loader_fields = LoaderField::get_fields(&mut *transaction, &redis)
+                let all_loaders = loader_fields::Loader::list(&mut *transaction, &redis).await?;
+                let loader_ids = version_item
+                    .loaders
+                    .iter()
+                    .filter_map(|x| all_loaders.iter().find(|y| &y.loader == x).map(|y| y.id))
+                    .collect_vec();
+
+                let loader_fields = LoaderField::get_fields(&loader_ids, &mut *transaction, &redis)
                     .await?
                     .into_iter()
                     .filter(|lf| version_fields_names.contains(&lf.field))
@@ -417,7 +427,7 @@ pub async fn version_edit_helper(
                         .find(|lf| lf.field == vf_name)
                         .ok_or_else(|| {
                             ApiError::InvalidInput(format!(
-                                "Loader field '{vf_name}' does not exist."
+                                "Loader field '{vf_name}' does not exist for any loaders supplied."
                             ))
                         })?;
                     let enum_variants = loader_field_enum_values

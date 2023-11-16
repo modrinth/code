@@ -32,6 +32,19 @@ INSERT INTO loader_field_enum_values (enum_id, value) SELECT id, 'forge' FROM lo
 INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id) SELECT joining_loader_id, joining_project_type_id, 1 FROM loaders_project_types WHERE joining_loader_id = 5;
 INSERT INTO loaders_project_types_games (loader_id, project_type_id, game_id) SELECT joining_loader_id, joining_project_type_id, 1 FROM loaders_project_types WHERE joining_loader_id = 6;
 
+-- Dummy-data only optional field, as we don't have any yet
+INSERT INTO loader_fields (
+  field,
+  field_type,
+  optional
+) VALUES (
+  'test_fabric_optional',
+  'integer',
+  true
+);
+INSERT INTO loader_fields_loaders(loader_id, loader_field_id)
+SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field = 'test_fabric_optional' AND l.loader = 'fabric';
+
 -- Sample game versions, loaders, categories
 -- Game versions is '2'
 INSERT INTO loader_field_enum_values(enum_id, value, metadata, created)

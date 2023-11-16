@@ -15,7 +15,7 @@ pub async fn get_user_notifications_after_team_invitation_returns_notification()
             .project_alpha
             .team_id
             .clone();
-        let api = test_env.v2;
+        let api = test_env.v3;
         api.get_user_notifications_deserialized(FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
 
@@ -34,7 +34,7 @@ pub async fn get_user_notifications_after_team_invitation_returns_notification()
 pub async fn get_user_notifications_after_reading_indicates_notification_read() {
     with_test_environment(|test_env| async move {
         test_env.generate_friend_user_notification().await;
-        let api = test_env.v2;
+        let api = test_env.v3;
         let notifications = api
             .get_user_notifications_deserialized(FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
@@ -57,7 +57,7 @@ pub async fn get_user_notifications_after_reading_indicates_notification_read() 
 pub async fn get_user_notifications_after_deleting_does_not_show_notification() {
     with_test_environment(|test_env| async move {
         test_env.generate_friend_user_notification().await;
-        let api = test_env.v2;
+        let api = test_env.v3;
         let notifications = api
             .get_user_notifications_deserialized(FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;

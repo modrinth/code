@@ -1,16 +1,18 @@
+use std::collections::HashMap;
+
 use actix_web::test;
 use common::environment::TestEnvironment;
 use futures::StreamExt;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::{Loader, ProjectId, VersionId, VersionStatus, VersionType};
-use labrinth::routes::v2::version_file::FileUpdateData;
+use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;
 
+use crate::common::api_v3::request_data::get_public_version_creation_data;
 use crate::common::database::*;
 
 use crate::common::dummy_data::TestFile;
-use crate::common::request_data::get_public_version_creation_data;
 
 // importing common module.
 mod common;
@@ -19,7 +21,7 @@ mod common;
 async fn test_get_version() {
     // Test setup and dummy data
     let test_env = TestEnvironment::build(None).await;
-    let api = &test_env.v2;
+    let api = &test_env.v3;
     let alpha_project_id: &String = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
     let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
     let beta_version_id = &test_env.dummy.as_ref().unwrap().project_beta.version_id;
@@ -68,11 +70,10 @@ async fn test_get_version() {
 }
 
 #[actix_rt::test]
-
 async fn version_updates() {
     // Test setup and dummy data
     let test_env = TestEnvironment::build(None).await;
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     let alpha_project_id: &String = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
     let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
@@ -158,11 +159,12 @@ async fn version_updates() {
     .iter()
     {
         let version = api
-            .add_public_version(
+            .add_public_version_deserialized(
                 get_public_version_creation_data(
                     ProjectId(parse_base62(alpha_project_id).unwrap()),
                     version_number,
                     TestFile::build_random_jar(),
+                    None::<fn(&mut serde_json::Value)>,
                 ),
                 USER_USER_PAT,
             )
@@ -222,10 +224,21 @@ async fn version_updates() {
         }
 
         // update_individual_files
+        let mut loader_fields = HashMap::new();
+        if let Some(game_versions) = game_versions {
+            loader_fields.insert(
+                "game_versions".to_string(),
+                game_versions
+                    .into_iter()
+                    .map(|v| json!(v))
+                    .collect::<Vec<_>>(),
+            );
+        }
+
         let hashes = vec![FileUpdateData {
             hash: alpha_version_hash.to_string(),
             loaders,
-            game_versions,
+            loader_fields: Some(loader_fields),
             version_types: version_types.map(|v| {
                 v.into_iter()
                     .map(|v| serde_json::from_str(&format!("\"{v}\"")).unwrap())
@@ -349,7 +362,7 @@ async fn version_updates() {
 #[actix_rt::test]
 pub async fn test_patch_version() {
     let test_env = TestEnvironment::build(None).await;
-    let api = &test_env.v2;
+    let api = &test_env.v3;
 
     let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
 
@@ -414,7 +427,6 @@ pub async fn test_patch_version() {
         version.version_type,
         serde_json::from_str::<VersionType>("\"beta\"").unwrap()
     );
-    assert_eq!(version.game_versions, vec!["1.20.5"]);
     assert_eq!(version.loaders, vec![Loader("forge".to_string())]);
     assert!(!version.featured);
     assert_eq!(version.status, VersionStatus::from_string("draft"));
@@ -435,7 +447,6 @@ pub async fn test_patch_version() {
     let version = api
         .get_version_deserialized(alpha_version_id, USER_USER_PAT)
         .await;
-    assert_eq!(version.game_versions, vec!["1.20.1", "1.20.2", "1.20.4"]);
     assert_eq!(version.loaders, vec![Loader("forge".to_string())]); // From last patch
 
     let resp = api
@@ -452,7 +463,6 @@ pub async fn test_patch_version() {
     let version = api
         .get_version_deserialized(alpha_version_id, USER_USER_PAT)
         .await;
-    assert_eq!(version.game_versions, vec!["1.20.1", "1.20.2", "1.20.4"]); // From last patch
     assert_eq!(version.loaders, vec![Loader("fabric".to_string())]);
 
     // Cleanup test db
@@ -462,7 +472,7 @@ pub async fn test_patch_version() {
 #[actix_rt::test]
 pub async fn test_project_versions() {
     let test_env = TestEnvironment::build(None).await;
-    let api = &test_env.v2;
+    let api = &test_env.v3;
     let alpha_project_id: &String = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
     let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
     let _beta_version_id = &test_env.dummy.as_ref().unwrap().project_beta.version_id;
@@ -498,14 +508,14 @@ async fn can_create_version_with_ordering() {
         let alpha_project_id = env.dummy.as_ref().unwrap().project_alpha.project_id.clone();
 
         let new_version_id = get_json_val_str(
-            env.v2
+            env.v3
                 .create_default_version(&alpha_project_id, Some(1), USER_USER_PAT)
                 .await
                 .id,
         );
 
         let versions = env
-            .v2
+            .v3
             .get_versions(vec![new_version_id.clone()], USER_USER_PAT)
             .await;
         assert_eq!(versions[0].ordering, Some(1));
@@ -519,13 +529,13 @@ async fn edit_version_ordering_works() {
         let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
 
         let resp = env
-            .v2
+            .v3
             .edit_version_ordering(&alpha_version_id, Some(10), USER_USER_PAT)
             .await;
         assert_status(&resp, StatusCode::NO_CONTENT);
 
         let versions = env
-            .v2
+            .v3
             .get_versions(vec![alpha_version_id.clone()], USER_USER_PAT)
             .await;
         assert_eq!(versions[0].ordering, Some(10));
@@ -539,17 +549,17 @@ async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
         let alpha_project_id = env.dummy.as_ref().unwrap().project_alpha.project_id.clone();
         let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
-            env.v2
+            env.v3
                 .create_default_version(&alpha_project_id, Some(1), USER_USER_PAT)
                 .await
                 .id,
         );
-        env.v2
+        env.v3
             .edit_version_ordering(&alpha_version_id, Some(10), USER_USER_PAT)
             .await;
 
         let versions = env
-            .v2
+            .v3
             .get_versions(
                 vec![alpha_version_id.clone(), new_version_id.clone()],
                 USER_USER_PAT,
@@ -566,14 +576,14 @@ async fn version_ordering_when_unspecified_orders_oldest_first() {
         let alpha_project_id = &env.dummy.as_ref().unwrap().project_alpha.project_id.clone();
         let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
-            env.v2
+            env.v3
                 .create_default_version(alpha_project_id, None, USER_USER_PAT)
                 .await
                 .id,
         );
 
         let versions = env
-            .v2
+            .v3
             .get_versions(
                 vec![alpha_version_id.clone(), new_version_id.clone()],
                 USER_USER_PAT,
@@ -590,17 +600,17 @@ async fn version_ordering_when_specified_orders_specified_before_unspecified() {
         let alpha_project_id = &env.dummy.as_ref().unwrap().project_alpha.project_id.clone();
         let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
-            env.v2
+            env.v3
                 .create_default_version(alpha_project_id, Some(10000), USER_USER_PAT)
                 .await
                 .id,
         );
-        env.v2
+        env.v3
             .edit_version_ordering(&alpha_version_id, None, USER_USER_PAT)
             .await;
 
         let versions = env
-            .v2
+            .v3
             .get_versions(
                 vec![alpha_version_id.clone(), new_version_id.clone()],
                 USER_USER_PAT,

@@ -26,7 +26,7 @@ use crate::{
     util::{routes::read_from_payload, validate::validation_errors_to_string},
 };
 
-use super::ApiError;
+use super::{oauth_clients::get_user_clients, ApiError};
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("user", web::get().to(user_auth_get));
@@ -45,7 +45,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}/notifications", web::get().to(user_notifications))
             .route("{id}/payouts", web::get().to(user_payouts))
             .route("{id}/payouts_fees", web::get().to(user_payouts_fees))
-            .route("{id}/payouts", web::post().to(user_payouts_request)),
+            .route("{id}/payouts", web::post().to(user_payouts_request))
+            .route("{id}/oauth_apps", web::get().to(get_user_clients)),
     );
 }
 

@@ -1,13 +1,12 @@
-use crate::common::{
-    api_v3::oauth::get_redirect_location_query_params, database::FRIEND_USER_ID,
-    dummy_data::DummyOAuthClientAlpha,
-};
 use actix_http::StatusCode;
-use actix_web::test::{self};
+use actix_web::test;
 use common::{
+    api_v3::oauth::get_redirect_location_query_params,
     api_v3::oauth::{get_auth_code_from_redirect_params, get_authorize_accept_flow_id},
     asserts::{assert_any_status_except, assert_status},
+    database::FRIEND_USER_ID,
     database::{FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
+    dummy_data::DummyOAuthClientAlpha,
     environment::with_test_environment,
 };
 use labrinth::auth::oauth::TokenResponse;

@@ -176,7 +176,7 @@ fn default_settings() -> Settings {
 const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "project_id",
     "version_id",
-    "project_type",
+    "project_types",
     "slug",
     "author",
     "title",
@@ -200,7 +200,7 @@ const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] = &["title", "description", "author
 const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "categories",
     "license",
-    "project_type",
+    "project_types",
     "downloads",
     "follows",
     "author",

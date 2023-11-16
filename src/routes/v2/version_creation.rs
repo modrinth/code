@@ -95,6 +95,11 @@ pub async fn version_create(
                 json!(legacy_create.game_versions),
             );
 
+            // TODO: will be overhauled with side-types overhaul
+            // TODO: if not, should default to previous version
+            fields.insert("client_side".to_string(), json!("required"));
+            fields.insert("server_side".to_string(), json!("optional"));
+
             // TODO: Some kind of handling here to ensure project type is fine.
             // We expect the version uploaded to be of loader type modpack, but there might  not be a way to check here for that.
             // After all, theoretically, they could be creating a genuine 'fabric' mod, and modpack no longer carries information on whether its a mod or modpack,

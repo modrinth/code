@@ -3,14 +3,12 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use bytes::Bytes;
-use labrinth::models::{organizations::Organization, v2::projects::LegacyProject};
+use labrinth::models::{organizations::Organization, v3::projects::Project};
 use serde_json::json;
 
-use crate::common::request_data::ImageData;
+use super::{request_data::ImageData, ApiV3};
 
-use super::ApiV2;
-
-impl ApiV2 {
+impl ApiV3 {
     pub async fn create_organization(
         &self,
         organization_title: &str,
@@ -18,7 +16,7 @@ impl ApiV2 {
         pat: &str,
     ) -> ServiceResponse {
         let req = test::TestRequest::post()
-            .uri("/v2/organization")
+            .uri("/v3/organization")
             .append_header(("Authorization", pat))
             .set_json(json!({
                 "title": organization_title,
@@ -30,7 +28,7 @@ impl ApiV2 {
 
     pub async fn get_organization(&self, id_or_title: &str, pat: &str) -> ServiceResponse {
         let req = TestRequest::get()
-            .uri(&format!("/v2/organization/{id_or_title}"))
+            .uri(&format!("/v3/organization/{id_or_title}"))
             .append_header(("Authorization", pat))
             .to_request();
         self.call(req).await
@@ -48,7 +46,7 @@ impl ApiV2 {
 
     pub async fn get_organization_projects(&self, id_or_title: &str, pat: &str) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v2/organization/{id_or_title}/projects"))
+            .uri(&format!("/v3/organization/{id_or_title}/projects"))
             .append_header(("Authorization", pat))
             .to_request();
         self.call(req).await
@@ -58,7 +56,7 @@ impl ApiV2 {
         &self,
         id_or_title: &str,
         pat: &str,
-    ) -> Vec<LegacyProject> {
+    ) -> Vec<Project> {
         let resp = self.get_organization_projects(id_or_title, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
@@ -71,7 +69,7 @@ impl ApiV2 {
         pat: &str,
     ) -> ServiceResponse {
         let req = test::TestRequest::patch()
-            .uri(&format!("/v2/organization/{id_or_title}"))
+            .uri(&format!("/v3/organization/{id_or_title}"))
             .append_header(("Authorization", pat))
             .set_json(patch)
             .to_request();
@@ -89,7 +87,7 @@ impl ApiV2 {
             // If an icon is provided, upload it
             let req = test::TestRequest::patch()
                 .uri(&format!(
-                    "/v2/organization/{id_or_title}/icon?ext={ext}",
+                    "/v3/organization/{id_or_title}/icon?ext={ext}",
                     ext = icon.extension
                 ))
                 .append_header(("Authorization", pat))
@@ -100,7 +98,7 @@ impl ApiV2 {
         } else {
             // If no icon is provided, delete the icon
             let req = test::TestRequest::delete()
-                .uri(&format!("/v2/organization/{id_or_title}/icon"))
+                .uri(&format!("/v3/organization/{id_or_title}/icon"))
                 .append_header(("Authorization", pat))
                 .to_request();
 
@@ -110,7 +108,7 @@ impl ApiV2 {
 
     pub async fn delete_organization(&self, id_or_title: &str, pat: &str) -> ServiceResponse {
         let req = test::TestRequest::delete()
-            .uri(&format!("/v2/organization/{id_or_title}"))
+            .uri(&format!("/v3/organization/{id_or_title}"))
             .append_header(("Authorization", pat))
             .to_request();
 
@@ -124,7 +122,7 @@ impl ApiV2 {
         pat: &str,
     ) -> ServiceResponse {
         let req = test::TestRequest::post()
-            .uri(&format!("/v2/organization/{id_or_title}/projects"))
+            .uri(&format!("/v3/organization/{id_or_title}/projects"))
             .append_header(("Authorization", pat))
             .set_json(json!({
                 "project_id": project_id_or_slug,
@@ -142,7 +140,7 @@ impl ApiV2 {
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!(
-                "/v2/organization/{id_or_title}/projects/{project_id_or_slug}"
+                "/v3/organization/{id_or_title}/projects/{project_id_or_slug}"
             ))
             .append_header(("Authorization", pat))
             .to_request();
