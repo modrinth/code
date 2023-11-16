@@ -102,7 +102,6 @@ import {
   delete_logs_by_filename,
   get_logs,
   get_output_by_filename,
-  get_latest_log_cursor,
   get_std_log_cursor,
 } from '@/helpers/logs.js'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
@@ -217,29 +216,6 @@ const processedLogs = computed(() => {
   return processed
 })
 
-async function getLiveLatestLog() {
-  if (route.params.id) {
-    const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
-    let returnValue
-    if (uuids.length === 0) {
-      returnValue = emptyText.join('\n')
-    } else {
-      const logCursor = await get_latest_log_cursor(
-        props.instance.path,
-        currentLiveLogCursor.value
-      ).catch(handleError)
-      if (logCursor.new_file) {
-        currentLiveLog.value = ''
-      }
-      currentLiveLog.value = currentLiveLog.value + logCursor.output
-      currentLiveLogCursor.value = logCursor.cursor
-      returnValue = currentLiveLog.value
-    }
-    return { name: 'Latest Log (Live)', stdout: returnValue, live: true }
-  }
-  return null
-}
-
 async function getLiveStdLog() {
   if (route.params.id) {
     const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
@@ -258,46 +234,48 @@ async function getLiveStdLog() {
       currentLiveLogCursor.value = logCursor.cursor
       returnValue = currentLiveLog.value
     }
-    return { name: 'Stdout/Stderr (Live)', stdout: returnValue, live: true }
+    return { name: 'Live Log', stdout: returnValue, live: true }
   }
   return null
 }
 
 async function getLogs() {
-  return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
-    if (log.filename == 'latest.log') {
-      log.name = 'Latest Log'
-    } else if (log.filename == 'latest_stdout.log') {
-      log.name = 'Latest Stdout/Stderr'
-    } else {
-      let filename = log.filename.split('.')[0]
-      let day = dayjs(filename.slice(0, 10))
-      if (day.isValid()) {
-        if (day.isToday()) {
-          log.name = 'Today'
-        } else if (day.isYesterday()) {
-          log.name = 'Yesterday'
-        } else {
-          log.name = day.format('MMMM D, YYYY')
-        }
-        // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
-        log.name = log.name + filename.slice(10)
+  return (await get_logs(props.instance.path, true).catch(handleError))
+    .reverse()
+    .filter(
+      (log) =>
+        log.filename !== 'latest_stdout.log' &&
+        log.filename !== 'latest_stdout' &&
+        log.stdout !== ''
+    )
+    .map((log) => {
+      if (log.filename == 'latest.log') {
+        log.name = 'Latest Log'
       } else {
-        log.name = filename
+        let filename = log.filename.split('.')[0]
+        let day = dayjs(filename.slice(0, 10))
+        if (day.isValid()) {
+          if (day.isToday()) {
+            log.name = 'Today'
+          } else if (day.isYesterday()) {
+            log.name = 'Yesterday'
+          } else {
+            log.name = day.format('MMMM D, YYYY')
+          }
+          // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
+          log.name = log.name + filename.slice(10)
+        } else {
+          log.name = filename
+        }
       }
-    }
-    log.stdout = 'Loading...'
-    return log
-  })
+      log.stdout = 'Loading...'
+      return log
+    })
 }
 
 async function setLogs() {
-  const [liveLog, liveStd, allLogs] = await Promise.all([
-    getLiveLatestLog(),
-    getLiveStdLog(),
-    getLogs(),
-  ])
-  logs.value = [liveLog, liveStd, ...allLogs]
+  const [liveStd, allLogs] = await Promise.all([getLiveStdLog(), getLogs()])
+  logs.value = [liveStd, ...allLogs]
 }
 
 const copyLog = () => {
@@ -325,7 +303,7 @@ watch(selectedLogIndex, async (newIndex) => {
   copied.value = false
   userScrolled.value = false
 
-  if (logs.value.length > 2 && newIndex >= 2) {
+  if (logs.value.length > 1 && newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_filename(
       props.instance.path,
@@ -334,8 +312,8 @@ watch(selectedLogIndex, async (newIndex) => {
   }
 })
 
-if (logs.value.length > 2 && !props.playing) {
-  selectedLogIndex.value = 2
+if (logs.value.length > 1 && !props.playing) {
+  selectedLogIndex.value = 1
 } else {
   selectedLogIndex.value = 0
 }
@@ -456,7 +434,7 @@ function handleUserScroll() {
 
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
-    logs.value[0] = await getLiveLatestLog()
+    logs.value[0] = await getLiveStdLog()
 
     const scroll = logContainer.value.getScroll()
     // Allow resetting of userScrolled if the user scrolls to the bottom
