@@ -447,11 +447,10 @@ a,
     height: 1.25rem;
   }
 
-  :deep(.external-icon) {
+  .external-icon {
     width: 0.75rem;
     height: 0.75rem;
     margin-bottom: auto;
-    margin-left: 0.25rem;
     margin-right: 0;
   }
 

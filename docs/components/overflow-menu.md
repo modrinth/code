@@ -14,7 +14,8 @@
   },
   {
     'id': 'report',
-    'action': () => {}
+    'link': 'https://example.com/report',
+    'external': true,
   },
   {
     'id': 'remain',
@@ -65,7 +66,8 @@
     },
     {
       'id': 'report',
-      'action': () => {}
+      'link': 'https://example.com/report',
+      'external': true,
     },
     {
       'id': 'remain',
