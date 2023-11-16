@@ -1,3 +1,14 @@
 {
-  "recommendations": ["esbenp.prettier-vscode", "Vue.volar", "rust-lang.rust-analyzer"]
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "rust-lang.rust-analyzer",
+    "Vue.volar",
+    "vscode.typescript-language-features",
+    "dbaeumer.vscode-eslint",
+    "EditorConfig.EditorConfig",
+    "tauri-apps.tauri-vscode",
+    "vunguyentuan.vscode-css-variables",
+    "usernamehw.errorlens",
+    "yoavbls.pretty-ts-errors"
+  ]
 }
