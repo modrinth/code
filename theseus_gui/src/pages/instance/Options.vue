@@ -264,7 +264,17 @@
           Make the game start in full screen when launched (using options.txt).
         </span>
       </label>
-      <Checkbox id="fullscreen" v-model="fullscreenSetting" :disabled="!overrideWindowSettings" />
+      <Toggle
+        id="fullscreen"
+        :model-value="fullscreenSetting"
+        :checked="fullscreenSetting"
+        :disabled="!overrideWindowSettings"
+        @update:model-value="
+          (e) => {
+            fullscreenSetting = e
+          }
+        "
+      />
     </div>
     <div class="adjacent-input">
       <label for="width">
@@ -519,6 +529,7 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
   Button,
+  Toggle,
 } from 'omorphia'
 import { SwapIcon } from '@/assets/icons'
 
@@ -550,7 +561,10 @@ import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+
+const breadcrumbs = useBreadcrumbs()
 
 const router = useRouter()
 
@@ -742,6 +756,9 @@ const editProfileObject = computed(() => {
   if (unlinkModpack.value) {
     editProfile.metadata.linked_data = null
   }
+
+  breadcrumbs.setName('Instance', editProfile.metadata.name)
+
   return editProfile
 })
 

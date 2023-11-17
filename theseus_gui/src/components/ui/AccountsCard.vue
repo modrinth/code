@@ -2,7 +2,7 @@
   <div
     v-if="mode !== 'isolated'"
     ref="button"
-    v-tooltip="'Minecraft accounts'"
+    v-tooltip.right="'Minecraft accounts'"
     class="button-base avatar-button"
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
@@ -11,7 +11,7 @@
       :size="mode === 'expanded' ? 'xs' : 'sm'"
       :src="
         selectedAccount
-          ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
+          ? `https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
@@ -24,7 +24,7 @@
       :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
     >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`" />
+        <Avatar size="xs" :src="`https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`" />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
@@ -42,7 +42,10 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="`https://mc-heads.net/avatar/${account.id}/128`" class="icon" />
+            <Avatar
+              :src="`https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`"
+              class="icon"
+            />
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
