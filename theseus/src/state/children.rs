@@ -773,6 +773,17 @@ impl SharedOutput {
         log_file_path: &Path,
         censor_strings: HashMap<String, String>,
     ) -> crate::Result<Self> {
+        // create log_file_path parent if it doesn't exist
+        let parent_folder = log_file_path.parent().ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Could not get parent folder of {:?}",
+                log_file_path
+            ))
+        })?;
+        tokio::fs::create_dir_all(parent_folder)
+            .await
+            .map_err(|e| IOError::with_path(e, parent_folder))?;
+
         Ok(SharedOutput {
             log_file: Arc::new(RwLock::new(
                 File::create(log_file_path)
