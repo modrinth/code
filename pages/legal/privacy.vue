@@ -1,7 +1,7 @@
 <template>
   <div class="markdown-body">
     <h1>Privacy Policy</h1>
-    <p><em>Last modified: August 5, 2023</em></p>
+    <p><em>Last modified: November 17, 2023</em></p>
 
     <h2>Introduction</h2>
     <p>
@@ -31,8 +31,8 @@
     <p>It does not apply to information collected by:</p>
     <ul>
       <li>
-        Us offline or through any other means, including on any other website operated by Company or
-        any third party (including our affiliates and subsidiaries); or
+        Us offline or through any other means, including on any other website operated by Rinth,
+        Inc. or any third party (including our affiliates and subsidiaries); or
       </li>
       <li>
         Any third party (including our affiliates and subsidiaries), including through any
