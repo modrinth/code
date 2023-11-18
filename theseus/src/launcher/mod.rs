@@ -512,8 +512,8 @@ pub async fn launch_minecraft(
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null());
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
     #[cfg(target_os = "macos")]

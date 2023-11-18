@@ -1,6 +1,10 @@
 //! Fetch player info for display
 use serde::Deserialize;
 
+use crate::util::fetch::REQWEST_CLIENT;
+
+use super::auth_retry;
+
 const PROFILE_URL: &str = "https://api.minecraftservices.com/minecraft/profile";
 
 #[derive(Deserialize)]
@@ -18,16 +22,17 @@ impl Default for PlayerInfo {
     }
 }
 
+#[tracing::instrument]
 pub async fn fetch_info(token: &str) -> crate::Result<PlayerInfo> {
-    let client = reqwest::Client::new();
-    let resp = client
-        .get(PROFILE_URL)
-        .header(reqwest::header::AUTHORIZATION, format!("Bearer {token}"))
-        .send()
-        .await?
-        .error_for_status()?
-        .json()
-        .await?;
+    let response = auth_retry(|| {
+        REQWEST_CLIENT
+            .get(PROFILE_URL)
+            .header(reqwest::header::AUTHORIZATION, format!("Bearer {token}"))
+            .send()
+    })
+    .await?;
+
+    let resp = response.error_for_status()?.json().await?;
 
     Ok(resp)
 }

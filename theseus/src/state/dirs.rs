@@ -159,7 +159,6 @@ impl DirectoryInfo {
     /// Gets the logs dir for a given profile
     #[inline]
     pub async fn profile_logs_dir(
-        &self,
         profile_id: &ProfilePathId,
     ) -> crate::Result<PathBuf> {
         Ok(profile_id.get_full_path().await?.join("logs"))

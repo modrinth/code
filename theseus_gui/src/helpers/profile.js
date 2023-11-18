@@ -18,7 +18,7 @@ import { invoke } from '@tauri-apps/api/tauri'
 
 export async function create(name, gameVersion, modloader, loaderVersion, icon, noWatch) {
   //Trim string name to avoid "Unable to find directory"
-  name = name.trim();
+  name = name.trim()
   return await invoke('plugin:profile_create|profile_create', {
     name,
     gameVersion,

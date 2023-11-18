@@ -102,7 +102,7 @@ import {
   delete_logs_by_filename,
   get_logs,
   get_output_by_filename,
-  get_latest_log_cursor,
+  get_std_log_cursor,
 } from '@/helpers/logs.js'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
@@ -216,14 +216,14 @@ const processedLogs = computed(() => {
   return processed
 })
 
-async function getLiveLog() {
+async function getLiveStdLog() {
   if (route.params.id) {
     const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
     let returnValue
     if (uuids.length === 0) {
       returnValue = emptyText.join('\n')
     } else {
-      const logCursor = await get_latest_log_cursor(
+      const logCursor = await get_std_log_cursor(
         props.instance.path,
         currentLiveLogCursor.value
       ).catch(handleError)
@@ -240,34 +240,42 @@ async function getLiveLog() {
 }
 
 async function getLogs() {
-  return (await get_logs(props.instance.path, true).catch(handleError)).reverse().map((log) => {
-    if (log.filename == 'latest.log') {
-      log.name = 'Latest Log'
-    } else {
-      let filename = log.filename.split('.')[0]
-      let day = dayjs(filename.slice(0, 10))
-      if (day.isValid()) {
-        if (day.isToday()) {
-          log.name = 'Today'
-        } else if (day.isYesterday()) {
-          log.name = 'Yesterday'
-        } else {
-          log.name = day.format('MMMM D, YYYY')
-        }
-        // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
-        log.name = log.name + filename.slice(10)
+  return (await get_logs(props.instance.path, true).catch(handleError))
+    .reverse()
+    .filter(
+      (log) =>
+        log.filename !== 'latest_stdout.log' &&
+        log.filename !== 'latest_stdout' &&
+        log.stdout !== ''
+    )
+    .map((log) => {
+      if (log.filename == 'latest.log') {
+        log.name = 'Latest Log'
       } else {
-        log.name = filename
+        let filename = log.filename.split('.')[0]
+        let day = dayjs(filename.slice(0, 10))
+        if (day.isValid()) {
+          if (day.isToday()) {
+            log.name = 'Today'
+          } else if (day.isYesterday()) {
+            log.name = 'Yesterday'
+          } else {
+            log.name = day.format('MMMM D, YYYY')
+          }
+          // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
+          log.name = log.name + filename.slice(10)
+        } else {
+          log.name = filename
+        }
       }
-    }
-    log.stdout = 'Loading...'
-    return log
-  })
+      log.stdout = 'Loading...'
+      return log
+    })
 }
 
 async function setLogs() {
-  const [liveLog, allLogs] = await Promise.all([getLiveLog(), getLogs()])
-  logs.value = [liveLog, ...allLogs]
+  const [liveStd, allLogs] = await Promise.all([getLiveStdLog(), getLogs()])
+  logs.value = [liveStd, ...allLogs]
 }
 
 const copyLog = () => {
@@ -426,7 +434,7 @@ function handleUserScroll() {
 
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
-    logs.value[0] = await getLiveLog()
+    logs.value[0] = await getLiveStdLog()
 
     const scroll = logContainer.value.getScroll()
     // Allow resetting of userScrolled if the user scrolls to the bottom

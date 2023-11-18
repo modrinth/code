@@ -50,6 +50,11 @@ export async function delete_logs(profilePath) {
     new_file: bool <- the cursor was too far, meaning that the file was likely rotated/reset. This signals to the frontend to clear the log and start over with this struct.
   }
 */
+// From latest.log directly
 export async function get_latest_log_cursor(profilePath, cursor) {
   return await invoke('plugin:logs|logs_get_latest_log_cursor', { profilePath, cursor })
+}
+// For std log (from modrinth app written latest_stdout.log, contains stdout and stderr)
+export async function get_std_log_cursor(profilePath, cursor) {
+  return await invoke('plugin:logs|logs_get_std_log_cursor', { profilePath, cursor })
 }

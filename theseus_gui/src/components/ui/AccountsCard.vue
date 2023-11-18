@@ -24,7 +24,10 @@
       :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
     >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`" />
+        <Avatar
+          size="xs"
+          :src="`https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`"
+        />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
