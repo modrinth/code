@@ -8,7 +8,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             settings_get,
             settings_set,
-            settings_change_config_dir
+            settings_change_config_dir,
+            settings_is_dir_writeable
         ])
         .build()
 }
@@ -36,4 +37,12 @@ pub async fn settings_set(settings: Settings) -> Result<()> {
 pub async fn settings_change_config_dir(new_config_dir: PathBuf) -> Result<()> {
     settings::set_config_dir(new_config_dir).await?;
     Ok(())
+}
+
+#[tauri::command]
+pub async fn settings_is_dir_writeable(
+    new_config_dir: PathBuf,
+) -> Result<bool> {
+    let res = settings::is_dir_writeable(new_config_dir).await?;
+    Ok(res)
 }

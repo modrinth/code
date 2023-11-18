@@ -1,6 +1,7 @@
 //! Theseus profile management interface
 
 use std::path::PathBuf;
+use tokio::fs;
 
 use io::IOError;
 use tokio::sync::RwLock;
@@ -187,4 +188,18 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
     );
 
     Ok(())
+}
+
+pub async fn is_dir_writeable(new_config_dir: PathBuf) -> crate::Result<bool> {
+    let temp_path = new_config_dir.join(".tmp");
+    match fs::write(temp_path.clone(), "test").await {
+        Ok(_) => {
+            fs::remove_file(temp_path).await?;
+            Ok(true)
+        }
+        Err(e) => {
+            tracing::error!("Error writing to new config dir: {}", e);
+            Ok(false)
+        }
+    }
 }
