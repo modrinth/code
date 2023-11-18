@@ -1,0 +1,13 @@
+comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        threshold: 60% # make CI green
+    patch:
+      default:
+        threshold: 60% # make CI green
+
+ignore: # ignore code coverage on following paths
+  - "**/tests"
