@@ -2,11 +2,13 @@
 import { Button, LogInIcon, Modal, ClipboardCopyIcon, GlobeIcon, Card } from 'omorphia'
 import { authenticate_await_completion, authenticate_begin_flow } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
+import { useTheming } from '@/store/theme.js'
 import mixpanel from 'mixpanel-browser'
 import { get, set } from '@/helpers/settings.js'
 import { ref } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 
+const themeStore = useTheming()
 const loginUrl = ref(null)
 const loginModal = ref()
 const loginCode = ref(null)
@@ -94,7 +96,7 @@ const clipboardWrite = async (a) => {
       </div>
     </Card>
   </div>
-  <Modal ref="loginModal" header="Signing in">
+  <Modal ref="loginModal" header="Signing in" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
