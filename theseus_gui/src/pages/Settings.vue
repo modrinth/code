@@ -119,10 +119,10 @@ async function findLauncherDir() {
   const newDir = await open({
     multiple: false,
     directory: true,
-    title: 'Select a new app directory'
+    title: 'Select a new app directory',
   })
 
-  const writeable = await is_dir_writeable(newDir);
+  const writeable = await is_dir_writeable(newDir)
 
   if (!writeable) {
     handleError('The selected directory does not have proper permissions for write access.')
