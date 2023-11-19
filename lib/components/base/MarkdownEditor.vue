@@ -263,7 +263,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Component, computed, ref, onMounted, onBeforeUnmount } from 'vue'
+import { type Component, computed, ref, onMounted, onBeforeUnmount, toRef, watch } from 'vue'
 
 import { EditorState } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
@@ -296,6 +296,7 @@ import {
   InfoIcon,
   Chips,
 } from '@/components'
+
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@/helpers/codemirror'
 import { renderHighlightedString } from '@/helpers/highlight'
 
@@ -332,8 +333,7 @@ const emit = defineEmits(['update:modelValue'])
 onMounted(() => {
   const updateListener = EditorView.updateListener.of((update) => {
     if (update.docChanged) {
-      currentValue.value = update.state.doc.toString()
-      emit('update:modelValue', currentValue.value)
+      updateCurrentValue(update.state.doc.toString())
     }
   })
 
@@ -357,8 +357,30 @@ onMounted(() => {
 
   const eventHandlers = EditorView.domEventHandlers({
     paste: (ev, view) => {
+      const { clipboardData } = ev
+      if (!clipboardData) return
+
+      if (clipboardData.files && clipboardData.files.length > 0 && props.onImageUpload) {
+        // If the user is pasting a file, upload it if there's an included handler and insert the link.
+        uploadImagesFromList(clipboardData.files)
+          .then(function (url) {
+            const selection = markdownCommands.yankSelection(view)
+            const altText = selection || 'Replace this with a description'
+            const linkMarkdown = `![${altText}](${url})`
+            return markdownCommands.replaceSelection(view, linkMarkdown)
+          })
+          .catch((error) => {
+            if (error instanceof Error) {
+              console.error('Problem with handling image.', error)
+            }
+          })
+
+        return false
+      }
+
       // If the user's pasting a url, automatically convert it to a link with the selection as the text or the url itself if no selection content.
       const url = ev.clipboardData?.getData('text/plain')
+
       if (url) {
         try {
           cleanUrl(url)
@@ -374,6 +396,7 @@ onMounted(() => {
         const linkMarkdown = `[${linkText}](${url})`
         return markdownCommands.replaceSelection(view, linkMarkdown)
       }
+
       // Check if the length of the document is greater than the max length. If it is, prevent the paste.
       if (props.maxLength && view.state.doc.length > props.maxLength) {
         ev.preventDefault()
@@ -401,7 +424,6 @@ onMounted(() => {
   })
 
   const editorState = EditorState.create({
-    doc: props.modelValue,
     extensions: [
       theme,
       eventHandlers,
@@ -519,7 +541,23 @@ const BUTTONS: ButtonGroupMap = {
   },
 }
 
-const currentValue = ref(props.modelValue)
+const currentValue = toRef(props, 'modelValue')
+watch(currentValue, (newValue) => {
+  if (editor) {
+    editor.dispatch({
+      changes: {
+        from: 0,
+        to: editor.state.doc.length,
+        insert: newValue,
+      },
+    })
+  }
+})
+
+const updateCurrentValue = (newValue: string) => {
+  emit('update:modelValue', newValue)
+}
+
 const previewMode = ref(false)
 
 const linkText = ref('')
@@ -586,20 +624,36 @@ const linkMarkdown = computed(() => {
   return ''
 })
 
+const uploadImagesFromList = async (files: FileList): Promise<string> => {
+  const file = files[0]
+  if (!props.onImageUpload) {
+    throw new Error('No image upload handler provided')
+  }
+  if (file) {
+    try {
+      const url = await props.onImageUpload(file)
+      return url
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Unable to upload image using handler.', error.message)
+        throw new Error(error.message)
+      }
+    }
+  }
+  throw new Error('No file provided')
+}
+
 const handleImageUpload = async (files: FileList) => {
   if (props.onImageUpload) {
-    const file = files[0]
-    if (file) {
-      try {
-        const url = await props.onImageUpload(file)
-        linkUrl.value = url
-        validateURL()
-      } catch (error) {
-        if (error instanceof Error) {
-          linkValidationErrorMessage.value = error.message
-        }
-        console.error(error)
+    try {
+      const uploadedURL = await uploadImagesFromList(files)
+      linkUrl.value = uploadedURL
+      validateURL()
+    } catch (error) {
+      if (error instanceof Error) {
+        linkValidationErrorMessage.value = error.message
       }
+      console.error(error)
     }
   }
 }
