@@ -40,20 +40,21 @@ async fn test_get_project() {
     assert_eq!(versions[0], json!(alpha_version_id));
 
     // Confirm that the request was cached
+    let mut redis_pool = test_env.db.redis_pool.connect().await.unwrap();
     assert_eq!(
-        test_env
-            .db
-            .redis_pool
-            .get::<i64, _>(PROJECTS_SLUGS_NAMESPACE, alpha_project_slug)
+        redis_pool
+            .get(PROJECTS_SLUGS_NAMESPACE, alpha_project_slug)
             .await
-            .unwrap(),
+            .unwrap()
+            .and_then(|x| x.parse::<i64>().ok()),
         Some(parse_base62(alpha_project_id).unwrap() as i64)
     );
 
-    let cached_project = test_env
-        .db
-        .redis_pool
-        .get::<String, _>(PROJECTS_NAMESPACE, parse_base62(alpha_project_id).unwrap())
+    let cached_project = redis_pool
+        .get(
+            PROJECTS_NAMESPACE,
+            &parse_base62(alpha_project_id).unwrap().to_string(),
+        )
         .await
         .unwrap()
         .unwrap();
@@ -249,22 +250,21 @@ async fn test_add_remove_project() {
     assert_eq!(resp.status(), 204);
 
     // Confirm that the project is gone from the cache
+    let mut redis_pool = test_env.db.redis_pool.connect().await.unwrap();
     assert_eq!(
-        test_env
-            .db
-            .redis_pool
-            .get::<i64, _>(PROJECTS_SLUGS_NAMESPACE, "demo")
+        redis_pool
+            .get(PROJECTS_SLUGS_NAMESPACE, "demo")
             .await
-            .unwrap(),
+            .unwrap()
+            .and_then(|x| x.parse::<i64>().ok()),
         None
     );
     assert_eq!(
-        test_env
-            .db
-            .redis_pool
-            .get::<i64, _>(PROJECTS_SLUGS_NAMESPACE, id)
+        redis_pool
+            .get(PROJECTS_SLUGS_NAMESPACE, &id)
             .await
-            .unwrap(),
+            .unwrap()
+            .and_then(|x| x.parse::<i64>().ok()),
         None
     );
 

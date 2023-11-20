@@ -58,6 +58,8 @@ impl Flow {
         expires: Duration,
         redis: &RedisPool,
     ) -> Result<String, DatabaseError> {
+        let mut redis = redis.connect().await?;
+
         let flow = ChaCha20Rng::from_entropy()
             .sample_iter(&Alphanumeric)
             .take(32)
@@ -71,6 +73,8 @@ impl Flow {
     }
 
     pub async fn get(id: &str, redis: &RedisPool) -> Result<Option<Flow>, DatabaseError> {
+        let mut redis = redis.connect().await?;
+
         redis.get_deserialized_from_json(FLOWS_NAMESPACE, id).await
     }
 
@@ -91,6 +95,8 @@ impl Flow {
     }
 
     pub async fn remove(id: &str, redis: &RedisPool) -> Result<Option<()>, DatabaseError> {
+        let mut redis = redis.connect().await?;
+
         redis.delete(FLOWS_NAMESPACE, id).await?;
         Ok(Some(()))
     }

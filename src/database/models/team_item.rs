@@ -197,18 +197,23 @@ impl TeamMember {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
+        use futures::stream::TryStreamExt;
+
         if team_ids.is_empty() {
             return Ok(Vec::new());
         }
 
-        use futures::stream::TryStreamExt;
+        let mut redis = redis.connect().await?;
 
         let mut team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
         let mut found_teams = Vec::new();
 
         let teams = redis
-            .multi_get::<String, _>(TEAMS_NAMESPACE, team_ids_parsed.clone())
+            .multi_get::<String>(
+                TEAMS_NAMESPACE,
+                team_ids_parsed.iter().map(|x| x.to_string()),
+            )
             .await?;
 
         for team_raw in teams {
@@ -271,6 +276,7 @@ impl TeamMember {
     }
 
     pub async fn clear_cache(id: TeamId, redis: &RedisPool) -> Result<(), super::DatabaseError> {
+        let mut redis = redis.connect().await?;
         redis.delete(TEAMS_NAMESPACE, id.0).await?;
         Ok(())
     }

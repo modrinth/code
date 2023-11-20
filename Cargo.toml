@@ -109,3 +109,9 @@ derive-new = "0.5.9"
 
 [dev-dependencies]
 actix-http = "3.4.0"
+
+[profile.dev]
+opt-level = 0                # Minimal optimization, speeds up compilation
+lto = false                  # Disables Link Time Optimization
+incremental = true           # Enables incremental compilation
+codegen-units = 16           # Higher number can improve compile times but reduce runtime performance

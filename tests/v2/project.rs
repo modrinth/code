@@ -221,22 +221,21 @@ async fn test_add_remove_project() {
     assert_eq!(resp.status(), 204);
 
     // Confirm that the project is gone from the cache
+    let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
     assert_eq!(
-        test_env
-            .db
-            .redis_pool
-            .get::<i64, _>(PROJECTS_SLUGS_NAMESPACE, "demo")
+        redis_conn
+            .get(PROJECTS_SLUGS_NAMESPACE, "demo")
             .await
-            .unwrap(),
+            .unwrap()
+            .map(|x| x.parse::<i64>().unwrap()),
         None
     );
     assert_eq!(
-        test_env
-            .db
-            .redis_pool
-            .get::<i64, _>(PROJECTS_SLUGS_NAMESPACE, id)
+        redis_conn
+            .get(PROJECTS_SLUGS_NAMESPACE, &id)
             .await
-            .unwrap(),
+            .unwrap()
+            .map(|x| x.parse::<i64>().unwrap()),
         None
     );
 

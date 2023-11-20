@@ -17,7 +17,7 @@ async fn search_projects() {
     // It should drastically simplify this function
 
     // Test setup and dummy data
-    let test_env = TestEnvironment::build(Some(8)).await;
+    let test_env = TestEnvironment::build(Some(10)).await;
     let api = &test_env.v2;
     let test_name = test_env.db.database_name.clone();
 

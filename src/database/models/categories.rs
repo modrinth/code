@@ -90,6 +90,8 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.connect().await?;
+
         let res: Option<Vec<Category>> = redis
             .get_deserialized_from_json(TAGS_NAMESPACE, "category")
             .await?;
@@ -155,6 +157,8 @@ impl DonationPlatform {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.connect().await?;
+
         let res: Option<Vec<DonationPlatform>> = redis
             .get_deserialized_from_json(TAGS_NAMESPACE, "donation_platform")
             .await?;
@@ -209,6 +213,8 @@ impl ReportType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.connect().await?;
+
         let res: Option<Vec<String>> = redis
             .get_deserialized_from_json(TAGS_NAMESPACE, "report_type")
             .await?;
@@ -257,6 +263,8 @@ impl ProjectType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.connect().await?;
+
         let res: Option<Vec<String>> = redis
             .get_deserialized_from_json(TAGS_NAMESPACE, "project_type")
             .await?;

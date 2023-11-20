@@ -157,6 +157,8 @@ impl Collection {
     {
         use futures::TryStreamExt;
 
+        let mut redis = redis.connect().await?;
+
         if collection_ids.is_empty() {
             return Ok(Vec::new());
         }
@@ -166,7 +168,10 @@ impl Collection {
 
         if !collection_ids.is_empty() {
             let collections = redis
-                .multi_get::<String, _>(COLLECTIONS_NAMESPACE, collection_ids.iter().map(|x| x.0))
+                .multi_get::<String>(
+                    COLLECTIONS_NAMESPACE,
+                    collection_ids.iter().map(|x| x.0.to_string()),
+                )
                 .await?;
 
             for collection in collections {
@@ -240,6 +245,8 @@ impl Collection {
     }
 
     pub async fn clear_cache(id: CollectionId, redis: &RedisPool) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+
         redis.delete(COLLECTIONS_NAMESPACE, id.0).await?;
         Ok(())
     }

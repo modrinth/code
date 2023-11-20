@@ -130,6 +130,8 @@ impl Session {
     {
         use futures::TryStreamExt;
 
+        let mut redis = redis.connect().await?;
+
         if session_strings.is_empty() {
             return Ok(Vec::new());
         }
@@ -147,7 +149,7 @@ impl Session {
 
         session_ids.append(
             &mut redis
-                .multi_get::<i64, _>(
+                .multi_get::<i64>(
                     SESSIONS_IDS_NAMESPACE,
                     session_strings.iter().map(|x| x.to_string()),
                 )
@@ -159,7 +161,10 @@ impl Session {
 
         if !session_ids.is_empty() {
             let sessions = redis
-                .multi_get::<String, _>(SESSIONS_NAMESPACE, session_ids)
+                .multi_get::<String>(
+                    SESSIONS_NAMESPACE,
+                    session_ids.iter().map(|x| x.to_string()),
+                )
                 .await?;
             for session in sessions {
                 if let Some(session) =
@@ -218,8 +223,8 @@ impl Session {
                 redis
                     .set(
                         SESSIONS_IDS_NAMESPACE,
-                        session.session.clone(),
-                        session.id.0,
+                        &session.session,
+                        &session.id.0.to_string(),
                         None,
                     )
                     .await?;
@@ -238,8 +243,13 @@ impl Session {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let mut redis = redis.connect().await?;
+
         let res = redis
-            .get_deserialized_from_json::<Vec<i64>, _>(SESSIONS_USERS_NAMESPACE, user_id.0)
+            .get_deserialized_from_json::<Vec<i64>>(
+                SESSIONS_USERS_NAMESPACE,
+                &user_id.0.to_string(),
+            )
             .await?;
 
         if let Some(res) = res {
@@ -272,6 +282,8 @@ impl Session {
         clear_sessions: Vec<(Option<SessionId>, Option<String>, Option<UserId>)>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+
         if clear_sessions.is_empty() {
             return Ok(());
         }

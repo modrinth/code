@@ -33,10 +33,12 @@ async fn test_get_version() {
     assert_eq!(&version.project_id.to_string(), alpha_project_id);
     assert_eq!(&version.id.to_string(), alpha_version_id);
 
-    let cached_project = test_env
-        .db
-        .redis_pool
-        .get::<String, _>(VERSIONS_NAMESPACE, parse_base62(alpha_version_id).unwrap())
+    let mut redis_conn = test_env.db.redis_pool.connect().await.unwrap();
+    let cached_project = redis_conn
+        .get(
+            VERSIONS_NAMESPACE,
+            &parse_base62(alpha_version_id).unwrap().to_string(),
+        )
         .await
         .unwrap()
         .unwrap();

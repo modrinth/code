@@ -174,8 +174,10 @@ impl Notification {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
+        let mut redis = redis.connect().await?;
+
         let cached_notifications: Option<Vec<Notification>> = redis
-            .get_deserialized_from_json(USER_NOTIFICATIONS_NAMESPACE, user_id.0)
+            .get_deserialized_from_json(USER_NOTIFICATIONS_NAMESPACE, &user_id.0.to_string())
             .await?;
 
         if let Some(notifications) = cached_notifications {
@@ -319,6 +321,8 @@ impl Notification {
         user_ids: impl IntoIterator<Item = &UserId>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
+        let mut redis = redis.connect().await?;
+
         redis
             .delete_many(
                 user_ids
