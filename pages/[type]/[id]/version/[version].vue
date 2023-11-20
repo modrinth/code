@@ -1117,26 +1117,32 @@ export default defineNuxtComponent({
           })
         }
 
+        const body = {
+          name: this.version.name || this.version.version_number,
+          version_number: this.version.version_number,
+          changelog: this.version.changelog,
+          version_type: this.version.version_type,
+          dependencies: this.version.dependencies,
+          game_versions: this.version.game_versions,
+          loaders: this.version.loaders,
+          primary_file: ['sha1', this.primaryFile.hashes.sha1],
+          featured: this.version.featured,
+          file_types: this.oldFileTypes.map((x, i) => {
+            return {
+              algorithm: 'sha1',
+              hash: this.version.files[i].hashes.sha1,
+              file_type: x ? x.value : null,
+            }
+          }),
+        }
+
+        if (this.project.project_type === 'modpack') {
+          delete body.dependencies
+        }
+
         await useBaseFetch(`version/${this.version.id}`, {
           method: 'PATCH',
-          body: {
-            name: this.version.name || this.version.version_number,
-            version_number: this.version.version_number,
-            changelog: this.version.changelog,
-            version_type: this.version.version_type,
-            dependencies: this.version.dependencies,
-            game_versions: this.version.game_versions,
-            loaders: this.version.loaders,
-            primary_file: ['sha1', this.primaryFile.hashes.sha1],
-            featured: this.version.featured,
-            file_types: this.oldFileTypes.map((x, i) => {
-              return {
-                algorithm: 'sha1',
-                hash: this.version.files[i].hashes.sha1,
-                file_type: x ? x.value : null,
-              }
-            }),
-          },
+          body,
         })
 
         for (const hash of this.deleteFiles) {
