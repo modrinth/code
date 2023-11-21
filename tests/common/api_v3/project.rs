@@ -204,13 +204,21 @@ impl ApiV3 {
     pub async fn get_analytics_revenue(
         &self,
         id_or_slugs: Vec<&str>,
+        ids_are_version_ids: bool,
         start_date: Option<DateTime<Utc>>,
         end_date: Option<DateTime<Utc>>,
         resolution_minutes: Option<u32>,
         pat: &str,
     ) -> ServiceResponse {
-        let projects_string = serde_json::to_string(&id_or_slugs).unwrap();
-        let projects_string = urlencoding::encode(&projects_string);
+        let pv_string = if ids_are_version_ids {
+            let version_string: String = serde_json::to_string(&id_or_slugs).unwrap();
+            let version_string = urlencoding::encode(&version_string);
+            format!("version_ids={}", version_string)
+        } else {
+            let projects_string: String = serde_json::to_string(&id_or_slugs).unwrap();
+            let projects_string = urlencoding::encode(&projects_string);
+            format!("project_ids={}", projects_string)
+        };
 
         let mut extra_args = String::new();
         if let Some(start_date) = start_date {
@@ -230,9 +238,7 @@ impl ApiV3 {
         }
 
         let req = test::TestRequest::get()
-            .uri(&format!(
-                "/v3/analytics/revenue?{projects_string}{extra_args}",
-            ))
+            .uri(&format!("/v3/analytics/revenue?{pv_string}{extra_args}",))
             .append_header(("Authorization", pat))
             .to_request();
 
@@ -242,13 +248,21 @@ impl ApiV3 {
     pub async fn get_analytics_revenue_deserialized(
         &self,
         id_or_slugs: Vec<&str>,
+        ids_are_version_ids: bool,
         start_date: Option<DateTime<Utc>>,
         end_date: Option<DateTime<Utc>>,
         resolution_minutes: Option<u32>,
         pat: &str,
     ) -> HashMap<String, HashMap<i64, Decimal>> {
         let resp = self
-            .get_analytics_revenue(id_or_slugs, start_date, end_date, resolution_minutes, pat)
+            .get_analytics_revenue(
+                id_or_slugs,
+                ids_are_version_ids,
+                start_date,
+                end_date,
+                resolution_minutes,
+                pat,
+            )
             .await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await

@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use actix_http::StatusCode;
 use actix_web::test::{self, TestRequest};
 use itertools::Itertools;
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
@@ -45,6 +46,12 @@ pub struct PermissionsTest<'a> {
     // The codes that is allow to be returned if the scope is not present.
     // (for instance, we might expect a 401, but not a 400)
     allowed_failure_codes: Vec<u16>,
+
+    // Closures that check the JSON body of the response for failure and success cases.
+    // These are used to perform more complex tests than just checking the status code.
+    // (eg: checking that the response contains the correct data)
+    failure_json_check: Option<Box<dyn Fn(&serde_json::Value) + Send>>,
+    success_json_check: Option<Box<dyn Fn(&serde_json::Value) + Send>>,
 }
 
 pub struct PermissionsTestContext<'a> {
@@ -71,6 +78,8 @@ impl<'a> PermissionsTest<'a> {
             project_team_id: None,
             organization_team_id: None,
             allowed_failure_codes: vec![401, 404],
+            failure_json_check: None,
+            success_json_check: None,
         }
     }
 
@@ -84,6 +93,20 @@ impl<'a> PermissionsTest<'a> {
     ) -> Self {
         self.failure_project_permissions = failure_project_permissions;
         self.failure_organization_permissions = failure_organization_permissions;
+        self
+    }
+
+    // Set check closures for the JSON body of the response
+    // These are used to perform more complex tests than just checking the status code.
+    // If not set, no checks will be performed (and the status code is the only check).
+    // This is useful if, say, both expected status codes are 200.
+    pub fn with_200_json_checks(
+        mut self,
+        failure_json_check: impl Fn(&serde_json::Value) + Send + 'static,
+        success_json_check: impl Fn(&serde_json::Value) + Send + 'static,
+    ) -> Self {
+        self.failure_json_check = Some(Box::new(failure_json_check));
+        self.success_json_check = Some(Box::new(success_json_check));
         self
     }
 
@@ -181,6 +204,11 @@ impl<'a> PermissionsTest<'a> {
                 resp.status().as_u16()
             ));
         }
+        if resp.status() == StatusCode::OK {
+            if let Some(failure_json_check) = &self.failure_json_check {
+                failure_json_check(&test::read_body_json(resp).await);
+            }
+        }
 
         // Failure test- logged in on a non-team user
         let request = req_gen(&PermissionsTestContext {
@@ -202,6 +230,11 @@ impl<'a> PermissionsTest<'a> {
                 resp.status().as_u16()
             ));
         }
+        if resp.status() == StatusCode::OK {
+            if let Some(failure_json_check) = &self.failure_json_check {
+                failure_json_check(&test::read_body_json(resp).await);
+            }
+        }
 
         // Failure test- logged in with EVERY non-relevant permission
         let request = req_gen(&PermissionsTestContext {
@@ -222,6 +255,11 @@ impl<'a> PermissionsTest<'a> {
                     .join(","),
                 resp.status().as_u16()
             ));
+        }
+        if resp.status() == StatusCode::OK {
+            if let Some(failure_json_check) = &self.failure_json_check {
+                failure_json_check(&test::read_body_json(resp).await);
+            }
         }
 
         // Patch user's permissions to success permissions
@@ -249,6 +287,11 @@ impl<'a> PermissionsTest<'a> {
                 "Success permissions test failed. Expected success, got {}",
                 resp.status().as_u16()
             ));
+        }
+        if resp.status() == StatusCode::OK {
+            if let Some(success_json_check) = &self.success_json_check {
+                success_json_check(&test::read_body_json(resp).await);
+            }
         }
 
         // If the remove_user flag is set, remove the user from the project

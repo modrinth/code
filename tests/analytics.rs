@@ -1,8 +1,11 @@
+use actix_web::test;
 use chrono::{DateTime, Duration, Utc};
-use common::database::*;
 use common::environment::TestEnvironment;
+use common::permissions::PermissionsTest;
+use common::{database::*, permissions::PermissionsTestContext};
 use itertools::Itertools;
 use labrinth::models::ids::base62_impl::parse_base62;
+use labrinth::models::teams::ProjectPermissions;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 
 mod common;
@@ -70,6 +73,7 @@ pub async fn analytics_revenue() {
     let analytics = api
         .get_analytics_revenue_deserialized(
             vec![&alpha_project_id],
+            false,
             None,
             None,
             None,
@@ -99,6 +103,7 @@ pub async fn analytics_revenue() {
     let analytics = api
         .get_analytics_revenue_deserialized(
             vec![&alpha_project_id],
+            false,
             Some(Utc::now() - Duration::days(801)),
             None,
             None,
@@ -132,4 +137,93 @@ fn to_f64_rounded_up(d: Decimal) -> f64 {
 
 fn to_f64_vec_rounded_up(d: Vec<Decimal>) -> Vec<f64> {
     d.into_iter().map(to_f64_rounded_up).collect_vec()
+}
+
+#[actix_rt::test]
+pub async fn permissions_analytics_revenue() {
+    let test_env = TestEnvironment::build(None).await;
+
+    let alpha_project_id = test_env
+        .dummy
+        .as_ref()
+        .unwrap()
+        .project_alpha
+        .project_id
+        .clone();
+    let alpha_version_id = test_env
+        .dummy
+        .as_ref()
+        .unwrap()
+        .project_alpha
+        .version_id
+        .clone();
+    let alpha_team_id = test_env
+        .dummy
+        .as_ref()
+        .unwrap()
+        .project_alpha
+        .team_id
+        .clone();
+
+    let view_analytics = ProjectPermissions::VIEW_ANALYTICS;
+
+    // first, do check with a project
+    let req_gen = |ctx: &PermissionsTestContext| {
+        let projects_string = serde_json::to_string(&vec![ctx.project_id]).unwrap();
+        let projects_string = urlencoding::encode(&projects_string);
+        test::TestRequest::get().uri(&format!(
+            "/v3/analytics/revenue?project_ids={projects_string}&resolution_minutes=5",
+        ))
+    };
+
+    PermissionsTest::new(&test_env)
+        .with_failure_codes(vec![200, 401])
+        .with_200_json_checks(
+            // On failure, should have 0 projects returned
+            |value: &serde_json::Value| {
+                let value = value.as_object().unwrap();
+                assert_eq!(value.len(), 0);
+            },
+            // On success, should have 1 project returned
+            |value: &serde_json::Value| {
+                let value = value.as_object().unwrap();
+                assert_eq!(value.len(), 1);
+            },
+        )
+        .simple_project_permissions_test(view_analytics, req_gen)
+        .await
+        .unwrap();
+
+    // Now with a version
+    // Need to use alpha
+    let req_gen = |_: &PermissionsTestContext| {
+        let versions_string = serde_json::to_string(&vec![alpha_version_id.clone()]).unwrap();
+        let versions_string = urlencoding::encode(&versions_string);
+        test::TestRequest::get().uri(&format!(
+            "/v3/analytics/revenue?version_ids={versions_string}&resolution_minutes=5",
+        ))
+    };
+
+    PermissionsTest::new(&test_env)
+        .with_failure_codes(vec![200, 401])
+        .with_existing_project(&alpha_project_id, &alpha_team_id)
+        .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
+        .with_200_json_checks(
+            // On failure, should have 0 versions returned
+            |value: &serde_json::Value| {
+                let value = value.as_object().unwrap();
+                assert_eq!(value.len(), 0);
+            },
+            // On success, should have 1 versions returned
+            |value: &serde_json::Value| {
+                let value = value.as_object().unwrap();
+                assert_eq!(value.len(), 1);
+            },
+        )
+        .simple_project_permissions_test(view_analytics, req_gen)
+        .await
+        .unwrap();
+
+    // Cleanup test db
+    test_env.cleanup().await;
 }

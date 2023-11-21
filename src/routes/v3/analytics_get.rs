@@ -1,8 +1,10 @@
 use super::ApiError;
+use crate::database;
 use crate::database::redis::RedisPool;
+use crate::models::teams::ProjectPermissions;
 use crate::{
-    auth::{filter_authorized_projects, filter_authorized_versions, get_user_from_headers},
-    database::models::{project_item, user_item, version_item},
+    auth::get_user_from_headers,
+    database::models::user_item,
     models::{
         ids::{
             base62_impl::{parse_base62, to_base62},
@@ -351,6 +353,7 @@ pub async fn revenue_get(
         .try_into()
         .map_err(|_| ApiError::InvalidInput("Invalid resolution_minutes".to_string()))?;
     // Get the revenue data
+    let project_ids = project_ids.unwrap_or_default();
     let payouts_values = sqlx::query!(
         "
         SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start
@@ -358,7 +361,7 @@ pub async fn revenue_get(
         WHERE mod_id = ANY($1) AND created BETWEEN $2 AND $3
         GROUP by mod_id, interval_start ORDER BY interval_start
         ",
-        &project_ids.unwrap_or_default().into_iter().map(|x| x.0 as i64).collect::<Vec<_>>(),
+        &project_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>(),
         start_date,
         end_date,
         duration,
@@ -366,7 +369,10 @@ pub async fn revenue_get(
         .fetch_all(&**pool)
         .await?;
 
-    let mut hm = HashMap::new();
+    let mut hm: HashMap<_, _> = project_ids
+        .into_iter()
+        .map(|x| (x.to_string(), HashMap::new()))
+        .collect::<HashMap<_, _>>();
     for value in payouts_values {
         if let Some(mod_id) = value.mod_id {
             if let Some(amount) = value.amount_sum {
@@ -559,7 +565,7 @@ async fn filter_allowed_ids(
         ));
     }
 
-    // If no project_ids or version_ids are provided, we default to all projects the user has access to
+    // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
     if project_ids.is_none() && version_ids.is_none() {
         project_ids = Some(
             user_item::User::get_projects(user.id.into(), &***pool, redis)
@@ -572,35 +578,154 @@ async fn filter_allowed_ids(
 
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
+    let project_ids = if let Some(project_strings) = project_ids {
+        let projects_data =
+            database::models::Project::get_many(&project_strings, &***pool, redis).await?;
 
-    let project_ids = if let Some(project_ids) = project_ids {
-        // Submitted project_ids are filtered by the user's permissions
-        let ids = project_ids
+        let team_ids = projects_data
             .iter()
-            .map(|id| Ok(ProjectId(parse_base62(id)?).into()))
-            .collect::<Result<Vec<_>, ApiError>>()?;
-        let projects = project_item::Project::get_many_ids(&ids, &***pool, redis).await?;
-        let ids: Vec<ProjectId> = filter_authorized_projects(projects, &Some(user.clone()), pool)
-            .await?
+            .map(|x| x.inner.team_id)
+            .collect::<Vec<database::models::TeamId>>();
+        let team_members =
+            database::models::TeamMember::get_from_team_full_many(&team_ids, &***pool, redis)
+                .await?;
+
+        let organization_ids = projects_data
+            .iter()
+            .filter_map(|x| x.inner.organization_id)
+            .collect::<Vec<database::models::OrganizationId>>();
+        let organizations =
+            database::models::Organization::get_many_ids(&organization_ids, &***pool, redis)
+                .await?;
+
+        let organization_team_ids = organizations
+            .iter()
+            .map(|x| x.team_id)
+            .collect::<Vec<database::models::TeamId>>();
+        let organization_team_members = database::models::TeamMember::get_from_team_full_many(
+            &organization_team_ids,
+            &***pool,
+            redis,
+        )
+        .await?;
+
+        let ids = projects_data
             .into_iter()
-            .map(|x| x.id)
+            .filter(|project| {
+                let team_member = team_members
+                    .iter()
+                    .find(|x| x.team_id == project.inner.team_id && x.user_id == user.id.into());
+
+                let organization = project
+                    .inner
+                    .organization_id
+                    .and_then(|oid| organizations.iter().find(|x| x.id == oid));
+
+                let organization_team_member = if let Some(organization) = organization {
+                    organization_team_members
+                        .iter()
+                        .find(|x| x.team_id == organization.team_id && x.user_id == user.id.into())
+                } else {
+                    None
+                };
+
+                let permissions = ProjectPermissions::get_permissions_by_role(
+                    &user.role,
+                    &team_member.cloned(),
+                    &organization_team_member.cloned(),
+                )
+                .unwrap_or_default();
+
+                permissions.contains(ProjectPermissions::VIEW_ANALYTICS)
+            })
+            .map(|x| x.inner.id.into())
             .collect::<Vec<_>>();
+
         Some(ids)
     } else {
         None
     };
+
     let version_ids = if let Some(version_ids) = version_ids {
         // Submitted version_ids are filtered by the user's permissions
         let ids = version_ids
             .iter()
             .map(|id| Ok(VersionId(parse_base62(id)?).into()))
             .collect::<Result<Vec<_>, ApiError>>()?;
-        let versions = version_item::Version::get_many(&ids, &***pool, redis).await?;
-        let ids: Vec<VersionId> = filter_authorized_versions(versions, &Some(user), pool)
-            .await?
+        let versions_data = database::models::Version::get_many(&ids, &***pool, redis).await?;
+        let project_ids = versions_data
+            .iter()
+            .map(|x| x.inner.project_id)
+            .collect::<Vec<database::models::ProjectId>>();
+
+        let projects_data =
+            database::models::Project::get_many_ids(&project_ids, &***pool, redis).await?;
+
+        let team_ids = projects_data
+            .iter()
+            .map(|x| x.inner.team_id)
+            .collect::<Vec<database::models::TeamId>>();
+        let team_members =
+            database::models::TeamMember::get_from_team_full_many(&team_ids, &***pool, redis)
+                .await?;
+
+        let organization_ids = projects_data
+            .iter()
+            .filter_map(|x| x.inner.organization_id)
+            .collect::<Vec<database::models::OrganizationId>>();
+        let organizations =
+            database::models::Organization::get_many_ids(&organization_ids, &***pool, redis)
+                .await?;
+
+        let organization_team_ids = organizations
+            .iter()
+            .map(|x| x.team_id)
+            .collect::<Vec<database::models::TeamId>>();
+        let organization_team_members = database::models::TeamMember::get_from_team_full_many(
+            &organization_team_ids,
+            &***pool,
+            redis,
+        )
+        .await?;
+
+        let ids = projects_data
             .into_iter()
-            .map(|x| x.id)
+            .filter(|project| {
+                let team_member = team_members
+                    .iter()
+                    .find(|x| x.team_id == project.inner.team_id && x.user_id == user.id.into());
+
+                let organization = project
+                    .inner
+                    .organization_id
+                    .and_then(|oid| organizations.iter().find(|x| x.id == oid));
+
+                let organization_team_member = if let Some(organization) = organization {
+                    organization_team_members
+                        .iter()
+                        .find(|x| x.team_id == organization.team_id && x.user_id == user.id.into())
+                } else {
+                    None
+                };
+
+                let permissions = ProjectPermissions::get_permissions_by_role(
+                    &user.role,
+                    &team_member.cloned(),
+                    &organization_team_member.cloned(),
+                )
+                .unwrap_or_default();
+
+                permissions.contains(ProjectPermissions::VIEW_ANALYTICS)
+            })
+            .map(|x| x.inner.id)
             .collect::<Vec<_>>();
+
+        let ids = versions_data
+            .into_iter()
+            .filter(|version| ids.contains(&version.inner.project_id))
+            .map(|x| x.inner.id.into())
+            .collect::<Vec<_>>();
+
         Some(ids)
     } else {
         None
