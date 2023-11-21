@@ -11,7 +11,7 @@
       :size="mode === 'expanded' ? 'xs' : 'sm'"
       :src="
         selectedAccount
-          ? `https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`
+          ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
@@ -45,10 +45,7 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar
-              :src="`https://crafatar.com/avatars/${selectedAccount.id}?size=128&overlay`"
-              class="icon"
-            />
+            <Avatar :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`" class="icon" />
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
@@ -62,7 +59,7 @@
       </Button>
     </Card>
   </transition>
-  <Modal ref="loginModal" class="modal" header="Signing in">
+  <Modal ref="loginModal" class="modal" header="Signing in" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
@@ -120,6 +117,7 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
+import { useTheming } from '@/store/theme.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
 import { process_listener } from '@/helpers/events'
@@ -136,6 +134,7 @@ const emit = defineEmits(['change'])
 
 const loginCode = ref(null)
 
+const themeStore = useTheming()
 const settings = ref({})
 const accounts = ref([])
 const loginUrl = ref('')

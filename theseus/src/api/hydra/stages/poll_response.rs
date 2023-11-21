@@ -8,6 +8,8 @@ use crate::{
     util::fetch::REQWEST_CLIENT,
 };
 
+use super::auth_retry;
+
 #[derive(Debug, Deserialize)]
 pub struct OauthSuccess {
     pub token_type: String,
@@ -17,6 +19,7 @@ pub struct OauthSuccess {
     pub refresh_token: String,
 }
 
+#[tracing::instrument]
 pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
     let mut params = HashMap::new();
     params.insert("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
@@ -26,14 +29,16 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
     // Poll the URL in a loop until we are successful.
     // On an authorization_pending response, wait 5 seconds and try again.
     loop {
-        let resp = REQWEST_CLIENT
+        let resp = auth_retry(|| {
+            REQWEST_CLIENT
             .post(
                 "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
             )
             .header("Content-Type", "application/x-www-form-urlencoded")
             .form(&params)
             .send()
-            .await?;
+        })
+        .await?;
 
         match resp.status() {
             StatusCode::OK => {

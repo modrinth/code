@@ -1,5 +1,9 @@
 use serde_json::json;
 
+use crate::util::fetch::REQWEST_CLIENT;
+
+use super::auth_retry;
+
 const XSTS_AUTH_URL: &str = "https://xsts.auth.xboxlive.com/xsts/authorize";
 
 pub enum XSTSResponse {
@@ -7,23 +11,25 @@ pub enum XSTSResponse {
     Success { token: String },
 }
 
+#[tracing::instrument]
 pub async fn fetch_token(token: &str) -> crate::Result<XSTSResponse> {
-    let client = reqwest::Client::new();
-    let resp = client
-        .post(XSTS_AUTH_URL)
-        .header(reqwest::header::ACCEPT, "application/json")
-        .json(&json!({
-            "Properties": {
-                "SandboxId": "RETAIL",
-                "UserTokens": [
-                    token
-                ]
-            },
-            "RelyingParty": "rp://api.minecraftservices.com/",
-            "TokenType": "JWT"
-        }))
-        .send()
-        .await?;
+    let resp = auth_retry(|| {
+        REQWEST_CLIENT
+            .post(XSTS_AUTH_URL)
+            .header(reqwest::header::ACCEPT, "application/json")
+            .json(&json!({
+                "Properties": {
+                    "SandboxId": "RETAIL",
+                    "UserTokens": [
+                        token
+                    ]
+                },
+                "RelyingParty": "rp://api.minecraftservices.com/",
+                "TokenType": "JWT"
+            }))
+            .send()
+    })
+    .await?;
     let status = resp.status();
 
     let body = resp.text().await?;

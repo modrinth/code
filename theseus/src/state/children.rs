@@ -1,12 +1,21 @@
+use super::DirectoryInfo;
 use super::{Profile, ProfilePathId};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::Serialize;
+use std::path::Path;
 use std::{collections::HashMap, sync::Arc};
 use sysinfo::PidExt;
+use tokio::fs::File;
+use tokio::io::AsyncBufReadExt;
+use tokio::io::AsyncWriteExt;
+use tokio::io::BufReader;
 use tokio::process::Child;
+use tokio::process::ChildStderr;
+use tokio::process::ChildStdout;
 use tokio::process::Command;
 use tokio::sync::RwLock;
+use tracing::error;
 
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
@@ -192,6 +201,7 @@ impl ChildType {
 pub struct MinecraftChild {
     pub uuid: Uuid,
     pub profile_relative_path: ProfilePathId,
+    pub output: Option<SharedOutput>,
     pub manager: Option<JoinHandle<crate::Result<i32>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<ChildType>>,
     pub last_updated_playtime: DateTime<Utc>, // The last time we updated the playtime for the associated profile
@@ -271,7 +281,43 @@ impl Children {
         censor_strings: HashMap<String, String>,
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
-        let child = mc_command.spawn().map_err(IOError::from)?;
+        let mut child = mc_command.spawn().map_err(IOError::from)?;
+
+        // Create std watcher threads for stdout and stderr
+        let log_path = DirectoryInfo::profile_logs_dir(&profile_relative_path)
+            .await?
+            .join("latest_stdout.log");
+        let shared_output =
+            SharedOutput::build(&log_path, censor_strings).await?;
+        if let Some(child_stdout) = child.stdout.take() {
+            let stdout_clone = shared_output.clone();
+            tokio::spawn(async move {
+                if let Err(e) = stdout_clone.read_stdout(child_stdout).await {
+                    error!("Stdout process died with error: {}", e);
+                    let _ = stdout_clone
+                        .push_line(format!(
+                            "Stdout process died with error: {}",
+                            e
+                        ))
+                        .await;
+                }
+            });
+        }
+        if let Some(child_stderr) = child.stderr.take() {
+            let stderr_clone = shared_output.clone();
+            tokio::spawn(async move {
+                if let Err(e) = stderr_clone.read_stderr(child_stderr).await {
+                    error!("Stderr process died with error: {}", e);
+                    let _ = stderr_clone
+                        .push_line(format!(
+                            "Stderr process died with error: {}",
+                            e
+                        ))
+                        .await;
+                }
+            });
+        }
+
         let child = ChildType::TokioChild(child);
 
         // Slots child into manager
@@ -312,6 +358,7 @@ impl Children {
         let mchild = MinecraftChild {
             uuid,
             profile_relative_path,
+            output: Some(shared_output),
             current_child,
             manager,
             last_updated_playtime,
@@ -402,6 +449,7 @@ impl Children {
         let mchild = MinecraftChild {
             uuid: cached_process.uuid,
             profile_relative_path: cached_process.profile_relative_path,
+            output: None, // No output for cached/rescued processes
             current_child,
             manager,
             last_updated_playtime,
@@ -708,5 +756,119 @@ impl Children {
 impl Default for Children {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+// SharedOutput, a wrapper around a String that can be read from and written to concurrently
+// Designed to be used with ChildStdout and ChildStderr in a tokio thread to have a simple String storage for the output of a child process
+#[derive(Debug, Clone)]
+pub struct SharedOutput {
+    log_file: Arc<RwLock<File>>,
+    censor_strings: HashMap<String, String>,
+}
+
+impl SharedOutput {
+    #[tracing::instrument(skip(censor_strings))]
+    async fn build(
+        log_file_path: &Path,
+        censor_strings: HashMap<String, String>,
+    ) -> crate::Result<Self> {
+        // create log_file_path parent if it doesn't exist
+        let parent_folder = log_file_path.parent().ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Could not get parent folder of {:?}",
+                log_file_path
+            ))
+        })?;
+        tokio::fs::create_dir_all(parent_folder)
+            .await
+            .map_err(|e| IOError::with_path(e, parent_folder))?;
+
+        Ok(SharedOutput {
+            log_file: Arc::new(RwLock::new(
+                File::create(log_file_path)
+                    .await
+                    .map_err(|e| IOError::with_path(e, log_file_path))?,
+            )),
+            censor_strings,
+        })
+    }
+
+    async fn read_stdout(
+        &self,
+        child_stdout: ChildStdout,
+    ) -> crate::Result<()> {
+        let mut buf_reader = BufReader::new(child_stdout);
+        let mut buf = Vec::new();
+
+        while buf_reader
+            .read_until(b'\n', &mut buf)
+            .await
+            .map_err(IOError::from)?
+            > 0
+        {
+            let line = String::from_utf8_lossy(&buf).into_owned();
+            let val_line = self.censor_log(line.clone());
+            {
+                let mut log_file = self.log_file.write().await;
+                log_file
+                    .write_all(val_line.as_bytes())
+                    .await
+                    .map_err(IOError::from)?;
+            }
+
+            buf.clear();
+        }
+        Ok(())
+    }
+
+    async fn read_stderr(
+        &self,
+        child_stderr: ChildStderr,
+    ) -> crate::Result<()> {
+        let mut buf_reader = BufReader::new(child_stderr);
+        let mut buf = Vec::new();
+
+        // TODO: these can be asbtracted into noe function
+        while buf_reader
+            .read_until(b'\n', &mut buf)
+            .await
+            .map_err(IOError::from)?
+            > 0
+        {
+            let line = String::from_utf8_lossy(&buf).into_owned();
+            let val_line = self.censor_log(line.clone());
+            {
+                let mut log_file = self.log_file.write().await;
+                log_file
+                    .write_all(val_line.as_bytes())
+                    .await
+                    .map_err(IOError::from)?;
+            }
+
+            buf.clear();
+        }
+        Ok(())
+    }
+
+    async fn push_line(&self, line: String) -> crate::Result<()> {
+        let val_line = self.censor_log(line.clone());
+        {
+            let mut log_file = self.log_file.write().await;
+            log_file
+                .write_all(val_line.as_bytes())
+                .await
+                .map_err(IOError::from)?;
+        }
+
+        Ok(())
+    }
+
+    fn censor_log(&self, mut val: String) -> String {
+        for (find, replace) in &self.censor_strings {
+            val = val.replace(find, replace);
+        }
+
+        val
     }
 }

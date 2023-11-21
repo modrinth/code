@@ -1,7 +1,7 @@
 use std::io::{Read, SeekFrom};
 
 use crate::{
-    prelude::Credentials,
+    prelude::{Credentials, DirectoryInfo},
     util::io::{self, IOError},
     {state::ProfilePathId, State},
 };
@@ -74,7 +74,6 @@ pub async fn get_logs(
     profile_path: ProfilePathId,
     clear_contents: Option<bool>,
 ) -> crate::Result<Vec<Logs>> {
-    let state = State::get().await?;
     let profile_path =
         if let Some(p) = crate::profile::get(&profile_path, None).await? {
             p.profile_id()
@@ -85,7 +84,7 @@ pub async fn get_logs(
             .into());
         };
 
-    let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
+    let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
     let mut logs = Vec::new();
     if logs_folder.exists() {
         for entry in std::fs::read_dir(&logs_folder)
@@ -138,8 +137,7 @@ pub async fn get_output_by_filename(
     file_name: &str,
 ) -> crate::Result<CensoredString> {
     let state = State::get().await?;
-    let logs_folder =
-        state.directories.profile_logs_dir(profile_subpath).await?;
+    let logs_folder = DirectoryInfo::profile_logs_dir(profile_subpath).await?;
     let path = logs_folder.join(file_name);
 
     let credentials: Vec<Credentials> =
@@ -201,8 +199,7 @@ pub async fn delete_logs(profile_path: ProfilePathId) -> crate::Result<()> {
             .into());
         };
 
-    let state = State::get().await?;
-    let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
+    let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
     for entry in std::fs::read_dir(&logs_folder)
         .map_err(|e| IOError::with_path(e, &logs_folder))?
     {
@@ -230,8 +227,7 @@ pub async fn delete_logs_by_filename(
             .into());
         };
 
-    let state = State::get().await?;
-    let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
+    let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
     let path = logs_folder.join(filename);
     io::remove_dir_all(&path).await?;
     Ok(())
@@ -240,6 +236,23 @@ pub async fn delete_logs_by_filename(
 #[tracing::instrument]
 pub async fn get_latest_log_cursor(
     profile_path: ProfilePathId,
+    cursor: u64, // 0 to start at beginning of file
+) -> crate::Result<LatestLogCursor> {
+    get_generic_live_log_cursor(profile_path, "latest.log", cursor).await
+}
+
+#[tracing::instrument]
+pub async fn get_std_log_cursor(
+    profile_path: ProfilePathId,
+    cursor: u64, // 0 to start at beginning of file
+) -> crate::Result<LatestLogCursor> {
+    get_generic_live_log_cursor(profile_path, "latest_stdout.log", cursor).await
+}
+
+#[tracing::instrument]
+pub async fn get_generic_live_log_cursor(
+    profile_path: ProfilePathId,
+    log_file_name: &str,
     mut cursor: u64, // 0 to start at beginning of file
 ) -> crate::Result<LatestLogCursor> {
     let profile_path =
@@ -253,8 +266,8 @@ pub async fn get_latest_log_cursor(
         };
 
     let state = State::get().await?;
-    let logs_folder = state.directories.profile_logs_dir(&profile_path).await?;
-    let path = logs_folder.join("latest.log");
+    let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
+    let path = logs_folder.join(log_file_name);
     if !path.exists() {
         // Allow silent failure if latest.log doesn't exist (as the instance may have been launched, but not yet created the file)
         return Ok(LatestLogCursor {

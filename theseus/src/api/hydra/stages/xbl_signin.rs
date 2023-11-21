@@ -1,5 +1,9 @@
 use serde_json::json;
 
+use crate::util::fetch::REQWEST_CLIENT;
+
+use super::auth_retry;
+
 const XBL_AUTH_URL: &str = "https://user.auth.xboxlive.com/user/authenticate";
 
 // Deserialization
@@ -9,25 +13,26 @@ pub struct XBLLogin {
 }
 
 // Impl
+#[tracing::instrument]
 pub async fn login_xbl(token: &str) -> crate::Result<XBLLogin> {
-    let client = reqwest::Client::new();
-    let body = client
-        .post(XBL_AUTH_URL)
-        .header(reqwest::header::ACCEPT, "application/json")
-        .header("x-xbl-contract-version", "1")
-        .json(&json!({
-            "Properties": {
-                "AuthMethod": "RPS",
-                "SiteName": "user.auth.xboxlive.com",
-                "RpsTicket": format!("d={token}")
-            },
-            "RelyingParty": "http://auth.xboxlive.com",
-            "TokenType": "JWT"
-        }))
-        .send()
-        .await?
-        .text()
-        .await?;
+    let response = auth_retry(|| {
+        REQWEST_CLIENT
+            .post(XBL_AUTH_URL)
+            .header(reqwest::header::ACCEPT, "application/json")
+            .header("x-xbl-contract-version", "1")
+            .json(&json!({
+                "Properties": {
+                    "AuthMethod": "RPS",
+                    "SiteName": "user.auth.xboxlive.com",
+                    "RpsTicket": format!("d={token}")
+                },
+                "RelyingParty": "http://auth.xboxlive.com",
+                "TokenType": "JWT"
+            }))
+            .send()
+    })
+    .await?;
+    let body = response.text().await?;
 
     let json = serde_json::from_str::<serde_json::Value>(&body)?;
     let token = Some(&json)

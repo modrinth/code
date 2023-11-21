@@ -14,7 +14,7 @@ import {
   UpdatedIcon,
 } from 'omorphia'
 import { handleError, useTheming } from '@/store/state'
-import { change_config_dir, get, set } from '@/helpers/settings'
+import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
@@ -119,7 +119,18 @@ async function signInAfter() {
 }
 
 async function findLauncherDir() {
-  const newDir = await open({ multiple: false, directory: true })
+  const newDir = await open({
+    multiple: false,
+    directory: true,
+    title: 'Select a new app directory',
+  })
+
+  const writeable = await is_dir_writeable(newDir)
+
+  if (!writeable) {
+    handleError('The selected directory does not have proper permissions for write access.')
+    return
+  }
 
   if (newDir) {
     settingsDir.value = newDir
