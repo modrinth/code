@@ -56,7 +56,7 @@
       </Button>
     </Card>
   </transition>
-  <Modal ref="loginModal" class="modal" header="Signing in">
+  <Modal ref="loginModal" class="modal" header="Signing in" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
       <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
       <div class="modal-text">
@@ -114,6 +114,7 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
+import { useTheming } from '@/store/theme.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
 import { process_listener } from '@/helpers/events'
@@ -130,6 +131,7 @@ const emit = defineEmits(['change'])
 
 const loginCode = ref(null)
 
+const themeStore = useTheming()
 const settings = ref({})
 const accounts = ref([])
 const loginUrl = ref('')
