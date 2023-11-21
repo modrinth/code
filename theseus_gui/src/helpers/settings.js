@@ -43,3 +43,7 @@ export async function set(settings) {
 export async function change_config_dir(newConfigDir) {
   return await invoke('plugin:settings|settings_change_config_dir', { newConfigDir })
 }
+
+export async function is_dir_writeable(newConfigDir) {
+  return await invoke('plugin:settings|settings_is_dir_writeable', { newConfigDir })
+}
