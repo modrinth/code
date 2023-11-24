@@ -117,14 +117,10 @@ pub async fn random_projects_get(
     let response =
         v3::projects::random_projects_get(web::Query(count), pool.clone(), redis.clone()).await?;
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<Project>(response).await {
+    match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
-            let version_item = match project.versions.first() {
-                Some(vid) => version_item::Version::get((*vid).into(), &**pool, &redis).await?,
-                None => None,
-            };
-            let project = LegacyProject::from(project, version_item);
-            Ok(HttpResponse::Ok().json(project))
+            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(legacy_projects))
         }
         Err(response) => Ok(response),
     }
