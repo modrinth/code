@@ -5,29 +5,36 @@ use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
 };
+use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
-use labrinth::{
-    models::v3::projects::{Project, Version},
-    search::SearchResults,
-    util::actix::AppendsMultipart,
-};
+use labrinth::{search::SearchResults, util::actix::AppendsMultipart};
 use rust_decimal::Decimal;
 use serde_json::json;
 
-use crate::common::{asserts::assert_status, database::MOD_USER_PAT};
-
-use super::{
-    request_data::{ImageData, ProjectCreationRequestData},
-    ApiV3,
+use crate::common::{
+    api_common::{
+        models::{CommonImageData, CommonProject, CommonVersion},
+        Api, ApiProject,
+    },
+    asserts::assert_status,
+    database::MOD_USER_PAT,
+    dummy_data::TestFile,
 };
 
-impl ApiV3 {
-    pub async fn add_public_project(
+use super::{request_data::get_public_project_creation_data, ApiV3};
+
+#[async_trait(?Send)]
+impl ApiProject for ApiV3 {
+    async fn add_public_project(
         &self,
-        creation_data: ProjectCreationRequestData,
+        slug: &str,
+        version_jar: Option<TestFile>,
+        modify_json: Option<json_patch::Patch>,
         pat: &str,
-    ) -> (Project, Vec<Version>) {
+    ) -> (CommonProject, Vec<CommonVersion>) {
+        let creation_data = get_public_project_creation_data(slug, version_jar, modify_json);
+
         // Add a project.
         let req = TestRequest::post()
             .uri("/v3/project")
@@ -50,9 +57,8 @@ impl ApiV3 {
         let resp = self.call(req).await;
         assert_status(&resp, StatusCode::NO_CONTENT);
 
-        let project = self
-            .get_project_deserialized(&creation_data.slug, pat)
-            .await;
+        let project = self.get_project(&creation_data.slug, pat).await;
+        let project = test::read_body_json(project).await;
 
         // Get project's versions
         let req = TestRequest::get()
@@ -60,12 +66,12 @@ impl ApiV3 {
             .append_header(("Authorization", pat))
             .to_request();
         let resp = self.call(req).await;
-        let versions: Vec<Version> = test::read_body_json(resp).await;
+        let versions: Vec<CommonVersion> = test::read_body_json(resp).await;
 
         (project, versions)
     }
 
-    pub async fn remove_project(&self, project_slug_or_id: &str, pat: &str) -> ServiceResponse {
+    async fn remove_project(&self, project_slug_or_id: &str, pat: &str) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v3/project/{project_slug_or_id}"))
             .append_header(("Authorization", pat))
@@ -75,20 +81,21 @@ impl ApiV3 {
         resp
     }
 
-    pub async fn get_project(&self, id_or_slug: &str, pat: &str) -> ServiceResponse {
+    async fn get_project(&self, id_or_slug: &str, pat: &str) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/project/{id_or_slug}"))
             .append_header(("Authorization", pat))
             .to_request();
         self.call(req).await
     }
-    pub async fn get_project_deserialized(&self, id_or_slug: &str, pat: &str) -> Project {
+
+    async fn get_project_deserialized_common(&self, id_or_slug: &str, pat: &str) -> CommonProject {
         let resp = self.get_project(id_or_slug, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
     }
 
-    pub async fn get_user_projects(&self, user_id_or_username: &str, pat: &str) -> ServiceResponse {
+    async fn get_user_projects(&self, user_id_or_username: &str, pat: &str) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/user/{}/projects", user_id_or_username))
             .append_header(("Authorization", pat))
@@ -96,17 +103,17 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn get_user_projects_deserialized(
+    async fn get_user_projects_deserialized_common(
         &self,
         user_id_or_username: &str,
         pat: &str,
-    ) -> Vec<Project> {
+    ) -> Vec<CommonProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
     }
 
-    pub async fn edit_project(
+    async fn edit_project(
         &self,
         id_or_slug: &str,
         patch: serde_json::Value,
@@ -121,14 +128,14 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn edit_project_bulk(
+    async fn edit_project_bulk(
         &self,
-        ids_or_slugs: impl IntoIterator<Item = &str>,
+        ids_or_slugs: &[&str],
         patch: serde_json::Value,
         pat: &str,
     ) -> ServiceResponse {
         let projects_str = ids_or_slugs
-            .into_iter()
+            .iter()
             .map(|s| format!("\"{}\"", s))
             .collect::<Vec<_>>()
             .join(",");
@@ -144,10 +151,10 @@ impl ApiV3 {
         self.call(req).await
     }
 
-    pub async fn edit_project_icon(
+    async fn edit_project_icon(
         &self,
         id_or_slug: &str,
-        icon: Option<ImageData>,
+        icon: Option<CommonImageData>,
         pat: &str,
     ) -> ServiceResponse {
         if let Some(icon) = icon {
@@ -173,7 +180,7 @@ impl ApiV3 {
         }
     }
 
-    pub async fn search_deserialized(
+    async fn search_deserialized_common(
         &self,
         query: Option<&str>,
         facets: Option<serde_json::Value>,
@@ -200,7 +207,9 @@ impl ApiV3 {
         assert_eq!(status, 200);
         test::read_body_json(resp).await
     }
+}
 
+impl ApiV3 {
     pub async fn get_analytics_revenue(
         &self,
         id_or_slugs: Vec<&str>,

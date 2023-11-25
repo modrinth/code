@@ -28,8 +28,12 @@ pub struct ImageData {
 pub fn get_public_project_creation_data(
     slug: &str,
     version_jar: Option<TestFile>,
+    modify_json: Option<json_patch::Patch>,
 ) -> ProjectCreationRequestData {
-    let json_data = get_public_project_creation_data_json(slug, version_jar.as_ref());
+    let mut json_data = get_public_project_creation_data_json(slug, version_jar.as_ref());
+    if let Some(modify_json) = modify_json {
+        json_patch::patch(&mut json_data, &modify_json).unwrap();
+    }
     let multipart_data = get_public_creation_data_multipart(&json_data, version_jar.as_ref());
     ProjectCreationRequestData {
         slug: slug.to_string(),
@@ -42,9 +46,15 @@ pub fn get_public_version_creation_data(
     project_id: ProjectId,
     version_number: &str,
     version_jar: TestFile,
+    ordering: Option<i32>,
+    modify_json: Option<json_patch::Patch>,
 ) -> VersionCreationRequestData {
-    let mut json_data = get_public_version_creation_data_json(version_number, &version_jar);
+    let mut json_data =
+        get_public_version_creation_data_json(version_number, ordering, &version_jar);
     json_data["project_id"] = json!(project_id);
+    if let Some(modify_json) = modify_json {
+        json_patch::patch(&mut json_data, &modify_json).unwrap();
+    }
     let multipart_data = get_public_creation_data_multipart(&json_data, Some(&version_jar));
     VersionCreationRequestData {
         version: version_number.to_string(),
@@ -55,9 +65,10 @@ pub fn get_public_version_creation_data(
 
 pub fn get_public_version_creation_data_json(
     version_number: &str,
+    ordering: Option<i32>,
     version_jar: &TestFile,
 ) -> serde_json::Value {
-    json!({
+    let mut j = json!({
         "file_parts": [version_jar.filename()],
         "version_number": version_number,
         "version_title": "start",
@@ -66,7 +77,11 @@ pub fn get_public_version_creation_data_json(
         "release_channel": "release",
         "loaders": ["fabric"],
         "featured": true
-    })
+    });
+    if let Some(ordering) = ordering {
+        j["ordering"] = json!(ordering);
+    }
+    j
 }
 
 pub fn get_public_project_creation_data_json(
@@ -74,7 +89,7 @@ pub fn get_public_project_creation_data_json(
     version_jar: Option<&TestFile>,
 ) -> serde_json::Value {
     let initial_versions = if let Some(jar) = version_jar {
-        json!([get_public_version_creation_data_json("1.2.3", jar)])
+        json!([get_public_version_creation_data_json("1.2.3", None, jar)])
     } else {
         json!([])
     };

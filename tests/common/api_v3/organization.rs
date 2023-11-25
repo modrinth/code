@@ -6,6 +6,8 @@ use bytes::Bytes;
 use labrinth::models::{organizations::Organization, v3::projects::Project};
 use serde_json::json;
 
+use crate::common::api_common::Api;
+
 use super::{request_data::ImageData, ApiV3};
 
 impl ApiV3 {

@@ -7,7 +7,7 @@ use url::Url;
 
 use crate::common::{dummy_data, environment::TestEnvironment};
 
-use super::dummy_data::DUMMY_DATA_UPDATE;
+use super::{api_v3::ApiV3, dummy_data::DUMMY_DATA_UPDATE};
 
 // The dummy test database adds a fair bit of 'dummy' data to test with.
 // Some constants are used to refer to that data, and are described here.
@@ -168,13 +168,20 @@ impl TemporaryDatabase {
 
                 if !dummy_data_exists {
                     // Add dummy data
-                    let temporary_test_env = TestEnvironment::build_with_db(TemporaryDatabase {
-                        pool: pool.clone(),
-                        database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                        redis_pool: RedisPool::new(Some(generate_random_name("test_template_"))),
-                    })
+                    let temporary_test_env =
+                        TestEnvironment::<ApiV3>::build_with_db(TemporaryDatabase {
+                            pool: pool.clone(),
+                            database_name: TEMPLATE_DATABASE_NAME.to_string(),
+                            redis_pool: RedisPool::new(Some(generate_random_name(
+                                "test_template_",
+                            ))),
+                        })
+                        .await;
+                    dummy_data::add_dummy_data(
+                        &temporary_test_env.setup_api,
+                        temporary_test_env.db.clone(),
+                    )
                     .await;
-                    dummy_data::add_dummy_data(&temporary_test_env).await;
                     temporary_test_env.db.pool.close().await;
                 }
                 pool.close().await;

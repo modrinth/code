@@ -894,7 +894,6 @@ async fn create_initial_version(
         &mut loader_field_enum_values,
     )?;
 
-    println!("Made it past here");
     let dependencies = version_data
         .dependencies
         .iter()

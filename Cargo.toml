@@ -109,7 +109,7 @@ derive-new = "0.5.9"
 
 [dev-dependencies]
 actix-http = "3.4.0"
-
+json-patch = "*"
 [profile.dev]
 opt-level = 0                # Minimal optimization, speeds up compilation
 lto = false                  # Disables Link Time Optimization

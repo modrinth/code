@@ -10,7 +10,7 @@ use labrinth::auth::oauth::{
 };
 use reqwest::header::{AUTHORIZATION, LOCATION};
 
-use crate::common::asserts::assert_status;
+use crate::common::{api_common::Api, asserts::assert_status};
 
 use super::ApiV3;
 

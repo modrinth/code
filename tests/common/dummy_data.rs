@@ -4,19 +4,23 @@ use std::io::{Cursor, Write};
 use actix_http::StatusCode;
 use actix_web::test::{self, TestRequest};
 use labrinth::models::{
-    oauth_clients::OAuthClient,
-    organizations::Organization,
-    pats::Scopes,
-    v3::projects::{Project, Version},
+    oauth_clients::OAuthClient, organizations::Organization, pats::Scopes, projects::ProjectId,
 };
 use serde_json::json;
 use sqlx::Executor;
 use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
-use crate::common::database::USER_USER_PAT;
+use crate::common::{api_common::Api, database::USER_USER_PAT};
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 
-use super::{api_v3::request_data::get_public_project_creation_data, environment::TestEnvironment};
+use super::{
+    api_common::{
+        models::{CommonProject, CommonVersion},
+        ApiProject,
+    },
+    api_v3::ApiV3,
+    database::TemporaryDatabase,
+};
 
 use super::{asserts::assert_status, database::USER_USER_ID, get_json_val_str};
 
@@ -170,10 +174,10 @@ pub struct DummyData {
 
 impl DummyData {
     pub fn new(
-        project_alpha: Project,
-        project_alpha_version: Version,
-        project_beta: Project,
-        project_beta_version: Version,
+        project_alpha: CommonProject,
+        project_alpha_version: CommonVersion,
+        project_beta: CommonProject,
+        project_beta_version: CommonVersion,
         organization_zeta: Organization,
         oauth_client_alpha: OAuthClient,
     ) -> Self {
@@ -182,6 +186,7 @@ impl DummyData {
                 team_id: project_alpha.team.to_string(),
                 project_id: project_alpha.id.to_string(),
                 project_slug: project_alpha.slug.unwrap(),
+                project_id_parsed: project_alpha.id,
                 version_id: project_alpha_version.id.to_string(),
                 thread_id: project_alpha.thread_id.to_string(),
                 file_hash: project_alpha_version.files[0].hashes["sha1"].clone(),
@@ -191,6 +196,7 @@ impl DummyData {
                 team_id: project_beta.team.to_string(),
                 project_id: project_beta.id.to_string(),
                 project_slug: project_beta.slug.unwrap(),
+                project_id_parsed: project_beta.id,
                 version_id: project_beta_version.id.to_string(),
                 thread_id: project_beta.thread_id.to_string(),
                 file_hash: project_beta_version.files[0].hashes["sha1"].clone(),
@@ -220,6 +226,7 @@ impl DummyData {
 pub struct DummyProjectAlpha {
     pub project_id: String,
     pub project_slug: String,
+    pub project_id_parsed: ProjectId,
     pub version_id: String,
     pub thread_id: String,
     pub file_hash: String,
@@ -230,6 +237,7 @@ pub struct DummyProjectAlpha {
 pub struct DummyProjectBeta {
     pub project_id: String,
     pub project_slug: String,
+    pub project_id_parsed: ProjectId,
     pub version_id: String,
     pub thread_id: String,
     pub file_hash: String,
@@ -250,9 +258,9 @@ pub struct DummyOAuthClientAlpha {
     pub valid_redirect_uri: String,
 }
 
-pub async fn add_dummy_data(test_env: &TestEnvironment) -> DummyData {
+pub async fn add_dummy_data(api: &ApiV3, db: TemporaryDatabase) -> DummyData {
     // Adds basic dummy data to the database directly with sql (user, pats)
-    let pool = &test_env.db.pool.clone();
+    let pool = &db.pool.clone();
 
     pool.execute(
         include_str!("../files/dummy_data.sql")
@@ -262,12 +270,12 @@ pub async fn add_dummy_data(test_env: &TestEnvironment) -> DummyData {
     .await
     .unwrap();
 
-    let (alpha_project, alpha_version) = add_project_alpha(test_env).await;
-    let (beta_project, beta_version) = add_project_beta(test_env).await;
+    let (alpha_project, alpha_version) = add_project_alpha(api).await;
+    let (beta_project, beta_version) = add_project_beta(api).await;
 
-    let zeta_organization = add_organization_zeta(test_env).await;
+    let zeta_organization = add_organization_zeta(api).await;
 
-    let oauth_client_alpha = get_oauth_client_alpha(test_env).await;
+    let oauth_client_alpha = get_oauth_client_alpha(api).await;
 
     sqlx::query("INSERT INTO dummy_data (update_id) VALUES ($1)")
         .bind(DUMMY_DATA_UPDATE)
@@ -285,13 +293,13 @@ pub async fn add_dummy_data(test_env: &TestEnvironment) -> DummyData {
     )
 }
 
-pub async fn get_dummy_data(test_env: &TestEnvironment) -> DummyData {
-    let (alpha_project, alpha_version) = get_project_alpha(test_env).await;
-    let (beta_project, beta_version) = get_project_beta(test_env).await;
+pub async fn get_dummy_data(api: &ApiV3) -> DummyData {
+    let (alpha_project, alpha_version) = get_project_alpha(api).await;
+    let (beta_project, beta_version) = get_project_beta(api).await;
 
-    let zeta_organization = get_organization_zeta(test_env).await;
+    let zeta_organization = get_organization_zeta(api).await;
 
-    let oauth_client_alpha = get_oauth_client_alpha(test_env).await;
+    let oauth_client_alpha = get_oauth_client_alpha(api).await;
 
     DummyData::new(
         alpha_project,
@@ -303,18 +311,19 @@ pub async fn get_dummy_data(test_env: &TestEnvironment) -> DummyData {
     )
 }
 
-pub async fn add_project_alpha(test_env: &TestEnvironment) -> (Project, Version) {
-    let (project, versions) = test_env
-        .v3
+pub async fn add_project_alpha(api: &ApiV3) -> (CommonProject, CommonVersion) {
+    let (project, versions) = api
         .add_public_project(
-            get_public_project_creation_data("alpha", Some(TestFile::DummyProjectAlpha)),
+            "alpha",
+            Some(TestFile::DummyProjectAlpha),
+            None,
             USER_USER_PAT,
         )
         .await;
     (project, versions.into_iter().next().unwrap())
 }
 
-pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn add_project_beta(api: &ApiV3) -> (CommonProject, CommonVersion) {
     // Adds dummy data to the database with sqlx (projects, versions, threads)
     // Generate test project data.
     let jar = TestFile::DummyProjectBeta;
@@ -367,13 +376,13 @@ pub async fn add_project_beta(test_env: &TestEnvironment) -> (Project, Version) 
         .append_header(("Authorization", USER_USER_PAT))
         .set_multipart(vec![json_segment.clone(), file_segment.clone()])
         .to_request();
-    let resp = test_env.call(req).await;
+    let resp = api.call(req).await;
     assert_eq!(resp.status(), 200);
 
-    get_project_beta(test_env).await
+    get_project_beta(api).await
 }
 
-pub async fn add_organization_zeta(test_env: &TestEnvironment) -> Organization {
+pub async fn add_organization_zeta(api: &ApiV3) -> Organization {
     // Add an organzation.
     let req = TestRequest::post()
         .uri("/v3/organization")
@@ -383,73 +392,72 @@ pub async fn add_organization_zeta(test_env: &TestEnvironment) -> Organization {
             "description": "A dummy organization for testing with."
         }))
         .to_request();
-    let resp = test_env.call(req).await;
+    let resp = api.call(req).await;
 
     assert_eq!(resp.status(), 200);
 
-    get_organization_zeta(test_env).await
+    get_organization_zeta(api).await
 }
 
-pub async fn get_project_alpha(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn get_project_alpha(api: &ApiV3) -> (CommonProject, CommonVersion) {
     // Get project
     let req = TestRequest::get()
         .uri("/v3/project/alpha")
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
-    let resp = test_env.call(req).await;
-    let project: Project = test::read_body_json(resp).await;
+    let resp = api.call(req).await;
+    let project: CommonProject = test::read_body_json(resp).await;
 
     // Get project's versions
     let req = TestRequest::get()
         .uri("/v3/project/alpha/version")
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
-    let resp = test_env.call(req).await;
-    let versions: Vec<Version> = test::read_body_json(resp).await;
+    let resp = api.call(req).await;
+    let versions: Vec<CommonVersion> = test::read_body_json(resp).await;
     let version = versions.into_iter().next().unwrap();
 
     (project, version)
 }
 
-pub async fn get_project_beta(test_env: &TestEnvironment) -> (Project, Version) {
+pub async fn get_project_beta(api: &ApiV3) -> (CommonProject, CommonVersion) {
     // Get project
     let req = TestRequest::get()
         .uri("/v3/project/beta")
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
-    let resp = test_env.call(req).await;
+    let resp = api.call(req).await;
     assert_status(&resp, StatusCode::OK);
     let project: serde_json::Value = test::read_body_json(resp).await;
-    let project: Project = serde_json::from_value(project).unwrap();
+    let project: CommonProject = serde_json::from_value(project).unwrap();
 
     // Get project's versions
     let req = TestRequest::get()
         .uri("/v3/project/beta/version")
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
-    let resp = test_env.call(req).await;
+    let resp = api.call(req).await;
     assert_status(&resp, StatusCode::OK);
-    let versions: Vec<Version> = test::read_body_json(resp).await;
+    let versions: Vec<CommonVersion> = test::read_body_json(resp).await;
     let version = versions.into_iter().next().unwrap();
 
     (project, version)
 }
 
-pub async fn get_organization_zeta(test_env: &TestEnvironment) -> Organization {
+pub async fn get_organization_zeta(api: &ApiV3) -> Organization {
     // Get organization
     let req = TestRequest::get()
         .uri("/v3/organization/zeta")
         .append_header(("Authorization", USER_USER_PAT))
         .to_request();
-    let resp = test_env.call(req).await;
+    let resp = api.call(req).await;
     let organization: Organization = test::read_body_json(resp).await;
 
     organization
 }
 
-pub async fn get_oauth_client_alpha(test_env: &TestEnvironment) -> OAuthClient {
-    let oauth_clients = test_env
-        .v3
+pub async fn get_oauth_client_alpha(api: &ApiV3) -> OAuthClient {
+    let oauth_clients = api
         .get_user_oauth_clients(USER_USER_ID, USER_USER_PAT)
         .await;
     oauth_clients.into_iter().next().unwrap()

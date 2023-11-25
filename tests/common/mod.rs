@@ -2,6 +2,7 @@ use labrinth::{check_env_vars, clickhouse};
 use labrinth::{file_hosting, queue, LabrinthConfig};
 use std::sync::Arc;
 
+pub mod api_common;
 pub mod api_v2;
 pub mod api_v3;
 pub mod asserts;

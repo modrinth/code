@@ -1,9 +1,10 @@
 use actix_http::StatusCode;
 use actix_web::test;
 use common::{
+    api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
     dummy_data::DummyOAuthClientAlpha,
-    environment::with_test_environment,
+    environment::{with_test_environment, TestEnvironment},
     get_json_val_str,
 };
 use labrinth::{
@@ -20,14 +21,14 @@ mod common;
 
 #[actix_rt::test]
 async fn can_create_edit_get_oauth_client() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_name = "test_client".to_string();
         let redirect_uris = vec![
             "https://modrinth.com".to_string(),
             "https://modrinth.com/a".to_string(),
         ];
         let resp = env
-            .v3
+            .api
             .add_oauth_client(
                 client_name.clone(),
                 Scopes::all() - Scopes::restricted(),
@@ -51,13 +52,13 @@ async fn can_create_edit_get_oauth_client() {
             redirect_uris: Some(edited_redirect_uris.clone()),
         };
         let resp = env
-            .v3
+            .api
             .edit_oauth_client(&client_id, edit, FRIEND_USER_PAT)
             .await;
         assert_status(&resp, StatusCode::OK);
 
         let clients = env
-            .v3
+            .api
             .get_user_oauth_clients(FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
         assert_eq!(1, clients.len());
@@ -72,9 +73,9 @@ async fn can_create_edit_get_oauth_client() {
 
 #[actix_rt::test]
 async fn create_oauth_client_with_restricted_scopes_fails() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let resp = env
-            .v3
+            .api
             .add_oauth_client(
                 "test_client".to_string(),
                 Scopes::restricted(),
@@ -90,12 +91,12 @@ async fn create_oauth_client_with_restricted_scopes_fails() {
 
 #[actix_rt::test]
 async fn get_oauth_client_for_client_creator_succeeds() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha { client_id, .. } =
             env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
 
         let resp = env
-            .v3
+            .api
             .get_oauth_client(client_id.clone(), USER_USER_PAT)
             .await;
 
@@ -108,12 +109,12 @@ async fn get_oauth_client_for_client_creator_succeeds() {
 
 #[actix_rt::test]
 async fn get_oauth_client_for_unrelated_user_fails() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha { client_id, .. } =
             env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
 
         let resp = env
-            .v3
+            .api
             .get_oauth_client(client_id.clone(), FRIEND_USER_PAT)
             .await;
 
@@ -124,13 +125,13 @@ async fn get_oauth_client_for_unrelated_user_fails() {
 
 #[actix_rt::test]
 async fn can_delete_oauth_client() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_id = env.dummy.unwrap().oauth_client_alpha.client_id.clone();
-        let resp = env.v3.delete_oauth_client(&client_id, USER_USER_PAT).await;
+        let resp = env.api.delete_oauth_client(&client_id, USER_USER_PAT).await;
         assert_status(&resp, StatusCode::NO_CONTENT);
 
         let clients = env
-            .v3
+            .api
             .get_user_oauth_clients(USER_USER_ID, USER_USER_PAT)
             .await;
         assert_eq!(0, clients.len());
@@ -140,14 +141,14 @@ async fn can_delete_oauth_client() {
 
 #[actix_rt::test]
 async fn delete_oauth_client_after_issuing_access_tokens_revokes_tokens() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha {
             client_id,
             client_secret,
             ..
         } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
         let access_token = env
-            .v3
+            .api
             .complete_full_authorize_flow(
                 &client_id,
                 &client_secret,
@@ -158,7 +159,7 @@ async fn delete_oauth_client_after_issuing_access_tokens_revokes_tokens() {
             )
             .await;
 
-        env.v3.delete_oauth_client(&client_id, USER_USER_PAT).await;
+        env.api.delete_oauth_client(&client_id, USER_USER_PAT).await;
 
         env.assert_read_notifications_status(USER_USER_ID, &access_token, StatusCode::UNAUTHORIZED)
             .await;
@@ -168,13 +169,13 @@ async fn delete_oauth_client_after_issuing_access_tokens_revokes_tokens() {
 
 #[actix_rt::test]
 async fn can_list_user_oauth_authorizations() {
-    with_test_environment(|env| async move {
+    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let DummyOAuthClientAlpha {
             client_id,
             client_secret,
             ..
         } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
-        env.v3
+        env.api
             .complete_full_authorize_flow(
                 &client_id,
                 &client_secret,
@@ -185,7 +186,7 @@ async fn can_list_user_oauth_authorizations() {
             )
             .await;
 
-        let authorizations = env.v3.get_user_oauth_authorizations(USER_USER_PAT).await;
+        let authorizations = env.api.get_user_oauth_authorizations(USER_USER_PAT).await;
         assert_eq!(1, authorizations.len());
         assert_eq!(USER_USER_ID_PARSED, authorizations[0].user_id.0 as i64);
     })

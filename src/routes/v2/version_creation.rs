@@ -105,7 +105,7 @@ pub async fn version_create(
             for file_part in &legacy_create.file_parts {
                 if let Some(ext) = file_part.split('.').last() {
                     match ext {
-                        "mrpack" => {
+                        "mrpack" | "mrpack-primary" => {
                             project_type = Some("modpack");
                             break;
                         }
