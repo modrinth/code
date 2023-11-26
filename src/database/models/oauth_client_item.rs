@@ -23,6 +23,8 @@ pub struct OAuthClient {
     pub redirect_uris: Vec<OAuthRedirectUri>,
     pub created: DateTime<Utc>,
     pub created_by: UserId,
+    pub url: Option<String>,
+    pub description: Option<String>,
 }
 
 struct ClientQueryResult {
@@ -33,6 +35,8 @@ struct ClientQueryResult {
     secret_hash: String,
     created: DateTime<Utc>,
     created_by: i64,
+    url: Option<String>,
+    description: Option<String>,
     uri_ids: Option<Vec<i64>>,
     uri_vals: Option<Vec<String>>,
 }
@@ -53,6 +57,8 @@ macro_rules! select_clients_with_predicate {
                 clients.secret_hash as "secret_hash!",
                 clients.created as "created!",
                 clients.created_by as "created_by!",
+                clients.url as "url?",
+                clients.description as "description?",
                 uris.uri_ids as "uri_ids?",
                 uris.uri_vals as "uri_vals?"
             FROM oauth_clients clients
@@ -155,12 +161,14 @@ impl OAuthClient {
         sqlx::query!(
             "
             UPDATE oauth_clients
-            SET name = $1, icon_url = $2, max_scopes = $3
-            WHERE (id = $4)
+            SET name = $1, icon_url = $2, max_scopes = $3, url = $4, description = $5
+            WHERE (id = $6)
             ",
             self.name,
             self.icon_url,
             self.max_scopes.to_postgres(),
+            self.url,
+            self.description,
             self.id.0,
         )
         .execute(exec)
@@ -240,6 +248,8 @@ impl From<ClientQueryResult> for OAuthClient {
             redirect_uris: redirects,
             created: r.created,
             created_by: UserId(r.created_by),
+            url: r.url,
+            description: r.description,
         }
     }
 }

@@ -54,6 +54,13 @@ pub struct OAuthClient {
 
     // The user that created (and thus controls) this client
     pub created_by: UserId,
+
+    // When this client was created
+    pub created: DateTime<Utc>,
+
+    // (optional) Metadata about the client
+    pub url: Option<String>,
+    pub description: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -88,6 +95,9 @@ impl From<DBOAuthClient> for OAuthClient {
             max_scopes: value.max_scopes,
             redirect_uris: value.redirect_uris.into_iter().map(|r| r.into()).collect(),
             created_by: value.created_by.into(),
+            created: value.created,
+            url: value.url,
+            description: value.description,
         }
     }
 }

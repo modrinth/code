@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fmt::Display};
+use std::{collections::HashSet, fmt::Display, sync::Arc};
 
 use actix_web::{
     delete, get, patch, post,
@@ -16,7 +16,9 @@ use validator::Validate;
 use super::ApiError;
 use crate::{
     auth::checks::ValidateAllAuthorized,
+    file_hosting::FileHost,
     models::{ids::base62_impl::parse_base62, oauth_clients::DeleteOAuthClientQueryParam},
+    util::routes::read_from_payload,
 };
 use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
@@ -50,6 +52,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(oauth_client_create)
             .service(oauth_client_edit)
             .service(oauth_client_delete)
+            .service(oauth_client_icon_edit)
+            .service(oauth_client_icon_delete)
             .service(get_client)
             .service(get_clients)
             .service(get_user_oauth_authorizations),
@@ -145,6 +149,15 @@ pub struct NewOAuthApp {
     pub max_scopes: Scopes,
 
     pub redirect_uris: Vec<String>,
+
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 255)
+    )]
+    pub url: Option<String>,
+
+    #[validate(length(max = 255))]
+    pub description: Option<String>,
 }
 
 #[post("app")]
@@ -187,6 +200,8 @@ pub async fn oauth_client_create<'a>(
         redirect_uris,
         created: Utc::now(),
         created_by: current_user.id.into(),
+        url: new_oauth_app.url.clone(),
+        description: new_oauth_app.description.clone(),
         secret_hash: client_secret_hash,
     };
     client.clone().insert(&mut transaction).await?;
@@ -248,6 +263,15 @@ pub struct OAuthClientEdit {
 
     #[validate(length(min = 1))]
     pub redirect_uris: Option<Vec<String>>,
+
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 255)
+    )]
+    pub url: Option<Option<String>>,
+
+    #[validate(length(max = 255))]
+    pub description: Option<Option<String>>,
 }
 
 #[patch("app/{id}")]
@@ -289,6 +313,8 @@ pub async fn oauth_client_edit(
             icon_url,
             max_scopes,
             redirect_uris,
+            url,
+            description,
         } = client_updates.into_inner();
         if let Some(name) = name {
             updated_client.name = name;
@@ -300,6 +326,14 @@ pub async fn oauth_client_edit(
 
         if let Some(max_scopes) = max_scopes {
             updated_client.max_scopes = max_scopes;
+        }
+
+        if let Some(url) = url {
+            updated_client.url = url;
+        }
+
+        if let Some(description) = description {
+            updated_client.description = description;
         }
 
         let mut transaction = pool.begin().await?;
@@ -317,6 +351,130 @@ pub async fn oauth_client_edit(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Extension {
+    pub ext: String,
+}
+
+#[patch("app/{id}/icon")]
+#[allow(clippy::too_many_arguments)]
+pub async fn oauth_client_icon_edit(
+    web::Query(ext): web::Query<Extension>,
+    req: HttpRequest,
+    client_id: web::Path<ApiOAuthClientId>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::Payload,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
+        let cdn_url = dotenvy::var("CDN_URL")?;
+        let user = get_user_from_headers(
+            &req,
+            &**pool,
+            &redis,
+            &session_queue,
+            Some(&[Scopes::SESSION_ACCESS]),
+        )
+        .await?
+        .1;
+
+        let client = OAuthClient::get((*client_id).into(), &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput("The specified client does not exist!".to_string())
+            })?;
+
+        client.validate_authorized(Some(&user))?;
+
+        if let Some(ref icon) = client.icon_url {
+            let name = icon.split(&format!("{cdn_url}/")).nth(1);
+
+            if let Some(icon_path) = name {
+                file_host.delete_file_version("", icon_path).await?;
+            }
+        }
+
+        let bytes =
+            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+        let hash = sha1::Sha1::from(&bytes).hexdigest();
+        let upload_data = file_host
+            .upload_file(
+                content_type,
+                &format!("data/{}/{}.{}", client_id, hash, ext.ext),
+                bytes.freeze(),
+            )
+            .await?;
+
+        let mut transaction = pool.begin().await?;
+
+        let mut editable_client = client.clone();
+        editable_client.icon_url = Some(format!("{}/{}", cdn_url, upload_data.file_name));
+
+        editable_client
+            .update_editable_fields(&mut *transaction)
+            .await?;
+
+        transaction.commit().await?;
+
+        Ok(HttpResponse::NoContent().body(""))
+    } else {
+        Err(ApiError::InvalidInput(format!(
+            "Invalid format for project icon: {}",
+            ext.ext
+        )))
+    }
+}
+
+#[delete("app/{id}/icon")]
+pub async fn oauth_client_icon_delete(
+    req: HttpRequest,
+    client_id: web::Path<ApiOAuthClientId>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let cdn_url = dotenvy::var("CDN_URL")?;
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::SESSION_ACCESS]),
+    )
+    .await?
+    .1;
+
+    let client = OAuthClient::get((*client_id).into(), &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified client does not exist!".to_string())
+        })?;
+    client.validate_authorized(Some(&user))?;
+
+    if let Some(ref icon) = client.icon_url {
+        let name = icon.split(&format!("{cdn_url}/")).nth(1);
+
+        if let Some(icon_path) = name {
+            file_host.delete_file_version("", icon_path).await?;
+        }
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    let mut editable_client = client.clone();
+    editable_client.icon_url = None;
+
+    editable_client
+        .update_editable_fields(&mut *transaction)
+        .await?;
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[get("authorizations")]
