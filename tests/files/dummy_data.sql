@@ -25,6 +25,9 @@ INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) V
 INSERT INTO loaders (id, loader) VALUES (6, 'forge');
 INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) VALUES (6,1);
 
+INSERT INTO loaders (id, loader, metadata) VALUES (7, 'bukkit', '{"platform":false}'::jsonb);
+INSERT INTO loaders (id, loader, metadata) VALUES (8, 'waterfall', '{"platform":true}'::jsonb);
+
 -- Adds dummies to mrpack_loaders
 INSERT INTO loader_field_enum_values (enum_id, value) SELECT id, 'fabric' FROM loader_field_enums WHERE enum_name = 'mrpack_loaders';
 INSERT INTO loader_field_enum_values (enum_id, value) SELECT id, 'forge' FROM loader_field_enums WHERE enum_name = 'mrpack_loaders';

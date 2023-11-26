@@ -84,6 +84,7 @@ pub struct LoaderData {
     pub name: String,
     pub supported_project_types: Vec<String>,
     pub supported_games: Vec<String>,
+    pub metadata: Value,
 }
 
 pub async fn loader_list(
@@ -98,6 +99,7 @@ pub async fn loader_list(
             name: x.loader,
             supported_project_types: x.supported_project_types,
             supported_games: x.supported_games,
+            metadata: x.metadata,
         })
         .collect::<Vec<_>>();
 
