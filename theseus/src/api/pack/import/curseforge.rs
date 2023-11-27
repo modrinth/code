@@ -16,37 +16,22 @@ use crate::{
 
 use super::{copy_dotminecraft, recache_icon};
 
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FlameManifest {
-    pub manifest_version: u8,
-    pub name: String,
-    pub minecraft: FlameMinecraft,
-}
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FlameMinecraft {
-    pub version: String,
-    pub mod_loaders: Vec<FlameModLoader>,
-}
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct FlameModLoader {
-    pub id: String,
-    pub primary: bool,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct MinecraftInstance {
     pub name: Option<String>,
+    pub base_mod_loader: Option<MinecraftInstanceModLoader>,
     pub profile_image_path: Option<PathBuf>,
     pub installed_modpack: Option<InstalledModpack>,
     pub game_version: String, // Minecraft game version. Non-prioritized, use this if Vanilla
 }
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
-
+pub struct MinecraftInstanceModLoader {
+    pub name: String,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct InstalledModpack {
     pub thumbnail_url: Option<String>,
 }
@@ -113,35 +98,26 @@ pub async fn import_curseforge(
         }
     }
 
-    // Curseforge vanilla profile may not have a manifest.json, so we allow it to not exist
-    if curseforge_instance_folder.join("manifest.json").exists() {
-        // Load manifest.json
-        let cf_manifest: String = io::read_to_string(
-            &curseforge_instance_folder.join("manifest.json"),
-        )
-        .await?;
-
-        let cf_manifest: FlameManifest =
-            serde_json::from_str::<FlameManifest>(&cf_manifest)?;
-
-        let game_version = cf_manifest.minecraft.version;
+    // base mod loader is always None for vanilla
+    if let Some(instance_mod_loader) = minecraft_instance.base_mod_loader {
+        let game_version = minecraft_instance.game_version;
 
         // CF allows Forge, Fabric, and Vanilla
         let mut mod_loader = None;
         let mut loader_version = None;
-        for loader in cf_manifest.minecraft.mod_loaders {
-            match loader.id.split_once('-') {
-                Some(("forge", version)) => {
-                    mod_loader = Some(ModLoader::Forge);
-                    loader_version = Some(version.to_string());
-                }
-                Some(("fabric", version)) => {
-                    mod_loader = Some(ModLoader::Fabric);
-                    loader_version = Some(version.to_string());
-                }
-                _ => {}
+
+        match instance_mod_loader.name.split_once('-') {
+            Some(("forge", version)) => {
+                mod_loader = Some(ModLoader::Forge);
+                loader_version = Some(version.to_string());
             }
+            Some(("fabric", version)) => {
+                mod_loader = Some(ModLoader::Fabric);
+                loader_version = Some(version.to_string());
+            }
+            _ => {}
         }
+
         let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
 
         let loader_version = if mod_loader != ModLoader::Vanilla {
@@ -170,7 +146,7 @@ pub async fn import_curseforge(
         })
         .await?;
     } else {
-        // If no manifest is found, it's a vanilla profile
+        // create a vanilla profile
         crate::api::profile::edit(&profile_path, |prof| {
             prof.metadata.name = override_title
                 .clone()
