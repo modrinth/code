@@ -77,7 +77,11 @@ impl LegacyProject {
 
         // V2 versions only have one project type- v3 versions can rarely have multiple.
         // We'll just use the first one.
-        let mut project_type = data.project_types.first().cloned().unwrap_or_default();
+        let mut project_type = data
+            .project_types
+            .first()
+            .cloned()
+            .unwrap_or("unknown".to_string());
         let mut loaders = data.loaders;
 
         if let Some(versions_item) = versions_item {

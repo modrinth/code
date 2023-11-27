@@ -281,11 +281,7 @@ async fn search_projects() {
                 let test_name = test_name.clone();
                 async move {
                     let projects = api
-                        .search_deserialized_common(
-                            Some(&test_name),
-                            Some(facets.clone()),
-                            USER_USER_PAT,
-                        )
+                        .search_deserialized(Some(&test_name), Some(facets.clone()), USER_USER_PAT)
                         .await;
                     let mut found_project_ids: Vec<u64> = projects
                         .hits

@@ -124,9 +124,15 @@ async fn create_and_add_to_index(
     let index = create_index(client, name, custom_rules).await?;
 
     let mut new_filterable_attributes = index.get_filterable_attributes().await?;
+    let mut new_displayed_attributes = index.get_displayed_attributes().await?;
+
     new_filterable_attributes.extend(additional_fields.iter().map(|s| s.to_string()));
+    new_displayed_attributes.extend(additional_fields.iter().map(|s| s.to_string()));
     index
         .set_filterable_attributes(new_filterable_attributes)
+        .await?;
+    index
+        .set_displayed_attributes(new_displayed_attributes)
         .await?;
 
     add_to_index(client, index, projects).await?;

@@ -6,6 +6,7 @@ use crate::models::projects::{
     DonationLink, MonetizationStatus, Project, ProjectStatus, SearchRequest, SideType,
 };
 use crate::models::v2::projects::LegacyProject;
+use crate::models::v2::search::LegacySearchResults;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{v2_reroute, v3, ApiError};
@@ -95,7 +96,7 @@ pub async fn project_search(
 
     let results = search_for_project(&info, &config).await?;
 
-    // TODO: convert to v2 format-we may need a new v2 struct for this for 'original' format
+    let results = LegacySearchResults::from(results);
 
     Ok(HttpResponse::Ok().json(results))
 }

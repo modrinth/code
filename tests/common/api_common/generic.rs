@@ -2,12 +2,9 @@ use std::collections::HashMap;
 
 use actix_web::dev::ServiceResponse;
 use async_trait::async_trait;
-use labrinth::{
-    models::{
-        projects::{ProjectId, VersionType},
-        teams::{OrganizationPermissions, ProjectPermissions},
-    },
-    search::SearchResults,
+use labrinth::models::{
+    projects::{ProjectId, VersionType},
+    teams::{OrganizationPermissions, ProjectPermissions},
 };
 
 use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
@@ -76,7 +73,6 @@ delegate_api_variant!(
         [edit_project, ServiceResponse, id_or_slug: &str, patch: serde_json::Value, pat: &str],
         [edit_project_bulk, ServiceResponse, ids_or_slugs: &[&str], patch: serde_json::Value, pat: &str],
         [edit_project_icon, ServiceResponse, id_or_slug: &str, icon: Option<CommonImageData>, pat: &str],
-        [search_deserialized_common, SearchResults, query: Option<&str>, facets: Option<serde_json::Value>, pat: &str],
     }
 );
 

@@ -13,7 +13,8 @@ use actix_web::{
 use async_trait::async_trait;
 use bytes::Bytes;
 use labrinth::{
-    models::v2::projects::LegacyProject, search::SearchResults, util::actix::AppendsMultipart,
+    models::v2::{projects::LegacyProject, search::LegacySearchResults},
+    util::actix::AppendsMultipart,
 };
 use serde_json::json;
 
@@ -35,6 +36,34 @@ impl ApiV2 {
     ) -> Vec<LegacyProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
         assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
+
+    pub async fn search_deserialized(
+        &self,
+        query: Option<&str>,
+        facets: Option<serde_json::Value>,
+        pat: &str,
+    ) -> LegacySearchResults {
+        let query_field = if let Some(query) = query {
+            format!("&query={}", urlencoding::encode(query))
+        } else {
+            "".to_string()
+        };
+
+        let facets_field = if let Some(facets) = facets {
+            format!("&facets={}", urlencoding::encode(&facets.to_string()))
+        } else {
+            "".to_string()
+        };
+
+        let req = test::TestRequest::get()
+            .uri(&format!("/v2/search?{}{}", query_field, facets_field))
+            .append_header(("Authorization", pat))
+            .to_request();
+        let resp = self.call(req).await;
+        let status = resp.status();
+        assert_eq!(status, 200);
         test::read_body_json(resp).await
     }
 }
@@ -194,33 +223,5 @@ impl ApiProject for ApiV2 {
 
             self.call(req).await
         }
-    }
-
-    async fn search_deserialized_common(
-        &self,
-        query: Option<&str>,
-        facets: Option<serde_json::Value>,
-        pat: &str,
-    ) -> SearchResults {
-        let query_field = if let Some(query) = query {
-            format!("&query={}", urlencoding::encode(query))
-        } else {
-            "".to_string()
-        };
-
-        let facets_field = if let Some(facets) = facets {
-            format!("&facets={}", urlencoding::encode(&facets.to_string()))
-        } else {
-            "".to_string()
-        };
-
-        let req = test::TestRequest::get()
-            .uri(&format!("/v2/search?{}{}", query_field, facets_field))
-            .append_header(("Authorization", pat))
-            .to_request();
-        let resp = self.call(req).await;
-        let status = resp.status();
-        assert_eq!(status, 200);
-        test::read_body_json(resp).await
     }
 }

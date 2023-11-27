@@ -179,8 +179,10 @@ impl ApiProject for ApiV3 {
             self.call(req).await
         }
     }
+}
 
-    async fn search_deserialized_common(
+impl ApiV3 {
+    pub async fn search_deserialized(
         &self,
         query: Option<&str>,
         facets: Option<serde_json::Value>,
@@ -207,9 +209,7 @@ impl ApiProject for ApiV3 {
         assert_eq!(status, 200);
         test::read_body_json(resp).await
     }
-}
 
-impl ApiV3 {
     pub async fn get_analytics_revenue(
         &self,
         id_or_slugs: Vec<&str>,
