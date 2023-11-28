@@ -511,7 +511,6 @@ pub async fn revoke_oauth_authorization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    println!("Inside revoke_oauth_authorization");
     let current_user = get_user_from_headers(
         &req,
         &**pool,

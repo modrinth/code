@@ -83,8 +83,10 @@ pub fn get_public_version_creation_data_json(
 
         // Loader fields
         "game_versions": ["1.20.1"],
-        "client_side": "required",
-        "server_side": "optional"
+        "singleplayer": true,
+        "client_and_server": true,
+        "client_only": true,
+        "server_only": false,
     });
     if is_modpack {
         j["mrpack_loaders"] = json!(["fabric"]);

@@ -72,18 +72,20 @@ INSERT INTO loader_fields_loaders (loader_id, loader_field_id) SELECT l.id, lf.i
 INSERT INTO loader_fields_loaders (loader_id, loader_field_id) SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf  WHERE lf.field = 'server_side' AND l.loader = ANY( ARRAY['forge', 'fabric', 'quilt', 'modloader','rift','liteloader', 'neoforge']);
 
 INSERT INTO version_fields (version_id, field_id, enum_value) 
-SELECT v.id, 1, m.client_side 
+SELECT v.id, lf.id, lfev.id  -- Note: bug fix/edited 2023-11-27
 FROM versions v
 INNER JOIN mods m ON v.mod_id = m.id
 INNER JOIN loader_field_enum_values lfev ON m.client_side = lfev.original_id
-WHERE client_side IS NOT NULL AND lfev.enum_id = 1;
+CROSS JOIN loader_fields lf
+WHERE client_side IS NOT NULL AND lfev.enum_id = 1 AND lf.field = 'client_side';
 
 INSERT INTO version_fields (version_id, field_id, enum_value) 
-SELECT v.id, 1, m.server_side 
+SELECT v.id, lf.id, lfev.id   -- Note: bug fix/edited 2023-11-27
 FROM versions v
 INNER JOIN mods m ON v.mod_id = m.id
-INNER JOIN loader_field_enum_values lfev ON m.client_side = lfev.original_id
-WHERE server_side IS NOT NULL AND lfev.enum_id = 1;
+INNER JOIN loader_field_enum_values lfev ON m.server_side = lfev.original_id
+CROSS JOIN loader_fields lf
+WHERE server_side IS NOT NULL AND lfev.enum_id = 1 AND lf.field = 'server_side';
 
 ALTER TABLE mods DROP COLUMN client_side;
 ALTER TABLE mods DROP COLUMN server_side;
@@ -95,11 +97,13 @@ INSERT INTO loader_field_enum_values (original_id, enum_id, value, created, meta
 SELECT id, 2, version, created, json_build_object('type', type, 'major', major) FROM game_versions;
 
 INSERT INTO loader_fields (field, field_type, enum_type, optional, min_val) VALUES('game_versions', 'array_enum', 2, false, 0);
+INSERT INTO loader_fields_loaders (loader_id, loader_field_id) SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf  WHERE lf.field = 'game_versions' AND l.loader = ANY( ARRAY['forge', 'fabric', 'quilt', 'modloader','rift','liteloader', 'neoforge']);
 
 INSERT INTO version_fields(version_id, field_id, enum_value) 
-SELECT gvv.joining_version_id, 2, lfev.id 
+SELECT gvv.joining_version_id, lf.id, lfev.id 
 FROM game_versions_versions gvv INNER JOIN loader_field_enum_values lfev ON gvv.game_version_id = lfev.original_id
-WHERE lfev.enum_id = 2;
+CROSS JOIN loader_fields lf
+WHERE lf.field = 'game_versions' AND lfev.enum_id = 2;
 
 ALTER TABLE mods DROP COLUMN loaders;
 ALTER TABLE mods DROP COLUMN game_versions;
@@ -108,12 +112,13 @@ DROP TABLE game_versions;
 
 -- Convert project types
 -- we are creating a new loader type- 'mrpack'- for minecraft modpacks
+SELECT setval('loaders_id_seq', (SELECT MAX(id) FROM loaders) + 1, false);
 INSERT INTO loaders (loader) VALUES ('mrpack');
 
 -- For the loader 'mrpack', we create loader fields for every loader
 -- That way we keep information like "this modpack is a fabric modpack"
 INSERT INTO loader_field_enums (id, enum_name, hidable) VALUES (3, 'mrpack_loaders', true);
-INSERT INTO loader_field_enum_values (original_id, enum_id, value) SELECT id, 2, loader FROM loaders WHERE loader != 'mrpack';
+INSERT INTO loader_field_enum_values (original_id, enum_id, value) SELECT id, 3, loader FROM loaders WHERE loader != 'mrpack';
 INSERT INTO loader_fields (field, field_type, enum_type, optional, min_val) VALUES('mrpack_loaders', 'array_enum', 3, false, 0);
 INSERT INTO loader_fields_loaders (loader_id, loader_field_id) 
 SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf  WHERE lf.field = 'mrpack_loaders' AND l.loader = 'mrpack';
@@ -125,10 +130,30 @@ INNER JOIN mods m ON v.mod_id = m.id
 INNER JOIN loaders_versions lv ON v.id = lv.version_id
 INNER JOIN loaders l ON lv.loader_id = l.id
 CROSS JOIN loader_fields lf
-LEFT JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id 
+LEFT JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND lfev.original_id = l.id
 WHERE m.project_type = (SELECT id FROM project_types WHERE name = 'modpack') AND lf.field = 'mrpack_loaders';
 
 INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id) SELECT DISTINCT l.id, pt.id FROM loaders l CROSS JOIN project_types pt WHERE pt.name = 'modpack' AND l.loader = 'mrpack';
+
+-- Set those versions to mrpack as their version
+INSERT INTO loaders_versions (version_id, loader_id)
+SELECT DISTINCT vf.version_id, l.id
+FROM version_fields vf
+LEFT JOIN loader_fields lf ON lf.id = vf.field_id
+CROSS JOIN loaders l
+WHERE lf.field = 'mrpack_loaders'
+AND l.loader = 'mrpack'
+ON CONFLICT DO NOTHING;
+
+--  Delete the old versions that had mrpack added to them
+DELETE FROM loaders_versions lv
+WHERE lv.loader_id != (SELECT id FROM loaders WHERE loader = 'mrpack')
+AND lv.version_id IN (
+    SELECT version_id
+    FROM loaders_versions
+    WHERE loader_id = (SELECT id FROM loaders WHERE loader = 'mrpack')
+);
+
 
 --- Non-mrpack loaders no longer support modpacks
 DELETE FROM loaders_project_types WHERE joining_loader_id != (SELECT id FROM loaders WHERE loader = 'mrpack') AND joining_project_type_id = (SELECT id FROM project_types WHERE name = 'modpack');

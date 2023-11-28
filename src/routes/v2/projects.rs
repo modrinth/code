@@ -3,9 +3,9 @@ use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::projects::{
-    DonationLink, MonetizationStatus, Project, ProjectStatus, SearchRequest, SideType,
+    DonationLink, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
 };
-use crate::models::v2::projects::LegacyProject;
+use crate::models::v2::projects::{LegacyProject, LegacySideType};
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
@@ -13,10 +13,9 @@ use crate::routes::{v2_reroute, v3, ApiError};
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use sqlx::PgPool;
-use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -59,27 +58,55 @@ pub async fn project_search(
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
     // in the API calls except that 'versions:x' is now 'game_versions:x'
-    let facets: Option<Vec<Vec<String>>> = if let Some(facets) = info.facets {
-        let facets = serde_json::from_str::<Vec<Vec<&str>>>(&facets)?;
+    let facets: Option<Vec<Vec<Vec<String>>>> = if let Some(facets) = info.facets {
+        let facets = serde_json::from_str::<Vec<Vec<serde_json::Value>>>(&facets)?;
+        // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
+        // For every inner facet, we will check if it can be deserialized into a Vec<&str>, and do so.
+        // If not, we will assume it is a single facet and wrap it in a Vec.
+        let facets: Vec<Vec<Vec<String>>> = facets
+            .into_iter()
+            .map(|facets| {
+                facets
+                        .into_iter()
+                        .map(|facet| {
+                            if facet.is_array() {
+                                serde_json::from_value::<Vec<String>>(facet).unwrap_or_default()
+                            } else {
+                                vec![serde_json::from_value::<String>(facet.clone())
+                                    .unwrap_or_default()]
+                            }
+                        })
+                        .collect_vec()
+            })
+            .collect_vec();
+
+        // We will now convert side_types to their new boolean format
+        let facets = v2_reroute::convert_side_type_facets_v3(facets);
+
         Some(
             facets
                 .into_iter()
                 .map(|facet| {
                     facet
                         .into_iter()
-                        .map(|facet| {
-                            let val = match facet.split(':').nth(1) {
-                                Some(val) => val,
-                                None => return facet.to_string(),
-                            };
+                        .map(|facets| {
+                            facets
+                                .into_iter()
+                                .map(|facet| {
+                                    let val = match facet.split(':').nth(1) {
+                                        Some(val) => val,
+                                        None => return facet.to_string(),
+                                    };
 
-                            if facet.starts_with("versions:") {
-                                format!("game_versions:{}", val)
-                            } else if facet.starts_with("project_type:") {
-                                format!("project_types:{}", val)
-                            } else {
-                                facet.to_string()
-                            }
+                                    if facet.starts_with("versions:") {
+                                        format!("game_versions:{}", val)
+                                    } else if facet.starts_with("project_type:") {
+                                        format!("project_types:{}", val)
+                                    } else {
+                                        facet.to_string()
+                                    }
+                                })
+                                .collect::<Vec<_>>()
                         })
                         .collect::<Vec<_>>()
                 })
@@ -279,8 +306,8 @@ pub struct EditProject {
     #[validate]
     pub donation_urls: Option<Vec<DonationLink>>,
     pub license_id: Option<String>,
-    pub client_side: Option<SideType>,
-    pub server_side: Option<SideType>,
+    pub client_side: Option<LegacySideType>,
+    pub server_side: Option<LegacySideType>,
     #[validate(
         length(min = 3, max = 64),
         regex = "crate::util::validate::RE_URL_SAFE"
@@ -321,8 +348,8 @@ pub async fn project_edit(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let v2_new_project = new_project.into_inner();
-    let client_side = v2_new_project.client_side.clone();
-    let server_side = v2_new_project.server_side.clone();
+    let client_side = v2_new_project.client_side;
+    let server_side = v2_new_project.server_side;
     let new_slug = v2_new_project.slug.clone();
 
     // TODO: Some kind of handling here to ensure project type is fine.
@@ -376,12 +403,17 @@ pub async fn project_edit(
         let version_ids = project_item.map(|x| x.versions).unwrap_or_default();
         let versions = version_item::Version::get_many(&version_ids, &**pool, &redis).await?;
         for version in versions {
-            let mut fields = HashMap::new();
-            fields.insert("client_side".to_string(), json!(client_side));
-            fields.insert("server_side".to_string(), json!(server_side));
+            let version = Version::from(version);
+            let mut fields = version.fields;
+            let (current_client_side, current_server_side) =
+                v2_reroute::convert_side_types_v2(&fields);
+            let client_side = client_side.unwrap_or(current_client_side);
+            let server_side = server_side.unwrap_or(current_server_side);
+            fields.extend(v2_reroute::convert_side_types_v3(client_side, server_side));
+
             response = v3::versions::version_edit_helper(
                 req.clone(),
-                (version.inner.id.into(),),
+                (version.id,),
                 pool.clone(),
                 redis.clone(),
                 v3::versions::EditVersion {

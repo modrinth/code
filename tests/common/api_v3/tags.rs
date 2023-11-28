@@ -3,10 +3,8 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use async_trait::async_trait;
-use labrinth::routes::v3::tags::GameData;
-use labrinth::{
-    database::models::loader_fields::LoaderFieldEnumValue, routes::v3::tags::LoaderData,
-};
+use labrinth::database::models::loader_fields::LoaderFieldEnumValue;
+use labrinth::routes::v3::tags::{GameData, LoaderData};
 
 use crate::common::{
     api_common::{

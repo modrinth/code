@@ -3,8 +3,10 @@ use crate::models::projects::SearchRequest;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::borrow::Cow;
 use std::cmp::min;
 use std::collections::HashMap;
@@ -177,7 +179,7 @@ pub async fn search_for_project(
             query.with_filter(new_filters);
         } else {
             let facets = if let Some(facets) = &info.facets {
-                Some(serde_json::from_str::<Vec<Vec<&str>>>(facets)?)
+                Some(serde_json::from_str::<Vec<Vec<Value>>>(facets)?)
             } else {
                 None
             };
@@ -190,14 +192,42 @@ pub async fn search_for_project(
             };
 
             if let Some(facets) = facets {
+                // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
+                // For every inner facet, we will check if it can be deserialized into a Vec<&str>, and do so.
+                // If not, we will assume it is a single facet and wrap it in a Vec.
+                let facets: Vec<Vec<Vec<String>>> = facets
+                    .into_iter()
+                    .map(|facets| {
+                        facets
+                            .into_iter()
+                            .map(|facet| {
+                                if facet.is_array() {
+                                    serde_json::from_value::<Vec<String>>(facet).unwrap_or_default()
+                                } else {
+                                    vec![serde_json::from_value::<String>(facet.clone())
+                                        .unwrap_or_default()]
+                                }
+                            })
+                            .collect_vec()
+                    })
+                    .collect_vec();
+
                 filter_string.push('(');
-                for (index, facet_list) in facets.iter().enumerate() {
+                for (index, facet_outer_list) in facets.iter().enumerate() {
                     filter_string.push('(');
 
-                    for (facet_index, facet) in facet_list.iter().enumerate() {
-                        filter_string.push_str(&facet.replace(':', " = "));
+                    for (facet_outer_index, facet_inner_list) in facet_outer_list.iter().enumerate()
+                    {
+                        filter_string.push('(');
+                        for (facet_inner_index, facet) in facet_inner_list.iter().enumerate() {
+                            filter_string.push_str(&facet.replace(':', " = "));
+                            if facet_inner_index != (facet_inner_list.len() - 1) {
+                                filter_string.push_str(" AND ")
+                            }
+                        }
+                        filter_string.push(')');
 
-                        if facet_index != (facet_list.len() - 1) {
+                        if facet_outer_index != (facet_outer_list.len() - 1) {
                             filter_string.push_str(" OR ")
                         }
                     }

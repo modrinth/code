@@ -24,7 +24,7 @@ use super::{
 
 use super::{asserts::assert_status, database::USER_USER_ID, get_json_val_str};
 
-pub const DUMMY_DATA_UPDATE: i64 = 5;
+pub const DUMMY_DATA_UPDATE: i64 = 6;
 
 #[allow(dead_code)]
 pub const DUMMY_CATEGORIES: &[&str] = &[
@@ -340,8 +340,10 @@ pub async fn add_project_beta(api: &ApiV3) -> (CommonProject, CommonVersion) {
                 "version_title": "start",
                 "status": "unlisted",
                 "dependencies": [],
-                "client_side": "required",
-                "server_side": "optional",
+                "singleplayer": true,
+                "client_and_server": true,
+                "client_only": true,
+                "server_only": false,
                 "game_versions": ["1.20.1"] ,
                 "release_channel": "release",
                 "loaders": ["fabric"],

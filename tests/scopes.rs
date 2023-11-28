@@ -2,9 +2,16 @@ use actix_web::test::{self, TestRequest};
 use bytes::Bytes;
 use chrono::{Duration, Utc};
 
-use common::environment::with_test_environment_all;
+use common::api_v3::request_data::{
+    get_public_project_creation_data, get_public_version_creation_data,
+};
+use common::api_v3::ApiV3;
+use common::dummy_data::TestFile;
+use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
 use common::{database::*, scopes::ScopeTest};
+use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
+use labrinth::models::projects::ProjectId;
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
@@ -201,93 +208,37 @@ pub async fn notifications_scopes() {
 // Project version creation scopes
 #[actix_rt::test]
 pub async fn project_version_create_scopes() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         // Create project
         let create_project = Scopes::PROJECT_CREATE;
-        let json_data = json!(
-            {
-                "title": "Test_Add_Project project",
-                "slug": "demo",
-                "description": "Example description.",
-                "body": "Example body.",
-                "initial_versions": [{
-                    "file_parts": ["basic-mod.jar"],
-                    "version_number": "1.2.3",
-                    "version_title": "start",
-                    "dependencies": [],
-                    "game_versions": ["1.20.1"] ,
-                    "client_side": "required",
-                    "server_side": "optional",
-                    "release_channel": "release",
-                    "loaders": ["fabric"],
-                    "featured": true
-                }],
-                "categories": [],
-                "license_id": "MIT"
-            }
-        );
-        let json_segment = MultipartSegment {
-            name: "data".to_string(),
-            filename: None,
-            content_type: Some("application/json".to_string()),
-            data: MultipartSegmentData::Text(serde_json::to_string(&json_data).unwrap()),
-        };
-        let file_segment = MultipartSegment {
-            name: "basic-mod.jar".to_string(),
-            filename: Some("basic-mod.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../tests/files/basic-mod.jar").to_vec(),
-            ),
-        };
-
         let req_gen = || {
+            let creation_data =
+                get_public_project_creation_data("demo", Some(TestFile::BasicMod), None);
             test::TestRequest::post()
                 .uri("/v3/project")
-                .set_multipart(vec![json_segment.clone(), file_segment.clone()])
+                .set_multipart(creation_data.segment_data)
         };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, create_project)
             .await
             .unwrap();
         let project_id = success["id"].as_str().unwrap();
+        let project_id = ProjectId(parse_base62(project_id).unwrap());
 
         // Add version to project
         let create_version = Scopes::VERSION_CREATE;
-        let json_data = json!(
-                {
-                    "project_id": project_id,
-                    "file_parts": ["basic-mod-different.jar"],
-                    "version_number": "1.2.3.4",
-                    "version_title": "start",
-                    "dependencies": [],
-                    "game_versions": ["1.20.1"] ,
-                    "client_side": "required",
-                    "server_side": "optional",
-                    "release_channel": "release",
-                    "loaders": ["fabric"],
-                    "featured": true
-                }
-        );
-        let json_segment = MultipartSegment {
-            name: "data".to_string(),
-            filename: None,
-            content_type: Some("application/json".to_string()),
-            data: MultipartSegmentData::Text(serde_json::to_string(&json_data).unwrap()),
-        };
-        let file_segment = MultipartSegment {
-            name: "basic-mod-different.jar".to_string(),
-            filename: Some("basic-mod.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../tests/files/basic-mod-different.jar").to_vec(),
-            ),
-        };
-
         let req_gen = || {
+            let creation_data = get_public_version_creation_data(
+                project_id,
+                "1.2.3.4",
+                TestFile::BasicModDifferent,
+                None,
+                None,
+            );
+
             test::TestRequest::post()
                 .uri("/v3/version")
-                .set_multipart(vec![json_segment.clone(), file_segment.clone()])
+                .set_multipart(creation_data.segment_data)
         };
         ScopeTest::new(&test_env)
             .test(req_gen, create_version)

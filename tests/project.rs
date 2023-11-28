@@ -2,19 +2,24 @@ use actix_http::StatusCode;
 use actix_web::test;
 use bytes::Bytes;
 use chrono::{Duration, Utc};
+use common::api_v3::request_data::get_public_version_creation_data;
+use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
 
-use common::environment::with_test_environment_all;
+use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
 use common::permissions::{PermissionsTest, PermissionsTestContext};
 use futures::StreamExt;
 use labrinth::database::models::project_item::{PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE};
 use labrinth::models::ids::base62_impl::parse_base62;
+use labrinth::models::projects::ProjectId;
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
 use crate::common::api_common::{ApiProject, ApiVersion};
+use crate::common::api_v3::request_data::get_public_project_creation_data_json;
+use crate::common::dummy_data::TestFile;
 
 mod common;
 
@@ -101,32 +106,11 @@ async fn test_get_project() {
 #[actix_rt::test]
 async fn test_add_remove_project() {
     // Test setup and dummy data
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
 
-        // Generate test project data.
-        let mut json_data = json!(
-            {
-                "title": "Test_Add_Project project",
-                "slug": "demo",
-                "description": "Example description.",
-                "body": "Example body.",
-                "initial_versions": [{
-                    "file_parts": ["basic-mod.jar"],
-                    "version_number": "1.2.3",
-                    "version_title": "start",
-                    "dependencies": [],
-                    "game_versions": ["1.20.1"] ,
-                    "client_side": "required",
-                    "server_side": "optional",
-                    "release_channel": "release",
-                    "loaders": ["fabric"],
-                    "featured": true
-                }],
-                "categories": [],
-                "license_id": "MIT"
-            }
-        );
+        let mut json_data =
+            get_public_project_creation_data_json("demo", Some(&TestFile::BasicMod));
 
         // Basic json
         let json_segment = MultipartSegment {
@@ -730,48 +714,27 @@ async fn permissions_edit_details() {
 
 #[actix_rt::test]
 async fn permissions_upload_version() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
         let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
         let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
         let alpha_file_hash = &test_env.dummy.as_ref().unwrap().project_alpha.file_hash;
 
         let upload_version = ProjectPermissions::UPLOAD_VERSION;
-
         // Upload version with basic-mod.jar
         let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post().uri("/v3/version").set_multipart([
-                MultipartSegment {
-                    name: "data".to_string(),
-                    filename: None,
-                    content_type: Some("application/json".to_string()),
-                    data: MultipartSegmentData::Text(
-                        serde_json::to_string(&json!({
-                            "project_id": ctx.project_id.unwrap(),
-                            "file_parts": ["basic-mod.jar"],
-                            "version_number": "1.0.0",
-                            "version_title": "1.0.0",
-                            "version_type": "release",
-                            "client_side": "required",
-                            "server_side": "optional",
-                            "dependencies": [],
-                            "game_versions": ["1.20.1"],
-                            "loaders": ["fabric"],
-                            "featured": false,
-
-                        }))
-                        .unwrap(),
-                    ),
-                },
-                MultipartSegment {
-                    name: "basic-mod.jar".to_string(),
-                    filename: Some("basic-mod.jar".to_string()),
-                    content_type: Some("application/java-archive".to_string()),
-                    data: MultipartSegmentData::Binary(
-                        include_bytes!("../tests/files/basic-mod.jar").to_vec(),
-                    ),
-                },
-            ])
+            let project_id = ctx.project_id.unwrap();
+            let project_id = ProjectId(parse_base62(project_id).unwrap());
+            let multipart = get_public_version_creation_data(
+                project_id,
+                "1.0.0",
+                TestFile::BasicMod,
+                None,
+                None,
+            );
+            test::TestRequest::post()
+                .uri("/v3/version")
+                .set_multipart(multipart.segment_data)
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(upload_version, req_gen)

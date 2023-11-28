@@ -323,6 +323,23 @@ impl LoaderField {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let found_loader_fields = Self::get_fields_per_loader(loader_ids, exec, redis).await?;
+        let result = found_loader_fields
+            .into_values()
+            .flatten()
+            .unique_by(|x| x.id)
+            .collect();
+        Ok(result)
+    }
+
+    pub async fn get_fields_per_loader<'a, E>(
+        loader_ids: &[LoaderId],
+        exec: E,
+        redis: &RedisPool,
+    ) -> Result<HashMap<LoaderId, Vec<LoaderField>>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
         type RedisLoaderFieldTuple = (LoaderId, Vec<LoaderField>);
 
         let mut redis = redis.connect().await?;
@@ -336,11 +353,11 @@ impl LoaderField {
             .filter_map(|x: String| serde_json::from_str::<RedisLoaderFieldTuple>(&x).ok())
             .collect();
 
-        let mut found_loader_fields = vec![];
+        let mut found_loader_fields = HashMap::new();
         if !cached_fields.is_empty() {
             for (loader_id, fields) in cached_fields {
                 if loader_ids.contains(&loader_id) {
-                    found_loader_fields.extend(fields);
+                    found_loader_fields.insert(loader_id, fields);
                     loader_ids.retain(|x| x != &loader_id);
                 }
             }
@@ -388,14 +405,10 @@ impl LoaderField {
                 redis
                     .set_serialized_to_json(LOADER_FIELDS_NAMESPACE, k.0, (k, &v), None)
                     .await?;
-                found_loader_fields.extend(v);
+                found_loader_fields.insert(k, v);
             }
         }
-        let result = found_loader_fields
-            .into_iter()
-            .unique_by(|x| x.id)
-            .collect();
-        Ok(result)
+        Ok(found_loader_fields)
     }
 
     // Gets all fields for a given loader(s)

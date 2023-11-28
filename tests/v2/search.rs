@@ -214,6 +214,15 @@ async fn search_projects() {
         // 1. vec of search facets
         // 2. expected project ids to be returned by this search
         let pairs = vec![
+            // For testing: remove me
+            (
+                json!([
+                    ["client_side:required"],
+                    ["versions:1.20.5"],
+                    [&format!("categories:{}", DUMMY_CATEGORIES[5])]
+                ]),
+                vec![],
+            ),
             (json!([["categories:fabric"]]), vec![0, 1, 2, 3, 4, 5, 6, 7]),
             (json!([["categories:forge"]]), vec![7]),
             (
@@ -229,7 +238,9 @@ async fn search_projects() {
                 vec![1, 2, 3, 4],
             ),
             (json!([["project_types:modpack"]]), vec![4]),
-            (json!([["client_side:required"]]), vec![0, 2, 3, 7]),
+            // Formerly included 7, but with v2 changes, this is no longer the case.
+            // This is because we assume client_side/server_side with subsequent versions.
+            (json!([["client_side:required"]]), vec![0, 2, 3]),
             (json!([["server_side:required"]]), vec![0, 2, 3, 6, 7]),
             (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7]),
             (json!([["license:MIT"]]), vec![1, 2, 4]),

@@ -1,6 +1,9 @@
 use crate::common::{
     api_common::ApiProject,
-    api_v2::ApiV2,
+    api_v2::{
+        request_data::{get_public_project_creation_data_json, get_public_version_creation_data},
+        ApiV2,
+    },
     database::{ENEMY_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
     dummy_data::{TestFile, DUMMY_CATEGORIES},
     environment::{with_test_environment, TestEnvironment},
@@ -10,7 +13,7 @@ use actix_web::test;
 use itertools::Itertools;
 use labrinth::{
     database::models::project_item::PROJECTS_SLUGS_NAMESPACE,
-    models::teams::ProjectPermissions,
+    models::{ids::base62_impl::parse_base62, projects::ProjectId, teams::ProjectPermissions},
     util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData},
 };
 use serde_json::json;
@@ -63,28 +66,8 @@ async fn test_add_remove_project() {
         let api = &test_env.api;
 
         // Generate test project data.
-        let mut json_data = json!(
-            {
-                "title": "Test_Add_Project project",
-                "slug": "demo",
-                "description": "Example description.",
-                "body": "Example body.",
-                "client_side": "required",
-                "server_side": "optional",
-                "initial_versions": [{
-                    "file_parts": ["basic-mod.jar"],
-                    "version_number": "1.2.3",
-                    "version_title": "start",
-                    "dependencies": [],
-                    "game_versions": ["1.20.1"] ,
-                    "release_channel": "release",
-                    "loaders": ["fabric"],
-                    "featured": true
-                }],
-                "categories": [],
-                "license_id": "MIT"
-            }
-        );
+        let mut json_data =
+            get_public_project_creation_data_json("demo", Some(&TestFile::BasicMod));
 
         // Basic json
         let json_segment = MultipartSegment {
@@ -251,36 +234,18 @@ async fn permissions_upload_version() {
 
         // Upload version with basic-mod.jar
         let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post().uri("/v2/version").set_multipart([
-                MultipartSegment {
-                    name: "data".to_string(),
-                    filename: None,
-                    content_type: Some("application/json".to_string()),
-                    data: MultipartSegmentData::Text(
-                        serde_json::to_string(&json!({
-                            "project_id": ctx.project_id.unwrap(),
-                            "file_parts": ["basic-mod.jar"],
-                            "version_number": "1.0.0",
-                            "version_title": "1.0.0",
-                            "version_type": "release",
-                            "dependencies": [],
-                            "game_versions": ["1.20.1"],
-                            "loaders": ["fabric"],
-                            "featured": false,
-
-                        }))
-                        .unwrap(),
-                    ),
-                },
-                MultipartSegment {
-                    name: "basic-mod.jar".to_string(),
-                    filename: Some("basic-mod.jar".to_string()),
-                    content_type: Some("application/java-archive".to_string()),
-                    data: MultipartSegmentData::Binary(
-                        include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
-                    ),
-                },
-            ])
+            let project_id = ctx.project_id.unwrap();
+            let project_id = ProjectId(parse_base62(project_id).unwrap());
+            let multipart = get_public_version_creation_data(
+                project_id,
+                "1.0.0",
+                TestFile::BasicMod,
+                None,
+                None,
+            );
+            test::TestRequest::post()
+                .uri("/v2/version")
+                .set_multipart(multipart.segment_data)
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(upload_version, req_gen)
@@ -491,7 +456,7 @@ pub async fn test_patch_project() {
                     "issues_url": "https://github.com",
                     "discord_url": "https://discord.gg",
                     "wiki_url": "https://wiki.com",
-                    "client_side": "optional",
+                    "client_side": "unsupported",
                     "server_side": "required",
                     "donation_urls": [{
                         "id": "patreon",
@@ -520,7 +485,11 @@ pub async fn test_patch_project() {
         assert_eq!(project.issues_url, Some("https://github.com".to_string()));
         assert_eq!(project.discord_url, Some("https://discord.gg".to_string()));
         assert_eq!(project.wiki_url, Some("https://wiki.com".to_string()));
-        assert_eq!(project.client_side.as_str(), "optional");
+        // Note: the original V2 value of this was "optional",
+        // but Required/Optional is no longer a carried combination in v3, as the changes made were lossy.
+        // Now, the test Required/Unsupported combination is tested instead.
+        // Setting Required/Optional in v2 will not work, this is known and accepteed.
+        assert_eq!(project.client_side.as_str(), "unsupported");
         assert_eq!(project.server_side.as_str(), "required");
         assert_eq!(project.donation_urls.unwrap()[0].url, "https://patreon.com");
     })

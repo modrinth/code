@@ -1,4 +1,4 @@
-use crate::{models::projects::SideType, util::env::parse_strings_from_var};
+use crate::{models::v2::projects::LegacySideType, util::env::parse_strings_from_var};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -23,7 +23,7 @@ pub struct PackFormat {
 pub struct PackFile {
     pub path: String,
     pub hashes: std::collections::HashMap<PackFileHash, String>,
-    pub env: Option<std::collections::HashMap<EnvType, SideType>>,
+    pub env: Option<std::collections::HashMap<EnvType, LegacySideType>>, // TODO: Should this use LegacySideType? Will probably require a overhaul of mrpack format to change this
     #[validate(custom(function = "validate_download_url"))]
     pub downloads: Vec<String>,
     pub file_size: u32,

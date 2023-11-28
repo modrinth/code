@@ -3,10 +3,12 @@ use std::collections::HashMap;
 use super::ApiError;
 use crate::database::models::loader_fields::LoaderFieldEnumValue;
 use crate::database::redis::RedisPool;
+use crate::models::v2::projects::LegacySideType;
 use crate::routes::v3::tags::{LoaderData as LoaderDataV3, LoaderFieldsEnumQuery};
 use crate::routes::{v2_reroute, v3};
 use actix_web::{get, web, HttpResponse};
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -191,28 +193,15 @@ pub async fn project_type_list(
 }
 
 #[get("side_type")]
-pub async fn side_type_list(
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-) -> Result<HttpResponse, ApiError> {
-    let response = v3::tags::loader_fields_list(
-        pool,
-        web::Query(LoaderFieldsEnumQuery {
-            loader_field: "client_side".to_string(), // same as server_side
-            filters: None,
-        }),
-        redis,
-    )
-    .await?;
-
-    // Convert to V2 format
-    Ok(
-        match v2_reroute::extract_ok_json::<Vec<LoaderFieldEnumValue>>(response).await {
-            Ok(fields) => {
-                let fields = fields.into_iter().map(|f| f.value).collect::<Vec<_>>();
-                HttpResponse::Ok().json(fields)
-            }
-            Err(response) => response,
-        },
-    )
+pub async fn side_type_list() -> Result<HttpResponse, ApiError> {
+    // Original side types are no longer reflected in the database.
+    // Therefore, we hardcode and return all the fields that are supported by our v2 conversion logic.
+    let side_types = [
+        LegacySideType::Required,
+        LegacySideType::Optional,
+        LegacySideType::Unsupported,
+        LegacySideType::Unknown,
+    ];
+    let side_types = side_types.iter().map(|s| s.to_string()).collect_vec();
+    Ok(HttpResponse::Ok().json(side_types))
 }

@@ -66,7 +66,7 @@ async fn search_projects() {
         let id = 0;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[4..6] },
-            { "op": "add", "path": "/initial_versions/0/server_side", "value": "required" },
+            { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
             { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
         ]))
         .unwrap();
@@ -81,7 +81,7 @@ async fn search_projects() {
         let id = 1;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..2] },
-            { "op": "add", "path": "/initial_versions/0/client_side", "value": "optional" },
+            { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
         ]))
         .unwrap();
         project_creation_futures.push(create_async_future(
@@ -95,7 +95,7 @@ async fn search_projects() {
         let id = 2;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..2] },
-            { "op": "add", "path": "/initial_versions/0/server_side", "value": "required" },
+            { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
             { "op": "add", "path": "/title", "value": "Mysterious Project" },
         ]))
         .unwrap();
@@ -110,7 +110,7 @@ async fn search_projects() {
         let id = 3;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..3] },
-            { "op": "add", "path": "/initial_versions/0/server_side", "value": "required" },
+            { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
             { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.4"] },
             { "op": "add", "path": "/title", "value": "Mysterious Project" },
             { "op": "add", "path": "/license_id", "value": "LicenseRef-All-Rights-Reserved" },
@@ -127,7 +127,7 @@ async fn search_projects() {
         let id = 4;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..3] },
-            { "op": "add", "path": "/initial_versions/0/client_side", "value": "optional" },
+            { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
             { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.5"] },
         ]))
         .unwrap();
@@ -142,7 +142,7 @@ async fn search_projects() {
         let id = 5;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
-            { "op": "add", "path": "/initial_versions/0/client_side", "value": "optional" },
+            { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
             { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.5"] },
             { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
         ]))
@@ -158,8 +158,8 @@ async fn search_projects() {
         let id = 6;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
-            { "op": "add", "path": "/initial_versions/0/client_side", "value": "optional" },
-            { "op": "add", "path": "/initial_versions/0/server_side", "value": "required" },
+            { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
+            { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
             { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
         ]))
         .unwrap();
@@ -176,8 +176,8 @@ async fn search_projects() {
         let id = 7;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
-            { "op": "add", "path": "/initial_versions/0/client_side", "value": "optional" },
-            { "op": "add", "path": "/initial_versions/0/server_side", "value": "required" },
+            { "op": "add", "path": "/initial_versions/0/client_only", "value": false },
+            { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
             { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
             { "op": "add", "path": "/initial_versions/0/loaders", "value": ["forge"] },
             { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.2"] },
@@ -236,8 +236,8 @@ async fn search_projects() {
                 vec![1, 2, 3, 4],
             ),
             (json!([["project_types:modpack"]]), vec![4]),
-            (json!([["client_side:required"]]), vec![0, 2, 3, 7]),
-            (json!([["server_side:required"]]), vec![0, 2, 3, 6, 7]),
+            (json!([["client_only:true"]]), vec![0, 2, 3, 7]),
+            (json!([["server_only:true"]]), vec![0, 2, 3, 6, 7]),
             (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7]),
             (json!([["license:MIT"]]), vec![1, 2, 4]),
             (json!([[r#"title:'Mysterious Project'"#]]), vec![2, 3]),

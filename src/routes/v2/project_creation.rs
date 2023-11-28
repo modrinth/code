@@ -3,8 +3,8 @@ use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::ImageId;
-use crate::models::projects::{DonationLink, Loader, Project, ProjectStatus, SideType};
-use crate::models::v2::projects::LegacyProject;
+use crate::models::projects::{DonationLink, Loader, Project, ProjectStatus};
+use crate::models::v2::projects::{LegacyProject, LegacySideType};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
@@ -60,9 +60,9 @@ struct ProjectCreateData {
     pub body: String,
 
     /// The support range for the client project
-    pub client_side: SideType,
+    pub client_side: LegacySideType,
     /// The support range for the server project
-    pub server_side: SideType,
+    pub server_side: LegacySideType,
 
     #[validate(length(max = 32))]
     #[validate]
@@ -146,7 +146,7 @@ pub async fn project_create(
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: ProjectCreateData| {
+        |legacy_create: ProjectCreateData| async move {
             // Side types will be applied to each version
             let client_side = legacy_create.client_side;
             let server_side = legacy_create.server_side;
@@ -158,8 +158,7 @@ pub async fn project_create(
                 .into_iter()
                 .map(|v| {
                     let mut fields = HashMap::new();
-                    fields.insert("client_side".to_string(), json!(client_side));
-                    fields.insert("server_side".to_string(), json!(server_side));
+                    fields.extend(v2_reroute::convert_side_types_v3(client_side, server_side));
                     fields.insert("game_versions".to_string(), json!(v.game_versions));
 
                     // Modpacks now use the "mrpack" loader, and loaders are converted to loader fields.

@@ -216,42 +216,6 @@ pub struct ModeratorMessage {
     pub body: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-pub enum SideType {
-    Required,
-    Optional,
-    Unsupported,
-    Unknown,
-}
-
-impl std::fmt::Display for SideType {
-    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(fmt, "{}", self.as_str())
-    }
-}
-
-impl SideType {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            SideType::Required => "required",
-            SideType::Optional => "optional",
-            SideType::Unsupported => "unsupported",
-            SideType::Unknown => "unknown",
-        }
-    }
-
-    pub fn from_string(string: &str) -> SideType {
-        match string {
-            "required" => SideType::Required,
-            "optional" => SideType::Optional,
-            "unsupported" => SideType::Unsupported,
-            _ => SideType::Unknown,
-        }
-    }
-}
-
 pub const DEFAULT_LICENSE_ID: &str = "LicenseRef-All-Rights-Reserved";
 
 #[derive(Serialize, Deserialize, Clone)]

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use super::super::ids::OrganizationId;
 use super::super::teams::TeamId;
 use super::super::users::UserId;
@@ -10,6 +12,7 @@ use crate::models::projects::{
     Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
 use crate::models::threads::ThreadId;
+use crate::routes::v2_reroute;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -85,26 +88,6 @@ impl LegacyProject {
         let mut loaders = data.loaders;
 
         if let Some(versions_item) = versions_item {
-            client_side = versions_item
-                .version_fields
-                .iter()
-                .find(|f| f.field_name == "client_side")
-                .and_then(|f| {
-                    Some(LegacySideType::from_string(
-                        f.value.serialize_internal().as_str()?,
-                    ))
-                })
-                .unwrap_or(LegacySideType::Unknown);
-            server_side = versions_item
-                .version_fields
-                .iter()
-                .find(|f| f.field_name == "server_side")
-                .and_then(|f| {
-                    Some(LegacySideType::from_string(
-                        f.value.serialize_internal().as_str()?,
-                    ))
-                })
-                .unwrap_or(LegacySideType::Unknown);
             game_versions = versions_item
                 .version_fields
                 .iter()
@@ -112,6 +95,14 @@ impl LegacyProject {
                 .and_then(|f| MinecraftGameVersion::try_from_version_field(f).ok())
                 .map(|v| v.into_iter().map(|v| v.version).collect())
                 .unwrap_or(Vec::new());
+
+            // Extract side types from remaining fields (singleplayer, client_only, etc)
+            let fields = versions_item
+                .version_fields
+                .iter()
+                .map(|f| (f.field_name.clone(), f.value.clone().serialize_internal()))
+                .collect::<HashMap<_, _>>();
+            (client_side, server_side) = v2_reroute::convert_side_types_v2(&fields);
 
             // - if loader is mrpack, this is a modpack
             // the loaders are whatever the corresponding loader fields are
@@ -194,7 +185,7 @@ impl LegacyProject {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Copy)]
 #[serde(rename_all = "kebab-case")]
 pub enum LegacySideType {
     Required,
