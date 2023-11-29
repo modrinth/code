@@ -1,7 +1,6 @@
 <template>
   <div v-if="user">
     <ModalCreation ref="modal_creation" />
-    <ModalReport ref="modal_report" :item-id="user.id" item-type="user" />
     <div class="user-header-wrapper">
       <div class="user-header">
         <Avatar
@@ -44,7 +43,7 @@
             <button
               v-else-if="auth.user"
               class="iconified-button"
-              @click="$refs.modal_report.show()"
+              @click="() => reportUser(user.id)"
             >
               <ReportIcon aria-hidden="true" />
               {{ formatMessage(messages.profileReportButton) }}
@@ -264,6 +263,7 @@
 import { Promotion } from 'omorphia'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Badge from '~/components/ui/Badge.vue'
+import { reportUser } from '~/utils/report-helpers.ts'
 
 import ReportIcon from '~/assets/images/utils/report.svg'
 import SunriseIcon from '~/assets/images/utils/sunrise.svg'
@@ -280,7 +280,6 @@ import ListIcon from '~/assets/images/utils/list.svg'
 import ImageIcon from '~/assets/images/utils/image.svg'
 import UploadIcon from '~/assets/images/utils/upload.svg'
 import FileInput from '~/components/ui/FileInput.vue'
-import ModalReport from '~/components/ui/ModalReport.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import NavRow from '~/components/ui/NavRow.vue'
 import CopyCode from '~/components/ui/CopyCode.vue'

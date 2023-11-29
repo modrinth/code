@@ -63,9 +63,9 @@
     <section id="messages" class="universal-card">
       <h2>Messages</h2>
       <p>
-        This is a private conversation thread with the Modrinth moderators. They will message you
-        for issues concerning your project on Modrinth, and you are welcome to message them about
-        things concerning your project.
+        This is a private conversation thread with the Modrinth moderators. They may message you
+        with issues concerning this project. Additionally, you are welcome to start a discussion
+        here regarding this project and its status.
       </p>
       <ConversationThread
         v-if="thread"

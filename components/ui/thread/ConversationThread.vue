@@ -51,14 +51,12 @@
       This thread is closed and new messages cannot be sent to it.
     </span>
     <template v-else-if="!report || !report.closed">
-      <div class="resizable-textarea-wrapper">
-        <Chips v-model="replyViewMode" class="chips" :items="['source', 'preview']" />
-        <textarea
-          v-if="replyViewMode === 'source'"
+      <div class="markdown-editor-spacing">
+        <MarkdownEditor
           v-model="replyBody"
           :placeholder="sortedMessages.length > 0 ? 'Reply to thread...' : 'Send a message...'"
+          :on-image-upload="onUploadImage"
         />
-        <div v-else class="markdown-body preview" v-html="renderString(replyBody)" />
       </div>
       <div class="input-group">
         <button
@@ -170,7 +168,8 @@
 </template>
 
 <script setup>
-import Chips from '~/components/ui/Chips.vue'
+import { MarkdownEditor } from 'omorphia'
+import { useImageUpload } from '~/composables/image-upload.ts'
 import CopyCode from '~/components/ui/CopyCode.vue'
 import ReplyIcon from '~/assets/images/utils/reply.svg'
 import SendIcon from '~/assets/images/utils/send.svg'
@@ -179,7 +178,6 @@ import CrossIcon from '~/assets/images/utils/x.svg'
 import EyeOffIcon from '~/assets/images/utils/eye-off.svg'
 import CheckIcon from '~/assets/images/utils/check.svg'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg'
-import { renderString } from '~/helpers/parse.js'
 import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
 import { isStaff } from '~/helpers/users.js'
 import { isApproved, isRejected } from '~/helpers/projects.js'
@@ -233,7 +231,6 @@ const members = computed(() => {
   return members
 })
 
-const replyViewMode = ref('source')
 const replyBody = ref('')
 
 const sortedMessages = computed(() => {
@@ -261,18 +258,41 @@ async function updateThreadLocal() {
   props.updateThread(thread)
 }
 
+const imageIDs = ref([])
+
+async function onUploadImage(file) {
+  const response = await useImageUpload(file, { context: 'thread_message' })
+
+  imageIDs.value.push(response.id)
+  // Keep the last 10 entries of image IDs
+  imageIDs.value = imageIDs.value.slice(-10)
+
+  return response.url
+}
+
 async function sendReply(status = null) {
   try {
+    const body = {
+      body: {
+        type: 'text',
+        body: replyBody.value,
+      },
+    }
+
+    if (imageIDs.value.length > 0) {
+      body.body = {
+        ...body.body,
+        uploaded_images: imageIDs.value,
+      }
+    }
+
     await useBaseFetch(`thread/${props.thread.id}`, {
       method: 'POST',
-      body: {
-        body: {
-          type: 'text',
-          body: replyBody.value,
-        },
-      },
+      body,
     })
+
     replyBody.value = ''
+
     await updateThreadLocal()
     if (status !== null) {
       props.setStatus(status)
@@ -332,6 +352,10 @@ const requestedStatus = computed(() => props.project.requested_status ?? 'approv
 </script>
 
 <style lang="scss" scoped>
+.markdown-editor-spacing {
+  margin-bottom: var(--gap-md);
+}
+
 .messages {
   display: flex;
   flex-direction: column;

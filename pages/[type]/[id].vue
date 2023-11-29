@@ -130,12 +130,6 @@
         <div class="markdown-body" v-html="renderString(licenseText)" />
       </div>
     </Modal>
-    <ModalReport
-      v-if="auth.user"
-      ref="modal_project_report"
-      :item-id="project.id"
-      item-type="project"
-    />
     <div
       :class="{
         'normal-page': true,
@@ -258,7 +252,7 @@
             <hr class="card-divider" />
             <div class="input-group">
               <template v-if="auth.user">
-                <button class="iconified-button" @click="$refs.modal_project_report.show()">
+                <button class="iconified-button" @click="() => reportProject(project.id)">
                   <ReportIcon aria-hidden="true" />
                   Report
                 </button>
@@ -689,7 +683,6 @@ import Badge from '~/components/ui/Badge.vue'
 import Categories from '~/components/ui/search/Categories.vue'
 import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator.vue'
 import Modal from '~/components/ui/Modal.vue'
-import ModalReport from '~/components/ui/ModalReport.vue'
 import NavRow from '~/components/ui/NavRow.vue'
 import CopyCode from '~/components/ui/CopyCode.vue'
 import Avatar from '~/components/ui/Avatar.vue'
@@ -706,6 +699,7 @@ import LicenseIcon from '~/assets/images/utils/copyright.svg'
 import GalleryIcon from '~/assets/images/utils/image.svg'
 import VersionIcon from '~/assets/images/utils/version.svg'
 import { renderString } from '~/helpers/parse.js'
+import { reportProject } from '~/utils/report-helpers.ts'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 
 const data = useNuxtApp()

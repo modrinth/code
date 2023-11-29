@@ -9,12 +9,6 @@
       proceed-label="Delete"
       @proceed="deleteVersion()"
     />
-    <ModalReport
-      v-if="auth.user"
-      ref="modal_version_report"
-      :item-id="version.id"
-      item-type="version"
-    />
     <Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
       <div class="modal-package-mod universal-labels">
         <div class="markdown-body">
@@ -157,7 +151,7 @@
           <ReportIcon aria-hidden="true" />
           Report
         </nuxt-link>
-        <button v-else class="iconified-button" @click="$refs.modal_version_report.show()">
+        <button v-else class="iconified-button" @click="() => reportVersion(version.id)">
           <ReportIcon aria-hidden="true" />
           Report
         </button>
@@ -195,29 +189,9 @@
     <div class="version-page__changelog universal-card">
       <h3>Changelog</h3>
       <template v-if="isEditing">
-        <span
-          >This editor supports
-          <a
-            class="text-link"
-            href="https://docs.modrinth.com/docs/tutorials/markdown/"
-            target="_blank"
-            >Markdown formatting</a
-          >. HTML can also be used inside your changelog, not including styles, scripts, and
-          iframes.
-        </span>
-        <Chips v-model="changelogViewMode" class="separator" :items="['source', 'preview']" />
-        <div v-if="changelogViewMode === 'source'" class="resizable-textarea-wrapper">
-          <textarea id="body" v-model="version.changelog" maxlength="65536" />
+        <div class="changelog-editor-spacing">
+          <MarkdownEditor v-model="version.changelog" :on-image-upload="onImageUpload" />
         </div>
-        <div
-          v-if="changelogViewMode === 'preview'"
-          class="markdown-body"
-          v-html="
-            version.changelog
-              ? renderHighlightedString(version.changelog)
-              : 'No changelog specified.'
-          "
-        />
       </template>
       <div
         v-else
@@ -656,11 +630,14 @@
   </div>
 </template>
 <script>
+import { MarkdownEditor } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 import { inferVersionInfo } from '~/helpers/infer.js'
 import { createDataPackVersion } from '~/helpers/package.js'
 import { renderHighlightedString } from '~/helpers/highlight.js'
+import { reportVersion } from '~/utils/report-helpers.ts'
+import { useImageUpload } from '~/composables/image-upload.ts'
 
 import Avatar from '~/components/ui/Avatar.vue'
 import Badge from '~/components/ui/Badge.vue'
@@ -668,7 +645,6 @@ import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import CopyCode from '~/components/ui/CopyCode.vue'
 import Categories from '~/components/ui/search/Categories.vue'
 import ModalConfirm from '~/components/ui/ModalConfirm.vue'
-import ModalReport from '~/components/ui/ModalReport.vue'
 import Chips from '~/components/ui/Chips.vue'
 import Checkbox from '~/components/ui/Checkbox.vue'
 import FileInput from '~/components/ui/FileInput.vue'
@@ -693,6 +669,7 @@ import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
 
 export default defineNuxtComponent({
   components: {
+    MarkdownEditor,
     Modal,
     FileInput,
     Checkbox,
@@ -717,7 +694,6 @@ export default defineNuxtComponent({
     Breadcrumbs,
     CopyCode,
     ModalConfirm,
-    ModalReport,
     Multiselect,
     BoxIcon,
     RightArrowIcon,
@@ -919,6 +895,7 @@ export default defineNuxtComponent({
       primaryFile: ref(primaryFile),
       alternateFile: ref(alternateFile),
       replaceFile: ref(replaceFile),
+      uploadedImageIds: ref([]),
     }
   },
   data() {
@@ -927,7 +904,6 @@ export default defineNuxtComponent({
       newDependencyType: 'required',
       newDependencyId: '',
 
-      changelogViewMode: 'source',
       showSnapshots: false,
 
       newFiles: [],
@@ -967,6 +943,14 @@ export default defineNuxtComponent({
     },
   },
   methods: {
+    async onImageUpload(file) {
+      const response = await useImageUpload(file, { context: 'version' })
+
+      this.uploadedImageIds.push(response.id)
+      this.uploadedImageIds = this.uploadedImageIds.slice(-10)
+
+      return response.url
+    },
     getPreviousLink() {
       if (this.$router.options.history.state.back) {
         if (
@@ -1171,6 +1155,7 @@ export default defineNuxtComponent({
       }
       stopLoading()
     },
+    reportVersion,
     async createVersion() {
       this.shouldPreventActions = true
       startLoading()
@@ -1349,6 +1334,10 @@ export default defineNuxtComponent({
 </script>
 
 <style lang="scss" scoped>
+.changelog-editor-spacing {
+  padding-block: var(--gap-md);
+}
+
 .version-page {
   display: grid;
 
