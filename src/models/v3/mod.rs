@@ -1,6 +1,5 @@
 pub mod analytics;
 pub mod collections;
-pub mod error;
 pub mod ids;
 pub mod images;
 pub mod notifications;
@@ -8,6 +7,7 @@ pub mod oauth_clients;
 pub mod organizations;
 pub mod pack;
 pub mod pats;
+pub mod payouts;
 pub mod projects;
 pub mod reports;
 pub mod sessions;

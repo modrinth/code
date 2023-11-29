@@ -1,21 +1,40 @@
+use crate::models::ids::UserId;
+use crate::models::payouts::{
+    PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee, PayoutMethodType,
+};
 use crate::routes::ApiError;
 use crate::util::env::parse_var;
 use crate::{database::redis::RedisPool, models::projects::MonetizationStatus};
+use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
-use hex::ToHex;
-use hmac::{Hmac, Mac, NewMac};
+use dashmap::DashMap;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
-use sha2::Sha256;
+use serde_json::Value;
 use sqlx::PgPool;
 use std::collections::HashMap;
+use std::sync::Arc;
+use tokio::sync::{Mutex, RwLock};
 
 pub struct PayoutsQueue {
-    access_key: String,
-    secret_key: String,
+    credential: RwLock<Option<PayPalCredentials>>,
+    payout_options: RwLock<Option<PayoutMethods>>,
+    payouts_locks: DashMap<UserId, Arc<Mutex<()>>>,
+}
+
+#[derive(Clone)]
+struct PayPalCredentials {
+    access_token: String,
+    token_type: String,
+    expires: DateTime<Utc>,
+}
+
+#[derive(Clone)]
+struct PayoutMethods {
+    options: Vec<PayoutMethod>,
+    expires: DateTime<Utc>,
 }
 
 impl Default for PayoutsQueue {
@@ -23,67 +42,178 @@ impl Default for PayoutsQueue {
         Self::new()
     }
 }
-
-#[derive(Clone, Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum AccountUser {
-    Business { name: String },
-    Individual { first: String, last: String },
-}
-
-#[derive(Serialize)]
-pub struct PaymentInfo {
-    country: String,
-    payout_method: String,
-    route_minimum: Decimal,
-    estimated_fees: Decimal,
-    deduct_fees: Decimal,
-}
-
 // Batches payouts and handles token refresh
 impl PayoutsQueue {
     pub fn new() -> Self {
         PayoutsQueue {
-            access_key: dotenvy::var("TROLLEY_ACCESS_KEY").expect("missing trolley access key"),
-            secret_key: dotenvy::var("TROLLEY_SECRET_KEY").expect("missing trolley secret key"),
+            credential: RwLock::new(None),
+            payout_options: RwLock::new(None),
+            payouts_locks: DashMap::new(),
         }
     }
 
-    pub async fn make_trolley_request<T: Serialize, X: DeserializeOwned>(
+    async fn refresh_token(&self) -> Result<PayPalCredentials, ApiError> {
+        let mut creds = self.credential.write().await;
+        let client = reqwest::Client::new();
+
+        let combined_key = format!(
+            "{}:{}",
+            dotenvy::var("PAYPAL_CLIENT_ID")?,
+            dotenvy::var("PAYPAL_CLIENT_SECRET")?
+        );
+        let formatted_key = format!(
+            "Basic {}",
+            base64::engine::general_purpose::STANDARD.encode(combined_key)
+        );
+
+        let mut form = HashMap::new();
+        form.insert("grant_type", "client_credentials");
+
+        #[derive(Deserialize)]
+        struct PaypalCredential {
+            access_token: String,
+            token_type: String,
+            expires_in: i64,
+        }
+
+        let credential: PaypalCredential = client
+            .post(&format!("{}oauth2/token", dotenvy::var("PAYPAL_API_URL")?))
+            .header("Accept", "application/json")
+            .header("Accept-Language", "en_US")
+            .header("Authorization", formatted_key)
+            .form(&form)
+            .send()
+            .await
+            .map_err(|_| ApiError::Payments("Error while authenticating with PayPal".to_string()))?
+            .json()
+            .await
+            .map_err(|_| {
+                ApiError::Payments(
+                    "Error while authenticating with PayPal (deser error)".to_string(),
+                )
+            })?;
+
+        let new_creds = PayPalCredentials {
+            access_token: credential.access_token,
+            token_type: credential.token_type,
+            expires: Utc::now() + Duration::seconds(credential.expires_in),
+        };
+
+        *creds = Some(new_creds.clone());
+
+        Ok(new_creds)
+    }
+
+    pub async fn make_paypal_request<T: Serialize, X: DeserializeOwned>(
+        &self,
+        method: Method,
+        path: &str,
+        body: Option<T>,
+        raw_text: Option<String>,
+        no_api_prefix: Option<bool>,
+    ) -> Result<X, ApiError> {
+        let read = self.credential.read().await;
+        let credentials = if let Some(credentials) = read.as_ref() {
+            if credentials.expires < Utc::now() {
+                drop(read);
+                self.refresh_token().await.map_err(|_| {
+                    ApiError::Payments("Error while authenticating with PayPal".to_string())
+                })?
+            } else {
+                credentials.clone()
+            }
+        } else {
+            drop(read);
+            self.refresh_token().await.map_err(|_| {
+                ApiError::Payments("Error while authenticating with PayPal".to_string())
+            })?
+        };
+
+        let client = reqwest::Client::new();
+        let mut request = client
+            .request(
+                method,
+                if no_api_prefix.unwrap_or(false) {
+                    path.to_string()
+                } else {
+                    format!("{}{path}", dotenvy::var("PAYPAL_API_URL")?)
+                },
+            )
+            .header(
+                "Authorization",
+                format!("{} {}", credentials.token_type, credentials.access_token),
+            );
+
+        if let Some(body) = body {
+            request = request.json(&body);
+        } else if let Some(body) = raw_text {
+            request = request
+                .header(reqwest::header::CONTENT_TYPE, "application/json")
+                .body(body);
+        }
+
+        let resp = request
+            .send()
+            .await
+            .map_err(|_| ApiError::Payments("could not communicate with PayPal".to_string()))?;
+
+        let status = resp.status();
+
+        let value = resp.json::<Value>().await.map_err(|_| {
+            ApiError::Payments("could not retrieve PayPal response body".to_string())
+        })?;
+
+        if !status.is_success() {
+            #[derive(Deserialize)]
+            struct PayPalError {
+                pub name: String,
+                pub message: String,
+            }
+
+            #[derive(Deserialize)]
+            struct PayPalIdentityError {
+                pub error: String,
+                pub error_description: String,
+            }
+
+            if let Ok(error) = serde_json::from_value::<PayPalError>(value.clone()) {
+                return Err(ApiError::Payments(format!(
+                    "error name: {}, message: {}",
+                    error.name, error.message
+                )));
+            }
+
+            if let Ok(error) = serde_json::from_value::<PayPalIdentityError>(value) {
+                return Err(ApiError::Payments(format!(
+                    "error name: {}, message: {}",
+                    error.error, error.error_description
+                )));
+            }
+
+            return Err(ApiError::Payments(
+                "could not retrieve PayPal error body".to_string(),
+            ));
+        }
+
+        Ok(serde_json::from_value(value)?)
+    }
+
+    pub async fn make_tremendous_request<T: Serialize, X: DeserializeOwned>(
         &self,
         method: Method,
         path: &str,
         body: Option<T>,
     ) -> Result<X, ApiError> {
-        let timestamp = Utc::now().timestamp();
-
-        let mut mac: Hmac<Sha256> = Hmac::new_from_slice(self.secret_key.as_bytes())
-            .map_err(|_| ApiError::Payments("error initializing HMAC".to_string()))?;
-        mac.update(
-            if let Some(body) = &body {
-                format!(
-                    "{}\n{}\n{}\n{}\n",
-                    timestamp,
-                    method.as_str(),
-                    path,
-                    serde_json::to_string(&body)?
-                )
-            } else {
-                format!("{}\n{}\n{}\n\n", timestamp, method.as_str(), path)
-            }
-            .as_bytes(),
-        );
-        let request_signature = mac.finalize().into_bytes().encode_hex::<String>();
-
         let client = reqwest::Client::new();
-
         let mut request = client
-            .request(method, format!("https://api.trolley.com{path}"))
+            .request(
+                method,
+                format!("{}{path}", dotenvy::var("TREMENDOUS_API_URL")?),
+            )
             .header(
                 "Authorization",
-                format!("prsign {}:{}", self.access_key, request_signature),
-            )
-            .header("X-PR-Timestamp", timestamp);
+                format!("Bearer {}", dotenvy::var("TREMENDOUS_API_KEY")?),
+            );
 
         if let Some(body) = body {
             request = request.json(&body);
@@ -92,40 +222,34 @@ impl PayoutsQueue {
         let resp = request
             .send()
             .await
-            .map_err(|_| ApiError::Payments("could not communicate with Trolley".to_string()))?;
+            .map_err(|_| ApiError::Payments("could not communicate with Tremendous".to_string()))?;
+
+        let status = resp.status();
 
         let value = resp.json::<Value>().await.map_err(|_| {
-            ApiError::Payments("could not retrieve Trolley response body".to_string())
+            ApiError::Payments("could not retrieve Tremendous response body".to_string())
         })?;
 
-        if let Some(obj) = value.as_object() {
-            if !obj.get("ok").and_then(|x| x.as_bool()).unwrap_or(true) {
-                #[derive(Deserialize)]
-                struct TrolleyError {
-                    field: Option<String>,
-                    message: String,
-                }
-
+        if !status.is_success() {
+            if let Some(obj) = value.as_object() {
                 if let Some(array) = obj.get("errors") {
-                    let err = serde_json::from_value::<Vec<TrolleyError>>(array.clone()).map_err(
-                        |_| {
-                            ApiError::Payments(
-                                "could not retrieve Trolley error json body".to_string(),
-                            )
-                        },
-                    )?;
-
-                    if let Some(first) = err.into_iter().next() {
-                        return Err(ApiError::Payments(if let Some(field) = &first.field {
-                            format!("error - field: {field} message: {}", first.message)
-                        } else {
-                            first.message
-                        }));
+                    #[derive(Deserialize)]
+                    struct TremendousError {
+                        message: String,
                     }
+
+                    let err =
+                        serde_json::from_value::<TremendousError>(array.clone()).map_err(|_| {
+                            ApiError::Payments(
+                                "could not retrieve Tremendous error json body".to_string(),
+                            )
+                        })?;
+
+                    return Err(ApiError::Payments(err.message));
                 }
 
                 return Err(ApiError::Payments(
-                    "could not retrieve Trolley error body".to_string(),
+                    "could not retrieve Tremendous error body".to_string(),
                 ));
             }
         }
@@ -133,200 +257,260 @@ impl PayoutsQueue {
         Ok(serde_json::from_value(value)?)
     }
 
-    pub async fn send_payout(
-        &mut self,
-        recipient: &str,
-        amount: Decimal,
-    ) -> Result<(String, Option<String>), ApiError> {
-        #[derive(Deserialize)]
-        struct TrolleyRes {
-            batch: Batch,
-        }
+    pub async fn get_payout_methods(&self) -> Result<Vec<PayoutMethod>, ApiError> {
+        async fn refresh_payout_methods(queue: &PayoutsQueue) -> Result<PayoutMethods, ApiError> {
+            let mut options = queue.payout_options.write().await;
 
-        #[derive(Deserialize)]
-        struct Batch {
-            id: String,
-            payments: BatchPayments,
-        }
+            let mut methods = Vec::new();
 
-        #[derive(Deserialize)]
-        struct Payment {
-            id: String,
-        }
+            #[derive(Deserialize)]
+            pub struct Sku {
+                pub min: Decimal,
+                pub max: Decimal,
+            }
 
-        #[derive(Deserialize)]
-        struct BatchPayments {
-            payments: Vec<Payment>,
-        }
+            #[derive(Deserialize, Eq, PartialEq)]
+            #[serde(rename_all = "snake_case")]
+            pub enum ProductImageType {
+                Card,
+                Logo,
+            }
 
-        let fee = self.get_estimated_fees(recipient, amount).await?;
+            #[derive(Deserialize)]
+            pub struct ProductImage {
+                pub src: String,
+                #[serde(rename = "type")]
+                pub type_: ProductImageType,
+            }
 
-        if fee.estimated_fees > amount || fee.route_minimum > amount {
-            return Err(ApiError::Payments(
-                "Account balance is too low to withdraw funds".to_string(),
-            ));
-        }
+            #[derive(Deserialize)]
+            pub struct ProductCountry {
+                pub abbr: String,
+            }
 
-        let send_amount = amount - fee.deduct_fees;
+            #[derive(Deserialize)]
+            pub struct Product {
+                pub id: String,
+                pub category: String,
+                pub name: String,
+                pub description: String,
+                pub disclosure: String,
+                pub skus: Vec<Sku>,
+                pub currency_codes: Vec<String>,
+                pub countries: Vec<ProductCountry>,
+                pub images: Vec<ProductImage>,
+            }
 
-        let res = self
-            .make_trolley_request::<_, TrolleyRes>(
-                Method::POST,
-                "/v1/batches/",
-                Some(json!({
-                    "currency": "USD",
-                    "description": "labrinth payout",
-                    "payments": [{
-                        "recipient": {
-                            "id": recipient
-                        },
-                        "amount": send_amount.to_string(),
-                        "currency": "USD",
-                        "memo": "Modrinth ad revenue payout"
-                    }],
-                })),
-            )
-            .await?;
+            #[derive(Deserialize)]
+            pub struct TremendousResponse {
+                pub products: Vec<Product>,
+            }
 
-        self.make_trolley_request::<Value, Value>(
-            Method::POST,
-            &format!("/v1/batches/{}/start-processing", res.batch.id),
-            None,
-        )
-        .await?;
+            let response = queue
+                .make_tremendous_request::<(), TremendousResponse>(Method::GET, "products", None)
+                .await?;
 
-        let payment_id = res.batch.payments.payments.into_iter().next().map(|x| x.id);
+            for product in response.products {
+                const BLACKLISTED_IDS: &[&str] = &[
+                    // physical visa
+                    "A2J05SWPI2QG",
+                    // crypto
+                    "1UOOSHUUYTAM",
+                    "5EVJN47HPDFT",
+                    "NI9M4EVAVGFJ",
+                    "VLY29QHTMNGT",
+                    "7XU98H109Y3A",
+                    "0CGEDFP2UIKV",
+                    "PDYLQU0K073Y",
+                    "HCS5Z7O2NV5G",
+                    "IY1VMST1MOXS",
+                    "VRPZLJ7HCA8X",
+                    // bitcard (crypto)
+                    "GWQQS5RM8IZS",
+                    "896MYD4SGOGZ",
+                    "PWLEN1VZGMZA",
+                    "A2VRM96J5K5W",
+                    "HV9ICIM3JT7P",
+                    "K2KLSPVWC2Q4",
+                    "HRBRQLLTDF95",
+                    "UUBYLZVK7QAB",
+                    "BH8W3XEDEOJN",
+                    "7WGE043X1RYQ",
+                    "2B13MHUZZVTF",
+                    "JN6R44P86EYX",
+                    "DA8H43GU84SO",
+                    "QK2XAQHSDEH4",
+                    "J7K1IQFS76DK",
+                    "NL4JQ2G7UPRZ",
+                    "OEFTMSBA5ELH",
+                    "A3CQK6UHNV27",
+                ];
+                const SUPPORTED_METHODS: &[&str] =
+                    &["merchant_cards", "visa", "bank", "ach", "visa_card"];
 
-        Ok((res.batch.id, payment_id))
-    }
+                if !SUPPORTED_METHODS.contains(&&*product.category)
+                    || BLACKLISTED_IDS.contains(&&*product.id)
+                {
+                    continue;
+                };
 
-    pub async fn register_recipient(
-        &self,
-        email: &str,
-        user: AccountUser,
-    ) -> Result<String, ApiError> {
-        #[derive(Deserialize)]
-        struct TrolleyRes {
-            recipient: Recipient,
-        }
+                let method = PayoutMethod {
+                    id: product.id,
+                    type_: PayoutMethodType::Tremendous,
+                    name: product.name.clone(),
+                    supported_countries: product.countries.into_iter().map(|x| x.abbr).collect(),
+                    image_url: product
+                        .images
+                        .into_iter()
+                        .find(|x| x.type_ == ProductImageType::Card)
+                        .map(|x| x.src),
+                    interval: if product.skus.len() > 1 {
+                        let mut values = product
+                            .skus
+                            .into_iter()
+                            .map(|x| PayoutDecimal(x.min))
+                            .collect::<Vec<_>>();
+                        values.sort_by(|a, b| a.0.cmp(&b.0));
 
-        #[derive(Deserialize)]
-        struct Recipient {
-            id: String,
-        }
+                        PayoutInterval::Fixed { values }
+                    } else if let Some(first) = product.skus.first() {
+                        PayoutInterval::Standard {
+                            min: first.min,
+                            max: first.max,
+                        }
+                    } else {
+                        PayoutInterval::Standard {
+                            min: Decimal::ZERO,
+                            max: Decimal::from(5_000),
+                        }
+                    },
+                    fee: if product.category == "ach" {
+                        PayoutMethodFee {
+                            percentage: Decimal::from(4) / Decimal::from(100),
+                            min: Decimal::from(1) / Decimal::from(4),
+                            max: None,
+                        }
+                    } else {
+                        PayoutMethodFee {
+                            percentage: Default::default(),
+                            min: Default::default(),
+                            max: None,
+                        }
+                    },
+                };
 
-        let id = self
-            .make_trolley_request::<_, TrolleyRes>(
-                Method::POST,
-                "/v1/recipients/",
-                Some(match user {
-                    AccountUser::Business { name } => json!({
-                        "type": "business",
-                        "email": email,
-                        "name": name,
-                    }),
-                    AccountUser::Individual { first, last } => json!({
-                        "type": "individual",
-                        "firstName": first,
-                        "lastName": last,
-                        "email": email,
-                    }),
-                }),
-            )
-            .await?;
+                // we do not support interval gift cards with non US based currencies since we cannot do currency conversions properly
+                if let PayoutInterval::Fixed { .. } = method.interval {
+                    if !product.currency_codes.contains(&"USD".to_string()) {
+                        continue;
+                    }
+                }
 
-        Ok(id.recipient.id)
-    }
+                methods.push(method);
+            }
 
-    // lhs minimum, rhs estimate
-    pub async fn get_estimated_fees(
-        &self,
-        id: &str,
-        amount: Decimal,
-    ) -> Result<PaymentInfo, ApiError> {
-        #[derive(Deserialize)]
-        struct TrolleyRes {
-            recipient: Recipient,
-        }
+            const UPRANK_IDS: &[&str] = &["ET0ZVETV5ILN", "Q24BD9EZ332JT", "UIL1ZYJU5MKN"];
+            const DOWNRANK_IDS: &[&str] = &["EIPF8Q00EMM1", "OU2MWXYWPNWQ"];
 
-        #[derive(Deserialize)]
-        #[serde(rename_all = "camelCase")]
-        struct Recipient {
-            route_minimum: Option<Decimal>,
-            estimated_fees: Option<Decimal>,
-            address: RecipientAddress,
-            payout_method: String,
-        }
+            methods.sort_by(|a, b| {
+                let a_top = UPRANK_IDS.contains(&&*a.id);
+                let a_bottom = DOWNRANK_IDS.contains(&&*a.id);
+                let b_top = UPRANK_IDS.contains(&&*b.id);
+                let b_bottom = DOWNRANK_IDS.contains(&&*b.id);
 
-        #[derive(Deserialize)]
-        struct RecipientAddress {
-            country: String,
-        }
+                match (a_top, a_bottom, b_top, b_bottom) {
+                    (true, _, true, _) => a.name.cmp(&b.name), // Both in top_priority: sort alphabetically
+                    (_, true, _, true) => a.name.cmp(&b.name), // Both in bottom_priority: sort alphabetically
+                    (true, _, _, _) => std::cmp::Ordering::Less, // a in top_priority: a comes first
+                    (_, _, true, _) => std::cmp::Ordering::Greater, // b in top_priority: b comes first
+                    (_, true, _, _) => std::cmp::Ordering::Greater, // a in bottom_priority: b comes first
+                    (_, _, _, true) => std::cmp::Ordering::Less, // b in bottom_priority: a comes first
+                    (_, _, _, _) => a.name.cmp(&b.name), // Neither in priority: sort alphabetically
+                }
+            });
 
-        let id = self
-            .make_trolley_request::<Value, TrolleyRes>(
-                Method::GET,
-                &format!("/v1/recipients/{id}"),
-                None,
-            )
-            .await?;
+            {
+                let paypal_us = PayoutMethod {
+                    id: "paypal_us".to_string(),
+                    type_: PayoutMethodType::PayPal,
+                    name: "PayPal".to_string(),
+                    supported_countries: vec!["US".to_string()],
+                    image_url: None,
+                    interval: PayoutInterval::Standard {
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Decimal::from(100_000),
+                    },
+                    fee: PayoutMethodFee {
+                        percentage: Decimal::from(2) / Decimal::from(100),
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Some(Decimal::from(1)),
+                    },
+                };
 
-        if &id.recipient.payout_method == "paypal" {
-            // based on https://www.paypal.com/us/webapps/mpp/merchant-fees. see paypal payouts section
-            let fee = if &id.recipient.address.country == "US" {
-                std::cmp::min(
-                    std::cmp::max(
-                        Decimal::ONE / Decimal::from(4),
-                        (Decimal::from(2) / Decimal::ONE_HUNDRED) * amount,
-                    ),
-                    Decimal::from(1),
-                )
-            } else {
-                std::cmp::min(
-                    (Decimal::from(2) / Decimal::ONE_HUNDRED) * amount,
-                    Decimal::from(20),
-                )
+                let mut venmo = paypal_us.clone();
+                venmo.id = "venmo".to_string();
+                venmo.name = "Venmo".to_string();
+                venmo.type_ = PayoutMethodType::Venmo;
+
+                methods.insert(0, paypal_us);
+                methods.insert(1, venmo)
+            }
+
+            methods.insert(
+                2,
+                PayoutMethod {
+                    id: "paypal_in".to_string(),
+                    type_: PayoutMethodType::PayPal,
+                    name: "PayPal".to_string(),
+                    supported_countries: rust_iso3166::ALL
+                        .iter()
+                        .filter(|x| x.alpha2 != "US")
+                        .map(|x| x.alpha2.to_string())
+                        .collect(),
+                    image_url: None,
+                    interval: PayoutInterval::Standard {
+                        min: Decimal::from(1) / Decimal::from(4),
+                        max: Decimal::from(100_000),
+                    },
+                    fee: PayoutMethodFee {
+                        percentage: Decimal::from(2) / Decimal::from(100),
+                        min: Decimal::ZERO,
+                        max: Some(Decimal::from(20)),
+                    },
+                },
+            );
+
+            let new_options = PayoutMethods {
+                options: methods,
+                expires: Utc::now() + Duration::hours(6),
             };
 
-            Ok(PaymentInfo {
-                country: id.recipient.address.country,
-                payout_method: id.recipient.payout_method,
-                route_minimum: fee,
-                estimated_fees: fee,
-                deduct_fees: fee,
-            })
-        } else if &id.recipient.payout_method == "venmo" {
-            let venmo_fee = Decimal::ONE / Decimal::from(4);
+            *options = Some(new_options.clone());
 
-            Ok(PaymentInfo {
-                country: id.recipient.address.country,
-                payout_method: id.recipient.payout_method,
-                route_minimum: id.recipient.route_minimum.unwrap_or(Decimal::ZERO) + venmo_fee,
-                estimated_fees: id.recipient.estimated_fees.unwrap_or(Decimal::ZERO) + venmo_fee,
-                deduct_fees: venmo_fee,
-            })
-        } else {
-            Ok(PaymentInfo {
-                country: id.recipient.address.country,
-                payout_method: id.recipient.payout_method,
-                route_minimum: id.recipient.route_minimum.unwrap_or(Decimal::ZERO),
-                estimated_fees: id.recipient.estimated_fees.unwrap_or(Decimal::ZERO),
-                deduct_fees: Decimal::ZERO,
-            })
+            Ok(new_options)
         }
+
+        let read = self.payout_options.read().await;
+        let options = if let Some(options) = read.as_ref() {
+            if options.expires < Utc::now() {
+                drop(read);
+                refresh_payout_methods(self).await?
+            } else {
+                options.clone()
+            }
+        } else {
+            drop(read);
+            refresh_payout_methods(self).await?
+        };
+
+        Ok(options.options)
     }
 
-    pub async fn update_recipient_email(&self, id: &str, email: &str) -> Result<(), ApiError> {
-        self.make_trolley_request::<_, Value>(
-            Method::PATCH,
-            &format!("/v1/recipients/{}", id),
-            Some(json!({
-                "email": email,
-            })),
-        )
-        .await?;
-
-        Ok(())
+    pub fn lock_user_payouts(&self, user_id: UserId) -> Arc<Mutex<()>> {
+        self.payouts_locks
+            .entry(user_id)
+            .or_insert_with(|| Arc::new(Mutex::new(())))
+            .clone()
     }
 }
 

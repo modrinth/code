@@ -3,17 +3,14 @@ use crate::file_hosting::FileHost;
 use crate::models::projects::Project;
 use crate::models::users::{Badges, Role};
 use crate::models::v2::projects::LegacyProject;
-use crate::queue::payouts::PayoutsQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use lazy_static::lazy_static;
 use regex::Regex;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
-use tokio::sync::Mutex;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
@@ -30,10 +27,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(user_edit)
             .service(user_icon_edit)
             .service(user_notifications)
-            .service(user_follows)
-            .service(user_payouts)
-            .service(user_payouts_fees)
-            .service(user_payouts_request),
+            .service(user_follows),
     );
 }
 
@@ -158,6 +152,7 @@ pub async fn user_edit(
             bio: new_user.bio,
             role: new_user.role,
             badges: new_user.badges,
+            venmo_handle: None,
         }),
         pool,
         redis,
@@ -249,73 +244,4 @@ pub async fn user_notifications(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     v3::users::user_notifications(req, info, pool, redis, session_queue).await
-}
-
-#[get("{id}/payouts")]
-pub async fn user_payouts(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    v3::users::user_payouts(req, info, pool, redis, session_queue).await
-}
-
-#[derive(Deserialize)]
-pub struct FeeEstimateAmount {
-    amount: Decimal,
-}
-
-#[get("{id}/payouts_fees")]
-pub async fn user_payouts_fees(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    web::Query(amount): web::Query<FeeEstimateAmount>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    payouts_queue: web::Data<Mutex<PayoutsQueue>>,
-) -> Result<HttpResponse, ApiError> {
-    v3::users::user_payouts_fees(
-        req,
-        info,
-        web::Query(v3::users::FeeEstimateAmount {
-            amount: amount.amount,
-        }),
-        pool,
-        redis,
-        session_queue,
-        payouts_queue,
-    )
-    .await
-}
-
-#[derive(Deserialize)]
-pub struct PayoutData {
-    amount: Decimal,
-}
-
-#[post("{id}/payouts")]
-pub async fn user_payouts_request(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    data: web::Json<PayoutData>,
-    payouts_queue: web::Data<Mutex<PayoutsQueue>>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    v3::users::user_payouts_request(
-        req,
-        info,
-        pool,
-        web::Json(v3::users::PayoutData {
-            amount: data.amount,
-        }),
-        payouts_queue,
-        redis,
-        session_queue,
-    )
-    .await
 }

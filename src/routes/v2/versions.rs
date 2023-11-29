@@ -8,8 +8,7 @@ use crate::models::projects::{Dependency, FileType, Version, VersionStatus, Vers
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
-use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
+use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
@@ -23,7 +22,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(version_get)
             .service(version_delete)
             .service(version_edit)
-            .service(version_schedule)
             .service(super::version_creation::upload_file_to_version),
     );
 }
@@ -252,35 +250,6 @@ pub async fn version_edit(
     )
     .await?;
     Ok(response)
-}
-
-#[derive(Deserialize)]
-pub struct SchedulingData {
-    pub time: DateTime<Utc>,
-    pub requested_status: VersionStatus,
-}
-
-#[post("{id}/schedule")]
-pub async fn version_schedule(
-    req: HttpRequest,
-    info: web::Path<(models::ids::VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    scheduling_data: web::Json<SchedulingData>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    v3::versions::version_schedule(
-        req,
-        info,
-        pool,
-        redis,
-        web::Json(v3::versions::SchedulingData {
-            time: scheduling_data.time,
-            requested_status: scheduling_data.requested_status,
-        }),
-        session_queue,
-    )
-    .await
 }
 
 #[delete("{version_id}")]

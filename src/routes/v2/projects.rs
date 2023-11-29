@@ -38,7 +38,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(delete_gallery_item)
             .service(project_follow)
             .service(project_unfollow)
-            .service(project_schedule)
             .service(super::teams::team_members_get_project)
             .service(
                 web::scope("{project_id}")
@@ -522,36 +521,6 @@ pub async fn projects_edit(
         }),
         redis,
         session_queue,
-    )
-    .await
-}
-
-#[derive(Deserialize)]
-pub struct SchedulingData {
-    pub time: DateTime<Utc>,
-    pub requested_status: ProjectStatus,
-}
-
-#[post("{id}/schedule")]
-pub async fn project_schedule(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    scheduling_data: web::Json<SchedulingData>,
-) -> Result<HttpResponse, ApiError> {
-    let scheduling_data = scheduling_data.into_inner();
-    v3::projects::project_schedule(
-        req,
-        info,
-        pool,
-        redis,
-        session_queue,
-        web::Json(v3::projects::SchedulingData {
-            time: scheduling_data.time,
-            requested_status: scheduling_data.requested_status,
-        }),
     )
     .await
 }

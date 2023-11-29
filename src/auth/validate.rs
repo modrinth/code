@@ -44,6 +44,9 @@ where
     if db_user.steam_id.is_some() {
         auth_providers.push(AuthProvider::Steam)
     }
+    if db_user.paypal_id.is_some() {
+        auth_providers.push(AuthProvider::PayPal)
+    }
 
     let user = User {
         id: UserId::from(db_user.id),
@@ -61,9 +64,10 @@ where
         has_totp: Some(db_user.totp_secret.is_some()),
         github_id: None,
         payout_data: Some(UserPayoutData {
+            paypal_address: db_user.paypal_email,
+            paypal_country: db_user.paypal_country,
+            venmo_handle: db_user.venmo_handle,
             balance: db_user.balance,
-            trolley_id: db_user.trolley_id,
-            trolley_status: db_user.trolley_account_status,
         }),
     };
 

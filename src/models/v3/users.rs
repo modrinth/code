@@ -5,7 +5,7 @@ use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug, Hash)]
 #[serde(from = "Base62Id")]
 #[serde(into = "Base62Id")]
 pub struct UserId(pub u64);
@@ -61,9 +61,11 @@ pub struct User {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserPayoutData {
+    pub paypal_address: Option<String>,
+    pub paypal_country: Option<String>,
+    pub venmo_handle: Option<String>,
+    #[serde(with = "rust_decimal::serde::float")]
     pub balance: Decimal,
-    pub trolley_id: Option<String>,
-    pub trolley_status: Option<RecipientStatus>,
 }
 
 use crate::database::models::user_item::User as DBUser;
@@ -131,92 +133,6 @@ impl Role {
         match self {
             Role::Developer | Role::Moderator => false,
             Role::Admin => true,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug)]
-#[serde(rename_all = "lowercase")]
-pub enum RecipientStatus {
-    Active,
-    Incomplete,
-    Disabled,
-    Archived,
-    Suspended,
-    Blocked,
-}
-
-impl RecipientStatus {
-    pub fn from_string(string: &str) -> RecipientStatus {
-        match string {
-            "active" => RecipientStatus::Active,
-            "incomplete" => RecipientStatus::Incomplete,
-            "disabled" => RecipientStatus::Disabled,
-            "archived" => RecipientStatus::Archived,
-            "suspended" => RecipientStatus::Suspended,
-            "blocked" => RecipientStatus::Blocked,
-            _ => RecipientStatus::Disabled,
-        }
-    }
-
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            RecipientStatus::Active => "active",
-            RecipientStatus::Incomplete => "incomplete",
-            RecipientStatus::Disabled => "disabled",
-            RecipientStatus::Archived => "archived",
-            RecipientStatus::Suspended => "suspended",
-            RecipientStatus::Blocked => "blocked",
-        }
-    }
-}
-
-#[derive(Serialize)]
-pub struct Payout {
-    pub created: DateTime<Utc>,
-    pub amount: Decimal,
-    pub status: PayoutStatus,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Eq, Clone)]
-#[serde(rename_all = "lowercase")]
-pub enum PayoutStatus {
-    Pending,
-    Failed,
-    Processed,
-    Returned,
-    Processing,
-}
-
-impl PayoutStatus {
-    pub fn from_string(string: &str) -> PayoutStatus {
-        match string {
-            "pending" => PayoutStatus::Pending,
-            "failed" => PayoutStatus::Failed,
-            "processed" => PayoutStatus::Processed,
-            "returned" => PayoutStatus::Returned,
-            "processing" => PayoutStatus::Processing,
-            _ => PayoutStatus::Processing,
-        }
-    }
-
-    pub fn as_str(&self) -> &'static str {
-        match self {
-            PayoutStatus::Pending => "pending",
-            PayoutStatus::Failed => "failed",
-            PayoutStatus::Processed => "processed",
-            PayoutStatus::Returned => "returned",
-            PayoutStatus::Processing => "processing",
-        }
-    }
-
-    pub fn is_failed(&self) -> bool {
-        match self {
-            PayoutStatus::Pending => false,
-            PayoutStatus::Failed => true,
-            PayoutStatus::Processed => false,
-            PayoutStatus::Returned => true,
-            PayoutStatus::Processing => false,
         }
     }
 }

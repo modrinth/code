@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id FROM users WHERE trolley_id = $1",
+  "query": "\n            SELECT id\n            FROM payouts\n            WHERE user_id = $1\n            ",
   "describe": {
     "columns": [
       {
@@ -11,12 +11,12 @@
     ],
     "parameters": {
       "Left": [
-        "Text"
+        "Int8"
       ]
     },
     "nullable": [
       false
     ]
   },
-  "hash": "04128dd06489004e0d0305bfd0f4ca5ee4b4a6b9f610de6e1b9ef9c8543cc025"
+  "hash": "f8ede4a0cd843e8f5622d6e0fb26df14fbc3a47b17c4d628a1bb21cff387238e"
 }

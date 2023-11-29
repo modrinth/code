@@ -8,8 +8,7 @@ use crate::file_hosting::FileHost;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::ids::random_base62_rng;
 use crate::models::pats::Scopes;
-use crate::models::users::{Badges, RecipientStatus, Role, UserPayoutData};
-use crate::queue::payouts::{AccountUser, PayoutsQueue};
+use crate::models::users::{Badges, Role};
 use crate::queue::session::AuthQueue;
 use crate::queue::socket::ActiveSockets;
 use crate::routes::ApiError;
@@ -22,6 +21,7 @@ use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use actix_ws::Closed;
 use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
+use base64::Engine;
 use chrono::{Duration, Utc};
 use rand_chacha::rand_core::SeedableRng;
 use rand_chacha::ChaCha20Rng;
@@ -31,7 +31,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 use validator::Validate;
 
 pub fn config(cfg: &mut ServiceConfig) {
@@ -52,8 +52,7 @@ pub fn config(cfg: &mut ServiceConfig) {
             .service(resend_verify_email)
             .service(set_email)
             .service(verify_email)
-            .service(subscribe_newsletter)
-            .service(link_trolley),
+            .service(subscribe_newsletter),
     );
 }
 
@@ -67,6 +66,7 @@ pub enum AuthProvider {
     GitLab,
     Google,
     Steam,
+    PayPal,
 }
 
 #[derive(Debug)]
@@ -78,6 +78,8 @@ pub struct TempUser {
     pub avatar_url: Option<String>,
     pub bio: Option<String>,
     pub name: Option<String>,
+
+    pub country: Option<String>,
 }
 
 impl TempUser {
@@ -211,11 +213,23 @@ impl TempUser {
                     None
                 },
                 microsoft_id: if provider == AuthProvider::Microsoft {
-                    Some(self.id)
+                    Some(self.id.clone())
                 } else {
                     None
                 },
                 password: None,
+                paypal_id: if provider == AuthProvider::PayPal {
+                    Some(self.id)
+                } else {
+                    None
+                },
+                paypal_country: self.country,
+                paypal_email: if provider == AuthProvider::PayPal {
+                    self.email.clone()
+                } else {
+                    None
+                },
+                venmo_handle: None,
                 totp_secret: None,
                 username,
                 name: self.name,
@@ -227,8 +241,6 @@ impl TempUser {
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
                 balance: Decimal::ZERO,
-                trolley_id: None,
-                trolley_account_status: None,
             }
             .insert(transaction)
             .await?;
@@ -297,6 +309,21 @@ impl AuthProvider {
                     self_addr,
                     "http://specs.openid.net/auth/2.0/identifier_select",
                     "http://specs.openid.net/auth/2.0/identifier_select",
+                )
+            }
+            AuthProvider::PayPal => {
+                let api_url = dotenvy::var("PAYPAL_API_URL")?;
+                let client_id = dotenvy::var("PAYPAL_CLIENT_ID")?;
+
+                let auth_url = if api_url.contains("sandbox") {
+                    "sandbox.paypal.com"
+                } else {
+                    "paypal.com"
+                };
+
+                format!(
+                    "https://{auth_url}/connect?flowEntry=static&client_id={client_id}&scope={}&response_type=code&redirect_uri={redirect_uri}&state={state}",
+                    urlencoding::encode("openid email address https://uri.paypal.com/services/paypalattributes"),
                 )
             }
         })
@@ -487,6 +514,37 @@ impl AuthProvider {
                     return Err(AuthenticationError::InvalidCredentials);
                 }
             }
+            AuthProvider::PayPal => {
+                let code = query
+                    .get("code")
+                    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+                let api_url = dotenvy::var("PAYPAL_API_URL")?;
+                let client_id = dotenvy::var("PAYPAL_CLIENT_ID")?;
+                let client_secret = dotenvy::var("PAYPAL_CLIENT_SECRET")?;
+
+                let mut map = HashMap::new();
+                map.insert("code", code.as_str());
+                map.insert("grant_type", "authorization_code");
+
+                let token: AccessToken = reqwest::Client::new()
+                    .post(&format!("{api_url}oauth2/token"))
+                    .header(reqwest::header::ACCEPT, "application/json")
+                    .header(
+                        AUTHORIZATION,
+                        format!(
+                            "Basic {}",
+                            base64::engine::general_purpose::STANDARD
+                                .encode(format!("{client_id}:{client_secret}"))
+                        ),
+                    )
+                    .form(&map)
+                    .send()
+                    .await?
+                    .json()
+                    .await?;
+
+                token.access_token
+            }
         };
 
         Ok(res)
@@ -532,6 +590,7 @@ impl AuthProvider {
                     avatar_url: Some(github_user.avatar_url),
                     bio: github_user.bio,
                     name: github_user.name,
+                    country: None,
                 }
             }
             AuthProvider::Discord => {
@@ -563,6 +622,7 @@ impl AuthProvider {
                         .map(|x| format!("https://cdn.discordapp.com/avatars/{}/{}.webp", id, x)),
                     bio: None,
                     name: discord_user.global_name,
+                    country: None,
                 }
             }
             AuthProvider::Microsoft => {
@@ -594,6 +654,7 @@ impl AuthProvider {
                     avatar_url: None,
                     bio: None,
                     name: microsoft_user.display_name,
+                    country: None,
                 }
             }
             AuthProvider::GitLab => {
@@ -623,6 +684,7 @@ impl AuthProvider {
                     avatar_url: gitlab_user.avatar_url,
                     bio: gitlab_user.bio,
                     name: gitlab_user.name,
+                    country: None,
                 }
             }
             AuthProvider::Google => {
@@ -656,6 +718,7 @@ impl AuthProvider {
                     avatar_url: google_user.picture,
                     bio: None,
                     name: google_user.name,
+                    country: None,
                 }
             }
             AuthProvider::Steam => {
@@ -707,9 +770,52 @@ impl AuthProvider {
                         avatar_url: player.avatar,
                         bio: None,
                         name: Some(player.personaname),
+                        country: None,
                     }
                 } else {
                     return Err(AuthenticationError::InvalidCredentials);
+                }
+            }
+            AuthProvider::PayPal => {
+                #[derive(Deserialize, Debug)]
+                pub struct PayPalUser {
+                    pub payer_id: String,
+                    pub email: String,
+                    pub picture: Option<String>,
+                    pub address: PayPalAddress,
+                }
+
+                #[derive(Deserialize, Debug)]
+                pub struct PayPalAddress {
+                    pub country: String,
+                }
+
+                let api_url = dotenvy::var("PAYPAL_API_URL")?;
+
+                let paypal_user: PayPalUser = reqwest::Client::new()
+                    .get(&format!(
+                        "{api_url}identity/openidconnect/userinfo?schema=openid"
+                    ))
+                    .header(reqwest::header::USER_AGENT, "Modrinth")
+                    .header(AUTHORIZATION, format!("Bearer {token}"))
+                    .send()
+                    .await?
+                    .json()
+                    .await?;
+
+                TempUser {
+                    id: paypal_user.payer_id,
+                    username: paypal_user
+                        .email
+                        .split('@')
+                        .next()
+                        .unwrap_or_default()
+                        .to_string(),
+                    email: Some(paypal_user.email),
+                    avatar_url: paypal_user.picture,
+                    bio: None,
+                    name: None,
+                    country: Some(paypal_user.address.country),
                 }
             }
         };
@@ -781,6 +887,13 @@ impl AuthProvider {
                 )
                 .fetch_optional(executor)
                 .await?;
+
+                value.map(|x| crate::database::models::UserId(x.id))
+            }
+            AuthProvider::PayPal => {
+                let value = sqlx::query!("SELECT id FROM users WHERE paypal_id = $1", id)
+                    .fetch_optional(executor)
+                    .await?;
 
                 value.map(|x| crate::database::models::UserId(x.id))
             }
@@ -872,6 +985,32 @@ impl AuthProvider {
                 .execute(&mut **transaction)
                 .await?;
             }
+            AuthProvider::PayPal => {
+                if id.is_none() {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET paypal_country = NULL, paypal_email = NULL, paypal_id = NULL
+                        WHERE (id = $1)
+                        ",
+                        user_id as crate::database::models::UserId,
+                    )
+                    .execute(&mut **transaction)
+                    .await?;
+                } else {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET paypal_id = $2
+                        WHERE (id = $1)
+                        ",
+                        user_id as crate::database::models::UserId,
+                        id,
+                    )
+                    .execute(&mut **transaction)
+                    .await?;
+                }
+            }
         }
 
         Ok(())
@@ -885,6 +1024,7 @@ impl AuthProvider {
             AuthProvider::GitLab => "GitLab",
             AuthProvider::Google => "Google",
             AuthProvider::Steam => "Steam",
+            AuthProvider::PayPal => "PayPal",
         }
     }
 }
@@ -1043,7 +1183,22 @@ pub async fn auth_callback(
                     .await?;
 
                 let user = crate::database::models::User::get_id(id, &**client, &redis).await?;
-                if let Some(email) = user.and_then(|x| x.email) {
+
+                if provider == AuthProvider::PayPal  {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET paypal_country = $1, paypal_email = $2, paypal_id = $3
+                        WHERE (id = $4)
+                        ",
+                        oauth_user.country,
+                        oauth_user.email,
+                        oauth_user.id,
+                        id as crate::database::models::ids::UserId,
+                    )
+                        .execute(&mut *transaction)
+                        .await?;
+                } else if let Some(email) = user.and_then(|x| x.email) {
                     send_email(
                         email,
                         "Authentication method added",
@@ -1241,14 +1396,16 @@ pub async fn delete_auth_provider(
         .update_user_id(user.id.into(), None, &mut transaction)
         .await?;
 
-    if let Some(email) = user.email {
-        send_email(
-            email,
-            "Authentication method removed",
-            &format!("When logging into Modrinth, you can no longer log in using the {} authentication provider.", delete_provider.provider.as_str()),
-            "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
-            None,
-        )?;
+    if delete_provider.provider != AuthProvider::PayPal {
+        if let Some(email) = user.email {
+            send_email(
+                email,
+                "Authentication method removed",
+                &format!("When logging into Modrinth, you can no longer log in using the {} authentication provider.", delete_provider.provider.as_str()),
+                "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
+                None,
+            )?;
+        }
     }
 
     crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
@@ -1375,6 +1532,10 @@ pub async fn create_account_with_password(
         steam_id: None,
         microsoft_id: None,
         password: Some(password_hash),
+        paypal_id: None,
+        paypal_country: None,
+        paypal_email: None,
+        venmo_handle: None,
         totp_secret: None,
         username: new_account.username.clone(),
         name: Some(new_account.username),
@@ -1386,8 +1547,6 @@ pub async fn create_account_with_password(
         role: Role::Developer.to_string(),
         badges: Badges::default(),
         balance: Decimal::ZERO,
-        trolley_id: None,
-        trolley_account_status: None,
     }
     .insert(&mut transaction)
     .await?;
@@ -2011,7 +2170,6 @@ pub async fn set_email(
     redis: Data<RedisPool>,
     email: web::Json<SetEmail>,
     session_queue: Data<AuthQueue>,
-    payouts_queue: Data<Mutex<PayoutsQueue>>,
 ) -> Result<HttpResponse, ApiError> {
     email
         .0
@@ -2064,17 +2222,6 @@ pub async fn set_email(
         flow,
         "We need to verify your email address.",
     )?;
-
-    if let Some(UserPayoutData {
-        trolley_id: Some(trolley_id),
-        ..
-    }) = user.payout_data
-    {
-        let queue = payouts_queue.lock().await;
-        queue
-            .update_recipient_email(&trolley_id, &email.email)
-            .await?;
-    }
 
     crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
     transaction.commit().await?;
@@ -2217,64 +2364,4 @@ fn send_email_verify(
         "Please visit the following link below to verify your email. If the button does not work, you can copy the link and paste it into your browser. This link expires in 24 hours.",
         Some(("Verify email", &format!("{}/{}?flow={}", dotenvy::var("SITE_URL")?,  dotenvy::var("SITE_VERIFY_EMAIL_PATH")?, flow))),
     )
-}
-
-#[post("trolley/link")]
-pub async fn link_trolley(
-    req: HttpRequest,
-    pool: Data<PgPool>,
-    redis: Data<RedisPool>,
-    session_queue: Data<AuthQueue>,
-    payouts_queue: Data<Mutex<PayoutsQueue>>,
-    body: web::Json<AccountUser>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::PAYOUTS_WRITE]),
-    )
-    .await?
-    .1;
-
-    if let Some(payout_data) = user.payout_data {
-        if payout_data.trolley_id.is_some() {
-            return Err(ApiError::InvalidInput(
-                "User already has a trolley account.".to_string(),
-            ));
-        }
-    }
-
-    if let Some(email) = user.email {
-        let id = payouts_queue
-            .lock()
-            .await
-            .register_recipient(&email, body.0)
-            .await?;
-
-        let mut transaction = pool.begin().await?;
-
-        sqlx::query!(
-            "
-            UPDATE users
-            SET trolley_id = $1, trolley_account_status = $2
-            WHERE id = $3
-            ",
-            id,
-            RecipientStatus::Incomplete.as_str(),
-            user.id.0 as i64,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        transaction.commit().await?;
-        crate::database::models::User::clear_caches(&[(user.id.into(), None)], &redis).await?;
-
-        Ok(HttpResponse::NoContent().finish())
-    } else {
-        Err(ApiError::InvalidInput(
-            "User needs to have an email set on account.".to_string(),
-        ))
-    }
 }

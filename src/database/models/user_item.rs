@@ -3,7 +3,7 @@ use super::CollectionId;
 use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
-use crate::models::users::{Badges, RecipientStatus};
+use crate::models::users::Badges;
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -24,6 +24,11 @@ pub struct User {
     pub microsoft_id: Option<String>,
     pub password: Option<String>,
 
+    pub paypal_id: Option<String>,
+    pub paypal_country: Option<String>,
+    pub paypal_email: Option<String>,
+    pub venmo_handle: Option<String>,
+
     pub totp_secret: Option<String>,
 
     pub username: String,
@@ -37,8 +42,6 @@ pub struct User {
     pub badges: Badges,
 
     pub balance: Decimal,
-    pub trolley_id: Option<String>,
-    pub trolley_account_status: Option<RecipientStatus>,
 }
 
 impl User {
@@ -52,13 +55,14 @@ impl User {
                 id, username, name, email,
                 avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                email_verified, password
+                email_verified, password, paypal_id, paypal_country, paypal_email,
+                venmo_handle
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15
+                $14, $15, $16, $17, $18, $19
             )
             ",
             self.id as UserId,
@@ -76,6 +80,10 @@ impl User {
             self.microsoft_id,
             self.email_verified,
             self.password,
+            self.paypal_id,
+            self.paypal_country,
+            self.paypal_email,
+            self.venmo_handle
         )
         .execute(&mut **transaction)
         .await?;
@@ -192,7 +200,8 @@ impl User {
                     created, role, badges,
                     balance,
                     github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                    email_verified, password, totp_secret, trolley_id, trolley_account_status
+                    email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
+                    venmo_handle
                 FROM users
                 WHERE id = ANY($1) OR LOWER(username) = ANY($2)
                 ",
@@ -223,12 +232,11 @@ impl User {
                     badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
                     balance: u.balance,
                     password: u.password,
+                    paypal_id: u.paypal_id,
+                    paypal_country: u.paypal_country,
+                    paypal_email: u.paypal_email,
+                    venmo_handle: u.venmo_handle,
                     totp_secret: u.totp_secret,
-                    trolley_id: u.trolley_id,
-                    trolley_account_status: u
-                        .trolley_account_status
-                        .as_ref()
-                        .map(|x| RecipientStatus::from_string(x)),
                 }))
             })
             .try_collect::<Vec<User>>()
@@ -559,7 +567,7 @@ impl User {
 
             sqlx::query!(
                 "
-                DELETE FROM historical_payouts
+                DELETE FROM payouts
                 WHERE user_id = $1
                 ",
                 id as UserId,

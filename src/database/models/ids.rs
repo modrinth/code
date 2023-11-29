@@ -184,6 +184,14 @@ generate_ids!(
     OAuthAccessTokenId
 );
 
+generate_ids!(
+    pub generate_payout_id,
+    PayoutId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM oauth_access_tokens WHERE id=$1)",
+    PayoutId
+);
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
@@ -297,6 +305,10 @@ pub struct OAuthRedirectUriId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[sqlx(transparent)]
 pub struct OAuthAccessTokenId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct PayoutId(pub i64);
 
 use crate::models::ids;
 
@@ -438,5 +450,16 @@ impl From<OAuthRedirectUriId> for ids::OAuthRedirectUriId {
 impl From<OAuthClientAuthorizationId> for ids::OAuthClientAuthorizationId {
     fn from(id: OAuthClientAuthorizationId) -> Self {
         ids::OAuthClientAuthorizationId(id.0 as u64)
+    }
+}
+
+impl From<ids::PayoutId> for PayoutId {
+    fn from(id: ids::PayoutId) -> Self {
+        PayoutId(id.0 as i64)
+    }
+}
+impl From<PayoutId> for ids::PayoutId {
+    fn from(id: PayoutId) -> Self {
+        ids::PayoutId(id.0 as u64)
     }
 }

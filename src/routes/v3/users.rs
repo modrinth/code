@@ -3,11 +3,8 @@ use std::{collections::HashMap, sync::Arc};
 use actix_web::{web, HttpRequest, HttpResponse};
 use lazy_static::lazy_static;
 use regex::Regex;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use sqlx::PgPool;
-use tokio::sync::Mutex;
 use validator::Validate;
 
 use crate::{
@@ -20,9 +17,9 @@ use crate::{
         notifications::Notification,
         pats::Scopes,
         projects::Project,
-        users::{Badges, Payout, PayoutStatus, RecipientStatus, Role, UserPayoutData},
+        users::{Badges, Role},
     },
-    queue::{payouts::PayoutsQueue, session::AuthQueue},
+    queue::session::AuthQueue,
     util::{routes::read_from_payload, validate::validation_errors_to_string},
 };
 
@@ -43,9 +40,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}", web::delete().to(user_delete))
             .route("{id}/follows", web::get().to(user_follows))
             .route("{id}/notifications", web::get().to(user_notifications))
-            .route("{id}/payouts", web::get().to(user_payouts))
-            .route("{id}/payouts_fees", web::get().to(user_payouts_fees))
-            .route("{id}/payouts", web::post().to(user_payouts_request))
             .route("{id}/oauth_apps", web::get().to(get_user_clients)),
     );
 }
@@ -302,6 +296,8 @@ pub struct EditUser {
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
     pub badges: Option<Badges>,
+    #[validate(length(max = 160))]
+    pub venmo_handle: Option<String>,
 }
 
 pub async fn user_edit(
@@ -312,7 +308,7 @@ pub async fn user_edit(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let (_scopes, user) = get_user_from_headers(
+    let (scopes, user) = get_user_from_headers(
         &req,
         &**pool,
         &redis,
@@ -426,6 +422,27 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     badges.bits() as i64,
+                    id as crate::database::models::ids::UserId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            if let Some(venmo_handle) = &new_user.venmo_handle {
+                if !scopes.contains(Scopes::PAYOUTS_WRITE) {
+                    return Err(ApiError::CustomAuthentication(
+                        "You do not have the permissions to edit the venmo handle of this user!"
+                            .to_string(),
+                    ));
+                }
+
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET venmo_handle = $1
+                    WHERE (id = $2)
+                    ",
+                    venmo_handle,
                     id as crate::database::models::ids::UserId,
                 )
                 .execute(&mut *transaction)
@@ -678,236 +695,6 @@ pub async fn user_notifications(
 
         notifications.sort_by(|a, b| b.created.cmp(&a.created));
         Ok(HttpResponse::Ok().json(notifications))
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-pub async fn user_payouts(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::PAYOUTS_READ]),
-    )
-    .await?
-    .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
-
-    if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to see the payouts of this user!".to_string(),
-            ));
-        }
-
-        let (all_time, last_month, payouts) = futures::future::try_join3(
-            sqlx::query!(
-                "
-                SELECT SUM(pv.amount) amount
-                FROM payouts_values pv
-                WHERE pv.user_id = $1
-                ",
-                id as crate::database::models::UserId
-            )
-            .fetch_one(&**pool),
-            sqlx::query!(
-                "
-                SELECT SUM(pv.amount) amount
-                FROM payouts_values pv
-                WHERE pv.user_id = $1 AND created > NOW() - '1 month'::interval
-                ",
-                id as crate::database::models::UserId
-            )
-            .fetch_one(&**pool),
-            sqlx::query!(
-                "
-                SELECT hp.created, hp.amount, hp.status
-                FROM historical_payouts hp
-                WHERE hp.user_id = $1
-                ORDER BY hp.created DESC
-                ",
-                id as crate::database::models::UserId
-            )
-            .fetch_many(&**pool)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|row| Payout {
-                    created: row.created,
-                    amount: row.amount,
-                    status: PayoutStatus::from_string(&row.status),
-                }))
-            })
-            .try_collect::<Vec<Payout>>(),
-        )
-        .await?;
-
-        use futures::TryStreamExt;
-
-        Ok(HttpResponse::Ok().json(json!({
-            "all_time": all_time.amount,
-            "last_month": last_month.amount,
-            "payouts": payouts,
-        })))
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-#[derive(Deserialize)]
-pub struct FeeEstimateAmount {
-    pub amount: Decimal,
-}
-
-pub async fn user_payouts_fees(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    web::Query(amount): web::Query<FeeEstimateAmount>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    payouts_queue: web::Data<Mutex<PayoutsQueue>>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::PAYOUTS_READ]),
-    )
-    .await?
-    .1;
-    let actual_user = User::get(&info.into_inner().0, &**pool, &redis).await?;
-
-    if let Some(actual_user) = actual_user {
-        if !user.role.is_admin() && user.id != actual_user.id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to request payouts of this user!".to_string(),
-            ));
-        }
-
-        if let Some(UserPayoutData {
-            trolley_id: Some(trolley_id),
-            ..
-        }) = user.payout_data
-        {
-            let payouts = payouts_queue
-                .lock()
-                .await
-                .get_estimated_fees(&trolley_id, amount.amount)
-                .await?;
-
-            Ok(HttpResponse::Ok().json(payouts))
-        } else {
-            Err(ApiError::InvalidInput(
-                "You must set up your trolley account first!".to_string(),
-            ))
-        }
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-#[derive(Deserialize)]
-pub struct PayoutData {
-    pub amount: Decimal,
-}
-
-pub async fn user_payouts_request(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    data: web::Json<PayoutData>,
-    payouts_queue: web::Data<Mutex<PayoutsQueue>>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let mut payouts_queue = payouts_queue.lock().await;
-
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::PAYOUTS_WRITE]),
-    )
-    .await?
-    .1;
-    let id_option = User::get(&info.into_inner().0, &**pool, &redis).await?;
-
-    if let Some(id) = id_option.map(|x| x.id) {
-        if !user.role.is_admin() && user.id != id.into() {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to request payouts of this user!".to_string(),
-            ));
-        }
-
-        if let Some(UserPayoutData {
-            trolley_id: Some(trolley_id),
-            trolley_status: Some(trolley_status),
-            balance,
-            ..
-        }) = user.payout_data
-        {
-            if trolley_status == RecipientStatus::Active {
-                return if data.amount < balance {
-                    let mut transaction = pool.begin().await?;
-
-                    let (batch_id, payment_id) =
-                        payouts_queue.send_payout(&trolley_id, data.amount).await?;
-
-                    sqlx::query!(
-                                "
-                                INSERT INTO historical_payouts (user_id, amount, status, batch_id, payment_id)
-                                VALUES ($1, $2, $3, $4, $5)
-                                ",
-                                id as crate::database::models::ids::UserId,
-                                data.amount,
-                                "processing",
-                                batch_id,
-                                payment_id,
-                            )
-                                .execute(&mut *transaction)
-                                .await?;
-
-                    sqlx::query!(
-                        "
-                                UPDATE users
-                                SET balance = balance - $1
-                                WHERE id = $2
-                                ",
-                        data.amount,
-                        id as crate::database::models::ids::UserId
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-
-                    User::clear_caches(&[(id, None)], &redis).await?;
-
-                    transaction.commit().await?;
-
-                    Ok(HttpResponse::NoContent().body(""))
-                } else {
-                    Err(ApiError::InvalidInput(
-                        "You do not have enough funds to make this payout!".to_string(),
-                    ))
-                };
-            } else {
-                return Err(ApiError::InvalidInput(
-                    "Please complete payout information via the trolley dashboard!".to_string(),
-                ));
-            }
-        }
-
-        Err(ApiError::InvalidInput(
-            "You are not enrolled in the payouts program yet!".to_string(),
-        ))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

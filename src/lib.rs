@@ -8,7 +8,7 @@ use queue::{
 };
 use scheduler::Scheduler;
 use sqlx::Postgres;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
@@ -49,7 +49,7 @@ pub struct LabrinthConfig {
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
     pub session_queue: web::Data<AuthQueue>,
-    pub payouts_queue: web::Data<Mutex<PayoutsQueue>>,
+    pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<RwLock<ActiveSockets>>,
 }
@@ -227,7 +227,7 @@ pub fn app_setup(
         pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),
     };
 
-    let payouts_queue = web::Data::new(Mutex::new(PayoutsQueue::new()));
+    let payouts_queue = web::Data::new(PayoutsQueue::new());
     let active_sockets = web::Data::new(RwLock::new(ActiveSockets::default()));
 
     LabrinthConfig {
@@ -349,10 +349,6 @@ pub fn check_env_vars() -> bool {
         failed |= true;
     }
 
-    failed |= check_var::<String>("TROLLEY_ACCESS_KEY");
-    failed |= check_var::<String>("TROLLEY_SECRET_KEY");
-    failed |= check_var::<String>("TROLLEY_WEBHOOK_SIGNATURE");
-
     failed |= check_var::<String>("GITHUB_CLIENT_ID");
     failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
     failed |= check_var::<String>("GITLAB_CLIENT_ID");
@@ -364,6 +360,15 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("GOOGLE_CLIENT_ID");
     failed |= check_var::<String>("GOOGLE_CLIENT_SECRET");
     failed |= check_var::<String>("STEAM_API_KEY");
+
+    failed |= check_var::<String>("TREMENDOUS_API_URL");
+    failed |= check_var::<String>("TREMENDOUS_API_KEY");
+    failed |= check_var::<String>("TREMENDOUS_PRIVATE_KEY");
+
+    failed |= check_var::<String>("PAYPAL_API_URL");
+    failed |= check_var::<String>("PAYPAL_WEBHOOK_ID");
+    failed |= check_var::<String>("PAYPAL_CLIENT_ID");
+    failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
 
     failed |= check_var::<String>("TURNSTILE_SECRET");
 

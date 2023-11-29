@@ -112,6 +112,7 @@ pub struct NewTeamMember {
     #[serde(default)]
     pub organization_permissions: Option<OrganizationPermissions>,
     #[serde(default)]
+    #[serde(with = "rust_decimal::serde::float")]
     pub payouts_split: Decimal,
     #[serde(default = "default_ordering")]
     pub ordering: i64,

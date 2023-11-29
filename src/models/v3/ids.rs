@@ -7,6 +7,7 @@ pub use super::oauth_clients::OAuthClientAuthorizationId;
 pub use super::oauth_clients::{OAuthClientId, OAuthRedirectUriId};
 pub use super::organizations::OrganizationId;
 pub use super::pats::PatId;
+pub use super::payouts::PayoutId;
 pub use super::projects::{ProjectId, VersionId};
 pub use super::reports::ReportId;
 pub use super::sessions::SessionId;
@@ -127,6 +128,7 @@ base62_id_impl!(ImageId, ImageId);
 base62_id_impl!(OAuthClientId, OAuthClientId);
 base62_id_impl!(OAuthRedirectUriId, OAuthRedirectUriId);
 base62_id_impl!(OAuthClientAuthorizationId, OAuthClientAuthorizationId);
+base62_id_impl!(PayoutId, PayoutId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

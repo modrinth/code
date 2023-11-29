@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT id, name, email,\n                    avatar_url, username, bio,\n                    created, role, badges,\n                    balance,\n                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                    email_verified, password, totp_secret, trolley_id, trolley_account_status\n                FROM users\n                WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                ",
+  "query": "\n                SELECT id, name, email,\n                    avatar_url, username, bio,\n                    created, role, badges,\n                    balance,\n                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,\n                    email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,\n                    venmo_handle\n                FROM users\n                WHERE id = ANY($1) OR LOWER(username) = ANY($2)\n                ",
   "describe": {
     "columns": [
       {
@@ -100,12 +100,22 @@
       },
       {
         "ordinal": 19,
-        "name": "trolley_id",
+        "name": "paypal_id",
         "type_info": "Text"
       },
       {
         "ordinal": 20,
-        "name": "trolley_account_status",
+        "name": "paypal_country",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 21,
+        "name": "paypal_email",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 22,
+        "name": "venmo_handle",
         "type_info": "Text"
       }
     ],
@@ -136,8 +146,10 @@
       true,
       true,
       true,
+      true,
+      true,
       true
     ]
   },
-  "hash": "faec0a606ccaeb3f21c81e60a1749640b929e97db40252118fb72610df64a457"
+  "hash": "5e7e85c8c1f4b4e600c51669b6591b5cc279bd7482893ec687e83ee22d00a3a0"
 }
