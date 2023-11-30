@@ -12,7 +12,7 @@ use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{v2_reroute, v3, ApiError};
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
+
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

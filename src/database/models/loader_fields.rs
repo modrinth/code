@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::hash::Hasher;
 
 use super::ids::*;
 use super::DatabaseError;
@@ -248,14 +249,24 @@ pub struct LoaderFieldEnumValue {
     pub metadata: serde_json::Value,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+impl std::hash::Hash for LoaderFieldEnumValue {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+        self.enum_id.hash(state);
+        self.value.hash(state);
+        self.ordering.hash(state);
+        self.created.hash(state);
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
 pub struct VersionField {
     pub version_id: VersionId,
     pub field_id: LoaderFieldId,
     pub field_name: String,
     pub value: VersionFieldValue,
 }
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Hash)]
 pub enum VersionFieldValue {
     Integer(i32),
     Text(String),
@@ -796,13 +807,18 @@ impl VersionField {
     }
 
     pub fn from_query_json(
-        version_id: i64,
         loader_fields: Option<serde_json::Value>,
         version_fields: Option<serde_json::Value>,
         loader_field_enum_values: Option<serde_json::Value>,
+        allow_many: bool, // If true, will allow multiple values for a single singleton field, returning them as separate VersionFields
+                          // allow_many = true, multiple Bools => two VersionFields of Bool
+                          // allow_many = false, multiple Bools => error
+                          // multiple Arraybools => 1 VersionField of ArrayBool
     ) -> Vec<VersionField> {
         #[derive(Deserialize, Debug)]
         struct JsonLoaderField {
+            version_id: i64,
+
             lf_id: i32,
             field: String,
             field_type: String,
@@ -840,13 +856,12 @@ impl VersionField {
             loader_field_enum_values
                 .and_then(|x| serde_json::from_value(x).ok())
                 .unwrap_or_default();
-        let version_id = VersionId(version_id);
         query_loader_fields
             .into_iter()
-            .filter_map(|q| {
+            .flat_map(|q| {
                 let loader_field_type = match LoaderFieldType::build(&q.field_type, q.enum_type) {
                     Some(lft) => lft,
-                    None => return None,
+                    None => return vec![],
                 };
                 let loader_field = LoaderField {
                     id: LoaderFieldId(q.lf_id),
@@ -856,6 +871,7 @@ impl VersionField {
                     min_val: q.min_val,
                     max_val: q.max_val,
                 };
+                let version_id = VersionId(q.version_id);
                 let values = query_version_field_combined
                     .iter()
                     .filter_map(|qvf| {
@@ -883,8 +899,18 @@ impl VersionField {
                         }
                     })
                     .collect::<Vec<_>>();
-
-                VersionField::build(loader_field, version_id, values).ok()
+                if allow_many {
+                    VersionField::build_many(loader_field, version_id, values)
+                        .unwrap_or_default()
+                        .into_iter()
+                        .unique()
+                        .collect_vec()
+                } else {
+                    match VersionField::build(loader_field, version_id, values) {
+                        Ok(vf) => vec![vf],
+                        Err(_) => vec![],
+                    }
+                }
             })
             .collect()
     }
@@ -901,6 +927,23 @@ impl VersionField {
             field_name: loader_field.field,
             value,
         })
+    }
+
+    pub fn build_many(
+        loader_field: LoaderField,
+        version_id: VersionId,
+        query_version_fields: Vec<QueryVersionField>,
+    ) -> Result<Vec<VersionField>, DatabaseError> {
+        let values = VersionFieldValue::build_many(&loader_field.field_type, query_version_fields)?;
+        Ok(values
+            .into_iter()
+            .map(|value| VersionField {
+                version_id,
+                field_id: loader_field.id,
+                field_name: loader_field.field.clone(),
+                value,
+            })
+            .collect())
     }
 }
 
@@ -982,25 +1025,56 @@ impl VersionFieldValue {
         })
     }
 
-    // Build from internal query data
-    // This encapsulates reundant behavior in db querie -> object conversions
+    // This will ensure that if multiple QueryVersionFields are provided, they can be combined into a single VersionFieldValue
+    // of the appropriate type (ie: false, false, true -> ArrayBoolean([false, false, true])) (and not just Boolean)
     pub fn build(
         field_type: &LoaderFieldType,
         qvfs: Vec<QueryVersionField>,
     ) -> Result<VersionFieldValue, DatabaseError> {
-        let field_name = field_type.to_str();
-        let get_first = |qvfs: Vec<QueryVersionField>| -> Result<QueryVersionField, DatabaseError> {
-            if qvfs.len() > 1 {
-                return Err(DatabaseError::SchemaError(format!(
-                    "Multiple fields for field {}",
-                    field_name
-                )));
+        match field_type {
+            LoaderFieldType::Integer
+            | LoaderFieldType::Text
+            | LoaderFieldType::Boolean
+            | LoaderFieldType::Enum(_) => {
+                let mut fields = Self::build_many(field_type, qvfs)?;
+                if fields.len() > 1 {
+                    return Err(DatabaseError::SchemaError(format!(
+                        "Multiple fields for field {}",
+                        field_type.to_str()
+                    )));
+                }
+                fields.pop().ok_or_else(|| {
+                    DatabaseError::SchemaError(format!(
+                        "No version fields for field {}",
+                        field_type.to_str()
+                    ))
+                })
             }
-            qvfs.into_iter().next().ok_or_else(|| {
-                DatabaseError::SchemaError(format!("No version fields for field {}", field_name))
-            })
-        };
+            LoaderFieldType::ArrayInteger
+            | LoaderFieldType::ArrayText
+            | LoaderFieldType::ArrayBoolean
+            | LoaderFieldType::ArrayEnum(_) => {
+                let fields = Self::build_many(field_type, qvfs)?;
+                Ok(fields.into_iter().next().ok_or_else(|| {
+                    DatabaseError::SchemaError(format!(
+                        "No version fields for field {}",
+                        field_type.to_str()
+                    ))
+                })?)
+            }
+        }
+    }
 
+    // Build from internal query data
+    // This encapsulates reundant behavior in db querie -> object conversions
+    // This allows for multiple fields to be built at once. If there are multiple fields,
+    // but the type only allows for a single field, then multiple VersionFieldValues will be returned
+    // If there are multiple fields, and the type allows for multiple fields, then a single VersionFieldValue will be returned (array.len == 1)
+    pub fn build_many(
+        field_type: &LoaderFieldType,
+        qvfs: Vec<QueryVersionField>,
+    ) -> Result<Vec<VersionFieldValue>, DatabaseError> {
+        let field_name = field_type.to_str();
         let did_not_exist_error = |field_name: &str, desired_field: &str| {
             DatabaseError::SchemaError(format!(
                 "Field name {} for field {} in does not exist",
@@ -1009,39 +1083,61 @@ impl VersionFieldValue {
         };
 
         Ok(match field_type {
-            LoaderFieldType::Integer => VersionFieldValue::Integer(
-                get_first(qvfs)?
-                    .int_value
-                    .ok_or(did_not_exist_error(field_name, "int_value"))?,
-            ),
-            LoaderFieldType::Text => VersionFieldValue::Text(
-                get_first(qvfs)?
-                    .string_value
-                    .ok_or(did_not_exist_error(field_name, "string_value"))?,
-            ),
-            LoaderFieldType::Boolean => VersionFieldValue::Boolean(
-                get_first(qvfs)?
-                    .int_value
-                    .ok_or(did_not_exist_error(field_name, "int_value"))?
-                    != 0,
-            ),
-            LoaderFieldType::ArrayInteger => VersionFieldValue::ArrayInteger(
+            LoaderFieldType::Integer => qvfs
+                .into_iter()
+                .map(|qvf| {
+                    Ok(VersionFieldValue::Integer(
+                        qvf.int_value
+                            .ok_or(did_not_exist_error(field_name, "int_value"))?,
+                    ))
+                })
+                .collect::<Result<Vec<VersionFieldValue>, DatabaseError>>()?,
+            LoaderFieldType::Text => qvfs
+                .into_iter()
+                .map(|qvf| {
+                    Ok::<VersionFieldValue, DatabaseError>(VersionFieldValue::Text(
+                        qvf.string_value
+                            .ok_or(did_not_exist_error(field_name, "string_value"))?,
+                    ))
+                })
+                .collect::<Result<Vec<VersionFieldValue>, DatabaseError>>()?,
+            LoaderFieldType::Boolean => qvfs
+                .into_iter()
+                .map(|qvf| {
+                    Ok::<VersionFieldValue, DatabaseError>(VersionFieldValue::Boolean(
+                        qvf.int_value
+                            .ok_or(did_not_exist_error(field_name, "int_value"))?
+                            != 0,
+                    ))
+                })
+                .collect::<Result<Vec<VersionFieldValue>, DatabaseError>>()?,
+            LoaderFieldType::Enum(id) => qvfs
+                .into_iter()
+                .map(|qvf| {
+                    Ok::<VersionFieldValue, DatabaseError>(VersionFieldValue::Enum(
+                        *id,
+                        qvf.enum_value
+                            .ok_or(did_not_exist_error(field_name, "enum_value"))?,
+                    ))
+                })
+                .collect::<Result<Vec<VersionFieldValue>, DatabaseError>>()?,
+            LoaderFieldType::ArrayInteger => vec![VersionFieldValue::ArrayInteger(
                 qvfs.into_iter()
                     .map(|qvf| {
                         qvf.int_value
                             .ok_or(did_not_exist_error(field_name, "int_value"))
                     })
                     .collect::<Result<_, _>>()?,
-            ),
-            LoaderFieldType::ArrayText => VersionFieldValue::ArrayText(
+            )],
+            LoaderFieldType::ArrayText => vec![VersionFieldValue::ArrayText(
                 qvfs.into_iter()
                     .map(|qvf| {
                         qvf.string_value
                             .ok_or(did_not_exist_error(field_name, "string_value"))
                     })
                     .collect::<Result<_, _>>()?,
-            ),
-            LoaderFieldType::ArrayBoolean => VersionFieldValue::ArrayBoolean(
+            )],
+            LoaderFieldType::ArrayBoolean => vec![VersionFieldValue::ArrayBoolean(
                 qvfs.into_iter()
                     .map(|qvf| {
                         Ok::<bool, DatabaseError>(
@@ -1051,15 +1147,8 @@ impl VersionFieldValue {
                         )
                     })
                     .collect::<Result<_, _>>()?,
-            ),
-
-            LoaderFieldType::Enum(id) => VersionFieldValue::Enum(
-                *id,
-                get_first(qvfs)?
-                    .enum_value
-                    .ok_or(did_not_exist_error(field_name, "enum_value"))?,
-            ),
-            LoaderFieldType::ArrayEnum(id) => VersionFieldValue::ArrayEnum(
+            )],
+            LoaderFieldType::ArrayEnum(id) => vec![VersionFieldValue::ArrayEnum(
                 *id,
                 qvfs.into_iter()
                     .map(|qvf| {
@@ -1067,7 +1156,7 @@ impl VersionFieldValue {
                             .ok_or(did_not_exist_error(field_name, "enum_value"))
                     })
                     .collect::<Result<_, _>>()?,
-            ),
+            )],
         })
     }
 

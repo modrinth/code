@@ -227,7 +227,9 @@ pub struct GameId(pub i32);
 #[sqlx(transparent)]
 pub struct DonationPlatformId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(
+    Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord,
+)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
@@ -278,7 +280,9 @@ pub struct SessionId(pub i64);
 #[sqlx(transparent)]
 pub struct ImageId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(
+    Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash, PartialOrd, Ord,
+)]
 #[sqlx(transparent)]
 pub struct LoaderFieldId(pub i32);
 

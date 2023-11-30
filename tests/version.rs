@@ -13,7 +13,9 @@ use common::environment::{with_test_environment, with_test_environment_all};
 use futures::StreamExt;
 use labrinth::database::models::version_item::VERSIONS_NAMESPACE;
 use labrinth::models::ids::base62_impl::parse_base62;
-use labrinth::models::projects::{VersionId, VersionStatus, VersionType};
+use labrinth::models::projects::{
+    Dependency, DependencyType, VersionId, VersionStatus, VersionType,
+};
 use labrinth::routes::v3::version_file::FileUpdateData;
 use serde_json::json;
 
@@ -381,6 +383,13 @@ pub async fn test_patch_version() {
         let api = &test_env.api;
 
         let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
+        let beta_project_id = &test_env.dummy.as_ref().unwrap().project_beta.project_id;
+        let beta_project_id_parsed = &test_env
+            .dummy
+            .as_ref()
+            .unwrap()
+            .project_beta
+            .project_id_parsed;
 
         // // First, we do some patch requests that should fail.
         // // Failure because the user is not authorized.
@@ -419,7 +428,11 @@ pub async fn test_patch_version() {
                     "version_number": "1.3.0",
                     "changelog": "new changelog",
                     "version_type": "beta",
-                    // // "dependencies": [], TODO: test this
+                    "dependencies": [{
+                        "project_id": beta_project_id,
+                        "dependency_type": "required",
+                        "file_name": "dummy_file_name"
+                    }],
                     "game_versions": ["1.20.5"],
                     "loaders": ["forge"],
                     "featured": false,
@@ -442,6 +455,15 @@ pub async fn test_patch_version() {
         assert_eq!(
             version.version_type,
             serde_json::from_str::<VersionType>("\"beta\"").unwrap()
+        );
+        assert_eq!(
+            version.dependencies,
+            vec![Dependency {
+                project_id: Some(*beta_project_id_parsed),
+                version_id: None,
+                file_name: Some("dummy_file_name".to_string()),
+                dependency_type: DependencyType::Required
+            }]
         );
         assert_eq!(version.loaders, vec!["forge".to_string()]);
         assert!(!version.featured);

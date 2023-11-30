@@ -13,6 +13,7 @@ use crate::common::dummy_data::TestFile;
 mod common;
 
 #[actix_rt::test]
+
 async fn creating_loader_fields() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
@@ -24,7 +25,18 @@ async fn creating_loader_fields() {
             .project_alpha
             .project_id
             .clone();
-        let alpha_project_id = serde_json::from_str(&format!("\"{}\"", alpha_project_id)).unwrap();
+        let alpha_project_id_parsed = test_env
+            .dummy
+            .as_ref()
+            .unwrap()
+            .project_alpha
+            .project_id_parsed;
+        let beta_project_id_parsed = test_env
+            .dummy
+            .as_ref()
+            .unwrap()
+            .project_beta
+            .project_id_parsed;
         let alpha_version_id = &test_env
             .dummy
             .as_ref()
@@ -39,7 +51,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -72,7 +84,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -105,7 +117,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -127,7 +139,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -149,7 +161,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp: actix_web::dev::ServiceResponse = api
             .add_public_version(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -189,7 +201,7 @@ async fn creating_loader_fields() {
             // - Create version
             let resp = api
                 .add_public_version(
-                    alpha_project_id,
+                    alpha_project_id_parsed,
                     "1.0.0",
                     TestFile::build_random_jar(),
                     None,
@@ -224,7 +236,7 @@ async fn creating_loader_fields() {
         // - Create version
         let v = api
             .add_public_version_deserialized(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -260,7 +272,7 @@ async fn creating_loader_fields() {
         // - Create
         let v = api
             .add_public_version_deserialized(
-                alpha_project_id,
+                alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -308,6 +320,59 @@ async fn creating_loader_fields() {
         assert_eq!(
             v.fields.get("game_versions").unwrap(),
             &json!(["1.20.1", "1.20.2"])
+        );
+
+        // Now that we've created a version, we need to make sure that the Project's loader fields are updated (aggregate)
+        // First, add a new version
+        api.add_public_version_deserialized(
+            alpha_project_id_parsed,
+            "1.0.1",
+            TestFile::build_random_jar(),
+            None,
+            Some(
+                serde_json::from_value(json!([{
+                    "op": "add",
+                    "path": "/game_versions",
+                    "value": ["1.20.5"]
+                }, {
+                    "op": "add",
+                    "path": "/singleplayer",
+                    "value": false
+                }]))
+                .unwrap(),
+            ),
+            USER_USER_PAT,
+        )
+        .await;
+
+        // Also, add one to the beta project
+        api.add_public_version_deserialized(
+            beta_project_id_parsed,
+            "1.0.1",
+            TestFile::build_random_jar(),
+            None,
+            Some(
+                serde_json::from_value(json!([{
+                    "op": "add",
+                    "path": "/game_versions",
+                    "value": ["1.20.4"]
+                }]))
+                .unwrap(),
+            ),
+            USER_USER_PAT,
+        )
+        .await;
+
+        let project = api
+            .get_project_deserialized(&alpha_project_id.to_string(), USER_USER_PAT)
+            .await;
+        assert_eq!(
+            project.fields.get("game_versions").unwrap(),
+            &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
+        );
+        assert_eq!(
+            project.fields.get("singleplayer").unwrap(),
+            &[json!(false), json!(true)]
         );
     })
     .await

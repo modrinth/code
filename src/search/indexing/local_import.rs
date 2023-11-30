@@ -19,6 +19,49 @@ pub async fn index_local(
     let uploads =
         sqlx::query!(
             "
+            WITH version_fields_cte AS (
+                SELECT version_id, field_id, int_value, enum_value, string_value
+                FROM version_fields
+            ),
+            version_fields_json AS (
+                SELECT DISTINCT version_id,
+                JSONB_AGG( 
+                    DISTINCT jsonb_build_object('field_id', field_id, 'int_value', int_value, 'enum_value', enum_value, 'string_value', string_value)
+                ) version_fields_json
+                FROM version_fields_cte
+                GROUP BY version_id
+            ),
+            loader_fields_cte AS (
+                SELECT DISTINCT vf.version_id, lf.*, l.loader
+                FROM loader_fields lf
+                INNER JOIN version_fields_cte vf ON lf.id = vf.field_id
+                LEFT JOIN loaders_versions lv ON vf.version_id = lv.version_id
+                LEFT JOIN loaders l ON lv.loader_id = l.id
+                GROUP BY vf.version_id, lf.enum_type, lf.id, l.loader
+            ),
+            loader_fields_json AS (
+                SELECT DISTINCT version_id,
+                    JSONB_AGG(
+                    DISTINCT jsonb_build_object(
+                        'version_id', lf.version_id,
+                        'lf_id', id, 'loader_name', loader, 'field', field, 'field_type', field_type, 'enum_type', enum_type, 'min_val', min_val, 'max_val', max_val, 'optional', optional
+                    )
+                ) filter (where lf.id is not null) loader_fields_json
+                FROM loader_fields_cte lf
+                GROUP BY version_id
+            ),
+            loader_field_enum_values_json AS (
+                SELECT DISTINCT version_id,
+                    JSONB_AGG(
+                    DISTINCT jsonb_build_object(
+                        'id', lfev.id, 'enum_id', lfev.enum_id, 'value', lfev.value, 'ordering', lfev.ordering, 'created', lfev.created, 'metadata', lfev.metadata
+                    ) 
+                ) filter (where lfev.id is not null) loader_field_enum_values_json
+                FROM loader_field_enum_values lfev
+                INNER JOIN loader_fields_cte lf on lf.enum_type = lfev.enum_id
+                GROUP BY version_id
+            )
+
             SELECT m.id id, v.id version_id, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
             m.team_id team_id, m.license license, m.slug slug, m.status status_name, m.color color,
@@ -30,37 +73,9 @@ pub async fn index_local(
             ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery,
-            JSONB_AGG(
-                DISTINCT jsonb_build_object(
-                'field_id', vf.field_id,
-                'int_value', vf.int_value,
-                'enum_value', vf.enum_value,
-                'string_value', vf.string_value
-                )
-            ) filter (where vf.field_id is not null) version_fields,
-            JSONB_AGG(
-                DISTINCT jsonb_build_object(
-                    'lf_id', lf.id,
-                    'loader_name', lo.loader,
-                    'field', lf.field,
-                    'field_type', lf.field_type,
-                    'enum_type', lf.enum_type,
-                    'min_val', lf.min_val,
-                    'max_val', lf.max_val,
-                    'optional', lf.optional
-                )
-            ) filter (where lf.id is not null) loader_fields,
-            JSONB_AGG(
-                DISTINCT jsonb_build_object(
-                    'id', lfev.id,
-                    'enum_id', lfev.enum_id,
-                    'value', lfev.value,
-                    'ordering', lfev.ordering,
-                    'created', lfev.created,
-                    'metadata', lfev.metadata
-                )  
-            ) filter (where lfev.id is not null) loader_field_enum_values
-
+            vf.version_fields_json version_fields,
+            lf.loader_fields_json loader_fields,
+            lfev.loader_field_enum_values_json loader_field_enum_values
             FROM versions v
             INNER JOIN mods m ON v.mod_id = m.id AND m.status = ANY($2)
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
@@ -74,12 +89,11 @@ pub async fn index_local(
             LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
-            LEFT OUTER JOIN version_fields vf on v.id = vf.version_id
-            LEFT OUTER JOIN loader_fields lf on vf.field_id = lf.id
-            LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id
-            LEFT OUTER JOIN loader_field_enum_values lfev on lfev.enum_id = lfe.id
+            LEFT OUTER JOIN version_fields_json vf ON v.id = vf.version_id
+            LEFT OUTER JOIN loader_fields_json lf ON v.id = lf.version_id
+            LEFT OUTER JOIN loader_field_enum_values_json lfev ON v.id = lfev.version_id
             WHERE v.status != ANY($1)
-            GROUP BY v.id, m.id, u.id;
+            GROUP BY v.id, vf.version_fields_json, lf.loader_fields_json, lfev.loader_field_enum_values_json, m.id, u.id;
             ",
             &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
             &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_searchable()).map(|x| x.to_string()).collect::<Vec<String>>(),
@@ -98,7 +112,7 @@ pub async fn index_local(
                     let display_categories = categories.clone();
                     categories.append(&mut additional_categories);
 
-                    let version_fields = VersionField::from_query_json(m.id, m.loader_fields, m.version_fields, m.loader_field_enum_values);
+                    let version_fields = VersionField::from_query_json(m.loader_fields, m.version_fields, m.loader_field_enum_values, false);
 
                     let loader_fields : HashMap<String, Vec<String>> = version_fields.into_iter().map(|vf| {
                         (vf.field_name, vf.value.as_strings())

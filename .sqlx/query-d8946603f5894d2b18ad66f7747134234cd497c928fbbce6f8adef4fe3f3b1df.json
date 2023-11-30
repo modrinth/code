@@ -1,0 +1,252 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                WITH version_fields_cte AS (\n                    SELECT mod_id, version_id, field_id, int_value, enum_value, string_value\n                    FROM mods m\n                    INNER JOIN versions v ON m.id = v.mod_id\n                    INNER JOIN version_fields vf ON v.id = vf.version_id\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                ),\n\t\t\t\tversion_fields_json AS (\n\t\t\t\t\tSELECT DISTINCT mod_id,\n                    JSONB_AGG( \n                        DISTINCT jsonb_build_object('version_id', version_id, 'field_id', field_id, 'int_value', int_value, 'enum_value', enum_value, 'string_value', string_value)\n                    ) version_fields_json\n                    FROM version_fields_cte\n                    GROUP BY mod_id\n\t\t\t\t),\n\t\t\t\tloader_fields_cte AS (\n\t\t\t\t\tSELECT DISTINCT vf.mod_id, vf.version_id, lf.*, l.loader\n\t\t\t\t\tFROM loader_fields lf\n                    INNER JOIN version_fields_cte vf ON lf.id = vf.field_id\n\t\t\t\t\tLEFT JOIN loaders_versions lv ON vf.version_id = lv.version_id\n\t\t\t\t\tLEFT JOIN loaders l ON lv.loader_id = l.id\n                    GROUP BY vf.mod_id, vf.version_id, lf.enum_type, lf.id, l.loader\n\t\t\t\t),\n                loader_fields_json AS (\n                    SELECT DISTINCT mod_id,\n                        JSONB_AGG(\n                        DISTINCT jsonb_build_object(\n                            'version_id', lf.version_id,\n                            'lf_id', id, 'loader_name', loader, 'field', field, 'field_type', field_type, 'enum_type', enum_type, 'min_val', min_val, 'max_val', max_val, 'optional', optional\n                        )\n                    ) filter (where lf.id is not null) loader_fields_json\n                    FROM loader_fields_cte lf\n                    GROUP BY mod_id\n                ),\n                loader_field_enum_values_json AS (\n                    SELECT DISTINCT mod_id,\n                        JSONB_AGG(\n                        DISTINCT jsonb_build_object(\n                            'id', lfev.id, 'enum_id', lfev.enum_id, 'value', lfev.value, 'ordering', lfev.ordering, 'created', lfev.created, 'metadata', lfev.metadata\n                        ) \n                    ) filter (where lfev.id is not null) loader_field_enum_values_json\n                    FROM loader_field_enum_values lfev\n                    INNER JOIN loader_fields_cte lf on lf.enum_type = lfev.enum_id\n                    GROUP BY mod_id\n                ),\n                versions_cte AS (\n                    SELECT DISTINCT mod_id, v.id as id, date_published\n                    FROM mods m\n                    INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                ),\n                versions_json AS (\n                    SELECT DISTINCT mod_id,\n                        JSONB_AGG(\n                        DISTINCT jsonb_build_object(\n                            'id', id, 'date_published', date_published\n                        )\n                    ) filter (where id is not null) versions_json\n                    FROM versions_cte\n                    GROUP BY mod_id\n                ),\n                loaders_cte AS (\n                    SELECT DISTINCT mod_id, l.id as id, l.loader\n                    FROM versions_cte\n                    INNER JOIN loaders_versions lv ON versions_cte.id = lv.version_id\n                    INNER JOIN loaders l ON lv.loader_id = l.id \n                ),\n                mods_gallery_json AS (\n                    SELECT DISTINCT mod_id,\n                        JSONB_AGG(\n                        DISTINCT jsonb_build_object(\n                            'image_url', mg.image_url, 'featured', mg.featured, 'title', mg.title, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering\n                        )\n                    ) filter (where image_url is not null) mods_gallery_json\n                    FROM mods_gallery mg\n                    INNER JOIN mods m ON mg.mod_id = m.id\n                    WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                    GROUP BY mod_id\n                ),\n                donations_json AS (\n                    SELECT DISTINCT joining_mod_id as mod_id,\n                        JSONB_AGG(\n                        DISTINCT jsonb_build_object(\n                            'platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url\n                        )\n                    ) filter (where md.joining_platform_id is not null) donations_json\n                    FROM mods_donations md\n                    INNER JOIN mods m ON md.joining_mod_id = m.id AND m.id = ANY($1) OR m.slug = ANY($2)\n                    INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id\n                    GROUP BY mod_id\n                )\n                \n                SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,\n                m.icon_url icon_url, m.body body, m.published published,\n                m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,\n                m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n                m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,\n                m.webhook_sent, m.color,\n                t.id thread_id, m.monetization_status monetization_status,\n                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n                ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,\n                ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,\n                ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,\n                ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,\n                v.versions_json versions,\n                mg.mods_gallery_json gallery,\n                md.donations_json donations,\n                vf.version_fields_json version_fields,\n                lf.loader_fields_json loader_fields,\n                lfev.loader_field_enum_values_json loader_field_enum_values\n                FROM mods m                \n                INNER JOIN threads t ON t.mod_id = m.id\n                LEFT JOIN mods_gallery_json mg ON mg.mod_id = m.id\n                LEFT JOIN donations_json md ON md.mod_id = m.id\n                LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id\n                LEFT JOIN categories c ON mc.joining_category_id = c.id\n                LEFT JOIN versions_json v ON v.mod_id = m.id\n                LEFT JOIN loaders_cte l on l.mod_id = m.id\n                LEFT JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id\n                LEFT JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n                LEFT JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id\n                LEFT JOIN games g ON lptg.game_id = g.id\n                LEFT OUTER JOIN version_fields_json vf ON m.id = vf.mod_id\n                LEFT OUTER JOIN loader_fields_json lf ON m.id = lf.mod_id\n                LEFT OUTER JOIN loader_field_enum_values_json lfev ON m.id = lfev.mod_id\n                WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                GROUP BY t.id, m.id, version_fields_json, loader_fields_json, loader_field_enum_values_json, versions_json, mods_gallery_json, donations_json;\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "downloads",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "follows",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "body",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "published",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 8,
+        "name": "updated",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 9,
+        "name": "approved",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 10,
+        "name": "queued",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 11,
+        "name": "status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 12,
+        "name": "requested_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 13,
+        "name": "issues_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 14,
+        "name": "source_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 15,
+        "name": "wiki_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 16,
+        "name": "discord_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 17,
+        "name": "license_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 18,
+        "name": "team_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 19,
+        "name": "organization_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 20,
+        "name": "license",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 21,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 22,
+        "name": "moderation_message",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 23,
+        "name": "moderation_message_body",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 24,
+        "name": "webhook_sent",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 25,
+        "name": "color",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 26,
+        "name": "thread_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 27,
+        "name": "monetization_status",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 28,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 29,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 30,
+        "name": "games",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 31,
+        "name": "categories",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 32,
+        "name": "additional_categories",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 33,
+        "name": "versions",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 34,
+        "name": "gallery",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 35,
+        "name": "donations",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 36,
+        "name": "version_fields",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 37,
+        "name": "loader_fields",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 38,
+        "name": "loader_field_enum_values",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "d8946603f5894d2b18ad66f7747134234cd497c928fbbce6f8adef4fe3f3b1df"
+}

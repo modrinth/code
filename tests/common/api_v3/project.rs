@@ -8,7 +8,7 @@ use actix_web::{
 use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
-use labrinth::{search::SearchResults, util::actix::AppendsMultipart};
+use labrinth::{models::projects::Project, search::SearchResults, util::actix::AppendsMultipart};
 use rust_decimal::Decimal;
 use serde_json::json;
 
@@ -182,6 +182,12 @@ impl ApiProject for ApiV3 {
 }
 
 impl ApiV3 {
+    pub async fn get_project_deserialized(&self, id_or_slug: &str, pat: &str) -> Project {
+        let resp = self.get_project(id_or_slug, pat).await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
+
     pub async fn search_deserialized(
         &self,
         query: Option<&str>,

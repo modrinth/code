@@ -1,0 +1,120 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT m.id id, m.title title, m.description description, m.color color,\n            m.icon_url icon_url, m.slug slug,\n            u.username username, u.avatar_url avatar_url,\n            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,\n            ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,\n            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,\n            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery,\n            JSONB_AGG(\n                DISTINCT jsonb_build_object(\n                'field_id', vf.field_id,\n                'int_value', vf.int_value,\n                'enum_value', vf.enum_value,\n                'string_value', vf.string_value\n                )\n            ) filter (where vf.field_id is not null) version_fields,\n            JSONB_AGG(\n                DISTINCT jsonb_build_object(\n                    'version_id', 0, -- TODO: When webhook is updated to match others, this should match version\n                    'lf_id', lf.id,\n                    'loader_name', lo.loader,\n                    'field', lf.field,\n                    'field_type', lf.field_type,\n                    'enum_type', lf.enum_type,\n                    'min_val', lf.min_val,\n                    'max_val', lf.max_val,\n                    'optional', lf.optional\n                )\n            ) filter (where lf.id is not null) loader_fields,\n            JSONB_AGG(\n                DISTINCT jsonb_build_object(\n                    'id', lfev.id,\n                    'enum_id', lfev.enum_id,\n                    'value', lfev.value,\n                    'ordering', lfev.ordering,\n                    'created', lfev.created,\n                    'metadata', lfev.metadata\n                )  \n            ) filter (where lfev.id is not null) loader_field_enum_values\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ALL($2)\n            LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id\n            LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id\n            LEFT JOIN loaders_project_types lpt ON lpt.joining_loader_id = lo.id\n            LEFT JOIN project_types pt ON pt.id = lpt.joining_project_type_id\n            LEFT JOIN loaders_project_types_games lptg ON lptg.loader_id = lo.id AND lptg.project_type_id = pt.id\n            LEFT JOIN games g ON lptg.game_id = g.id\n            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE\n            INNER JOIN users u ON tm.user_id = u.id\n            LEFT OUTER JOIN version_fields vf on v.id = vf.version_id\n            LEFT OUTER JOIN loader_fields lf on vf.field_id = lf.id\n            LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id\n            LEFT OUTER JOIN loader_field_enum_values lfev on lfev.enum_id = lfe.id\n            WHERE m.id = $1\n            GROUP BY m.id, u.id;\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "title",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 3,
+        "name": "color",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "icon_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "slug",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 6,
+        "name": "username",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 7,
+        "name": "avatar_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 8,
+        "name": "categories",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 9,
+        "name": "loaders",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 10,
+        "name": "project_types",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 11,
+        "name": "games",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 12,
+        "name": "gallery",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 13,
+        "name": "featured_gallery",
+        "type_info": "VarcharArray"
+      },
+      {
+        "ordinal": 14,
+        "name": "version_fields",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 15,
+        "name": "loader_fields",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 16,
+        "name": "loader_field_enum_values",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "TextArray",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  },
+  "hash": "108fe88fbd116817e48719c370a63b7d0d56b6de443db0e4466237ee3e93fbde"
+}

@@ -104,6 +104,7 @@ pub async fn send_discord_webhook(
             ) filter (where vf.field_id is not null) version_fields,
             JSONB_AGG(
                 DISTINCT jsonb_build_object(
+                    'version_id', 0, -- TODO: When webhook is updated to match others, this should match version
                     'lf_id', lf.id,
                     'loader_name', lo.loader,
                     'field', lf.field,
@@ -227,10 +228,10 @@ pub async fn send_discord_webhook(
         // TODO: Modified to keep "Versions" as a field as it may be hardcoded. Ideally, this pushes all loader fields to the embed for v3
         // TODO: This might need some work to manually test
         let version_fields = VersionField::from_query_json(
-            project.id,
             project.loader_fields,
             project.version_fields,
             project.loader_field_enum_values,
+            true,
         );
         let versions = version_fields
             .into_iter()

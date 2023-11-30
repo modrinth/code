@@ -30,6 +30,7 @@ use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
+use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
@@ -843,6 +844,7 @@ async fn project_create_inner(
             color: project_builder.color,
             thread_id: thread_id.into(),
             monetization_status: MonetizationStatus::Monetized,
+            fields: HashMap::new(), // Fields instantiate to empty
         };
 
         Ok(HttpResponse::Ok().json(response))

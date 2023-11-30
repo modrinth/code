@@ -1,3 +1,4 @@
+use super::loader_fields::VersionField;
 use super::{ids::*, User};
 use crate::database::models;
 use crate::database::models::DatabaseError;
@@ -565,8 +566,103 @@ impl Project {
                 .map(|x| x as i64)
                 .collect();
 
+            // TODO: Possible improvements to look into:
+            // - use multiple queries instead of CTES (for cleanliness?)
+            // - repeated joins to mods in separate CTEs- perhaps 1 CTE for mods and use later (in mods_gallery_json, mods_donations_json, etc.)
             let db_projects: Vec<QueryProject> = sqlx::query!(
                 "
+                WITH version_fields_cte AS (
+                    SELECT mod_id, version_id, field_id, int_value, enum_value, string_value
+                    FROM mods m
+                    INNER JOIN versions v ON m.id = v.mod_id
+                    INNER JOIN version_fields vf ON v.id = vf.version_id
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                ),
+				version_fields_json AS (
+					SELECT DISTINCT mod_id,
+                    JSONB_AGG( 
+                        DISTINCT jsonb_build_object('version_id', version_id, 'field_id', field_id, 'int_value', int_value, 'enum_value', enum_value, 'string_value', string_value)
+                    ) version_fields_json
+                    FROM version_fields_cte
+                    GROUP BY mod_id
+				),
+				loader_fields_cte AS (
+					SELECT DISTINCT vf.mod_id, vf.version_id, lf.*, l.loader
+					FROM loader_fields lf
+                    INNER JOIN version_fields_cte vf ON lf.id = vf.field_id
+					LEFT JOIN loaders_versions lv ON vf.version_id = lv.version_id
+					LEFT JOIN loaders l ON lv.loader_id = l.id
+                    GROUP BY vf.mod_id, vf.version_id, lf.enum_type, lf.id, l.loader
+				),
+                loader_fields_json AS (
+                    SELECT DISTINCT mod_id,
+                        JSONB_AGG(
+                        DISTINCT jsonb_build_object(
+                            'version_id', lf.version_id,
+                            'lf_id', id, 'loader_name', loader, 'field', field, 'field_type', field_type, 'enum_type', enum_type, 'min_val', min_val, 'max_val', max_val, 'optional', optional
+                        )
+                    ) filter (where lf.id is not null) loader_fields_json
+                    FROM loader_fields_cte lf
+                    GROUP BY mod_id
+                ),
+                loader_field_enum_values_json AS (
+                    SELECT DISTINCT mod_id,
+                        JSONB_AGG(
+                        DISTINCT jsonb_build_object(
+                            'id', lfev.id, 'enum_id', lfev.enum_id, 'value', lfev.value, 'ordering', lfev.ordering, 'created', lfev.created, 'metadata', lfev.metadata
+                        ) 
+                    ) filter (where lfev.id is not null) loader_field_enum_values_json
+                    FROM loader_field_enum_values lfev
+                    INNER JOIN loader_fields_cte lf on lf.enum_type = lfev.enum_id
+                    GROUP BY mod_id
+                ),
+                versions_cte AS (
+                    SELECT DISTINCT mod_id, v.id as id, date_published
+                    FROM mods m
+                    INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                ),
+                versions_json AS (
+                    SELECT DISTINCT mod_id,
+                        JSONB_AGG(
+                        DISTINCT jsonb_build_object(
+                            'id', id, 'date_published', date_published
+                        )
+                    ) filter (where id is not null) versions_json
+                    FROM versions_cte
+                    GROUP BY mod_id
+                ),
+                loaders_cte AS (
+                    SELECT DISTINCT mod_id, l.id as id, l.loader
+                    FROM versions_cte
+                    INNER JOIN loaders_versions lv ON versions_cte.id = lv.version_id
+                    INNER JOIN loaders l ON lv.loader_id = l.id 
+                ),
+                mods_gallery_json AS (
+                    SELECT DISTINCT mod_id,
+                        JSONB_AGG(
+                        DISTINCT jsonb_build_object(
+                            'image_url', mg.image_url, 'featured', mg.featured, 'title', mg.title, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering
+                        )
+                    ) filter (where image_url is not null) mods_gallery_json
+                    FROM mods_gallery mg
+                    INNER JOIN mods m ON mg.mod_id = m.id
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                    GROUP BY mod_id
+                ),
+                donations_json AS (
+                    SELECT DISTINCT joining_mod_id as mod_id,
+                        JSONB_AGG(
+                        DISTINCT jsonb_build_object(
+                            'platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url
+                        )
+                    ) filter (where md.joining_platform_id is not null) donations_json
+                    FROM mods_donations md
+                    INNER JOIN mods m ON md.joining_mod_id = m.id AND m.id = ANY($1) OR m.slug = ANY($2)
+                    INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+                    GROUP BY mod_id
+                )
+                
                 SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
                 m.icon_url icon_url, m.body body, m.published published,
                 m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
@@ -579,25 +675,29 @@ impl Project {
                 ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
-                JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
-                JSONB_AGG(DISTINCT jsonb_build_object('image_url', mg.image_url, 'featured', mg.featured, 'title', mg.title, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering)) filter (where mg.image_url is not null) gallery,
-                JSONB_AGG(DISTINCT jsonb_build_object('platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url)) filter (where md.joining_platform_id is not null) donations
+                v.versions_json versions,
+                mg.mods_gallery_json gallery,
+                md.donations_json donations,
+                vf.version_fields_json version_fields,
+                lf.loader_fields_json loader_fields,
+                lfev.loader_field_enum_values_json loader_field_enum_values
                 FROM mods m                
                 INNER JOIN threads t ON t.mod_id = m.id
-                LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
-                LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
-                LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+                LEFT JOIN mods_gallery_json mg ON mg.mod_id = m.id
+                LEFT JOIN donations_json md ON md.mod_id = m.id
                 LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
                 LEFT JOIN categories c ON mc.joining_category_id = c.id
-                LEFT JOIN versions v ON v.mod_id = m.id AND v.status = ANY($3)
-                LEFT JOIN loaders_versions lv ON lv.version_id = v.id
-                LEFT JOIN loaders l on lv.loader_id = l.id
+                LEFT JOIN versions_json v ON v.mod_id = m.id
+                LEFT JOIN loaders_cte l on l.mod_id = m.id
                 LEFT JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
                 LEFT JOIN project_types pt ON pt.id = lpt.joining_project_type_id
                 LEFT JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
                 LEFT JOIN games g ON lptg.game_id = g.id
+                LEFT OUTER JOIN version_fields_json vf ON m.id = vf.mod_id
+                LEFT OUTER JOIN loader_fields_json lf ON m.id = lf.mod_id
+                LEFT OUTER JOIN loader_field_enum_values_json lfev ON m.id = lfev.mod_id
                 WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                GROUP BY t.id, m.id;
+                GROUP BY t.id, m.id, version_fields_json, loader_fields_json, loader_field_enum_values_json, versions_json, mods_gallery_json, donations_json;
                 ",
                 &project_ids_parsed,
                 &remaining_strings.into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<_>>(),
@@ -677,6 +777,7 @@ impl Project {
                             donation_urls: serde_json::from_value(
                                 m.donations.unwrap_or_default(),
                             ).ok().unwrap_or_default(),
+                        aggregate_version_fields: VersionField::from_query_json(m.loader_fields, m.version_fields, m.loader_field_enum_values, true),
                         thread_id: ThreadId(m.thread_id),
                     }}))
                 })
@@ -796,4 +897,5 @@ pub struct QueryProject {
     pub donation_urls: Vec<DonationUrl>,
     pub gallery_items: Vec<GalleryItem>,
     pub thread_id: ThreadId,
+    pub aggregate_version_fields: Vec<VersionField>,
 }
