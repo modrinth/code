@@ -13,6 +13,7 @@ use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -733,4 +734,26 @@ pub async fn process_payout(
     transaction.commit().await?;
 
     Ok(())
+}
+
+// Used for testing, should be the same as the above function
+pub async fn insert_payouts(
+    insert_user_ids: Vec<i64>,
+    insert_project_ids: Vec<i64>,
+    insert_payouts: Vec<Decimal>,
+    insert_starts: Vec<DateTime<Utc>>,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+) -> sqlx::Result<PgQueryResult> {
+    sqlx::query!(
+        "
+        INSERT INTO payouts_values (user_id, mod_id, amount, created)
+        SELECT * FROM UNNEST ($1::bigint[], $2::bigint[], $3::numeric[], $4::timestamptz[])
+        ",
+        &insert_user_ids[..],
+        &insert_project_ids[..],
+        &insert_payouts[..],
+        &insert_starts[..]
+    )
+    .execute(&mut **transaction)
+    .await
 }

@@ -10,6 +10,7 @@ use common::{
 use itertools::Itertools;
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::teams::ProjectPermissions;
+use labrinth::queue::payouts;
 use rust_decimal::{prelude::ToPrimitive, Decimal};
 
 mod common;
@@ -55,19 +56,17 @@ pub async fn analytics_revenue() {
             insert_starts.push(*time);
         }
 
-        sqlx::query!(
-            "
-            INSERT INTO payouts_values (user_id, mod_id, amount, created)
-            SELECT * FROM UNNEST ($1::bigint[], $2::bigint[], $3::numeric[], $4::timestamptz[])
-            ",
-            &insert_user_ids[..],
-            &insert_project_ids[..],
-            &insert_payouts[..],
-            &insert_starts[..]
+        let mut transaction = pool.begin().await.unwrap();
+        payouts::insert_payouts(
+            insert_user_ids,
+            insert_project_ids,
+            insert_payouts,
+            insert_starts,
+            &mut transaction,
         )
-        .execute(&pool)
         .await
         .unwrap();
+        transaction.commit().await.unwrap();
 
         let day = 86400;
 
