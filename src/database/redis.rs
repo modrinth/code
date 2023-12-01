@@ -1,7 +1,7 @@
 use super::models::DatabaseError;
 use deadpool_redis::{Config, Runtime};
 use itertools::Itertools;
-use redis::{cmd, Cmd};
+use redis::{cmd, Cmd, FromRedisValue};
 use std::fmt::Display;
 
 const DEFAULT_EXPIRY: i64 = 1800; // 30 minutes
@@ -126,21 +126,18 @@ impl RedisConnection {
         ids: impl IntoIterator<Item = impl Display>,
     ) -> Result<Vec<Option<R>>, DatabaseError>
     where
-        R: for<'a> serde::Deserialize<'a>,
+        R: FromRedisValue,
     {
         let mut cmd = cmd("MGET");
 
+        let ids = ids.into_iter().map(|x| x.to_string()).collect_vec();
         redis_args(
             &mut cmd,
             &ids.into_iter()
                 .map(|x| format!("{}_{}:{}", self.meta_namespace, namespace, x))
                 .collect_vec(),
         );
-        let res: Vec<Option<String>> = redis_execute(&mut cmd, &mut self.connection).await?;
-        Ok(res
-            .into_iter()
-            .map(|x| x.and_then(|x| serde_json::from_str(&x).ok()))
-            .collect())
+        Ok(redis_execute(&mut cmd, &mut self.connection).await?)
     }
 
     pub async fn delete<T1>(&mut self, namespace: &str, id: T1) -> Result<(), DatabaseError>
