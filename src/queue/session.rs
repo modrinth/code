@@ -1,8 +1,8 @@
-use crate::auth::session::SessionMetadata;
 use crate::database::models::pat_item::PersonalAccessToken;
 use crate::database::models::session_item::Session;
 use crate::database::models::{DatabaseError, OAuthAccessTokenId, PatId, SessionId, UserId};
 use crate::database::redis::RedisPool;
+use crate::routes::internal::session::SessionMetadata;
 use chrono::Utc;
 use itertools::Itertools;
 use sqlx::PgPool;

@@ -1,10 +1,6 @@
 mod admin;
-mod analytics_get;
-mod collections;
-mod images;
 mod moderation;
 mod notifications;
-mod organizations;
 pub(crate) mod project_creation;
 mod projects;
 mod reports;
@@ -25,17 +21,13 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         actix_web::web::scope("v2")
             .wrap(default_cors())
             .configure(admin::config)
-            .configure(analytics_get::config)
             // Todo: separate these- they need to also follow v2-v3 conversion
-            .configure(crate::auth::session::config)
-            .configure(crate::auth::flows::config)
-            .configure(crate::auth::pats::config)
+            .configure(super::internal::session::config)
+            .configure(super::internal::flows::config)
+            .configure(super::internal::pats::config)
             .configure(moderation::config)
             .configure(notifications::config)
-            .configure(organizations::config)
             .configure(project_creation::config)
-            .configure(collections::config)
-            .configure(images::config)
             .configure(projects::config)
             .configure(reports::config)
             .configure(statistics::config)

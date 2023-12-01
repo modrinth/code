@@ -19,7 +19,7 @@ pub async fn pat_full_test() {
     with_test_environment_all(None, |test_env| async move {
         // Create a PAT for a full test
         let req = test::TestRequest::post()
-            .uri("/v3/pat")
+            .uri("/_internal/pat")
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "scopes": Scopes::COLLECTION_CREATE, // Collection create as an easily tested example
@@ -43,7 +43,7 @@ pub async fn pat_full_test() {
         // Get PAT again
         let req = test::TestRequest::get()
             .append_header(("Authorization", USER_USER_PAT))
-            .uri("/v3/pat")
+            .uri("/_internal/pat")
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status().as_u16(), 200);
@@ -75,7 +75,7 @@ pub async fn pat_full_test() {
 
         // Change scopes and test again
         let req = test::TestRequest::patch()
-            .uri(&format!("/v3/pat/{}", id))
+            .uri(&format!("/_internal/pat/{}", id))
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "scopes": 0,
@@ -87,7 +87,7 @@ pub async fn pat_full_test() {
 
         // Change scopes back, and set expiry to the past, and test again
         let req = test::TestRequest::patch()
-            .uri(&format!("/v3/pat/{}", id))
+            .uri(&format!("/_internal/pat/{}", id))
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "scopes": Scopes::COLLECTION_CREATE,
@@ -103,7 +103,7 @@ pub async fn pat_full_test() {
 
         // Change everything back to normal and test again
         let req = test::TestRequest::patch()
-            .uri(&format!("/v3/pat/{}", id))
+            .uri(&format!("/_internal/pat/{}", id))
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "expires": Utc::now() + Duration::days(1), // no longer expired!
@@ -115,7 +115,7 @@ pub async fn pat_full_test() {
 
         // Patching to a bad expiry should fail
         let req = test::TestRequest::patch()
-            .uri(&format!("/v3/pat/{}", id))
+            .uri(&format!("/_internal/pat/{}", id))
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "expires": Utc::now() - Duration::days(1), // Past
@@ -132,7 +132,7 @@ pub async fn pat_full_test() {
             }
 
             let req = test::TestRequest::patch()
-                .uri(&format!("/v3/pat/{}", id))
+                .uri(&format!("/_internal/pat/{}", id))
                 .append_header(("Authorization", USER_USER_PAT))
                 .set_json(json!({
                     "scopes": scope.bits(),
@@ -148,7 +148,7 @@ pub async fn pat_full_test() {
         // Delete PAT
         let req = test::TestRequest::delete()
             .append_header(("Authorization", USER_USER_PAT))
-            .uri(&format!("/v3/pat/{}", id))
+            .uri(&format!("/_internal/pat/{}", id))
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status().as_u16(), 204);
@@ -162,7 +162,7 @@ pub async fn bad_pats() {
     with_test_environment_all(None, |test_env| async move {
         // Creating a PAT with no name should fail
         let req = test::TestRequest::post()
-            .uri("/v3/pat")
+            .uri("/_internal/pat")
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "scopes": Scopes::COLLECTION_CREATE, // Collection create as an easily tested example
@@ -175,7 +175,7 @@ pub async fn bad_pats() {
         // Name too short or too long should fail
         for name in ["n", "this_name_is_too_long".repeat(16).as_str()] {
             let req = test::TestRequest::post()
-                .uri("/v3/pat")
+                .uri("/_internal/pat")
                 .append_header(("Authorization", USER_USER_PAT))
                 .set_json(json!({
                     "name": name,
@@ -189,7 +189,7 @@ pub async fn bad_pats() {
 
         // Creating a PAT with an expiry in the past should fail
         let req = test::TestRequest::post()
-            .uri("/v3/pat")
+            .uri("/_internal/pat")
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "scopes": Scopes::COLLECTION_CREATE, // Collection create as an easily tested example
@@ -207,7 +207,7 @@ pub async fn bad_pats() {
                 continue;
             }
             let req = test::TestRequest::post()
-                .uri("/v3/pat")
+                .uri("/_internal/pat")
                 .append_header(("Authorization", USER_USER_PAT))
                 .set_json(json!({
                     "scopes": scope.bits(),
@@ -224,7 +224,7 @@ pub async fn bad_pats() {
 
         // Create a 'good' PAT for patching
         let req = test::TestRequest::post()
-            .uri("/v3/pat")
+            .uri("/_internal/pat")
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "scopes": Scopes::COLLECTION_CREATE,
@@ -240,7 +240,7 @@ pub async fn bad_pats() {
         // Patching to a bad name should fail
         for name in ["n", "this_name_is_too_long".repeat(16).as_str()] {
             let req = test::TestRequest::post()
-                .uri("/v3/pat")
+                .uri("/_internal/pat")
                 .append_header(("Authorization", USER_USER_PAT))
                 .set_json(json!({
                     "name": name,
@@ -252,7 +252,7 @@ pub async fn bad_pats() {
 
         // Patching to a bad expiry should fail
         let req = test::TestRequest::patch()
-            .uri(&format!("/v3/pat/{}", id))
+            .uri(&format!("/_internal/pat/{}", id))
             .append_header(("Authorization", USER_USER_PAT))
             .set_json(json!({
                 "expires": Utc::now() - Duration::days(1), // Past
@@ -269,7 +269,7 @@ pub async fn bad_pats() {
             }
 
             let req = test::TestRequest::patch()
-                .uri(&format!("/v3/pat/{}", id))
+                .uri(&format!("/_internal/pat/{}", id))
                 .append_header(("Authorization", USER_USER_PAT))
                 .set_json(json!({
                     "scopes": scope.bits(),

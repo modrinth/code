@@ -1,11 +1,11 @@
-use crate::auth::flows::AuthProvider;
-use crate::auth::session::get_session_metadata;
+use super::AuthProvider;
 use crate::auth::AuthenticationError;
 use crate::database::models::user_item;
 use crate::database::redis::RedisPool;
 use crate::models::pats::Scopes;
 use crate::models::users::{Role, User, UserId, UserPayoutData};
 use crate::queue::session::AuthQueue;
+use crate::routes::internal::session::get_session_metadata;
 use actix_web::HttpRequest;
 use chrono::Utc;
 use reqwest::header::{HeaderValue, AUTHORIZATION};

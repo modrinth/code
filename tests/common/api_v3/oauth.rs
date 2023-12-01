@@ -55,7 +55,7 @@ impl ApiV3 {
     pub async fn oauth_accept(&self, flow: &str, pat: &str) -> ServiceResponse {
         self.call(
             TestRequest::post()
-                .uri("/v3/oauth/accept")
+                .uri("/_internal/oauth/accept")
                 .append_header((AUTHORIZATION, pat))
                 .set_json(RespondToOAuthClientScopes {
                     flow: flow.to_string(),
@@ -68,7 +68,7 @@ impl ApiV3 {
     pub async fn oauth_reject(&self, flow: &str, pat: &str) -> ServiceResponse {
         self.call(
             TestRequest::post()
-                .uri("/v3/oauth/reject")
+                .uri("/_internal/oauth/reject")
                 .append_header((AUTHORIZATION, pat))
                 .set_json(RespondToOAuthClientScopes {
                     flow: flow.to_string(),
@@ -87,7 +87,7 @@ impl ApiV3 {
     ) -> ServiceResponse {
         self.call(
             TestRequest::post()
-                .uri("/v3/oauth/token")
+                .uri("/_internal/oauth/token")
                 .append_header((AUTHORIZATION, client_secret))
                 .set_form(TokenRequest {
                     grant_type: "authorization_code".to_string(),
@@ -108,7 +108,7 @@ pub fn generate_authorize_uri(
     state: Option<&str>,
 ) -> String {
     format!(
-        "/v3/oauth/authorize?client_id={}{}{}{}",
+        "/_internal/oauth/authorize?client_id={}{}{}{}",
         urlencoding::encode(client_id),
         optional_query_param("redirect_uri", redirect_uri),
         optional_query_param("scope", scope),

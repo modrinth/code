@@ -37,17 +37,6 @@ pub async fn team_members_get_project(
     v3::teams::team_members_get_project(req, info, pool, redis, session_queue).await
 }
 
-#[get("{id}/members")]
-pub async fn team_members_get_organization(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    v3::teams::team_members_get_organization(req, info, pool, redis, session_queue).await
-}
-
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
 #[get("{id}/members")]
 pub async fn team_members_get(

@@ -8,6 +8,7 @@ use actix_web::http::StatusCode;
 use actix_web::{web, HttpResponse};
 use futures::FutureExt;
 
+pub mod internal;
 pub mod v2;
 pub mod v3;
 

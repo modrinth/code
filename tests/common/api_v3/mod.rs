@@ -41,7 +41,7 @@ impl Api for ApiV3 {
 
     async fn reset_search_index(&self) -> ServiceResponse {
         let req = actix_web::test::TestRequest::post()
-            .uri("/v3/admin/_force_reindex")
+            .uri("/_internal/admin/_force_reindex")
             .append_header((
                 "Modrinth-Admin",
                 dotenvy::var("LABRINTH_ADMIN_KEY").unwrap(),

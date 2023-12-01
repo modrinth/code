@@ -3,7 +3,6 @@ use crate::util::cors::default_cors;
 use actix_web::{web, HttpResponse};
 use serde_json::json;
 
-pub mod admin;
 pub mod analytics_get;
 pub mod collections;
 pub mod images;
@@ -29,13 +28,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("v3")
             .wrap(default_cors())
-            .configure(admin::config)
             .configure(analytics_get::config)
-            // TODO: write tests that catch these
-            .configure(oauth_clients::config)
-            .configure(crate::auth::session::config)
-            .configure(crate::auth::flows::config)
-            .configure(crate::auth::pats::config)
             .configure(collections::config)
             .configure(images::config)
             .configure(moderation::config)

@@ -27,7 +27,7 @@ impl ApiV3 {
     ) -> ServiceResponse {
         let max_scopes = max_scopes.bits();
         let req = TestRequest::post()
-            .uri("/v3/oauth/app")
+            .uri("/_internal/oauth/app")
             .append_header((AUTHORIZATION, pat))
             .set_json(json!({
                 "name": name,
@@ -52,7 +52,7 @@ impl ApiV3 {
 
     pub async fn get_oauth_client(&self, client_id: String, pat: &str) -> ServiceResponse {
         let req = TestRequest::get()
-            .uri(&format!("/v3/oauth/app/{}", client_id))
+            .uri(&format!("/_internal/oauth/app/{}", client_id))
             .append_header((AUTHORIZATION, pat))
             .to_request();
 
@@ -66,7 +66,10 @@ impl ApiV3 {
         pat: &str,
     ) -> ServiceResponse {
         let req = TestRequest::patch()
-            .uri(&format!("/v3/oauth/app/{}", urlencoding::encode(client_id)))
+            .uri(&format!(
+                "/_internal/oauth/app/{}",
+                urlencoding::encode(client_id)
+            ))
             .set_json(edit)
             .append_header((AUTHORIZATION, pat))
             .to_request();
@@ -76,7 +79,7 @@ impl ApiV3 {
 
     pub async fn delete_oauth_client(&self, client_id: &str, pat: &str) -> ServiceResponse {
         let req = TestRequest::delete()
-            .uri(&format!("/v3/oauth/app/{}", client_id))
+            .uri(&format!("/_internal/oauth/app/{}", client_id))
             .append_header((AUTHORIZATION, pat))
             .to_request();
 
@@ -86,7 +89,7 @@ impl ApiV3 {
     pub async fn revoke_oauth_authorization(&self, client_id: &str, pat: &str) -> ServiceResponse {
         let req = TestRequest::delete()
             .uri(&format!(
-                "/v3/oauth/authorizations?client_id={}",
+                "/_internal/oauth/authorizations?client_id={}",
                 urlencoding::encode(client_id)
             ))
             .append_header((AUTHORIZATION, pat))
@@ -96,7 +99,7 @@ impl ApiV3 {
 
     pub async fn get_user_oauth_authorizations(&self, pat: &str) -> Vec<OAuthClientAuthorization> {
         let req = TestRequest::get()
-            .uri("/v3/oauth/authorizations")
+            .uri("/_internal/oauth/authorizations")
             .append_header((AUTHORIZATION, pat))
             .to_request();
         let resp = self.call(req).await;

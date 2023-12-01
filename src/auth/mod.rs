@@ -1,14 +1,12 @@
 pub mod checks;
 pub mod email;
-pub mod flows;
 pub mod oauth;
-pub mod pats;
-pub mod session;
-mod templates;
+pub mod templates;
 pub mod validate;
 pub use checks::{
     filter_authorized_projects, filter_authorized_versions, is_authorized, is_authorized_version,
 };
+use serde::{Deserialize, Serialize};
 // pub use pat::{generate_pat, PersonalAccessToken};
 pub use validate::{check_is_moderator_from_headers, get_user_from_headers};
 
@@ -97,4 +95,17 @@ impl AuthenticationError {
             AuthenticationError::SocketError => "socket",
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Default, Eq, PartialEq, Clone, Copy, Debug)]
+#[serde(rename_all = "lowercase")]
+pub enum AuthProvider {
+    #[default]
+    GitHub,
+    Discord,
+    Microsoft,
+    GitLab,
+    Google,
+    Steam,
+    PayPal,
 }

@@ -1,8 +1,9 @@
 use super::ids::*;
 use crate::auth::oauth::uris::OAuthRedirectUris;
+use crate::auth::AuthProvider;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::{auth::flows::AuthProvider, models::pats::Scopes};
+use crate::models::pats::Scopes;
 use chrono::Duration;
 use rand::distributions::Alphanumeric;
 use rand::Rng;

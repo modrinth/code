@@ -276,6 +276,7 @@ pub fn app_config(cfg: &mut web::ServiceConfig, labrinth_config: LabrinthConfig)
     .app_data(labrinth_config.active_sockets.clone())
     .configure(routes::v2::config)
     .configure(routes::v3::config)
+    .configure(routes::internal::config)
     .configure(routes::root_config)
     .default_service(web::get().wrap(default_cors()).to(routes::not_found));
 }
