@@ -79,12 +79,26 @@ impl LegacyProject {
         let mut game_versions = Vec::new();
 
         // V2 versions only have one project type- v3 versions can rarely have multiple.
-        // We'll just use the first one.
-        let mut project_type = data
-            .project_types
+        // We'll prioritize 'modpack' first, then 'mod', and if neither are found, use the first one.
+        // If there are no project types, default to 'project'
+        let mut project_types = data.project_types;
+        if project_types.contains(&"modpack".to_string()) {
+            project_types = vec!["modpack".to_string()];
+        } else if project_types.contains(&"mod".to_string()) {
+            project_types = vec!["mod".to_string()];
+        }
+        let project_type = project_types
             .first()
             .cloned()
-            .unwrap_or("unknown".to_string());
+            .unwrap_or("project".to_string()); // Default to 'project' if none are found
+
+        let mut project_type = if project_type == "datapack" || project_type == "plugin" {
+            // These are not supported in V2, so we'll just use 'mod' instead
+            "mod".to_string()
+        } else {
+            project_type
+        };
+
         let mut loaders = data.loaders;
 
         if let Some(versions_item) = versions_item {

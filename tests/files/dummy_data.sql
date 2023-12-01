@@ -46,7 +46,7 @@ INSERT INTO loader_fields (
   true
 );
 INSERT INTO loader_fields_loaders(loader_id, loader_field_id)
-SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field = 'test_fabric_optional' AND l.loader = 'fabric';
+SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field = 'test_fabric_optional' AND l.loader = 'fabric' ON CONFLICT DO NOTHING;
 
 -- Sample game versions, loaders, categories
 -- Game versions is '2'
@@ -68,7 +68,7 @@ INSERT INTO loader_field_enum_values(enum_id, value, metadata, ordering)
 VALUES (2, 'Ordering_Positive100', '{"type":"release","major":false}', 100);
 
 INSERT INTO loader_fields_loaders(loader_id, loader_field_id) 
-SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field IN ('game_versions','singleplayer', 'client_and_server', 'client_only', 'server_only');
+SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf WHERE lf.field IN ('game_versions','singleplayer', 'client_and_server', 'client_only', 'server_only')  ON CONFLICT DO NOTHING;
 
 INSERT INTO categories (id, category, project_type) VALUES
     (51, 'combat', 1),

@@ -427,7 +427,8 @@ async fn add_version_project_types_v2() {
         let test_project = api
             .get_project_deserialized(&test_project.slug.unwrap(), USER_USER_PAT)
             .await;
-        assert_eq!(test_project.project_type, "unknown"); // No project_type set, as no versions are set
+        assert_eq!(test_project.project_type, "project"); // No project_type set, as no versions are set
+                                                          // Default to 'project' if none are found
                                                           // This is a known difference between older v2 ,but is acceptable.
                                                           // This would be the appropriate test on older v2:
                                                           // assert_eq!(test_project.project_type, "modpack");
