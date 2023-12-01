@@ -15,26 +15,26 @@ pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
 const PROJECTS_DEPENDENCIES_NAMESPACE: &str = "projects_dependencies";
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct DonationUrl {
-    pub platform_id: DonationPlatformId,
-    pub platform_short: String,
+pub struct LinkUrl {
+    pub platform_id: LinkPlatformId,
     pub platform_name: String,
     pub url: String,
+    pub donation: bool, // Is this a donation link
 }
 
-impl DonationUrl {
+impl LinkUrl {
     pub async fn insert_many_projects(
-        donation_urls: Vec<Self>,
+        links: Vec<Self>,
         project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
-        let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = donation_urls
+        let (project_ids, platform_ids, urls): (Vec<_>, Vec<_>, Vec<_>) = links
             .into_iter()
             .map(|url| (project_id.0, url.platform_id.0, url.url))
             .multiunzip();
         sqlx::query!(
             "
-            INSERT INTO mods_donations (
+            INSERT INTO mods_links (
                 joining_mod_id, joining_platform_id, url
             )
             SELECT * FROM UNNEST($1::bigint[], $2::int[], $3::varchar[])
@@ -148,11 +148,7 @@ pub struct ProjectBuilder {
     pub description: String,
     pub body: String,
     pub icon_url: Option<String>,
-    pub issues_url: Option<String>,
-    pub source_url: Option<String>,
-    pub wiki_url: Option<String>,
     pub license_url: Option<String>,
-    pub discord_url: Option<String>,
     pub categories: Vec<CategoryId>,
     pub additional_categories: Vec<CategoryId>,
     pub initial_versions: Vec<super::version_item::VersionBuilder>,
@@ -160,7 +156,7 @@ pub struct ProjectBuilder {
     pub requested_status: Option<ProjectStatus>,
     pub license: String,
     pub slug: Option<String>,
-    pub donation_urls: Vec<DonationUrl>,
+    pub link_urls: Vec<LinkUrl>,
     pub gallery_items: Vec<GalleryItem>,
     pub color: Option<u32>,
     pub monetization_status: MonetizationStatus,
@@ -192,11 +188,7 @@ impl ProjectBuilder {
             downloads: 0,
             follows: 0,
             icon_url: self.icon_url,
-            issues_url: self.issues_url,
-            source_url: self.source_url,
-            wiki_url: self.wiki_url,
             license_url: self.license_url,
-            discord_url: self.discord_url,
             license: self.license,
             slug: self.slug,
             moderation_message: None,
@@ -209,7 +201,7 @@ impl ProjectBuilder {
         project_struct.insert(&mut *transaction).await?;
 
         let ProjectBuilder {
-            donation_urls,
+            link_urls,
             gallery_items,
             categories,
             additional_categories,
@@ -221,8 +213,7 @@ impl ProjectBuilder {
             version.insert(&mut *transaction).await?;
         }
 
-        DonationUrl::insert_many_projects(donation_urls, self.project_id, &mut *transaction)
-            .await?;
+        LinkUrl::insert_many_projects(link_urls, self.project_id, &mut *transaction).await?;
 
         GalleryItem::insert_many(gallery_items, self.project_id, &mut *transaction).await?;
 
@@ -259,11 +250,7 @@ pub struct Project {
     pub downloads: i32,
     pub follows: i32,
     pub icon_url: Option<String>,
-    pub issues_url: Option<String>,
-    pub source_url: Option<String>,
-    pub wiki_url: Option<String>,
     pub license_url: Option<String>,
-    pub discord_url: Option<String>,
     pub license: String,
     pub slug: Option<String>,
     pub moderation_message: Option<String>,
@@ -283,17 +270,15 @@ impl Project {
             "
             INSERT INTO mods (
                 id, team_id, title, description, body,
-                published, downloads, icon_url, issues_url,
-                source_url, wiki_url, status, requested_status, discord_url,
+                published, downloads, icon_url, status, requested_status,
                 license_url, license,
                 slug, color, monetization_status
             )
             VALUES (
-                $1, $2, $3, $4, $5,
-                $6, $7, $8, $9,
-                $10, $11, $12, $13, $14,
-                $15, $16, 
-                LOWER($17), $18, $19
+                $1, $2, $3, $4, $5, $6, 
+                $7, $8, $9, $10, 
+                $11, $12, 
+                LOWER($13), $14, $15
             )
             ",
             self.id as ProjectId,
@@ -304,12 +289,8 @@ impl Project {
             self.published,
             self.downloads,
             self.icon_url.as_ref(),
-            self.issues_url.as_ref(),
-            self.source_url.as_ref(),
-            self.wiki_url.as_ref(),
             self.status.as_str(),
             self.requested_status.map(|x| x.as_str()),
-            self.discord_url.as_ref(),
             self.license_url.as_ref(),
             &self.license,
             self.slug.as_ref(),
@@ -384,7 +365,7 @@ impl Project {
 
             sqlx::query!(
                 "
-                DELETE FROM mods_donations
+                DELETE FROM mods_links
                 WHERE joining_mod_id = $1
                 ",
                 id as ProjectId,
@@ -650,23 +631,23 @@ impl Project {
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
                     GROUP BY mod_id
                 ),
-                donations_json AS (
+                links_json AS (
                     SELECT DISTINCT joining_mod_id as mod_id,
                         JSONB_AGG(
                         DISTINCT jsonb_build_object(
-                            'platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url
+                            'platform_id', ml.joining_platform_id, 'platform_name', lp.name,'url', ml.url, 'donation', lp.donation
                         )
-                    ) filter (where md.joining_platform_id is not null) donations_json
-                    FROM mods_donations md
-                    INNER JOIN mods m ON md.joining_mod_id = m.id AND m.id = ANY($1) OR m.slug = ANY($2)
-                    INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+                    ) filter (where ml.joining_platform_id is not null) links_json
+                    FROM mods_links ml
+                    INNER JOIN mods m ON ml.joining_mod_id = m.id AND m.id = ANY($1) OR m.slug = ANY($2)
+                    INNER JOIN link_platforms lp ON ml.joining_platform_id = lp.id
                     GROUP BY mod_id
                 )
                 
                 SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
                 m.icon_url icon_url, m.body body, m.published published,
                 m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
-                m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
+                m.license_url license_url,
                 m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
                 m.webhook_sent, m.color,
                 t.id thread_id, m.monetization_status monetization_status,
@@ -677,14 +658,14 @@ impl Project {
                 ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
                 v.versions_json versions,
                 mg.mods_gallery_json gallery,
-                md.donations_json donations,
+                ml.links_json links,
                 vf.version_fields_json version_fields,
                 lf.loader_fields_json loader_fields,
                 lfev.loader_field_enum_values_json loader_field_enum_values
                 FROM mods m                
                 INNER JOIN threads t ON t.mod_id = m.id
                 LEFT JOIN mods_gallery_json mg ON mg.mod_id = m.id
-                LEFT JOIN donations_json md ON md.mod_id = m.id
+                LEFT JOIN links_json ml ON ml.mod_id = m.id
                 LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
                 LEFT JOIN categories c ON mc.joining_category_id = c.id
                 LEFT JOIN versions_json v ON v.mod_id = m.id
@@ -697,7 +678,7 @@ impl Project {
                 LEFT OUTER JOIN loader_fields_json lf ON m.id = lf.mod_id
                 LEFT OUTER JOIN loader_field_enum_values_json lfev ON m.id = lfev.mod_id
                 WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                GROUP BY t.id, m.id, version_fields_json, loader_fields_json, loader_field_enum_values_json, versions_json, mods_gallery_json, donations_json;
+                GROUP BY t.id, m.id, version_fields_json, loader_fields_json, loader_field_enum_values_json, versions_json, mods_gallery_json, links_json;
                 ",
                 &project_ids_parsed,
                 &remaining_strings.into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<_>>(),
@@ -719,11 +700,7 @@ impl Project {
                             icon_url: m.icon_url.clone(),
                             published: m.published,
                             updated: m.updated,
-                            issues_url: m.issues_url.clone(),
-                            source_url: m.source_url.clone(),
-                            wiki_url: m.wiki_url.clone(),
                             license_url: m.license_url.clone(),
-                            discord_url: m.discord_url.clone(),
                             status: ProjectStatus::from_string(
                                 &m.status,
                             ),
@@ -774,9 +751,9 @@ impl Project {
 
                                 gallery
                             },
-                            donation_urls: serde_json::from_value(
-                                m.donations.unwrap_or_default(),
-                            ).ok().unwrap_or_default(),
+                            urls: serde_json::from_value(
+                                m.links.unwrap_or_default(),
+                            ).unwrap_or_default(),
                         aggregate_version_fields: VersionField::from_query_json(m.loader_fields, m.version_fields, m.loader_field_enum_values, true),
                         thread_id: ThreadId(m.thread_id),
                     }}))
@@ -894,7 +871,7 @@ pub struct QueryProject {
     pub versions: Vec<VersionId>,
     pub project_types: Vec<String>,
     pub games: Vec<String>,
-    pub donation_urls: Vec<DonationUrl>,
+    pub urls: Vec<LinkUrl>,
     pub gallery_items: Vec<GalleryItem>,
     pub thread_id: ThreadId,
     pub aggregate_version_fields: Vec<VersionField>,

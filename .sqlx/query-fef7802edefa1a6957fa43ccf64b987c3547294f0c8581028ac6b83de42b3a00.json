@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT id, short, name FROM donation_platforms\n            ",
+  "query": "\n            SELECT id, name, donation FROM link_platforms\n            ",
   "describe": {
     "columns": [
       {
@@ -10,13 +10,13 @@
       },
       {
         "ordinal": 1,
-        "name": "short",
+        "name": "name",
         "type_info": "Varchar"
       },
       {
         "ordinal": 2,
-        "name": "name",
-        "type_info": "Varchar"
+        "name": "donation",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "76db1c204139e18002e5751c3dcefff79791a1dd852b62d34fcf008151e8945a"
+  "hash": "fef7802edefa1a6957fa43ccf64b987c3547294f0c8581028ac6b83de42b3a00"
 }

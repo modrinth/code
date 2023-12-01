@@ -4,11 +4,15 @@ use crate::common::{
         request_data::{get_public_project_creation_data_json, get_public_version_creation_data},
         ApiV2,
     },
-    database::{ENEMY_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
+    database::{
+        ADMIN_USER_PAT, ENEMY_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, MOD_USER_PAT,
+        USER_USER_PAT,
+    },
     dummy_data::{TestFile, DUMMY_CATEGORIES},
     environment::{with_test_environment, TestEnvironment},
     permissions::{PermissionsTest, PermissionsTestContext},
 };
+use actix_http::StatusCode;
 use actix_web::test;
 use itertools::Itertools;
 use labrinth::{
@@ -475,7 +479,6 @@ pub async fn test_patch_project() {
 
         // New slug does work
         let project = api.get_project_deserialized("newslug", USER_USER_PAT).await;
-
         assert_eq!(project.slug.unwrap(), "newslug");
         assert_eq!(project.title, "New successful title");
         assert_eq!(project.description, "New successful description");
@@ -492,6 +495,172 @@ pub async fn test_patch_project() {
         assert_eq!(project.client_side.as_str(), "unsupported");
         assert_eq!(project.server_side.as_str(), "required");
         assert_eq!(project.donation_urls.unwrap()[0].url, "https://patreon.com");
+    })
+    .await;
+}
+
+#[actix_rt::test]
+pub async fn test_bulk_edit_links() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
+        let api = &test_env.api;
+        let alpha_project_id: &str = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
+        let beta_project_id: &str = &test_env.dummy.as_ref().unwrap().project_beta.project_id;
+
+        let resp = api
+            .edit_project_bulk(
+                &[alpha_project_id, beta_project_id],
+                json!({
+                    "issues_url": "https://github.com",
+                    "donation_urls": [
+                        {
+                            "id": "patreon",
+                            "platform": "Patreon",
+                            "url": "https://www.patreon.com/my_user"
+                        }
+                    ],
+                }),
+                ADMIN_USER_PAT,
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+
+        let alpha_body = api
+            .get_project_deserialized(alpha_project_id, ADMIN_USER_PAT)
+            .await;
+        let donation_urls = alpha_body.donation_urls.unwrap();
+        assert_eq!(donation_urls.len(), 1);
+        assert_eq!(donation_urls[0].url, "https://www.patreon.com/my_user");
+        assert_eq!(
+            alpha_body.issues_url,
+            Some("https://github.com".to_string())
+        );
+        assert_eq!(alpha_body.discord_url, None);
+
+        let beta_body = api
+            .get_project_deserialized(beta_project_id, ADMIN_USER_PAT)
+            .await;
+        let donation_urls = beta_body.donation_urls.unwrap();
+        assert_eq!(donation_urls.len(), 1);
+        assert_eq!(donation_urls[0].url, "https://www.patreon.com/my_user");
+        assert_eq!(beta_body.issues_url, Some("https://github.com".to_string()));
+        assert_eq!(beta_body.discord_url, None);
+
+        let resp = api
+            .edit_project_bulk(
+                &[alpha_project_id, beta_project_id],
+                json!({
+                    "discord_url": "https://discord.gg",
+                    "issues_url": null,
+                    "add_donation_urls": [
+                        {
+                            "id": "bmac",
+                            "platform": "Buy Me a Coffee",
+                            "url": "https://www.buymeacoffee.com/my_user"
+                        }
+                    ],
+                }),
+                ADMIN_USER_PAT,
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+
+        let alpha_body = api
+            .get_project_deserialized(alpha_project_id, ADMIN_USER_PAT)
+            .await;
+        let donation_urls = alpha_body
+            .donation_urls
+            .unwrap()
+            .into_iter()
+            .sorted_by_key(|x| x.id.clone())
+            .collect_vec();
+        assert_eq!(donation_urls.len(), 2);
+        assert_eq!(donation_urls[0].url, "https://www.buymeacoffee.com/my_user");
+        assert_eq!(donation_urls[1].url, "https://www.patreon.com/my_user");
+        assert_eq!(alpha_body.issues_url, None);
+        assert_eq!(
+            alpha_body.discord_url,
+            Some("https://discord.gg".to_string())
+        );
+
+        let beta_body = api
+            .get_project_deserialized(beta_project_id, ADMIN_USER_PAT)
+            .await;
+        let donation_urls = beta_body
+            .donation_urls
+            .unwrap()
+            .into_iter()
+            .sorted_by_key(|x| x.id.clone())
+            .collect_vec();
+        assert_eq!(donation_urls.len(), 2);
+        assert_eq!(donation_urls[0].url, "https://www.buymeacoffee.com/my_user");
+        assert_eq!(donation_urls[1].url, "https://www.patreon.com/my_user");
+        assert_eq!(alpha_body.issues_url, None);
+        assert_eq!(
+            alpha_body.discord_url,
+            Some("https://discord.gg".to_string())
+        );
+
+        let resp = api
+            .edit_project_bulk(
+                &[alpha_project_id, beta_project_id],
+                json!({
+                    "donation_urls": [
+                        {
+                            "id": "patreon",
+                            "platform": "Patreon",
+                            "url": "https://www.patreon.com/my_user"
+                        },
+                        {
+                            "id": "ko-fi",
+                            "platform": "Ko-fi",
+                            "url": "https://www.ko-fi.com/my_user"
+                        }
+                    ],
+                    "add_donation_urls": [
+                        {
+                            "id": "paypal",
+                            "platform": "PayPal",
+                            "url": "https://www.paypal.com/my_user"
+                        }
+                    ],
+                    "remove_donation_urls": [
+                        {
+                            "id": "ko-fi",
+                            "platform": "Ko-fi",
+                            "url": "https://www.ko-fi.com/my_user"
+                        }
+                    ],
+                }),
+                ADMIN_USER_PAT,
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+
+        let alpha_body = api
+            .get_project_deserialized(alpha_project_id, ADMIN_USER_PAT)
+            .await;
+        let donation_urls = alpha_body
+            .donation_urls
+            .unwrap()
+            .into_iter()
+            .sorted_by_key(|x| x.id.clone())
+            .collect_vec();
+        assert_eq!(donation_urls.len(), 2);
+        assert_eq!(donation_urls[0].url, "https://www.patreon.com/my_user");
+        assert_eq!(donation_urls[1].url, "https://www.paypal.com/my_user");
+
+        let beta_body = api
+            .get_project_deserialized(beta_project_id, ADMIN_USER_PAT)
+            .await;
+        let donation_urls = beta_body
+            .donation_urls
+            .unwrap()
+            .into_iter()
+            .sorted_by_key(|x| x.id.clone())
+            .collect_vec();
+        assert_eq!(donation_urls.len(), 2);
+        assert_eq!(donation_urls[0].url, "https://www.patreon.com/my_user");
+        assert_eq!(donation_urls[1].url, "https://www.paypal.com/my_user");
     })
     .await;
 }

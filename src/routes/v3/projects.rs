@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use crate::auth::{filter_authorized_projects, get_user_from_headers, is_authorized};
@@ -14,7 +15,7 @@ use crate::models::images::ImageContext;
 use crate::models::notifications::NotificationBody;
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    DonationLink, MonetizationStatus, Project, ProjectId, ProjectStatus, SearchRequest,
+    MonetizationStatus, Project, ProjectId, ProjectStatus, SearchRequest,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
@@ -192,49 +193,10 @@ pub struct EditProject {
         custom(function = "crate::util::validate::validate_url"),
         length(max = 2048)
     )]
-    pub issues_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub source_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub wiki_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
     pub license_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub discord_url: Option<Option<String>>,
-    #[validate]
-    pub donation_urls: Option<Vec<DonationLink>>,
+    #[validate(custom(function = "crate::util::validate::validate_url_hashmap_optional_values"))]
+    // <name, url> (leave url empty to delete)
+    pub link_urls: Option<HashMap<String, Option<String>>>,
     pub license_id: Option<String>,
     #[validate(
         length(min = 3, max = 64),
@@ -592,69 +554,6 @@ pub async fn project_edit(
                 .await?;
             }
 
-            if let Some(issues_url) = &new_project.issues_url {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the issues URL of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET issues_url = $1
-                    WHERE (id = $2)
-                    ",
-                    issues_url.as_deref(),
-                    id as db_ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(source_url) = &new_project.source_url {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the source URL of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET source_url = $1
-                    WHERE (id = $2)
-                    ",
-                    source_url.as_deref(),
-                    id as db_ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(wiki_url) = &new_project.wiki_url {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the wiki URL of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET wiki_url = $1
-                    WHERE (id = $2)
-                    ",
-                    wiki_url.as_deref(),
-                    id as db_ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
             if let Some(license_url) = &new_project.license_url {
                 if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
@@ -670,27 +569,6 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     license_url.as_deref(),
-                    id as db_ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(discord_url) = &new_project.discord_url {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the discord URL of this project!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET discord_url = $1
-                    WHERE (id = $2)
-                    ",
-                    discord_url.as_deref(),
                     id as db_ids::ProjectId,
                 )
                 .execute(&mut *transaction)
@@ -785,51 +663,59 @@ pub async fn project_edit(
                 .execute(&mut *transaction)
                 .await?;
             }
-            if let Some(donations) = &new_project.donation_urls {
+            if let Some(links) = &new_project.link_urls {
                 if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the donation links of this project!"
+                        "You do not have the permissions to edit the links of this project!"
                             .to_string(),
                     ));
                 }
 
+                let ids_to_delete = links
+                    .iter()
+                    .map(|(name, _)| name.clone())
+                    .collect::<Vec<String>>();
+                // Deletes all links from hashmap- either will be deleted or be replaced
                 sqlx::query!(
                     "
-                    DELETE FROM mods_donations
-                    WHERE joining_mod_id = $1
+                    DELETE FROM mods_links
+                    WHERE joining_mod_id = $1 AND joining_platform_id IN (
+                        SELECT id FROM link_platforms WHERE name = ANY($2)
+                    )
                     ",
                     id as db_ids::ProjectId,
+                    &ids_to_delete
                 )
                 .execute(&mut *transaction)
                 .await?;
 
-                for donation in donations {
-                    let platform_id = db_models::categories::DonationPlatform::get_id(
-                        &donation.id,
-                        &mut *transaction,
-                    )
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(format!(
-                            "Platform {} does not exist.",
-                            donation.id.clone()
-                        ))
-                    })?;
-
-                    sqlx::query!(
-                        "
-                        INSERT INTO mods_donations (joining_mod_id, joining_platform_id, url)
-                        VALUES ($1, $2, $3)
-                        ",
-                        id as db_ids::ProjectId,
-                        platform_id as db_ids::DonationPlatformId,
-                        donation.url
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
+                for (platform, url) in links {
+                    if let Some(url) = url {
+                        let platform_id = db_models::categories::LinkPlatform::get_id(
+                            platform,
+                            &mut *transaction,
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(format!(
+                                "Platform {} does not exist.",
+                                platform.clone()
+                            ))
+                        })?;
+                        sqlx::query!(
+                            "
+                            INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                            VALUES ($1, $2, $3)
+                            ",
+                            id as db_ids::ProjectId,
+                            platform_id as db_ids::LinkPlatformId,
+                            url
+                        )
+                        .execute(&mut *transaction)
+                        .await?;
+                    }
                 }
             }
-
             if let Some(moderation_message) = &new_project.moderation_message {
                 if !user.role.is_mod()
                     && (!project_item.inner.status.is_approved() || moderation_message.is_some())
@@ -1139,53 +1025,8 @@ pub struct BulkEditProject {
     pub add_additional_categories: Option<Vec<String>>,
     pub remove_additional_categories: Option<Vec<String>>,
 
-    #[validate]
-    pub donation_urls: Option<Vec<DonationLink>>,
-    #[validate]
-    pub add_donation_urls: Option<Vec<DonationLink>>,
-    #[validate]
-    pub remove_donation_urls: Option<Vec<DonationLink>>,
-
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub issues_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub source_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub wiki_url: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    pub discord_url: Option<Option<String>>,
+    #[validate(custom(function = " crate::util::validate::validate_url_hashmap_optional_values"))]
+    pub link_urls: Option<HashMap<String, Option<String>>>,
 }
 
 pub async fn projects_edit(
@@ -1250,7 +1091,7 @@ pub async fn projects_edit(
             .await?;
 
     let categories = db_models::categories::Category::list(&**pool, &redis).await?;
-    let donation_platforms = db_models::categories::DonationPlatform::list(&**pool, &redis).await?;
+    let link_platforms = db_models::categories::LinkPlatform::list(&**pool, &redis).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -1330,128 +1171,50 @@ pub async fn projects_edit(
         )
         .await?;
 
-        let project_donations: Vec<DonationLink> = project
-            .donation_urls
-            .into_iter()
-            .map(|d| DonationLink {
-                id: d.platform_short,
-                platform: d.platform_name,
-                url: d.url,
-            })
-            .collect();
-        let mut set_donation_links =
-            if let Some(donation_links) = bulk_edit_project.donation_urls.clone() {
-                donation_links
-            } else {
-                project_donations.clone()
-            };
+        if let Some(links) = &bulk_edit_project.link_urls {
+            let ids_to_delete = links
+                .iter()
+                .map(|(name, _)| name.clone())
+                .collect::<Vec<String>>();
+            // Deletes all links from hashmap- either will be deleted or be replaced
+            sqlx::query!(
+                "
+                DELETE FROM mods_links
+                WHERE joining_mod_id = $1 AND joining_platform_id IN (
+                    SELECT id FROM link_platforms WHERE name = ANY($2)
+                )
+                ",
+                project.inner.id as db_ids::ProjectId,
+                &ids_to_delete
+            )
+            .execute(&mut *transaction)
+            .await?;
 
-        if let Some(delete_donations) = &bulk_edit_project.remove_donation_urls {
-            for donation in delete_donations {
-                if let Some(pos) = set_donation_links
-                    .iter()
-                    .position(|x| donation.url == x.url && donation.id == x.id)
-                {
-                    set_donation_links.remove(pos);
+            for (platform, url) in links {
+                if let Some(url) = url {
+                    let platform_id = link_platforms
+                        .iter()
+                        .find(|x| &x.name == platform)
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(format!(
+                                "Platform {} does not exist.",
+                                platform.clone()
+                            ))
+                        })?
+                        .id;
+                    sqlx::query!(
+                        "
+                        INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                        VALUES ($1, $2, $3)
+                        ",
+                        project.inner.id as db_ids::ProjectId,
+                        platform_id as db_ids::LinkPlatformId,
+                        url
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
                 }
             }
-        }
-
-        if let Some(add_donations) = &bulk_edit_project.add_donation_urls {
-            set_donation_links.append(&mut add_donations.clone());
-        }
-
-        if set_donation_links != project_donations {
-            sqlx::query!(
-                "
-                DELETE FROM mods_donations
-                WHERE joining_mod_id = $1
-                ",
-                project.inner.id as db_ids::ProjectId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-
-            for donation in set_donation_links {
-                let platform_id = donation_platforms
-                    .iter()
-                    .find(|x| x.short == donation.id)
-                    .ok_or_else(|| {
-                        ApiError::InvalidInput(format!(
-                            "Platform {} does not exist.",
-                            donation.id.clone()
-                        ))
-                    })?
-                    .id;
-
-                sqlx::query!(
-                    "
-                    INSERT INTO mods_donations (joining_mod_id, joining_platform_id, url)
-                    VALUES ($1, $2, $3)
-                    ",
-                    project.inner.id as db_ids::ProjectId,
-                    platform_id as db_ids::DonationPlatformId,
-                    donation.url
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-        }
-
-        if let Some(issues_url) = &bulk_edit_project.issues_url {
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET issues_url = $1
-                WHERE (id = $2)
-                ",
-                issues_url.as_deref(),
-                project.inner.id as db_ids::ProjectId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
-
-        if let Some(source_url) = &bulk_edit_project.source_url {
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET source_url = $1
-                WHERE (id = $2)
-                ",
-                source_url.as_deref(),
-                project.inner.id as db_ids::ProjectId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
-
-        if let Some(wiki_url) = &bulk_edit_project.wiki_url {
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET wiki_url = $1
-                WHERE (id = $2)
-                ",
-                wiki_url.as_deref(),
-                project.inner.id as db_ids::ProjectId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
-
-        if let Some(discord_url) = &bulk_edit_project.discord_url {
-            sqlx::query!(
-                "
-                UPDATE mods
-                SET discord_url = $1
-                WHERE (id = $2)
-                ",
-                discord_url.as_deref(),
-                project.inner.id as db_ids::ProjectId,
-            )
-            .execute(&mut *transaction)
-            .await?;
         }
 
         db_models::Project::clear_cache(project.inner.id, project.inner.slug, None, &redis).await?;

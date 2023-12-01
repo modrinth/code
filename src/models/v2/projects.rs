@@ -1,3 +1,5 @@
+use std::convert::TryFrom;
+
 use std::collections::HashMap;
 
 use super::super::ids::OrganizationId;
@@ -8,13 +10,14 @@ use crate::database::models::{version_item, DatabaseError};
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
 use crate::models::projects::{
-    Dependency, DonationLink, GalleryItem, License, Loader, ModeratorMessage, MonetizationStatus,
-    Project, ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
+    Dependency, GalleryItem, License, Link, Loader, ModeratorMessage, MonetizationStatus, Project,
+    ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
 use crate::models::threads::ThreadId;
 use crate::routes::v2_reroute;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Clone)]
@@ -132,6 +135,18 @@ impl LegacyProject {
             }
         }
 
+        let issues_url = data.link_urls.get("issues").map(|l| l.url.clone());
+        let source_url = data.link_urls.get("source").map(|l| l.url.clone());
+        let wiki_url = data.link_urls.get("wiki").map(|l| l.url.clone());
+        let discord_url = data.link_urls.get("discord").map(|l| l.url.clone());
+
+        let donation_urls = data
+            .link_urls
+            .iter()
+            .filter(|(_, l)| l.donation)
+            .map(|(_, l)| DonationLink::try_from(l.clone()).ok())
+            .collect::<Option<Vec<_>>>();
+
         Self {
             id: data.id,
             slug: data.slug,
@@ -157,11 +172,11 @@ impl LegacyProject {
             loaders,
             versions: data.versions,
             icon_url: data.icon_url,
-            issues_url: data.issues_url,
-            source_url: data.source_url,
-            wiki_url: data.wiki_url,
-            discord_url: data.discord_url,
-            donation_urls: data.donation_urls,
+            issues_url,
+            source_url,
+            wiki_url,
+            discord_url,
+            donation_urls,
             gallery: data.gallery,
             color: data.color,
             thread_id: data.thread_id,
@@ -315,4 +330,37 @@ impl From<Version> for LegacyVersion {
             loaders,
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Validate, Clone, Eq, PartialEq)]
+pub struct DonationLink {
+    pub id: String,
+    pub platform: String,
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
+    pub url: String,
+}
+
+impl TryFrom<Link> for DonationLink {
+    type Error = String;
+    fn try_from(link: Link) -> Result<Self, String> {
+        if !link.donation {
+            return Err("Not a donation".to_string());
+        }
+        Ok(Self {
+            platform: capitalize_first(&link.platform),
+            url: link.url,
+            id: link.platform,
+        })
+    }
+}
+
+fn capitalize_first(input: &str) -> String {
+    let mut result = input.to_owned();
+    if let Some(first_char) = result.get_mut(0..1) {
+        first_char.make_ascii_uppercase();
+    }
+    result
 }

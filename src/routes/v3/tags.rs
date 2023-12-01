@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::database::models::categories::{Category, DonationPlatform, ProjectType, ReportType};
+use crate::database::models::categories::{Category, LinkPlatform, ProjectType, ReportType};
 use crate::database::models::loader_fields::{
     Game, Loader, LoaderField, LoaderFieldEnumValue, LoaderFieldType,
 };
@@ -22,7 +22,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     .route("loader_field", web::get().to(loader_fields_list))
     .route("license", web::get().to(license_list))
     .route("license/{id}", web::get().to(license_text))
-    .route("donation_platform", web::get().to(donation_platform_list))
+    .route("link_platform", web::get().to(link_platform_list))
     .route("report_type", web::get().to(report_type_list))
     .route("project_type", web::get().to(project_type_list));
 }
@@ -214,23 +214,19 @@ pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, 
     ))
 }
 
-#[derive(serde::Serialize)]
-pub struct DonationPlatformQueryData {
-    short: String,
-    name: String,
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LinkPlatformQueryData {
+    pub name: String,
 }
 
-pub async fn donation_platform_list(
+pub async fn link_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let results: Vec<DonationPlatformQueryData> = DonationPlatform::list(&**pool, &redis)
+    let results: Vec<LinkPlatformQueryData> = LinkPlatform::list(&**pool, &redis)
         .await?
         .into_iter()
-        .map(|x| DonationPlatformQueryData {
-            short: x.short,
-            name: x.name,
-        })
+        .map(|x| LinkPlatformQueryData { name: x.name })
         .collect();
     Ok(HttpResponse::Ok().json(results))
 }

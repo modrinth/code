@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use super::ids::{Base62Id, OrganizationId};
 use super::teams::TeamId;
 use super::users::UserId;
-use crate::database::models::project_item::QueryProject;
+use crate::database::models::project_item::{LinkUrl, QueryProject};
 use crate::database::models::version_item::QueryVersion;
 use crate::models::threads::ThreadId;
 use chrono::{DateTime, Utc};
@@ -87,16 +87,9 @@ pub struct Project {
     pub versions: Vec<VersionId>,
     /// The URL of the icon of the project
     pub icon_url: Option<String>,
-    /// An optional link to where to submit bugs or issues with the project.
-    pub issues_url: Option<String>,
-    /// An optional link to the source code for the project.
-    pub source_url: Option<String>,
-    /// An optional link to the project's wiki page or other relevant information.
-    pub wiki_url: Option<String>,
-    /// An optional link to the project's discord
-    pub discord_url: Option<String>,
-    /// An optional list of all donation links the project has
-    pub donation_urls: Option<Vec<DonationLink>>,
+
+    /// A collection of links to the project's various pages.
+    pub link_urls: HashMap<String, Link>,
 
     /// A string of URLs to visual content featuring the project
     pub gallery: Vec<GalleryItem>,
@@ -206,20 +199,11 @@ impl From<QueryProject> for Project {
             loaders: m.loaders,
             versions: data.versions.into_iter().map(|v| v.into()).collect(),
             icon_url: m.icon_url,
-            issues_url: m.issues_url,
-            source_url: m.source_url,
-            wiki_url: m.wiki_url,
-            discord_url: m.discord_url,
-            donation_urls: Some(
-                data.donation_urls
-                    .into_iter()
-                    .map(|d| DonationLink {
-                        id: d.platform_short,
-                        platform: d.platform_name,
-                        url: d.url,
-                    })
-                    .collect(),
-            ),
+            link_urls: data
+                .urls
+                .into_iter()
+                .map(|d| (d.platform_name.clone(), Link::from(d)))
+                .collect(),
             gallery: data
                 .gallery_items
                 .into_iter()
@@ -266,14 +250,23 @@ pub struct License {
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone, Eq, PartialEq)]
-pub struct DonationLink {
-    pub id: String,
+pub struct Link {
     pub platform: String,
+    pub donation: bool,
     #[validate(
         custom(function = "crate::util::validate::validate_url"),
         length(max = 2048)
     )]
     pub url: String,
+}
+impl From<LinkUrl> for Link {
+    fn from(data: LinkUrl) -> Self {
+        Self {
+            platform: data.platform_name,
+            donation: data.donation,
+            url: data.url,
+        }
+    }
 }
 
 /// A status decides the visibility of a project in search, URLs, and the whole site itself.

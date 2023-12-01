@@ -1,21 +1,22 @@
+use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::projects::{
-    DonationLink, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
+    Link, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
 };
-use crate::models::v2::projects::{LegacyProject, LegacySideType};
+use crate::models::v2::projects::{DonationLink, LegacyProject, LegacySideType};
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{v2_reroute, v3, ApiError};
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
-
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -360,18 +361,78 @@ pub async fn project_edit(
     // - change the loaders to mrpack only
     // - add categories to the project for the corresponding loaders
 
+    let mut new_links = HashMap::new();
+    if let Some(issues_url) = v2_new_project.issues_url {
+        if let Some(issues_url) = issues_url {
+            new_links.insert("issues".to_string(), Some(issues_url));
+        } else {
+            new_links.insert("issues".to_string(), None);
+        }
+    }
+
+    if let Some(source_url) = v2_new_project.source_url {
+        if let Some(source_url) = source_url {
+            new_links.insert("source".to_string(), Some(source_url));
+        } else {
+            new_links.insert("source".to_string(), None);
+        }
+    }
+
+    if let Some(wiki_url) = v2_new_project.wiki_url {
+        if let Some(wiki_url) = wiki_url {
+            new_links.insert("wiki".to_string(), Some(wiki_url));
+        } else {
+            new_links.insert("wiki".to_string(), None);
+        }
+    }
+
+    if let Some(discord_url) = v2_new_project.discord_url {
+        if let Some(discord_url) = discord_url {
+            new_links.insert("discord".to_string(), Some(discord_url));
+        } else {
+            new_links.insert("discord".to_string(), None);
+        }
+    }
+
+    // In v2, setting donation links resets all other donation links
+    // (resetting to the new ones)
+    if let Some(donation_urls) = v2_new_project.donation_urls {
+        // Fetch current donation links from project so we know what to delete
+        let fetched_example_project = project_item::Project::get(&info.0, &**pool, &redis).await?;
+        let donation_links = fetched_example_project
+            .map(|x| {
+                x.urls
+                    .into_iter()
+                    .filter_map(|l| {
+                        if l.donation {
+                            Some(Link::from(l)) // TODO: tests
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default();
+
+        // Set existing donation links to None
+        for old_link in donation_links {
+            new_links.insert(old_link.platform, None);
+        }
+
+        // Add new donation links
+        for donation_url in donation_urls {
+            new_links.insert(donation_url.id, Some(donation_url.url));
+        }
+    }
+
     let new_project = v3::projects::EditProject {
         title: v2_new_project.title,
         description: v2_new_project.description,
         body: v2_new_project.body,
         categories: v2_new_project.categories,
         additional_categories: v2_new_project.additional_categories,
-        issues_url: v2_new_project.issues_url,
-        source_url: v2_new_project.source_url,
-        wiki_url: v2_new_project.wiki_url,
         license_url: v2_new_project.license_url,
-        discord_url: v2_new_project.discord_url,
-        donation_urls: v2_new_project.donation_urls,
+        link_urls: Some(new_links),
         license_id: v2_new_project.license_id,
         slug: v2_new_project.slug,
         status: v2_new_project.status,
@@ -500,6 +561,70 @@ pub async fn projects_edit(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let bulk_edit_project = bulk_edit_project.into_inner();
+
+    let mut link_urls = HashMap::new();
+
+    // If we are *setting* donation links, we will set every possible donation link to None, as
+    // setting will delete all of them then 're-add' the ones we want to keep
+    if let Some(donation_url) = bulk_edit_project.donation_urls {
+        let link_platforms = LinkPlatform::list(&**pool, &redis).await?;
+        for link in link_platforms {
+            if link.donation {
+                link_urls.insert(link.name, None);
+            }
+        }
+        // add
+        for donation_url in donation_url {
+            link_urls.insert(donation_url.id, Some(donation_url.url));
+        }
+    }
+
+    // For every delete, we will set the link to None
+    if let Some(donation_url) = bulk_edit_project.remove_donation_urls {
+        for donation_url in donation_url {
+            link_urls.insert(donation_url.id, None);
+        }
+    }
+
+    // For every add, we will set the link to the new url
+    if let Some(donation_url) = bulk_edit_project.add_donation_urls {
+        for donation_url in donation_url {
+            link_urls.insert(donation_url.id, Some(donation_url.url));
+        }
+    }
+
+    if let Some(issue_url) = bulk_edit_project.issues_url {
+        if let Some(issue_url) = issue_url {
+            link_urls.insert("issues".to_string(), Some(issue_url));
+        } else {
+            link_urls.insert("issues".to_string(), None);
+        }
+    }
+
+    if let Some(source_url) = bulk_edit_project.source_url {
+        if let Some(source_url) = source_url {
+            link_urls.insert("source".to_string(), Some(source_url));
+        } else {
+            link_urls.insert("source".to_string(), None);
+        }
+    }
+
+    if let Some(wiki_url) = bulk_edit_project.wiki_url {
+        if let Some(wiki_url) = wiki_url {
+            link_urls.insert("wiki".to_string(), Some(wiki_url));
+        } else {
+            link_urls.insert("wiki".to_string(), None);
+        }
+    }
+
+    if let Some(discord_url) = bulk_edit_project.discord_url {
+        if let Some(discord_url) = discord_url {
+            link_urls.insert("discord".to_string(), Some(discord_url));
+        } else {
+            link_urls.insert("discord".to_string(), None);
+        }
+    }
+
     v3::projects::projects_edit(
         req,
         web::Query(ids),
@@ -511,13 +636,7 @@ pub async fn projects_edit(
             additional_categories: bulk_edit_project.additional_categories,
             add_additional_categories: bulk_edit_project.add_additional_categories,
             remove_additional_categories: bulk_edit_project.remove_additional_categories,
-            donation_urls: bulk_edit_project.donation_urls,
-            add_donation_urls: bulk_edit_project.add_donation_urls,
-            remove_donation_urls: bulk_edit_project.remove_donation_urls,
-            issues_url: bulk_edit_project.issues_url,
-            source_url: bulk_edit_project.source_url,
-            wiki_url: bulk_edit_project.wiki_url,
-            discord_url: bulk_edit_project.discord_url,
+            link_urls: Some(link_urls),
         }),
         redis,
         session_queue,

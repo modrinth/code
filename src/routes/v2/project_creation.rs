@@ -3,8 +3,8 @@ use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::ImageId;
-use crate::models::projects::{DonationLink, Loader, Project, ProjectStatus};
-use crate::models::v2::projects::{LegacyProject, LegacySideType};
+use crate::models::projects::{Loader, Project, ProjectStatus};
+use crate::models::v2::projects::{DonationLink, LegacyProject, LegacySideType};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::default_project_type;
 use crate::routes::v3::project_creation::{CreateError, NewGalleryItem};
@@ -193,6 +193,25 @@ pub async fn project_create(
                 })
                 .collect();
 
+            let mut link_urls = HashMap::new();
+            if let Some(issue_url) = legacy_create.issues_url {
+                link_urls.insert("issues".to_string(), issue_url);
+            }
+            if let Some(source_url) = legacy_create.source_url {
+                link_urls.insert("source".to_string(), source_url);
+            }
+            if let Some(wiki_url) = legacy_create.wiki_url {
+                link_urls.insert("wiki".to_string(), wiki_url);
+            }
+            if let Some(discord_url) = legacy_create.discord_url {
+                link_urls.insert("discord".to_string(), discord_url);
+            }
+            if let Some(donation_urls) = legacy_create.donation_urls {
+                for donation_url in donation_urls {
+                    link_urls.insert(donation_url.platform, donation_url.url);
+                }
+            }
+
             Ok(v3::project_creation::ProjectCreateData {
                 title: legacy_create.title,
                 slug: legacy_create.slug,
@@ -201,12 +220,8 @@ pub async fn project_create(
                 initial_versions,
                 categories: legacy_create.categories,
                 additional_categories: legacy_create.additional_categories,
-                issues_url: legacy_create.issues_url,
-                source_url: legacy_create.source_url,
-                wiki_url: legacy_create.wiki_url,
                 license_url: legacy_create.license_url,
-                discord_url: legacy_create.discord_url,
-                donation_urls: legacy_create.donation_urls,
+                link_urls,
                 is_draft: legacy_create.is_draft,
                 license_id: legacy_create.license_id,
                 gallery_items: legacy_create.gallery_items,

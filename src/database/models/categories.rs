@@ -29,10 +29,10 @@ pub struct ReportType {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct DonationPlatform {
-    pub id: DonationPlatformId,
-    pub short: String,
+pub struct LinkPlatform {
+    pub id: LinkPlatformId,
     pub name: String,
+    pub donation: bool,
 }
 
 impl Category {
@@ -129,38 +129,32 @@ impl Category {
     }
 }
 
-impl DonationPlatform {
-    pub async fn get_id<'a, E>(
-        id: &str,
-        exec: E,
-    ) -> Result<Option<DonationPlatformId>, DatabaseError>
+impl LinkPlatform {
+    pub async fn get_id<'a, E>(id: &str, exec: E) -> Result<Option<LinkPlatformId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
-            SELECT id FROM donation_platforms
-            WHERE short = $1
+            SELECT id FROM link_platforms
+            WHERE name = $1
             ",
             id
         )
         .fetch_optional(exec)
         .await?;
 
-        Ok(result.map(|r| DonationPlatformId(r.id)))
+        Ok(result.map(|r| LinkPlatformId(r.id)))
     }
 
-    pub async fn list<'a, E>(
-        exec: E,
-        redis: &RedisPool,
-    ) -> Result<Vec<DonationPlatform>, DatabaseError>
+    pub async fn list<'a, E>(exec: E, redis: &RedisPool) -> Result<Vec<LinkPlatform>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let mut redis = redis.connect().await?;
 
-        let res: Option<Vec<DonationPlatform>> = redis
-            .get_deserialized_from_json(TAGS_NAMESPACE, "donation_platform")
+        let res: Option<Vec<LinkPlatform>> = redis
+            .get_deserialized_from_json(TAGS_NAMESPACE, "link_platform")
             .await?;
 
         if let Some(res) = res {
@@ -169,22 +163,22 @@ impl DonationPlatform {
 
         let result = sqlx::query!(
             "
-            SELECT id, short, name FROM donation_platforms
+            SELECT id, name, donation FROM link_platforms
             "
         )
         .fetch_many(exec)
         .try_filter_map(|e| async {
-            Ok(e.right().map(|c| DonationPlatform {
-                id: DonationPlatformId(c.id),
-                short: c.short,
+            Ok(e.right().map(|c| LinkPlatform {
+                id: LinkPlatformId(c.id),
                 name: c.name,
+                donation: c.donation,
             }))
         })
-        .try_collect::<Vec<DonationPlatform>>()
+        .try_collect::<Vec<LinkPlatform>>()
         .await?;
 
         redis
-            .set_serialized_to_json(TAGS_NAMESPACE, "donation_platform", &result, None)
+            .set_serialized_to_json(TAGS_NAMESPACE, "link_platform", &result, None)
             .await?;
 
         Ok(result)

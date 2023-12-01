@@ -10,7 +10,7 @@ use crate::models::ids::{ImageId, OrganizationId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
 use crate::models::projects::{
-    DonationLink, License, MonetizationStatus, ProjectId, ProjectStatus, VersionId, VersionStatus,
+    License, Link, MonetizationStatus, ProjectId, ProjectStatus, VersionId, VersionStatus,
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::ThreadType;
@@ -187,39 +187,12 @@ pub struct ProjectCreateData {
     /// A list of the categories that the project is in.
     pub additional_categories: Vec<String>,
 
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    /// An optional link to where to submit bugs or issues with the project.
-    pub issues_url: Option<String>,
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    /// An optional link to the source code for the project.
-    pub source_url: Option<String>,
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    /// An optional link to the project's wiki page or other relevant information.
-    pub wiki_url: Option<String>,
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
     /// An optional link to the project's license page
     pub license_url: Option<String>,
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 2048)
-    )]
-    /// An optional link to the project's discord.
-    pub discord_url: Option<String>,
-    /// An optional list of all donation links the project has\
-    #[validate]
-    pub donation_urls: Option<Vec<DonationLink>>,
+    /// An optional list of all donation links the project has
+    #[validate(custom(function = "crate::util::validate::validate_url_hashmap_values"))]
+    #[serde(default)]
+    pub link_urls: HashMap<String, String>,
 
     /// An optional boolean. If true, the project will be created as a draft.
     pub is_draft: Option<bool>,
@@ -671,27 +644,35 @@ async fn project_create_inner(
                 CreateError::InvalidInput(format!("Invalid SPDX license identifier: {err}"))
             })?;
 
-        let mut donation_urls = vec![];
+        let mut link_urls = vec![];
 
-        if let Some(urls) = &project_create_data.donation_urls {
-            for url in urls {
-                let platform_id =
-                    models::categories::DonationPlatform::get_id(&url.id, &mut **transaction)
-                        .await?
-                        .ok_or_else(|| {
-                            CreateError::InvalidInput(format!(
-                                "Donation platform {} does not exist.",
-                                url.id.clone()
-                            ))
-                        })?;
-
-                donation_urls.push(models::project_item::DonationUrl {
-                    platform_id,
-                    platform_short: "".to_string(),
-                    platform_name: "".to_string(),
-                    url: url.url.clone(),
-                })
-            }
+        let link_platforms =
+            models::categories::LinkPlatform::list(&mut **transaction, redis).await?;
+        for (platform, url) in &project_create_data.link_urls {
+            let platform_id =
+                models::categories::LinkPlatform::get_id(platform, &mut **transaction)
+                    .await?
+                    .ok_or_else(|| {
+                        CreateError::InvalidInput(format!(
+                            "Link platform {} does not exist.",
+                            platform.clone()
+                        ))
+                    })?;
+            let link_platform = link_platforms
+                .iter()
+                .find(|x| x.id == platform_id)
+                .ok_or_else(|| {
+                    CreateError::InvalidInput(format!(
+                        "Link platform {} does not exist.",
+                        platform.clone()
+                    ))
+                })?;
+            link_urls.push(models::project_item::LinkUrl {
+                platform_id,
+                platform_name: link_platform.name.clone(),
+                url: url.clone(),
+                donation: link_platform.donation,
+            })
         }
 
         let project_builder_actual = models::project_item::ProjectBuilder {
@@ -702,12 +683,8 @@ async fn project_create_inner(
             description: project_create_data.description,
             body: project_create_data.body,
             icon_url: icon_data.clone().map(|x| x.0),
-            issues_url: project_create_data.issues_url,
-            source_url: project_create_data.source_url,
-            wiki_url: project_create_data.wiki_url,
 
             license_url: project_create_data.license_url,
-            discord_url: project_create_data.discord_url,
             categories,
             additional_categories,
             initial_versions: versions,
@@ -715,7 +692,7 @@ async fn project_create_inner(
             requested_status: Some(project_create_data.requested_status),
             license: license_id.to_string(),
             slug: Some(project_create_data.slug),
-            donation_urls,
+            link_urls,
             gallery_items: gallery_urls
                 .iter()
                 .map(|x| models::project_item::GalleryItem {
@@ -835,11 +812,12 @@ async fn project_create_inner(
                 .map(|v| v.version_id.into())
                 .collect::<Vec<_>>(),
             icon_url: project_builder.icon_url.clone(),
-            issues_url: project_builder.issues_url.clone(),
-            source_url: project_builder.source_url.clone(),
-            wiki_url: project_builder.wiki_url.clone(),
-            discord_url: project_builder.discord_url.clone(),
-            donation_urls: project_create_data.donation_urls.clone(),
+            link_urls: project_builder
+                .link_urls
+                .clone()
+                .into_iter()
+                .map(|x| (x.platform_name.clone(), Link::from(x)))
+                .collect(),
             gallery: gallery_urls,
             color: project_builder.color,
             thread_id: thread_id.into(),

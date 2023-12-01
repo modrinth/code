@@ -223,9 +223,9 @@ pub struct SideTypeId(pub i32);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct GameId(pub i32);
-#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[sqlx(transparent)]
-pub struct DonationPlatformId(pub i32);
+pub struct LinkPlatformId(pub i32);
 
 #[derive(
     Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Serialize, Deserialize, PartialOrd, Ord,

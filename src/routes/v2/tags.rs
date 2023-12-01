@@ -4,7 +4,9 @@ use super::ApiError;
 use crate::database::models::loader_fields::LoaderFieldEnumValue;
 use crate::database::redis::RedisPool;
 use crate::models::v2::projects::LegacySideType;
-use crate::routes::v3::tags::{LoaderData as LoaderDataV3, LoaderFieldsEnumQuery};
+use crate::routes::v3::tags::{
+    LinkPlatformQueryData, LoaderData as LoaderDataV3, LoaderFieldsEnumQuery,
+};
 use crate::routes::{v2_reroute, v3};
 use actix_web::{get, web, HttpResponse};
 use chrono::{DateTime, Utc};
@@ -164,8 +166,10 @@ pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, 
 
 #[derive(serde::Serialize)]
 pub struct DonationPlatformQueryData {
-    short: String,
-    name: String,
+    // The difference between name and short is removed in v3.
+    // Now, the 'id' becomes the name, and the 'name' is removed (the frontend uses the id as the name)
+    // pub short: String,
+    pub name: String,
 }
 
 #[get("donation_platform")]
@@ -173,7 +177,21 @@ pub async fn donation_platform_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::tags::donation_platform_list(pool, redis).await
+    let response = v3::tags::link_platform_list(pool, redis).await?;
+
+    // Convert to V2 format
+    Ok(
+        match v2_reroute::extract_ok_json::<Vec<LinkPlatformQueryData>>(response).await {
+            Ok(platforms) => {
+                let platforms = platforms
+                    .into_iter()
+                    .map(|p| DonationPlatformQueryData { name: p.name })
+                    .collect::<Vec<_>>();
+                HttpResponse::Ok().json(platforms)
+            }
+            Err(response) => response,
+        },
+    )
 }
 
 #[get("report_type")]

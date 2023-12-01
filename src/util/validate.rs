@@ -93,6 +93,26 @@ pub fn validate_url(value: &str) -> Result<(), validator::ValidationError> {
     Ok(())
 }
 
+pub fn validate_url_hashmap_optional_values(
+    values: &std::collections::HashMap<String, Option<String>>,
+) -> Result<(), validator::ValidationError> {
+    for value in values.values().flatten() {
+        validate_url(value)?;
+    }
+
+    Ok(())
+}
+
+pub fn validate_url_hashmap_values(
+    values: &std::collections::HashMap<String, String>,
+) -> Result<(), validator::ValidationError> {
+    for value in values.values() {
+        validate_url(value)?;
+    }
+
+    Ok(())
+}
+
 pub fn validate_no_restricted_scopes(value: &Scopes) -> Result<(), validator::ValidationError> {
     if value.is_restricted() {
         return Err(validator::ValidationError::new(
