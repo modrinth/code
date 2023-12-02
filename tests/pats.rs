@@ -62,7 +62,7 @@ pub async fn pat_full_test() {
                     .uri("/v3/collection")
                     .append_header(("Authorization", token))
                     .set_json(json!({
-                        "title": "Test Collection 1",
+                        "name": "Test Collection 1",
                         "description": "Test Collection Description"
                     }))
                     .to_request();

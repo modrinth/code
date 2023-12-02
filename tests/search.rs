@@ -96,7 +96,7 @@ async fn search_projects() {
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..2] },
             { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
-            { "op": "add", "path": "/title", "value": "Mysterious Project" },
+            { "op": "add", "path": "/name", "value": "Mysterious Project" },
         ]))
         .unwrap();
         project_creation_futures.push(create_async_future(
@@ -112,7 +112,7 @@ async fn search_projects() {
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[0..3] },
             { "op": "add", "path": "/initial_versions/0/server_only", "value": true },
             { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.4"] },
-            { "op": "add", "path": "/title", "value": "Mysterious Project" },
+            { "op": "add", "path": "/name", "value": "Mysterious Project" },
             { "op": "add", "path": "/license_id", "value": "LicenseRef-All-Rights-Reserved" },
         ]))
         .unwrap();
@@ -240,7 +240,7 @@ async fn search_projects() {
             (json!([["server_only:true"]]), vec![0, 2, 3, 6, 7]),
             (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7]),
             (json!([["license:MIT"]]), vec![1, 2, 4]),
-            (json!([[r#"title:'Mysterious Project'"#]]), vec![2, 3]),
+            (json!([[r#"name:'Mysterious Project'"#]]), vec![2, 3]),
             (json!([["author:user"]]), vec![0, 1, 2, 4, 5, 7]),
             (json!([["game_versions:1.20.5"]]), vec![4, 5]),
             // bug fix

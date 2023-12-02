@@ -263,7 +263,7 @@ pub async fn thread_get(
             return Ok(HttpResponse::Ok().json(Thread::from(data, users, &user)));
         }
     }
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[derive(Deserialize)]
@@ -371,7 +371,7 @@ pub async fn thread_send_message(
 
     if let Some(thread) = result {
         if !is_authorized_thread(&thread, &user, &pool).await? {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
 
         let mut transaction = pool.begin().await?;
@@ -499,7 +499,7 @@ pub async fn thread_send_message(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -616,6 +616,6 @@ pub async fn message_delete(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }

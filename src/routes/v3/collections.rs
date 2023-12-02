@@ -43,7 +43,7 @@ pub struct CollectionCreateData {
         custom(function = "crate::util::validate::validate_name")
     )]
     /// The title or name of the project.
-    pub title: String,
+    pub name: String,
     #[validate(length(min = 3, max = 255))]
     /// A short description of the collection.
     pub description: String,
@@ -94,7 +94,7 @@ pub async fn collection_create(
     let collection_builder_actual = collection_item::CollectionBuilder {
         collection_id: collection_id.into(),
         user_id: current_user.id.into(),
-        title: collection_create_data.title,
+        name: collection_create_data.name,
         description: collection_create_data.description,
         status: CollectionStatus::Listed,
         projects: initial_project_ids
@@ -111,7 +111,7 @@ pub async fn collection_create(
     let response = crate::models::collections::Collection {
         id: collection_id,
         user: collection_builder.user_id.into(),
-        title: collection_builder.title.clone(),
+        name: collection_builder.name.clone(),
         description: collection_builder.description.clone(),
         created: now,
         updated: now,
@@ -187,7 +187,7 @@ pub async fn collection_get(
             return Ok(HttpResponse::Ok().json(Collection::from(data)));
         }
     }
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[derive(Deserialize, Validate)]
@@ -196,7 +196,7 @@ pub struct EditCollection {
         length(min = 3, max = 64),
         custom(function = "crate::util::validate::validate_name")
     )]
-    pub title: Option<String>,
+    pub name: Option<String>,
     #[validate(length(min = 3, max = 256))]
     pub description: Option<String>,
     pub status: Option<CollectionStatus>,
@@ -239,14 +239,14 @@ pub async fn collection_edit(
 
         let mut transaction = pool.begin().await?;
 
-        if let Some(title) = &new_collection.title {
+        if let Some(name) = &new_collection.name {
             sqlx::query!(
                 "
                 UPDATE collections
-                SET title = $1
+                SET name = $1
                 WHERE (id = $2)
                 ",
-                title.trim(),
+                name.trim(),
                 id as database::models::ids::CollectionId,
             )
             .execute(&mut *transaction)
@@ -335,7 +335,7 @@ pub async fn collection_edit(
         transaction.commit().await?;
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -526,7 +526,7 @@ pub async fn collection_delete(
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 

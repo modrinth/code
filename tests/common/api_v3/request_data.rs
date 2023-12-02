@@ -1,29 +1,14 @@
 #![allow(dead_code)]
 use serde_json::json;
 
-use crate::common::dummy_data::{DummyImage, TestFile};
+use crate::common::{
+    api_common::request_data::{ImageData, ProjectCreationRequestData, VersionCreationRequestData},
+    dummy_data::{DummyImage, TestFile},
+};
 use labrinth::{
     models::projects::ProjectId,
     util::actix::{MultipartSegment, MultipartSegmentData},
 };
-
-pub struct ProjectCreationRequestData {
-    pub slug: String,
-    pub jar: Option<TestFile>,
-    pub segment_data: Vec<MultipartSegment>,
-}
-
-pub struct VersionCreationRequestData {
-    pub version: String,
-    pub jar: Option<TestFile>,
-    pub segment_data: Vec<MultipartSegment>,
-}
-
-pub struct ImageData {
-    pub filename: String,
-    pub extension: String,
-    pub icon: Vec<u8>,
-}
 
 pub fn get_public_project_creation_data(
     slug: &str,
@@ -110,10 +95,10 @@ pub fn get_public_project_creation_data_json(
     let is_draft = version_jar.is_none();
     json!(
         {
-            "title": format!("Test Project {slug}"),
+            "name": format!("Test Project {slug}"),
             "slug": slug,
-            "description": "A dummy project for testing with.",
-            "body": "This project is approved, and versions are listed.",
+            "summary": "A dummy project for testing with.",
+            "description": "This project is approved, and versions are listed.",
             "initial_versions": initial_versions,
             "is_draft": is_draft,
             "categories": [],

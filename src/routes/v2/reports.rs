@@ -2,7 +2,7 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
 use crate::models::reports::ItemType;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v3, ApiError};
+use crate::routes::{v2_reroute, v3, ApiError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -37,7 +37,9 @@ pub async fn report_create(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::report_create(req, pool, body, redis, session_queue).await
+    v3::reports::report_create(req, pool, body, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Deserialize)]
@@ -74,6 +76,7 @@ pub async fn reports(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Deserialize)]
@@ -97,6 +100,7 @@ pub async fn reports_get(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[get("report/{id}")]
@@ -107,7 +111,9 @@ pub async fn report_get(
     info: web::Path<(crate::models::reports::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::report_get(req, pool, redis, info, session_queue).await
+    v3::reports::report_get(req, pool, redis, info, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Deserialize, Validate)]
@@ -139,6 +145,7 @@ pub async fn report_edit(
         }),
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[delete("report/{id}")]
@@ -149,5 +156,7 @@ pub async fn report_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::report_delete(req, pool, info, redis, session_queue).await
+    v3::reports::report_delete(req, pool, info, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }

@@ -83,7 +83,7 @@ pub async fn projects_list(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -143,7 +143,7 @@ pub async fn user_get(
         let response: crate::models::users::User = data.into();
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -186,7 +186,7 @@ pub async fn collections_list(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -268,7 +268,7 @@ pub async fn orgs_list(
 
         Ok(HttpResponse::Ok().json(organizations))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -458,7 +458,7 @@ pub async fn user_edit(
             ))
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -536,7 +536,7 @@ pub async fn user_icon_edit(
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Ok(HttpResponse::NotFound().body(""))
+            Err(ApiError::NotFound)
         }
     } else {
         Err(ApiError::InvalidInput(format!(
@@ -597,10 +597,10 @@ pub async fn user_delete(
         if result.is_some() {
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Ok(HttpResponse::NotFound().body(""))
+            Err(ApiError::NotFound)
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -655,7 +655,7 @@ pub async fn user_follows(
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -696,6 +696,6 @@ pub async fn user_notifications(
         notifications.sort_by(|a, b| b.created.cmp(&a.created));
         Ok(HttpResponse::Ok().json(notifications))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }

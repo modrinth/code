@@ -20,7 +20,7 @@ pub struct Collection {
     /// The person that has ownership of this collection.
     pub user: UserId,
     /// The title or name of the collection.
-    pub title: String,
+    pub name: String,
     /// A short description of the collection.
     pub description: String,
 
@@ -48,7 +48,7 @@ impl From<database::models::Collection> for Collection {
             id: c.id.into(),
             user: c.user_id.into(),
             created: c.created,
-            title: c.title,
+            name: c.name,
             description: c.description,
             updated: c.updated,
             projects: c.projects.into_iter().map(|x| x.into()).collect(),

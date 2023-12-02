@@ -85,7 +85,7 @@ pub async fn send_discord_webhook(
     let row =
         sqlx::query!(
             "
-            SELECT m.id id, m.title title, m.description description, m.color color,
+            SELECT m.id id, m.name name, m.description description, m.color color,
             m.icon_url icon_url, m.slug slug,
             u.username username, u.avatar_url avatar_url,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
@@ -136,7 +136,7 @@ pub async fn send_discord_webhook(
             LEFT JOIN loaders_project_types_games lptg ON lptg.loader_id = lo.id AND lptg.project_type_id = pt.id
             LEFT JOIN games g ON lptg.game_id = g.id
             LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.is_owner = TRUE AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
             LEFT OUTER JOIN version_fields vf on v.id = vf.version_id
             LEFT OUTER JOIN loader_fields lf on vf.field_id = lf.id
@@ -147,7 +147,6 @@ pub async fn send_discord_webhook(
             ",
             project_id.0 as i64,
             &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
-            crate::models::teams::OWNER_ROLE,
         )
         .fetch_optional(pool)
         .await?;
@@ -279,7 +278,7 @@ pub async fn send_discord_webhook(
                 project_type,
                 project.slug.unwrap_or_else(|| project_id.to_string())
             ),
-            title: project.title,
+            title: project.name, // Do not change DiscordEmbed
             description: project.description,
             timestamp: Utc::now(),
             color: project.color.unwrap_or(0x1bd96a) as u32,

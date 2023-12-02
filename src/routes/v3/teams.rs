@@ -59,7 +59,7 @@ pub async fn team_members_get_project(
         .ok();
 
         if !is_authorized(&project.inner, &current_user, &pool).await? {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
         let mut members_data =
             TeamMember::get_from_team_full(project.inner.team_id, &**pool, &redis).await?;
@@ -110,7 +110,7 @@ pub async fn team_members_get_project(
             .collect();
         Ok(HttpResponse::Ok().json(team_members))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -174,7 +174,7 @@ pub async fn team_members_get_organization(
 
         Ok(HttpResponse::Ok().json(team_members))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -343,6 +343,7 @@ pub async fn join_team(
             Some(true),
             None,
             None,
+            None,
             &mut transaction,
         )
         .await?;
@@ -474,12 +475,6 @@ pub async fn add_team_member(
         }
     }
 
-    if new_member.role == crate::models::teams::OWNER_ROLE {
-        return Err(ApiError::InvalidInput(
-            "The `Owner` role is restricted to one person".to_string(),
-        ));
-    }
-
     if new_member.payouts_split < Decimal::ZERO || new_member.payouts_split > Decimal::from(5000) {
         return Err(ApiError::InvalidInput(
             "Payouts split must be between 0 and 5000!".to_string(),
@@ -510,6 +505,7 @@ pub async fn add_team_member(
         team_id,
         user_id: new_member.user_id.into(),
         role: new_member.role.clone(),
+        is_owner: false, // Cannot just create an owner
         permissions: new_member.permissions,
         organization_permissions: new_member.organization_permissions,
         accepted: false,
@@ -598,11 +594,9 @@ pub async fn edit_team_member(
 
     let mut transaction = pool.begin().await?;
 
-    if &*edit_member_db.role == crate::models::teams::OWNER_ROLE
-        && (edit_member.role.is_some() || edit_member.permissions.is_some())
-    {
+    if edit_member_db.is_owner && edit_member.permissions.is_some() {
         return Err(ApiError::InvalidInput(
-            "The owner's permission and role of a team cannot be edited".to_string(),
+            "The owner's permission's in a team cannot be edited".to_string(),
         ));
     }
 
@@ -683,12 +677,6 @@ pub async fn edit_team_member(
         }
     }
 
-    if edit_member.role.as_deref() == Some(crate::models::teams::OWNER_ROLE) {
-        return Err(ApiError::InvalidInput(
-            "The `Owner` role is restricted to one person".to_string(),
-        ));
-    }
-
     TeamMember::edit_team_member(
         id,
         user_id,
@@ -698,6 +686,7 @@ pub async fn edit_team_member(
         None,
         edit_member.payouts_split,
         edit_member.ordering,
+        None,
         &mut transaction,
     )
     .await?;
@@ -758,7 +747,7 @@ pub async fn transfer_ownership(
                 )
             })?;
 
-        if member.role != crate::models::teams::OWNER_ROLE {
+        if !member.is_owner {
             return Err(ApiError::CustomAuthentication(
                 "You don't have permission to edit the ownership of this team".to_string(),
             ));
@@ -779,15 +768,17 @@ pub async fn transfer_ownership(
 
     let mut transaction = pool.begin().await?;
 
+    // The following are the only places new_is_owner is modified.
     TeamMember::edit_team_member(
         id.into(),
         current_user.id.into(),
         None,
         None,
-        Some(crate::models::teams::DEFAULT_ROLE.to_string()),
         None,
         None,
         None,
+        None,
+        Some(false),
         &mut transaction,
     )
     .await?;
@@ -797,10 +788,11 @@ pub async fn transfer_ownership(
         new_owner.user_id.into(),
         Some(ProjectPermissions::all()),
         Some(OrganizationPermissions::all()),
-        Some(crate::models::teams::OWNER_ROLE.to_string()),
         None,
         None,
         None,
+        None,
+        Some(true),
         &mut transaction,
     )
     .await?;
@@ -841,7 +833,7 @@ pub async fn remove_team_member(
     let delete_member = TeamMember::get_from_user_id_pending(id, user_id, &**pool).await?;
 
     if let Some(delete_member) = delete_member {
-        if delete_member.role == crate::models::teams::OWNER_ROLE {
+        if delete_member.is_owner {
             // The owner cannot be removed from a team
             return Err(ApiError::CustomAuthentication(
                 "The owner can't be removed from a team".to_string(),
@@ -939,6 +931,6 @@ pub async fn remove_team_member(
         transaction.commit().await?;
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }

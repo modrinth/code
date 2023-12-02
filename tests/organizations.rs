@@ -65,13 +65,13 @@ async fn create_organization() {
         let theta = api
             .get_organization_deserialized("theta", USER_USER_PAT)
             .await;
-        assert_eq!(theta.title, "theta");
+        assert_eq!(theta.name, "theta");
         assert_eq!(theta.description, "not url safe%&^!#$##!@#$%^&");
         assert_eq!(resp.status(), 200);
 
         // Get created team
         let members = api
-            .get_organization_members_deserialized_common("theta", USER_USER_PAT)
+            .get_organization_members_deserialized("theta", USER_USER_PAT)
             .await;
 
         // Should only be one member, which is USER_USER_ID, and is the owner with full permissions
@@ -81,6 +81,7 @@ async fn create_organization() {
             Some(OrganizationPermissions::all())
         );
         assert_eq!(members[0].role, "Owner");
+        assert!(members[0].is_owner);
     })
     .await;
 }
@@ -118,7 +119,7 @@ async fn patch_organization() {
                 .edit_organization(
                     zeta_organization_id,
                     json!({
-                        "title": title,
+                        "name": title,
                         "description": "theta_description"
                     }),
                     USER_USER_PAT,
@@ -148,7 +149,7 @@ async fn patch_organization() {
             .edit_organization(
                 zeta_organization_id,
                 json!({
-                    "title": "new_title",
+                    "name": "new_title",
                     "description": "not url safe%&^!#$##!@#$%^&" // not-URL-safe description should still work
                 }),
                 USER_USER_PAT,
@@ -160,7 +161,7 @@ async fn patch_organization() {
         let new_title = api
             .get_organization_deserialized("new_title", USER_USER_PAT)
             .await;
-        assert_eq!(new_title.title, "new_title");
+        assert_eq!(new_title.name, "new_title");
         assert_eq!(new_title.description, "not url safe%&^!#$##!@#$%^&");
     })
     .await;
@@ -297,7 +298,7 @@ async fn permissions_patch_organization() {
         // For each permission covered by EDIT_DETAILS, ensure the permission is required
         let edit_details = OrganizationPermissions::EDIT_DETAILS;
         let test_pairs = [
-            ("title", json!("")), // generated in the test to not collide slugs
+            ("name", json!("")), // generated in the test to not collide slugs
             ("description", json!("New description")),
         ];
 
@@ -309,7 +310,7 @@ async fn permissions_patch_organization() {
                         ctx.organization_id.unwrap()
                     ))
                     .set_json(json!({
-                        key: if key == "title" {
+                        key: if key == "name" {
                             json!(generate_random_name("randomslug"))
                         } else {
                             value.clone()

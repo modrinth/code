@@ -11,6 +11,7 @@ use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
 
 use super::{
     models::{CommonImageData, CommonProject, CommonVersion},
+    request_data::ProjectCreationRequestData,
     Api, ApiProject, ApiTags, ApiTeams, ApiVersion,
 };
 
@@ -65,6 +66,8 @@ delegate_api_variant!(
     #[async_trait(?Send)]
     impl ApiProject for GenericApi {
         [add_public_project, (CommonProject, Vec<CommonVersion>), slug: &str, version_jar: Option<TestFile>, modify_json: Option<json_patch::Patch>, pat: &str],
+        [get_public_project_creation_data_json, serde_json::Value, slug: &str, version_jar: Option<&TestFile>],
+        [create_project, ServiceResponse, creation_data: ProjectCreationRequestData, pat: &str],
         [remove_project, ServiceResponse, project_slug_or_id: &str, pat: &str],
         [get_project, ServiceResponse, id_or_slug: &str, pat: &str],
         [get_project_deserialized_common, CommonProject, id_or_slug: &str, pat: &str],

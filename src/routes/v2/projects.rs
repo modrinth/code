@@ -102,6 +102,8 @@ pub async fn project_search(
                                         format!("game_versions:{}", val)
                                     } else if facet.starts_with("project_type:") {
                                         format!("project_types:{}", val)
+                                    } else if facet.starts_with("title:") {
+                                        format!("name:{}", val)
                                     } else {
                                         facet.to_string()
                                     }
@@ -143,7 +145,10 @@ pub async fn random_projects_get(
     let count = v3::projects::RandomProjects { count: count.count };
 
     let response =
-        v3::projects::random_projects_get(web::Query(count), pool.clone(), redis.clone()).await?;
+        v3::projects::random_projects_get(web::Query(count), pool.clone(), redis.clone())
+            .await
+            .or_else(v2_reroute::flatten_404_error)
+            .or_else(v2_reroute::flatten_404_error)?;
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
         Ok(project) => {
@@ -170,7 +175,9 @@ pub async fn projects_get(
         redis.clone(),
         session_queue,
     )
-    .await?;
+    .await
+    .or_else(v2_reroute::flatten_404_error)
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
@@ -191,10 +198,11 @@ pub async fn project_get(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Convert V2 data to V3 data
-
     // Call V3 project creation
-    let response =
-        v3::projects::project_get(req, info, pool.clone(), redis.clone(), session_queue).await?;
+    let response = v3::projects::project_get(req, info, pool.clone(), redis.clone(), session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Project>(response).await {
@@ -217,7 +225,10 @@ pub async fn project_get_check(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::projects::project_get_check(info, pool, redis).await
+    v3::projects::project_get_check(info, pool, redis)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize)]
@@ -235,7 +246,10 @@ pub async fn dependency_list(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // TODO: requires V2 conversion and tests, probably
-    v3::projects::dependency_list(req, info, pool, redis, session_queue).await
+    v3::projects::dependency_list(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -426,9 +440,9 @@ pub async fn project_edit(
     }
 
     let new_project = v3::projects::EditProject {
-        title: v2_new_project.title,
-        description: v2_new_project.description,
-        body: v2_new_project.body,
+        name: v2_new_project.title,
+        summary: v2_new_project.description, // Description becomes summary
+        description: v2_new_project.body,    // Body becomes description
         categories: v2_new_project.categories,
         additional_categories: v2_new_project.additional_categories,
         license_url: v2_new_project.license_url,
@@ -453,7 +467,8 @@ pub async fn project_edit(
         redis.clone(),
         session_queue.clone(),
     )
-    .await?;
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // If client and server side were set, we will call
     // the version setting route for each version to set the side types for each of them.
@@ -642,6 +657,7 @@ pub async fn projects_edit(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -672,6 +688,7 @@ pub async fn project_icon_edit(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[delete("{id}/icon")]
@@ -683,7 +700,9 @@ pub async fn delete_project_icon(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::projects::delete_project_icon(req, info, pool, redis, file_host, session_queue).await
+    v3::projects::delete_project_icon(req, info, pool, redis, file_host, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -714,7 +733,7 @@ pub async fn add_gallery_item(
         req,
         web::Query(v3::projects::GalleryCreateQuery {
             featured: item.featured,
-            title: item.title,
+            name: item.title,
             description: item.description,
             ordering: item.ordering,
         }),
@@ -726,6 +745,7 @@ pub async fn add_gallery_item(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -764,7 +784,7 @@ pub async fn edit_gallery_item(
         web::Query(v3::projects::GalleryEditQuery {
             url: item.url,
             featured: item.featured,
-            title: item.title,
+            name: item.title,
             description: item.description,
             ordering: item.ordering,
         }),
@@ -774,6 +794,7 @@ pub async fn edit_gallery_item(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -801,6 +822,7 @@ pub async fn delete_gallery_item(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[delete("{id}")]
@@ -812,7 +834,9 @@ pub async fn project_delete(
     config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::projects::project_delete(req, info, pool, redis, config, session_queue).await
+    v3::projects::project_delete(req, info, pool, redis, config, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[post("{id}/follow")]
@@ -823,7 +847,9 @@ pub async fn project_follow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::projects::project_follow(req, info, pool, redis, session_queue).await
+    v3::projects::project_follow(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[delete("{id}/follow")]
@@ -834,5 +860,7 @@ pub async fn project_unfollow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::projects::project_unfollow(req, info, pool, redis, session_queue).await
+    v3::projects::project_unfollow(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }

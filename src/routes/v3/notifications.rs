@@ -93,10 +93,10 @@ pub async fn notification_get(
         if user.id == data.user_id.into() || user.role.is_admin() {
             Ok(HttpResponse::Ok().json(Notification::from(data)))
         } else {
-            Ok(HttpResponse::NotFound().body(""))
+            Err(ApiError::NotFound)
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -142,7 +142,7 @@ pub async fn notification_read(
             ))
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -188,7 +188,7 @@ pub async fn notification_delete(
             ))
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 

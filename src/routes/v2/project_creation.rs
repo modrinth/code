@@ -213,10 +213,10 @@ pub async fn project_create(
             }
 
             Ok(v3::project_creation::ProjectCreateData {
-                title: legacy_create.title,
+                name: legacy_create.title,
                 slug: legacy_create.slug,
-                description: legacy_create.description,
-                body: legacy_create.body,
+                summary: legacy_create.description, // Description becomes summary
+                description: legacy_create.body,    // Body becomes description
                 initial_versions,
                 categories: legacy_create.categories,
                 additional_categories: legacy_create.additional_categories,

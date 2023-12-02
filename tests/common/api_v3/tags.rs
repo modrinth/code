@@ -3,8 +3,10 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use async_trait::async_trait;
-use labrinth::database::models::loader_fields::LoaderFieldEnumValue;
 use labrinth::routes::v3::tags::{GameData, LoaderData};
+use labrinth::{
+    database::models::loader_fields::LoaderFieldEnumValue, routes::v3::tags::CategoryData,
+};
 
 use crate::common::{
     api_common::{
@@ -29,7 +31,11 @@ impl ApiTags for ApiV3 {
     async fn get_loaders_deserialized_common(&self) -> Vec<CommonLoaderData> {
         let resp = self.get_loaders().await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<LoaderData> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_categories(&self) -> ServiceResponse {
@@ -43,7 +49,11 @@ impl ApiTags for ApiV3 {
     async fn get_categories_deserialized_common(&self) -> Vec<CommonCategoryData> {
         let resp = self.get_categories().await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<CategoryData> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 }
 

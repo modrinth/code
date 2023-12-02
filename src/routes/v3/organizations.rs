@@ -71,7 +71,7 @@ pub async fn organization_projects_get(
         "
         SELECT m.id FROM organizations o
         INNER JOIN mods m ON m.organization_id = o.id
-        WHERE (o.id = $1 AND $1 IS NOT NULL) OR (o.title = $2 AND $2 IS NOT NULL)
+        WHERE (o.id = $1 AND $1 IS NOT NULL) OR (o.name = $2 AND $2 IS NOT NULL)
         ",
         possible_organization_id.map(|x| x as i64),
         info
@@ -95,7 +95,7 @@ pub struct NewOrganization {
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
     // Title of the organization, also used as slug
-    pub title: String,
+    pub name: String,
     #[validate(length(min = 3, max = 256))]
     pub description: String,
 }
@@ -124,13 +124,13 @@ pub async fn organization_create(
     let mut transaction = pool.begin().await?;
 
     // Try title
-    let title_organization_id_option: Option<OrganizationId> =
-        serde_json::from_str(&format!("\"{}\"", new_organization.title)).ok();
+    let name_organization_id_option: Option<OrganizationId> =
+        serde_json::from_str(&format!("\"{}\"", new_organization.name)).ok();
     let mut organization_strings = vec![];
-    if let Some(title_organization_id) = title_organization_id_option {
-        organization_strings.push(title_organization_id.to_string());
+    if let Some(name_organization_id) = name_organization_id_option {
+        organization_strings.push(name_organization_id.to_string());
     }
-    organization_strings.push(new_organization.title.clone());
+    organization_strings.push(new_organization.name.clone());
     let results = Organization::get_many(&organization_strings, &mut *transaction, &redis).await?;
     if !results.is_empty() {
         return Err(CreateError::SlugCollision);
@@ -143,6 +143,7 @@ pub async fn organization_create(
         members: vec![team_item::TeamMemberBuilder {
             user_id: current_user.id.into(),
             role: crate::models::teams::OWNER_ROLE.to_owned(),
+            is_owner: true,
             permissions: ProjectPermissions::all(),
             organization_permissions: Some(OrganizationPermissions::all()),
             accepted: true,
@@ -155,7 +156,7 @@ pub async fn organization_create(
     // Create organization
     let organization = Organization {
         id: organization_id,
-        title: new_organization.title.clone(),
+        name: new_organization.name.clone(),
         description: new_organization.description.clone(),
         team_id,
         icon_url: None,
@@ -243,7 +244,7 @@ pub async fn organization_get(
         let organization = models::organizations::Organization::from(data, team_members);
         return Ok(HttpResponse::Ok().json(organization));
     }
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[derive(Deserialize)]
@@ -335,7 +336,7 @@ pub struct OrganizationEdit {
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
     // Title of the organization, also used as slug
-    pub title: Option<String>,
+    pub name: Option<String>,
 }
 
 pub async fn organizations_edit(
@@ -397,47 +398,47 @@ pub async fn organizations_edit(
                 .await?;
             }
 
-            if let Some(title) = &new_organization.title {
+            if let Some(name) = &new_organization.name {
                 if !perms.contains(OrganizationPermissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the title of this organization!"
+                        "You do not have the permissions to edit the name of this organization!"
                             .to_string(),
                     ));
                 }
 
-                let title_organization_id_option: Option<u64> = parse_base62(title).ok();
-                if let Some(title_organization_id) = title_organization_id_option {
+                let name_organization_id_option: Option<u64> = parse_base62(name).ok();
+                if let Some(name_organization_id) = name_organization_id_option {
                     let results = sqlx::query!(
                         "
                         SELECT EXISTS(SELECT 1 FROM organizations WHERE id=$1)
                         ",
-                        title_organization_id as i64
+                        name_organization_id as i64
                     )
                     .fetch_one(&mut *transaction)
                     .await?;
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "Title collides with other organization's id!".to_string(),
+                            "name collides with other organization's id!".to_string(),
                         ));
                     }
                 }
 
-                // Make sure the new title is different from the old one
-                // We are able to unwrap here because the title is always set
-                if !title.eq(&organization_item.title.clone()) {
+                // Make sure the new name is different from the old one
+                // We are able to unwrap here because the name is always set
+                if !name.eq(&organization_item.name.clone()) {
                     let results = sqlx::query!(
                         "
-                      SELECT EXISTS(SELECT 1 FROM organizations WHERE title = LOWER($1))
+                      SELECT EXISTS(SELECT 1 FROM organizations WHERE name = LOWER($1))
                       ",
-                        title
+                        name
                     )
                     .fetch_one(&mut *transaction)
                     .await?;
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "Title collides with other organization's id!".to_string(),
+                            "Name collides with other organization's id!".to_string(),
                         ));
                     }
                 }
@@ -445,10 +446,10 @@ pub async fn organizations_edit(
                 sqlx::query!(
                     "
                     UPDATE organizations
-                    SET title = LOWER($1)
+                    SET name = LOWER($1)
                     WHERE (id = $2)
                     ",
-                    Some(title),
+                    Some(name),
                     id as database::models::ids::OrganizationId,
                 )
                 .execute(&mut *transaction)
@@ -457,7 +458,7 @@ pub async fn organizations_edit(
 
             database::models::Organization::clear_cache(
                 organization_item.id,
-                Some(organization_item.title),
+                Some(organization_item.name),
                 &redis,
             )
             .await?;
@@ -470,7 +471,7 @@ pub async fn organizations_edit(
             ))
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -527,19 +528,19 @@ pub async fn organization_delete(
 
     transaction.commit().await?;
 
-    database::models::Organization::clear_cache(organization.id, Some(organization.title), &redis)
+    database::models::Organization::clear_cache(organization.id, Some(organization.name), &redis)
         .await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
 #[derive(Deserialize)]
 pub struct OrganizationProjectAdd {
-    pub project_id: String, // Also allow title/slug
+    pub project_id: String, // Also allow name/slug
 }
 pub async fn organization_projects_add(
     req: HttpRequest,
@@ -596,11 +597,7 @@ pub async fn organization_projects_add(
     })?;
 
     // Require ownership of a project to add it to an organization
-    if !current_user.role.is_admin()
-        && !project_team_member
-            .role
-            .eq(crate::models::teams::OWNER_ROLE)
-    {
+    if !current_user.role.is_admin() && !project_team_member.is_owner {
         return Err(ApiError::CustomAuthentication(
             "You need to be an owner of a project to add it to an organization!".to_string(),
         ));
@@ -824,7 +821,7 @@ pub async fn organization_icon_edit(
 
         database::models::Organization::clear_cache(
             organization_item.id,
-            Some(organization_item.title),
+            Some(organization_item.name),
             &redis,
         )
         .await?;
@@ -909,7 +906,7 @@ pub async fn delete_organization_icon(
 
     database::models::Organization::clear_cache(
         organization_item.id,
-        Some(organization_item.title),
+        Some(organization_item.name),
         &redis,
     )
     .await?;

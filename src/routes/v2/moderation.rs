@@ -1,7 +1,7 @@
 use super::ApiError;
-use crate::database::redis::RedisPool;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3;
+use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -36,4 +36,5 @@ pub async fn get_projects(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }

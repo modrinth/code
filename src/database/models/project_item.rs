@@ -54,7 +54,7 @@ impl LinkUrl {
 pub struct GalleryItem {
     pub image_url: String,
     pub featured: bool,
-    pub title: Option<String>,
+    pub name: Option<String>,
     pub description: Option<String>,
     pub created: DateTime<Utc>,
     pub ordering: i64,
@@ -66,7 +66,7 @@ impl GalleryItem {
         project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
-        let (project_ids, image_urls, featureds, titles, descriptions, orderings): (
+        let (project_ids, image_urls, featureds, names, descriptions, orderings): (
             Vec<_>,
             Vec<_>,
             Vec<_>,
@@ -80,7 +80,7 @@ impl GalleryItem {
                     project_id.0,
                     gi.image_url,
                     gi.featured,
-                    gi.title,
+                    gi.name,
                     gi.description,
                     gi.ordering,
                 )
@@ -89,14 +89,14 @@ impl GalleryItem {
         sqlx::query!(
             "
             INSERT INTO mods_gallery (
-                mod_id, image_url, featured, title, description, ordering
+                mod_id, image_url, featured, name, description, ordering
             )
             SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bool[], $4::varchar[], $5::varchar[], $6::bigint[])
             ",
             &project_ids[..],
             &image_urls[..],
             &featureds[..],
-            &titles[..] as &[Option<String>],
+            &names[..] as &[Option<String>],
             &descriptions[..] as &[Option<String>],
             &orderings[..]
         )
@@ -144,9 +144,9 @@ pub struct ProjectBuilder {
     pub project_id: ProjectId,
     pub team_id: TeamId,
     pub organization_id: Option<OrganizationId>,
-    pub title: String,
+    pub name: String,
+    pub summary: String,
     pub description: String,
-    pub body: String,
     pub icon_url: Option<String>,
     pub license_url: Option<String>,
     pub categories: Vec<CategoryId>,
@@ -171,10 +171,9 @@ impl ProjectBuilder {
             id: self.project_id,
             team_id: self.team_id,
             organization_id: self.organization_id,
-            title: self.title,
+            name: self.name,
+            summary: self.summary,
             description: self.description,
-            body: self.body,
-            body_url: None,
             published: Utc::now(),
             updated: Utc::now(),
             approved: None,
@@ -237,10 +236,9 @@ pub struct Project {
     pub id: ProjectId,
     pub team_id: TeamId,
     pub organization_id: Option<OrganizationId>,
-    pub title: String,
+    pub name: String,
+    pub summary: String,
     pub description: String,
-    pub body: String,
-    pub body_url: Option<String>,
     pub published: DateTime<Utc>,
     pub updated: DateTime<Utc>,
     pub approved: Option<DateTime<Utc>>,
@@ -269,7 +267,7 @@ impl Project {
         sqlx::query!(
             "
             INSERT INTO mods (
-                id, team_id, title, description, body,
+                id, team_id, name, summary, description,
                 published, downloads, icon_url, status, requested_status,
                 license_url, license,
                 slug, color, monetization_status
@@ -283,9 +281,9 @@ impl Project {
             ",
             self.id as ProjectId,
             self.team_id as TeamId,
-            &self.title,
+            &self.name,
+            &self.summary,
             &self.description,
-            &self.body,
             self.published,
             self.downloads,
             self.icon_url.as_ref(),
@@ -623,7 +621,7 @@ impl Project {
                     SELECT DISTINCT mod_id,
                         JSONB_AGG(
                         DISTINCT jsonb_build_object(
-                            'image_url', mg.image_url, 'featured', mg.featured, 'title', mg.title, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering
+                            'image_url', mg.image_url, 'featured', mg.featured, 'name', mg.name, 'description', mg.description, 'created', mg.created, 'ordering', mg.ordering
                         )
                     ) filter (where image_url is not null) mods_gallery_json
                     FROM mods_gallery mg
@@ -644,8 +642,8 @@ impl Project {
                     GROUP BY mod_id
                 )
                 
-                SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
-                m.icon_url icon_url, m.body body, m.published published,
+                SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
+                m.icon_url icon_url, m.description description, m.published published,
                 m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
                 m.license_url license_url,
                 m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
@@ -693,10 +691,9 @@ impl Project {
                             id: ProjectId(id),
                             team_id: TeamId(m.team_id),
                             organization_id: m.organization_id.map(OrganizationId),
-                            title: m.title.clone(),
-                            description: m.description.clone(),
+                            name: m.name.clone(),
+                            summary: m.summary.clone(),
                             downloads: m.downloads,
-                            body_url: None,
                             icon_url: m.icon_url.clone(),
                             published: m.published,
                             updated: m.updated,
@@ -709,7 +706,7 @@ impl Project {
                             )),
                             license: m.license.clone(),
                             slug: m.slug.clone(),
-                            body: m.body.clone(),
+                            description: m.description.clone(),
                             follows: m.follows,
                             moderation_message: m.moderation_message,
                             moderation_message_body: m.moderation_message_body,

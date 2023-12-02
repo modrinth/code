@@ -1,12 +1,12 @@
 use chrono::{DateTime, Utc};
 use labrinth::models::{
-    notifications::{NotificationAction, NotificationBody, NotificationId},
+    notifications::NotificationId,
     organizations::OrganizationId,
     projects::{
         Dependency, GalleryItem, License, ModeratorMessage, MonetizationStatus, ProjectId,
         ProjectStatus, VersionFile, VersionId, VersionStatus, VersionType,
     },
-    teams::{OrganizationPermissions, ProjectPermissions, TeamId},
+    teams::{ProjectPermissions, TeamId},
     threads::ThreadId,
     users::{User, UserId},
 };
@@ -31,12 +31,7 @@ pub struct CommonProject {
     // For any tests that require those fields, we make a separate test with separate API functions tht do not use Common models.
     pub id: ProjectId,
     pub slug: Option<String>,
-    pub team: TeamId,
     pub organization: Option<OrganizationId>,
-    pub title: String,
-    pub description: String,
-    pub body: String,
-    pub body_url: Option<String>,
     pub published: DateTime<Utc>,
     pub updated: DateTime<Utc>,
     pub approved: Option<DateTime<Utc>>,
@@ -67,7 +62,6 @@ pub struct CommonVersion {
     pub name: String,
     pub version_number: String,
     pub changelog: String,
-    pub changelog_url: Option<String>,
     pub date_published: DateTime<Utc>,
     pub downloads: u32,
     pub version_type: VersionType,
@@ -109,9 +103,7 @@ pub struct CommonTeamMember {
     pub user: User,
     pub role: String,
 
-    // TODO: Should these be removed from the Common?
     pub permissions: Option<ProjectPermissions>,
-    pub organization_permissions: Option<OrganizationPermissions>,
 
     pub accepted: bool,
     pub payouts_split: Option<Decimal>,
@@ -124,13 +116,13 @@ pub struct CommonNotification {
     pub user_id: UserId,
     pub read: bool,
     pub created: DateTime<Utc>,
-    pub body: NotificationBody,
-
-    // DEPRECATED: use body field instead
-    #[serde(rename = "type")]
-    pub type_: Option<String>,
-    pub title: String,
+    // Body is absent as one of the variants differs
     pub text: String,
     pub link: String,
-    pub actions: Vec<NotificationAction>,
+    pub actions: Vec<CommonNotificationAction>,
+}
+
+#[derive(Deserialize)]
+pub struct CommonNotificationAction {
+    pub action_route: (String, String),
 }

@@ -361,13 +361,13 @@ pub async fn report_get(
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
 
         let report: Report = report.into();
         Ok(HttpResponse::Ok().json(report))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -401,7 +401,7 @@ pub async fn report_edit(
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
 
         let mut transaction = pool.begin().await?;
@@ -479,7 +479,7 @@ pub async fn report_edit(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -519,6 +519,6 @@ pub async fn report_delete(
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }

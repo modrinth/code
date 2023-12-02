@@ -15,6 +15,7 @@ use serde_json::json;
 use crate::common::{
     api_common::{
         models::{CommonImageData, CommonProject, CommonVersion},
+        request_data::ProjectCreationRequestData,
         Api, ApiProject,
     },
     asserts::assert_status,
@@ -22,7 +23,10 @@ use crate::common::{
     dummy_data::TestFile,
 };
 
-use super::{request_data::get_public_project_creation_data, ApiV3};
+use super::{
+    request_data::{self, get_public_project_creation_data},
+    ApiV3,
+};
 
 #[async_trait(?Send)]
 impl ApiProject for ApiV3 {
@@ -36,17 +40,13 @@ impl ApiProject for ApiV3 {
         let creation_data = get_public_project_creation_data(slug, version_jar, modify_json);
 
         // Add a project.
-        let req = TestRequest::post()
-            .uri("/v3/project")
-            .append_header(("Authorization", pat))
-            .set_multipart(creation_data.segment_data)
-            .to_request();
-        let resp = self.call(req).await;
+        let slug = creation_data.slug.clone();
+        let resp = self.create_project(creation_data, pat).await;
         assert_status(&resp, StatusCode::OK);
 
         // Approve as a moderator.
         let req = TestRequest::patch()
-            .uri(&format!("/v3/project/{}", creation_data.slug))
+            .uri(&format!("/v3/project/{}", slug))
             .append_header(("Authorization", MOD_USER_PAT))
             .set_json(json!(
                 {
@@ -57,18 +57,39 @@ impl ApiProject for ApiV3 {
         let resp = self.call(req).await;
         assert_status(&resp, StatusCode::NO_CONTENT);
 
-        let project = self.get_project(&creation_data.slug, pat).await;
+        let project = self.get_project(&slug, pat).await;
         let project = test::read_body_json(project).await;
 
         // Get project's versions
         let req = TestRequest::get()
-            .uri(&format!("/v3/project/{}/version", creation_data.slug))
+            .uri(&format!("/v3/project/{}/version", slug))
             .append_header(("Authorization", pat))
             .to_request();
         let resp = self.call(req).await;
         let versions: Vec<CommonVersion> = test::read_body_json(resp).await;
 
         (project, versions)
+    }
+
+    async fn get_public_project_creation_data_json(
+        &self,
+        slug: &str,
+        version_jar: Option<&TestFile>,
+    ) -> serde_json::Value {
+        request_data::get_public_project_creation_data_json(slug, version_jar)
+    }
+
+    async fn create_project(
+        &self,
+        creation_data: ProjectCreationRequestData,
+        pat: &str,
+    ) -> ServiceResponse {
+        let req = TestRequest::post()
+            .uri("/v3/project")
+            .append_header(("Authorization", pat))
+            .set_multipart(creation_data.segment_data)
+            .to_request();
+        self.call(req).await
     }
 
     async fn remove_project(&self, project_slug_or_id: &str, pat: &str) -> ServiceResponse {
@@ -92,7 +113,11 @@ impl ApiProject for ApiV3 {
     async fn get_project_deserialized_common(&self, id_or_slug: &str, pat: &str) -> CommonProject {
         let resp = self.get_project(id_or_slug, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let project: Project = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(project).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_user_projects(&self, user_id_or_username: &str, pat: &str) -> ServiceResponse {
@@ -110,7 +135,11 @@ impl ApiProject for ApiV3 {
     ) -> Vec<CommonProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let projects: Vec<Project> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(projects).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn edit_project(

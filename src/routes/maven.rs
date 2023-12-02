@@ -80,7 +80,7 @@ pub async fn maven_metadata(
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
     let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
@@ -95,7 +95,7 @@ pub async fn maven_metadata(
     .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     let version_names = sqlx::query!(
@@ -274,7 +274,7 @@ pub async fn version_file(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
@@ -289,15 +289,15 @@ pub async fn version_file(
     .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     if !is_authorized_version(&version.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     if file == format!("{}-{}.pom", &project_id, &vnum) {
@@ -310,7 +310,7 @@ pub async fn version_file(
             group_id: "maven.modrinth".to_string(),
             artifact_id: project_id,
             version: vnum,
-            name: project.inner.title,
+            name: project.inner.name,
             description: project.inner.description,
         };
         return Ok(HttpResponse::Ok()
@@ -322,7 +322,7 @@ pub async fn version_file(
             .body(""));
     }
 
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha1")]
@@ -335,7 +335,7 @@ pub async fn version_file_sha1(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
@@ -350,15 +350,15 @@ pub async fn version_file_sha1(
     .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     if !is_authorized_version(&version.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     Ok(find_file(&project_id, &vnum, &version, &file)
@@ -377,7 +377,7 @@ pub async fn version_file_sha512(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let Some(project) = database::models::Project::get(&project_id, &**pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     let user_option = get_user_from_headers(
@@ -392,15 +392,15 @@ pub async fn version_file_sha512(
     .ok();
 
     if !is_authorized(&project.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     let Some(version) = find_version(&project, &vnum, &pool, &redis).await? else {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     };
 
     if !is_authorized_version(&version.inner, &user_option, &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     Ok(find_file(&project_id, &vnum, &version, &file)

@@ -34,17 +34,15 @@ pub struct Project {
     /// The aggregated games of the versions of this project
     pub games: Vec<String>,
     /// The team of people that has ownership of this project.
-    pub team: TeamId,
+    pub team_id: TeamId,
     /// The optional organization of people that have ownership of this project.
     pub organization: Option<OrganizationId>,
     /// The title or name of the project.
-    pub title: String,
+    pub name: String,
     /// A short description of the project.
-    pub description: String,
+    pub summary: String,
     /// A long form description of the project.
-    pub body: String,
-    /// The link to the long description of the project. Deprecated, always None
-    pub body_url: Option<String>,
+    pub description: String,
 
     /// The date at which the project was first published.
     pub published: DateTime<Utc>,
@@ -151,12 +149,11 @@ impl From<QueryProject> for Project {
             slug: m.slug,
             project_types: data.project_types,
             games: data.games,
-            team: m.team_id.into(),
+            team_id: m.team_id.into(),
             organization: m.organization_id.map(|i| i.into()),
-            title: m.title,
+            name: m.name,
+            summary: m.summary,
             description: m.description,
-            body: m.body,
-            body_url: None,
             published: m.published,
             updated: m.updated,
             approved: m.approved,
@@ -210,7 +207,7 @@ impl From<QueryProject> for Project {
                 .map(|x| GalleryItem {
                     url: x.image_url,
                     featured: x.featured,
-                    title: x.title,
+                    name: x.name,
                     description: x.description,
                     created: x.created,
                     ordering: x.ordering,
@@ -228,7 +225,7 @@ impl From<QueryProject> for Project {
 pub struct GalleryItem {
     pub url: String,
     pub featured: bool,
-    pub title: Option<String>,
+    pub name: Option<String>,
     pub description: Option<String>,
     pub created: DateTime<Utc>,
     pub ordering: i64,
@@ -464,8 +461,6 @@ pub struct Version {
     pub games: Vec<String>,
     /// The changelog for this version of the project.
     pub changelog: String,
-    /// A link to the changelog for this version of the project. Deprecated, always None
-    pub changelog_url: Option<String>,
 
     /// The date that this version was published.
     pub date_published: DateTime<Utc>,
@@ -517,7 +512,6 @@ impl From<QueryVersion> for Version {
             project_types: data.project_types,
             games: data.games,
             changelog: v.changelog,
-            changelog_url: None,
             date_published: v.date_published,
             downloads: v.downloads as u32,
             version_type: match v.version_type.as_str() {

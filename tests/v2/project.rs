@@ -5,15 +5,15 @@ use crate::common::{
         ApiV2,
     },
     database::{
-        ADMIN_USER_PAT, ENEMY_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, MOD_USER_PAT,
-        USER_USER_PAT,
+        generate_random_name, ADMIN_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT,
     },
-    dummy_data::{TestFile, DUMMY_CATEGORIES},
+    dummy_data::TestFile,
     environment::{with_test_environment, TestEnvironment},
     permissions::{PermissionsTest, PermissionsTestContext},
 };
 use actix_http::StatusCode;
 use actix_web::test;
+use futures::StreamExt;
 use itertools::Itertools;
 use labrinth::{
     database::models::project_item::PROJECTS_SLUGS_NAMESPACE,
@@ -336,165 +336,102 @@ async fn permissions_upload_version() {
 }
 
 #[actix_rt::test]
-pub async fn test_patch_project() {
+pub async fn test_patch_v2() {
+    // Hits V3-specific patchable fields
+    // Other fields are tested in test_patch_project (the v2 version of that test)
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
 
         let alpha_project_slug = &test_env.dummy.as_ref().unwrap().project_alpha.project_slug;
-        let beta_project_slug = &test_env.dummy.as_ref().unwrap().project_beta.project_slug;
-
-        // First, we do some patch requests that should fail.
-        // Failure because the user is not authorized.
-        let resp = api
-            .edit_project(
-                alpha_project_slug,
-                json!({
-                    "title": "Test_Add_Project project - test 1",
-                }),
-                ENEMY_USER_PAT,
-            )
-            .await;
-        assert_eq!(resp.status(), 401);
-
-        // Failure because we are setting URL fields to invalid urls.
-        for url_type in ["issues_url", "source_url", "wiki_url", "discord_url"] {
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        url_type: "w.fake.url",
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(resp.status(), 400);
-        }
-
-        // Failure because these are illegal requested statuses for a normal user.
-        for req in ["unknown", "processing", "withheld", "scheduled"] {
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        "requested_status": req,
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(resp.status(), 400);
-        }
-
-        // Failure because these should not be able to be set by a non-mod
-        for key in ["moderation_message", "moderation_message_body"] {
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        key: "test",
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(resp.status(), 401);
-
-            // (should work for a mod, though)
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        key: "test",
-                    }),
-                    MOD_USER_PAT,
-                )
-                .await;
-            assert_eq!(resp.status(), 204);
-        }
-
-        // Failed patch to alpha slug:
-        // - slug collision with beta
-        // - too short slug
-        // - too long slug
-        // - not url safe slug
-        // - not url safe slug
-        for slug in [
-            beta_project_slug,
-            "a",
-            &"a".repeat(100),
-            "not url safe%&^!#$##!@#$%^&*()",
-        ] {
-            let resp = api
-                .edit_project(
-                    alpha_project_slug,
-                    json!({
-                        "slug": slug, // the other dummy project has this slug
-                    }),
-                    USER_USER_PAT,
-                )
-                .await;
-            assert_eq!(resp.status(), 400);
-        }
-
-        // Not allowed to directly set status, as 'beta_project_slug' (the other project) is "processing" and cannot have its status changed like this.
-        let resp = api
-            .edit_project(
-                beta_project_slug,
-                json!({
-                    "status": "private"
-                }),
-                USER_USER_PAT,
-            )
-            .await;
-        assert_eq!(resp.status(), 401);
 
         // Sucessful request to patch many fields.
         let resp = api
             .edit_project(
                 alpha_project_slug,
                 json!({
-                    "slug": "newslug",
-                    "title": "New successful title",
-                    "description": "New successful description",
-                    "body": "New successful body",
-                    "categories": [DUMMY_CATEGORIES[0]],
-                    "license_id": "MIT",
-                    "issues_url": "https://github.com",
-                    "discord_url": "https://discord.gg",
-                    "wiki_url": "https://wiki.com",
                     "client_side": "unsupported",
                     "server_side": "required",
-                    "donation_urls": [{
-                        "id": "patreon",
-                        "platform": "Patreon",
-                        "url": "https://patreon.com"
-                    }]
                 }),
                 USER_USER_PAT,
             )
             .await;
         assert_eq!(resp.status(), 204);
 
-        // Old slug no longer works
-        let resp = api.get_project(alpha_project_slug, USER_USER_PAT).await;
-        assert_eq!(resp.status(), 404);
+        let project = api
+            .get_project_deserialized(alpha_project_slug, USER_USER_PAT)
+            .await;
 
-        // New slug does work
-        let project = api.get_project_deserialized("newslug", USER_USER_PAT).await;
-        assert_eq!(project.slug.unwrap(), "newslug");
-        assert_eq!(project.title, "New successful title");
-        assert_eq!(project.description, "New successful description");
-        assert_eq!(project.body, "New successful body");
-        assert_eq!(project.categories, vec![DUMMY_CATEGORIES[0]]);
-        assert_eq!(project.license.id, "MIT");
-        assert_eq!(project.issues_url, Some("https://github.com".to_string()));
-        assert_eq!(project.discord_url, Some("https://discord.gg".to_string()));
-        assert_eq!(project.wiki_url, Some("https://wiki.com".to_string()));
         // Note: the original V2 value of this was "optional",
         // but Required/Optional is no longer a carried combination in v3, as the changes made were lossy.
         // Now, the test Required/Unsupported combination is tested instead.
         // Setting Required/Optional in v2 will not work, this is known and accepteed.
         assert_eq!(project.client_side.as_str(), "unsupported");
         assert_eq!(project.server_side.as_str(), "required");
-        assert_eq!(project.donation_urls.unwrap()[0].url, "https://patreon.com");
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn permissions_patch_project_v2() {
+    with_test_environment(Some(8), |test_env: TestEnvironment<ApiV2>| async move {
+        // TODO: This only includes v2 ones (as it should. See v3)
+        // For each permission covered by EDIT_DETAILS, ensure the permission is required
+        let edit_details = ProjectPermissions::EDIT_DETAILS;
+        let test_pairs = [
+            ("description", json!("description")),
+            ("issues_url", json!("https://issues.com")),
+            ("source_url", json!("https://source.com")),
+            ("wiki_url", json!("https://wiki.com")),
+            (
+                "donation_urls",
+                json!([{
+                    "id": "paypal",
+                    "platform": "Paypal",
+                    "url": "https://paypal.com"
+                }]),
+            ),
+            ("discord_url", json!("https://discord.com")),
+        ];
+
+        futures::stream::iter(test_pairs)
+            .map(|(key, value)| {
+                let test_env = test_env.clone();
+                async move {
+                    let req_gen = |ctx: &PermissionsTestContext| {
+                        test::TestRequest::patch()
+                            .uri(&format!("/v2/project/{}", ctx.project_id.unwrap()))
+                            .set_json(json!({
+                                key: if key == "slug" {
+                                    json!(generate_random_name("randomslug"))
+                                } else {
+                                    value.clone()
+                                },
+                            }))
+                    };
+                    PermissionsTest::new(&test_env)
+                        .simple_project_permissions_test(edit_details, req_gen)
+                        .await
+                        .into_iter();
+                }
+            })
+            .buffer_unordered(4)
+            .collect::<Vec<_>>()
+            .await;
+
+        // Edit body
+        // Cannot bulk edit body
+        let edit_body = ProjectPermissions::EDIT_BODY;
+        let req_gen = |ctx: &PermissionsTestContext| {
+            test::TestRequest::patch()
+                .uri(&format!("/v2/project/{}", ctx.project_id.unwrap()))
+                .set_json(json!({
+                    "body": "new body!", // new body
+                }))
+        };
+        PermissionsTest::new(&test_env)
+            .simple_project_permissions_test(edit_body, req_gen)
+            .await
+            .unwrap();
     })
     .await;
 }

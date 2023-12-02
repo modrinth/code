@@ -1,7 +1,9 @@
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
+use crate::models::notifications::Notification;
 use crate::models::projects::Project;
 use crate::models::users::{Badges, Role};
+use crate::models::v2::notifications::LegacyNotification;
 use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
@@ -36,7 +38,9 @@ pub async fn user_auth_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::users::user_auth_get(req, pool, redis, session_queue).await
+    v3::users::user_auth_get(req, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -50,7 +54,9 @@ pub async fn users_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::users::users_get(web::Query(v3::users::UserIds { ids: ids.ids }), pool, redis).await
+    v3::users::users_get(web::Query(v3::users::UserIds { ids: ids.ids }), pool, redis)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[get("{id}")]
@@ -59,7 +65,9 @@ pub async fn user_get(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::users::user_get(info, pool, redis).await
+    v3::users::user_get(info, pool, redis)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[get("{user_id}/projects")]
@@ -70,8 +78,9 @@ pub async fn projects_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response =
-        v3::users::projects_list(req, info, pool.clone(), redis.clone(), session_queue).await?;
+    let response = v3::users::projects_list(req, info, pool.clone(), redis.clone(), session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2 projects
     match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
@@ -135,6 +144,7 @@ pub async fn user_edit(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -165,6 +175,7 @@ pub async fn user_icon_edit(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Deserialize)]
@@ -198,6 +209,7 @@ pub async fn user_delete(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[get("{id}/follows")]
@@ -208,7 +220,9 @@ pub async fn user_follows(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::users::user_follows(req, info, pool, redis, session_queue).await
+    v3::users::user_follows(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[get("{id}/notifications")]
@@ -219,5 +233,18 @@ pub async fn user_notifications(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::users::user_notifications(req, info, pool, redis, session_queue).await
+    let response = v3::users::user_notifications(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)?;
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<Notification>>(response).await {
+        Ok(notifications) => {
+            let legacy_notifications: Vec<LegacyNotification> = notifications
+                .into_iter()
+                .map(LegacyNotification::from)
+                .collect();
+            Ok(HttpResponse::Ok().json(legacy_notifications))
+        }
+        Err(response) => Ok(response),
+    }
 }

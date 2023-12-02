@@ -450,10 +450,9 @@ impl User {
                     "
                     SELECT m.id FROM mods m
                     INNER JOIN team_members tm ON tm.team_id = m.team_id
-                    WHERE tm.user_id = $1 AND tm.role = $2
+                    WHERE tm.user_id = $1 AND tm.is_owner = TRUE
                     ",
                     id as UserId,
-                    crate::models::teams::OWNER_ROLE
                 )
                 .fetch_many(&mut **transaction)
                 .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
@@ -470,11 +469,10 @@ impl User {
                     "
                     UPDATE team_members
                     SET user_id = $1
-                    WHERE (user_id = $2 AND role = $3)
+                    WHERE (user_id = $2 AND is_owner = TRUE)
                     ",
                     deleted_user as UserId,
                     id as UserId,
-                    crate::models::teams::OWNER_ROLE
                 )
                 .execute(&mut **transaction)
                 .await?;

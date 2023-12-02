@@ -3,7 +3,7 @@ use crate::database::redis::RedisPool;
 use crate::models::projects::{Project, Version, VersionType};
 use crate::models::v2::projects::{LegacyProject, LegacyVersion};
 use crate::queue::session::AuthQueue;
-use crate::routes::v3::version_file::{default_algorithm, HashQuery};
+use crate::routes::v3::version_file::HashQuery;
 use crate::routes::{v2_reroute, v3};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -40,10 +40,11 @@ pub async fn get_version_from_hash(
 ) -> Result<HttpResponse, ApiError> {
     let response =
         v3::version_file::get_version_from_hash(req, info, pool, redis, hash_query, session_queue)
-            .await;
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<Version>(response?).await {
+    match v2_reroute::extract_ok_json::<Version>(response).await {
         Ok(version) => {
             let v2_version = LegacyVersion::from(version);
             Ok(HttpResponse::Ok().json(v2_version))
@@ -62,7 +63,9 @@ pub async fn download_version(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::version_file::download_version(req, info, pool, redis, hash_query, session_queue).await
+    v3::version_file::download_version(req, info, pool, redis, hash_query, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 // under /api/v1/version_file/{hash}
@@ -75,7 +78,9 @@ pub async fn delete_file(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::version_file::delete_file(req, info, pool, redis, hash_query, session_queue).await
+    v3::version_file::delete_file(req, info, pool, redis, hash_query, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -119,7 +124,8 @@ pub async fn get_update_from_hash(
         web::Json(update_data),
         session_queue,
     )
-    .await?;
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<Version>(response).await {
@@ -134,8 +140,7 @@ pub async fn get_update_from_hash(
 // Requests above with multiple versions below
 #[derive(Deserialize)]
 pub struct FileHashes {
-    #[serde(default = "default_algorithm")]
-    pub algorithm: String,
+    pub algorithm: Option<String>,
     pub hashes: Vec<String>,
 }
 
@@ -160,7 +165,8 @@ pub async fn get_versions_from_hashes(
         web::Json(file_data),
         session_queue,
     )
-    .await?;
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {
@@ -198,7 +204,8 @@ pub async fn get_projects_from_hashes(
         web::Json(file_data),
         session_queue,
     )
-    .await?;
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert to V2
     match v2_reroute::extract_ok_json::<HashMap<String, Project>>(response).await {
@@ -230,8 +237,7 @@ pub async fn get_projects_from_hashes(
 
 #[derive(Deserialize)]
 pub struct ManyUpdateData {
-    #[serde(default = "default_algorithm")]
-    pub algorithm: String,
+    pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<String>,
     pub loaders: Option<Vec<String>>,
     pub game_versions: Option<Vec<String>>,
@@ -265,7 +271,8 @@ pub async fn update_files(
 
     let response =
         v3::version_file::update_files(req, pool, redis, web::Json(update_data), session_queue)
-            .await?;
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {
@@ -293,8 +300,7 @@ pub struct FileUpdateData {
 
 #[derive(Deserialize)]
 pub struct ManyFileUpdateData {
-    #[serde(default = "default_algorithm")]
-    pub algorithm: String,
+    pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<FileUpdateData>,
 }
 
@@ -338,7 +344,8 @@ pub async fn update_individual_files(
         web::Json(update_data),
         session_queue,
     )
-    .await?;
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {

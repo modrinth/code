@@ -82,7 +82,7 @@ pub async fn version_project_get_helper(
 
     if let Some(project) = result {
         if !is_authorized(&project.inner, &user_option, &pool).await? {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
 
         let versions =
@@ -100,7 +100,7 @@ pub async fn version_project_get_helper(
         }
     }
 
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[derive(Serialize, Deserialize)]
@@ -174,7 +174,7 @@ pub async fn version_get_helper(
         }
     }
 
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[derive(Serialize, Deserialize, Validate, Default, Debug)]
@@ -678,7 +678,7 @@ pub async fn version_edit_helper(
             ))
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -723,7 +723,7 @@ pub async fn version_list(
 
     if let Some(project) = result {
         if !is_authorized(&project.inner, &user_option, &pool).await? {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
 
         let loader_field_filters = filters.loader_fields.as_ref().map(|x| {
@@ -822,7 +822,7 @@ pub async fn version_list(
 
         Ok(HttpResponse::Ok().json(response))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -924,7 +924,7 @@ pub async fn version_schedule(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -1010,6 +1010,6 @@ pub async fn version_delete(
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }

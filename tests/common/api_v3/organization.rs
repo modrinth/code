@@ -6,9 +6,9 @@ use bytes::Bytes;
 use labrinth::models::{organizations::Organization, v3::projects::Project};
 use serde_json::json;
 
-use crate::common::api_common::Api;
+use crate::common::api_common::{request_data::ImageData, Api};
 
-use super::{request_data::ImageData, ApiV3};
+use super::ApiV3;
 
 impl ApiV3 {
     pub async fn create_organization(
@@ -21,7 +21,7 @@ impl ApiV3 {
             .uri("/v3/organization")
             .append_header(("Authorization", pat))
             .set_json(json!({
-                "title": organization_title,
+                "name": organization_title,
                 "description": description,
             }))
             .to_request();

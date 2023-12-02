@@ -1,8 +1,9 @@
 use crate::database::redis::RedisPool;
-use crate::models::teams::{OrganizationPermissions, ProjectPermissions, TeamId};
+use crate::models::teams::{OrganizationPermissions, ProjectPermissions, TeamId, TeamMember};
 use crate::models::users::UserId;
+use crate::models::v2::teams::LegacyTeamMember;
 use crate::queue::session::AuthQueue;
-use crate::routes::{v3, ApiError};
+use crate::routes::{v2_reroute, v3, ApiError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -34,7 +35,20 @@ pub async fn team_members_get_project(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::teams::team_members_get_project(req, info, pool, redis, session_queue).await
+    let response = v3::teams::team_members_get_project(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)?;
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<TeamMember>>(response).await {
+        Ok(members) => {
+            let members = members
+                .into_iter()
+                .map(LegacyTeamMember::from)
+                .collect::<Vec<_>>();
+            Ok(HttpResponse::Ok().json(members))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 // Returns all members of a team, but not necessarily those of a project-team's organization (unlike team_members_get_project)
@@ -46,7 +60,20 @@ pub async fn team_members_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::teams::team_members_get(req, info, pool, redis, session_queue).await
+    let response = v3::teams::team_members_get(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)?;
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<TeamMember>>(response).await {
+        Ok(members) => {
+            let members = members
+                .into_iter()
+                .map(LegacyTeamMember::from)
+                .collect::<Vec<_>>();
+            Ok(HttpResponse::Ok().json(members))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -62,7 +89,7 @@ pub async fn teams_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::teams::teams_get(
+    let response = v3::teams::teams_get(
         req,
         web::Query(v3::teams::TeamIds { ids: ids.ids }),
         pool,
@@ -70,6 +97,23 @@ pub async fn teams_get(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error);
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<Vec<TeamMember>>>(response?).await {
+        Ok(members) => {
+            let members = members
+                .into_iter()
+                .map(|members| {
+                    members
+                        .into_iter()
+                        .map(LegacyTeamMember::from)
+                        .collect::<Vec<_>>()
+                })
+                .collect::<Vec<_>>();
+            Ok(HttpResponse::Ok().json(members))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[post("{id}/join")]
@@ -80,7 +124,9 @@ pub async fn join_team(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::teams::join_team(req, info, pool, redis, session_queue).await
+    v3::teams::join_team(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 fn default_role() -> String {
@@ -132,6 +178,7 @@ pub async fn add_team_member(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -167,6 +214,7 @@ pub async fn edit_team_member(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Deserialize)]
@@ -194,6 +242,7 @@ pub async fn transfer_ownership(
         session_queue,
     )
     .await
+    .or_else(v2_reroute::flatten_404_error)
 }
 
 #[delete("{id}/members/{user_id}")]
@@ -204,5 +253,7 @@ pub async fn remove_team_member(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::teams::remove_team_member(req, info, pool, redis, session_queue).await
+    v3::teams::remove_team_member(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }

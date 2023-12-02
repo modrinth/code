@@ -158,7 +158,7 @@ pub struct ProjectCreateData {
     )]
     #[serde(alias = "mod_name")]
     /// The title or name of the project.
-    pub title: String,
+    pub name: String,
     #[validate(
         length(min = 3, max = 64),
         regex = "crate::util::validate::RE_URL_SAFE"
@@ -169,11 +169,11 @@ pub struct ProjectCreateData {
     #[validate(length(min = 3, max = 255))]
     #[serde(alias = "mod_description")]
     /// A short description of the project.
-    pub description: String,
+    pub summary: String,
     #[validate(length(max = 65536))]
     #[serde(alias = "mod_body")]
     /// A long description of the project, in markdown.
-    pub body: String,
+    pub description: String,
 
     #[validate(length(max = 32))]
     #[validate]
@@ -225,7 +225,7 @@ pub struct NewGalleryItem {
     pub featured: bool,
     #[validate(length(min = 1, max = 2048))]
     /// The title of the gallery item
-    pub title: Option<String>,
+    pub name: Option<String>,
     #[validate(length(min = 1, max = 2048))]
     /// The description of the gallery item
     pub description: Option<String>,
@@ -518,7 +518,7 @@ async fn project_create_inner(
                     gallery_urls.push(crate::models::projects::GalleryItem {
                         url: format!("{cdn_url}/{url}"),
                         featured: item.featured,
-                        title: item.title.clone(),
+                        name: item.name.clone(),
                         description: item.description.clone(),
                         created: Utc::now(),
                         ordering: item.ordering,
@@ -616,6 +616,7 @@ async fn project_create_inner(
             members: vec![models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
+                is_owner: true,
                 // Allow all permissions for project creator, even if attached to a project
                 permissions: ProjectPermissions::all(),
                 organization_permissions: None,
@@ -679,9 +680,9 @@ async fn project_create_inner(
             project_id: project_id.into(),
             team_id,
             organization_id: project_create_data.organization_id.map(|x| x.into()),
-            title: project_create_data.title,
+            name: project_create_data.name,
+            summary: project_create_data.summary,
             description: project_create_data.description,
-            body: project_create_data.body,
             icon_url: icon_data.clone().map(|x| x.0),
 
             license_url: project_create_data.license_url,
@@ -698,7 +699,7 @@ async fn project_create_inner(
                 .map(|x| models::project_item::GalleryItem {
                     image_url: x.url.clone(),
                     featured: x.featured,
-                    title: x.title.clone(),
+                    name: x.name.clone(),
                     description: x.description.clone(),
                     created: x.created,
                     ordering: x.ordering,
@@ -783,12 +784,11 @@ async fn project_create_inner(
             slug: project_builder.slug.clone(),
             project_types,
             games,
-            team: team_id.into(),
+            team_id: team_id.into(),
             organization: project_create_data.organization_id,
-            title: project_builder.title.clone(),
+            name: project_builder.name.clone(),
+            summary: project_builder.summary.clone(),
             description: project_builder.description.clone(),
-            body: project_builder.body.clone(),
-            body_url: None,
             published: now,
             updated: now,
             approved: None,

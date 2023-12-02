@@ -123,6 +123,8 @@ pub enum ApiError {
     Mail(#[from] crate::auth::email::MailError),
     #[error("Error while rerouting request: {0}")]
     Reroute(#[from] reqwest::Error),
+    #[error("Resource not found")]
+    NotFound,
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -150,6 +152,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::PasswordStrengthCheck(..) => StatusCode::BAD_REQUEST,
             ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::NotFound => StatusCode::NOT_FOUND,
         }
     }
 
@@ -178,6 +181,7 @@ impl actix_web::ResponseError for ApiError {
                 ApiError::Mail(..) => "mail_error",
                 ApiError::Clickhouse(..) => "clickhouse_error",
                 ApiError::Reroute(..) => "reroute_error",
+                ApiError::NotFound => "not_found",
             },
             description: &self.to_string(),
         })

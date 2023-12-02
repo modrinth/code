@@ -4,6 +4,7 @@ use self::models::{
     CommonCategoryData, CommonImageData, CommonLoaderData, CommonNotification, CommonProject,
     CommonTeamMember, CommonVersion,
 };
+use self::request_data::ProjectCreationRequestData;
 use actix_web::dev::ServiceResponse;
 use async_trait::async_trait;
 use labrinth::{
@@ -18,6 +19,7 @@ use super::dummy_data::TestFile;
 
 pub mod generic;
 pub mod models;
+pub mod request_data;
 #[async_trait(?Send)]
 pub trait ApiBuildable: Api {
     async fn build(labrinth_config: LabrinthConfig) -> Self;
@@ -38,6 +40,17 @@ pub trait ApiProject {
         modify_json: Option<json_patch::Patch>,
         pat: &str,
     ) -> (CommonProject, Vec<CommonVersion>);
+    async fn create_project(
+        &self,
+        creation_data: ProjectCreationRequestData,
+        pat: &str,
+    ) -> ServiceResponse;
+    async fn get_public_project_creation_data_json(
+        &self,
+        slug: &str,
+        version_jar: Option<&TestFile>,
+    ) -> serde_json::Value;
+
     async fn remove_project(&self, id_or_slug: &str, pat: &str) -> ServiceResponse;
     async fn get_project(&self, id_or_slug: &str, pat: &str) -> ServiceResponse;
     async fn get_project_deserialized_common(&self, id_or_slug: &str, pat: &str) -> CommonProject;

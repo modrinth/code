@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use super::v3::project_creation::CreateError;
+use super::ApiError;
 use crate::models::v2::projects::LegacySideType;
 use crate::util::actix::{generate_multipart, MultipartSegment, MultipartSegmentData};
 use actix_multipart::Multipart;
@@ -14,6 +15,7 @@ pub async fn extract_ok_json<T>(response: HttpResponse) -> Result<T, HttpRespons
 where
     T: serde::de::DeserializeOwned,
 {
+    // If the response is OK, parse the json and return it
     if response.status() == actix_web::http::StatusCode::OK {
         let failure_http_response = || {
             HttpResponse::InternalServerError().json(json!({
@@ -30,6 +32,15 @@ where
         Ok(json_value)
     } else {
         Err(response)
+    }
+}
+
+// This only removes the body of 404 responses
+// This should not be used on the fallback no-route-found handler
+pub fn flatten_404_error(res: ApiError) -> Result<HttpResponse, ApiError> {
+    match res {
+        ApiError::NotFound => Ok(HttpResponse::NotFound().body("")),
+        _ => Err(res),
     }
 }
 

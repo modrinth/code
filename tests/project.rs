@@ -17,10 +17,9 @@ use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
+use crate::common::api_common::request_data::ProjectCreationRequestData;
 use crate::common::api_common::{ApiProject, ApiVersion};
-use crate::common::api_v3::request_data::get_public_project_creation_data_json;
 use crate::common::dummy_data::TestFile;
-
 mod common;
 
 #[actix_rt::test]
@@ -109,8 +108,10 @@ async fn test_add_remove_project() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
 
-        let mut json_data =
-            get_public_project_creation_data_json("demo", Some(&TestFile::BasicMod));
+        // Generate test project data.
+        let mut json_data = api
+            .get_public_project_creation_data_json("demo", Some(&TestFile::BasicMod))
+            .await;
 
         // Basic json
         let json_segment = MultipartSegment {
@@ -167,12 +168,16 @@ async fn test_add_remove_project() {
         };
 
         // Add a project- simple, should work.
-        let req = test::TestRequest::post()
-            .uri("/v3/project")
-            .append_header(("Authorization", USER_USER_PAT))
-            .set_multipart(vec![json_segment.clone(), file_segment.clone()])
-            .to_request();
-        let resp = test_env.call(req).await;
+        let resp = api
+            .create_project(
+                ProjectCreationRequestData {
+                    slug: "demo".to_string(),
+                    segment_data: vec![json_segment.clone(), file_segment.clone()],
+                    jar: None, // File not needed at this point
+                },
+                USER_USER_PAT,
+            )
+            .await;
 
         let status = resp.status();
         assert_eq!(status, 200);
@@ -195,42 +200,51 @@ async fn test_add_remove_project() {
 
         // Reusing with a different slug and the same file should fail
         // Even if that file is named differently
-        let req = test::TestRequest::post()
-            .uri("/v3/project")
-            .append_header(("Authorization", USER_USER_PAT))
-            .set_multipart(vec![
-                json_diff_slug_file_segment.clone(), // Different slug, different file name
-                file_diff_name_segment.clone(),      // Different file name, same content
-            ])
-            .to_request();
-
-        let resp = test_env.call(req).await;
+        let resp = api
+            .create_project(
+                ProjectCreationRequestData {
+                    slug: "demo".to_string(),
+                    segment_data: vec![
+                        json_diff_slug_file_segment.clone(),
+                        file_diff_name_segment.clone(),
+                    ],
+                    jar: None, // File not needed at this point
+                },
+                USER_USER_PAT,
+            )
+            .await;
         assert_eq!(resp.status(), 400);
 
         // Reusing with the same slug and a different file should fail
-        let req = test::TestRequest::post()
-            .uri("/v3/project")
-            .append_header(("Authorization", USER_USER_PAT))
-            .set_multipart(vec![
-                json_diff_file_segment.clone(), // Same slug, different file name
-                file_diff_name_content_segment.clone(), // Different file name, different content
-            ])
-            .to_request();
-
-        let resp = test_env.call(req).await;
+        let resp = api
+            .create_project(
+                ProjectCreationRequestData {
+                    slug: "demo".to_string(),
+                    segment_data: vec![
+                        json_diff_file_segment.clone(),
+                        file_diff_name_content_segment.clone(),
+                    ],
+                    jar: None, // File not needed at this point
+                },
+                USER_USER_PAT,
+            )
+            .await;
         assert_eq!(resp.status(), 400);
 
         // Different slug, different file should succeed
-        let req = test::TestRequest::post()
-            .uri("/v3/project")
-            .append_header(("Authorization", USER_USER_PAT))
-            .set_multipart(vec![
-                json_diff_slug_file_segment.clone(), // Different slug, different file name
-                file_diff_name_content_segment.clone(), // Different file name, same content
-            ])
-            .to_request();
-
-        let resp = test_env.call(req).await;
+        let resp = api
+            .create_project(
+                ProjectCreationRequestData {
+                    slug: "demo".to_string(),
+                    segment_data: vec![
+                        json_diff_slug_file_segment.clone(),
+                        file_diff_name_content_segment.clone(),
+                    ],
+                    jar: None, // File not needed at this point
+                },
+                USER_USER_PAT,
+            )
+            .await;
         assert_eq!(resp.status(), 200);
 
         // Get
@@ -283,7 +297,7 @@ pub async fn test_patch_project() {
             .edit_project(
                 alpha_project_slug,
                 json!({
-                    "title": "Test_Add_Project project - test 1",
+                    "name": "Test_Add_Project project - test 1",
                 }),
                 ENEMY_USER_PAT,
             )
@@ -388,9 +402,6 @@ pub async fn test_patch_project() {
                 alpha_project_slug,
                 json!({
                     "slug": "newslug",
-                    "title": "New successful title",
-                    "description": "New successful description",
-                    "body": "New successful body",
                     "categories": [DUMMY_CATEGORIES[0]],
                     "license_id": "MIT",
                     "link_urls":
@@ -404,7 +415,6 @@ pub async fn test_patch_project() {
                 USER_USER_PAT,
             )
             .await;
-        println!("{:?}", resp.response().body());
         assert_eq!(resp.status(), 204);
 
         // Old slug no longer works
@@ -415,9 +425,6 @@ pub async fn test_patch_project() {
         let project = api.get_project_deserialized("newslug", USER_USER_PAT).await;
 
         assert_eq!(project.slug.unwrap(), "newslug");
-        assert_eq!(project.title, "New successful title");
-        assert_eq!(project.description, "New successful description");
-        assert_eq!(project.body, "New successful body");
         assert_eq!(project.categories, vec![DUMMY_CATEGORIES[0]]);
         assert_eq!(project.license.id, "MIT");
 
@@ -449,11 +456,43 @@ pub async fn test_patch_project() {
                 USER_USER_PAT,
             )
             .await;
-        println!("{:?}", resp.response().body());
         assert_eq!(resp.status(), 204);
         let project = api.get_project_deserialized("newslug", USER_USER_PAT).await;
         assert_eq!(project.link_urls.len(), 3);
         assert!(!project.link_urls.contains_key("issues"));
+    })
+    .await;
+}
+
+#[actix_rt::test]
+pub async fn test_patch_v3() {
+    // Hits V3-specific patchable fields
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+
+        let alpha_project_slug = &test_env.dummy.as_ref().unwrap().project_alpha.project_slug;
+
+        // Sucessful request to patch many fields.
+        let resp = api
+            .edit_project(
+                alpha_project_slug,
+                json!({
+                    "name": "New successful title",
+                    "summary": "New successful summary",
+                    "description": "New successful description",
+                }),
+                USER_USER_PAT,
+            )
+            .await;
+        assert_eq!(resp.status(), 204);
+
+        let project = api
+            .get_project_deserialized(alpha_project_slug, USER_USER_PAT)
+            .await;
+
+        assert_eq!(project.name, "New successful title");
+        assert_eq!(project.summary, "New successful summary");
+        assert_eq!(project.description, "New successful description");
     })
     .await;
 }
@@ -551,32 +590,31 @@ pub async fn test_bulk_edit_links() {
 }
 
 #[actix_rt::test]
-async fn permissions_patch_project() {
-    with_test_environment_all(Some(8), |test_env| async move {
+async fn permissions_patch_project_v3() {
+    with_test_environment(Some(8), |test_env: TestEnvironment<ApiV3>| async move {
         let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
         let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
+
+        // TODO: This should be a separate test from v3
+        // - only a couple of these fields are v3-specific
+        // once we have permissions/scope tests setup to not just take closures, we can split this up
 
         // For each permission covered by EDIT_DETAILS, ensure the permission is required
         let edit_details = ProjectPermissions::EDIT_DETAILS;
         let test_pairs = [
             // Body, status, requested_status tested separately
             ("slug", json!("")), // generated in the test to not collide slugs
-            ("title", json!("randomname")),
+            ("name", json!("randomname")),
             ("description", json!("randomdescription")),
             ("categories", json!(["combat", "economy"])),
             ("additional_categories", json!(["decoration"])),
-            ("issues_url", json!("https://issues.com")),
-            ("source_url", json!("https://source.com")),
-            ("wiki_url", json!("https://wiki.com")),
             (
-                "donation_urls",
-                json!([{
-                    "id": "paypal",
-                    "platform": "Paypal",
-                    "url": "https://paypal.com"
-                }]),
+                "links",
+                json!({
+                    "issues": "https://issues.com",
+                    "source": "https://source.com",
+                }),
             ),
-            ("discord_url", json!("https://discord.com")),
             ("license_id", json!("MIT")),
         ];
 
@@ -645,7 +683,7 @@ async fn permissions_patch_project() {
             test::TestRequest::patch()
                 .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
                 .set_json(json!({
-                    "body": "new body!",
+                    "description": "new description!",
                 }))
         };
         PermissionsTest::new(&test_env)
@@ -1027,7 +1065,7 @@ async fn project_permissions_consistency_test() {
             test::TestRequest::patch()
                 .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
                 .set_json(json!({
-                    "title": "Example title - changed.",
+                    "name": "Example title - changed.",
                 }))
         };
         PermissionsTest::new(&test_env)
@@ -1044,7 +1082,7 @@ async fn project_permissions_consistency_test() {
             test::TestRequest::patch()
                 .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
                 .set_json(json!({
-                    "title": "Example title - changed.",
+                    "name": "Example title - changed.",
                 }))
         };
         PermissionsTest::new(&test_env)

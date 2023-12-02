@@ -62,7 +62,7 @@ pub async fn index_local(
                 GROUP BY version_id
             )
 
-            SELECT m.id id, v.id version_id, m.title title, m.description description, m.downloads downloads, m.follows follows,
+            SELECT m.id id, v.id version_id, m.name name, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
             m.team_id team_id, m.license license, m.slug slug, m.status status_name, m.color color,
             u.username username,
@@ -87,7 +87,7 @@ pub async fn index_local(
             LEFT JOIN loaders_project_types_games lptg ON lptg.loader_id = lo.id AND lptg.project_type_id = pt.id
             LEFT JOIN games g ON lptg.game_id = g.id
             LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.is_owner = TRUE AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
             LEFT OUTER JOIN version_fields_json vf ON v.id = vf.version_id
             LEFT OUTER JOIN loader_fields_json lf ON v.id = lf.version_id
@@ -97,7 +97,6 @@ pub async fn index_local(
             ",
             &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
             &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_searchable()).map(|x| x.to_string()).collect::<Vec<String>>(),
-            crate::models::teams::OWNER_ROLE,
         )
             .fetch_many(&pool)
             .try_filter_map(|e| {
@@ -147,7 +146,7 @@ pub async fn index_local(
                     UploadSearchProject {
                         version_id: version_id.to_string(),
                         project_id: project_id.to_string(),
-                        title: m.title,
+                        name: m.name,
                         description: m.description,
                         categories,
                         follows: m.follows,

@@ -138,7 +138,11 @@ impl ApiVersion for ApiV3 {
             )
             .await;
         assert_status(&resp, StatusCode::OK);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Version = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_version(&self, id: &str, pat: &str) -> ServiceResponse {
@@ -152,7 +156,11 @@ impl ApiVersion for ApiV3 {
     async fn get_version_deserialized_common(&self, id: &str, pat: &str) -> CommonVersion {
         let resp = self.get_version(id, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Version = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn edit_version(
@@ -191,7 +199,11 @@ impl ApiVersion for ApiV3 {
     ) -> CommonVersion {
         let resp = self.get_version_from_hash(hash, algorithm, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Version = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_versions_from_hashes(
@@ -219,7 +231,11 @@ impl ApiVersion for ApiV3 {
     ) -> HashMap<String, CommonVersion> {
         let resp = self.get_versions_from_hashes(hashes, algorithm, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: HashMap<String, Version> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_update_from_hash(
@@ -267,7 +283,11 @@ impl ApiVersion for ApiV3 {
             .get_update_from_hash(hash, algorithm, loaders, game_versions, version_types, pat)
             .await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Version = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn update_files(
@@ -323,7 +343,11 @@ impl ApiVersion for ApiV3 {
             )
             .await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: HashMap<String, Version> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     // TODO: Not all fields are tested currently in the v3 tests, only the v2-v3 relevant ones are
@@ -402,7 +426,11 @@ impl ApiVersion for ApiV3 {
             )
             .await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<Version> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     // TODO: remove redundancy in these functions
@@ -440,6 +468,10 @@ impl ApiVersion for ApiV3 {
     ) -> Vec<CommonVersion> {
         let resp = self.get_versions(version_ids, pat).await;
         assert_status(&resp, StatusCode::OK);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<Version> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 }

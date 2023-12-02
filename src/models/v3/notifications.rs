@@ -21,10 +21,7 @@ pub struct Notification {
     pub created: DateTime<Utc>,
     pub body: NotificationBody,
 
-    // DEPRECATED: use body field instead
-    #[serde(rename = "type")]
-    pub type_: Option<String>,
-    pub title: String,
+    pub name: String,
     pub text: String,
     pub link: String,
     pub actions: Vec<NotificationAction>,
@@ -63,7 +60,7 @@ pub enum NotificationBody {
     },
     LegacyMarkdown {
         notification_type: Option<String>,
-        title: String,
+        name: String,
         text: String,
         link: String,
         actions: Vec<NotificationAction>,
@@ -73,13 +70,12 @@ pub enum NotificationBody {
 
 impl From<DBNotification> for Notification {
     fn from(notif: DBNotification) -> Self {
-        let (type_, title, text, link, actions) = {
+        let (name, text, link, actions) = {
             match &notif.body {
                 NotificationBody::ProjectUpdate {
                     project_id,
                     version_id,
                 } => (
-                    Some("project_update".to_string()),
                     "A project you follow has been updated!".to_string(),
                     format!(
                         "The project {} has released a new version: {}",
@@ -94,17 +90,16 @@ impl From<DBNotification> for Notification {
                     team_id,
                     ..
                 } => (
-                    Some("team_invite".to_string()),
                     "You have been invited to join a team!".to_string(),
                     format!("An invite has been sent for you to be {} of a team", role),
                     format!("/project/{}", project_id),
                     vec![
                         NotificationAction {
-                            title: "Accept".to_string(),
+                            name: "Accept".to_string(),
                             action_route: ("POST".to_string(), format!("team/{team_id}/join")),
                         },
                         NotificationAction {
-                            title: "Deny".to_string(),
+                            name: "Deny".to_string(),
                             action_route: (
                                 "DELETE".to_string(),
                                 format!("team/{team_id}/members/{}", UserId::from(notif.user_id)),
@@ -118,7 +113,6 @@ impl From<DBNotification> for Notification {
                     team_id,
                     ..
                 } => (
-                    Some("organization_invite".to_string()),
                     "You have been invited to join an organization!".to_string(),
                     format!(
                         "An invite has been sent for you to be {} of an organization",
@@ -127,11 +121,11 @@ impl From<DBNotification> for Notification {
                     format!("/organization/{}", organization_id),
                     vec![
                         NotificationAction {
-                            title: "Accept".to_string(),
+                            name: "Accept".to_string(),
                             action_route: ("POST".to_string(), format!("team/{team_id}/join")),
                         },
                         NotificationAction {
-                            title: "Deny".to_string(),
+                            name: "Deny".to_string(),
                             action_route: (
                                 "DELETE".to_string(),
                                 format!(
@@ -147,7 +141,6 @@ impl From<DBNotification> for Notification {
                     new_status,
                     project_id,
                 } => (
-                    Some("status_change".to_string()),
                     "Project status has changed".to_string(),
                     format!(
                         "Status has changed from {} to {}",
@@ -162,7 +155,6 @@ impl From<DBNotification> for Notification {
                     report_id,
                     ..
                 } => (
-                    Some("moderator_message".to_string()),
                     "A moderator has sent you a message!".to_string(),
                     "Click on the link to read more.".to_string(),
                     if let Some(project_id) = project_id {
@@ -175,25 +167,20 @@ impl From<DBNotification> for Notification {
                     vec![],
                 ),
                 NotificationBody::LegacyMarkdown {
-                    notification_type,
-                    title,
+                    name,
                     text,
                     link,
                     actions,
+                    ..
                 } => (
-                    notification_type.clone(),
-                    title.clone(),
+                    name.clone(),
                     text.clone(),
                     link.clone(),
                     actions.clone().into_iter().map(Into::into).collect(),
                 ),
-                NotificationBody::Unknown => (
-                    None,
-                    "".to_string(),
-                    "".to_string(),
-                    "#".to_string(),
-                    vec![],
-                ),
+                NotificationBody::Unknown => {
+                    ("".to_string(), "".to_string(), "#".to_string(), vec![])
+                }
             }
         };
 
@@ -204,9 +191,7 @@ impl From<DBNotification> for Notification {
             read: notif.read,
             created: notif.created,
 
-            // DEPRECATED
-            type_,
-            title,
+            name,
             text,
             link,
             actions,
@@ -216,7 +201,7 @@ impl From<DBNotification> for Notification {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NotificationAction {
-    pub title: String,
+    pub name: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
     pub action_route: (String, String),
 }
@@ -224,7 +209,7 @@ pub struct NotificationAction {
 impl From<DBNotificationAction> for NotificationAction {
     fn from(act: DBNotificationAction) -> Self {
         Self {
-            title: act.title,
+            name: act.name,
             action_route: (act.action_route_method, act.action_route),
         }
     }

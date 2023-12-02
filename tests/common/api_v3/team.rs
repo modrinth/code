@@ -1,7 +1,10 @@
 use actix_http::StatusCode;
 use actix_web::{dev::ServiceResponse, test};
 use async_trait::async_trait;
-use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
+use labrinth::models::{
+    notifications::Notification,
+    teams::{OrganizationPermissions, ProjectPermissions, TeamMember},
+};
 use serde_json::json;
 
 use crate::common::{
@@ -13,6 +16,24 @@ use crate::common::{
 };
 
 use super::ApiV3;
+
+impl ApiV3 {
+    pub async fn get_organization_members_deserialized(
+        &self,
+        id_or_title: &str,
+        pat: &str,
+    ) -> Vec<TeamMember> {
+        let resp = self.get_organization_members(id_or_title, pat).await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
+
+    pub async fn get_team_members_deserialized(&self, team_id: &str, pat: &str) -> Vec<TeamMember> {
+        let resp = self.get_team_members(team_id, pat).await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
+}
 
 #[async_trait(?Send)]
 impl ApiTeams for ApiV3 {
@@ -31,7 +52,11 @@ impl ApiTeams for ApiV3 {
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_team_members(id_or_title, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<TeamMember> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_project_members(&self, id_or_title: &str, pat: &str) -> ServiceResponse {
@@ -49,7 +74,11 @@ impl ApiTeams for ApiV3 {
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_project_members(id_or_title, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<TeamMember> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn get_organization_members(&self, id_or_title: &str, pat: &str) -> ServiceResponse {
@@ -67,7 +96,11 @@ impl ApiTeams for ApiV3 {
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_organization_members(id_or_title, pat).await;
         assert_eq!(resp.status(), 200);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<TeamMember> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn join_team(&self, team_id: &str, pat: &str) -> ServiceResponse {
@@ -132,7 +165,11 @@ impl ApiTeams for ApiV3 {
     ) -> Vec<CommonNotification> {
         let resp = self.get_user_notifications(user_id, pat).await;
         assert_status(&resp, StatusCode::OK);
-        test::read_body_json(resp).await
+        // First, deserialize to the non-common format (to test the response is valid for this api version)
+        let v: Vec<Notification> = test::read_body_json(resp).await;
+        // Then, deserialize to the common format
+        let value = serde_json::to_value(v).unwrap();
+        serde_json::from_value(value).unwrap()
     }
 
     async fn mark_notification_read(&self, notification_id: &str, pat: &str) -> ServiceResponse {

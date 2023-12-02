@@ -166,7 +166,7 @@ pub async fn project_get(
             return Ok(HttpResponse::Ok().json(Project::from(data)));
         }
     }
-    Ok(HttpResponse::NotFound().body(""))
+    Err(ApiError::NotFound)
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -175,11 +175,11 @@ pub struct EditProject {
         length(min = 3, max = 64),
         custom(function = "crate::util::validate::validate_name")
     )]
-    pub title: Option<String>,
+    pub name: Option<String>,
     #[validate(length(min = 3, max = 256))]
-    pub description: Option<String>,
+    pub summary: Option<String>,
     #[validate(length(max = 65536))]
-    pub body: Option<String>,
+    pub description: Option<String>,
     #[validate(length(max = 3))]
     pub categories: Option<Vec<String>>,
     #[validate(length(max = 256))]
@@ -272,10 +272,10 @@ pub async fn project_edit(
         if let Some(perms) = permissions {
             let mut transaction = pool.begin().await?;
 
-            if let Some(title) = &new_project.title {
+            if let Some(name) = &new_project.name {
                 if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the title of this project!"
+                        "You do not have the permissions to edit the name of this project!"
                             .to_string(),
                     ));
                 }
@@ -283,20 +283,20 @@ pub async fn project_edit(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET title = $1
+                    SET name = $1
                     WHERE (id = $2)
                     ",
-                    title.trim(),
+                    name.trim(),
                     id as db_ids::ProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
             }
 
-            if let Some(description) = &new_project.description {
+            if let Some(summary) = &new_project.summary {
                 if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the description of this project!"
+                        "You do not have the permissions to edit the summary of this project!"
                             .to_string(),
                     ));
                 }
@@ -304,10 +304,10 @@ pub async fn project_edit(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET description = $1
+                    SET summary = $1
                     WHERE (id = $2)
                     ",
-                    description,
+                    summary,
                     id as db_ids::ProjectId,
                 )
                 .execute(&mut *transaction)
@@ -664,55 +664,57 @@ pub async fn project_edit(
                 .await?;
             }
             if let Some(links) = &new_project.link_urls {
-                if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the links of this project!"
-                            .to_string(),
-                    ));
-                }
+                if !links.is_empty() {
+                    if !perms.contains(ProjectPermissions::EDIT_DETAILS) {
+                        return Err(ApiError::CustomAuthentication(
+                            "You do not have the permissions to edit the links of this project!"
+                                .to_string(),
+                        ));
+                    }
 
-                let ids_to_delete = links
-                    .iter()
-                    .map(|(name, _)| name.clone())
-                    .collect::<Vec<String>>();
-                // Deletes all links from hashmap- either will be deleted or be replaced
-                sqlx::query!(
-                    "
-                    DELETE FROM mods_links
-                    WHERE joining_mod_id = $1 AND joining_platform_id IN (
-                        SELECT id FROM link_platforms WHERE name = ANY($2)
+                    let ids_to_delete = links
+                        .iter()
+                        .map(|(name, _)| name.clone())
+                        .collect::<Vec<String>>();
+                    // Deletes all links from hashmap- either will be deleted or be replaced
+                    sqlx::query!(
+                        "
+                        DELETE FROM mods_links
+                        WHERE joining_mod_id = $1 AND joining_platform_id IN (
+                            SELECT id FROM link_platforms WHERE name = ANY($2)
+                        )
+                        ",
+                        id as db_ids::ProjectId,
+                        &ids_to_delete
                     )
-                    ",
-                    id as db_ids::ProjectId,
-                    &ids_to_delete
-                )
-                .execute(&mut *transaction)
-                .await?;
+                    .execute(&mut *transaction)
+                    .await?;
 
-                for (platform, url) in links {
-                    if let Some(url) = url {
-                        let platform_id = db_models::categories::LinkPlatform::get_id(
-                            platform,
-                            &mut *transaction,
-                        )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Platform {} does not exist.",
-                                platform.clone()
-                            ))
-                        })?;
-                        sqlx::query!(
-                            "
-                            INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
-                            VALUES ($1, $2, $3)
-                            ",
-                            id as db_ids::ProjectId,
-                            platform_id as db_ids::LinkPlatformId,
-                            url
-                        )
-                        .execute(&mut *transaction)
-                        .await?;
+                    for (platform, url) in links {
+                        if let Some(url) = url {
+                            let platform_id = db_models::categories::LinkPlatform::get_id(
+                                platform,
+                                &mut *transaction,
+                            )
+                            .await?
+                            .ok_or_else(|| {
+                                ApiError::InvalidInput(format!(
+                                    "Platform {} does not exist.",
+                                    platform.clone()
+                                ))
+                            })?;
+                            sqlx::query!(
+                                "
+                                INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
+                                VALUES ($1, $2, $3)
+                                ",
+                                id as db_ids::ProjectId,
+                                platform_id as db_ids::LinkPlatformId,
+                                url
+                            )
+                            .execute(&mut *transaction)
+                            .await?;
+                        }
                     }
                 }
             }
@@ -763,10 +765,10 @@ pub async fn project_edit(
                 .await?;
             }
 
-            if let Some(body) = &new_project.body {
+            if let Some(description) = &new_project.description {
                 if !perms.contains(ProjectPermissions::EDIT_BODY) {
                     return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the body of this project!"
+                        "You do not have the permissions to edit the description (body) of this project!"
                             .to_string(),
                     ));
                 }
@@ -774,10 +776,10 @@ pub async fn project_edit(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET body = $1
+                    SET description = $1
                     WHERE (id = $2)
                     ",
-                    body,
+                    description,
                     id as db_ids::ProjectId,
                 )
                 .execute(&mut *transaction)
@@ -818,7 +820,7 @@ pub async fn project_edit(
 
             // check new description and body for links to associated images
             // if they no longer exist in the description or body, delete them
-            let checkable_strings: Vec<&str> = vec![&new_project.description, &new_project.body]
+            let checkable_strings: Vec<&str> = vec![&new_project.description, &new_project.summary]
                 .into_iter()
                 .filter_map(|x| x.as_ref().map(|y| y.as_str()))
                 .collect();
@@ -844,7 +846,7 @@ pub async fn project_edit(
             ))
         }
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -918,7 +920,7 @@ pub async fn project_get_check(
             "id": models::ids::ProjectId::from(project.inner.id)
         })))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -952,7 +954,7 @@ pub async fn dependency_list(
 
     if let Some(project) = result {
         if !is_authorized(&project.inner, &user_option, &pool).await? {
-            return Ok(HttpResponse::NotFound().body(""));
+            return Err(ApiError::NotFound);
         }
 
         let dependencies =
@@ -1000,7 +1002,7 @@ pub async fn dependency_list(
 
         Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -1125,7 +1127,7 @@ pub async fn projects_edit(
                 if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(format!(
                         "You do not have the permissions to bulk edit project {}!",
-                        project.inner.title
+                        project.inner.name
                     )));
                 }
             } else if project.inner.status.is_hidden() {
@@ -1136,7 +1138,7 @@ pub async fn projects_edit(
             } else {
                 return Err(ApiError::CustomAuthentication(format!(
                     "You are not a member of project {}!",
-                    project.inner.title
+                    project.inner.name
                 )));
             };
         }
@@ -1377,7 +1379,7 @@ pub async fn project_schedule(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -1591,7 +1593,7 @@ pub async fn delete_project_icon(
 pub struct GalleryCreateQuery {
     pub featured: bool,
     #[validate(length(min = 1, max = 255))]
-    pub title: Option<String>,
+    pub name: Option<String>,
     #[validate(length(min = 1, max = 2048))]
     pub description: Option<String>,
     pub ordering: Option<i64>,
@@ -1712,7 +1714,7 @@ pub async fn add_gallery_item(
         let gallery_item = vec![db_models::project_item::GalleryItem {
             image_url: file_url,
             featured: item.featured,
-            title: item.title,
+            name: item.name,
             description: item.description,
             created: Utc::now(),
             ordering: item.ordering.unwrap_or(0),
@@ -1749,7 +1751,7 @@ pub struct GalleryEditQuery {
         with = "::serde_with::rust::double_option"
     )]
     #[validate(length(min = 1, max = 255))]
-    pub title: Option<Option<String>>,
+    pub name: Option<Option<String>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -1864,15 +1866,15 @@ pub async fn edit_gallery_item(
         .execute(&mut *transaction)
         .await?;
     }
-    if let Some(title) = item.title {
+    if let Some(name) = item.name {
         sqlx::query!(
             "
             UPDATE mods_gallery
-            SET title = $2
+            SET name = $2
             WHERE id = $1
             ",
             id,
-            title
+            name
         )
         .execute(&mut *transaction)
         .await?;
@@ -2101,7 +2103,7 @@ pub async fn project_delete(
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Ok(HttpResponse::NotFound().body(""))
+        Err(ApiError::NotFound)
     }
 }
 
@@ -2133,7 +2135,7 @@ pub async fn project_follow(
     let project_id: db_ids::ProjectId = result.inner.id;
 
     if !is_authorized(&result.inner, &Some(user), &pool).await? {
-        return Ok(HttpResponse::NotFound().body(""));
+        return Err(ApiError::NotFound);
     }
 
     let following = sqlx::query!(

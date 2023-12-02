@@ -1,7 +1,6 @@
 use actix_web::test::{self, TestRequest};
 use bytes::Bytes;
 use chrono::{Duration, Utc};
-
 use common::api_v3::request_data::{
     get_public_project_creation_data, get_public_version_creation_data,
 };
@@ -207,8 +206,11 @@ pub async fn notifications_scopes() {
 
 // Project version creation scopes
 #[actix_rt::test]
-pub async fn project_version_create_scopes() {
+pub async fn project_version_create_scopes_v3() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        // TODO: If possible, find a way to use generic api functions with the Permissions/Scopes test, then this can be recombined with the V2 version of this test
+        // let api = &test_env.api;
+
         // Create project
         let create_project = Scopes::PROJECT_CREATE;
         let req_gen = || {
@@ -510,7 +512,7 @@ pub async fn project_write_scopes() {
                 .uri(&format!("/v3/project/{beta_project_id}"))
                 .set_json(json!(
                     {
-                        "title": "test_project_version_write_scopes Title",
+                        "name": "test_project_version_write_scopes Title",
                     }
                 ))
         };
@@ -1081,7 +1083,7 @@ pub async fn collections_scopes() {
             test::TestRequest::post()
                 .uri("/v3/collection")
                 .set_json(json!({
-                    "title": "Test Collection",
+                    "name": "Test Collection",
                     "description": "Test Collection Description",
                     "projects": [alpha_project_id]
                 }))
@@ -1099,7 +1101,7 @@ pub async fn collections_scopes() {
             test::TestRequest::patch()
                 .uri(&format!("/v3/collection/{collection_id}"))
                 .set_json(json!({
-                    "title": "Test Collection patch",
+                    "name": "Test Collection patch",
                     "status": "private",
                 }))
         };
@@ -1182,7 +1184,7 @@ pub async fn organization_scopes() {
             test::TestRequest::post()
                 .uri("/v3/organization")
                 .set_json(json!({
-                    "title": "TestOrg",
+                    "name": "TestOrg",
                     "description": "TestOrg Description",
                 }))
         };

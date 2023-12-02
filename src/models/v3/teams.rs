@@ -135,6 +135,8 @@ pub struct TeamMember {
     pub user: User,
     /// The role of the user in the team
     pub role: String,
+    /// Is the user the owner of the team?
+    pub is_owner: bool,
     /// A bitset containing the user's permissions in this team.
     /// In an organization-controlled project, these are the unique overriding permissions for the user's role for any project in the organization, if they exist.
     /// In an organization, these are the default project permissions for any project in the organization.
@@ -178,6 +180,7 @@ impl TeamMember {
             team_id: data.team_id.into(),
             user,
             role: data.role,
+            is_owner: data.is_owner,
             permissions: if override_permissions {
                 None
             } else {

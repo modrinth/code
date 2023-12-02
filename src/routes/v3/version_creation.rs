@@ -421,7 +421,6 @@ async fn version_create_inner(
         project_types: all_project_types,
         games: all_games,
         changelog: builder.changelog.clone(),
-        changelog_url: None,
         date_published: Utc::now(),
         downloads: 0,
         version_type: version_data.release_channel,
