@@ -106,12 +106,12 @@ pub async fn import_curseforge(
         let mut mod_loader = None;
         let mut loader_version = None;
 
-        match instance_mod_loader.name.split_once('-') {
-            Some(("forge", version)) => {
+        match instance_mod_loader.name.split('-').collect::<Vec<&str>>()[..] {
+            ["forge", version] => {
                 mod_loader = Some(ModLoader::Forge);
                 loader_version = Some(version.to_string());
             }
-            Some(("fabric", version)) => {
+            ["fabric", version, _game_version] => {
                 mod_loader = Some(ModLoader::Fabric);
                 loader_version = Some(version.to_string());
             }
