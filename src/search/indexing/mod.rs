@@ -1,6 +1,7 @@
 /// This module is used for the indexing from any source.
 pub mod local_import;
 
+use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;
 use meilisearch_sdk::client::Client;
@@ -30,11 +31,15 @@ pub enum IndexingError {
 // assumes a max average size of 1KiB per project to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000;
 
-pub async fn index_projects(pool: PgPool, config: &SearchConfig) -> Result<(), IndexingError> {
+pub async fn index_projects(
+    pool: PgPool,
+    redis: RedisPool,
+    config: &SearchConfig,
+) -> Result<(), IndexingError> {
     let mut docs_to_add: Vec<UploadSearchProject> = vec![];
     let mut additional_fields: Vec<String> = vec![];
 
-    let (mut uploads, mut loader_fields) = index_local(pool.clone()).await?;
+    let (mut uploads, mut loader_fields) = index_local(pool.clone(), &redis).await?;
     docs_to_add.append(&mut uploads);
     additional_fields.append(&mut loader_fields);
 
@@ -186,7 +191,7 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "slug",
     "author",
     "name",
-    "description",
+    "summary",
     "categories",
     "display_categories",
     "downloads",
@@ -199,9 +204,26 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery",
     "featured_gallery",
     "color",
+    // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
+
+    // Non-searchable fields for filling out the Project model.
+    "license_url",
+    "monetization_status",
+    "team_id",
+    "thread_id",
+    "versions",
+    "date_published",
+    "date_queued",
+    "status",
+    "requested_status",
+    "games",
+    "organization_id",
+    "links",
+    "gallery_items",
+    "loaders", // search uses loaders as categories- this is purely for the Project model.
 ];
 
-const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] = &["name", "description", "author", "slug"];
+const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] = &["name", "summary", "author", "slug"];
 
 const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "categories",

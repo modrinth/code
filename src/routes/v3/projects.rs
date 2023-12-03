@@ -882,11 +882,31 @@ pub async fn edit_project_categories(
     Ok(())
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct ReturnSearchResults {
+    pub hits: Vec<Project>,
+    pub offset: usize,
+    pub limit: usize,
+    pub total_hits: usize,
+}
+
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, SearchError> {
     let results = search_for_project(&info, &config).await?;
+
+    let results = ReturnSearchResults {
+        hits: results
+            .hits
+            .into_iter()
+            .filter_map(Project::from_search)
+            .collect::<Vec<_>>(),
+        offset: results.offset,
+        limit: results.limit,
+        total_hits: results.total_hits,
+    };
+
     Ok(HttpResponse::Ok().json(results))
 }
 

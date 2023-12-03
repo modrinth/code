@@ -1,6 +1,7 @@
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-use crate::search::ResultSearchProject;
+use crate::{routes::v2_reroute, search::ResultSearchProject};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct LegacySearchResults {
@@ -44,7 +45,12 @@ impl LegacyResultSearchProject {
         if categories.contains(&"mrpack".to_string()) {
             if let Some(mrpack_loaders) = result_search_project.loader_fields.get("mrpack_loaders")
             {
-                categories.extend(mrpack_loaders.clone());
+                categories.extend(
+                    mrpack_loaders
+                        .iter()
+                        .filter_map(|c| c.as_str())
+                        .map(String::from),
+                );
                 categories.retain(|c| c != "mrpack");
             }
         }
@@ -52,7 +58,12 @@ impl LegacyResultSearchProject {
         if display_categories.contains(&"mrpack".to_string()) {
             if let Some(mrpack_loaders) = result_search_project.loader_fields.get("mrpack_loaders")
             {
-                display_categories.extend(mrpack_loaders.clone());
+                categories.extend(
+                    mrpack_loaders
+                        .iter()
+                        .filter_map(|c| c.as_str())
+                        .map(String::from),
+                );
                 display_categories.retain(|c| c != "mrpack");
             }
         }
@@ -84,25 +95,44 @@ impl LegacyResultSearchProject {
             project_type
         };
 
+        let loader_fields = result_search_project.loader_fields.clone();
+        let get_one_bool_loader_field = |key: &str| {
+            loader_fields
+                .get(key)
+                .cloned()
+                .unwrap_or_default()
+                .first()
+                .and_then(|s| s.as_bool())
+        };
+
+        let singleplayer = get_one_bool_loader_field("singleplayer");
+        let client_only = get_one_bool_loader_field("client_only").unwrap_or(false);
+        let server_only = get_one_bool_loader_field("server_only").unwrap_or(false);
+        let client_and_server = get_one_bool_loader_field("client_and_server");
+
+        let (client_side, server_side) = v2_reroute::convert_side_types_v2_bools(
+            singleplayer,
+            client_only,
+            server_only,
+            client_and_server,
+        );
+        let client_side = client_side.to_string();
+        let server_side = server_side.to_string();
+
+        let versions = result_search_project
+            .loader_fields
+            .get("game_versions")
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .filter_map(|s| s.as_str().map(String::from))
+            .collect_vec();
+
         Self {
             project_type,
-            client_side: result_search_project
-                .loader_fields
-                .get("client_side")
-                .cloned()
-                .unwrap_or_default()
-                .join(","),
-            server_side: result_search_project
-                .loader_fields
-                .get("server_side")
-                .cloned()
-                .unwrap_or_default()
-                .join(","),
-            versions: result_search_project
-                .loader_fields
-                .get("game_versions")
-                .cloned()
-                .unwrap_or_default(),
+            client_side,
+            server_side,
+            versions,
             latest_version: result_search_project.version_id,
             categories,
 
@@ -110,11 +140,11 @@ impl LegacyResultSearchProject {
             slug: result_search_project.slug,
             author: result_search_project.author,
             title: result_search_project.name,
-            description: result_search_project.description,
+            description: result_search_project.summary,
             display_categories,
             downloads: result_search_project.downloads,
             follows: result_search_project.follows,
-            icon_url: result_search_project.icon_url,
+            icon_url: result_search_project.icon_url.unwrap_or_default(),
             license: result_search_project.license,
             date_created: result_search_project.date_created,
             date_modified: result_search_project.date_modified,

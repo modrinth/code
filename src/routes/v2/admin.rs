@@ -139,9 +139,11 @@ pub async fn count_download(
 #[post("/_force_reindex", guard = "admin_key_guard")]
 pub async fn force_reindex(
     pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
     config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
     use crate::search::indexing::index_projects;
-    index_projects(pool.as_ref().clone(), &config).await?;
+    let redis = redis.get_ref();
+    index_projects(pool.as_ref().clone(), redis.clone(), &config).await?;
     Ok(HttpResponse::NoContent().finish())
 }

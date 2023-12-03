@@ -243,8 +243,6 @@ pub fn convert_side_type_facets_v3(facets: Vec<Vec<Vec<String>>>) -> Vec<Vec<Vec
 pub fn convert_side_types_v2(
     side_types: &HashMap<String, Value>,
 ) -> (LegacySideType, LegacySideType) {
-    use LegacySideType::{Optional, Required, Unsupported};
-
     let client_and_server = side_types
         .get("client_and_server")
         .and_then(|x| x.as_bool())
@@ -261,6 +259,25 @@ pub fn convert_side_types_v2(
         .get("server_only")
         .and_then(|x| x.as_bool())
         .unwrap_or(false);
+
+    convert_side_types_v2_bools(
+        Some(singleplayer),
+        client_only,
+        server_only,
+        Some(client_and_server),
+    )
+}
+
+// Client side, server side
+pub fn convert_side_types_v2_bools(
+    singleplayer: Option<bool>,
+    client_only: bool,
+    server_only: bool,
+    client_and_server: Option<bool>,
+) -> (LegacySideType, LegacySideType) {
+    use LegacySideType::{Optional, Required, Unsupported};
+
+    let singleplayer = singleplayer.or(client_and_server).unwrap_or(false);
 
     match (singleplayer, client_only, server_only) {
         // Only singleplayer

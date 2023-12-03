@@ -305,6 +305,51 @@ async fn search_projects() {
                 }
             })
             .await;
+
+        // A couple additional tests for the saerch type returned, making sure it is properly translated back
+        let client_side_required = api
+            .search_deserialized(
+                Some(&test_name),
+                Some(json!([["client_side:required"]])),
+                USER_USER_PAT,
+            )
+            .await;
+        for hit in client_side_required.hits {
+            assert_eq!(hit.client_side, "required".to_string());
+        }
+
+        let server_side_required = api
+            .search_deserialized(
+                Some(&test_name),
+                Some(json!([["server_side:required"]])),
+                USER_USER_PAT,
+            )
+            .await;
+        for hit in server_side_required.hits {
+            assert_eq!(hit.server_side, "required".to_string());
+        }
+
+        let client_side_unsupported = api
+            .search_deserialized(
+                Some(&test_name),
+                Some(json!([["client_side:unsupported"]])),
+                USER_USER_PAT,
+            )
+            .await;
+        for hit in client_side_unsupported.hits {
+            assert_eq!(hit.client_side, "unsupported".to_string());
+        }
+
+        let game_versions = api
+            .search_deserialized(
+                Some(&test_name),
+                Some(json!([["versions:1.20.5"]])),
+                USER_USER_PAT,
+            )
+            .await;
+        for hit in game_versions.hits {
+            assert_eq!(hit.versions, vec!["1.20.5".to_string()]);
+        }
     })
     .await;
 }

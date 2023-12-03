@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use actix_http::StatusCode;
 use actix_web::test;
 use bytes::Bytes;
@@ -9,10 +11,11 @@ use common::dummy_data::DUMMY_CATEGORIES;
 
 use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
 use common::permissions::{PermissionsTest, PermissionsTestContext};
+use common::search::setup_search_projects;
 use futures::StreamExt;
 use labrinth::database::models::project_item::{PROJECTS_NAMESPACE, PROJECTS_SLUGS_NAMESPACE};
 use labrinth::models::ids::base62_impl::parse_base62;
-use labrinth::models::projects::ProjectId;
+use labrinth::models::projects::{Project, ProjectId};
 use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 use serde_json::json;
@@ -1091,6 +1094,47 @@ async fn project_permissions_consistency_test() {
             .unwrap();
     })
     .await;
+}
+
+#[actix_rt::test]
+async fn align_search_projects() {
+    // Test setup and dummy data
+    with_test_environment(Some(10), |test_env: TestEnvironment<ApiV3>| async move {
+        setup_search_projects(&test_env).await;
+
+        let api = &test_env.api;
+        let test_name = test_env.db.database_name.clone();
+
+        let projects = api
+            .search_deserialized(
+                Some(&test_name),
+                Some(json!([["categories:fabric"]])),
+                USER_USER_PAT,
+            )
+            .await;
+
+        for mut project in projects.hits {
+            let project_model = api
+                .get_project(&project.id.to_string(), USER_USER_PAT)
+                .await;
+            let mut project_model: Project = test::read_body_json(project_model).await;
+
+            // Body/description is huge- don't store it in search, so it's OK if they differ here
+            // (Search should return "")
+            project_model.description = "".into();
+
+            // Aggregate project loader fields will not match exactly,
+            // because the search will only return the matching version, whereas the project returns the aggregate.
+            // So, we remove them from both.
+            project_model.fields = HashMap::new();
+            project.fields = HashMap::new();
+
+            let project_model = serde_json::to_value(project_model).unwrap();
+            let searched_project_serialized = serde_json::to_value(project).unwrap();
+            assert_eq!(project_model, searched_project_serialized);
+        }
+    })
+    .await
 }
 
 // Route tests:
