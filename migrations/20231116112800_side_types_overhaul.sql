@@ -1,3 +1,5 @@
+CREATE INDEX version_fields_version_id ON version_fields (version_id);
+CREATE INDEX hashes_file_id ON hashes (file_id);
 
 INSERT INTO loader_fields (field, field_type, optional) SELECT 'singleplayer', 'boolean', false;
 INSERT INTO loader_fields (field, field_type, optional) SELECT 'client_and_server', 'boolean', false;
@@ -14,7 +16,7 @@ ALTER TABLE versions ADD COLUMN server_only boolean;
 UPDATE versions v SET singleplayer = true
 FROM version_fields vf
 INNER JOIN loader_fields lf ON vf.field_id = lf.id
-INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.id AND vf.enum_value = lfev.id
+INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND vf.enum_value = lfev.id
 WHERE v.id = vf.version_id 
 AND (lf.field = 'client_side' OR lf.field = 'server_side') AND (lfev.value = 'required' OR lfev.value = 'optional');
 
@@ -22,33 +24,49 @@ AND (lf.field = 'client_side' OR lf.field = 'server_side') AND (lfev.value = 're
 UPDATE versions v SET client_and_server = true
 FROM version_fields vf
 INNER JOIN loader_fields lf ON vf.field_id = lf.id
-INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.id AND vf.enum_value = lfev.id
+INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND vf.enum_value = lfev.id
 WHERE v.id = vf.version_id 
 AND (lf.field = 'client_side' OR lf.field = 'server_side') AND (lfev.value = 'required' OR lfev.value = 'optional');
 
--- Set client_only to be true if client_side is 'required' or 'optional', and server_side is 'optional', 'unsupported', or 'unknown'
-UPDATE versions v SET client_only = true
-FROM version_fields vf
-INNER JOIN loader_fields lf ON vf.field_id = lf.id
-INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND vf.enum_value = lfev.id
-CROSS JOIN version_fields vf2
-INNER JOIN loader_fields lf2 ON vf2.field_id = lf2.id
-INNER JOIN loader_field_enum_values lfev2 ON lf2.enum_type = lfev2.enum_id AND vf2.enum_value = lfev2.id
-WHERE v.id = vf.version_id AND v.id = vf2.version_id
-AND lf.field = 'client_side' AND (lfev.value = 'required' OR lfev.value = 'optional') 
-AND lf2.field = 'server_side' AND (lfev2.value = 'optional' OR lfev2.value = 'unsupported' OR lfev2.value = 'unknown');
+-- -- Set client_only to be true if client_side is 'required' or 'optional', and server_side is 'optional', 'unsupported', or 'unknown'
+UPDATE versions v
+SET client_only = true
+WHERE EXISTS (
+    SELECT 1
+    FROM version_fields vf
+    INNER JOIN loader_fields lf ON vf.field_id = lf.id
+    INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND vf.enum_value = lfev.id
+    WHERE v.id = vf.version_id
+    AND lf.field = 'client_side' AND (lfev.value = 'required' OR lfev.value = 'optional')
+)
+AND EXISTS (
+    SELECT 1
+    FROM version_fields vf2
+    INNER JOIN loader_fields lf2 ON vf2.field_id = lf2.id
+    INNER JOIN loader_field_enum_values lfev2 ON lf2.enum_type = lfev2.enum_id AND vf2.enum_value = lfev2.id
+    WHERE v.id = vf2.version_id
+    AND lf2.field = 'server_side' AND (lfev2.value = 'optional' OR lfev2.value = 'unsupported' OR lfev2.value = 'unknown')
+);
 
--- Set server_only to be true if server_side is 'required' or 'optional', and client_side is 'optional', 'unsupported', or 'unknown'
-UPDATE versions v SET server_only = true
-FROM version_fields vf
-INNER JOIN loader_fields lf ON vf.field_id = lf.id
-INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND vf.enum_value = lfev.id
-CROSS JOIN version_fields vf2
-INNER JOIN loader_fields lf2 ON vf2.field_id = lf2.id
-INNER JOIN loader_field_enum_values lfev2 ON lf2.enum_type = lfev2.enum_id AND vf2.enum_value = lfev2.id
-WHERE v.id = vf.version_id  AND v.id = vf2.version_id
-AND lf.field = 'server_side' AND (lfev.value = 'required' OR lfev.value = 'optional')
-AND lf2.field = 'client_side' AND (lfev2.value = 'optional' OR lfev2.value = 'unsupported' OR lfev2.value = 'unknown');
+-- -- Set server_only to be true if server_side is 'required' or 'optional', and client_side is 'optional', 'unsupported', or 'unknown'
+UPDATE versions v
+SET server_only = true
+WHERE EXISTS (
+    SELECT 1
+    FROM version_fields vf
+    INNER JOIN loader_fields lf ON vf.field_id = lf.id
+    INNER JOIN loader_field_enum_values lfev ON lf.enum_type = lfev.enum_id AND vf.enum_value = lfev.id
+    WHERE v.id = vf.version_id
+    AND lf.field = 'server_side' AND (lfev.value = 'required' OR lfev.value = 'optional')
+)
+AND EXISTS (
+    SELECT 1
+    FROM version_fields vf2
+    INNER JOIN loader_fields lf2 ON vf2.field_id = lf2.id
+    INNER JOIN loader_field_enum_values lfev2 ON lf2.enum_type = lfev2.enum_id AND vf2.enum_value = lfev2.id
+    WHERE v.id = vf2.version_id
+    AND lf2.field = 'client_side' AND (lfev2.value = 'optional' OR lfev2.value = 'unsupported' OR lfev2.value = 'unknown')
+);
 
 -- Insert the values into the version_fields table
 INSERT INTO version_fields (version_id, field_id, int_value) 
