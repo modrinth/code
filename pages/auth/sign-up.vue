@@ -3,27 +3,27 @@
     <h1>Sign up with</h1>
 
     <section class="third-party">
-      <a class="btn discord-btn" :href="getAuthUrl('discord')">
+      <a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
         <DiscordIcon />
         <span>Discord</span>
       </a>
-      <a class="btn" :href="getAuthUrl('github')">
+      <a class="btn" :href="getAuthUrl('github', redirectTarget)">
         <GitHubIcon />
         <span>GitHub</span>
       </a>
-      <a class="btn" :href="getAuthUrl('microsoft')">
+      <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
         <MicrosoftIcon />
         <span>Microsoft</span>
       </a>
-      <a class="btn" :href="getAuthUrl('google')">
+      <a class="btn" :href="getAuthUrl('google', redirectTarget)">
         <GoogleIcon />
         <span>Google</span>
       </a>
-      <a class="btn" :href="getAuthUrl('steam')">
+      <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
         <SteamIcon />
         <span>Steam</span>
       </a>
-      <a class="btn" :href="getAuthUrl('gitlab')">
+      <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
         <GitLabIcon />
         <span>GitLab</span>
       </a>
@@ -128,6 +128,8 @@ useHead({
 
 const auth = await useAuth()
 const route = useRoute()
+
+const redirectTarget = route.query.redirect
 
 if (route.fullPath.includes('new_account=true')) {
   await navigateTo(

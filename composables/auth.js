@@ -92,9 +92,14 @@ export const initAuth = async (oldToken = null) => {
   return auth
 }
 
-export const getAuthUrl = (provider) => {
+export const getAuthUrl = (provider, redirect = '') => {
   const config = useRuntimeConfig()
   const route = useRoute()
 
-  return `${config.public.apiBaseUrl}auth/init?url=${config.public.siteUrl}${route.path}&provider=${provider}`
+  if (redirect === '') {
+    redirect = route.path
+  }
+  const fullURL = `${config.public.siteUrl}${redirect}`
+
+  return `${config.public.apiBaseUrl}auth/init?url=${fullURL}&provider=${provider}`
 }
