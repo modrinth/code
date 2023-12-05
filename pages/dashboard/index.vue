@@ -88,13 +88,6 @@
             >
           </div>
           <div class="grid-display__item">
-            <div class="label">Total revenue</div>
-            <div class="value">
-              {{ $formatMoney(payouts.all_time, true) }}
-            </div>
-            <span>{{ $formatMoney(payouts.last_month, true) }} in the last month</span>
-          </div>
-          <div class="grid-display__item">
             <div class="label">Current balance</div>
             <div class="value">
               {{ $formatMoney(auth.user.payout_data.balance, true) }}
@@ -127,12 +120,9 @@ useHead({
 
 const auth = await useAuth()
 
-const [{ data: projects }, { data: payouts }] = await Promise.all([
+const [{ data: projects }] = await Promise.all([
   useAsyncData(`user/${auth.value.user.id}/projects`, () =>
     useBaseFetch(`user/${auth.value.user.id}/projects`)
-  ),
-  useAsyncData(`user/${auth.value.user.id}/payouts`, () =>
-    useBaseFetch(`user/${auth.value.user.id}/payouts`)
   ),
 ])
 

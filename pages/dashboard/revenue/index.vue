@@ -1,132 +1,109 @@
 <template>
   <div>
-    <ModalTransfer
-      v-if="enrolled"
-      ref="modal_transfer"
-      :wallet="auth.user.payout_data.payout_wallet"
-      :account-type="auth.user.payout_data.payout_wallet_type"
-      :account="auth.user.payout_data.payout_address"
-      :balance="auth.user.payout_data.balance"
-      :min-withdraw="minWithdraw"
-    />
     <section class="universal-card">
-      <h2>Withdraw</h2>
+      <h2>Revenue</h2>
       <div v-if="auth.user.payout_data.balance >= minWithdraw">
         <p>
           You have
           <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong>
           available to withdraw.
-          <span v-if="!enrolled"
-            >Enroll in the Creator Monetization Program to withdraw your revenue.</span
-          >
         </p>
       </div>
-      <p v-else-if="auth.user.payout_data.balance > 0">
-        You have made
-        <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong
-        >, however you have not yet met the minimum of ${{ minWithdraw }} to withdraw.
-      </p>
       <p v-else>
         You have made
         <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong
         >, which is under the minimum of ${{ minWithdraw }} to withdraw.
       </p>
-      <div v-if="!enrolled">
-        <NuxtLink class="iconified-button" to="/settings/monetization">
-          <SettingsIcon /> Enroll in the Creator Monetization Program
-        </NuxtLink>
-      </div>
-      <div v-if="enrolled" class="input-group">
-        <button
+      <div class="input-group">
+        <nuxt-link
           v-if="auth.user.payout_data.balance >= minWithdraw"
           class="iconified-button brand-button"
-          @click="$refs.modal_transfer.show()"
+          to="/dashboard/revenue/withdraw"
         >
-          <TransferIcon /> Transfer to
-          {{ $formatWallet(auth.user.payout_data.payout_wallet) }}
-        </button>
+          <TransferIcon /> Withdraw
+        </nuxt-link>
         <NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
           <HistoryIcon /> View transfer history
         </NuxtLink>
-        <NuxtLink class="iconified-button" to="/settings/monetization">
-          <SettingsIcon /> Monetization settings
-        </NuxtLink>
       </div>
-    </section>
-    <section class="universal-card">
-      <h2>About the program</h2>
       <p>
         By uploading projects to Modrinth and withdrawing money from your account, you agree to the
         <nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link>. For more
         information on how the rewards system works, see our information page
         <nuxt-link to="/legal/cmp-info" class="text-link">here</nuxt-link>.
       </p>
-      <h2>Processing fees</h2>
-      <p>
-        To avoid paying unnecessary fee deductions, you may want to wait to transfer your money out
-        after it accumulates for a bit rather than transferring as soon as you reach the minimum of
-        ${{ minWithdraw }}.
-      </p>
+    </section>
+    <section class="universal-card">
+      <h2>Payout methods</h2>
       <h3>PayPal</h3>
-      <ul>
-        <li>
-          In the <strong>United States</strong>, PayPal charges a flat
-          <strong>$0.25</strong>
-          fee per transaction.
-        </li>
-        <li>
-          In the rest of the world, PayPal charges a <strong>2%</strong> (up to $20) fee per
-          transaction.
-        </li>
-      </ul>
+      <template v-if="auth.user.auth_providers.includes('paypal')">
+        <p>
+          Your PayPal {{ auth.user.payout_data.paypal_country }} account is currently connected with
+          email
+          {{ auth.user.payout_data.paypal_address }}
+        </p>
+        <button class="btn" @click="removeAuthProvider('paypal')">
+          <XIcon /> Disconnect account
+        </button>
+      </template>
+      <template v-else>
+        <p>Connect your PayPal account to enable withdrawing to your PayPal balance.</p>
+        <a class="btn" :href="`${getAuthUrl('paypal')}&token=${auth.token}`">
+          <PayPalIcon />
+          Sign in with PayPal
+        </a>
+      </template>
+      <h3>Tremendous</h3>
       <p>
-        Modrinth will deduct <strong>2%</strong> for the fee (minimum of $0.25 and maximum of $20)
-        from <strong>all transfers</strong> and if the fee PayPal charges is less than the amount we
-        deducted, the difference will be added back to your Modrinth balance. This happens as
-        Modrinth cannot determine if a transaction will be in the United States or international or
-        not until after the transaction has been made.
+        Tremendous payments are sent to your Modrinth email. To change/set your Modrinth email,
+        visit
+        <nuxt-link to="/settings/account" class="text-link">here</nuxt-link>.
       </p>
-      <h3>Venmo (United States only)</h3>
-      <p>
-        Venmo will charge a $0.25 processing fee per transaction, which will be deducted from the
-        amount you choose to transfer.
-      </p>
-      <h2>Currency conversions</h2>
-      <p>
-        All revenue generated by Modrinth is in United States dollars. Any conversions to your local
-        currency will happen at withdrawal and is not handled by Modrinth. Modrinth cannot guarantee
-        any exchange rate, so only USD is displayed in the creator dashboard.
-      </p>
+      <h3>Venmo</h3>
+      <p>Enter your Venmo username below to enable withdrawing to your Venmo balance.</p>
+      <label class="hidden" for="venmo">Venmo address</label>
+      <input
+        id="venmo"
+        v-model="auth.user.payout_data.venmo_handle"
+        type="search"
+        name="search"
+        placeholder="@example"
+        autocomplete="off"
+      />
+      <button class="btn btn-secondary" @click="updateVenmo"><SaveIcon /> Save information</button>
     </section>
   </div>
 </template>
-<script>
-import TransferIcon from '~/assets/images/utils/transfer.svg'
-import SettingsIcon from '~/assets/images/utils/settings.svg'
-import HistoryIcon from '~/assets/images/utils/history.svg'
-import ModalTransfer from '~/components/ui/ModalTransfer.vue'
+<script setup>
+import { TransferIcon, HistoryIcon, PayPalIcon, SaveIcon, XIcon } from 'omorphia'
 
-export default defineNuxtComponent({
-  components: { TransferIcon, SettingsIcon, HistoryIcon, ModalTransfer },
-  async setup() {
-    const auth = await useAuth()
+const auth = await useAuth()
+const minWithdraw = ref(0.1)
 
-    return { auth }
-  },
-  data() {
-    return {
-      minWithdraw: 0.26,
-      enrolled:
-        this.auth.user.payout_data.payout_wallet &&
-        this.auth.user.payout_data.payout_wallet_type &&
-        this.auth.user.payout_data.payout_address,
+async function updateVenmo() {
+  startLoading()
+  try {
+    const data = {
+      venmo_handle: auth.value.user.payout_data.venmo_handle ?? null,
     }
-  },
-  head: {
-    title: 'Revenue - Modrinth',
-  },
-  methods: {},
-})
+
+    await useBaseFetch(`user/${auth.value.user.id}`, {
+      method: 'PATCH',
+      body: data,
+      apiVersion: 3,
+    })
+    await useAuth(auth.value.token)
+  } catch (err) {
+    const data = useNuxtApp()
+    data.$notify({
+      group: 'main',
+      title: 'An error occurred',
+      text: err.data.description,
+      type: 'error',
+    })
+  }
+  stopLoading()
+}
 </script>
 <style lang="scss" scoped>
 strong {

@@ -268,7 +268,7 @@
     @media screen and (max-width: 750px) {
       &:not(&.small) {
         flex-direction: column;
-        align-items: start;
+        align-items: flex-start;
 
         .stylized-toggle {
           flex-basis: 0;
@@ -339,7 +339,7 @@
     .adjacent-input,
     &.adjacent-input &:not(&.small) {
       flex-direction: column;
-      align-items: start;
+      align-items: flex-start;
     }
   }
 }

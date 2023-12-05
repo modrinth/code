@@ -129,7 +129,7 @@ async function revokeSession(id) {
   stopLoading()
 }
 </script>
-<style lang="scss">
+<style lang="scss" socped>
 .session {
   display: flex;
   flex-direction: column;
