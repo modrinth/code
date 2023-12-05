@@ -340,7 +340,7 @@ impl From<Version> for LegacyVersion {
 pub struct LegacyGalleryItem {
     pub url: String,
     pub featured: bool,
-    pub name: Option<String>,
+    pub title: Option<String>,
     pub description: Option<String>,
     pub created: DateTime<Utc>,
     pub ordering: i64,
@@ -351,7 +351,7 @@ impl LegacyGalleryItem {
         Self {
             url: data.url,
             featured: data.featured,
-            name: data.name,
+            title: data.name,
             description: data.description,
             created: data.created,
             ordering: data.ordering,
