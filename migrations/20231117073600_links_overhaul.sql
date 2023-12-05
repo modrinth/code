@@ -21,7 +21,7 @@ CREATE TABLE mods_links (
     id SERIAL PRIMARY KEY,
     joining_mod_id BIGINT NOT NULL REFERENCES mods (id), 
     joining_platform_id INTEGER NOT NULL REFERENCES link_platforms (id),
-    url VARCHAR(255) NOT NULL
+    url VARCHAR(2048) NOT NULL
 );
 
 INSERT INTO mods_links (joining_mod_id, joining_platform_id, url)
