@@ -125,7 +125,7 @@ pub async fn fetch_countries_downloads(
             WHERE recorded BETWEEN ? AND ? AND project_id IN ?
             GROUP BY
                 country,
-                project_id;
+                project_id
             "
     )
         .bind(start_date.timestamp())
@@ -151,7 +151,7 @@ pub async fn fetch_countries_views(
             WHERE recorded BETWEEN ? AND ? AND project_id IN ?
             GROUP BY
                 country,
-                project_id;
+                project_id
             "
     )
         .bind(start_date.timestamp())
