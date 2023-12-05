@@ -117,7 +117,7 @@ pub async fn playtimes_get(
             hm.insert(id_string.clone(), HashMap::new());
         }
         if let Some(hm) = hm.get_mut(&id_string) {
-            hm.insert(playtime.time, playtime.total_seconds);
+            hm.insert(playtime.time, playtime.total);
         }
     }
 
@@ -183,7 +183,7 @@ pub async fn views_get(
             hm.insert(id_string.clone(), HashMap::new());
         }
         if let Some(hm) = hm.get_mut(&id_string) {
-            hm.insert(views.time, views.total_views);
+            hm.insert(views.time, views.total);
         }
     }
 
@@ -249,7 +249,7 @@ pub async fn downloads_get(
             hm.insert(id_string.clone(), HashMap::new());
         }
         if let Some(hm) = hm.get_mut(&id_string) {
-            hm.insert(downloads.time, downloads.total_downloads);
+            hm.insert(downloads.time, downloads.total);
         }
     }
 
@@ -394,7 +394,7 @@ pub async fn countries_downloads_get(
     let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     // Get the countries
-    let countries = crate::clickhouse::fetch_countries(
+    let countries = crate::clickhouse::fetch_countries_downloads(
         project_ids.unwrap_or_default(),
         start_date,
         end_date,
@@ -409,7 +409,7 @@ pub async fn countries_downloads_get(
             hm.insert(id_string.clone(), HashMap::new());
         }
         if let Some(hm) = hm.get_mut(&id_string) {
-            hm.insert(views.country, views.total_downloads);
+            hm.insert(views.country, views.total);
         }
     }
 
@@ -461,7 +461,7 @@ pub async fn countries_views_get(
     let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     // Get the countries
-    let countries = crate::clickhouse::fetch_countries(
+    let countries = crate::clickhouse::fetch_countries_views(
         project_ids.unwrap_or_default(),
         start_date,
         end_date,
@@ -476,7 +476,7 @@ pub async fn countries_views_get(
             hm.insert(id_string.clone(), HashMap::new());
         }
         if let Some(hm) = hm.get_mut(&id_string) {
-            hm.insert(views.country, views.total_views);
+            hm.insert(views.country, views.total);
         }
     }
 
