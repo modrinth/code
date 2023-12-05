@@ -186,7 +186,6 @@ export default defineNuxtConfig({
 
       const resolveCompactNumberDataImport = await (async () => {
         const compactNumberLocales: string[] = []
-        const resolvedImports = new Map<string, string>()
 
         for await (const localeFile of globIterate(
           'node_modules/@vintl/compact-number/dist/locale-data/*.mjs',
@@ -194,7 +193,6 @@ export default defineNuxtConfig({
         )) {
           const tag = basename(localeFile, '.mjs')
           compactNumberLocales.push(tag)
-          resolvedImports.set(tag, String(pathToFileURL(resolve(localeFile))))
         }
 
         function resolveImport(tag: string) {
@@ -207,6 +205,33 @@ export default defineNuxtConfig({
         return resolveImport
       })()
 
+      const resolveOmorphiaLocaleImport = await (async () => {
+        const omorphiaLocales: string[] = []
+        const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>()
+
+        for await (const localeDir of globIterate('node_modules/omorphia/locales/*', {
+          posix: true,
+        })) {
+          const tag = basename(localeDir)
+          omorphiaLocales.push(tag)
+
+          const localeFiles: { from: string; format?: string }[] = []
+
+          omorphiaLocaleSets.set(tag, { files: localeFiles })
+
+          for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
+            localeFiles.push({
+              from: pathToFileURL(localeFile).toString(),
+              format: 'default',
+            })
+          }
+        }
+
+        return function resolveLocaleImport(tag: string) {
+          return omorphiaLocaleSets.get(matchLocale([tag], omorphiaLocales, 'en-x-placeholder'))
+        }
+      })()
+
       for await (const localeDir of globIterate('locales/*/', { posix: true })) {
         const tag = basename(localeDir)
         if (isProduction && !enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
@@ -215,20 +240,15 @@ export default defineNuxtConfig({
           opts.locales.find((locale) => locale.tag === tag) ??
           opts.locales[opts.locales.push({ tag }) - 1]
 
+        const localeFiles = (locale.files ??= [])
+
         for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
           const fileName = basename(localeFile)
           if (fileName === 'index.json') {
-            if (locale.file == null) {
-              locale.file = {
-                from: `./${localeFile}`,
-                format: 'crowdin',
-              }
-            } else {
-              ;(locale.files ??= []).push({
-                from: `./${localeFile}`,
-                format: 'crowdin',
-              })
-            }
+            localeFiles.push({
+              from: `./${localeFile}`,
+              format: 'crowdin',
+            })
           } else if (fileName === 'meta.json') {
             const meta: Record<string, { message: string }> = await fs
               .readFile(localeFile, 'utf8')
@@ -245,6 +265,11 @@ export default defineNuxtConfig({
         const categoryOverride = localesCategoriesOverrides[tag]
         if (categoryOverride != null) {
           ;(locale.meta ??= {}).category = categoryOverride
+        }
+
+        const omorphiaLocaleData = resolveOmorphiaLocaleImport(tag)
+        if (omorphiaLocaleData != null) {
+          localeFiles.push(...omorphiaLocaleData.files)
         }
 
         const cnDataImport = resolveCompactNumberDataImport(tag)
