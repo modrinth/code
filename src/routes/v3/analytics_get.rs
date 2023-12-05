@@ -6,10 +6,7 @@ use crate::{
     auth::get_user_from_headers,
     database::models::user_item,
     models::{
-        ids::{
-            base62_impl::{parse_base62, to_base62},
-            ProjectId, VersionId,
-        },
+        ids::{base62_impl::to_base62, ProjectId, VersionId},
         pats::Scopes,
     },
     queue::session::AuthQueue,
@@ -46,7 +43,6 @@ pub struct GetData {
     // only one of project_ids or version_ids should be used
     // if neither are provided, all projects the user has access to will be used
     pub project_ids: Option<String>,
-    pub version_ids: Option<String>,
 
     pub start_date: Option<DateTime<Utc>>, // defaults to 2 weeks ago
     pub end_date: Option<DateTime<Utc>>,   // defaults to now
@@ -94,17 +90,6 @@ pub async fn playtimes_get(
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
         .transpose()?;
-    let version_ids = data
-        .version_ids
-        .as_ref()
-        .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
-
-    if project_ids.is_some() && version_ids.is_some() {
-        return Err(ApiError::InvalidInput(
-            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
-        ));
-    }
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -113,13 +98,11 @@ pub async fn playtimes_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let (project_ids, version_ids) =
-        filter_allowed_ids(project_ids, version_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     // Get the views
     let playtimes = crate::clickhouse::fetch_playtimes(
-        project_ids,
-        version_ids,
+        project_ids.unwrap_or_default(),
         start_date,
         end_date,
         resolution_minutes,
@@ -173,17 +156,6 @@ pub async fn views_get(
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
         .transpose()?;
-    let version_ids = data
-        .version_ids
-        .as_ref()
-        .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
-
-    if project_ids.is_some() && version_ids.is_some() {
-        return Err(ApiError::InvalidInput(
-            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
-        ));
-    }
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -192,13 +164,11 @@ pub async fn views_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let (project_ids, version_ids) =
-        filter_allowed_ids(project_ids, version_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     // Get the views
     let views = crate::clickhouse::fetch_views(
-        project_ids,
-        version_ids,
+        project_ids.unwrap_or_default(),
         start_date,
         end_date,
         resolution_minutes,
@@ -252,17 +222,6 @@ pub async fn downloads_get(
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
         .transpose()?;
-    let version_ids = data
-        .version_ids
-        .as_ref()
-        .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
-
-    if project_ids.is_some() && version_ids.is_some() {
-        return Err(ApiError::InvalidInput(
-            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
-        ));
-    }
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -271,13 +230,11 @@ pub async fn downloads_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let (project_ids, version_ids) =
-        filter_allowed_ids(project_ids, version_ids, user_option, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user_option, &pool, &redis).await?;
 
     // Get the downloads
     let downloads = crate::clickhouse::fetch_downloads(
-        project_ids,
-        version_ids,
+        project_ids.unwrap_or_default(),
         start_date,
         end_date,
         resolution_minutes,
@@ -347,7 +304,7 @@ pub async fn revenue_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let (project_ids, _) = filter_allowed_ids(project_ids, None, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     let duration: PgInterval = Duration::minutes(resolution_minutes as i64)
         .try_into()
@@ -427,17 +384,6 @@ pub async fn countries_downloads_get(
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
         .transpose()?;
-    let version_ids = data
-        .version_ids
-        .as_ref()
-        .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
-
-    if project_ids.is_some() && version_ids.is_some() {
-        return Err(ApiError::InvalidInput(
-            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
-        ));
-    }
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -445,13 +391,11 @@ pub async fn countries_downloads_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let (project_ids, version_ids) =
-        filter_allowed_ids(project_ids, version_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries(
-        project_ids,
-        version_ids,
+        project_ids.unwrap_or_default(),
         start_date,
         end_date,
         clickhouse.into_inner(),
@@ -507,17 +451,6 @@ pub async fn countries_views_get(
         .as_ref()
         .map(|ids| serde_json::from_str::<Vec<String>>(ids))
         .transpose()?;
-    let version_ids = data
-        .version_ids
-        .as_ref()
-        .map(|ids| serde_json::from_str::<Vec<String>>(ids))
-        .transpose()?;
-
-    if project_ids.is_some() && version_ids.is_some() {
-        return Err(ApiError::InvalidInput(
-            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
-        ));
-    }
 
     let start_date = data.start_date.unwrap_or(Utc::now() - Duration::weeks(2));
     let end_date = data.end_date.unwrap_or(Utc::now());
@@ -525,13 +458,11 @@ pub async fn countries_views_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let (project_ids, version_ids) =
-        filter_allowed_ids(project_ids, version_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries(
-        project_ids,
-        version_ids,
+        project_ids.unwrap_or_default(),
         start_date,
         end_date,
         clickhouse.into_inner(),
@@ -554,19 +485,12 @@ pub async fn countries_views_get(
 
 async fn filter_allowed_ids(
     mut project_ids: Option<Vec<String>>,
-    version_ids: Option<Vec<String>>,
     user: crate::models::users::User,
     pool: &web::Data<PgPool>,
     redis: &RedisPool,
-) -> Result<(Option<Vec<ProjectId>>, Option<Vec<VersionId>>), ApiError> {
-    if project_ids.is_some() && version_ids.is_some() {
-        return Err(ApiError::InvalidInput(
-            "Only one of 'project_ids' or 'version_ids' should be used.".to_string(),
-        ));
-    }
-
+) -> Result<Option<Vec<ProjectId>>, ApiError> {
     // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
-    if project_ids.is_none() && version_ids.is_none() {
+    if project_ids.is_none() {
         project_ids = Some(
             user_item::User::get_projects(user.id.into(), &***pool, redis)
                 .await?
@@ -645,92 +569,6 @@ async fn filter_allowed_ids(
     } else {
         None
     };
-
-    let version_ids = if let Some(version_ids) = version_ids {
-        // Submitted version_ids are filtered by the user's permissions
-        let ids = version_ids
-            .iter()
-            .map(|id| Ok(VersionId(parse_base62(id)?).into()))
-            .collect::<Result<Vec<_>, ApiError>>()?;
-        let versions_data = database::models::Version::get_many(&ids, &***pool, redis).await?;
-        let project_ids = versions_data
-            .iter()
-            .map(|x| x.inner.project_id)
-            .collect::<Vec<database::models::ProjectId>>();
-
-        let projects_data =
-            database::models::Project::get_many_ids(&project_ids, &***pool, redis).await?;
-
-        let team_ids = projects_data
-            .iter()
-            .map(|x| x.inner.team_id)
-            .collect::<Vec<database::models::TeamId>>();
-        let team_members =
-            database::models::TeamMember::get_from_team_full_many(&team_ids, &***pool, redis)
-                .await?;
-
-        let organization_ids = projects_data
-            .iter()
-            .filter_map(|x| x.inner.organization_id)
-            .collect::<Vec<database::models::OrganizationId>>();
-        let organizations =
-            database::models::Organization::get_many_ids(&organization_ids, &***pool, redis)
-                .await?;
-
-        let organization_team_ids = organizations
-            .iter()
-            .map(|x| x.team_id)
-            .collect::<Vec<database::models::TeamId>>();
-        let organization_team_members = database::models::TeamMember::get_from_team_full_many(
-            &organization_team_ids,
-            &***pool,
-            redis,
-        )
-        .await?;
-
-        let ids = projects_data
-            .into_iter()
-            .filter(|project| {
-                let team_member = team_members
-                    .iter()
-                    .find(|x| x.team_id == project.inner.team_id && x.user_id == user.id.into());
-
-                let organization = project
-                    .inner
-                    .organization_id
-                    .and_then(|oid| organizations.iter().find(|x| x.id == oid));
-
-                let organization_team_member = if let Some(organization) = organization {
-                    organization_team_members
-                        .iter()
-                        .find(|x| x.team_id == organization.team_id && x.user_id == user.id.into())
-                } else {
-                    None
-                };
-
-                let permissions = ProjectPermissions::get_permissions_by_role(
-                    &user.role,
-                    &team_member.cloned(),
-                    &organization_team_member.cloned(),
-                )
-                .unwrap_or_default();
-
-                permissions.contains(ProjectPermissions::VIEW_ANALYTICS)
-            })
-            .map(|x| x.inner.id)
-            .collect::<Vec<_>>();
-
-        let ids = versions_data
-            .into_iter()
-            .filter(|version| ids.contains(&version.inner.project_id))
-            .map(|x| x.inner.id.into())
-            .collect::<Vec<_>>();
-
-        Some(ids)
-    } else {
-        None
-    };
-
     // Only one of project_ids or version_ids will be Some
-    Ok((project_ids, version_ids))
+    Ok(project_ids)
 }

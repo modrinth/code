@@ -16,7 +16,6 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
-use uuid::Uuid;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -103,7 +102,6 @@ pub async fn count_download(
         .unwrap_or_else(|_| Ipv4Addr::new(127, 0, 0, 1).to_ipv6_mapped());
 
     analytics_queue.add_download(Download {
-        id: Uuid::new_v4(),
         recorded: get_current_tenths_of_ms(),
         domain: url.host_str().unwrap_or_default().to_string(),
         site_path: url.path().to_string(),

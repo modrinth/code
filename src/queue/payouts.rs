@@ -550,7 +550,7 @@ pub async fn process_payout(
         client
             .query(
                 r#"
-                SELECT COUNT(id) page_views, project_id
+                SELECT COUNT(1) page_views, project_id
                 FROM views
                 WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)
                 GROUP BY project_id
@@ -561,14 +561,14 @@ pub async fn process_payout(
             .bind(end.timestamp())
             .fetch_all::<ProjectMultiplier>(),
         client
-            .query("SELECT COUNT(id) FROM views WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)")
+            .query("SELECT COUNT(1) FROM views WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)")
             .bind(start.timestamp())
             .bind(end.timestamp())
             .fetch_one::<u64>(),
         client
             .query(
                 r#"
-                SELECT COUNT(id) page_views, project_id
+                SELECT COUNT(1) page_views, project_id
                 FROM downloads
                 WHERE (recorded BETWEEN ? AND ?) AND (user_id != 0)
                 GROUP BY project_id
@@ -579,7 +579,7 @@ pub async fn process_payout(
             .bind(end.timestamp())
             .fetch_all::<ProjectMultiplier>(),
         client
-            .query("SELECT COUNT(id) FROM downloads WHERE (recorded BETWEEN ? AND ?) AND (user_id != 0)")
+            .query("SELECT COUNT(1) FROM downloads WHERE (recorded BETWEEN ? AND ?) AND (user_id != 0)")
             .bind(start.timestamp())
             .bind(end.timestamp())
             .fetch_one::<u64>(),

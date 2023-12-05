@@ -36,7 +36,6 @@ pub async fn init_client_with_database(
             "
             CREATE TABLE IF NOT EXISTS {database}.views
             (
-                id UUID,
                 recorded DateTime64(4),
                 domain String,
                 site_path String,
@@ -50,7 +49,7 @@ pub async fn init_client_with_database(
                 headers Array(Tuple(String, String)),
             )
             ENGINE = MergeTree()
-            PRIMARY KEY (id, recorded)
+            PRIMARY KEY (project_id, recorded)
             "
         ))
         .execute()
@@ -61,7 +60,6 @@ pub async fn init_client_with_database(
             "
             CREATE TABLE IF NOT EXISTS {database}.downloads
             (
-                id UUID,
                 recorded DateTime64(4),
                 domain String,
                 site_path String,
@@ -76,7 +74,7 @@ pub async fn init_client_with_database(
                 headers Array(Tuple(String, String)),
             )
             ENGINE = MergeTree()
-            PRIMARY KEY (id, recorded)
+            PRIMARY KEY (project_id, recorded)
             "
         ))
         .execute()
@@ -87,7 +85,6 @@ pub async fn init_client_with_database(
             "
             CREATE TABLE IF NOT EXISTS {database}.playtime
             (
-                id UUID,
                 recorded DateTime64(4),
                 seconds UInt64,
 
@@ -100,7 +97,7 @@ pub async fn init_client_with_database(
                 parent UInt64,
             )
             ENGINE = MergeTree()
-            PRIMARY KEY (id, recorded)
+            PRIMARY KEY (project_id, recorded)
             "
         ))
         .execute()

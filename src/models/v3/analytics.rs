@@ -1,13 +1,10 @@
 use clickhouse::Row;
 use serde::{Deserialize, Serialize};
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 use std::net::Ipv6Addr;
-use uuid::Uuid;
 
-#[derive(Row, Serialize, Deserialize, Clone)]
+#[derive(Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
 pub struct Download {
-    #[serde(with = "uuid::serde::compact")]
-    pub id: Uuid,
     pub recorded: i64,
     pub domain: String,
     pub site_path: String,
@@ -27,24 +24,8 @@ pub struct Download {
     pub headers: Vec<(String, String)>,
 }
 
-impl PartialEq<Self> for Download {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for Download {}
-
-impl Hash for Download {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-#[derive(Row, Serialize, Deserialize, Clone)]
+#[derive(Row, Serialize, Deserialize, Clone, Eq, PartialEq, Hash)]
 pub struct PageView {
-    #[serde(with = "uuid::serde::compact")]
-    pub id: Uuid,
     pub recorded: i64,
     pub domain: String,
     pub site_path: String,
@@ -62,24 +43,8 @@ pub struct PageView {
     pub headers: Vec<(String, String)>,
 }
 
-impl PartialEq<Self> for PageView {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for PageView {}
-
-impl Hash for PageView {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
-}
-
-#[derive(Row, Serialize, Deserialize, Clone, Debug)]
+#[derive(Row, Serialize, Deserialize, Clone, Debug, Eq, PartialEq, Hash)]
 pub struct Playtime {
-    #[serde(with = "uuid::serde::compact")]
-    pub id: Uuid,
     pub recorded: i64,
     pub seconds: u64,
 
@@ -94,18 +59,4 @@ pub struct Playtime {
     pub game_version: String,
     /// Parent modpack this playtime was recorded in
     pub parent: u64,
-}
-
-impl PartialEq<Self> for Playtime {
-    fn eq(&self, other: &Self) -> bool {
-        self.id == other.id
-    }
-}
-
-impl Eq for Playtime {}
-
-impl Hash for Playtime {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.id.hash(state);
-    }
 }
