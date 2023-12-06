@@ -47,6 +47,14 @@ const projectTypeMessages = defineMessages({
     id: 'project-type.shader.plural',
     defaultMessage: 'Shaders',
   },
+  project: {
+    id: 'project-type.project.singular',
+    defaultMessage: 'Project',
+  },
+  projects: {
+    id: 'project-type.project.plural',
+    defaultMessage: 'Projects',
+  },
 })
 
 type ExtractSingulars<K extends string> = K extends `${infer T}s` ? T : never
@@ -54,5 +62,8 @@ type ExtractSingulars<K extends string> = K extends `${infer T}s` ? T : never
 type ProjectType = ExtractSingulars<keyof typeof projectTypeMessages>
 
 export function getProjectTypeMessage(type: ProjectType, plural = false) {
-  return projectTypeMessages[`${type}${plural ? 's' : ''}`]
+  return (
+    projectTypeMessages[`${type}${plural ? 's' : ''}`] ??
+    projectTypeMessages[`project${plural ? 's' : ''}`]
+  )
 }
