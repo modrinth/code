@@ -1,0 +1,59 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT DISTINCT mod_id, mg.image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering\n                FROM mods_gallery mg\n                INNER JOIN mods m ON mg.mod_id = m.id\n                WHERE m.id = ANY($1) OR m.slug = ANY($2)\n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "image_url",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "featured",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 3,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "description",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 5,
+        "name": "created",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "ordering",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false
+    ]
+  },
+  "hash": "7bb8a2e1e01817ea3778fcd2af039e38d085484dd20abf57d0eff8d7801b728b"
+}

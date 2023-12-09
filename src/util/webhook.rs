@@ -1,5 +1,4 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
-use crate::database::models::loader_fields::VersionField;
 use crate::database::redis::RedisPool;
 use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
@@ -80,6 +79,8 @@ pub async fn send_discord_webhook(
 ) -> Result<(), ApiError> {
     // TODO: this currently uses Minecraft as it is a v2 webhook, and requires 'game_versions', a minecraft-java loader field.
     // TODO: This should be updated to use the generic loader fields w/ discord from the project game
+
+    // TODO: This should use the project_item get route
     let all_game_versions = MinecraftGameVersion::list(pool, redis).await?;
 
     let row =
@@ -93,38 +94,7 @@ pub async fn send_discord_webhook(
             ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
             ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
-            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery,
-            JSONB_AGG(
-                DISTINCT jsonb_build_object(
-                'field_id', vf.field_id,
-                'int_value', vf.int_value,
-                'enum_value', vf.enum_value,
-                'string_value', vf.string_value
-                )
-            ) filter (where vf.field_id is not null) version_fields,
-            JSONB_AGG(
-                DISTINCT jsonb_build_object(
-                    'version_id', 0, -- TODO: When webhook is updated to match others, this should match version
-                    'lf_id', lf.id,
-                    'loader_name', lo.loader,
-                    'field', lf.field,
-                    'field_type', lf.field_type,
-                    'enum_type', lf.enum_type,
-                    'min_val', lf.min_val,
-                    'max_val', lf.max_val,
-                    'optional', lf.optional
-                )
-            ) filter (where lf.id is not null) loader_fields,
-            JSONB_AGG(
-                DISTINCT jsonb_build_object(
-                    'id', lfev.id,
-                    'enum_id', lfev.enum_id,
-                    'value', lfev.value,
-                    'ordering', lfev.ordering,
-                    'created', lfev.created,
-                    'metadata', lfev.metadata
-                )  
-            ) filter (where lfev.id is not null) loader_field_enum_values
+            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -138,10 +108,6 @@ pub async fn send_discord_webhook(
             LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.is_owner = TRUE AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
-            LEFT OUTER JOIN version_fields vf on v.id = vf.version_id
-            LEFT OUTER JOIN loader_fields lf on vf.field_id = lf.id
-            LEFT OUTER JOIN loader_field_enums lfe on lf.enum_type = lfe.id
-            LEFT OUTER JOIN loader_field_enum_values lfev on lfev.enum_id = lfe.id
             WHERE m.id = $1
             GROUP BY m.id, u.id;
             ",
@@ -156,11 +122,6 @@ pub async fn send_discord_webhook(
 
         let categories = project.categories.unwrap_or_default();
         let loaders = project.loaders.unwrap_or_default();
-
-        // let versions: Vec<GameVersion> =
-        //     serde_json::from_value(project.versions.unwrap_or_default())
-        //         .ok()
-        //         .unwrap_or_default();
 
         if !categories.is_empty() {
             fields.push(DiscordEmbedField {
@@ -226,12 +187,17 @@ pub async fn send_discord_webhook(
 
         // TODO: Modified to keep "Versions" as a field as it may be hardcoded. Ideally, this pushes all loader fields to the embed for v3
         // TODO: This might need some work to manually test
-        let version_fields = VersionField::from_query_json(
-            project.loader_fields,
-            project.version_fields,
-            project.loader_field_enum_values,
-            true,
-        );
+        let version_fields = crate::database::models::project_item::Project::get_id(
+            crate::database::models::ids::ProjectId(project.id),
+            pool,
+            redis,
+        )
+        .await
+        .ok()
+        .flatten()
+        .map(|project| project.aggregate_version_fields)
+        .unwrap_or_default();
+
         let versions = version_fields
             .into_iter()
             .find_map(|vf| MinecraftGameVersion::try_from_version_field(&vf).ok())

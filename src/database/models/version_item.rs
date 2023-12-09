@@ -1,9 +1,13 @@
 use super::ids::*;
 use super::loader_fields::VersionField;
 use super::DatabaseError;
+use crate::database::models::loader_fields::{
+    QueryLoaderField, QueryLoaderFieldEnumValue, QueryVersionField,
+};
 use crate::database::redis::RedisPool;
 use crate::models::projects::{FileType, VersionStatus};
 use chrono::{DateTime, Utc};
+use dashmap::{DashMap, DashSet};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
@@ -475,7 +479,7 @@ impl Version {
         redis: &RedisPool,
     ) -> Result<Option<QueryVersion>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
         Self::get_many(&[id], executor, redis)
             .await
@@ -488,7 +492,7 @@ impl Version {
         redis: &RedisPool,
     ) -> Result<Vec<QueryVersion>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
         use futures::stream::TryStreamExt;
 
@@ -496,6 +500,7 @@ impl Version {
             return Ok(Vec::new());
         }
 
+        let mut exec = exec.acquire().await?;
         let mut redis = redis.connect().await?;
 
         let mut version_ids_parsed: Vec<i64> = version_ids.iter().map(|x| x.0).collect();
@@ -524,116 +529,230 @@ impl Version {
         }
 
         if !version_ids_parsed.is_empty() {
+            let loader_field_ids = DashSet::new();
+            let loader_field_enum_value_ids = DashSet::new();
+            let version_fields: DashMap<VersionId, Vec<QueryVersionField>> = sqlx::query!(
+                "
+                SELECT version_id, field_id, int_value, enum_value, string_value
+                FROM version_fields
+                WHERE version_id = ANY($1)
+                ",
+                &version_ids_parsed
+            )
+            .fetch(&mut *exec)
+            .try_fold(DashMap::new(), |acc : DashMap<VersionId, Vec<QueryVersionField>>, m| {
+                let qvf = QueryVersionField {
+                    version_id: VersionId(m.version_id),
+                    field_id: LoaderFieldId(m.field_id),
+                    int_value: m.int_value,
+                    enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                    string_value: m.string_value,
+                };
+
+                loader_field_ids.insert(LoaderFieldId(m.field_id));
+                if let Some(enum_value) = m.enum_value {
+                    loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
+                }
+
+                acc.entry(VersionId(m.version_id))
+                    .or_default()
+                    .push(qvf);
+                async move { Ok(acc) }
+            })
+            .await?;
+
+            let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
+                "
+                SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
+                FROM loader_fields lf
+                WHERE id = ANY($1)  
+                ",
+                &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+            )
+            .fetch(&mut *exec)
+            .map_ok(|m| QueryLoaderField {
+                id: LoaderFieldId(m.id),
+                field: m.field,
+                field_type: m.field_type,
+                enum_type: m.enum_type.map(LoaderFieldEnumId),
+                min_val: m.min_val,
+                max_val: m.max_val,
+                optional: m.optional,
+            })
+            .try_collect()
+            .await?;
+
+            let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
+                "
+                SELECT DISTINCT id, enum_id, value, ordering, created, metadata
+                FROM loader_field_enum_values lfev
+                WHERE id = ANY($1)  
+                ORDER BY enum_id, ordering, created ASC
+                ",
+                &loader_field_enum_value_ids
+                    .iter()
+                    .map(|x| x.0)
+                    .collect::<Vec<_>>()
+            )
+            .fetch(&mut *exec)
+            .map_ok(|m| QueryLoaderFieldEnumValue {
+                id: LoaderFieldEnumValueId(m.id),
+                enum_id: LoaderFieldEnumId(m.enum_id),
+                value: m.value,
+                ordering: m.ordering,
+                created: m.created,
+                metadata: m.metadata,
+            })
+            .try_collect()
+            .await?;
+
+            type StringTriple = (Vec<String>, Vec<String>, Vec<String>);
+            let loaders_ptypes_games: DashMap<VersionId, StringTriple> = sqlx::query!(
+                "
+                SELECT DISTINCT version_id,
+                    ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+                    ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
+                    ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
+                FROM versions v
+                INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                INNER JOIN loaders l ON lv.loader_id = l.id
+                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
+                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
+                INNER JOIN games g ON lptg.game_id = g.id
+                WHERE v.id = ANY($1)
+                GROUP BY version_id
+                ",
+                &version_ids_parsed
+            ).fetch(&mut *exec)
+            .map_ok(|m| {
+                let version_id = VersionId(m.version_id);
+                let loaders = m.loaders.unwrap_or_default();
+                    let project_types = m.project_types.unwrap_or_default();
+                    let games = m.games.unwrap_or_default();
+
+                    (version_id, (loaders, project_types, games))
+
+                }
+            ).try_collect().await?;
+
+            #[derive(Deserialize)]
+            struct Hash {
+                pub file_id: FileId,
+                pub algorithm: String,
+                pub hash: String,
+            }
+
+            #[derive(Deserialize)]
+            struct File {
+                pub id: FileId,
+                pub url: String,
+                pub filename: String,
+                pub primary: bool,
+                pub size: u32,
+                pub file_type: Option<FileType>,
+            }
+
+            let file_ids = DashSet::new();
+            let reverse_file_map = DashMap::new();
+            let files : DashMap<VersionId, Vec<File>> = sqlx::query!(
+                "
+                SELECT DISTINCT version_id, f.id, f.url, f.filename, f.is_primary, f.size, f.file_type
+                FROM files f
+                WHERE f.version_id = ANY($1)
+                ",
+                &version_ids_parsed
+            ).fetch(&mut *exec)
+            .try_fold(DashMap::new(), |acc : DashMap<VersionId, Vec<File>>, m| {
+                    let file = File {
+                        id: FileId(m.id),
+                        url: m.url,
+                        filename: m.filename,
+                        primary: m.is_primary,
+                        size: m.size as u32,
+                        file_type: m.file_type.map(|x| FileType::from_string(&x)),
+                    };
+
+                    file_ids.insert(FileId(m.id));
+                    reverse_file_map.insert(FileId(m.id), VersionId(m.version_id));
+
+                    acc.entry(VersionId(m.version_id))
+                    .or_default()
+                    .push(file);
+                    async move { Ok(acc) }
+                }
+            ).await?;
+
+            let hashes: DashMap<VersionId, Vec<Hash>> = sqlx::query!(
+                "
+                SELECT DISTINCT file_id, algorithm, encode(hash, 'escape') hash
+                FROM hashes
+                WHERE file_id = ANY($1)
+                ",
+                &file_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+            )
+            .fetch(&mut *exec)
+            .try_fold(DashMap::new(), |acc : DashMap<VersionId, Vec<Hash>>, m| {
+                if let Some(found_hash) = m.hash {
+                    let hash = Hash {
+                        file_id: FileId(m.file_id),
+                        algorithm: m.algorithm,
+                        hash: found_hash,
+                    };
+
+                    let version_id = *reverse_file_map.get(&FileId(m.file_id)).unwrap();
+
+                    acc.entry(version_id).or_default().push(hash);
+                }
+                async move { Ok(acc) }
+            })
+            .await?;
+
+            let dependencies : DashMap<VersionId, Vec<QueryDependency>> = sqlx::query!(
+                "
+                SELECT DISTINCT dependent_id as version_id, d.mod_dependency_id as dependency_project_id, d.dependency_id as dependency_version_id, d.dependency_file_name as file_name, d.dependency_type as dependency_type
+                FROM dependencies d
+                WHERE dependent_id = ANY($1)
+                ",
+                &version_ids_parsed
+            ).fetch(&mut *exec)
+            .try_fold(DashMap::new(), |acc : DashMap<_,Vec<QueryDependency>>, m| {
+                    let dependency = QueryDependency {
+                        project_id: m.dependency_project_id.map(ProjectId),
+                        version_id: m.dependency_version_id.map(VersionId),
+                        file_name: m.file_name,
+                        dependency_type: m.dependency_type,
+                    };
+
+                    acc.entry(VersionId(m.version_id))
+                    .or_default()
+                    .push(dependency);
+                    async move { Ok(acc) }
+                }
+            ).await?;
+
             let db_versions: Vec<QueryVersion> = sqlx::query!(
                 "
-                WITH version_fields_cte AS (
-                    SELECT version_id, field_id, int_value, enum_value, string_value
-                    FROM version_fields WHERE version_id = ANY($1) 
-                ),
-				version_fields_json AS (
-					SELECT DISTINCT version_id,
-                    JSONB_AGG( 
-                        DISTINCT jsonb_build_object('field_id', field_id, 'int_value', int_value, 'enum_value', enum_value, 'string_value', string_value)
-                    ) version_fields_json
-                    FROM version_fields_cte
-                    GROUP BY version_id
-				),
-				loader_fields_cte AS (
-					SELECT DISTINCT vf.version_id, lf.*, l.loader
-					FROM loader_fields lf
-                    INNER JOIN version_fields_cte vf ON lf.id = vf.field_id
-					LEFT JOIN loaders_versions lv ON vf.version_id = lv.version_id
-					LEFT JOIN loaders l ON lv.loader_id = l.id
-                    GROUP BY vf.version_id, lf.enum_type, lf.id, l.loader
-				),
-                loader_fields_json AS (
-                    SELECT DISTINCT version_id,
-                        JSONB_AGG(
-                        DISTINCT jsonb_build_object(
-                            'version_id', lf.version_id,
-                            'lf_id', id, 'loader_name', loader, 'field', field, 'field_type', field_type, 'enum_type', enum_type, 'min_val', min_val, 'max_val', max_val, 'optional', optional
-                        )
-                    ) filter (where lf.id is not null) loader_fields_json
-                    FROM loader_fields_cte lf
-                    GROUP BY version_id
-                ),
-                loader_field_enum_values_json AS (
-                    SELECT DISTINCT version_id,
-                        JSONB_AGG(
-                        DISTINCT jsonb_build_object(
-                            'id', lfev.id, 'enum_id', lfev.enum_id, 'value', lfev.value, 'ordering', lfev.ordering, 'created', lfev.created, 'metadata', lfev.metadata
-                        ) 
-                    ) filter (where lfev.id is not null) loader_field_enum_values_json
-                    FROM loader_field_enum_values lfev
-                    INNER JOIN loader_fields_cte lf on lf.enum_type = lfev.enum_id
-                    GROUP BY version_id
-                ),
-                files_cte AS (
-                    SELECT DISTINCT version_id, f.id, f.url, f.filename, f.is_primary, f.size, f.file_type
-                    FROM files f
-                    WHERE f.version_id = ANY($1)
-                ),
-                files_json AS (
-                    SELECT DISTINCT version_id,
-                    JSONB_AGG(
-                        DISTINCT jsonb_build_object('id', id, 'url', url, 'filename', filename, 'primary', is_primary, 'size', size, 'file_type', file_type)
-                    ) files_json
-                    FROM files_cte lf
-                    GROUP BY version_id
-                ),
-                hashes_json AS (
-                    SELECT DISTINCT version_id,
-                    JSONB_AGG(
-                        DISTINCT jsonb_build_object('algorithm', algorithm, 'hash', encode(hash, 'escape'), 'file_id', file_id)
-                    ) hashes_json
-                    FROM hashes
-                    INNER JOIN files_cte lf on lf.id = hashes.file_id
-                    GROUP BY version_id
-                ),
-                dependencies_json AS (
-                    SELECT DISTINCT dependent_id as version_id,
-                    JSONB_AGG(
-                        DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)
-                    ) dependencies_json
-                    FROM dependencies d
-                    WHERE dependent_id = ANY($1)
-                    GROUP BY version_id
-                )
-
                 SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
                 v.changelog changelog, v.date_published date_published, v.downloads downloads,
-                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering,
-                ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-                ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
-                f.files_json files,
-                h.hashes_json hashes,
-                d.dependencies_json dependencies,
-                vf.version_fields_json version_fields,
-                lf.loader_fields_json loader_fields,
-                lfev.loader_field_enum_values_json loader_field_enum_values
+                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering
                 FROM versions v
-                LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
-                LEFT OUTER JOIN loaders l on lv.loader_id = l.id
-                LEFT OUTER JOIN loaders_project_types lpt on l.id = lpt.joining_loader_id
-                LEFT JOIN project_types pt on lpt.joining_project_type_id = pt.id
-                LEFT OUTER JOIN loaders_project_types_games lptg on l.id = lptg.loader_id AND pt.id = lptg.project_type_id
-                LEFT JOIN games g on lptg.game_id = g.id
-                LEFT OUTER JOIN files_json f on v.id = f.version_id
-                LEFT OUTER JOIN hashes_json h on v.id = h.version_id
-                LEFT OUTER JOIN dependencies_json d on v.id = d.version_id
-                LEFT OUTER JOIN version_fields_json vf ON v.id = vf.version_id
-                LEFT OUTER JOIN loader_fields_json lf ON v.id = lf.version_id
-                LEFT OUTER JOIN loader_field_enum_values_json lfev ON v.id = lfev.version_id
                 WHERE v.id = ANY($1)
-                GROUP BY v.id, vf.version_fields_json, lf.loader_fields_json, lfev.loader_field_enum_values_json, f.files_json, h.hashes_json, d.dependencies_json
                 ORDER BY v.ordering ASC NULLS LAST, v.date_published ASC;
                 ",
                 &version_ids_parsed
             )
-                .fetch_many(exec)
+                .fetch_many(&mut *exec)
                 .try_filter_map(|e| async {
                     Ok(e.right().map(|v|
+                        {
+                        let version_id = VersionId(v.id);
+                        let (loaders, project_types, games) = loaders_ptypes_games.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let files = files.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let hashes = hashes.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let version_fields = version_fields.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let dependencies = dependencies.remove(&version_id).map(|x|x.1).unwrap_or_default();
+
                         QueryVersion {
                             inner: Version {
                                 id: VersionId(v.id),
@@ -652,39 +771,10 @@ impl Version {
                                 ordering: v.ordering,
                             },
                             files: {
-                                #[derive(Deserialize)]
-                                struct Hash {
-                                    pub file_id: FileId,
-                                    pub algorithm: String,
-                                    pub hash: String,
-                                }
-
-                                #[derive(Deserialize)]
-                                struct File {
-                                    pub id: FileId,
-                                    pub url: String,
-                                    pub filename: String,
-                                    pub primary: bool,
-                                    pub size: u32,
-                                    pub file_type: Option<FileType>,
-                                }
-
-                                let hashes: Vec<Hash> = serde_json::from_value(
-                                    v.hashes.unwrap_or_default(),
-                                )
-                                    .ok()
-                                    .unwrap_or_default();
-
-                                let files: Vec<File> = serde_json::from_value(
-                                    v.files.unwrap_or_default(),
-                                )
-                                    .ok()
-                                    .unwrap_or_default();
-
                                 let mut files = files.into_iter().map(|x| {
                                     let mut file_hashes = HashMap::new();
 
-                                    for hash in &hashes {
+                                    for hash in hashes.iter() {
                                         if hash.file_id == x.id {
                                             file_hashes.insert(
                                                 hash.algorithm.clone(),
@@ -695,8 +785,8 @@ impl Version {
 
                                     QueryFile {
                                         id: x.id,
-                                        url: x.url,
-                                        filename: x.filename,
+                                        url: x.url.clone(),
+                                        filename: x.filename.clone(),
                                         hashes: file_hashes,
                                         primary: x.primary,
                                         size: x.size,
@@ -716,17 +806,13 @@ impl Version {
 
                                 files
                             },
-                            version_fields: VersionField::from_query_json(v.loader_fields, v.version_fields, v.loader_field_enum_values, false),
-                            loaders: v.loaders.unwrap_or_default(),
-                            project_types: v.project_types.unwrap_or_default(),
-                            games: v.games.unwrap_or_default(),
-                            dependencies: serde_json::from_value(
-                                v.dependencies.unwrap_or_default(),
-                            )
-                                .ok()
-                                .unwrap_or_default(),
+                            version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, false),
+                            loaders,
+                            project_types,
+                            games,
+                            dependencies,
                         }
-                    ))
+                }))
                 })
                 .try_collect::<Vec<QueryVersion>>()
                 .await?;

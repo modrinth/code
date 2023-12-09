@@ -1,14 +1,20 @@
 /// This module is used for the indexing from any source.
 pub mod local_import;
 
+use std::collections::HashMap;
+
 use crate::database::redis::RedisPool;
 use crate::search::{SearchConfig, UploadSearchProject};
+use itertools::Itertools;
 use local_import::index_local;
+use log::info;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
+
+use self::local_import::get_all_ids;
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
@@ -31,6 +37,7 @@ pub enum IndexingError {
 // assumes a max average size of 1KiB per project to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000;
 
+const FETCH_PROJECT_SIZE: usize = 5000;
 pub async fn index_projects(
     pool: PgPool,
     redis: RedisPool,
@@ -39,10 +46,40 @@ pub async fn index_projects(
     let mut docs_to_add: Vec<UploadSearchProject> = vec![];
     let mut additional_fields: Vec<String> = vec![];
 
-    let (mut uploads, mut loader_fields) = index_local(pool.clone(), &redis).await?;
-    docs_to_add.append(&mut uploads);
-    additional_fields.append(&mut loader_fields);
+    let all_ids = get_all_ids(pool.clone()).await?;
+    let all_ids_len = all_ids.len();
+    info!("Got all ids, indexing {} projects", all_ids_len);
+    let mut so_far = 0;
 
+    let as_chunks: Vec<_> = all_ids
+        .into_iter()
+        .chunks(FETCH_PROJECT_SIZE)
+        .into_iter()
+        .map(|x| x.collect::<Vec<_>>())
+        .collect();
+
+    for id_chunk in as_chunks {
+        info!(
+            "Fetching chunk {}-{}/{}, size: {}",
+            so_far,
+            so_far + FETCH_PROJECT_SIZE,
+            all_ids_len,
+            id_chunk.len()
+        );
+        so_far += FETCH_PROJECT_SIZE;
+
+        let id_chunk = id_chunk
+            .into_iter()
+            .map(|(version_id, project_id, owner_username)| {
+                (version_id, (project_id, owner_username.to_lowercase()))
+            })
+            .collect::<HashMap<_, _>>();
+        let (mut uploads, mut loader_fields) = index_local(&pool, &redis, id_chunk).await?;
+        docs_to_add.append(&mut uploads);
+        additional_fields.append(&mut loader_fields);
+    }
+
+    info!("Got all ids, indexing...");
     // Write Indices
     add_projects(docs_to_add, additional_fields, config).await?;
 

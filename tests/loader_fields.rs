@@ -370,10 +370,16 @@ async fn creating_loader_fields() {
             project.fields.get("game_versions").unwrap(),
             &[json!("1.20.1"), json!("1.20.2"), json!("1.20.5")]
         );
-        assert_eq!(
-            project.fields.get("singleplayer").unwrap(),
-            &[json!(false), json!(true)]
-        );
+        assert!(project
+            .fields
+            .get("singleplayer")
+            .unwrap()
+            .contains(&json!(false)));
+        assert!(project
+            .fields
+            .get("singleplayer")
+            .unwrap()
+            .contains(&json!(true)));
     })
     .await
 }

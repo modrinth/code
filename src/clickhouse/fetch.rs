@@ -115,8 +115,9 @@ pub async fn fetch_countries_downloads(
     end_date: DateTime<Utc>,
     client: Arc<clickhouse::Client>,
 ) -> Result<Vec<ReturnCountry>, ApiError> {
-    let query = client.query(
-        "
+    let query = client
+        .query(
+            "
             SELECT
                 country,
                 project_id,
@@ -126,8 +127,8 @@ pub async fn fetch_countries_downloads(
             GROUP BY
                 country,
                 project_id
-            "
-    )
+            ",
+        )
         .bind(start_date.timestamp())
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
@@ -141,8 +142,9 @@ pub async fn fetch_countries_views(
     end_date: DateTime<Utc>,
     client: Arc<clickhouse::Client>,
 ) -> Result<Vec<ReturnCountry>, ApiError> {
-    let query = client.query(
-        "
+    let query = client
+        .query(
+            "
             SELECT
                 country,
                 project_id,
@@ -152,8 +154,8 @@ pub async fn fetch_countries_views(
             GROUP BY
                 country,
                 project_id
-            "
-    )
+            ",
+        )
         .bind(start_date.timestamp())
         .bind(end_date.timestamp())
         .bind(projects.iter().map(|x| x.0).collect::<Vec<_>>());
