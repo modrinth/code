@@ -272,8 +272,8 @@ pub(crate) async fn get_loader_version_from_loader(
 
     let loader_version = loaders
         .iter()
+        .find(|&x| filter(x))
         .cloned()
-        .find(filter)
         .or(
             // If stable was searched for but not found, return latest by default
             if version == "stable" {

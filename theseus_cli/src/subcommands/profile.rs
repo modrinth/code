@@ -175,12 +175,13 @@ impl ProfileInit {
                 .ok_or_else(|| eyre::eyre!("Modloader {loader} unsupported for Minecraft version {game_version}"))?
                 .loaders;
 
-            let loader_version =
-                loaders.iter().cloned().find(filter).ok_or_else(|| {
-                    eyre::eyre!(
-                        "Invalid version {version} for modloader {loader}"
-                    )
-                })?;
+            let loader_version = loaders
+                .iter()
+                .find(|&x| filter(x))
+                .cloned()
+                .ok_or_else(|| {
+                eyre::eyre!("Invalid version {version} for modloader {loader}")
+            })?;
 
             Some((loader_version, loader))
         } else {
