@@ -41,7 +41,7 @@ pub async fn wait_finish(device_code: String) -> crate::Result<Credentials> {
         }
         xsts_token::XSTSResponse::Success { token: xsts_token } => {
             // Get xsts bearer token from xsts token
-            let bearer_token =
+            let (bearer_token, expires_in) =
                 bearer_token::fetch_bearer(&xsts_token, &xbl_token.uhs)
                     .await
                     .map_err(|err| {
@@ -63,8 +63,7 @@ pub async fn wait_finish(device_code: String) -> crate::Result<Credentials> {
                 player_info.name,
                 bearer_token,
                 oauth.refresh_token,
-                chrono::Utc::now()
-                    + chrono::Duration::seconds(oauth.expires_in),
+                chrono::Utc::now() + chrono::Duration::seconds(expires_in),
             );
 
             // Put credentials into state

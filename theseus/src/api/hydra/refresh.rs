@@ -24,6 +24,10 @@ pub async fn refresh(refresh_token: String) -> crate::Result<OauthSuccess> {
     params.insert("grant_type", "refresh_token");
     params.insert("client_id", MICROSOFT_CLIENT_ID);
     params.insert("refresh_token", &refresh_token);
+    params.insert(
+        "redirect_uri",
+        "https://login.microsoftonline.com/common/oauth2/nativeclient",
+    );
 
     // Poll the URL in a loop until we are successful.
     // On an authorization_pending response, wait 5 seconds and try again.

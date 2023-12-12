@@ -1,6 +1,4 @@
 //! Login route for Hydra, redirects to the Microsoft login page before going to the redirect route
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 use crate::{hydra::MicrosoftError, util::fetch::REQWEST_CLIENT};
@@ -19,17 +17,21 @@ pub struct DeviceLoginSuccess {
 
 pub async fn init() -> crate::Result<DeviceLoginSuccess> {
     // Get the initial URL
-    let client_id = MICROSOFT_CLIENT_ID;
-
     // Get device code
     // Define the parameters
-    let mut params = HashMap::new();
-    params.insert("client_id", client_id);
-    params.insert("scope", "XboxLive.signin offline_access");
 
     // urlencoding::encode("XboxLive.signin offline_access"));
-    let resp = auth_retry(|| REQWEST_CLIENT.post("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode")
-    .header("Content-Type", "application/x-www-form-urlencoded").form(&params).send()).await?;
+    let resp = auth_retry(|| REQWEST_CLIENT.get("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode")
+        .header("Content-Length", "0")
+        .query(&[
+            ("client_id", MICROSOFT_CLIENT_ID),
+            (
+                "scope",
+                "XboxLive.signin XboxLive.offline_access profile openid email",
+            ),
+        ])
+        .send()
+    ).await?;
 
     match resp.status() {
         reqwest::StatusCode::OK => Ok(resp.json().await?),

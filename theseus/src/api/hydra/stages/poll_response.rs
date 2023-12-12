@@ -25,6 +25,10 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
     params.insert("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
     params.insert("client_id", MICROSOFT_CLIENT_ID);
     params.insert("device_code", &device_code);
+    params.insert(
+        "scope",
+        "XboxLive.signin XboxLive.offline_access profile openid email",
+    );
 
     // Poll the URL in a loop until we are successful.
     // On an authorization_pending response, wait 5 seconds and try again.
@@ -34,7 +38,6 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
             .post(
                 "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
             )
-            .header("Content-Type", "application/x-www-form-urlencoded")
             .form(&params)
             .send()
         })

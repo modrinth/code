@@ -64,7 +64,7 @@ pub async fn refresh_credentials(
             .as_error())
         }
         xsts_token::XSTSResponse::Success { token: xsts_token } => {
-            let bearer_token =
+            let (bearer_token, expires_in) =
                 bearer_token::fetch_bearer(&xsts_token, &xbl_token.uhs)
                     .await
                     .map_err(|err| {
@@ -76,8 +76,7 @@ pub async fn refresh_credentials(
 
             credentials.access_token = bearer_token;
             credentials.refresh_token = oauth.refresh_token;
-            credentials.expires =
-                Utc::now() + Duration::seconds(oauth.expires_in);
+            credentials.expires = Utc::now() + Duration::seconds(expires_in);
         }
     }
 
