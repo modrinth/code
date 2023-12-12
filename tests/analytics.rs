@@ -1,4 +1,3 @@
-use actix_web::test;
 use chrono::{DateTime, Duration, Utc};
 use common::permissions::PermissionsTest;
 use common::permissions::PermissionsTestContext;
@@ -166,15 +165,23 @@ pub async fn permissions_analytics_revenue() {
             .team_id
             .clone();
 
+        let api = &test_env.api;
+
         let view_analytics = ProjectPermissions::VIEW_ANALYTICS;
 
         // first, do check with a project
-        let req_gen = |ctx: &PermissionsTestContext| {
-            let projects_string = serde_json::to_string(&vec![ctx.project_id]).unwrap();
-            let projects_string = urlencoding::encode(&projects_string);
-            test::TestRequest::get().uri(&format!(
-                "/v3/analytics/revenue?project_ids={projects_string}&resolution_minutes=5",
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            let project_id = ctx.project_id.unwrap();
+            let ids_or_slugs = vec![project_id.as_str()];
+            api.get_analytics_revenue(
+                ids_or_slugs,
+                false,
+                None,
+                None,
+                Some(5),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
 
         PermissionsTest::new(&test_env)
@@ -197,12 +204,20 @@ pub async fn permissions_analytics_revenue() {
 
         // Now with a version
         // Need to use alpha
-        let req_gen = |_: &PermissionsTestContext| {
-            let versions_string = serde_json::to_string(&vec![alpha_version_id.clone()]).unwrap();
-            let versions_string = urlencoding::encode(&versions_string);
-            test::TestRequest::get().uri(&format!(
-                "/v3/analytics/revenue?version_ids={versions_string}&resolution_minutes=5",
-            ))
+        let req_gen = |ctx: PermissionsTestContext| {
+            let alpha_version_id = alpha_version_id.clone();
+            async move {
+                let ids_or_slugs = vec![alpha_version_id.as_str()];
+                api.get_analytics_revenue(
+                    ids_or_slugs,
+                    true,
+                    None,
+                    None,
+                    Some(5),
+                    ctx.test_pat.as_deref(),
+                )
+                .await
+            }
         };
 
         PermissionsTest::new(&test_env)

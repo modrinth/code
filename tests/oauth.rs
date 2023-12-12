@@ -71,7 +71,7 @@ async fn oauth_flow_happy_path() {
         // Validate the token works
         env.assert_read_notifications_status(
             FRIEND_USER_ID,
-            &token_resp.access_token,
+            Some(&token_resp.access_token),
             StatusCode::OK,
         )
         .await;
@@ -179,17 +179,29 @@ async fn authorize_with_broader_scopes_can_complete_flow() {
 
         env.assert_read_notifications_status(
             USER_USER_ID,
-            &first_access_token,
+            Some(&first_access_token),
             StatusCode::UNAUTHORIZED,
         )
         .await;
-        env.assert_read_user_projects_status(USER_USER_ID, &first_access_token, StatusCode::OK)
-            .await;
+        env.assert_read_user_projects_status(
+            USER_USER_ID,
+            Some(&first_access_token),
+            StatusCode::OK,
+        )
+        .await;
 
-        env.assert_read_notifications_status(USER_USER_ID, &second_access_token, StatusCode::OK)
-            .await;
-        env.assert_read_user_projects_status(USER_USER_ID, &second_access_token, StatusCode::OK)
-            .await;
+        env.assert_read_notifications_status(
+            USER_USER_ID,
+            Some(&second_access_token),
+            StatusCode::OK,
+        )
+        .await;
+        env.assert_read_user_projects_status(
+            USER_USER_ID,
+            Some(&second_access_token),
+            StatusCode::OK,
+        )
+        .await;
     })
     .await;
 }
@@ -278,7 +290,7 @@ async fn revoke_authorization_after_issuing_token_revokes_token() {
                 USER_USER_PAT,
             )
             .await;
-        env.assert_read_notifications_status(USER_USER_ID, &access_token, StatusCode::OK)
+        env.assert_read_notifications_status(USER_USER_ID, Some(&access_token), StatusCode::OK)
             .await;
 
         let resp = env
@@ -287,8 +299,12 @@ async fn revoke_authorization_after_issuing_token_revokes_token() {
             .await;
         assert_status(&resp, StatusCode::OK);
 
-        env.assert_read_notifications_status(USER_USER_ID, &access_token, StatusCode::UNAUTHORIZED)
-            .await;
+        env.assert_read_notifications_status(
+            USER_USER_ID,
+            Some(&access_token),
+            StatusCode::UNAUTHORIZED,
+        )
+        .await;
     })
     .await;
 }

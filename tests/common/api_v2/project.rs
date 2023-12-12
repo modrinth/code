@@ -1,8 +1,10 @@
+use std::collections::HashMap;
+
 use crate::common::{
     api_common::{
-        models::{CommonImageData, CommonProject, CommonVersion},
-        request_data::ProjectCreationRequestData,
-        Api, ApiProject,
+        models::{CommonProject, CommonVersion},
+        request_data::{ImageData, ProjectCreationRequestData},
+        Api, ApiProject, AppendsOptionalPat,
     },
     dummy_data::TestFile,
 };
@@ -13,6 +15,7 @@ use actix_web::{
 };
 use async_trait::async_trait;
 use bytes::Bytes;
+use chrono::{DateTime, Utc};
 use labrinth::{
     models::v2::{projects::LegacyProject, search::LegacySearchResults},
     util::actix::AppendsMultipart,
@@ -27,7 +30,11 @@ use super::{
 };
 
 impl ApiV2 {
-    pub async fn get_project_deserialized(&self, id_or_slug: &str, pat: &str) -> LegacyProject {
+    pub async fn get_project_deserialized(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> LegacyProject {
         let resp = self.get_project(id_or_slug, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
@@ -36,7 +43,7 @@ impl ApiV2 {
     pub async fn get_user_projects_deserialized(
         &self,
         user_id_or_username: &str,
-        pat: &str,
+        pat: Option<&str>,
     ) -> Vec<LegacyProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
         assert_eq!(resp.status(), 200);
@@ -47,7 +54,7 @@ impl ApiV2 {
         &self,
         query: Option<&str>,
         facets: Option<serde_json::Value>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> LegacySearchResults {
         let query_field = if let Some(query) = query {
             format!("&query={}", urlencoding::encode(query))
@@ -63,7 +70,7 @@ impl ApiV2 {
 
         let req = test::TestRequest::get()
             .uri(&format!("/v2/search?{}{}", query_field, facets_field))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
         let status = resp.status();
@@ -79,7 +86,7 @@ impl ApiProject for ApiV2 {
         slug: &str,
         version_jar: Option<TestFile>,
         modify_json: Option<json_patch::Patch>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> (CommonProject, Vec<CommonVersion>) {
         let creation_data = get_public_project_creation_data(slug, version_jar, modify_json);
 
@@ -91,7 +98,7 @@ impl ApiProject for ApiV2 {
         // Approve as a moderator.
         let req = TestRequest::patch()
             .uri(&format!("/v2/project/{}", slug))
-            .append_header(("Authorization", MOD_USER_PAT))
+            .append_pat(MOD_USER_PAT)
             .set_json(json!(
                 {
                     "status": "approved"
@@ -106,7 +113,7 @@ impl ApiProject for ApiV2 {
         // Get project's versions
         let req = TestRequest::get()
             .uri(&format!("/v2/project/{}/version", slug))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
         let versions: Vec<CommonVersion> = test::read_body_json(resp).await;
@@ -125,35 +132,38 @@ impl ApiProject for ApiV2 {
     async fn create_project(
         &self,
         creation_data: ProjectCreationRequestData,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let req = TestRequest::post()
             .uri("/v2/project")
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_multipart(creation_data.segment_data)
             .to_request();
         self.call(req).await
     }
 
-    async fn remove_project(&self, project_slug_or_id: &str, pat: &str) -> ServiceResponse {
+    async fn remove_project(&self, project_slug_or_id: &str, pat: Option<&str>) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v2/project/{project_slug_or_id}"))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
-        let resp = self.call(req).await;
-        assert_eq!(resp.status(), 204);
-        resp
+
+        self.call(req).await
     }
 
-    async fn get_project(&self, id_or_slug: &str, pat: &str) -> ServiceResponse {
+    async fn get_project(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v2/project/{id_or_slug}"))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         self.call(req).await
     }
 
-    async fn get_project_deserialized_common(&self, id_or_slug: &str, pat: &str) -> CommonProject {
+    async fn get_project_deserialized_common(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> CommonProject {
         let resp = self.get_project(id_or_slug, pat).await;
         assert_eq!(resp.status(), 200);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
@@ -163,10 +173,14 @@ impl ApiProject for ApiV2 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn get_user_projects(&self, user_id_or_username: &str, pat: &str) -> ServiceResponse {
+    async fn get_user_projects(
+        &self,
+        user_id_or_username: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v2/user/{}/projects", user_id_or_username))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         self.call(req).await
     }
@@ -174,7 +188,7 @@ impl ApiProject for ApiV2 {
     async fn get_user_projects_deserialized_common(
         &self,
         user_id_or_username: &str,
-        pat: &str,
+        pat: Option<&str>,
     ) -> Vec<CommonProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
         assert_eq!(resp.status(), 200);
@@ -189,11 +203,11 @@ impl ApiProject for ApiV2 {
         &self,
         id_or_slug: &str,
         patch: serde_json::Value,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::patch()
             .uri(&format!("/v2/project/{id_or_slug}"))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(patch)
             .to_request();
 
@@ -204,7 +218,7 @@ impl ApiProject for ApiV2 {
         &self,
         ids_or_slugs: &[&str],
         patch: serde_json::Value,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let projects_str = ids_or_slugs
             .iter()
@@ -216,7 +230,7 @@ impl ApiProject for ApiV2 {
                 "/v2/projects?ids={encoded}",
                 encoded = urlencoding::encode(&format!("[{projects_str}]"))
             ))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(patch)
             .to_request();
 
@@ -226,8 +240,8 @@ impl ApiProject for ApiV2 {
     async fn edit_project_icon(
         &self,
         id_or_slug: &str,
-        icon: Option<CommonImageData>,
-        pat: &str,
+        icon: Option<ImageData>,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         if let Some(icon) = icon {
             // If an icon is provided, upload it
@@ -236,7 +250,7 @@ impl ApiProject for ApiV2 {
                     "/v2/project/{id_or_slug}/icon?ext={ext}",
                     ext = icon.extension
                 ))
-                .append_header(("Authorization", pat))
+                .append_pat(pat)
                 .set_payload(Bytes::from(icon.icon))
                 .to_request();
 
@@ -245,10 +259,110 @@ impl ApiProject for ApiV2 {
             // If no icon is provided, delete the icon
             let req = test::TestRequest::delete()
                 .uri(&format!("/v2/project/{id_or_slug}/icon"))
-                .append_header(("Authorization", pat))
+                .append_pat(pat)
                 .to_request();
 
             self.call(req).await
         }
+    }
+
+    async fn schedule_project(
+        &self,
+        id_or_slug: &str,
+        requested_status: &str,
+        date: DateTime<Utc>,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = test::TestRequest::post()
+            .uri(&format!("/v2/version/{id_or_slug}/schedule"))
+            .set_json(json!(
+                {
+                    "requested_status": requested_status,
+                    "time": date,
+                }
+            ))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    async fn add_gallery_item(
+        &self,
+        id_or_slug: &str,
+        image: ImageData,
+        featured: bool,
+        title: Option<String>,
+        description: Option<String>,
+        ordering: Option<i32>,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let mut url = format!(
+            "/v2/project/{id_or_slug}/gallery?ext={ext}&featured={featured}",
+            ext = image.extension,
+            featured = featured
+        );
+        if let Some(title) = title {
+            url.push_str(&format!("&title={}", title));
+        }
+        if let Some(description) = description {
+            url.push_str(&format!("&description={}", description));
+        }
+        if let Some(ordering) = ordering {
+            url.push_str(&format!("&ordering={}", ordering));
+        }
+
+        let req = test::TestRequest::post()
+            .uri(&url)
+            .append_pat(pat)
+            .set_payload(Bytes::from(image.icon))
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn edit_gallery_item(
+        &self,
+        id_or_slug: &str,
+        image_url: &str,
+        patch: HashMap<String, String>,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let mut url = format!(
+            "/v2/project/{id_or_slug}/gallery?url={image_url}",
+            image_url = urlencoding::encode(image_url)
+        );
+
+        for (key, value) in patch {
+            url.push_str(&format!(
+                "&{key}={value}",
+                key = key,
+                value = urlencoding::encode(&value)
+            ));
+        }
+
+        let req = test::TestRequest::patch()
+            .uri(&url)
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
+    async fn remove_gallery_item(
+        &self,
+        id_or_slug: &str,
+        url: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = test::TestRequest::delete()
+            .uri(&format!(
+                "/v2/project/{id_or_slug}/gallery?url={url}",
+                url = url
+            ))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
     }
 }

@@ -2,8 +2,8 @@
 use serde_json::json;
 
 use crate::common::{
-    api_common::request_data::{ImageData, ProjectCreationRequestData, VersionCreationRequestData},
-    dummy_data::{DummyImage, TestFile},
+    api_common::request_data::{ProjectCreationRequestData, VersionCreationRequestData},
+    dummy_data::TestFile,
 };
 use labrinth::{
     models::projects::ProjectId,
@@ -131,13 +131,5 @@ pub fn get_public_creation_data_multipart(
         vec![json_segment, file_segment]
     } else {
         vec![json_segment]
-    }
-}
-
-pub fn get_icon_data(dummy_icon: DummyImage) -> ImageData {
-    ImageData {
-        filename: dummy_icon.filename(),
-        extension: dummy_icon.extension(),
-        icon: dummy_icon.bytes(),
     }
 }

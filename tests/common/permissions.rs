@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 use actix_http::StatusCode;
-use actix_web::test::{self, TestRequest};
+use actix_web::{dev::ServiceResponse, test};
+use futures::Future;
 use itertools::Itertools;
 use labrinth::models::teams::{OrganizationPermissions, ProjectPermissions};
 use serde_json::json;
@@ -32,7 +33,7 @@ pub struct PermissionsTest<'a, A: Api> {
 
     // User ID to use for the test user, and their PAT
     user_id: &'a str,
-    user_pat: &'a str,
+    user_pat: Option<&'a str>,
 
     // Whether or not the user ID should be removed from the project/organization team after the test
     // (This is mostly reelvant if you are also using an existing project/organization, and want to do
@@ -58,15 +59,14 @@ pub struct PermissionsTest<'a, A: Api> {
     failure_json_check: Option<JsonCheck>,
     success_json_check: Option<JsonCheck>,
 }
-
-pub struct PermissionsTestContext<'a> {
-    // pub test_env: &'a TestEnvironment<A>,
-    pub user_id: &'a str,
-    pub user_pat: &'a str,
-    pub project_id: Option<&'a str>,
-    pub team_id: Option<&'a str>,
-    pub organization_id: Option<&'a str>,
-    pub organization_team_id: Option<&'a str>,
+#[derive(Clone, Debug)]
+pub struct PermissionsTestContext {
+    pub test_pat: Option<String>,
+    pub user_id: String,
+    pub project_id: Option<String>,
+    pub team_id: Option<String>,
+    pub organization_id: Option<String>,
+    pub organization_team_id: Option<String>,
 }
 
 impl<'a, A: Api> PermissionsTest<'a, A> {
@@ -118,7 +118,12 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
     // Set the user ID to use
     // (eg: a moderator, or friend)
     // remove_user: Whether or not the user ID should be removed from the project/organization team after the test
-    pub fn with_user(mut self, user_id: &'a str, user_pat: &'a str, remove_user: bool) -> Self {
+    pub fn with_user(
+        mut self,
+        user_id: &'a str,
+        user_pat: Option<&'a str>,
+        remove_user: bool,
+    ) -> Self {
         self.user_id = user_id;
         self.user_pat = user_pat;
         self.remove_user = remove_user;
@@ -149,21 +154,22 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         self
     }
 
-    pub async fn simple_project_permissions_test<T>(
+    pub async fn simple_project_permissions_test<T, Fut>(
         &self,
         success_permissions: ProjectPermissions,
         req_gen: T,
     ) -> Result<(), String>
     where
-        T: Fn(&PermissionsTestContext) -> TestRequest,
+        T: Fn(PermissionsTestContext) -> Fut,
+        Fut: Future<Output = ServiceResponse>, // Ensure Fut is Send and 'static
     {
         let test_env = self.test_env;
         let failure_project_permissions = self
             .failure_project_permissions
             .unwrap_or(ProjectPermissions::all() ^ success_permissions);
         let test_context = PermissionsTestContext {
-            user_id: self.user_id,
-            user_pat: self.user_pat,
+            test_pat: None,
+            user_id: self.user_id.to_string(),
             project_id: None,
             team_id: None,
             organization_id: None,
@@ -190,14 +196,12 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         .await;
 
         // Failure test- not logged in
-        let request = req_gen(&PermissionsTestContext {
-            project_id: Some(&project_id),
-            team_id: Some(&team_id),
-            ..test_context
+        let resp = req_gen(PermissionsTestContext {
+            project_id: Some(project_id.clone()),
+            team_id: Some(team_id.clone()),
+            ..test_context.clone()
         })
-        .to_request();
-
-        let resp = test_env.call(request).await;
+        .await;
         if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
             return Err(format!(
                 "Failure permissions test failed. Expected failure codes {} got {}",
@@ -215,15 +219,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         }
 
         // Failure test- logged in on a non-team user
-        let request = req_gen(&PermissionsTestContext {
-            project_id: Some(&project_id),
-            team_id: Some(&team_id),
-            ..test_context
+        let resp = req_gen(PermissionsTestContext {
+            test_pat: ENEMY_USER_PAT.map(|s| s.to_string()),
+            project_id: Some(project_id.clone()),
+            team_id: Some(team_id.clone()),
+            ..test_context.clone()
         })
-        .append_header(("Authorization", ENEMY_USER_PAT))
-        .to_request();
-
-        let resp = test_env.call(request).await;
+        .await;
         if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
             return Err(format!(
                 "Failure permissions test failed. Expected failure codes {} got {}",
@@ -241,15 +243,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         }
 
         // Failure test- logged in with EVERY non-relevant permission
-        let request = req_gen(&PermissionsTestContext {
-            project_id: Some(&project_id),
-            team_id: Some(&team_id),
-            ..test_context
+        let resp: ServiceResponse = req_gen(PermissionsTestContext {
+            test_pat: self.user_pat.map(|s| s.to_string()),
+            project_id: Some(project_id.clone()),
+            team_id: Some(team_id.clone()),
+            ..test_context.clone()
         })
-        .append_header(("Authorization", self.user_pat))
-        .to_request();
-
-        let resp = test_env.call(request).await;
+        .await;
         if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
             return Err(format!(
                 "Failure permissions test failed. Expected failure codes {} got {}",
@@ -277,15 +277,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         .await;
 
         // Successful test
-        let request = req_gen(&PermissionsTestContext {
-            project_id: Some(&project_id),
-            team_id: Some(&team_id),
-            ..test_context
+        let resp = req_gen(PermissionsTestContext {
+            test_pat: self.user_pat.map(|s| s.to_string()),
+            project_id: Some(project_id.clone()),
+            team_id: Some(team_id.clone()),
+            ..test_context.clone()
         })
-        .append_header(("Authorization", self.user_pat))
-        .to_request();
-
-        let resp = test_env.call(request).await;
+        .await;
         if !resp.status().is_success() {
             return Err(format!(
                 "Success permissions test failed. Expected success, got {}",
@@ -306,21 +304,22 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         Ok(())
     }
 
-    pub async fn simple_organization_permissions_test<T>(
+    pub async fn simple_organization_permissions_test<T, Fut>(
         &self,
         success_permissions: OrganizationPermissions,
         req_gen: T,
     ) -> Result<(), String>
     where
-        T: Fn(&PermissionsTestContext) -> TestRequest,
+        T: Fn(PermissionsTestContext) -> Fut,
+        Fut: Future<Output = ServiceResponse>,
     {
         let test_env = self.test_env;
         let failure_organization_permissions = self
             .failure_organization_permissions
             .unwrap_or(OrganizationPermissions::all() ^ success_permissions);
         let test_context = PermissionsTestContext {
-            user_id: self.user_id,
-            user_pat: self.user_pat,
+            test_pat: None,
+            user_id: self.user_id.to_string(),
             project_id: None,
             team_id: None,
             organization_id: None,
@@ -348,15 +347,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         .await;
 
         // Failure test
-        let request = req_gen(&PermissionsTestContext {
-            organization_id: Some(&organization_id),
-            team_id: Some(&team_id),
-            ..test_context
+        let resp = req_gen(PermissionsTestContext {
+            test_pat: self.user_pat.map(|s| s.to_string()),
+            organization_id: Some(organization_id.clone()),
+            team_id: Some(team_id.clone()),
+            ..test_context.clone()
         })
-        .append_header(("Authorization", self.user_pat))
-        .to_request();
-
-        let resp = test_env.call(request).await;
+        .await;
         if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
             return Err(format!(
                 "Failure permissions test failed. Expected failure codes {} got {}",
@@ -379,15 +376,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         .await;
 
         // Successful test
-        let request = req_gen(&PermissionsTestContext {
-            organization_id: Some(&organization_id),
-            team_id: Some(&team_id),
-            ..test_context
+        let resp = req_gen(PermissionsTestContext {
+            test_pat: self.user_pat.map(|s| s.to_string()),
+            organization_id: Some(organization_id.clone()),
+            team_id: Some(team_id.clone()),
+            ..test_context.clone()
         })
-        .append_header(("Authorization", self.user_pat))
-        .to_request();
-
-        let resp = test_env.call(request).await;
+        .await;
         if !resp.status().is_success() {
             return Err(format!(
                 "Success permissions test failed. Expected success, got {}",
@@ -403,21 +398,22 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         Ok(())
     }
 
-    pub async fn full_project_permissions_test<T>(
+    pub async fn full_project_permissions_test<T, Fut>(
         &self,
         success_permissions: ProjectPermissions,
         req_gen: T,
     ) -> Result<(), String>
     where
-        T: Fn(&PermissionsTestContext) -> TestRequest,
+        T: Fn(PermissionsTestContext) -> Fut,
+        Fut: Future<Output = ServiceResponse>,
     {
         let test_env = self.test_env;
         let failure_project_permissions = self
             .failure_project_permissions
             .unwrap_or(ProjectPermissions::all() ^ success_permissions);
         let test_context = PermissionsTestContext {
-            user_id: self.user_id,
-            user_pat: self.user_pat,
+            test_pat: None,
+            user_id: self.user_id.to_string(),
             project_id: None,
             team_id: None,
             organization_id: None,
@@ -430,14 +426,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         let test_1 = async {
             let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: None,
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 1 failed. Expected failure codes {} got {}",
@@ -471,14 +466,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         let test_2 = async {
             let (project_id, team_id) = create_dummy_project(&test_env.setup_api).await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 2 failed. Expected failure codes {} got {}",
@@ -521,15 +515,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 3 failed. Expected failure codes {} got {}",
@@ -572,15 +564,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !resp.status().is_success() {
                 return Err(format!(
                     "Test 4 failed. Expected success, got {}",
@@ -623,15 +613,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 5 failed. Expected failure codes {} got {}",
@@ -678,15 +666,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !resp.status().is_success() {
                 return Err(format!(
                     "Test 6 failed. Expected success, got {}",
@@ -739,15 +725,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 7 failed. Expected failure codes {} got {}",
@@ -804,15 +788,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                project_id: Some(&project_id),
-                team_id: Some(&team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                project_id: Some(project_id.clone()),
+                team_id: Some(team_id.clone()),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
 
             if !resp.status().is_success() {
                 return Err(format!(
@@ -844,21 +826,22 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
         Ok(())
     }
 
-    pub async fn full_organization_permissions_tests<T>(
+    pub async fn full_organization_permissions_tests<T, Fut>(
         &self,
         success_permissions: OrganizationPermissions,
         req_gen: T,
     ) -> Result<(), String>
     where
-        T: Fn(&PermissionsTestContext) -> TestRequest,
+        T: Fn(PermissionsTestContext) -> Fut,
+        Fut: Future<Output = ServiceResponse>,
     {
         let test_env = self.test_env;
         let failure_organization_permissions = self
             .failure_organization_permissions
             .unwrap_or(OrganizationPermissions::all() ^ success_permissions);
         let test_context = PermissionsTestContext {
-            user_id: self.user_id,
-            user_pat: self.user_pat,
+            test_pat: None,
+            user_id: self.user_id.to_string(),
             project_id: None, // Will be overwritten on each test
             team_id: None,    // Will be overwritten on each test
             organization_id: None,
@@ -871,14 +854,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             let (organization_id, organization_team_id) =
                 create_dummy_org(&test_env.setup_api).await;
 
-            let request = req_gen(&PermissionsTestContext {
-                organization_id: Some(&organization_id),
-                organization_team_id: Some(&organization_team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                organization_id: Some(organization_id.clone()),
+                organization_team_id: Some(organization_team_id),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 1 failed. Expected failure codes {} got {}",
@@ -921,15 +903,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                organization_id: Some(&organization_id),
-                organization_team_id: Some(&organization_team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                organization_id: Some(organization_id.clone()),
+                organization_team_id: Some(organization_team_id),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !self.allowed_failure_codes.contains(&resp.status().as_u16()) {
                 return Err(format!(
                     "Test 2 failed. Expected failure codes {} got {}",
@@ -972,15 +952,13 @@ impl<'a, A: Api> PermissionsTest<'a, A> {
             )
             .await;
 
-            let request = req_gen(&PermissionsTestContext {
-                organization_id: Some(&organization_id),
-                organization_team_id: Some(&organization_team_id),
-                ..test_context
+            let resp = req_gen(PermissionsTestContext {
+                test_pat: self.user_pat.map(|s| s.to_string()),
+                organization_id: Some(organization_id.clone()),
+                organization_team_id: Some(organization_team_id),
+                ..test_context.clone()
             })
-            .append_header(("Authorization", self.user_pat))
-            .to_request();
-
-            let resp = test_env.call(request).await;
+            .await;
             if !resp.status().is_success() {
                 return Err(format!(
                     "Test 3 failed. Expected success, got {}",
@@ -1054,7 +1032,7 @@ async fn add_project_to_org(setup_api: &ApiV3, project_id: &str, organization_id
 
 async fn add_user_to_team(
     user_id: &str,
-    user_pat: &str,
+    user_pat: Option<&str>,
     team_id: &str,
     project_permissions: Option<ProjectPermissions>,
     organization_permissions: Option<OrganizationPermissions>,
@@ -1109,7 +1087,7 @@ async fn remove_user_from_team(user_id: &str, team_id: &str, setup_api: &ApiV3) 
 
 async fn get_project_permissions(
     user_id: &str,
-    user_pat: &str,
+    user_pat: Option<&str>,
     project_id: &str,
     setup_api: &ApiV3,
 ) -> ProjectPermissions {
@@ -1132,7 +1110,7 @@ async fn get_project_permissions(
 
 async fn get_organization_permissions(
     user_id: &str,
-    user_pat: &str,
+    user_pat: Option<&str>,
     organization_id: &str,
     setup_api: &ApiV3,
 ) -> OrganizationPermissions {

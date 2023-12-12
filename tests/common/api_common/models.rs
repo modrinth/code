@@ -75,13 +75,6 @@ pub struct CommonVersion {
 }
 
 #[derive(Deserialize)]
-pub struct CommonImageData {
-    pub filename: String,
-    pub extension: String,
-    pub icon: Vec<u8>,
-}
-
-#[derive(Deserialize)]
 pub struct CommonLoaderData {
     pub icon: String,
     pub name: String,

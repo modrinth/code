@@ -14,7 +14,8 @@ use labrinth::models::projects::ProjectId;
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
-use crate::common::api_common::ApiTeams;
+use crate::common::api_common::{ApiTeams, AppendsOptionalPat};
+use crate::common::dummy_data::DummyImage;
 
 // For each scope, we (using test_scope):
 // - create a PAT with a given set of scopes for a function
@@ -386,7 +387,7 @@ pub async fn project_version_reads_scopes() {
         let read_version = Scopes::VERSION_READ;
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/version/{beta_version_id}"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "status": "draft"
             }))
@@ -505,6 +506,8 @@ pub async fn project_write_scopes() {
             .team_id
             .clone();
 
+        let test_icon = DummyImage::SmallIcon;
+
         // Projects writing
         let write_project = Scopes::PROJECT_WRITE;
         let req_gen = || {
@@ -541,7 +544,7 @@ pub async fn project_write_scopes() {
         // Approve beta as private so we can schedule it
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/project/{beta_project_id}"))
-            .append_header(("Authorization", MOD_USER_PAT))
+            .append_pat(MOD_USER_PAT)
             .set_json(json!({
                 "status": "private"
             }))
@@ -567,10 +570,11 @@ pub async fn project_write_scopes() {
         // Icons and gallery images
         let req_gen = || {
             test::TestRequest::patch()
-                .uri(&format!("/v3/project/{beta_project_id}/icon?ext=png"))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
+                .uri(&format!(
+                    "/v3/project/{beta_project_id}/icon?ext={ext}",
+                    ext = test_icon.extension()
                 ))
+                .set_payload(test_icon.bytes())
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -587,11 +591,10 @@ pub async fn project_write_scopes() {
         let req_gen = || {
             test::TestRequest::post()
                 .uri(&format!(
-                    "/v3/project/{beta_project_id}/gallery?ext=png&featured=true"
+                    "/v3/project/{beta_project_id}/gallery?ext={ext}&featured=true",
+                    ext = test_icon.extension()
                 ))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
-                ))
+                .set_payload(test_icon.bytes())
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -601,7 +604,7 @@ pub async fn project_write_scopes() {
         // Get project, as we need the gallery image url
         let req_gen = test::TestRequest::get()
             .uri(&format!("/v3/project/{beta_project_id}"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .to_request();
         let resp = test_env.call(req_gen).await;
         let project: serde_json::Value = test::read_body_json(resp).await;
@@ -728,12 +731,14 @@ pub async fn version_write_scopes() {
             .file_hash
             .clone();
 
+        let basic_zip = TestFile::BasicZip;
+
         let write_version = Scopes::VERSION_WRITE;
 
         // Approve beta version as private so we can schedule it
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/version/{beta_version_id}"))
-            .append_header(("Authorization", MOD_USER_PAT))
+            .append_pat(MOD_USER_PAT)
             .set_json(json!({
                 "status": "unlisted"
             }))
@@ -782,7 +787,7 @@ pub async fn version_write_scopes() {
                 serde_json::to_string(&json!(
                     {
                         "file_types": {
-                            "simple-zip.zip": "required-resource-pack"
+                            basic_zip.filename(): "required-resource-pack"
                         },
                     }
                 ))
@@ -792,12 +797,10 @@ pub async fn version_write_scopes() {
 
         // Differently named file, with different content
         let content_segment = MultipartSegment {
-            name: "simple-zip.zip".to_string(),
-            filename: Some("simple-zip.zip".to_string()),
-            content_type: Some("application/zip".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../tests/files/simple-zip.zip").to_vec(),
-            ),
+            name: basic_zip.filename(),
+            filename: Some(basic_zip.filename()),
+            content_type: basic_zip.content_type(),
+            data: MultipartSegmentData::Binary(basic_zip.bytes()),
         };
 
         // Upload version file
@@ -995,7 +998,7 @@ pub async fn thread_scopes() {
         // First, get message id
         let req_gen = test::TestRequest::get()
             .uri(&format!("/v3/thread/{thread_id}"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .to_request();
         let resp = test_env.call(req_gen).await;
         let success: serde_json::Value = test::read_body_json(resp).await;
@@ -1077,6 +1080,8 @@ pub async fn collections_scopes() {
             .project_id
             .clone();
 
+        let small_icon = DummyImage::SmallIcon;
+
         // Create collection
         let collection_create = Scopes::COLLECTION_CREATE;
         let req_gen = || {
@@ -1145,10 +1150,11 @@ pub async fn collections_scopes() {
 
         let req_gen = || {
             test::TestRequest::patch()
-                .uri(&format!("/v3/collection/{collection_id}/icon?ext=png"))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
+                .uri(&format!(
+                    "/v3/collection/{collection_id}/icon?ext={ext}",
+                    ext = small_icon.extension()
                 ))
+                .set_payload(Bytes::from(small_icon.bytes()))
         };
         ScopeTest::new(&test_env)
             .test(req_gen, collection_write)
@@ -1177,6 +1183,8 @@ pub async fn organization_scopes() {
             .project_beta
             .project_id
             .clone();
+
+        let icon = DummyImage::SmallIcon;
 
         // Create organization
         let organization_create = Scopes::ORGANIZATION_CREATE;
@@ -1210,10 +1218,11 @@ pub async fn organization_scopes() {
 
         let req_gen = || {
             test::TestRequest::patch()
-                .uri(&format!("/v3/organization/{organization_id}/icon?ext=png"))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
+                .uri(&format!(
+                    "/v3/organization/{organization_id}/icon?ext={ext}",
+                    ext = icon.extension()
                 ))
+                .set_payload(Bytes::from(icon.bytes()))
         };
         ScopeTest::new(&test_env)
             .test(req_gen, organization_edit)

@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use actix_http::StatusCode;
 use actix_web::test;
-use bytes::Bytes;
 use chrono::{Duration, Utc};
-use common::api_v3::request_data::get_public_version_creation_data;
 use common::api_v3::ApiV3;
 use common::database::*;
 use common::dummy_data::DUMMY_CATEGORIES;
@@ -17,12 +15,12 @@ use labrinth::database::models::project_item::{PROJECTS_NAMESPACE, PROJECTS_SLUG
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::projects::{Project, ProjectId};
 use labrinth::models::teams::ProjectPermissions;
-use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
+use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
 use crate::common::api_common::request_data::ProjectCreationRequestData;
-use crate::common::api_common::{ApiProject, ApiVersion};
-use crate::common::dummy_data::TestFile;
+use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion, AppendsOptionalPat};
+use crate::common::dummy_data::{DummyImage, TestFile};
 mod common;
 
 #[actix_rt::test]
@@ -37,7 +35,7 @@ async fn test_get_project() {
         // Perform request on dummy data
         let req = test::TestRequest::get()
             .uri(&format!("/v3/project/{alpha_project_id}"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         let status = resp.status();
@@ -74,7 +72,7 @@ async fn test_get_project() {
         // Make the request again, this time it should be cached
         let req = test::TestRequest::get()
             .uri(&format!("/v3/project/{alpha_project_id}"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         let status = resp.status();
@@ -87,7 +85,7 @@ async fn test_get_project() {
         // Request should fail on non-existent project
         let req = test::TestRequest::get()
             .uri("/v3/project/nonexistent")
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .to_request();
 
         let resp = test_env.call(req).await;
@@ -96,7 +94,7 @@ async fn test_get_project() {
         // Similarly, request should fail on non-authorized user, on a yet-to-be-approved or hidden project, with a 404 (hiding the existence of the project)
         let req = test::TestRequest::get()
             .uri(&format!("/v3/project/{beta_project_id}"))
-            .append_header(("Authorization", ENEMY_USER_PAT))
+            .append_pat(ENEMY_USER_PAT)
             .to_request();
 
         let resp = test_env.call(req).await;
@@ -139,35 +137,35 @@ async fn test_add_remove_project() {
             ..json_segment.clone()
         };
 
+        let basic_mod_file = TestFile::BasicMod;
+        let basic_mod_different_file = TestFile::BasicModDifferent;
+
         // Basic file
         let file_segment = MultipartSegment {
-            name: "basic-mod.jar".to_string(),
-            filename: Some("basic-mod.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            // TODO: look at these: can be used in the reuse data
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../tests/files/basic-mod.jar").to_vec(),
-            ),
+            // 'Basic'
+            name: basic_mod_file.filename(),
+            filename: Some(basic_mod_file.filename()),
+            content_type: basic_mod_file.content_type(),
+            data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
         };
 
-        // Differently named file, with the same content (for hash testing)
+        // Differently named file, with the SAME content (for hash testing)
         let file_diff_name_segment = MultipartSegment {
-            name: "basic-mod-different.jar".to_string(),
-            filename: Some("basic-mod-different.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../tests/files/basic-mod.jar").to_vec(),
-            ),
+            // 'Different'
+            name: basic_mod_different_file.filename(),
+            filename: Some(basic_mod_different_file.filename()),
+            content_type: basic_mod_different_file.content_type(),
+            // 'Basic'
+            data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
         };
 
         // Differently named file, with different content
         let file_diff_name_content_segment = MultipartSegment {
-            name: "basic-mod-different.jar".to_string(),
-            filename: Some("basic-mod-different.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../tests/files/basic-mod-different.jar").to_vec(),
-            ),
+            // 'Different'
+            name: basic_mod_different_file.filename(),
+            filename: Some(basic_mod_different_file.filename()),
+            content_type: basic_mod_different_file.content_type(),
+            data: MultipartSegmentData::Binary(basic_mod_different_file.bytes()),
         };
 
         // Add a project- simple, should work.
@@ -193,7 +191,7 @@ async fn test_add_remove_project() {
         let uploaded_version_id = project.versions[0];
 
         // Checks files to ensure they were uploaded and correctly identify the file
-        let hash = sha1::Sha1::from(include_bytes!("../tests/files/basic-mod.jar"))
+        let hash = sha1::Sha1::from(basic_mod_file.bytes())
             .digest()
             .to_string();
         let version = api
@@ -598,6 +596,7 @@ async fn permissions_patch_project_v3() {
         let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
         let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
 
+        let api = &test_env.api;
         // TODO: This should be a separate test from v3
         // - only a couple of these fields are v3-specific
         // once we have permissions/scope tests setup to not just take closures, we can split this up
@@ -625,16 +624,22 @@ async fn permissions_patch_project_v3() {
             .map(|(key, value)| {
                 let test_env = test_env.clone();
                 async move {
-                    let req_gen = |ctx: &PermissionsTestContext| {
-                        test::TestRequest::patch()
-                            .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
-                            .set_json(json!({
-                                key: if key == "slug" {
-                                    json!(generate_random_name("randomslug"))
-                                } else {
-                                    value.clone()
-                                },
-                            }))
+                    let req_gen = |ctx: PermissionsTestContext| {
+                        let value = value.clone();
+                        async move {
+                            api.edit_project(
+                                &ctx.project_id.unwrap(),
+                                json!({
+                                    key: if key == "slug" {
+                                        json!(generate_random_name("randomslug"))
+                                    } else {
+                                        value.clone()
+                                    },
+                                }),
+                                ctx.test_pat.as_deref(),
+                            )
+                            .await
+                        }
                     };
                     PermissionsTest::new(&test_env)
                         .simple_project_permissions_test(edit_details, req_gen)
@@ -648,13 +653,16 @@ async fn permissions_patch_project_v3() {
 
         // Test with status and requested_status
         // This requires a project with a version, so we use alpha_project_id
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project(
+                &ctx.project_id.unwrap(),
+                json!({
                     "status": "private",
                     "requested_status": "private",
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -664,15 +672,15 @@ async fn permissions_patch_project_v3() {
             .unwrap();
 
         // Bulk patch projects
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/projects?ids=[{uri}]",
-                    uri = urlencoding::encode(&format!("\"{}\"", ctx.project_id.unwrap()))
-                ))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project_bulk(
+                &[&ctx.project_id.unwrap()],
+                json!({
                     "name": "randomname",
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(edit_details, req_gen)
@@ -682,12 +690,15 @@ async fn permissions_patch_project_v3() {
         // Edit body
         // Cannot bulk edit body
         let edit_body = ProjectPermissions::EDIT_BODY;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project(
+                &ctx.project_id.unwrap(),
+                json!({
                     "description": "new description!",
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(edit_body, req_gen)
@@ -706,12 +717,14 @@ async fn permissions_edit_details() {
         let beta_project_id = &test_env.dummy.as_ref().unwrap().project_beta.project_id;
         let beta_team_id = &test_env.dummy.as_ref().unwrap().project_beta.team_id;
         let beta_version_id = &test_env.dummy.as_ref().unwrap().project_beta.version_id;
+
         let edit_details = ProjectPermissions::EDIT_DETAILS;
+        let api = &test_env.api;
 
         // Approve beta version as private so we can schedule it
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/version/{beta_version_id}"))
-            .append_header(("Authorization", MOD_USER_PAT))
+            .append_pat(MOD_USER_PAT)
             .set_json(json!({
                 "status": "unlisted"
             }))
@@ -720,15 +733,14 @@ async fn permissions_edit_details() {
         assert_eq!(resp.status(), 204);
 
         // Schedule version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!("/v3/version/{beta_version_id}/schedule")) // beta_version_id is an *approved* version, so we can schedule it
-                .set_json(json!(
-                    {
-                        "requested_status": "archived",
-                        "time": Utc::now() + Duration::days(1),
-                    }
-                ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.schedule_project(
+                beta_version_id,
+                "archived",
+                Utc::now() + Duration::days(1),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(beta_project_id, beta_team_id)
@@ -739,15 +751,13 @@ async fn permissions_edit_details() {
 
         // Icon edit
         // Uses alpha project to delete this icon
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/project/{}/icon?ext=png",
-                    ctx.project_id.unwrap()
-                ))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
-                ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project_icon(
+                &ctx.project_id.unwrap(),
+                Some(DummyImage::SmallIcon.get_icon_data()),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -758,11 +768,9 @@ async fn permissions_edit_details() {
 
         // Icon delete
         // Uses alpha project to delete added icon
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/project/{}/icon?ext=png",
-                ctx.project_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project_icon(&ctx.project_id.unwrap(), None, ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -773,15 +781,17 @@ async fn permissions_edit_details() {
 
         // Add gallery item
         // Uses alpha project to add gallery item so we can get its url
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!(
-                    "/v3/project/{}/gallery?ext=png&featured=true",
-                    ctx.project_id.unwrap()
-                ))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
-                ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.add_gallery_item(
+                &ctx.project_id.unwrap(),
+                DummyImage::SmallIcon.get_icon_data(),
+                true,
+                None,
+                None,
+                None,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -792,7 +802,7 @@ async fn permissions_edit_details() {
         // Get project, as we need the gallery image url
         let req = test::TestRequest::get()
             .uri(&format!("/v3/project/{alpha_project_id}"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         let project: serde_json::Value = test::read_body_json(resp).await;
@@ -800,11 +810,16 @@ async fn permissions_edit_details() {
 
         // Edit gallery item
         // Uses alpha project to edit gallery item
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch().uri(&format!(
-                "/v3/project/{}/gallery?url={gallery_url}",
-                ctx.project_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_gallery_item(
+                &ctx.project_id.unwrap(),
+                gallery_url,
+                vec![("description".to_string(), "new caption!".to_string())]
+                    .into_iter()
+                    .collect(),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -815,11 +830,13 @@ async fn permissions_edit_details() {
 
         // Remove gallery item
         // Uses alpha project to remove gallery item
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/project/{}/gallery?url={gallery_url}",
-                ctx.project_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_gallery_item(
+                &ctx.project_id.unwrap(),
+                gallery_url,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -839,21 +856,22 @@ async fn permissions_upload_version() {
         let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
         let alpha_file_hash = &test_env.dummy.as_ref().unwrap().project_alpha.file_hash;
 
+        let api = &test_env.api;
+
         let upload_version = ProjectPermissions::UPLOAD_VERSION;
         // Upload version with basic-mod.jar
-        let req_gen = |ctx: &PermissionsTestContext| {
+        let req_gen = |ctx: PermissionsTestContext| async move {
             let project_id = ctx.project_id.unwrap();
-            let project_id = ProjectId(parse_base62(project_id).unwrap());
-            let multipart = get_public_version_creation_data(
+            let project_id = ProjectId(parse_base62(&project_id).unwrap());
+            api.add_public_version(
                 project_id,
                 "1.0.0",
                 TestFile::BasicMod,
                 None,
                 None,
-            );
-            test::TestRequest::post()
-                .uri("/v3/version")
-                .set_multipart(multipart.segment_data)
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(upload_version, req_gen)
@@ -862,30 +880,13 @@ async fn permissions_upload_version() {
 
         // Upload file to existing version
         // Uses alpha project, as it has an existing version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!("/v3/version/{}/file", alpha_version_id))
-                .set_multipart([
-                    MultipartSegment {
-                        name: "data".to_string(),
-                        filename: None,
-                        content_type: Some("application/json".to_string()),
-                        data: MultipartSegmentData::Text(
-                            serde_json::to_string(&json!({
-                                "file_parts": ["basic-mod-different.jar"],
-                            }))
-                            .unwrap(),
-                        ),
-                    },
-                    MultipartSegment {
-                        name: "basic-mod-different.jar".to_string(),
-                        filename: Some("basic-mod-different.jar".to_string()),
-                        content_type: Some("application/java-archive".to_string()),
-                        data: MultipartSegmentData::Binary(
-                            include_bytes!("../tests/files/basic-mod-different.jar").to_vec(),
-                        ),
-                    },
-                ])
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.upload_file_to_version(
+                alpha_version_id,
+                &TestFile::BasicModDifferent,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -896,12 +897,15 @@ async fn permissions_upload_version() {
 
         // Patch version
         // Uses alpha project, as it has an existing version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/version/{}", alpha_version_id))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_version(
+                alpha_version_id,
+                json!({
                     "name": "Basic Mod",
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -913,8 +917,9 @@ async fn permissions_upload_version() {
         // Delete version file
         // Uses alpha project, as it has an existing version
         let delete_version = ProjectPermissions::DELETE_VERSION;
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!("/v3/version_file/{}", alpha_file_hash))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_version_file(alpha_file_hash, ctx.test_pat.as_deref())
+                .await
         };
 
         PermissionsTest::new(&test_env)
@@ -926,8 +931,9 @@ async fn permissions_upload_version() {
 
         // Delete version
         // Uses alpha project, as it has an existing version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!("/v3/version/{}", alpha_version_id))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_version(alpha_version_id, ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -946,16 +952,19 @@ async fn permissions_manage_invites() {
         let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
         let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
 
+        let api = &test_env.api;
         let manage_invites = ProjectPermissions::MANAGE_INVITES;
 
         // Add member
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!("/v3/team/{}/members", ctx.team_id.unwrap()))
-                .set_json(json!({
-                    "user_id": MOD_USER_ID,
-                    "permissions": 0,
-                }))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.add_user_to_team(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                Some(ProjectPermissions::empty()),
+                None,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -966,15 +975,16 @@ async fn permissions_manage_invites() {
 
         // Edit member
         let edit_member = ProjectPermissions::EDIT_MEMBER;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/team/{}/members/{MOD_USER_ID}",
-                    ctx.team_id.unwrap()
-                ))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_team_member(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                json!({
                     "permissions": 0,
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -985,11 +995,9 @@ async fn permissions_manage_invites() {
 
         // remove member
         // requires manage_invites if they have not yet accepted the invite
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/team/{}/members/{MOD_USER_ID}",
-                ctx.team_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_from_team(&ctx.team_id.unwrap(), MOD_USER_ID, ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -1001,7 +1009,7 @@ async fn permissions_manage_invites() {
         // re-add member for testing
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{}/members", alpha_team_id))
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .set_json(json!({
                 "user_id": MOD_USER_ID,
             }))
@@ -1012,18 +1020,16 @@ async fn permissions_manage_invites() {
         // Accept invite
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{}/join", alpha_team_id))
-            .append_header(("Authorization", MOD_USER_PAT))
+            .append_pat(MOD_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 204);
 
         // remove existing member (requires remove_member)
         let remove_member = ProjectPermissions::REMOVE_MEMBER;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/team/{}/members/{MOD_USER_ID}",
-                ctx.team_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_from_team(&ctx.team_id.unwrap(), MOD_USER_ID, ctx.test_pat.as_deref())
+                .await
         };
 
         PermissionsTest::new(&test_env)
@@ -1041,10 +1047,11 @@ async fn permissions_delete_project() {
     // Add member, remove member, edit member
     with_test_environment_all(None, |test_env| async move {
         let delete_project = ProjectPermissions::DELETE_PROJECT;
-
+        let api = &test_env.api;
         // Delete project
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_project(&ctx.project_id.unwrap(), ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(delete_project, req_gen)
@@ -1061,15 +1068,18 @@ async fn project_permissions_consistency_test() {
     with_test_environment_all(Some(10), |test_env| async move {
         // Test that the permissions are consistent with each other
         // For example, if we get the projectpermissions directly, from an organization's defaults, overriden, etc, they should all be correct & consistent
-
+        let api = &test_env.api;
         // Full project permissions test with EDIT_DETAILS
         let success_permissions = ProjectPermissions::EDIT_DETAILS;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
-                .set_json(json!({
-                    "name": "Example title - changed.",
-                }))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project(
+                &ctx.project_id.unwrap(),
+                json!({
+                    "categories": [],
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .full_project_permissions_test(success_permissions, req_gen)
@@ -1081,12 +1091,15 @@ async fn project_permissions_consistency_test() {
             | ProjectPermissions::REMOVE_MEMBER
             | ProjectPermissions::DELETE_VERSION
             | ProjectPermissions::VIEW_PAYOUTS;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/project/{}", ctx.project_id.unwrap()))
-                .set_json(json!({
-                    "name": "Example title - changed.",
-                }))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project(
+                &ctx.project_id.unwrap(),
+                json!({
+                    "categories": [],
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .full_project_permissions_test(success_permissions, req_gen)

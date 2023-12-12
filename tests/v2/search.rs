@@ -28,7 +28,7 @@ async fn search_projects() {
 
         let create_async_future =
             |id: u64,
-             pat: &'static str,
+             pat: Option<&'static str>,
              is_modpack: bool,
              modify_json: Option<json_patch::Patch>| {
                 let slug = format!("{test_name}-searchable-project-{id}");

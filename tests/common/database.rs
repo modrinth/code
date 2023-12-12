@@ -27,11 +27,11 @@ pub const FRIEND_USER_ID_PARSED: i64 = 4;
 pub const ENEMY_USER_ID_PARSED: i64 = 5;
 
 // These are full-scoped PATs- as if the user was logged in (including illegal scopes).
-pub const ADMIN_USER_PAT: &str = "mrp_patadmin";
-pub const MOD_USER_PAT: &str = "mrp_patmoderator";
-pub const USER_USER_PAT: &str = "mrp_patuser";
-pub const FRIEND_USER_PAT: &str = "mrp_patfriend";
-pub const ENEMY_USER_PAT: &str = "mrp_patenemy";
+pub const ADMIN_USER_PAT: Option<&str> = Some("mrp_patadmin");
+pub const MOD_USER_PAT: Option<&str> = Some("mrp_patmoderator");
+pub const USER_USER_PAT: Option<&str> = Some("mrp_patuser");
+pub const FRIEND_USER_PAT: Option<&str> = Some("mrp_patfriend");
+pub const ENEMY_USER_PAT: Option<&str> = Some("mrp_patenemy");
 
 const TEMPLATE_DATABASE_NAME: &str = "labrinth_tests_template";
 

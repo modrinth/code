@@ -1,9 +1,8 @@
+use std::sync::Arc;
+
 use crate::common::{
-    api_common::ApiProject,
-    api_v2::{
-        request_data::{get_public_project_creation_data_json, get_public_version_creation_data},
-        ApiV2,
-    },
+    api_common::{ApiProject, ApiVersion, AppendsOptionalPat},
+    api_v2::{request_data::get_public_project_creation_data_json, ApiV2},
     database::{
         generate_random_name, ADMIN_USER_PAT, FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT,
     },
@@ -96,41 +95,41 @@ async fn test_add_remove_project() {
             ..json_segment.clone()
         };
 
+        let basic_mod_file = TestFile::BasicMod;
+        let basic_mod_different_file = TestFile::BasicModDifferent;
+
         // Basic file
         let file_segment = MultipartSegment {
-            name: "basic-mod.jar".to_string(),
-            filename: Some("basic-mod.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            // TODO: look at these: can be simplified with TestFile
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
-            ),
+            // 'Basic'
+            name: basic_mod_file.filename(),
+            filename: Some(basic_mod_file.filename()),
+            content_type: basic_mod_file.content_type(),
+            data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
         };
 
-        // Differently named file, with the same content (for hash testing)
+        // Differently named file, with the SAME content (for hash testing)
         let file_diff_name_segment = MultipartSegment {
-            name: "basic-mod-different.jar".to_string(),
-            filename: Some("basic-mod-different.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
-            ),
+            // 'Different'
+            name: basic_mod_different_file.filename(),
+            filename: Some(basic_mod_different_file.filename()),
+            content_type: basic_mod_different_file.content_type(),
+            // 'Basic'
+            data: MultipartSegmentData::Binary(basic_mod_file.bytes()),
         };
 
         // Differently named file, with different content
         let file_diff_name_content_segment = MultipartSegment {
-            name: "basic-mod-different.jar".to_string(),
-            filename: Some("basic-mod-different.jar".to_string()),
-            content_type: Some("application/java-archive".to_string()),
-            data: MultipartSegmentData::Binary(
-                include_bytes!("../../tests/files/basic-mod-different.jar").to_vec(),
-            ),
+            // 'Different'
+            name: basic_mod_different_file.filename(),
+            filename: Some(basic_mod_different_file.filename()),
+            content_type: basic_mod_different_file.content_type(),
+            data: MultipartSegmentData::Binary(basic_mod_different_file.bytes()),
         };
 
         // Add a project- simple, should work.
         let req = test::TestRequest::post()
             .uri("/v2/project")
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_multipart(vec![json_segment.clone(), file_segment.clone()])
             .to_request();
         let resp = test_env.call(req).await;
@@ -144,7 +143,7 @@ async fn test_add_remove_project() {
         let uploaded_version_id = project.versions[0];
 
         // Checks files to ensure they were uploaded and correctly identify the file
-        let hash = sha1::Sha1::from(include_bytes!("../../tests/files/basic-mod.jar"))
+        let hash = sha1::Sha1::from(basic_mod_file.bytes())
             .digest()
             .to_string();
         let version = api
@@ -156,7 +155,7 @@ async fn test_add_remove_project() {
         // Even if that file is named differently
         let req = test::TestRequest::post()
             .uri("/v2/project")
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_multipart(vec![
                 json_diff_slug_file_segment.clone(), // Different slug, different file name
                 file_diff_name_segment.clone(),      // Different file name, same content
@@ -169,7 +168,7 @@ async fn test_add_remove_project() {
         // Reusing with the same slug and a different file should fail
         let req = test::TestRequest::post()
             .uri("/v2/project")
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_multipart(vec![
                 json_diff_file_segment.clone(), // Same slug, different file name
                 file_diff_name_content_segment.clone(), // Different file name, different content
@@ -182,7 +181,7 @@ async fn test_add_remove_project() {
         // Different slug, different file should succeed
         let req = test::TestRequest::post()
             .uri("/v2/project")
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_multipart(vec![
                 json_diff_slug_file_segment.clone(), // Different slug, different file name
                 file_diff_name_content_segment.clone(), // Different file name, same content
@@ -234,23 +233,24 @@ async fn permissions_upload_version() {
         let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
         let alpha_file_hash = &test_env.dummy.as_ref().unwrap().project_alpha.file_hash;
 
+        let api = &test_env.api;
+        let basic_mod_different_file = TestFile::BasicModDifferent;
         let upload_version = ProjectPermissions::UPLOAD_VERSION;
 
-        // Upload version with basic-mod.jar
-        let req_gen = |ctx: &PermissionsTestContext| {
+        let req_gen = |ctx: PermissionsTestContext| async move {
             let project_id = ctx.project_id.unwrap();
-            let project_id = ProjectId(parse_base62(project_id).unwrap());
-            let multipart = get_public_version_creation_data(
+            let project_id = ProjectId(parse_base62(&project_id).unwrap());
+            api.add_public_version(
                 project_id,
                 "1.0.0",
                 TestFile::BasicMod,
                 None,
                 None,
-            );
-            test::TestRequest::post()
-                .uri("/v2/version")
-                .set_multipart(multipart.segment_data)
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
+
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(upload_version, req_gen)
             .await
@@ -258,30 +258,13 @@ async fn permissions_upload_version() {
 
         // Upload file to existing version
         // Uses alpha project, as it has an existing version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!("/v2/version/{}/file", alpha_version_id))
-                .set_multipart([
-                    MultipartSegment {
-                        name: "data".to_string(),
-                        filename: None,
-                        content_type: Some("application/json".to_string()),
-                        data: MultipartSegmentData::Text(
-                            serde_json::to_string(&json!({
-                                "file_parts": ["basic-mod-different.jar"],
-                            }))
-                            .unwrap(),
-                        ),
-                    },
-                    MultipartSegment {
-                        name: "basic-mod-different.jar".to_string(),
-                        filename: Some("basic-mod-different.jar".to_string()),
-                        content_type: Some("application/java-archive".to_string()),
-                        data: MultipartSegmentData::Binary(
-                            include_bytes!("../../tests/files/basic-mod-different.jar").to_vec(),
-                        ),
-                    },
-                ])
+        let file_ref = Arc::new(basic_mod_different_file);
+        let req_gen = |ctx: PermissionsTestContext| {
+            let file_ref = file_ref.clone();
+            async move {
+                api.upload_file_to_version(alpha_version_id, &file_ref, ctx.test_pat.as_deref())
+                    .await
+            }
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -292,13 +275,17 @@ async fn permissions_upload_version() {
 
         // Patch version
         // Uses alpha project, as it has an existing version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v2/version/{}", alpha_version_id))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_version(
+                alpha_version_id,
+                json!({
                     "name": "Basic Mod",
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
+
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
             .with_user(FRIEND_USER_ID, FRIEND_USER_PAT, true)
@@ -309,8 +296,9 @@ async fn permissions_upload_version() {
         // Delete version file
         // Uses alpha project, as it has an existing version
         let delete_version = ProjectPermissions::DELETE_VERSION;
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!("/v2/version_file/{}", alpha_file_hash))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_version_file(alpha_file_hash, ctx.test_pat.as_deref())
+                .await
         };
 
         PermissionsTest::new(&test_env)
@@ -322,8 +310,9 @@ async fn permissions_upload_version() {
 
         // Delete version
         // Uses alpha project, as it has an existing version
-        let req_gen = |_: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!("/v2/version/{}", alpha_version_id))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_version(alpha_version_id, ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_project(alpha_project_id, alpha_team_id)
@@ -374,6 +363,8 @@ pub async fn test_patch_v2() {
 #[actix_rt::test]
 async fn permissions_patch_project_v2() {
     with_test_environment(Some(8), |test_env: TestEnvironment<ApiV2>| async move {
+        let api = &test_env.api;
+
         // TODO: This only includes v2 ones (as it should. See v3)
         // For each permission covered by EDIT_DETAILS, ensure the permission is required
         let edit_details = ProjectPermissions::EDIT_DETAILS;
@@ -397,16 +388,19 @@ async fn permissions_patch_project_v2() {
             .map(|(key, value)| {
                 let test_env = test_env.clone();
                 async move {
-                    let req_gen = |ctx: &PermissionsTestContext| {
-                        test::TestRequest::patch()
-                            .uri(&format!("/v2/project/{}", ctx.project_id.unwrap()))
-                            .set_json(json!({
+                    let req_gen = |ctx: PermissionsTestContext| async {
+                        api.edit_project(
+                            &ctx.project_id.unwrap(),
+                            json!({
                                 key: if key == "slug" {
                                     json!(generate_random_name("randomslug"))
                                 } else {
                                     value.clone()
                                 },
-                            }))
+                            }),
+                            ctx.test_pat.as_deref(),
+                        )
+                        .await
                     };
                     PermissionsTest::new(&test_env)
                         .simple_project_permissions_test(edit_details, req_gen)
@@ -421,12 +415,15 @@ async fn permissions_patch_project_v2() {
         // Edit body
         // Cannot bulk edit body
         let edit_body = ProjectPermissions::EDIT_BODY;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!("/v2/project/{}", ctx.project_id.unwrap()))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_project(
+                &ctx.project_id.unwrap(),
+                json!({
                     "body": "new body!", // new body
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .simple_project_permissions_test(edit_body, req_gen)

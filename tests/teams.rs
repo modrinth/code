@@ -1,4 +1,7 @@
-use crate::common::{api_common::ApiTeams, database::*};
+use crate::common::{
+    api_common::{ApiTeams, AppendsOptionalPat},
+    database::*,
+};
 use actix_web::test;
 use common::{
     api_v3::ApiV3,
@@ -36,7 +39,7 @@ async fn test_get_team() {
             ] {
                 let req = test::TestRequest::get()
                     .uri(&uri)
-                    .append_header(("Authorization", FRIEND_USER_PAT))
+                    .append_pat(FRIEND_USER_PAT)
                     .to_request();
 
                 let resp = test_env.call(req).await;
@@ -51,7 +54,7 @@ async fn test_get_team() {
             // - should not appear in the team members list to enemy users
             let req = test::TestRequest::post()
                 .uri(&format!("/v3/team/{team_id}/members"))
-                .append_header(("Authorization", USER_USER_PAT))
+                .append_pat(USER_USER_PAT)
                 .set_json(&json!({
                     "user_id": FRIEND_USER_ID,
                 }))
@@ -65,7 +68,7 @@ async fn test_get_team() {
             ] {
                 let req = test::TestRequest::get()
                     .uri(&uri)
-                    .append_header(("Authorization", FRIEND_USER_PAT))
+                    .append_pat(FRIEND_USER_PAT)
                     .to_request();
                 let resp = test_env.call(req).await;
                 assert_eq!(resp.status(), 200);
@@ -87,7 +90,7 @@ async fn test_get_team() {
 
                 let req = test::TestRequest::get()
                     .uri(&uri)
-                    .append_header(("Authorization", ENEMY_USER_PAT))
+                    .append_pat(ENEMY_USER_PAT)
                     .to_request();
                 let resp = test_env.call(req).await;
                 assert_eq!(resp.status(), 200);
@@ -101,7 +104,7 @@ async fn test_get_team() {
             // and should be able to see private data about the team
             let req = test::TestRequest::post()
                 .uri(&format!("/v3/team/{team_id}/join"))
-                .append_header(("Authorization", FRIEND_USER_PAT))
+                .append_pat(FRIEND_USER_PAT)
                 .to_request();
             let resp = test_env.call(req).await;
             assert_eq!(resp.status(), 204);
@@ -112,7 +115,7 @@ async fn test_get_team() {
             ] {
                 let req = test::TestRequest::get()
                     .uri(&uri)
-                    .append_header(("Authorization", FRIEND_USER_PAT))
+                    .append_pat(FRIEND_USER_PAT)
                     .to_request();
                 let resp = test_env.call(req).await;
                 assert_eq!(resp.status(), 200);
@@ -154,7 +157,7 @@ async fn test_get_team_project_orgs() {
         // Attach alpha to zeta
         let req = test::TestRequest::post()
             .uri(&format!("/v3/organization/{zeta_organization_id}/projects"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "project_id": alpha_project_id,
             }))
@@ -165,7 +168,7 @@ async fn test_get_team_project_orgs() {
         // Invite and add friend to zeta
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{zeta_team_id}/members"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "user_id": FRIEND_USER_ID,
             }))
@@ -175,7 +178,7 @@ async fn test_get_team_project_orgs() {
 
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{zeta_team_id}/join"))
-            .append_header(("Authorization", FRIEND_USER_PAT))
+            .append_pat(FRIEND_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 204);
@@ -185,7 +188,7 @@ async fn test_get_team_project_orgs() {
         // - not the ones from the organization
         let req = test::TestRequest::get()
             .uri(&format!("/v3/team/{alpha_team_id}/members"))
-            .append_header(("Authorization", FRIEND_USER_PAT))
+            .append_pat(FRIEND_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 200);
@@ -197,7 +200,7 @@ async fn test_get_team_project_orgs() {
         // - the members of the project team including the ones from the organization
         let req = test::TestRequest::get()
             .uri(&format!("/v3/project/{alpha_project_id}/members"))
-            .append_header(("Authorization", FRIEND_USER_PAT))
+            .append_pat(FRIEND_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 200);
@@ -290,7 +293,7 @@ async fn test_patch_organization_team_member() {
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/team/{zeta_team_id}/members/{USER_USER_ID}"))
             .set_json(json!({}))
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 204);
@@ -298,7 +301,7 @@ async fn test_patch_organization_team_member() {
         // As a non-owner with full permissions, attempt to edit the owner's permissions
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/team/{zeta_team_id}/members/{USER_USER_ID}"))
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .set_json(json!({
                 "permissions": 0
             }))
@@ -312,7 +315,7 @@ async fn test_patch_organization_team_member() {
         // first, invite friend
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{zeta_team_id}/members"))
-            .append_header(("Authorization", USER_USER_PAT))
+            .append_pat(USER_USER_PAT)
             .set_json(json!({
                 "user_id": FRIEND_USER_ID,
                 "organization_permissions": (OrganizationPermissions::EDIT_MEMBER | OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS).bits(),
@@ -323,7 +326,7 @@ async fn test_patch_organization_team_member() {
         // accept
         let req = test::TestRequest::post()
             .uri(&format!("/v3/team/{zeta_team_id}/join"))
-            .append_header(("Authorization", FRIEND_USER_PAT))
+            .append_pat(FRIEND_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 204);
@@ -331,7 +334,7 @@ async fn test_patch_organization_team_member() {
         // try to add permissions- fails, as we do not have EDIT_DETAILS
         let req = test::TestRequest::patch()
         .uri(&format!("/v3/team/{zeta_team_id}/members/{FRIEND_USER_ID}"))
-        .append_header(("Authorization", FRIEND_USER_PAT))
+        .append_pat(FRIEND_USER_PAT)
             .set_json(json!({
                 "organization_permissions": (OrganizationPermissions::EDIT_MEMBER | OrganizationPermissions::EDIT_DETAILS).bits()
             }))
@@ -344,7 +347,7 @@ async fn test_patch_organization_team_member() {
         for payout in [-1, 5001] {
             let req = test::TestRequest::patch()
                 .uri(&format!("/v3/team/{zeta_team_id}/members/{FRIEND_USER_ID}"))
-                .append_header(("Authorization", USER_USER_PAT))
+                .append_pat(USER_USER_PAT)
                 .set_json(json!({
                     "payouts_split": payout
                 }))
@@ -356,7 +359,7 @@ async fn test_patch_organization_team_member() {
         // Successful patch
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/team/{zeta_team_id}/members/{FRIEND_USER_ID}"))
-            .append_header(("Authorization", FRIEND_USER_PAT))
+            .append_pat(FRIEND_USER_PAT)
             .set_json(json!({
                 "payouts_split": 51,
                 "organization_permissions": (OrganizationPermissions::EDIT_MEMBER).bits(), // reduces permissions
@@ -372,7 +375,7 @@ async fn test_patch_organization_team_member() {
         // Check results
         let req = test::TestRequest::get()
             .uri(&format!("/v3/team/{zeta_team_id}/members"))
-            .append_header(("Authorization", FRIEND_USER_PAT))
+            .append_pat(FRIEND_USER_PAT)
             .to_request();
         let resp = test_env.call(req).await;
         assert_eq!(resp.status(), 200);

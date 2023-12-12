@@ -11,7 +11,7 @@ use labrinth::{
 use crate::common::{
     api_common::{
         models::{CommonCategoryData, CommonLoaderData},
-        Api, ApiTags,
+        Api, ApiTags, AppendsOptionalPat,
     },
     database::ADMIN_USER_PAT,
 };
@@ -23,7 +23,7 @@ impl ApiTags for ApiV3 {
     async fn get_loaders(&self) -> ServiceResponse {
         let req = TestRequest::get()
             .uri("/v3/tag/loader")
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .to_request();
         self.call(req).await
     }
@@ -41,7 +41,7 @@ impl ApiTags for ApiV3 {
     async fn get_categories(&self) -> ServiceResponse {
         let req = TestRequest::get()
             .uri("/v3/tag/category")
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .to_request();
         self.call(req).await
     }
@@ -67,7 +67,7 @@ impl ApiV3 {
     pub async fn get_loader_field_variants(&self, loader_field: &str) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/loader_field?loader_field={}", loader_field))
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .to_request();
         self.call(req).await
     }
@@ -85,7 +85,7 @@ impl ApiV3 {
     async fn get_games(&self) -> ServiceResponse {
         let req = TestRequest::get()
             .uri("/v3/games")
-            .append_header(("Authorization", ADMIN_USER_PAT))
+            .append_pat(ADMIN_USER_PAT)
             .to_request();
         self.call(req).await
     }

@@ -122,7 +122,7 @@ impl<A: Api> TestEnvironment<A> {
     pub async fn assert_read_notifications_status(
         &self,
         user_id: &str,
-        pat: &str,
+        pat: Option<&str>,
         status_code: StatusCode,
     ) {
         let resp = self.api.get_user_notifications(user_id, pat).await;
@@ -133,7 +133,7 @@ impl<A: Api> TestEnvironment<A> {
     pub async fn assert_read_user_projects_status(
         &self,
         user_id: &str,
-        pat: &str,
+        pat: Option<&str>,
         status_code: StatusCode,
     ) {
         let resp = self.api.get_user_projects(user_id, pat).await;

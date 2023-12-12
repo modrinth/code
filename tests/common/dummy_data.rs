@@ -16,7 +16,11 @@ use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 use crate::common::{api_common::Api, database::USER_USER_PAT};
 use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 
-use super::{api_common::ApiProject, api_v3::ApiV3, database::TemporaryDatabase};
+use super::{
+    api_common::{request_data::ImageData, ApiProject, AppendsOptionalPat},
+    api_v3::ApiV3,
+    database::TemporaryDatabase,
+};
 
 use super::{asserts::assert_status, database::USER_USER_ID, get_json_val_str};
 
@@ -36,9 +40,11 @@ pub const DUMMY_CATEGORIES: &[&str] = &[
 pub const DUMMY_OAUTH_CLIENT_ALPHA_SECRET: &str = "abcdefghijklmnopqrstuvwxyz";
 
 #[allow(dead_code)]
+#[derive(Clone)]
 pub enum TestFile {
     DummyProjectAlpha,
     DummyProjectBeta,
+    BasicZip,
     BasicMod,
     BasicModDifferent,
     // Randomly generates a valid .jar with a random hash.
@@ -380,7 +386,7 @@ pub async fn add_project_beta(api: &ApiV3) -> (Project, Version) {
     // Add a project.
     let req = TestRequest::post()
         .uri("/v3/project")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .set_multipart(vec![json_segment.clone(), file_segment.clone()])
         .to_request();
     let resp = api.call(req).await;
@@ -393,7 +399,7 @@ pub async fn add_organization_zeta(api: &ApiV3) -> Organization {
     // Add an organzation.
     let req = TestRequest::post()
         .uri("/v3/organization")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .set_json(json!({
             "name": "zeta",
             "description": "A dummy organization for testing with."
@@ -410,7 +416,7 @@ pub async fn get_project_alpha(api: &ApiV3) -> (Project, Version) {
     // Get project
     let req = TestRequest::get()
         .uri("/v3/project/alpha")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .to_request();
     let resp = api.call(req).await;
     let project: Project = test::read_body_json(resp).await;
@@ -418,7 +424,7 @@ pub async fn get_project_alpha(api: &ApiV3) -> (Project, Version) {
     // Get project's versions
     let req = TestRequest::get()
         .uri("/v3/project/alpha/version")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .to_request();
     let resp = api.call(req).await;
     let versions: Vec<Version> = test::read_body_json(resp).await;
@@ -431,7 +437,7 @@ pub async fn get_project_beta(api: &ApiV3) -> (Project, Version) {
     // Get project
     let req = TestRequest::get()
         .uri("/v3/project/beta")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .to_request();
     let resp = api.call(req).await;
     assert_status(&resp, StatusCode::OK);
@@ -441,7 +447,7 @@ pub async fn get_project_beta(api: &ApiV3) -> (Project, Version) {
     // Get project's versions
     let req = TestRequest::get()
         .uri("/v3/project/beta/version")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .to_request();
     let resp = api.call(req).await;
     assert_status(&resp, StatusCode::OK);
@@ -455,7 +461,7 @@ pub async fn get_organization_zeta(api: &ApiV3) -> Organization {
     // Get organization
     let req = TestRequest::get()
         .uri("/v3/organization/zeta")
-        .append_header(("Authorization", USER_USER_PAT))
+        .append_pat(USER_USER_PAT)
         .to_request();
     let resp = api.call(req).await;
     let organization: Organization = test::read_body_json(resp).await;
@@ -475,6 +481,7 @@ impl TestFile {
         match self {
             TestFile::DummyProjectAlpha => "dummy-project-alpha.jar",
             TestFile::DummyProjectBeta => "dummy-project-beta.jar",
+            TestFile::BasicZip => "simple-zip.zip",
             TestFile::BasicMod => "basic-mod.jar",
             TestFile::BasicModDifferent => "basic-mod-different.jar",
             TestFile::BasicModRandom { filename, .. } => filename,
@@ -492,6 +499,7 @@ impl TestFile {
                 include_bytes!("../../tests/files/dummy-project-beta.jar").to_vec()
             }
             TestFile::BasicMod => include_bytes!("../../tests/files/basic-mod.jar").to_vec(),
+            TestFile::BasicZip => include_bytes!("../../tests/files/simple-zip.zip").to_vec(),
             TestFile::BasicModDifferent => {
                 include_bytes!("../../tests/files/basic-mod-different.jar").to_vec()
             }
@@ -508,9 +516,26 @@ impl TestFile {
             TestFile::BasicModDifferent => "mod",
             TestFile::BasicModRandom { .. } => "mod",
 
+            TestFile::BasicZip => "resourcepack",
+
             TestFile::BasicModpackRandom { .. } => "modpack",
         }
         .to_string()
+    }
+
+    pub fn content_type(&self) -> Option<String> {
+        match self {
+            TestFile::DummyProjectAlpha => Some("application/java-archive"),
+            TestFile::DummyProjectBeta => Some("application/java-archive"),
+            TestFile::BasicMod => Some("application/java-archive"),
+            TestFile::BasicModDifferent => Some("application/java-archive"),
+            TestFile::BasicModRandom { .. } => Some("application/java-archive"),
+
+            TestFile::BasicZip => Some("application/zip"),
+
+            TestFile::BasicModpackRandom { .. } => Some("application/x-modrinth-modpack+zip"),
+        }
+        .map(|s| s.to_string())
     }
 }
 
@@ -532,6 +557,14 @@ impl DummyImage {
     pub fn bytes(&self) -> Vec<u8> {
         match self {
             DummyImage::SmallIcon => include_bytes!("../../tests/files/200x200.png").to_vec(),
+        }
+    }
+
+    pub fn get_icon_data(&self) -> ImageData {
+        ImageData {
+            filename: self.filename(),
+            extension: self.extension(),
+            icon: self.bytes(),
         }
     }
 }

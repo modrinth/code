@@ -21,7 +21,10 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
     let mut project_creation_futures = vec![];
 
     let create_async_future =
-        |id: u64, pat: &'static str, is_modpack: bool, modify_json: Option<json_patch::Patch>| {
+        |id: u64,
+         pat: Option<&'static str>,
+         is_modpack: bool,
+         modify_json: Option<json_patch::Patch>| {
             let slug = format!("{test_name}-searchable-project-{id}");
 
             let jar = if is_modpack {

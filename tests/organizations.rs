@@ -1,11 +1,8 @@
 use crate::common::{
     api_common::ApiTeams,
-    api_v3::request_data::get_icon_data,
     database::{generate_random_name, ADMIN_USER_PAT, MOD_USER_ID, MOD_USER_PAT, USER_USER_ID},
     dummy_data::DummyImage,
 };
-use actix_web::test;
-use bytes::Bytes;
 use common::{
     api_v3::ApiV3,
     database::{FRIEND_USER_ID, FRIEND_USER_PAT, USER_USER_PAT},
@@ -191,7 +188,7 @@ async fn add_remove_icon() {
         let resp = api
             .edit_organization_icon(
                 zeta_organization_id,
-                Some(get_icon_data(DummyImage::SmallIcon)),
+                Some(DummyImage::SmallIcon.get_icon_data()),
                 USER_USER_PAT,
             )
             .await;
@@ -294,8 +291,9 @@ async fn add_remove_organization_projects() {
 
 #[actix_rt::test]
 async fn permissions_patch_organization() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         // For each permission covered by EDIT_DETAILS, ensure the permission is required
+        let api = &test_env.api;
         let edit_details = OrganizationPermissions::EDIT_DETAILS;
         let test_pairs = [
             ("name", json!("")), // generated in the test to not collide slugs
@@ -303,19 +301,22 @@ async fn permissions_patch_organization() {
         ];
 
         for (key, value) in test_pairs {
-            let req_gen = |ctx: &PermissionsTestContext| {
-                test::TestRequest::patch()
-                    .uri(&format!(
-                        "/v3/organization/{}",
-                        ctx.organization_id.unwrap()
-                    ))
-                    .set_json(json!({
-                        key: if key == "name" {
-                            json!(generate_random_name("randomslug"))
-                        } else {
-                            value.clone()
-                        },
-                    }))
+            let req_gen = |ctx: PermissionsTestContext| {
+                let value = value.clone();
+                async move {
+                    api.edit_organization(
+                        &ctx.organization_id.unwrap(),
+                        json!({
+                            key: if key == "name" {
+                                json!(generate_random_name("randomslug"))
+                            } else {
+                                value.clone()
+                            },
+                        }),
+                        ctx.test_pat.as_deref(),
+                    )
+                    .await
+                }
             };
             PermissionsTest::new(&test_env)
                 .simple_organization_permissions_test(edit_details, req_gen)
@@ -329,7 +330,7 @@ async fn permissions_patch_organization() {
 // Not covered by PATCH /organization
 #[actix_rt::test]
 async fn permissions_edit_details() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let zeta_organization_id = &test_env
             .dummy
             .as_ref()
@@ -338,19 +339,18 @@ async fn permissions_edit_details() {
             .organization_id;
         let zeta_team_id = &test_env.dummy.as_ref().unwrap().organization_zeta.team_id;
 
+        let api = &test_env.api;
         let edit_details = OrganizationPermissions::EDIT_DETAILS;
 
         // Icon edit
         // Uses alpha organization to delete this icon
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/organization/{}/icon?ext=png",
-                    ctx.organization_id.unwrap()
-                ))
-                .set_payload(Bytes::from(
-                    include_bytes!("../tests/files/200x200.png") as &[u8]
-                ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_organization_icon(
+                &ctx.organization_id.unwrap(),
+                Some(DummyImage::SmallIcon.get_icon_data()),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -361,11 +361,9 @@ async fn permissions_edit_details() {
 
         // Icon delete
         // Uses alpha project to delete added icon
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/organization/{}/icon?ext=png",
-                ctx.organization_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_organization_icon(&ctx.organization_id.unwrap(), None, ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -394,14 +392,15 @@ async fn permissions_manage_invites() {
         let manage_invites = OrganizationPermissions::MANAGE_INVITES;
 
         // Add member
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!("/v3/team/{}/members", ctx.team_id.unwrap()))
-                .set_json(json!({
-                    "user_id": MOD_USER_ID,
-                    "permissions": 0,
-                    "organization_permissions": 0,
-                }))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.add_user_to_team(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                Some(ProjectPermissions::empty()),
+                Some(OrganizationPermissions::empty()),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -412,15 +411,16 @@ async fn permissions_manage_invites() {
 
         // Edit member
         let edit_member = OrganizationPermissions::EDIT_MEMBER;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/team/{}/members/{MOD_USER_ID}",
-                    ctx.team_id.unwrap()
-                ))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_team_member(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                json!({
                     "organization_permissions": 0,
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -431,11 +431,9 @@ async fn permissions_manage_invites() {
 
         // remove member
         // requires manage_invites if they have not yet accepted the invite
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/team/{}/members/{MOD_USER_ID}",
-                ctx.team_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_from_team(&ctx.team_id.unwrap(), MOD_USER_ID, ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -454,11 +452,9 @@ async fn permissions_manage_invites() {
 
         // remove existing member (requires remove_member)
         let remove_member = OrganizationPermissions::REMOVE_MEMBER;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/team/{}/members/{MOD_USER_ID}",
-                ctx.team_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.remove_from_team(&ctx.team_id.unwrap(), MOD_USER_ID, ctx.test_pat.as_deref())
+                .await
         };
 
         PermissionsTest::new(&test_env)
@@ -473,7 +469,7 @@ async fn permissions_manage_invites() {
 
 #[actix_rt::test]
 async fn permissions_add_remove_project() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
 
         let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
@@ -503,15 +499,13 @@ async fn permissions_add_remove_project() {
 
         // Now, FRIEND_USER_ID owns the alpha project
         // Add alpha project to zeta organization
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!(
-                    "/v3/organization/{}/projects",
-                    ctx.organization_id.unwrap()
-                ))
-                .set_json(json!({
-                    "project_id": alpha_project_id,
-                }))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.organization_add_project(
+                &ctx.organization_id.unwrap(),
+                alpha_project_id,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -522,11 +516,13 @@ async fn permissions_add_remove_project() {
 
         // Remove alpha project from zeta organization
         let remove_project = OrganizationPermissions::REMOVE_PROJECT;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/organization/{}/projects/{alpha_project_id}",
-                ctx.organization_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.organization_remove_project(
+                &ctx.organization_id.unwrap(),
+                alpha_project_id,
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -540,16 +536,15 @@ async fn permissions_add_remove_project() {
 
 #[actix_rt::test]
 async fn permissions_delete_organization() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
         let delete_organization = OrganizationPermissions::DELETE_ORGANIZATION;
 
         // Now, FRIEND_USER_ID owns the alpha project
         // Add alpha project to zeta organization
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/organization/{}",
-                ctx.organization_id.unwrap()
-            ))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.delete_organization(&ctx.organization_id.unwrap(), ctx.test_pat.as_deref())
+                .await
         };
         PermissionsTest::new(&test_env)
             .simple_organization_permissions_test(delete_organization, req_gen)
@@ -570,23 +565,27 @@ async fn permissions_add_default_project_permissions() {
             .organization_id;
         let zeta_team_id = &test_env.dummy.as_ref().unwrap().organization_zeta.team_id;
 
+        let api = &test_env.api;
+
         // Add member
         let add_member_default_permissions = OrganizationPermissions::MANAGE_INVITES
             | OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS;
 
         // Failure test should include MANAGE_INVITES, as it is required to add
         // default permissions on an invited user, but should still fail without EDIT_MEMBER_DEFAULT_PERMISSIONS
-        let failure_with_add_member = (OrganizationPermissions::all() ^ add_member_default_permissions)
+        let failure_with_add_member = (OrganizationPermissions::all()
+            ^ add_member_default_permissions)
             | OrganizationPermissions::MANAGE_INVITES;
 
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::post()
-                .uri(&format!("/v3/team/{}/members", ctx.team_id.unwrap()))
-                .set_json(json!({
-                    "user_id": MOD_USER_ID,
-                    "permissions": (ProjectPermissions::UPLOAD_VERSION | ProjectPermissions::DELETE_VERSION).bits(),
-                    "organization_permissions": 0,
-                }))
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.add_user_to_team(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                Some(ProjectPermissions::UPLOAD_VERSION | ProjectPermissions::DELETE_VERSION),
+                Some(OrganizationPermissions::empty()),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -606,15 +605,16 @@ async fn permissions_add_default_project_permissions() {
             ^ add_member_default_permissions)
             | OrganizationPermissions::EDIT_MEMBER;
 
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/team/{}/members/{MOD_USER_ID}",
-                    ctx.team_id.unwrap()
-                ))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_team_member(
+                &ctx.team_id.unwrap(),
+                MOD_USER_ID,
+                json!({
                     "permissions": ProjectPermissions::EDIT_DETAILS.bits(),
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .with_existing_organization(zeta_organization_id, zeta_team_id)
@@ -623,25 +623,26 @@ async fn permissions_add_default_project_permissions() {
             .simple_organization_permissions_test(modify_member_default_permission, req_gen)
             .await
             .unwrap();
-
-    }).await;
+    })
+    .await;
 }
 
 #[actix_rt::test]
 async fn permissions_organization_permissions_consistency_test() {
-    with_test_environment_all(None, |test_env| async move {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
         // Ensuring that permission are as we expect them to be
         // Full organization permissions test
         let success_permissions = OrganizationPermissions::EDIT_DETAILS;
-        let req_gen = |ctx: &PermissionsTestContext| {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/organization/{}",
-                    ctx.organization_id.unwrap()
-                ))
-                .set_json(json!({
+        let req_gen = |ctx: PermissionsTestContext| async move {
+            api.edit_organization(
+                &ctx.organization_id.unwrap(),
+                json!({
                     "description": "Example description - changed.",
-                }))
+                }),
+                ctx.test_pat.as_deref(),
+            )
+            .await
         };
         PermissionsTest::new(&test_env)
             .full_organization_permissions_tests(success_permissions, req_gen)

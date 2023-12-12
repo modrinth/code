@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 
-use super::{request_data::get_public_version_creation_data, ApiV3};
+use super::{
+    request_data::{self, get_public_version_creation_data},
+    ApiV3,
+};
 use crate::common::{
-    api_common::{models::CommonVersion, Api, ApiVersion},
+    api_common::{models::CommonVersion, Api, ApiVersion, AppendsOptionalPat},
     asserts::assert_status,
     dummy_data::TestFile,
 };
-use actix_http::{header::AUTHORIZATION, StatusCode};
+use actix_http::StatusCode;
 use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
@@ -35,7 +38,7 @@ impl ApiV3 {
         version_jar: TestFile,
         ordering: Option<i32>,
         modify_json: Option<json_patch::Patch>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> Version {
         let resp = self
             .add_public_version(
@@ -55,7 +58,7 @@ impl ApiV3 {
         test::read_body_json(version).await
     }
 
-    pub async fn get_version_deserialized(&self, id: &str, pat: &str) -> Version {
+    pub async fn get_version_deserialized(&self, id: &str, pat: Option<&str>) -> Version {
         let resp = self.get_version(id, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
@@ -65,11 +68,11 @@ impl ApiV3 {
         &self,
         algorithm: &str,
         hashes: Vec<FileUpdateData>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::post()
             .uri("/v3/version_files/update_individual")
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(json!({
                 "algorithm": algorithm,
                 "hashes": hashes
@@ -82,7 +85,7 @@ impl ApiV3 {
         &self,
         algorithm: &str,
         hashes: Vec<FileUpdateData>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> HashMap<String, Version> {
         let resp = self.update_individual_files(algorithm, hashes, pat).await;
         assert_eq!(resp.status(), 200);
@@ -99,7 +102,7 @@ impl ApiVersion for ApiV3 {
         version_jar: TestFile,
         ordering: Option<i32>,
         modify_json: Option<json_patch::Patch>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let creation_data = get_public_version_creation_data(
             project_id,
@@ -112,7 +115,7 @@ impl ApiVersion for ApiV3 {
         // Add a versiom.
         let req = TestRequest::post()
             .uri("/v3/version")
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_multipart(creation_data.segment_data)
             .to_request();
         self.call(req).await
@@ -125,7 +128,7 @@ impl ApiVersion for ApiV3 {
         version_jar: TestFile,
         ordering: Option<i32>,
         modify_json: Option<json_patch::Patch>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> CommonVersion {
         let resp = self
             .add_public_version(
@@ -145,15 +148,15 @@ impl ApiVersion for ApiV3 {
         serde_json::from_value(value).unwrap()
     }
 
-    async fn get_version(&self, id: &str, pat: &str) -> ServiceResponse {
+    async fn get_version(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
         let req = TestRequest::get()
             .uri(&format!("/v3/version/{id}"))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         self.call(req).await
     }
 
-    async fn get_version_deserialized_common(&self, id: &str, pat: &str) -> CommonVersion {
+    async fn get_version_deserialized_common(&self, id: &str, pat: Option<&str>) -> CommonVersion {
         let resp = self.get_version(id, pat).await;
         assert_eq!(resp.status(), 200);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
@@ -167,11 +170,11 @@ impl ApiVersion for ApiV3 {
         &self,
         version_id: &str,
         patch: serde_json::Value,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::patch()
             .uri(&format!("/v3/version/{version_id}"))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(patch)
             .to_request();
 
@@ -182,11 +185,11 @@ impl ApiVersion for ApiV3 {
         &self,
         hash: &str,
         algorithm: &str,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v3/version_file/{hash}?algorithm={algorithm}"))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         self.call(req).await
     }
@@ -195,7 +198,7 @@ impl ApiVersion for ApiV3 {
         &self,
         hash: &str,
         algorithm: &str,
-        pat: &str,
+        pat: Option<&str>,
     ) -> CommonVersion {
         let resp = self.get_version_from_hash(hash, algorithm, pat).await;
         assert_eq!(resp.status(), 200);
@@ -210,11 +213,11 @@ impl ApiVersion for ApiV3 {
         &self,
         hashes: &[&str],
         algorithm: &str,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let req = TestRequest::post()
             .uri("/v3/version_files")
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(json!({
                 "hashes": hashes,
                 "algorithm": algorithm,
@@ -227,7 +230,7 @@ impl ApiVersion for ApiV3 {
         &self,
         hashes: &[&str],
         algorithm: &str,
-        pat: &str,
+        pat: Option<&str>,
     ) -> HashMap<String, CommonVersion> {
         let resp = self.get_versions_from_hashes(hashes, algorithm, pat).await;
         assert_eq!(resp.status(), 200);
@@ -245,7 +248,7 @@ impl ApiVersion for ApiV3 {
         loaders: Option<Vec<String>>,
         game_versions: Option<Vec<String>>,
         version_types: Option<Vec<String>>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let mut json = json!({});
         if let Some(loaders) = loaders {
@@ -264,7 +267,7 @@ impl ApiVersion for ApiV3 {
             .uri(&format!(
                 "/v3/version_file/{hash}/update?algorithm={algorithm}"
             ))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(json)
             .to_request();
         self.call(req).await
@@ -277,7 +280,7 @@ impl ApiVersion for ApiV3 {
         loaders: Option<Vec<String>>,
         game_versions: Option<Vec<String>>,
         version_types: Option<Vec<String>>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> CommonVersion {
         let resp = self
             .get_update_from_hash(hash, algorithm, loaders, game_versions, version_types, pat)
@@ -297,7 +300,7 @@ impl ApiVersion for ApiV3 {
         loaders: Option<Vec<String>>,
         game_versions: Option<Vec<String>>,
         version_types: Option<Vec<String>>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let mut json = json!({
             "algorithm": algorithm,
@@ -317,7 +320,7 @@ impl ApiVersion for ApiV3 {
 
         let req = test::TestRequest::post()
             .uri("/v3/version_files/update")
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .set_json(json)
             .to_request();
         self.call(req).await
@@ -330,7 +333,7 @@ impl ApiVersion for ApiV3 {
         loaders: Option<Vec<String>>,
         game_versions: Option<Vec<String>>,
         version_types: Option<Vec<String>>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> HashMap<String, CommonVersion> {
         let resp = self
             .update_files(
@@ -361,7 +364,7 @@ impl ApiVersion for ApiV3 {
         version_type: Option<VersionType>,
         limit: Option<usize>,
         offset: Option<usize>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let mut query_string = String::new();
         if let Some(game_versions) = game_versions {
@@ -396,7 +399,7 @@ impl ApiVersion for ApiV3 {
                 "/v3/project/{project_id_slug}/version?{}",
                 query_string.trim_start_matches('&')
             ))
-            .append_header(("Authorization", pat))
+            .append_pat(pat)
             .to_request();
         self.call(req).await
     }
@@ -411,7 +414,7 @@ impl ApiVersion for ApiV3 {
         version_type: Option<VersionType>,
         limit: Option<usize>,
         offset: Option<usize>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> Vec<CommonVersion> {
         let resp = self
             .get_project_versions(
@@ -438,7 +441,7 @@ impl ApiVersion for ApiV3 {
         &self,
         version_id: &str,
         ordering: Option<i32>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> ServiceResponse {
         let request = test::TestRequest::patch()
             .uri(&format!("/v3/version/{version_id}"))
@@ -447,16 +450,16 @@ impl ApiVersion for ApiV3 {
                     "ordering": ordering
                 }
             ))
-            .append_header((AUTHORIZATION, pat))
+            .append_pat(pat)
             .to_request();
         self.call(request).await
     }
 
-    async fn get_versions(&self, version_ids: Vec<String>, pat: &str) -> ServiceResponse {
+    async fn get_versions(&self, version_ids: Vec<String>, pat: Option<&str>) -> ServiceResponse {
         let ids = url_encode_json_serialized_vec(&version_ids);
         let request = test::TestRequest::get()
             .uri(&format!("/v3/versions?ids={}", ids))
-            .append_header((AUTHORIZATION, pat))
+            .append_pat(pat)
             .to_request();
         self.call(request).await
     }
@@ -464,7 +467,7 @@ impl ApiVersion for ApiV3 {
     async fn get_versions_deserialized_common(
         &self,
         version_ids: Vec<String>,
-        pat: &str,
+        pat: Option<&str>,
     ) -> Vec<CommonVersion> {
         let resp = self.get_versions(version_ids, pat).await;
         assert_status(&resp, StatusCode::OK);
@@ -473,5 +476,47 @@ impl ApiVersion for ApiV3 {
         // Then, deserialize to the common format
         let value = serde_json::to_value(v).unwrap();
         serde_json::from_value(value).unwrap()
+    }
+
+    async fn upload_file_to_version(
+        &self,
+        version_id: &str,
+        file: &TestFile,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let m = request_data::get_public_creation_data_multipart(
+            &json!({
+                "file_parts": [file.filename()]
+            }),
+            Some(file),
+        );
+        let request = test::TestRequest::post()
+            .uri(&format!(
+                "/v3/version/{version_id}/file",
+                version_id = version_id
+            ))
+            .append_pat(pat)
+            .set_multipart(m)
+            .to_request();
+        self.call(request).await
+    }
+
+    async fn remove_version(&self, version_id: &str, pat: Option<&str>) -> ServiceResponse {
+        let request = test::TestRequest::delete()
+            .uri(&format!(
+                "/v3/version/{version_id}",
+                version_id = version_id
+            ))
+            .append_pat(pat)
+            .to_request();
+        self.call(request).await
+    }
+
+    async fn remove_version_file(&self, hash: &str, pat: Option<&str>) -> ServiceResponse {
+        let request = test::TestRequest::delete()
+            .uri(&format!("/v3/version_file/{hash}"))
+            .append_pat(pat)
+            .to_request();
+        self.call(request).await
     }
 }
