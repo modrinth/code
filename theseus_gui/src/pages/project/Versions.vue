@@ -283,6 +283,7 @@ watch([filterVersions, filterLoader, filterGameVersions], () => {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  text-wrap: wrap;
 
   .version-badge {
     display: flex;
