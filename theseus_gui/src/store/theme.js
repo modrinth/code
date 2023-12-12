@@ -2,10 +2,9 @@ import { defineStore } from 'pinia'
 
 export const useTheming = defineStore('themeStore', {
   state: () => ({
-    themeOptions: ['dark'],
+    themeOptions: ['dark', 'light', 'oled'],
     advancedRendering: true,
     selectedTheme: 'dark',
-    darkTheme: true,
   }),
   actions: {
     setThemeState(newTheme) {
@@ -15,8 +14,9 @@ export const useTheming = defineStore('themeStore', {
       this.setThemeClass()
     },
     setThemeClass() {
-      document.getElementsByTagName('html')[0].classList.remove('dark-mode')
-      document.getElementsByTagName('html')[0].classList.remove('light-mode')
+      for (const theme of this.themeOptions) {
+        document.getElementsByTagName('html')[0].classList.remove(`${theme}-mode`)
+      }
       document.getElementsByTagName('html')[0].classList.add(`${this.selectedTheme}-mode`)
     },
   },
