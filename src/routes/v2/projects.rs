@@ -67,16 +67,15 @@ pub async fn project_search(
             .into_iter()
             .map(|facets| {
                 facets
-                        .into_iter()
-                        .map(|facet| {
-                            if facet.is_array() {
-                                serde_json::from_value::<Vec<String>>(facet).unwrap_or_default()
-                            } else {
-                                vec![serde_json::from_value::<String>(facet.clone())
-                                    .unwrap_or_default()]
-                            }
-                        })
-                        .collect_vec()
+                    .into_iter()
+                    .map(|facet| {
+                        if facet.is_array() {
+                            serde_json::from_value::<Vec<String>>(facet).unwrap_or_default()
+                        } else {
+                            vec![serde_json::from_value::<String>(facet).unwrap_or_default()]
+                        }
+                    })
+                    .collect_vec()
             })
             .collect_vec();
 

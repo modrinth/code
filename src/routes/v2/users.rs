@@ -178,38 +178,17 @@ pub async fn user_icon_edit(
     .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(Deserialize)]
-pub struct RemovalType {
-    #[serde(default = "default_removal")]
-    removal_type: String,
-}
-
-fn default_removal() -> String {
-    "partial".into()
-}
-
 #[delete("{id}")]
 pub async fn user_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    removal_type: web::Query<RemovalType>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let removal_type = removal_type.into_inner();
-    v3::users::user_delete(
-        req,
-        info,
-        pool,
-        web::Query(v3::users::RemovalType {
-            removal_type: removal_type.removal_type,
-        }),
-        redis,
-        session_queue,
-    )
-    .await
-    .or_else(v2_reroute::flatten_404_error)
+    v3::users::user_delete(req, info, pool, redis, session_queue)
+        .await
+        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[get("{id}/follows")]

@@ -20,6 +20,8 @@ use crate::models::projects::{skip_nulls, Loader};
 use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
 use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
+use crate::search::indexing::remove_documents;
+use crate::search::SearchConfig;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
@@ -934,6 +936,7 @@ pub async fn version_delete(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -1001,7 +1004,7 @@ pub async fn version_delete(
 
     let result =
         database::models::Version::remove_full(version.inner.id, &redis, &mut transaction).await?;
-
+    remove_documents(&[version.inner.id.into()], &search_config).await?;
     database::models::Project::clear_cache(version.inner.project_id, None, Some(true), &redis)
         .await?;
 

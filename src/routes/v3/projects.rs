@@ -21,6 +21,7 @@ use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
+use crate::search::indexing::remove_documents;
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use crate::util::img;
 use crate::util::routes::read_from_payload;
@@ -28,7 +29,6 @@ use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
-use meilisearch_sdk::indexes::IndexesResults;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::PgPool;
@@ -231,7 +231,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    config: web::Data<SearchConfig>,
+    search_config: web::Data<SearchConfig>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -472,7 +472,15 @@ pub async fn project_edit(
                 .await?;
 
                 if project_item.inner.status.is_searchable() && !status.is_searchable() {
-                    delete_from_index(id.into(), config).await?;
+                    remove_documents(
+                        &project_item
+                            .versions
+                            .into_iter()
+                            .map(|x| x.into())
+                            .collect::<Vec<_>>(),
+                        &search_config,
+                    )
+                    .await?;
                 }
             }
 
@@ -908,21 +916,6 @@ pub async fn project_search(
     };
 
     Ok(HttpResponse::Ok().json(results))
-}
-
-pub async fn delete_from_index(
-    id: ProjectId,
-    config: web::Data<SearchConfig>,
-) -> Result<(), meilisearch_sdk::errors::Error> {
-    let client = meilisearch_sdk::client::Client::new(&*config.address, &*config.key);
-
-    let indexes: IndexesResults = client.get_indexes().await?;
-
-    for index in indexes.results {
-        index.delete_document(id.to_string()).await?;
-    }
-
-    Ok(())
 }
 
 //checks the validity of a project id or slug
@@ -2045,7 +2038,7 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    config: web::Data<SearchConfig>,
+    search_config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
@@ -2118,7 +2111,15 @@ pub async fn project_delete(
 
     transaction.commit().await?;
 
-    delete_from_index(project.inner.id.into(), config).await?;
+    remove_documents(
+        &project
+            .versions
+            .into_iter()
+            .map(|x| x.into())
+            .collect::<Vec<_>>(),
+        &search_config,
+    )
+    .await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))

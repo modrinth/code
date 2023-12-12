@@ -8,6 +8,7 @@ use crate::models::projects::{Dependency, FileType, Version, VersionStatus, Vers
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3};
+use crate::search::SearchConfig;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -263,12 +264,13 @@ pub async fn version_edit(
 #[delete("{version_id}")]
 pub async fn version_delete(
     req: HttpRequest,
-    info: web::Path<(models::ids::VersionId,)>,
+    info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    search_config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::versions::version_delete(req, info, pool, redis, session_queue)
+    v3::versions::version_delete(req, info, pool, redis, session_queue, search_config)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }

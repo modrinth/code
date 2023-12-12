@@ -540,25 +540,26 @@ impl Version {
                 &version_ids_parsed
             )
             .fetch(&mut *exec)
-            .try_fold(DashMap::new(), |acc : DashMap<VersionId, Vec<QueryVersionField>>, m| {
-                let qvf = QueryVersionField {
-                    version_id: VersionId(m.version_id),
-                    field_id: LoaderFieldId(m.field_id),
-                    int_value: m.int_value,
-                    enum_value: m.enum_value.map(LoaderFieldEnumValueId),
-                    string_value: m.string_value,
-                };
+            .try_fold(
+                DashMap::new(),
+                |acc: DashMap<VersionId, Vec<QueryVersionField>>, m| {
+                    let qvf = QueryVersionField {
+                        version_id: VersionId(m.version_id),
+                        field_id: LoaderFieldId(m.field_id),
+                        int_value: m.int_value,
+                        enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                        string_value: m.string_value,
+                    };
 
-                loader_field_ids.insert(LoaderFieldId(m.field_id));
-                if let Some(enum_value) = m.enum_value {
-                    loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
-                }
+                    loader_field_ids.insert(LoaderFieldId(m.field_id));
+                    if let Some(enum_value) = m.enum_value {
+                        loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
+                    }
 
-                acc.entry(VersionId(m.version_id))
-                    .or_default()
-                    .push(qvf);
-                async move { Ok(acc) }
-            })
+                    acc.entry(VersionId(m.version_id)).or_default().push(qvf);
+                    async move { Ok(acc) }
+                },
+            )
             .await?;
 
             let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
@@ -692,7 +693,7 @@ impl Version {
                 &file_ids.iter().map(|x| x.0).collect::<Vec<_>>()
             )
             .fetch(&mut *exec)
-            .try_fold(DashMap::new(), |acc : DashMap<VersionId, Vec<Hash>>, m| {
+            .try_fold(DashMap::new(), |acc: DashMap<VersionId, Vec<Hash>>, m| {
                 if let Some(found_hash) = m.hash {
                     let hash = Hash {
                         file_id: FileId(m.file_id),
@@ -700,9 +701,9 @@ impl Version {
                         hash: found_hash,
                     };
 
-                    let version_id = *reverse_file_map.get(&FileId(m.file_id)).unwrap();
-
-                    acc.entry(version_id).or_default().push(hash);
+                    if let Some(version_id) = reverse_file_map.get(&FileId(m.file_id)) {
+                        acc.entry(*version_id).or_default().push(hash);
+                    }
                 }
                 async move { Ok(acc) }
             })

@@ -546,21 +546,10 @@ pub async fn user_icon_edit(
     }
 }
 
-#[derive(Deserialize)]
-pub struct RemovalType {
-    #[serde(default = "default_removal")]
-    pub removal_type: String,
-}
-
-fn default_removal() -> String {
-    "partial".into()
-}
-
 pub async fn user_delete(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    removal_type: web::Query<RemovalType>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
@@ -584,13 +573,7 @@ pub async fn user_delete(
 
         let mut transaction = pool.begin().await?;
 
-        let result = User::remove(
-            id,
-            removal_type.removal_type == "full",
-            &mut transaction,
-            &redis,
-        )
-        .await?;
+        let result = User::remove(id, &mut transaction, &redis).await?;
 
         transaction.commit().await?;
 

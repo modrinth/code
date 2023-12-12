@@ -434,7 +434,6 @@ impl User {
 
     pub async fn remove(
         id: UserId,
-        full: bool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, DatabaseError> {
@@ -445,38 +444,17 @@ impl User {
 
             let deleted_user: UserId = crate::models::users::DELETED_USER.into();
 
-            if full {
-                let projects: Vec<ProjectId> = sqlx::query!(
-                    "
-                    SELECT m.id FROM mods m
-                    INNER JOIN team_members tm ON tm.team_id = m.team_id
-                    WHERE tm.user_id = $1 AND tm.is_owner = TRUE
-                    ",
-                    id as UserId,
-                )
-                .fetch_many(&mut **transaction)
-                .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
-                .try_collect::<Vec<ProjectId>>()
-                .await?;
-
-                for project_id in projects {
-                    let _result =
-                        super::project_item::Project::remove(project_id, transaction, redis)
-                            .await?;
-                }
-            } else {
-                sqlx::query!(
-                    "
-                    UPDATE team_members
-                    SET user_id = $1
-                    WHERE (user_id = $2 AND is_owner = TRUE)
-                    ",
-                    deleted_user as UserId,
-                    id as UserId,
-                )
-                .execute(&mut **transaction)
-                .await?;
-            }
+            sqlx::query!(
+                "
+                UPDATE team_members
+                SET user_id = $1
+                WHERE (user_id = $2 AND is_owner = TRUE)
+                ",
+                deleted_user as UserId,
+                id as UserId,
+            )
+            .execute(&mut **transaction)
+            .await?;
 
             sqlx::query!(
                 "

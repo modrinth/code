@@ -82,7 +82,7 @@ async fn oauth_flow_happy_path() {
 #[actix_rt::test]
 async fn oauth_authorize_for_already_authorized_scopes_returns_auth_code() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.unwrap().oauth_client_alpha.clone();
+        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.unwrap().oauth_client_alpha;
 
         let resp = env
             .api
@@ -119,7 +119,7 @@ async fn get_oauth_token_with_already_used_auth_code_fails() {
             client_id,
             client_secret,
             ..
-        } = env.dummy.unwrap().oauth_client_alpha.clone();
+        } = env.dummy.unwrap().oauth_client_alpha;
 
         let resp = env
             .api
