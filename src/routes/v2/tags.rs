@@ -66,7 +66,9 @@ pub async fn loader_list(
                 .map(|l| LoaderData {
                     icon: l.icon,
                     name: l.name,
-                    supported_project_types: l.supported_project_types,
+                    // Add generic 'project' type to all loaders, which is the v2 representation of
+                    // a project type before any versions are set.
+                    supported_project_types: l.supported_project_types.into_iter().chain(std::iter::once("project".to_string())).collect(),
                 })
                 .collect::<Vec<_>>();
             Ok(HttpResponse::Ok().json(loaders))
