@@ -134,7 +134,7 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let versions = filter_authorized_versions(versions_data, &user_option, &pool).await?;
+    let versions = filter_authorized_versions(versions_data, &user_option, &pool, redis).await?;
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -820,7 +820,7 @@ pub async fn version_list(
         response.sort();
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response = filter_authorized_versions(response, &user_option, &pool).await?;
+        let response = filter_authorized_versions(response, &user_option, &pool, redis).await?;
 
         Ok(HttpResponse::Ok().json(response))
     } else {

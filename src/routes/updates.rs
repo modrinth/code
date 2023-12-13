@@ -75,6 +75,7 @@ pub async fn forge_updates(
             .collect(),
         &user_option,
         &pool,
+        redis,
     )
     .await?;
 
