@@ -24,14 +24,13 @@ impl Default for PlayerInfo {
 
 #[tracing::instrument]
 pub async fn fetch_info(token: &str) -> crate::Result<PlayerInfo> {
-    REQWEST_CLIENT
-        .get("https://api.minecraftservices.com/entitlements/mcstore")
-        .bearer_auth(token)
-        .send()
-        .await?
-        .error_for_status()?
-        .json::<serde_json::Value>()
-        .await?;
+    auth_retry(|| {
+        REQWEST_CLIENT
+            .get("https://api.minecraftservices.com/entitlements/mcstore")
+            .bearer_auth(token)
+            .send()
+    })
+    .await?;
 
     let response = auth_retry(|| {
         REQWEST_CLIENT

@@ -3,7 +3,7 @@
 use futures::Future;
 use reqwest::Response;
 
-const RETRY_COUNT: usize = 2; // Does command 3 times
+const RETRY_COUNT: usize = 9; // Does command 3 times
 const RETRY_WAIT: std::time::Duration = std::time::Duration::from_secs(2);
 
 pub mod bearer_token;
