@@ -1,4 +1,3 @@
-mod admin;
 mod moderation;
 mod notifications;
 pub(crate) mod project_creation;
@@ -20,7 +19,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
     cfg.service(
         actix_web::web::scope("v2")
             .wrap(default_cors())
-            .configure(admin::config)
+            .configure(super::internal::admin::config)
             // Todo: separate these- they need to also follow v2-v3 conversion
             .configure(super::internal::session::config)
             .configure(super::internal::flows::config)

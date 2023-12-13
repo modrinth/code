@@ -494,6 +494,12 @@ impl Version {
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
+        let version_ids = version_ids
+            .iter()
+            .unique()
+            .copied()
+            .collect::<Vec<VersionId>>();
+
         use futures::stream::TryStreamExt;
 
         if version_ids.is_empty() {

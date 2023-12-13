@@ -1,4 +1,4 @@
-mod admin;
+pub(crate) mod admin;
 pub mod flows;
 pub mod pats;
 pub mod session;

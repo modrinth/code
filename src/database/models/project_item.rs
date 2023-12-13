@@ -492,6 +492,12 @@ impl Project {
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
+        let project_strings = project_strings
+            .iter()
+            .map(|x| x.to_string())
+            .unique()
+            .collect::<Vec<String>>();
+
         if project_strings.is_empty() {
             return Ok(Vec::new());
         }
@@ -500,10 +506,7 @@ impl Project {
         let mut exec = exec.acquire().await?;
 
         let mut found_projects = Vec::new();
-        let mut remaining_strings = project_strings
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>();
+        let mut remaining_strings = project_strings.clone();
 
         let mut project_ids = project_strings
             .iter()
