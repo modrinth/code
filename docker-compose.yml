@@ -12,12 +12,12 @@ services:
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
   meilisearch:
-    image: getmeili/meilisearch:v1.0.1
+    image: getmeili/meilisearch:v1.5.0
     restart: on-failure
     ports:
       - "7700:7700"
     volumes:
-      - meilisearch-data:/meili_data
+      - meilisearch-data:/data.ms
     environment:
       MEILI_MASTER_KEY: modrinth
   redis:

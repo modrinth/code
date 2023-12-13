@@ -67,7 +67,7 @@ pub struct SearchConfig {
 
 impl SearchConfig {
     pub fn make_client(&self) -> Client {
-        Client::new(self.address.as_str(), self.key.as_str())
+        Client::new(self.address.as_str(), Some(self.key.as_str()))
     }
 }
 
@@ -187,7 +187,7 @@ pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
 ) -> Result<SearchResults, SearchError> {
-    let client = Client::new(&*config.address, &*config.key);
+    let client = Client::new(&*config.address, Some(&*config.key));
 
     let offset = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");

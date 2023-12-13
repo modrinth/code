@@ -204,6 +204,8 @@ async fn create_or_update_index(
                 } else {
                     old_settings.faceting
                 },
+                typo_tolerance: None, // We don't use typo tolerance right now
+                dictionary: None,     // We don't use dictionary right now
             };
 
             if old_settings.synonyms != settings.synonyms
@@ -216,6 +218,8 @@ async fn create_or_update_index(
                 || old_settings.displayed_attributes != settings.displayed_attributes
                 || old_settings.pagination != settings.pagination
                 || old_settings.faceting != settings.faceting
+                || old_settings.typo_tolerance != settings.typo_tolerance
+                || old_settings.dictionary != settings.dictionary
             {
                 info!("Performing index settings set.");
                 index
