@@ -200,7 +200,6 @@ pub async fn project_get(
     // Call V3 project creation
     let response = v3::projects::project_get(req, info, pool.clone(), redis.clone(), session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)
         .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
@@ -227,7 +226,6 @@ pub async fn project_get_check(
     v3::projects::project_get_check(info, pool, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)
-        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[derive(Serialize)]
@@ -247,7 +245,6 @@ pub async fn dependency_list(
     // TODO: requires V2 conversion and tests, probably
     v3::projects::dependency_list(req, info, pool, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)
         .or_else(v2_reroute::flatten_404_error)
 }
 

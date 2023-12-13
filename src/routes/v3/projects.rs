@@ -29,6 +29,7 @@ use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::PgPool;
@@ -972,7 +973,6 @@ pub async fn dependency_list(
 
         let dependencies =
             database::Project::get_dependencies(project.inner.id, &**pool, &redis).await?;
-
         let project_ids = dependencies
             .iter()
             .filter_map(|x| {
@@ -986,11 +986,13 @@ pub async fn dependency_list(
                     x.1
                 }
             })
+            .unique()
             .collect::<Vec<_>>();
 
         let dep_version_ids = dependencies
             .iter()
             .filter_map(|x| x.0)
+            .unique()
             .collect::<Vec<db_models::VersionId>>();
         let (projects_result, versions_result) = futures::future::try_join(
             database::Project::get_many_ids(&project_ids, &**pool, &redis),
