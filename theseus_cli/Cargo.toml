@@ -1,6 +1,6 @@
 [package]
 name = "theseus_cli"
-version = "0.6.2"
+version = "0.6.3"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2018"
 
