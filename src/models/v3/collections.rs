@@ -22,7 +22,7 @@ pub struct Collection {
     /// The title or name of the collection.
     pub name: String,
     /// A short description of the collection.
-    pub description: String,
+    pub description: Option<String>,
 
     /// An icon URL for the collection.
     pub icon_url: Option<String>,

@@ -131,11 +131,10 @@ impl AuthQueue {
             .execute(&mut *transaction)
             .await?;
 
-            PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
-
             update_oauth_access_token_last_used(oauth_access_token_queue, &mut transaction).await?;
 
             transaction.commit().await?;
+            PersonalAccessToken::clear_cache(clear_cache_pats, redis).await?;
         }
 
         Ok(())

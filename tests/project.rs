@@ -18,6 +18,7 @@ use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
+use crate::common::api_common::models::CommonItemType;
 use crate::common::api_common::request_data::ProjectCreationRequestData;
 use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion, AppendsOptionalPat};
 use crate::common::dummy_data::{DummyImage, TestFile};
@@ -586,6 +587,94 @@ pub async fn test_bulk_edit_links() {
                 alpha_body.additional_categories,
             );
         }
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn delete_project_with_report() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+        let alpha_project_id: &str = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
+        let beta_project_id: &str = &test_env.dummy.as_ref().unwrap().project_beta.project_id;
+
+        // Create a report for the project
+        let resp = api
+            .create_report(
+                "copyright",
+                alpha_project_id,
+                CommonItemType::Project,
+                "Hey! This is my project, copied without permission!",
+                ENEMY_USER_PAT, // Enemy makes a report
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let value = test::read_body_json::<serde_json::Value, _>(resp).await;
+        let alpha_report_id = value["id"].as_str().unwrap();
+
+        // Confirm existence
+        let resp = api
+            .get_report(
+                alpha_report_id,
+                ENEMY_USER_PAT, // Enemy makes a report
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::OK);
+
+        // Do the same for beta
+        let resp = api
+            .create_report(
+                "copyright",
+                beta_project_id,
+                CommonItemType::Project,
+                "Hey! This is my project, copied without permission!",
+                ENEMY_USER_PAT, // Enemy makes a report
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::OK);
+        let value = test::read_body_json::<serde_json::Value, _>(resp).await;
+        let beta_report_id = value["id"].as_str().unwrap();
+
+        // Delete the project
+        let resp = api.remove_project(alpha_project_id, USER_USER_PAT).await;
+        assert_eq!(resp.status(), StatusCode::NO_CONTENT);
+
+        // Confirm that the project is gone from the cache
+        let mut redis_pool = test_env.db.redis_pool.connect().await.unwrap();
+        assert_eq!(
+            redis_pool
+                .get(PROJECTS_SLUGS_NAMESPACE, "demo")
+                .await
+                .unwrap()
+                .and_then(|x| x.parse::<i64>().ok()),
+            None
+        );
+        assert_eq!(
+            redis_pool
+                .get(PROJECTS_SLUGS_NAMESPACE, alpha_project_id)
+                .await
+                .unwrap()
+                .and_then(|x| x.parse::<i64>().ok()),
+            None
+        );
+
+        // Report for alpha no longer exists
+        let resp = api
+            .get_report(
+                alpha_report_id,
+                ENEMY_USER_PAT, // Enemy makes a report
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+
+        // Confirm that report for beta still exists
+        let resp = api
+            .get_report(
+                beta_report_id,
+                ENEMY_USER_PAT, // Enemy makes a report
+            )
+            .await;
+        assert_eq!(resp.status(), StatusCode::OK);
     })
     .await;
 }

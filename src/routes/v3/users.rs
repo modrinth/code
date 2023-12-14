@@ -449,8 +449,8 @@ pub async fn user_edit(
                 .await?;
             }
 
-            User::clear_caches(&[(id, Some(actual_user.username))], &redis).await?;
             transaction.commit().await?;
+            User::clear_caches(&[(id, Some(actual_user.username))], &redis).await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(

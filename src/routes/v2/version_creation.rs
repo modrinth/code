@@ -100,34 +100,66 @@ pub async fn version_create(
                     json!(legacy_create.game_versions),
                 );
 
+                // Get all possible side-types for loaders given- we will use these to check if we need to convert/apply singleplayer, etc.
+                let loaders = match v3::tags::loader_list(client.clone(), redis.clone()).await {
+                    Ok(loader_response) => match v2_reroute::extract_ok_json::<
+                        Vec<v3::tags::LoaderData>,
+                    >(loader_response)
+                    .await
+                    {
+                        Ok(loaders) => loaders,
+                        Err(_) => vec![],
+                    },
+                    Err(_) => vec![],
+                };
+
+                let loader_fields_aggregate = loaders
+                    .into_iter()
+                    .filter_map(|loader| {
+                        if legacy_create.loaders.contains(&Loader(loader.name.clone())) {
+                            Some(loader.supported_fields)
+                        } else {
+                            None
+                        }
+                    })
+                    .flatten()
+                    .collect::<Vec<_>>();
+
                 // Copies side types of another version of the project.
                 // If no version exists, defaults to all false.
-                // TODO: write test for this to ensure predictible unchanging behaviour
                 // This is inherently lossy, but not much can be done about it, as side types are no longer associated with projects,
-                // so the 'missing' ones can't be easily accessed.
+                // so the 'missing' ones can't be easily accessed, and versions do need to have these fields explicitly set.
                 let side_type_loader_field_names = [
                     "singleplayer",
                     "client_and_server",
                     "client_only",
                     "server_only",
                 ];
-                fields.extend(
-                    side_type_loader_field_names
-                        .iter()
-                        .map(|f| (f.to_string(), json!(false))),
-                );
-                if let Some(example_version_fields) =
-                    get_example_version_fields(legacy_create.project_id, client, &redis).await?
-                {
-                    fields.extend(example_version_fields.into_iter().filter_map(|f| {
-                        if side_type_loader_field_names.contains(&f.field_name.as_str()) {
-                            Some((f.field_name, f.value.serialize_internal()))
-                        } else {
-                            None
-                        }
-                    }));
-                }
 
+                // Check if loader_fields_aggregate contains any of these side types
+                // We assume these four fields are linked together.
+                if loader_fields_aggregate
+                    .iter()
+                    .any(|f| side_type_loader_field_names.contains(&f.as_str()))
+                {
+                    // If so, we get the fields of the example version of the project, and set the side types to match.
+                    fields.extend(
+                        side_type_loader_field_names
+                            .iter()
+                            .map(|f| (f.to_string(), json!(false))),
+                    );
+                    if let Some(example_version_fields) =
+                        get_example_version_fields(legacy_create.project_id, client, &redis).await?
+                    {
+                        fields.extend(example_version_fields.into_iter().filter_map(|f| {
+                            if side_type_loader_field_names.contains(&f.field_name.as_str()) {
+                                Some((f.field_name, f.value.serialize_internal()))
+                            } else {
+                                None
+                            }
+                        }));
+                    }
+                }
                 // Handle project type via file extension prediction
                 let mut project_type = None;
                 for file_part in &legacy_create.file_parts {

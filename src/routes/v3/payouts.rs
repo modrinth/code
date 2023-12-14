@@ -144,12 +144,6 @@ pub async fn paypal_webhook(
                 .execute(&mut *transaction)
                 .await?;
 
-                crate::database::models::user_item::User::clear_caches(
-                    &[(crate::database::models::UserId(result.user_id), None)],
-                    &redis,
-                )
-                .await?;
-
                 sqlx::query!(
                     "
                     UPDATE payouts
@@ -168,6 +162,12 @@ pub async fn paypal_webhook(
                 .await?;
 
                 transaction.commit().await?;
+
+                crate::database::models::user_item::User::clear_caches(
+                    &[(crate::database::models::UserId(result.user_id), None)],
+                    &redis,
+                )
+                .await?;
             }
         }
         "PAYMENT.PAYOUTS-ITEM.SUCCEEDED" => {
@@ -265,12 +265,6 @@ pub async fn tremendous_webhook(
                 .execute(&mut *transaction)
                 .await?;
 
-                crate::database::models::user_item::User::clear_caches(
-                    &[(crate::database::models::UserId(result.user_id), None)],
-                    &redis,
-                )
-                .await?;
-
                 sqlx::query!(
                     "
                     UPDATE payouts
@@ -289,6 +283,12 @@ pub async fn tremendous_webhook(
                 .await?;
 
                 transaction.commit().await?;
+
+                crate::database::models::user_item::User::clear_caches(
+                    &[(crate::database::models::UserId(result.user_id), None)],
+                    &redis,
+                )
+                .await?;
             }
         }
         "REWARDS.DELIVERY.SUCCEEDED" => {
@@ -616,9 +616,9 @@ pub async fn create_payout(
     .execute(&mut *transaction)
     .await?;
     payout_item.insert(&mut transaction).await?;
-    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
 
     transaction.commit().await?;
+    crate::database::models::User::clear_caches(&[(user.id, None)], &redis).await?;
 
     Ok(HttpResponse::NoContent().finish())
 }

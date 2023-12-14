@@ -127,12 +127,12 @@ pub async fn create_pat(
     .insert(&mut transaction)
     .await?;
 
+    transaction.commit().await?;
     database::models::pat_item::PersonalAccessToken::clear_cache(
         vec![(None, None, Some(user.id.into()))],
         &redis,
     )
     .await?;
-    transaction.commit().await?;
 
     Ok(HttpResponse::Ok().json(PersonalAccessToken {
         id: id.into(),
@@ -232,12 +232,12 @@ pub async fn edit_pat(
                 .await?;
             }
 
+            transaction.commit().await?;
             database::models::pat_item::PersonalAccessToken::clear_cache(
                 vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
                 &redis,
             )
             .await?;
-            transaction.commit().await?;
         }
     }
 
@@ -269,12 +269,12 @@ pub async fn delete_pat(
             let mut transaction = pool.begin().await?;
             database::models::pat_item::PersonalAccessToken::remove(pat.id, &mut transaction)
                 .await?;
+            transaction.commit().await?;
             database::models::pat_item::PersonalAccessToken::clear_cache(
                 vec![(Some(pat.id), Some(pat.access_token), Some(pat.user_id))],
                 &redis,
             )
             .await?;
-            transaction.commit().await?;
         }
     }
 

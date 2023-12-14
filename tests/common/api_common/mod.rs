@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use self::models::{
-    CommonCategoryData, CommonLoaderData, CommonNotification, CommonProject, CommonTeamMember,
-    CommonVersion,
+    CommonCategoryData, CommonItemType, CommonLoaderData, CommonNotification, CommonProject,
+    CommonTeamMember, CommonVersion,
 };
 use self::request_data::{ImageData, ProjectCreationRequestData};
 use actix_web::dev::ServiceResponse;
@@ -118,6 +118,15 @@ pub trait ApiProject {
         patch: HashMap<String, String>,
         pat: Option<&str>,
     ) -> ServiceResponse;
+    async fn create_report(
+        &self,
+        report_type: &str,
+        id: &str,
+        item_type: CommonItemType,
+        body: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn get_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
 }
 
 #[async_trait(?Send)]

@@ -4,6 +4,7 @@ use super::ApiError;
 use crate::database::models::loader_fields::LoaderFieldEnumValue;
 use crate::database::redis::RedisPool;
 use crate::models::v2::projects::LegacySideType;
+use crate::routes::v2_reroute::capitalize_first;
 use crate::routes::v3::tags::{
     LinkPlatformQueryData, LoaderData as LoaderDataV3, LoaderFieldsEnumQuery,
 };
@@ -172,11 +173,12 @@ pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, 
         .or_else(v2_reroute::flatten_404_error)
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
 pub struct DonationPlatformQueryData {
     // The difference between name and short is removed in v3.
     // Now, the 'id' becomes the name, and the 'name' is removed (the frontend uses the id as the name)
     // pub short: String,
+    pub short: String,
     pub name: String,
 }
 
@@ -193,7 +195,26 @@ pub async fn donation_platform_list(
             Ok(platforms) => {
                 let platforms = platforms
                     .into_iter()
-                    .map(|p| DonationPlatformQueryData { name: p.name })
+                    .filter_map(|p| {
+                        if p.donation {
+                            Some(DonationPlatformQueryData {
+                                // Short vs name is no longer a recognized difference in v3.
+                                // We capitalize to recreate the old behavior, with some special handling.
+                                // This may result in different behaviour for platforms added after the v3 migration.
+                                name: match p.name.as_str() {
+                                    "bmac" => "Buy Me A Coffee".to_string(),
+                                    "github" => "GitHub Sponsors".to_string(),
+                                    "ko-fi" => "Ko-fi".to_string(),
+                                    "paypal" => "PayPal".to_string(),
+                                    // Otherwise, capitalize it
+                                    _ => capitalize_first(&p.name),
+                                },
+                                short: p.name,
+                            })
+                        } else {
+                            None
+                        }
+                    })
                     .collect::<Vec<_>>();
                 HttpResponse::Ok().json(platforms)
             }

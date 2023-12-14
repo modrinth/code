@@ -348,10 +348,10 @@ pub async fn join_team(
         )
         .await?;
 
+        transaction.commit().await?;
+
         User::clear_project_cache(&[current_user.id.into()], &redis).await?;
         TeamMember::clear_cache(team_id, &redis).await?;
-
-        transaction.commit().await?;
     } else {
         return Err(ApiError::InvalidInput(
             "There is no pending request from this team".to_string(),
@@ -542,9 +542,8 @@ pub async fn add_team_member(
         }
     }
 
-    TeamMember::clear_cache(team_id, &redis).await?;
-
     transaction.commit().await?;
+    TeamMember::clear_cache(team_id, &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -691,9 +690,8 @@ pub async fn edit_team_member(
     )
     .await?;
 
-    TeamMember::clear_cache(id, &redis).await?;
-
     transaction.commit().await?;
+    TeamMember::clear_cache(id, &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -797,9 +795,8 @@ pub async fn transfer_ownership(
     )
     .await?;
 
-    TeamMember::clear_cache(id.into(), &redis).await?;
-
     transaction.commit().await?;
+    TeamMember::clear_cache(id.into(), &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }
@@ -925,10 +922,11 @@ pub async fn remove_team_member(
             }
         }
 
+        transaction.commit().await?;
+
         TeamMember::clear_cache(id, &redis).await?;
         User::clear_project_cache(&[delete_member.user_id], &redis).await?;
 
-        transaction.commit().await?;
         Ok(HttpResponse::NoContent().body(""))
     } else {
         Err(ApiError::NotFound)

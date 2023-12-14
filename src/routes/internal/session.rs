@@ -187,6 +187,7 @@ pub async fn delete(
         if session.user_id == current_user.id.into() {
             let mut transaction = pool.begin().await?;
             DBSession::remove(session.id, &mut transaction).await?;
+            transaction.commit().await?;
             DBSession::clear_cache(
                 vec![(
                     Some(session.id),
@@ -196,7 +197,6 @@ pub async fn delete(
                 &redis,
             )
             .await?;
-            transaction.commit().await?;
         }
     }
 
@@ -232,6 +232,7 @@ pub async fn refresh(
 
         DBSession::remove(session.id, &mut transaction).await?;
         let new_session = issue_session(req, session.user_id, &mut transaction, &redis).await?;
+        transaction.commit().await?;
         DBSession::clear_cache(
             vec![(
                 Some(session.id),
@@ -241,8 +242,6 @@ pub async fn refresh(
             &redis,
         )
         .await?;
-
-        transaction.commit().await?;
 
         Ok(HttpResponse::Ok().json(Session::from(new_session, true, None)))
     } else {

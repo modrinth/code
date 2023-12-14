@@ -217,6 +217,7 @@ pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct LinkPlatformQueryData {
     pub name: String,
+    pub donation: bool,
 }
 
 pub async fn link_platform_list(
@@ -226,7 +227,10 @@ pub async fn link_platform_list(
     let results: Vec<LinkPlatformQueryData> = LinkPlatform::list(&**pool, &redis)
         .await?
         .into_iter()
-        .map(|x| LinkPlatformQueryData { name: x.name })
+        .map(|x| LinkPlatformQueryData {
+            name: x.name,
+            donation: x.donation,
+        })
         .collect();
     Ok(HttpResponse::Ok().json(results))
 }

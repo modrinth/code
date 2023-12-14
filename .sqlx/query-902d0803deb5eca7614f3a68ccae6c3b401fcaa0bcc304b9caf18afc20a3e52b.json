@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n                SELECT t.id\n                FROM threads t\n                INNER JOIN reports r ON t.report_id = r.id\n                WHERE r.mod_id = $1 AND report_id IS NOT NULL \n                ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "902d0803deb5eca7614f3a68ccae6c3b401fcaa0bcc304b9caf18afc20a3e52b"
+}

@@ -11,7 +11,7 @@ use labrinth::models::{
     users::{User, UserId},
 };
 use rust_decimal::Decimal;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 // Fields shared by every version of the API.
 // No struct in here should have ANY field that
@@ -118,4 +118,24 @@ pub struct CommonNotification {
 #[derive(Deserialize)]
 pub struct CommonNotificationAction {
     pub action_route: (String, String),
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum CommonItemType {
+    Project,
+    Version,
+    User,
+    Unknown,
+}
+
+impl CommonItemType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            CommonItemType::Project => "project",
+            CommonItemType::Version => "version",
+            CommonItemType::User => "user",
+            CommonItemType::Unknown => "unknown",
+        }
+    }
 }

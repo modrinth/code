@@ -14,7 +14,7 @@ use crate::models::projects::{
     ProjectStatus, Version, VersionFile, VersionStatus, VersionType,
 };
 use crate::models::threads::ThreadId;
-use crate::routes::v2_reroute;
+use crate::routes::v2_reroute::{self, capitalize_first};
 use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -394,12 +394,4 @@ impl TryFrom<Link> for DonationLink {
             id: link.platform,
         })
     }
-}
-
-fn capitalize_first(input: &str) -> String {
-    let mut result = input.to_owned();
-    if let Some(first_char) = result.get_mut(0..1) {
-        first_char.make_ascii_uppercase();
-    }
-    result
 }

@@ -80,6 +80,8 @@ delegate_api_variant!(
         [add_gallery_item, ServiceResponse, id_or_slug: &str, image: ImageData,  featured: bool, title: Option<String>, description: Option<String>, ordering: Option<i32>, pat: Option<&str>],
         [remove_gallery_item, ServiceResponse, id_or_slug: &str, image_url: &str, pat: Option<&str>],
         [edit_gallery_item, ServiceResponse, id_or_slug: &str, image_url: &str, patch: HashMap<String, String>, pat: Option<&str>],
+        [create_report, ServiceResponse, report_type: &str, id: &str, item_type: crate::common::api_common::models::CommonItemType, body: &str, pat: Option<&str>],
+        [get_report, ServiceResponse, id: &str, pat: Option<&str>],
     }
 );
 

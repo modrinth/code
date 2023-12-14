@@ -664,6 +664,7 @@ pub async fn version_edit_helper(
 
             img::delete_unused_images(context, checkable_strings, &mut transaction, &redis).await?;
 
+            transaction.commit().await?;
             database::models::Version::clear_cache(&version_item, &redis).await?;
             database::models::Project::clear_cache(
                 version_item.inner.project_id,
@@ -672,7 +673,6 @@ pub async fn version_edit_helper(
                 &redis,
             )
             .await?;
-            transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthentication(
@@ -921,8 +921,8 @@ pub async fn version_schedule(
         .execute(&mut *transaction)
         .await?;
 
-        database::models::Version::clear_cache(&version_item, &redis).await?;
         transaction.commit().await?;
+        database::models::Version::clear_cache(&version_item, &redis).await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -1004,11 +1004,10 @@ pub async fn version_delete(
 
     let result =
         database::models::Version::remove_full(version.inner.id, &redis, &mut transaction).await?;
+    transaction.commit().await?;
     remove_documents(&[version.inner.id.into()], &search_config).await?;
     database::models::Project::clear_cache(version.inner.project_id, None, Some(true), &redis)
         .await?;
-
-    transaction.commit().await?;
 
     if result.is_some() {
         Ok(HttpResponse::NoContent().body(""))

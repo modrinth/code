@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use labrinth::routes::v2::tags::DonationPlatformQueryData;
 
 use std::collections::HashSet;
 
@@ -59,6 +60,48 @@ async fn get_tags() {
                 .map(|s| s.to_string())
                 .collect()
         );
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn get_donation_platforms() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
+        let api = &test_env.api;
+        let mut donation_platforms_unsorted = api.get_donation_platforms_deserialized().await;
+
+        // These tests match dummy data and will need to be updated if the dummy data changes
+        let mut included = vec![
+            DonationPlatformQueryData {
+                short: "patreon".to_string(),
+                name: "Patreon".to_string(),
+            },
+            DonationPlatformQueryData {
+                short: "ko-fi".to_string(),
+                name: "Ko-fi".to_string(),
+            },
+            DonationPlatformQueryData {
+                short: "paypal".to_string(),
+                name: "PayPal".to_string(),
+            },
+            DonationPlatformQueryData {
+                short: "bmac".to_string(),
+                name: "Buy Me A Coffee".to_string(),
+            },
+            DonationPlatformQueryData {
+                short: "github".to_string(),
+                name: "GitHub Sponsors".to_string(),
+            },
+            DonationPlatformQueryData {
+                short: "other".to_string(),
+                name: "Other".to_string(),
+            },
+        ];
+
+        included.sort_by(|a, b| a.short.cmp(&b.short));
+        donation_platforms_unsorted.sort_by(|a, b| a.short.cmp(&b.short));
+
+        assert_eq!(donation_platforms_unsorted, included);
     })
     .await;
 }

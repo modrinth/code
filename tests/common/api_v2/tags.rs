@@ -3,7 +3,9 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use async_trait::async_trait;
-use labrinth::routes::v2::tags::{CategoryData, GameVersionQueryData, LoaderData};
+use labrinth::routes::v2::tags::{
+    CategoryData, DonationPlatformQueryData, GameVersionQueryData, LoaderData,
+};
 
 use crate::common::{
     api_common::{
@@ -54,6 +56,21 @@ impl ApiV2 {
 
     pub async fn get_categories_deserialized(&self) -> Vec<CategoryData> {
         let resp = self.get_categories().await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
+
+    pub async fn get_donation_platforms(&self) -> ServiceResponse {
+        let req = TestRequest::get()
+            .uri("/v2/tag/donation_platform")
+            .append_pat(ADMIN_USER_PAT)
+            .to_request();
+        self.call(req).await
+    }
+
+    pub async fn get_donation_platforms_deserialized(&self) -> Vec<DonationPlatformQueryData> {
+        let resp = self.get_donation_platforms().await;
+        println!("Response: {:?}", resp.response().body());
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
     }
