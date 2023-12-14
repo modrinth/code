@@ -292,7 +292,11 @@ async fn search_projects() {
                 let test_name = test_name.clone();
                 async move {
                     let projects = api
-                        .search_deserialized(Some(&test_name), Some(facets.clone()), USER_USER_PAT)
+                        .search_deserialized(
+                            Some(&format!("\"&{test_name}\"")),
+                            Some(facets.clone()),
+                            USER_USER_PAT,
+                        )
                         .await;
                     let mut found_project_ids: Vec<u64> = projects
                         .hits
@@ -309,7 +313,7 @@ async fn search_projects() {
         // A couple additional tests for the saerch type returned, making sure it is properly translated back
         let client_side_required = api
             .search_deserialized(
-                Some(&test_name),
+                Some(&format!("\"&{test_name}\"")),
                 Some(json!([["client_side:required"]])),
                 USER_USER_PAT,
             )
@@ -320,7 +324,7 @@ async fn search_projects() {
 
         let server_side_required = api
             .search_deserialized(
-                Some(&test_name),
+                Some(&format!("\"&{test_name}\"")),
                 Some(json!([["server_side:required"]])),
                 USER_USER_PAT,
             )
@@ -331,7 +335,7 @@ async fn search_projects() {
 
         let client_side_unsupported = api
             .search_deserialized(
-                Some(&test_name),
+                Some(&format!("\"&{test_name}\"")),
                 Some(json!([["client_side:unsupported"]])),
                 USER_USER_PAT,
             )
@@ -342,7 +346,7 @@ async fn search_projects() {
 
         let game_versions = api
             .search_deserialized(
-                Some(&test_name),
+                Some(&format!("\"&{test_name}\"")),
                 Some(json!([["versions:1.20.5"]])),
                 USER_USER_PAT,
             )

@@ -1120,7 +1120,7 @@ async fn align_search_projects() {
 
         let projects = api
             .search_deserialized(
-                Some(&test_name),
+                Some(&format!("\"&{test_name}\"")),
                 Some(json!([["categories:fabric"]])),
                 USER_USER_PAT,
             )
@@ -1130,6 +1130,7 @@ async fn align_search_projects() {
             let project_model = api
                 .get_project(&project.id.to_string(), USER_USER_PAT)
                 .await;
+            assert_eq!(project_model.status(), 200);
             let mut project_model: Project = test::read_body_json(project_model).await;
 
             // Body/description is huge- don't store it in search, so it's OK if they differ here

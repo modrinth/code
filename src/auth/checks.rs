@@ -186,7 +186,7 @@ impl ValidateAuthorized for models::OAuthClient {
                     "You don't have sufficient permissions to interact with this OAuth application"
                         .to_string(),
                 ))
-            }
+            };
         }
 
         Ok(())
