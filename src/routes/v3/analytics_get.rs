@@ -413,6 +413,11 @@ pub async fn countries_downloads_get(
         }
     }
 
+    let hm: HashMap<String, HashMap<String, u64>> = hm
+        .into_iter()
+        .map(|(key, value)| (key, condense_countries(value)))
+        .collect();
+
     Ok(HttpResponse::Ok().json(hm))
 }
 
@@ -480,7 +485,29 @@ pub async fn countries_views_get(
         }
     }
 
+    let hm: HashMap<String, HashMap<String, u64>> = hm
+        .into_iter()
+        .map(|(key, value)| (key, condense_countries(value)))
+        .collect();
+
     Ok(HttpResponse::Ok().json(hm))
+}
+
+fn condense_countries(countries: HashMap<String, u64>) -> HashMap<String, u64> {
+    // Every country under '15' (view or downloads) should be condensed into 'XX'
+    let mut hm = HashMap::new();
+    for (mut country, count) in countries {
+        if count < 15 {
+            country = "XX".to_string();
+        }
+        if !hm.contains_key(&country) {
+            hm.insert(country.to_string(), 0);
+        }
+        if let Some(hm) = hm.get_mut(&country) {
+            *hm += count;
+        }
+    }
+    hm
 }
 
 async fn filter_allowed_ids(
