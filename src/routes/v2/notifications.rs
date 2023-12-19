@@ -85,6 +85,7 @@ pub async fn notification_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::notifications::notification_read(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -98,6 +99,7 @@ pub async fn notification_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::notifications::notification_delete(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -111,6 +113,7 @@ pub async fn notifications_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::notifications::notifications_read(
         req,
         web::Query(v3::notifications::NotificationIds { ids: ids.ids }),
@@ -130,6 +133,7 @@ pub async fn notifications_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::notifications::notifications_delete(
         req,
         web::Query(v3::notifications::NotificationIds { ids: ids.ids }),

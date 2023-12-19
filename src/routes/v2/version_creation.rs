@@ -268,6 +268,7 @@ pub async fn upload_file_to_version(
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, CreateError> {
+    // Returns NoContent, so no need to convert to V2
     let response = v3::version_creation::upload_file_to_version(
         req,
         url_data,

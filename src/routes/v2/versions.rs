@@ -270,6 +270,7 @@ pub async fn version_delete(
     session_queue: web::Data<AuthQueue>,
     search_config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so we don't need to convert the response
     v3::versions::version_delete(req, info, pool, redis, session_queue, search_config)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -290,6 +291,7 @@ pub async fn version_schedule(
     scheduling_data: web::Json<SchedulingData>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so we don't need to convert the response
     let scheduling_data = scheduling_data.into_inner();
     let scheduling_data = v3::versions::SchedulingData {
         time: scheduling_data.time,

@@ -63,6 +63,7 @@ pub async fn download_version(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns TemporaryRedirect, so no need to convert to V2
     v3::version_file::download_version(req, info, pool, redis, hash_query, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -78,6 +79,7 @@ pub async fn delete_file(
     hash_query: web::Query<HashQuery>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert to V2
     v3::version_file::delete_file(req, info, pool, redis, hash_query, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)

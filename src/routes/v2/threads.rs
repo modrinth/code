@@ -3,7 +3,8 @@ use std::sync::Arc;
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
 use crate::models::ids::ThreadMessageId;
-use crate::models::threads::{MessageBody, ThreadId};
+use crate::models::threads::{MessageBody, Thread, ThreadId};
+use crate::models::v2::threads::LegacyThread;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
@@ -48,7 +49,7 @@ pub async fn threads_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::threads::threads_get(
+    let response = v3::threads::threads_get(
         req,
         web::Query(v3::threads::ThreadIds { ids: ids.ids }),
         pool,
@@ -56,7 +57,19 @@ pub async fn threads_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)
+    .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<Thread>>(response).await {
+        Ok(threads) => {
+            let threads = threads
+                .into_iter()
+                .map(LegacyThread::from)
+                .collect::<Vec<_>>();
+            Ok(HttpResponse::Ok().json(threads))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(Deserialize)]
@@ -74,6 +87,7 @@ pub async fn thread_send_message(
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let new_message = new_message.into_inner();
+    // Returns NoContent, so we don't need to convert the response
     v3::threads::thread_send_message(
         req,
         info,
@@ -95,9 +109,21 @@ pub async fn moderation_inbox(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::threads::moderation_inbox(req, pool, redis, session_queue)
+    let response = v3::threads::moderation_inbox(req, pool, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<Thread>>(response).await {
+        Ok(threads) => {
+            let threads = threads
+                .into_iter()
+                .map(LegacyThread::from)
+                .collect::<Vec<_>>();
+            Ok(HttpResponse::Ok().json(threads))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[post("{id}/read")]
@@ -108,6 +134,7 @@ pub async fn thread_read(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so we don't need to convert the response
     v3::threads::thread_read(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -122,6 +149,7 @@ pub async fn message_delete(
     session_queue: web::Data<AuthQueue>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so we don't need to convert the response
     v3::threads::message_delete(req, info, pool, redis, session_queue, file_host)
         .await
         .or_else(v2_reroute::flatten_404_error)

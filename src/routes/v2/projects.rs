@@ -2,11 +2,10 @@ use crate::database::models::categories::LinkPlatform;
 use crate::database::models::{project_item, version_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
-use crate::models;
 use crate::models::projects::{
     Link, MonetizationStatus, Project, ProjectStatus, SearchRequest, Version,
 };
-use crate::models::v2::projects::{DonationLink, LegacyProject, LegacySideType};
+use crate::models::v2::projects::{DonationLink, LegacyProject, LegacySideType, LegacyVersion};
 use crate::models::v2::search::LegacySearchResults;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::projects::ProjectIds;
@@ -223,6 +222,7 @@ pub async fn project_get_check(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns an id only, do not need to convert
     v3::projects::project_get_check(info, pool, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -230,8 +230,8 @@ pub async fn project_get_check(
 
 #[derive(Serialize)]
 struct DependencyInfo {
-    pub projects: Vec<Project>,
-    pub versions: Vec<models::projects::Version>,
+    pub projects: Vec<LegacyProject>,
+    pub versions: Vec<LegacyVersion>,
 }
 
 #[get("dependencies")]
@@ -242,10 +242,30 @@ pub async fn dependency_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    // TODO: requires V2 conversion and tests, probably
-    v3::projects::dependency_list(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
+    // TODO: tests, probably
+    let response =
+        v3::projects::dependency_list(req, info, pool.clone(), redis.clone(), session_queue)
+            .await
+            .or_else(v2_reroute::flatten_404_error)?;
+
+    match v2_reroute::extract_ok_json::<crate::routes::v3::projects::DependencyInfo>(response).await
+    {
+        Ok(dependency_info) => {
+            let converted_projects =
+                LegacyProject::from_many(dependency_info.projects, &**pool, &redis).await?;
+            let converted_versions = dependency_info
+                .versions
+                .into_iter()
+                .map(LegacyVersion::from)
+                .collect();
+
+            Ok(HttpResponse::Ok().json(DependencyInfo {
+                projects: converted_projects,
+                versions: converted_versions,
+            }))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -636,6 +656,7 @@ pub async fn projects_edit(
         }
     }
 
+    // This returns NoContent or failure so we don't need to do anything with it
     v3::projects::projects_edit(
         req,
         web::Query(ids),
@@ -673,6 +694,7 @@ pub async fn project_icon_edit(
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::project_icon_edit(
         web::Query(v3::projects::Extension { ext: ext.ext }),
         req,
@@ -696,6 +718,7 @@ pub async fn delete_project_icon(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::delete_project_icon(req, info, pool, redis, file_host, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -724,6 +747,7 @@ pub async fn add_gallery_item(
     payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::add_gallery_item(
         web::Query(v3::projects::Extension { ext: ext.ext }),
         req,
@@ -775,6 +799,7 @@ pub async fn edit_gallery_item(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::edit_gallery_item(
         req,
         web::Query(v3::projects::GalleryEditQuery {
@@ -808,6 +833,7 @@ pub async fn delete_gallery_item(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::delete_gallery_item(
         req,
         web::Query(v3::projects::GalleryDeleteQuery { url: item.url }),
@@ -830,6 +856,7 @@ pub async fn project_delete(
     config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::project_delete(req, info, pool, redis, config, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -843,6 +870,7 @@ pub async fn project_follow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::project_follow(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -856,6 +884,7 @@ pub async fn project_unfollow(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::projects::project_unfollow(req, info, pool, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)

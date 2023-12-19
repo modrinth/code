@@ -939,8 +939,8 @@ pub async fn project_get_check(
     }
 }
 
-#[derive(Serialize)]
-struct DependencyInfo {
+#[derive(Serialize, Deserialize)]
+pub struct DependencyInfo {
     pub projects: Vec<Project>,
     pub versions: Vec<models::projects::Version>,
 }

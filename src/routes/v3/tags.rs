@@ -166,10 +166,10 @@ pub async fn loader_fields_list(
     Ok(HttpResponse::Ok().json(results))
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct License {
-    short: String,
-    name: String,
+    pub short: String,
+    pub name: String,
 }
 
 pub async fn license_list() -> HttpResponse {
@@ -186,10 +186,10 @@ pub async fn license_list() -> HttpResponse {
     HttpResponse::Ok().json(results)
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct LicenseText {
-    title: String,
-    body: String,
+    pub title: String,
+    pub body: String,
 }
 
 pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, ApiError> {

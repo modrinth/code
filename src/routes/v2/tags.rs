@@ -5,9 +5,7 @@ use crate::database::models::loader_fields::LoaderFieldEnumValue;
 use crate::database::redis::RedisPool;
 use crate::models::v2::projects::LegacySideType;
 use crate::routes::v2_reroute::capitalize_first;
-use crate::routes::v3::tags::{
-    LinkPlatformQueryData, LoaderData as LoaderDataV3, LoaderFieldsEnumQuery,
-};
+use crate::routes::v3::tags::{LinkPlatformQueryData, LoaderFieldsEnumQuery};
 use crate::routes::{v2_reroute, v3};
 use actix_web::{get, web, HttpResponse};
 use chrono::{DateTime, Utc};
@@ -42,7 +40,24 @@ pub async fn category_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::tags::category_list(pool, redis).await
+    let response = v3::tags::category_list(pool, redis).await?;
+
+    // Convert to V2 format
+    match v2_reroute::extract_ok_json::<Vec<v3::tags::CategoryData>>(response).await {
+        Ok(categories) => {
+            let categories = categories
+                .into_iter()
+                .map(|c| CategoryData {
+                    icon: c.icon,
+                    name: c.name,
+                    project_type: c.project_type,
+                    header: c.header,
+                })
+                .collect::<Vec<_>>();
+            Ok(HttpResponse::Ok().json(categories))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
@@ -60,7 +75,7 @@ pub async fn loader_list(
     let response = v3::tags::loader_list(pool, redis).await?;
 
     // Convert to V2 format
-    match v2_reroute::extract_ok_json::<Vec<LoaderDataV3>>(response).await {
+    match v2_reroute::extract_ok_json::<Vec<v3::tags::LoaderData>>(response).await {
         Ok(loaders) => {
             let loaders = loaders
                 .into_iter()
@@ -151,26 +166,52 @@ pub async fn game_version_list(
 
 #[derive(serde::Serialize)]
 pub struct License {
-    short: String,
-    name: String,
+    pub short: String,
+    pub name: String,
 }
 
 #[get("license")]
 pub async fn license_list() -> HttpResponse {
-    v3::tags::license_list().await
+    let response = v3::tags::license_list().await;
+
+    // Convert to V2 format
+    match v2_reroute::extract_ok_json::<Vec<v3::tags::License>>(response).await {
+        Ok(licenses) => {
+            let licenses = licenses
+                .into_iter()
+                .map(|l| License {
+                    short: l.short,
+                    name: l.name,
+                })
+                .collect::<Vec<_>>();
+            HttpResponse::Ok().json(licenses)
+        }
+        Err(response) => response,
+    }
 }
 
 #[derive(serde::Serialize)]
 pub struct LicenseText {
-    title: String,
-    body: String,
+    pub title: String,
+    pub body: String,
 }
 
 #[get("license/{id}")]
 pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, ApiError> {
-    v3::tags::license_text(params)
+    let license = v3::tags::license_text(params)
         .await
-        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert to V2 format
+    Ok(
+        match v2_reroute::extract_ok_json::<v3::tags::LicenseText>(license).await {
+            Ok(license) => HttpResponse::Ok().json(LicenseText {
+                title: license.title,
+                body: license.body,
+            }),
+            Err(response) => response,
+        },
+    )
 }
 
 #[derive(serde::Serialize, serde::Deserialize, PartialEq, Eq, Debug)]
@@ -229,6 +270,7 @@ pub async fn report_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
+    // This returns a list of strings directly, so we don't need to convert to v2 format.
     v3::tags::report_type_list(pool, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)
@@ -239,6 +281,7 @@ pub async fn project_type_list(
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
 ) -> Result<HttpResponse, ApiError> {
+    // This returns a list of strings directly, so we don't need to convert to v2 format.
     v3::tags::project_type_list(pool, redis)
         .await
         .or_else(v2_reroute::flatten_404_error)

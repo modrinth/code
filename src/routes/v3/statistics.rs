@@ -1,10 +1,17 @@
 use crate::routes::ApiError;
 use actix_web::{web, HttpResponse};
-use serde_json::json;
 use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.route("statistics", web::get().to(get_stats));
+}
+
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct V3Stats {
+    pub projects: Option<i64>,
+    pub versions: Option<i64>,
+    pub authors: Option<i64>,
+    pub files: Option<i64>,
 }
 
 pub async fn get_stats(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
@@ -74,12 +81,12 @@ pub async fn get_stats(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError
     .fetch_one(&**pool)
     .await?;
 
-    let json = json!({
-        "projects": projects.count,
-        "versions": versions.count,
-        "authors": authors.count,
-        "files": files.count,
-    });
+    let v3_stats = V3Stats {
+        projects: projects.count,
+        versions: versions.count,
+        authors: authors.count,
+        files: files.count,
+    };
 
-    Ok(HttpResponse::Ok().json(json))
+    Ok(HttpResponse::Ok().json(v3_stats))
 }

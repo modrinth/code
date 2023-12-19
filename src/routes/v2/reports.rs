@@ -1,6 +1,7 @@
 use crate::database::redis::RedisPool;
 use crate::models::ids::ImageId;
-use crate::models::reports::ItemType;
+use crate::models::reports::{ItemType, Report};
+use crate::models::v2::reports::LegacyReport;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
@@ -37,9 +38,18 @@ pub async fn report_create(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::report_create(req, pool, body, redis, session_queue)
+    let response = v3::reports::report_create(req, pool, body, redis, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Report>(response).await {
+        Ok(report) => {
+            let report = LegacyReport::from(report);
+            Ok(HttpResponse::Ok().json(report))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(Deserialize)]
@@ -65,7 +75,7 @@ pub async fn reports(
     count: web::Query<ReportsRequestOptions>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::reports(
+    let response = v3::reports::reports(
         req,
         pool,
         redis,
@@ -76,7 +86,16 @@ pub async fn reports(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)
+    .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<Report>>(response).await {
+        Ok(reports) => {
+            let reports: Vec<_> = reports.into_iter().map(LegacyReport::from).collect();
+            Ok(HttpResponse::Ok().json(reports))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(Deserialize)]
@@ -92,7 +111,7 @@ pub async fn reports_get(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::reports_get(
+    let response = v3::reports::reports_get(
         req,
         web::Query(v3::reports::ReportIds { ids: ids.ids }),
         pool,
@@ -100,7 +119,16 @@ pub async fn reports_get(
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)
+    .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Vec<Report>>(response).await {
+        Ok(report_list) => {
+            let report_list: Vec<_> = report_list.into_iter().map(LegacyReport::from).collect();
+            Ok(HttpResponse::Ok().json(report_list))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[get("report/{id}")]
@@ -111,9 +139,18 @@ pub async fn report_get(
     info: web::Path<(crate::models::reports::ReportId,)>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::reports::report_get(req, pool, redis, info, session_queue)
+    let response = v3::reports::report_get(req, pool, redis, info, session_queue)
         .await
-        .or_else(v2_reroute::flatten_404_error)
+        .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert response to V2 format
+    match v2_reroute::extract_ok_json::<Report>(response).await {
+        Ok(report) => {
+            let report = LegacyReport::from(report);
+            Ok(HttpResponse::Ok().json(report))
+        }
+        Err(response) => Ok(response),
+    }
 }
 
 #[derive(Deserialize, Validate)]
@@ -133,6 +170,7 @@ pub async fn report_edit(
     edit_report: web::Json<EditReport>,
 ) -> Result<HttpResponse, ApiError> {
     let edit_report = edit_report.into_inner();
+    // Returns NoContent, so no need to convert
     v3::reports::report_edit(
         req,
         pool,
@@ -156,6 +194,7 @@ pub async fn report_delete(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    // Returns NoContent, so no need to convert
     v3::reports::report_delete(req, pool, info, redis, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)

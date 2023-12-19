@@ -1,4 +1,6 @@
 use super::ApiError;
+use crate::models::projects::Project;
+use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
@@ -28,13 +30,22 @@ pub async fn get_projects(
     count: web::Query<ResultCount>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    v3::moderation::get_projects(
+    let response = v3::moderation::get_projects(
         req,
-        pool,
-        redis,
+        pool.clone(),
+        redis.clone(),
         web::Query(v3::moderation::ResultCount { count: count.count }),
         session_queue,
     )
     .await
-    .or_else(v2_reroute::flatten_404_error)
+    .or_else(v2_reroute::flatten_404_error)?;
+
+    // Convert to V2 projects
+    match v2_reroute::extract_ok_json::<Vec<Project>>(response).await {
+        Ok(project) => {
+            let legacy_projects = LegacyProject::from_many(project, &**pool, &redis).await?;
+            Ok(HttpResponse::Ok().json(legacy_projects))
+        }
+        Err(response) => Ok(response),
+    }
 }
