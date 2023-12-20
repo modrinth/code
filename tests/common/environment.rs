@@ -65,32 +65,29 @@ where
 // Use .call(req) on it directly to make a test call as if test::call_service(req) were being used.
 #[derive(Clone)]
 pub struct TestEnvironment<A> {
-    // test_app: Rc<dyn LocalService>, // Rc as it's not Send
     pub db: TemporaryDatabase,
     pub api: A,
     pub setup_api: ApiV3, // Used for setting up tests only (ie: in ScopesTest)
-    pub dummy: Option<dummy_data::DummyData>,
+    pub dummy: dummy_data::DummyData,
 }
 
 impl<A: ApiBuildable> TestEnvironment<A> {
     async fn build(max_connections: Option<u32>) -> Self {
         let db = TemporaryDatabase::create(max_connections).await;
-        let mut test_env = Self::build_with_db(db).await;
-
-        let dummy = dummy_data::get_dummy_data(&test_env.setup_api).await;
-        test_env.dummy = Some(dummy);
-        test_env
-    }
-
-    pub async fn build_with_db(db: TemporaryDatabase) -> Self {
         let labrinth_config = setup(&db).await;
+        let api = A::build(labrinth_config.clone()).await;
+        let setup_api = ApiV3::build(labrinth_config).await;
+        let dummy = dummy_data::get_dummy_data(&setup_api).await;
         Self {
             db,
-            api: A::build(labrinth_config.clone()).await,
-            setup_api: ApiV3::build(labrinth_config.clone()).await,
-            dummy: None,
-            // test_app
+            api,
+            setup_api,
+            dummy,
         }
+    }
+    pub async fn build_setup_api(db: &TemporaryDatabase) -> ApiV3 {
+        let labrinth_config = setup(db).await;
+        ApiV3::build(labrinth_config).await
     }
 }
 
@@ -108,7 +105,7 @@ impl<A: Api> TestEnvironment<A> {
         let resp = self
             .api
             .add_user_to_team(
-                &self.dummy.as_ref().unwrap().project_alpha.team_id,
+                &self.dummy.project_alpha.team_id,
                 FRIEND_USER_ID,
                 None,
                 None,

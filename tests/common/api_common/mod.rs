@@ -7,7 +7,6 @@ use self::models::{
 use self::request_data::{ImageData, ProjectCreationRequestData};
 use actix_web::dev::ServiceResponse;
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
 use labrinth::{
     models::{
         projects::{ProjectId, VersionType},
@@ -27,7 +26,7 @@ pub trait ApiBuildable: Api {
 }
 
 #[async_trait(?Send)]
-pub trait Api: ApiProject + ApiTags + ApiTeams + ApiVersion {
+pub trait Api: ApiProject + ApiTags + ApiTeams + ApiUser + ApiVersion {
     async fn call(&self, req: actix_http::Request) -> ServiceResponse;
     async fn reset_search_index(&self) -> ServiceResponse;
 }
@@ -59,6 +58,12 @@ pub trait ApiProject {
         id_or_slug: &str,
         pat: Option<&str>,
     ) -> CommonProject;
+    async fn get_projects(&self, ids_or_slugs: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn get_project_dependencies(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn get_user_projects(
         &self,
         user_id_or_username: &str,
@@ -85,13 +90,6 @@ pub trait ApiProject {
         &self,
         id_or_slug: &str,
         icon: Option<ImageData>,
-        pat: Option<&str>,
-    ) -> ServiceResponse;
-    async fn schedule_project(
-        &self,
-        id_or_slug: &str,
-        requested_status: &str,
-        date: DateTime<Utc>,
         pat: Option<&str>,
     ) -> ServiceResponse;
     #[allow(clippy::too_many_arguments)]
@@ -127,6 +125,27 @@ pub trait ApiProject {
         pat: Option<&str>,
     ) -> ServiceResponse;
     async fn get_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_reports(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn get_user_reports(&self, pat: Option<&str>) -> ServiceResponse;
+    async fn edit_report(
+        &self,
+        id: &str,
+        patch: serde_json::Value,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn delete_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_threads(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+    async fn write_to_thread(
+        &self,
+        id: &str,
+        r#type: &str,
+        message: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn get_moderation_inbox(&self, pat: Option<&str>) -> ServiceResponse;
+    async fn read_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn delete_thread_message(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
 }
 
 #[async_trait(?Send)]
@@ -145,6 +164,7 @@ pub trait ApiTeams {
         team_id: &str,
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember>;
+    async fn get_teams_members(&self, team_ids: &[&str], pat: Option<&str>) -> ServiceResponse;
     async fn get_project_members(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse;
     async fn get_project_members_deserialized_common(
         &self,
@@ -187,11 +207,14 @@ pub trait ApiTeams {
         user_id: &str,
         pat: Option<&str>,
     ) -> Vec<CommonNotification>;
+    async fn get_notification(&self, notification_id: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_notifications(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
     async fn mark_notification_read(
         &self,
         notification_id: &str,
         pat: Option<&str>,
     ) -> ServiceResponse;
+    async fn mark_notifications_read(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
     async fn add_user_to_team(
         &self,
         team_id: &str,
@@ -205,6 +228,20 @@ pub trait ApiTeams {
         notification_id: &str,
         pat: Option<&str>,
     ) -> ServiceResponse;
+    async fn delete_notifications(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse;
+}
+
+#[async_trait(?Send)]
+pub trait ApiUser {
+    async fn get_user(&self, id_or_username: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_current_user(&self, pat: Option<&str>) -> ServiceResponse;
+    async fn edit_user(
+        &self,
+        id_or_username: &str,
+        patch: serde_json::Value,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
+    async fn delete_user(&self, id_or_username: &str, pat: Option<&str>) -> ServiceResponse;
 }
 
 #[async_trait(?Send)]
@@ -227,34 +264,40 @@ pub trait ApiVersion {
         modify_json: Option<json_patch::Patch>,
         pat: Option<&str>,
     ) -> CommonVersion;
-    async fn get_version(&self, id_or_slug: &str, pat: Option<&str>) -> ServiceResponse;
+    async fn get_version(&self, id: &str, pat: Option<&str>) -> ServiceResponse;
     async fn get_version_deserialized_common(
         &self,
         id_or_slug: &str,
         pat: Option<&str>,
     ) -> CommonVersion;
-    async fn get_versions(&self, ids_or_slugs: Vec<String>, pat: Option<&str>) -> ServiceResponse;
+    async fn get_versions(&self, ids: Vec<String>, pat: Option<&str>) -> ServiceResponse;
     async fn get_versions_deserialized_common(
         &self,
-        ids_or_slugs: Vec<String>,
+        ids: Vec<String>,
         pat: Option<&str>,
     ) -> Vec<CommonVersion>;
+    async fn download_version_redirect(
+        &self,
+        hash: &str,
+        algorithm: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse;
     async fn edit_version(
         &self,
-        id_or_slug: &str,
+        id: &str,
         patch: serde_json::Value,
         pat: Option<&str>,
     ) -> ServiceResponse;
     async fn get_version_from_hash(
         &self,
-        id_or_slug: &str,
         hash: &str,
+        algorithm: &str,
         pat: Option<&str>,
     ) -> ServiceResponse;
     async fn get_version_from_hash_deserialized_common(
         &self,
-        id_or_slug: &str,
         hash: &str,
+        algorithm: &str,
         pat: Option<&str>,
     ) -> CommonVersion;
     async fn get_versions_from_hashes(

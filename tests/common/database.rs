@@ -168,21 +168,14 @@ impl TemporaryDatabase {
 
                 if !dummy_data_exists {
                     // Add dummy data
-                    let temporary_test_env =
-                        TestEnvironment::<ApiV3>::build_with_db(TemporaryDatabase {
-                            pool: pool.clone(),
-                            database_name: TEMPLATE_DATABASE_NAME.to_string(),
-                            redis_pool: RedisPool::new(Some(generate_random_name(
-                                "test_template_",
-                            ))),
-                        })
-                        .await;
-                    dummy_data::add_dummy_data(
-                        &temporary_test_env.setup_api,
-                        temporary_test_env.db.clone(),
-                    )
-                    .await;
-                    temporary_test_env.db.pool.close().await;
+                    let db = TemporaryDatabase {
+                        pool: pool.clone(),
+                        database_name: TEMPLATE_DATABASE_NAME.to_string(),
+                        redis_pool: RedisPool::new(Some(generate_random_name("test_template_"))),
+                    };
+                    let setup_api = TestEnvironment::<ApiV3>::build_setup_api(&db).await;
+                    dummy_data::add_dummy_data(&setup_api, db.clone()).await;
+                    db.pool.close().await;
                 }
                 pool.close().await;
                 drop(pool);

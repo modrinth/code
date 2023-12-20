@@ -1,5 +1,6 @@
 #![allow(dead_code)]
-use actix_web::test::{self, TestRequest};
+use actix_web::{dev::ServiceResponse, test};
+use futures::Future;
 use labrinth::models::pats::Scopes;
 
 use super::{
@@ -59,13 +60,14 @@ impl<'a, A: Api> ScopeTest<'a, A> {
     // success_scopes : the scopes that we are testing that should succeed
     // returns a tuple of (failure_body, success_body)
     // Should return a String error if on unexpected status code, allowing unwrapping in tests.
-    pub async fn test<T>(
+    pub async fn test<T, Fut>(
         &self,
         req_gen: T,
         success_scopes: Scopes,
     ) -> Result<(serde_json::Value, serde_json::Value), String>
     where
-        T: Fn() -> TestRequest,
+        T: Fn(Option<String>) -> Fut,
+        Fut: Future<Output = ServiceResponse>, // Ensure Fut is Send and 'static
     {
         // First, create a PAT with failure scopes
         let failure_scopes = self
@@ -79,11 +81,7 @@ impl<'a, A: Api> ScopeTest<'a, A> {
 
         // Perform test twice, once with each PAT
         // the first time, we expect a 401 (or known failure code)
-        let req = req_gen()
-            .append_header(("Authorization", access_token_all_others.as_str()))
-            .to_request();
-        let resp = self.test_env.call(req).await;
-
+        let resp = req_gen(Some(access_token_all_others.clone())).await;
         if resp.status().as_u16() != self.expected_failure_code {
             return Err(format!(
                 "Expected failure code {}, got {} ({:#?})",
@@ -103,11 +101,7 @@ impl<'a, A: Api> ScopeTest<'a, A> {
         };
 
         // The second time, we expect a success code
-        let req = req_gen()
-            .append_header(("Authorization", access_token.as_str()))
-            .to_request();
-        let resp = self.test_env.call(req).await;
-
+        let resp = req_gen(Some(access_token.clone())).await;
         if !(resp.status().is_success() || resp.status().is_redirection()) {
             return Err(format!(
                 "Expected success code, got {} ({:#?})",

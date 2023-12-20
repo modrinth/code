@@ -161,6 +161,22 @@ impl ApiVersion for ApiV2 {
         serde_json::from_value(value).unwrap()
     }
 
+    async fn download_version_redirect(
+        &self,
+        hash: &str,
+        algorithm: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v2/version_file/{hash}/download",))
+            .set_json(json!({
+                "algorithm": algorithm,
+            }))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
     async fn edit_version(
         &self,
         version_id: &str,

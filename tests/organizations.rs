@@ -18,12 +18,7 @@ mod common;
 async fn create_organization() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
-        let zeta_organization_slug = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
+        let zeta_organization_slug = &test_env.dummy.organization_zeta.organization_id;
 
         // Failed creations title:
         // - slug collision with zeta
@@ -88,12 +83,7 @@ async fn patch_organization() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
 
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
 
         // Create 'theta' organization
         let resp = api
@@ -169,12 +159,7 @@ async fn patch_organization() {
 async fn add_remove_icon() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
 
         // Get project
         let resp = test_env
@@ -221,12 +206,7 @@ async fn add_remove_icon() {
 async fn delete_org() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
 
         let resp = api
             .delete_organization(zeta_organization_id, USER_USER_PAT)
@@ -246,14 +226,9 @@ async fn delete_org() {
 #[actix_rt::test]
 async fn add_remove_organization_projects() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let alpha_project_id: &str = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let alpha_project_slug: &str = &test_env.dummy.as_ref().unwrap().project_alpha.project_slug;
-        let zeta_organization_id: &str = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
+        let alpha_project_id: &str = &test_env.dummy.project_alpha.project_id;
+        let alpha_project_slug: &str = &test_env.dummy.project_alpha.project_slug;
+        let zeta_organization_id: &str = &test_env.dummy.organization_zeta.organization_id;
 
         // Add/remove project to organization, first by ID, then by slug
         for alpha in [alpha_project_id, alpha_project_slug] {
@@ -331,13 +306,8 @@ async fn permissions_patch_organization() {
 #[actix_rt::test]
 async fn permissions_edit_details() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
-        let zeta_team_id = &test_env.dummy.as_ref().unwrap().organization_zeta.team_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
+        let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
         let api = &test_env.api;
         let edit_details = OrganizationPermissions::EDIT_DETAILS;
@@ -381,13 +351,8 @@ async fn permissions_manage_invites() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
 
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
-        let zeta_team_id = &test_env.dummy.as_ref().unwrap().organization_zeta.team_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
+        let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
         let manage_invites = OrganizationPermissions::MANAGE_INVITES;
 
@@ -472,15 +437,10 @@ async fn permissions_add_remove_project() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
 
-        let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
-        let zeta_team_id = &test_env.dummy.as_ref().unwrap().organization_zeta.team_id;
+        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
+        let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
         let add_project = OrganizationPermissions::ADD_PROJECT;
 
@@ -557,13 +517,8 @@ async fn permissions_delete_organization() {
 #[actix_rt::test]
 async fn permissions_add_default_project_permissions() {
     with_test_environment_all(None, |test_env| async move {
-        let zeta_organization_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .organization_zeta
-            .organization_id;
-        let zeta_team_id = &test_env.dummy.as_ref().unwrap().organization_zeta.team_id;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
+        let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
         let api = &test_env.api;
 

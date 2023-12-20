@@ -19,13 +19,7 @@ pub async fn analytics_revenue() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
 
-        let alpha_project_id = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .project_id
-            .clone();
+        let alpha_project_id = test_env.dummy.project_alpha.project_id.clone();
 
         let pool = test_env.db.pool.clone();
 
@@ -143,27 +137,9 @@ fn to_f64_vec_rounded_up(d: Vec<Decimal>) -> Vec<f64> {
 #[actix_rt::test]
 pub async fn permissions_analytics_revenue() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        let alpha_project_id = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .project_id
-            .clone();
-        let alpha_version_id = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .version_id
-            .clone();
-        let alpha_team_id = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .team_id
-            .clone();
+        let alpha_project_id = test_env.dummy.project_alpha.project_id.clone();
+        let alpha_version_id = test_env.dummy.project_alpha.version_id.clone();
+        let alpha_team_id = test_env.dummy.project_alpha.team_id.clone();
 
         let api = &test_env.api;
 

@@ -228,10 +228,10 @@ async fn test_add_remove_project() {
 #[actix_rt::test]
 async fn permissions_upload_version() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
-        let alpha_project_id = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
-        let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
-        let alpha_file_hash = &test_env.dummy.as_ref().unwrap().project_alpha.file_hash;
+        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+        let alpha_version_id = &test_env.dummy.project_alpha.version_id;
+        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
+        let alpha_file_hash = &test_env.dummy.project_alpha.file_hash;
 
         let api = &test_env.api;
         let basic_mod_different_file = TestFile::BasicModDifferent;
@@ -331,7 +331,7 @@ pub async fn test_patch_v2() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
 
-        let alpha_project_slug = &test_env.dummy.as_ref().unwrap().project_alpha.project_slug;
+        let alpha_project_slug = &test_env.dummy.project_alpha.project_slug;
 
         // Sucessful request to patch many fields.
         let resp = api
@@ -437,8 +437,8 @@ async fn permissions_patch_project_v2() {
 pub async fn test_bulk_edit_links() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
-        let alpha_project_id: &str = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let beta_project_id: &str = &test_env.dummy.as_ref().unwrap().project_beta.project_id;
+        let alpha_project_id: &str = &test_env.dummy.project_alpha.project_id;
+        let beta_project_id: &str = &test_env.dummy.project_beta.project_id;
 
         let resp = api
             .edit_project_bulk(

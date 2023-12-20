@@ -72,6 +72,22 @@ impl ApiTeams for ApiV2 {
         test::read_body_json(resp).await
     }
 
+    async fn get_teams_members(
+        &self,
+        ids_or_titles: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let ids_or_titles = serde_json::to_string(ids_or_titles).unwrap();
+        let req = test::TestRequest::get()
+            .uri(&format!(
+                "/v2/teams?ids={}",
+                urlencoding::encode(&ids_or_titles)
+            ))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
     async fn get_project_members(&self, id_or_title: &str, pat: Option<&str>) -> ServiceResponse {
         let req = test::TestRequest::get()
             .uri(&format!("/v2/project/{id_or_title}/members"))
@@ -192,6 +208,30 @@ impl ApiTeams for ApiV2 {
         serde_json::from_value(value).unwrap()
     }
 
+    async fn get_notification(&self, notification_id: &str, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v2/notification/{notification_id}"))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
+    async fn get_notifications(
+        &self,
+        notification_ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let notification_ids = serde_json::to_string(notification_ids).unwrap();
+        let req = test::TestRequest::get()
+            .uri(&format!(
+                "/v2/notifications?ids={}",
+                urlencoding::encode(&notification_ids)
+            ))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
     async fn mark_notification_read(
         &self,
         notification_id: &str,
@@ -199,6 +239,22 @@ impl ApiTeams for ApiV2 {
     ) -> ServiceResponse {
         let req = test::TestRequest::patch()
             .uri(&format!("/v2/notification/{notification_id}"))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
+    async fn mark_notifications_read(
+        &self,
+        notification_ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let notification_ids = serde_json::to_string(notification_ids).unwrap();
+        let req = test::TestRequest::patch()
+            .uri(&format!(
+                "/v2/notifications?ids={}",
+                urlencoding::encode(&notification_ids)
+            ))
             .append_pat(pat)
             .to_request();
         self.call(req).await
@@ -231,6 +287,22 @@ impl ApiTeams for ApiV2 {
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!("/v2/notification/{notification_id}"))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
+    async fn delete_notifications(
+        &self,
+        notification_ids: &[&str],
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let notification_ids = serde_json::to_string(notification_ids).unwrap();
+        let req = test::TestRequest::delete()
+            .uri(&format!(
+                "/v2/notifications?ids={}",
+                urlencoding::encode(&notification_ids)
+            ))
             .append_pat(pat)
             .to_request();
         self.call(req).await

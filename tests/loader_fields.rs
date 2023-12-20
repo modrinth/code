@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::common::api_common::ApiVersion;
 use crate::common::database::*;
 
-use crate::common::dummy_data::TestFile;
+use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta, TestFile};
 
 // importing common module.
 mod common;
@@ -17,33 +17,16 @@ mod common;
 async fn creating_loader_fields() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
-
-        let alpha_project_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .project_id
-            .clone();
-        let alpha_project_id_parsed = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .project_id_parsed;
-        let beta_project_id_parsed = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .project_id_parsed;
-        let alpha_version_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .version_id
-            .clone();
+        let DummyProjectAlpha {
+            project_id: alpha_project_id,
+            project_id_parsed: alpha_project_id_parsed,
+            version_id: alpha_version_id,
+            ..
+        } = &test_env.dummy.project_alpha;
+        let DummyProjectBeta {
+            project_id_parsed: beta_project_id_parsed,
+            ..
+        } = &test_env.dummy.project_beta;
 
         // ALL THE FOLLOWING FOR CREATE AND PATCH
         // Cannot create a version with an extra argument that cannot be tied to a loader field ("invalid loader field")
@@ -51,7 +34,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -84,7 +67,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -117,7 +100,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -139,7 +122,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp = api
             .add_public_version(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -161,7 +144,7 @@ async fn creating_loader_fields() {
         // - Create version
         let resp: actix_web::dev::ServiceResponse = api
             .add_public_version(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -201,7 +184,7 @@ async fn creating_loader_fields() {
             // - Create version
             let resp = api
                 .add_public_version(
-                    alpha_project_id_parsed,
+                    *alpha_project_id_parsed,
                     "1.0.0",
                     TestFile::build_random_jar(),
                     None,
@@ -236,7 +219,7 @@ async fn creating_loader_fields() {
         // - Create version
         let v = api
             .add_public_version_deserialized(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -272,7 +255,7 @@ async fn creating_loader_fields() {
         // - Create
         let v = api
             .add_public_version_deserialized(
-                alpha_project_id_parsed,
+                *alpha_project_id_parsed,
                 "1.0.0",
                 TestFile::build_random_jar(),
                 None,
@@ -325,7 +308,7 @@ async fn creating_loader_fields() {
         // Now that we've created a version, we need to make sure that the Project's loader fields are updated (aggregate)
         // First, add a new version
         api.add_public_version_deserialized(
-            alpha_project_id_parsed,
+            *alpha_project_id_parsed,
             "1.0.1",
             TestFile::build_random_jar(),
             None,
@@ -347,7 +330,7 @@ async fn creating_loader_fields() {
 
         // Also, add one to the beta project
         api.add_public_version_deserialized(
-            beta_project_id_parsed,
+            *beta_project_id_parsed,
             "1.0.1",
             TestFile::build_random_jar(),
             None,

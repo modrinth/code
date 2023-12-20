@@ -98,8 +98,7 @@ async fn create_oauth_client_with_restricted_scopes_fails() {
 #[actix_rt::test]
 async fn get_oauth_client_for_client_creator_succeeds() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } =
-            env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.oauth_client_alpha.clone();
 
         let resp = env
             .api
@@ -116,8 +115,7 @@ async fn get_oauth_client_for_client_creator_succeeds() {
 #[actix_rt::test]
 async fn get_oauth_client_for_unrelated_user_fails() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } =
-            env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.oauth_client_alpha.clone();
 
         let resp = env
             .api
@@ -132,7 +130,7 @@ async fn get_oauth_client_for_unrelated_user_fails() {
 #[actix_rt::test]
 async fn can_delete_oauth_client() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let client_id = env.dummy.unwrap().oauth_client_alpha.client_id.clone();
+        let client_id = env.dummy.oauth_client_alpha.client_id.clone();
         let resp = env.api.delete_oauth_client(&client_id, USER_USER_PAT).await;
         assert_status(&resp, StatusCode::NO_CONTENT);
 
@@ -152,7 +150,7 @@ async fn delete_oauth_client_after_issuing_access_tokens_revokes_tokens() {
             client_id,
             client_secret,
             ..
-        } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        } = env.dummy.oauth_client_alpha.clone();
         let access_token = env
             .api
             .complete_full_authorize_flow(
@@ -184,7 +182,7 @@ async fn can_list_user_oauth_authorizations() {
             client_id,
             client_secret,
             ..
-        } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        } = env.dummy.oauth_client_alpha.clone();
         env.api
             .complete_full_authorize_flow(
                 &client_id,

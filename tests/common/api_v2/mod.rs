@@ -13,6 +13,7 @@ pub mod project;
 pub mod request_data;
 pub mod tags;
 pub mod team;
+pub mod user;
 pub mod version;
 
 #[derive(Clone)]

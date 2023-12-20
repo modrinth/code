@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::common::api_common::ApiVersion;
 use crate::common::database::*;
-use crate::common::dummy_data::TestFile;
+use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta, TestFile};
 use crate::common::{asserts::assert_status, get_json_val_str};
 use actix_http::StatusCode;
 use actix_web::test;
@@ -27,9 +27,15 @@ async fn test_get_version() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
-        let alpha_project_id: &String = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
-        let beta_version_id = &test_env.dummy.as_ref().unwrap().project_beta.version_id;
+        let DummyProjectAlpha {
+            project_id: alpha_project_id,
+            version_id: alpha_version_id,
+            ..
+        } = &test_env.dummy.project_alpha;
+        let DummyProjectBeta {
+            version_id: beta_version_id,
+            ..
+        } = &test_env.dummy.project_beta;
 
         // Perform request on dummy data
         let version = api
@@ -82,19 +88,18 @@ async fn version_updates() {
         None,
         |test_env: common::environment::TestEnvironment<ApiV3>| async move {
             let api = &test_env.api;
-
-            let alpha_project_id: &String =
-                &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-            let alpha_project_id_parsed = test_env
-                .dummy
-                .as_ref()
-                .unwrap()
-                .project_alpha
-                .project_id_parsed;
-            let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
-            let beta_version_id = &test_env.dummy.as_ref().unwrap().project_beta.version_id;
-            let alpha_version_hash = &test_env.dummy.as_ref().unwrap().project_alpha.file_hash;
-            let beta_version_hash = &test_env.dummy.as_ref().unwrap().project_beta.file_hash;
+            let DummyProjectAlpha {
+                project_id: alpha_project_id,
+                project_id_parsed: alpha_project_id_parsed,
+                version_id: alpha_version_id,
+                file_hash: alpha_version_hash,
+                ..
+            } = &test_env.dummy.project_alpha;
+            let DummyProjectBeta {
+                version_id: beta_version_id,
+                file_hash: beta_version_hash,
+                ..
+            } = &test_env.dummy.project_beta;
 
             // Quick test, using get version from hash
             let version = api
@@ -179,7 +184,7 @@ async fn version_updates() {
             {
                 let version = api
                     .add_public_version_deserialized(
-                        alpha_project_id_parsed,
+                        *alpha_project_id_parsed,
                         version_number,
                         TestFile::build_random_jar(),
                         None,
@@ -382,17 +387,15 @@ pub async fn test_patch_version() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
 
-        let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
-        let beta_project_id = &test_env.dummy.as_ref().unwrap().project_beta.project_id;
-        let beta_project_id_parsed = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .project_id_parsed;
+        let alpha_version_id = &test_env.dummy.project_alpha.version_id;
+        let DummyProjectBeta {
+            project_id: beta_project_id,
+            project_id_parsed: beta_project_id_parsed,
+            ..
+        } = &test_env.dummy.project_beta;
 
-        // // First, we do some patch requests that should fail.
-        // // Failure because the user is not authorized.
+        // First, we do some patch requests that should fail.
+        // Failure because the user is not authorized.
         let resp = api
             .edit_version(
                 alpha_version_id,
@@ -510,8 +513,8 @@ pub async fn test_patch_version() {
 pub async fn test_project_versions() {
     with_test_environment_all(None, |test_env| async move {
         let api = &test_env.api;
-        let alpha_project_id: &String = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
+        let alpha_project_id: &String = &test_env.dummy.project_alpha.project_id;
+        let alpha_version_id = &test_env.dummy.project_alpha.version_id;
 
         let versions = api
             .get_project_versions_deserialized_common(
@@ -534,7 +537,7 @@ pub async fn test_project_versions() {
 #[actix_rt::test]
 async fn can_create_version_with_ordering() {
     with_test_environment_all(None, |env| async move {
-        let alpha_project_id_parsed = env.dummy.as_ref().unwrap().project_alpha.project_id_parsed;
+        let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
 
         let new_version_id = get_json_val_str(
             env.api
@@ -562,7 +565,7 @@ async fn can_create_version_with_ordering() {
 #[actix_rt::test]
 async fn edit_version_ordering_works() {
     with_test_environment_all(None, |env| async move {
-        let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
+        let alpha_version_id = env.dummy.project_alpha.version_id.clone();
 
         let resp = env
             .api
@@ -582,8 +585,8 @@ async fn edit_version_ordering_works() {
 #[actix_rt::test]
 async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
     with_test_environment_all(None, |env| async move {
-        let alpha_project_id_parsed = env.dummy.as_ref().unwrap().project_alpha.project_id_parsed;
-        let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
+        let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
+        let alpha_version_id = env.dummy.project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
             env.api
                 .add_public_version_deserialized_common(
@@ -616,8 +619,8 @@ async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
 #[actix_rt::test]
 async fn version_ordering_when_unspecified_orders_oldest_first() {
     with_test_environment_all(None, |env| async move {
-        let alpha_project_id_parsed = env.dummy.as_ref().unwrap().project_alpha.project_id_parsed;
-        let alpha_version_id: String = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
+        let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
+        let alpha_version_id: String = env.dummy.project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
             env.api
                 .add_public_version_deserialized_common(
@@ -647,8 +650,8 @@ async fn version_ordering_when_unspecified_orders_oldest_first() {
 #[actix_rt::test]
 async fn version_ordering_when_specified_orders_specified_before_unspecified() {
     with_test_environment_all(None, |env| async move {
-        let alpha_project_id_parsed = env.dummy.as_ref().unwrap().project_alpha.project_id_parsed;
-        let alpha_version_id = env.dummy.as_ref().unwrap().project_alpha.version_id.clone();
+        let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
+        let alpha_version_id = env.dummy.project_alpha.version_id.clone();
         let new_version_id = get_json_val_str(
             env.api
                 .add_public_version_deserialized_common(

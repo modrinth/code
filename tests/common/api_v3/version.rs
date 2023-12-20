@@ -181,6 +181,22 @@ impl ApiVersion for ApiV3 {
         self.call(req).await
     }
 
+    async fn download_version_redirect(
+        &self,
+        hash: &str,
+        algorithm: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v3/version_file/{hash}/download",))
+            .set_json(json!({
+                "algorithm": algorithm,
+            }))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
     async fn get_version_from_hash(
         &self,
         hash: &str,

@@ -8,13 +8,7 @@ use crate::common::{
 #[actix_rt::test]
 pub async fn get_user_notifications_after_team_invitation_returns_notification() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
-        let alpha_team_id = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .team_id
-            .clone();
+        let alpha_team_id = test_env.dummy.project_alpha.team_id.clone();
         let api = test_env.api;
         api.add_user_to_team(&alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;

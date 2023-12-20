@@ -9,6 +9,7 @@ use serde_json::json;
 
 use crate::common::api_common::{ApiProject, ApiVersion};
 use crate::common::api_v2::ApiV2;
+use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta};
 use crate::common::environment::{with_test_environment, TestEnvironment};
 use crate::common::{
     database::{ENEMY_USER_PAT, USER_USER_PAT},
@@ -20,7 +21,7 @@ pub async fn test_patch_version() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
 
-        let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
+        let alpha_version_id = &test_env.dummy.project_alpha.version_id;
 
         // // First, we do some patch requests that should fail.
         // // Failure because the user is not authorized.
@@ -132,18 +133,18 @@ async fn version_updates() {
     // Test setup and dummy data
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
-
-        let alpha_project_id: &String = &test_env.dummy.as_ref().unwrap().project_alpha.project_id;
-        let alpha_project_id_parsed = test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .project_id_parsed;
-        let alpha_version_id = &test_env.dummy.as_ref().unwrap().project_alpha.version_id;
-        let beta_version_id = &test_env.dummy.as_ref().unwrap().project_beta.version_id;
-        let alpha_version_hash = &test_env.dummy.as_ref().unwrap().project_alpha.file_hash;
-        let beta_version_hash = &test_env.dummy.as_ref().unwrap().project_beta.file_hash;
+        let DummyProjectAlpha {
+            project_id: alpha_project_id,
+            project_id_parsed: alpha_project_id_parsed,
+            version_id: alpha_version_id,
+            file_hash: alpha_version_hash,
+            ..
+        } = &test_env.dummy.project_alpha;
+        let DummyProjectBeta {
+            version_id: beta_version_id,
+            file_hash: beta_version_hash,
+            ..
+        } = &test_env.dummy.project_beta;
 
         // Quick test, using get version from hash
         let version = api
@@ -224,7 +225,7 @@ async fn version_updates() {
         {
             let version = api
                 .add_public_version_deserialized_common(
-                    alpha_project_id_parsed,
+                    *alpha_project_id_parsed,
                     version_number,
                     TestFile::build_random_jar(),
                     None,

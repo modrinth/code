@@ -27,7 +27,7 @@ use crate::util::img;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -54,7 +54,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}/gallery", web::delete().to(delete_gallery_item))
             .route("{id}/follow", web::post().to(project_follow))
             .route("{id}/follow", web::delete().to(project_unfollow))
-            .route("{id}/schedule", web::post().to(project_schedule))
             .service(
                 web::scope("{project_id}")
                     .route(
@@ -1303,100 +1302,6 @@ pub async fn bulk_edit_project_categories(
     }
 
     Ok(())
-}
-
-#[derive(Deserialize)]
-pub struct SchedulingData {
-    pub time: DateTime<Utc>,
-    pub requested_status: ProjectStatus,
-}
-
-pub async fn project_schedule(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-    scheduling_data: web::Json<SchedulingData>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::PROJECT_WRITE]),
-    )
-    .await?
-    .1;
-
-    if scheduling_data.time < Utc::now() {
-        return Err(ApiError::InvalidInput(
-            "You cannot schedule a project to be released in the past!".to_string(),
-        ));
-    }
-
-    if !scheduling_data.requested_status.can_be_requested() {
-        return Err(ApiError::InvalidInput(
-            "Specified requested status cannot be requested!".to_string(),
-        ));
-    }
-
-    let string = info.into_inner().0;
-    let result = db_models::Project::get(&string, &**pool, &redis).await?;
-
-    if let Some(project_item) = result {
-        let (team_member, organization_team_member) =
-            db_models::TeamMember::get_for_project_permissions(
-                &project_item.inner,
-                user.id.into(),
-                &**pool,
-            )
-            .await?;
-
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
-            &team_member.clone(),
-            &organization_team_member.clone(),
-        )
-        .unwrap_or_default();
-
-        if !user.role.is_mod() && !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this project's scheduling data!".to_string(),
-            ));
-        }
-
-        if !project_item.inner.status.is_approved() {
-            return Err(ApiError::InvalidInput(
-                "This project has not been approved yet. Submit to the queue with the private status to schedule it in the future!".to_string(),
-            ));
-        }
-
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET status = $1, approved = $2
-            WHERE (id = $3)
-            ",
-            ProjectStatus::Scheduled.as_str(),
-            scheduling_data.time,
-            project_item.inner.id as db_ids::ProjectId,
-        )
-        .execute(&**pool)
-        .await?;
-
-        db_models::Project::clear_cache(
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-            &redis,
-        )
-        .await?;
-
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::NotFound)
-    }
 }
 
 #[derive(Serialize, Deserialize)]

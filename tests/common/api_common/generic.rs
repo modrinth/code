@@ -12,7 +12,7 @@ use crate::common::{api_v2::ApiV2, api_v3::ApiV3, dummy_data::TestFile};
 use super::{
     models::{CommonProject, CommonVersion},
     request_data::{ImageData, ProjectCreationRequestData},
-    Api, ApiProject, ApiTags, ApiTeams, ApiVersion,
+    Api, ApiProject, ApiTags, ApiTeams, ApiUser, ApiVersion,
 };
 
 #[derive(Clone)]
@@ -71,17 +71,28 @@ delegate_api_variant!(
         [remove_project, ServiceResponse, project_slug_or_id: &str, pat: Option<&str>],
         [get_project, ServiceResponse, id_or_slug: &str, pat: Option<&str>],
         [get_project_deserialized_common, CommonProject, id_or_slug: &str, pat: Option<&str>],
+        [get_projects, ServiceResponse, ids_or_slugs: &[&str], pat: Option<&str>],
+        [get_project_dependencies, ServiceResponse, id_or_slug: &str, pat: Option<&str>],
         [get_user_projects, ServiceResponse, user_id_or_username: &str, pat: Option<&str>],
         [get_user_projects_deserialized_common, Vec<CommonProject>, user_id_or_username: &str, pat: Option<&str>],
         [edit_project, ServiceResponse, id_or_slug: &str, patch: serde_json::Value, pat: Option<&str>],
         [edit_project_bulk, ServiceResponse, ids_or_slugs: &[&str], patch: serde_json::Value, pat: Option<&str>],
         [edit_project_icon, ServiceResponse, id_or_slug: &str, icon: Option<ImageData>, pat: Option<&str>],
-        [schedule_project, ServiceResponse, id_or_slug: &str, requested_status: &str, date : chrono::DateTime<chrono::Utc>, pat: Option<&str>],
         [add_gallery_item, ServiceResponse, id_or_slug: &str, image: ImageData,  featured: bool, title: Option<String>, description: Option<String>, ordering: Option<i32>, pat: Option<&str>],
         [remove_gallery_item, ServiceResponse, id_or_slug: &str, image_url: &str, pat: Option<&str>],
         [edit_gallery_item, ServiceResponse, id_or_slug: &str, image_url: &str, patch: HashMap<String, String>, pat: Option<&str>],
         [create_report, ServiceResponse, report_type: &str, id: &str, item_type: crate::common::api_common::models::CommonItemType, body: &str, pat: Option<&str>],
         [get_report, ServiceResponse, id: &str, pat: Option<&str>],
+        [get_reports, ServiceResponse, ids: &[&str], pat: Option<&str>],
+        [get_user_reports, ServiceResponse, pat: Option<&str>],
+        [edit_report, ServiceResponse, id: &str, patch: serde_json::Value, pat: Option<&str>],
+        [delete_report, ServiceResponse, id: &str, pat: Option<&str>],
+        [get_thread, ServiceResponse, id: &str, pat: Option<&str>],
+        [get_threads, ServiceResponse, ids: &[&str], pat: Option<&str>],
+        [write_to_thread, ServiceResponse, id: &str, r#type : &str, message: &str, pat: Option<&str>],
+        [get_moderation_inbox, ServiceResponse, pat: Option<&str>],
+        [read_thread, ServiceResponse, id: &str, pat: Option<&str>],
+        [delete_thread_message, ServiceResponse, id: &str, pat: Option<&str>],
     }
 );
 
@@ -100,6 +111,7 @@ delegate_api_variant!(
     impl ApiTeams for GenericApi {
         [get_team_members, ServiceResponse, team_id: &str, pat: Option<&str>],
         [get_team_members_deserialized_common, Vec<crate::common::api_common::models::CommonTeamMember>, team_id: &str, pat: Option<&str>],
+        [get_teams_members, ServiceResponse, ids: &[&str], pat: Option<&str>],
         [get_project_members, ServiceResponse, id_or_slug: &str, pat: Option<&str>],
         [get_project_members_deserialized_common, Vec<crate::common::api_common::models::CommonTeamMember>, id_or_slug: &str, pat: Option<&str>],
         [get_organization_members, ServiceResponse, id_or_title: &str, pat: Option<&str>],
@@ -110,9 +122,23 @@ delegate_api_variant!(
         [transfer_team_ownership, ServiceResponse, team_id: &str, user_id: &str, pat: Option<&str>],
         [get_user_notifications, ServiceResponse, user_id: &str, pat: Option<&str>],
         [get_user_notifications_deserialized_common, Vec<crate::common::api_common::models::CommonNotification>, user_id: &str, pat: Option<&str>],
+        [get_notification, ServiceResponse, notification_id: &str, pat: Option<&str>],
+        [get_notifications, ServiceResponse, ids: &[&str], pat: Option<&str>],
         [mark_notification_read, ServiceResponse, notification_id: &str, pat: Option<&str>],
+        [mark_notifications_read, ServiceResponse, ids: &[&str], pat: Option<&str>],
         [add_user_to_team, ServiceResponse, team_id: &str, user_id: &str, project_permissions: Option<ProjectPermissions>, organization_permissions: Option<OrganizationPermissions>, pat: Option<&str>],
         [delete_notification, ServiceResponse, notification_id: &str, pat: Option<&str>],
+        [delete_notifications, ServiceResponse, ids: &[&str], pat: Option<&str>],
+    }
+);
+
+delegate_api_variant!(
+    #[async_trait(?Send)]
+    impl ApiUser for GenericApi {
+        [get_user, ServiceResponse, id_or_username: &str, pat: Option<&str>],
+        [get_current_user, ServiceResponse, pat: Option<&str>],
+        [edit_user, ServiceResponse, id_or_username: &str, patch: serde_json::Value, pat: Option<&str>],
+        [delete_user, ServiceResponse, id_or_username: &str, pat: Option<&str>],
     }
 );
 
@@ -125,6 +151,7 @@ delegate_api_variant!(
         [get_version_deserialized_common, CommonVersion, id_or_slug: &str, pat: Option<&str>],
         [get_versions, ServiceResponse, ids_or_slugs: Vec<String>, pat: Option<&str>],
         [get_versions_deserialized_common, Vec<CommonVersion>, ids_or_slugs: Vec<String>, pat: Option<&str>],
+        [download_version_redirect, ServiceResponse, hash: &str, algorithm: &str, pat: Option<&str>],
         [edit_version, ServiceResponse, id_or_slug: &str, patch: serde_json::Value, pat: Option<&str>],
         [get_version_from_hash, ServiceResponse, id_or_slug: &str, hash: &str, pat: Option<&str>],
         [get_version_from_hash_deserialized_common, CommonVersion, id_or_slug: &str, hash: &str, pat: Option<&str>],

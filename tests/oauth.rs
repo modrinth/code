@@ -24,7 +24,7 @@ async fn oauth_flow_happy_path() {
             valid_redirect_uri: base_redirect_uri,
             client_id,
             client_secret,
-        } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        } = &env.dummy.oauth_client_alpha;
 
         // Initiate authorization
         let redirect_uri = format!("{}?foo=bar", base_redirect_uri);
@@ -32,7 +32,7 @@ async fn oauth_flow_happy_path() {
         let resp = env
             .api
             .oauth_authorize(
-                &client_id,
+                client_id,
                 Some("USER_READ NOTIFICATION_READ"),
                 Some(&redirect_uri),
                 Some(original_state),
@@ -60,7 +60,7 @@ async fn oauth_flow_happy_path() {
                 auth_code.to_string(),
                 Some(redirect_uri.clone()),
                 client_id.to_string(),
-                &client_secret,
+                client_secret,
             )
             .await;
         assert_status(&resp, StatusCode::OK);
@@ -82,7 +82,7 @@ async fn oauth_flow_happy_path() {
 #[actix_rt::test]
 async fn oauth_authorize_for_already_authorized_scopes_returns_auth_code() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.unwrap().oauth_client_alpha;
+        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.oauth_client_alpha;
 
         let resp = env
             .api
@@ -119,7 +119,7 @@ async fn get_oauth_token_with_already_used_auth_code_fails() {
             client_id,
             client_secret,
             ..
-        } = env.dummy.unwrap().oauth_client_alpha;
+        } = env.dummy.oauth_client_alpha;
 
         let resp = env
             .api
@@ -152,7 +152,7 @@ async fn authorize_with_broader_scopes_can_complete_flow() {
             client_id,
             client_secret,
             ..
-        } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        } = env.dummy.oauth_client_alpha.clone();
 
         let first_access_token = env
             .api
@@ -209,7 +209,7 @@ async fn authorize_with_broader_scopes_can_complete_flow() {
 #[actix_rt::test]
 async fn oauth_authorize_with_broader_scopes_requires_user_accept() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let client_id = env.dummy.unwrap().oauth_client_alpha.client_id.clone();
+        let client_id = env.dummy.oauth_client_alpha.client_id;
         let resp = env
             .api
             .oauth_authorize(&client_id, Some("USER_READ"), None, None, USER_USER_PAT)
@@ -237,7 +237,7 @@ async fn oauth_authorize_with_broader_scopes_requires_user_accept() {
 #[actix_rt::test]
 async fn reject_authorize_ends_authorize_flow() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let client_id = env.dummy.unwrap().oauth_client_alpha.client_id.clone();
+        let client_id = env.dummy.oauth_client_alpha.client_id;
         let resp = env
             .api
             .oauth_authorize(&client_id, None, None, None, USER_USER_PAT)
@@ -256,7 +256,7 @@ async fn reject_authorize_ends_authorize_flow() {
 #[actix_rt::test]
 async fn accept_authorize_after_already_accepting_fails() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let client_id = env.dummy.unwrap().oauth_client_alpha.client_id.clone();
+        let client_id = env.dummy.oauth_client_alpha.client_id;
         let resp = env
             .api
             .oauth_authorize(&client_id, None, None, None, USER_USER_PAT)
@@ -278,12 +278,12 @@ async fn revoke_authorization_after_issuing_token_revokes_token() {
             client_id,
             client_secret,
             ..
-        } = env.dummy.as_ref().unwrap().oauth_client_alpha.clone();
+        } = &env.dummy.oauth_client_alpha;
         let access_token = env
             .api
             .complete_full_authorize_flow(
-                &client_id,
-                &client_secret,
+                client_id,
+                client_secret,
                 Some("NOTIFICATION_READ"),
                 None,
                 None,
@@ -295,7 +295,7 @@ async fn revoke_authorization_after_issuing_token_revokes_token() {
 
         let resp = env
             .api
-            .revoke_oauth_authorization(&client_id, USER_USER_PAT)
+            .revoke_oauth_authorization(client_id, USER_USER_PAT)
             .await;
         assert_status(&resp, StatusCode::OK);
 

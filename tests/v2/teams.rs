@@ -17,7 +17,7 @@ async fn transfer_ownership_v2() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
 
-        let alpha_team_id = &test_env.dummy.as_ref().unwrap().project_alpha.team_id;
+        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
 
         // Cannot set friend as owner (not a member)
         let resp = api

@@ -15,7 +15,6 @@ use actix_web::{
 };
 use async_trait::async_trait;
 use bytes::Bytes;
-use chrono::{DateTime, Utc};
 use labrinth::{
     models::v2::{projects::LegacyProject, search::LegacySearchResults},
     util::actix::AppendsMultipart,
@@ -173,6 +172,30 @@ impl ApiProject for ApiV2 {
         serde_json::from_value(value).unwrap()
     }
 
+    async fn get_projects(&self, ids_or_slugs: &[&str], pat: Option<&str>) -> ServiceResponse {
+        let ids_or_slugs = serde_json::to_string(ids_or_slugs).unwrap();
+        let req = test::TestRequest::get()
+            .uri(&format!(
+                "/v2/projects?ids={encoded}",
+                encoded = urlencoding::encode(&ids_or_slugs)
+            ))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
+    async fn get_project_dependencies(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = TestRequest::get()
+            .uri(&format!("/v2/project/{id_or_slug}/dependencies"))
+            .append_pat(pat)
+            .to_request();
+        self.call(req).await
+    }
+
     async fn get_user_projects(
         &self,
         user_id_or_username: &str,
@@ -275,7 +298,7 @@ impl ApiProject for ApiV2 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::post()
-            .uri("/v3/report")
+            .uri("/v2/report")
             .append_pat(pat)
             .set_json(json!(
                 {
@@ -292,28 +315,123 @@ impl ApiProject for ApiV2 {
 
     async fn get_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
         let req = test::TestRequest::get()
-            .uri(&format!("/v3/report/{id}", id = id))
+            .uri(&format!("/v2/report/{id}"))
             .append_pat(pat)
             .to_request();
 
         self.call(req).await
     }
 
-    async fn schedule_project(
+    async fn get_reports(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+        let ids_str = serde_json::to_string(ids).unwrap();
+        let req = test::TestRequest::get()
+            .uri(&format!(
+                "/v2/reports?ids={encoded}",
+                encoded = urlencoding::encode(&ids_str)
+            ))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn get_user_reports(&self, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri("/v2/report")
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn delete_report(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::delete()
+            .uri(&format!("/v2/report/{id}"))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn edit_report(
         &self,
-        id_or_slug: &str,
-        requested_status: &str,
-        date: DateTime<Utc>,
+        id: &str,
+        patch: serde_json::Value,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = test::TestRequest::patch()
+            .uri(&format!("/v2/report/{id}"))
+            .append_pat(pat)
+            .set_json(patch)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn get_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v3/thread/{id}"))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn get_threads(&self, ids: &[&str], pat: Option<&str>) -> ServiceResponse {
+        let ids_str = serde_json::to_string(ids).unwrap();
+        let req = test::TestRequest::get()
+            .uri(&format!(
+                "/v3/threads?ids={encoded}",
+                encoded = urlencoding::encode(&ids_str)
+            ))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn write_to_thread(
+        &self,
+        id: &str,
+        r#type: &str,
+        content: &str,
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::post()
-            .uri(&format!("/v2/version/{id_or_slug}/schedule"))
-            .set_json(json!(
-                {
-                    "requested_status": requested_status,
-                    "time": date,
+            .uri(&format!("/v2/thread/{id}"))
+            .append_pat(pat)
+            .set_json(json!({
+                "body" : {
+                    "type": r#type,
+                    "body": content,
                 }
-            ))
+            }))
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn get_moderation_inbox(&self, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri("/v2/thread/inbox")
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn read_thread(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::post()
+            .uri(&format!("/v2/thread/{id}/read"))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    async fn delete_thread_message(&self, id: &str, pat: Option<&str>) -> ServiceResponse {
+        let req = test::TestRequest::delete()
+            .uri(&format!("/v2/message/{id}"))
             .append_pat(pat)
             .to_request();
 

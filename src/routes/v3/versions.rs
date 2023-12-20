@@ -25,7 +25,6 @@ use crate::search::SearchConfig;
 use crate::util::img;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -43,7 +42,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}", web::get().to(version_get))
             .route("{id}", web::patch().to(version_edit))
             .route("{id}", web::delete().to(version_delete))
-            .route("{id}/schedule", web::post().to(version_schedule))
             .route(
                 "{version_id}/file",
                 web::post().to(super::version_creation::upload_file_to_version),
@@ -823,108 +821,6 @@ pub async fn version_list(
         let response = filter_authorized_versions(response, &user_option, &pool, redis).await?;
 
         Ok(HttpResponse::Ok().json(response))
-    } else {
-        Err(ApiError::NotFound)
-    }
-}
-
-#[derive(Deserialize)]
-pub struct SchedulingData {
-    pub time: DateTime<Utc>,
-    pub requested_status: VersionStatus,
-}
-
-pub async fn version_schedule(
-    req: HttpRequest,
-    info: web::Path<(models::ids::VersionId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    scheduling_data: web::Json<SchedulingData>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::VERSION_WRITE]),
-    )
-    .await?
-    .1;
-
-    if scheduling_data.time < Utc::now() {
-        return Err(ApiError::InvalidInput(
-            "You cannot schedule a version to be released in the past!".to_string(),
-        ));
-    }
-
-    if !scheduling_data.requested_status.can_be_requested() {
-        return Err(ApiError::InvalidInput(
-            "Specified requested status cannot be requested!".to_string(),
-        ));
-    }
-
-    let string = info.into_inner().0;
-    let result = database::models::Version::get(string.into(), &**pool, &redis).await?;
-
-    if let Some(version_item) = result {
-        let team_member = database::models::TeamMember::get_from_user_id_project(
-            version_item.inner.project_id,
-            user.id.into(),
-            &**pool,
-        )
-        .await?;
-
-        let organization_item =
-            database::models::Organization::get_associated_organization_project_id(
-                version_item.inner.project_id,
-                &**pool,
-            )
-            .await
-            .map_err(ApiError::Database)?;
-
-        let organization_team_member = if let Some(organization) = &organization_item {
-            database::models::TeamMember::get_from_user_id(
-                organization.team_id,
-                user.id.into(),
-                &**pool,
-            )
-            .await?
-        } else {
-            None
-        };
-
-        let permissions = ProjectPermissions::get_permissions_by_role(
-            &user.role,
-            &team_member,
-            &organization_team_member,
-        )
-        .unwrap_or_default();
-
-        if !user.role.is_mod() && !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthentication(
-                "You do not have permission to edit this version's scheduling data!".to_string(),
-            ));
-        }
-
-        let mut transaction = pool.begin().await?;
-        sqlx::query!(
-            "
-            UPDATE versions
-            SET status = $1, date_published = $2
-            WHERE (id = $3)
-            ",
-            VersionStatus::Scheduled.as_str(),
-            scheduling_data.time,
-            version_item.inner.id as database::models::ids::VersionId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        transaction.commit().await?;
-        database::models::Version::clear_cache(&version_item, &redis).await?;
-
-        Ok(HttpResponse::NoContent().body(""))
     } else {
         Err(ApiError::NotFound)
     }

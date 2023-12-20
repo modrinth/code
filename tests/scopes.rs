@@ -1,9 +1,12 @@
-use actix_web::test::{self, TestRequest};
-use bytes::Bytes;
+use std::collections::HashMap;
+
+use crate::common::api_common::{ApiProject, ApiTeams, ApiUser, ApiVersion, AppendsOptionalPat};
+use crate::common::dummy_data::{DummyImage, DummyProjectAlpha, DummyProjectBeta};
+use actix_web::test;
 use chrono::{Duration, Utc};
-use common::api_v3::request_data::{
-    get_public_project_creation_data, get_public_version_creation_data,
-};
+use common::api_common::models::CommonItemType;
+use common::api_common::Api;
+use common::api_v3::request_data::get_public_project_creation_data;
 use common::api_v3::ApiV3;
 use common::dummy_data::TestFile;
 use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
@@ -11,11 +14,7 @@ use common::{database::*, scopes::ScopeTest};
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
-use labrinth::util::actix::{AppendsMultipart, MultipartSegment, MultipartSegmentData};
 use serde_json::json;
-
-use crate::common::api_common::{ApiTeams, AppendsOptionalPat};
-use crate::common::dummy_data::DummyImage;
 
 // For each scope, we (using test_scope):
 // - create a PAT with a given set of scopes for a function
@@ -30,9 +29,11 @@ mod common;
 async fn user_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
+        let api = &test_env.api;
         // User reading
         let read_user = Scopes::USER_READ;
-        let req_gen = || TestRequest::get().uri("/v3/user");
+        let req_gen =
+            |pat: Option<String>| async move { api.get_current_user(pat.as_deref()).await };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, read_user)
             .await
@@ -42,7 +43,8 @@ async fn user_scopes() {
 
         // Email reading
         let read_email = Scopes::USER_READ | Scopes::USER_READ_EMAIL;
-        let req_gen = || TestRequest::get().uri("/v3/user");
+        let req_gen =
+            |pat: Option<String>| async move { api.get_current_user(pat.as_deref()).await };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, read_email)
             .await
@@ -51,7 +53,8 @@ async fn user_scopes() {
 
         // Payout reading
         let read_payout = Scopes::USER_READ | Scopes::PAYOUTS_READ;
-        let req_gen = || TestRequest::get().uri("/v3/user");
+        let req_gen =
+            |pat: Option<String>| async move { api.get_current_user(pat.as_deref()).await };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, read_payout)
             .await
@@ -61,16 +64,21 @@ async fn user_scopes() {
         // User writing
         // We use the Admin PAT for this test, on the 'user' user
         let write_user = Scopes::USER_WRITE;
-        let req_gen = || {
-            TestRequest::patch().uri("/v3/user/user").set_json(json!( {
-                // Do not include 'username', as to not change the rest of the tests
-                "name": "NewName",
-                "bio": "New bio",
-                "location": "New location",
-                "role": "admin",
-                "badges": 5,
-                // Do not include payout info, different scope
-            }))
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_user(
+                "user",
+                json!( {
+                    // Do not include 'username', as to not change the rest of the tests
+                    "name": "NewName",
+                    "bio": "New bio",
+                    "location": "New location",
+                    "role": "admin",
+                    "badges": 5,
+                    // Do not include payout info, different scope
+                }),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .with_user_id(ADMIN_USER_ID_PARSED)
@@ -81,7 +89,8 @@ async fn user_scopes() {
         // User deletion
         // (The failure is first, and this is the last test for this test function, we can delete it and use the same PAT for both tests)
         let delete_user = Scopes::USER_DELETE;
-        let req_gen = || TestRequest::delete().uri("/v3/user/enemy");
+        let req_gen =
+            |pat: Option<String>| async move { api.delete_user("enemy", pat.as_deref()).await };
         ScopeTest::new(&test_env)
             .with_user_id(ENEMY_USER_ID_PARSED)
             .test(req_gen, delete_user)
@@ -95,13 +104,8 @@ async fn user_scopes() {
 #[actix_rt::test]
 pub async fn notifications_scopes() {
     with_test_environment_all(None, |test_env| async move {
-        let alpha_team_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .team_id
-            .clone();
+        let api = &test_env.api;
+        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
 
         // We will invite user 'friend' to project team, and use that as a notification
         // Get notifications
@@ -113,8 +117,10 @@ pub async fn notifications_scopes() {
 
         // Notification get
         let read_notifications = Scopes::NOTIFICATION_READ;
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/user/{FRIEND_USER_ID}/notifications"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_user_notifications(FRIEND_USER_ID, pat.as_deref())
+                .await
+        };
         let (_, success) = ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
             .test(req_gen, read_notifications)
@@ -122,11 +128,9 @@ pub async fn notifications_scopes() {
             .unwrap();
         let notification_id = success[0]["id"].as_str().unwrap();
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/notifications?ids=[{uri}]",
-                uri = urlencoding::encode(&format!("\"{notification_id}\""))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_notifications(&[notification_id], pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
@@ -134,8 +138,9 @@ pub async fn notifications_scopes() {
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/notification/{notification_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_notification(notification_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
             .test(req_gen, read_notifications)
@@ -144,11 +149,9 @@ pub async fn notifications_scopes() {
 
         // Notification mark as read
         let write_notifications = Scopes::NOTIFICATION_WRITE;
-        let req_gen = || {
-            test::TestRequest::patch().uri(&format!(
-                "/v3/notifications?ids=[{uri}]",
-                uri = urlencoding::encode(&format!("\"{notification_id}\""))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.mark_notifications_read(&[notification_id], pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
@@ -156,8 +159,10 @@ pub async fn notifications_scopes() {
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::patch().uri(&format!("/v3/notification/{notification_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.mark_notification_read(notification_id, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
             .test(req_gen, write_notifications)
@@ -165,8 +170,10 @@ pub async fn notifications_scopes() {
             .unwrap();
 
         // Notification delete
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/notification/{notification_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.delete_notification(notification_id, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
             .test(req_gen, write_notifications)
@@ -181,8 +188,10 @@ pub async fn notifications_scopes() {
             .await;
         assert_eq!(resp.status(), 204);
         let read_notifications = Scopes::NOTIFICATION_READ;
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/user/{MOD_USER_ID}/notifications"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_user_notifications(MOD_USER_ID, pat.as_deref())
+                .await
+        };
         let (_, success) = ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
             .test(req_gen, read_notifications)
@@ -190,11 +199,9 @@ pub async fn notifications_scopes() {
             .unwrap();
         let notification_id = success[0]["id"].as_str().unwrap();
 
-        let req_gen = || {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/notifications?ids=[{uri}]",
-                uri = urlencoding::encode(&format!("\"{notification_id}\""))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.delete_notifications(&[notification_id], pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
@@ -210,16 +217,14 @@ pub async fn notifications_scopes() {
 pub async fn project_version_create_scopes_v3() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         // TODO: If possible, find a way to use generic api functions with the Permissions/Scopes test, then this can be recombined with the V2 version of this test
-        // let api = &test_env.api;
+        let api = &test_env.api;
 
         // Create project
         let create_project = Scopes::PROJECT_CREATE;
-        let req_gen = || {
+        let req_gen = |pat: Option<String>| async move {
             let creation_data =
                 get_public_project_creation_data("demo", Some(TestFile::BasicMod), None);
-            test::TestRequest::post()
-                .uri("/v3/project")
-                .set_multipart(creation_data.segment_data)
+            api.create_project(creation_data, pat.as_deref()).await
         };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, create_project)
@@ -230,18 +235,16 @@ pub async fn project_version_create_scopes_v3() {
 
         // Add version to project
         let create_version = Scopes::VERSION_CREATE;
-        let req_gen = || {
-            let creation_data = get_public_version_creation_data(
+        let req_gen = |pat: Option<String>| async move {
+            api.add_public_version(
                 project_id,
                 "1.2.3.4",
                 TestFile::BasicModDifferent,
                 None,
                 None,
-            );
-
-            test::TestRequest::post()
-                .uri("/v3/version")
-                .set_multipart(creation_data.segment_data)
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, create_version)
@@ -255,58 +258,43 @@ pub async fn project_version_create_scopes_v3() {
 #[actix_rt::test]
 pub async fn project_version_reads_scopes() {
     with_test_environment_all(None, |test_env| async move {
-        let beta_project_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .project_id
-            .clone();
-        let beta_version_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .version_id
-            .clone();
-        let alpha_team_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .team_id
-            .clone();
-        let beta_file_hash = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .file_hash
-            .clone();
+        let api = &test_env.api;
+        let DummyProjectAlpha {
+            team_id: alpha_team_id,
+            ..
+        } = &test_env.dummy.project_alpha;
+        let DummyProjectBeta {
+            project_id: beta_project_id,
+            version_id: beta_version_id,
+            file_hash: beta_file_hash,
+            ..
+        } = &test_env.dummy.project_beta;
 
         // Project reading
         // Uses 404 as the expected failure code (or 200 and an empty list for mass reads)
         let read_project = Scopes::PROJECT_READ;
-        let req_gen = || test::TestRequest::get().uri(&format!("/v3/project/{beta_project_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_project(beta_project_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, read_project)
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/project/{beta_project_id}/dependencies"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_project_dependencies(beta_project_id, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, read_project)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/projects?ids=[{uri}]",
-                uri = urlencoding::encode(&format!("\"{beta_project_id}\""))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_projects(&[beta_project_id.as_str()], pat.as_deref())
+                .await
         };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
@@ -317,8 +305,10 @@ pub async fn project_version_reads_scopes() {
         assert!(!success.as_array().unwrap().is_empty());
 
         // Team project reading
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/project/{beta_project_id}/members"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_project_members(beta_project_id, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, read_project)
@@ -328,7 +318,9 @@ pub async fn project_version_reads_scopes() {
         // Get team members
         // In this case, as these are public endpoints, logging in only is relevant to showing permissions
         // So for our test project (with 1 user, 'user') we will check the permissions before and after having the scope.
-        let req_gen = || test::TestRequest::get().uri(&format!("/v3/team/{alpha_team_id}/members"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_team_members(alpha_team_id, pat.as_deref()).await
+        };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
             .test(req_gen, read_project)
@@ -337,11 +329,9 @@ pub async fn project_version_reads_scopes() {
         assert!(!failure[0]["permissions"].is_number());
         assert!(success[0]["permissions"].is_number());
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/teams?ids=[{uri}]",
-                uri = urlencoding::encode(&format!("\"{alpha_team_id}\""))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_teams_members(&[alpha_team_id.as_str()], pat.as_deref())
+                .await
         };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
@@ -353,7 +343,9 @@ pub async fn project_version_reads_scopes() {
 
         // User project reading
         // Test user has two projects, one public and one private
-        let req_gen = || test::TestRequest::get().uri(&format!("/v3/user/{USER_USER_ID}/projects"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_user_projects(USER_USER_ID, pat.as_deref()).await
+        };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
             .test(req_gen, read_project)
@@ -371,10 +363,14 @@ pub async fn project_version_reads_scopes() {
             .any(|x| x["status"] == "processing"));
 
         // Project metadata reading
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/maven/maven/modrinth/{beta_project_id}/maven-metadata.xml"
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            let req = test::TestRequest::get()
+                .uri(&format!(
+                    "/maven/maven/modrinth/{beta_project_id}/maven-metadata.xml"
+                ))
+                .append_pat(pat.as_deref())
+                .to_request();
+            api.call(req).await
         };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
@@ -385,26 +381,26 @@ pub async fn project_version_reads_scopes() {
         // Version reading
         // First, set version to hidden (which is when the scope is required to read it)
         let read_version = Scopes::VERSION_READ;
-        let req = test::TestRequest::patch()
-            .uri(&format!("/v3/version/{beta_version_id}"))
-            .append_pat(USER_USER_PAT)
-            .set_json(json!({
-                "status": "draft"
-            }))
-            .to_request();
-        let resp = test_env.call(req).await;
+        let resp = test_env
+            .api
+            .edit_version(beta_version_id, json!({ "status": "draft" }), USER_USER_PAT)
+            .await;
         assert_eq!(resp.status(), 204);
 
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/version_file/{beta_file_hash}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_version_from_hash(beta_file_hash, "sha1", pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, read_version)
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/version_file/{beta_file_hash}/download"));
+        let req_gen = |pat: Option<String>| async move {
+            api.download_version_redirect(beta_file_hash, "sha1", pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, read_version)
@@ -421,12 +417,9 @@ pub async fn project_version_reads_scopes() {
         // ScopeTest::new(&test_env).with_failure_code(404).test(req_gen, read_version).await.unwrap();
 
         // TODO: Should this be /POST? Looks like /GET
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri("/v3/version_files")
-                .set_json(json!({
-                    "hashes": [beta_file_hash]
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_versions_from_hashes(&[beta_file_hash], "sha1", pat.as_deref())
+                .await
         };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
@@ -468,8 +461,19 @@ pub async fn project_version_reads_scopes() {
 
         // Both project and version reading
         let read_project_and_version = Scopes::PROJECT_READ | Scopes::VERSION_READ;
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/project/{beta_project_id}/version"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_project_versions(
+                beta_project_id,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                pat.as_deref(),
+            )
+            .await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, read_project_and_version)
@@ -491,76 +495,39 @@ pub async fn project_version_reads_scopes() {
 pub async fn project_write_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
-        let beta_project_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .project_id
-            .clone();
-        let alpha_team_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .team_id
-            .clone();
-
-        let test_icon = DummyImage::SmallIcon;
+        let api = &test_env.api;
+        let beta_project_id = &test_env.dummy.project_beta.project_id;
+        let alpha_team_id = &test_env.dummy.project_alpha.team_id;
 
         // Projects writing
         let write_project = Scopes::PROJECT_WRITE;
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/project/{beta_project_id}"))
-                .set_json(json!(
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_project(
+                beta_project_id,
+                json!(
                     {
                         "name": "test_project_version_write_scopes Title",
                     }
-                ))
+                ),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/projects?ids=[{uri}]",
-                    uri = urlencoding::encode(&format!("\"{beta_project_id}\""))
-                ))
-                .set_json(json!(
-                    {
-                        "description": "test_project_version_write_scopes Description",
-                    }
-                ))
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, write_project)
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_project_bulk(
+                &[beta_project_id.as_str()],
+                json!(
+                {
+                    "description": "test_project_version_write_scopes Description"
+                }),
+                pat.as_deref(),
+            )
             .await
-            .unwrap();
-
-        // Approve beta as private so we can schedule it
-        let req = test::TestRequest::patch()
-            .uri(&format!("/v3/project/{beta_project_id}"))
-            .append_pat(MOD_USER_PAT)
-            .set_json(json!({
-                "status": "private"
-            }))
-            .to_request();
-        let resp = test_env.call(req).await;
-        assert_eq!(resp.status(), 204);
-
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!("/v3/project/{beta_project_id}/schedule")) // beta_project_id is an unpublished can schedule it
-                .set_json(json!(
-                    {
-                        "requested_status": "private",
-                        "time": Utc::now() + Duration::days(1),
-                    }
-                ))
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -568,33 +535,39 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Icons and gallery images
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/project/{beta_project_id}/icon?ext={ext}",
-                    ext = test_icon.extension()
-                ))
-                .set_payload(test_icon.bytes())
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_project_icon(
+                beta_project_id,
+                Some(DummyImage::SmallIcon.get_icon_data()),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/project/{beta_project_id}/icon"));
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_project_icon(beta_project_id, None, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!(
-                    "/v3/project/{beta_project_id}/gallery?ext={ext}&featured=true",
-                    ext = test_icon.extension()
-                ))
-                .set_payload(test_icon.bytes())
+        let req_gen = |pat: Option<String>| async move {
+            api.add_gallery_item(
+                beta_project_id,
+                DummyImage::SmallIcon.get_icon_data(),
+                true,
+                None,
+                None,
+                None,
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -602,28 +575,22 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Get project, as we need the gallery image url
-        let req_gen = test::TestRequest::get()
-            .uri(&format!("/v3/project/{beta_project_id}"))
-            .append_pat(USER_USER_PAT)
-            .to_request();
-        let resp = test_env.call(req_gen).await;
+        let resp = api.get_project(beta_project_id, USER_USER_PAT).await;
         let project: serde_json::Value = test::read_body_json(resp).await;
         let gallery_url = project["gallery"][0]["url"].as_str().unwrap();
 
-        let req_gen = || {
-            test::TestRequest::patch().uri(&format!(
-                "/v3/project/{beta_project_id}/gallery?url={gallery_url}"
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_gallery_item(beta_project_id, gallery_url, HashMap::new(), pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/project/{beta_project_id}/gallery?url={gallery_url}"
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.remove_gallery_item(beta_project_id, gallery_url, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -631,12 +598,9 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Team scopes - add user 'friend'
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!("/v3/team/{alpha_team_id}/members"))
-                .set_json(json!({
-                    "user_id": FRIEND_USER_ID
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -644,7 +608,8 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Accept team invite as 'friend'
-        let req_gen = || test::TestRequest::post().uri(&format!("/v3/team/{alpha_team_id}/join"));
+        let req_gen =
+            |pat: Option<String>| async move { api.join_team(alpha_team_id, pat.as_deref()).await };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
             .test(req_gen, write_project)
@@ -652,14 +617,16 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Patch 'friend' user
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/team/{alpha_team_id}/members/{FRIEND_USER_ID}"
-                ))
-                .set_json(json!({
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_team_member(
+                alpha_team_id,
+                FRIEND_USER_ID,
+                json!({
                     "permissions": 1
-                }))
+                }),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -667,12 +634,9 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Transfer ownership to 'friend'
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/team/{alpha_team_id}/owner"))
-                .set_json(json!({
-                    "user_id": FRIEND_USER_ID
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_project)
@@ -680,9 +644,9 @@ pub async fn project_write_scopes() {
             .unwrap();
 
         // Now as 'friend', delete 'user'
-        let req_gen = || {
-            test::TestRequest::delete()
-                .uri(&format!("/v3/team/{alpha_team_id}/members/{USER_USER_ID}"))
+        let req_gen = |pat: Option<String>| async move {
+            api.remove_from_team(alpha_team_id, USER_USER_ID, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .with_user_id(FRIEND_USER_ID_PARSED)
@@ -709,105 +673,37 @@ pub async fn project_write_scopes() {
 pub async fn version_write_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
-        let alpha_version_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .version_id
-            .clone();
-        let beta_version_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .version_id
-            .clone();
-        let alpha_file_hash = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .file_hash
-            .clone();
-
-        let basic_zip = TestFile::BasicZip;
+        let api = &test_env.api;
+        let DummyProjectAlpha {
+            version_id: alpha_version_id,
+            file_hash: alpha_file_hash,
+            ..
+        } = &test_env.dummy.project_alpha;
 
         let write_version = Scopes::VERSION_WRITE;
 
-        // Approve beta version as private so we can schedule it
-        let req = test::TestRequest::patch()
-            .uri(&format!("/v3/version/{beta_version_id}"))
-            .append_pat(MOD_USER_PAT)
-            .set_json(json!({
-                "status": "unlisted"
-            }))
-            .to_request();
-        let resp = test_env.call(req).await;
-        assert_eq!(resp.status(), 204);
-
-        // Schedule version
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!("/v3/version/{beta_version_id}/schedule")) // beta_version_id is an *approved* version, so we can schedule it
-                .set_json(json!(
-                    {
-                        "requested_status": "archived",
-                        "time": Utc::now() + Duration::days(1),
-                    }
-                ))
-        };
-        ScopeTest::new(&test_env)
-            .test(req_gen, write_version)
-            .await
-            .unwrap();
-
         // Patch version
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/version/{alpha_version_id}"))
-                .set_json(json!(
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_version(
+                alpha_version_id,
+                json!(
                     {
                         "name": "test_version_write_scopes Title",
                     }
-                ))
+                ),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_version)
             .await
             .unwrap();
 
-        // Generate test project data.
-        // Basic json
-        let json_segment = MultipartSegment {
-            name: "data".to_string(),
-            filename: None,
-            content_type: Some("application/json".to_string()),
-            data: MultipartSegmentData::Text(
-                serde_json::to_string(&json!(
-                    {
-                        "file_types": {
-                            basic_zip.filename(): "required-resource-pack"
-                        },
-                    }
-                ))
-                .unwrap(),
-            ),
-        };
-
-        // Differently named file, with different content
-        let content_segment = MultipartSegment {
-            name: basic_zip.filename(),
-            filename: Some(basic_zip.filename()),
-            content_type: basic_zip.content_type(),
-            data: MultipartSegmentData::Binary(basic_zip.bytes()),
-        };
-
         // Upload version file
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!("/v3/version/{alpha_version_id}/file"))
-                .set_multipart(vec![json_segment.clone(), content_segment.clone()])
+        let req_gen = |pat: Option<String>| async move {
+            api.upload_file_to_version(alpha_version_id, &TestFile::BasicZip, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, write_version)
@@ -816,8 +712,9 @@ pub async fn version_write_scopes() {
 
         //  Delete version file
         // TODO: Should this scope be VERSION_DELETE?
-        let req_gen = || {
-            test::TestRequest::delete().uri(&format!("/v3/version_file/{alpha_file_hash}"))
+        let req_gen = |pat: Option<String>| async move {
+            api.remove_version_file(alpha_file_hash, pat.as_deref())
+                .await
             // Delete from alpha_version_id, as we uploaded to alpha_version_id and it needs another file
         };
         ScopeTest::new(&test_env)
@@ -827,8 +724,9 @@ pub async fn version_write_scopes() {
 
         // Delete version
         let delete_version = Scopes::VERSION_DELETE;
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/version/{alpha_version_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.remove_version(alpha_version_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, delete_version)
             .await
@@ -842,23 +740,20 @@ pub async fn version_write_scopes() {
 pub async fn report_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
-        let beta_project_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .project_id
-            .clone();
+        let api = &test_env.api;
+        let beta_project_id = &test_env.dummy.project_beta.project_id;
 
         // Create report
         let report_create = Scopes::REPORT_CREATE;
-        let req_gen = || {
-            test::TestRequest::post().uri("/v3/report").set_json(json!({
-                "report_type": "copyright",
-                "item_id": beta_project_id,
-                "item_type": "project",
-                "body": "This is a reupload of my mod, ",
-            }))
+        let req_gen = |pat: Option<String>| async move {
+            api.create_report(
+                "copyright",
+                beta_project_id,
+                CommonItemType::Project,
+                "This is a reupload of my mod",
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, report_create)
@@ -867,24 +762,23 @@ pub async fn report_scopes() {
 
         // Get reports
         let report_read = Scopes::REPORT_READ;
-        let req_gen = || test::TestRequest::get().uri("/v3/report");
+        let req_gen =
+            |pat: Option<String>| async move { api.get_user_reports(pat.as_deref()).await };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, report_read)
             .await
             .unwrap();
         let report_id = success[0]["id"].as_str().unwrap();
 
-        let req_gen = || test::TestRequest::get().uri(&format!("/v3/report/{}", report_id));
+        let req_gen =
+            |pat: Option<String>| async move { api.get_report(report_id, pat.as_deref()).await };
         ScopeTest::new(&test_env)
             .test(req_gen, report_read)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/reports?ids=[{}]",
-                urlencoding::encode(&format!("\"{}\"", report_id))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_reports(&[report_id], pat.as_deref()).await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, report_read)
@@ -893,12 +787,13 @@ pub async fn report_scopes() {
 
         // Edit report
         let report_edit = Scopes::REPORT_WRITE;
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/report/{}", report_id))
-                .set_json(json!({
-                    "body": "This is a reupload of my mod, G8!",
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_report(
+                report_id,
+                json!({ "body": "This is a reupload of my mod, G8!" }),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, report_edit)
@@ -908,7 +803,8 @@ pub async fn report_scopes() {
         // Delete report
         // We use a moderator PAT here, as only moderators can delete reports
         let report_delete = Scopes::REPORT_DELETE;
-        let req_gen = || test::TestRequest::delete().uri(&format!("/v3/report/{}", report_id));
+        let req_gen =
+            |pat: Option<String>| async move { api.delete_report(report_id, pat.as_deref()).await };
         ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
             .test(req_gen, report_delete)
@@ -923,34 +819,23 @@ pub async fn report_scopes() {
 pub async fn thread_scopes() {
     // Test setup and dummy data
     with_test_environment_all(None, |test_env| async move {
-        let alpha_thread_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .thread_id
-            .clone();
-        let beta_thread_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .thread_id
-            .clone();
+        let api = &test_env.api;
+        let alpha_thread_id = &test_env.dummy.project_alpha.thread_id;
+        let beta_thread_id = &test_env.dummy.project_beta.thread_id;
 
         // Thread read
         let thread_read = Scopes::THREAD_READ;
-        let req_gen = || test::TestRequest::get().uri(&format!("/v3/thread/{alpha_thread_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_thread(alpha_thread_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, thread_read)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/threads?ids=[{}]",
-                urlencoding::encode(&format!("\"{}\"", "U"))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_threads(&[alpha_thread_id.as_str()], pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, thread_read)
@@ -959,15 +844,14 @@ pub async fn thread_scopes() {
 
         // Thread write (to also push to moderator inbox)
         let thread_write = Scopes::THREAD_WRITE;
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!("/v3/thread/{beta_thread_id}"))
-                .set_json(json!({
-                    "body": {
-                        "type": "text",
-                        "body": "test_thread_scopes Body"
-                    }
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.write_to_thread(
+                beta_thread_id,
+                "text",
+                "test_thread_scopes Body",
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .with_user_id(USER_USER_ID_PARSED)
@@ -977,7 +861,8 @@ pub async fn thread_scopes() {
 
         // Check moderation inbox
         // Uses moderator PAT, as only moderators can see the moderation inbox
-        let req_gen = || test::TestRequest::get().uri("/v3/thread/inbox");
+        let req_gen =
+            |pat: Option<String>| async move { api.get_moderation_inbox(pat.as_deref()).await };
         let (_, success) = ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
             .test(req_gen, thread_read)
@@ -987,7 +872,8 @@ pub async fn thread_scopes() {
 
         // Moderator 'read' thread
         // Uses moderator PAT, as only moderators can see the moderation inbox
-        let req_gen = || test::TestRequest::post().uri(&format!("/v3/thread/{thread_id}/read"));
+        let req_gen =
+            |pat: Option<String>| async move { api.read_thread(thread_id, pat.as_deref()).await };
         ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
             .test(req_gen, thread_read)
@@ -996,16 +882,14 @@ pub async fn thread_scopes() {
 
         // Delete that message
         // First, get message id
-        let req_gen = test::TestRequest::get()
-            .uri(&format!("/v3/thread/{thread_id}"))
-            .append_pat(USER_USER_PAT)
-            .to_request();
-        let resp = test_env.call(req_gen).await;
+        let resp = api.get_thread(thread_id, USER_USER_PAT).await;
         let success: serde_json::Value = test::read_body_json(resp).await;
         let thread_message_id = success["messages"][0]["id"].as_str().unwrap();
 
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/message/{thread_message_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.delete_thread_message(thread_message_id, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .with_user_id(MOD_USER_ID_PARSED)
             .test(req_gen, thread_write)
@@ -1019,16 +903,20 @@ pub async fn thread_scopes() {
 #[actix_rt::test]
 pub async fn pat_scopes() {
     with_test_environment_all(None, |test_env| async move {
+        let api = &test_env.api;
         // Pat create
         let pat_create = Scopes::PAT_CREATE;
-        let req_gen = || {
-            test::TestRequest::post()
+        let req_gen = |pat: Option<String>| async move {
+            let req = test::TestRequest::post()
                 .uri("/_internal/pat")
                 .set_json(json!({
                     "scopes": 1,
                     "name": "test_pat_scopes Name",
                     "expires": Utc::now() + Duration::days(1),
                 }))
+                .append_pat(pat.as_deref())
+                .to_request();
+            api.call(req).await
         };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, pat_create)
@@ -1038,10 +926,13 @@ pub async fn pat_scopes() {
 
         // Pat write
         let pat_write = Scopes::PAT_WRITE;
-        let req_gen = || {
-            test::TestRequest::patch()
+        let req_gen = |pat: Option<String>| async move {
+            let req = test::TestRequest::patch()
                 .uri(&format!("/_internal/pat/{pat_id}"))
                 .set_json(json!({}))
+                .append_pat(pat.as_deref())
+                .to_request();
+            api.call(req).await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, pat_write)
@@ -1050,7 +941,13 @@ pub async fn pat_scopes() {
 
         // Pat read
         let pat_read = Scopes::PAT_READ;
-        let req_gen = || test::TestRequest::get().uri("/_internal/pat");
+        let req_gen = |pat: Option<String>| async move {
+            let req = test::TestRequest::get()
+                .uri("/_internal/pat")
+                .append_pat(pat.as_deref())
+                .to_request();
+            api.call(req).await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, pat_read)
             .await
@@ -1058,7 +955,13 @@ pub async fn pat_scopes() {
 
         // Pat delete
         let pat_delete = Scopes::PAT_DELETE;
-        let req_gen = || test::TestRequest::delete().uri(&format!("/_internal/pat/{pat_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            let req = test::TestRequest::delete()
+                .uri(&format!("/_internal/pat/{pat_id}"))
+                .append_pat(pat.as_deref())
+                .to_request();
+            api.call(req).await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, pat_delete)
             .await
@@ -1071,27 +974,20 @@ pub async fn pat_scopes() {
 #[actix_rt::test]
 pub async fn collections_scopes() {
     // Test setup and dummy data
-    with_test_environment_all(None, |test_env| async move {
-        let alpha_project_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_alpha
-            .project_id
-            .clone();
-
-        let small_icon = DummyImage::SmallIcon;
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
 
         // Create collection
         let collection_create = Scopes::COLLECTION_CREATE;
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri("/v3/collection")
-                .set_json(json!({
-                    "name": "Test Collection",
-                    "description": "Test Collection Description",
-                    "projects": [alpha_project_id]
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.create_collection(
+                "Test Collection",
+                "Test Collection Description",
+                &[alpha_project_id.as_str()],
+                pat.as_deref(),
+            )
+            .await
         };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, collection_create)
@@ -1102,13 +998,16 @@ pub async fn collections_scopes() {
         // Patch collection
         // Collections always initialize to public, so we do patch before Get testing
         let collection_write = Scopes::COLLECTION_WRITE;
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/collection/{collection_id}"))
-                .set_json(json!({
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_collection(
+                collection_id,
+                json!({
                     "name": "Test Collection patch",
                     "status": "private",
-                }))
+                }),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, collection_write)
@@ -1117,18 +1016,17 @@ pub async fn collections_scopes() {
 
         // Read collection
         let collection_read = Scopes::COLLECTION_READ;
-        let req_gen = || test::TestRequest::get().uri(&format!("/v3/collection/{}", collection_id));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_collection(collection_id, pat.as_deref()).await
+        };
         ScopeTest::new(&test_env)
             .with_failure_code(404)
             .test(req_gen, collection_read)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/collections?ids=[{}]",
-                urlencoding::encode(&format!("\"{}\"", collection_id))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_collections(&[collection_id], pat.as_deref()).await
         };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
@@ -1138,8 +1036,9 @@ pub async fn collections_scopes() {
         assert_eq!(failure.as_array().unwrap().len(), 0);
         assert_eq!(success.as_array().unwrap().len(), 1);
 
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/user/{USER_USER_ID}/collections"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_user_collections(USER_USER_ID, pat.as_deref()).await
+        };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
             .test(req_gen, collection_read)
@@ -1148,21 +1047,23 @@ pub async fn collections_scopes() {
         assert_eq!(failure.as_array().unwrap().len(), 0);
         assert_eq!(success.as_array().unwrap().len(), 1);
 
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/collection/{collection_id}/icon?ext={ext}",
-                    ext = small_icon.extension()
-                ))
-                .set_payload(Bytes::from(small_icon.bytes()))
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_collection_icon(
+                collection_id,
+                Some(DummyImage::SmallIcon.get_icon_data()),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, collection_write)
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/collection/{collection_id}/icon"));
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_collection_icon(collection_id, None, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, collection_write)
             .await
@@ -1175,26 +1076,15 @@ pub async fn collections_scopes() {
 #[actix_rt::test]
 pub async fn organization_scopes() {
     // Test setup and dummy data
-    with_test_environment_all(None, |test_env| async move {
-        let beta_project_id = &test_env
-            .dummy
-            .as_ref()
-            .unwrap()
-            .project_beta
-            .project_id
-            .clone();
-
-        let icon = DummyImage::SmallIcon;
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+        let beta_project_id = &test_env.dummy.project_beta.project_id;
 
         // Create organization
         let organization_create = Scopes::ORGANIZATION_CREATE;
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri("/v3/organization")
-                .set_json(json!({
-                    "name": "TestOrg",
-                    "description": "TestOrg Description",
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.create_organization("TestOrg", "TestOrg Description", pat.as_deref())
+                .await
         };
         let (_, success) = ScopeTest::new(&test_env)
             .test(req_gen, organization_create)
@@ -1204,33 +1094,38 @@ pub async fn organization_scopes() {
 
         // Patch organization
         let organization_edit = Scopes::ORGANIZATION_WRITE;
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!("/v3/organization/{organization_id}"))
-                .set_json(json!({
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_organization(
+                organization_id,
+                json!({
                     "description": "TestOrg Patch Description",
-                }))
+                }),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, organization_edit)
             .await
             .unwrap();
 
-        let req_gen = || {
-            test::TestRequest::patch()
-                .uri(&format!(
-                    "/v3/organization/{organization_id}/icon?ext={ext}",
-                    ext = icon.extension()
-                ))
-                .set_payload(Bytes::from(icon.bytes()))
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_organization_icon(
+                organization_id,
+                Some(DummyImage::SmallIcon.get_icon_data()),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .test(req_gen, organization_edit)
             .await
             .unwrap();
 
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/organization/{organization_id}/icon"));
+        let req_gen = |pat: Option<String>| async move {
+            api.edit_organization_icon(organization_id, None, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, organization_edit)
             .await
@@ -1238,12 +1133,9 @@ pub async fn organization_scopes() {
 
         // add project
         let organization_project_edit = Scopes::PROJECT_WRITE | Scopes::ORGANIZATION_WRITE;
-        let req_gen = || {
-            test::TestRequest::post()
-                .uri(&format!("/v3/organization/{organization_id}/projects"))
-                .set_json(json!({
-                    "project_id": beta_project_id
-                }))
+        let req_gen = |pat: Option<String>| async move {
+            api.organization_add_project(organization_id, beta_project_id, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)
@@ -1253,8 +1145,9 @@ pub async fn organization_scopes() {
 
         // Organization reads
         let organization_read = Scopes::ORGANIZATION_READ;
-        let req_gen =
-            || test::TestRequest::get().uri(&format!("/v3/organization/{organization_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.get_organization(organization_id, pat.as_deref()).await
+        };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
             .test(req_gen, organization_read)
@@ -1263,11 +1156,9 @@ pub async fn organization_scopes() {
         assert!(failure["members"][0]["permissions"].is_null());
         assert!(!success["members"][0]["permissions"].is_null());
 
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!(
-                "/v3/organizations?ids=[{}]",
-                urlencoding::encode(&format!("\"{}\"", organization_id))
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_organizations(&[organization_id], pat.as_deref())
+                .await
         };
 
         let (failure, success) = ScopeTest::new(&test_env)
@@ -1279,8 +1170,9 @@ pub async fn organization_scopes() {
         assert!(!success[0]["members"][0]["permissions"].is_null());
 
         let organization_project_read = Scopes::PROJECT_READ | Scopes::ORGANIZATION_READ;
-        let req_gen = || {
-            test::TestRequest::get().uri(&format!("/v3/organization/{organization_id}/projects"))
+        let req_gen = |pat: Option<String>| async move {
+            api.get_organization_projects(organization_id, pat.as_deref())
+                .await
         };
         let (failure, success) = ScopeTest::new(&test_env)
             .with_failure_code(200)
@@ -1292,10 +1184,9 @@ pub async fn organization_scopes() {
         assert!(!success.as_array().unwrap().is_empty());
 
         // remove project (now that we've checked)
-        let req_gen = || {
-            test::TestRequest::delete().uri(&format!(
-                "/v3/organization/{organization_id}/projects/{beta_project_id}"
-            ))
+        let req_gen = |pat: Option<String>| async move {
+            api.organization_remove_project(organization_id, beta_project_id, pat.as_deref())
+                .await
         };
         ScopeTest::new(&test_env)
             .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)
@@ -1305,8 +1196,10 @@ pub async fn organization_scopes() {
 
         // Delete organization
         let organization_delete = Scopes::ORGANIZATION_DELETE;
-        let req_gen =
-            || test::TestRequest::delete().uri(&format!("/v3/organization/{organization_id}"));
+        let req_gen = |pat: Option<String>| async move {
+            api.delete_organization(organization_id, pat.as_deref())
+                .await
+        };
         ScopeTest::new(&test_env)
             .test(req_gen, organization_delete)
             .await
