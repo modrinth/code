@@ -14,6 +14,7 @@ use common::{database::*, scopes::ScopeTest};
 use labrinth::models::ids::base62_impl::parse_base62;
 use labrinth::models::pats::Scopes;
 use labrinth::models::projects::ProjectId;
+use labrinth::models::users::UserId;
 use serde_json::json;
 
 // For each scope, we (using test_scope):
@@ -1185,8 +1186,13 @@ pub async fn organization_scopes() {
 
         // remove project (now that we've checked)
         let req_gen = |pat: Option<String>| async move {
-            api.organization_remove_project(organization_id, beta_project_id, pat.as_deref())
-                .await
+            api.organization_remove_project(
+                organization_id,
+                beta_project_id,
+                UserId(USER_USER_ID_PARSED as u64),
+                pat.as_deref(),
+            )
+            .await
         };
         ScopeTest::new(&test_env)
             .with_failure_scopes(Scopes::all() ^ Scopes::ORGANIZATION_WRITE)

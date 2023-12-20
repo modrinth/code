@@ -273,6 +273,7 @@ pub async fn version_edit_helper(
         let team_member = database::models::TeamMember::get_from_user_id_project(
             version_item.inner.project_id,
             user.id.into(),
+            false,
             &**pool,
         )
         .await?;
@@ -855,6 +856,7 @@ pub async fn version_delete(
         let team_member = database::models::TeamMember::get_from_user_id_project(
             version.inner.project_id,
             user.id.into(),
+            false,
             &**pool,
         )
         .await

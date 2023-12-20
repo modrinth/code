@@ -1051,8 +1051,10 @@ async fn add_user_to_team(
     assert!(resp.status().is_success());
 
     // Accept invitation
-    let resp = setup_api.join_team(team_id, user_pat).await;
-    assert!(resp.status().is_success());
+    setup_api.join_team(team_id, user_pat).await;
+    // This does not check if the join request was successful,
+    // as the join is not always needed- an org project + in-org invite
+    // will automatically go through.
 }
 
 async fn modify_user_team_permissions(

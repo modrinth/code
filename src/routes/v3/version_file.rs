@@ -586,6 +586,7 @@ pub async fn delete_file(
                 database::models::TeamMember::get_from_user_id_organization(
                     organization.id,
                     user.id.into(),
+                    false,
                     &**pool,
                 )
                 .await

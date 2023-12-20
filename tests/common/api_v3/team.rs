@@ -37,6 +37,16 @@ impl ApiV3 {
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
     }
+
+    pub async fn get_project_members_deserialized(
+        &self,
+        project_id: &str,
+        pat: Option<&str>,
+    ) -> Vec<TeamMember> {
+        let resp = self.get_project_members(project_id, pat).await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
 }
 
 #[async_trait(?Send)]

@@ -217,6 +217,7 @@ async fn version_create_inner(
                 let team_member = models::TeamMember::get_from_user_id_project(
                     project_id,
                     user.id.into(),
+                    false,
                     &mut **transaction,
                 )
                 .await?;
@@ -609,6 +610,7 @@ async fn upload_file_to_version_inner(
         let team_member = models::TeamMember::get_from_user_id_project(
             version.inner.project_id,
             user.id.into(),
+            false,
             &mut **transaction,
         )
         .await?;

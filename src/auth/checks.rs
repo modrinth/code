@@ -109,8 +109,14 @@ pub async fn filter_authorized_projects(
                 "
                 SELECT m.id id, m.team_id team_id FROM team_members tm
                 INNER JOIN mods m ON m.team_id = tm.team_id
-                LEFT JOIN organizations o ON o.team_id = tm.team_id
-                WHERE (tm.team_id = ANY($1) or o.id = ANY($2)) AND tm.user_id = $3
+                WHERE tm.team_id = ANY($1) AND tm.user_id = $3
+
+                UNION
+
+                SELECT m.id id, m.team_id team_id FROM team_members tm
+                INNER JOIN organizations o ON o.team_id = tm.team_id
+                INNER JOIN mods m ON m.organization_id = o.id
+                WHERE o.id = ANY($2) AND tm.user_id = $3
                 ",
                 &check_projects
                     .iter()
@@ -126,7 +132,8 @@ pub async fn filter_authorized_projects(
             .try_for_each(|e| {
                 if let Some(row) = e.right() {
                     check_projects.retain(|x| {
-                        let bool = x.inner.id.0 == row.id && x.inner.team_id.0 == row.team_id;
+                        let bool =
+                            Some(x.inner.id.0) == row.id && Some(x.inner.team_id.0) == row.team_id;
 
                         if bool {
                             return_projects.push(x.clone().into());
@@ -160,15 +167,35 @@ pub async fn is_authorized_version(
                 let user_id: models::ids::UserId = user.id.into();
 
                 let version_exists = sqlx::query!(
-                    "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 WHERE m.id = $1)",
+                    "SELECT EXISTS(
+                        SELECT 1 FROM mods m 
+                        INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 
+                        WHERE m.id = $1
+                    )",
                     version_data.project_id as database::models::ids::ProjectId,
                     user_id as database::models::ids::UserId,
                 )
-                    .fetch_one(&***pool)
-                    .await?
-                    .exists;
+                .fetch_one(&***pool)
+                .await?
+                .exists;
 
-                authorized = version_exists.unwrap_or(false);
+                let version_organization_exists = sqlx::query!(
+                    "SELECT EXISTS(
+                        SELECT 1 FROM mods m 
+                        INNER JOIN organizations o ON m.organization_id = o.id
+                        INNER JOIN team_members tm ON tm.team_id = o.team_id AND user_id = $2 
+                        WHERE m.id = $1
+                    )",
+                    version_data.project_id as database::models::ids::ProjectId,
+                    user_id as database::models::ids::UserId,
+                )
+                .fetch_one(&***pool)
+                .await?
+                .exists;
+
+                authorized = version_exists
+                    .or(version_organization_exists)
+                    .unwrap_or(false);
             }
         }
     }

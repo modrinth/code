@@ -256,31 +256,9 @@ impl Organization {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<Option<()>, super::DatabaseError> {
-        use futures::TryStreamExt;
-
         let organization = Self::get_id(id, &mut **transaction, redis).await?;
 
         if let Some(organization) = organization {
-            let projects: Vec<ProjectId> = sqlx::query!(
-                "
-                SELECT m.id
-                FROM mods m
-                WHERE m.organization_id = $1
-                ",
-                id as OrganizationId,
-            )
-            .fetch_many(&mut **transaction)
-            .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
-            .try_collect::<Vec<ProjectId>>()
-            .await?;
-
-            for project_id in projects {
-                let _result =
-                    super::project_item::Project::remove(project_id, transaction, redis).await?;
-            }
-
-            Organization::clear_cache(id, Some(organization.name), redis).await?;
-
             sqlx::query!(
                 "
                 DELETE FROM organizations

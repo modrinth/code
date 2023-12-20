@@ -339,12 +339,6 @@ pub struct QueryLoaderFieldEnumValue {
     pub metadata: Option<serde_json::Value>,
 }
 
-#[derive(Clone, Serialize, Deserialize, Debug)]
-pub struct SideType {
-    pub id: SideTypeId,
-    pub name: String,
-}
-
 impl LoaderField {
     pub async fn get_field<'a, E>(
         field: &str,

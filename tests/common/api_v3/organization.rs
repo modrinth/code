@@ -3,7 +3,7 @@ use actix_web::{
     test::{self, TestRequest},
 };
 use bytes::Bytes;
-use labrinth::models::{organizations::Organization, v3::projects::Project};
+use labrinth::models::{organizations::Organization, users::UserId, v3::projects::Project};
 use serde_json::json;
 
 use crate::common::api_common::{request_data::ImageData, Api, AppendsOptionalPat};
@@ -162,12 +162,16 @@ impl ApiV3 {
         &self,
         id_or_title: &str,
         project_id_or_slug: &str,
+        new_owner_user_id: UserId,
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = test::TestRequest::delete()
             .uri(&format!(
                 "/v3/organization/{id_or_title}/projects/{project_id_or_slug}"
             ))
+            .set_json(json!({
+                "new_owner": new_owner_user_id,
+            }))
             .append_pat(pat)
             .to_request();
 

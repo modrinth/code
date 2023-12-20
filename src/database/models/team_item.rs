@@ -412,10 +412,10 @@ impl TeamMember {
         sqlx::query!(
             "
             INSERT INTO team_members (
-                id, team_id, user_id, role, permissions, organization_permissions, accepted
+                id, team_id, user_id, role, permissions, organization_permissions, is_owner, accepted
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7
+                $1, $2, $3, $4, $5, $6, $7, $8
             )
             ",
             self.id as TeamMemberId,
@@ -424,6 +424,7 @@ impl TeamMember {
             self.role,
             self.permissions.bits() as i64,
             self.organization_permissions.map(|p| p.bits() as i64),
+            self.is_owner,
             self.accepted,
         )
         .execute(&mut **transaction)
@@ -576,20 +577,28 @@ impl TeamMember {
     pub async fn get_from_user_id_project<'a, 'b, E>(
         id: ProjectId,
         user_id: UserId,
+        allow_pending: bool,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let accepted = if allow_pending {
+            vec![true, false]
+        } else {
+            vec![true]
+        };
+
         let result = sqlx::query!(
             "
             SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering
             FROM mods m
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = TRUE
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = ANY($3)
             WHERE m.id = $1
             ",
             id as ProjectId,
-            user_id as UserId
+            user_id as UserId,
+            &accepted
         )
             .fetch_optional(executor)
             .await?;
@@ -618,20 +627,27 @@ impl TeamMember {
     pub async fn get_from_user_id_organization<'a, 'b, E>(
         id: OrganizationId,
         user_id: UserId,
+        allow_pending: bool,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
+        let accepted = if allow_pending {
+            vec![true, false]
+        } else {
+            vec![true]
+        };
         let result = sqlx::query!(
             "
             SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.is_owner, tm.permissions, tm.organization_permissions, tm.accepted, tm.payouts_split, tm.ordering
             FROM organizations o
-            INNER JOIN team_members tm ON tm.team_id = o.team_id AND user_id = $2 AND accepted = TRUE
+            INNER JOIN team_members tm ON tm.team_id = o.team_id AND user_id = $2 AND accepted = ANY($3)
             WHERE o.id = $1
             ",
             id as OrganizationId,
-            user_id as UserId
+            user_id as UserId,
+            &accepted
         )
             .fetch_optional(executor)
             .await?;

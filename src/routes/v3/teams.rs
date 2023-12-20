@@ -36,6 +36,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 // including the team members of the project's team, but
 // also the members of the organization's team if the project is associated with an organization
 // (Unlike team_members_get_project, which only returns the members of the project's team)
+// They can be differentiated by the "organization_permissions" field being null or not
 pub async fn team_members_get_project(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -495,9 +496,39 @@ pub async fn add_team_member(
             ));
         }
     }
-    crate::database::models::User::get_id(new_member.user_id.into(), &**pool, &redis)
-        .await?
-        .ok_or_else(|| ApiError::InvalidInput("An invalid User ID specified".to_string()))?;
+    let new_user =
+        crate::database::models::User::get_id(new_member.user_id.into(), &**pool, &redis)
+            .await?
+            .ok_or_else(|| ApiError::InvalidInput("An invalid User ID specified".to_string()))?;
+
+    let mut force_accepted = false;
+    if let TeamAssociationId::Project(pid) = team_association {
+        // We cannot add the owner to a project team in their own org
+        let organization =
+            Organization::get_associated_organization_project_id(pid, &**pool).await?;
+        let new_user_organization_team_member = if let Some(organization) = &organization {
+            TeamMember::get_from_user_id(organization.team_id, new_user.id, &**pool).await?
+        } else {
+            None
+        };
+        if new_user_organization_team_member
+            .as_ref()
+            .map(|tm| tm.is_owner)
+            .unwrap_or(false)
+        {
+            return Err(ApiError::InvalidInput(
+                "You cannot add the owner of an organization to a project team owned by that organization".to_string(),
+            ));
+        }
+
+        // In the case of adding a user that is in an org, to a project that is owned by that same org,
+        // the user is automatically accepted into that project.
+        // That is because the user is part of the org, and project teame-membership in an org can also be used to reduce permissions
+        // (Which should not be a deniable action by that user)
+        if new_user_organization_team_member.is_some() {
+            force_accepted = true;
+        }
+    }
 
     let new_id = crate::database::models::ids::generate_team_member_id(&mut transaction).await?;
     TeamMember {
@@ -508,37 +539,40 @@ pub async fn add_team_member(
         is_owner: false, // Cannot just create an owner
         permissions: new_member.permissions,
         organization_permissions: new_member.organization_permissions,
-        accepted: false,
+        accepted: force_accepted,
         payouts_split: new_member.payouts_split,
         ordering: new_member.ordering,
     }
     .insert(&mut transaction)
     .await?;
 
-    match team_association {
-        TeamAssociationId::Project(pid) => {
-            NotificationBuilder {
-                body: NotificationBody::TeamInvite {
-                    project_id: pid.into(),
-                    team_id: team_id.into(),
-                    invited_by: current_user.id,
-                    role: new_member.role.clone(),
-                },
+    // If the user has an opportunity to accept the invite, send a notification
+    if !force_accepted {
+        match team_association {
+            TeamAssociationId::Project(pid) => {
+                NotificationBuilder {
+                    body: NotificationBody::TeamInvite {
+                        project_id: pid.into(),
+                        team_id: team_id.into(),
+                        invited_by: current_user.id,
+                        role: new_member.role.clone(),
+                    },
+                }
+                .insert(new_member.user_id.into(), &mut transaction, &redis)
+                .await?;
             }
-            .insert(new_member.user_id.into(), &mut transaction, &redis)
-            .await?;
-        }
-        TeamAssociationId::Organization(oid) => {
-            NotificationBuilder {
-                body: NotificationBody::OrganizationInvite {
-                    organization_id: oid.into(),
-                    team_id: team_id.into(),
-                    invited_by: current_user.id,
-                    role: new_member.role.clone(),
-                },
+            TeamAssociationId::Organization(oid) => {
+                NotificationBuilder {
+                    body: NotificationBody::OrganizationInvite {
+                        organization_id: oid.into(),
+                        team_id: team_id.into(),
+                        invited_by: current_user.id,
+                        role: new_member.role.clone(),
+                    },
+                }
+                .insert(new_member.user_id.into(), &mut transaction, &redis)
+                .await?;
             }
-            .insert(new_member.user_id.into(), &mut transaction, &redis)
-            .await?;
         }
     }
 
@@ -593,7 +627,9 @@ pub async fn edit_team_member(
 
     let mut transaction = pool.begin().await?;
 
-    if edit_member_db.is_owner && edit_member.permissions.is_some() {
+    if edit_member_db.is_owner
+        && (edit_member.permissions.is_some() || edit_member.organization_permissions.is_some())
+    {
         return Err(ApiError::InvalidInput(
             "The owner's permission's in a team cannot be edited".to_string(),
         ));
@@ -723,8 +759,9 @@ pub async fn transfer_ownership(
 
     // Forbid transferring ownership of a project team that is owned by an organization
     // These are owned by the organization owner, and must be removed from the organization first
-    let pid = Team::get_association(id.into(), &**pool).await?;
-    if let Some(TeamAssociationId::Project(pid)) = pid {
+    // There shouldnt be an ownr on these projects in these cases, but just in case.
+    let team_association_id = Team::get_association(id.into(), &**pool).await?;
+    if let Some(TeamAssociationId::Project(pid)) = team_association_id {
         let result = Project::get_id(pid, &**pool, &redis).await?;
         if let Some(project_item) = result {
             if project_item.inner.organization_id.is_some() {
@@ -785,7 +822,14 @@ pub async fn transfer_ownership(
         id.into(),
         new_owner.user_id.into(),
         Some(ProjectPermissions::all()),
-        Some(OrganizationPermissions::all()),
+        if matches!(
+            team_association_id,
+            Some(TeamAssociationId::Organization(_))
+        ) {
+            Some(OrganizationPermissions::all())
+        } else {
+            None
+        },
         None,
         None,
         None,
@@ -795,8 +839,44 @@ pub async fn transfer_ownership(
     )
     .await?;
 
+    let project_teams_edited =
+        if let Some(TeamAssociationId::Organization(oid)) = team_association_id {
+            // The owner of ALL projects that this organization owns, if applicable, should be removed as members of the project,
+            // if they are members of those projects.
+            // (As they are the org owners for them, and they should not have more specific permissions)
+
+            // First, get team id for every project owned by this organization
+            let team_ids = sqlx::query!(
+                "
+            SELECT m.team_id FROM organizations o
+            INNER JOIN mods m ON m.organization_id = o.id
+            WHERE o.id = $1 AND $1 IS NOT NULL
+            ",
+                oid.0 as i64
+            )
+            .fetch_all(&mut *transaction)
+            .await?;
+
+            let team_ids: Vec<crate::database::models::ids::TeamId> = team_ids
+                .into_iter()
+                .map(|x| TeamId(x.team_id as u64).into())
+                .collect();
+
+            // If the owner of the organization is a member of the project, remove them
+            for team_id in team_ids.iter() {
+                TeamMember::delete(*team_id, new_owner.user_id.into(), &mut transaction).await?;
+            }
+
+            team_ids
+        } else {
+            vec![]
+        };
+
     transaction.commit().await?;
     TeamMember::clear_cache(id.into(), &redis).await?;
+    for team_id in project_teams_edited {
+        TeamMember::clear_cache(team_id, &redis).await?;
+    }
 
     Ok(HttpResponse::NoContent().body(""))
 }

@@ -287,11 +287,12 @@ async fn test_get_team_project_orgs() {
         // The team members route from teams (on a project's team):
         // - the members of the project team specifically
         // - not the ones from the organization
+        // - Remember: the owner of an org will not be included in the org's team members list
         let members = test_env
             .api
             .get_team_members_deserialized_common(alpha_team_id, FRIEND_USER_PAT)
             .await;
-        assert_eq!(members.len(), 1);
+        assert_eq!(members.len(), 0);
 
         // The team members route from project should show:
         // - the members of the project team including the ones from the organization
