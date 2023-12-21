@@ -139,7 +139,7 @@ async function findLauncherDir() {
 }
 
 async function refreshDir() {
-  await change_config_dir(settingsDir.value)
+  await change_config_dir(settingsDir.value).catch(handleError)
   settings.value = await accessSettings().catch(handleError)
   settingsDir.value = settings.value.loaded_config_dir
 }
