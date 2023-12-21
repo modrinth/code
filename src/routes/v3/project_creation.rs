@@ -612,11 +612,14 @@ async fn project_create_inner(
             additional_categories.extend(ids.values());
         }
 
+        // Should only be owner if not attached to an organization
+        let is_owner = project_create_data.organization_id.is_none();
+
         let team = models::team_item::TeamBuilder {
             members: vec![models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
-                is_owner: true,
+                is_owner,
                 // Allow all permissions for project creator, even if attached to a project
                 permissions: ProjectPermissions::all(),
                 organization_permissions: None,

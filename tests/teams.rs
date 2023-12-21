@@ -294,13 +294,12 @@ async fn test_get_team_project_orgs() {
             .await;
         assert_eq!(members.len(), 0);
 
-        // The team members route from project should show:
-        // - the members of the project team including the ones from the organization
+        // The team members route from project should show the same!
         let members = test_env
             .api
             .get_project_members_deserialized_common(alpha_project_id, FRIEND_USER_PAT)
             .await;
-        assert_eq!(members.len(), 2);
+        assert_eq!(members.len(), 0);
     })
     .await;
 }

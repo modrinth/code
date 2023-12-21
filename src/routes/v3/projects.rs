@@ -54,6 +54,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("{id}/gallery", web::delete().to(delete_gallery_item))
             .route("{id}/follow", web::post().to(project_follow))
             .route("{id}/follow", web::delete().to(project_unfollow))
+            .route("{id}/organization", web::get().to(project_get_organization))
             .service(
                 web::scope("{project_id}")
                     .route(
@@ -2182,5 +2183,40 @@ pub async fn project_unfollow(
         Err(ApiError::InvalidInput(
             "You are not following this project!".to_string(),
         ))
+    }
+}
+
+pub async fn project_get_organization(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
+        .await?
+        .1;
+    let string = info.into_inner().0;
+
+    let result = db_models::Project::get(&string, &**pool, &redis)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
+
+    if is_authorized(&result.inner, &Some(user), &pool).await? {
+        Err(ApiError::InvalidInput(
+            "The specified project does not exist!".to_string(),
+        ))
+    } else if let Some(organization_id) = result.inner.organization_id {
+        let organization = db_models::Organization::get_id(organization_id, &**pool, &redis)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInput("The specified organization does not exist!".to_string())
+            })?;
+
+        Ok(HttpResponse::Ok().json(organization))
+    } else {
+        Err(ApiError::NotFound)
     }
 }

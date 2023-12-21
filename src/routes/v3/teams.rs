@@ -62,28 +62,14 @@ pub async fn team_members_get_project(
         if !is_authorized(&project.inner, &current_user, &pool).await? {
             return Err(ApiError::NotFound);
         }
-        let mut members_data =
+        let members_data =
             TeamMember::get_from_team_full(project.inner.team_id, &**pool, &redis).await?;
-        let mut member_user_ids = members_data.iter().map(|x| x.user_id).collect::<Vec<_>>();
-
-        // Adds the organization's team members to the list of members, if the project is associated with an organization
-        if let Some(oid) = project.inner.organization_id {
-            let organization_data = Organization::get_id(oid, &**pool, &redis).await?;
-            if let Some(organization_data) = organization_data {
-                let org_team =
-                    TeamMember::get_from_team_full(organization_data.team_id, &**pool, &redis)
-                        .await?;
-                for member in org_team {
-                    if !member_user_ids.contains(&member.user_id) {
-                        member_user_ids.push(member.user_id);
-                        members_data.push(member);
-                    }
-                }
-            }
-        }
-
-        let users =
-            crate::database::models::User::get_many_ids(&member_user_ids, &**pool, &redis).await?;
+        let users = crate::database::models::User::get_many_ids(
+            &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
+            &**pool,
+            &redis,
+        )
+        .await?;
 
         let user_id = current_user.as_ref().map(|x| x.id.into());
 
@@ -94,6 +80,7 @@ pub async fn team_members_get_project(
                     .find(|x| x.user_id == user.id.into() && x.accepted)
             })
             .is_some();
+
         let team_members: Vec<_> = members_data
             .into_iter()
             .filter(|x| {
@@ -109,6 +96,7 @@ pub async fn team_members_get_project(
                 })
             })
             .collect();
+
         Ok(HttpResponse::Ok().json(team_members))
     } else {
         Err(ApiError::NotFound)
