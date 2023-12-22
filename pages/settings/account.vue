@@ -44,7 +44,10 @@
       } password`"
     >
       <div class="universal-modal">
-        <ul v-if="newPassword !== confirmNewPassword" class="known-errors">
+        <ul
+          v-if="newPassword !== confirmNewPassword && confirmNewPassword.length > 0"
+          class="known-errors"
+        >
           <li>Input passwords do not match!</li>
         </ul>
         <label v-if="removePasswordMode" for="old-password">
@@ -116,8 +119,8 @@
               type="button"
               class="iconified-button brand-button"
               :disabled="
-                newPassword.length == 0 ||
-                oldPassword.length == 0 ||
+                newPassword.length === 0 ||
+                oldPassword.length === 0 ||
                 newPassword !== confirmNewPassword
               "
               @click="savePassword"
