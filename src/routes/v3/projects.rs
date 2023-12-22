@@ -6,7 +6,7 @@ use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{GalleryItem, ModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::database::models::{ids as db_ids, image_item};
+use crate::database::models::{ids as db_ids, image_item, TeamMember};
 use crate::database::redis::RedisPool;
 use crate::database::{self, models as db_models};
 use crate::file_hosting::FileHost;
@@ -2194,18 +2194,26 @@ pub async fn project_get_organization(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(&req, &**pool, &redis, &session_queue, None)
-        .await?
-        .1;
-    let string = info.into_inner().0;
+    let current_user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_READ, Scopes::ORGANIZATION_READ]),
+    )
+    .await
+    .map(|x| x.1)
+    .ok();
+    let user_id = current_user.as_ref().map(|x| x.id.into());
 
+    let string = info.into_inner().0;
     let result = db_models::Project::get(&string, &**pool, &redis)
         .await?
         .ok_or_else(|| {
             ApiError::InvalidInput("The specified project does not exist!".to_string())
         })?;
 
-    if is_visible_project(&result.inner, &Some(user), &pool).await? {
+    if !is_visible_project(&result.inner, &current_user, &pool).await? {
         Err(ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         ))
@@ -2213,10 +2221,44 @@ pub async fn project_get_organization(
         let organization = db_models::Organization::get_id(organization_id, &**pool, &redis)
             .await?
             .ok_or_else(|| {
-                ApiError::InvalidInput("The specified organization does not exist!".to_string())
+                ApiError::InvalidInput("The attached organization does not exist!".to_string())
             })?;
 
-        Ok(HttpResponse::Ok().json(organization))
+        let members_data =
+            TeamMember::get_from_team_full(organization.team_id, &**pool, &redis).await?;
+
+        let users = crate::database::models::User::get_many_ids(
+            &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
+            &**pool,
+            &redis,
+        )
+        .await?;
+        let logged_in = current_user
+            .as_ref()
+            .and_then(|user| {
+                members_data
+                    .iter()
+                    .find(|x| x.user_id == user.id.into() && x.accepted)
+            })
+            .is_some();
+        let team_members: Vec<_> = members_data
+            .into_iter()
+            .filter(|x| {
+                logged_in
+                    || x.accepted
+                    || user_id
+                        .map(|y: crate::database::models::UserId| y == x.user_id)
+                        .unwrap_or(false)
+            })
+            .flat_map(|data| {
+                users.iter().find(|x| x.id == data.user_id).map(|user| {
+                    crate::models::teams::TeamMember::from(data, user.clone(), !logged_in)
+                })
+            })
+            .collect();
+
+        let organization = models::organizations::Organization::from(organization, team_members);
+        return Ok(HttpResponse::Ok().json(organization));
     } else {
         Err(ApiError::NotFound)
     }

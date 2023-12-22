@@ -9,7 +9,8 @@ use async_trait::async_trait;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use labrinth::{
-    models::projects::Project, routes::v3::projects::ReturnSearchResults,
+    models::{organizations::Organization, projects::Project},
+    routes::v3::projects::ReturnSearchResults,
     util::actix::AppendsMultipart,
 };
 use rust_decimal::Decimal;
@@ -479,6 +480,29 @@ impl ApiProject for ApiV3 {
 impl ApiV3 {
     pub async fn get_project_deserialized(&self, id_or_slug: &str, pat: Option<&str>) -> Project {
         let resp = self.get_project(id_or_slug, pat).await;
+        assert_eq!(resp.status(), 200);
+        test::read_body_json(resp).await
+    }
+
+    pub async fn get_project_organization(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> ServiceResponse {
+        let req = test::TestRequest::get()
+            .uri(&format!("/v3/project/{id_or_slug}/organization"))
+            .append_pat(pat)
+            .to_request();
+
+        self.call(req).await
+    }
+
+    pub async fn get_project_organization_deserialized(
+        &self,
+        id_or_slug: &str,
+        pat: Option<&str>,
+    ) -> Organization {
+        let resp = self.get_project_organization(id_or_slug, pat).await;
         assert_eq!(resp.status(), 200);
         test::read_body_json(resp).await
     }

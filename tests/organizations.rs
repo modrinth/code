@@ -85,6 +85,28 @@ async fn create_organization() {
 }
 
 #[actix_rt::test]
+async fn get_project_organization() {
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+        let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
+        let alpha_project_id = &test_env.dummy.project_alpha.project_id;
+
+        // ADd alpha project to zeta organization
+        let resp = api
+            .organization_add_project(zeta_organization_id, alpha_project_id, USER_USER_PAT)
+            .await;
+        assert_eq!(resp.status(), 200);
+
+        // Get project organization
+        let zeta = api
+            .get_project_organization_deserialized(alpha_project_id, USER_USER_PAT)
+            .await;
+        assert_eq!(zeta.id.to_string(), zeta_organization_id.to_string());
+    })
+    .await;
+}
+
+#[actix_rt::test]
 async fn patch_organization() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let api = &test_env.api;
