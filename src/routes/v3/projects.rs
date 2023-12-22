@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::auth::{filter_authorized_projects, get_user_from_headers, is_authorized};
+use crate::auth::checks::is_visible_project;
+use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{GalleryItem, ModCategory};
 use crate::database::models::thread_item::ThreadMessageBuilder;
@@ -136,7 +137,7 @@ pub async fn projects_get(
     .map(|x| x.1)
     .ok();
 
-    let projects = filter_authorized_projects(projects_data, &user_option, &pool).await?;
+    let projects = filter_visible_projects(projects_data, &user_option, &pool).await?;
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -163,7 +164,7 @@ pub async fn project_get(
     .ok();
 
     if let Some(data) = project_data {
-        if is_authorized(&data.inner, &user_option, &pool).await? {
+        if is_visible_project(&data.inner, &user_option, &pool).await? {
             return Ok(HttpResponse::Ok().json(Project::from(data)));
         }
     }
@@ -968,7 +969,7 @@ pub async fn dependency_list(
     .ok();
 
     if let Some(project) = result {
-        if !is_authorized(&project.inner, &user_option, &pool).await? {
+        if !is_visible_project(&project.inner, &user_option, &pool).await? {
             return Err(ApiError::NotFound);
         }
 
@@ -2061,7 +2062,7 @@ pub async fn project_follow(
     let user_id: db_ids::UserId = user.id.into();
     let project_id: db_ids::ProjectId = result.inner.id;
 
-    if !is_authorized(&result.inner, &Some(user), &pool).await? {
+    if !is_visible_project(&result.inner, &Some(user), &pool).await? {
         return Err(ApiError::NotFound);
     }
 
@@ -2204,7 +2205,7 @@ pub async fn project_get_organization(
             ApiError::InvalidInput("The specified project does not exist!".to_string())
         })?;
 
-    if is_authorized(&result.inner, &Some(user), &pool).await? {
+    if is_visible_project(&result.inner, &Some(user), &pool).await? {
         Err(ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         ))

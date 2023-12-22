@@ -4,7 +4,8 @@ use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
-use crate::auth::{filter_authorized_versions, get_user_from_headers, is_authorized};
+use crate::auth::checks::{filter_visible_versions, is_visible_project};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
@@ -56,7 +57,7 @@ pub async fn forge_updates(
     .map(|x| x.1)
     .ok();
 
-    if !is_authorized(&project.inner, &user_option, &pool).await? {
+    if !is_visible_project(&project.inner, &user_option, &pool).await? {
         return Err(ApiError::InvalidInput(ERROR.to_string()));
     }
 
@@ -68,14 +69,14 @@ pub async fn forge_updates(
         _ => |x: &String| *x == "forge",
     };
 
-    let mut versions = filter_authorized_versions(
+    let mut versions = filter_visible_versions(
         versions
             .into_iter()
             .filter(|x| x.loaders.iter().any(loaders))
             .collect(),
         &user_option,
         &pool,
-        redis,
+        &redis,
     )
     .await?;
 

@@ -1,4 +1,5 @@
-use crate::auth::{get_user_from_headers, is_authorized};
+use crate::auth::checks::is_visible_project;
+use crate::auth::get_user_from_headers;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::team_item::TeamAssociationId;
 use crate::database::models::{Organization, Team, TeamMember, User};
@@ -59,7 +60,7 @@ pub async fn team_members_get_project(
         .map(|x| x.1)
         .ok();
 
-        if !is_authorized(&project.inner, &current_user, &pool).await? {
+        if !is_visible_project(&project.inner, &current_user, &pool).await? {
             return Err(ApiError::NotFound);
         }
         let members_data =

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use crate::auth::{get_user_from_headers, is_authorized, is_authorized_version};
+use crate::auth::checks::{is_team_member_project, is_team_member_version};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::{project_item, report_item, thread_item, version_item};
 use crate::database::redis::RedisPool;
@@ -62,7 +63,9 @@ pub async fn images_add(
                 if let Some(id) = data.project_id {
                     let project = project_item::Project::get(&id, &**pool, &redis).await?;
                     if let Some(project) = project {
-                        if is_authorized(&project.inner, &Some(user.clone()), &pool).await? {
+                        if is_team_member_project(&project.inner, &Some(user.clone()), &pool)
+                            .await?
+                        {
                             *project_id = Some(project.inner.id.into());
                         } else {
                             return Err(ApiError::CustomAuthentication(
@@ -81,7 +84,13 @@ pub async fn images_add(
                 if let Some(id) = data.version_id {
                     let version = version_item::Version::get(id.into(), &**pool, &redis).await?;
                     if let Some(version) = version {
-                        if is_authorized_version(&version.inner, &Some(user.clone()), &pool).await?
+                        if is_team_member_version(
+                            &version.inner,
+                            &Some(user.clone()),
+                            &pool,
+                            &redis,
+                        )
+                        .await?
                         {
                             *version_id = Some(version.inner.id.into());
                         } else {

@@ -1,5 +1,5 @@
-use crate::auth::checks::{filter_authorized_collections, is_authorized_collection};
-use crate::auth::get_user_from_headers;
+use crate::auth::checks::is_visible_collection;
+use crate::auth::{filter_visible_collections, get_user_from_headers};
 use crate::database::models::{collection_item, generate_collection_id, project_item};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::FileHost;
@@ -155,7 +155,7 @@ pub async fn collections_get(
     .map(|x| x.1)
     .ok();
 
-    let collections = filter_authorized_collections(collections_data, &user_option, &pool).await?;
+    let collections = filter_visible_collections(collections_data, &user_option).await?;
 
     Ok(HttpResponse::Ok().json(collections))
 }
@@ -183,7 +183,7 @@ pub async fn collection_get(
     .ok();
 
     if let Some(data) = collection_data {
-        if is_authorized_collection(&data, &user_option).await? {
+        if is_visible_collection(&data, &user_option).await? {
             return Ok(HttpResponse::Ok().json(Collection::from(data)));
         }
     }

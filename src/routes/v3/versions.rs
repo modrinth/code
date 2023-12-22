@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 
 use super::ApiError;
-use crate::auth::{
-    filter_authorized_versions, get_user_from_headers, is_authorized, is_authorized_version,
-};
+use crate::auth::checks::{filter_visible_versions, is_visible_project, is_visible_version};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::loader_fields::{
     self, LoaderField, LoaderFieldEnumValue, VersionField,
@@ -81,7 +80,7 @@ pub async fn version_project_get_helper(
     .ok();
 
     if let Some(project) = result {
-        if !is_authorized(&project.inner, &user_option, &pool).await? {
+        if !is_visible_project(&project.inner, &user_option, &pool).await? {
             return Err(ApiError::NotFound);
         }
 
@@ -94,7 +93,7 @@ pub async fn version_project_get_helper(
             .find(|x| Some(x.inner.id.0 as u64) == id_opt || x.inner.version_number == id.1);
 
         if let Some(version) = version {
-            if is_authorized_version(&version.inner, &user_option, &pool).await? {
+            if is_visible_version(&version.inner, &user_option, &pool, &redis).await? {
                 return Ok(HttpResponse::Ok().json(models::projects::Version::from(version)));
             }
         }
@@ -132,7 +131,7 @@ pub async fn versions_get(
     .map(|x| x.1)
     .ok();
 
-    let versions = filter_authorized_versions(versions_data, &user_option, &pool, redis).await?;
+    let versions = filter_visible_versions(versions_data, &user_option, &pool, &redis).await?;
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -169,7 +168,7 @@ pub async fn version_get_helper(
     .ok();
 
     if let Some(data) = version_data {
-        if is_authorized_version(&data.inner, &user_option, &pool).await? {
+        if is_visible_version(&data.inner, &user_option, &pool, &redis).await? {
             return Ok(HttpResponse::Ok().json(models::projects::Version::from(data)));
         }
     }
@@ -723,7 +722,7 @@ pub async fn version_list(
     .ok();
 
     if let Some(project) = result {
-        if !is_authorized(&project.inner, &user_option, &pool).await? {
+        if !is_visible_project(&project.inner, &user_option, &pool).await? {
             return Err(ApiError::NotFound);
         }
 
@@ -819,7 +818,7 @@ pub async fn version_list(
         response.sort();
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response = filter_authorized_versions(response, &user_option, &pool, redis).await?;
+        let response = filter_visible_versions(response, &user_option, &pool, &redis).await?;
 
         Ok(HttpResponse::Ok().json(response))
     } else {

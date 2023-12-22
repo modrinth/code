@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use super::ApiError;
-use crate::auth::{filter_authorized_projects, get_user_from_headers};
+use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::team_item::TeamMember;
 use crate::database::models::{generate_organization_id, team_item, Organization};
 use crate::database::redis::RedisPool;
@@ -85,7 +85,7 @@ pub async fn organization_projects_get(
     let projects_data =
         crate::database::models::Project::get_many_ids(&project_ids, &**pool, &redis).await?;
 
-    let projects = filter_authorized_projects(projects_data, &current_user, &pool).await?;
+    let projects = filter_visible_projects(projects_data, &current_user, &pool).await?;
     Ok(HttpResponse::Ok().json(projects))
 }
 
