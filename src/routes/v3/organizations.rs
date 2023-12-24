@@ -858,12 +858,13 @@ pub async fn organization_projects_remove(
             SET 
                 is_owner = TRUE,
                 accepted = TRUE,
-                permissions = $1,
+                permissions = $2,
                 organization_permissions = NULL,
                 role = 'Inherited Owner'
             WHERE (id = $1)
             ",
-            new_owner.id as database::models::ids::TeamMemberId
+            new_owner.id as database::models::ids::TeamMemberId,
+            ProjectPermissions::all().bits() as i64
         )
         .execute(&mut *transaction)
         .await?;

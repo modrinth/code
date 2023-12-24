@@ -459,6 +459,20 @@ async fn add_remove_organization_project_ownership_to_user() {
             .await;
         assert_eq!(resp.status(), 400);
 
+        // Set user's permissions within the project that it is a member of to none (for a later test)
+        let resp = test_env
+            .api
+            .edit_team_member(
+                alpha_team_id,
+                USER_USER_ID,
+                json!({
+                    "project_permissions": 0,
+                }),
+                FRIEND_USER_PAT,
+            )
+            .await;
+        assert_eq!(resp.status(), 204);
+
         // Remove project from organization with a user that is an organization member, and a project member
         // This should succeed
         let resp = test_env
@@ -487,6 +501,7 @@ async fn add_remove_organization_project_ownership_to_user() {
 
         // For each of alpha and beta, confirm:
         // - There is one member of each project, the owner, USER_USER_ID
+        // - In addition to being the owner, they have full permissions (even though they were set to none earlier)
         // - They no longer have an attached organization
         for team_id in [alpha_team_id, beta_team_id] {
             let members = test_env
@@ -497,6 +512,10 @@ async fn add_remove_organization_project_ownership_to_user() {
             let user_member = members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();
             assert_eq!(user_member.len(), 1);
             assert_eq!(user_member[0].user.id.to_string(), USER_USER_ID);
+            assert_eq!(
+                user_member[0].permissions.unwrap(),
+                ProjectPermissions::all()
+            );
         }
 
         for project_id in [alpha_project_id, beta_project_id] {
