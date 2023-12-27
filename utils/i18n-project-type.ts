@@ -55,6 +55,14 @@ const projectTypeMessages = defineMessages({
     id: 'project-type.project.plural',
     defaultMessage: 'Projects',
   },
+  collection: {
+    id: 'project-type.collection.singular',
+    defaultMessage: 'Collection',
+  },
+  collections: {
+    id: 'project-type.collection.plural',
+    defaultMessage: 'Collections',
+  },
 })
 
 type ExtractSingulars<K extends string> = K extends `${infer T}s` ? T : never

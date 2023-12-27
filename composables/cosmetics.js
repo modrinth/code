@@ -25,6 +25,7 @@ export const useCosmetics = () =>
           shader: 'gallery',
           datapack: 'list',
           user: 'list',
+          collection: 'list',
         },
       }
     }

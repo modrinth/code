@@ -220,7 +220,6 @@ import {
   UploadIcon,
   PlusIcon,
   Avatar,
-  Modal,
   XIcon,
   Button,
   Checkbox,
@@ -230,6 +229,7 @@ import {
   CopyCode,
   ConfirmModal,
 } from 'omorphia'
+import Modal from '~/components/ui/Modal.vue'
 import { scopeList, hasScope, toggleScope } from '~/utils/auth/scopes.ts'
 
 definePageMeta({

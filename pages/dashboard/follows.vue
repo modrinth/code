@@ -15,6 +15,7 @@
       :client-side="project.client_side"
       :server-side="project.server_side"
       :color="project.color"
+      :show-updated-date="false"
     >
       <button class="iconified-button" @click="userUnfollowProject(project)">
         <HeartIcon />

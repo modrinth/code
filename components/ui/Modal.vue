@@ -11,7 +11,7 @@
     <div class="modal-container" :class="{ shown: actuallyShown }">
       <div class="modal-body">
         <div v-if="header" class="header">
-          <h1>{{ header }}</h1>
+          <strong>{{ header }}</strong>
           <button class="iconified-button icon-only transparent" @click="hide">
             <CrossIcon />
           </button>
@@ -127,8 +127,9 @@ export default {
       background-color: var(--color-bg);
       padding: var(--spacing-card-md) var(--spacing-card-lg);
 
-      h1 {
+      strong {
         font-size: 1.25rem;
+        margin: 0.67em 0;
       }
     }
 

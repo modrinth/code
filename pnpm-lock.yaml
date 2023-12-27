@@ -38,7 +38,7 @@ dependencies:
     specifier: ^13.0.1
     version: 13.0.1(patch_hash=3vlxaukqep4gvqytxeznhg6wbq)
   omorphia:
-    specifier: ^0.7.1
+    specifier: '=0.7.1'
     version: 0.7.1(vue@3.3.4)
   qrcode.vue:
     specifier: ^3.4.0

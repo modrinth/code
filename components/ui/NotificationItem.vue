@@ -361,8 +361,6 @@ async function performAction(notification, actionIndex) {
   try {
     await read()
 
-    await userDeleteNotification(notification.id)
-
     if (actionIndex !== null) {
       await useBaseFetch(`${notification.actions[actionIndex].action_route[1]}`, {
         method: notification.actions[actionIndex].action_route[0].toUpperCase(),

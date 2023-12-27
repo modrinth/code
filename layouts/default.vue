@@ -33,7 +33,6 @@
                 v-if="auth.user"
                 to="/dashboard/notifications"
                 class="control-button button-transparent"
-                :class="{ bubble: user.notifications.some((notif) => !notif.read) }"
                 title="Notifications"
               >
                 <NotificationIcon aria-hidden="true" />
@@ -86,9 +85,9 @@
                     <ChartIcon class="icon" />
                     <span class="title">Dashboard</span>
                   </NuxtLink>
-                  <NuxtLink class="item button-transparent" to="/dashboard/follows">
-                    <HeartIcon class="icon" />
-                    <span class="title">Following</span>
+                  <NuxtLink class="item button-transparent" to="/dashboard/collections">
+                    <LibraryIcon class="icon" />
+                    <span class="title">Collections</span>
                   </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/settings">
                     <SettingsIcon class="icon" />
@@ -236,7 +235,6 @@
               to="/dashboard/notifications"
               class="tab button-animation"
               :class="{
-                bubble: user.notifications.some((notif) => !notif.read),
                 'no-active': isMobileMenuOpen || isBrowseMenuOpen,
               }"
               title="Notifications"
@@ -359,7 +357,7 @@
   </div>
 </template>
 <script setup>
-import { LogInIcon, DownloadIcon } from 'omorphia'
+import { LogInIcon, DownloadIcon, LibraryIcon } from 'omorphia'
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg'
 import CrossIcon from '~/assets/images/utils/x.svg'
 import SearchIcon from '~/assets/images/utils/search.svg'
@@ -383,7 +381,6 @@ import Avatar from '~/components/ui/Avatar.vue'
 
 const app = useNuxtApp()
 const auth = await useAuth()
-const user = await useUser()
 const cosmetics = useCosmetics()
 const tags = useTags()
 

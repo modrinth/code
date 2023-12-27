@@ -1,5 +1,4 @@
 import { useNuxtApp } from '#app'
-import { userReadNotifications } from '~/composables/user.js'
 
 async function getBulk(type, ids) {
   if (ids.length === 0) {
@@ -168,7 +167,6 @@ export async function markAsRead(ids) {
     await useBaseFetch(`notifications?ids=${JSON.stringify([...new Set(ids)])}`, {
       method: 'PATCH',
     })
-    await userReadNotifications(ids)
     return (notifications) => {
       const newNotifs = notifications
       newNotifs.forEach((notif) => {

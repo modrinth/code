@@ -49,6 +49,8 @@ html {
 
   --color-ad: #d6e6f9;
   --color-ad-raised: #b1c8e4;
+  --color-ad-contrast: var(--color-text);
+  --color-ad-highlight: #088cdb;
 
   --color-grey-link: var(--color-text);
   --color-grey-link-hover: var(--color-heading);
@@ -187,6 +189,8 @@ html {
 
   --color-ad: #1f324a;
   --color-ad-raised: #2e4057;
+  --color-ad-contrast: var(--color-text);
+  --color-ad-highlight: #088cdb;
 
   --color-link: #74b6f3;
   --color-link-hover: #92c0f5;

@@ -69,6 +69,12 @@
 }
 
 @media (min-width: 1024px) {
+  .full-page {
+    margin: 0 auto;
+    max-width: min(1280px, 100vw);
+    width: 80rem;
+  }
+
   .normal-page {
     margin: 0 auto;
     max-width: 80rem;
@@ -86,6 +92,20 @@
         'content info' auto
         'content dummy' 1fr
         / 1fr 20rem;
+    }
+
+    &.no-sidebar {
+      grid-template:
+        'header header' auto
+        'content content' auto
+        'info info' auto
+        'dummy dummy' 1fr
+        / 1fr 1fr;
+
+      .normal-page__content {
+        grid-area: content;
+        max-width: 100%;
+      }
     }
   }
 
