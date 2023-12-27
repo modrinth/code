@@ -119,8 +119,8 @@
               type="button"
               class="iconified-button brand-button"
               :disabled="
-                newPassword.length === 0 ||
-                oldPassword.length === 0 ||
+                newPassword.length == 0 ||
+                (auth.user.has_password && oldPassword.length == 0) ||
                 newPassword !== confirmNewPassword
               "
               @click="savePassword"
