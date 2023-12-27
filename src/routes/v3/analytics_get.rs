@@ -497,7 +497,7 @@ fn condense_countries(countries: HashMap<String, u64>) -> HashMap<String, u64> {
     // Every country under '15' (view or downloads) should be condensed into 'XX'
     let mut hm = HashMap::new();
     for (mut country, count) in countries {
-        if count < 15 {
+        if count < 50 {
             country = "XX".to_string();
         }
         if !hm.contains_key(&country) {

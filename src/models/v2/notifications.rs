@@ -35,6 +35,7 @@ pub struct LegacyNotificationAction {
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
 pub enum LegacyNotificationBody {
     ProjectUpdate {
         project_id: ProjectId,
