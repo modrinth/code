@@ -11,6 +11,7 @@
         maxlength="11"
         type="text"
         placeholder="Enter code..."
+        autofocus
         @keyup.enter="begin2FASignIn"
       />
 
