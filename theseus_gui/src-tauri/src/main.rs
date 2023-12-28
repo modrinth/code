@@ -57,7 +57,6 @@ fn main() {
             ERROR > WARN > INFO > DEBUG > TRACE
         eg. RUST_LOG=info will show info, warn, and error logs
             RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
-            RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
 
         Error messages returned to Tauri will display as traced error logs if they return an error.
         This will also include an attached span trace if the error is from a tracing error, and the level is set to info, debug, or trace
