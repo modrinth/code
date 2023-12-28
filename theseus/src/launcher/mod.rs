@@ -16,7 +16,7 @@ use daedalus as d;
 use daedalus::minecraft::{RuleAction, VersionInfo};
 use st::Profile;
 use std::collections::HashMap;
-use std::{process::Stdio, sync::Arc};
+use std::sync::Arc;
 use tokio::process::Command;
 use uuid::Uuid;
 
@@ -511,9 +511,7 @@ pub async fn launch_minecraft(
             .into_iter()
             .collect::<Vec<_>>(),
         )
-        .current_dir(instance_path.clone())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
+        .current_dir(instance_path.clone());
 
     // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
     #[cfg(target_os = "macos")]
