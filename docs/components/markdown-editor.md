@@ -7,6 +7,10 @@ const description1 = ref(null);
 const description2 = ref(null);
 const description3 = ref(null);
 
+const description4 = ref("Hello, world! This is a **bold** statement.");
+
+const isDisabled = ref(false);
+
 const onImageUpload = (file) => {
   return URL.createObjectURL(file).replace("blob:", "");
 };
@@ -78,4 +82,35 @@ const description = ref(null)
 </script>
 
 <MarkdownEditor v-model="description" :heading-buttons="false" />
+```
+
+## With default value
+<DemoContainer>
+  <MarkdownEditor v-model="description4" />
+</DemoContainer>
+
+```vue
+<script setup>
+import { ref } from "vue";
+
+const description = ref("Hello, world! This is a **bold** statement.");
+</script>
+
+<MardownEditor v-model="description" />
+```
+
+## Disabled
+<DemoContainer>
+  <Toggle v-model="isDisabled" label="Disabled" />
+  <MarkdownEditor v-model="description" :disabled="isDisabled" />
+</DemoContainer>
+
+```vue
+<script setup>
+import { ref } from "vue";
+
+const description = ref(null);
+</script>
+
+<MardownEditor v-model="description" disabled />
 ```

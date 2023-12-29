@@ -250,7 +250,7 @@
         </span>
       </div>
     </div>
-    <div v-if="previewMode">
+    <div v-else>
       <div class="markdown-body-wrapper">
         <div
           style="width: 100%"
@@ -265,7 +265,7 @@
 <script setup lang="ts">
 import { type Component, computed, ref, onMounted, onBeforeUnmount, toRef, watch } from 'vue'
 
-import { EditorState } from '@codemirror/state'
+import { Compartment, EditorState } from '@codemirror/state'
 import { EditorView, keymap, placeholder as cm_placeholder } from '@codemirror/view'
 import { markdown } from '@codemirror/lang-markdown'
 import { indentWithTab, historyKeymap, history } from '@codemirror/commands'
@@ -327,6 +327,8 @@ const props = withDefaults(
 
 const editorRef = ref<HTMLDivElement>()
 let editor: EditorView | null = null
+let isDisabledCompartment: Compartment | null = null
+let editorThemeCompartment: Compartment | null = null
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -337,8 +339,10 @@ onMounted(() => {
     }
   })
 
+  editorThemeCompartment = new Compartment()
+
   const theme = EditorView.theme({
-    // in defualts.scss there's references to .cm-content and such to inherit global styles
+    // in defaults.scss there's references to .cm-content and such to inherit global styles
     '.cm-content': {
       marginBlockEnd: '0.5rem',
       padding: '0.5rem',
@@ -354,6 +358,10 @@ onMounted(() => {
       overflow: 'visible',
     },
   })
+
+  isDisabledCompartment = new Compartment()
+
+  const disabledCompartment = EditorState.readOnly.of(props.disabled)
 
   const eventHandlers = EditorView.domEventHandlers({
     paste: (ev, view) => {
@@ -425,7 +433,6 @@ onMounted(() => {
 
   const editorState = EditorState.create({
     extensions: [
-      theme,
       eventHandlers,
       updateListener,
       keymap.of([indentWithTab]),
@@ -437,13 +444,24 @@ onMounted(() => {
       keymap.of(historyKeymap),
       cm_placeholder(props.placeholder || ''),
       inputFilter,
+      isDisabledCompartment.of(disabledCompartment),
+      editorThemeCompartment.of(theme),
     ],
   })
 
   editor = new EditorView({
     state: editorState,
     parent: editorRef.value,
-    doc: props.modelValue,
+    doc: props.modelValue ?? '', // This doesn't work for some reason
+  })
+
+  // set editor content to props.modelValue
+  editor?.dispatch({
+    changes: {
+      from: 0,
+      to: editor.state.doc.length,
+      insert: props.modelValue,
+    },
   })
 })
 
@@ -541,18 +559,70 @@ const BUTTONS: ButtonGroupMap = {
   },
 }
 
-const currentValue = toRef(props, 'modelValue')
-watch(currentValue, (newValue) => {
-  if (editor) {
-    editor.dispatch({
-      changes: {
-        from: 0,
-        to: editor.state.doc.length,
-        insert: newValue,
-      },
-    })
+watch(
+  () => props.disabled,
+  (newValue) => {
+    if (editor) {
+      if (isDisabledCompartment) {
+        editor.dispatch({
+          effects: [isDisabledCompartment.reconfigure(EditorState.readOnly.of(newValue))],
+        })
+      }
+
+      if (editorThemeCompartment) {
+        editor.dispatch({
+          effects: [
+            editorThemeCompartment.reconfigure(
+              EditorView.theme({
+                // in defaults.scss there's references to .cm-content and such to inherit global styles
+                '.cm-content': {
+                  marginBlockEnd: '0.5rem',
+                  padding: '0.5rem',
+                  minHeight: '200px',
+                  caretColor: 'var(--color-contrast)',
+                  width: '100%',
+                  overflowX: 'scroll',
+                  maxHeight: props.maxHeight ? `${props.maxHeight}px` : 'unset',
+                  overflowY: 'scroll',
+
+                  opacity: newValue ? 0.6 : 1,
+                  pointerEvents: newValue ? 'none' : 'all',
+                  cursor: newValue ? 'not-allowed' : 'auto',
+                },
+                '.cm-scroller': {
+                  height: '100%',
+                  overflow: 'visible',
+                },
+              })
+            ),
+          ],
+        })
+      }
+    }
+  },
+  {
+    immediate: true,
   }
-})
+)
+
+const currentValue = toRef(props, 'modelValue')
+watch(
+  currentValue,
+  (newValue) => {
+    if (editor && newValue !== editor.state.doc.toString()) {
+      editor.dispatch({
+        changes: {
+          from: 0,
+          to: editor.state.doc.length,
+          insert: newValue,
+        },
+      })
+    }
+  },
+  {
+    immediate: true,
+  }
+)
 
 const updateCurrentValue = (newValue: string) => {
   emit('update:modelValue', newValue)
@@ -872,5 +942,11 @@ function openVideoModal() {
     align-items: center;
     justify-content: start;
   }
+}
+
+.cm-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
 }
 </style>
