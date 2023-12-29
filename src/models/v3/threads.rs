@@ -51,7 +51,10 @@ pub enum MessageBody {
     },
     ThreadClosure,
     ThreadReopen,
-    Deleted,
+    Deleted {
+        #[serde(default)]
+        private: bool,
+    },
 }
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone)]
@@ -102,6 +105,8 @@ impl Thread {
                 .into_iter()
                 .filter(|x| {
                     if let MessageBody::Text { private, .. } = x.body {
+                        !private || user.role.is_mod()
+                    } else if let MessageBody::Deleted { private, .. } = x.body {
                         !private || user.role.is_mod()
                     } else {
                         true

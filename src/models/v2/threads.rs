@@ -40,7 +40,10 @@ pub enum LegacyMessageBody {
     },
     ThreadClosure,
     ThreadReopen,
-    Deleted,
+    Deleted {
+        #[serde(default)]
+        private: bool,
+    },
 }
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Copy, Clone)]
@@ -90,7 +93,9 @@ impl From<crate::models::v3::threads::MessageBody> for LegacyMessageBody {
             crate::models::v3::threads::MessageBody::ThreadReopen => {
                 LegacyMessageBody::ThreadReopen
             }
-            crate::models::v3::threads::MessageBody::Deleted => LegacyMessageBody::Deleted,
+            crate::models::v3::threads::MessageBody::Deleted { private } => {
+                LegacyMessageBody::Deleted { private }
+            }
         }
     }
 }

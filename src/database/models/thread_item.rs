@@ -241,7 +241,8 @@ impl ThreadMessage {
                 id: ThreadMessageId(x.id),
                 thread_id: ThreadId(x.thread_id),
                 author_id: x.author_id.map(UserId),
-                body: serde_json::from_value(x.body).unwrap_or(MessageBody::Deleted),
+                body: serde_json::from_value(x.body)
+                    .unwrap_or(MessageBody::Deleted { private: false }),
                 created: x.created,
             }))
         })
@@ -253,6 +254,7 @@ impl ThreadMessage {
 
     pub async fn remove_full(
         id: ThreadMessageId,
+        private: bool,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
@@ -262,7 +264,7 @@ impl ThreadMessage {
             WHERE id = $1
             ",
             id as ThreadMessageId,
-            serde_json::to_value(MessageBody::Deleted).unwrap_or(serde_json::json!({}))
+            serde_json::to_value(MessageBody::Deleted { private }).unwrap_or(serde_json::json!({}))
         )
         .execute(&mut **transaction)
         .await?;

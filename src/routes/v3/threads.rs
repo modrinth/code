@@ -611,7 +611,15 @@ pub async fn message_delete(
             database::Image::remove(image.id, &mut transaction, &redis).await?;
         }
 
-        database::models::ThreadMessage::remove_full(thread.id, &mut transaction).await?;
+        let private = if let MessageBody::Text { private, .. } = thread.body {
+            private
+        } else if let MessageBody::Deleted { private, .. } = thread.body {
+            private
+        } else {
+            false
+        };
+
+        database::models::ThreadMessage::remove_full(thread.id, private, &mut transaction).await?;
         transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))
