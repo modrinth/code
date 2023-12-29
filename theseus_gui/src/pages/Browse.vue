@@ -148,6 +148,8 @@ if (route.query.ai) {
   hideAlreadyInstalled.value = route.query.ai === 'true'
 }
 
+let abortController = new AbortController()
+
 async function refreshSearch() {
   const base = 'https://api.modrinth.com/v2/'
 
@@ -251,7 +253,17 @@ async function refreshSearch() {
 
   let val = `${base}${url}`
 
-  let rawResults = await useFetch(val, 'search results', offline.value)
+
+  abortController.abort()
+  abortController = new AbortController()
+
+  let rawResults
+  try {
+    rawResults = await useFetch(val, 'search results', offline.value, abortController.signal)
+  } catch (error) {
+    return
+  }
+
   if (!rawResults) {
     rawResults = {
       hits: [],
