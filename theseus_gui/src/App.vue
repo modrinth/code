@@ -551,18 +551,15 @@ command_listener(async (e) => {
     background: inherit;
     transition: all ease-in-out 0.1s;
     color: var(--color-base);
-    box-shadow: none;
 
     &.router-link-active {
-      color: var(--color-contrast);
-      background: var(--color-button-bg);
-      box-shadow: var(--shadow-floating);
+      color: var(--color-brand);
+      background: var(--color-brand-highlight);
     }
 
     &:hover {
       background-color: var(--color-button-bg);
       color: var(--color-contrast);
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
       text-decoration: none;
     }
   }
@@ -577,7 +574,7 @@ command_listener(async (e) => {
   height: 3rem !important;
   width: 3rem !important;
   padding: 0.75rem;
-  border-radius: var(--radius-md);
+  border-radius: 99999px;
   box-shadow: none;
 
   svg {
