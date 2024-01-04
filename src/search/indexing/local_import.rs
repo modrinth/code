@@ -163,6 +163,9 @@ pub async fn index_local(
             })
             .unwrap_or_default();
         categories.extend(mrpack_loaders);
+        if loader_fields.contains_key("mrpack_loaders") {
+            categories.retain(|x| *x != "mrpack");
+        }
 
         let gallery = m
             .gallery_items

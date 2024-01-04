@@ -15,7 +15,10 @@ pub struct Organization {
     /// The id of the organization
     pub id: OrganizationId,
 
-    /// The title (and slug) of the organization
+    /// The slug of the organization
+    pub slug: String,
+
+    /// The title of the organization
     pub name: String,
 
     /// The associated team of the organization
@@ -36,10 +39,11 @@ impl Organization {
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
             "
-            INSERT INTO organizations (id, name, team_id, description, icon_url, color)
-            VALUES ($1, $2, $3, $4, $5, $6)
+            INSERT INTO organizations (id, slug, name, team_id, description, icon_url, color)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             ",
             self.id.0,
+            self.slug,
             self.name,
             self.team_id as TeamId,
             self.description,
@@ -149,7 +153,7 @@ impl Organization {
                 {
                     remaining_strings.retain(|x| {
                         &to_base62(organization.id.0 as u64) != x
-                            && organization.name.to_lowercase() != x.to_lowercase()
+                            && organization.slug.to_lowercase() != x.to_lowercase()
                     });
                     found_organizations.push(organization);
                     continue;
@@ -166,9 +170,9 @@ impl Organization {
 
             let organizations: Vec<Organization> = sqlx::query!(
                 "
-                SELECT o.id, o.name, o.team_id, o.description, o.icon_url, o.color
+                SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color
                 FROM organizations o
-                WHERE o.id = ANY($1) OR LOWER(o.name) = ANY($2)
+                WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)
                 GROUP BY o.id;
                 ",
                 &organization_ids_parsed,
@@ -181,6 +185,7 @@ impl Organization {
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| Organization {
                     id: OrganizationId(m.id),
+                    slug: m.slug,
                     name: m.name,
                     team_id: TeamId(m.team_id),
                     description: m.description,
@@ -203,7 +208,7 @@ impl Organization {
                 redis
                     .set(
                         ORGANIZATIONS_TITLES_NAMESPACE,
-                        &organization.name.to_lowercase(),
+                        &organization.slug.to_lowercase(),
                         &organization.id.0.to_string(),
                         None,
                     )
@@ -226,7 +231,7 @@ impl Organization {
     {
         let result = sqlx::query!(
             "
-            SELECT o.id, o.name, o.team_id, o.description, o.icon_url, o.color
+            SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color
             FROM organizations o
             LEFT JOIN mods m ON m.organization_id = o.id
             WHERE m.id = $1
@@ -240,6 +245,7 @@ impl Organization {
         if let Some(result) = result {
             Ok(Some(Organization {
                 id: OrganizationId(result.id),
+                slug: result.slug,
                 name: result.name,
                 team_id: TeamId(result.team_id),
                 description: result.description,
@@ -299,7 +305,7 @@ impl Organization {
 
     pub async fn clear_cache(
         id: OrganizationId,
-        title: Option<String>,
+        slug: Option<String>,
         redis: &RedisPool,
     ) -> Result<(), super::DatabaseError> {
         let mut redis = redis.connect().await?;
@@ -309,7 +315,7 @@ impl Organization {
                 (ORGANIZATIONS_NAMESPACE, Some(id.0.to_string())),
                 (
                     ORGANIZATIONS_TITLES_NAMESPACE,
-                    title.map(|x| x.to_lowercase()),
+                    slug.map(|x| x.to_lowercase()),
                 ),
             ])
             .await?;

@@ -11,7 +11,7 @@ use serde_json::json;
 
 mod common;
 
-// TODO: Revisit this with the new modify_json in the version maker
+// TODO: Revisit this wit   h the new modify_json in the version maker
 // That change here should be able to simplify it vastly
 
 #[actix_rt::test]
@@ -61,17 +61,13 @@ async fn search_projects() {
             ),
             // Project type change
             // Modpack should still be able to search based on former loader, even though technically the loader is 'mrpack'
-            (json!([["categories:mrpack"]]), vec![4]),
+            // (json!([["categories:mrpack"]]), vec![4]),
+            // (
+            //     json!([["categories:fabric"]]),
+            //     vec![4],
+            // ),
             (
-                json!([["categories:mrpack"], ["categories:fabric"]]),
-                vec![4],
-            ),
-            (
-                json!([
-                    ["categories:mrpack"],
-                    ["categories:fabric"],
-                    ["project_types:modpack"]
-                ]),
+                json!([["categories:fabric"], ["project_types:modpack"]]),
                 vec![4],
             ),
         ];

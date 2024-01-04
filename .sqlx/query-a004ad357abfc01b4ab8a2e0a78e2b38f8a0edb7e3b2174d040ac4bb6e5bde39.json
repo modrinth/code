@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO organizations (id, slug, name, team_id, description, icon_url, color)\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8",
+        "Varchar",
+        "Text",
+        "Int8",
+        "Text",
+        "Varchar",
+        "Int4"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a004ad357abfc01b4ab8a2e0a78e2b38f8a0edb7e3b2174d040ac4bb6e5bde39"
+}

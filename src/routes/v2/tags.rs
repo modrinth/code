@@ -79,16 +79,22 @@ pub async fn loader_list(
         Ok(loaders) => {
             let loaders = loaders
                 .into_iter()
-                .map(|l| LoaderData {
-                    icon: l.icon,
-                    name: l.name,
+                .filter(|l| &*l.name != "mrpack")
+                .map(|l| {
+                    let mut supported_project_types = l.supported_project_types;
                     // Add generic 'project' type to all loaders, which is the v2 representation of
                     // a project type before any versions are set.
-                    supported_project_types: l
-                        .supported_project_types
-                        .into_iter()
-                        .chain(std::iter::once("project".to_string()))
-                        .collect(),
+                    supported_project_types.push("project".to_string());
+
+                    if ["forge", "fabric", "quilt", "neoforge"].contains(&&*l.name) {
+                        supported_project_types.push("modpack".to_string());
+                    }
+
+                    LoaderData {
+                        icon: l.icon,
+                        name: l.name,
+                        supported_project_types,
+                    }
                 })
                 .collect::<Vec<_>>();
             Ok(HttpResponse::Ok().json(loaders))

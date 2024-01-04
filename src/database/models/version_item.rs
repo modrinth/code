@@ -126,70 +126,42 @@ pub struct VersionFileBuilder {
 }
 
 impl VersionFileBuilder {
-    pub async fn insert_many(
-        version_files: Vec<Self>,
+    pub async fn insert(
+        self,
         version_id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<FileId, DatabaseError> {
-        let file_id = generate_file_id(transaction).await?;
+        let file_id = generate_file_id(&mut *transaction).await?;
 
-        let (file_ids, version_ids, urls, filenames, primary, sizes, file_types): (
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-            Vec<_>,
-        ) = version_files
-            .iter()
-            .map(|f| {
-                (
-                    file_id.0,
-                    version_id.0,
-                    f.url.clone(),
-                    f.filename.clone(),
-                    f.primary,
-                    f.size as i32,
-                    f.file_type.map(|x| x.to_string()),
-                )
-            })
-            .multiunzip();
         sqlx::query!(
             "
             INSERT INTO files (id, version_id, url, filename, is_primary, size, file_type)
-            SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::varchar[], $4::varchar[], $5::bool[], $6::integer[], $7::varchar[])
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             ",
-            &file_ids[..],
-            &version_ids[..],
-            &urls[..],
-            &filenames[..],
-            &primary[..],
-            &sizes[..],
-            &file_types[..] as &[Option<String>],
+            file_id as FileId,
+            version_id as VersionId,
+            self.url,
+            self.filename,
+            self.primary,
+            self.size as i32,
+            self.file_type.map(|x| x.as_str()),
         )
         .execute(&mut **transaction)
         .await?;
 
-        let (file_ids, algorithms, hashes): (Vec<_>, Vec<_>, Vec<_>) = version_files
-            .into_iter()
-            .flat_map(|f| {
-                f.hashes
-                    .into_iter()
-                    .map(|h| (file_id.0, h.algorithm, h.hash))
-            })
-            .multiunzip();
-        sqlx::query!(
-            "
-            INSERT INTO hashes (file_id, algorithm, hash)
-            SELECT * FROM UNNEST($1::bigint[], $2::varchar[], $3::bytea[])
-            ",
-            &file_ids[..],
-            &algorithms[..],
-            &hashes[..],
-        )
-        .execute(&mut **transaction)
-        .await?;
+        for hash in self.hashes {
+            sqlx::query!(
+                "
+                INSERT INTO hashes (file_id, algorithm, hash)
+                VALUES ($1, $2, $3)
+                ",
+                file_id as FileId,
+                hash.algorithm,
+                hash.hash,
+            )
+            .execute(&mut **transaction)
+            .await?;
+        }
 
         Ok(file_id)
     }
@@ -242,7 +214,10 @@ impl VersionBuilder {
             version_id,
             ..
         } = self;
-        VersionFileBuilder::insert_many(files, self.version_id, transaction).await?;
+
+        for file in files {
+            file.insert(version_id, transaction).await?;
+        }
 
         DependencyBuilder::insert_many(dependencies, self.version_id, transaction).await?;
 

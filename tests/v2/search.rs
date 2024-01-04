@@ -259,14 +259,14 @@ async fn search_projects() {
             ),
             // Project type change
             // Modpack should still be able to search based on former loader, even though technically the loader is 'mrpack'
-            (json!([["categories:mrpack"]]), vec![4]),
-            (
-                json!([["categories:mrpack"], ["categories:fabric"]]),
-                vec![4],
-            ),
+            // (json!([["categories:mrpack"]]), vec![4]),
+            // (
+            //     json!([["categories:mrpack"], ["categories:fabric"]]),
+            //     vec![4],
+            // ),
             (
                 json!([
-                    ["categories:mrpack"],
+                    // ["categories:mrpack"],
                     ["categories:fabric"],
                     ["project_type:modpack"]
                 ]),

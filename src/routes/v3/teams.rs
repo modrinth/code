@@ -65,7 +65,7 @@ pub async fn team_members_get_project(
         }
         let members_data =
             TeamMember::get_from_team_full(project.inner.team_id, &**pool, &redis).await?;
-        let users = crate::database::models::User::get_many_ids(
+        let users = User::get_many_ids(
             &members_data.iter().map(|x| x.user_id).collect::<Vec<_>>(),
             &**pool,
             &redis,
@@ -73,14 +73,14 @@ pub async fn team_members_get_project(
         .await?;
 
         let user_id = current_user.as_ref().map(|x| x.id.into());
+        let logged_in = if let Some(user_id) = user_id {
+            let (team_member, organization_team_member) =
+                TeamMember::get_for_project_permissions(&project.inner, user_id, &**pool).await?;
 
-        let logged_in = current_user
-            .and_then(|user| {
-                members_data
-                    .iter()
-                    .find(|x| x.user_id == user.id.into() && x.accepted)
-            })
-            .is_some();
+            team_member.is_some() || organization_team_member.is_some()
+        } else {
+            false
+        };
 
         let team_members: Vec<_> = members_data
             .into_iter()

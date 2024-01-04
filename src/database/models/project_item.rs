@@ -273,13 +273,13 @@ impl Project {
                 id, team_id, name, summary, description,
                 published, downloads, icon_url, status, requested_status,
                 license_url, license,
-                slug, color, monetization_status
+                slug, color, monetization_status, organization_id
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6, 
                 $7, $8, $9, $10, 
                 $11, $12, 
-                LOWER($13), $14, $15
+                LOWER($13), $14, $15, $16
             )
             ",
             self.id as ProjectId,
@@ -297,6 +297,7 @@ impl Project {
             self.slug.as_ref(),
             self.color.map(|x| x as i32),
             self.monetization_status.as_str(),
+            self.organization_id.map(|x| x.0 as i64),
         )
         .execute(&mut **transaction)
         .await?;

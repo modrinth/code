@@ -46,7 +46,7 @@ async fn get_tags() {
         let loader_names = loaders.into_iter().map(|x| x.name).collect::<HashSet<_>>();
         assert_eq!(
             loader_names,
-            ["fabric", "forge", "mrpack", "bukkit", "waterfall"]
+            ["fabric", "forge", "bukkit", "waterfall"]
                 .iter()
                 .map(|s| s.to_string())
                 .collect()

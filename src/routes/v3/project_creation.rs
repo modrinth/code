@@ -73,7 +73,7 @@ pub enum CreateError {
     InvalidCategory(String),
     #[error("Invalid file type for version file: {0}")]
     InvalidFileType(String),
-    #[error("Slug collides with other project's id!")]
+    #[error("Slug is already taken!")]
     SlugCollision,
     #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
@@ -612,22 +612,22 @@ async fn project_create_inner(
             additional_categories.extend(ids.values());
         }
 
-        // Should only be owner if not attached to an organization
-        let is_owner = project_create_data.organization_id.is_none();
+        let mut members = vec![];
 
-        let team = models::team_item::TeamBuilder {
-            members: vec![models::team_item::TeamMemberBuilder {
+        if project_create_data.organization_id.is_none() {
+            members.push(models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
-                is_owner,
-                // Allow all permissions for project creator, even if attached to a project
+                is_owner: true,
                 permissions: ProjectPermissions::all(),
                 organization_permissions: None,
                 accepted: true,
                 payouts_split: Decimal::ONE_HUNDRED,
                 ordering: 0,
-            }],
-        };
+            })
+        }
+
+        let team = models::team_item::TeamBuilder { members };
 
         let team_id = team.insert(&mut *transaction).await?;
 

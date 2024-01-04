@@ -412,10 +412,10 @@ impl TeamMember {
         sqlx::query!(
             "
             INSERT INTO team_members (
-                id, team_id, user_id, role, permissions, organization_permissions, is_owner, accepted
+                id, team_id, user_id, role, permissions, organization_permissions, is_owner, accepted, payouts_split
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8
+                $1, $2, $3, $4, $5, $6, $7, $8, $9
             )
             ",
             self.id as TeamMemberId,
@@ -426,6 +426,7 @@ impl TeamMember {
             self.organization_permissions.map(|p| p.bits() as i64),
             self.is_owner,
             self.accepted,
+            self.payouts_split
         )
         .execute(&mut **transaction)
         .await?;

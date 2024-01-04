@@ -242,6 +242,7 @@ pub fn convert_side_type_facets_v3(facets: Vec<Vec<Vec<String>>>) -> Vec<Vec<Vec
 // this is not lossless. (See tests)
 pub fn convert_side_types_v2(
     side_types: &HashMap<String, Value>,
+    project_type: Option<&str>,
 ) -> (LegacySideType, LegacySideType) {
     let client_and_server = side_types
         .get("client_and_server")
@@ -265,6 +266,7 @@ pub fn convert_side_types_v2(
         client_only,
         server_only,
         Some(client_and_server),
+        project_type,
     )
 }
 
@@ -274,29 +276,38 @@ pub fn convert_side_types_v2_bools(
     client_only: bool,
     server_only: bool,
     client_and_server: Option<bool>,
+    project_type: Option<&str>,
 ) -> (LegacySideType, LegacySideType) {
-    use LegacySideType::{Optional, Required, Unsupported};
+    use LegacySideType::{Optional, Required, Unknown, Unsupported};
 
-    let singleplayer = singleplayer.or(client_and_server).unwrap_or(false);
+    match project_type {
+        Some("plugin") => (Unsupported, Required),
+        Some("datapack") => (Optional, Required),
+        Some("shader") => (Required, Unsupported),
+        Some("resourcepack") => (Required, Unsupported),
+        _ => {
+            let singleplayer = singleplayer.or(client_and_server).unwrap_or(false);
 
-    match (singleplayer, client_only, server_only) {
-        // Only singleplayer
-        (true, false, false) => (Required, Required),
+            match (singleplayer, client_only, server_only) {
+                // Only singleplayer
+                (true, false, false) => (Required, Required),
 
-        // Client only and not server only
-        (false, true, false) => (Required, Unsupported),
-        (true, true, false) => (Required, Unsupported),
+                // Client only and not server only
+                (false, true, false) => (Required, Unsupported),
+                (true, true, false) => (Required, Unsupported),
 
-        // Server only and not client only
-        (false, false, true) => (Unsupported, Required),
-        (true, false, true) => (Unsupported, Required),
+                // Server only and not client only
+                (false, false, true) => (Unsupported, Required),
+                (true, false, true) => (Unsupported, Required),
 
-        // Both server only and client only
-        (true, true, true) => (Optional, Optional),
-        (false, true, true) => (Optional, Optional),
+                // Both server only and client only
+                (true, true, true) => (Optional, Optional),
+                (false, true, true) => (Optional, Optional),
 
-        // Bad type
-        (false, false, false) => (Unsupported, Unsupported),
+                // Bad type
+                (false, false, false) => (Unknown, Unknown),
+            }
+        }
     }
 }
 
@@ -321,6 +332,7 @@ mod tests {
             (Unsupported, Optional),
             (Required, Optional),
             (Optional, Required),
+            (Unsupported, Unsupported),
         ];
 
         for client_side in [Required, Optional, Unsupported] {
@@ -329,7 +341,7 @@ mod tests {
                     continue;
                 }
                 let side_types = convert_side_types_v3(client_side, server_side);
-                let (client_side2, server_side2) = convert_side_types_v2(&side_types);
+                let (client_side2, server_side2) = convert_side_types_v2(&side_types, None);
                 assert_eq!(client_side, client_side2);
                 assert_eq!(server_side, server_side2);
             }

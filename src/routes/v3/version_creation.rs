@@ -731,7 +731,9 @@ async fn upload_file_to_version_inner(
             "At least one file must be specified".to_string(),
         ));
     } else {
-        VersionFileBuilder::insert_many(file_builders, version_id, &mut *transaction).await?;
+        for file in file_builders {
+            file.insert(version_id, &mut *transaction).await?;
+        }
     }
 
     // Clear version cache

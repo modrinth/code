@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT o.id, o.name, o.team_id, o.description, o.icon_url, o.color\n                FROM organizations o\n                WHERE o.id = ANY($1) OR LOWER(o.name) = ANY($2)\n                GROUP BY o.id;\n                ",
+  "query": "\n                SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color\n                FROM organizations o\n                WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)\n                GROUP BY o.id;\n                ",
   "describe": {
     "columns": [
       {
@@ -10,26 +10,31 @@
       },
       {
         "ordinal": 1,
-        "name": "name",
+        "name": "slug",
         "type_info": "Varchar"
       },
       {
         "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
         "name": "team_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "description",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "icon_url",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "color",
         "type_info": "Int4"
       }
@@ -45,9 +50,10 @@
       false,
       false,
       false,
+      false,
       true,
       true
     ]
   },
-  "hash": "ca9f3298ff92051412f5096690b3314fe91fe0b7c79ab2f7d09396af47b85ee6"
+  "hash": "4deaf065c12dbfd5f585286001fdf66f60524ec13eab7d922db9290237297849"
 }

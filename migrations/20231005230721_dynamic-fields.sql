@@ -77,7 +77,7 @@ FROM versions v
 INNER JOIN mods m ON v.mod_id = m.id
 INNER JOIN loader_field_enum_values lfev ON m.client_side = lfev.original_id
 CROSS JOIN loader_fields lf
-WHERE client_side IS NOT NULL AND lfev.enum_id = 1 AND lf.field = 'client_side';
+WHERE client_side IS NOT NULL AND lfev.enum_id = 1 AND lf.field = 'client_side' AND NOT (ARRAY['vanilla', 'minecraft', 'optifine', 'iris', 'canvas', 'bukkit', 'folia', 'paper', 'purpur', 'spigot', 'sponge', 'datapack', 'bungeecord', 'velocity', 'waterfall'] @> m.loaders::text[]);;
 
 INSERT INTO version_fields (version_id, field_id, enum_value) 
 SELECT v.id, lf.id, lfev.id   -- Note: bug fix/edited 2023-11-27
@@ -85,7 +85,7 @@ FROM versions v
 INNER JOIN mods m ON v.mod_id = m.id
 INNER JOIN loader_field_enum_values lfev ON m.server_side = lfev.original_id
 CROSS JOIN loader_fields lf
-WHERE server_side IS NOT NULL AND lfev.enum_id = 1 AND lf.field = 'server_side';
+WHERE server_side IS NOT NULL AND lfev.enum_id = 1 AND lf.field = 'server_side' AND NOT (ARRAY['vanilla', 'minecraft', 'optifine', 'iris', 'canvas', 'bukkit', 'folia', 'paper', 'purpur', 'spigot', 'sponge', 'datapack', 'bungeecord', 'velocity', 'waterfall'] @> m.loaders::text[]);
 
 ALTER TABLE mods DROP COLUMN client_side;
 ALTER TABLE mods DROP COLUMN server_side;
@@ -99,8 +99,12 @@ SELECT id, 2, version, created, json_build_object('type', type, 'major', major) 
 INSERT INTO loader_fields (field, field_type, enum_type, optional, min_val) VALUES('game_versions', 'array_enum', 2, false, 0);
 INSERT INTO loader_fields_loaders (loader_id, loader_field_id) SELECT l.id, lf.id FROM loaders l CROSS JOIN loader_fields lf  WHERE lf.field = 'game_versions' AND l.loader = ANY( ARRAY['forge', 'fabric', 'quilt', 'modloader','rift','liteloader', 'neoforge']);
 
-INSERT INTO version_fields(version_id, field_id, enum_value) 
-SELECT gvv.joining_version_id, lf.id, lfev.id 
+-- remove dangling game versions
+DELETE FROM game_versions_versions
+WHERE joining_version_id NOT IN (SELECT id FROM versions);
+
+INSERT INTO version_fields(version_id, field_id, enum_value)
+SELECT gvv.joining_version_id, lf.id, lfev.id
 FROM game_versions_versions gvv INNER JOIN loader_field_enum_values lfev ON gvv.game_version_id = lfev.original_id
 CROSS JOIN loader_fields lf
 WHERE lf.field = 'game_versions' AND lfev.enum_id = 2;

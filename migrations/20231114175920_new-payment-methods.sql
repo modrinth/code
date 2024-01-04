@@ -1,3 +1,5 @@
+ALTER TABLE users DROP COLUMN IF EXISTS paypal_email;
+
 ALTER TABLE users
     ADD COLUMN paypal_country text NULL,
     ADD COLUMN paypal_email text NULL,

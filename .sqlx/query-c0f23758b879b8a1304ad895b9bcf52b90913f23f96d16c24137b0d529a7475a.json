@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT o.id, o.name, o.team_id, o.description, o.icon_url, o.color\n            FROM organizations o\n            LEFT JOIN mods m ON m.organization_id = o.id\n            WHERE m.id = $1\n            GROUP BY o.id;\n            ",
+  "query": "\n            SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color\n            FROM organizations o\n            LEFT JOIN mods m ON m.organization_id = o.id\n            WHERE m.id = $1\n            GROUP BY o.id;\n            ",
   "describe": {
     "columns": [
       {
@@ -10,26 +10,31 @@
       },
       {
         "ordinal": 1,
-        "name": "name",
+        "name": "slug",
         "type_info": "Varchar"
       },
       {
         "ordinal": 2,
+        "name": "name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
         "name": "team_id",
         "type_info": "Int8"
       },
       {
-        "ordinal": 3,
+        "ordinal": 4,
         "name": "description",
         "type_info": "Text"
       },
       {
-        "ordinal": 4,
+        "ordinal": 5,
         "name": "icon_url",
         "type_info": "Varchar"
       },
       {
-        "ordinal": 5,
+        "ordinal": 6,
         "name": "color",
         "type_info": "Int4"
       }
@@ -44,9 +49,10 @@
       false,
       false,
       false,
+      false,
       true,
       true
     ]
   },
-  "hash": "26a6271a6d365e64c68ea5855109f1597a121b2e0075b20e2bc34659a269294b"
+  "hash": "c0f23758b879b8a1304ad895b9bcf52b90913f23f96d16c24137b0d529a7475a"
 }
