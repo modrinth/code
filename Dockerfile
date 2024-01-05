@@ -1,4 +1,4 @@
-FROM rust:1.68.0 as build
+FROM rust:1.75.0 as build
 ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/labrinth

@@ -119,7 +119,7 @@ impl ApiProject for ApiV3 {
         pat: Option<&str>,
     ) -> CommonProject {
         let resp = self.get_project(id_or_slug, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let project: Project = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -169,7 +169,7 @@ impl ApiProject for ApiV3 {
         pat: Option<&str>,
     ) -> Vec<CommonProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let projects: Vec<Project> = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -383,10 +383,7 @@ impl ApiProject for ApiV3 {
             .append_pat(pat)
             .to_request();
 
-        let t = self.call(req).await;
-        println!("Status: {}", t.status());
-        println!("respone Body: {:?}", t.response().body());
-        t
+        self.call(req).await
     }
 
     async fn remove_gallery_item(
@@ -480,7 +477,7 @@ impl ApiProject for ApiV3 {
 impl ApiV3 {
     pub async fn get_project_deserialized(&self, id_or_slug: &str, pat: Option<&str>) -> Project {
         let resp = self.get_project(id_or_slug, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -503,7 +500,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Organization {
         let resp = self.get_project_organization(id_or_slug, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -530,8 +527,7 @@ impl ApiV3 {
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
-        let status = resp.status();
-        assert_eq!(status, 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -598,7 +594,7 @@ impl ApiV3 {
                 pat,
             )
             .await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 }

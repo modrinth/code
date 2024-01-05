@@ -81,7 +81,7 @@ pub fn root_config(cfg: &mut web::ServiceConfig) {
 pub enum ApiError {
     #[error("Environment Error")]
     Env(#[from] dotenvy::Error),
-    #[error("Error while uploading file")]
+    #[error("Error while uploading file: {0}")]
     FileHosting(#[from] FileHostingError),
     #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),

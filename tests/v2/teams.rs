@@ -1,9 +1,11 @@
+use actix_http::StatusCode;
 use labrinth::models::teams::ProjectPermissions;
 use serde_json::json;
 
 use crate::common::{
     api_common::ApiTeams,
     api_v2::ApiV2,
+    asserts::assert_status,
     database::{
         FRIEND_USER_ID, FRIEND_USER_ID_PARSED, FRIEND_USER_PAT, USER_USER_ID_PARSED, USER_USER_PAT,
     },
@@ -23,35 +25,35 @@ async fn transfer_ownership_v2() {
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_eq!(resp.status(), 400);
+        assert_status(&resp, StatusCode::BAD_REQUEST);
 
         // first, invite friend
         let resp = api
             .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_eq!(resp.status(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
 
         // still cannot set friend as owner (not accepted)
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_eq!(resp.status(), 400);
+        assert_status(&resp, StatusCode::BAD_REQUEST);
 
         // accept
         let resp = api.join_team(alpha_team_id, FRIEND_USER_PAT).await;
-        assert_eq!(resp.status(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
 
         // Cannot set ourselves as owner if we are not owner
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
-        assert_eq!(resp.status(), 401);
+        assert_status(&resp, StatusCode::UNAUTHORIZED);
 
         // Can set friend as owner
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_eq!(resp.status(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
 
         // Check
         let members = api
@@ -78,7 +80,7 @@ async fn transfer_ownership_v2() {
         let resp = api
             .remove_from_team(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_eq!(resp.status(), 401);
+        assert_status(&resp, StatusCode::UNAUTHORIZED);
 
         // V2 only- confirm the owner changing the role to member does nothing
         let resp = api
@@ -91,7 +93,7 @@ async fn transfer_ownership_v2() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert_eq!(resp.status(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
         let members = api
             .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
             .await;

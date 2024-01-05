@@ -6,10 +6,10 @@ use labrinth::file_hosting::S3Host;
 use labrinth::ratelimit::errors::ARError;
 use labrinth::ratelimit::memory::{MemoryStore, MemoryStoreActor};
 use labrinth::ratelimit::middleware::RateLimiter;
+use labrinth::search;
 use labrinth::util::env::parse_var;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use log::{error, info};
-
 use std::sync::Arc;
 
 #[derive(Clone)]
@@ -93,11 +93,13 @@ async fn main() -> std::io::Result<()> {
         .build()
         .expect("Failed to create prometheus metrics middleware");
 
+    let search_config = search::SearchConfig::new(None);
     info!("Starting Actix HTTP server!");
 
     let labrinth_config = labrinth::app_setup(
         pool.clone(),
         redis_pool.clone(),
+        search_config.clone(),
         &mut clickhouse,
         file_host.clone(),
         maxmind_reader.clone(),

@@ -2,6 +2,7 @@
 
 use std::{collections::HashMap, sync::Arc};
 
+use actix_http::StatusCode;
 use serde_json::json;
 
 use crate::common::{
@@ -10,7 +11,7 @@ use crate::common::{
     dummy_data::{TestFile, DUMMY_CATEGORIES},
 };
 
-use super::{api_v3::ApiV3, environment::TestEnvironment};
+use super::{api_v3::ApiV3, asserts::assert_status, environment::TestEnvironment};
 
 pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<HashMap<u64, u64>> {
     // Test setup and dummy data
@@ -47,7 +48,7 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
                         MOD_USER_PAT,
                     )
                     .await;
-                assert_eq!(resp.status(), 204);
+                assert_status(&resp, StatusCode::NO_CONTENT);
                 (project.id.0, id)
             }
         };
@@ -209,7 +210,7 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
 
     // Forcibly reset the search index
     let resp = api.reset_search_index().await;
-    assert_eq!(resp.status(), 204);
+    assert_status(&resp, StatusCode::NO_CONTENT);
 
     id_conversion
 }

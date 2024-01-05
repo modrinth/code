@@ -57,6 +57,7 @@ pub struct LabrinthConfig {
 pub fn app_setup(
     pool: sqlx::Pool<Postgres>,
     redis_pool: RedisPool,
+    search_config: search::SearchConfig,
     clickhouse: &mut Client,
     file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     maxmind: Arc<queue::maxmind::MaxMindIndexer>,
@@ -65,11 +66,6 @@ pub fn app_setup(
         "Starting Labrinth on {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
-
-    let search_config = search::SearchConfig {
-        address: dotenvy::var("MEILISEARCH_ADDR").unwrap(),
-        key: dotenvy::var("MEILISEARCH_KEY").unwrap(),
-    };
 
     let mut scheduler = scheduler::Scheduler::new();
 

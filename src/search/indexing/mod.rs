@@ -107,11 +107,12 @@ pub async fn get_indexes(
     config: &SearchConfig,
 ) -> Result<Vec<Index>, meilisearch_sdk::errors::Error> {
     let client = config.make_client();
-
-    let projects_index = create_or_update_index(&client, "projects", None).await?;
+    let project_name = config.get_index_name("projects");
+    let project_filtered_name = config.get_index_name("projects_filtered");
+    let projects_index = create_or_update_index(&client, &project_name, None).await?;
     let projects_filtered_index = create_or_update_index(
         &client,
-        "projects_filtered",
+        &project_filtered_name,
         Some(&[
             "sort",
             "words",
@@ -128,7 +129,7 @@ pub async fn get_indexes(
 
 async fn create_or_update_index(
     client: &Client,
-    name: &'static str,
+    name: &str,
     custom_rules: Option<&'static [&'static str]>,
 ) -> Result<Index, meilisearch_sdk::errors::Error> {
     info!("Updating/creating index.");
@@ -207,7 +208,6 @@ async fn create_or_update_index(
                 typo_tolerance: None, // We don't use typo tolerance right now
                 dictionary: None,     // We don't use dictionary right now
             };
-
             if old_settings.synonyms != settings.synonyms
                 || old_settings.stop_words != settings.stop_words
                 || old_settings.ranking_rules != settings.ranking_rules
@@ -294,16 +294,23 @@ async fn update_and_add_to_index(
     new_filterable_attributes.extend(additional_fields.iter().map(|s| s.to_string()));
     new_displayed_attributes.extend(additional_fields.iter().map(|s| s.to_string()));
     info!("add attributes.");
-    index
+    let filterable_task = index
         .set_filterable_attributes(new_filterable_attributes)
         .await?;
-    index
+    let displayable_task = index
         .set_displayed_attributes(new_displayed_attributes)
+        .await?;
+    filterable_task
+        .wait_for_completion(client, None, Some(TIMEOUT))
+        .await?;
+    displayable_task
+        .wait_for_completion(client, None, Some(TIMEOUT))
         .await?;
 
     info!("Adding to index.");
 
     add_to_index(client, index, projects).await?;
+
     Ok(())
 }
 
@@ -315,7 +322,6 @@ pub async fn add_projects(
 ) -> Result<(), IndexingError> {
     let client = config.make_client();
     for index in indices {
-        info!("adding projects part1 or 2.");
         update_and_add_to_index(&client, index, &projects, &additional_fields).await?;
     }
 
@@ -329,7 +335,6 @@ fn default_settings() -> Settings {
     sorted_sortable.sort();
     let mut sorted_attrs = DEFAULT_ATTRIBUTES_FOR_FACETING.to_vec();
     sorted_attrs.sort();
-
     Settings::new()
         .with_distinct_attribute("project_id")
         .with_displayed_attributes(sorted_display)

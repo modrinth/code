@@ -17,7 +17,7 @@ pub struct Organization {
     pub id: OrganizationId,
     /// The slug of the organization
     pub slug: String,
-    /// The title (and slug) of the organization
+    /// The title of the organization
     pub name: String,
     /// The associated team of the organization
     pub team_id: TeamId,

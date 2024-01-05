@@ -1,4 +1,6 @@
 use crate::common::api_common::ApiProject;
+use crate::common::asserts::assert_status;
+use actix_http::StatusCode;
 use actix_web::test;
 use bytes::Bytes;
 
@@ -13,7 +15,7 @@ pub async fn error_404_empty() {
         // V2 errors should have 404 as blank body, for missing resources
         let api = &test_env.api;
         let resp = api.get_project("does-not-exist", USER_USER_PAT).await;
-        assert_eq!(resp.status(), 404);
+        assert_status(&resp, StatusCode::NOT_FOUND);
         let body = test::read_body(resp).await;
         let empty_bytes = Bytes::from_static(b"");
         assert_eq!(body, empty_bytes);

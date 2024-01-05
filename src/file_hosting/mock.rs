@@ -47,8 +47,9 @@ impl FileHost for MockHost {
     ) -> Result<DeleteFileData, FileHostingError> {
         let path = std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
             .join(file_name.replace("../", ""));
-        std::fs::remove_file(path)?;
-
+        if path.exists() {
+            std::fs::remove_file(path)?;
+        }
         Ok(DeleteFileData {
             file_id: file_id.to_string(),
             file_name: file_name.to_string(),

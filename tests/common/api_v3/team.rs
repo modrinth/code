@@ -24,7 +24,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<TeamMember> {
         let resp = self.get_organization_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -34,7 +34,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<TeamMember> {
         let resp = self.get_team_members(team_id, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -44,7 +44,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<TeamMember> {
         let resp = self.get_project_members(project_id, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 }
@@ -65,7 +65,7 @@ impl ApiTeams for ApiV3 {
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_team_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Vec<TeamMember> = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -103,7 +103,7 @@ impl ApiTeams for ApiV3 {
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_project_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Vec<TeamMember> = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -129,7 +129,7 @@ impl ApiTeams for ApiV3 {
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_organization_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Vec<TeamMember> = test::read_body_json(resp).await;
         // Then, deserialize to the common format

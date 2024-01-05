@@ -59,15 +59,33 @@ impl actix_web::ResponseError for SearchError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct SearchConfig {
     pub address: String,
     pub key: String,
+    pub meta_namespace: String,
 }
 
 impl SearchConfig {
+    // Panics if the environment variables are not set,
+    // but these are already checked for on startup.
+    pub fn new(meta_namespace: Option<String>) -> Self {
+        let address = dotenvy::var("MEILISEARCH_ADDR").expect("MEILISEARCH_ADDR not set");
+        let key = dotenvy::var("MEILISEARCH_KEY").expect("MEILISEARCH_KEY not set");
+
+        Self {
+            address,
+            key,
+            meta_namespace: meta_namespace.unwrap_or_default(),
+        }
+    }
+
     pub fn make_client(&self) -> Client {
         Client::new(self.address.as_str(), Some(self.key.as_str()))
+    }
+
+    pub fn get_index_name(&self, index: &str) -> String {
+        format!("{}_{}", self.meta_namespace, index)
     }
 }
 
@@ -172,13 +190,18 @@ pub struct ResultSearchProject {
     pub loader_fields: HashMap<String, Vec<serde_json::Value>>,
 }
 
-pub fn get_sort_index(index: &str) -> Result<(&str, [&str; 1]), SearchError> {
+pub fn get_sort_index(
+    config: &SearchConfig,
+    index: &str,
+) -> Result<(String, [&'static str; 1]), SearchError> {
+    let projects_name = config.get_index_name("projects");
+    let projects_filtered_name = config.get_index_name("projects_filtered");
     Ok(match index {
-        "relevance" => ("projects", ["downloads:desc"]),
-        "downloads" => ("projects_filtered", ["downloads:desc"]),
-        "follows" => ("projects", ["follows:desc"]),
-        "updated" => ("projects", ["date_modified:desc"]),
-        "newest" => ("projects", ["date_created:desc"]),
+        "relevance" => (projects_name, ["downloads:desc"]),
+        "downloads" => (projects_filtered_name, ["downloads:desc"]),
+        "follows" => (projects_name, ["follows:desc"]),
+        "updated" => (projects_name, ["date_modified:desc"]),
+        "newest" => (projects_name, ["date_created:desc"]),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     })
 }
@@ -193,8 +216,7 @@ pub async fn search_for_project(
     let index = info.index.as_deref().unwrap_or("relevance");
     let limit = info.limit.as_deref().unwrap_or("10").parse()?;
 
-    let sort = get_sort_index(index)?;
-
+    let sort = get_sort_index(config, index)?;
     let meilisearch_index = client.get_index(sort.0).await?;
 
     let mut filter_string = String::new();

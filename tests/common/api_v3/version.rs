@@ -60,7 +60,7 @@ impl ApiV3 {
 
     pub async fn get_version_deserialized(&self, id: &str, pat: Option<&str>) -> Version {
         let resp = self.get_version(id, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -88,7 +88,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> HashMap<String, Version> {
         let resp = self.update_individual_files(algorithm, hashes, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 }
@@ -158,7 +158,7 @@ impl ApiVersion for ApiV3 {
 
     async fn get_version_deserialized_common(&self, id: &str, pat: Option<&str>) -> CommonVersion {
         let resp = self.get_version(id, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Version = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -217,7 +217,7 @@ impl ApiVersion for ApiV3 {
         pat: Option<&str>,
     ) -> CommonVersion {
         let resp = self.get_version_from_hash(hash, algorithm, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Version = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -249,7 +249,7 @@ impl ApiVersion for ApiV3 {
         pat: Option<&str>,
     ) -> HashMap<String, CommonVersion> {
         let resp = self.get_versions_from_hashes(hashes, algorithm, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: HashMap<String, Version> = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -301,7 +301,7 @@ impl ApiVersion for ApiV3 {
         let resp = self
             .get_update_from_hash(hash, algorithm, loaders, game_versions, version_types, pat)
             .await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Version = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -361,7 +361,7 @@ impl ApiVersion for ApiV3 {
                 pat,
             )
             .await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: HashMap<String, Version> = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -444,7 +444,7 @@ impl ApiVersion for ApiV3 {
                 pat,
             )
             .await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let v: Vec<Version> = test::read_body_json(resp).await;
         // Then, deserialize to the common format

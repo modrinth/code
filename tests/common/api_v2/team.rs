@@ -24,7 +24,7 @@ impl ApiV2 {
         pat: Option<&str>,
     ) -> Vec<LegacyTeamMember> {
         let resp = self.get_organization_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -34,7 +34,7 @@ impl ApiV2 {
         pat: Option<&str>,
     ) -> Vec<LegacyTeamMember> {
         let resp = self.get_team_members(team_id, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -44,7 +44,7 @@ impl ApiV2 {
         pat: Option<&str>,
     ) -> Vec<LegacyNotification> {
         let resp = self.get_user_notifications(user_id, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 }
@@ -65,7 +65,7 @@ impl ApiTeams for ApiV2 {
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_team_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // TODO: Note, this does NOT deserialize to any other struct first, as currently TeamMember is the same in v2 and v3.
         // CommonTeamMember = TeamMember (v3)
         // This may yet change, so we should keep common struct.
@@ -102,7 +102,7 @@ impl ApiTeams for ApiV2 {
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_project_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // TODO: Note, this does NOT deserialize to any other struct first, as currently TeamMember is the same in v2 and v3.
         // CommonTeamMember = TeamMember (v3)
         // This may yet change, so we should keep common struct.
@@ -127,7 +127,7 @@ impl ApiTeams for ApiV2 {
         pat: Option<&str>,
     ) -> Vec<CommonTeamMember> {
         let resp = self.get_organization_members(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         // TODO: Note, this does NOT deserialize to any other struct first, as currently TeamMember is the same in v2 and v3.
         // CommonTeamMember = TeamMember (v3)
         // This may yet change, so we should keep common struct.

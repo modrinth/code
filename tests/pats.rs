@@ -1,3 +1,4 @@
+use actix_http::StatusCode;
 use actix_web::test;
 use chrono::{Duration, Utc};
 use common::{database::*, environment::with_test_environment_all};
@@ -5,7 +6,7 @@ use common::{database::*, environment::with_test_environment_all};
 use labrinth::models::pats::Scopes;
 use serde_json::json;
 
-use crate::common::api_common::AppendsOptionalPat;
+use crate::common::{api_common::AppendsOptionalPat, asserts::assert_status};
 
 mod common;
 
@@ -30,7 +31,7 @@ pub async fn pat_full_test() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 200);
+        assert_status(&resp, StatusCode::OK);
         let success: serde_json::Value = test::read_body_json(resp).await;
         let id = success["id"].as_str().unwrap();
 
@@ -48,7 +49,7 @@ pub async fn pat_full_test() {
             .uri("/_internal/pat")
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 200);
+        assert_status(&resp, StatusCode::OK);
         let success: serde_json::Value = test::read_body_json(resp).await;
 
         // Ensure access token is NOT returned for any PATs
@@ -87,7 +88,7 @@ pub async fn pat_full_test() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
         assert_eq!(mock_pat_test(access_token).await, 401); // No longer works
 
         // Change scopes back, and set expiry to the past, and test again
@@ -100,7 +101,7 @@ pub async fn pat_full_test() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
 
         // Wait 1 second before testing again for expiry
         tokio::time::sleep(Duration::seconds(1).to_std().unwrap()).await;
@@ -115,7 +116,7 @@ pub async fn pat_full_test() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
         assert_eq!(mock_pat_test(access_token).await, 200); // Works again
 
         // Patching to a bad expiry should fail
@@ -127,7 +128,7 @@ pub async fn pat_full_test() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 400);
+        assert_status(&resp, StatusCode::BAD_REQUEST);
 
         // Similar to above with PAT creation, patching to a bad scope should fail
         for i in 0..64 {
@@ -156,7 +157,7 @@ pub async fn pat_full_test() {
             .uri(&format!("/_internal/pat/{}", id))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 204);
+        assert_status(&resp, StatusCode::NO_CONTENT);
     })
     .await;
 }
@@ -175,7 +176,7 @@ pub async fn bad_pats() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 400);
+        assert_status(&resp, StatusCode::BAD_REQUEST);
 
         // Name too short or too long should fail
         for name in ["n", "this_name_is_too_long".repeat(16).as_str()] {
@@ -189,7 +190,7 @@ pub async fn bad_pats() {
                 }))
                 .to_request();
             let resp = test_env.call(req).await;
-            assert_eq!(resp.status().as_u16(), 400);
+            assert_status(&resp, StatusCode::BAD_REQUEST);
         }
 
         // Creating a PAT with an expiry in the past should fail
@@ -203,7 +204,7 @@ pub async fn bad_pats() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 400);
+        assert_status(&resp, StatusCode::BAD_REQUEST);
 
         // Make a PAT with each scope, with the result varying by whether that scope is restricted
         for i in 0..64 {
@@ -238,7 +239,7 @@ pub async fn bad_pats() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 200);
+        assert_status(&resp, StatusCode::OK);
         let success: serde_json::Value = test::read_body_json(resp).await;
         let id = success["id"].as_str().unwrap();
 
@@ -252,7 +253,7 @@ pub async fn bad_pats() {
                 }))
                 .to_request();
             let resp = test_env.call(req).await;
-            assert_eq!(resp.status().as_u16(), 400);
+            assert_status(&resp, StatusCode::BAD_REQUEST);
         }
 
         // Patching to a bad expiry should fail
@@ -264,7 +265,7 @@ pub async fn bad_pats() {
             }))
             .to_request();
         let resp = test_env.call(req).await;
-        assert_eq!(resp.status().as_u16(), 400);
+        assert_status(&resp, StatusCode::BAD_REQUEST);
 
         // Similar to above with PAT creation, patching to a bad scope should fail
         for i in 0..64 {

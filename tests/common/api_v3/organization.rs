@@ -1,3 +1,4 @@
+use actix_http::StatusCode;
 use actix_web::{
     dev::ServiceResponse,
     test::{self, TestRequest},
@@ -6,7 +7,10 @@ use bytes::Bytes;
 use labrinth::models::{organizations::Organization, users::UserId, v3::projects::Project};
 use serde_json::json;
 
-use crate::common::api_common::{request_data::ImageData, Api, AppendsOptionalPat};
+use crate::common::{
+    api_common::{request_data::ImageData, Api, AppendsOptionalPat},
+    asserts::assert_status,
+};
 
 use super::ApiV3;
 
@@ -14,6 +18,7 @@ impl ApiV3 {
     pub async fn create_organization(
         &self,
         organization_title: &str,
+        organization_slug: &str,
         description: &str,
         pat: Option<&str>,
     ) -> ServiceResponse {
@@ -22,6 +27,7 @@ impl ApiV3 {
             .append_pat(pat)
             .set_json(json!({
                 "name": organization_title,
+                "slug": organization_slug,
                 "description": description,
             }))
             .to_request();
@@ -42,7 +48,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Organization {
         let resp = self.get_organization(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -80,7 +86,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<Project> {
         let resp = self.get_organization_projects(id_or_title, pat).await;
-        assert_eq!(resp.status(), 200);
+        assert_status(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
