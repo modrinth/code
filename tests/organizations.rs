@@ -293,6 +293,16 @@ async fn add_remove_organization_projects() {
         let alpha_project_slug: &str = &test_env.dummy.project_alpha.project_slug;
         let zeta_organization_id: &str = &test_env.dummy.organization_zeta.organization_id;
 
+        // user's page should show alpha project
+        // It may contain more than one project, depending on dummy data, but should contain the alpha project
+        let projects = test_env
+            .api
+            .get_user_projects_deserialized_common(USER_USER_ID, USER_USER_PAT)
+            .await;
+        assert!(projects
+            .iter()
+            .any(|p| p.id.to_string() == alpha_project_id));
+
         // Add/remove project to organization, first by ID, then by slug
         for alpha in [alpha_project_id, alpha_project_slug] {
             let resp = test_env
@@ -309,6 +319,16 @@ async fn add_remove_organization_projects() {
             assert_eq!(projects[0].id.to_string(), alpha_project_id);
             assert_eq!(projects[0].slug, Some(alpha_project_slug.to_string()));
 
+            // Currently, intended behaviour is that user's page should NOT show organization projects.
+            // It may contain other projects, depending on dummy data, but should not contain the alpha project
+            let projects = test_env
+                .api
+                .get_user_projects_deserialized_common(USER_USER_ID, USER_USER_PAT)
+                .await;
+            assert!(!projects
+                .iter()
+                .any(|p| p.id.to_string() == alpha_project_id));
+
             // Remove project from organization
             let resp = test_env
                 .api
@@ -320,6 +340,17 @@ async fn add_remove_organization_projects() {
                 )
                 .await;
             assert_status!(&resp, StatusCode::OK);
+
+            // Get user's projects as user - should be 1, the alpha project,
+            // as we gave back ownership to the user when we removed it from the organization
+            // So user's page should show the alpha project (and possibly others)
+            let projects = test_env
+                .api
+                .get_user_projects_deserialized_common(USER_USER_ID, USER_USER_PAT)
+                .await;
+            assert!(projects
+                .iter()
+                .any(|p| p.id.to_string() == alpha_project_id));
 
             // Get organization projects
             let projects = test_env
@@ -428,23 +459,32 @@ async fn add_remove_organization_project_ownership_to_user() {
             );
         }
 
-        // Both alpha and beta project should have:
+        // Alpha project should have:
         // - 1 member, FRIEND_USER_ID
+        //      -> User was removed entirely as a team_member as it is now the owner of the organization
         // - No owner.
         //      -> For alpha, user was removed as owner when it was added to the organization
-        //      -> For beta, user was removed as owner when ownership was transferred to friend
-        //              then friend was removed as owner when it was added to the organization
-        // -> In both cases, user was removed entirely as a team_member as it is now the owner of the organization
-        for team_id in [alpha_team_id, beta_team_id] {
-            let members = test_env
-                .api
-                .get_team_members_deserialized(team_id, USER_USER_PAT)
-                .await;
-            assert_eq!(members.len(), 1);
-            assert_eq!(members[0].user.id.to_string(), FRIEND_USER_ID);
-            let user_member = members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();
-            assert_eq!(user_member.len(), 0);
-        }
+        //      -> Friend was never an owner of the alpha project
+        let members = test_env
+            .api
+            .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
+            .await;
+        assert_eq!(members.len(), 1);
+        assert_eq!(members[0].user.id.to_string(), FRIEND_USER_ID);
+        let user_member = members.iter().filter(|m| m.is_owner).collect::<Vec<_>>();
+        assert_eq!(user_member.len(), 0);
+
+        // Beta project should have:
+        // - No members
+        // -> User was removed entirely as a team_member as it is now the owner of the organization
+        // -> Friend was made owner of the beta project, but was removed as a member when it was added to the organization
+        // If you are owner of a projeect, you are removed from the team when it is added to an organization,
+        // so that your former permissions are not overriding the organization permissions by default.
+        let members = test_env
+            .api
+            .get_team_members_deserialized(beta_team_id, USER_USER_PAT)
+            .await;
+        assert!(members.is_empty());
 
         // Transfer ownership of zeta organization to FRIEND
         let resp = test_env
