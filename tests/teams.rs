@@ -1,4 +1,4 @@
-use crate::common::{api_common::ApiTeams, asserts::assert_status, database::*};
+use crate::common::{api_common::ApiTeams, database::*};
 use actix_http::StatusCode;
 use common::{
     api_v3::ApiV3,
@@ -40,7 +40,7 @@ async fn test_get_team() {
         let resp = api
             .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Team check directly
         let members = api
@@ -93,7 +93,7 @@ async fn test_get_team() {
         // An accepted member of the team should appear in the team members list
         // and should be able to see private data about the team
         let resp = api.join_team(alpha_team_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Team check directly
         let members = api
@@ -164,7 +164,7 @@ async fn test_get_team_organization() {
         let resp = api
             .add_user_to_team(zeta_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Team check directly
         let members = api
@@ -218,7 +218,7 @@ async fn test_get_team_organization() {
         // An accepted member of the team should appear in the team members list
         // and should be able to see private data about the team
         let resp = api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Team check directly
         let members = api
@@ -273,17 +273,17 @@ async fn test_get_team_project_orgs() {
             .api
             .organization_add_project(zeta_organization_id, alpha_project_id, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         // Invite and add friend to zeta
         let resp = test_env
             .api
             .add_user_to_team(zeta_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let resp = test_env.api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // The team members route from teams (on a project's team):
         // - the members of the project team specifically
@@ -314,21 +314,21 @@ async fn test_patch_project_team_member() {
 
         let alpha_team_id = &test_env.dummy.project_alpha.team_id;
 
-        // Edit team as admin/mod but not a part of the team should be OK
+        // Edit team as admin/mod but not a part of the team should be StatusCode::OK
         let resp = api.edit_team_member(alpha_team_id, USER_USER_ID, json!({}), ADMIN_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // As a non-owner with full permissions, attempt to edit the owner's permissions
         let resp = api.edit_team_member(alpha_team_id, USER_USER_ID, json!({
             "permissions": 0
         }), ADMIN_USER_PAT).await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
 
         // Should not be able to edit organization permissions of a project team
         let resp = api.edit_team_member(alpha_team_id, USER_USER_ID, json!({
             "organization_permissions": 0
         }), USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
 
         // Should not be able to add permissions to a user that the adding-user does not have
         // (true for both project and org)
@@ -337,24 +337,24 @@ async fn test_patch_project_team_member() {
         let resp = api.add_user_to_team(alpha_team_id, FRIEND_USER_ID,
             Some(ProjectPermissions::EDIT_MEMBER | ProjectPermissions::EDIT_BODY),
             None, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // accept
         let resp = api.join_team(alpha_team_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // try to add permissions
         let resp = api.edit_team_member(alpha_team_id, FRIEND_USER_ID, json!({
             "permissions": (ProjectPermissions::EDIT_MEMBER | ProjectPermissions::EDIT_DETAILS).bits()
         }), FRIEND_USER_PAT).await; // should this be friend_user_pat
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
 
         // Cannot set payouts outside of 0 and 5000
         for payout in [-1, 5001] {
             let resp = api.edit_team_member(alpha_team_id, FRIEND_USER_ID, json!({
                 "payouts_split": payout
             }), USER_USER_PAT).await;
-            assert_status(&resp, StatusCode::BAD_REQUEST);
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
         }
 
         // Successful patch
@@ -364,7 +364,7 @@ async fn test_patch_project_team_member() {
                 "role": "membe2r",
                 "ordering": 5
         }), FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Check results
         let members = api.get_team_members_deserialized_common(alpha_team_id, FRIEND_USER_PAT).await;
@@ -383,19 +383,19 @@ async fn test_patch_organization_team_member() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
         let zeta_team_id = &test_env.dummy.organization_zeta.team_id;
 
-        // Edit team as admin/mod but not a part of the team should be OK
+        // Edit team as admin/mod but not a part of the team should be StatusCode::OK
         let resp = test_env
             .api
             .edit_team_member(zeta_team_id, USER_USER_ID, json!({}), ADMIN_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // As a non-owner with full permissions, attempt to edit the owner's permissions
         let resp = test_env
             .api
             .edit_team_member(zeta_team_id, USER_USER_ID, json!({ "permissions": 0 }), ADMIN_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
 
         // Should not be able to add permissions to a user that the adding-user does not have
         // (true for both project and org)
@@ -405,18 +405,18 @@ async fn test_patch_organization_team_member() {
             .api
             .add_user_to_team(zeta_team_id, FRIEND_USER_ID, None, Some(OrganizationPermissions::EDIT_MEMBER | OrganizationPermissions::EDIT_MEMBER_DEFAULT_PERMISSIONS), USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // accept
         let resp = test_env.api.join_team(zeta_team_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // try to add permissions- fails, as we do not have EDIT_DETAILS
         let resp = test_env
             .api
             .edit_team_member(zeta_team_id, FRIEND_USER_ID, json!({ "organization_permissions": (OrganizationPermissions::EDIT_MEMBER | OrganizationPermissions::EDIT_DETAILS).bits() }), FRIEND_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
 
         // Cannot set payouts outside of 0 and 5000
         for payout in [-1, 5001] {
@@ -424,7 +424,7 @@ async fn test_patch_organization_team_member() {
                 .api
                 .edit_team_member(zeta_team_id, FRIEND_USER_ID, json!({ "payouts_split": payout }), USER_USER_PAT)
                 .await;
-            assert_status(&resp, StatusCode::BAD_REQUEST);
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
         }
 
         // Successful patch
@@ -443,7 +443,7 @@ async fn test_patch_organization_team_member() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Check results
         let members = test_env
@@ -482,39 +482,39 @@ async fn transfer_ownership_v3() {
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::UNAUTHORIZED);
+        assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
         // first, invite friend
         let resp = api
             .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // still cannot set friend as owner (not accepted)
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
 
         // accept
         let resp = api.join_team(alpha_team_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Cannot set ourselves as owner if we are not owner
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::UNAUTHORIZED);
+        assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
         // Can set friend as owner
         let resp = api
             .transfer_team_ownership(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Check
         let members = api
@@ -543,7 +543,7 @@ async fn transfer_ownership_v3() {
         let resp = api
             .remove_from_team(alpha_team_id, FRIEND_USER_ID, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::UNAUTHORIZED);
+        assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
         // V3 only- confirm the owner can change their role without losing ownership
         let resp = api
@@ -556,7 +556,7 @@ async fn transfer_ownership_v3() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let members = api
             .get_team_members_deserialized(alpha_team_id, USER_USER_PAT)
@@ -589,25 +589,25 @@ async fn transfer_ownership_v3() {
 
 //     // Link alpha team to zeta org
 //     let resp = api.organization_add_project(zeta_organization_id, alpha_project_id, USER_USER_PAT).await;
-//     assert_status(&resp, StatusCode::OK);
+//     assert_status!(&resp, StatusCode::OK);
 
 //     // Invite friend to zeta team with all project default permissions
 //     let resp = api.add_user_to_team(&zeta_team_id, FRIEND_USER_ID, Some(ProjectPermissions::all()), Some(OrganizationPermissions::all()), USER_USER_PAT).await;
-//     assert_status(&resp, StatusCode::NO_CONTENT);
+//     assert_status!(&resp, StatusCode::NO_CONTENT);
 
 //     // Accept invite to zeta team
 //     let resp = api.join_team(&zeta_team_id, FRIEND_USER_PAT).await;
-//     assert_status(&resp, StatusCode::NO_CONTENT);
+//     assert_status!(&resp, StatusCode::NO_CONTENT);
 
 //     // Attempt, as friend, to edit details of alpha project (should succeed, org invite accepted)
 //     let resp = api.edit_project(alpha_project_id, json!({
 //         "title": "new name"
 //     }), FRIEND_USER_PAT).await;
-//     assert_status(&resp, StatusCode::NO_CONTENT);
+//     assert_status!(&resp, StatusCode::NO_CONTENT);
 
 //     // Invite friend to alpha team with *no* project permissions
 //     let resp = api.add_user_to_team(&alpha_team_id, FRIEND_USER_ID, Some(ProjectPermissions::empty()), None, USER_USER_PAT).await;
-//     assert_status(&resp, StatusCode::NO_CONTENT);
+//     assert_status!(&resp, StatusCode::NO_CONTENT);
 
 //     // Do not accept invite to alpha team
 
@@ -615,7 +615,7 @@ async fn transfer_ownership_v3() {
 //     let resp = api.edit_project(alpha_project_id, json!({
 //         "title": "new name"
 //     }), FRIEND_USER_PAT).await;
-//     assert_status(&resp, StatusCode::UNAUTHORIZED);
+//     assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
 //     test_env.cleanup().await;
 // }

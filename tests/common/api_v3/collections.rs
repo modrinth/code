@@ -7,9 +7,9 @@ use bytes::Bytes;
 use labrinth::models::{collections::Collection, v3::projects::Project};
 use serde_json::json;
 
-use crate::common::{
-    api_common::{request_data::ImageData, Api, AppendsOptionalPat},
-    asserts::assert_status,
+use crate::{
+    assert_status,
+    common::api_common::{request_data::ImageData, Api, AppendsOptionalPat},
 };
 
 use super::ApiV3;
@@ -44,7 +44,7 @@ impl ApiV3 {
 
     pub async fn get_collection_deserialized(&self, id: &str, pat: Option<&str>) -> Collection {
         let resp = self.get_collection(id, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -74,7 +74,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<Project> {
         let resp = self.get_collection_projects(id, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -149,7 +149,7 @@ impl ApiV3 {
         pat: Option<&str>,
     ) -> Vec<Collection> {
         let resp = self.get_user_collections(user_id_or_username, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let projects: Vec<Project> = test::read_body_json(resp).await;
         // Then, deserialize to the common format

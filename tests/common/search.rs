@@ -5,13 +5,16 @@ use std::{collections::HashMap, sync::Arc};
 use actix_http::StatusCode;
 use serde_json::json;
 
-use crate::common::{
-    api_common::{Api, ApiProject, ApiVersion},
-    database::{FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
-    dummy_data::{TestFile, DUMMY_CATEGORIES},
+use crate::{
+    assert_status,
+    common::{
+        api_common::{Api, ApiProject, ApiVersion},
+        database::{FRIEND_USER_PAT, MOD_USER_PAT, USER_USER_PAT},
+        dummy_data::{TestFile, DUMMY_CATEGORIES},
+    },
 };
 
-use super::{api_v3::ApiV3, asserts::assert_status, environment::TestEnvironment};
+use super::{api_v3::ApiV3, environment::TestEnvironment};
 
 pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<HashMap<u64, u64>> {
     // Test setup and dummy data
@@ -48,7 +51,7 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
                         MOD_USER_PAT,
                     )
                     .await;
-                assert_status(&resp, StatusCode::NO_CONTENT);
+                assert_status!(&resp, StatusCode::NO_CONTENT);
                 (project.id.0, id)
             }
         };
@@ -210,7 +213,7 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
 
     // Forcibly reset the search index
     let resp = api.reset_search_index().await;
-    assert_status(&resp, StatusCode::NO_CONTENT);
+    assert_status!(&resp, StatusCode::NO_CONTENT);
 
     id_conversion
 }

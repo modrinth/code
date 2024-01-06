@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::common::api_common::ApiVersion;
 use crate::common::database::*;
 use crate::common::dummy_data::{DummyProjectAlpha, DummyProjectBeta, TestFile};
-use crate::common::{asserts::assert_status, get_json_val_str};
+use crate::common::get_json_val_str;
 use actix_http::StatusCode;
 use actix_web::test;
 use common::api_v3::ApiV3;
@@ -61,7 +61,7 @@ async fn test_get_version() {
 
         // Request should fail on non-existent version
         let resp = api.get_version("false", USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::NOT_FOUND);
+        assert_status!(&resp, StatusCode::NOT_FOUND);
 
         // Similarly, request should fail on non-authorized user, on a yet-to-be-approved or hidden project, with a 404 (hiding the existence of the project)
         // TODO: beta version should already be draft in dummy data, but theres a bug in finding it that
@@ -74,9 +74,9 @@ async fn test_get_version() {
         )
         .await;
         let resp = api.get_version(beta_version_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         let resp = api.get_version(beta_version_id, ENEMY_USER_PAT).await;
-        assert_status(&resp, StatusCode::NOT_FOUND);
+        assert_status!(&resp, StatusCode::NOT_FOUND);
     })
     .await;
 }
@@ -219,12 +219,12 @@ async fn version_updates() {
                     )
                     .await;
                 if success {
-                    assert_status(&resp, StatusCode::OK);
+                    assert_status!(&resp, StatusCode::OK);
                     let body: serde_json::Value = test::read_body_json(resp).await;
                     let id = body["id"].as_str().unwrap();
                     assert_eq!(id, &result_id.to_string());
                 } else {
-                    assert_status(&resp, StatusCode::NOT_FOUND);
+                    assert_status!(&resp, StatusCode::NOT_FOUND);
                 }
 
                 // update_files
@@ -405,7 +405,7 @@ pub async fn test_patch_version() {
                 ENEMY_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::UNAUTHORIZED);
+        assert_status!(&resp, StatusCode::UNAUTHORIZED);
 
         // Failure because these are illegal requested statuses for a normal user.
         for req in ["unknown", "scheduled"] {
@@ -419,7 +419,7 @@ pub async fn test_patch_version() {
                     USER_USER_PAT,
                 )
                 .await;
-            assert_status(&resp, StatusCode::BAD_REQUEST);
+            assert_status!(&resp, StatusCode::BAD_REQUEST);
         }
 
         // Sucessful request to patch many fields.
@@ -447,7 +447,7 @@ pub async fn test_patch_version() {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let version = api
             .get_version_deserialized_common(alpha_version_id, USER_USER_PAT)
@@ -483,7 +483,7 @@ pub async fn test_patch_version() {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let version = api
             .get_version_deserialized_common(alpha_version_id, USER_USER_PAT)
@@ -499,7 +499,7 @@ pub async fn test_patch_version() {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let version = api
             .get_version_deserialized_common(alpha_version_id, USER_USER_PAT)
@@ -571,7 +571,7 @@ async fn edit_version_ordering_works() {
             .api
             .edit_version_ordering(&alpha_version_id, Some(10), USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let versions = env
             .api

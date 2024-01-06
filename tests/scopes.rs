@@ -9,7 +9,6 @@ use common::api_common::models::CommonItemType;
 use common::api_common::Api;
 use common::api_v3::request_data::get_public_project_creation_data;
 use common::api_v3::ApiV3;
-use common::asserts::assert_status;
 use common::dummy_data::TestFile;
 use common::environment::{with_test_environment, with_test_environment_all, TestEnvironment};
 use common::{database::*, scopes::ScopeTest};
@@ -116,7 +115,7 @@ pub async fn notifications_scopes() {
             .api
             .add_user_to_team(alpha_team_id, FRIEND_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Notification get
         let read_notifications = Scopes::NOTIFICATION_READ;
@@ -189,7 +188,7 @@ pub async fn notifications_scopes() {
             .api
             .add_user_to_team(alpha_team_id, MOD_USER_ID, None, None, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
         let read_notifications = Scopes::NOTIFICATION_READ;
         let req_gen = |pat: Option<String>| async move {
             api.get_user_notifications(MOD_USER_ID, pat.as_deref())
@@ -388,7 +387,7 @@ pub async fn project_version_reads_scopes() {
             .api
             .edit_version(beta_version_id, json!({ "status": "draft" }), USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let req_gen = |pat: Option<String>| async move {
             api.get_version_from_hash(beta_file_hash, "sha1", pat.as_deref())

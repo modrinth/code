@@ -4,11 +4,10 @@ use super::{
     api_common::{generic::GenericApi, Api, ApiBuildable},
     api_v2::ApiV2,
     api_v3::ApiV3,
-    asserts::assert_status,
     database::{TemporaryDatabase, FRIEND_USER_ID, USER_USER_PAT},
     dummy_data,
 };
-use crate::common::setup;
+use crate::{assert_status, common::setup};
 use actix_http::StatusCode;
 use actix_web::dev::ServiceResponse;
 use futures::Future;
@@ -112,7 +111,7 @@ impl<A: Api> TestEnvironment<A> {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
     }
 
     // Setup data, assert that a user can read notifications
@@ -123,7 +122,7 @@ impl<A: Api> TestEnvironment<A> {
         status_code: StatusCode,
     ) {
         let resp = self.api.get_user_notifications(user_id, pat).await;
-        assert_status(&resp, status_code);
+        assert_status!(&resp, status_code);
     }
 
     // Setup data, assert that a user can read projects notifications
@@ -134,7 +133,7 @@ impl<A: Api> TestEnvironment<A> {
         status_code: StatusCode,
     ) {
         let resp = self.api.get_user_projects(user_id, pat).await;
-        assert_status(&resp, status_code);
+        assert_status!(&resp, status_code);
     }
 }
 

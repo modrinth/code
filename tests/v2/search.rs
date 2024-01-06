@@ -1,8 +1,9 @@
+use crate::assert_status;
 use crate::common::api_common::Api;
 use crate::common::api_common::ApiProject;
 use crate::common::api_common::ApiVersion;
 use crate::common::api_v2::ApiV2;
-use crate::common::asserts::assert_status;
+
 use crate::common::database::*;
 use crate::common::dummy_data::TestFile;
 use crate::common::dummy_data::DUMMY_CATEGORIES;
@@ -55,7 +56,7 @@ async fn search_projects() {
                             MOD_USER_PAT,
                         )
                         .await;
-                    assert_status(&resp, StatusCode::NO_CONTENT);
+                    assert_status!(&resp, StatusCode::NO_CONTENT);
                     (project.id.0, id)
                 }
             };
@@ -284,7 +285,7 @@ async fn search_projects() {
 
         // Forcibly reset the search index
         let resp = api.reset_search_index().await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         // Test searches
         let stream = futures::stream::iter(pairs);

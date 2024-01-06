@@ -15,7 +15,7 @@ pub async fn extract_ok_json<T>(response: HttpResponse) -> Result<T, HttpRespons
 where
     T: serde::de::DeserializeOwned,
 {
-    // If the response is OK, parse the json and return it
+    // If the response is StatusCode::OK, parse the json and return it
     if response.status() == actix_web::http::StatusCode::OK {
         let failure_http_response = || {
             HttpResponse::InternalServerError().json(json!({

@@ -15,7 +15,7 @@ use labrinth::{
     routes::v3::oauth_clients::OAuthClientEdit,
 };
 
-use common::{asserts::assert_status, database::USER_USER_ID_PARSED};
+use common::database::USER_USER_ID_PARSED;
 
 mod common;
 
@@ -36,7 +36,7 @@ async fn can_create_edit_get_oauth_client() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         let creation_result: OAuthClientCreationResult = test::read_body_json(resp).await;
         let client_id = get_json_val_str(creation_result.client.id);
 
@@ -59,7 +59,7 @@ async fn can_create_edit_get_oauth_client() {
             .api
             .edit_oauth_client(&client_id, edit, FRIEND_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         let clients = env
             .api
@@ -90,7 +90,7 @@ async fn create_oauth_client_with_restricted_scopes_fails() {
             )
             .await;
 
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
     })
     .await;
 }
@@ -105,7 +105,7 @@ async fn get_oauth_client_for_client_creator_succeeds() {
             .get_oauth_client(client_id.clone(), USER_USER_PAT)
             .await;
 
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         let client: OAuthClient = test::read_body_json(resp).await;
         assert_eq!(get_json_val_str(client.id), client_id);
     })
@@ -122,7 +122,7 @@ async fn get_oauth_client_for_unrelated_user_fails() {
             .get_oauth_client(client_id.clone(), FRIEND_USER_PAT)
             .await;
 
-        assert_status(&resp, StatusCode::UNAUTHORIZED);
+        assert_status!(&resp, StatusCode::UNAUTHORIZED);
     })
     .await;
 }
@@ -132,7 +132,7 @@ async fn can_delete_oauth_client() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_id = env.dummy.oauth_client_alpha.client_id.clone();
         let resp = env.api.delete_oauth_client(&client_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let clients = env
             .api

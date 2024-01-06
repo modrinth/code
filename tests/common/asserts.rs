@@ -6,8 +6,28 @@ use labrinth::models::v3::projects::Version;
 
 use super::api_common::models::CommonVersion;
 
-pub fn assert_status(response: &actix_web::dev::ServiceResponse, status: actix_http::StatusCode) {
-    assert_eq!(response.status(), status, "{:#?}", response.response());
+#[macro_export]
+macro_rules! assert_status {
+    ($response:expr, $status:expr) => {
+        assert_eq!(
+            $response.status(),
+            $status,
+            "{:#?}",
+            $response.response().body()
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! assert_any_status_except {
+    ($response:expr, $status:expr) => {
+        assert_ne!(
+            $response.status(),
+            $status,
+            "{:#?}",
+            $response.response().body()
+        );
+    };
 }
 
 pub fn assert_version_ids(versions: &[Version], expected_ids: Vec<String>) {
@@ -24,11 +44,4 @@ pub fn assert_common_version_ids(versions: &[CommonVersion], expected_ids: Vec<S
         .map(|v| get_json_val_str(v.id))
         .collect_vec();
     assert_eq!(version_ids, expected_ids);
-}
-
-pub fn assert_any_status_except(
-    response: &actix_web::dev::ServiceResponse,
-    status: actix_http::StatusCode,
-) {
-    assert_ne!(response.status(), status, "{:#?}", response.response());
 }

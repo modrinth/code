@@ -1,12 +1,15 @@
 use std::collections::HashMap;
 
-use crate::common::{
-    api_common::{
-        models::{CommonItemType, CommonProject, CommonVersion},
-        request_data::{ImageData, ProjectCreationRequestData},
-        Api, ApiProject, AppendsOptionalPat,
+use crate::{
+    assert_status,
+    common::{
+        api_common::{
+            models::{CommonItemType, CommonProject, CommonVersion},
+            request_data::{ImageData, ProjectCreationRequestData},
+            Api, ApiProject, AppendsOptionalPat,
+        },
+        dummy_data::TestFile,
     },
-    dummy_data::TestFile,
 };
 use actix_http::StatusCode;
 use actix_web::{
@@ -21,7 +24,7 @@ use labrinth::{
 };
 use serde_json::json;
 
-use crate::common::{asserts::assert_status, database::MOD_USER_PAT};
+use crate::common::database::MOD_USER_PAT;
 
 use super::{
     request_data::{self, get_public_project_creation_data},
@@ -35,7 +38,7 @@ impl ApiV2 {
         pat: Option<&str>,
     ) -> LegacyProject {
         let resp = self.get_project(id_or_slug, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -45,7 +48,7 @@ impl ApiV2 {
         pat: Option<&str>,
     ) -> Vec<LegacyProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 
@@ -72,7 +75,7 @@ impl ApiV2 {
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         test::read_body_json(resp).await
     }
 }
@@ -91,7 +94,7 @@ impl ApiProject for ApiV2 {
         // Add a project.
         let slug = creation_data.slug.clone();
         let resp = self.create_project(creation_data, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         // Approve as a moderator.
         let req = TestRequest::patch()
@@ -104,7 +107,7 @@ impl ApiProject for ApiV2 {
             ))
             .to_request();
         let resp = self.call(req).await;
-        assert_status(&resp, StatusCode::NO_CONTENT);
+        assert_status!(&resp, StatusCode::NO_CONTENT);
 
         let project = self.get_project_deserialized_common(&slug, pat).await;
 
@@ -163,7 +166,7 @@ impl ApiProject for ApiV2 {
         pat: Option<&str>,
     ) -> CommonProject {
         let resp = self.get_project(id_or_slug, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let project: LegacyProject = test::read_body_json(resp).await;
         // Then, deserialize to the common format
@@ -213,7 +216,7 @@ impl ApiProject for ApiV2 {
         pat: Option<&str>,
     ) -> Vec<CommonProject> {
         let resp = self.get_user_projects(user_id_or_username, pat).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         // First, deserialize to the non-common format (to test the response is valid for this api version)
         let projects: Vec<LegacyProject> = test::read_body_json(resp).await;
         // Then, deserialize to the common format

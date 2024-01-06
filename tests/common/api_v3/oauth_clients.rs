@@ -12,9 +12,9 @@ use labrinth::{
 };
 use serde_json::json;
 
-use crate::common::{
-    api_common::{Api, AppendsOptionalPat},
-    asserts::assert_status,
+use crate::{
+    assert_status,
+    common::api_common::{Api, AppendsOptionalPat},
 };
 
 use super::ApiV3;
@@ -51,7 +51,7 @@ impl ApiV3 {
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         test::read_body_json(resp).await
     }
@@ -116,7 +116,7 @@ impl ApiV3 {
             .append_pat(pat)
             .to_request();
         let resp = self.call(req).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         test::read_body_json(resp).await
     }

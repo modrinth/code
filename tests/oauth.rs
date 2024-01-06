@@ -6,7 +6,6 @@ use common::{
         oauth::{get_auth_code_from_redirect_params, get_authorize_accept_flow_id},
         ApiV3,
     },
-    asserts::{assert_any_status_except, assert_status},
     database::FRIEND_USER_ID,
     database::{FRIEND_USER_PAT, USER_USER_ID, USER_USER_PAT},
     dummy_data::DummyOAuthClientAlpha,
@@ -39,12 +38,12 @@ async fn oauth_flow_happy_path() {
                 FRIEND_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         let flow_id = get_authorize_accept_flow_id(resp).await;
 
         // Accept the authorization request
         let resp = env.api.oauth_accept(&flow_id, FRIEND_USER_PAT).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         let query = get_redirect_location_query_params(&resp);
 
         let auth_code = query.get("code").unwrap();
@@ -63,7 +62,7 @@ async fn oauth_flow_happy_path() {
                 client_secret,
             )
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         assert_eq!(resp.headers().get(CACHE_CONTROL).unwrap(), "no-store");
         assert_eq!(resp.headers().get(PRAGMA).unwrap(), "no-cache");
         let token_resp: TokenResponse = test::read_body_json(resp).await;
@@ -107,7 +106,7 @@ async fn oauth_authorize_for_already_authorized_scopes_returns_auth_code() {
                 USER_USER_PAT,
             )
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
     })
     .await;
 }
@@ -134,13 +133,13 @@ async fn get_oauth_token_with_already_used_auth_code_fails() {
             .api
             .oauth_token(auth_code.clone(), None, client_id.clone(), &client_secret)
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         let resp = env
             .api
             .oauth_token(auth_code, None, client_id, &client_secret)
             .await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
     })
     .await;
 }
@@ -228,7 +227,7 @@ async fn oauth_authorize_with_broader_scopes_requires_user_accept() {
             )
             .await;
 
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
         get_authorize_accept_flow_id(resp).await; // ensure we can deser this without error to really confirm
     })
     .await;
@@ -245,10 +244,10 @@ async fn reject_authorize_ends_authorize_flow() {
         let flow_id = get_authorize_accept_flow_id(resp).await;
 
         let resp = env.api.oauth_reject(&flow_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         let resp = env.api.oauth_accept(&flow_id, USER_USER_PAT).await;
-        assert_any_status_except(&resp, StatusCode::OK);
+        assert_any_status_except!(&resp, StatusCode::OK);
     })
     .await;
 }
@@ -263,10 +262,10 @@ async fn accept_authorize_after_already_accepting_fails() {
             .await;
         let flow_id = get_authorize_accept_flow_id(resp).await;
         let resp = env.api.oauth_accept(&flow_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         let resp = env.api.oauth_accept(&flow_id, USER_USER_PAT).await;
-        assert_status(&resp, StatusCode::BAD_REQUEST);
+        assert_status!(&resp, StatusCode::BAD_REQUEST);
     })
     .await;
 }
@@ -297,7 +296,7 @@ async fn revoke_authorization_after_issuing_token_revokes_token() {
             .api
             .revoke_oauth_authorization(client_id, USER_USER_PAT)
             .await;
-        assert_status(&resp, StatusCode::OK);
+        assert_status!(&resp, StatusCode::OK);
 
         env.assert_read_notifications_status(
             USER_USER_ID,

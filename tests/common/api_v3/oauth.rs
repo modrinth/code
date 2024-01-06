@@ -10,9 +10,9 @@ use labrinth::auth::oauth::{
 };
 use reqwest::header::{AUTHORIZATION, LOCATION};
 
-use crate::common::{
-    api_common::{Api, AppendsOptionalPat},
-    asserts::assert_status,
+use crate::{
+    assert_status,
+    common::api_common::{Api, AppendsOptionalPat},
 };
 
 use super::ApiV3;
@@ -117,20 +117,20 @@ pub fn generate_authorize_uri(
 }
 
 pub async fn get_authorize_accept_flow_id(response: ServiceResponse) -> String {
-    assert_status(&response, StatusCode::OK);
+    assert_status!(&response, StatusCode::OK);
     test::read_body_json::<OAuthClientAccessRequest, _>(response)
         .await
         .flow_id
 }
 
 pub async fn get_auth_code_from_redirect_params(response: &ServiceResponse) -> String {
-    assert_status(response, StatusCode::OK);
+    assert_status!(response, StatusCode::OK);
     let query_params = get_redirect_location_query_params(response);
     query_params.get("code").unwrap().to_string()
 }
 
 pub async fn get_access_token(response: ServiceResponse) -> String {
-    assert_status(&response, StatusCode::OK);
+    assert_status!(&response, StatusCode::OK);
     test::read_body_json::<TokenResponse, _>(response)
         .await
         .access_token
