@@ -65,6 +65,13 @@ pub async fn index_projects(
 
     let indices = get_indexes(config).await?;
 
+    let all_loader_fields =
+        crate::database::models::loader_fields::LoaderField::get_fields_all(&pool, &redis)
+            .await?
+            .into_iter()
+            .map(|x| x.field)
+            .collect::<Vec<_>>();
+
     let all_ids = get_all_ids(pool.clone()).await?;
     let all_ids_len = all_ids.len();
     info!("Got all ids, indexing {} projects", all_ids_len);
@@ -93,10 +100,10 @@ pub async fn index_projects(
                 (version_id, (project_id, owner_username.to_lowercase()))
             })
             .collect::<HashMap<_, _>>();
-        let (uploads, loader_fields) = index_local(&pool, &redis, id_chunk).await?;
+        let uploads = index_local(&pool, &redis, id_chunk).await?;
 
         info!("Got chunk, adding to docs_to_add");
-        add_projects(&indices, uploads, loader_fields, config).await?;
+        add_projects(&indices, uploads, all_loader_fields.clone(), config).await?;
     }
 
     info!("Done adding projects.");

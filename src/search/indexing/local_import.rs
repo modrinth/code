@@ -1,9 +1,6 @@
-use std::collections::HashMap;
-use std::sync::Arc;
-
-use dashmap::DashSet;
 use futures::TryStreamExt;
 use log::info;
+use std::collections::HashMap;
 
 use super::IndexingError;
 use crate::database::models::{project_item, version_item, ProjectId, VersionId};
@@ -54,10 +51,8 @@ pub async fn index_local(
     pool: &PgPool,
     redis: &RedisPool,
     visible_ids: HashMap<VersionId, (ProjectId, String)>,
-) -> Result<(Vec<UploadSearchProject>, Vec<String>), IndexingError> {
+) -> Result<Vec<UploadSearchProject>, IndexingError> {
     info!("Indexing local projects!");
-    let loader_field_keys: Arc<DashSet<String>> = Arc::new(DashSet::new());
-
     let project_ids = visible_ids
         .values()
         .map(|(project_id, _)| project_id)
@@ -120,10 +115,6 @@ pub async fn index_local(
 
         let version_fields = v.version_fields.clone();
         let loader_fields = models::projects::from_duplicate_version_fields(version_fields);
-        for v in loader_fields.keys().cloned() {
-            loader_field_keys.insert(v);
-        }
-
         let license = match m.inner.license.split(' ').next() {
             Some(license) => license.to_string(),
             None => m.inner.license.clone(),
@@ -223,11 +214,5 @@ pub async fn index_local(
         uploads.push(usp);
     }
 
-    Ok((
-        uploads,
-        Arc::try_unwrap(loader_field_keys)
-            .unwrap_or_default()
-            .into_iter()
-            .collect(),
-    ))
+    Ok(uploads)
 }
