@@ -115,6 +115,11 @@ const orderedCollections = computed(() => {
 .collections-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+
+  @media screen and (max-width: 800px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
   gap: var(--gap-md);
 
   .collection {

@@ -437,16 +437,14 @@ if (!collection.value) {
 const title = `${collection.value.name} - Collection`
 const description = `${collection.value.description} - View the collection ${collection.value.description} by ${creator.value.username} on Modrinth`
 
-if (!route.name.startsWith('type-id-settings')) {
-  useSeoMeta({
-    title,
-    description,
-    ogTitle: title,
-    ogDescription: collection.value.description,
-    ogImage: collection.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-    robots: collection.value.status === 'listed' ? 'all' : 'noindex',
-  })
-}
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: collection.value.description,
+  ogImage: collection.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+  robots: collection.value.status === 'listed' ? 'all' : 'noindex',
+})
 
 const canEdit = computed(
   () =>
@@ -461,6 +459,8 @@ const projectTypes = computed(() => {
   for (const project of projects.value) {
     obj[project.project_type] = true
   }
+
+  delete obj.project
 
   return Object.keys(obj)
 })
@@ -656,6 +656,8 @@ function showPreviewImage(files) {
 
 .title {
   margin: var(--gap-md) 0 var(--spacing-card-xs) 0;
+  font-size: var(--font-size-xl);
+  color: var(--color-text-dark);
 }
 
 .collection-label {

@@ -42,6 +42,7 @@
       class="tags"
     >
       <EnvironmentIndicator
+        v-if="clientSide && serverSide"
         :type-only="moderation"
         :client-side="clientSide"
         :server-side="serverSide"

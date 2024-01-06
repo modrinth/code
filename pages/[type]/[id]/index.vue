@@ -1,5 +1,9 @@
 <template>
-  <div class="markdown-body card" v-html="renderHighlightedString(project.body)" />
+  <div
+    v-if="project.body"
+    class="markdown-body card"
+    v-html="renderHighlightedString(project.body || '')"
+  />
 </template>
 
 <script>

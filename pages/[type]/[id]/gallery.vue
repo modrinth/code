@@ -199,7 +199,8 @@
         :max-size="524288000"
         :accept="acceptFileTypes"
         prompt="Upload an image"
-        class="brand-button iconified-button"
+        class="iconified-button brand-button"
+        :disabled="!isPermission(currentMember?.permissions, 1 << 2)"
         @change="handleFiles"
       >
         <UploadIcon />
@@ -207,7 +208,14 @@
       <span class="indicator">
         <InfoIcon /> Click to choose an image or drag one onto this page
       </span>
-      <DropArea :accept="acceptFileTypes" @change="handleFiles" />
+      <DropArea
+        :accept="acceptFileTypes"
+        :disabled="!isPermission(currentMember?.permissions, 1 << 2)"
+        @change="handleFiles"
+      />
+    </div>
+    <div v-else class="card header-buttons">
+      <span class="indicator"> <InfoIcon /> You don't have permission to upload images </span>
     </div>
     <div class="items">
       <div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
@@ -288,10 +296,12 @@ import {
   ImageIcon,
   TransferIcon,
   ConfirmModal,
-  FileInput,
-  DropArea,
 } from 'omorphia'
+import FileInput from '~/components/ui/FileInput.vue'
+import DropArea from '~/components/ui/DropArea.vue'
 import Modal from '~/components/ui/Modal.vue'
+
+import { isPermission } from '~/utils/permissions.ts'
 
 const props = defineProps({
   project: {
@@ -305,6 +315,11 @@ const props = defineProps({
     default() {
       return null
     },
+  },
+  resetProject: {
+    type: Function,
+    required: true,
+    default: () => {},
   },
 })
 
@@ -430,7 +445,7 @@ export default defineNuxtComponent({
           method: 'POST',
           body: this.editFile,
         })
-        await this.updateProject()
+        await this.resetProject()
 
         this.$refs.modal_edit_item.hide()
       } catch (err) {
@@ -468,7 +483,7 @@ export default defineNuxtComponent({
           method: 'PATCH',
         })
 
-        await this.updateProject()
+        await this.resetProject()
         this.$refs.modal_edit_item.hide()
       } catch (err) {
         this.$notify({
@@ -495,7 +510,7 @@ export default defineNuxtComponent({
           }
         )
 
-        await this.updateProject()
+        await this.resetProject()
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -506,16 +521,6 @@ export default defineNuxtComponent({
       }
 
       stopLoading()
-    },
-    async updateProject() {
-      const project = await useBaseFetch(`project/${this.project.id}`)
-
-      project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
-
-      project.project_type = this.$getProjectTypeForUrl(project.project_type, project.loaders)
-
-      this.$emit('update:project', project)
-      this.resetEdit()
     },
   },
 })

@@ -1,7 +1,12 @@
 <template>
   <div>
-    <div v-if="analytics.error.value">
-      {{ analytics.error.value }}
+    <div v-if="analytics.error.value" class="universal-card">
+      <h2>
+        <span class="label__title">Error</span>
+      </h2>
+      <div>
+        {{ analytics.error.value }}
+      </div>
     </div>
     <div v-else class="graphs">
       <div class="graphs__vertical-bar">
@@ -18,7 +23,7 @@
             :class="`clickable button-base ${
               selectedChart === 'downloads' ? 'button-base__selected' : ''
             }`"
-            :onclick="() => (selectedChart = 'downloads')"
+            :onclick="() => setSelectedChart('downloads')"
             role="button"
           />
         </client-only>
@@ -35,7 +40,7 @@
             :class="`clickable button-base ${
               selectedChart === 'views' ? 'button-base__selected' : ''
             }`"
-            :onclick="() => (selectedChart = 'views')"
+            :onclick="() => setSelectedChart('views')"
             role="button"
           />
         </client-only>
@@ -52,7 +57,7 @@
             :class="`clickable button-base ${
               selectedChart === 'revenue' ? 'button-base__selected' : ''
             }`"
-            :onclick="() => (selectedChart = 'revenue')"
+            :onclick="() => setSelectedChart('revenue')"
             role="button"
           />
         </client-only>
@@ -118,7 +123,9 @@
         <div class="country-data">
           <Card
             v-if="
-              analytics.formattedData.value?.downloadsByCountry && selectedChart === 'downloads'
+              analytics.formattedData.value?.downloadsByCountry &&
+              selectedChart === 'downloads' &&
+              analytics.formattedData.value.downloadsByCountry.data.length > 0
             "
             class="country-downloads"
           >
@@ -169,7 +176,11 @@
             </div>
           </Card>
           <Card
-            v-if="analytics.formattedData.value?.viewsByCountry && selectedChart === 'views'"
+            v-if="
+              analytics.formattedData.value?.viewsByCountry &&
+              selectedChart === 'views' &&
+              analytics.formattedData.value.viewsByCountry.data.length > 0
+            "
             class="country-downloads"
           >
             <label>
@@ -183,14 +194,20 @@
               >
                 <div class="country-flag-container">
                   <img
-                    :src="`https://flagcdn.com/h240/${name.toLowerCase()}.png`"
-                    :alt="name"
+                    :src="
+                      name.toLowerCase() === 'xx' || !name
+                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
+                        : countryCodeToFlag(name)
+                    "
+                    alt="Hidden country"
                     class="country-flag"
                   />
                 </div>
-
                 <div class="country-text">
-                  <strong class="country-name">{{ countryCodeToName(name) }}</strong>
+                  <strong class="country-name">
+                    <template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
+                    <template v-else>{{ countryCodeToName(name) }}</template>
+                  </strong>
                   <span class="data-point">{{ formatNumber(count) }}</span>
                 </div>
                 <div
@@ -225,6 +242,8 @@ import dayjs from 'dayjs'
 import { defineProps, ref, computed } from 'vue'
 import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from '#components'
 
+const router = useRouter()
+
 const props = withDefaults(
   defineProps<{
     projects?: any[]
@@ -247,7 +266,18 @@ const selectableRanges = Object.entries(props.ranges).map(([duration, extra]) =>
   res: typeof extra === 'string' ? Number(duration) : extra[1],
 }))
 
-const selectedChart = ref('downloads')
+// const selectedChart = ref('downloads')
+const selectedChart = computed(() => {
+  return (router.currentRoute.value.query?.chart as string | undefined) || 'downloads'
+})
+const setSelectedChart = (chart: string) => {
+  router.push({
+    query: {
+      ...router.currentRoute.value.query,
+      chart,
+    },
+  })
+}
 
 // Chart refs
 const downloadsChart = ref()

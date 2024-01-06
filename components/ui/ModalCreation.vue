@@ -4,14 +4,6 @@
       <div class="markdown-body">
         <p>New projects are created as drafts and can be found under your profile page.</p>
       </div>
-      <label for="project-type">
-        <span class="label__title">Project type<span class="required">*</span></span>
-      </label>
-      <Chips
-        id="project-type"
-        v-model="projectType"
-        :items="tags.projectTypes.map((x) => x.display)"
-      />
       <label for="name">
         <span class="label__title">Name<span class="required">*</span></span>
       </label>
@@ -28,9 +20,7 @@
         <span class="label__title">URL<span class="required">*</span></span>
       </label>
       <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">
-          https://modrinth.com/{{ getProjectType() ? getProjectType().id : '???' }}/
-        </div>
+        <div class="text-input-wrapper__before">https://modrinth.com/project/</div>
         <input
           id="slug"
           v-model="slug"
@@ -40,6 +30,25 @@
           @input="manualSlug = true"
         />
       </div>
+      <label for="visibility">
+        <span class="label__title">Visibility<span class="required">*</span></span>
+        <span class="label__description">
+          The visibility of your project after it has been approved.
+        </span>
+      </label>
+      <multiselect
+        id="visibility"
+        v-model="visibility"
+        :options="visibilities"
+        track-by="actual"
+        label="display"
+        :multiple="false"
+        :searchable="false"
+        :show-no-results="false"
+        :show-labels="false"
+        placeholder="Choose visibility.."
+        open-direction="bottom"
+      />
       <label for="additional-information">
         <span class="label__title">Summary<span class="required">*</span></span>
         <span class="label__description"
@@ -64,26 +73,23 @@
 </template>
 
 <script>
+import { Multiselect } from 'vue-multiselect'
 import CrossIcon from '~/assets/images/utils/x.svg'
 import CheckIcon from '~/assets/images/utils/right-arrow.svg'
 import Modal from '~/components/ui/Modal.vue'
-import Chips from '~/components/ui/Chips.vue'
 
 export default {
   components: {
-    Chips,
     CrossIcon,
     CheckIcon,
     Modal,
+    Multiselect,
   },
   props: {
-    itemType: {
+    organizationId: {
       type: String,
-      default: '',
-    },
-    itemId: {
-      type: String,
-      default: '',
+      required: false,
+      default: null,
     },
   },
   setup() {
@@ -93,80 +99,68 @@ export default {
   },
   data() {
     return {
-      projectType: this.tags.projectTypes[0].display,
       name: '',
       slug: '',
       description: '',
       manualSlug: false,
+      visibilities: [
+        {
+          actual: 'approved',
+          display: 'Public',
+        },
+        {
+          actual: 'private',
+          display: 'Private',
+        },
+        {
+          actual: 'unlisted',
+          display: 'Unlisted',
+        },
+      ],
+      visibility: {
+        actual: 'approved',
+        display: 'Public',
+      },
     }
   },
   methods: {
     cancel() {
       this.$refs.modal.hide()
     },
-    getProjectType() {
-      return this.tags.projectTypes.find((x) => this.projectType === x.display)
-    },
-    getClientSide() {
-      switch (this.getProjectType().id) {
-        case 'plugin':
-          return 'unsupported'
-        case 'resourcepack':
-          return 'required'
-        case 'shader':
-          return 'required'
-        case 'datapack':
-          return 'optional'
-        default:
-          return 'unknown'
-      }
-    },
-    getServerSide() {
-      switch (this.getProjectType().id) {
-        case 'plugin':
-          return 'required'
-        case 'resourcepack':
-          return 'unsupported'
-        case 'shader':
-          return 'unsupported'
-        case 'datapack':
-          return 'required'
-        default:
-          return 'unknown'
-      }
-    },
     async createProject() {
       startLoading()
-
-      const projectType = this.getProjectType()
 
       const formData = new FormData()
 
       const auth = await useAuth()
 
-      formData.append(
-        'data',
-        JSON.stringify({
-          title: this.name.trim(),
-          project_type: projectType.actual,
-          slug: this.slug,
-          description: this.description.trim(),
-          body: '',
-          initial_versions: [],
-          team_members: [
-            {
-              user_id: auth.value.user.id,
-              name: auth.value.user.username,
-              role: 'Owner',
-            },
-          ],
-          categories: [],
-          client_side: this.getClientSide(),
-          server_side: this.getServerSide(),
-          license_id: 'LicenseRef-Unknown',
-          is_draft: true,
-        })
-      )
+      const projectData = {
+        title: this.name.trim(),
+        project_type: 'mod',
+        slug: this.slug,
+        description: this.description.trim(),
+        body: '',
+        requested_status: this.visibility.actual,
+        initial_versions: [],
+        team_members: [
+          {
+            user_id: auth.value.user.id,
+            name: auth.value.user.username,
+            role: 'Owner',
+          },
+        ],
+        categories: [],
+        client_side: 'required',
+        server_side: 'required',
+        license_id: 'LicenseRef-Unknown',
+        is_draft: true,
+      }
+
+      if (this.organizationId) {
+        projectData.organization_id = this.organizationId
+      }
+
+      formData.append('data', JSON.stringify(projectData))
 
       try {
         await useBaseFetch('project', {
@@ -181,11 +175,8 @@ export default {
         await this.$router.push({
           name: 'type-id',
           params: {
-            type: projectType.id,
+            type: 'project',
             id: this.slug,
-          },
-          state: {
-            overrideProjectType: projectType.id,
           },
         })
       } catch (err) {

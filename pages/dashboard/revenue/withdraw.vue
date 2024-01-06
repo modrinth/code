@@ -194,7 +194,6 @@ const selectedMethod = computed(() =>
 const parsedAmount = computed(() => {
   const regex = /^\$?(\d*(\.\d{2})?)$/gm
   const matches = regex.exec(amount.value)
-  console.log(matches)
   return matches && matches[1] ? parseFloat(matches[1]) : 0.0
 })
 const fees = computed(() => {
@@ -251,7 +250,6 @@ const agreedTerms = ref(false)
 
 watch(country, async () => {
   await refreshPayoutMethods()
-  console.log(payoutMethods.value)
   if (payoutMethods.value && payoutMethods.value[0]) {
     selectedMethodId.value = payoutMethods.value[0].id
   }
@@ -285,7 +283,6 @@ async function withdraw() {
       type: 'success',
     })
   } catch (err) {
-    console.log(err)
     data.$notify({
       group: 'main',
       title: 'An error occurred',

@@ -154,6 +154,23 @@
                 </IntlFormatted>
               </span>
             </div>
+            <template v-if="organizations.length > 0">
+              <hr class="card-divider" />
+              <div class="stats-block__item">
+                <IntlFormatted :message-id="messages.profileOrganizations" />
+                <div class="organizations-grid">
+                  <nuxt-link
+                    v-for="org in organizations"
+                    :key="org.id"
+                    v-tooltip="org.name"
+                    class="organization"
+                    :to="`/organization/${org.slug}`"
+                  >
+                    <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="xs" />
+                  </nuxt-link>
+                </div>
+              </div>
+            </template>
           </template>
         </div>
       </div>
@@ -380,6 +397,10 @@ const messages = defineMessages({
     id: 'profile.user-id',
     defaultMessage: 'User ID: {id}',
   },
+  profileOrganizations: {
+    id: 'profile.label.organizations',
+    defaultMessage: 'Organizations',
+  },
   profileManageProjectsButton: {
     id: 'profile.button.manage-projects',
     defaultMessage: 'Manage projects',
@@ -419,7 +440,7 @@ const messages = defineMessages({
   },
   profileNoCollectionsLabel: {
     id: 'profile.label.no-collections',
-    defaultMessage: 'This user has no collection!',
+    defaultMessage: 'This user has no collections!',
   },
   profileNoCollectionsAuthLabel: {
     id: 'profile.label.no-collections-auth',
@@ -432,32 +453,38 @@ const messages = defineMessages({
   },
 })
 
-let user, projects, collections
+let user, projects, organizations, collections
 try {
-  ;[{ data: user }, { data: projects }, { data: collections }] = await Promise.all([
-    useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
-    useAsyncData(
-      `user/${route.params.id}/projects`,
-      () => useBaseFetch(`user/${route.params.id}/projects`),
-      {
-        transform: (projects) => {
-          for (const project of projects) {
-            project.categories = project.categories.concat(project.loaders)
-            project.project_type = data.$getProjectTypeForUrl(
-              project.project_type,
-              project.categories,
-              tags.value
-            )
-          }
+  ;[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
+    await Promise.all([
+      useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
+      useAsyncData(
+        `user/${route.params.id}/projects`,
+        () => useBaseFetch(`user/${route.params.id}/projects`),
+        {
+          transform: (projects) => {
+            for (const project of projects) {
+              project.categories = project.categories.concat(project.loaders)
+              project.project_type = data.$getProjectTypeForUrl(
+                project.project_type,
+                project.categories,
+                tags.value
+              )
+            }
 
-          return projects
-        },
-      }
-    ),
-    useAsyncData(`user/${route.params.id}/collections`, () =>
-      useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 })
-    ),
-  ])
+            return projects
+          },
+        }
+      ),
+      useAsyncData(`user/${route.params.id}/organizations`, () =>
+        useBaseFetch(`user/${route.params.id}/organizations`, {
+          apiVersion: 3,
+        })
+      ),
+      useAsyncData(`user/${route.params.id}/collections`, () =>
+        useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 })
+      ),
+    ])
 } catch {
   throw createError({
     fatal: true,
@@ -497,11 +524,17 @@ useSeoMeta({
 })
 
 const projectTypes = computed(() => {
-  const obj = { collection: true }
+  const obj = {}
+
+  if (collections.value.length > 0) {
+    obj.collection = true
+  }
 
   for (const project of projects.value) {
     obj[project.project_type] = true
   }
+
+  delete obj.project
 
   return Object.keys(obj)
 })
@@ -594,9 +627,24 @@ export default defineNuxtComponent({
 </script>
 
 <style lang="scss" scoped>
+.organizations-grid {
+  // 5 wide
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+
+  grid-gap: var(--gap-sm);
+  margin-top: 0.5rem;
+}
+
 .collections-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+
+  @media screen and (max-width: 800px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
   gap: var(--gap-lg);
 
   .collection-item {
@@ -658,6 +706,7 @@ export default defineNuxtComponent({
     }
   }
 }
+
 .user-header-wrapper {
   display: flex;
   margin: 0 auto -1.5rem;

@@ -5,7 +5,12 @@
         <Breadcrumbs
           current-title="Settings"
           :link-stack="[
-            { href: `/dashboard/projects`, label: 'Projects' },
+            {
+              href: organization
+                ? `/organization/${organization.slug}/settings/projects`
+                : `/dashboard/projects`,
+              label: 'Projects',
+            },
             {
               href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
               label: project.title,
@@ -126,10 +131,13 @@
         v-model:members="members"
         v-model:all-members="allMembers"
         v-model:dependencies="dependencies"
+        v-model:organization="organization"
         :current-member="currentMember"
         :patch-project="patchProject"
         :patch-icon="patchIcon"
-        :update-icon="resetProject"
+        :reset-project="resetProject"
+        :reset-organization="resetOrganization"
+        :reset-members="resetMembers"
         :route="route"
       />
     </div>
@@ -478,11 +486,15 @@
           v-model:members="members"
           v-model:all-members="allMembers"
           v-model:dependencies="dependencies"
+          v-model:organization="organization"
           :current-member="currentMember"
+          :reset-project="resetProject"
+          :reset-organization="resetOrganization"
+          :reset-members="resetMembers"
           :route="route"
         />
       </section>
-      <div class="card normal-page__info">
+      <div class="universal-card normal-page__info">
         <template
           v-if="
             project.issues_url ||
@@ -618,6 +630,17 @@
           <hr class="card-divider" />
         </template>
         <h2 class="card-header">Project members</h2>
+        <nuxt-link
+          v-if="organization"
+          class="team-member columns button-transparent"
+          :to="`/organization/${organization.slug}`"
+        >
+          <Avatar :src="organization.icon_url" :alt="organization.name" size="sm" />
+          <div class="member-info">
+            <p class="name">{{ organization.name }}</p>
+            <p class="role"><OrganizationIcon /> Organization</p>
+          </div>
+        </nuxt-link>
         <nuxt-link
           v-for="member in members"
           :key="member.user.id"
@@ -787,6 +810,7 @@ import { reportProject } from '~/utils/report-helpers.ts'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 import { userCollectProject } from '~/composables/user.js'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import OrganizationIcon from '~/assets/images/utils/organization.svg'
 
 const data = useNuxtApp()
 const route = useRoute()
@@ -820,14 +844,23 @@ if (
   })
 }
 
-let project, allMembers, dependencies, featuredVersions, versions
+let project,
+  resetProject,
+  allMembers,
+  resetMembers,
+  dependencies,
+  featuredVersions,
+  versions,
+  organization,
+  resetOrganization
 try {
   ;[
-    { data: project },
-    { data: allMembers },
+    { data: project, refresh: resetProject },
+    { data: allMembers, refresh: resetMembers },
     { data: dependencies },
     { data: featuredVersions },
     { data: versions },
+    { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
       transform: (project) => {
@@ -838,10 +871,6 @@ try {
             project.loaders,
             tags.value
           )
-
-          if (process.client && history.state && history.state.overrideProjectType) {
-            project.project_type = history.state.overrideProjectType
-          }
         }
 
         return project
@@ -869,6 +898,9 @@ try {
     ),
     useAsyncData(`project/${route.params.id}/version`, () =>
       useBaseFetch(`project/${route.params.id}/version`)
+    ),
+    useAsyncData(`project/${route.params.id}/organization`, () =>
+      useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 })
     ),
   ])
 
@@ -903,27 +935,46 @@ if (project.value.project_type !== route.params.type || route.params.id !== proj
   )
 }
 
-const members = ref(allMembers.value.filter((x) => x.accepted))
-const currentMember = ref(
-  auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null
-)
+// Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
+// The rest of the members should be sorted by role, then by name
+const members = computed(() => {
+  const acceptedMembers = allMembers.value.filter((x) => x.accepted)
+  const owner = acceptedMembers.find((x) => x.role === 'Owner')
+  const rest = acceptedMembers.filter((x) => x.role !== 'Owner') || []
 
-if (
-  !currentMember.value &&
-  auth.value.user &&
-  tags.value.staffRoles.includes(auth.value.user.role)
-) {
-  currentMember.value = {
-    team_id: project.team_id,
-    user: auth.value.user,
-    role: auth.value.role,
-    permissions: auth.value.user.role === 'admin' ? 1023 : 12,
-    accepted: true,
-    payouts_split: 0,
-    avatar_url: auth.value.user.avatar_url,
-    name: auth.value.user.username,
+  rest.sort((a, b) => {
+    if (a.role === b.role) {
+      return a.user.username.localeCompare(b.user.username)
+    } else {
+      return a.role.localeCompare(b.role)
+    }
+  })
+
+  return owner ? [owner, ...rest] : rest
+})
+
+const currentMember = computed(() => {
+  let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null
+
+  if (!val && organization.value && organization.value.members) {
+    val = organization.value.members.find((x) => x.user.id === auth.value.user.id)
   }
-}
+
+  if (!val && auth.value.user && tags.value.staffRoles.includes(auth.value.user.role)) {
+    val = {
+      team_id: project.team_id,
+      user: auth.value.user,
+      role: auth.value.role,
+      permissions: auth.value.user.role === 'admin' ? 1023 : 12,
+      accepted: true,
+      payouts_split: 0,
+      avatar_url: auth.value.user.avatar_url,
+      name: auth.value.user.username,
+    }
+  }
+
+  return val
+})
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
 
@@ -955,36 +1006,34 @@ const licenseIdDisplay = computed(() => {
 })
 const featuredGalleryImage = computed(() => project.value.gallery.find((img) => img.featured))
 
-const projectTypeDisplay = data.$formatProjectType(
-  data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders)
+const projectTypeDisplay = computed(() =>
+  data.$formatProjectType(
+    data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders)
+  )
 )
-const title = `${project.value.title} - Minecraft ${projectTypeDisplay}`
-const description = `${project.value.description} - Download the Minecraft ${projectTypeDisplay} ${
-  project.value.title
-} by ${members.value.find((x) => x.role === 'Owner').user.username} on Modrinth`
+
+const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`)
+const description = computed(
+  () =>
+    `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
+      project.value.title
+    } by ${
+      members.value.find((x) => x.role === 'Owner')?.user?.username || 'a Creator'
+    } on Modrinth`
+)
 
 if (!route.name.startsWith('type-id-settings')) {
   useSeoMeta({
-    title,
-    description,
-    ogTitle: title,
-    ogDescription: project.value.description,
-    ogImage: project.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
-    robots:
+    title: () => title.value,
+    description: () => description.value,
+    ogTitle: () => title.value,
+    ogDescription: () => project.value.description,
+    ogImage: () => project.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+    robots: () =>
       project.value.status === 'approved' || project.value.status === 'archived'
         ? 'all'
         : 'noindex',
   })
-}
-
-async function resetProject() {
-  const newProject = await useBaseFetch(`project/${project.value.id}`)
-
-  newProject.actualProjectType = JSON.parse(JSON.stringify(newProject.project_type))
-
-  newProject.project_type = data.$getProjectTypeForUrl(newProject.project_type, newProject.loaders)
-
-  project.value = newProject
 }
 
 async function clearMessage() {
@@ -1041,7 +1090,7 @@ const licenseText = ref('')
 async function getLicenseData() {
   try {
     const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
-    licenseText.value = text.body
+    licenseText.value = text.body || 'License text could not be retrieved.'
   } catch {
     licenseText.value = 'License text could not be retrieved.'
   }
@@ -1363,6 +1412,12 @@ const collapsedChecklist = ref(false)
     p {
       font-size: var(--font-size-sm);
       margin: 0.2rem 0;
+    }
+
+    .role {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
     }
   }
 }

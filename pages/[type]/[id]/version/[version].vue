@@ -541,7 +541,7 @@
             :custom-label="(value) => $formatCategory(value)"
             :loading="tags.loaders.length === 0"
             :multiple="true"
-            :searchable="false"
+            :searchable="true"
             :show-no-results="false"
             :close-on-select="false"
             :clear-on-select="false"
@@ -734,6 +734,11 @@ export default defineNuxtComponent({
       default() {
         return {}
       },
+    },
+    resetProject: {
+      type: Function,
+      required: true,
+      default: () => {},
     },
   },
   async setup(props) {
@@ -1135,13 +1140,13 @@ export default defineNuxtComponent({
           })
         }
 
-        const newEditedVersions = await this.resetProjectVersions()
+        await this.resetProjectVersions()
 
         await this.$router.replace(
           `/${this.project.project_type}/${
             this.project.slug ? this.project.slug : this.project.id
           }/version/${encodeURI(
-            newEditedVersions.find((x) => x.id === this.version.id).displayUrlEnding
+            this.versions.find((x) => x.id === this.version.id).displayUrlEnding
           )}`
         )
       } catch (err) {
@@ -1316,6 +1321,7 @@ export default defineNuxtComponent({
         useBaseFetch(`project/${this.version.project_id}/version`),
         useBaseFetch(`project/${this.version.project_id}/version?featured=true`),
         useBaseFetch(`project/${this.version.project_id}/dependencies`),
+        this.resetProject(),
       ])
 
       const newCreatedVersions = this.$computeVersions(versions, this.members)

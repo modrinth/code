@@ -1133,6 +1133,10 @@ button {
     font-size: var(--font-size-lg);
     font-weight: bold;
   }
+
+  &.no-margin {
+    margin: 0;
+  }
 }
 
 .project-list {

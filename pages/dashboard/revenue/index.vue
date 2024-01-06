@@ -78,7 +78,7 @@
 import { TransferIcon, HistoryIcon, PayPalIcon, SaveIcon, XIcon } from 'omorphia'
 
 const auth = await useAuth()
-const minWithdraw = ref(0.1)
+const minWithdraw = ref(0.01)
 
 async function updateVenmo() {
   startLoading()

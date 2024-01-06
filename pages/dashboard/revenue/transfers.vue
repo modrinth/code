@@ -85,7 +85,6 @@ async function cancelPayout(id) {
     await refresh()
     await useAuth(auth.value.token)
   } catch (err) {
-    console.log(err)
     data.$notify({
       group: 'main',
       title: 'An error occurred',

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Card>
+    <div class="universal-card">
       <div class="markdown-disclaimer">
         <h2>Description</h2>
         <span class="label__description">
@@ -29,12 +29,12 @@
           Save changes
         </button>
       </div>
-    </Card>
+    </div>
   </div>
 </template>
 
 <script>
-import { MarkdownEditor, Card } from 'omorphia'
+import { MarkdownEditor } from 'omorphia'
 import Chips from '~/components/ui/Chips.vue'
 import SaveIcon from '~/assets/images/utils/save.svg'
 import { renderHighlightedString } from '~/helpers/highlight.js'
@@ -42,7 +42,6 @@ import { useImageUpload } from '~/composables/image-upload.ts'
 
 export default defineNuxtComponent({
   components: {
-    Card,
     Chips,
     SaveIcon,
     MarkdownEditor,

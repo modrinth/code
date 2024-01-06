@@ -11,44 +11,82 @@
         {{ $formatProjectType(project.project_type).toLowerCase() }}. Make sure to select all tags
         that apply.
       </p>
-      <template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
+      <p v-if="project.versions.length === 0" class="known-errors">
+        Please upload a version first in order to select tags!
+      </p>
+      <template v-else>
+        <template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
+          <div class="label">
+            <h4>
+              <span class="label__title">{{ $formatCategoryHeader(header) }}</span>
+            </h4>
+            <span class="label__description">
+              <template v-if="header === 'categories'">
+                Select all categories that reflect the themes or function of your
+                {{ $formatProjectType(project.project_type).toLowerCase() }}.
+              </template>
+              <template v-else-if="header === 'features'">
+                Select all of the features that your
+                {{ $formatProjectType(project.project_type).toLowerCase() }} makes use of.
+              </template>
+              <template v-else-if="header === 'resolutions'">
+                Select the resolution(s) of textures in your
+                {{ $formatProjectType(project.project_type).toLowerCase() }}.
+              </template>
+              <template v-else-if="header === 'performance impact'">
+                Select the realistic performance impact of your
+                {{ $formatProjectType(project.project_type).toLowerCase() }}. Select multiple if the
+                {{ $formatProjectType(project.project_type).toLowerCase() }} is configurable to
+                different levels of performance impact.
+              </template>
+            </span>
+          </div>
+          <div class="category-list input-div">
+            <Checkbox
+              v-for="category in categoryLists[header]"
+              :key="`category-${header}-${category.name}`"
+              :model-value="selectedTags.includes(category)"
+              :description="$formatCategory(category.name)"
+              class="category-selector"
+              @update:model-value="toggleCategory(category)"
+            >
+              <div class="category-selector__label">
+                <div
+                  v-if="header !== 'resolutions' && category.icon"
+                  aria-hidden="true"
+                  class="icon"
+                  v-html="category.icon"
+                />
+                <span aria-hidden="true"> {{ $formatCategory(category.name) }}</span>
+              </div>
+            </Checkbox>
+          </div>
+        </template>
         <div class="label">
           <h4>
-            <span class="label__title">{{ $formatCategoryHeader(header) }}</span>
+            <span class="label__title"><StarIcon /> Featured tags</span>
           </h4>
           <span class="label__description">
-            <template v-if="header === 'categories'">
-              Select all categories that reflect the themes or function of your
-              {{ $formatProjectType(project.project_type).toLowerCase() }}.
-            </template>
-            <template v-else-if="header === 'features'">
-              Select all of the features that your
-              {{ $formatProjectType(project.project_type).toLowerCase() }} makes use of.
-            </template>
-            <template v-else-if="header === 'resolutions'">
-              Select the resolution(s) of textures in your
-              {{ $formatProjectType(project.project_type).toLowerCase() }}.
-            </template>
-            <template v-else-if="header === 'performance impact'">
-              Select the realistic performance impact of your
-              {{ $formatProjectType(project.project_type).toLowerCase() }}. Select multiple if the
-              {{ $formatProjectType(project.project_type).toLowerCase() }} is configurable to
-              different levels of performance impact.
-            </template>
+            You can feature up to 3 of your most relevant tags. Other tags may be promoted to
+            featured if you do not select all 3.
           </span>
         </div>
+        <p v-if="selectedTags.length < 1">
+          Select at least one category in order to feature a category.
+        </p>
         <div class="category-list input-div">
           <Checkbox
-            v-for="category in categoryLists[header]"
-            :key="`category-${header}-${category.name}`"
-            :model-value="selectedTags.includes(category)"
-            :description="$formatCategory(category.name)"
+            v-for="category in selectedTags"
+            :key="`featured-category-${category.name}`"
             class="category-selector"
-            @update:model-value="toggleCategory(category)"
+            :model-value="featuredTags.includes(category)"
+            :description="$formatCategory(category.name)"
+            :disabled="featuredTags.length >= 3 && !featuredTags.includes(category)"
+            @update:model-value="toggleFeaturedCategory(category)"
           >
             <div class="category-selector__label">
               <div
-                v-if="header !== 'resolutions' && category.icon"
+                v-if="category.header !== 'resolutions' && category.icon"
                 aria-hidden="true"
                 class="icon"
                 v-html="category.icon"
@@ -58,39 +96,7 @@
           </Checkbox>
         </div>
       </template>
-      <div class="label">
-        <h4>
-          <span class="label__title"><StarIcon /> Featured tags</span>
-        </h4>
-        <span class="label__description">
-          You can feature up to 3 of your most relevant tags. Other tags may be promoted to featured
-          if you do not select all 3.
-        </span>
-      </div>
-      <p v-if="selectedTags.length < 1">
-        Select at least one category in order to feature a category.
-      </p>
-      <div class="category-list input-div">
-        <Checkbox
-          v-for="category in selectedTags"
-          :key="`featured-category-${category.name}`"
-          class="category-selector"
-          :model-value="featuredTags.includes(category)"
-          :description="$formatCategory(category.name)"
-          :disabled="featuredTags.length >= 3 && !featuredTags.includes(category)"
-          @update:model-value="toggleFeaturedCategory(category)"
-        >
-          <div class="category-selector__label">
-            <div
-              v-if="category.header !== 'resolutions' && category.icon"
-              aria-hidden="true"
-              class="icon"
-              v-html="category.icon"
-            />
-            <span aria-hidden="true"> {{ $formatCategory(category.name) }}</span>
-          </div>
-        </Checkbox>
-      </div>
+
       <div class="button-group">
         <button
           type="button"

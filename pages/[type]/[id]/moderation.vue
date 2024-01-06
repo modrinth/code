@@ -104,9 +104,12 @@ const props = defineProps({
       return null
     },
   },
+  resetProject: {
+    type: Function,
+    required: true,
+    default: () => {},
+  },
 })
-
-const emit = defineEmits(['update:project'])
 
 const app = useNuxtApp()
 const auth = await useAuth()
@@ -130,7 +133,7 @@ async function setStatus(status) {
     })
     const project = props.project
     project.status = status
-    emit('update:project', project)
+    await props.resetProject()
     thread.value = await useBaseFetch(`thread/${thread.value.id}`)
   } catch (err) {
     app.$notify({

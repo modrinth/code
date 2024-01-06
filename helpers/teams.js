@@ -1,5 +1,6 @@
 export const acceptTeamInvite = async (teamId) => {
   await useBaseFetch(`team/${teamId}/join`, {
+    apiVersion: 3,
     method: 'POST',
   })
 }
@@ -9,6 +10,7 @@ export const removeSelfFromTeam = async (teamId) => {
 }
 export const removeTeamMember = async (teamId, userId) => {
   await useBaseFetch(`team/${teamId}/members/${userId}`, {
+    apiVersion: 3,
     method: 'DELETE',
   })
 }

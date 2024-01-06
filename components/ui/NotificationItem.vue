@@ -20,6 +20,13 @@
         <nuxt-link v-if="project" :to="getProjectLink(project)" tabindex="-1">
           <Avatar size="xs" :src="project.icon_url" :raised="raised" no-shadow />
         </nuxt-link>
+        <nuxt-link
+          v-else-if="organization"
+          :to="`/organization/${organization.slug}`"
+          tabindex="-1"
+        >
+          <Avatar size="xs" :src="organization.icon_url" :raised="raised" no-shadow />
+        </nuxt-link>
         <nuxt-link v-else-if="user" :to="getUserLink(user)" tabindex="-1">
           <Avatar size="xs" :src="user.avatar_url" :raised="raised" no-shadow />
         </nuxt-link>
@@ -31,6 +38,10 @@
           class="moderation-color"
         />
         <InvitationIcon v-else-if="type === 'team_invite' && project" class="creator-color" />
+        <InvitationIcon
+          v-else-if="type === 'organization_invite' && organization"
+          class="creator-color"
+        />
         <VersionIcon v-else-if="type === 'project_update' && project && version" />
         <NotificationIcon v-else />
       </template>
@@ -51,6 +62,19 @@
           has invited you to join
           <nuxt-link :to="getProjectLink(project)" class="title-link">
             {{ project.title }} </nuxt-link
+          >.
+        </span>
+      </template>
+      <template v-else-if="type === 'organization_invite' && organization">
+        <nuxt-link :to="`/user/${invitedBy.username}`" class="iconified-link title-link">
+          <Avatar :src="invitedBy.avatar_url" circle size="xxs" no-shadow :raised="raised" />
+          <span class="space">&nbsp;</span>
+          <span>{{ invitedBy.username }}</span>
+        </nuxt-link>
+        <span>
+          has invited you to join
+          <nuxt-link :to="`/organization/${organization.slug}`" class="title-link">
+            {{ organization.name }} </nuxt-link
           >.
         </span>
       </template>
@@ -154,7 +178,7 @@
       </span>
     </span>
     <div v-if="compact" class="notification__actions">
-      <template v-if="type === 'team_invite'">
+      <template v-if="type === 'team_invite' || type === 'organization_invite'">
         <button
           v-tooltip="`Accept`"
           class="iconified-button square-button brand-button button-transparent"
@@ -191,7 +215,9 @@
     </div>
     <div v-else class="notification__actions">
       <div v-if="type !== null" class="input-group">
-        <template v-if="type === 'team_invite' && !notification.read">
+        <template
+          v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
+        >
           <button
             class="iconified-button brand-button"
             @click="
@@ -322,6 +348,7 @@ const report = computed(() => props.notification.extra_data.report)
 const project = computed(() => props.notification.extra_data.project)
 const version = computed(() => props.notification.extra_data.version)
 const user = computed(() => props.notification.extra_data.user)
+const organization = computed(() => props.notification.extra_data.organization)
 const invitedBy = computed(() => props.notification.extra_data.invited_by)
 
 const threadLink = computed(() => {

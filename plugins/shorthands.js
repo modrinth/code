@@ -227,6 +227,12 @@ export const formatCategory = (name) => {
     return 'Colored Lighting'
   } else if (name === 'optifine') {
     return 'OptiFine'
+  } else if (name === 'mrpack') {
+    return 'Modpack'
+  } else if (name === 'minecraft') {
+    return 'Resource Pack'
+  } else if (name === 'vanilla') {
+    return 'Vanilla Shader'
   }
 
   return capitalizeString(name)

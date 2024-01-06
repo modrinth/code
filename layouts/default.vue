@@ -77,6 +77,10 @@
                     <span class="title">Create a project</span>
                   </button>
                   <hr class="divider" />
+                  <NuxtLink class="item button-transparent" to="/dashboard/collections">
+                    <LibraryIcon class="icon" />
+                    <span class="title">Collections</span>
+                  </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/dashboard/notifications">
                     <NotificationIcon class="icon" />
                     <span class="title">Notifications</span>
@@ -84,10 +88,6 @@
                   <NuxtLink class="item button-transparent" to="/dashboard">
                     <ChartIcon class="icon" />
                     <span class="title">Dashboard</span>
-                  </NuxtLink>
-                  <NuxtLink class="item button-transparent" to="/dashboard/collections">
-                    <LibraryIcon class="icon" />
-                    <span class="title">Collections</span>
                   </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/settings">
                     <SettingsIcon class="icon" />

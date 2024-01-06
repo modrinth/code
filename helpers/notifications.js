@@ -1,12 +1,12 @@
 import { useNuxtApp } from '#app'
 
-async function getBulk(type, ids) {
+async function getBulk(type, ids, apiVersion = 2) {
   if (ids.length === 0) {
     return []
   }
 
   const url = `${type}?ids=${encodeURIComponent(JSON.stringify([...new Set(ids)]))}`
-  const { data: bulkFetch } = await useAsyncData(url, () => useBaseFetch(url))
+  const { data: bulkFetch } = await useAsyncData(url, () => useBaseFetch(url, { apiVersion }))
   return bulkFetch.value
 }
 
@@ -22,6 +22,7 @@ export async function fetchNotifications() {
     const threadIds = []
     const userIds = []
     const versionIds = []
+    const organizationIds = []
 
     for (const notification of notifications.value) {
       if (notification.body) {
@@ -39,6 +40,9 @@ export async function fetchNotifications() {
         }
         if (notification.body.invited_by) {
           userIds.push(notification.body.invited_by)
+        }
+        if (notification.body.organization_id) {
+          organizationIds.push(notification.body.organization_id)
         }
       }
     }
@@ -61,9 +65,12 @@ export async function fetchNotifications() {
       projectIds.push(version.project_id)
     }
 
-    const projects = await getBulk('projects', projectIds)
-    const threads = await getBulk('threads', threadIds)
-    const users = await getBulk('users', userIds)
+    const [projects, threads, users, organizations] = await Promise.all([
+      getBulk('projects', projectIds),
+      getBulk('threads', threadIds),
+      getBulk('users', userIds),
+      getBulk('organizations', organizationIds, 3),
+    ])
 
     for (const notification of notifications.value) {
       notification.extra_data = {}
@@ -71,6 +78,11 @@ export async function fetchNotifications() {
         if (notification.body.project_id) {
           notification.extra_data.project = projects.find(
             (x) => x.id === notification.body.project_id
+          )
+        }
+        if (notification.body.organization_id) {
+          notification.extra_data.organization = organizations.find(
+            (x) => x.id === notification.body.organization_id
           )
         }
         if (notification.body.report_id) {
