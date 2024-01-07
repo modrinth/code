@@ -773,7 +773,7 @@ pub async fn version_list(
             .cloned()
             .collect::<Vec<_>>();
 
-        versions.sort();
+        versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
@@ -823,8 +823,7 @@ pub async fn version_list(
             }
         }
 
-        response.sort();
-        response.reverse();
+        response.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
         let response = filter_visible_versions(response, &user_option, &pool, &redis).await?;

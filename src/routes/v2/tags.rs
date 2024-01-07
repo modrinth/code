@@ -90,6 +90,12 @@ pub async fn loader_list(
                         supported_project_types.push("modpack".to_string());
                     }
 
+                    if supported_project_types.contains(&"datapack".to_string())
+                        || supported_project_types.contains(&"plugin".to_string())
+                    {
+                        supported_project_types.push("mod".to_string());
+                    }
+
                     LoaderData {
                         icon: l.icon,
                         name: l.name,
