@@ -104,15 +104,16 @@ impl LegacyProject {
 
         let mut loaders = data.loaders;
 
-        if let Some(versions_item) = versions_item {
-            game_versions = versions_item
-                .version_fields
-                .iter()
-                .find(|f| f.field_name == "game_versions")
-                .and_then(|f| MinecraftGameVersion::try_from_version_field(f).ok())
-                .map(|v| v.into_iter().map(|v| v.version).collect())
-                .unwrap_or(Vec::new());
+        game_versions = data
+            .fields
+            .get("game_versions")
+            .unwrap_or(&Vec::new())
+            .iter()
+            .filter_map(|v| v.as_str())
+            .map(|v| v.to_string())
+            .collect();
 
+        if let Some(versions_item) = versions_item {
             // Extract side types from remaining fields (singleplayer, client_only, etc)
             let fields = versions_item
                 .version_fields

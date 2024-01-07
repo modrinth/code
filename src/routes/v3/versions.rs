@@ -824,6 +824,7 @@ pub async fn version_list(
         }
 
         response.sort();
+        response.reverse();
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
         let response = filter_visible_versions(response, &user_option, &pool, &redis).await?;

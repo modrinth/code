@@ -765,9 +765,6 @@ impl Project {
                 }
             ).try_collect().await?;
 
-            // TODO: Possible improvements to look into:
-            // - use multiple queries instead of CTES (for cleanliness?)
-            // - repeated joins to mods in separate CTEs- perhaps 1 CTE for mods and use later (in mods_gallery_json, mods_donations_json, etc.)
             let db_projects: Vec<QueryProject> = sqlx::query!(
                 "
                 SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
