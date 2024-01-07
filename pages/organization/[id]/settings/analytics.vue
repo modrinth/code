@@ -10,7 +10,7 @@
       </p>
     </div>
 
-    <ChartDisplay :projects="projects" />
+    <ChartDisplay :projects="projects.map((x) => ({ title: x.name, ...x }))" />
   </div>
 </template>
 

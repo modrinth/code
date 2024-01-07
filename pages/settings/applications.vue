@@ -323,7 +323,7 @@ async function onImageSelection(files) {
 
     await useBaseFetch('oauth/app/' + editingId.value + '/icon', {
       method: 'PATCH',
-      apiVersion: 3,
+      internal: true,
       body: file,
       query: {
         ext: extFromType,
@@ -352,7 +352,7 @@ async function createApp() {
   try {
     const createdAppInfo = await useBaseFetch('oauth/app', {
       method: 'POST',
-      apiVersion: 3,
+      internal: true,
       body: {
         name: name.value,
         icon_url: icon.value,
@@ -427,7 +427,7 @@ async function editApp() {
 
     await useBaseFetch('oauth/app/' + editingId.value, {
       method: 'PATCH',
-      apiVersion: 3,
+      internal: true,
       body,
     })
 
@@ -455,7 +455,7 @@ async function removeApp() {
       throw new Error('No editing id')
     }
     await useBaseFetch(`oauth/app/${editingId.value}`, {
-      apiVersion: 3,
+      internal: true,
       method: 'DELETE',
     })
     await refresh()

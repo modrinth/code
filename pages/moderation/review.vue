@@ -53,9 +53,21 @@
         </div>
         <div class="mobile-row">
           by
-          <nuxt-link :to="`/user/${project.owner.username}`" class="iconified-link">
-            <Avatar :src="project.owner.avatar_url" circle size="xxs" raised />
-            <span>{{ project.owner.username }}</span>
+          <nuxt-link
+            v-if="project.owner"
+            :to="`/user/${project.owner.user.username}`"
+            class="iconified-link"
+          >
+            <Avatar :src="project.owner.user.avatar_url" circle size="xxs" raised />
+            <span>{{ project.owner.user.username }}</span>
+          </nuxt-link>
+          <nuxt-link
+            v-else-if="project.org"
+            :to="`/organization/${project.org.slug}`"
+            class="iconified-link"
+          >
+            <Avatar :src="project.org.icon_url" circle size="xxs" raised />
+            <span>{{ project.org.name }}</span>
           </nuxt-link>
         </div>
         <div class="mobile-row">
@@ -144,9 +156,12 @@ const projectTypes = computed(() => {
 
 if (projects.value) {
   const teamIds = projects.value.map((x) => x.team)
+  const organizationIds = projects.value.filter((x) => x.organization).map((x) => x.organization)
 
   const url = `teams?ids=${encodeURIComponent(JSON.stringify(teamIds))}`
+  const orgUrl = `organizations?ids=${encodeURIComponent(JSON.stringify(organizationIds))}`
   const { data: result } = await useAsyncData(url, () => useBaseFetch(url))
+  const { data: orgs } = await useAsyncData(orgUrl, () => useBaseFetch(orgUrl, { apiVersion: 3 }))
 
   if (result.value) {
     members.value = result.value
@@ -154,7 +169,8 @@ if (projects.value) {
     projects.value = projects.value.map((project) => {
       project.owner = members.value
         .flat()
-        .find((x) => x.team_id === project.team && x.role === 'Owner').user
+        .find((x) => x.team_id === project.team && x.role === 'Owner')
+      project.org = orgs.value.find((x) => x.id === project.organization)
       project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE
       project.age_warning = ''
       if (project.age > TIME_24H * 2) {
