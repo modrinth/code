@@ -9,7 +9,6 @@ use meilisearch_sdk::client::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::borrow::Cow;
-use std::cmp::min;
 use std::collections::HashMap;
 use std::fmt::Write;
 use thiserror::Error;

@@ -44,7 +44,7 @@ pub enum ValidationError {
     Database(#[from] DatabaseError),
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Debug)]
 pub enum ValidationResult {
     /// File should be marked as primary with pack file data
     PassWithPackDataAndFiles {

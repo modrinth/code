@@ -46,6 +46,17 @@ pub async fn version_list(
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
+    let loaders = if let Some(loaders) = filters.loaders {
+        if let Ok(mut loaders) = serde_json::from_str::<Vec<String>>(&loaders) {
+            loaders.push("mrpack".to_string());
+            Some(loaders)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
     let loader_fields = if let Some(game_versions) = filters.game_versions {
         // TODO: extract this logic which is similar to the other v2->v3 version_file functions
         let mut loader_fields = HashMap::new();
@@ -57,6 +68,17 @@ pub async fn version_list(
                     game_versions.push(serde_json::json!(gv.clone()));
                 }
                 loader_fields.insert("game_versions".to_string(), game_versions);
+
+                if let Some(ref loaders) = loaders {
+                    loader_fields.insert(
+                        "loaders".to_string(),
+                        loaders
+                            .iter()
+                            .map(|x| serde_json::json!(x.clone()))
+                            .collect(),
+                    );
+                }
+
                 serde_json::to_string(&loader_fields).ok()
             })
     } else {
@@ -65,7 +87,7 @@ pub async fn version_list(
 
     let filters = v3::versions::VersionListFilters {
         loader_fields,
-        loaders: filters.loaders,
+        loaders: loaders.and_then(|x| serde_json::to_string(&x).ok()),
         featured: filters.featured,
         version_type: filters.version_type,
         limit: filters.limit,

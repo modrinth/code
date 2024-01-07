@@ -18,7 +18,7 @@ impl super::Validator for ModpackValidator {
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
-        &["forge", "fabric", "quilt"]
+        &["forge", "fabric", "quilt", "mrpack"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
