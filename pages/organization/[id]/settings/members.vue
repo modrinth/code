@@ -25,7 +25,7 @@
               organizationPermissions.MANAGE_INVITES
             )
           "
-          @keypress.enter="() => onInviteTeamMember(organization.team_id, currentUsername)"
+          @keypress.enter="() => onInviteTeamMember(organization.team, currentUsername)"
         />
         <label for="username" class="hidden">Username</label>
         <Button
@@ -49,7 +49,11 @@
             Remove yourself as a member of this organization.
           </span>
         </span>
-        <Button color="danger" :disabled="currentMember.role === 'Owner'" @click="leaveProject()">
+        <Button
+          color="danger"
+          :disabled="currentMember.role === 'Owner'"
+          @click="() => onLeaveProject(organization.team_id, auth.user.id)"
+        >
           <UserRemoveIcon />
           Leave organization
         </Button>
@@ -287,10 +291,12 @@ const permToLabel = (key) => {
   return o.charAt(0).toUpperCase() + o.slice(1).toLowerCase()
 }
 
-const leaveProject = async () => {
-  await removeTeamMember(organization.value.team_id, auth.user.id)
-  await navigateTo(`/organization/${organization.value.slug}`)
+const leaveProject = async (teamId, uid) => {
+  await removeTeamMember(teamId, uid)
+  await navigateTo(`/organization/${organization.value.id}`)
 }
+
+const onLeaveProject = useClientTry(leaveProject)
 
 const onInviteTeamMember = useClientTry(async (teamId, username) => {
   const user = await useBaseFetch(`user/${username}`)

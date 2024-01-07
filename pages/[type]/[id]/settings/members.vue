@@ -274,8 +274,8 @@
               <div class="stats">
                 <UsersIcon />
                 <span>
-                  {{ props.organization.members?.length || 0 }} member<template
-                    v-if="props.organization.members?.length !== 1"
+                  {{ acceptedOrgMembers.length }} member<template
+                    v-if="acceptedOrgMembers.length !== 1"
                     >s</template
                   >
                 </span>
@@ -579,6 +579,10 @@ const auth = await useAuth()
 
 const allTeamMembers = ref([])
 const allOrgMembers = ref([])
+
+const acceptedOrgMembers = computed(() => {
+  return props.organization?.members?.filter((x) => x.accepted) || []
+})
 
 watch(
   [

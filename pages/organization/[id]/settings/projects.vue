@@ -166,7 +166,7 @@
           Create a project
         </Button>
         <OrganizationProjectTransferModal
-          :projects="userProjects || []"
+          :projects="usersOwnedProjects || []"
           @submit="onProjectTransferSubmit"
         />
       </div>
@@ -325,12 +325,40 @@ const { organization, projects, refresh } = inject('organizationContext')
 
 const auth = await useAuth()
 
-const { data: userProjects } = await useAsyncData(
+const { data: userProjects, refresh: refreshUserProjects } = await useAsyncData(
   `user/${auth.value.user.id}/projects`,
   () => useBaseFetch(`user/${auth.value.user.id}/projects`),
   {
     watch: [auth],
   }
+)
+
+const usersOwnedProjects = ref([])
+
+watch(
+  () => userProjects.value,
+  async () => {
+    if (!userProjects.value) return
+    if (!userProjects.value.length) return
+
+    const projects = userProjects.value.filter((project) => project.organization === null)
+
+    const teamIds = projects.map((project) => project?.team).filter((x) => x)
+    // Shape of teams is member[][]
+    const teams = await useBaseFetch(`teams?ids=${JSON.stringify(teamIds)}`, {
+      apiVersion: 3,
+    })
+    // for each team id, figure out if the user is a member, and is_owner. Then filter the projects to only include those that are owned by the user
+    const ownedTeamIds = teamIds.filter((_tid, i) => {
+      const team = teams?.[i]
+      if (!team) return false
+      const member = team.find((member) => member.user.id === auth.value.user.id)
+      return member && member.is_owner
+    })
+    const ownedProjects = projects.filter((project) => ownedTeamIds.includes(project.team))
+    usersOwnedProjects.value = ownedProjects
+  }, // watch options
+  { immediate: true, deep: true }
 )
 
 const onProjectTransferSubmit = async (projects) => {
@@ -346,6 +374,7 @@ const onProjectTransferSubmit = async (projects) => {
     }
 
     await refresh()
+    await refreshUserProjects()
 
     addNotification({
       group: 'main',

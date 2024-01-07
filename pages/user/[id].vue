@@ -201,6 +201,7 @@
               {{ formatMessage(messages.profileManageProjectsButton) }}
             </NuxtLink>
             <button
+              v-if="route.params.projectType !== 'collections'"
               v-tooltip="
                 formatMessage(commonMessages[`${cosmetics.searchDisplayMode.user}InputView`])
               "

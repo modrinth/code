@@ -18,7 +18,7 @@
             :key="org.id"
             :to="`/organization/${org.slug}`"
             class="universal-card button-base recessed org"
-            :class="{ 'is-disabled': org.members?.length === 0 }"
+            :class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
           >
             <Avatar :src="org.icon_url" :alt="org.name" class="icon" />
             <div class="details">
@@ -32,7 +32,8 @@
                 <div class="stats">
                   <UsersIcon />
                   <span>
-                    {{ org.members?.length || 0 }} member<template v-if="org.members?.length !== 1"
+                    {{ onlyAcceptedMembers(org.members).length }} member<template
+                      v-if="onlyAcceptedMembers(org.members).length !== 1"
                       >s</template
                     >
                   </span>
@@ -65,6 +66,8 @@ const { data: orgs, error } = useAsyncData('organizations', () => {
     apiVersion: 3,
   })
 })
+
+const onlyAcceptedMembers = (members) => members.filter((member) => member?.accepted)
 
 if (error.value) {
   createError({
@@ -102,13 +105,13 @@ const openCreateOrgModal = () => {
 
   .org {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: max-content 1fr;
     gap: var(--gap-md);
     margin-bottom: 0;
 
     .icon {
       width: 100% !important;
-      height: 6rem !important;
+      height: min(6rem, 20vw) !important;
       max-width: unset !important;
       max-height: unset !important;
       aspect-ratio: 1 / 1;
