@@ -31,7 +31,8 @@ export const useImageUpload = async (file: File, ctx: ImageUploadContext) => {
   const response = (await useBaseFetch(url, {
     method: 'POST',
     body: file,
-  })) as ImageUploadResponse // TODO: zod or object validation
+    apiVersion: 3,
+  })) as ImageUploadResponse
 
   // Type check to see if response has a url property and an id property
   if (!response?.id || typeof response.id !== 'string') {

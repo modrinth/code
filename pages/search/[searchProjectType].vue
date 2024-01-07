@@ -442,7 +442,7 @@ const {
     const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
 
     if (query.value.length > 0) {
-      params.push(`query=${encodeURIComponent(query.value.replace(/ /g, '+'))}`)
+      params.push(`query=${encodeURIComponent(query.value)}`)
     }
 
     if (
