@@ -956,7 +956,7 @@ const members = computed(() => {
 const currentMember = computed(() => {
   let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null
 
-  if (!val && organization.value && organization.value.members) {
+  if (!val && auth.value.user && organization.value && organization.value.members) {
     val = organization.value.members.find((x) => x.user.id === auth.value.user.id)
   }
 

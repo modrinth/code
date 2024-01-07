@@ -31,8 +31,11 @@
               <span class="stat-bar">
                 <div class="stats">
                   <UsersIcon />
-                  {{ org.members?.length || 0 }} member
-                  <template v-if="org.members?.length !== 1">s</template>
+                  <span>
+                    {{ org.members?.length || 0 }} member<template v-if="org.members?.length !== 1"
+                      >s</template
+                    >
+                  </span>
                 </div>
               </span>
             </div>

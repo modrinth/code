@@ -23,11 +23,8 @@
               </nuxt-link>
             </h2>
             <span>
-              <span>
-                {{ $formatNumber(acceptedMembers?.length || 0) }}
-              </span>
-              member
-              <span v-if="acceptedMembers?.length !== 1">s</span>
+              {{ $formatNumber(acceptedMembers?.length || 0) }}
+              member<template v-if="acceptedMembers?.length !== 1">s</template>
             </span>
           </div>
         </div>
@@ -85,7 +82,7 @@
                   <span class="primary-stat__counter">
                     {{ $formatNumber(acceptedMembers?.length || 0) }}
                   </span>
-                  member<span v-if="acceptedMembers?.length !== 1">s</span>
+                  member<template v-if="acceptedMembers?.length !== 1">s</template>
                 </div>
               </div>
 

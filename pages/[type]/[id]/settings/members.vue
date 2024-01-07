@@ -273,8 +273,12 @@
             <span class="stat-bar">
               <div class="stats">
                 <UsersIcon />
-                {{ props.organization.members?.length || 0 }} member
-                <template v-if="props.organization.members?.length !== 1">s</template>
+                <span>
+                  {{ props.organization.members?.length || 0 }} member<template
+                    v-if="props.organization.members?.length !== 1"
+                    >s</template
+                  >
+                </span>
               </div>
             </span>
           </div>
