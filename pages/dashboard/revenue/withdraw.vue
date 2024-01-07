@@ -19,6 +19,7 @@
       :searchable="true"
       :close-on-select="true"
       :show-labels="false"
+      :allow-empty="false"
     />
 
     <h3>Withdraw method</h3>

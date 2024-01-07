@@ -373,7 +373,6 @@
               </defs>
             </svg>
           </div>
-          <div class="additional-label">Coming soon</div>
           <h3>Data and Statistics</h3>
           <p>Get detailed reports on page views, download counts, and revenue</p>
         </div>

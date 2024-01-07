@@ -130,7 +130,7 @@
             class="country-downloads"
           >
             <label>
-              <span class="label__title">Downloads by country</span>
+              <span class="label__title">Downloads by region</span>
             </label>
             <div class="country-values">
               <div
@@ -184,7 +184,7 @@
             class="country-downloads"
           >
             <label>
-              <span class="label__title">Page views by country</span>
+              <span class="label__title">Page views by region</span>
             </label>
             <div class="country-values">
               <div

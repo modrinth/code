@@ -157,7 +157,7 @@
 
               <div class="primary-stat">
                 <LibraryIcon class="primary-stat__icon" aria-hidden="true" />
-                <div class="primary-stat__text">
+                <div v-if="projects" class="primary-stat__text">
                   <span class="primary-stat__counter">
                     {{ $formatNumber(projects.length || 0) }}
                   </span>
@@ -283,7 +283,7 @@
             :updated-at="project.updated"
             :description="project.description"
             :downloads="project.downloads ? project.downloads.toString() : '0'"
-            :follows="project.follows ? project.follows.toString() : '0'"
+            :follows="project.followers ? project.followers.toString() : '0'"
             :icon-url="project.icon_url"
             :name="project.title"
             :client-side="project.client_side"
