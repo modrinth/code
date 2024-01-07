@@ -8,7 +8,6 @@ use actix_multipart::Multipart;
 use actix_web::http::header::{HeaderMap, TryIntoHeaderPair};
 use actix_web::HttpResponse;
 use futures::{stream, Future, StreamExt};
-use itertools::Itertools;
 use serde_json::{json, Value};
 
 pub async fn extract_ok_json<T>(response: HttpResponse) -> Result<T, HttpResponse>
@@ -152,90 +151,24 @@ pub fn convert_side_types_v3(
     fields
 }
 
-// Convert search facets from V2 to V3
-// Less trivial as we need to handle the case where one side is set and the other is not, which does not convert cleanly
-pub fn convert_side_type_facets_v3(facets: Vec<Vec<Vec<String>>>) -> Vec<Vec<Vec<String>>> {
-    use LegacySideType::{Optional, Required, Unsupported};
-    let possible_side_types = [Required, Optional, Unsupported]; // Should not include Unknown
-
-    let mut v3_facets = vec![];
-
-    // Outer facets are joined by AND
-    for inner_facets in facets {
-        // Inner facets are joined by OR
-        // These may change as the inner facets are converted
-        // ie:
-        // for A v B v C, if A is converted to X^Y v Y^Z, then the new facets are X^Y v Y^Z v B v C
-        let mut new_inner_facets = vec![];
-
-        for inner_inner_facets in inner_facets {
-            // Inner inner facets are joined by AND
-            let mut client_side = None;
-            let mut server_side = None;
-
-            // Extract client_side and server_side facets, and remove them from the list
-            let inner_inner_facets = inner_inner_facets
-                .into_iter()
-                .filter_map(|facet| {
-                    let val = match facet.split(':').nth(1) {
-                        Some(val) => val,
-                        None => return Some(facet.to_string()),
-                    };
-
-                    if facet.starts_with("client_side:") {
-                        client_side = Some(LegacySideType::from_string(val));
-                        None
-                    } else if facet.starts_with("server_side:") {
-                        server_side = Some(LegacySideType::from_string(val));
-                        None
-                    } else {
-                        Some(facet.to_string())
-                    }
-                })
-                .collect_vec();
-
-            // Depending on whether client_side and server_side are set, we can convert the facets to the new loader fields differently
-            let mut new_possibilities = match (client_side, server_side) {
-                // Both set or unset is a trivial case
-                (Some(client_side), Some(server_side)) => {
-                    vec![convert_side_types_v3(client_side, server_side)
-                        .into_iter()
-                        .map(|(k, v)| format!("{}:{}", k, v))
-                        .collect()]
-                }
-                (None, None) => vec![vec![]],
-
-                (Some(client_side), None) => possible_side_types
-                    .iter()
-                    .map(|server_side| {
-                        convert_side_types_v3(client_side, *server_side)
-                            .into_iter()
-                            .map(|(k, v)| format!("{}:{}", k, v))
-                            .unique()
-                            .collect::<Vec<_>>()
-                    })
-                    .collect::<Vec<_>>(),
-                (None, Some(server_side)) => possible_side_types
-                    .iter()
-                    .map(|client_side| {
-                        convert_side_types_v3(*client_side, server_side)
-                            .into_iter()
-                            .map(|(k, v)| format!("{}:{}", k, v))
-                            .unique()
-                            .collect::<Vec<_>>()
-                    })
-                    .collect::<Vec<_>>(),
-            };
-
-            // Add the new possibilities to the list
-            for new_possibility in &mut new_possibilities {
-                new_possibility.extend(inner_inner_facets.clone());
+// Converts plugin loaders from v2 to v3
+// Within every 1st and 2nd level (the ones allowed in v2), we convert every instance of:
+// "project_type:mod" to "project_type:plugin" OR "project_type:mod"
+pub fn convert_plugin_loaders_v3(facets: Vec<Vec<Vec<String>>>) -> Vec<Vec<Vec<String>>> {
+    facets
+        .into_iter()
+        .map(|inner_facets| {
+            if inner_facets == [["project_type:mod"]] {
+                vec![
+                    vec!["project_type:plugin".to_string()],
+                    vec!["project_type:datapack".to_string()],
+                    vec!["project_type:mod".to_string()],
+                ]
+            } else {
+                inner_facets
             }
-            new_inner_facets.extend(new_possibilities);
-        }
-        v3_facets.push(new_inner_facets);
-    }
-    v3_facets
+        })
+        .collect::<Vec<_>>()
 }
 
 // Convert search facets from V3 back to v2
@@ -346,170 +279,5 @@ mod tests {
                 assert_eq!(server_side, server_side2);
             }
         }
-    }
-
-    #[test]
-    fn convert_facets() {
-        let pre_facets = vec![
-            // Test combinations of both sides being set
-            vec![vec![
-                "client_side:required".to_string(),
-                "server_side:required".to_string(),
-            ]],
-            vec![vec![
-                "client_side:required".to_string(),
-                "server_side:optional".to_string(),
-            ]],
-            vec![vec![
-                "client_side:required".to_string(),
-                "server_side:unsupported".to_string(),
-            ]],
-            vec![vec![
-                "client_side:optional".to_string(),
-                "server_side:required".to_string(),
-            ]],
-            vec![vec![
-                "client_side:optional".to_string(),
-                "server_side:optional".to_string(),
-            ]],
-            // Test multiple inner facets
-            vec![
-                vec![
-                    "client_side:required".to_string(),
-                    "server_side:required".to_string(),
-                ],
-                vec![
-                    "client_side:required".to_string(),
-                    "server_side:optional".to_string(),
-                ],
-            ],
-            // Test additional fields
-            vec![
-                vec![
-                    "random_field_test_1".to_string(),
-                    "client_side:required".to_string(),
-                    "server_side:required".to_string(),
-                ],
-                vec![
-                    "random_field_test_2".to_string(),
-                    "client_side:required".to_string(),
-                    "server_side:optional".to_string(),
-                ],
-            ],
-            // Test only one facet being set
-            vec![vec!["client_side:required".to_string()]],
-        ];
-
-        let converted_facets = convert_side_type_facets_v3(pre_facets)
-            .into_iter()
-            .map(|x| {
-                x.into_iter()
-                    .map(|mut y| {
-                        y.sort();
-                        y
-                    })
-                    .collect::<Vec<_>>()
-            })
-            .collect::<Vec<_>>();
-
-        let post_facets = vec![
-            vec![vec![
-                "singleplayer:true".to_string(),
-                "client_and_server:true".to_string(),
-                "client_only:false".to_string(),
-                "server_only:false".to_string(),
-            ]],
-            vec![vec![
-                "singleplayer:true".to_string(),
-                "client_and_server:true".to_string(),
-                "client_only:true".to_string(),
-                "server_only:false".to_string(),
-            ]],
-            vec![vec![
-                "singleplayer:true".to_string(),
-                "client_and_server:true".to_string(),
-                "client_only:true".to_string(),
-                "server_only:false".to_string(),
-            ]],
-            vec![vec![
-                "singleplayer:true".to_string(),
-                "client_and_server:true".to_string(),
-                "client_only:false".to_string(),
-                "server_only:true".to_string(),
-            ]],
-            vec![vec![
-                "singleplayer:true".to_string(),
-                "client_and_server:true".to_string(),
-                "client_only:true".to_string(),
-                "server_only:true".to_string(),
-            ]],
-            vec![
-                vec![
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:false".to_string(),
-                    "server_only:false".to_string(),
-                ],
-                vec![
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:true".to_string(),
-                    "server_only:false".to_string(),
-                ],
-            ],
-            vec![
-                vec![
-                    "random_field_test_1".to_string(),
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:false".to_string(),
-                    "server_only:false".to_string(),
-                ],
-                vec![
-                    "random_field_test_2".to_string(),
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:true".to_string(),
-                    "server_only:false".to_string(),
-                ],
-            ],
-            // Test only one facet being set
-            // Iterates over all possible side types
-            vec![
-                // C: Required, S: Required
-                vec![
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:false".to_string(),
-                    "server_only:false".to_string(),
-                ],
-                // C: Required, S: Optional
-                vec![
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:true".to_string(),
-                    "server_only:false".to_string(),
-                ],
-                // C: Required, S: Unsupported
-                vec![
-                    "singleplayer:true".to_string(),
-                    "client_and_server:true".to_string(),
-                    "client_only:true".to_string(),
-                    "server_only:false".to_string(),
-                ],
-            ],
-        ]
-        .into_iter()
-        .map(|x| {
-            x.into_iter()
-                .map(|mut y| {
-                    y.sort();
-                    y
-                })
-                .collect::<Vec<_>>()
-        })
-        .collect::<Vec<_>>();
-
-        assert_eq!(converted_facets, post_facets);
     }
 }

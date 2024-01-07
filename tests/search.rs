@@ -27,11 +27,14 @@ async fn search_projects() {
         // 1. vec of search facets
         // 2. expected project ids to be returned by this search
         let pairs = vec![
-            (json!([["categories:fabric"]]), vec![0, 1, 2, 3, 4, 5, 6, 7]),
+            (
+                json!([["categories:fabric"]]),
+                vec![0, 1, 2, 3, 4, 5, 6, 7, 9],
+            ),
             (json!([["categories:forge"]]), vec![7]),
             (
                 json!([["categories:fabric", "categories:forge"]]),
-                vec![0, 1, 2, 3, 4, 5, 6, 7],
+                vec![0, 1, 2, 3, 4, 5, 6, 7, 9],
             ),
             (json!([["categories:fabric"], ["categories:forge"]]), vec![]),
             (
@@ -42,12 +45,12 @@ async fn search_projects() {
                 vec![1, 2, 3, 4],
             ),
             (json!([["project_types:modpack"]]), vec![4]),
-            (json!([["client_only:true"]]), vec![0, 2, 3, 7]),
+            (json!([["client_only:true"]]), vec![0, 2, 3, 7, 9]),
             (json!([["server_only:true"]]), vec![0, 2, 3, 6, 7]),
-            (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7]),
-            (json!([["license:MIT"]]), vec![1, 2, 4]),
+            (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7, 9]),
+            (json!([["license:MIT"]]), vec![1, 2, 4, 9]),
             (json!([[r#"name:'Mysterious Project'"#]]), vec![2, 3]),
-            (json!([["author:user"]]), vec![0, 1, 2, 4, 5, 7]),
+            (json!([["author:user"]]), vec![0, 1, 2, 4, 5, 7, 9]), // Organization test '9' is included here as user is owner of org
             (json!([["game_versions:1.20.5"]]), vec![4, 5]),
             // bug fix
             (
@@ -98,10 +101,12 @@ async fn search_projects() {
                         .into_iter()
                         .map(|p| id_conversion[&p.id.0])
                         .collect();
+                    let num_hits = projects.total_hits;
                     expected_project_ids.sort();
                     found_project_ids.sort();
                     println!("Facets: {:?}", facets);
                     assert_eq!(found_project_ids, expected_project_ids);
+                    assert_eq!(num_hits, expected_project_ids.len() as usize);
                 }
             })
             .await;

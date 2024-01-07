@@ -70,6 +70,33 @@ pub struct LegacyProject {
 }
 
 impl LegacyProject {
+    // Returns visible v2 project_type and also 'og' selected project type
+    // These are often identical, but we want to display 'mod' for datapacks and plugins
+    // The latter can be used for further processing, such as determining side types of plugins
+    pub fn get_project_type(project_types: &[String]) -> (String, String) {
+        // V2 versions only have one project type- v3 versions can rarely have multiple.
+        // We'll prioritize 'modpack' first, and if neither are found, use the first one.
+        // If there are no project types, default to 'project'
+        let mut project_types = project_types.to_vec();
+        if project_types.contains(&"modpack".to_string()) {
+            project_types = vec!["modpack".to_string()];
+        }
+
+        let og_project_type = project_types
+            .first()
+            .cloned()
+            .unwrap_or("project".to_string()); // Default to 'project' if none are found
+
+        let project_type = if og_project_type == "datapack" || og_project_type == "plugin" {
+            // These are not supported in V2, so we'll just use 'mod' instead
+            "mod".to_string()
+        } else {
+            og_project_type.clone()
+        };
+
+        (project_type, og_project_type)
+    }
+
     // Convert from a standard V3 project to a V2 project
     // Requires any queried versions to be passed in, to get access to certain version fields contained within.
     // - This can be any version, because the fields are ones that used to be on the project itself.
@@ -83,22 +110,8 @@ impl LegacyProject {
         // V2 versions only have one project type- v3 versions can rarely have multiple.
         // We'll prioritize 'modpack' first, and if neither are found, use the first one.
         // If there are no project types, default to 'project'
-        let mut project_types = data.project_types;
-        if project_types.contains(&"modpack".to_string()) {
-            project_types = vec!["modpack".to_string()];
-        }
-
-        let og_project_type = project_types
-            .first()
-            .cloned()
-            .unwrap_or("project".to_string()); // Default to 'project' if none are found
-
-        let mut project_type = if og_project_type == "datapack" || og_project_type == "plugin" {
-            // These are not supported in V2, so we'll just use 'mod' instead
-            "mod".to_string()
-        } else {
-            og_project_type.clone()
-        };
+        let project_types = data.project_types;
+        let (mut project_type, og_project_type) = Self::get_project_type(&project_types);
 
         let mut loaders = data.loaders;
 

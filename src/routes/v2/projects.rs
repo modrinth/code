@@ -78,8 +78,10 @@ pub async fn project_search(
             })
             .collect_vec();
 
-        // We will now convert side_types to their new boolean format
-        let facets = v2_reroute::convert_side_type_facets_v3(facets);
+        // These loaders speciically used to be combined with 'mod' to be a plugin, but now
+        // they are their own loader type. We will convert 'mod' to 'mod' OR 'plugin'
+        // as it essentially was before.
+        let facets = v2_reroute::convert_plugin_loaders_v3(facets);
 
         Some(
             facets

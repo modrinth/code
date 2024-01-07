@@ -382,6 +382,9 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "singleplayer",
     "client_and_server",
     "mrpack_loaders",
+    // V2 legacy fields for logical consistency
+    "client_side",
+    "server_side",
     // Non-searchable fields for filling out the Project model.
     "license_url",
     "monetization_status",
@@ -424,6 +427,9 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "singleplayer",
     "client_and_server",
     "mrpack_loaders",
+    // V2 legacy fields for logical consistency
+    "client_side",
+    "server_side",
 ];
 
 const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =

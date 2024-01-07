@@ -189,6 +189,20 @@ async fn search_projects() {
             Some(modify_json),
         ));
 
+        // Test project 8
+        // Server side unsupported
+        let id = 8;
+        let modify_json = serde_json::from_value(json!([
+            { "op": "add", "path": "/server_side", "value": "unsupported" },
+        ]))
+        .unwrap();
+        project_creation_futures.push(create_async_future(
+            id,
+            USER_USER_PAT,
+            false,
+            Some(modify_json),
+        ));
+
         // Await all project creation
         // Returns a mapping of:
         // project id -> test id
@@ -226,11 +240,14 @@ async fn search_projects() {
                 ]),
                 vec![],
             ),
-            (json!([["categories:fabric"]]), vec![0, 1, 2, 3, 4, 5, 6, 7]),
+            (
+                json!([["categories:fabric"]]),
+                vec![0, 1, 2, 3, 4, 5, 6, 7, 8],
+            ),
             (json!([["categories:forge"]]), vec![7]),
             (
                 json!([["categories:fabric", "categories:forge"]]),
-                vec![0, 1, 2, 3, 4, 5, 6, 7],
+                vec![0, 1, 2, 3, 4, 5, 6, 7, 8],
             ),
             (json!([["categories:fabric"], ["categories:forge"]]), vec![]),
             (
@@ -243,12 +260,12 @@ async fn search_projects() {
             (json!([["project_types:modpack"]]), vec![4]),
             // Formerly included 7, but with v2 changes, this is no longer the case.
             // This is because we assume client_side/server_side with subsequent versions.
-            (json!([["client_side:required"]]), vec![0, 2, 3]),
+            (json!([["client_side:required"]]), vec![0, 2, 3, 8]),
             (json!([["server_side:required"]]), vec![0, 2, 3, 6, 7]),
-            (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7]),
-            (json!([["license:MIT"]]), vec![1, 2, 4]),
+            (json!([["open_source:true"]]), vec![0, 1, 2, 4, 5, 6, 7, 8]),
+            (json!([["license:MIT"]]), vec![1, 2, 4, 8]),
             (json!([[r#"title:'Mysterious Project'"#]]), vec![2, 3]),
-            (json!([["author:user"]]), vec![0, 1, 2, 4, 5, 7]),
+            (json!([["author:user"]]), vec![0, 1, 2, 4, 5, 7, 8]),
             (json!([["versions:1.20.5"]]), vec![4, 5]),
             // bug fix
             (
@@ -275,6 +292,12 @@ async fn search_projects() {
                 ]),
                 vec![4],
             ),
+            (
+                json!([["client_side:optional"], ["server_side:optional"]]),
+                vec![1, 4, 5],
+            ),
+            (json!([["server_side:optional"]]), vec![1, 4, 5]),
+            (json!([["server_side:unsupported"]]), vec![8]),
         ];
 
         // TODO: Untested:
@@ -313,7 +336,7 @@ async fn search_projects() {
             })
             .await;
 
-        // A couple additional tests for the saerch type returned, making sure it is properly translated back
+        // A couple additional tests for the search type returned, making sure it is properly translated back
         let client_side_required = api
             .search_deserialized(
                 Some(&format!("\"&{test_name}\"")),
@@ -345,6 +368,18 @@ async fn search_projects() {
             .await;
         for hit in client_side_unsupported.hits {
             assert_eq!(hit.client_side, "unsupported".to_string());
+        }
+
+        let client_side_optional_server_side_optional = api
+            .search_deserialized(
+                Some(&format!("\"&{test_name}\"")),
+                Some(json!([["client_side:optional"], ["server_side:optional"]])),
+                USER_USER_PAT,
+            )
+            .await;
+        for hit in client_side_optional_server_side_optional.hits {
+            assert_eq!(hit.client_side, "optional".to_string());
+            assert_eq!(hit.server_side, "optional".to_string());
         }
 
         let game_versions = api

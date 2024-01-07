@@ -896,8 +896,8 @@ pub async fn edit_project_categories(
 #[derive(Serialize, Deserialize)]
 pub struct ReturnSearchResults {
     pub hits: Vec<Project>,
-    pub offset: usize,
-    pub limit: usize,
+    pub page: usize,
+    pub hits_per_page: usize,
     pub total_hits: usize,
 }
 
@@ -913,8 +913,8 @@ pub async fn project_search(
             .into_iter()
             .filter_map(Project::from_search)
             .collect::<Vec<_>>(),
-        offset: results.offset,
-        limit: results.limit,
+        page: results.page,
+        hits_per_page: results.hits_per_page,
         total_hits: results.total_hits,
     };
 

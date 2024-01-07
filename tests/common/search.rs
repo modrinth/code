@@ -20,6 +20,7 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
     // Test setup and dummy data
     let api = &test_env.api;
     let test_name = test_env.db.database_name.clone();
+    let zeta_organization_id = &test_env.dummy.organization_zeta.organization_id;
 
     // Add dummy projects of various categories for searchability
     let mut project_creation_futures = vec![];
@@ -175,6 +176,20 @@ pub async fn setup_search_projects(test_env: &TestEnvironment<ApiV3>) -> Arc<Has
         { "op": "add", "path": "/license_id", "value": "LGPL-3.0-or-later" },
         { "op": "add", "path": "/initial_versions/0/loaders", "value": ["forge"] },
         { "op": "add", "path": "/initial_versions/0/game_versions", "value": ["1.20.2"] },
+    ]))
+    .unwrap();
+    project_creation_futures.push(create_async_future(
+        id,
+        USER_USER_PAT,
+        false,
+        Some(modify_json),
+    ));
+
+    // Test project 9 (organization)
+    // This project gets added to the Zeta organization automatically
+    let id = 9;
+    let modify_json = serde_json::from_value(json!([
+        { "op": "add", "path": "/organization_id", "value": zeta_organization_id },
     ]))
     .unwrap();
     project_creation_futures.push(create_async_future(

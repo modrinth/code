@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT v.id id, m.id mod_id, COALESCE(u.username, ou.username) owner_username\n        FROM versions v\n        INNER JOIN mods m ON v.mod_id = m.id AND m.status = ANY($2)\n        LEFT JOIN team_members tm ON tm.team_id = m.team_id AND tm.is_owner = TRUE AND tm.accepted = TRUE\n        LEFT JOIN users u ON tm.user_id = u.id\n        LEFT JOIN organizations o ON o.id = m.organization_id\n        LEFT JOIN team_members otm ON otm.team_id = o.team_id AND otm.is_owner = TRUE AND otm.accepted = TRUE\n        LEFT JOIN users ou ON otm.user_id = ou.id\n        WHERE v.status != ANY($1)\n        GROUP BY v.id, m.id, u.username, ou.username\n        ORDER BY m.id DESC;\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "mod_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 2,
+        "name": "owner_username",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "TextArray",
+        "TextArray"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      null
+    ]
+  },
+  "hash": "594ead968747529638ce41ebd3f7f5433df9b9d86a2a1a695933feb94b093d5d"
+}
