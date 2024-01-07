@@ -188,9 +188,9 @@
                 <PlusIcon aria-hidden="true" />
                 Create a project
               </button>
-              <NuxtLink class="iconified-button" to="/dashboard/follows">
-                <HeartIcon aria-hidden="true" />
-                Following
+              <NuxtLink class="iconified-button" to="/dashboard/collections">
+                <LibraryIcon class="icon" />
+                Collections
               </NuxtLink>
               <NuxtLink
                 v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
@@ -372,7 +372,6 @@ import SunIcon from '~/assets/images/utils/sun.svg'
 import PlusIcon from '~/assets/images/utils/plus.svg'
 import DropdownIcon from '~/assets/images/utils/dropdown.svg'
 import LogOutIcon from '~/assets/images/utils/log-out.svg'
-import HeartIcon from '~/assets/images/utils/heart.svg'
 import ChartIcon from '~/assets/images/utils/chart.svg'
 
 import NavRow from '~/components/ui/NavRow.vue'
