@@ -5,6 +5,7 @@
 // These fields only apply to minecraft-java, and are hardcoded to the minecraft-java game.
 
 use chrono::{DateTime, Utc};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
@@ -34,6 +35,8 @@ impl MinecraftGameVersion {
     }
 
     pub async fn list<'a, E>(
+        version_type_option: Option<&str>,
+        major_option: Option<bool>,
         exec: E,
         redis: &RedisPool,
     ) -> Result<Vec<MinecraftGameVersion>, DatabaseError>
@@ -47,10 +50,25 @@ impl MinecraftGameVersion {
             })?;
         let game_version_enum_values =
             LoaderFieldEnumValue::list(game_version_enum.id, exec, redis).await?;
-        Ok(game_version_enum_values
+
+        let game_versions = game_version_enum_values
             .into_iter()
             .map(MinecraftGameVersion::from_enum_value)
-            .collect())
+            .filter(|x| {
+                let mut bool = true;
+
+                if let Some(version_type) = version_type_option {
+                    bool &= &*x.type_ == version_type;
+                }
+                if let Some(major) = major_option {
+                    bool &= x.major == major;
+                }
+
+                bool
+            })
+            .collect_vec();
+
+        Ok(game_versions)
     }
 
     // TODO: remove this

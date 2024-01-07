@@ -777,36 +777,44 @@ pub async fn version_list(
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
-            // TODO: Re-implement this
-            // let (loaders, game_versions) = futures::future::try_join(
-            //     database::models::loader_fields::Loader::list(&**pool, &redis),
-            //     database::models::loader_fields::GameVersion::list_filter(
-            //         None,
-            //         Some(true),
-            //         &**pool,
-            //         &redis,
-            //     ),
-            // )
-            // .await?;
+            // TODO: This is a bandaid fix for detecting auto-featured versions.
+            // In the future, not all versions will have 'game_versions' fields, so this will need to be changed.
+            let (loaders, game_versions) = futures::future::try_join(
+                database::models::loader_fields::Loader::list(&**pool, &redis),
+                database::models::legacy_loader_fields::MinecraftGameVersion::list(
+                    None,
+                    Some(true),
+                    &**pool,
+                    &redis,
+                ),
+            )
+            .await?;
 
-            // let mut joined_filters = Vec::new();
-            // for game_version in &game_versions {
-            //     for loader in &loaders {
-            //         joined_filters.push((game_version, loader))
-            //     }
-            // }
+            let mut joined_filters = Vec::new();
+            for game_version in &game_versions {
+                for loader in &loaders {
+                    joined_filters.push((game_version, loader))
+                }
+            }
 
-            // joined_filters.into_iter().for_each(|filter| {
-            //     versions
-            //         .iter()
-            //         .find(|version| {
-            //             // version.game_versions.contains(&filter.0.version)
-            //                 // &&
-            //                 version.loaders.contains(&filter.1.loader)
-            //         })
-            //         .map(|version| response.push(version.clone()))
-            //         .unwrap_or(());
-            // });
+            joined_filters.into_iter().for_each(|filter| {
+                versions
+                    .iter()
+                    .find(|version| {
+                        // TODO: This is the bandaid fix for detecting auto-featured versions.
+                        let game_versions = version
+                            .version_fields
+                            .iter()
+                            .find(|vf| vf.field_name == "game_versions")
+                            .map(|vf| vf.value.clone())
+                            .map(|v| v.as_strings())
+                            .unwrap_or_default();
+                        game_versions.contains(&filter.0.version)
+                            && version.loaders.contains(&filter.1.loader)
+                    })
+                    .map(|version| response.push(version.clone()))
+                    .unwrap_or(());
+            });
 
             if response.is_empty() {
                 versions

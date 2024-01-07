@@ -17,7 +17,7 @@ use labrinth::models::teams::ProjectPermissions;
 use labrinth::util::actix::{MultipartSegment, MultipartSegmentData};
 use serde_json::json;
 
-use crate::common::api_common::models::CommonItemType;
+use crate::common::api_common::models::{CommonItemType, CommonProject};
 use crate::common::api_common::request_data::ProjectCreationRequestData;
 use crate::common::api_common::{ApiProject, ApiTeams, ApiVersion};
 use crate::common::dummy_data::{
@@ -1372,8 +1372,9 @@ async fn projects_various_visibility() {
             for (pat, expected_count) in visible_pat_pairs {
                 let projects = env
                     .api
-                    .get_user_projects_deserialized_common(USER_USER_ID, pat)
+                    .get_projects(&[&alpha_project_id, &beta_project_id], pat)
                     .await;
+                let projects: Vec<CommonProject> = test::read_body_json(projects).await;
                 assert_eq!(projects.len(), expected_count);
             }
         },

@@ -81,7 +81,7 @@ pub async fn send_discord_webhook(
     // TODO: This should be updated to use the generic loader fields w/ discord from the project game
 
     // TODO: This should use the project_item get route
-    let all_game_versions = MinecraftGameVersion::list(pool, redis).await?;
+    let all_game_versions = MinecraftGameVersion::list(None, None, pool, redis).await?;
 
     let row =
         sqlx::query!(
