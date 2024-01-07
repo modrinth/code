@@ -209,8 +209,12 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
                 INSERT INTO loader_field_enum_values (enum_id, value, created, metadata)
                 VALUES ($1, $2, COALESCE($3, timezone('utc', now())), $4)
                 ON CONFLICT (enum_id, value) DO UPDATE
-                    SET metadata = COALESCE($4, loader_field_enum_values.metadata),
-                        created = COALESCE($3, loader_field_enum_values.created)
+                    SET metadata = jsonb_set(
+                        COALESCE(loader_field_enum_values.metadata, $4),
+                        '{type}', 
+                        COALESCE($4->'type', loader_field_enum_values.metadata->'type')
+                    ),
+                    created = COALESCE($3, loader_field_enum_values.created)
                 RETURNING id
                 ",
             game_versions_enum.id.0,

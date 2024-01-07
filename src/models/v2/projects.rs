@@ -5,7 +5,6 @@ use std::collections::HashMap;
 use super::super::ids::OrganizationId;
 use super::super::teams::TeamId;
 use super::super::users::UserId;
-use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::models::{version_item, DatabaseError};
 use crate::database::redis::RedisPool;
 use crate::models::ids::{ProjectId, VersionId};
@@ -80,7 +79,6 @@ impl LegacyProject {
     pub fn from(data: Project, versions_item: Option<version_item::QueryVersion>) -> Self {
         let mut client_side = LegacySideType::Unknown;
         let mut server_side = LegacySideType::Unknown;
-        let mut game_versions = Vec::new();
 
         // V2 versions only have one project type- v3 versions can rarely have multiple.
         // We'll prioritize 'modpack' first, and if neither are found, use the first one.
@@ -104,7 +102,7 @@ impl LegacyProject {
 
         let mut loaders = data.loaders;
 
-        game_versions = data
+        let game_versions = data
             .fields
             .get("game_versions")
             .unwrap_or(&Vec::new())
