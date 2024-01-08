@@ -34,28 +34,59 @@ async fn test_project_type_sanity() {
             ("mod", "test-mod", TestFile::build_random_jar()),
             ("modpack", "test-modpack", TestFile::build_random_mrpack()),
         ] {
+            // Create a modpack or mod
+            // both are 'fabric' (but modpack is actually 'mrpack' behind the scenes, through v3,with fabric as a 'mrpack_loader')
             let (test_project, test_version) = api
                 .add_public_project(slug, Some(file), None, USER_USER_PAT)
                 .await;
             let test_project_slug = test_project.slug.as_ref().unwrap();
 
-            // TODO:
-            // assert_eq!(test_project.project_type, mod_or_modpack);
+            // Check that the loader displays correctly as fabric from the version creation
             assert_eq!(test_project.loaders, vec!["fabric"]);
             assert_eq!(test_version[0].loaders, vec!["fabric"]);
 
+            // Check that the project type is correct when getting the project
             let project = api
                 .get_project_deserialized(test_project_slug, USER_USER_PAT)
                 .await;
             assert_eq!(test_project.loaders, vec!["fabric"]);
             assert_eq!(project.project_type, mod_or_modpack);
 
+            // Check that the project type is correct when getting the version
             let version = api
                 .get_version_deserialized(&test_version[0].id.to_string(), USER_USER_PAT)
                 .await;
             assert_eq!(
                 version.loaders.iter().map(|x| &x.0).collect_vec(),
                 vec!["fabric"]
+            );
+
+            // Edit the version loader to change it to 'forge'
+            let resp = api
+                .edit_version(
+                    &test_version[0].id.to_string(),
+                    json!({
+                        "loaders": ["forge"],
+                    }),
+                    USER_USER_PAT,
+                )
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
+
+            // Check that the project type is still correct when getting the project
+            let project = api
+                .get_project_deserialized(test_project_slug, USER_USER_PAT)
+                .await;
+            assert_eq!(project.project_type, mod_or_modpack);
+            assert_eq!(project.loaders, vec!["forge"]);
+
+            // Check that the project type is still correct when getting the version
+            let version = api
+                .get_version_deserialized(&test_version[0].id.to_string(), USER_USER_PAT)
+                .await;
+            assert_eq!(
+                version.loaders.iter().map(|x| &x.0).collect_vec(),
+                vec!["forge"]
             );
         }
 

@@ -244,13 +244,40 @@ pub async fn version_edit(
         );
     }
 
+    // Get the older version to get info from
+    let old_version = v3::versions::version_get_helper(
+        req.clone(),
+        info.clone().0,
+        pool.clone(),
+        redis.clone(),
+        session_queue.clone(),
+    )
+    .await
+    .or_else(v2_reroute::flatten_404_error)?;
+    let old_version = match v2_reroute::extract_ok_json::<Version>(old_version).await {
+        Ok(version) => version,
+        Err(response) => return Ok(response),
+    };
+
+    // If this has 'mrpack_loaders' as a loader field previously, this is a modpack.
+    // Therefore, if we are modifying the 'loader' field in this case,
+    // we are actually modifying the 'mrpack_loaders' loader field
+    let mut loaders = new_version.loaders.clone();
+    if old_version.fields.contains_key("mrpack_loaders") && new_version.loaders.is_some() {
+        fields.insert(
+            "mrpack_loaders".to_string(),
+            serde_json::json!(new_version.loaders),
+        );
+        loaders = None;
+    }
+
     let new_version = v3::versions::EditVersion {
         name: new_version.name,
         version_number: new_version.version_number,
         changelog: new_version.changelog,
         version_type: new_version.version_type,
         dependencies: new_version.dependencies,
-        loaders: new_version.loaders,
+        loaders,
         featured: new_version.featured,
         primary_file: new_version.primary_file,
         downloads: new_version.downloads,

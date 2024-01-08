@@ -106,7 +106,7 @@ async fn search_projects() {
                     found_project_ids.sort();
                     println!("Facets: {:?}", facets);
                     assert_eq!(found_project_ids, expected_project_ids);
-                    assert_eq!(num_hits, expected_project_ids.len() as usize);
+                    assert_eq!(num_hits, { expected_project_ids.len() });
                 }
             })
             .await;
