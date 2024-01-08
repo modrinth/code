@@ -412,8 +412,12 @@ try {
       await useAsyncData(`user/${collection.value.user}`, () =>
         useBaseFetch(`user/${collection.value.user}`)
       ),
-      await useAsyncData(`projects?ids=${JSON.stringify(collection.value.projects)}]`, () =>
-        useBaseFetch(`projects?ids=${JSON.stringify(collection.value.projects)}`)
+      await useAsyncData(
+        `projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}]`,
+        () =>
+          useBaseFetch(
+            `projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`
+          )
       ),
     ])
   }

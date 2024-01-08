@@ -1,9 +1,0 @@
-name = "knossos"
-main = "./.output/server/index.mjs"
-workers_dev = true
-compatibility_date = "2022-07-12"
-account_id = "9ddae624c98677d68d93df6e524a6061"
-node_compat = true
-
-[site]
-bucket = ".output/public"
