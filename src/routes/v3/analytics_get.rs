@@ -98,7 +98,7 @@ pub async fn playtimes_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the views
     let playtimes = crate::clickhouse::fetch_playtimes(
@@ -164,7 +164,7 @@ pub async fn views_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the views
     let views = crate::clickhouse::fetch_views(
@@ -230,7 +230,7 @@ pub async fn downloads_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user_option, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user_option, &pool, &redis, None).await?;
 
     // Get the downloads
     let downloads = crate::clickhouse::fetch_downloads(
@@ -304,27 +304,60 @@ pub async fn revenue_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
+    let project_ids =
+        filter_allowed_ids(project_ids, user.clone(), &pool, &redis, Some(true)).await?;
 
     let duration: PgInterval = Duration::minutes(resolution_minutes as i64)
         .try_into()
         .map_err(|_| ApiError::InvalidInput("Invalid resolution_minutes".to_string()))?;
     // Get the revenue data
     let project_ids = project_ids.unwrap_or_default();
-    let payouts_values = sqlx::query!(
-        "
-        SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start
-        FROM payouts_values
-        WHERE mod_id = ANY($1) AND created BETWEEN $2 AND $3
-        GROUP by mod_id, interval_start ORDER BY interval_start
-        ",
-        &project_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>(),
-        start_date,
-        end_date,
-        duration,
-    )
-        .fetch_all(&**pool)
-        .await?;
+
+    struct PayoutValue {
+        mod_id: Option<i64>,
+        amount_sum: Option<rust_decimal::Decimal>,
+        interval_start: Option<DateTime<Utc>>,
+    }
+
+    let payouts_values = if project_ids.is_empty() {
+        sqlx::query!(
+            "
+            SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start
+            FROM payouts_values
+            WHERE user_id = $1 AND created BETWEEN $2 AND $3
+            GROUP by mod_id, interval_start ORDER BY interval_start
+            ",
+            user.id.0 as i64,
+            start_date,
+            end_date,
+            duration,
+        )
+            .fetch_all(&**pool)
+            .await?.into_iter().map(|x| PayoutValue {
+            mod_id: x.mod_id,
+            amount_sum: x.amount_sum,
+            interval_start: x.interval_start,
+        }).collect::<Vec<_>>()
+    } else {
+        sqlx::query!(
+            "
+            SELECT mod_id, SUM(amount) amount_sum, DATE_BIN($4::interval, created, TIMESTAMP '2001-01-01') AS interval_start
+            FROM payouts_values
+            WHERE mod_id = ANY($1) AND created BETWEEN $2 AND $3
+            GROUP by mod_id, interval_start ORDER BY interval_start
+            ",
+            &project_ids.iter().map(|x| x.0 as i64).collect::<Vec<_>>(),
+            start_date,
+            end_date,
+            duration,
+        )
+            .fetch_all(&**pool)
+            .await?.into_iter().map(|x| PayoutValue {
+            mod_id: x.mod_id,
+            amount_sum: x.amount_sum,
+            interval_start: x.interval_start,
+        }).collect::<Vec<_>>()
+    };
 
     let mut hm: HashMap<_, _> = project_ids
         .into_iter()
@@ -391,7 +424,7 @@ pub async fn countries_downloads_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries_downloads(
@@ -463,7 +496,7 @@ pub async fn countries_views_get(
     // Convert String list to list of ProjectIds or VersionIds
     // - Filter out unauthorized projects/versions
     // - If no project_ids or version_ids are provided, we default to all projects the user has access to
-    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis).await?;
+    let project_ids = filter_allowed_ids(project_ids, user, &pool, &redis, None).await?;
 
     // Get the countries
     let countries = crate::clickhouse::fetch_countries_views(
@@ -515,9 +548,10 @@ async fn filter_allowed_ids(
     user: crate::models::users::User,
     pool: &web::Data<PgPool>,
     redis: &RedisPool,
+    remove_defaults: Option<bool>,
 ) -> Result<Option<Vec<ProjectId>>, ApiError> {
     // If no project_ids or version_ids are provided, we default to all projects the user has *public* access to
-    if project_ids.is_none() {
+    if project_ids.is_none() && !remove_defaults.unwrap_or(false) {
         project_ids = Some(
             user_item::User::get_projects(user.id.into(), &***pool, redis)
                 .await?

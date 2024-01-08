@@ -209,7 +209,7 @@ pub async fn permissions_analytics_revenue() {
                 // On success, should have 1 versions returned
                 |value: &serde_json::Value| {
                     let value = value.as_object().unwrap();
-                    assert_eq!(value.len(), 1);
+                    assert_eq!(value.len(), 0);
                 },
             )
             .simple_project_permissions_test(view_analytics, req_gen)
