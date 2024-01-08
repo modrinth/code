@@ -584,6 +584,27 @@ const acceptedOrgMembers = computed(() => {
   return props.organization?.members?.filter((x) => x.accepted) || []
 })
 
+function initMembers() {
+  const orgMembers = props.organization?.members || []
+
+  const selectedMembersForOrg = orgMembers.map((partialOrgMember) => {
+    const foundMember = props.allMembers.find((tM) => tM.user.id === partialOrgMember.user.id)
+    const returnVal = foundMember ?? partialOrgMember
+
+    // If replacing a partial with a full member, we need to mark as such.
+    returnVal.override = !!foundMember
+    returnVal.oldOverride = !!foundMember
+
+    return returnVal
+  })
+
+  allOrgMembers.value = selectedMembersForOrg
+
+  allTeamMembers.value = props.allMembers
+    .map((x) => ({ ...x, oldRole: x.role }))
+    .filter((x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id))
+}
+
 watch(
   [
     () => props.allMembers,
@@ -591,28 +612,9 @@ watch(
     () => props.project,
     () => props.currentMember,
   ],
-  () => {
-    const orgMembers = props.organization?.members || []
-
-    const selectedMembersForOrg = orgMembers.map((partialOrgMember) => {
-      const foundMember = props.allMembers.find((tM) => tM.user.id === partialOrgMember.user.id)
-      const returnVal = foundMember ?? partialOrgMember
-
-      // If replacing a partial with a full member, we need to mark as such.
-      returnVal.override = !!foundMember
-      returnVal.oldOverride = !!foundMember
-
-      return returnVal
-    })
-
-    allOrgMembers.value = selectedMembersForOrg
-
-    allTeamMembers.value = props.allMembers
-      .map((x) => ({ ...x, oldRole: x.role }))
-      .filter((x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id))
-  },
-  { immediate: true, deep: true }
+  initMembers
 )
+initMembers()
 
 const currentUsername = ref('')
 const openTeamMembers = ref([])

@@ -214,9 +214,6 @@
         @change="handleFiles"
       />
     </div>
-    <div v-else class="card header-buttons">
-      <span class="indicator"> <InfoIcon /> You don't have permission to upload images </span>
-    </div>
     <div class="items">
       <div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
         <a class="gallery-thumbnail" @click="expandImage(item, index)">
