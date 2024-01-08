@@ -88,6 +88,10 @@ textarea,
   }
 }
 
+.cm-content {
+  white-space: pre-wrap !important;
+}
+
 input[type='number'] {
   &::-webkit-inner-spin-button,
   &::-webkit-outer-spin-button {
