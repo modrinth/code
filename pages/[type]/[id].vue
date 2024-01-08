@@ -305,7 +305,7 @@
                         :key="option.id"
                         :model-value="option.projects.includes(project.id)"
                         class="popout-checkbox"
-                        @update:model-value="userCollectProject(option, project.id)"
+                        @update:model-value="() => onUserCollectProject(option, project.id)"
                       >
                         {{ option.name }}
                       </Checkbox>
@@ -1035,6 +1035,8 @@ if (!route.name.startsWith('type-id-settings')) {
         : 'noindex',
   })
 }
+
+const onUserCollectProject = useClientTry(userCollectProject)
 
 async function clearMessage() {
   startLoading()

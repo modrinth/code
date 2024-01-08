@@ -76,13 +76,21 @@ export const initUserProjects = async () => {
 
 export const userCollectProject = async (collection, projectId) => {
   const user = (await useUser()).value
+  await initUserCollections()
 
-  const add = !collection.projects.includes(projectId)
+  const collectionId = collection.id
+
+  const latestCollection = user.collections.find((x) => x.id === collectionId)
+  if (!latestCollection) {
+    throw new Error('This collection was not found. Has it been deleted?')
+  }
+
+  const add = !latestCollection.projects.includes(projectId)
   const projects = add
-    ? [...collection.projects, projectId]
-    : [...collection.projects].filter((x) => x !== projectId)
+    ? [...latestCollection.projects, projectId]
+    : [...latestCollection.projects].filter((x) => x !== projectId)
 
-  const idx = user.collections.findIndex((x) => x.id === collection.id)
+  const idx = user.collections.findIndex((x) => x.id === latestCollection.id)
   if (idx >= 0) {
     user.collections[idx].projects = projects
   }
