@@ -14,8 +14,8 @@
       <ConversationThread
         :thread="thread"
         :report="report"
-        :update-thread="updateThread"
         :auth="auth"
+        @update-thread="updateThread"
       />
     </section>
   </div>

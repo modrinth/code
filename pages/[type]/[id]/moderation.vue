@@ -70,11 +70,11 @@
       <ConversationThread
         v-if="thread"
         :thread="thread"
-        :update-thread="(newThread) => (thread = newThread)"
         :project="project"
         :set-status="setStatus"
         :current-member="currentMember"
         :auth="auth"
+        @update-thread="(newThread) => (thread = newThread)"
       />
     </section>
   </div>

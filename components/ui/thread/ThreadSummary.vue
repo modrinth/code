@@ -14,6 +14,7 @@
         :message="message"
         :report="report"
         :members="members"
+        :auth="auth"
         force-compact
         no-links
       />

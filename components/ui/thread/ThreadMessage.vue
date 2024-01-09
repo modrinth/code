@@ -23,9 +23,9 @@
         />
       </ConditionalNuxtLink>
       <span :class="`message__author role-${members[message.author_id].role}`">
-        <PrivateIcon
+        <LockIcon
           v-if="message.body.private"
-          v-tooltip="'Only visible by moderators'"
+          v-tooltip="'Only visible to moderators'"
           class="private-icon"
         />
         <ConditionalNuxtLink
@@ -34,15 +34,12 @@
         >
           {{ members[message.author_id].username }}
         </ConditionalNuxtLink>
-        <ModeratorIcon
-          v-if="members[message.author_id].role === 'moderator'"
-          v-tooltip="'Moderator'"
-        />
+        <ScaleIcon v-if="members[message.author_id].role === 'moderator'" v-tooltip="'Moderator'" />
         <ModrinthIcon
           v-else-if="members[message.author_id].role === 'admin'"
           v-tooltip="'Modrinth Team'"
         />
-        <MicIcon
+        <MicrophoneIcon
           v-if="report && message.author_id === report.reporterUser.id"
           v-tooltip="'Reporter'"
           class="reporter-icon"
@@ -51,11 +48,11 @@
     </template>
     <template v-else>
       <div class="message__icon backed-svg circle moderation-color" :class="{ raised: raised }">
-        <ModeratorIcon />
+        <ScaleIcon />
       </div>
       <span class="message__author moderation-color">
         Moderator
-        <ModeratorIcon v-tooltip="'Moderator'" />
+        <ScaleIcon v-tooltip="'Moderator'" />
       </span>
     </template>
     <div
@@ -81,21 +78,40 @@
         {{ timeSincePosted }}
       </span>
     </span>
-    <!--    <div class="message__actions">-->
-    <!--      <Button icon-only><MoreIcon /></Button>-->
-    <!--    </div>-->
+    <div v-if="isStaff(auth.user) && message.author_id === auth.user.id" class="message__actions">
+      <OverflowMenu
+        class="btn btn-transparent icon-only"
+        :options="[
+          {
+            id: 'delete',
+            action: () => deleteMessage(),
+            color: 'red',
+            hoverFilled: true,
+          },
+        ]"
+      >
+        <MoreHorizontalIcon />
+        <template #delete> <TrashIcon /> Delete </template>
+      </OverflowMenu>
+    </div>
   </div>
 </template>
 
 <script setup>
+import {
+  OverflowMenu,
+  MoreHorizontalIcon,
+  TrashIcon,
+  ConditionalNuxtLink,
+  MicrophoneIcon,
+  LockIcon,
+  ModrinthIcon,
+  ScaleIcon,
+} from 'omorphia'
 import Avatar from '~/components/ui/Avatar.vue'
 import Badge from '~/components/ui/Badge.vue'
-import ModeratorIcon from '~/assets/images/sidebar/admin.svg'
-import ModrinthIcon from '~/assets/images/utils/modrinth.svg'
-import MicIcon from '~/assets/images/utils/mic.svg'
-import PrivateIcon from '~/assets/images/utils/lock.svg'
 import { renderString } from '~/helpers/parse.js'
-import ConditionalNuxtLink from '~/components/ui/ConditionalNuxtLink.vue'
+import { isStaff } from '~/helpers/users.js'
 
 const props = defineProps({
   message: {
@@ -122,7 +138,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  auth: {
+    type: Object,
+    required: true,
+  },
 })
+
+const emit = defineEmits(['update-thread'])
 
 const formattedMessage = computed(() => {
   const body = renderString(props.message.body.body)
@@ -142,6 +164,13 @@ const formattedMessage = computed(() => {
 
 const formatRelativeTime = useRelativeTime()
 const timeSincePosted = ref(formatRelativeTime(props.message.created))
+
+async function deleteMessage() {
+  await useBaseFetch(`message/${props.message.id}`, {
+    method: 'DELETE',
+  })
+  emit('update-thread')
+}
 </script>
 
 <style lang="scss" scoped>
@@ -222,7 +251,10 @@ const timeSincePosted = ref(formatRelativeTime(props.message.created))
 .message__actions {
   grid-area: actions;
   margin-left: auto;
-  opacity: 0;
+
+  @media (hover: hover) {
+    opacity: 0;
+  }
 }
 
 .message__body {
