@@ -7,7 +7,7 @@
 
     <h2>Withdraw</h2>
 
-    <h3>Country</h3>
+    <h3>Region</h3>
     <Multiselect
       id="country-multiselect"
       v-model="country"
