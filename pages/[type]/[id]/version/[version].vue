@@ -371,27 +371,9 @@
           :show-labels="false"
           :allow-empty="false"
         />
-        <FileInput
-          v-if="isEditing && primaryFile.hashes.sha1 === file.hashes.sha1"
-          class="iconified-button raised-button"
-          prompt="Replace"
-          :accept="acceptFileFromProjectType(project.project_type)"
-          :max-size="524288000"
-          should-always-reset
-          @change="
-            (x) => {
-              deleteFiles.push(file.hashes.sha1)
-              version.files.splice(index, 1)
-              oldFileTypes.splice(index, 1)
-
-              replaceFile = x[0]
-            }
-          "
-        >
-          <TransferIcon />
-        </FileInput>
         <button
           v-else-if="isEditing"
+          :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
           class="iconified-button raised-button"
           @click="
             () => {
@@ -1056,19 +1038,7 @@ export default defineNuxtComponent({
       }
 
       try {
-        if (this.replaceFile) {
-          const reader = new FileReader()
-          reader.onloadend = async function (event) {
-            const hash = await crypto.subtle.digest('SHA-1', event.target.result)
-            this.primaryFile.hashes.sha1 = [...new Uint8Array(hash)]
-              .map((x) => x.toString(16).padStart(2, '0'))
-              .join('')
-          }
-
-          reader.readAsArrayBuffer(this.replaceFile)
-        }
-
-        if (this.newFiles.length > 0 || this.replaceFile) {
+        if (this.newFiles.length > 0) {
           const formData = new FormData()
           const fileParts = this.newFiles.map((f, idx) => `${f.name}-${idx}`)
 
@@ -1087,14 +1057,6 @@ export default defineNuxtComponent({
 
           for (let i = 0; i < this.newFiles.length; i++) {
             formData.append(fileParts[i], new Blob([this.newFiles[i]]), this.newFiles[i].name)
-          }
-
-          if (this.replaceFile) {
-            formData.append(
-              this.replaceFile.name.concat('-' + this.newFiles.length),
-              new Blob([this.replaceFile]),
-              this.replaceFile.name
-            )
           }
 
           await useBaseFetch(`version/${this.version.id}/file`, {
