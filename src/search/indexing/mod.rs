@@ -97,7 +97,7 @@ pub async fn index_projects(
         let id_chunk = id_chunk
             .into_iter()
             .map(|(version_id, project_id, owner_username)| {
-                (version_id, (project_id, owner_username.to_lowercase()))
+                (version_id, (project_id, owner_username))
             })
             .collect::<HashMap<_, _>>();
         let uploads = index_local(&pool, &redis, id_chunk).await?;

@@ -391,6 +391,7 @@ async fn search_projects() {
             .await;
         for hit in game_versions.hits {
             assert_eq!(hit.versions, vec!["1.20.5".to_string()]);
+            assert_eq!(hit.author, "User".to_string());
         }
     })
     .await;
