@@ -372,7 +372,7 @@
           :allow-empty="false"
         />
         <button
-          v-else-if="isEditing"
+          v-if="isEditing"
           :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
           class="iconified-button raised-button"
           @click="
