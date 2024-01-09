@@ -78,7 +78,7 @@ pub async fn project_search(
             })
             .collect_vec();
 
-        // These loaders speciically used to be combined with 'mod' to be a plugin, but now
+        // These loaders specifically used to be combined with 'mod' to be a plugin, but now
         // they are their own loader type. We will convert 'mod' to 'mod' OR 'plugin'
         // as it essentially was before.
         let facets = v2_reroute::convert_plugin_loaders_v3(facets);
@@ -93,17 +93,13 @@ pub async fn project_search(
                             facets
                                 .into_iter()
                                 .map(|facet| {
-                                    let val = match facet.split(':').nth(1) {
-                                        Some(val) => val,
-                                        None => return facet.to_string(),
-                                    };
-
-                                    if facet.starts_with("versions:") {
-                                        format!("game_versions:{}", val)
-                                    } else if facet.starts_with("project_type:") {
-                                        format!("project_types:{}", val)
-                                    } else if facet.starts_with("title:") {
-                                        format!("name:{}", val)
+                                    if let Some((key, operator, val)) = parse_facet(&facet) {
+                                        format!("{}{}{}", match key.as_str() {
+                                            "versions" => "game_versions",
+                                            "project_type" => "project_types",
+                                            "title" => "name",
+                                            x => x,
+                                        }, operator, val)
                                     } else {
                                         facet.to_string()
                                     }
@@ -128,6 +124,39 @@ pub async fn project_search(
     let results = LegacySearchResults::from(results);
 
     Ok(HttpResponse::Ok().json(results))
+}
+
+/// Parses a facet into a key, operator, and value
+fn parse_facet(facet: &String) -> Option<(String, String, String)> {
+    let mut key = String::new();
+    let mut operator = String::new();
+    let mut val = String::new();
+
+    let mut iterator = facet.chars();
+    while let Some(char) = iterator.next() {
+        match char {
+            ':' | '=' => {
+                operator.push(char);
+                val = iterator.collect::<String>();
+                return Some((key, operator, val));
+            }
+            '<' | '>' => {
+                operator.push(char);
+                if let Some(next_char) = iterator.next() {
+                    if next_char == '=' {
+                        operator.push(next_char);
+                    } else {
+                        val.push(next_char);
+                    }
+                }
+                val.push_str(&iterator.collect::<String>());
+                return Some((key, operator, val));
+            }
+            _ => key.push(char),
+        }
+    }
+
+    None
 }
 
 #[derive(Deserialize, Validate)]
