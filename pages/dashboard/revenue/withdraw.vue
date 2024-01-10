@@ -47,12 +47,24 @@
           @click="() => (selectedMethodId = method.id)"
         >
           <div class="preview" :class="{ 'show-bg': !method.image_url || method.name === 'ACH' }">
-            <img
-              v-if="method.image_url && method.name !== 'ACH'"
-              class="preview-img"
-              :src="method.image_url"
-              :alt="method.name"
-            />
+            <template v-if="method.image_url && method.name !== 'ACH'">
+              <div class="preview-badges">
+                <span class="badge">
+                  {{
+                    getRangeOfMethod(method)
+                      .map($formatMoney)
+                      .map((i) => i.replace('.00', ''))
+                      .join('–')
+                  }}
+                </span>
+              </div>
+              <img
+                v-if="method.image_url && method.name !== 'ACH'"
+                class="preview-img"
+                :src="method.image_url"
+                :alt="method.name"
+              />
+            </template>
             <div v-else class="placeholder">
               <template v-if="method.type === 'venmo'">
                 <VenmoIcon class="enlarge" />
@@ -87,15 +99,35 @@
           :format-label="(val) => '$' + val"
         />
       </template>
+      <template v-else-if="minWithdrawAmount == maxWithdrawAmount">
+        <div>
+          <p>
+            This method has a fixed transfer amount of
+            <strong>{{ $formatMoney(minWithdrawAmount) }}</strong
+            >.
+          </p>
+        </div>
+      </template>
       <template v-else>
-        <input
-          id="confirmation"
-          v-model="amount"
-          type="text"
-          pattern="^\d*(\.\d{0,2})?$"
-          autocomplete="off"
-          placeholder="Amount to transfer..."
-        />
+        <div>
+          <p>
+            This method has a minimum transfer amount of
+            <strong>{{ $formatMoney(minWithdrawAmount) }}</strong> and a maximum transfer amount of
+            <strong>{{ $formatMoney(maxWithdrawAmount) }}</strong
+            >.
+          </p>
+          <input
+            id="confirmation"
+            v-model="amount"
+            type="text"
+            pattern="^\d*(\.\d{0,2})?$"
+            autocomplete="off"
+            placeholder="Amount to transfer..."
+          />
+          <p>
+            You have entered <strong>{{ $formatMoney(parsedAmount) }}</strong> to transfer.
+          </p>
+        </div>
       </template>
     </div>
 
@@ -206,6 +238,36 @@ const fees = computed(() => {
     selectedMethod.value.fee.max ?? Number.MAX_VALUE
   )
 })
+
+const getIntervalRange = (intervalType) => {
+  if (!intervalType) {
+    return []
+  }
+
+  const { min, max, values } = intervalType
+  if (values) {
+    const first = values[0]
+    const last = values.slice(-1)[0]
+    return first === last ? [first] : [first, last]
+  }
+
+  return min === max ? [min] : [min, max]
+}
+
+const getRangeOfMethod = (method) => {
+  return getIntervalRange(method.interval?.fixed || method.interval?.standard)
+}
+
+const maxWithdrawAmount = computed(() => {
+  const interval = selectedMethod.value.interval
+  return interval?.standard ? interval.standard.max : interval?.fixed?.values.slice(-1)[0] ?? 0
+})
+
+const minWithdrawAmount = computed(() => {
+  const interval = selectedMethod.value.interval
+  return interval?.standard ? interval.standard.min : interval?.fixed?.values?.[0] ?? fees.value
+})
+
 const withdrawAccount = computed(() => {
   if (selectedMethod.value.type === 'paypal') {
     return auth.value.user.payout_data.paypal_address
@@ -234,12 +296,15 @@ const knownErrors = computed(() => {
 
   if (!parsedAmount.value && amount.value.length > 0) {
     errors.push(`${amount.value} is not a valid amount`)
-  } else if (parsedAmount.value > auth.value.user.payout_data.balance) {
-    errors.push(
-      `The amount must be no more than ${data.$formatMoney(auth.value.user.payout_data.balance)}`
-    )
-  } else if (parsedAmount.value <= fees.value) {
-    errors.push(`The amount must be at least ${data.$formatMoney(fees.value + 0.01)}`)
+  } else if (
+    parsedAmount.value > auth.value.user.payout_data.balance ||
+    parsedAmount.value > maxWithdrawAmount.value
+  ) {
+    const maxAmount = Math.min(auth.value.user.payout_data.balance, maxWithdrawAmount.value)
+    errors.push(`The amount must be no more than ${data.$formatMoney(maxAmount)}`)
+  } else if (parsedAmount.value <= fees.value || parsedAmount.value < minWithdrawAmount.value) {
+    const minAmount = Math.max(fees.value + 0.01, minWithdrawAmount.value)
+    errors.push(`The amount must be at least ${data.$formatMoney(minAmount)}`)
   }
 
   return errors
@@ -254,6 +319,18 @@ watch(country, async () => {
   if (payoutMethods.value && payoutMethods.value[0]) {
     selectedMethodId.value = payoutMethods.value[0].id
   }
+})
+
+watch(selectedMethod, () => {
+  if (selectedMethod.value.interval?.fixed) {
+    amount.value = selectedMethod.value.interval.fixed.values[0]
+  }
+  if (maxWithdrawAmount.value === minWithdrawAmount.value) {
+    amount.value = maxWithdrawAmount.value
+  }
+  agreedTransfer.value = false
+  agreedFees.value = false
+  agreedTerms.value = false
 })
 
 async function withdraw() {
@@ -353,6 +430,22 @@ async function withdraw() {
     display: flex;
     justify-content: center;
     aspect-ratio: 30 / 19;
+    position: relative;
+
+    .preview-badges {
+      // These will float over the image in the bottom right corner
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      padding: var(--gap-sm) var(--gap-xs);
+
+      .badge {
+        background-color: var(--color-button-bg);
+        border-radius: var(--radius-xs);
+        padding: var(--gap-xs) var(--gap-sm);
+        font-size: var(--font-size-xs);
+      }
+    }
 
     &.show-bg {
       background-color: var(--color-bg);
