@@ -51,7 +51,7 @@
         </span>
         <Button
           color="danger"
-          :disabled="currentMember.role === 'Owner'"
+          :disabled="currentMember.is_owner"
           @click="() => onLeaveProject(organization.team_id, auth.user.id)"
         >
           <UserRemoveIcon />
@@ -71,6 +71,7 @@
           <div class="text">
             <nuxt-link :to="'/user/' + member.user.username" class="name">
               <p>{{ member.user.username }}</p>
+              <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
             </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
@@ -93,7 +94,7 @@
         </div>
       </div>
       <div class="content">
-        <div v-if="member.oldRole !== 'Owner'" class="adjacent-input">
+        <div class="adjacent-input">
           <label :for="`member-${member.user.id}-role`">
             <span class="label__title">Role</span>
             <span class="label__description">
@@ -104,7 +105,6 @@
             :id="`member-${member.user.id}-role`"
             v-model="member.role"
             type="text"
-            :class="{ 'known-error': member.role === 'Owner' }"
             :disabled="
               !isPermission(
                 currentMember.organization_permissions,
@@ -133,11 +133,7 @@
             "
           />
         </div>
-        <p v-if="member.role === 'Owner' && member.oldRole !== 'Owner'" class="known-errors">
-          A organization can only have one 'Owner'. Use the 'Transfer ownership' button below if you
-          no longer wish to be owner.
-        </p>
-        <template v-if="member.oldRole !== 'Owner'">
+        <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">Project permissions</span>
           </span>
@@ -157,7 +153,7 @@
             />
           </div>
         </template>
-        <template v-if="member.oldRole !== 'Owner'">
+        <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">Organization permissions</span>
           </span>
@@ -192,7 +188,7 @@
             Save changes
           </Button>
           <Button
-            v-if="member.oldRole !== 'Owner'"
+            v-if="!member.is_owner"
             color="danger"
             :disabled="
               !isPermission(
@@ -210,7 +206,7 @@
             Remove member
           </Button>
           <Button
-            v-if="member.oldRole !== 'Owner' && currentMember.role === 'Owner' && member.accepted"
+            v-if="!member.is_owner && currentMember.is_owner && member.accepted"
             @click="() => onTransferOwnership(organization.team_id, member.user.id)"
           >
             <TransferIcon />
@@ -234,8 +230,9 @@ import {
   DropdownIcon,
   Button,
 } from 'omorphia'
-
 import { ref } from 'vue'
+import CrownIcon from '~/assets/images/utils/crown.svg'
+
 import { removeTeamMember } from '~/helpers/teams.js'
 import { isPermission } from '~/utils/permissions.ts'
 
@@ -246,20 +243,13 @@ const auth = await useAuth()
 const currentUsername = ref('')
 const openTeamMembers = ref([])
 
-const processMembers = (members) => {
-  return members
-    .map((x) => ({ ...x, oldRole: x.role }))
-    .sort((a, b) => a.user.username.localeCompare(b.user.username))
-}
-
-const allTeamMembers = ref(processMembers(organization.value.members))
+const allTeamMembers = ref(organization.value.members)
 
 watch(
   () => organization.value,
   () => {
-    allTeamMembers.value = processMembers(organization.value.members)
-  },
-  { deep: true, immediate: true }
+    allTeamMembers.value = organization.value.members
+  }
 )
 
 const projectPermissions = {
@@ -329,17 +319,17 @@ const onRemoveMember = useClientTry(async (teamId, member) => {
 })
 
 const onUpdateTeamMember = useClientTry(async (teamId, member) => {
-  const data =
-    member.oldRole !== 'Owner'
-      ? {
-          permissions: member.permissions,
-          organization_permissions: member.organization_permissions,
-          role: member.role,
-          payouts_split: member.payouts_split,
-        }
-      : {
-          payouts_split: member.payouts_split,
-        }
+  const data = !member.is_owner
+    ? {
+        permissions: member.permissions,
+        organization_permissions: member.organization_permissions,
+        role: member.role,
+        payouts_split: member.payouts_split,
+      }
+    : {
+        payouts_split: member.payouts_split,
+        role: member.role,
+      }
   await useBaseFetch(`team/${teamId}/members/${member.user.id}`, {
     method: 'PATCH',
     body: data,
@@ -381,9 +371,19 @@ const onTransferOwnership = useClientTry(async (teamId, uid) => {
       .text {
         margin: auto 0 auto 0.5rem;
         font-size: var(--font-size-sm);
+
         .name {
           font-weight: bold;
+
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+
+          svg {
+            color: var(--color-orange);
+          }
         }
+
         p {
           margin: 0.2rem 0;
         }

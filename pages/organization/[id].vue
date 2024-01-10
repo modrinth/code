@@ -107,7 +107,10 @@
           <template v-for="member in acceptedMembers" :key="member.user.id">
             <nuxt-link class="creator button-base" :to="`/user/${member.user.username}`">
               <Avatar :src="member.user.avatar_url" circle />
-              <p class="name">{{ member.user.username }}</p>
+              <p class="name">
+                {{ member.user.username }}
+                <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
+              </p>
               <p class="role">{{ member.role }}</p>
             </nuxt-link>
           </template>
@@ -226,6 +229,7 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 
 import OrganizationIcon from '~/assets/images/utils/organization.svg'
+import CrownIcon from '~/assets/images/utils/crown.svg'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 
 const vintl = useVIntl()
@@ -269,8 +273,8 @@ if (!organization.value) {
 // Filter accepted, sort by role, then by name and Owner role always goes first
 const acceptedMembers = computed(() => {
   const acceptedMembers = organization.value.members?.filter((x) => x.accepted)
-  const owner = acceptedMembers.find((x) => x.role === 'Owner')
-  const rest = acceptedMembers.filter((x) => x.role !== 'Owner') || []
+  const owner = acceptedMembers.find((x) => x.is_owner)
+  const rest = acceptedMembers.filter((x) => !x.is_owner) || []
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
@@ -446,6 +450,14 @@ useSeoMeta({
       align-self: flex-end;
       margin-left: var(--gap-xs);
       font-weight: bold;
+
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      svg {
+        color: var(--color-orange);
+      }
     }
 
     .role {

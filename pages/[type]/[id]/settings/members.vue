@@ -47,7 +47,7 @@
         </span>
         <button
           class="iconified-button danger-button"
-          :disabled="props.currentMember?.role === 'Owner'"
+          :disabled="props.currentMember?.is_owner"
           @click="leaveProject()"
         >
           <UserRemoveIcon />
@@ -67,6 +67,7 @@
           <div class="text">
             <nuxt-link :to="'/user/' + member.user.username" class="name">
               <p>{{ member.name }}</p>
+              <CrownIcon v-if="member.is_owner" v-tooltip="'Project owner'" />
             </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
@@ -87,7 +88,7 @@
         </div>
       </div>
       <div class="content">
-        <div v-if="member.oldRole !== 'Owner'" class="adjacent-input">
+        <div class="adjacent-input">
           <label :for="`member-${allTeamMembers[index].user.username}-role`">
             <span class="label__title">Role</span>
             <span class="label__description">
@@ -98,7 +99,6 @@
             :id="`member-${allTeamMembers[index].user.username}-role`"
             v-model="allTeamMembers[index].role"
             type="text"
-            :class="{ 'known-error': member.role === 'Owner' }"
             :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
           />
         </div>
@@ -117,11 +117,7 @@
             :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
           />
         </div>
-        <p v-if="member.role === 'Owner' && member.oldRole !== 'Owner'" class="known-errors">
-          A project can only have one 'Owner'. Use the 'Transfer ownership' button below if you no
-          longer wish to be owner.
-        </p>
-        <template v-if="member.oldRole !== 'Owner'">
+        <template v-if="!member.is_owner">
           <span class="label">
             <span class="label__title">Permissions</span>
           </span>
@@ -225,7 +221,7 @@
             Save changes
           </button>
           <button
-            v-if="member.oldRole !== 'Owner'"
+            v-if="!member.is_owner"
             class="iconified-button danger-button"
             :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
             @click="removeTeamMember(index)"
@@ -234,9 +230,7 @@
             Remove member
           </button>
           <button
-            v-if="
-              member.oldRole !== 'Owner' && props.currentMember?.role === 'Owner' && member.accepted
-            "
+            v-if="!member.is_owner && props.currentMember?.is_owner && member.accepted"
             class="iconified-button"
             @click="transferOwnership(index)"
           >
@@ -300,7 +294,7 @@
           :show-labels="false"
           :allow-empty="false"
           :options="organizations || []"
-          :disabled="props.currentMember?.role !== 'Owner' || organizations?.length === 0"
+          :disabled="!props.currentMember?.is_owner || organizations?.length === 0"
         />
         <button class="btn btn-primary" :disabled="!selectedOrganization" @click="onAddToOrg">
           <CheckIcon />
@@ -324,6 +318,7 @@
           <div class="text">
             <nuxt-link :to="'/user/' + member.user.username" class="name">
               <p>{{ member.user.username }}</p>
+              <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
             </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
@@ -344,7 +339,7 @@
         </div>
       </div>
       <div class="content">
-        <div v-if="!member.is_owner" class="adjacent-input">
+        <div class="adjacent-input">
           <label :for="`member-${allOrgMembers[index].user.username}-override-perms`">
             <span class="label__title">Override values</span>
             <span class="label__description">
@@ -529,6 +524,7 @@ import SaveIcon from '~/assets/images/utils/save.svg'
 import UserPlusIcon from '~/assets/images/utils/user-plus.svg'
 import UserRemoveIcon from '~/assets/images/utils/user-x.svg'
 import OrganizationIcon from '~/assets/images/utils/organization.svg'
+import CrownIcon from '~/assets/images/utils/crown.svg'
 
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 
@@ -600,9 +596,9 @@ function initMembers() {
 
   allOrgMembers.value = selectedMembersForOrg
 
-  allTeamMembers.value = props.allMembers
-    .map((x) => ({ ...x, oldRole: x.role }))
-    .filter((x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id))
+  allTeamMembers.value = props.allMembers.filter(
+    (x) => !selectedMembersForOrg.some((y) => y.user.id === x.user.id)
+  )
 }
 
 watch(
@@ -737,16 +733,16 @@ const updateTeamMember = async (index) => {
   startLoading()
 
   try {
-    const data =
-      allTeamMembers.value[index].oldRole !== 'Owner'
-        ? {
-            permissions: allTeamMembers.value[index].permissions,
-            role: allTeamMembers.value[index].role,
-            payouts_split: allTeamMembers.value[index].payouts_split,
-          }
-        : {
-            payouts_split: allTeamMembers.value[index].payouts_split,
-          }
+    const data = !allTeamMembers.value[index].is_owner
+      ? {
+          permissions: allTeamMembers.value[index].permissions,
+          role: allTeamMembers.value[index].role,
+          payouts_split: allTeamMembers.value[index].payouts_split,
+        }
+      : {
+          payouts_split: allTeamMembers.value[index].payouts_split,
+          role: allTeamMembers.value[index].role,
+        }
 
     await useBaseFetch(
       `team/${props.project.team}/members/${allTeamMembers.value[index].user.id}`,
@@ -900,6 +896,14 @@ const updateMembers = async () => {
         font-size: var(--font-size-sm);
         .name {
           font-weight: bold;
+
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+
+          svg {
+            color: var(--color-orange);
+          }
         }
         p {
           margin: 0.2rem 0;

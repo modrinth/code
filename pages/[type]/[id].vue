@@ -637,7 +637,9 @@
         >
           <Avatar :src="organization.icon_url" :alt="organization.name" size="sm" />
           <div class="member-info">
-            <p class="name">{{ organization.name }}</p>
+            <p class="name">
+              {{ organization.name }}
+            </p>
             <p class="role"><OrganizationIcon /> Organization</p>
           </div>
         </nuxt-link>
@@ -650,7 +652,9 @@
           <Avatar :src="member.avatar_url" :alt="member.username" size="sm" circle />
 
           <div class="member-info">
-            <p class="name">{{ member.name }}</p>
+            <p class="name">
+              {{ member.name }} <CrownIcon v-if="member.is_owner" v-tooltip="'Project owner'" />
+            </p>
             <p class="role">
               {{ member.role }}
             </p>
@@ -766,6 +770,7 @@ import {
   Checkbox,
   ChartIcon,
 } from 'omorphia'
+import CrownIcon from '~/assets/images/utils/crown.svg'
 import CalendarIcon from '~/assets/images/utils/calendar.svg'
 import ClearIcon from '~/assets/images/utils/clear.svg'
 import DownloadIcon from '~/assets/images/utils/download.svg'
@@ -878,7 +883,7 @@ try {
     }),
     useAsyncData(
       `project/${route.params.id}/members`,
-      () => useBaseFetch(`project/${route.params.id}/members`),
+      () => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
       {
         transform: (members) => {
           members.forEach((it, index) => {
@@ -939,8 +944,8 @@ if (project.value.project_type !== route.params.type || route.params.id !== proj
 // The rest of the members should be sorted by role, then by name
 const members = computed(() => {
   const acceptedMembers = allMembers.value.filter((x) => x.accepted)
-  const owner = acceptedMembers.find((x) => x.role === 'Owner')
-  const rest = acceptedMembers.filter((x) => x.role !== 'Owner') || []
+  const owner = acceptedMembers.find((x) => x.is_owner)
+  const rest = acceptedMembers.filter((x) => !x.is_owner) || []
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
@@ -1017,9 +1022,7 @@ const description = computed(
   () =>
     `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
       project.value.title
-    } by ${
-      members.value.find((x) => x.role === 'Owner')?.user?.username || 'a Creator'
-    } on Modrinth`
+    } by ${members.value.find((x) => x.is_owner)?.user?.username || 'a Creator'} on Modrinth`
 )
 
 if (!route.name.startsWith('type-id-settings')) {
@@ -1409,6 +1412,13 @@ const collapsedChecklist = ref(false)
 
     .name {
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      svg {
+        color: var(--color-orange);
+      }
     }
 
     p {
