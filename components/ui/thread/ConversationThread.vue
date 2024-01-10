@@ -49,9 +49,12 @@
         @update-thread="() => updateThreadLocal()"
       />
     </div>
-    <span v-if="report && report.closed">
-      This thread is closed and new messages cannot be sent to it.
-    </span>
+    <template v-if="report && report.closed">
+      <p>This thread is closed and new messages cannot be sent to it.</p>
+      <button v-if="isStaff(auth.user)" class="iconified-button" @click="reopenReport()">
+        <CloseIcon /> Reopen thread
+      </button>
+    </template>
     <template v-else-if="!report || !report.closed">
       <div class="markdown-editor-spacing">
         <MarkdownEditor
@@ -348,6 +351,25 @@ async function closeReport(reply) {
     app.$notify({
       group: 'main',
       title: 'Error closing report',
+      text: err.data ? err.data.description : err,
+      type: 'error',
+    })
+  }
+}
+
+async function reopenReport() {
+  try {
+    await useBaseFetch(`report/${props.report.id}`, {
+      method: 'PATCH',
+      body: {
+        closed: false,
+      },
+    })
+    await updateThreadLocal()
+  } catch (err) {
+    app.$notify({
+      group: 'main',
+      title: 'Error reopening report',
       text: err.data ? err.data.description : err,
       type: 'error',
     })
