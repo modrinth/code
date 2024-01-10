@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { Button, DownloadIcon, UpdatedIcon, formatNumber, formatMoney } from 'omorphia'
+import { formatNumber, formatMoney } from 'omorphia'
 import VueApexCharts from 'vue3-apexcharts'
 
 // let VueApexCharts
@@ -138,6 +138,8 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
       props
     )
   } else {
+    const returnTopN = 5
+
     const listEntries = series
       .map((value, index) => [
         value[dataPointIndex],
@@ -145,6 +147,7 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
       ])
       .filter((value) => value[0] > 0)
       .sort((a, b) => b[0] - a[0])
+      .slice(0, returnTopN) // Return only the top X entries
       .map((value) => value[1])
       .join('')
 
@@ -283,25 +286,6 @@ const flipLegend = (legend, newVal) => {
   chart.value.toggleSeries(legend.name)
 }
 
-const downloadCSV = () => {
-  const csvContent =
-    'data:text/csv;charset=utf-8,' +
-    'Date,' +
-    props.labels.join(',') +
-    '\n' +
-    props.data
-      .map((project) => project.name.replace(',', '-') + ',' + project.data.join(','))
-      .reduce((a, b) => a + '\n' + b)
-
-  const encodedUri = encodeURI(csvContent)
-  const link = document.createElement('a')
-  link.setAttribute('href', encodedUri)
-  link.setAttribute('download', `${props.name}.csv`)
-  document.body.appendChild(link) // Required for FF
-
-  link.click()
-}
-
 const resetChart = () => {
   chart.value.updateSeries([...props.data])
   chart.value.updateOptions({
@@ -318,36 +302,21 @@ const resetChart = () => {
 
 defineExpose({
   resetChart,
-  downloadCSV,
   flipLegend,
 })
 </script>
 
 <template>
-  <div class="bar-chart">
-    <div class="title-bar">
-      <slot />
-      <div v-if="!hideToolbar" class="toolbar">
-        <Button v-tooltip="'Download data as CSV'" icon-only @click="downloadCSV">
-          <DownloadIcon />
-        </Button>
-        <Button v-tooltip="'Reset chart'" icon-only @click="resetChart">
-          <UpdatedIcon />
-        </Button>
-        <slot name="toolbar" />
-      </div>
-    </div>
-    <VueApexCharts
-      ref="chart"
-      :type="type"
-      :options="{
-        ...chartOptions,
-        fill: type === 'area' ? fillOptions : {},
-      }"
-      :series="data"
-      class="chart"
-    />
-  </div>
+  <VueApexCharts
+    ref="chart"
+    :type="type"
+    :options="{
+      ...chartOptions,
+      fill: type === 'area' ? fillOptions : {},
+    }"
+    :series="data"
+    class="chart"
+  />
 </template>
 
 <style scoped lang="scss">

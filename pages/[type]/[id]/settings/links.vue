@@ -210,6 +210,12 @@ export default defineNuxtComponent({
         data.donation_urls = donationLinks
       }
 
+      if (data.donation_urls) {
+        data.donation_urls.forEach((link) => {
+          link.id = link.platform.toLowerCase()
+        })
+      }
+
       return data
     },
     hasChanges() {

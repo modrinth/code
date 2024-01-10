@@ -20,8 +20,10 @@
             :data="analytics.formattedData.value.downloads.chart.sumData"
             :labels="analytics.formattedData.value.downloads.chart.labels"
             suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
-            :class="`clickable button-base ${
-              selectedChart === 'downloads' ? 'button-base__selected' : ''
+            :class="`clickable chart-button-base button-base ${
+              selectedChart === 'downloads'
+                ? 'chart-button-base__selected button-base__selected'
+                : ''
             }`"
             :onclick="() => setSelectedChart('downloads')"
             role="button"
@@ -37,8 +39,8 @@
             :data="analytics.formattedData.value.views.chart.sumData"
             :labels="analytics.formattedData.value.views.chart.labels"
             suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
-            :class="`clickable button-base ${
-              selectedChart === 'views' ? 'button-base__selected' : ''
+            :class="`clickable chart-button-base button-base ${
+              selectedChart === 'views' ? 'chart-button-base__selected button-base__selected' : ''
             }`"
             :onclick="() => setSelectedChart('views')"
             role="button"
@@ -54,8 +56,8 @@
             :data="analytics.formattedData.value.revenue.chart.sumData"
             :labels="analytics.formattedData.value.revenue.chart.labels"
             is-money
-            :class="`clickable button-base ${
-              selectedChart === 'revenue' ? 'button-base__selected' : ''
+            :class="`clickable chart-button-base button-base ${
+              selectedChart === 'revenue' ? 'chart-button-base__selected button-base__selected' : ''
             }`"
             :onclick="() => setSelectedChart('revenue')"
             role="button"
@@ -63,63 +65,96 @@
         </client-only>
       </div>
       <div class="graphs__main-graph">
-        <Card>
-          <div class="graphs__main-graph-control">
-            <DropdownSelect
-              v-model="selectedRange"
-              :options="selectableRanges"
-              name="Time range"
-              :display-name="(o: typeof selectableRanges[number] | undefined) => o?.label || 'Custom'"
-            />
-            <!-- <DropdownSelect
-              v-model="selectedResolution"
-              :options="selectableResoloutions"
-              :display-name="(o: typeof selectableResoloutions[number] | undefined) => o?.label || 'Custom'"
-            /> -->
+        <div class="universal-card">
+          <div class="chart-controls">
+            <h2>
+              <span class="label__title">
+                {{ formatCategoryHeader(selectedChart) }}
+              </span>
+            </h2>
+            <div class="chart-controls__buttons">
+              <Button v-tooltip="'Download this data as CSV'" icon-only @click="onDownloadSetAsCSV">
+                <DownloadIcon />
+              </Button>
+              <Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
+                <UpdatedIcon />
+              </Button>
+              <DropdownSelect
+                v-model="selectedRange"
+                :options="selectableRanges"
+                name="Time range"
+                :display-name="(o: typeof selectableRanges[number] | undefined) => o?.label || 'Custom'"
+              />
+            </div>
           </div>
-          <client-only>
-            <Chart
-              v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
-              ref="downloadsChart"
-              type="line"
-              name="Download data"
-              legend-position="right"
-              :data="analytics.formattedData.value.downloads.chart.data"
-              :labels="analytics.formattedData.value.downloads.chart.labels"
-              suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
-              :colors="analytics.formattedData.value.downloads.chart.colors"
-            >
-              <h2>Downloads</h2>
-            </Chart>
-            <Chart
-              v-if="analytics.formattedData.value.views && selectedChart === 'views'"
-              ref="viewsChart"
-              type="line"
-              name="View data"
-              legend-position="right"
-              :data="analytics.formattedData.value.views.chart.data"
-              :labels="analytics.formattedData.value.views.chart.labels"
-              suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
-              :colors="analytics.formattedData.value.views.chart.colors"
-            >
-              <h2 class="">Views</h2>
-            </Chart>
-            <Chart
-              v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'"
-              ref="revenueChart"
-              type="line"
-              name="Revenue data"
-              legend-position="right"
-              :data="analytics.formattedData.value.revenue.chart.data"
-              :labels="analytics.formattedData.value.revenue.chart.labels"
-              is-money
-              suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='2' x2='12' y2='22'></line><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'></path></svg>"
-              :colors="analytics.formattedData.value.revenue.chart.colors"
-            >
-              <h2 class="">Revenue</h2>
-            </Chart>
-          </client-only>
-        </Card>
+          <div class="chart-area">
+            <div class="chart">
+              <client-only>
+                <Chart
+                  v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
+                  ref="downloadsChart"
+                  type="line"
+                  name="Download data"
+                  :hide-legend="true"
+                  :data="analytics.formattedData.value.downloads.chart.data"
+                  :labels="analytics.formattedData.value.downloads.chart.labels"
+                  suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
+                  :colors="analytics.formattedData.value.downloads.chart.colors"
+                />
+                <Chart
+                  v-if="analytics.formattedData.value.views && selectedChart === 'views'"
+                  ref="viewsChart"
+                  type="line"
+                  name="View data"
+                  :hide-legend="true"
+                  :data="analytics.formattedData.value.views.chart.data"
+                  :labels="analytics.formattedData.value.views.chart.labels"
+                  suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
+                  :colors="analytics.formattedData.value.views.chart.colors"
+                />
+                <Chart
+                  v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'"
+                  ref="revenueChart"
+                  type="line"
+                  name="Revenue data"
+                  :hide-legend="true"
+                  :data="analytics.formattedData.value.revenue.chart.data"
+                  :labels="analytics.formattedData.value.revenue.chart.labels"
+                  is-money
+                  suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='2' x2='12' y2='22'></line><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'></path></svg>"
+                  :colors="analytics.formattedData.value.revenue.chart.colors"
+                />
+              </client-only>
+            </div>
+            <div class="legend">
+              <div class="legend__items">
+                <template v-for="project in props.projects" :key="project.id">
+                  <button
+                    v-if="analytics.validProjectIds.value.includes(project.id)"
+                    v-tooltip="project.title"
+                    :class="`legend__item button-base btn-transparent ${
+                      !projectIsOnDisplay(project.id) ? 'btn-dimmed' : ''
+                    }`"
+                    @click="
+                      () =>
+                        projectIsOnDisplay(project.id)
+                          ? removeProjectFromDisplay(project.id)
+                          : addProjectToDisplay(project.id)
+                    "
+                  >
+                    <div
+                      :style="{
+                        '--color-brand': intToRgba(project.color, project.id, theme || 'dark'),
+                      }"
+                      class="legend__item__color"
+                    ></div>
+                    <div class="legend__item__text">{{ project.title }}</div>
+                  </button>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="country-data">
           <Card
             v-if="
@@ -237,12 +272,25 @@
 </template>
 
 <script setup lang="ts">
-import { Card, formatMoney, formatNumber, DropdownSelect } from 'omorphia'
+import {
+  Button,
+  UpdatedIcon,
+  DownloadIcon,
+  Card,
+  formatMoney,
+  formatNumber,
+  DropdownSelect,
+  formatCategoryHeader,
+} from 'omorphia'
 import dayjs from 'dayjs'
 import { defineProps, ref, computed } from 'vue'
+
+import { analyticsSetToCSVString, intToRgba } from '~/utils/analytics.js'
+
 import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from '#components'
 
 const router = useRouter()
+const theme = useTheme()
 
 const props = withDefaults(
   defineProps<{
@@ -268,7 +316,12 @@ const selectableRanges = Object.entries(props.ranges).map(([duration, extra]) =>
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed(() => {
-  return (router.currentRoute.value.query?.chart as string | undefined) || 'downloads'
+  const id = (router.currentRoute.value.query?.chart as string | undefined) || 'downloads'
+  // if the id is anything but the 3 charts we have or undefined, throw an error
+  if (!['downloads', 'views', 'revenue'].includes(id)) {
+    throw new Error(`Unknown chart ${id}`)
+  }
+  return id
 })
 const setSelectedChart = (chart: string) => {
   router.push({
@@ -287,7 +340,24 @@ const tinyDownloadChart = ref()
 const tinyViewChart = ref()
 const tinyRevenueChart = ref()
 
-const analytics = useFetchAllAnalytics(() => {
+const selectedDisplayProjects = ref(props.projects || [])
+
+const removeProjectFromDisplay = (id: string) => {
+  selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id)
+}
+
+const addProjectToDisplay = (id: string) => {
+  selectedDisplayProjects.value = [
+    ...selectedDisplayProjects.value,
+    props.projects?.find((p) => p.id === id),
+  ].filter(Boolean)
+}
+
+const projectIsOnDisplay = (id: string) => {
+  return selectedDisplayProjects.value.some((p) => p.id === id)
+}
+
+const resetCharts = () => {
   downloadsChart.value?.resetChart()
   viewsChart.value?.resetChart()
   revenueChart.value?.resetChart()
@@ -295,7 +365,9 @@ const analytics = useFetchAllAnalytics(() => {
   tinyDownloadChart.value?.resetChart()
   tinyViewChart.value?.resetChart()
   tinyRevenueChart.value?.resetChart()
-}, props.projects)
+}
+
+const analytics = useFetchAllAnalytics(resetCharts, selectedDisplayProjects)
 
 const { startDate, endDate, timeRange, timeResolution } = analytics
 
@@ -318,6 +390,41 @@ const selectedRange = computed({
     }
   },
 })
+
+const downloadSelectedSetAsCSV = () => {
+  const selectedChartName = selectedChart.value
+
+  let downloadsDataSet
+
+  switch (selectedChartName) {
+    case 'downloads':
+      downloadsDataSet = analytics.formattedData.value.downloads
+      break
+    case 'views':
+      downloadsDataSet = analytics.formattedData.value.views
+      break
+    case 'revenue':
+      downloadsDataSet = analytics.formattedData.value.revenue
+      break
+    default:
+      throw new Error(`Unknown chart ${selectedChartName}`)
+  }
+
+  const csv = analyticsSetToCSVString(downloadsDataSet)
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+
+  const link = document.createElement('a')
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', `${selectedChartName}-data.csv`)
+  link.style.visibility = 'hidden'
+  document.body.appendChild(link)
+
+  link.click()
+}
+
+const onDownloadSetAsCSV = useClientTry(async () => await downloadSelectedSetAsCSV())
 </script>
 
 <script lang="ts">
@@ -344,11 +451,98 @@ const defaultRanges: Record<number, [string, number] | string> = {
 </script>
 
 <style scoped lang="scss">
-.button-base {
+.chart-controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--gap-md);
+
+  .chart-controls__buttons {
+    display: flex;
+    flex-direction: row;
+    gap: var(--gap-xs);
+
+    * {
+      width: auto;
+      min-height: auto;
+    }
+  }
+}
+
+.chart-area {
+  display: flex;
+  flex-direction: row;
+  gap: var(--gap-md);
+
+  height: 100%;
+
+  .chart {
+    flex-grow: 1;
+    flex-shrink: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+  }
+
+  .legend {
+    margin-top: 24px;
+    overflow: hidden;
+
+    max-width: 26ch;
+    width: fit-content;
+
+    .legend__items {
+      display: flex;
+      flex-direction: column;
+      gap: var(--gap-xs);
+
+      .legend__item {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--gap-xs);
+        font-size: var(--font-size-sm);
+        width: 100%;
+
+        .legend__item__text {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .legend__item__color {
+          height: var(--font-size-xs);
+          width: var(--font-size-xs);
+          border-radius: var(--radius-sm);
+          background-color: var(--color-brand);
+
+          flex-grow: 0;
+          flex-shrink: 0;
+        }
+      }
+    }
+  }
+}
+
+.btn-transparent {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  color: var(--text-color);
+  font-weight: var(--font-weight-regular);
+}
+
+.btn-dimmed {
+  opacity: 0.5;
+}
+
+.chart-button-base {
   overflow: hidden;
 }
 
-.button-base__selected {
+.chart-button-base__selected {
   color: var(--color-contrast);
   background-color: var(--color-brand-highlight);
   box-shadow: inset 0 0 0 transparent, 0 0 0 2px var(--color-brand);
@@ -372,47 +566,6 @@ const defaultRanges: Record<number, [string, number] | string> = {
     gap: 0.75rem;
     display: flex;
     margin-right: 0.1rem;
-  }
-
-  .graphs__main-graph {
-    // Take up the rest of the width
-    flex-grow: 1;
-
-    display: grid;
-    grid-template-columns: 1fr;
-
-    .graphs__main-graph-control {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-end;
-      justify-content: end;
-      margin-bottom: var(--gap-md);
-      gap: var(--gap-md);
-
-      .animated-dropdown {
-        width: auto;
-      }
-    }
-  }
-}
-
-// Mobile
-@media (max-width: 768px) {
-  .graphs {
-    flex-direction: column;
-    gap: var(--gap-md);
-
-    .graphs__vertical-bar {
-      display: block;
-
-      width: 100%;
-      max-width: none;
-    }
-
-    .graphs__main-graph {
-      display: block;
-      overflow: hidden;
-    }
   }
 }
 
@@ -493,6 +646,38 @@ const defaultRanges: Record<number, [string, number] | string> = {
 }
 
 @media (max-width: 768px) {
+  .chart-area {
+    flex-direction: column;
+    gap: var(--gap-md);
+  }
+
+  .chart-controls {
+    flex-direction: column;
+    gap: var(--gap-md);
+  }
+
+  .chart {
+    flex-direction: column;
+    gap: var(--gap-md);
+  }
+
+  .legend {
+    margin-top: 0px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .graphs {
+    margin-left: 0px;
+    margin-top: 0px;
+
+    .graphs__vertical-bar {
+      flex-direction: column;
+      gap: 0;
+      margin-right: 0px;
+    }
+  }
+
   .country-data {
     display: block;
   }
