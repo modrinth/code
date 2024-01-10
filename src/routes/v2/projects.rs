@@ -152,6 +152,7 @@ fn parse_facet(facet: &String) -> Option<(String, String, String)> {
                 val.push_str(&iterator.collect::<String>());
                 return Some((key, operator, val));
             }
+            ' ' => continue,
             _ => key.push(char),
         }
     }
