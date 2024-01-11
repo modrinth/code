@@ -48,8 +48,8 @@ modules:
       - pnpm config set store-dir .pnpm-store
       - cd theseus/theseus_gui && pnpm install
       - cd theseus/theseus_gui && pnpm build
-      - cd theseus && cargo --offline fetch --manifest-path Cargo.toml
-      - cd theseus && cargo --offline build --release
+      - cd theseus && cargo fetch --locked --manifest-path Cargo.toml
+      - cd theseus && cargo build --locked --release
       
       - install -Dm755 theseus/target/release/theseus_gui /app/bin/modrinth-app
 
@@ -60,13 +60,6 @@ modules:
       - install -Dm644 com.modrinth.ModrinthApp.desktop /app/share/applications/com.modrinth.ModrinthApp.desktop
 
     sources:
-      - cargo-theseus-sources.json
-
-      - type: shell
-        commands:
-          - mkdir .cargo
-          - cp cargo/config .cargo/
-
       - type: archive
         url: https://registry.npmjs.org/@pnpm/linux-x64/-/linux-x64-7.33.5.tgz
         sha512: d594a9e505b33a5a7b8684645ca762a2c24c6b3e1e477afe8f412d0dd5c8b1b9b9e636e3a19ae0ceeed603d8507f84b081ed12b283ac543bc4bf26d591cab4c5
