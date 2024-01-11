@@ -520,8 +520,6 @@ pub async fn process_payout(
     redis: &RedisPool,
     client: &clickhouse::Client,
 ) -> Result<(), ApiError> {
-    return Ok(());
-
     let start: DateTime<Utc> = DateTime::from_naive_utc_and_offset(
         (Utc::now() - Duration::days(1))
             .date_naive()
@@ -621,40 +619,69 @@ pub async fn process_payout(
 
     let mut projects_map: HashMap<i64, Project> = HashMap::new();
 
-    use futures::TryStreamExt;
+    let project_ids = multipliers
+        .values
+        .keys()
+        .map(|x| *x as i64)
+        .collect::<Vec<i64>>();
 
-    sqlx::query!(
+    let project_org_members = sqlx::query!(
+        "
+        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split
+        FROM mods m
+        INNER JOIN organizations o ON m.organization_id = o.id
+        INNER JOIN team_members tm on o.team_id = tm.team_id AND tm.accepted = TRUE
+        WHERE m.id = ANY($1) AND m.monetization_status = $2 AND m.organization_id IS NOT NULL
+        ",
+        &project_ids,
+        MonetizationStatus::Monetized.as_str(),
+    )
+    .fetch_all(&mut *transaction)
+    .await?;
+
+    let project_team_members = sqlx::query!(
         "
         SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split
         FROM mods m
         INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE
         WHERE m.id = ANY($1) AND m.monetization_status = $2
         ",
-        &multipliers
-            .values
-            .keys()
-            .map(|x| *x as i64)
-            .collect::<Vec<i64>>(),
+        &project_ids,
         MonetizationStatus::Monetized.as_str(),
     )
-    .fetch_many(&mut *transaction)
-    .try_for_each(|e| {
-        if let Some(row) = e.right() {
-            if let Some(project) = projects_map.get_mut(&row.id) {
-                project.team_members.push((row.user_id, row.payouts_split));
-            } else {
-                projects_map.insert(
-                    row.id,
-                    Project {
-                        team_members: vec![(row.user_id, row.payouts_split)],
-                    },
-                );
+    .fetch_all(&mut *transaction)
+    .await?;
+
+    for project_id in project_ids {
+        let team_members: HashMap<i64, Decimal> = project_team_members
+            .iter()
+            .filter(|r| r.id == project_id)
+            .map(|r| (r.user_id, r.payouts_split))
+            .collect();
+        let org_team_members: HashMap<i64, Decimal> = project_org_members
+            .iter()
+            .filter(|r| r.id == project_id)
+            .map(|r| (r.user_id, r.payouts_split))
+            .collect();
+
+        let mut all_team_members = vec![];
+
+        for (user_id, payouts_split) in org_team_members {
+            if !team_members.contains_key(&user_id) {
+                all_team_members.push((user_id, payouts_split));
             }
         }
+        for (user_id, payouts_split) in team_members {
+            all_team_members.push((user_id, payouts_split));
+        }
 
-        futures::future::ready(Ok(()))
-    })
-    .await?;
+        projects_map.insert(
+            project_id,
+            Project {
+                team_members: all_team_members,
+            },
+        );
+    }
 
     let amount = Decimal::from(parse_var::<u64>("PAYOUTS_BUDGET").unwrap_or(0));
 

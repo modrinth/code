@@ -94,12 +94,17 @@ pub async fn project_search(
                                 .into_iter()
                                 .map(|facet| {
                                     if let Some((key, operator, val)) = parse_facet(&facet) {
-                                        format!("{}{}{}", match key.as_str() {
-                                            "versions" => "game_versions",
-                                            "project_type" => "project_types",
-                                            "title" => "name",
-                                            x => x,
-                                        }, operator, val)
+                                        format!(
+                                            "{}{}{}",
+                                            match key.as_str() {
+                                                "versions" => "game_versions",
+                                                "project_type" => "project_types",
+                                                "title" => "name",
+                                                x => x,
+                                            },
+                                            operator,
+                                            val
+                                        )
                                     } else {
                                         facet.to_string()
                                     }
@@ -127,7 +132,7 @@ pub async fn project_search(
 }
 
 /// Parses a facet into a key, operator, and value
-fn parse_facet(facet: &String) -> Option<(String, String, String)> {
+fn parse_facet(facet: &str) -> Option<(String, String, String)> {
     let mut key = String::new();
     let mut operator = String::new();
     let mut val = String::new();

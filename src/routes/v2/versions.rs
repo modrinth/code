@@ -247,7 +247,7 @@ pub async fn version_edit(
     // Get the older version to get info from
     let old_version = v3::versions::version_get_helper(
         req.clone(),
-        info.clone().0,
+        (*info).0,
         pool.clone(),
         redis.clone(),
         session_queue.clone(),
