@@ -607,7 +607,6 @@ impl Project {
             )
             .await?;
 
-            let loader_field_ids = DashSet::new();
             let loader_field_enum_value_ids = DashSet::new();
             let version_fields: DashMap<ProjectId, Vec<QueryVersionField>> = sqlx::query!(
                 "
@@ -630,7 +629,6 @@ impl Project {
                         string_value: m.string_value,
                     };
 
-                    loader_field_ids.insert(LoaderFieldId(m.field_id));
                     if let Some(enum_value) = m.enum_value {
                         loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
                     }
@@ -639,27 +637,6 @@ impl Project {
                     async move { Ok(acc) }
                 },
             )
-            .await?;
-
-            let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
-                "
-                SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
-                FROM loader_fields lf
-                WHERE id = ANY($1)  
-                ",
-                &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-            )
-            .fetch(&mut *exec)
-            .map_ok(|m| QueryLoaderField {
-                id: LoaderFieldId(m.id),
-                field: m.field,
-                field_type: m.field_type,
-                enum_type: m.enum_type.map(LoaderFieldEnumId),
-                min_val: m.min_val,
-                max_val: m.max_val,
-                optional: m.optional,
-            })
-            .try_collect()
             .await?;
 
             let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
@@ -735,13 +712,22 @@ impl Project {
                 }
             ).await?;
 
-            type StringTriple = (Vec<String>, Vec<String>, Vec<String>);
-            let loaders_ptypes_games: DashMap<ProjectId, StringTriple> = sqlx::query!(
+            #[derive(Default)]
+            struct VersionLoaderData {
+                loaders: Vec<String>,
+                project_types: Vec<String>,
+                games: Vec<String>,
+                loader_loader_field_ids: Vec<LoaderFieldId>,
+            }
+
+            let loader_field_ids = DashSet::new();
+            let loaders_ptypes_games: DashMap<ProjectId, VersionLoaderData> = sqlx::query!(
                 "
                 SELECT DISTINCT mod_id,
                     ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
                     ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                    ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
+                    ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
+                    ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields
                 FROM versions v
                 INNER JOIN loaders_versions lv ON v.id = lv.version_id
                 INNER JOIN loaders l ON lv.loader_id = l.id
@@ -749,6 +735,7 @@ impl Project {
                 INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
                 INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
                 INNER JOIN games g ON lptg.game_id = g.id
+                LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id
                 WHERE v.id = ANY($1)
                 GROUP BY mod_id
                 ",
@@ -756,14 +743,46 @@ impl Project {
             ).fetch(&mut *exec)
             .map_ok(|m| {
                 let project_id = ProjectId(m.mod_id);
-                let loaders = m.loaders.unwrap_or_default();
-                    let project_types = m.project_types.unwrap_or_default();
-                    let games = m.games.unwrap_or_default();
 
-                    (project_id, (loaders, project_types, games))
+                // Add loader fields to the set we need to fetch
+                let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
+                for loader_field_id in loader_loader_field_ids.iter() {
+                    loader_field_ids.insert(*loader_field_id);
+                }
+
+                // Add loader + loader associated data to the map
+                let version_loader_data = VersionLoaderData {
+                    loaders: m.loaders.unwrap_or_default(),
+                    project_types: m.project_types.unwrap_or_default(),
+                    games: m.games.unwrap_or_default(),
+                    loader_loader_field_ids,
+                };
+
+                    (project_id, version_loader_data)
 
                 }
             ).try_collect().await?;
+
+            let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
+                "
+                SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
+                FROM loader_fields lf
+                WHERE id = ANY($1)  
+                ",
+                &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+            )
+            .fetch(&mut *exec)
+            .map_ok(|m| QueryLoaderField {
+                id: LoaderFieldId(m.id),
+                field: m.field,
+                field_type: m.field_type,
+                enum_type: m.enum_type.map(LoaderFieldEnumId),
+                min_val: m.min_val,
+                max_val: m.max_val,
+                optional: m.optional,
+            })
+            .try_collect()
+            .await?;
 
             let db_projects: Vec<QueryProject> = sqlx::query!(
                 "
@@ -791,11 +810,21 @@ impl Project {
                     Ok(e.right().map(|m| {
                         let id = m.id;
                         let project_id = ProjectId(id);
-                        let (loaders, project_types, games) = loaders_ptypes_games.remove(&project_id).map(|x| x.1).unwrap_or_default();
+                        let VersionLoaderData {
+                            loaders,
+                            project_types,
+                            games,
+                            loader_loader_field_ids,
+                         } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&project_id).map(|x| x.1).unwrap_or_default();
+
+                        let loader_fields = loader_fields.iter()
+                        .filter(|x| loader_loader_field_ids.contains(&x.id))
+                        .collect::<Vec<_>>();
+
                     QueryProject {
                         inner: Project {
                             id: ProjectId(id),

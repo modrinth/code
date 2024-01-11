@@ -146,7 +146,7 @@ pub async fn project_create(
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: ProjectCreateData| async move {
+        |legacy_create: ProjectCreateData, _| async move {
             // Side types will be applied to each version
             let client_side = legacy_create.client_side;
             let server_side = legacy_create.server_side;

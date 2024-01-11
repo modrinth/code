@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use actix_http::StatusCode;
 use actix_web::test;
 use common::api_v3::ApiV3;
@@ -1218,7 +1216,7 @@ async fn align_search_projects() {
             )
             .await;
 
-        for mut project in projects.hits {
+        for project in projects.hits {
             let project_model = api
                 .get_project(&project.id.to_string(), USER_USER_PAT)
                 .await;
@@ -1228,27 +1226,6 @@ async fn align_search_projects() {
             // Body/description is huge- don't store it in search, so it's StatusCode::OK if they differ here
             // (Search should return "")
             project_model.description = "".into();
-
-            // Aggregate project loader fields will not match exactly,
-            // because the search will only return the matching version, whereas the project returns the aggregate.
-            // So, we remove them from both.
-            let project_model_mrpack_loaders: Vec<_> = project_model
-                .fields
-                .remove("mrpack_loaders")
-                .unwrap_or_default()
-                .into_iter()
-                .filter_map(|v| v.as_str().map(|v| v.to_string()))
-                .collect();
-            project_model.fields = HashMap::new();
-            project.fields = HashMap::new();
-
-            // For a similar reason we also remove the mrpack loaders from the additional categories of the search model
-            // (Becasue they are not returned by the search)
-            // TODO: get models to match *exactly* without an additional project fetch,
-            // including these fields removed here
-            project
-                .additional_categories
-                .retain(|x| !project_model_mrpack_loaders.contains(x));
 
             let project_model = serde_json::to_value(project_model).unwrap();
             let searched_project_serialized = serde_json::to_value(project).unwrap();

@@ -133,7 +133,7 @@ impl ApiProject for ApiV3 {
         let ids_or_slugs = serde_json::to_string(ids_or_slugs).unwrap();
         let req = test::TestRequest::get()
             .uri(&format!(
-                "/v2/projects?ids={encoded}",
+                "/v3/projects?ids={encoded}",
                 encoded = urlencoding::encode(&ids_or_slugs)
             ))
             .append_pat(pat)
@@ -147,7 +147,7 @@ impl ApiProject for ApiV3 {
         pat: Option<&str>,
     ) -> ServiceResponse {
         let req = TestRequest::get()
-            .uri(&format!("/v2/project/{id_or_slug}/dependencies"))
+            .uri(&format!("/v3/project/{id_or_slug}/dependencies"))
             .append_pat(pat)
             .to_request();
         self.call(req).await

@@ -170,8 +170,9 @@ async fn search_projects() {
         ));
 
         // Test project 7 (testing the search bug)
-        // This project has an initial private forge version that is 1.20.3, and a fabric 1.20.5 version.
-        // This means that a search for fabric + 1.20.3 or forge + 1.20.5 should not return this project.
+        // This project has an initial private forge version that is 1.20.2, and a fabric 1.20.1 version.
+        // This means that a search for fabric + 1.20.1 or forge + 1.20.1 should not return this project,
+        // but a search for fabric + 1.20.1 should, and it should include both versions in the data.
         let id = 7;
         let modify_json = serde_json::from_value(json!([
             { "op": "add", "path": "/categories", "value": DUMMY_CATEGORIES[5..6] },
@@ -231,15 +232,6 @@ async fn search_projects() {
         // 1. vec of search facets
         // 2. expected project ids to be returned by this search
         let pairs = vec![
-            // For testing: remove me
-            (
-                json!([
-                    ["client_side:required"],
-                    ["versions:1.20.5"],
-                    [&format!("categories:{}", DUMMY_CATEGORIES[5])]
-                ]),
-                vec![],
-            ),
             (
                 json!([["categories:fabric"]]),
                 vec![0, 1, 2, 3, 4, 5, 6, 7, 8],
@@ -276,6 +268,14 @@ async fn search_projects() {
                     ["versions:1.20.2"]
                 ]),
                 vec![],
+            ),
+            (
+                json!([
+                    // But it does have a 1.20.2 forge version, so this should return it.
+                    ["categories:forge"],
+                    ["versions:1.20.2"]
+                ]),
+                vec![7],
             ),
             // Project type change
             // Modpack should still be able to search based on former loader, even though technically the loader is 'mrpack'
@@ -382,15 +382,25 @@ async fn search_projects() {
             assert_eq!(hit.server_side, "optional".to_string());
         }
 
+        // Ensure game_versions return correctly, but also correctly aggregated
+        // over all versions of a project
         let game_versions = api
             .search_deserialized(
                 Some(&format!("\"&{test_name}\"")),
-                Some(json!([["versions:1.20.5"]])),
+                Some(json!([["categories:forge"], ["versions:1.20.2"]])),
                 USER_USER_PAT,
             )
             .await;
+        assert_eq!(game_versions.hits.len(), 1);
         for hit in game_versions.hits {
-            assert_eq!(hit.versions, vec!["1.20.5".to_string()]);
+            assert_eq!(
+                hit.versions,
+                vec!["1.20.1".to_string(), "1.20.2".to_string()]
+            );
+            assert!(hit.categories.contains(&"forge".to_string()));
+            assert!(hit.categories.contains(&"fabric".to_string()));
+
+            // Also, ensure author is correctly capitalized
             assert_eq!(hit.author, "User".to_string());
         }
     })

@@ -9,8 +9,10 @@ use crate::models::projects::{
 use crate::models::v2::projects::LegacyVersion;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
+use crate::routes::v3::version_creation;
 use crate::routes::{v2_reroute, v3};
 use actix_multipart::Multipart;
+use actix_web::http::header::ContentDisposition;
 use actix_web::web::Data;
 use actix_web::{post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -89,7 +91,7 @@ pub async fn version_create(
     let payload = v2_reroute::alter_actix_multipart(
         payload,
         req.headers().clone(),
-        |legacy_create: InitialVersionData| {
+        |legacy_create: InitialVersionData, content_dispositions: Vec<ContentDisposition>| {
             let client = client.clone();
             let redis = redis.clone();
             async move {
@@ -172,6 +174,19 @@ pub async fn version_create(
                             // No other type matters
                             _ => {}
                         }
+                        break;
+                    }
+                }
+
+                // Similarly, check actual content disposition for mrpacks, in case file_parts is wrong
+                for content_disposition in content_dispositions {
+                    // Uses version_create functions to get the file name and extension
+                    let (_, file_extension) = version_creation::get_name_ext(&content_disposition)?;
+                    crate::util::ext::project_file_type(file_extension)
+                        .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
+
+                    if file_extension == "mrpack" {
+                        project_type = Some("modpack");
                         break;
                     }
                 }

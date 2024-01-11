@@ -272,11 +272,16 @@ impl Project {
 
         // Loaders
         let mut loaders = m.loaders;
-        let mrpack_loaders_strings = m.loader_fields.get("mrpack_loaders").cloned().map(|v| {
-            v.into_iter()
-                .filter_map(|v| v.as_str().map(String::from))
-                .collect_vec()
-        });
+        let mrpack_loaders_strings =
+            m.project_loader_fields
+                .get("mrpack_loaders")
+                .cloned()
+                .map(|v| {
+                    v.into_iter()
+                        .filter_map(|v| v.as_str().map(String::from))
+                        .collect_vec()
+                });
+
         // If the project has a mrpack loader,  keep only 'loaders' that are not in the mrpack_loaders
         if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
             loaders.retain(|l| !mrpack_loaders.contains(l));
@@ -375,7 +380,7 @@ impl Project {
             thread_id,
             monetization_status,
             fields: m
-                .loader_fields
+                .project_loader_fields
                 .into_iter()
                 .map(|(k, v)| (k, v.into_iter().collect()))
                 .collect(),

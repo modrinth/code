@@ -400,6 +400,7 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "links",
     "gallery_items",
     "loaders", // search uses loaders as categories- this is purely for the Project model.
+    "project_loader_fields",
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] = &["name", "summary", "author", "slug"];

@@ -510,7 +510,6 @@ impl Version {
         }
 
         if !version_ids_parsed.is_empty() {
-            let loader_field_ids = DashSet::new();
             let loader_field_enum_value_ids = DashSet::new();
             let version_fields: DashMap<VersionId, Vec<QueryVersionField>> = sqlx::query!(
                 "
@@ -532,7 +531,6 @@ impl Version {
                         string_value: m.string_value,
                     };
 
-                    loader_field_ids.insert(LoaderFieldId(m.field_id));
                     if let Some(enum_value) = m.enum_value {
                         loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
                     }
@@ -543,6 +541,57 @@ impl Version {
             )
             .await?;
 
+            #[derive(Default)]
+            struct VersionLoaderData {
+                loaders: Vec<String>,
+                project_types: Vec<String>,
+                games: Vec<String>,
+                loader_loader_field_ids: Vec<LoaderFieldId>,
+            }
+
+            let loader_field_ids = DashSet::new();
+            let loaders_ptypes_games: DashMap<VersionId, VersionLoaderData> = sqlx::query!(
+                "
+                SELECT DISTINCT version_id,
+                    ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+                    ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
+                    ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
+                    ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields
+                FROM versions v
+                INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                INNER JOIN loaders l ON lv.loader_id = l.id
+                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
+                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
+                INNER JOIN games g ON lptg.game_id = g.id
+                LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id
+                WHERE v.id = ANY($1)
+                GROUP BY version_id
+                ",
+                &version_ids_parsed
+            ).fetch(&mut *exec)
+            .map_ok(|m| {
+                let version_id = VersionId(m.version_id);
+
+                // Add loader fields to the set we need to fetch
+                let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
+                for loader_field_id in loader_loader_field_ids.iter() {
+                    loader_field_ids.insert(*loader_field_id);
+                }
+
+                // Add loader + loader associated data to the map
+                let version_loader_data = VersionLoaderData {
+                    loaders: m.loaders.unwrap_or_default(),
+                    project_types: m.project_types.unwrap_or_default(),
+                    games: m.games.unwrap_or_default(),
+                    loader_loader_field_ids,
+                };
+                (version_id,version_loader_data)
+
+                }
+            ).try_collect().await?;
+
+            // Fetch all loader fields from any version
             let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
                 "
                 SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
@@ -587,36 +636,6 @@ impl Version {
             })
             .try_collect()
             .await?;
-
-            type StringTriple = (Vec<String>, Vec<String>, Vec<String>);
-            let loaders_ptypes_games: DashMap<VersionId, StringTriple> = sqlx::query!(
-                "
-                SELECT DISTINCT version_id,
-                    ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-                    ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                    ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games
-                FROM versions v
-                INNER JOIN loaders_versions lv ON v.id = lv.version_id
-                INNER JOIN loaders l ON lv.loader_id = l.id
-                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
-                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-                INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
-                INNER JOIN games g ON lptg.game_id = g.id
-                WHERE v.id = ANY($1)
-                GROUP BY version_id
-                ",
-                &version_ids_parsed
-            ).fetch(&mut *exec)
-            .map_ok(|m| {
-                let version_id = VersionId(m.version_id);
-                let loaders = m.loaders.unwrap_or_default();
-                    let project_types = m.project_types.unwrap_or_default();
-                    let games = m.games.unwrap_or_default();
-
-                    (version_id, (loaders, project_types, games))
-
-                }
-            ).try_collect().await?;
 
             #[derive(Deserialize)]
             struct Hash {
@@ -729,11 +748,20 @@ impl Version {
                     Ok(e.right().map(|v|
                         {
                         let version_id = VersionId(v.id);
-                        let (loaders, project_types, games) = loaders_ptypes_games.remove(&version_id).map(|x|x.1).unwrap_or_default();
+                        let VersionLoaderData {
+                            loaders,
+                            project_types,
+                            games,
+                            loader_loader_field_ids,
+                         } = loaders_ptypes_games.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let files = files.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let hashes = hashes.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&version_id).map(|x|x.1).unwrap_or_default();
                         let dependencies = dependencies.remove(&version_id).map(|x|x.1).unwrap_or_default();
+
+                        let loader_fields = loader_fields.iter()
+                        .filter(|x| loader_loader_field_ids.contains(&x.id))
+                        .collect::<Vec<_>>();
 
                         QueryVersion {
                             inner: Version {

@@ -836,13 +836,19 @@ impl VersionField {
     }
 
     pub fn from_query_json(
+        // A list of all version fields to extract data from
         query_version_field_combined: Vec<QueryVersionField>,
-        query_loader_fields: &[QueryLoaderField],
+        // A list of all loader fields to reference when extracting data
+        // Note: any loader field in here that is not in query_version_field_combined will be still considered
+        // (For example, game_versions in query_loader_fields but not in query_version_field_combined would produce game_versions: [])
+        query_loader_fields: &[&QueryLoaderField],
+        // enum values to reference when parsing enum values
         query_loader_field_enum_values: &[QueryLoaderFieldEnumValue],
-        allow_many: bool, // If true, will allow multiple values for a single singleton field, returning them as separate VersionFields
-                          // allow_many = true, multiple Bools => two VersionFields of Bool
-                          // allow_many = false, multiple Bools => error
-                          // multiple Arraybools => 1 VersionField of ArrayBool
+        // If true, will allow multiple values for a single singleton field, returning them as separate VersionFields
+        // allow_many = true, multiple Bools => two VersionFields of Bool
+        // allow_many = false, multiple Bools => error
+        // multiple Arraybools => 1 VersionField of ArrayBool
+        allow_many: bool,
     ) -> Vec<VersionField> {
         query_loader_fields
             .iter()

@@ -128,6 +128,8 @@ pub async fn index_local(
             .map(|vf| (vf.field_name.clone(), vf.value.serialize_internal()))
             .collect();
         let mut loader_fields = models::projects::from_duplicate_version_fields(version_fields);
+        let project_loader_fields =
+            models::projects::from_duplicate_version_fields(m.aggregate_version_fields.clone());
         let license = match m.inner.license.split(' ').next() {
             Some(license) => license.to_string(),
             None => m.inner.license.clone(),
@@ -240,6 +242,7 @@ pub async fn index_local(
             links: m.urls.clone(),
             gallery_items: m.gallery_items.clone(),
             loaders,
+            project_loader_fields,
         };
 
         uploads.push(usp);

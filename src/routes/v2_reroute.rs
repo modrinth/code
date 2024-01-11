@@ -5,7 +5,7 @@ use super::ApiError;
 use crate::models::v2::projects::LegacySideType;
 use crate::util::actix::{generate_multipart, MultipartSegment, MultipartSegmentData};
 use actix_multipart::Multipart;
-use actix_web::http::header::{HeaderMap, TryIntoHeaderPair};
+use actix_web::http::header::{ContentDisposition, HeaderMap, TryIntoHeaderPair};
 use actix_web::HttpResponse;
 use futures::{stream, Future, StreamExt};
 use serde_json::{json, Value};
@@ -43,10 +43,15 @@ pub fn flatten_404_error(res: ApiError) -> Result<HttpResponse, ApiError> {
     }
 }
 
+// Allows internal modification of an actix multipart file
+// Expected:
+// 1. A json segment
+// 2. Any number of other binary segments
+// 'closure' is called with the json value, and the content disposition of the other segments
 pub async fn alter_actix_multipart<T, U, Fut>(
     mut multipart: Multipart,
     mut headers: HeaderMap,
-    mut closure: impl FnMut(T) -> Fut,
+    mut closure: impl FnMut(T, Vec<ContentDisposition>) -> Fut,
 ) -> Result<Multipart, CreateError>
 where
     T: serde::de::DeserializeOwned,
@@ -54,6 +59,10 @@ where
     Fut: Future<Output = Result<U, CreateError>>,
 {
     let mut segments: Vec<MultipartSegment> = Vec::new();
+
+    let mut json = None;
+    let mut json_segment = None;
+    let mut content_dispositions = Vec::new();
 
     if let Some(field) = multipart.next().await {
         let mut field = field?;
@@ -71,16 +80,15 @@ where
 
         {
             let json_value: T = serde_json::from_slice(&buffer)?;
-            let json_value: U = closure(json_value).await?;
-            buffer = serde_json::to_vec(&json_value)?;
+            json = Some(json_value);
         }
 
-        segments.push(MultipartSegment {
+        json_segment = Some(MultipartSegment {
             name: field_name.to_string(),
             filename: field_filename.map(|s| s.to_string()),
             content_type: field_content_type,
-            data: MultipartSegmentData::Binary(buffer),
-        })
+            data: MultipartSegmentData::Binary(vec![]), // Initialize to empty, will be finished after
+        });
     }
 
     while let Some(field) = multipart.next().await {
@@ -97,12 +105,31 @@ where
             buffer.extend_from_slice(&data);
         }
 
+        content_dispositions.push(content_disposition.clone());
         segments.push(MultipartSegment {
             name: field_name.to_string(),
             filename: field_filename.map(|s| s.to_string()),
             content_type: field_content_type,
             data: MultipartSegmentData::Binary(buffer),
         })
+    }
+
+    // Finishes the json segment, with aggregated content dispositions
+    {
+        let json_value = json.ok_or(CreateError::InvalidInput(
+            "No json segment found in multipart.".to_string(),
+        ))?;
+        let mut json_segment = json_segment.ok_or(CreateError::InvalidInput(
+            "No json segment found in multipart.".to_string(),
+        ))?;
+
+        // Call closure, with the json value and names of the other segments
+        let json_value: U = closure(json_value, content_dispositions).await?;
+        let buffer = serde_json::to_vec(&json_value)?;
+        json_segment.data = MultipartSegmentData::Binary(buffer);
+
+        // Insert the json segment at the beginning
+        segments.insert(0, json_segment);
     }
 
     let (boundary, payload) = generate_multipart(segments);

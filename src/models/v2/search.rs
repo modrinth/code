@@ -42,8 +42,11 @@ pub struct LegacyResultSearchProject {
 impl LegacyResultSearchProject {
     pub fn from(result_search_project: ResultSearchProject) -> Self {
         let mut categories = result_search_project.categories;
+        categories.extend(result_search_project.loaders);
         if categories.contains(&"mrpack".to_string()) {
-            if let Some(mrpack_loaders) = result_search_project.loader_fields.get("mrpack_loaders")
+            if let Some(mrpack_loaders) = result_search_project
+                .project_loader_fields
+                .get("mrpack_loaders")
             {
                 categories.extend(
                     mrpack_loaders
@@ -56,7 +59,9 @@ impl LegacyResultSearchProject {
         }
         let mut display_categories = result_search_project.display_categories;
         if display_categories.contains(&"mrpack".to_string()) {
-            if let Some(mrpack_loaders) = result_search_project.loader_fields.get("mrpack_loaders")
+            if let Some(mrpack_loaders) = result_search_project
+                .project_loader_fields
+                .get("mrpack_loaders")
             {
                 categories.extend(
                     mrpack_loaders
@@ -93,9 +98,9 @@ impl LegacyResultSearchProject {
             og_project_type.clone()
         };
 
-        let loader_fields = result_search_project.loader_fields.clone();
+        let project_loader_fields = result_search_project.project_loader_fields.clone();
         let get_one_bool_loader_field = |key: &str| {
-            loader_fields
+            project_loader_fields
                 .get(key)
                 .cloned()
                 .unwrap_or_default()
@@ -119,7 +124,7 @@ impl LegacyResultSearchProject {
         let server_side = server_side.to_string();
 
         let versions = result_search_project
-            .loader_fields
+            .project_loader_fields
             .get("game_versions")
             .cloned()
             .unwrap_or_default()
