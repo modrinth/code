@@ -21,9 +21,9 @@ pub struct SuccessfulLogin {
     pub expires_after: i64,
 }
 
-pub async fn wait_finish(device_code: String) -> crate::Result<Credentials> {
+pub async fn wait_finish() -> crate::Result<Credentials> {
     // Loop, polling for response from Microsoft
-    let oauth = poll_response::poll_response(device_code).await?;
+    let oauth = poll_response::poll_response().await?;
 
     // Get xbl token from oauth token
     let xbl_token = xbl_signin::login_xbl(&oauth.access_token).await?;

@@ -56,55 +56,10 @@
       </Button>
     </Card>
   </transition>
-  <Modal ref="loginModal" class="modal" header="Signing in" :noblur="!themeStore.advancedRendering">
-    <div class="modal-body">
-      <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
-      <div class="modal-text">
-        <div class="label">Copy this code</div>
-        <div class="code-text">
-          <div class="code">
-            {{ loginCode }}
-          </div>
-          <Button
-            v-tooltip="'Copy code'"
-            icon-only
-            large
-            color="raised"
-            @click="() => clipboardWrite(loginCode)"
-          >
-            <ClipboardCopyIcon />
-          </Button>
-        </div>
-        <div>And enter it on Microsoft's website to sign in.</div>
-        <div class="iconified-input">
-          <LogInIcon />
-          <input type="text" :value="loginUrl" readonly />
-          <Button
-            v-tooltip="'Open link'"
-            icon-only
-            color="raised"
-            @click="() => clipboardWrite(loginUrl)"
-          >
-            <GlobeIcon />
-          </Button>
-        </div>
-      </div>
-    </div>
-  </Modal>
 </template>
 
 <script setup>
-import {
-  Avatar,
-  Button,
-  Card,
-  PlusIcon,
-  TrashIcon,
-  LogInIcon,
-  Modal,
-  GlobeIcon,
-  ClipboardCopyIcon,
-} from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
   users,
@@ -114,10 +69,9 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
-import { useTheming } from '@/store/theme.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import QrcodeVue from 'qrcode.vue'
 import { process_listener } from '@/helpers/events'
+import { WebviewWindow } from '@tauri-apps/api/window'
 
 defineProps({
   mode: {
@@ -129,13 +83,8 @@ defineProps({
 
 const emit = defineEmits(['change'])
 
-const loginCode = ref(null)
-
-const themeStore = useTheming()
 const settings = ref({})
 const accounts = ref([])
-const loginUrl = ref('')
-const loginModal = ref(null)
 
 async function refreshValues() {
   settings.value = await get().catch(handleError)
@@ -160,33 +109,22 @@ async function setAccount(account) {
   emit('change')
 }
 
-const clipboardWrite = async (a) => {
-  navigator.clipboard.writeText(a)
-}
-
 async function login() {
   const loginSuccess = await authenticate_begin_flow().catch(handleError)
 
-  loginModal.value.show()
-  loginCode.value = loginSuccess.user_code
-  loginUrl.value = loginSuccess.verification_uri
-  await window.__TAURI_INVOKE__('tauri', {
-    __tauriModule: 'Shell',
-    message: {
-      cmd: 'open',
-      path: loginSuccess.verification_uri,
-    },
+  const window = new WebviewWindow('loginWindow', {
+    title: 'Modrinth App',
+    url: loginSuccess.verification_uri,
   })
 
   const loggedIn = await authenticate_await_completion().catch(handleError)
-  loginModal.value.hide()
+  await window.close()
 
   if (loggedIn) {
     await setAccount(loggedIn)
     await refreshValues()
   }
 
-  loginModal.value.hide()
   mixpanel_track('AccountLogIn')
 }
 

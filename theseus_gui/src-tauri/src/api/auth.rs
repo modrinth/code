@@ -1,6 +1,6 @@
 use crate::api::Result;
 use tauri::plugin::TauriPlugin;
-use theseus::{hydra::init::DeviceLoginSuccess, prelude::*};
+use theseus::{hydra::init::AuthInit, prelude::*};
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::new("auth")
@@ -20,7 +20,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 /// Authenticate a user with Hydra - part 1
 /// This begins the authentication flow quasi-synchronously, returning a URL to visit (that the user will sign in at)
 #[tauri::command]
-pub async fn auth_authenticate_begin_flow() -> Result<DeviceLoginSuccess> {
+pub async fn auth_authenticate_begin_flow() -> Result<AuthInit> {
     Ok(auth::authenticate_begin_flow().await?)
 }
 

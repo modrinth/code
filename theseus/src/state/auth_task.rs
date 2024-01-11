@@ -1,7 +1,8 @@
 use crate::{
-    hydra::{self, init::DeviceLoginSuccess},
+    hydra::{self, init::AuthInit},
     launcher::auth::Credentials,
 };
+use tokio::sync::RwLock;
 
 use tokio::task::JoinHandle;
 
@@ -9,29 +10,47 @@ use tokio::task::JoinHandle;
 // A wrapper over the authentication task that allows it to be called from the frontend
 // without caching the task handle in the frontend
 
-pub struct AuthTask(
-    #[allow(clippy::type_complexity)]
-    Option<JoinHandle<crate::Result<Credentials>>>,
-);
+pub struct AuthTask {
+    pub http_server: RwLock<Option<tiny_http::Server>>,
+    pub task_handle: RwLock<Option<JoinHandle<crate::Result<Credentials>>>>,
+}
 
 impl AuthTask {
     pub fn new() -> AuthTask {
-        AuthTask(None)
+        AuthTask {
+            http_server: RwLock::new(None),
+            task_handle: RwLock::new(None),
+        }
     }
 
-    pub async fn begin_auth() -> crate::Result<DeviceLoginSuccess> {
+    pub async fn begin_auth() -> crate::Result<AuthInit> {
         let state = crate::State::get().await?;
         // Init task, get url
-        let login = hydra::init::init().await?;
+        let login = hydra::init::init().await;
+
+        {
+            let read = state.auth_flow.http_server.read().await;
+            if read.is_none() {
+                drop(read);
+                let mut write = state.auth_flow.http_server.write().await;
+                *write =
+                    Some(tiny_http::Server::http("0.0.0.0:20123").map_err(
+                        |err| {
+                            crate::ErrorKind::HydraError(format!(
+                                "Could not start local server: {}",
+                                err
+                            ))
+                        },
+                    )?)
+            }
+        }
 
         // Await completion
-        let task = tokio::spawn(hydra::complete::wait_finish(
-            login.device_code.clone(),
-        ));
+        let task = tokio::spawn(hydra::complete::wait_finish());
 
         // Flow is going, store in state and return
-        let mut write = state.auth_flow.write().await;
-        write.0 = Some(task);
+        let mut write = state.auth_flow.task_handle.write().await;
+        *write = Some(task);
 
         Ok(login)
     }
@@ -40,9 +59,9 @@ impl AuthTask {
         // Gets the task handle from the state, replacing with None
         let task = {
             let state = crate::State::get().await?;
-            let mut write = state.auth_flow.write().await;
+            let mut write = state.auth_flow.task_handle.write().await;
 
-            write.0.take()
+            write.take()
         };
 
         // Waits for the task to complete, and returns the credentials
@@ -58,9 +77,9 @@ impl AuthTask {
         // Gets the task handle from the state, replacing with None
         let task = {
             let state = crate::State::get().await?;
-            let mut write = state.auth_flow.write().await;
+            let mut write = state.auth_flow.task_handle.write().await;
 
-            write.0.take()
+            write.take()
         };
         if let Some(task) = task {
             // Cancels the task

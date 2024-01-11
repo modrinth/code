@@ -1,6 +1,6 @@
 //! Authentication flow interface
 use crate::{
-    hydra::{self, init::DeviceLoginSuccess},
+    hydra::{self, init::AuthInit},
     launcher::auth as inner,
     State,
 };
@@ -14,7 +14,7 @@ pub use inner::Credentials;
 /// This can be used in conjunction with 'authenticate_await_complete_flow'
 /// to call authenticate and call the flow from the frontend.
 /// Visit the URL in a browser, then call and await 'authenticate_await_complete_flow'.
-pub async fn authenticate_begin_flow() -> crate::Result<DeviceLoginSuccess> {
+pub async fn authenticate_begin_flow() -> crate::Result<AuthInit> {
     let url = AuthTask::begin_auth().await?;
     Ok(url)
 }

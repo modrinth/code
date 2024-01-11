@@ -148,7 +148,6 @@ pub fn get_jvm_arguments(
             parsed_arguments.push(arg);
         }
     }
-    parsed_arguments.push("-Dorg.lwjgl.util.Debug=true".to_string());
 
     Ok(parsed_arguments)
 }
@@ -275,7 +274,7 @@ fn parse_minecraft_argument(
         .replace("${auth_xuid}", "0")
         .replace("${auth_uuid}", &uuid.simple().to_string())
         .replace("${uuid}", &uuid.simple().to_string())
-        .replace("${clientid}", "c4502edb-87c6-40cb-b595-64a280cf8906")
+        .replace("${clientid}", "c4502edb-c6-40cb-b595-64a280cf8906")
         .replace("${user_properties}", "{}")
         .replace("${user_type}", "msa")
         .replace("${version_name}", version)

@@ -89,7 +89,7 @@ pub struct State {
     /// Launcher user account info
     pub(crate) users: RwLock<Users>,
     /// Authentication flow
-    pub auth_flow: RwLock<AuthTask>,
+    pub auth_flow: AuthTask,
     /// Modrinth Credentials Store
     pub credentials: RwLock<CredentialsStore>,
     /// Modrinth auth flow
@@ -217,7 +217,7 @@ impl State {
             profiles: RwLock::new(profiles),
             users: RwLock::new(users),
             children: RwLock::new(children),
-            auth_flow: RwLock::new(auth_flow),
+            auth_flow,
             credentials: RwLock::new(creds),
             tags: RwLock::new(tags),
             discord_rpc,

@@ -2,9 +2,13 @@ use std::collections::HashMap;
 
 use reqwest::StatusCode;
 use serde::Deserialize;
+use tiny_http::Response;
 
 use crate::{
-    hydra::{MicrosoftError, MICROSOFT_CLIENT_ID},
+    hydra::{
+        MicrosoftError, MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET,
+        REDIRECT_URL, REQUESTED_SCOPES,
+    },
     util::fetch::REQWEST_CLIENT,
 };
 
@@ -20,26 +24,71 @@ pub struct OauthSuccess {
 }
 
 #[tracing::instrument]
-pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
-    let mut params = HashMap::new();
-    params.insert("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
-    params.insert("client_id", MICROSOFT_CLIENT_ID);
-    params.insert("device_code", &device_code);
-    params.insert(
-        "scope",
-        "XboxLive.signin XboxLive.offline_access profile openid email",
-    );
+pub async fn poll_response() -> crate::Result<OauthSuccess> {
+    let state = crate::state::State::get().await?;
+    let server = state.auth_flow.http_server.read().await;
 
-    // Poll the URL in a loop until we are successful.
-    // On an authorization_pending response, wait 5 seconds and try again.
     loop {
+        // blocks until the next request is received
+        let request = match server
+            .as_ref()
+            .ok_or_else(|| {
+                crate::ErrorKind::HydraError(
+                    "Could not aqquire HTTP server".to_string(),
+                )
+            })?
+            .recv()
+        {
+            Ok(rq) => rq,
+            Err(e) => {
+                tracing::warn!("server request error: {}", e);
+                continue;
+            }
+        };
+
+        let url = match url::Url::parse(&format!(
+            "http://localhost:20123{}",
+            request.url()
+        )) {
+            Ok(val) => val,
+            Err(err) => {
+                tracing::warn!("error parsing uri: {err}");
+                continue;
+            }
+        };
+
+        if url.path() != "/theseus/callback" {
+            tracing::warn!("wrong URI path: {}", url.path());
+
+            continue;
+        }
+
+        let query = url
+            .query_pairs()
+            .collect::<HashMap<std::borrow::Cow<str>, std::borrow::Cow<str>>>();
+
+        let code = match query.get("code") {
+            Some(val) => val,
+            None => {
+                tracing::warn!("missing response code");
+                continue;
+            }
+        };
+
+        let mut map = HashMap::new();
+        map.insert("client_id", MICROSOFT_CLIENT_ID);
+        map.insert("client_secret", MICROSOFT_CLIENT_SECRET);
+        map.insert("code", &**code);
+        map.insert("grant_type", "authorization_code");
+        map.insert("redirect_uri", REDIRECT_URL);
+        map.insert("scope", REQUESTED_SCOPES);
+
         let resp = auth_retry(|| {
             REQWEST_CLIENT
-            .post(
-                "https://login.microsoftonline.com/consumers/oauth2/v2.0/token",
-            )
-            .form(&params)
-            .send()
+                .post("https://login.live.com/oauth20_token.srf")
+                .header(reqwest::header::ACCEPT, "application/json")
+                .form(&map)
+                .send()
         })
         .await?;
 
@@ -52,9 +101,18 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
                             err
                         ))
                     })?;
+
+                let response = Response::from_string("Microsoft login succeeded. Loading your Minecraft account...");
+                request.respond(response).ok();
+
                 return Ok(oauth);
             }
             _ => {
+                let response = Response::from_string(
+                    "Authentication failed. Please try again.",
+                );
+                request.respond(response).ok();
+
                 let failure =
                     resp.json::<MicrosoftError>().await.map_err(|err| {
                         crate::ErrorKind::HydraError(format!(
@@ -63,25 +121,9 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
                         ))
                     })?;
                 match failure.error.as_str() {
-                    "authorization_pending" => {
-                        tokio::time::sleep(std::time::Duration::from_secs(2))
-                            .await;
-                    }
                     "authorization_declined" => {
                         return Err(crate::ErrorKind::HydraError(
                             "Authorization declined".to_string(),
-                        )
-                        .as_error());
-                    }
-                    "expired_token" => {
-                        return Err(crate::ErrorKind::HydraError(
-                            "Device code expired".to_string(),
-                        )
-                        .as_error());
-                    }
-                    "bad_verification_code" => {
-                        return Err(crate::ErrorKind::HydraError(
-                            "Invalid device code".to_string(),
                         )
                         .as_error());
                     }

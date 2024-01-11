@@ -17,7 +17,6 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
     let login = auth::authenticate_begin_flow().await?;
 
     println!("URL {}", login.verification_uri.as_str());
-    println!("Code {}", login.user_code.as_str());
     webbrowser::open(login.verification_uri.as_str())
         .map_err(|e| IOError::with_path(e, login.verification_uri.as_str()))?;
 
@@ -37,6 +36,12 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     let st = State::get().await?;
     //State::update();
+
+    // Attempt to run game
+    if auth::users().await?.is_empty() {
+        println!("No users found, authenticating.");
+        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
+    }
 
     // Autodetect java globals
     let jres = jre::get_all_jre().await?;
@@ -90,12 +95,6 @@ async fn main() -> theseus::Result<()> {
     .await?;
 
     State::sync().await?;
-
-    // Attempt to run game
-    if auth::users().await?.is_empty() {
-        println!("No users found, authenticating.");
-        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
-    }
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
