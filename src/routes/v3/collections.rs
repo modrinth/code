@@ -205,7 +205,7 @@ pub struct EditCollection {
     )]
     pub description: Option<Option<String>>,
     pub status: Option<CollectionStatus>,
-    #[validate(length(max = 64))]
+    #[validate(length(max = 1024))]
     pub new_projects: Option<Vec<String>>,
 }
 
