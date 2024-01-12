@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="normal-page__content">
     <div class="universal-card">
       <h2>Analytics</h2>
 

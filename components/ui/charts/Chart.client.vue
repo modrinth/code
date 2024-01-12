@@ -3,11 +3,6 @@ import dayjs from 'dayjs'
 import { formatNumber, formatMoney } from 'omorphia'
 import VueApexCharts from 'vue3-apexcharts'
 
-// let VueApexCharts
-// if (process.client) {
-//   VueApexCharts = defineAsyncComponent(() => import('vue3-apexcharts'))
-// }
-
 const props = defineProps({
   name: {
     type: String,
@@ -158,120 +153,124 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
   return tooltip
 }
 
-const chartOptions = {
-  chart: {
-    id: props.name,
-    fontFamily:
-      'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-    foreColor: 'var(--color-base)',
-    selection: {
-      enabled: true,
-      fill: {
-        color: 'var(--color-brand)',
+const chartOptions = computed(() => {
+  return {
+    chart: {
+      id: props.name,
+      fontFamily:
+        'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
+      foreColor: 'var(--color-base)',
+      selection: {
+        enabled: true,
+        fill: {
+          color: 'var(--color-brand)',
+        },
+      },
+      toolbar: {
+        show: false,
+      },
+      stacked: props.stacked,
+      stackType: props.percentStacked ? '100%' : 'normal',
+      zoom: {
+        autoScaleYaxis: true,
+      },
+      animations: {
+        enabled: props.disableAnimations,
       },
     },
-    toolbar: {
-      show: false,
-    },
-    stacked: props.stacked,
-    stackType: props.percentStacked ? '100%' : 'normal',
-    zoom: {
-      autoScaleYaxis: true,
-    },
-    animations: {
-      enabled: props.disableAnimations,
-    },
-  },
-  xaxis: {
-    type: props.xAxisType,
-    categories: props.labels,
-    labels: {
-      style: {
-        borderRadius: 'var(--radius-sm)',
+    xaxis: {
+      type: props.xAxisType,
+      categories: props.labels,
+      labels: {
+        style: {
+          borderRadius: 'var(--radius-sm)',
+        },
+      },
+      axisTicks: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
       },
     },
-    axisTicks: {
-      show: false,
+    yaxis: {
+      tooltip: {
+        enabled: false,
+      },
+    },
+    colors: props.colors,
+    dataLabels: {
+      enabled: false,
+      background: {
+        enabled: true,
+        borderRadius: 20,
+      },
+    },
+    grid: {
+      borderColor: 'var(--color-button-bg)',
+      tickColor: 'var(--color-button-bg)',
+    },
+    legend: {
+      show: !props.hideLegend,
+      position: props.legendPosition,
+      showForZeroSeries: false,
+      showForSingleSeries: false,
+      showForNullSeries: false,
+      fontSize: 'var(--font-size-nm)',
+      fontFamily:
+        'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
+      onItemClick: {
+        toggleDataSeries: true,
+      },
+    },
+    markers: {
+      size: 0,
+      strokeColor: 'var(--color-contrast)',
+      strokeWidth: 3,
+      strokeOpacity: 1,
+      fillOpacity: 1,
+      hover: {
+        size: 6,
+      },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: props.horizontalBar,
+        columnWidth: '80%',
+        endingShape: 'rounded',
+        borderRadius: 5,
+        borderRadiusApplication: 'end',
+        borderRadiusWhenStacked: 'last',
+      },
+    },
+    stroke: {
+      curve: 'smooth',
+      width: 2,
     },
     tooltip: {
-      enabled: false,
+      custom: (d) => generateTooltip(d, props),
     },
-  },
-  yaxis: {
-    tooltip: {
-      enabled: false,
-    },
-  },
-  colors: props.colors,
-  dataLabels: {
-    enabled: false,
-    background: {
-      enabled: true,
-      borderRadius: 20,
-    },
-  },
-  grid: {
-    borderColor: 'var(--color-button-bg)',
-    tickColor: 'var(--color-button-bg)',
-  },
-  legend: {
-    show: !props.hideLegend,
-    position: props.legendPosition,
-    showForZeroSeries: false,
-    showForSingleSeries: false,
-    showForNullSeries: false,
-    fontSize: 'var(--font-size-nm)',
-    fontFamily:
-      'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-    onItemClick: {
-      toggleDataSeries: true,
-    },
-  },
-  markers: {
-    size: 0,
-    strokeColor: 'var(--color-contrast)',
-    strokeWidth: 3,
-    strokeOpacity: 1,
-    fillOpacity: 1,
-    hover: {
-      size: 6,
-    },
-  },
-  plotOptions: {
-    bar: {
-      horizontal: props.horizontalBar,
-      columnWidth: '80%',
-      endingShape: 'rounded',
-      borderRadius: 5,
-      borderRadiusApplication: 'end',
-      borderRadiusWhenStacked: 'last',
-    },
-  },
-  stroke: {
-    curve: 'smooth',
-    width: 2,
-  },
-  tooltip: {
-    custom: (d) => generateTooltip(d, props),
-  },
-}
-
-const fillOptions = {
-  colors: props.colors,
-  type: 'gradient',
-  opacity: 1,
-  gradient: {
-    shade: 'light',
-    type: 'vertical',
-    shadeIntensity: 0,
-    gradientToColors: props.colors,
-    inverseColors: true,
-    opacityFrom: 0.5,
-    opacityTo: 0,
-    stops: [0, 100],
-    colorStops: [],
-  },
-}
+    fill:
+      props.type === 'area'
+        ? {
+            colors: props.colors,
+            type: 'gradient',
+            opacity: 1,
+            gradient: {
+              shade: 'light',
+              type: 'vertical',
+              shadeIntensity: 0,
+              gradientToColors: props.colors,
+              inverseColors: true,
+              opacityFrom: 0.5,
+              opacityTo: 0,
+              stops: [0, 100],
+              colorStops: [],
+            },
+          }
+        : {},
+  }
+})
 
 const chart = ref(null)
 
@@ -287,6 +286,7 @@ const flipLegend = (legend, newVal) => {
 }
 
 const resetChart = () => {
+  if (!chart.value) return
   chart.value.updateSeries([...props.data])
   chart.value.updateOptions({
     xaxis: {
@@ -299,31 +299,14 @@ const resetChart = () => {
   })
 }
 
-const updateColors = (colors) => {
-  chart.value.updateOptions({
-    colors,
-  })
-  chart.value.resetSeries()
-}
-
 defineExpose({
   resetChart,
-  updateColors,
   flipLegend,
 })
 </script>
 
 <template>
-  <VueApexCharts
-    ref="chart"
-    :type="type"
-    :options="{
-      ...chartOptions,
-      fill: type === 'area' ? fillOptions : {},
-    }"
-    :series="data"
-    class="chart"
-  />
+  <VueApexCharts ref="chart" :type="type" :options="chartOptions" :series="data" class="chart" />
 </template>
 
 <style scoped lang="scss">

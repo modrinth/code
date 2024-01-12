@@ -38,7 +38,22 @@ const hashProjectId = (projectId) => {
   return projectId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 30
 }
 
-export const defaultColors = ['#ff496e', '#ffa347', '#1bd96a', '#4f9cff', '#c78aff']
+export const defaultColors = [
+  '#ff496e', // Original: Bright pink
+  '#ffa347', // Original: Bright orange
+  '#1bd96a', // Original: Bright green
+  '#4f9cff', // Original: Bright blue
+  '#c78aff', // Original: Bright purple
+  '#ffeb3b', // Added: Bright yellow
+  '#00bcd4', // Added: Bright cyan
+  '#ff5722', // Added: Bright red-orange
+  '#9c27b0', // Added: Bright deep purple
+  '#3f51b5', // Added: Bright indigo
+  '#009688', // Added: Bright teal
+  '#cddc39', // Added: Bright lime
+  '#795548', // Added: Bright brown
+  '#607d8b', // Added: Bright blue-grey
+]
 
 /**
  * @param {string | number} value
@@ -111,6 +126,7 @@ const emptyAnalytics = {
     colors: [],
     defaultColors: [],
   },
+  projectIds: [],
 }
 
 export const analyticsSetToCSVString = (analytics) => {
@@ -150,7 +166,6 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
   const loadedProjectData = loadedProjectIds.map((id) => category[id])
 
   // Convert each project's data into a list of [unix_ts_str, number] pairs
-  // Sort, label&map
   const projectData = loadedProjectData
     .map((data) => Object.entries(data))
     .map((data) => data.sort(sortFn))
@@ -183,6 +198,8 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         b.data.reduce((acc, cur) => acc + cur, 0) - a.data.reduce((acc, cur) => acc + cur, 0)
     )
 
+  const projectIdsSortedBySum = chartData.map((p) => p.id)
+
   return {
     // The total count of all the values across all projects
     sum: projectData.reduce((acc, cur) => acc + cur.reduce((a, c) => a + c[1], 0), 0),
@@ -210,6 +227,7 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         return getDefaultColor(project.id)
       }),
     },
+    projectIds: projectIdsSortedBySum,
   }
 }
 
@@ -280,7 +298,12 @@ const useFetchAnalytics = (
  * @param {Ref<any[]>} projects
  * @param {undefined | () => any} onDataRefresh
  */
-export const useFetchAllAnalytics = (onDataRefresh, projects) => {
+export const useFetchAllAnalytics = (
+  onDataRefresh,
+  projects,
+  selectedProjects,
+  personalRevenue = false
+) => {
   const timeResolution = ref(1440) // 1 day
   const timeRange = ref(43200) // 30 days
 
@@ -296,17 +319,27 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
   const error = ref(null)
 
   const formattedData = computed(() => ({
+    downloads: processNumberAnalytics(downloadData.value, selectedProjects.value),
+    views: processNumberAnalytics(viewData.value, selectedProjects.value),
+    revenue: processRevAnalytics(revenueData.value, selectedProjects.value),
+    downloadsByCountry: processCountryAnalytics(downloadsByCountry.value, selectedProjects.value),
+    viewsByCountry: processCountryAnalytics(viewsByCountry.value, selectedProjects.value),
+  }))
+
+  const totalData = computed(() => ({
     downloads: processNumberAnalytics(downloadData.value, projects.value),
     views: processNumberAnalytics(viewData.value, projects.value),
     revenue: processRevAnalytics(revenueData.value, projects.value),
-    downloadsByCountry: processCountryAnalytics(downloadsByCountry.value, projects.value),
-    viewsByCountry: processCountryAnalytics(viewsByCountry.value, projects.value),
   }))
 
   const fetchData = async (query) => {
     const normalQuery = new URLSearchParams(query)
     const revenueQuery = new URLSearchParams(query)
-    revenueQuery.delete('projects')
+
+    if (personalRevenue) {
+      revenueQuery.delete('project_ids')
+    }
+
     const qs = normalQuery.toString()
     const revenueQs = revenueQuery.toString()
 
@@ -324,7 +357,12 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
 
       // collect project ids from projects.value into a set
       const projectIds = new Set()
-      projects.value.forEach((p) => projectIds.add(p.id))
+      if (projects.value) {
+        projects.value.forEach((p) => projectIds.add(p.id))
+      } else {
+        // if projects.value is not set, we assume that we want all project ids
+        Object.keys(responses[0] || {}).forEach((id) => projectIds.add(id))
+      }
 
       const filterProjectIds = (data) => {
         const filtered = {}
@@ -358,7 +396,7 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
         resolution_minutes: timeResolution.value,
       }
 
-      if (projects?.length) {
+      if (projects.value?.length) {
         q.project_ids = JSON.stringify(projects.value.map((p) => p.id))
       }
 
@@ -385,10 +423,12 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
     }
 
     if (revenueData.value) {
-      // revenue will always have all project ids, but the ids may have an empty object as value.
+      // revenue will always have all project ids, but the ids may have an empty object or a ton of keys below a cent (0.00...) as values. We want to filter those out
       Object.entries(revenueData.value).forEach(([id, data]) => {
         if (Object.keys(data).length) {
-          ids.add(id)
+          if (Object.values(data).some((v) => v >= 0.01)) {
+            ids.add(id)
+          }
         }
       })
     }
@@ -414,6 +454,7 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
     // Computed state
     validProjectIds,
     formattedData,
+    totalData,
     loading,
     error,
   }
