@@ -675,6 +675,13 @@ pub async fn process_payout(
             all_team_members.push((user_id, payouts_split));
         }
 
+        // if all team members are set to zero, we treat as an equal revenue distribution
+        if all_team_members.iter().all(|x| x.1 == Decimal::ZERO) {
+            all_team_members
+                .iter_mut()
+                .for_each(|x| x.1 = Decimal::from(1));
+        }
+
         projects_map.insert(
             project_id,
             Project {

@@ -145,7 +145,7 @@ pub async fn organization_create(
     let team = team_item::TeamBuilder {
         members: vec![team_item::TeamMemberBuilder {
             user_id: current_user.id.into(),
-            role: crate::models::teams::OWNER_ROLE.to_owned(),
+            role: crate::models::teams::DEFAULT_ROLE.to_owned(),
             is_owner: true,
             permissions: ProjectPermissions::all(),
             organization_permissions: Some(OrganizationPermissions::all()),

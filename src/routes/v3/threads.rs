@@ -71,7 +71,20 @@ pub async fn is_authorized_thread(
                     .await?
                     .exists;
 
-                project_exists.unwrap_or(false)
+                if !project_exists.unwrap_or(false) {
+                    let org_exists = sqlx::query!(
+                        "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN organizations o ON m.organization_id = o.id INNER JOIN team_members tm ON tm.team_id = o.team_id AND tm.user_id = $2 WHERE m.id = $1)",
+                        project_id as database::models::ids::ProjectId,
+                        user_id as database::models::ids::UserId,
+                    )
+                        .fetch_one(pool)
+                        .await?
+                        .exists;
+
+                    org_exists.unwrap_or(false)
+                } else {
+                    true
+                }
             } else {
                 false
             }
@@ -113,6 +126,42 @@ pub async fn filter_authorized_threads(
                 "
                 SELECT m.id FROM mods m
                 INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2
+                WHERE m.id = ANY($1)
+                ",
+                &*project_thread_ids,
+                user_id as database::models::ids::UserId,
+            )
+            .fetch_many(&***pool)
+            .try_for_each(|e| {
+                if let Some(row) = e.right() {
+                    check_threads.retain(|x| {
+                        let bool = x.project_id.map(|x| x.0) == Some(row.id);
+
+                        if bool {
+                            return_threads.push(x.clone());
+                        }
+
+                        !bool
+                    });
+                }
+
+                futures::future::ready(Ok(()))
+            })
+            .await?;
+        }
+
+        let org_project_thread_ids = check_threads
+            .iter()
+            .filter(|x| x.type_ == ThreadType::Project)
+            .flat_map(|x| x.project_id.map(|x| x.0))
+            .collect::<Vec<_>>();
+
+        if !org_project_thread_ids.is_empty() {
+            sqlx::query!(
+                "
+                SELECT m.id FROM mods m
+                INNER JOIN organizations o ON o.id = m.organization_id
+                INNER JOIN team_members tm ON tm.team_id = o.team_id AND user_id = $2
                 WHERE m.id = ANY($1)
                 ",
                 &*project_thread_ids,

@@ -535,7 +535,7 @@ async fn transfer_ownership_v3() {
             .iter()
             .find(|x| x.user.id.0 == USER_USER_ID_PARSED as u64)
             .unwrap();
-        assert_eq!(user_member.role, "Owner"); // We are the 'owner', but we are not actually the owner!
+        assert_eq!(user_member.role, "Member"); // We are the 'owner', but we are not actually the owner!
         assert!(!user_member.is_owner);
         assert_eq!(user_member.permissions.unwrap(), ProjectPermissions::all());
 

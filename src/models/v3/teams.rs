@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 #[serde(into = "Base62Id")]
 pub struct TeamId(pub u64);
 
-pub const OWNER_ROLE: &str = "Owner";
 pub const DEFAULT_ROLE: &str = "Member";
 
 /// A team of users who control a project

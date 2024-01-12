@@ -302,7 +302,7 @@ async fn update_and_add_to_index(
     // Check if any 'additional_fields' are not already in the index
     // Only add if they are not already in the index
     let new_fields = additional_fields
-        .into_iter()
+        .iter()
         .filter(|x| !new_filterable_attributes.contains(x))
         .collect::<Vec<_>>();
     if !new_fields.is_empty() {

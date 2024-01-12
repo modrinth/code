@@ -617,7 +617,7 @@ async fn project_create_inner(
         if project_create_data.organization_id.is_none() {
             members.push(models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
-                role: crate::models::teams::OWNER_ROLE.to_owned(),
+                role: crate::models::teams::DEFAULT_ROLE.to_owned(),
                 is_owner: true,
                 permissions: ProjectPermissions::all(),
                 organization_permissions: None,
