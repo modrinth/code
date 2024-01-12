@@ -3,6 +3,7 @@ ENV PKG_CONFIG_ALLOW_CROSS=1
 
 WORKDIR /usr/src/labrinth
 COPY . .
+ARG SQLX_OFFLINE=true
 RUN cargo build --release
 
 
@@ -16,6 +17,9 @@ RUN apt-get update \
 RUN update-ca-certificates
 
 COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth
+COPY --from=build /usr/src/labrinth/migrations/* /labrinth/migrations/
+COPY --from=build /usr/src/labrinth/assets /labrinth/assets
+
 WORKDIR /labrinth
 
 CMD /labrinth/labrinth
