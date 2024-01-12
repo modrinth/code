@@ -7,7 +7,48 @@
       />
       <h2>Transfer history</h2>
       <p>All of your withdrawals from your Modrinth balance will be listed here:</p>
-      <div v-for="payout in sortedPayouts" :key="payout.id" class="universal-card recessed payout">
+      <div class="input-group">
+        <DropdownSelect
+          v-model="selectedYear"
+          :options="years"
+          :display-name="(x) => (x === 'all' ? 'All years' : x)"
+          name="Year filter"
+        />
+        <DropdownSelect
+          v-model="selectedMethod"
+          :options="methods"
+          :display-name="
+            (x) => (x === 'all' ? 'Any method' : x === 'paypal' ? 'PayPal' : capitalizeString(x))
+          "
+          name="Method filter"
+        />
+      </div>
+      <p>
+        {{
+          selectedYear !== 'all'
+            ? selectedMethod !== 'all'
+              ? formatMessage(messages.transfersTotalYearMethod, {
+                  amount: $formatMoney(totalAmount),
+                  year: selectedYear,
+                  method: selectedMethod,
+                })
+              : formatMessage(messages.transfersTotalYear, {
+                  amount: $formatMoney(totalAmount),
+                  year: selectedYear,
+                })
+            : selectedMethod !== 'all'
+            ? formatMessage(messages.transfersTotalMethod, {
+                amount: $formatMoney(totalAmount),
+                method: selectedMethod,
+              })
+            : formatMessage(messages.transfersTotal, { amount: $formatMoney(totalAmount) })
+        }}
+      </p>
+      <div
+        v-for="payout in filteredPayouts"
+        :key="payout.id"
+        class="universal-card recessed payout"
+      >
         <div class="platform">
           <PayPalIcon v-if="payout.method === 'paypal'" />
           <TremendousIcon v-else-if="payout.method === 'tremendous'" />
@@ -53,10 +94,21 @@
   </div>
 </template>
 <script setup>
-import { Badge, Breadcrumbs, XIcon, PayPalIcon, UnknownIcon } from 'omorphia'
+import {
+  Badge,
+  Breadcrumbs,
+  XIcon,
+  PayPalIcon,
+  UnknownIcon,
+  DropdownSelect,
+  capitalizeString,
+} from 'omorphia'
 import dayjs from 'dayjs'
 import TremendousIcon from '~/assets/images/external/tremendous.svg'
 import VenmoIcon from '~/assets/images/external/venmo-small.svg'
+
+const vintl = useVIntl()
+const { formatMessage } = vintl
 
 useHead({
   title: 'Transfer history - Modrinth',
@@ -73,6 +125,30 @@ const { data: payouts, refresh } = await useAsyncData(`payout`, () =>
 
 const sortedPayouts = computed(() =>
   payouts.value.sort((a, b) => dayjs(b.created) - dayjs(a.created))
+)
+
+const years = computed(() => {
+  const values = sortedPayouts.value.map((x) => dayjs(x.created).year())
+  return ['all', ...new Set(values)]
+})
+
+const selectedYear = ref('all')
+
+const methods = computed(() => {
+  const values = sortedPayouts.value.filter((x) => x.method).map((x) => x.method)
+  return ['all', ...new Set(values)]
+})
+
+const selectedMethod = ref('all')
+
+const filteredPayouts = computed(() =>
+  sortedPayouts.value
+    .filter((x) => selectedYear.value === 'all' || dayjs(x.created).year() === selectedYear.value)
+    .filter((x) => selectedMethod.value === 'all' || x.method === selectedMethod.value)
+)
+
+const totalAmount = computed(() =>
+  filteredPayouts.value.reduce((sum, payout) => sum + payout.amount, 0)
 )
 
 async function cancelPayout(id) {
@@ -94,6 +170,25 @@ async function cancelPayout(id) {
   }
   stopLoading()
 }
+
+const messages = defineMessages({
+  transfersTotal: {
+    id: 'revenue.transfers.total',
+    defaultMessage: 'You have withdrawn {amount} in total.',
+  },
+  transfersTotalYear: {
+    id: 'revenue.transfers.total.year',
+    defaultMessage: 'You have withdrawn {amount} in {year}.',
+  },
+  transfersTotalMethod: {
+    id: 'revenue.transfers.total.method',
+    defaultMessage: 'You have withdrawn {amount} through {method}.',
+  },
+  transfersTotalYearMethod: {
+    id: 'revenue.transfers.total.year_method',
+    defaultMessage: 'You have withdrawn {amount} in {year} through {method}.',
+  },
+})
 </script>
 <style lang="scss" scoped>
 .payout {
