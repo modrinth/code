@@ -499,9 +499,7 @@
         <div class="input-group">
           <button
             class="iconified-button brand-button"
-            :disabled="
-              (props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER || member.is_owner
-            "
+            :disabled="(props.currentMember?.permissions & EDIT_MEMBER) !== EDIT_MEMBER"
             @click="updateOrgMember(index)"
           >
             <SaveIcon />
@@ -590,6 +588,8 @@ function initMembers() {
     // If replacing a partial with a full member, we need to mark as such.
     returnVal.override = !!foundMember
     returnVal.oldOverride = !!foundMember
+
+    returnVal.is_owner = partialOrgMember.is_owner
 
     return returnVal
   })

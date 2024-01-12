@@ -423,7 +423,7 @@ useSeoMeta({
   title: 'Modrinth',
   description,
   publisher: 'Modrinth',
-  themeColor: [{ color: '#1bd96a' }],
+  themeColor: '#1bd96a',
   colorScheme: 'dark light',
 
   // OpenGraph
