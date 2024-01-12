@@ -330,7 +330,7 @@
                     },
                     { id: 'copy-id', action: () => copyId() },
                   ]"
-                  direction="right"
+                  :direction="cosmetics.projectLayout ? 'left' : 'right'"
                 >
                   <MoreHorizontalIcon />
                   <template #report> <ReportIcon /> Report</template>
@@ -339,14 +339,13 @@
               </template>
               <template v-else>
                 <nuxt-link class="iconified-button" to="/auth/sign-in">
-                  <ReportIcon aria-hidden="true" />
-                  Report
-                </nuxt-link>
-                <nuxt-link class="iconified-button" to="/auth/sign-in">
                   <HeartIcon aria-hidden="true" />
                   Follow
                 </nuxt-link>
-
+                <nuxt-link class="iconified-button" to="/auth/sign-in">
+                  <BookmarkIcon aria-hidden="true" />
+                  Save
+                </nuxt-link>
                 <OverflowMenu
                   class="btn icon-only"
                   :options="[
@@ -358,7 +357,7 @@
                     },
                     { id: 'copy-id', action: () => copyId() },
                   ]"
-                  direction="right"
+                  :direction="cosmetics.projectLayout ? 'left' : 'right'"
                 >
                   <MoreHorizontalIcon />
                   <template #report> <ReportIcon /> Report</template>
