@@ -16,7 +16,13 @@
         </nuxt-link>
       </template>
     </div>
-    <div v-if="!cosmetics.hideStagingBanner" class="site-banner site-banner--warning">
+    <div
+      v-if="
+        config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
+        !cosmetics.hideStagingBanner
+      "
+      class="site-banner site-banner--warning"
+    >
       <div class="site-banner__title">
         <IssuesIcon />
         <span> You’re viewing Modrinth’s staging environment </span>
@@ -1220,7 +1226,7 @@ export default defineNuxtComponent({
   gap: 0.5rem;
   grid-template: 'title actions' 'description actions';
   padding-block: var(--gap-xl);
-  padding-inline: calc((100% - 80rem) / 2 + var(--gap-md));
+  padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
 
   .site-banner__title {
     grid-area: title;
@@ -1235,6 +1241,7 @@ export default defineNuxtComponent({
       color: var(--color-red);
       width: 1.5rem;
       height: 1.5rem;
+      flex-shrink: 0;
     }
   }
 
