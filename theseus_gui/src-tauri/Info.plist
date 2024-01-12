@@ -63,6 +63,7 @@
 		<string>A Minecraft mod wants to access your camera.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>A Minecraft mod wants to access your microphone.</string>
-
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.games</string>
     </dict>
 </plist>
