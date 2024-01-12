@@ -61,7 +61,7 @@
           <Checkbox
             v-for="scope in scopeList"
             :key="scope"
-            :label="constCaseToSentenceCase(scope)"
+            :label="getScopeLabel(scope)"
             :model-value="hasScope(scopesVal, scope)"
             @update:model-value="() => (scopesVal = toggleScope(scopesVal, scope))"
           />
@@ -230,7 +230,7 @@ import {
   ConfirmModal,
 } from 'omorphia'
 import Modal from '~/components/ui/Modal.vue'
-import { scopeList, hasScope, toggleScope } from '~/utils/auth/scopes.ts'
+import { scopeList, hasScope, toggleScope, getScopeLabel } from '~/utils/auth/scopes.ts'
 
 definePageMeta({
   middleware: 'auth',
@@ -469,11 +469,6 @@ async function removeApp() {
     })
   }
   stopLoading()
-}
-
-const constCaseToSentenceCase = (str) => {
-  str = str.replace(/_/g, ' ')
-  return str[0].toUpperCase() + str.slice(1).toLowerCase()
 }
 </script>
 <style lang="scss" scoped>

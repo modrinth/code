@@ -1,44 +1,276 @@
-export const Scopes = {
-  USER_READ_EMAIL: BigInt(1) << BigInt(0),
-  USER_READ: BigInt(1) << BigInt(1),
-  USER_WRITE: BigInt(1) << BigInt(2),
-  USER_DELETE: BigInt(1) << BigInt(3),
-  USER_AUTH_WRITE: BigInt(1) << BigInt(4),
-  NOTIFICATION_READ: BigInt(1) << BigInt(5),
-  NOTIFICATION_WRITE: BigInt(1) << BigInt(6),
-  PAYOUTS_READ: BigInt(1) << BigInt(7),
-  PAYOUTS_WRITE: BigInt(1) << BigInt(8),
-  ANALYTICS: BigInt(1) << BigInt(9),
-  PROJECT_CREATE: BigInt(1) << BigInt(10),
-  PROJECT_READ: BigInt(1) << BigInt(11),
-  PROJECT_WRITE: BigInt(1) << BigInt(12),
-  PROJECT_DELETE: BigInt(1) << BigInt(13),
-  VERSION_CREATE: BigInt(1) << BigInt(14),
-  VERSION_READ: BigInt(1) << BigInt(15),
-  VERSION_WRITE: BigInt(1) << BigInt(16),
-  VERSION_DELETE: BigInt(1) << BigInt(17),
-  REPORT_CREATE: BigInt(1) << BigInt(18),
-  REPORT_READ: BigInt(1) << BigInt(19),
-  REPORT_WRITE: BigInt(1) << BigInt(20),
-  REPORT_DELETE: BigInt(1) << BigInt(21),
-  THREAD_READ: BigInt(1) << BigInt(22),
-  THREAD_WRITE: BigInt(1) << BigInt(23),
-  PAT_CREATE: BigInt(1) << BigInt(24),
-  PAT_READ: BigInt(1) << BigInt(25),
-  PAT_WRITE: BigInt(1) << BigInt(26),
-  PAT_DELETE: BigInt(1) << BigInt(27),
-  SESSION_READ: BigInt(1) << BigInt(28),
-  SESSION_DELETE: BigInt(1) << BigInt(29),
-  PERFORM_ANALYTICS: BigInt(1) << BigInt(30),
-  COLLECTION_CREATE: BigInt(1) << BigInt(31),
-  COLLECTION_READ: BigInt(1) << BigInt(32),
-  COLLECTION_WRITE: BigInt(1) << BigInt(33),
-  COLLECTION_DELETE: BigInt(1) << BigInt(34),
-  ORGANIZATION_CREATE: BigInt(1) << BigInt(35),
-  ORGANIZATION_READ: BigInt(1) << BigInt(36),
-  ORGANIZATION_WRITE: BigInt(1) << BigInt(37),
-  ORGANIZATION_DELETE: BigInt(1) << BigInt(38),
-  SESSION_ACCESS: BigInt(1) << BigInt(39),
+const scopeDefinitions = [
+  {
+    name: 'USER_READ_EMAIL',
+    description: 'Read your email',
+    label: 'Read user email',
+    value: BigInt(1) << BigInt(0),
+  },
+  {
+    name: 'USER_READ',
+    description: 'Access your public profile information',
+    label: 'Read user data',
+    value: BigInt(1) << BigInt(1),
+  },
+  {
+    name: 'USER_WRITE',
+    description: 'Write to your profile',
+    label: 'Write user data',
+    value: BigInt(1) << BigInt(2),
+  },
+  {
+    name: 'USER_DELETE',
+    description: 'Delete your account',
+    label: 'Delete your account',
+    value: BigInt(1) << BigInt(3),
+  },
+  {
+    name: 'USER_AUTH_WRITE',
+    description: 'Modify your authentication data',
+    label: 'Write auth data',
+    value: BigInt(1) << BigInt(4),
+  },
+  {
+    name: 'NOTIFICATION_READ',
+    description: 'Read your notifications',
+    label: 'Read notifications',
+    value: BigInt(1) << BigInt(5),
+  },
+  {
+    name: 'NOTIFICATION_WRITE',
+    description: 'Delete/View your notifications',
+    label: 'Write notifications',
+    value: BigInt(1) << BigInt(6),
+  },
+  {
+    name: 'PAYOUTS_READ',
+    description: 'Read your payouts data',
+    label: 'Read payouts',
+    value: BigInt(1) << BigInt(7),
+  },
+  {
+    name: 'PAYOUTS_WRITE',
+    description: 'Withdraw money',
+    label: 'Write payouts',
+    value: BigInt(1) << BigInt(8),
+  },
+  {
+    name: 'ANALYTICS',
+    description: 'Access your analytics data',
+    label: 'Read analytics',
+    value: BigInt(1) << BigInt(9),
+  },
+  {
+    name: 'PROJECT_CREATE',
+    description: 'Create new projects',
+    label: 'Create projects',
+    value: BigInt(1) << BigInt(10),
+  },
+  {
+    name: 'PROJECT_READ',
+    description: 'Read all your projects',
+    label: 'Read projects',
+    value: BigInt(1) << BigInt(11),
+  },
+  {
+    name: 'PROJECT_WRITE',
+    description: 'Write to project data',
+    label: 'Write projects',
+    value: BigInt(1) << BigInt(12),
+  },
+  {
+    name: 'PROJECT_DELETE',
+    description: 'Delete your projects',
+    label: 'Delete projects',
+    value: BigInt(1) << BigInt(13),
+  },
+  {
+    name: 'VERSION_CREATE',
+    description: 'Create new versions',
+    label: 'Create versions',
+    value: BigInt(1) << BigInt(14),
+  },
+  {
+    name: 'VERSION_READ',
+    description: 'Read all versions',
+    label: 'Read versions',
+    value: BigInt(1) << BigInt(15),
+  },
+  {
+    name: 'VERSION_WRITE',
+    description: 'Write to version data',
+    label: 'Write versions',
+    value: BigInt(1) << BigInt(16),
+  },
+  {
+    name: 'VERSION_DELETE',
+    description: 'Delete a version',
+    label: 'Delete versions',
+    value: BigInt(1) << BigInt(17),
+  },
+  {
+    name: 'REPORT_CREATE',
+    description: 'Create reports',
+    label: 'Create reports',
+    value: BigInt(1) << BigInt(18),
+  },
+  {
+    name: 'REPORT_READ',
+    description: 'Read reports',
+    label: 'Read reports',
+    value: BigInt(1) << BigInt(19),
+  },
+  {
+    name: 'REPORT_WRITE',
+    description: 'Edit reports',
+    label: 'Write reports',
+    value: BigInt(1) << BigInt(20),
+  },
+  {
+    name: 'REPORT_DELETE',
+    description: 'Delete reports',
+    label: 'Delete reports',
+    value: BigInt(1) << BigInt(21),
+  },
+  {
+    name: 'THREAD_READ',
+    description: 'Read threads',
+    label: 'Read threads',
+    value: BigInt(1) << BigInt(22),
+  },
+  {
+    name: 'THREAD_WRITE',
+    description: 'Write to threads',
+    label: 'Write threads',
+    value: BigInt(1) << BigInt(23),
+  },
+  {
+    name: 'PAT_CREATE',
+    description: 'Create personal API tokens',
+    label: 'Create PATs',
+    value: BigInt(1) << BigInt(24),
+  },
+  {
+    name: 'PAT_READ',
+    description: 'View created API tokens',
+    label: 'Read PATs',
+    value: BigInt(1) << BigInt(25),
+  },
+  {
+    name: 'PAT_WRITE',
+    description: 'Edit personal API tokens',
+    label: 'Write PATs',
+    value: BigInt(1) << BigInt(26),
+  },
+  {
+    name: 'PAT_DELETE',
+    description: 'Delete your personal API tokens',
+    label: 'Delete PATs',
+    value: BigInt(1) << BigInt(27),
+  },
+  {
+    name: 'SESSION_READ',
+    description: 'Read active sessions',
+    label: 'Read sessions',
+    value: BigInt(1) << BigInt(28),
+  },
+  {
+    name: 'SESSION_DELETE',
+    description: 'Delete sessions',
+    label: 'Delete sessions',
+    value: BigInt(1) << BigInt(29),
+  },
+  {
+    name: 'PERFORM_ANALYTICS',
+    description: 'Perform analytics actions',
+    label: 'Perform analytics',
+    value: BigInt(1) << BigInt(30),
+  },
+  {
+    name: 'COLLECTION_CREATE',
+    description: 'Create collections',
+    label: 'Create collections',
+    value: BigInt(1) << BigInt(31),
+  },
+  {
+    name: 'COLLECTION_READ',
+    description: 'Read collections',
+    label: 'Read collections',
+    value: BigInt(1) << BigInt(32),
+  },
+  {
+    name: 'COLLECTION_WRITE',
+    description: 'Write to collections',
+    label: 'Write collections',
+    value: BigInt(1) << BigInt(33),
+  },
+  {
+    name: 'COLLECTION_DELETE',
+    description: 'Delete collections',
+    label: 'Delete collections',
+    value: BigInt(1) << BigInt(34),
+  },
+  {
+    name: 'ORGANIZATION_CREATE',
+    description: 'Create organizations',
+    label: 'Create organizations',
+    value: BigInt(1) << BigInt(35),
+  },
+  {
+    name: 'ORGANIZATION_READ',
+    description: 'Read organizations',
+    label: 'Read organizations',
+    value: BigInt(1) << BigInt(36),
+  },
+  {
+    name: 'ORGANIZATION_WRITE',
+    description: 'Write to organizations',
+    label: 'Write organizations',
+    value: BigInt(1) << BigInt(37),
+  },
+  {
+    name: 'ORGANIZATION_DELETE',
+    description: 'Delete organizations',
+    label: 'Delete organizations',
+    value: BigInt(1) << BigInt(38),
+  },
+  {
+    name: 'SESSION_ACCESS',
+    description: 'Access modrinth-issued sessions',
+    label: 'Access sessions',
+    value: BigInt(1) << BigInt(39),
+  },
+]
+
+const Scopes = scopeDefinitions.reduce((acc, scope) => {
+  acc[scope.name] = scope.value
+  return acc
+}, {} as Record<string, bigint>)
+
+const ScopeLabels = scopeDefinitions.reduce((acc, scope) => {
+  acc[scope.name] = scope.label
+  return acc
+}, {} as Record<string, string>)
+
+const ScopeDescriptions = scopeDefinitions.reduce((acc, scope) => {
+  acc[scope.name] = scope.description
+  return acc
+}, {} as Record<string, string>)
+
+export const getScopeLabel = (scope: string | bigint) => {
+  if (typeof scope === 'bigint') {
+    for (const [scopeName, scopeFlag] of Object.entries(Scopes)) {
+      if (scopeFlag === scope) {
+        scope = scopeName
+        break
+      }
+    }
+
+    if (typeof scope === 'bigint') {
+      return 'Unknown scope'
+    }
+  }
+
+  return ScopeLabels?.[scope] ?? 'Unknown scope'
 }
 
 export const restrictedScopes = [
@@ -111,47 +343,4 @@ export const getScopeDefinitions = (scopes: bigint) => {
   return decodeScopes(scopes)
     .filter((scope) => Object.keys(ScopeDescriptions).includes(scope))
     .map((scope) => (ScopeDescriptions as Record<string, string>)[scope])
-}
-
-export const ScopeDescriptions = {
-  USER_READ_EMAIL: 'Read your email',
-  USER_READ: 'Access your public profile information',
-  USER_WRITE: 'Write to your profile',
-  USER_DELETE: 'Delete your account',
-  USER_AUTH_WRITE: 'Modify your authentication data',
-  NOTIFICATION_READ: 'Read your notifications',
-  NOTIFICATION_WRITE: 'Delete/View your notifications',
-  PAYOUTS_READ: 'Read your payouts data',
-  PAYOUTS_WRITE: 'Withdraw money',
-  ANALYTICS: 'Access your analytics data',
-  PROJECT_CREATE: 'Create new projects',
-  PROJECT_READ: 'Read all your projects',
-  PROJECT_WRITE: 'Write to project data',
-  PROJECT_DELETE: 'Delete your projects',
-  VERSION_CREATE: 'Create new versions',
-  VERSION_READ: 'Read all versions',
-  VERSION_WRITE: 'Write to version data',
-  VERSION_DELETE: 'Delete a version',
-  REPORT_CREATE: 'Create reports',
-  REPORT_READ: 'Read reports',
-  REPORT_WRITE: 'Edit reports',
-  REPORT_DELETE: 'Delete reports',
-  THREAD_READ: 'Read threads',
-  THREAD_WRITE: 'Write to threads',
-  PAT_CREATE: 'Create personal API tokens',
-  PAT_READ: 'View created API tokens',
-  PAT_WRITE: 'Edit personal API tokens',
-  PAT_DELETE: 'Delete your personal API tokens',
-  SESSION_READ: 'Read active sessions',
-  SESSION_DELETE: 'Delete sessions',
-  PERFORM_ANALYTICS: 'Perform analytics actions',
-  COLLECTION_CREATE: 'Create collections',
-  COLLECTION_READ: 'Read collections',
-  COLLECTION_WRITE: 'Write to collections',
-  COLLECTION_DELETE: 'Delete collections',
-  ORGANIZATION_CREATE: 'Create organizations',
-  ORGANIZATION_READ: 'Read organizations',
-  ORGANIZATION_WRITE: 'Write to organizations',
-  ORGANIZATION_DELETE: 'Delete organizations',
-  SESSION_ACCESS: 'Access modrinth-issued sessions',
 }
