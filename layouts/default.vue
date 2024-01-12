@@ -16,6 +16,20 @@
         </nuxt-link>
       </template>
     </div>
+    <div v-if="!cosmetics.hideStagingBanner" class="site-banner site-banner--warning">
+      <div class="site-banner__title">
+        <IssuesIcon />
+        <span> You’re viewing Modrinth’s staging environment </span>
+      </div>
+      <div class="site-banner__description">
+        The staging environment is running on a copy of the production Modrinth database. This is
+        used for testing and debugging purposes, and may be running in-development versions of the
+        Modrinth backend or frontend newer than the production instance.
+      </div>
+      <div class="site-banner__actions">
+        <Button transparent icon-only :action="hideStagingBanner"><XIcon /></Button>
+      </div>
+    </div>
     <header class="site-header" role="presentation">
       <section class="navbar columns" role="navigation">
         <section class="logo column" role="presentation">
@@ -357,7 +371,7 @@
   </div>
 </template>
 <script setup>
-import { LogInIcon, DownloadIcon, LibraryIcon } from 'omorphia'
+import { LogInIcon, DownloadIcon, LibraryIcon, XIcon, IssuesIcon, Button } from 'omorphia'
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg'
 import CrossIcon from '~/assets/images/utils/x.svg'
 import SearchIcon from '~/assets/images/utils/search.svg'
@@ -447,6 +461,11 @@ function developerModeIncrement() {
 
 async function logoutUser() {
   await logout()
+}
+
+function hideStagingBanner() {
+  cosmetics.value.hideStagingBanner = true
+  saveCosmetics()
 }
 </script>
 <script>
@@ -1192,6 +1211,44 @@ export default defineNuxtComponent({
   justify-content: center;
   gap: 1rem;
   padding: 0.5rem 1rem;
+}
+
+.site-banner--warning {
+  background-color: var(--color-red-bg);
+  border-bottom: 2px solid var(--color-red);
+  display: grid;
+  gap: 0.5rem;
+  grid-template: 'title actions' 'description actions';
+  padding-block: var(--gap-xl);
+  padding-inline: calc((100% - 80rem) / 2 + var(--gap-md));
+
+  .site-banner__title {
+    grid-area: title;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-weight: bold;
+    font-size: var(--font-size-md);
+    color: var(--color-contrast);
+
+    svg {
+      color: var(--color-red);
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  .site-banner__description {
+    grid-area: description;
+  }
+
+  .site-banner__actions {
+    grid-area: actions;
+  }
+
+  a {
+    color: var(--color-red);
+  }
 }
 
 @media (max-width: 1200px) {

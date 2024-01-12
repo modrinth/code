@@ -66,6 +66,8 @@ html {
   --color-special-purple: #8e32f3;
   --color-special-gray: #595b61;
 
+  --color-red-bg: rgba(204, 35, 69, 0.1);
+
   --color-warning-bg: hsl(355, 70%, 88%);
   --color-warning-text: hsl(342, 70%, 35%);
 
@@ -158,6 +160,8 @@ html {
   --color-special-blue: #4f9cff;
   --color-special-purple: #c78aff;
   --color-special-gray: #9fa4b3;
+
+  --color-red-bg: rgba(255, 74, 110, 0.2);
 
   --color-brand-green: #1bd96a;
   --color-brand: var(--color-brand-green);
