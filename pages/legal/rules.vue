@@ -63,6 +63,9 @@
         Be designed to upload any data to a remote server (i.e. one that the user does not directly
         choose to connect to in-game) without clear disclosure.
       </li>
+      <li>
+        Bypass restrictions placed by Mojang to prevent users from joining certain in-game servers.
+      </li>
     </ol>
 
     <h2 id="clear-and-honest-function">2. Clear and Honest Function</h2>
