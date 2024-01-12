@@ -293,27 +293,39 @@ async fn update_and_add_to_index(
     client: &Client,
     index: &Index,
     projects: &[UploadSearchProject],
-    _additional_fields: &[String],
+    additional_fields: &[String],
 ) -> Result<(), IndexingError> {
     // TODO: Uncomment this- hardcoding loader_fields is a band-aid fix, and will be fixed soon
-    // let mut new_filterable_attributes: Vec<String> = index.get_filterable_attributes().await?;
-    // let mut new_displayed_attributes = index.get_displayed_attributes().await?;
+    let mut new_filterable_attributes: Vec<String> = index.get_filterable_attributes().await?;
+    let mut new_displayed_attributes = index.get_displayed_attributes().await?;
 
-    // new_filterable_attributes.extend(additional_fields.iter().map(|s: &String| s.to_string()));
-    // new_displayed_attributes.extend(additional_fields.iter().map(|s| s.to_string()));
-    // info!("add attributes.");
-    // let filterable_task = index
-    //     .set_filterable_attributes(new_filterable_attributes)
-    //     .await?;
-    // let displayable_task = index
-    //     .set_displayed_attributes(new_displayed_attributes)
-    //     .await?;
-    // filterable_task
-    //     .wait_for_completion(client, None, Some(TIMEOUT))
-    //     .await?;
-    // displayable_task
-    //     .wait_for_completion(client, None, Some(TIMEOUT))
-    //     .await?;
+    // Check if any 'additional_fields' are not already in the index
+    // Only add if they are not already in the index
+    let new_fields = additional_fields
+        .into_iter()
+        .filter(|x| !new_filterable_attributes.contains(x))
+        .collect::<Vec<_>>();
+    if !new_fields.is_empty() {
+        info!("Adding new fields to index: {:?}", new_fields);
+        new_filterable_attributes.extend(new_fields.iter().map(|s: &&String| s.to_string()));
+        new_displayed_attributes.extend(new_fields.iter().map(|s| s.to_string()));
+
+        // Adds new fields to the index
+        let filterable_task = index
+            .set_filterable_attributes(new_filterable_attributes)
+            .await?;
+        let displayable_task = index
+            .set_displayed_attributes(new_displayed_attributes)
+            .await?;
+
+        // Allow a long timeout for adding new attributes- it only needs to happen the once
+        filterable_task
+            .wait_for_completion(client, None, Some(TIMEOUT * 100))
+            .await?;
+        displayable_task
+            .wait_for_completion(client, None, Some(TIMEOUT * 100))
+            .await?;
+    }
 
     info!("Adding to index.");
 
@@ -374,14 +386,6 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "gallery",
     "featured_gallery",
     "color",
-    // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
-    // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "server_only",
-    "client_only",
-    "game_versions",
-    "singleplayer",
-    "client_and_server",
-    "mrpack_loaders",
     // V2 legacy fields for logical consistency
     "client_side",
     "server_side",
@@ -420,14 +424,6 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "project_id",
     "open_source",
     "color",
-    // Note: loader fields are not here, but are added on as they are needed (so they can be dynamically added depending on which exist).
-    // TODO: remove these- as they should be automatically populated. This is a band-aid fix.
-    "server_only",
-    "client_only",
-    "game_versions",
-    "singleplayer",
-    "client_and_server",
-    "mrpack_loaders",
     // V2 legacy fields for logical consistency
     "client_side",
     "server_side",
