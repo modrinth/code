@@ -131,8 +131,8 @@ pub struct UploadSearchProject {
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
     pub links: Vec<LinkUrl>,
     pub gallery_items: Vec<GalleryItem>, // Gallery *only* urls are stored in gallery, but the gallery items are stored here- required for the Project model.
-    pub games: Vec<String>,              // Todo: in future, could be a searchable field.
-    pub organization_id: Option<String>, // Todo: in future, could be a searchable field.
+    pub games: Vec<String>,
+    pub organization_id: Option<String>,
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
@@ -183,8 +183,8 @@ pub struct ResultSearchProject {
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
     pub links: Vec<LinkUrl>,
     pub gallery_items: Vec<GalleryItem>, // Gallery *only* urls are stored in gallery, but the gallery items are stored here- required for the Project model.
-    pub games: Vec<String>,              // Todo: in future, could be a searchable field.
-    pub organization_id: Option<String>, // Todo: in future, could be a searchable field.
+    pub games: Vec<String>,
+    pub organization_id: Option<String>,
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]

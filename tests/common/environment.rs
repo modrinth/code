@@ -25,9 +25,6 @@ pub async fn with_test_environment<Fut, A>(
     db.cleanup().await;
 }
 
-// TODO: This needs to be slightly redesigned in order to do both V2 and v3 tests.
-// TODO: Most tests, since they use API functions, can be applied to both. The ones that weren't are in v2/, but
-// all tests that can be applied to both should use both v2 and v3 (extract api to a trait  with all the API functions and call both).
 pub async fn with_test_environment_all<Fut, F>(max_connections: Option<u32>, f: F)
 where
     Fut: Future<Output = ()>,

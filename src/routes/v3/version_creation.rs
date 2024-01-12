@@ -583,8 +583,6 @@ async fn upload_file_to_version_inner(
     };
 
     let all_loaders = models::loader_fields::Loader::list(&mut **transaction, &redis).await?;
-
-    // TODO: this coded is reused a lot, it should be refactored into a function
     let selected_loaders = version
         .loaders
         .iter()

@@ -90,7 +90,7 @@ async fn test_project_type_sanity() {
             );
         }
 
-        // TODO: as we get more complicated strucures with v3 testing, and alpha/beta get more complicated, we should add more tests here,
+        // As we get more complicated strucures with as v3 continues to expand, and alpha/beta get more complicated, we should add more tests here,
         // to ensure that projects created with v3 routes are still valid and work with v3 routes.
     })
     .await;
@@ -397,7 +397,6 @@ async fn permissions_patch_project_v2() {
     with_test_environment(Some(8), |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
 
-        // TODO: This only includes v2 ones (as it should. See v3)
         // For each permission covered by EDIT_DETAILS, ensure the permission is required
         let edit_details = ProjectPermissions::EDIT_DETAILS;
         let test_pairs = [

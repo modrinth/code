@@ -218,7 +218,6 @@ pub async fn notifications_scopes() {
 #[actix_rt::test]
 pub async fn project_version_create_scopes_v3() {
     with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
-        // TODO: If possible, find a way to use generic api functions with the Permissions/Scopes test, then this can be recombined with the V2 version of this test
         let api = &test_env.api;
 
         // Create project
@@ -409,16 +408,14 @@ pub async fn project_version_reads_scopes() {
             .await
             .unwrap();
 
-        // TODO: Should this be /POST? Looks like /GET
-        // TODO: this scope doesn't actually affect anything, because the Project::get_id contained within disallows hidden versions, which is the point of this scope
-        // let req_gen = || {
-        //     test::TestRequest::post()
-        //     .uri(&format!("/v3/version_file/{beta_file_hash}/update"))
-        //     .set_json(json!({}))
+        // TODO: This scope currently fails still as the 'version' field of QueryProject only allows public versions.
+        // TODO: This will be fixed when the 'extracts_versions' PR is merged.
+        // let req_gen = |pat: Option<String>| async move {
+        //     api.get_update_from_hash(beta_file_hash, "sha1", None, None, None, pat.as_deref())
+        //         .await
         // };
         // ScopeTest::new(&test_env).with_failure_code(404).test(req_gen, read_version).await.unwrap();
 
-        // TODO: Should this be /POST? Looks like /GET
         let req_gen = |pat: Option<String>| async move {
             api.get_versions_from_hashes(&[beta_file_hash], "sha1", pat.as_deref())
                 .await
@@ -432,30 +429,10 @@ pub async fn project_version_reads_scopes() {
         assert!(success.as_object().unwrap().contains_key(beta_file_hash));
 
         // Update version file
-        // TODO: Should this be /POST? Looks like /GET
-        // TODO: this scope doesn't actually affect anything, because the Project::get_id contained within disallows hidden versions, which is the point of this scope
-
-        // let req_gen = || {
-        //     test::TestRequest::post()
-        //     .uri(&format!("/v3/version_files/update_individual"))
-        //     .set_json(json!({
-        //         "hashes": [{
-        //             "hash": beta_file_hash,
-        //         }]
-        //     }))
-        // };
-        // let (failure, success) = ScopeTest::new(&test_env).with_failure_code(200).test(req_gen, read_version).await.unwrap();
-        // assert!(!failure.as_object().unwrap().contains_key(beta_file_hash));
-        // assert!(success.as_object().unwrap().contains_key(beta_file_hash));
-
-        // Update version file
-        // TODO: this scope doesn't actually affect anything, because the Project::get_id contained within disallows hidden versions, which is the point of this scope
-        // let req_gen = || {
-        //     test::TestRequest::post()
-        //     .uri(&format!("/v3/version_files/update"))
-        //     .set_json(json!({
-        //         "hashes": [beta_file_hash]
-        //     }))
+        // TODO: This scope currently fails still as the 'version' field of QueryProject only allows public versions.
+        // TODO: This will be fixed when the 'extracts_versions' PR is merged.
+        // let req_gen = |pat : Option<String>| async move {
+        //     api.update_files("sha1", vec![beta_file_hash.clone()], None, None, None, pat.as_deref()).await
         // };
         // let (failure, success) = ScopeTest::new(&test_env).with_failure_code(200).test(req_gen, read_version).await.unwrap();
         // assert!(!failure.as_object().unwrap().contains_key(beta_file_hash));
@@ -712,8 +689,7 @@ pub async fn version_write_scopes() {
             .await
             .unwrap();
 
-        //  Delete version file
-        // TODO: Should this scope be VERSION_DELETE?
+        //  Delete version file. Notably, this uses 'VERSION_WRITE' instead of 'VERSION_DELETE' as it is writing to the version
         let req_gen = |pat: Option<String>| async move {
             api.remove_version_file(alpha_file_hash, pat.as_deref())
                 .await

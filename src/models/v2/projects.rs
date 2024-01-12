@@ -101,7 +101,6 @@ impl LegacyProject {
     // Requires any queried versions to be passed in, to get access to certain version fields contained within.
     // - This can be any version, because the fields are ones that used to be on the project itself.
     // - Its conceivable that certain V3 projects that have many different ones may not have the same fields on all of them.
-    // TODO: Should this return an error instead for v2 users?
     // It's safe to use a db version_item for this as the only info is side types, game versions, and loader fields (for loaders), which used to be public on project anyway.
     pub fn from(data: Project, versions_item: Option<version_item::QueryVersion>) -> Self {
         let mut client_side = LegacySideType::Unknown;
@@ -289,10 +288,6 @@ pub struct LegacyVersion {
     /// A list of loaders this project supports (has a newtype struct)
     pub loaders: Vec<Loader>,
 
-    // TODO: should we remove this? as this is a v3 field and tests for it should be isolated to v3
-    // it allows us to keep tests that use this struct in common
-    pub ordering: Option<i32>,
-
     pub id: VersionId,
     pub project_id: ProjectId,
     pub author_id: UserId,
@@ -354,7 +349,6 @@ impl From<Version> for LegacyVersion {
             files: data.files,
             dependencies: data.dependencies,
             game_versions,
-            ordering: data.ordering,
             loaders,
         }
     }

@@ -85,7 +85,6 @@ impl ApiV3 {
         test::read_body_json(resp).await
     }
 
-    // TODO: fold this into v3 API of other v3 testing PR
     async fn get_games(&self) -> ServiceResponse {
         let req = TestRequest::get()
             .uri("/v3/games")

@@ -50,3 +50,32 @@ pub async fn project_version_create_scopes() {
     })
     .await;
 }
+
+#[actix_rt::test]
+pub async fn project_version_reads_scopes() {
+    with_test_environment(None, |_test_env: TestEnvironment<ApiV2>| async move {
+        // let api = &test_env.api;
+        // let beta_file_hash = &test_env.dummy.project_beta.file_hash;
+
+        // let read_version = Scopes::VERSION_READ;
+
+        // Update individual version file
+        // TODO: This scope currently fails still as the 'version' field of QueryProject only allows public versions.
+        // TODO: This will be fixed when the 'extracts_versions' PR is merged.
+        // let req_gen = |pat : Option<String>| async move {
+        //     api.update_individual_files("sha1", vec![
+        //         FileUpdateData {
+        //             hash: beta_file_hash.clone(),
+        //             loaders: None,
+        //             game_versions: None,
+        //             version_types: None
+        //         }
+        //     ], pat.as_deref())
+        //         .await
+        // };
+        // let (failure, success) = ScopeTest::new(&test_env).with_failure_code(200).test(req_gen, read_version).await.unwrap();
+        // assert!(!failure.as_object().unwrap().contains_key(beta_file_hash));
+        // assert!(success.as_object().unwrap().contains_key(beta_file_hash));
+    })
+    .await;
+}

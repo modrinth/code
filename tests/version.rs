@@ -536,49 +536,55 @@ pub async fn test_project_versions() {
 
 #[actix_rt::test]
 async fn can_create_version_with_ordering() {
-    with_test_environment_all(None, |env| async move {
-        let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
+    with_test_environment(
+        None,
+        |env: common::environment::TestEnvironment<ApiV3>| async move {
+            let alpha_project_id_parsed = env.dummy.project_alpha.project_id_parsed;
 
-        let new_version_id = get_json_val_str(
-            env.api
-                .add_public_version_deserialized_common(
-                    alpha_project_id_parsed,
-                    "1.2.3.4",
-                    TestFile::BasicMod,
-                    Some(1),
-                    None,
-                    USER_USER_PAT,
-                )
-                .await
-                .id,
-        );
+            let new_version_id = get_json_val_str(
+                env.api
+                    .add_public_version_deserialized_common(
+                        alpha_project_id_parsed,
+                        "1.2.3.4",
+                        TestFile::BasicMod,
+                        Some(1),
+                        None,
+                        USER_USER_PAT,
+                    )
+                    .await
+                    .id,
+            );
 
-        let versions = env
-            .api
-            .get_versions_deserialized_common(vec![new_version_id.clone()], USER_USER_PAT)
-            .await;
-        assert_eq!(versions[0].ordering, Some(1));
-    })
+            let versions = env
+                .api
+                .get_versions_deserialized(vec![new_version_id.clone()], USER_USER_PAT)
+                .await;
+            assert_eq!(versions[0].ordering, Some(1));
+        },
+    )
     .await;
 }
 
 #[actix_rt::test]
 async fn edit_version_ordering_works() {
-    with_test_environment_all(None, |env| async move {
-        let alpha_version_id = env.dummy.project_alpha.version_id.clone();
+    with_test_environment(
+        None,
+        |env: common::environment::TestEnvironment<ApiV3>| async move {
+            let alpha_version_id = env.dummy.project_alpha.version_id.clone();
 
-        let resp = env
-            .api
-            .edit_version_ordering(&alpha_version_id, Some(10), USER_USER_PAT)
-            .await;
-        assert_status!(&resp, StatusCode::NO_CONTENT);
+            let resp = env
+                .api
+                .edit_version_ordering(&alpha_version_id, Some(10), USER_USER_PAT)
+                .await;
+            assert_status!(&resp, StatusCode::NO_CONTENT);
 
-        let versions = env
-            .api
-            .get_versions_deserialized_common(vec![alpha_version_id.clone()], USER_USER_PAT)
-            .await;
-        assert_eq!(versions[0].ordering, Some(10));
-    })
+            let versions = env
+                .api
+                .get_versions_deserialized(vec![alpha_version_id.clone()], USER_USER_PAT)
+                .await;
+            assert_eq!(versions[0].ordering, Some(10));
+        },
+    )
     .await;
 }
 

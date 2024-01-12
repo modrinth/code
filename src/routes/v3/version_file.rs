@@ -132,7 +132,6 @@ pub async fn get_update_from_hash(
     .map(|x| x.1)
     .ok();
     let hash = info.into_inner().0.to_lowercase();
-
     if let Some(file) = database::models::Version::get_file_from_hash(
         hash_query
             .algorithm
@@ -185,7 +184,6 @@ pub async fn get_update_from_hash(
             }
         }
     }
-
     Err(ApiError::NotFound)
 }
 

@@ -77,9 +77,6 @@ pub struct CommonVersion {
     pub requested_status: Option<VersionStatus>,
     pub files: Vec<VersionFile>,
     pub dependencies: Vec<Dependency>,
-
-    // TODO: should ordering be in v2?
-    pub ordering: Option<i32>,
 }
 
 #[derive(Deserialize)]

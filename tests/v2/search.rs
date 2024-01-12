@@ -18,9 +18,6 @@ use std::sync::Arc;
 
 #[actix_rt::test]
 async fn search_projects() {
-    // TODO: ("Match changes in the 2 version of thee add_public_version_creation_data to those made in v3
-    // It should drastically simplify this function
-
     // Test setup and dummy data
     with_test_environment(Some(10), |test_env: TestEnvironment<ApiV2>| async move {
         let api = &test_env.api;
@@ -399,6 +396,8 @@ async fn search_projects() {
             );
             assert!(hit.categories.contains(&"forge".to_string()));
             assert!(hit.categories.contains(&"fabric".to_string()));
+            assert!(hit.display_categories.contains(&"forge".to_string()));
+            assert!(hit.display_categories.contains(&"fabric".to_string()));
 
             // Also, ensure author is correctly capitalized
             assert_eq!(hit.author, "User".to_string());

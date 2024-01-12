@@ -12,7 +12,6 @@ use crate::routes::v3::projects::ProjectIds;
 use crate::routes::{v2_reroute, v3, ApiError};
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
-use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
@@ -53,35 +52,16 @@ pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, SearchError> {
-    // TODO: make this nicer
     // Search now uses loader_fields instead of explicit 'client_side' and 'server_side' fields
     // While the backend for this has changed, it doesnt affect much
     // in the API calls except that 'versions:x' is now 'game_versions:x'
-    let facets: Option<Vec<Vec<Vec<String>>>> = if let Some(facets) = info.facets {
-        let facets = serde_json::from_str::<Vec<Vec<serde_json::Value>>>(&facets)?;
-        // Search can now *optionally* have a third inner array: So Vec(AND)<Vec(OR)<Vec(AND)< _ >>>
-        // For every inner facet, we will check if it can be deserialized into a Vec<&str>, and do so.
-        // If not, we will assume it is a single facet and wrap it in a Vec.
-        let facets: Vec<Vec<Vec<String>>> = facets
-            .into_iter()
-            .map(|facets| {
-                facets
-                    .into_iter()
-                    .map(|facet| {
-                        if facet.is_array() {
-                            serde_json::from_value::<Vec<String>>(facet).unwrap_or_default()
-                        } else {
-                            vec![serde_json::from_value::<String>(facet).unwrap_or_default()]
-                        }
-                    })
-                    .collect_vec()
-            })
-            .collect_vec();
+    let facets: Option<Vec<Vec<String>>> = if let Some(facets) = info.facets {
+        let facets = serde_json::from_str::<Vec<Vec<String>>>(&facets)?;
 
         // These loaders specifically used to be combined with 'mod' to be a plugin, but now
         // they are their own loader type. We will convert 'mod' to 'mod' OR 'plugin'
         // as it essentially was before.
-        let facets = v2_reroute::convert_plugin_loaders_v3(facets);
+        let facets = v2_reroute::convert_plugin_loader_facets_v3(facets);
 
         Some(
             facets
@@ -89,27 +69,22 @@ pub async fn project_search(
                 .map(|facet| {
                     facet
                         .into_iter()
-                        .map(|facets| {
-                            facets
-                                .into_iter()
-                                .map(|facet| {
-                                    if let Some((key, operator, val)) = parse_facet(&facet) {
-                                        format!(
-                                            "{}{}{}",
-                                            match key.as_str() {
-                                                "versions" => "game_versions",
-                                                "project_type" => "project_types",
-                                                "title" => "name",
-                                                x => x,
-                                            },
-                                            operator,
-                                            val
-                                        )
-                                    } else {
-                                        facet.to_string()
-                                    }
-                                })
-                                .collect::<Vec<_>>()
+                        .map(|facet| {
+                            if let Some((key, operator, val)) = parse_facet(&facet) {
+                                format!(
+                                    "{}{}{}",
+                                    match key.as_str() {
+                                        "versions" => "game_versions",
+                                        "project_type" => "project_types",
+                                        "title" => "name",
+                                        x => x,
+                                    },
+                                    operator,
+                                    val
+                                )
+                            } else {
+                                facet.to_string()
+                            }
                         })
                         .collect::<Vec<_>>()
                 })

@@ -21,8 +21,6 @@ use crate::{
 
 use super::ApiV2;
 
-// TODO: Tag gets do not include PAT, as they are public.
-
 impl ApiV2 {
     async fn get_side_types(&self) -> ServiceResponse {
         let req = TestRequest::get()

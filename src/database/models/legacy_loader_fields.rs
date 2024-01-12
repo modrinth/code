@@ -41,15 +41,16 @@ impl MinecraftGameVersion {
         redis: &RedisPool,
     ) -> Result<Vec<MinecraftGameVersion>, DatabaseError>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
-        let game_version_enum = LoaderFieldEnum::get(Self::FIELD_NAME, exec, redis)
+        let mut exec = exec.acquire().await?;
+        let game_version_enum = LoaderFieldEnum::get(Self::FIELD_NAME, &mut *exec, redis)
             .await?
             .ok_or_else(|| {
                 DatabaseError::SchemaError("Could not find game version enum.".to_string())
             })?;
         let game_version_enum_values =
-            LoaderFieldEnumValue::list(game_version_enum.id, exec, redis).await?;
+            LoaderFieldEnumValue::list(game_version_enum.id, &mut *exec, redis).await?;
 
         let game_versions = game_version_enum_values
             .into_iter()
@@ -69,24 +70,6 @@ impl MinecraftGameVersion {
             .collect_vec();
 
         Ok(game_versions)
-    }
-
-    // TODO: remove this
-    pub async fn list_transaction(
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-        redis: &RedisPool,
-    ) -> Result<Vec<MinecraftGameVersion>, DatabaseError> {
-        let game_version_enum = LoaderFieldEnum::get(Self::FIELD_NAME, &mut **transaction, redis)
-            .await?
-            .ok_or_else(|| {
-                DatabaseError::SchemaError("Could not find game version enum.".to_string())
-            })?;
-        let game_version_enum_values =
-            LoaderFieldEnumValue::list(game_version_enum.id, &mut **transaction, redis).await?;
-        Ok(game_version_enum_values
-            .into_iter()
-            .map(MinecraftGameVersion::from_enum_value)
-            .collect())
     }
 
     // Tries to create a MinecraftGameVersion from a VersionField

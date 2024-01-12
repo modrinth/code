@@ -202,8 +202,12 @@ pub struct EditVersion {
     pub downloads: Option<u32>,
     pub status: Option<VersionStatus>,
     pub file_types: Option<Vec<EditVersionFileType>>,
-
-    pub ordering: Option<Option<i32>>, //TODO: How do you actually pass this in json?
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub ordering: Option<Option<i32>>,
 
     // Flattened loader fields
     // All other fields are loader-specific VersionFields
@@ -220,8 +224,6 @@ pub struct EditVersionFileType {
     pub file_type: Option<FileType>,
 }
 
-// TODO: Avoid this 'helper' pattern here and similar fnunctoins- a macro might be the best bet here to ensure it's callable from both v2 and v3
-// (web::Path can't be recreated naturally)
 pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(VersionId,)>,

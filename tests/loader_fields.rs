@@ -5,6 +5,7 @@ use actix_web::test;
 use common::api_v3::ApiV3;
 use common::environment::{with_test_environment, TestEnvironment};
 use itertools::Itertools;
+use labrinth::database::models::legacy_loader_fields::MinecraftGameVersion;
 use labrinth::models::v3;
 use serde_json::json;
 
@@ -555,4 +556,80 @@ async fn test_multi_get_redis_cache() {
         }
     })
     .await;
+}
+
+#[actix_rt::test]
+async fn minecraft_game_version_update() {
+    // We simulate adding a Minecraft game version, to ensure other data doesn't get overwritten
+    // This is basically a test for the insertion/concatenation query
+    // This doesn't use a route (as this behaviour isn't exposed via a route, but a scheduled URL call)
+    // We just interact with the labrinth functions directly
+    with_test_environment(None, |test_env: TestEnvironment<ApiV3>| async move {
+        let api = &test_env.api;
+
+        // First, get a list of all gameversions
+        let game_versions = api
+            .get_loader_field_variants_deserialized("game_versions")
+            .await;
+
+        // A couple specific checks- in the dummy data, all game versions are marked as major=false except 1.20.5
+        let name_to_major = game_versions
+            .iter()
+            .map(|x| {
+                (
+                    x.value.clone(),
+                    x.metadata.get("major").unwrap().as_bool().unwrap(),
+                )
+            })
+            .collect::<std::collections::HashMap<_, _>>();
+        for (name, major) in name_to_major {
+            if name == "1.20.5" {
+                assert!(major);
+            } else {
+                assert!(!major);
+            }
+        }
+
+        // Now, we add a new game version, directly to the db
+        let pool = test_env.db.pool.clone();
+        let redis = test_env.db.redis_pool.clone();
+        MinecraftGameVersion::builder()
+            .version("1.20.6")
+            .unwrap()
+            .version_type("release")
+            .unwrap()
+            .created(
+                // now
+                &chrono::Utc::now(),
+            )
+            .insert(&pool, &redis)
+            .await
+            .unwrap();
+
+        // Check again
+        let game_versions = api
+            .get_loader_field_variants_deserialized("game_versions")
+            .await;
+
+        let name_to_major = game_versions
+            .iter()
+            .map(|x| {
+                (
+                    x.value.clone(),
+                    x.metadata.get("major").unwrap().as_bool().unwrap(),
+                )
+            })
+            .collect::<std::collections::HashMap<_, _>>();
+        // Confirm that the new version is there
+        assert!(name_to_major.contains_key("1.20.6"));
+        // Confirm metadata is unaltered
+        for (name, major) in name_to_major {
+            if name == "1.20.5" {
+                assert!(major);
+            } else {
+                assert!(!major);
+            }
+        }
+    })
+    .await
 }
