@@ -25,7 +25,7 @@
           <Checkbox
             v-for="scope in scopeList"
             :key="scope"
-            :label="getScopeLabel(scope)"
+            :label="scopesToLabels(getScopeValue(scope)).join(', ')"
             :model-value="hasScope(scopesVal, scope)"
             @update:model-value="scopesVal = toggleScope(scopesVal, scope)"
           />
@@ -151,7 +151,13 @@
 <script setup>
 import { PlusIcon, XIcon, Checkbox, TrashIcon, EditIcon, SaveIcon, ConfirmModal } from 'omorphia'
 
-import { hasScope, scopeList, toggleScope, getScopeLabel } from '~/utils/auth/scopes.ts'
+import {
+  hasScope,
+  scopeList,
+  toggleScope,
+  useScopes,
+  getScopeValue,
+} from '~/composables/auth/scopes.ts'
 
 import CopyCode from '~/components/ui/CopyCode.vue'
 import Modal from '~/components/ui/Modal.vue'
@@ -165,6 +171,7 @@ useHead({
 })
 
 const data = useNuxtApp()
+const { scopesToLabels } = useScopes()
 const patModal = ref()
 
 const editPatIndex = ref(null)

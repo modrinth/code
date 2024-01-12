@@ -65,12 +65,14 @@
 import { Button, XIcon, CheckIcon, Avatar } from 'omorphia'
 import { useBaseFetch } from '@/composables/fetch.js'
 import { useAuth } from '@/composables/auth.js'
-import { getScopeDefinitions } from '@/utils/auth/scopes.ts'
+
+import { useScopes } from '@/composables/auth/scopes.ts'
 
 const data = useNuxtApp()
 
 const router = useRoute()
 const auth = await useAuth()
+const { scopesToDefinitions } = useScopes()
 
 const clientId = router.query?.client_id || false
 const redirectUri = router.query?.redirect_uri || false
@@ -115,7 +117,7 @@ const { data: app } = await useAsyncData('oauth/app/' + clientId, () =>
   })
 )
 
-const scopeDefinitions = getScopeDefinitions(BigInt(authorizationData.value?.requested_scopes || 0))
+const scopeDefinitions = scopesToDefinitions(BigInt(authorizationData.value?.requested_scopes || 0))
 
 const { data: createdBy } = await useAsyncData('user/' + app.value.created_by, () =>
   useBaseFetch('user/' + app.value.created_by, {

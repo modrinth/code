@@ -56,14 +56,14 @@
           </label>
           <div class="scope-list">
             <div
-              v-for="scope in getScopeDefinitions(authorization.scopes)"
+              v-for="scope in scopesToDefinitions(authorization.scopes)"
               :key="scope"
               class="scope-list-item"
             >
               <div class="scope-list-item-icon">
                 <CheckIcon />
               </div>
-              {{ constCaseToTitleCase(scope) }}
+              {{ scope }}
             </div>
           </div>
         </div>
@@ -89,7 +89,10 @@
 </template>
 <script setup>
 import { Button, TrashIcon, CheckIcon, ConfirmModal, Avatar } from 'omorphia'
-import { getScopeDefinitions } from '~/utils/auth/scopes.ts'
+
+import { useScopes } from '~/composables/auth/scopes.ts'
+
+const { scopesToDefinitions } = useScopes()
 
 const revokingId = ref(null)
 
@@ -166,12 +169,6 @@ async function revokeApp(id) {
     })
   }
 }
-
-const constCaseToTitleCase = (str) =>
-  str
-    .split('_')
-    .map((x) => x[0].toUpperCase() + x.slice(1).toLowerCase())
-    .join(' ')
 </script>
 
 <style lang="scss" scoped>

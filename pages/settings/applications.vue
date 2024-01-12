@@ -61,7 +61,7 @@
           <Checkbox
             v-for="scope in scopeList"
             :key="scope"
-            :label="getScopeLabel(scope)"
+            :label="scopesToLabels(getScopeValue(scope)).join(', ')"
             :model-value="hasScope(scopesVal, scope)"
             @update:model-value="() => (scopesVal = toggleScope(scopesVal, scope))"
           />
@@ -230,7 +230,14 @@ import {
   ConfirmModal,
 } from 'omorphia'
 import Modal from '~/components/ui/Modal.vue'
-import { scopeList, hasScope, toggleScope, getScopeLabel } from '~/utils/auth/scopes.ts'
+
+import {
+  scopeList,
+  hasScope,
+  toggleScope,
+  useScopes,
+  getScopeValue,
+} from '~/composables/auth/scopes.ts'
 
 definePageMeta({
   middleware: 'auth',
@@ -241,6 +248,7 @@ useHead({
 })
 
 const data = useNuxtApp()
+const { scopesToLabels } = useScopes()
 
 const appModal = ref()
 
