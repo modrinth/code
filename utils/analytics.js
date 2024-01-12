@@ -38,7 +38,7 @@ const hashProjectId = (projectId) => {
   return projectId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 30
 }
 
-const defaultColors = ['#ff496e', '#ffa347', '#1bd96a', '#4f9cff', '#c78aff']
+export const defaultColors = ['#ff496e', '#ffa347', '#1bd96a', '#4f9cff', '#c78aff']
 
 /**
  * @param {string | number} value
@@ -51,7 +51,7 @@ export const getDefaultColor = (value) => {
   return defaultColors[value % defaultColors.length]
 }
 
-export const intToRgba = (color, projectId = 'Unknown', theme) => {
+export const intToRgba = (color, projectId = 'Unknown', theme = 'dark') => {
   const hash = hashProjectId(projectId)
 
   if (!color || color === 0) {
@@ -109,6 +109,7 @@ const emptyAnalytics = {
       },
     ],
     colors: [],
+    defaultColors: [],
   },
 }
 
@@ -203,6 +204,10 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         const project = chartData[i]
 
         return intToRgba(project.color, project.id, theme.value)
+      }),
+      defaultColors: projectData.map((_, i) => {
+        const project = chartData[i]
+        return getDefaultColor(project.id)
       }),
     },
   }
@@ -300,11 +305,10 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
 
   const fetchData = async (query) => {
     const normalQuery = new URLSearchParams(query)
-
-    const revQuery = new URLSearchParams(query)
-
+    const revenueQuery = new URLSearchParams(query)
+    revenueQuery.delete('projects')
     const qs = normalQuery.toString()
-    const revQs = revQuery.toString()
+    const revenueQs = revenueQuery.toString()
 
     try {
       loading.value = true
@@ -313,14 +317,29 @@ export const useFetchAllAnalytics = (onDataRefresh, projects) => {
       const responses = await Promise.all([
         useFetchAnalytics(`analytics/downloads?${qs}`),
         useFetchAnalytics(`analytics/views?${qs}`),
-        useFetchAnalytics(`analytics/revenue?${revQs}`),
+        useFetchAnalytics(`analytics/revenue?${revenueQs}`),
         useFetchAnalytics(`analytics/countries/downloads?${qs}`),
         useFetchAnalytics(`analytics/countries/views?${qs}`),
       ])
 
-      downloadData.value = responses[0] || {}
-      viewData.value = responses[1] || {}
-      revenueData.value = responses[2] || {}
+      // collect project ids from projects.value into a set
+      const projectIds = new Set()
+      projects.value.forEach((p) => projectIds.add(p.id))
+
+      const filterProjectIds = (data) => {
+        const filtered = {}
+        Object.entries(data).forEach(([id, values]) => {
+          if (projectIds.has(id)) {
+            filtered[id] = values
+          }
+        })
+        return filtered
+      }
+
+      downloadData.value = filterProjectIds(responses[0] || {})
+      viewData.value = filterProjectIds(responses[1] || {})
+      revenueData.value = filterProjectIds(responses[2] || {})
+
       downloadsByCountry.value = responses[3] || {}
       viewsByCountry.value = responses[4] || {}
     } catch (e) {

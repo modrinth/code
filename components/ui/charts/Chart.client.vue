@@ -88,7 +88,7 @@ function formatTooltipValue(value, props) {
 }
 
 function generateListEntry(value, index, _, w, props) {
-  const color = props.colors[index % props.colors.length]
+  const color = w.globals.colors?.[index]
 
   return `<div class="list-entry">
     <span class="circle" style="background-color: ${color}"></span>
@@ -102,7 +102,7 @@ function generateListEntry(value, index, _, w, props) {
 }
 
 function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
-  const label = w.globals.lastXAxis.categories[dataPointIndex]
+  const label = w.globals.lastXAxis.categories?.[dataPointIndex]
 
   const formattedLabel = props.formatLabels(label)
 
@@ -158,7 +158,7 @@ function generateTooltip({ series, seriesIndex, dataPointIndex, w }, props) {
   return tooltip
 }
 
-const chartOptions = ref({
+const chartOptions = {
   chart: {
     id: props.name,
     fontFamily:
@@ -254,7 +254,7 @@ const chartOptions = ref({
   tooltip: {
     custom: (d) => generateTooltip(d, props),
   },
-})
+}
 
 const fillOptions = {
   colors: props.colors,
@@ -292,7 +292,6 @@ const resetChart = () => {
     xaxis: {
       categories: props.labels,
     },
-    colors: props.colors,
   })
   chart.value.resetSeries()
   legendValues.value.forEach((legend) => {
@@ -300,8 +299,16 @@ const resetChart = () => {
   })
 }
 
+const updateColors = (colors) => {
+  chart.value.updateOptions({
+    colors,
+  })
+  chart.value.resetSeries()
+}
+
 defineExpose({
   resetChart,
+  updateColors,
   flipLegend,
 })
 </script>

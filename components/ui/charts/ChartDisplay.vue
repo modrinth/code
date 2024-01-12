@@ -73,6 +73,9 @@
               </span>
             </h2>
             <div class="chart-controls__buttons">
+              <Button v-tooltip="'Toggle project colors'" icon-only @click="onToggleColors">
+                <EyeIcon />
+              </Button>
               <Button v-tooltip="'Download this data as CSV'" icon-only @click="onDownloadSetAsCSV">
                 <DownloadIcon />
               </Button>
@@ -144,7 +147,9 @@
                   >
                     <div
                       :style="{
-                        '--color-brand': intToRgba(project.color, project.id, theme || 'dark'),
+                        '--color-brand': isUsingProjectColors
+                          ? intToRgba(project.color, project.id, theme.value ?? undefined)
+                          : getDefaultColor(project.id),
                       }"
                       class="legend__item__color"
                     ></div>
@@ -281,6 +286,7 @@ import {
   formatNumber,
   DropdownSelect,
   formatCategoryHeader,
+  EyeIcon,
 } from 'omorphia'
 import dayjs from 'dayjs'
 import { defineProps, ref, computed } from 'vue'
@@ -357,6 +363,24 @@ const projectIsOnDisplay = (id: string) => {
   return selectedDisplayProjects.value.some((p) => p.id === id)
 }
 
+const setChartColors = (updatedVal: Ref<boolean>) => {
+  downloadsChart.value?.updateColors(
+    updatedVal.value
+      ? analytics.formattedData.value.downloads.chart.colors
+      : analytics.formattedData.value.downloads.chart.defaultColors
+  )
+  viewsChart.value?.updateColors(
+    updatedVal.value
+      ? analytics.formattedData.value.views.chart.colors
+      : analytics.formattedData.value.views.chart.defaultColors
+  )
+  revenueChart.value?.updateColors(
+    updatedVal.value
+      ? analytics.formattedData.value.revenue.chart.colors
+      : analytics.formattedData.value.revenue.chart.defaultColors
+  )
+}
+
 const resetCharts = () => {
   downloadsChart.value?.resetChart()
   viewsChart.value?.resetChart()
@@ -365,7 +389,14 @@ const resetCharts = () => {
   tinyDownloadChart.value?.resetChart()
   tinyViewChart.value?.resetChart()
   tinyRevenueChart.value?.resetChart()
+
+  setChartColors(isUsingProjectColors)
 }
+
+const isUsingProjectColors = ref(true)
+watch(() => isUsingProjectColors, setChartColors, {
+  deep: true,
+})
 
 const analytics = useFetchAllAnalytics(resetCharts, selectedDisplayProjects)
 
@@ -425,6 +456,9 @@ const downloadSelectedSetAsCSV = () => {
 }
 
 const onDownloadSetAsCSV = useClientTry(async () => await downloadSelectedSetAsCSV())
+const onToggleColors = () => {
+  isUsingProjectColors.value = !isUsingProjectColors.value
+}
 </script>
 
 <script lang="ts">
