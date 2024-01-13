@@ -8,6 +8,7 @@ use common::environment::with_test_environment;
 use common::environment::TestEnvironment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
+use labrinth::models::ids::base62_impl::parse_base62;
 use serde_json::json;
 
 use crate::common::api_common::Api;
@@ -103,7 +104,7 @@ async fn search_projects() {
                     let mut found_project_ids: Vec<u64> = projects
                         .hits
                         .into_iter()
-                        .map(|p| id_conversion[&p.id.0])
+                        .map(|p| id_conversion[&parse_base62(&p.project_id).unwrap()])
                         .collect();
                     let num_hits = projects.total_hits;
                     expected_project_ids.sort();

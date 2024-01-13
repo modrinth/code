@@ -1,6 +1,5 @@
-use crate::database::models::project_item::{GalleryItem, LinkUrl};
 use crate::models::error::ApiError;
-use crate::models::projects::{MonetizationStatus, ProjectStatus, SearchRequest};
+use crate::models::projects::SearchRequest;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use chrono::{DateTime, Utc};
@@ -96,6 +95,7 @@ impl SearchConfig {
 pub struct UploadSearchProject {
     pub version_id: String,
     pub project_id: String,
+    //
     pub project_types: Vec<String>,
     pub slug: Option<String>,
     pub author: String,
@@ -121,20 +121,7 @@ pub struct UploadSearchProject {
     pub color: Option<u32>,
 
     // Hidden fields to get the Project model out of the search results.
-    pub license_url: Option<String>,
-    pub monetization_status: Option<MonetizationStatus>,
-    pub team_id: String,
-    pub thread_id: String,
-    pub versions: Vec<String>,
-    pub date_published: DateTime<Utc>,
-    pub date_queued: Option<DateTime<Utc>>,
-    pub status: ProjectStatus,
-    pub requested_status: Option<ProjectStatus>,
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
-    pub links: Vec<LinkUrl>,
-    pub gallery_items: Vec<GalleryItem>, // Gallery *only* urls are stored in gallery, but the gallery items are stored here- required for the Project model.
-    pub games: Vec<String>,
-    pub organization_id: Option<String>,
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]
@@ -173,20 +160,7 @@ pub struct ResultSearchProject {
     pub color: Option<u32>,
 
     // Hidden fields to get the Project model out of the search results.
-    pub license_url: Option<String>,
-    pub monetization_status: Option<String>,
-    pub team_id: String,
-    pub thread_id: String,
-    pub versions: Vec<String>,
-    pub date_published: String,
-    pub date_queued: Option<String>,
-    pub status: String,
-    pub requested_status: Option<String>,
     pub loaders: Vec<String>, // Search uses loaders as categories- this is purely for the Project model.
-    pub links: Vec<LinkUrl>,
-    pub gallery_items: Vec<GalleryItem>, // Gallery *only* urls are stored in gallery, but the gallery items are stored here- required for the Project model.
-    pub games: Vec<String>,
-    pub organization_id: Option<String>,
     pub project_loader_fields: HashMap<String, Vec<serde_json::Value>>, // Aggregation of loader_fields from all versions of the project, allowing for reconstruction of the Project model.
 
     #[serde(flatten)]

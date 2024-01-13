@@ -20,6 +20,7 @@ services:
       - meilisearch-data:/data.ms
     environment:
       MEILI_MASTER_KEY: modrinth
+      MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 107374182400
   redis:
     image: redis:alpine
     restart: on-failure

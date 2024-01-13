@@ -1,6 +1,5 @@
 use std::collections::{HashMap, HashSet};
 
-use super::ids::base62_impl::parse_base62;
 use super::ids::{Base62Id, OrganizationId};
 use super::teams::TeamId;
 use super::users::UserId;
@@ -8,9 +7,7 @@ use crate::database::models::loader_fields::VersionField;
 use crate::database::models::project_item::{LinkUrl, QueryProject};
 use crate::database::models::version_item::QueryVersion;
 use crate::models::threads::ThreadId;
-use crate::search::ResultSearchProject;
 use chrono::{DateTime, Utc};
-use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -235,157 +232,157 @@ impl From<QueryProject> for Project {
 
 impl Project {
     // Matches the from QueryProject, but with a ResultSearchProject
-    pub fn from_search(m: ResultSearchProject) -> Option<Self> {
-        let project_id = ProjectId(parse_base62(&m.project_id).ok()?);
-        let team_id = TeamId(parse_base62(&m.team_id).ok()?);
-        let organization_id = m
-            .organization_id
-            .and_then(|id| Some(OrganizationId(parse_base62(&id).ok()?)));
-        let thread_id = ThreadId(parse_base62(&m.thread_id).ok()?);
-        let versions = m
-            .versions
-            .iter()
-            .filter_map(|id| Some(VersionId(parse_base62(id).ok()?)))
-            .collect();
-
-        let approved = DateTime::parse_from_rfc3339(&m.date_created).ok()?;
-        let published = DateTime::parse_from_rfc3339(&m.date_published).ok()?.into();
-        let approved = if approved == published {
-            None
-        } else {
-            Some(approved.into())
-        };
-
-        let updated = DateTime::parse_from_rfc3339(&m.date_modified).ok()?.into();
-        let queued = m
-            .date_queued
-            .and_then(|dq| DateTime::parse_from_rfc3339(&dq).ok())
-            .map(|d| d.into());
-
-        let status = ProjectStatus::from_string(&m.status);
-        let requested_status = m
-            .requested_status
-            .map(|mrs| ProjectStatus::from_string(&mrs));
-
-        let license_url = m.license_url;
-        let icon_url = m.icon_url;
-
-        // Loaders
-        let mut loaders = m.loaders;
-        let mrpack_loaders_strings =
-            m.project_loader_fields
-                .get("mrpack_loaders")
-                .cloned()
-                .map(|v| {
-                    v.into_iter()
-                        .filter_map(|v| v.as_str().map(String::from))
-                        .collect_vec()
-                });
-
-        // If the project has a mrpack loader,  keep only 'loaders' that are not in the mrpack_loaders
-        if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
-            loaders.retain(|l| !mrpack_loaders.contains(l));
-        }
-
-        // Categories
-        let mut categories = m.display_categories.clone();
-        categories.retain(|c| !loaders.contains(c));
-        if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
-            categories.retain(|l| !mrpack_loaders.contains(l));
-        }
-
-        // Additional categories
-        let mut additional_categories = m.categories.clone();
-        additional_categories.retain(|c| !categories.contains(c));
-        additional_categories.retain(|c| !loaders.contains(c));
-        if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
-            additional_categories.retain(|l| !mrpack_loaders.contains(l));
-        }
-
-        let games = m.games;
-
-        let monetization_status = m
-            .monetization_status
-            .as_deref()
-            .map(MonetizationStatus::from_string)
-            .unwrap_or(MonetizationStatus::Monetized);
-
-        let link_urls = m
-            .links
-            .into_iter()
-            .map(|d| (d.platform_name.clone(), Link::from(d)))
-            .collect();
-
-        let gallery = m
-            .gallery_items
-            .into_iter()
-            .map(|x| GalleryItem {
-                url: x.image_url,
-                featured: x.featured,
-                name: x.name,
-                description: x.description,
-                created: x.created,
-                ordering: x.ordering,
-            })
-            .collect();
-
-        Some(Self {
-            id: project_id,
-            slug: m.slug,
-            project_types: m.project_types,
-            games,
-            team_id,
-            organization: organization_id,
-            name: m.name,
-            summary: m.summary,
-            description: "".to_string(), // Body is potentially huge, do not store in search
-            published,
-            updated,
-            approved,
-            queued,
-            status,
-            requested_status,
-            moderator_message: None, // Deprecated
-            license: License {
-                id: m.license.clone(),
-                name: match spdx::Expression::parse(&m.license) {
-                    Ok(spdx_expr) => {
-                        let mut vec: Vec<&str> = Vec::new();
-                        for node in spdx_expr.iter() {
-                            if let spdx::expression::ExprNode::Req(req) = node {
-                                if let Some(id) = req.req.license.id() {
-                                    vec.push(id.full_name);
-                                }
-                            }
-                        }
-                        // spdx crate returns AND/OR operations in postfix order
-                        // and it would be a lot more effort to make it actually in order
-                        // so let's just ignore that and make them comma-separated
-                        vec.join(", ")
-                    }
-                    Err(_) => "".to_string(),
-                },
-                url: license_url,
-            },
-            downloads: m.downloads as u32,
-            followers: m.follows as u32,
-            categories,
-            additional_categories,
-            loaders,
-            versions,
-            icon_url,
-            link_urls,
-            gallery,
-            color: m.color,
-            thread_id,
-            monetization_status,
-            fields: m
-                .project_loader_fields
-                .into_iter()
-                .map(|(k, v)| (k, v.into_iter().collect()))
-                .collect(),
-        })
-    }
+    // pub fn from_search(m: ResultSearchProject) -> Option<Self> {
+    //     let project_id = ProjectId(parse_base62(&m.project_id).ok()?);
+    //     let team_id = TeamId(parse_base62(&m.team_id).ok()?);
+    //     let organization_id = m
+    //         .organization_id
+    //         .and_then(|id| Some(OrganizationId(parse_base62(&id).ok()?)));
+    //     let thread_id = ThreadId(parse_base62(&m.thread_id).ok()?);
+    //     let versions = m
+    //         .versions
+    //         .iter()
+    //         .filter_map(|id| Some(VersionId(parse_base62(id).ok()?)))
+    //         .collect();
+    //
+    //     let approved = DateTime::parse_from_rfc3339(&m.date_created).ok()?;
+    //     let published = DateTime::parse_from_rfc3339(&m.date_published).ok()?.into();
+    //     let approved = if approved == published {
+    //         None
+    //     } else {
+    //         Some(approved.into())
+    //     };
+    //
+    //     let updated = DateTime::parse_from_rfc3339(&m.date_modified).ok()?.into();
+    //     let queued = m
+    //         .date_queued
+    //         .and_then(|dq| DateTime::parse_from_rfc3339(&dq).ok())
+    //         .map(|d| d.into());
+    //
+    //     let status = ProjectStatus::from_string(&m.status);
+    //     let requested_status = m
+    //         .requested_status
+    //         .map(|mrs| ProjectStatus::from_string(&mrs));
+    //
+    //     let license_url = m.license_url;
+    //     let icon_url = m.icon_url;
+    //
+    //     // Loaders
+    //     let mut loaders = m.loaders;
+    //     let mrpack_loaders_strings =
+    //         m.project_loader_fields
+    //             .get("mrpack_loaders")
+    //             .cloned()
+    //             .map(|v| {
+    //                 v.into_iter()
+    //                     .filter_map(|v| v.as_str().map(String::from))
+    //                     .collect_vec()
+    //             });
+    //
+    //     // If the project has a mrpack loader,  keep only 'loaders' that are not in the mrpack_loaders
+    //     if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
+    //         loaders.retain(|l| !mrpack_loaders.contains(l));
+    //     }
+    //
+    //     // Categories
+    //     let mut categories = m.display_categories.clone();
+    //     categories.retain(|c| !loaders.contains(c));
+    //     if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
+    //         categories.retain(|l| !mrpack_loaders.contains(l));
+    //     }
+    //
+    //     // Additional categories
+    //     let mut additional_categories = m.categories.clone();
+    //     additional_categories.retain(|c| !categories.contains(c));
+    //     additional_categories.retain(|c| !loaders.contains(c));
+    //     if let Some(ref mrpack_loaders) = mrpack_loaders_strings {
+    //         additional_categories.retain(|l| !mrpack_loaders.contains(l));
+    //     }
+    //
+    //     let games = m.games;
+    //
+    //     let monetization_status = m
+    //         .monetization_status
+    //         .as_deref()
+    //         .map(MonetizationStatus::from_string)
+    //         .unwrap_or(MonetizationStatus::Monetized);
+    //
+    //     let link_urls = m
+    //         .links
+    //         .into_iter()
+    //         .map(|d| (d.platform_name.clone(), Link::from(d)))
+    //         .collect();
+    //
+    //     let gallery = m
+    //         .gallery_items
+    //         .into_iter()
+    //         .map(|x| GalleryItem {
+    //             url: x.image_url,
+    //             featured: x.featured,
+    //             name: x.name,
+    //             description: x.description,
+    //             created: x.created,
+    //             ordering: x.ordering,
+    //         })
+    //         .collect();
+    //
+    //     Some(Self {
+    //         id: project_id,
+    //         slug: m.slug,
+    //         project_types: m.project_types,
+    //         games,
+    //         team_id,
+    //         organization: organization_id,
+    //         name: m.name,
+    //         summary: m.summary,
+    //         description: "".to_string(), // Body is potentially huge, do not store in search
+    //         published,
+    //         updated,
+    //         approved,
+    //         queued,
+    //         status,
+    //         requested_status,
+    //         moderator_message: None, // Deprecated
+    //         license: License {
+    //             id: m.license.clone(),
+    //             name: match spdx::Expression::parse(&m.license) {
+    //                 Ok(spdx_expr) => {
+    //                     let mut vec: Vec<&str> = Vec::new();
+    //                     for node in spdx_expr.iter() {
+    //                         if let spdx::expression::ExprNode::Req(req) = node {
+    //                             if let Some(id) = req.req.license.id() {
+    //                                 vec.push(id.full_name);
+    //                             }
+    //                         }
+    //                     }
+    //                     // spdx crate returns AND/OR operations in postfix order
+    //                     // and it would be a lot more effort to make it actually in order
+    //                     // so let's just ignore that and make them comma-separated
+    //                     vec.join(", ")
+    //                 }
+    //                 Err(_) => "".to_string(),
+    //             },
+    //             url: license_url,
+    //         },
+    //         downloads: m.downloads as u32,
+    //         followers: m.follows as u32,
+    //         categories,
+    //         additional_categories,
+    //         loaders,
+    //         versions,
+    //         icon_url,
+    //         link_urls,
+    //         gallery,
+    //         color: m.color,
+    //         thread_id,
+    //         monetization_status,
+    //         fields: m
+    //             .project_loader_fields
+    //             .into_iter()
+    //             .map(|(k, v)| (k, v.into_iter().collect()))
+    //             .collect(),
+    //     })
+    // }
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GalleryItem {
