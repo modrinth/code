@@ -1,3 +1,4 @@
+use actix_http::StatusCode;
 use common::api_v3::ApiV3;
 use common::database::*;
 
@@ -8,6 +9,9 @@ use common::environment::TestEnvironment;
 use common::search::setup_search_projects;
 use futures::stream::StreamExt;
 use serde_json::json;
+
+use crate::common::api_common::Api;
+use crate::common::api_common::ApiProject;
 
 mod common;
 
@@ -110,6 +114,55 @@ async fn search_projects() {
                 }
             })
             .await;
+    })
+    .await;
+}
+
+#[actix_rt::test]
+async fn index_swaps() {
+    with_test_environment(Some(10), |test_env: TestEnvironment<ApiV3>| async move {
+        // Reindex
+        let resp = test_env.api.reset_search_index().await;
+        assert_status!(&resp, StatusCode::NO_CONTENT);
+
+        // Now we should get results
+        let projects = test_env
+            .api
+            .search_deserialized(None, Some(json!([["categories:fabric"]])), USER_USER_PAT)
+            .await;
+        assert_eq!(projects.total_hits, 1);
+        assert!(projects.hits[0].slug.as_ref().unwrap().contains("alpha"));
+
+        // Delete the project
+        let resp = test_env.api.remove_project("alpha", USER_USER_PAT).await;
+        assert_status!(&resp, StatusCode::NO_CONTENT);
+
+        // We should not get any results, because the project has been deleted
+        let projects = test_env
+            .api
+            .search_deserialized(None, Some(json!([["categories:fabric"]])), USER_USER_PAT)
+            .await;
+        assert_eq!(projects.total_hits, 0);
+
+        // But when we reindex, it should be gone
+        let resp = test_env.api.reset_search_index().await;
+        assert_status!(&resp, StatusCode::NO_CONTENT);
+
+        let projects = test_env
+            .api
+            .search_deserialized(None, Some(json!([["categories:fabric"]])), USER_USER_PAT)
+            .await;
+        assert_eq!(projects.total_hits, 0);
+
+        // Reindex again, should still be gone
+        let resp = test_env.api.reset_search_index().await;
+        assert_status!(&resp, StatusCode::NO_CONTENT);
+
+        let projects = test_env
+            .api
+            .search_deserialized(None, Some(json!([["categories:fabric"]])), USER_USER_PAT)
+            .await;
+        assert_eq!(projects.total_hits, 0);
     })
     .await;
 }

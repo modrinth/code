@@ -384,7 +384,7 @@ pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    config: web::Data<SearchConfig>,
+    search_config: web::Data<SearchConfig>,
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
@@ -490,7 +490,7 @@ pub async fn project_edit(
         req.clone(),
         info,
         pool.clone(),
-        config,
+        search_config,
         web::Json(new_project),
         redis.clone(),
         session_queue.clone(),
@@ -865,11 +865,11 @@ pub async fn project_delete(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    config: web::Data<SearchConfig>,
+    search_config: web::Data<SearchConfig>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     // Returns NoContent, so no need to convert
-    v3::projects::project_delete(req, info, pool, redis, config, session_queue)
+    v3::projects::project_delete(req, info, pool, redis, search_config, session_queue)
         .await
         .or_else(v2_reroute::flatten_404_error)
 }

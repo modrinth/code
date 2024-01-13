@@ -58,7 +58,7 @@ impl actix_web::ResponseError for SearchError {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct SearchConfig {
     pub address: String,
     pub key: String,
@@ -83,8 +83,10 @@ impl SearchConfig {
         Client::new(self.address.as_str(), Some(self.key.as_str()))
     }
 
-    pub fn get_index_name(&self, index: &str) -> String {
-        format!("{}_{}", self.meta_namespace, index)
+    // Next: true if we want the next index (we are preparing the next swap), false if we want the current index (searching)
+    pub fn get_index_name(&self, index: &str, next: bool) -> String {
+        let alt = if next { "_alt" } else { "" };
+        format!("{}_{}_{}", self.meta_namespace, index, alt)
     }
 }
 
@@ -195,8 +197,8 @@ pub fn get_sort_index(
     config: &SearchConfig,
     index: &str,
 ) -> Result<(String, [&'static str; 1]), SearchError> {
-    let projects_name = config.get_index_name("projects");
-    let projects_filtered_name = config.get_index_name("projects_filtered");
+    let projects_name = config.get_index_name("projects", false);
+    let projects_filtered_name = config.get_index_name("projects_filtered", false);
     Ok(match index {
         "relevance" => (projects_name, ["downloads:desc"]),
         "downloads" => (projects_filtered_name, ["downloads:desc"]),
