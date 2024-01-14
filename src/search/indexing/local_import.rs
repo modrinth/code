@@ -268,10 +268,11 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
                 let mut vals = Vec::new();
                 let mut featured_vals = Vec::new();
 
-                for (val, featured) in categories {
-                    if featured {
+                for (val, is_additional) in categories {
+                    if !is_additional {
                         featured_vals.push(val.clone());
                     }
+
                     vals.push(val);
                 }
 
