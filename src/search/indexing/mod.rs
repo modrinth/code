@@ -115,7 +115,14 @@ pub async fn get_indexes_for_indexing(
     let client = config.make_client();
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name = config.get_index_name("projects_filtered", next);
-    let projects_index = create_or_update_index(&client, &project_name, None).await?;
+    let projects_index = create_or_update_index(&client, &project_name, Some(&[
+        "words",
+        "typo",
+        "proximity",
+        "attribute",
+        "exactness",
+        "sort",
+    ]),).await?;
     let projects_filtered_index = create_or_update_index(
         &client,
         &project_filtered_name,
@@ -144,97 +151,19 @@ async fn create_or_update_index(
         Ok(index) => {
             info!("Updating index settings.");
 
-            let old_settings = index.get_settings().await?;
-
             let mut settings = default_settings();
 
             if let Some(custom_rules) = custom_rules {
                 settings = settings.with_ranking_rules(custom_rules);
             }
 
-            let old_settings = Settings {
-                synonyms: None, // We don't use synonyms right now
-                stop_words: if settings.stop_words.is_none() {
-                    None
-                } else {
-                    old_settings.stop_words.map(|mut x| {
-                        x.sort();
-                        x
-                    })
-                },
-                ranking_rules: if settings.ranking_rules.is_none() {
-                    None
-                } else {
-                    old_settings.ranking_rules
-                },
-                filterable_attributes: if settings.filterable_attributes.is_none() {
-                    None
-                } else {
-                    old_settings.filterable_attributes.map(|mut x| {
-                        x.sort();
-                        x
-                    })
-                },
-                sortable_attributes: if settings.sortable_attributes.is_none() {
-                    None
-                } else {
-                    old_settings.sortable_attributes.map(|mut x| {
-                        x.sort();
-                        x
-                    })
-                },
-                distinct_attribute: if settings.distinct_attribute.is_none() {
-                    None
-                } else {
-                    old_settings.distinct_attribute
-                },
-                searchable_attributes: if settings.searchable_attributes.is_none() {
-                    None
-                } else {
-                    old_settings.searchable_attributes
-                },
-                displayed_attributes: if settings.displayed_attributes.is_none() {
-                    None
-                } else {
-                    old_settings.displayed_attributes.map(|mut x| {
-                        x.sort();
-                        x
-                    })
-                },
-                pagination: if settings.pagination.is_none() {
-                    None
-                } else {
-                    old_settings.pagination
-                },
-                faceting: if settings.faceting.is_none() {
-                    None
-                } else {
-                    old_settings.faceting
-                },
-                typo_tolerance: None, // We don't use typo tolerance right now
-                dictionary: None,     // We don't use dictionary right now
-            };
-            if old_settings.synonyms != settings.synonyms
-                || old_settings.stop_words != settings.stop_words
-                || old_settings.ranking_rules != settings.ranking_rules
-                || old_settings.filterable_attributes != settings.filterable_attributes
-                || old_settings.sortable_attributes != settings.sortable_attributes
-                || old_settings.distinct_attribute != settings.distinct_attribute
-                || old_settings.searchable_attributes != settings.searchable_attributes
-                || old_settings.displayed_attributes != settings.displayed_attributes
-                || old_settings.pagination != settings.pagination
-                || old_settings.faceting != settings.faceting
-                || old_settings.typo_tolerance != settings.typo_tolerance
-                || old_settings.dictionary != settings.dictionary
-            {
-                info!("Performing index settings set.");
-                index
-                    .set_settings(&settings)
-                    .await?
-                    .wait_for_completion(client, None, Some(TIMEOUT))
-                    .await?;
-                info!("Done performing index settings set.");
-            }
+            info!("Performing index settings set.");
+            index
+                .set_settings(&settings)
+                .await?
+                .wait_for_completion(client, None, Some(TIMEOUT))
+                .await?;
+            info!("Done performing index settings set.");
 
             Ok(index)
         }
@@ -348,18 +277,12 @@ pub async fn add_projects(
 }
 
 fn default_settings() -> Settings {
-    let mut sorted_display = DEFAULT_DISPLAYED_ATTRIBUTES.to_vec();
-    sorted_display.sort();
-    let mut sorted_sortable = DEFAULT_SORTABLE_ATTRIBUTES.to_vec();
-    sorted_sortable.sort();
-    let mut sorted_attrs = DEFAULT_ATTRIBUTES_FOR_FACETING.to_vec();
-    sorted_attrs.sort();
     Settings::new()
         .with_distinct_attribute("project_id")
-        .with_displayed_attributes(sorted_display)
+        .with_displayed_attributes(DEFAULT_DISPLAYED_ATTRIBUTES)
         .with_searchable_attributes(DEFAULT_SEARCHABLE_ATTRIBUTES)
-        .with_sortable_attributes(sorted_sortable)
-        .with_filterable_attributes(sorted_attrs)
+        .with_sortable_attributes(DEFAULT_SORTABLE_ATTRIBUTES)
+        .with_filterable_attributes(DEFAULT_ATTRIBUTES_FOR_FACETING)
         .with_pagination(PaginationSetting {
             max_total_hits: 2147483647,
         })
