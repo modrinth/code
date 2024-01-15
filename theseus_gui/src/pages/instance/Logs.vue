@@ -102,7 +102,7 @@ import {
   delete_logs_by_filename,
   get_logs,
   get_output_by_filename,
-  get_std_log_cursor,
+  get_latest_log_cursor,
 } from '@/helpers/logs.js'
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
@@ -139,7 +139,7 @@ const props = defineProps({
 
 const currentLiveLog = ref(null)
 const currentLiveLogCursor = ref(0)
-const emptyText = ['No live game detected.', 'Start your game to proceed']
+const emptyText = ['No live game detected.', 'Start your game to proceed.']
 
 const logs = ref([])
 await setLogs()
@@ -223,7 +223,7 @@ async function getLiveStdLog() {
     if (uuids.length === 0) {
       returnValue = emptyText.join('\n')
     } else {
-      const logCursor = await get_std_log_cursor(
+      const logCursor = await get_latest_log_cursor(
         props.instance.path,
         currentLiveLogCursor.value
       ).catch(handleError)
@@ -243,31 +243,15 @@ async function getLogs() {
   return (await get_logs(props.instance.path, true).catch(handleError))
     .reverse()
     .filter(
+      // filter out latest_stdout.log or anything without .log in it
       (log) =>
         log.filename !== 'latest_stdout.log' &&
         log.filename !== 'latest_stdout' &&
-        log.stdout !== ''
+        log.stdout !== '' &&
+        log.filename.includes('.log')
     )
     .map((log) => {
-      if (log.filename == 'latest.log') {
-        log.name = 'Latest Log'
-      } else {
-        let filename = log.filename.split('.')[0]
-        let day = dayjs(filename.slice(0, 10))
-        if (day.isValid()) {
-          if (day.isToday()) {
-            log.name = 'Today'
-          } else if (day.isYesterday()) {
-            log.name = 'Yesterday'
-          } else {
-            log.name = day.format('MMMM D, YYYY')
-          }
-          // Displays as "Today-1", "Today-2", etc, matching minecraft log naming but with the date
-          log.name = log.name + filename.slice(10)
-        } else {
-          log.name = filename
-        }
-      }
+      log.name = log.filename || 'Unknown'
       log.stdout = 'Loading...'
       return log
     })

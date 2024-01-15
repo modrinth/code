@@ -242,14 +242,6 @@ pub async fn get_latest_log_cursor(
 }
 
 #[tracing::instrument]
-pub async fn get_std_log_cursor(
-    profile_path: ProfilePathId,
-    cursor: u64, // 0 to start at beginning of file
-) -> crate::Result<LatestLogCursor> {
-    get_generic_live_log_cursor(profile_path, "latest_stdout.log", cursor).await
-}
-
-#[tracing::instrument]
 pub async fn get_generic_live_log_cursor(
     profile_path: ProfilePathId,
     log_file_name: &str,

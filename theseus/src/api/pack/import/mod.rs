@@ -301,7 +301,7 @@ pub async fn copy_dotminecraft(
 #[theseus_macros::debug_pin]
 #[async_recursion::async_recursion]
 #[tracing::instrument]
-async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {
+pub async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {
     if !src.is_dir() {
         return Ok(vec![src.to_path_buf()]);
     }

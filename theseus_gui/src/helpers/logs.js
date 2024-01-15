@@ -54,7 +54,3 @@ export async function delete_logs(profilePath) {
 export async function get_latest_log_cursor(profilePath, cursor) {
   return await invoke('plugin:logs|logs_get_latest_log_cursor', { profilePath, cursor })
 }
-// For std log (from modrinth app written latest_stdout.log, contains stdout and stderr)
-export async function get_std_log_cursor(profilePath, cursor) {
-  return await invoke('plugin:logs|logs_get_std_log_cursor', { profilePath, cursor })
-}

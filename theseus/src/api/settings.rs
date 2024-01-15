@@ -1,6 +1,6 @@
 //! Theseus profile management interface
 
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use tokio::fs;
 
 use io::IOError;
@@ -10,7 +10,7 @@ use crate::{
     event::emit::{emit_loading, init_loading},
     prelude::DirectoryInfo,
     state::{self, Profiles},
-    util::io,
+    util::{io, fetch},
 };
 pub use crate::{
     state::{
@@ -77,9 +77,18 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
 /// Sets the new config dir, the location of all Theseus data except for the settings.json and caches
 /// Takes control of the entire state and blocks until completion
 pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
+    tracing::trace!("Changing config dir to: {}", new_config_dir.display());
     if !new_config_dir.is_dir() {
         return Err(crate::ErrorKind::FSError(format!(
             "New config dir is not a folder: {}",
+            new_config_dir.display()
+        ))
+        .as_error());
+    }
+
+    if !is_dir_writeable(new_config_dir.clone()).await? {
+        return Err(crate::ErrorKind::FSError(format!(
+            "New config dir is not writeable: {}",
             new_config_dir.display()
         ))
         .as_error());
@@ -99,6 +108,52 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
     let mut state_write = State::get_write().await?;
     let old_config_dir =
         state_write.directories.config_dir.read().await.clone();
+
+
+    // Reset file watcher
+    tracing::trace!("Reset file watcher");
+    let file_watcher = state::init_watcher().await?;
+    state_write.file_watcher = RwLock::new(file_watcher);
+
+    // Getting files to be moved
+    let mut config_entries = io::read_dir(&old_config_dir).await?;
+    let across_drives = is_different_drive(&old_config_dir, &new_config_dir);
+    let mut entries = vec![];
+    let mut deletable_entries = vec![];
+    while let Some(entry) = config_entries
+        .next_entry()
+        .await
+        .map_err(|e| IOError::with_path(e, &old_config_dir))?
+    {
+
+        let entry_path = entry.path();
+        if let Some(file_name) = entry_path.file_name() {
+            // We are only moving the profiles and metadata folders
+            if file_name == state::PROFILES_FOLDER_NAME || file_name == state::METADATA_FOLDER_NAME {
+                if across_drives {
+                    entries.extend(crate::pack::import::get_all_subfiles(&entry_path).await?);
+                    deletable_entries.push(entry_path.clone());
+                } else {
+                    entries.push(entry_path.clone());
+                }
+            }
+        }
+    }
+
+    tracing::trace!("Moving files");
+    let semaphore = &state_write.io_semaphore;
+    let num_entries = entries.len() as f64;
+    for entry_path in entries {
+        let relative_path = entry_path.strip_prefix(&old_config_dir)?;
+        let new_path = new_config_dir.join(relative_path);
+        if across_drives {
+            fetch::copy(&entry_path, &new_path, semaphore).await?;
+        } else {
+            io::rename(entry_path.clone(), new_path.clone()).await?;
+        }
+        emit_loading(&loading_bar, 80.0 * (1.0 / num_entries), None)
+            .await?;
+    }
 
     tracing::trace!("Setting configuration setting");
     // Set load config dir setting
@@ -132,41 +187,19 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
     tracing::trace!("Reinitializing directory");
     // Set new state information
     state_write.directories = DirectoryInfo::init(&settings)?;
-    let total_entries = std::fs::read_dir(&old_config_dir)
-        .map_err(|e| IOError::with_path(e, &old_config_dir))?
-        .count() as f64;
 
-    // Move all files over from state_write.directories.config_dir to new_config_dir
-    tracing::trace!("Renaming folder structure");
-    let mut i = 0.0;
-    let mut entries = io::read_dir(&old_config_dir).await?;
-    while let Some(entry) = entries
-        .next_entry()
-        .await
-        .map_err(|e| IOError::with_path(e, &old_config_dir))?
-    {
-        let entry_path = entry.path();
-        if let Some(file_name) = entry_path.file_name() {
-            // Ignore settings.json
-            if file_name == state::SETTINGS_FILE_NAME {
-                continue;
-            }
-            // Ignore caches folder
-            if file_name == state::CACHES_FOLDER_NAME {
-                continue;
-            }
-            // Ignore modrinth_logs folder
-            if file_name == state::LAUNCHER_LOGS_FOLDER_NAME {
-                continue;
-            }
-
-            let new_path = new_config_dir.join(file_name);
-            io::rename(entry_path, new_path).await?;
-
-            i += 1.0;
-            emit_loading(&loading_bar, 90.0 * (i / total_entries), None)
-                .await?;
-        }
+    // Delete entries that were from a different drive
+    let deletable_entries_len = deletable_entries.len();
+    if deletable_entries_len > 0 {
+        tracing::trace!("Deleting old files");
+    }
+    for entry in deletable_entries {
+        io::remove_dir_all(entry).await?;
+        emit_loading(
+            &loading_bar,
+            10.0 * (1.0 / deletable_entries_len as f64),
+            None,
+        ).await?;
     }
 
     // Reset file watcher
@@ -181,14 +214,20 @@ pub async fn set_config_dir(new_config_dir: PathBuf) -> crate::Result<()> {
 
     emit_loading(&loading_bar, 10.0, None).await?;
 
-    // TODO: need to be able to safely error out of this function, reverting the changes
     tracing::info!(
         "Successfully switched config folder to: {}",
         new_config_dir.display()
     );
-
     Ok(())
 }
+
+// Function to check if two paths are on different drives/roots
+fn is_different_drive(path1: &Path, path2: &Path) -> bool {
+    let root1 = path1.components().next();
+    let root2 = path2.components().next();
+    root1 != root2
+}
+
 
 pub async fn is_dir_writeable(new_config_dir: PathBuf) -> crate::Result<bool> {
     let temp_path = new_config_dir.join(".tmp");

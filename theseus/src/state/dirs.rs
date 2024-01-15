@@ -9,6 +9,8 @@ use super::{ProfilePathId, Settings};
 pub const SETTINGS_FILE_NAME: &str = "settings.json";
 pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
+pub const PROFILES_FOLDER_NAME: &str = "profiles";
+pub const METADATA_FOLDER_NAME: &str = "meta";
 
 #[derive(Debug)]
 pub struct DirectoryInfo {
@@ -75,7 +77,7 @@ impl DirectoryInfo {
     /// Get the Minecraft instance metadata directory
     #[inline]
     pub async fn metadata_dir(&self) -> PathBuf {
-        self.config_dir.read().await.join("meta")
+        self.config_dir.read().await.join(METADATA_FOLDER_NAME)
     }
 
     /// Get the Minecraft java versions metadata directory
@@ -153,7 +155,7 @@ impl DirectoryInfo {
     /// Get the profiles directory for created profiles
     #[inline]
     pub async fn profiles_dir(&self) -> PathBuf {
-        self.config_dir.read().await.join("profiles")
+        self.config_dir.read().await.join(PROFILES_FOLDER_NAME)
     }
 
     /// Gets the logs dir for a given profile
