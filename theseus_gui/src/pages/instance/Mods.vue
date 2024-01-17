@@ -43,7 +43,7 @@
       Update all
     </Button>
 
-    <DropdownButton
+    <!-- <DropdownButton
       v-if="!isPackLocked"
       :options="['search', 'from_file']"
       default-value="search"
@@ -59,7 +59,7 @@
         <FolderOpenIcon />
         <span class="no-wrap"> Add from file </span>
       </template>
-    </DropdownButton>
+    </DropdownButton> -->
   </Card>
   <Pagination
     v-if="projects.length > 0"
@@ -284,7 +284,10 @@
     <h3>No projects found</h3>
     <p class="empty-subtitle">Add a project to get started</p>
     <div class="empty-action">
-      <DropdownButton
+      <div class="joined-buttons">
+        <Button color="primary"> Search </Button>
+      </div>
+      <!-- <DropdownButton
         :options="['search', 'from_file']"
         default-value="search"
         name="add-content-dropdown-from-empty"
@@ -299,7 +302,7 @@
           <FolderOpenIcon />
           <span class="no-wrap"> Add from file </span>
         </template>
-      </DropdownButton>
+      </DropdownButton> -->
     </div>
   </div>
   <Pagination
@@ -378,7 +381,6 @@ import {
   FolderOpenIcon,
   Checkbox,
   formatProjectType,
-  DropdownButton,
   Modal,
   XIcon,
   ShareIcon,
@@ -393,7 +395,7 @@ import {
   DropdownSelect,
 } from 'omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
   get,
@@ -404,7 +406,7 @@ import {
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import { open } from '@tauri-apps/api/dialog'
+// import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { highlightModInProfile } from '@/helpers/utils.js'
@@ -412,7 +414,7 @@ import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } fro
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 
-const router = useRouter()
+// const router = useRouter()
 
 const props = defineProps({
   instance: {
@@ -844,22 +846,22 @@ const handleRightClick = (event, mod) => {
   }
 }
 
-const handleContentOptionClick = async (args) => {
-  if (args.option === 'search') {
-    await router.push({
-      path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-      query: { i: props.instance.path },
-    })
-  } else if (args.option === 'from_file') {
-    const newProject = await open({ multiple: true })
-    if (!newProject) return
+// const handleContentOptionClick = async (args) => {
+//   if (args.option === 'search') {
+//     await router.push({
+//       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+//       query: { i: props.instance.path },
+//     })
+//   } else if (args.option === 'from_file') {
+//     const newProject = await open({ multiple: true })
+//     if (!newProject) return
 
-    for (const project of newProject) {
-      await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
-    }
-    initProjects(await get(props.instance.path).catch(handleError))
-  }
-}
+//     for (const project of newProject) {
+//       await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
+//     }
+//     initProjects(await get(props.instance.path).catch(handleError))
+//   }
+// }
 
 watch(selectAll, () => {
   for (const [key, value] of Array.from(selectionMap.value)) {

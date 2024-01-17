@@ -5,7 +5,6 @@ import {
   HomeIcon,
   SearchIcon,
   LibraryIcon,
-  PlusIcon,
   SettingsIcon,
   FileIcon,
   Button,
@@ -14,7 +13,8 @@ import {
   Card,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
-import AccountsCard from '@/components/ui/AccountsCard.vue'
+import AccountsCard from './components/ui/AccountsCard.vue'
+import AccountDropdown from '@/components/ui/platform/AccountDropdown.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
@@ -159,7 +159,7 @@ const openSupport = async () => {
     __tauriModule: 'Shell',
     message: {
       cmd: 'open',
-      path: 'https://discord.gg/modrinth',
+      path: 'https://support.modrinth.com/',
     },
   })
 }
@@ -288,8 +288,6 @@ command_listener(async (e) => {
 
         <div class="button-row push-right">
           <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
-
-          <Button @click="openSupport"><ChatIcon />Get support</Button>
         </div>
       </Card>
     </div>
@@ -326,23 +324,26 @@ command_listener(async (e) => {
       </div>
       <div class="settings pages-list">
         <Button
-          v-tooltip="'Create profile'"
-          class="sleek-primary collapsed-button"
+          v-tooltip="'Get Support'"
+          transparent
           icon-only
-          :disabled="offline"
-          @click="() => $refs.installationModal.show()"
+          class="page-item collapsed-button"
+          @click="openSupport"
         >
-          <PlusIcon />
+          <ChatIcon />
         </Button>
         <RouterLink v-tooltip="'Settings'" to="/settings" class="btn icon-only collapsed-button">
           <SettingsIcon />
         </RouterLink>
+        <AccountDropdown />
       </div>
     </div>
     <div class="view">
       <div class="appbar-row">
+        <!-- Top Bar -->
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
+            Logo
             <Breadcrumbs data-tauri-drag-region />
           </section>
           <section class="mod-stats">
@@ -400,6 +401,9 @@ command_listener(async (e) => {
 .navigation-controls {
   flex-grow: 1;
   width: min-content;
+
+  display: flex;
+  flex-direction: row;
 }
 
 .appbar-row {
@@ -441,7 +445,7 @@ command_listener(async (e) => {
 }
 
 .container {
-  --appbar-height: 3.25rem;
+  --appbar-height: 3.5rem;
   --sidebar-width: 4.5rem;
 
   height: 100vh;
@@ -544,6 +548,7 @@ command_listener(async (e) => {
   width: 100%;
   gap: 0.5rem;
 
+  .page-item,
   a {
     display: flex;
     align-items: center;
@@ -558,8 +563,14 @@ command_listener(async (e) => {
     }
 
     &:hover {
-      background-color: var(--color-button-bg);
       color: var(--color-contrast);
+      background: var(--color-button-bg);
+      text-decoration: none;
+    }
+
+    &.router-link-active:hover {
+      color: var(--color-brand);
+      background: var(--color-brand-highlight);
       text-decoration: none;
     }
   }
@@ -639,9 +650,9 @@ command_listener(async (e) => {
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  width: 100%;
-  height: 100%;
   gap: 1rem;
+
+  height: 100%;
 }
 
 .video {
