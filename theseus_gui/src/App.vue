@@ -399,9 +399,6 @@ command_listener(async (e) => {
 }
 
 .navigation-controls {
-  flex-grow: 1;
-  width: min-content;
-
   display: flex;
   flex-direction: row;
 }
@@ -460,6 +457,8 @@ command_listener(async (e) => {
     .appbar {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+
       flex-grow: 1;
       background: var(--color-raised-bg);
       text-align: center;
