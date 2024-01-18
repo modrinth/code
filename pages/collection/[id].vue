@@ -284,6 +284,7 @@
             :description="project.description"
             :downloads="project.downloads ? project.downloads.toString() : '0'"
             :follows="project.followers ? project.followers.toString() : '0'"
+            :featured-image="project.gallery.find((element) => element.featured)?.url"
             :icon-url="project.icon_url"
             :name="project.title"
             :client-side="project.client_side"
