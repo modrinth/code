@@ -4,7 +4,8 @@
       <h2>Project status</h2>
       <Badge :type="project.status" />
       <p v-if="isApproved(project)">
-        Your project been approved by the moderators and you may freely change project visibility in
+        Your project has been approved by the moderators and you may freely change project
+        visibility in
         <router-link :to="`${getProjectLink(project)}/settings`" class="text-link"
           >your project's settings</router-link
         >.
