@@ -237,12 +237,7 @@
               :key="project.id"
               :name="project.title"
               :display="cosmetics.searchDisplayMode.user"
-              :featured-image="
-                project.gallery
-                  .slice()
-                  .sort((a, b) => b.featured - a.featured)
-                  .map((x) => x.url)[0]
-              "
+              :featured-image="project.gallery.find((element) => element.featured)?.url"
               :description="project.description"
               :created-at="project.published"
               :updated-at="project.updated"

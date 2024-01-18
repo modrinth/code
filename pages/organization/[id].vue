@@ -168,12 +168,7 @@
             :key="project.id"
             :name="project.name"
             :display="cosmetics.searchDisplayMode.user"
-            :featured-image="
-              project.gallery
-                .slice()
-                .sort((a, b) => b.featured - a.featured)
-                .map((x) => x.url)[0]
-            "
+            :featured-image="project.gallery.find((element) => element.featured)?.url"
             project-type-url="project"
             :description="project.summary"
             :created-at="project.published"
