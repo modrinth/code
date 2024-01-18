@@ -66,6 +66,9 @@ export default defineNuxtConfig({
         ...Object.entries(favicons).map(([media, href]): object => {
           return { rel: 'icon', type: 'image/x-icon', href, media }
         }),
+        ...Object.entries(favicons).map(([media, href]): object => {
+          return { rel: 'apple-touch-icon', type: 'image/x-icon', href, media, sizes: '64x64' }
+        }),
         {
           rel: 'search',
           type: 'application/opensearchdescription+xml',
