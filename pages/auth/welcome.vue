@@ -1,28 +1,36 @@
 <template>
   <div>
-    <h1>Welcome to Modrinth!</h1>
+    <h1>{{ formatMessage(messages.welcomeLongTitle) }}</h1>
 
     <section class="auth-form">
       <p>
-        Thank you for creating an account. You can now follow and create projects, receive updates
-        about your favorite projects, and more!
+        {{ formatMessage(messages.welcomeDescription) }}
       </p>
 
       <Checkbox
         v-model="subscribe"
         class="subscribe-btn"
-        label="Subscribe to updates about Modrinth"
-        description="Subscribe to updates about Modrinth"
+        :label="formatMessage(messages.subscribeCheckbox)"
+        :description="formatMessage(messages.subscribeCheckbox)"
       />
 
       <button class="btn btn-primary continue-btn centered-btn" @click="continueSignUp">
-        Continue <RightArrowIcon />
+        {{ formatMessage(commonMessages.continueButton) }} <RightArrowIcon />
       </button>
 
       <p>
-        By creating an account, you have agreed to Modrinth's
-        <NuxtLink to="/legal/terms" class="text-link">Terms</NuxtLink> and
-        <NuxtLink to="/legal/privacy" class="text-link">Privacy Policy</NuxtLink>.
+        <IntlFormatted :message-id="messages.tosLabel">
+          <template #terms-link="{ children }">
+            <NuxtLink to="/legal/terms" class="text-link">
+              <component :is="() => children" />
+            </NuxtLink>
+          </template>
+          <template #privacy-policy-link="{ children }">
+            <NuxtLink to="/legal/privacy" class="text-link">
+              <component :is="() => children" />
+            </NuxtLink>
+          </template>
+        </IntlFormatted>
       </p>
     </section>
   </div>
@@ -30,8 +38,35 @@
 <script setup>
 import { Checkbox, RightArrowIcon } from 'omorphia'
 
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+  subscribeCheckbox: {
+    id: 'auth.welcome.checkbox.subscribe',
+    defaultMessage: 'Subscribe to updates about Modrinth',
+  },
+  tosLabel: {
+    id: 'auth.welcome.label.tos',
+    defaultMessage:
+      "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
+  },
+  welcomeDescription: {
+    id: 'auth.welcome.description',
+    defaultMessage:
+      'Thank you for creating an account. You can now follow and create projects, receive updates about your favorite projects, and more!',
+  },
+  welcomeLongTitle: {
+    id: 'auth.welcome.long-title',
+    defaultMessage: 'Welcome to Modrinth!',
+  },
+  welcomeTitle: {
+    id: 'auth.welcome.title',
+    defaultMessage: 'Welcome',
+  },
+})
+
 useHead({
-  title: 'Welcome - Modrinth',
+  title: () => `${formatMessage(messages.welcomeTitle)} - Modrinth`,
 })
 
 const subscribe = ref(true)
