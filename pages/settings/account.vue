@@ -202,6 +202,7 @@
               v-model="twoFactorCode"
               maxlength="6"
               type="text"
+              autocomplete="one-time-code"
               placeholder="Enter code..."
               @keyup.enter="verifyTwoFactorCode()"
             />
