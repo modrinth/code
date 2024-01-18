@@ -180,7 +180,7 @@
 
               <div v-if="collection.id !== 'following'" class="metadata-item">
                 <div
-                  v-tooltip="$dayjs(collection.created).format('MMMM D, YYYY [at] h:mm A')"
+                  v-tooltip="$dayjs(collection.updated).format('MMMM D, YYYY [at] h:mm A')"
                   class="date"
                 >
                   <UpdatedIcon />
