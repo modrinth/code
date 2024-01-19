@@ -20,7 +20,7 @@
           class="text-input"
           autocomplete="off"
         />
-        <Button @click="() => (searchFilter = '')">
+        <Button class="r-btn" @click="() => (searchFilter = '')">
           <XIcon />
         </Button>
       </div>
