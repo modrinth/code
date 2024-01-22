@@ -16,7 +16,9 @@ import {
 import { handleError, useTheming } from '@/store/state'
 import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
-import { get as getCreds, logout } from '@/helpers/mr_auth.js'
+
+import { useMrAuth } from '@/composables/auth'
+
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
@@ -105,17 +107,12 @@ watch(
   { deep: true }
 )
 
-const credentials = ref(await getCreds().catch(handleError))
+const mrAuth = useMrAuth()
 const loginScreenModal = ref()
-
-async function logOut() {
-  await logout().catch(handleError)
-  credentials.value = await getCreds().catch(handleError)
-}
 
 async function signInAfter() {
   loginScreenModal.value.hide()
-  credentials.value = await getCreds().catch(handleError)
+  await mrAuth.get()
 }
 
 async function findLauncherDir() {
@@ -163,12 +160,12 @@ async function refreshDir() {
       <div class="adjacent-input">
         <label for="theme">
           <span class="label__title">Manage account</span>
-          <span v-if="credentials" class="label__description">
-            You are currently logged in as {{ credentials.user.username }}.
+          <span v-if="mrAuth.auth.value" class="label__description">
+            You are currently logged in as {{ mrAuth.auth.value?.user.username }}.
           </span>
           <span v-else> Sign in to your Modrinth account. </span>
         </label>
-        <button v-if="credentials" class="btn" @click="logOut">
+        <button v-if="mrAuth.auth.value" class="btn" @click="mrAuth.logout()">
           <LogOutIcon />
           Sign out
         </button>
