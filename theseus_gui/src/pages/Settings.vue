@@ -17,7 +17,7 @@ import { handleError, useTheming } from '@/store/state'
 import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 
-import { useMrAuth } from '@/composables/auth'
+import { useModrinthAuth } from '@/store/mr_auth.js'
 
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
@@ -25,6 +25,7 @@ import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/m
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
 import { version } from '../../package.json'
+import { storeToRefs } from 'pinia'
 
 const pageOptions = ['Home', 'Library']
 
@@ -107,7 +108,8 @@ watch(
   { deep: true }
 )
 
-const mrAuth = useMrAuth()
+const mrAuth = useModrinthAuth()
+const { auth } = storeToRefs(mrAuth)
 const loginScreenModal = ref()
 
 async function signInAfter() {
@@ -160,12 +162,12 @@ async function refreshDir() {
       <div class="adjacent-input">
         <label for="theme">
           <span class="label__title">Manage account</span>
-          <span v-if="mrAuth.auth.value" class="label__description">
-            You are currently logged in as {{ mrAuth.auth.value?.user.username }}.
+          <span v-if="auth" class="label__description">
+            You are currently logged in as {{ auth?.user.username }}.
           </span>
           <span v-else> Sign in to your Modrinth account. </span>
         </label>
-        <button v-if="mrAuth.auth.value" class="btn" @click="mrAuth.logout()">
+        <button v-if="auth" class="btn" @click="mrAuth.logout()">
           <LogOutIcon />
           Sign out
         </button>

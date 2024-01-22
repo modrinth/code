@@ -8,7 +8,7 @@
       <ModrinthLoginScreen :modal="true" :prev-page="signInAfter" :next-page="signInAfter" />
     </Modal>
     <OverflowMenu
-      v-if="mrAuth.auth.value?.user"
+      v-if="auth?.user"
       class="btn btn-transparent headless-button"
       :options="[
         {
@@ -23,7 +23,7 @@
       direction="up"
       position="right"
     >
-      <Avatar circle size="sm" :src="mrAuth.auth.value?.user?.avatar_url" />
+      <Avatar circle size="sm" :src="auth?.user?.avatar_url" />
       <template #sign-out> <LogOutIcon /> Sign out </template>
     </OverflowMenu>
     <OverflowMenu
@@ -52,12 +52,14 @@ import { ref } from 'vue'
 import { Avatar, OverflowMenu, LogOutIcon, LogInIcon, Modal } from 'omorphia'
 
 import { useTheming } from '@/store/state'
-import { useMrAuth } from '@/composables/auth.js'
+import { useModrinthAuth } from '@/store/mr_auth.js'
 
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
+import { storeToRefs } from 'pinia'
 
 const themeStore = useTheming()
-const mrAuth = useMrAuth()
+const mrAuth = useModrinthAuth()
+const { auth } = storeToRefs(mrAuth)
 
 const modrinthLoginModal = ref(null)
 

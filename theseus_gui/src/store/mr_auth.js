@@ -1,8 +1,9 @@
 import { ref, onMounted } from 'vue'
 import { get as getCredentials, logout as removeCredentials } from '@/helpers/mr_auth.js'
 import { handleError } from '@/store/state.js'
+import { defineStore } from 'pinia'
 
-export const useMrAuth = () => {
+export const useModrinthAuth = defineStore('modrinthAuthStore', () => {
   const auth = ref(null)
 
   const get = async () => {
@@ -36,4 +37,4 @@ export const useMrAuth = () => {
     get,
     logout,
   }
-}
+})
