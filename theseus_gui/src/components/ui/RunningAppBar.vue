@@ -4,7 +4,7 @@
       v-if="currentLoadingBars.length > 0"
       ref="infoButton"
       icon-only
-      class="show-card-icon"
+      class="download icon-button"
       @click="toggleCard()"
     >
       <DownloadIcon />
@@ -30,17 +30,17 @@
           <DropdownIcon />
         </div>
       </div>
-      <Button v-tooltip="'Stop instance'" icon-only class="stop" @click="stop()">
+      <Button v-tooltip="'Stop instance'" icon-only class="stop icon-button" @click="stop()">
         <StopCircleIcon />
       </Button>
-      <Button v-tooltip="'View logs'" icon-only @click="goToTerminal()">
+      <Button v-tooltip="'View logs'" icon-only class="utility icon-button" @click="goToTerminal()">
         <TerminalSquareIcon />
       </Button>
       <Button
         v-if="currentLoadingBars.length > 0"
         ref="infoButton"
         icon-only
-        class="show-card-icon"
+        class="download icon-button"
         @click="toggleCard()"
       >
         <DownloadIcon />
@@ -77,10 +77,20 @@
         @click="selectProfile(profile)"
       >
         <div class="text"><span class="circle running" /> {{ profile.metadata.name }}</div>
-        <Button v-tooltip="'Stop instance'" icon-only class="stop" @click.stop="stop(profile.path)">
+        <Button
+          v-tooltip="'Stop instance'"
+          icon-only
+          class="stop icon-button"
+          @click.stop="stop(profile.path)"
+        >
           <StopCircleIcon />
         </Button>
-        <Button v-tooltip="'View logs'" icon-only @click.stop="goToTerminal(profile.path)">
+        <Button
+          v-tooltip="'View logs'"
+          icon-only
+          class="utility icon-button"
+          @click.stop="goToTerminal(profile.path)"
+        >
           <TerminalSquareIcon />
         </Button>
       </Button>
@@ -309,6 +319,21 @@ onBeforeUnmount(() => {
   }
 }
 
+.icon-button {
+  background-color: rgba(0, 0, 0, 0);
+  box-shadow: none;
+
+  padding: 0 !important;
+}
+
+.stop {
+  color: var(--color-red);
+}
+
+.utility {
+  color: var(--color-contrast);
+}
+
 .info-card {
   position: absolute;
   top: 3.5rem;
@@ -368,7 +393,7 @@ onBeforeUnmount(() => {
   }
 }
 
-.show-card-icon {
+.download {
   color: var(--color-brand);
 }
 

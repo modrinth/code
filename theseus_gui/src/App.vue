@@ -12,6 +12,7 @@ import {
   XIcon,
   Card,
   TextLogo,
+  PlusIcon,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from './components/ui/AccountsCard.vue'
@@ -336,6 +337,15 @@ command_listener(async (e) => {
         <RouterLink v-tooltip="'Settings'" to="/settings" class="btn icon-only collapsed-button">
           <SettingsIcon />
         </RouterLink>
+        <Button
+          v-tooltip="'Create profile'"
+          class="sleek-primary collapsed-button"
+          icon-only
+          :disabled="offline"
+          @click="() => $refs.installationModal.show()"
+        >
+          <PlusIcon />
+        </Button>
         <AccountDropdown />
       </div>
     </div>
