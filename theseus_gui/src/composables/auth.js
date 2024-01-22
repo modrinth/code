@@ -13,6 +13,7 @@ export const useMrAuth = () => {
     } catch (error) {
       handleError(error)
     }
+    return null
   }
 
   const logout = async () => {

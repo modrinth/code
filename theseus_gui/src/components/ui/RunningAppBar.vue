@@ -33,14 +33,14 @@
       <Button v-tooltip="'Stop instance'" icon-only class="stop" @click="stop()">
         <StopCircleIcon />
       </Button>
-      <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
+      <Button v-tooltip="'View logs'" icon-only @click="goToTerminal()">
         <TerminalSquareIcon />
       </Button>
       <Button
         v-if="currentLoadingBars.length > 0"
         ref="infoButton"
         icon-only
-        class="icon-button show-card-icon"
+        class="show-card-icon"
         @click="toggleCard()"
       >
         <DownloadIcon />
@@ -77,20 +77,10 @@
         @click="selectProfile(profile)"
       >
         <div class="text"><span class="circle running" /> {{ profile.metadata.name }}</div>
-        <Button
-          v-tooltip="'Stop instance'"
-          icon-only
-          class="icon-button stop"
-          @click.stop="stop(profile.path)"
-        >
+        <Button v-tooltip="'Stop instance'" icon-only class="stop" @click.stop="stop(profile.path)">
           <StopCircleIcon />
         </Button>
-        <Button
-          v-tooltip="'View logs'"
-          icon-only
-          class="icon-button"
-          @click.stop="goToTerminal(profile.path)"
-        >
+        <Button v-tooltip="'View logs'" icon-only @click.stop="goToTerminal(profile.path)">
           <TerminalSquareIcon />
         </Button>
       </Button>
