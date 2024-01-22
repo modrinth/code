@@ -1,12 +1,5 @@
 <template>
   <div class="breadcrumbs">
-    <Button class="breadcrumbs__back transparent" icon-only @click="$router.back()">
-      <ChevronLeftIcon />
-    </Button>
-    <Button class="breadcrumbs__forward transparent" icon-only @click="$router.forward()">
-      <ChevronRightIcon />
-    </Button>
-    {{ breadcrumbData.resetToNames(breadcrumbs) }}
     <div v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name" class="breadcrumbs__item">
       <router-link
         v-if="breadcrumb.link"
@@ -14,24 +7,19 @@
           path: breadcrumb.link.replace('{id}', encodeURIComponent($route.params.id)),
           query: breadcrumb.query,
         }"
-        >{{
-          breadcrumb.name.charAt(0) === '?'
-            ? breadcrumbData.getName(breadcrumb.name.slice(1))
-            : breadcrumb.name
-        }}
+      >
+        {{ breadcrumbName(breadcrumb.name) }}
       </router-link>
-      <span v-else class="selected">{{
-        breadcrumb.name.charAt(0) === '?'
-          ? breadcrumbData.getName(breadcrumb.name.slice(1))
-          : breadcrumb.name
-      }}</span>
+      <span v-else class="selected">
+        {{ breadcrumbName(breadcrumb.name) }}
+      </span>
       <ChevronRightIcon v-if="breadcrumb.link" class="chevron" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ChevronRightIcon, Button, ChevronLeftIcon } from 'omorphia'
+import { ChevronRightIcon } from 'omorphia'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'
@@ -39,6 +27,11 @@ import { computed } from 'vue'
 const route = useRoute()
 
 const breadcrumbData = useBreadcrumbs()
+
+breadcrumbData.$subscribe(() => {
+  breadcrumbData?.resetToNames(breadcrumbs.value)
+})
+
 const breadcrumbs = computed(() => {
   const additionalContext =
     route.meta.useContext === true
@@ -48,6 +41,13 @@ const breadcrumbs = computed(() => {
       : null
   return additionalContext ? [additionalContext, ...route.meta.breadcrumb] : route.meta.breadcrumb
 })
+
+const breadcrumbName = (bcn) => {
+  if (bcn.charAt(0) === '?') {
+    return breadcrumbData.getName(bcn.slice(1))
+  }
+  return bcn
+}
 </script>
 
 <style scoped lang="scss">
@@ -63,7 +63,7 @@ const breadcrumbs = computed(() => {
 
     .chevron,
     a {
-      margin: auto 0;
+      margin: auto 0.25rem;
     }
   }
 

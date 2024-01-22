@@ -11,6 +11,7 @@ import {
   Notifications,
   XIcon,
   Card,
+  TextLogo,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from './components/ui/AccountsCard.vue'
@@ -343,7 +344,7 @@ command_listener(async (e) => {
         <!-- Top Bar -->
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
-            Logo
+            <TextLogo class="logo" :animate="false" />
             <Breadcrumbs data-tauri-drag-region />
           </section>
           <section class="mod-stats">
@@ -398,9 +399,19 @@ command_listener(async (e) => {
   transition: all ease-in-out 0.1s;
 }
 
+.logo {
+  height: calc(var(--appbar-height) - 3rem);
+  width: auto;
+  min-height: 100%;
+  margin-right: var(--gap-md);
+  color: var(--color-contrast);
+}
+
 .navigation-controls {
   display: flex;
   flex-direction: row;
+
+  align-items: center;
 }
 
 .appbar-row {
@@ -442,7 +453,7 @@ command_listener(async (e) => {
 }
 
 .container {
-  --appbar-height: 3.5rem;
+  --appbar-height: 4.5rem;
   --sidebar-width: 4.5rem;
 
   height: 100vh;
@@ -463,7 +474,7 @@ command_listener(async (e) => {
       background: var(--color-raised-bg);
       text-align: center;
       padding: var(--gap-md);
-      height: 3.25rem;
+      height: var(--appbar-height);
       gap: var(--gap-sm);
       //no select
       user-select: none;
@@ -491,7 +502,7 @@ command_listener(async (e) => {
   .appbar-failure {
     display: flex; /* Change to flex to align items horizontally */
     justify-content: flex-end; /* Align items to the right */
-    height: 3.25rem;
+    height: var(--appbar-height);
     //no select
     user-select: none;
     -webkit-user-select: none;
