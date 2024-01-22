@@ -43,23 +43,27 @@
       Update all
     </Button>
 
-    <!-- <DropdownButton
-      v-if="!isPackLocked"
-      :options="['search', 'from_file']"
-      default-value="search"
-      name="add-content-dropdown"
-      color="primary"
-      @option-click="handleContentOptionClick"
-    >
-      <template #search>
+    <div v-if="!isPackLocked" class="joined-buttons">
+      <Button color="primary" @click="onSearchContent">
         <SearchIcon />
-        <span class="no-wrap"> Add content </span>
-      </template>
-      <template #from_file>
-        <FolderOpenIcon />
-        <span class="no-wrap"> Add from file </span>
-      </template>
-    </DropdownButton> -->
+        Add content
+      </Button>
+      <OverflowMenu
+        :options="[
+          {
+            id: 'file',
+            action: onFileContent,
+          },
+        ]"
+        class="btn btn-primary btn-dropdown-animation icon-only"
+      >
+        <DropdownIcon />
+        <template #file>
+          <FolderOpenIcon />
+          Add from file
+        </template>
+      </OverflowMenu>
+    </div>
   </Card>
   <Pagination
     v-if="projects.length > 0"
@@ -283,26 +287,26 @@
     </div>
     <h3>No projects found</h3>
     <p class="empty-subtitle">Add a project to get started</p>
-    <div class="empty-action">
-      <div class="joined-buttons">
-        <Button color="primary"> Search </Button>
-      </div>
-      <!-- <DropdownButton
-        :options="['search', 'from_file']"
-        default-value="search"
-        name="add-content-dropdown-from-empty"
-        color="primary"
-        @option-click="handleContentOptionClick"
+    <div v-if="!isPackLocked" class="joined-buttons">
+      <Button color="primary" @click="onSearchContent">
+        <SearchIcon />
+        Add content
+      </Button>
+      <OverflowMenu
+        :options="[
+          {
+            id: 'file',
+            action: onFileContent,
+          },
+        ]"
+        class="btn btn-primary btn-dropdown-animation icon-only"
       >
-        <template #search>
-          <SearchIcon />
-          <span class="no-wrap"> Add content </span>
-        </template>
-        <template #from_file>
+        <DropdownIcon />
+        <template #file>
           <FolderOpenIcon />
-          <span class="no-wrap"> Add from file </span>
+          Add from file
         </template>
-      </DropdownButton> -->
+      </OverflowMenu>
     </div>
   </div>
   <Pagination
@@ -393,9 +397,10 @@ import {
   CodeIcon,
   Pagination,
   DropdownSelect,
+  OverflowMenu,
 } from 'omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
-// import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
   get,
@@ -406,7 +411,7 @@ import {
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-// import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { highlightModInProfile } from '@/helpers/utils.js'
@@ -414,7 +419,7 @@ import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } fro
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 
-// const router = useRouter()
+const router = useRouter()
 
 const props = defineProps({
   instance: {
@@ -846,22 +851,22 @@ const handleRightClick = (event, mod) => {
   }
 }
 
-// const handleContentOptionClick = async (args) => {
-//   if (args.option === 'search') {
-//     await router.push({
-//       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-//       query: { i: props.instance.path },
-//     })
-//   } else if (args.option === 'from_file') {
-//     const newProject = await open({ multiple: true })
-//     if (!newProject) return
+const onSearchContent = async () => {
+  await router.push({
+    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    query: { i: props.instance.path },
+  })
+}
 
-//     for (const project of newProject) {
-//       await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
-//     }
-//     initProjects(await get(props.instance.path).catch(handleError))
-//   }
-// }
+const onFileContent = async () => {
+  const newProject = await open({ multiple: true })
+  if (!newProject) return
+
+  for (const project of newProject) {
+    await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
+  }
+  initProjects(await get(props.instance.path).catch(handleError))
+}
 
 watch(selectAll, () => {
   for (const [key, value] of Array.from(selectionMap.value)) {
@@ -961,9 +966,17 @@ onUnmounted(() => {
   white-space: nowrap;
   align-items: center;
 
-  :deep(.dropdown-row) {
-    .btn {
-      height: 2.5rem !important;
+  :deep {
+    .popup-container {
+      .btn {
+        height: 2.5rem !important;
+      }
+    }
+
+    .dropdown-row {
+      .btn {
+        height: 2.5rem !important;
+      }
     }
   }
 

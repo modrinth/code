@@ -434,7 +434,7 @@ command_listener(async (e) => {
     background-color: var(--color-raised-bg);
     color: var(--color-base);
     border-radius: 0;
-    height: 3.25rem;
+    height: var(--appbar-height);
 
     &.close {
       &:hover,
@@ -483,7 +483,7 @@ command_listener(async (e) => {
 
     .router-view {
       width: 100%;
-      height: calc(100% - 3.125rem);
+      height: calc(100% - var(--appbar-height));
       overflow: auto;
       overflow-x: hidden;
       background-color: var(--color-bg);
