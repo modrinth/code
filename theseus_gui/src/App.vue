@@ -339,7 +339,7 @@ command_listener(async (e) => {
         </RouterLink>
         <Button
           v-tooltip="'Create profile'"
-          class="sleek-primary collapsed-button"
+          class="page-item collapsed-button"
           icon-only
           :disabled="offline"
           @click="() => $refs.installationModal.show()"
@@ -566,7 +566,7 @@ command_listener(async (e) => {
   align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
-  gap: 0.5rem;
+  gap: 0.35rem;
 
   .page-item,
   a {
@@ -585,13 +585,11 @@ command_listener(async (e) => {
     &:hover {
       color: var(--color-contrast);
       background: var(--color-button-bg);
-      text-decoration: none;
     }
 
     &.router-link-active:hover {
       color: var(--color-brand);
       background: var(--color-brand-highlight);
-      text-decoration: none;
     }
   }
 
