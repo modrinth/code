@@ -4,7 +4,7 @@
       v-if="currentLoadingBars.length > 0"
       ref="infoButton"
       icon-only
-      class="icon-button show-card-icon"
+      class="show-card-icon"
       @click="toggleCard()"
     >
       <DownloadIcon />
@@ -30,7 +30,7 @@
           <DropdownIcon />
         </div>
       </div>
-      <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop" @click="stop()">
+      <Button v-tooltip="'Stop instance'" icon-only class="stop" @click="stop()">
         <StopCircleIcon />
       </Button>
       <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
@@ -316,17 +316,6 @@ onBeforeUnmount(() => {
 
   &.stopped {
     background-color: var(--color-base);
-  }
-}
-
-.icon-button {
-  background-color: rgba(0, 0, 0, 0);
-  box-shadow: none;
-  width: 1.25rem !important;
-  height: 1.25rem !important;
-
-  &.stop {
-    --text-color: var(--color-red) !important;
   }
 }
 
