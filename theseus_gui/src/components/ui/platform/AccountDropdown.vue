@@ -14,7 +14,9 @@
         {
           id: 'sign-out',
           color: 'danger',
-          action: () => {},
+          action: async () => {
+            await mrAuth.logout()
+          },
           hoverFilledOnly: true,
         },
       ]"
@@ -46,30 +48,22 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { Avatar, OverflowMenu, LogOutIcon, LogInIcon, Modal } from 'omorphia'
 
 import { useTheming } from '@/store/state'
-import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 import { useMrAuth } from '@/composables/auth.js'
 
-const themeStore = useTheming()
+import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
 
+const themeStore = useTheming()
 const mrAuth = useMrAuth()
 
 const modrinthLoginModal = ref(null)
 
-const refreshCredentials = async () => {
-  await mrAuth.get()
-}
-
-onMounted(async () => {
-  await refreshCredentials()
-})
-
 const signInAfter = async () => {
   modrinthLoginModal.value?.hide()
-  await refreshCredentials()
+  await mrAuth.get()
 }
 </script>
 
