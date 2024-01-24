@@ -1,6 +1,16 @@
 <template>
   <div class="breadcrumbs">
-    <div v-for="breadcrumb in breadcrumbs" :key="breadcrumb.name" class="breadcrumbs__item">
+    <div
+      v-if="props.afterLogo && breadcrumbContext.routeBreadcrumbs.value?.length > 0"
+      class="breadcrumbs__item"
+    >
+      <ChevronRightIcon class="chevron" />
+    </div>
+    <div
+      v-for="breadcrumb in breadcrumbContext.routeBreadcrumbs.value"
+      :key="breadcrumb.name"
+      class="breadcrumbs__item"
+    >
       <router-link
         v-if="breadcrumb.link"
         :to="{
@@ -20,26 +30,23 @@
 
 <script setup>
 import { ChevronRightIcon } from 'omorphia'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumbs, useBreadcrumbContext } from '@/store/breadcrumbs'
 import { useRoute } from 'vue-router'
-import { computed } from 'vue'
 
-const route = useRoute()
+const props = defineProps({
+  afterLogo: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const breadcrumbData = useBreadcrumbs()
 
-breadcrumbData.$subscribe(() => {
-  breadcrumbData?.resetToNames(breadcrumbs.value)
-})
+const route = useRoute()
+const breadcrumbContext = useBreadcrumbContext(route)
 
-const breadcrumbs = computed(() => {
-  const additionalContext =
-    route.meta.useContext === true
-      ? breadcrumbData.context
-      : route.meta.useRootContext === true
-      ? breadcrumbData.rootContext
-      : null
-  return additionalContext ? [additionalContext, ...route.meta.breadcrumb] : route.meta.breadcrumb
+breadcrumbData.$subscribe(() => {
+  breadcrumbData?.resetToNames(breadcrumbContext.routeBreadcrumbs.value)
 })
 
 const breadcrumbName = (bcn) => {
@@ -61,9 +68,12 @@ const breadcrumbName = (bcn) => {
     vertical-align: center;
     margin: auto 0;
 
-    .chevron,
+    .chevron {
+      margin: auto 0.5rem;
+    }
+
     a {
-      margin: auto 0.25rem;
+      margin: auto 0;
     }
   }
 
