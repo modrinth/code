@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
 import {
   HomeIcon,
@@ -14,8 +14,9 @@ import {
   TextLogo,
   PlusIcon,
 } from 'omorphia'
+
 import { useLoading, useTheming } from '@/store/state'
-import AccountsCard from './components/ui/AccountsCard.vue'
+// import AccountsCard from './components/ui/AccountsCard.vue'
 import AccountDropdown from '@/components/ui/platform/AccountDropdown.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -26,34 +27,41 @@ import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
-import { type } from '@tauri-apps/api/os'
-import { appWindow } from '@tauri-apps/api/window'
 import { isDev, getOS, isOffline, showLauncherLogsFolder } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
   mixpanel_opt_out_tracking,
   mixpanel_is_loaded,
-} from '@/helpers/mixpanel'
+} from '@/helpers/mixpanel.js'
+import { useDisableClicks } from '@/composables/click.js'
+import { openExternal } from '@/helpers/external.js'
+import { await_sync, check_safe_loading_bars_complete } from '@/helpers/state.js'
+import { install_from_file } from '@/helpers/pack.js'
+
+import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
+import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
+import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
+
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
-import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
-import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
-import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
-import { install_from_file } from './helpers/pack'
+import { type } from '@tauri-apps/api/os'
+import { appWindow } from '@tauri-apps/api/window'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
+
 const isLoading = ref(true)
 
 const videoPlaying = ref(false)
 const offline = ref(false)
 const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
+
+const sidebarOpen = ref(false)
 
 const onboardingVideo = ref()
 
@@ -156,18 +164,12 @@ const handleClose = async () => {
   await TauriWindow.getCurrent().close()
 }
 
-const openSupport = async () => {
-  window.__TAURI_INVOKE__('tauri', {
-    __tauriModule: 'Shell',
-    message: {
-      cmd: 'open',
-      path: 'https://support.modrinth.com/',
-    },
-  })
-}
+const openSupport = () => openExternal(window, 'https://support.modrinth.com/')
 
-TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-  await handleClose()
+onMounted(() => {
+  return TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+    await handleClose()
+  })
 })
 
 const router = useRouter()
@@ -188,47 +190,9 @@ watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
 
-document.querySelector('body').addEventListener('click', function (e) {
-  let target = e.target
-  while (target != null) {
-    if (target.matches('a')) {
-      if (
-        target.href &&
-        ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
-        !target.classList.contains('router-link-active') &&
-        !target.href.startsWith('http://localhost') &&
-        !target.href.startsWith('https://tauri.localhost')
-      ) {
-        window.__TAURI_INVOKE__('tauri', {
-          __tauriModule: 'Shell',
-          message: {
-            cmd: 'open',
-            path: target.href,
-          },
-        })
-      }
-      e.preventDefault()
-      break
-    }
-    target = target.parentElement
-  }
-})
+useDisableClicks(document, window)
 
-document.querySelector('body').addEventListener('auxclick', function (e) {
-  // disables middle click -> new tab
-  if (e.button === 1) {
-    e.preventDefault()
-    // instead do a left click
-    const event = new MouseEvent('click', {
-      view: window,
-      bubbles: true,
-      cancelable: true,
-    })
-    e.target.dispatchEvent(event)
-  }
-})
-
-const accounts = ref(null)
+// const accounts = ref(null)
 
 command_listener(async (e) => {
   if (e.event === 'RunMRPack') {
@@ -244,6 +208,10 @@ command_listener(async (e) => {
     urlModal.value.show(e)
   }
 })
+
+const toggleSidebar = () => {
+  sidebarOpen.value = !sidebarOpen.value
+}
 </script>
 
 <template>
@@ -297,14 +265,36 @@ command_listener(async (e) => {
   <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
   <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
-    <div class="nav-container">
-      <div class="nav-section">
-        <suspense>
+    <div
+      class="nav-container"
+      data-tauri-drag-region
+      :class="`${sidebarOpen ? 'nav-container__open' : ''}`"
+      :style="{
+        '--sidebar-label-opacity': sidebarOpen ? '1' : '0',
+      }"
+    >
+      <div class="pages-list">
+        <div class="square-collapsed-space">
+          <Button
+            v-tooltip="'Toggle sidebar'"
+            transparent
+            icon-only
+            class="collapsed-button"
+            @click="toggleSidebar"
+          >
+            <PlusIcon />
+            <span class="collapsed-button__label">Collapse</span>
+          </Button>
+        </div>
+      </div>
+      <div class="pages-list">
+        <!-- <suspense>
           <AccountsCard ref="accounts" mode="small" />
-        </suspense>
+        </suspense> -->
         <div class="pages-list">
           <RouterLink v-tooltip="'Home'" to="/" class="btn icon-only collapsed-button">
             <HomeIcon />
+            <span class="collapsed-button__label">Home</span>
           </RouterLink>
           <RouterLink
             v-tooltip="'Browse'"
@@ -315,14 +305,21 @@ command_listener(async (e) => {
             }"
           >
             <SearchIcon />
+            <span class="collapsed-button__label">Browse</span>
           </RouterLink>
           <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
+            <span class="collapsed-button__label">Library</span>
           </RouterLink>
-          <Suspense>
+          <suspense>
             <InstanceCreationModal ref="installationModal" />
-          </Suspense>
+          </suspense>
         </div>
+      </div>
+      <div class="instances pages-list">
+        <RouterLink v-tooltip="'Meow'" to="/undefined" class="btn icon-only collapsed-button">
+          Meow
+        </RouterLink>
       </div>
       <div class="settings pages-list">
         <Button
@@ -333,9 +330,11 @@ command_listener(async (e) => {
           @click="openSupport"
         >
           <ChatIcon />
+          <span class="collapsed-button__label">Support</span>
         </Button>
         <RouterLink v-tooltip="'Settings'" to="/settings" class="btn icon-only collapsed-button">
           <SettingsIcon />
+          <span class="collapsed-button__label">Settings</span>
         </RouterLink>
         <Button
           v-tooltip="'Create profile'"
@@ -345,6 +344,7 @@ command_listener(async (e) => {
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
+          <span class="collapsed-button__label">Create Profile</span>
         </Button>
         <AccountDropdown />
       </div>
@@ -354,8 +354,11 @@ command_listener(async (e) => {
         <!-- Top Bar -->
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
-            <TextLogo class="logo" :animate="false" />
-            <Breadcrumbs data-tauri-drag-region />
+            <router-link :to="'/'">
+              <TextLogo class="logo" :animate="false" />
+            </router-link>
+            <Breadcrumbs after-logo data-tauri-drag-region />
+            <!-- <pre><code>{{ JSON.stringify(breadcrumbs.path) }}</code></pre> -->
           </section>
           <section class="mod-stats">
             <Suspense>
@@ -387,7 +390,7 @@ command_listener(async (e) => {
       <div class="router-view">
         <ModrinthLoadingIndicator
           offset-height="var(--appbar-height)"
-          offset-width="var(--sidebar-width)"
+          :offset-width="sidebarOpen ? 'var(--sidebar-open-width)' : 'var(--sidebar-width)'"
         />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
@@ -410,10 +413,9 @@ command_listener(async (e) => {
 }
 
 .logo {
-  height: calc(var(--appbar-height) - 3rem);
+  height: calc(var(--appbar-height) - 2.5rem);
   width: auto;
   min-height: 100%;
-  margin-right: var(--gap-md);
   color: var(--color-contrast);
 }
 
@@ -464,7 +466,14 @@ command_listener(async (e) => {
 
 .container {
   --appbar-height: 4.5rem;
+
   --sidebar-width: 4.5rem;
+  --sidebar-open-width: 15rem;
+  --sidebar-padding: 0.75rem;
+
+  --sidebar-icon-size: 1.5rem;
+  --sidebar-button-size: calc(var(--sidebar-width) - calc(var(--sidebar-padding) * 2));
+  --sidebar-open-button-size: calc(var(--sidebar-open-width) - calc(var(--sidebar-padding) * 2));
 
   height: 100vh;
   display: flex;
@@ -552,12 +561,50 @@ command_listener(async (e) => {
 .nav-container {
   display: flex;
   flex-direction: column;
+
+  padding-left: var(--sidebar-padding);
+  padding-right: var(--sidebar-padding);
+  padding-bottom: var(--sidebar-padding);
+
   align-items: center;
   justify-content: space-between;
+
   height: 100%;
+
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-  padding: var(--gap-md);
+
+  transition: all ease-in-out 0.1s;
+
+  width: var(--sidebar-width);
+}
+
+.nav-container__open {
+  width: var(--sidebar-open-width);
+}
+
+.square-collapsed-space {
+  height: var(--appbar-height);
+  width: 100%;
+
+  user-select: none;
+  -webkit-user-select: none;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .square-collapsed-space {
+    height: auto;
+    padding-bottom: var(--gap-md);
+  }
+}
+
+.instances {
+  height: 100%;
+  flex-grow: 1;
 }
 
 .pages-list {
@@ -565,7 +612,9 @@ command_listener(async (e) => {
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
+
   width: 100%;
+
   gap: 0.35rem;
 
   .page-item,
@@ -600,77 +649,33 @@ command_listener(async (e) => {
 }
 
 .collapsed-button {
-  height: 3rem !important;
-  width: 3rem !important;
-  padding: 0.75rem;
+  justify-content: flex-start;
+
+  // width: var(--sidebar-icon-size);
+  height: var(--sidebar-button-size);
+  width: 100%;
+
+  padding: var(--sidebar-padding) !important;
   border-radius: 99999px;
   box-shadow: none;
 
+  white-space: nowrap;
+  overflow: hidden;
+
+  transition: all ease-in-out 0.1s;
+
+  .collapsed-button__icon,
   svg {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    max-width: 1.5rem !important;
-    max-height: 1.5rem !important;
-  }
-}
+    width: var(--sidebar-icon-size);
+    height: var(--sidebar-icon-size);
 
-.instance-list {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 70%;
-  margin: 0.4rem;
-
-  p:nth-child(1) {
-    font-size: 0.6rem;
+    flex-shrink: 0;
   }
 
-  & > p {
-    color: var(--color-base);
-    margin: 0.8rem 0;
-    font-size: 0.7rem;
-    line-height: 0.8125rem;
-    font-weight: 500;
-    text-transform: uppercase;
+  .collapsed-button__label {
+    opacity: var(--sidebar-label-opacity);
+    transition: all ease-in-out 0.1s;
   }
-}
-
-.user-section {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 4.375rem;
-
-  section {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    text-align: left;
-    margin-left: 0.5rem;
-  }
-
-  .username {
-    margin-bottom: 0.3rem;
-    font-weight: 400;
-    line-height: 1.25rem;
-    color: var(--color-contrast);
-  }
-
-  a {
-    font-weight: 400;
-    color: var(--color-secondary);
-  }
-}
-
-.nav-section {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 1rem;
-
-  height: 100%;
 }
 
 .video {
