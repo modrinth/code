@@ -1,5 +1,12 @@
 // Quick snippets stolen from knossos project to make omorphia components fit
 
+.btn,
+.button-base,
+a {
+  // filter will change
+  will-change: filter;
+}
+
 .iconified-input {
   align-items: center;
   display: inline-flex;
