@@ -9,7 +9,7 @@ COPY docker_utils/dummy.rs .
 # Change temporarely the path of the code
 RUN sed -i 's|src/main.rs|dummy.rs|' Cargo.toml
 # Build only deps
-RUN cargo build --release
+RUN cargo build --release --features jemalloc
 # Now return the file back to normal
 RUN sed -i 's|dummy.rs|src/main.rs|' Cargo.toml
 
@@ -17,7 +17,7 @@ RUN sed -i 's|dummy.rs|src/main.rs|' Cargo.toml
 COPY . .
 # Build our code
 ARG SQLX_OFFLINE=true
-RUN cargo build --release
+RUN cargo build --release --features jemalloc
 
 # Final Stage
 FROM ubuntu:latest

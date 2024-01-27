@@ -115,14 +115,19 @@ pub async fn get_indexes_for_indexing(
     let client = config.make_client();
     let project_name = config.get_index_name("projects", next);
     let project_filtered_name = config.get_index_name("projects_filtered", next);
-    let projects_index = create_or_update_index(&client, &project_name, Some(&[
-        "words",
-        "typo",
-        "proximity",
-        "attribute",
-        "exactness",
-        "sort",
-    ]),).await?;
+    let projects_index = create_or_update_index(
+        &client,
+        &project_name,
+        Some(&[
+            "words",
+            "typo",
+            "proximity",
+            "attribute",
+            "exactness",
+            "sort",
+        ]),
+    )
+    .await?;
     let projects_filtered_index = create_or_update_index(
         &client,
         &project_filtered_name,
