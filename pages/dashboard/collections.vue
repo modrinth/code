@@ -1,10 +1,10 @@
 <template>
   <div class="universal-card">
     <CollectionCreateModal ref="modal_creation" />
-    <h2>Collections</h2>
+    <h2>{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
     <div class="search-row">
       <div class="iconified-input">
-        <label for="search-input" hidden>Search your collections</label>
+        <label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
         <SearchIcon />
         <input id="search-input" v-model="filterQuery" type="text" />
         <Button v-if="filterQuery" class="r-btn" @click="() => (filterQuery = '')">
@@ -12,7 +12,7 @@
         </Button>
       </div>
       <Button color="primary" @click="$refs.modal_creation.show()">
-        <PlusIcon /> Create new
+        <PlusIcon /> {{ formatMessage(messages.createNewButton) }}
       </Button>
     </div>
     <div class="collections-grid">
@@ -23,13 +23,22 @@
       >
         <Avatar src="https://cdn.modrinth.com/follow-collection.png" class="icon" />
         <div class="details">
-          <span class="title">Followed projects</span>
+          <span class="title">{{ formatMessage(commonMessages.followedProjectsLabel) }}</span>
           <span class="description">
-            Auto-generated collection of all the projects you're following.
+            {{ formatMessage(messages.followingCollectionDescription) }}
           </span>
           <div class="stat-bar">
-            <div class="stats"><BoxIcon /> {{ user.follows.length }} projects</div>
-            <div class="stats"><LockIcon /> <span> Private </span></div>
+            <div class="stats">
+              <BoxIcon />
+              {{
+                formatMessage(messages.projectsCountLabel, {
+                  count: formatCompactNumber(user.follows.length),
+                })
+              }}
+            </div>
+            <div class="stats">
+              <LockIcon /> <span> {{ formatMessage(commonMessages.privateLabel) }} </span>
+            </div>
           </div>
         </div>
       </nuxt-link>
@@ -46,23 +55,30 @@
             {{ collection.description }}
           </span>
           <div class="stat-bar">
-            <div class="stats"><BoxIcon /> {{ collection.projects?.length || 0 }} projects</div>
+            <div class="stats">
+              <BoxIcon />
+              {{
+                formatMessage(messages.projectsCountLabel, {
+                  count: formatCompactNumber(collection.projects?.length || 0),
+                })
+              }}
+            </div>
             <div class="stats">
               <template v-if="collection.status === 'listed'">
                 <WorldIcon />
-                <span> Public </span>
+                <span> {{ formatMessage(commonMessages.publicLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'unlisted'">
                 <LinkIcon />
-                <span> Unlisted </span>
+                <span> {{ formatMessage(commonMessages.unlistedLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'private'">
                 <LockIcon />
-                <span> Private </span>
+                <span> {{ formatMessage(commonMessages.privateLabel) }} </span>
               </template>
               <template v-else-if="collection.status === 'rejected'">
                 <XIcon />
-                <span> Rejected </span>
+                <span> {{ formatMessage(commonMessages.rejectedLabel) }} </span>
               </template>
             </div>
           </div>
@@ -76,12 +92,38 @@ import { Avatar, BoxIcon, SearchIcon, XIcon, Button, PlusIcon, LinkIcon, LockIco
 import WorldIcon from '~/assets/images/utils/world.svg'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 
+const { formatMessage } = useVIntl()
+const formatCompactNumber = useCompactNumber()
+
+const messages = defineMessages({
+  createNewButton: {
+    id: 'dashboard.collections.button.create-new',
+    defaultMessage: 'Create new',
+  },
+  collectionsLongTitle: {
+    id: 'dashboard.collections.long-title',
+    defaultMessage: 'Your collections',
+  },
+  followingCollectionDescription: {
+    id: 'collection.description.following',
+    defaultMessage: "Auto-generated collection of all the projects you're following.",
+  },
+  projectsCountLabel: {
+    id: 'dashboard.collections.label.projects-count',
+    defaultMessage: '{count, plural, one {{count} project} other {{count} projects}}',
+  },
+  searchInputLabel: {
+    id: 'dashboard.collections.label.search-input',
+    defaultMessage: 'Search your collections',
+  },
+})
+
 definePageMeta({
   middleware: 'auth',
 })
 
 useHead({
-  title: 'Your collections - Modrinth',
+  title: () => `${formatMessage(messages.collectionsLongTitle)} - Modrinth`,
 })
 
 const user = await useUser()

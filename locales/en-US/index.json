@@ -26,6 +26,78 @@
   "button.save": {
     "message": "Save"
   },
+  "collection.button.delete-icon": {
+    "message": "Delete icon"
+  },
+  "collection.button.edit-icon": {
+    "message": "Edit icon"
+  },
+  "collection.button.remove-project": {
+    "message": "Remove project"
+  },
+  "collection.button.unfollow-project": {
+    "message": "Unfollow project"
+  },
+  "collection.button.upload-icon": {
+    "message": "Upload icon"
+  },
+  "collection.delete-modal.description": {
+    "message": "This will remove this collection forever. This action cannot be undone."
+  },
+  "collection.delete-modal.title": {
+    "message": "Are you sure you want to delete this collection?"
+  },
+  "collection.description": {
+    "message": "{description} - View the collection {name} by {username} on Modrinth"
+  },
+  "collection.description.following": {
+    "message": "Auto-generated collection of all the projects you're following."
+  },
+  "collection.error.not-found": {
+    "message": "Collection not found"
+  },
+  "collection.label.collection": {
+    "message": "Collection"
+  },
+  "collection.label.created-at": {
+    "message": "Created {ago}"
+  },
+  "collection.label.curated-by": {
+    "message": "Curated by"
+  },
+  "collection.label.no-projects": {
+    "message": "This collection has no projects!"
+  },
+  "collection.label.no-projects-auth": {
+    "message": "You don't have any projects.\nWould you like to <create-link>add one</create-link>?"
+  },
+  "collection.label.owner": {
+    "message": "Owner"
+  },
+  "collection.label.private": {
+    "message": "Private"
+  },
+  "collection.label.projects-count": {
+    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
+  },
+  "collection.label.updated-at": {
+    "message": "Updated {ago}"
+  },
+  "collection.title": {
+    "message": "{name} - Collection"
+  },
+  "dashboard.collections.button.create-new": {
+    "message": "Create new"
+  },
+  "dashboard.collections.label.projects-count": {
+    "message": "{count, plural, one {{count} project} other {{count} projects}}"
+  },
+  "dashboard.collections.label.search-input": {
+    "message": "Search your collections"
+  },
+  "dashboard.collections.long-title": {
+    "message": "Your collections"
+  },
   "frog": {
     "message": "You've been frogged! 🐸"
   },
@@ -49,6 +121,33 @@
   },
   "input.view.list": {
     "message": "List view"
+  },
+  "label.collections": {
+    "message": "Collections"
+  },
+  "label.delete": {
+    "message": "Delete"
+  },
+  "label.description": {
+    "message": "Description"
+  },
+  "label.followed-projects": {
+    "message": "Followed projects"
+  },
+  "label.public": {
+    "message": "Public"
+  },
+  "label.rejected": {
+    "message": "Rejected"
+  },
+  "label.title": {
+    "message": "Title"
+  },
+  "label.unlisted": {
+    "message": "Unlisted"
+  },
+  "label.visibility": {
+    "message": "Visibility"
   },
   "notification.error.title": {
     "message": "An error occurred"

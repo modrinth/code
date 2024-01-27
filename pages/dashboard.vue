@@ -24,7 +24,10 @@
           <NavStackItem v-if="true" link="/dashboard/organizations" label="Organizations">
             <OrganizationIcon />
           </NavStackItem>
-          <NavStackItem link="/dashboard/collections" label="Collections">
+          <NavStackItem
+            link="/dashboard/collections"
+            :label="formatMessage(commonMessages.collectionsLabel)"
+          >
             <LibraryIcon />
           </NavStackItem>
           <NavStackItem link="/dashboard/revenue" label="Revenue">
@@ -49,6 +52,8 @@ import ListIcon from '~/assets/images/utils/list.svg'
 import ReportIcon from '~/assets/images/utils/report.svg'
 import NotificationsIcon from '~/assets/images/utils/bell.svg'
 import OrganizationIcon from '~/assets/images/utils/organization.svg'
+
+const { formatMessage } = useVIntl()
 
 definePageMeta({
   middleware: 'auth',
