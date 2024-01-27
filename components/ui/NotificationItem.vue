@@ -288,6 +288,7 @@
 </template>
 
 <script setup>
+import { renderString } from 'omorphia'
 import InvitationIcon from '~/assets/images/utils/user-plus.svg'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg'
 import NotificationIcon from '~/assets/images/sidebar/notifications.svg'
@@ -302,7 +303,6 @@ import { getProjectLink, getVersionLink } from '~/helpers/projects.js'
 import { getUserLink } from '~/helpers/users.js'
 import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams.js'
 import { markAsRead } from '~/helpers/notifications.js'
-import { renderString } from '~/helpers/parse.js'
 import DoubleIcon from '~/components/ui/DoubleIcon.vue'
 import Avatar from '~/components/ui/Avatar.vue'
 import Badge from '~/components/ui/Badge.vue'

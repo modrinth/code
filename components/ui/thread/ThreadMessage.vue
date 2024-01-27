@@ -108,10 +108,10 @@ import {
   LockIcon,
   ModrinthIcon,
   ScaleIcon,
+  renderString,
 } from 'omorphia'
 import Avatar from '~/components/ui/Avatar.vue'
 import Badge from '~/components/ui/Badge.vue'
-import { renderString } from '~/helpers/parse.js'
 import { isStaff } from '~/helpers/users.js'
 
 const props = defineProps({
