@@ -531,7 +531,16 @@ try {
         () =>
           useBaseFetch(
             `projects?ids=${encodeURIComponent(JSON.stringify(collection.value.projects))}`
-          )
+          ),
+        {
+          transform: (projects) => {
+            for (const project of projects) {
+              project.categories = project.categories.concat(project.loaders)
+            }
+
+            return projects
+          },
+        }
       ),
     ])
   }
