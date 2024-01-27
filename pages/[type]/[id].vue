@@ -1202,6 +1202,10 @@ async function updateMembers() {
   )
 }
 
+async function copyId() {
+  await navigator.clipboard.writeText(project.value.id)
+}
+
 const collapsedChecklist = ref(false)
 </script>
 <style lang="scss" scoped>
