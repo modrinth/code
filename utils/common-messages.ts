@@ -63,6 +63,10 @@ export const commonMessages = defineMessages({
     id: 'label.rejected',
     defaultMessage: 'Rejected',
   },
+  passwordLabel: {
+    id: 'label.password',
+    defaultMessage: 'Password',
+  },
   saveButton: {
     id: 'button.save',
     defaultMessage: 'Save',
