@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Sign up with</h1>
+    <h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
 
     <section class="third-party">
       <a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
@@ -29,11 +29,11 @@
       </a>
     </section>
 
-    <h1>Or create an account yourself</h1>
+    <h1>{{ formatMessage(messages.createAccountTitle) }}</h1>
 
     <section class="auth-form">
       <div class="iconified-input">
-        <label for="email" hidden>Email</label>
+        <label for="email" hidden>{{ formatMessage(messages.emailLabel) }}</label>
         <MailIcon />
         <input
           id="email"
@@ -41,12 +41,12 @@
           type="email"
           autocomplete="username"
           class="auth-form__input"
-          placeholder="Email"
+          :placeholder="formatMessage(messages.emailLabel)"
         />
       </div>
 
       <div class="iconified-input">
-        <label for="username" hidden>Username</label>
+        <label for="username" hidden>{{ formatMessage(messages.usernameLabel) }}</label>
         <UserIcon />
         <input
           id="username"
@@ -54,12 +54,12 @@
           type="text"
           autocomplete="username"
           class="auth-form__input"
-          placeholder="Username"
+          :placeholder="formatMessage(messages.usernameLabel)"
         />
       </div>
 
       <div class="iconified-input">
-        <label for="password" hidden>Password</label>
+        <label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
         <KeyIcon />
         <input
           id="password"
@@ -67,12 +67,12 @@
           class="auth-form__input"
           type="password"
           autocomplete="new-password"
-          placeholder="Password"
+          :placeholder="formatMessage(messages.passwordLabel)"
         />
       </div>
 
       <div class="iconified-input">
-        <label for="confirm-password" hidden>Password</label>
+        <label for="confirm-password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
         <KeyIcon />
         <input
           id="confirm-password"
@@ -80,7 +80,7 @@
           type="password"
           autocomplete="new-password"
           class="auth-form__input"
-          placeholder="Confirm password"
+          :placeholder="formatMessage(messages.confirmPasswordLabel)"
         />
       </div>
 
@@ -89,23 +89,34 @@
       <Checkbox
         v-model="subscribe"
         class="subscribe-btn"
-        label="Subscribe to updates about Modrinth"
-        description="Subscribe to updates about Modrinth"
+        :label="formatMessage(messages.subscribeLabel)"
+        :description="formatMessage(messages.subscribeLabel)"
       />
 
       <p>
-        By creating an account, you agree to Modrinth's
-        <NuxtLink to="/legal/terms" class="text-link">Terms</NuxtLink> and
-        <NuxtLink to="/legal/privacy" class="text-link">Privacy Policy</NuxtLink>.
+        <IntlFormatted :message-id="messages.legalDisclaimer">
+          <template #terms-link="{ children }">
+            <NuxtLink to="/legal/terms" class="text-link">
+              <component :is="() => children" />
+            </NuxtLink>
+          </template>
+          <template #privacy-policy-link="{ children }">
+            <NuxtLink to="/legal/privacy" class="text-link">
+              <component :is="() => children" />
+            </NuxtLink>
+          </template>
+        </IntlFormatted>
       </p>
 
       <button class="btn btn-primary continue-btn centered-btn" @click="createAccount">
-        Create account <RightArrowIcon />
+        {{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
       </button>
 
       <div class="auth-form__additional-options">
-        Already have an account?
-        <NuxtLink class="text-link" :to="signInLink">Sign in</NuxtLink>
+        {{ formatMessage(messages.alreadyHaveAccountLabel) }}
+        <NuxtLink class="text-link" :to="signInLink">
+          {{ formatMessage(messages.signInLabel) }}
+        </NuxtLink>
       </div>
     </section>
   </div>
@@ -122,8 +133,62 @@ import KeyIcon from 'assets/icons/auth/key.svg'
 import MailIcon from 'assets/icons/auth/mail.svg'
 import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
 
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+  title: {
+    id: 'auth.sign-up.title',
+    defaultMessage: 'Sign Up',
+  },
+  signUpWithTitle: {
+    id: 'auth.sign-up.title.sign-up-with',
+    defaultMessage: 'Sign up with',
+  },
+  createAccountTitle: {
+    id: 'auth.sign-up.title.create-account',
+    defaultMessage: 'Or create an account yourself',
+  },
+  emailLabel: {
+    id: 'auth.sign-up.email.label',
+    defaultMessage: 'Email',
+  },
+  usernameLabel: {
+    id: 'auth.sign-up.label.username',
+    defaultMessage: 'Username',
+  },
+  passwordLabel: {
+    id: 'auth.sign-up.password.label',
+    defaultMessage: 'Password',
+  },
+  confirmPasswordLabel: {
+    id: 'auth.sign-up.confirm-password.label',
+    defaultMessage: 'Confirm password',
+  },
+  subscribeLabel: {
+    id: 'auth.sign-up.subscribe.label',
+    defaultMessage: 'Subscribe to updates about Modrinth',
+  },
+  legalDisclaimer: {
+    id: 'auth.sign-up.legal-dislaimer',
+    defaultMessage:
+      "By creating an account, you agree to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
+  },
+  createAccountButton: {
+    id: 'auth.sign-up.action.create-account',
+    defaultMessage: 'Create account',
+  },
+  alreadyHaveAccountLabel: {
+    id: 'auth.sign-up.sign-in-option.title',
+    defaultMessage: 'Already have an account?',
+  },
+  signInLabel: {
+    id: 'auth.sign-up.sign-in-option.action',
+    defaultMessage: 'Sign in',
+  },
+})
+
 useHead({
-  title: 'Sign Up - Modrinth',
+  title: () => `${formatMessage(messages.title)} - Modrinth`,
 })
 
 const auth = await useAuth()
@@ -162,8 +227,11 @@ async function createAccount() {
     if (confirmPassword.value !== password.value) {
       addNotification({
         group: 'main',
-        title: 'An error occurred',
-        text: 'Passwords do not match!',
+        title: formatMessage(commonMessages.errorNotificationTitle),
+        text: formatMessage({
+          id: 'auth.sign-up.notification.password-mismatch.text',
+          defaultMessage: 'Passwords do not match!',
+        }),
         type: 'error',
       })
       turnstile.value?.reset()
@@ -191,7 +259,7 @@ async function createAccount() {
   } catch (err) {
     addNotification({
       group: 'main',
-      title: 'An error occurred',
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: 'error',
     })
