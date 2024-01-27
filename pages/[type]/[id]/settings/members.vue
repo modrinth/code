@@ -48,6 +48,11 @@
         <button
           class="iconified-button danger-button"
           :disabled="props.currentMember?.is_owner"
+          :title="
+            props.currentMember?.is_owner
+              ? 'You cannot leave the project if you are the owner!'
+              : ''
+          "
           @click="leaveProject()"
         >
           <UserRemoveIcon />
