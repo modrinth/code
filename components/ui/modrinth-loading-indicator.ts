@@ -1,6 +1,5 @@
 import { computed, defineComponent, h, onBeforeUnmount, ref, watch } from 'vue'
-import { useNuxtApp } from '#app'
-import { startLoading, stopLoading } from '#imports'
+import { startLoading, stopLoading, useNuxtApp } from '#imports'
 
 export default defineComponent({
   name: 'ModrinthLoadingIndicator',

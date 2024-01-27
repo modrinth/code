@@ -1,4 +1,4 @@
-import { useNuxtApp } from '#app'
+import { useNuxtApp } from '#imports'
 
 async function getBulk(type, ids, apiVersion = 2) {
   if (ids.length === 0) {
