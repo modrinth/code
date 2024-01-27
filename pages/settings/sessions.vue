@@ -24,7 +24,7 @@
             "
           >
             {{
-              formatMessage(messages.sessionsLastAccessedAt, {
+              formatMessage(messages.lastAccessedAgoLabel, {
                 ago: formatRelativeTime(session.last_login),
               })
             }}
@@ -39,7 +39,7 @@
             "
           >
             {{
-              formatMessage(messages.sessionsCreatedAt, {
+              formatMessage(messages.createdAgoLabel, {
                 ago: formatRelativeTime(session.created),
               })
             }}
@@ -67,15 +67,15 @@ const formatRelativeTime = useRelativeTime()
 
 const messages = defineMessages({
   currentSessionLabel: {
-    id: 'settings.sessions.label.current-session',
+    id: 'settings.sessions.current-session',
     defaultMessage: 'Current session',
   },
   revokeSessionButton: {
-    id: 'settings.sessions.button.revoke-session',
+    id: 'settings.sessions.action.revoke-session',
     defaultMessage: 'Revoke session',
   },
-  sessionsCreatedAt: {
-    id: 'settings.sessions.label.created-at',
+  createdAgoLabel: {
+    id: 'settings.sessions.created-ago',
     defaultMessage: 'Created {ago}',
   },
   sessionsDescription: {
@@ -83,8 +83,8 @@ const messages = defineMessages({
     defaultMessage:
       "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately.",
   },
-  sessionsLastAccessedAt: {
-    id: 'settings.sessions.label.last-accessed-at',
+  lastAccessedAgoLabel: {
+    id: 'settings.sessions.last-accessed-ago',
     defaultMessage: 'Last accessed {ago}',
   },
   sessionsTitle: {
@@ -92,11 +92,11 @@ const messages = defineMessages({
     defaultMessage: 'Sessions',
   },
   unknownOsLabel: {
-    id: 'settings.sessions.label.unknown-os',
+    id: 'settings.sessions.unknown-os',
     defaultMessage: 'Unknown OS',
   },
   unknownPlatformLabel: {
-    id: 'settings.sessions.label.unknown-platform',
+    id: 'settings.sessions.unknown-platform',
     defaultMessage: 'Unknown platform',
   },
 })

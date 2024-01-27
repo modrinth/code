@@ -695,29 +695,29 @@
   "settings.language.title": {
     "message": "Language"
   },
-  "settings.sessions.button.revoke-session": {
+  "settings.sessions.action.revoke-session": {
     "message": "Revoke session"
+  },
+  "settings.sessions.created-ago": {
+    "message": "Created {ago}"
+  },
+  "settings.sessions.current-session": {
+    "message": "Current session"
   },
   "settings.sessions.description": {
     "message": "Here are all the devices that are currently logged in with your Modrinth account. You can log out of each one individually.\n\nIf you see an entry you don't recognize, log out of that device and change your Modrinth account password immediately."
   },
-  "settings.sessions.label.created-at": {
-    "message": "Created {ago}"
-  },
-  "settings.sessions.label.current-session": {
-    "message": "Current session"
-  },
-  "settings.sessions.label.last-accessed-at": {
+  "settings.sessions.last-accessed-ago": {
     "message": "Last accessed {ago}"
-  },
-  "settings.sessions.label.unknown-os": {
-    "message": "Unknown OS"
-  },
-  "settings.sessions.label.unknown-platform": {
-    "message": "Unknown platform"
   },
   "settings.sessions.title": {
     "message": "Sessions"
+  },
+  "settings.sessions.unknown-os": {
+    "message": "Unknown OS"
+  },
+  "settings.sessions.unknown-platform": {
+    "message": "Unknown platform"
   },
   "tooltip.date-at-time": {
     "message": "{date, date, long} at {time, time, short}"
