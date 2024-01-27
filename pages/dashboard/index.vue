@@ -28,12 +28,13 @@
           <NotificationItem
             v-for="notification in notifications"
             :key="notification.id"
-            v-model:notifications="allNotifs"
+            :notifications="notifications"
             class="universal-card recessed"
             :notification="notification"
             :auth="auth"
             raised
             compact
+            @update:notifications="() => refresh()"
           />
           <nuxt-link
             v-if="extraNotifs > 0"
@@ -112,7 +113,7 @@ import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
 import HistoryIcon from '~/assets/images/utils/history.svg'
 import Avatar from '~/components/ui/Avatar.vue'
 import NotificationItem from '~/components/ui/NotificationItem.vue'
-import { fetchNotifications, groupNotifications } from '~/helpers/notifications.js'
+import { fetchExtraNotificationData, groupNotifications } from '~/helpers/notifications.js'
 
 useHead({
   title: 'Dashboard - Modrinth',
@@ -135,10 +136,26 @@ const followersProjectCount = computed(
   () => projects.value.filter((project) => project.followers > 0).length
 )
 
-const allNotifs = groupNotifications(await fetchNotifications())
+const { data, refresh } = await useAsyncData(async () => {
+  const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
 
-const notifications = computed(() => allNotifs.slice(0, 3))
-const extraNotifs = computed(() => allNotifs.length - notifications.value.length)
+  const filteredNotifications = notifications.filter((notif) => !notif.read)
+  const slice = filteredNotifications.slice(0, 30) // send first 30 notifs to be grouped before trimming to 3
+
+  return fetchExtraNotificationData(slice).then((notifications) => {
+    notifications = groupNotifications(notifications).slice(0, 3)
+    return { notifications, extraNotifs: filteredNotifications.length - slice.length }
+  })
+})
+
+const notifications = computed(() => {
+  if (data.value === null) {
+    return []
+  }
+  return data.value.notifications
+})
+
+const extraNotifs = computed(() => (data.value ? data.value.extraNotifs : 0))
 </script>
 <style lang="scss">
 .dashboard-overview {

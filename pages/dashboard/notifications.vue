@@ -12,45 +12,55 @@
           <h2 v-else>Notifications</h2>
         </div>
         <template v-if="!history">
-          <Button v-if="allNotifs && allNotifs.some((notif) => notif.read)" @click="updateRoute()">
-            <HistoryIcon /> View history
-          </Button>
+          <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> View history </Button>
           <Button v-if="notifications.length > 0" color="danger" @click="readAll()">
             <CheckCheckIcon /> Mark all as read
           </Button>
         </template>
       </div>
-      <template v-if="notifications.length > 0">
-        <Chips
-          v-if="notifTypes.length > 1"
-          v-model="selectedType"
-          :items="notifTypes"
-          :format-label="
-            (x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')
-          "
-          :capitalize="false"
-        />
+      <Chips
+        v-if="notifTypes.length > 1"
+        v-model="selectedType"
+        :items="notifTypes"
+        :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
+        :capitalize="false"
+      />
+      <p v-if="pending">Loading notifications...</p>
+      <template v-else-if="error">
+        <p>Error loading notifications:</p>
+        <pre>
+          {{ error }}
+        </pre>
+      </template>
+      <template v-else-if="notifications && notifications.length > 0">
         <NotificationItem
           v-for="notification in notifications"
           :key="notification.id"
-          v-model:notifications="allNotifs"
+          :notifications="notifications"
           class="universal-card recessed"
           :notification="notification"
           :auth="auth"
           raised
+          @update:notifications="() => refresh()"
         />
       </template>
       <p v-else>You don't have any unread notifications.</p>
+      <Pagination :page="page" :count="pages" @switch-page="changePage" />
     </section>
   </div>
 </template>
 <script setup>
 import { Button, HistoryIcon } from 'omorphia'
-import { fetchNotifications, groupNotifications, markAsRead } from '~/helpers/notifications.js'
+import {
+  fetchExtraNotificationData,
+  groupNotifications,
+  markAsRead,
+} from '~/helpers/notifications.js'
 import NotificationItem from '~/components/ui/NotificationItem.vue'
 import Chips from '~/components/ui/Chips.vue'
 import CheckCheckIcon from '~/assets/images/utils/check-check.svg'
 import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
+import Pagination from '~/components/ui/Pagination.vue'
 
 useHead({
   title: 'Notifications - Modrinth',
@@ -65,39 +75,59 @@ const history = computed(() => {
   return route.name === 'dashboard-notifications-history'
 })
 
-const allNotifs = ref(null)
+const selectedType = ref('all')
+const page = ref(1)
 
-const notifTypes = computed(() => {
-  if (allNotifs.value === null) {
-    return []
-  }
-  const types = [
-    ...new Set(
-      allNotifs.value
-        .filter((notification) => {
-          return history.value || !notification.read
-        })
-        .map((notif) => notif.type)
-    ),
-  ]
-  return types.length > 1 ? ['all', ...types] : types
-})
+const perPage = ref(50)
+
+const { data, pending, error, refresh } = await useAsyncData(
+  async () => {
+    const pageNum = page.value - 1
+
+    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
+    const showRead = history.value
+    const hasRead = notifications.some((notif) => notif.read)
+
+    const types = [
+      ...new Set(
+        notifications
+          .filter((notification) => {
+            return showRead || !notification.read
+          })
+          .map((notification) => notification.type)
+      ),
+    ]
+
+    const filteredNotifications = notifications.filter(
+      (notification) =>
+        (selectedType.value === 'all' || notification.type === selectedType.value) &&
+        (showRead || !notification.read)
+    )
+    const pages = Math.ceil(filteredNotifications.length / perPage.value)
+
+    return fetchExtraNotificationData(
+      filteredNotifications.slice(pageNum * perPage.value, perPage.value + pageNum * perPage.value)
+    ).then((notifications) => {
+      return {
+        notifications,
+        types: types.length > 1 ? ['all', ...types] : types,
+        pages,
+        hasRead,
+      }
+    })
+  },
+  { watch: [page, history, selectedType] }
+)
 
 const notifications = computed(() => {
-  if (allNotifs.value === null) {
+  if (data.value === null) {
     return []
   }
-  const groupedNotifs = groupNotifications(allNotifs.value, history.value)
-  return groupedNotifs.filter(
-    (notif) => selectedType.value === 'all' || notif.type === selectedType.value
-  )
+  return groupNotifications(data.value.notifications, history.value)
 })
-
-const selectedType = ref('all')
-
-await fetchNotifications().then((result) => {
-  allNotifs.value = result
-})
+const notifTypes = computed(() => data.value.types)
+const pages = computed(() => data.value.pages)
+const hasRead = computed(() => data.value.hasRead)
 
 function updateRoute() {
   if (history.value) {
@@ -105,6 +135,8 @@ function updateRoute() {
   } else {
     router.push('/dashboard/notifications/history')
   }
+  selectedType.value = 'all'
+  page.value = 1
 }
 
 async function readAll() {
@@ -115,6 +147,13 @@ async function readAll() {
 
   const updateNotifs = await markAsRead(ids)
   allNotifs.value = updateNotifs(allNotifs.value)
+}
+
+function changePage(newPage) {
+  page.value = newPage
+  if (process.client) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 </script>
 <style lang="scss" scoped>
