@@ -86,13 +86,23 @@
                 </div>
               </div>
 
-              <div class="primary-stat no-margin">
+              <div class="primary-stat">
                 <BoxIcon class="primary-stat__icon" aria-hidden="true" />
                 <div class="primary-stat__text">
                   <span class="primary-stat__counter">
                     {{ $formatNumber(projects?.length || 0) }}
                   </span>
-                  project<span v-if="organization.projects?.length !== 1">s</span>
+                  project<span v-if="projects?.length !== 1">s</span>
+                </div>
+              </div>
+
+              <div class="primary-stat no-margin">
+                <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
+                <div class="primary-stat__text">
+                  <span class="primary-stat__counter">
+                    {{ formatCompactNumber(sumDownloads) }}
+                  </span>
+                  download<span v-if="sumDownloads !== 1">s</span>
                 </div>
               </div>
             </div>
@@ -224,11 +234,14 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 
 import OrganizationIcon from '~/assets/images/utils/organization.svg'
+import DownloadIcon from '~/assets/images/utils/download.svg'
 import CrownIcon from '~/assets/images/utils/crown.svg'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 
 const vintl = useVIntl()
 const { formatMessage } = vintl
+
+const formatCompactNumber = useCompactNumber()
 
 const auth = await useAuth()
 const user = await useUser()
@@ -325,6 +338,15 @@ const projectTypes = computed(() => {
   delete obj.project
 
   return Object.keys(obj)
+})
+const sumDownloads = computed(() => {
+  let sum = 0
+
+  for (const project of projects.value) {
+    sum += project.downloads
+  }
+
+  return sum
 })
 
 const patchIcon = async (icon) => {
