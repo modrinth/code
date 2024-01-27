@@ -1,4 +1,37 @@
 {
+  "auth.verify-email.action.account-settings": {
+    "message": "Account settings"
+  },
+  "auth.verify-email.action.sign-in": {
+    "message": "Sign in"
+  },
+  "auth.verify-email.already-verified.description": {
+    "message": "Your email is already verified!"
+  },
+  "auth.verify-email.already-verified.title": {
+    "message": "Email already verified"
+  },
+  "auth.verify-email.failed-verification.action": {
+    "message": "Resend verification email"
+  },
+  "auth.verify-email.failed-verification.description": {
+    "message": "We were unable to verify your email. Try re-sending the verification email through your dashboard by signing in."
+  },
+  "auth.verify-email.failed-verification.description.logged-in": {
+    "message": "We were unable to verify your email. Try re-sending the verification email through the button below."
+  },
+  "auth.verify-email.failed-verification.title": {
+    "message": "Email verification failed"
+  },
+  "auth.verify-email.post-verification.description": {
+    "message": "Your email address has been successfully verified!"
+  },
+  "auth.verify-email.post-verification.title": {
+    "message": "Email verification"
+  },
+  "auth.verify-email.title": {
+    "message": "Verify Email"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
   },
