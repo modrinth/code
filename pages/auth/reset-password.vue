@@ -66,9 +66,7 @@
   </div>
 </template>
 <script setup>
-import { SendIcon } from 'omorphia'
-import MailIcon from 'assets/icons/auth/mail.svg'
-import KeyIcon from 'assets/icons/auth/key.svg'
+import { SendIcon, MailIcon, KeyIcon } from 'omorphia'
 
 const { formatMessage } = useVIntl()
 

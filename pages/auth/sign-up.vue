@@ -4,27 +4,27 @@
 
     <section class="third-party">
       <a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
-        <DiscordIcon />
+        <SSODiscordIcon />
         <span>Discord</span>
       </a>
       <a class="btn" :href="getAuthUrl('github', redirectTarget)">
-        <GitHubIcon />
+        <SSOGitHubIcon />
         <span>GitHub</span>
       </a>
       <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
-        <MicrosoftIcon />
+        <SSOMicrosoftIcon />
         <span>Microsoft</span>
       </a>
       <a class="btn" :href="getAuthUrl('google', redirectTarget)">
-        <GoogleIcon />
+        <SSOGoogleIcon />
         <span>Google</span>
       </a>
       <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
-        <SteamIcon />
+        <SSOSteamIcon />
         <span>Steam</span>
       </a>
       <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
-        <GitLabIcon />
+        <SSOGitLabIcon />
         <span>GitLab</span>
       </a>
     </section>
@@ -123,15 +123,19 @@
 </template>
 
 <script setup>
-import { RightArrowIcon, UserIcon, Checkbox } from 'omorphia'
-import GitHubIcon from 'assets/icons/auth/sso-github.svg'
-import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
-import GoogleIcon from 'assets/icons/auth/sso-google.svg'
-import SteamIcon from 'assets/icons/auth/sso-steam.svg'
-import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
-import KeyIcon from 'assets/icons/auth/key.svg'
-import MailIcon from 'assets/icons/auth/mail.svg'
-import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
+import {
+  RightArrowIcon,
+  UserIcon,
+  Checkbox,
+  SSOGitHubIcon,
+  SSOMicrosoftIcon,
+  SSOGoogleIcon,
+  SSOSteamIcon,
+  SSODiscordIcon,
+  KeyIcon,
+  MailIcon,
+  SSOGitLabIcon,
+} from 'omorphia'
 
 const { formatMessage } = useVIntl()
 
