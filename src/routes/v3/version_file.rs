@@ -283,6 +283,7 @@ pub async fn get_projects_from_hashes(
         database::models::Project::get_many_ids(&project_ids, &**pool, &redis).await?,
         &user_option,
         &pool,
+        false,
     )
     .await?;
 

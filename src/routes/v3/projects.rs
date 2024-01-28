@@ -137,7 +137,7 @@ pub async fn projects_get(
     .map(|x| x.1)
     .ok();
 
-    let projects = filter_visible_projects(projects_data, &user_option, &pool).await?;
+    let projects = filter_visible_projects(projects_data, &user_option, &pool, false).await?;
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -164,7 +164,7 @@ pub async fn project_get(
     .ok();
 
     if let Some(data) = project_data {
-        if is_visible_project(&data.inner, &user_option, &pool).await? {
+        if is_visible_project(&data.inner, &user_option, &pool, false).await? {
             return Ok(HttpResponse::Ok().json(Project::from(data)));
         }
     }
@@ -971,7 +971,7 @@ pub async fn dependency_list(
     .ok();
 
     if let Some(project) = result {
-        if !is_visible_project(&project.inner, &user_option, &pool).await? {
+        if !is_visible_project(&project.inner, &user_option, &pool, false).await? {
             return Err(ApiError::NotFound);
         }
 
@@ -2064,7 +2064,7 @@ pub async fn project_follow(
     let user_id: db_ids::UserId = user.id.into();
     let project_id: db_ids::ProjectId = result.inner.id;
 
-    if !is_visible_project(&result.inner, &Some(user), &pool).await? {
+    if !is_visible_project(&result.inner, &Some(user), &pool, false).await? {
         return Err(ApiError::NotFound);
     }
 
@@ -2215,7 +2215,7 @@ pub async fn project_get_organization(
             ApiError::InvalidInput("The specified project does not exist!".to_string())
         })?;
 
-    if !is_visible_project(&result.inner, &current_user, &pool).await? {
+    if !is_visible_project(&result.inner, &current_user, &pool, false).await? {
         Err(ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         ))

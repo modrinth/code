@@ -57,7 +57,7 @@ pub async fn forge_updates(
     .map(|x| x.1)
     .ok();
 
-    if !is_visible_project(&project.inner, &user_option, &pool).await? {
+    if !is_visible_project(&project.inner, &user_option, &pool, false).await? {
         return Err(ApiError::InvalidInput(ERROR.to_string()));
     }
 

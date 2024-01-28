@@ -85,7 +85,7 @@ pub async fn organization_projects_get(
     let projects_data =
         crate::database::models::Project::get_many_ids(&project_ids, &**pool, &redis).await?;
 
-    let projects = filter_visible_projects(projects_data, &current_user, &pool).await?;
+    let projects = filter_visible_projects(projects_data, &current_user, &pool, true).await?;
     Ok(HttpResponse::Ok().json(projects))
 }
 

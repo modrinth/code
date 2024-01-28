@@ -60,7 +60,7 @@ pub async fn team_members_get_project(
         .map(|x| x.1)
         .ok();
 
-        if !is_visible_project(&project.inner, &current_user, &pool).await? {
+        if !is_visible_project(&project.inner, &current_user, &pool, false).await? {
             return Err(ApiError::NotFound);
         }
         let members_data =
