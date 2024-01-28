@@ -2,7 +2,7 @@
   <div>
     <div v-if="error" class="oauth-items">
       <div>
-        <h1>Error</h1>
+        <h1>{{ formatMessage(commonMessages.errorLabel) }}</h1>
       </div>
       <p>
         <span>{{ error.data.error }}: </span>
@@ -20,15 +20,28 @@
         </div>
       </div>
       <div class="title">
-        <h1>Authorize {{ app.name }}</h1>
+        <h1>{{ formatMessage(messages.title, { appName: app.name }) }}</h1>
       </div>
       <div class="auth-info">
         <div class="scope-heading">
-          <strong>{{ app.name }}</strong> by
-          <nuxt-link class="text-link" :to="'/user/' + createdBy.id">{{
-            createdBy.username
-          }}</nuxt-link>
-          will be able to:
+          <IntlFormatted
+            :message-id="messages.appInfo"
+            :values="{
+              appName: app.name,
+              creator: createdBy.username,
+            }"
+          >
+            <template #strong="{ children }">
+              <strong>
+                <component :is="() => normalizeChildren(children)" />
+              </strong>
+            </template>
+            <template #creator-link="{ children }">
+              <nuxt-link class="text-link" :to="'/user/' + createdBy.id">
+                <component :is="() => normalizeChildren(children)" />
+              </nuxt-link>
+            </template>
+          </IntlFormatted>
         </div>
         <div class="scope-items">
           <div v-for="scopeItem in scopeDefinitions" :key="scopeItem">
@@ -44,17 +57,22 @@
       <div class="button-row">
         <Button class="wide-button" large :action="onReject" :disabled="pending">
           <XIcon />
-          Decline
+          {{ formatMessage(messages.decline) }}
         </Button>
         <Button class="wide-button" color="primary" large :action="onAuthorize" :disabled="pending">
           <CheckIcon />
-          Authorize
+          {{ formatMessage(messages.authorize) }}
         </Button>
       </div>
       <div class="redirection-notice">
         <p class="redirect-instructions">
-          You will be redirected to
-          <span class="redirect-url">{{ redirectUri }}</span>
+          <IntlFormatted :message-id="messages.redirectUrl" :values="{ url: redirectUri }">
+            <template #redirect-url="{ children }">
+              <span class="redirect-url">
+                <component :is="() => normalizeChildren(children)" />
+              </span>
+            </template>
+          </IntlFormatted>
         </p>
       </div>
     </div>
@@ -67,6 +85,36 @@ import { useBaseFetch } from '@/composables/fetch.js'
 import { useAuth } from '@/composables/auth.js'
 
 import { useScopes } from '@/composables/auth/scopes.ts'
+
+const { formatMessage } = useVIntl()
+
+const messages = defineMessages({
+  appInfo: {
+    id: 'auth.authorize.app-info',
+    defaultMessage:
+      '<strong>{appName}</strong> by <creator-link>{creator}</creator-link> will be able to:',
+  },
+  authorize: {
+    id: 'auth.authorize.action.authorize',
+    defaultMessage: 'Authorize',
+  },
+  decline: {
+    id: 'auth.authorize.action.decline',
+    defaultMessage: 'Decline',
+  },
+  noRedirectUrlError: {
+    id: 'auth.authorize.error.no-redirect-url',
+    defaultMessage: 'No redirect location found in response',
+  },
+  redirectUrl: {
+    id: 'auth.authorize.redirect-url',
+    defaultMessage: 'You will be redirected to <redirect-url>{url}</redirect-url>',
+  },
+  title: {
+    id: 'auth.authorize.authorize-app-name',
+    defaultMessage: 'Authorize {appName}',
+  },
+})
 
 const data = useNuxtApp()
 
@@ -143,11 +191,11 @@ const onAuthorize = async () => {
       return
     }
 
-    throw new Error('No redirect location found in response')
+    throw new Error(formatMessage(messages.noRedirectUrlError))
   } catch (error) {
     data.$notify({
       group: 'main',
-      title: 'An error occurred',
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: 'error',
     })
@@ -170,11 +218,11 @@ const onReject = async () => {
       return
     }
 
-    throw new Error('No redirect location found in response')
+    throw new Error(formatMessage(messages.noRedirectUrlError))
   } catch (error) {
     data.$notify({
       group: 'main',
-      title: 'An error occurred',
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: 'error',
     })

@@ -1,4 +1,22 @@
 {
+  "auth.authorize.action.authorize": {
+    "message": "Authorize"
+  },
+  "auth.authorize.action.decline": {
+    "message": "Decline"
+  },
+  "auth.authorize.app-info": {
+    "message": "<strong>{appName}</strong> by <creator-link>{creator}</creator-link> will be able to:"
+  },
+  "auth.authorize.authorize-app-name": {
+    "message": "Authorize {appName}"
+  },
+  "auth.authorize.error.no-redirect-url": {
+    "message": "No redirect location found in response"
+  },
+  "auth.authorize.redirect-url": {
+    "message": "You will be redirected to <redirect-url>{url}</redirect-url>"
+  },
   "auth.reset-password.method-choice.action": {
     "message": "Send recovery email"
   },
@@ -277,6 +295,9 @@
   },
   "label.description": {
     "message": "Description"
+  },
+  "label.error": {
+    "message": "Error"
   },
   "label.followed-projects": {
     "message": "Followed projects"

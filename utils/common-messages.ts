@@ -35,6 +35,10 @@ export const commonMessages = defineMessages({
     id: 'button.edit',
     defaultMessage: 'Edit',
   },
+  errorLabel: {
+    id: 'label.error',
+    defaultMessage: 'Error',
+  },
   errorNotificationTitle: {
     id: 'notification.error.title',
     defaultMessage: 'An error occurred',
