@@ -167,13 +167,16 @@
       <template v-if="projects?.length > 0">
         <div class="project-list display-mode--list">
           <ProjectCard
-            v-for="project in route.params.projectType !== undefined
+            v-for="project in (route.params.projectType !== undefined
               ? projects.filter((x) =>
                   x.project_types.includes(
                     route.params.projectType.substr(0, route.params.projectType.length - 1)
                   )
                 )
-              : projects"
+              : projects
+            )
+              .slice()
+              .sort((a, b) => b.downloads - a.downloads)"
             :id="project.slug || project.id"
             :key="project.id"
             :name="project.name"
@@ -261,8 +264,18 @@ const [
   useAsyncData(`organization/${orgId}`, () =>
     useBaseFetch(`organization/${orgId}`, { apiVersion: 3 })
   ),
-  useAsyncData(`organization/${orgId}/projects`, () =>
-    useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 })
+  useAsyncData(
+    `organization/${orgId}/projects`,
+    () => useBaseFetch(`organization/${orgId}/projects`, { apiVersion: 3 }),
+    {
+      transform: (projects) => {
+        for (const project of projects) {
+          project.categories = project.categories.concat(project.loaders)
+        }
+
+        return projects
+      },
+    }
   ),
 ])
 
