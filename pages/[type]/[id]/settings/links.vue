@@ -93,14 +93,16 @@
           :disabled="!hasPermission"
           @input="updateDonationLinks"
         />
-        <Multiselect
-          v-model="donationLink.platform"
+        <DropdownSelect
+          v-model="donationLink.id"
+          name="Donation platform selector"
+          :options="tags.donationPlatforms.map((x) => x.short)"
+          :display-name="
+            (option) => tags.donationPlatforms.find((platform) => platform.short === option)?.name
+          "
           placeholder="Select platform"
-          :options="tags.donationPlatforms.map((x) => x.name)"
-          :searchable="false"
-          :close-on-select="true"
-          :show-labels="false"
-          :disabled="!hasPermission"
+          render-up
+          class="platform-selector"
           @update:model-value="updateDonationLinks"
         />
       </div>
@@ -119,156 +121,141 @@
   </div>
 </template>
 
-<script>
-import { Multiselect } from 'vue-multiselect'
+<script setup>
+import { DropdownSelect } from 'omorphia'
 import SaveIcon from '~/assets/images/utils/save.svg'
 
-export default defineNuxtComponent({
-  components: {
-    Multiselect,
-    SaveIcon,
-  },
-  props: {
-    project: {
-      type: Object,
-      default() {
-        return {}
-      },
-    },
-    currentMember: {
-      type: Object,
-      default() {
-        return null
-      },
-    },
-    patchProject: {
-      type: Function,
-      default() {
-        return () => {
-          this.$notify({
-            group: 'main',
-            title: 'An error occurred',
-            text: 'Patch project function not found',
-            type: 'error',
-          })
-        }
-      },
-    },
-  },
-  setup() {
-    const tags = useTags()
+const tags = useTags()
 
-    return { tags }
+const props = defineProps({
+  project: {
+    type: Object,
+    default() {
+      return {}
+    },
   },
-  data() {
-    const donationLinks = JSON.parse(JSON.stringify(this.project.donation_urls))
-    donationLinks.push({
+  currentMember: {
+    type: Object,
+    default() {
+      return null
+    },
+  },
+  patchProject: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
+})
+
+const issuesUrl = ref(props.project.issues_url)
+const sourceUrl = ref(props.project.source_url)
+const wikiUrl = ref(props.project.wiki_url)
+const discordUrl = ref(props.project.discord_url)
+
+const rawDonationLinks = JSON.parse(JSON.stringify(props.project.donation_urls))
+rawDonationLinks.push({
+  id: null,
+  platform: null,
+  url: null,
+})
+const donationLinks = ref(rawDonationLinks)
+
+const hasPermission = computed(() => {
+  const EDIT_DETAILS = 1 << 2
+  return (props.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS
+})
+
+const patchData = computed(() => {
+  const data = {}
+
+  if (checkDifference(issuesUrl.value, props.project.issues_url)) {
+    data.issues_url = issuesUrl.value === '' ? null : issuesUrl.value.trim()
+  }
+  if (checkDifference(sourceUrl.value, props.project.source_url)) {
+    data.source_url = sourceUrl.value === '' ? null : sourceUrl.value.trim()
+  }
+  if (checkDifference(wikiUrl.value, props.project.wiki_url)) {
+    data.wiki_url = wikiUrl.value === '' ? null : wikiUrl.value.trim()
+  }
+  if (checkDifference(discordUrl.value, props.project.discord_url)) {
+    data.discord_url = discordUrl.value === '' ? null : discordUrl.value.trim()
+  }
+
+  const validDonationLinks = donationLinks.value.filter((link) => link.url && link.id)
+
+  if (
+    validDonationLinks !== props.project.donation_urls &&
+    !(
+      props.project.donation_urls &&
+      props.project.donation_urls.length === 0 &&
+      validDonationLinks.length === 0
+    )
+  ) {
+    data.donation_urls = validDonationLinks
+  }
+
+  if (data.donation_urls) {
+    data.donation_urls.forEach((link) => {
+      const platform = tags.value.donationPlatforms.find((platform) => platform.short === link.id)
+      link.platform = platform.name
+    })
+  }
+
+  return data
+})
+
+const hasChanges = computed(() => {
+  return Object.keys(patchData.value).length > 0
+})
+
+async function saveChanges() {
+  if (patchData.value && (await props.patchProject(patchData.value))) {
+    donationLinks.value = JSON.parse(JSON.stringify(props.project.donation_urls))
+    donationLinks.value.push({
       id: null,
       platform: null,
       url: null,
     })
+  }
+}
 
-    return {
-      issuesUrl: this.project.issues_url,
-      sourceUrl: this.project.source_url,
-      wikiUrl: this.project.wiki_url,
-      discordUrl: this.project.discord_url,
-
-      donationLinks,
+function updateDonationLinks() {
+  const links = donationLinks.value
+  links.forEach((link) => {
+    if (link.url) {
+      const url = link.url.toLowerCase()
+      if (url.includes('patreon.com')) {
+        link.id = 'patreon'
+      } else if (url.includes('ko-fi.com')) {
+        link.id = 'ko-fi'
+      } else if (url.includes('paypal.com') || url.includes('paypal.me')) {
+        link.id = 'paypal'
+      } else if (url.includes('buymeacoffee.com') || url.includes('buymeacoff.ee')) {
+        link.id = 'bmac'
+      } else if (url.includes('github.com/sponsors')) {
+        link.id = 'github'
+      }
     }
-  },
-  computed: {
-    hasPermission() {
-      const EDIT_DETAILS = 1 << 2
-      return (this.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS
-    },
-    patchData() {
-      const data = {}
-
-      if (this.checkDifference(this.issuesUrl, this.project.issues_url)) {
-        data.issues_url = this.issuesUrl === '' ? null : this.issuesUrl.trim()
-      }
-      if (this.checkDifference(this.sourceUrl, this.project.source_url)) {
-        data.source_url = this.sourceUrl === '' ? null : this.sourceUrl.trim()
-      }
-      if (this.checkDifference(this.wikiUrl, this.project.wiki_url)) {
-        data.wiki_url = this.wikiUrl === '' ? null : this.wikiUrl.trim()
-      }
-      if (this.checkDifference(this.discordUrl, this.project.discord_url)) {
-        data.discord_url = this.discordUrl === '' ? null : this.discordUrl.trim()
-      }
-
-      const donationLinks = this.donationLinks.filter((link) => link.url && link.platform)
-      if (
-        donationLinks !== this.project.donation_urls &&
-        !(
-          this.project.donation_urls &&
-          this.project.donation_urls.length === 0 &&
-          donationLinks.length === 0
-        )
-      ) {
-        data.donation_urls = donationLinks
-      }
-
-      if (data.donation_urls) {
-        data.donation_urls.forEach((link) => {
-          link.id = link.platform.toLowerCase()
-        })
-      }
-
-      return data
-    },
-    hasChanges() {
-      return Object.keys(this.patchData).length > 0
-    },
-  },
-  methods: {
-    async saveChanges() {
-      if (this.patchData && (await this.patchProject(this.patchData))) {
-        this.donationLinks = JSON.parse(JSON.stringify(this.project.donation_urls))
-        this.donationLinks.push({
-          id: null,
-          platform: null,
-          url: null,
-        })
-      }
-    },
-    updateDonationLinks() {
-      this.donationLinks.forEach((link) => {
-        if (link.url) {
-          const url = link.url.toLowerCase()
-          if (url.includes('patreon.com')) {
-            link.platform = 'Patreon'
-          } else if (url.includes('ko-fi.com')) {
-            link.platform = 'Ko-fi'
-          } else if (url.includes('paypal.com') || url.includes('paypal.me')) {
-            link.platform = 'PayPal'
-          } else if (url.includes('buymeacoffee.com') || url.includes('buymeacoff.ee')) {
-            link.platform = 'Buy Me a Coffee'
-          } else if (url.includes('github.com/sponsors')) {
-            link.platform = 'GitHub Sponsors'
-          }
-        }
-      })
-      if (!this.donationLinks.find((link) => !(link.url && link.platform))) {
-        this.donationLinks.push({
-          id: null,
-          platform: null,
-          url: null,
-        })
-      }
-    },
-    checkDifference(newLink, existingLink) {
-      if (newLink === '' && existingLink !== null) {
-        return true
-      }
-      if (!newLink && !existingLink) {
-        return false
-      }
-      return newLink !== existingLink
-    },
-  },
-})
+  })
+  if (!links.find((link) => !(link.url && link.id))) {
+    links.push({
+      id: null,
+      platform: null,
+      url: null,
+    })
+  }
+  donationLinks.value = links
+}
+function checkDifference(newLink, existingLink) {
+  if (newLink === '' && existingLink !== null) {
+    return true
+  }
+  if (!newLink && !existingLink) {
+    return false
+  }
+  return newLink !== existingLink
+}
 </script>
 <style lang="scss" scoped>
 .donation-link-group {
@@ -276,9 +263,9 @@ export default defineNuxtComponent({
     flex-grow: 2;
     max-width: 26rem;
   }
-}
 
-.multiselect {
-  max-width: 15rem;
+  :deep(.animated-dropdown .selected) {
+    height: 40px;
+  }
 }
 </style>
