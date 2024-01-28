@@ -137,43 +137,30 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { Multiselect } from 'vue-multiselect'
+import { formatProjectType } from '~/plugins/shorthands.js'
 
-export default defineNuxtComponent({
-  components: {
-    Multiselect,
-  },
-  setup() {
-    const cosmetics = useCosmetics()
-    const tags = useTags()
+useHead({
+  title: 'Display settings - Modrinth',
+})
 
-    return { cosmetics, tags }
-  },
-  data() {
+const cosmetics = useCosmetics()
+const tags = useTags()
+
+const listTypes = computed(() => {
+  const types = tags.value.projectTypes.map((type) => {
     return {
-      searchDisplayMode: this.cosmetics.searchDisplayMode,
+      id: type.id,
+      name: formatProjectType(type.id) + ' search',
+      display: 'the ' + formatProjectType(type.id).toLowerCase() + 's search page',
     }
-  },
-  head: {
-    title: 'Display settings - Modrinth',
-  },
-  computed: {
-    listTypes() {
-      const types = this.tags.projectTypes.map((type) => {
-        return {
-          id: type.id,
-          name: this.$formatProjectType(type.id) + ' search',
-          display: 'the ' + this.$formatProjectType(type.id).toLowerCase() + 's search page',
-        }
-      })
-      types.push({
-        id: 'user',
-        name: 'User page',
-        display: 'user pages',
-      })
-      return types
-    },
-  },
+  })
+  types.push({
+    id: 'user',
+    name: 'User page',
+    display: 'user pages',
+  })
+  return types
 })
 </script>
