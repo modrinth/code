@@ -24,7 +24,7 @@
           </template>
           <template v-if="auth.user">
             <h3>Developer Settings</h3>
-            <NavStackItem link="/settings/pats" label="PATs">
+            <NavStackItem link="/settings/pats" :label="formatMessage(messages.patsTitle)">
               <KeyIcon />
             </NavStackItem>
             <NavStackItem link="/settings/applications" label="Applications">
@@ -56,6 +56,10 @@ const messages = defineMessages({
   sessionsTitle: {
     id: 'settings.sessions.title',
     defaultMessage: 'Sessions',
+  },
+  patsTitle: {
+    id: 'settings.pats.title',
+    defaultMessage: 'PATs',
   },
 })
 

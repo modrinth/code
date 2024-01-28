@@ -2,25 +2,33 @@
   <div class="universal-card">
     <ConfirmModal
       ref="modal_confirm"
-      title="Are you sure you want to delete this token?"
-      description="This will remove this token forever (like really forever)."
-      proceed-label="Delete this token"
+      :title="formatMessage(deleteModalMessages.title)"
+      :description="formatMessage(deleteModalMessages.description)"
+      :proceed-label="formatMessage(deleteModalMessages.action)"
       @proceed="removePat(deletePatIndex)"
     />
     <Modal
       ref="patModal"
-      :header="`${editPatIndex !== null ? 'Edit' : 'Create'} personal access token`"
+      :header="
+        editPatIndex !== null
+          ? formatMessage(createModalMessages.editTitle)
+          : formatMessage(createModalMessages.createTitle)
+      "
     >
       <div class="universal-modal">
-        <label for="pat-name"><span class="label__title">Name</span> </label>
+        <label for="pat-name">
+          <span class="label__title">{{ formatMessage(createModalMessages.nameLabel) }}</span>
+        </label>
         <input
           id="pat-name"
           v-model="name"
           maxlength="2048"
           type="email"
-          placeholder="Enter the PAT's name..."
+          :placeholder="formatMessage(createModalMessages.namePlaceholder)"
         />
-        <label for="pat-scopes"><span class="label__title">Scopes</span> </label>
+        <label for="pat-scopes">
+          <span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
+        </label>
         <div id="pat-scopes" class="checkboxes">
           <Checkbox
             v-for="scope in scopeList"
@@ -30,13 +38,15 @@
             @update:model-value="scopesVal = toggleScope(scopesVal, scope)"
           />
         </div>
-        <label for="pat-name"><span class="label__title">Expires</span> </label>
+        <label for="pat-name">
+          <span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
+        </label>
         <input id="pat-name" v-model="expires" type="date" />
         <p></p>
         <div class="input-group push-right">
           <button class="iconified-button" @click="$refs.patModal.hide()">
             <XIcon />
-            Cancel
+            {{ formatMessage(commonMessages.cancelButton) }}
           </button>
           <button
             v-if="editPatIndex !== null"
@@ -46,7 +56,7 @@
             @click="editPat"
           >
             <SaveIcon />
-            Save changes
+            {{ formatMessage(commonMessages.saveChangesButton) }}
           </button>
           <button
             v-else
@@ -56,7 +66,7 @@
             @click="createPat"
           >
             <PlusIcon />
-            Create PAT
+            {{ formatMessage(createModalMessages.action) }}
           </button>
         </div>
       </div>
@@ -64,7 +74,7 @@
 
     <div class="header__row">
       <div class="header__title">
-        <h2>Personal Access Tokens</h2>
+        <h2>{{ formatMessage(messages.longTitle) }}</h2>
       </div>
       <button
         class="btn btn-primary"
@@ -78,13 +88,17 @@
           }
         "
       >
-        <PlusIcon /> Create a PAT
+        <PlusIcon /> {{ formatMessage(messages.create) }}
       </button>
     </div>
     <p>
-      PATs can be used to access Modrinth's API. For more information, see
-      <a class="text-link" href="https://docs.modrinth.com">Modrinth's API documentation</a>. They
-      can be created and revoked at any time.
+      <IntlFormatted :message-id="messages.description">
+        <template #doc-link="{ children }">
+          <a class="text-link" href="https://docs.modrinth.com">
+            <component :is="() => children" />
+          </a>
+        </template>
+      </IntlFormatted>
     </p>
     <div v-for="(pat, index) in pats" :key="pat.id" class="universal-card recessed token">
       <div>
@@ -98,22 +112,61 @@
           <template v-else>
             <span
               v-tooltip="
-                pat.last_used ? $dayjs(pat.last_login).format('MMMM D, YYYY [at] h:mm A') : null
+                pat.last_used
+                  ? formatMessage(commonMessages.dateAtTimeTooltip, {
+                      date: new Date(pat.last_used),
+                      time: new Date(pat.last_used),
+                    })
+                  : null
               "
             >
-              <template v-if="pat.last_used">Last used {{ fromNow(pat.last_used) }}</template>
-              <template v-else>Never used</template>
-            </span>
-            ⋅
-            <span v-tooltip="$dayjs(pat.expires).format('MMMM D, YYYY [at] h:mm A')">
-              <template v-if="new Date(pat.expires) > new Date()">
-                Expires {{ fromNow(pat.expires) }}
+              <template v-if="pat.last_used">
+                {{
+                  formatMessage(tokenMessages.lastUsed, {
+                    ago: formatRelativeTime(pat.last_used),
+                  })
+                }}
               </template>
-              <template v-else> Expired {{ fromNow(pat.expires) }} </template>
+              <template v-else>{{ formatMessage(tokenMessages.neverUsed) }}</template>
             </span>
             ⋅
-            <span v-tooltip="$dayjs(pat.created).format('MMMM D, YYYY [at] h:mm A')">
-              Created {{ fromNow(pat.created) }}
+            <span
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(pat.expires),
+                  time: new Date(pat.expires),
+                })
+              "
+            >
+              <template v-if="new Date(pat.expires) > new Date()">
+                {{
+                  formatMessage(tokenMessages.expiresIn, {
+                    inTime: formatRelativeTime(pat.expires),
+                  })
+                }}
+              </template>
+              <template v-else>
+                {{
+                  formatMessage(tokenMessages.expiredAgo, {
+                    ago: formatRelativeTime(pat.expires),
+                  })
+                }}
+              </template>
+            </span>
+            ⋅
+            <span
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(pat.created),
+                  time: new Date(pat.created),
+                })
+              "
+            >
+              {{
+                formatMessage(commonMessages.createdAgoLabel, {
+                  ago: formatRelativeTime(pat.created),
+                })
+              }}
             </span>
           </template>
         </div>
@@ -131,7 +184,7 @@
             }
           "
         >
-          <EditIcon /> Edit token
+          <EditIcon /> {{ formatMessage(tokenMessages.edit) }}
         </button>
         <button
           class="iconified-button raised-button"
@@ -142,7 +195,7 @@
             }
           "
         >
-          <TrashIcon /> Revoke token
+          <TrashIcon /> {{ formatMessage(tokenMessages.revoke) }}
         </button>
       </div>
     </div>
@@ -162,12 +215,105 @@ import {
 import CopyCode from '~/components/ui/CopyCode.vue'
 import Modal from '~/components/ui/Modal.vue'
 
+const { formatMessage } = useVIntl()
+
+const formatRelativeTime = useRelativeTime()
+
+const createModalMessages = defineMessages({
+  createTitle: {
+    id: 'settings.pats.modal.create.title',
+    defaultMessage: 'Create personal access token',
+  },
+  editTitle: {
+    id: 'settings.pats.modal.edit.title',
+    defaultMessage: 'Edit personal access token',
+  },
+  nameLabel: {
+    id: 'settings.pats.modal.create.name.label',
+    defaultMessage: 'Name',
+  },
+  namePlaceholder: {
+    id: 'settings.pats.modal.create.name.placeholder',
+    defaultMessage: "Enter the PAT's name...",
+  },
+  expiresLabel: {
+    id: 'settings.pats.modal.create.expires.label',
+    defaultMessage: 'Expires',
+  },
+  action: {
+    id: 'settings.pats.modal.create.action',
+    defaultMessage: 'Create PAT',
+  },
+})
+
+const deleteModalMessages = defineMessages({
+  title: {
+    id: 'settings.pats.modal.delete.title',
+    defaultMessage: 'Are you sure you want to delete this token?',
+  },
+  description: {
+    id: 'settings.pats.modal.delete.description',
+    defaultMessage: 'This will remove this token forever (like really forever).',
+  },
+  action: {
+    id: 'settings.pats.modal.delete.action',
+    defaultMessage: 'Delete this token',
+  },
+})
+
+const messages = defineMessages({
+  title: {
+    id: 'settings.pats.title',
+    defaultMessage: 'PATs',
+  },
+  longTitle: {
+    id: 'settings.pats.title.long',
+    defaultMessage: 'Personal Access Tokens',
+  },
+  description: {
+    id: 'settings.pats.description',
+    defaultMessage:
+      "PATs can be used to access Modrinth's API. For more information, see <doc-link>Modrinth's API documentation</doc-link>. They can be created and revoked at any time.",
+  },
+  create: {
+    id: 'settings.pats.action.create',
+    defaultMessage: 'Create a PAT',
+  },
+})
+
+const tokenMessages = defineMessages({
+  edit: {
+    id: 'settings.pats.token.action.edit',
+    defaultMessage: 'Edit token',
+  },
+  revoke: {
+    id: 'settings.pats.token.action.revoke',
+    defaultMessage: 'Revoke token',
+  },
+  lastUsed: {
+    id: 'settings.pats.token.last-used',
+    defaultMessage: 'Last used {ago}',
+  },
+  neverUsed: {
+    id: 'settings.pats.token.never-used',
+    defaultMessage: 'Never used',
+  },
+  expiresIn: {
+    id: 'settings.pats.token.expires-in',
+    defaultMessage: 'Expires {inTime}',
+  },
+  expiredAgo: {
+    id: 'settings.pats.token.expired-ago',
+    defaultMessage: 'Expired {ago}',
+  },
+})
+
 definePageMeta({
   middleware: 'auth',
 })
 
 useHead({
-  title: 'PATs - Modrinth',
+  title: `${formatMessage(messages.title)} - Modrinth`,
 })
 
 const data = useNuxtApp()
@@ -203,7 +349,7 @@ async function createPat() {
   } catch (err) {
     data.$notify({
       group: 'main',
-      title: 'An error occurred',
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: 'error',
     })
@@ -229,7 +375,7 @@ async function editPat() {
   } catch (err) {
     data.$notify({
       group: 'main',
-      title: 'An error occurred',
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: 'error',
     })
@@ -249,7 +395,7 @@ async function removePat(id) {
   } catch (err) {
     data.$notify({
       group: 'main',
-      title: 'An error occurred',
+      title: formatMessage(commonMessages.errorNotificationTitle),
       text: err.data ? err.data.description : err,
       type: 'error',
     })
