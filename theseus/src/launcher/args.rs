@@ -1,6 +1,6 @@
 //! Minecraft CLI argument logic
-use super::auth::Credentials;
 use crate::launcher::parse_rules;
+use crate::state::Credentials;
 use crate::{
     state::{MemorySettings, WindowSize},
     util::{io::IOError, platform::classpath_separator},

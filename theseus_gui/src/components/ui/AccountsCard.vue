@@ -61,13 +61,7 @@
 <script setup>
 import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
-import {
-  users,
-  remove_user,
-  authenticate_begin_flow,
-  authenticate_await_completion,
-} from '@/helpers/auth'
-import { get, set } from '@/helpers/settings'
+import { users, remove_user, set_default_user, begin_login, get_default_user } from '@/helpers/auth'
 import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { process_listener } from '@/helpers/events'
@@ -83,11 +77,11 @@ defineProps({
 
 const emit = defineEmits(['change'])
 
-const settings = ref({})
-const accounts = ref([])
+const accounts = ref({})
+const defaultUser = ref()
 
 async function refreshValues() {
-  settings.value = await get().catch(handleError)
+  defaultUser.value = await get_default_user().catch(handleError)
   accounts.value = await users().catch(handleError)
 }
 defineExpose({
@@ -95,35 +89,38 @@ defineExpose({
 })
 await refreshValues()
 
+console.log(accounts.value)
 const displayAccounts = computed(() =>
-  accounts.value.filter((account) => settings.value.default_user !== account.id)
+  accounts.value.filter((account) => defaultUser.value !== account.id)
 )
 
 const selectedAccount = computed(() =>
-  accounts.value.find((account) => account.id === settings.value.default_user)
+  accounts.value.find((account) => account.id === defaultUser.value)
 )
 
 async function setAccount(account) {
-  settings.value.default_user = account.id
-  await set(settings.value).catch(handleError)
+  accounts.value.default_user = account.id
+  await set_default_user(account.id).catch(handleError)
   emit('change')
 }
 
 async function login() {
-  const loginSuccess = await authenticate_begin_flow().catch(handleError)
+  const flow = await begin_login().catch(handleError)
 
   const window = new WebviewWindow('loginWindow', {
     title: 'Modrinth App',
-    url: loginSuccess.verification_uri,
+    url: flow.redirect_uri,
   })
 
-  const loggedIn = await authenticate_await_completion().catch(handleError)
-  await window.close()
+  console.log(window)
 
-  if (loggedIn) {
-    await setAccount(loggedIn)
-    await refreshValues()
-  }
+  // const loggedIn = await finish_login('', flow).catch(handleError)
+  // await window.close()
+
+  // if (loggedIn) {
+  //   await setAccount(loggedIn)
+  //   await refreshValues()
+  // }
 
   mixpanel_track('AccountLogIn')
 }

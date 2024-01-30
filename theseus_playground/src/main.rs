@@ -14,13 +14,14 @@ use theseus::profile::create::profile_create;
 // 3) call the authenticate_await_complete_flow() function to get the credentials (like you would in the frontend)
 pub async fn authenticate_run() -> theseus::Result<Credentials> {
     println!("A browser window will now open, follow the login flow there.");
-    let login = auth::authenticate_begin_flow().await?;
+    let login = minecraft_auth::authenticate_begin_flow().await?;
 
     println!("URL {}", login.verification_uri.as_str());
     webbrowser::open(login.verification_uri.as_str())
         .map_err(|e| IOError::with_path(e, login.verification_uri.as_str()))?;
 
-    let credentials = auth::authenticate_await_complete_flow().await?;
+    let credentials =
+        minecraft_auth::authenticate_await_complete_flow().await?;
     State::sync().await?;
 
     println!("Logged in user {}.", credentials.username);
@@ -38,7 +39,7 @@ async fn main() -> theseus::Result<()> {
     //State::update();
 
     // Attempt to run game
-    if auth::users().await?.is_empty() {
+    if minecraft_auth::users().await?.is_empty() {
         println!("No users found, authenticating.");
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }

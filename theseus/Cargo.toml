@@ -61,6 +61,11 @@ whoami = "1.4.0"
 
 discord-rich-presence = "0.2.3"
 
+rand = "0.8"
+openssl = "0.10"
+byteorder = "1.5.0"
+base64 = "0.21.7"
+
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.50.0"
 
