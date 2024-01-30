@@ -351,6 +351,7 @@ pub async fn refresh_credentials(
         }
     }
 
+    credentials_store.save().await?;
     Ok(())
 }
 
