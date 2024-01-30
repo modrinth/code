@@ -153,6 +153,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useFetch } from '@/helpers/fetch'
+import { useInstances } from '@/store/instances'
 
 const props = defineProps({
   id: {
@@ -176,6 +177,8 @@ watch(
     instance.value = await get(id).catch(handleError)
   }
 )
+
+const instancesStore = useInstances()
 
 breadcrumbs.setName(
   'Instance',
@@ -210,6 +213,8 @@ const startInstance = async (context) => {
     game_version: instance.value.metadata.game_version,
     source: context,
   })
+
+  await instancesStore.refreshInstances()
 }
 
 const checkProcess = async () => {
