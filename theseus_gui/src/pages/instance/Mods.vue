@@ -440,9 +440,21 @@ const props = defineProps({
       return false
     },
   },
+  playing: {
+    type: Boolean,
+    default() {
+      return false
+    },
+  },
   versions: {
     type: Array,
     required: true,
+  },
+  installed: {
+    type: Boolean,
+    default() {
+      return true
+    },
   },
 })
 
