@@ -163,7 +163,7 @@
       <div class="input-group">
         <Button color="primary" @click="$refs.modal_creation.show()">
           <PlusIcon />
-          Create a project
+          {{ formatMessage(commonMessages.createAProjectButton) }}
         </Button>
         <OrganizationProjectTransferModal
           :projects="usersOwnedProjects || []"
@@ -320,6 +320,8 @@ import {
 
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'
+
+const { formatMessage } = useVIntl()
 
 const { organization, projects, refresh } = inject('organizationContext')
 

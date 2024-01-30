@@ -5,14 +5,16 @@
       class="email-nag"
     >
       <template v-if="auth.user.email">
-        <span>For security purposes, please verify your email address on Modrinth.</span>
-        <button class="btn" @click="resendVerifyEmail">Re-send verification email</button>
+        <span>{{ formatMessage(verifyEmailBannerMessages.title) }}</span>
+        <button class="btn" @click="resendVerifyEmail">
+          {{ formatMessage(verifyEmailBannerMessages.action) }}
+        </button>
       </template>
       <template v-else>
-        <span>For security purposes, please enter your email on Modrinth.</span>
+        <span>{{ formatMessage(addEmailBannerMessages.title) }}</span>
         <nuxt-link class="btn" to="/settings/account">
           <SettingsIcon />
-          Visit account settings
+          {{ formatMessage(addEmailBannerMessages.action) }}
         </nuxt-link>
       </template>
     </div>
@@ -25,12 +27,10 @@
     >
       <div class="site-banner__title">
         <IssuesIcon />
-        <span> You’re viewing Modrinth’s staging environment </span>
+        <span>{{ formatMessage(stagingBannerMessages.title) }}</span>
       </div>
       <div class="site-banner__description">
-        The staging environment is running on a copy of the production Modrinth database. This is
-        used for testing and debugging purposes, and may be running in-development versions of the
-        Modrinth backend or frontend newer than the production instance.
+        {{ formatMessage(stagingBannerMessages.description) }}
       </div>
       <div class="site-banner__actions">
         <Button transparent icon-only :action="hideStagingBanner"><XIcon /></Button>
@@ -53,13 +53,13 @@
                 v-if="auth.user"
                 to="/dashboard/notifications"
                 class="control-button button-transparent"
-                title="Notifications"
+                :title="formatMessage(commonMessages.notificationsLabel)"
               >
                 <NotificationIcon aria-hidden="true" />
               </nuxt-link>
               <button
                 class="control-button button-transparent"
-                title="Switch theme"
+                :title="formatMessage(messages.changeTheme)"
                 @click="changeTheme"
               >
                 <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
@@ -78,7 +78,7 @@
                   <Avatar
                     :src="auth.user.avatar_url"
                     class="user-icon"
-                    alt="Your avatar"
+                    :alt="formatMessage(messages.yourAvatarAlt)"
                     aria-hidden="true"
                     circle
                   />
@@ -88,13 +88,15 @@
                   <NuxtLink class="item button-transparent" :to="`/user/${auth.user.username}`">
                     <div class="title profile-link">
                       <div class="username">@{{ auth.user.username }}</div>
-                      <div class="prompt">Visit your profile</div>
+                      <div class="prompt">{{ formatMessage(messages.visitYourProfile) }}</div>
                     </div>
                   </NuxtLink>
                   <hr class="divider" />
                   <button class="item button-transparent" @click="$refs.modal_creation.show()">
                     <PlusIcon class="icon" />
-                    <span class="title">Create a project</span>
+                    <span class="title">
+                      {{ formatMessage(commonMessages.createAProjectButton) }}
+                    </span>
                   </button>
                   <hr class="divider" />
                   <NuxtLink class="item button-transparent" to="/dashboard/collections">
@@ -103,15 +105,17 @@
                   </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/dashboard/notifications">
                     <NotificationIcon class="icon" />
-                    <span class="title">Notifications</span>
+                    <span class="title">{{
+                      formatMessage(commonMessages.notificationsLabel)
+                    }}</span>
                   </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/dashboard">
                     <ChartIcon class="icon" />
-                    <span class="title">Dashboard</span>
+                    <span class="title">{{ formatMessage(commonMessages.dashboardLabel) }}</span>
                   </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/settings">
                     <SettingsIcon class="icon" />
-                    <span class="title">Settings</span>
+                    <span class="title">{{ formatMessage(commonMessages.settingsLabel) }}</span>
                   </NuxtLink>
                   <NuxtLink
                     v-if="tags.staffRoles.includes(auth.user.role)"
@@ -119,7 +123,7 @@
                     to="/moderation"
                   >
                     <ModerationIcon class="icon" />
-                    <span class="title">Moderation</span>
+                    <span class="title">{{ formatMessage(commonMessages.moderationLabel) }}</span>
                   </NuxtLink>
                   <NuxtLink
                     v-if="!cosmetics.hideModrinthAppPromos"
@@ -127,25 +131,29 @@
                     to="/app"
                   >
                     <DownloadIcon class="icon" />
-                    <span class="title">Get Modrinth App</span>
+                    <span class="title">
+                      {{ formatMessage(messages.getModrinthApp) }}
+                    </span>
                   </NuxtLink>
                   <hr class="divider" />
                   <button class="item button-transparent" @click="logoutUser()">
                     <LogOutIcon class="icon" />
-                    <span class="dropdown-item__text">Log out</span>
+                    <span class="dropdown-item__text">
+                      {{ formatMessage(commonMessages.signOutButton) }}
+                    </span>
                   </button>
                 </div>
               </div>
               <section v-else class="auth-prompt">
                 <nuxt-link class="iconified-button raised-button" to="/auth/sign-in">
-                  <LogInIcon /> Sign in
+                  <LogInIcon /> {{ formatMessage(commonMessages.signInButton) }}
                 </nuxt-link>
                 <nuxt-link
                   v-if="$route.path !== '/app' && !cosmetics.hideModrinthAppPromos"
                   class="btn btn-outline btn-primary app-btn"
                   to="/app"
                 >
-                  <DownloadIcon /> Get Modrinth App
+                  <DownloadIcon /> {{ formatMessage(messages.getModrinthApp) }}
                 </nuxt-link>
               </section>
             </section>
@@ -185,32 +193,32 @@
               <Avatar
                 :src="auth.user.avatar_url"
                 class="user-icon"
-                alt="Your avatar"
+                :alt="formatMessage(messages.yourAvatarAlt)"
                 aria-hidden="true"
                 circle
               />
               <div class="account-text">
                 <div>@{{ auth.user.username }}</div>
-                <div>Visit your profile</div>
+                <div>{{ formatMessage(messages.visitYourProfile) }}</div>
               </div>
             </NuxtLink>
             <nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
-              <LogInIcon /> Sign in
+              <LogInIcon /> {{ formatMessage(commonMessages.signInButton) }}
             </nuxt-link>
           </div>
           <div class="links">
             <template v-if="auth.user">
               <button class="iconified-button danger-button" @click="logoutUser()">
                 <LogOutIcon aria-hidden="true" />
-                Log out
+                {{ formatMessage(commonMessages.signOutButton) }}
               </button>
               <button class="iconified-button" @click="$refs.modal_creation.show()">
                 <PlusIcon aria-hidden="true" />
-                Create a project
+                {{ formatMessage(commonMessages.createAProjectButton) }}
               </button>
               <NuxtLink class="iconified-button" to="/dashboard/collections">
                 <LibraryIcon class="icon" />
-                Collections
+                {{ formatMessage(commonMessages.collectionsLabel) }}
               </NuxtLink>
               <NuxtLink
                 v-if="auth.user.role === 'moderator' || auth.user.role === 'admin'"
@@ -218,28 +226,34 @@
                 to="/moderation"
               >
                 <ModerationIcon aria-hidden="true" />
-                Moderation
+                {{ formatMessage(commonMessages.moderationLabel) }}
               </NuxtLink>
             </template>
             <NuxtLink class="iconified-button" to="/settings">
               <SettingsIcon aria-hidden="true" />
-              Settings
+              {{ formatMessage(commonMessages.settingsLabel) }}
             </NuxtLink>
             <button class="iconified-button" @click="changeTheme">
               <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
               <SunIcon v-else class="icon" />
-              <span class="dropdown-item__text">Change theme</span>
+              <span class="dropdown-item__text">
+                {{ formatMessage(messages.changeTheme) }}
+              </span>
             </button>
           </div>
         </div>
         <div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
-          <NuxtLink to="/" class="tab button-animation" title="Home">
+          <NuxtLink
+            to="/"
+            class="tab button-animation"
+            :title="formatMessage(navMenuMessages.home)"
+          >
             <HomeIcon />
           </NuxtLink>
           <button
             class="tab button-animation"
             :class="{ 'router-link-exact-active': isBrowseMenuOpen }"
-            title="Search"
+            :title="formatMessage(navMenuMessages.search)"
             @click="toggleBrowseMenu()"
           >
             <template v-if="auth.user">
@@ -247,7 +261,7 @@
             </template>
             <template v-else>
               <SearchIcon class="smaller" />
-              Search
+              {{ formatMessage(navMenuMessages.search) }}
             </template>
           </button>
           <template v-if="auth.user">
@@ -257,7 +271,7 @@
               :class="{
                 'no-active': isMobileMenuOpen || isBrowseMenuOpen,
               }"
-              title="Notifications"
+              :title="formatMessage(commonMessages.notificationsLabel)"
               @click="
                 () => {
                   isMobileMenuOpen = false
@@ -267,13 +281,17 @@
             >
               <NotificationIcon />
             </NuxtLink>
-            <NuxtLink to="/dashboard" class="tab button-animation" title="Dashboard">
+            <NuxtLink
+              to="/dashboard"
+              class="tab button-animation"
+              :title="formatMessage(commonMessages.dashboardLabel)"
+            >
               <ChartIcon />
             </NuxtLink>
           </template>
           <button
             class="tab button-animation"
-            title="Toggle Mobile Menu"
+            :title="formatMessage(messages.toggleMenu)"
             @click="toggleMobileMenu()"
           >
             <template v-if="!auth.user">
@@ -285,7 +303,7 @@
                 :src="auth.user.avatar_url"
                 class="user-icon"
                 :class="{ expanded: isMobileMenuOpen }"
-                alt="Your avatar"
+                :alt="formatMessage(messages.yourAvatarAlt)"
                 aria-hidden="true"
                 circle
               />
@@ -300,17 +318,24 @@
     </main>
     <footer>
       <div class="logo-info" role="region" aria-label="Modrinth information">
-        <BrandTextLogo aria-hidden="true" class="text-logo" @click="developerModeIncrement()" />
+        <BrandTextLogo
+          aria-hidden="true"
+          class="text-logo button-base"
+          @click="developerModeIncrement()"
+        />
         <p>
-          Modrinth is
-          <a
-            :target="$external()"
-            href="https://github.com/modrinth"
-            class="text-link"
-            rel="noopener"
-          >
-            open source</a
-          >.
+          <IntlFormatted :message-id="footerMessages.openSource">
+            <template #github-link="{ children }">
+              <a
+                :target="$external()"
+                href="https://github.com/modrinth"
+                class="text-link"
+                rel="noopener"
+              >
+                <component :is="() => children" />
+              </a>
+            </template>
+          </IntlFormatted>
         </p>
         <p>
           {{ config.public.owner }}/{{ config.public.slug }} {{ config.public.branch }}@<a
@@ -331,23 +356,32 @@
         <p>© Rinth, Inc.</p>
       </div>
       <div class="links links-1" role="region" aria-label="Legal">
-        <h4 aria-hidden="true">Company</h4>
-        <nuxt-link to="/legal/terms"> Terms</nuxt-link>
-        <nuxt-link to="/legal/privacy"> Privacy</nuxt-link>
-        <nuxt-link to="/legal/rules"> Rules</nuxt-link>
+        <h4 aria-hidden="true">{{ formatMessage(footerMessages.companyTitle) }}</h4>
+        <nuxt-link to="/legal/terms"> {{ formatMessage(footerMessages.terms) }}</nuxt-link>
+        <nuxt-link to="/legal/privacy"> {{ formatMessage(footerMessages.privacy) }}</nuxt-link>
+        <nuxt-link to="/legal/rules"> {{ formatMessage(footerMessages.rules) }}</nuxt-link>
         <a :target="$external()" href="https://careers.modrinth.com">
-          Careers <span v-if="false" class="count-bubble">0</span>
+          {{ formatMessage(footerMessages.careers) }}
+          <span v-if="false" class="count-bubble">0</span>
         </a>
       </div>
       <div class="links links-2" role="region" aria-label="Resources">
-        <h4 aria-hidden="true">Resources</h4>
-        <a :target="$external()" href="https://support.modrinth.com">Support</a>
-        <a :target="$external()" href="https://blog.modrinth.com">Blog</a>
-        <a :target="$external()" href="https://docs.modrinth.com">Docs</a>
-        <a :target="$external()" href="https://status.modrinth.com">Status</a>
+        <h4 aria-hidden="true">{{ formatMessage(footerMessages.resourcesTitle) }}</h4>
+        <a :target="$external()" href="https://support.modrinth.com">
+          {{ formatMessage(footerMessages.support) }}
+        </a>
+        <a :target="$external()" href="https://blog.modrinth.com">
+          {{ formatMessage(footerMessages.blog) }}
+        </a>
+        <a :target="$external()" href="https://docs.modrinth.com">
+          {{ formatMessage(footerMessages.docs) }}
+        </a>
+        <a :target="$external()" href="https://status.modrinth.com">
+          {{ formatMessage(footerMessages.status) }}
+        </a>
       </div>
       <div class="links links-3" role="region" aria-label="Interact">
-        <h4 aria-hidden="true">Interact</h4>
+        <h4 aria-hidden="true">{{ formatMessage(footerMessages.interactTitle) }}</h4>
         <a rel="noopener" :target="$external()" href="https://discord.modrinth.com"> Discord </a>
         <a rel="noopener" :target="$external()" href="https://x.com/modrinth"> X (Twitter) </a>
         <a rel="noopener" :target="$external()" href="https://floss.social/@modrinth"> Mastodon </a>
@@ -358,20 +392,20 @@
       <div class="buttons">
         <nuxt-link class="btn btn-outline btn-primary" to="/app">
           <DownloadIcon aria-hidden="true" />
-          Get Modrinth App
+          {{ formatMessage(messages.getModrinthApp) }}
         </nuxt-link>
         <button class="iconified-button raised-button" @click="changeTheme">
           <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
-          Change theme
+          {{ formatMessage(messages.changeTheme) }}
         </button>
         <nuxt-link class="iconified-button raised-button" to="/settings">
           <SettingsIcon aria-hidden="true" />
-          Settings
+          {{ formatMessage(commonMessages.settingsLabel) }}
         </nuxt-link>
       </div>
       <div class="not-affiliated-notice">
-        NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG.
+        {{ formatMessage(footerMessages.legalDisclaimer) }}
       </div>
     </footer>
   </div>
@@ -397,6 +431,8 @@ import ChartIcon from '~/assets/images/utils/chart.svg'
 import NavRow from '~/components/ui/NavRow.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import Avatar from '~/components/ui/Avatar.vue'
+import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
+import { commonMessages } from '~/utils/common-messages'
 
 const { formatMessage } = useVIntl()
 
@@ -408,6 +444,131 @@ const tags = useTags()
 const config = useRuntimeConfig()
 const route = useRoute()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+
+const verifyEmailBannerMessages = defineMessages({
+  title: {
+    id: 'layout.banner.verify-email.title',
+    defaultMessage: 'For security purposes, please verify your email address on Modrinth.',
+  },
+  action: {
+    id: 'layout.banner.verify-email.action',
+    defaultMessage: 'Re-send verification email',
+  },
+})
+
+const addEmailBannerMessages = defineMessages({
+  title: {
+    id: 'layout.banner.add-email.title',
+    defaultMessage: 'For security purposes, please enter your email on Modrinth.',
+  },
+  action: {
+    id: 'layout.banner.add-email.button',
+    defaultMessage: 'Visit account settings',
+  },
+})
+
+const stagingBannerMessages = defineMessages({
+  title: {
+    id: 'layout.banner.staging.title',
+    defaultMessage: 'You’re viewing Modrinth’s staging environment.',
+  },
+  description: {
+    id: 'layout.banner.staging.description',
+    defaultMessage:
+      'The staging environment is running on a copy of the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.',
+  },
+})
+
+const navMenuMessages = defineMessages({
+  home: {
+    id: 'layout.nav.home',
+    defaultMessage: 'Home',
+  },
+  search: {
+    id: 'layout.nav.search',
+    defaultMessage: 'Search',
+  },
+})
+
+const messages = defineMessages({
+  visitYourProfile: {
+    id: 'layout.label.visit-your-profile',
+    defaultMessage: 'Visit your profile',
+  },
+  toggleMenu: {
+    id: 'layout.menu-toggle.action',
+    defaultMessage: 'Toggle menu',
+  },
+  yourAvatarAlt: {
+    id: 'layout.avatar.alt',
+    defaultMessage: 'Your avatar',
+  },
+  getModrinthApp: {
+    id: 'layout.action.get-modrinth-app',
+    defaultMessage: 'Get Modrinth App',
+  },
+  changeTheme: {
+    id: 'layout.action.change-theme',
+    defaultMessage: 'Change theme',
+  },
+})
+
+const footerMessages = defineMessages({
+  openSource: {
+    id: 'layout.footer.open-source',
+    defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
+  },
+  companyTitle: {
+    id: 'layout.footer.company.title',
+    defaultMessage: 'Company',
+  },
+  terms: {
+    id: 'layout.footer.company.terms',
+    defaultMessage: 'Terms',
+  },
+  privacy: {
+    id: 'layout.footer.company.privacy',
+    defaultMessage: 'Privacy',
+  },
+  rules: {
+    id: 'layout.footer.company.rules',
+    defaultMessage: 'Rules',
+  },
+  careers: {
+    id: 'layout.footer.company.careers',
+    defaultMessage: 'Careers',
+  },
+  resourcesTitle: {
+    id: 'layout.footer.resources.title',
+    defaultMessage: 'Resources',
+  },
+  support: {
+    id: 'layout.footer.resources.support',
+    defaultMessage: 'Support',
+  },
+  blog: {
+    id: 'layout.footer.resources.blog',
+    defaultMessage: 'Blog',
+  },
+  docs: {
+    id: 'layout.footer.resources.docs',
+    defaultMessage: 'Docs',
+  },
+  status: {
+    id: 'layout.footer.resources.status',
+    defaultMessage: 'Status',
+  },
+  interactTitle: {
+    id: 'layout.footer.interact.title',
+    defaultMessage: 'Interact',
+  },
+  legalDisclaimer: {
+    id: 'layout.footer.legal-disclaimer',
+    defaultMessage:
+      'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+  },
+})
+
 useHead({
   link: [
     {
@@ -416,14 +577,15 @@ useHead({
     },
   ],
 })
-
-const description =
-  'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
-  'Discover and publish projects on Modrinth with a modern, easy to use interface and API.'
-
 useSeoMeta({
   title: 'Modrinth',
-  description,
+  description: () =>
+    formatMessage({
+      id: 'layout.meta.description',
+      defaultMessage:
+        'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
+        'Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
+    }),
   publisher: 'Modrinth',
   themeColor: '#1bd96a',
   colorScheme: 'dark light',
@@ -431,7 +593,11 @@ useSeoMeta({
   // OpenGraph
   ogTitle: 'Modrinth',
   ogSiteName: 'Modrinth',
-  ogDescription: 'Discover and publish Minecraft content!',
+  ogDescription: () =>
+    formatMessage({
+      id: 'layout.meta.og-description',
+      defaultMessage: 'Discover and publish Minecraft content!',
+    }),
   ogType: 'website',
   ogImage: 'https://cdn.modrinth.com/modrinth-new.png',
   ogUrl: link,
@@ -441,12 +607,67 @@ useSeoMeta({
   twitterSite: '@modrinth',
 })
 
-let developerModeCounter = 0
+const developerModeCounter = ref(0)
+
+const isDropdownOpen = ref(false)
+const isMobileMenuOpen = ref(false)
+const isBrowseMenuOpen = ref(false)
+const navRoutes = computed(() => [
+  {
+    label: formatMessage(getProjectTypeMessage('mod', true)),
+    href: '/mods',
+  },
+  {
+    label: formatMessage(getProjectTypeMessage('plugin', true)),
+    href: '/plugins',
+  },
+  {
+    label: formatMessage(getProjectTypeMessage('datapack', true)),
+    href: '/datapacks',
+  },
+  {
+    label: formatMessage(getProjectTypeMessage('shader', true)),
+    href: '/shaders',
+  },
+  {
+    label: formatMessage(getProjectTypeMessage('resourcepack', true)),
+    href: '/resourcepacks',
+  },
+  {
+    label: formatMessage(getProjectTypeMessage('modpack', true)),
+    href: '/modpacks',
+  },
+])
+
+onMounted(() => {
+  if (window && process.client) {
+    window.history.scrollRestoration = 'auto'
+  }
+
+  runAnalytics()
+})
+
+watch(
+  () => route.path,
+  () => {
+    isMobileMenuOpen.value = false
+    isBrowseMenuOpen.value = false
+
+    if (process.client) {
+      document.body.style.overflowY = 'scroll'
+      document.body.setAttribute('tabindex', '-1')
+      document.body.removeAttribute('tabindex')
+    }
+
+    updateCurrentDate()
+    runAnalytics()
+  }
+)
 
 function developerModeIncrement() {
-  if (developerModeCounter >= 5) {
+  if (developerModeCounter.value >= 5) {
     cosmetics.value.developerMode = !cosmetics.value.developerMode
-    developerModeCounter = 0
+    developerModeCounter.value = 0
     if (cosmetics.value.developerMode) {
       app.$notify({
         group: 'main',
@@ -463,7 +684,7 @@ function developerModeIncrement() {
       })
     }
   } else {
-    developerModeCounter++
+    developerModeCounter.value++
   }
 }
 
@@ -471,109 +692,42 @@ async function logoutUser() {
   await logout()
 }
 
+function runAnalytics() {
+  const config = useRuntimeConfig()
+  const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
+
+  setTimeout(() => {
+    $fetch(`${replacedUrl}analytics/view`, {
+      method: 'POST',
+      body: {
+        url: window.location.href,
+      },
+    })
+      .then(() => {})
+      .catch(() => {})
+  })
+}
+function toggleMobileMenu() {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  if (isMobileMenuOpen.value) {
+    isBrowseMenuOpen.value = false
+  }
+}
+function toggleBrowseMenu() {
+  isBrowseMenuOpen.value = !isBrowseMenuOpen.value
+
+  if (isBrowseMenuOpen.value) {
+    isMobileMenuOpen.value = false
+  }
+}
+function changeTheme() {
+  updateTheme(app.$colorMode.value === 'dark' ? 'light' : 'dark', true)
+}
+
 function hideStagingBanner() {
   cosmetics.value.hideStagingBanner = true
   saveCosmetics()
 }
-</script>
-<script>
-export default defineNuxtComponent({
-  data() {
-    return {
-      isDropdownOpen: false,
-      isMobileMenuOpen: false,
-      isBrowseMenuOpen: false,
-      registeredSkipLink: null,
-      hideDropdown: false,
-      navRoutes: [
-        {
-          label: 'Mods',
-          href: '/mods',
-        },
-        {
-          label: 'Plugins',
-          href: '/plugins',
-        },
-        {
-          label: 'Data Packs',
-          href: '/datapacks',
-        },
-        {
-          label: 'Shaders',
-          href: '/shaders',
-        },
-        {
-          label: 'Resource Packs',
-          href: '/resourcepacks',
-        },
-        {
-          label: 'Modpacks',
-          href: '/modpacks',
-        },
-      ],
-    }
-  },
-  computed: {
-    isOnSearchPage() {
-      return this.navRoutes.some((route) => this.$route.path.startsWith(route.href))
-    },
-  },
-  watch: {
-    '$route.path'() {
-      this.isMobileMenuOpen = false
-      this.isBrowseMenuOpen = false
-
-      if (process.client) {
-        document.body.style.overflowY = 'scroll'
-        document.body.setAttribute('tabindex', '-1')
-        document.body.removeAttribute('tabindex')
-      }
-
-      updateCurrentDate()
-      this.runAnalytics()
-    },
-  },
-  mounted() {
-    if (process.client && window) {
-      window.history.scrollRestoration = 'auto'
-    }
-
-    this.runAnalytics()
-  },
-  methods: {
-    runAnalytics() {
-      const config = useRuntimeConfig()
-      const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
-
-      setTimeout(() => {
-        $fetch(`${replacedUrl}analytics/view`, {
-          method: 'POST',
-          body: {
-            url: window.location.href,
-          },
-        })
-          .then(() => {})
-          .catch(() => {})
-      })
-    },
-    toggleMobileMenu() {
-      this.isMobileMenuOpen = !this.isMobileMenuOpen
-      if (this.isMobileMenuOpen) {
-        this.isBrowseMenuOpen = false
-      }
-    },
-    toggleBrowseMenu() {
-      this.isBrowseMenuOpen = !this.isBrowseMenuOpen
-
-      if (this.isBrowseMenuOpen) {
-        this.isMobileMenuOpen = false
-      }
-    },
-    changeTheme() {
-      updateTheme(this.$colorMode.value === 'dark' ? 'light' : 'dark', true)
-    },
-  },
-})
 </script>
 
 <style lang="scss">

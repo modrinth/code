@@ -15,9 +15,17 @@ export const commonMessages = defineMessages({
     id: 'button.continue',
     defaultMessage: 'Continue',
   },
+  createAProjectButton: {
+    id: 'button.create-a-project',
+    defaultMessage: 'Create a project',
+  },
   createdAgoLabel: {
     id: 'label.created-ago',
     defaultMessage: 'Created {ago}',
+  },
+  dashboardLabel: {
+    id: 'label.dashboard',
+    defaultMessage: 'Dashboard',
   },
   dateAtTimeTooltip: {
     id: 'tooltip.date-at-time',
@@ -59,6 +67,14 @@ export const commonMessages = defineMessages({
     id: 'input.view.list',
     defaultMessage: 'List view',
   },
+  moderationLabel: {
+    id: 'label.moderation',
+    defaultMessage: 'Moderation',
+  },
+  notificationsLabel: {
+    id: 'label.notifications',
+    defaultMessage: 'Notifications',
+  },
   privateLabel: {
     id: 'collection.label.private',
     defaultMessage: 'Private',
@@ -86,6 +102,18 @@ export const commonMessages = defineMessages({
   scopesLabel: {
     id: 'label.scopes',
     defaultMessage: 'Scopes',
+  },
+  settingsLabel: {
+    id: 'label.settings',
+    defaultMessage: 'Settings',
+  },
+  signInButton: {
+    id: 'button.sign-in',
+    defaultMessage: 'Sign in',
+  },
+  signOutButton: {
+    id: 'button.sign-out',
+    defaultMessage: 'Sign out',
   },
   titleLabel: {
     id: 'label.title',

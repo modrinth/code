@@ -115,7 +115,7 @@
       <div class="auth-form__additional-options">
         {{ formatMessage(messages.alreadyHaveAccountLabel) }}
         <NuxtLink class="text-link" :to="signInLink">
-          {{ formatMessage(messages.signInLabel) }}
+          {{ formatMessage(commonMessages.signInButton) }}
         </NuxtLink>
       </div>
     </section>
@@ -184,10 +184,6 @@ const messages = defineMessages({
   alreadyHaveAccountLabel: {
     id: 'auth.sign-up.sign-in-option.title',
     defaultMessage: 'Already have an account?',
-  },
-  signInLabel: {
-    id: 'auth.sign-up.sign-in-option.action',
-    defaultMessage: 'Sign in',
   },
 })
 

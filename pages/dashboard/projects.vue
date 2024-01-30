@@ -163,7 +163,7 @@
         <div class="input-group">
           <button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
             <PlusIcon />
-            Create a project
+            {{ formatMessage(commonMessages.createAProjectButton) }}
           </button>
         </div>
       </div>
@@ -339,9 +339,11 @@ export default defineNuxtComponent({
     DescendingIcon,
   },
   async setup() {
+    const { formatMessage } = useVIntl()
+
     const user = await useUser()
     await initUserProjects()
-    return { user: ref(user) }
+    return { formatMessage, user: ref(user) }
   },
   data() {
     return {

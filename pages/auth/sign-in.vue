@@ -19,7 +19,7 @@
       />
 
       <button class="btn btn-primary continue-btn" @click="begin2FASignIn">
-        {{ formatMessage(messages.signInButton) }} <RightArrowIcon />
+        {{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
       </button>
     </template>
     <template v-else>
@@ -84,7 +84,7 @@
         <NuxtTurnstile ref="turnstile" v-model="token" class="turnstile" />
 
         <button class="btn btn-primary continue-btn centered-btn" @click="beginPasswordSignIn()">
-          {{ formatMessage(messages.signInButton) }} <RightArrowIcon />
+          {{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
         </button>
 
         <div class="auth-form__additional-options">
@@ -134,10 +134,6 @@ const messages = defineMessages({
   passwordLabel: {
     id: 'auth.sign-in.password.label',
     defaultMessage: 'Password',
-  },
-  signInButton: {
-    id: 'auth.sign-in.action.sign-in',
-    defaultMessage: 'Sign in',
   },
   signInWithLabel: {
     id: 'auth.sign-in.sign-in-with',
