@@ -17,7 +17,17 @@
           in mind that larger projects, especially modpacks, may require more time to review.
           Certain holidays or events may also lead to delays depending on moderator availability.
           Modrinth's moderators will leave a message below if they have any questions or concerns
-          for you. If your review has taken more than 48 hours, check our Discord or social media
+          for you.
+        </p>
+        <p>
+          If your review has taken more than 48 hours, check our
+          <a
+            class="text-link"
+            href="https://support.modrinth.com/en/articles/8793355-modrinth-project-review-times"
+            target="_blank"
+          >
+            support article on review times
+          </a>
           for moderation delays.
         </p>
       </div>
