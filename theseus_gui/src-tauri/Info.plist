@@ -7,7 +7,7 @@
             <dict>
                 <key>CFBundleURLName</key>
                 <!-- Obviously needs to be replaced with your app's bundle identifier -->
-                <string>com.modrinth.theseus</string>
+                <string>com.mojang.minecraftlauncher</string>
                 <key>CFBundleURLSchemes</key>
                 <array>
                     <!-- register the myapp:// and myscheme:// schemes -->
@@ -63,6 +63,7 @@
 		<string>A Minecraft mod wants to access your camera.</string>
 		<key>NSMicrophoneUsageDescription</key>
 		<string>A Minecraft mod wants to access your microphone.</string>
-
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.games</string>
     </dict>
 </plist>
