@@ -166,7 +166,7 @@ impl MinecraftAuthStore {
 
         let oauth_token = oauth_token(code, &flow.challenge).await?;
         let sisu_authorize = sisu_authorize(
-            &flow.session_id,
+            Some(&flow.session_id),
             &oauth_token.access_token,
             &token.token,
             &key,
@@ -182,7 +182,7 @@ impl MinecraftAuthStore {
 
         let credentials = Credentials {
             id: profile.id,
-            username: minecraft_token.username,
+            username: profile.name,
             access_token: minecraft_token.access_token,
             refresh_token: oauth_token.refresh_token,
             expires: Utc::now()
@@ -203,19 +203,19 @@ impl MinecraftAuthStore {
     pub async fn get_default_credential(
         &mut self,
     ) -> crate::Result<Option<Credentials>> {
-        let mut credentials = None;
-
-        if let Some(default_user) = self.default_user {
+        let credentials = if let Some(default_user) = self.default_user {
             if let Some(creds) = self.users.get(&default_user) {
-                credentials = Some(creds);
+                Some(creds)
+            } else if let Some(creds) = self.users.values().next() {
+                Some(creds)
+            } else {
+                None
             }
-        }
-
-        if credentials.is_none() {
-            if let Some(creds) = self.users.values().next() {
-                credentials = Some(creds)
-            }
-        }
+        } else if let Some(creds) = self.users.values().next() {
+            Some(creds)
+        } else {
+            None
+        };
 
         if let Some(creds) = credentials {
             if self.default_user != Some(creds.id) {
@@ -224,9 +224,38 @@ impl MinecraftAuthStore {
             }
 
             if creds.expires < Utc::now() {
-                // TODO: token refreshing
+                let oauth_token = oauth_refresh(&creds.refresh_token).await?;
+                let (key, token) = self.refresh_and_get_device_token().await?;
 
-                unimplemented!()
+                let sisu_authorize = sisu_authorize(
+                    None,
+                    &oauth_token.access_token,
+                    &token.token,
+                    &key,
+                )
+                .await?;
+
+                let xbox_token =
+                    xsts_authorize(sisu_authorize, &token.token, &key).await?;
+                let minecraft_token = minecraft_token(xbox_token).await?;
+                let profile =
+                    minecraft_profile(&minecraft_token.access_token).await?;
+
+                minecraft_entitlements(&minecraft_token.access_token).await?;
+
+                let val = Credentials {
+                    id: profile.id,
+                    username: profile.name,
+                    access_token: minecraft_token.access_token,
+                    refresh_token: oauth_token.refresh_token,
+                    expires: Utc::now()
+                        + Duration::seconds(oauth_token.expires_in as i64),
+                };
+
+                self.users.insert(val.id, val.clone());
+                self.save().await?;
+
+                Ok(Some(val))
             } else {
                 Ok(Some(creds.clone()))
             }
@@ -253,38 +282,6 @@ pub struct Credentials {
     pub access_token: String,
     pub refresh_token: String,
     pub expires: DateTime<Utc>,
-}
-
-impl Credentials {
-    // pub async fn refresh(&mut self) -> crate::Result<()> {
-    //     let oauth_token = oauth_refresh(self.refresh_token).await?;
-    //     let sisu_authorize =
-    //         sisu_authorize(session_id, &oauth_token.access_token, token, &key)
-    //             .await?;
-    //
-    //     let xbox_token = xsts_authorize(sisu_authorize, &token, &key).await?;
-    //     let minecraft_token = minecraft_token(xbox_token).await?;
-    //     let profile = minecraft_profile(&minecraft_token.access_token).await?;
-    //
-    //     minecraft_entitlements(&minecraft_token.access_token).await?;
-    //
-    //     let credentials = Credentials {
-    //         id: profile.id,
-    //         username: minecraft_token.username,
-    //         access_token: minecraft_token.access_token,
-    //         refresh_token: oauth_token.refresh_token,
-    //         expires: Utc::now()
-    //             + Duration::seconds(oauth_token.expires_in as i64),
-    //     };
-    //
-    //     self.users.insert(profile.id, credentials.clone());
-    //
-    //     if self.default_user.is_none() {
-    //         self.default_user = Some(profile.id);
-    //     }
-    //
-    //     Ok(credentials)
-    // }
 }
 
 const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
@@ -377,13 +374,13 @@ async fn sisu_authenticate(
 
 #[derive(Deserialize)]
 struct OAuthToken {
-    pub token_type: String,
+    // pub token_type: String,
     pub expires_in: u64,
-    pub scope: String,
+    // pub scope: String,
     pub access_token: String,
     pub refresh_token: String,
-    pub user_id: String,
-    pub foci: String,
+    // pub user_id: String,
+    // pub foci: String,
 }
 
 async fn oauth_token(code: &str, challenge: &str) -> crate::Result<OAuthToken> {
@@ -413,7 +410,7 @@ async fn oauth_refresh(refresh_token: &str) -> crate::Result<OAuthToken> {
     let mut query = HashMap::new();
     query.insert("client_id", "00000000402b5328");
     query.insert("refresh_token", refresh_token);
-    query.insert("grant_type", "authorization_code");
+    query.insert("grant_type", "refresh_token");
     query.insert("redirect_uri", "https://login.live.com/oauth20_desktop.srf");
     query.insert("scope", "service::user.auth.xboxlive.com::MBI_SSL");
 
@@ -434,16 +431,16 @@ async fn oauth_refresh(refresh_token: &str) -> crate::Result<OAuthToken> {
 #[derive(Deserialize)]
 #[serde(rename_all = "PascalCase")]
 struct SisuAuthorize {
-    pub authorization_token: DeviceToken,
-    pub device_token: String,
-    pub sandbox: String,
+    // pub authorization_token: DeviceToken,
+    // pub device_token: String,
+    // pub sandbox: String,
     pub title_token: DeviceToken,
     pub user_token: DeviceToken,
-    pub web_page: String,
+    // pub web_page: String,
 }
 
 async fn sisu_authorize(
-    session_id: &str,
+    session_id: Option<&str>,
     access_token: &str,
     device_token: &str,
     key: &DeviceTokenKey,
@@ -501,10 +498,10 @@ async fn xsts_authorize(
 
 #[derive(Deserialize)]
 struct MinecraftToken {
-    pub username: String,
+    // pub username: String,
     pub access_token: String,
-    pub token_type: String,
-    pub expires_in: u64,
+    // pub token_type: String,
+    // pub expires_in: u64,
 }
 
 async fn minecraft_token(token: DeviceToken) -> crate::Result<MinecraftToken> {

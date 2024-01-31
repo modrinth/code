@@ -16,7 +16,6 @@ use crate::util::fetch;
 use crate::util::io::{self, IOError};
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
-    minecraft_auth,
     state::MinecraftChild,
 };
 pub use crate::{

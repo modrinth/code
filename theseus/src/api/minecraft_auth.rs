@@ -21,7 +21,7 @@ pub async fn finish_login(
 
 pub async fn get_default_user() -> crate::Result<Option<uuid::Uuid>> {
     let state = State::get().await?;
-    let mut users = state.users.read().await;
+    let users = state.users.read().await;
     Ok(users.default_user)
 }
 
@@ -30,6 +30,7 @@ pub async fn set_default_user(user: uuid::Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     let mut users = state.users.write().await;
     users.default_user = Some(user.id);
+    users.save().await?;
     Ok(())
 }
 

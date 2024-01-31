@@ -61,11 +61,16 @@
 <script setup>
 import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
-import { users, remove_user, set_default_user, begin_login, get_default_user } from '@/helpers/auth'
+import {
+  users,
+  remove_user,
+  set_default_user,
+  login as login_flow,
+  get_default_user,
+} from '@/helpers/auth'
 import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { process_listener } from '@/helpers/events'
-import { WebviewWindow } from '@tauri-apps/api/window'
 
 defineProps({
   mode: {
@@ -89,7 +94,6 @@ defineExpose({
 })
 await refreshValues()
 
-console.log(accounts.value)
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.id)
 )
@@ -99,28 +103,19 @@ const selectedAccount = computed(() =>
 )
 
 async function setAccount(account) {
-  accounts.value.default_user = account.id
+  defaultUser.value = account.id
   await set_default_user(account.id).catch(handleError)
   emit('change')
 }
 
 async function login() {
-  const flow = await begin_login().catch(handleError)
+  const loggedIn = await login_flow().catch(handleError)
 
-  const window = new WebviewWindow('loginWindow', {
-    title: 'Modrinth App',
-    url: flow.redirect_uri,
-  })
-
-  console.log(window)
-
-  // const loggedIn = await finish_login('', flow).catch(handleError)
-  // await window.close()
-
-  // if (loggedIn) {
-  //   await setAccount(loggedIn)
-  //   await refreshValues()
-  // }
+  console.log(loggedIn)
+  if (loggedIn) {
+    await setAccount(loggedIn)
+    await refreshValues()
+  }
 
   mixpanel_track('AccountLogIn')
 }

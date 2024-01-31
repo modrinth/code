@@ -18,16 +18,8 @@ import { invoke } from '@tauri-apps/api/tauri'
 /// This returns a DeviceLoginSuccess object, with two relevant fields:
 ///  - verification_uri: the URL to go to to complete the flow
 ///  - user_code: the code to enter on the verification_uri page
-export async function begin_login() {
-  return await invoke('plugin:auth|auth_begin_login')
-}
-
-/// Authenticate a user with Hydra - part 2
-/// This completes the authentication flow quasi-synchronously, returning the sign-in credentials
-/// (and also adding the credentials to the state)
-/// This returns a Credentials object
-export async function finish_login(code, flow) {
-  return await invoke('plugin:auth|auth_finish_login', { code, flow })
+export async function login() {
+  return await invoke('auth_login')
 }
 
 /// Retrieves the default user
