@@ -317,7 +317,10 @@ async function fetchProjectData() {
     useFetch(`https://staging-api.modrinth.com/v2/project/${route.params.id}`, 'project'),
     useFetch(`https://staging-api.modrinth.com/v2/project/${route.params.id}/version`, 'project'),
     useFetch(`https://staging-api.modrinth.com/v2/project/${route.params.id}/members`, 'project'),
-    useFetch(`https://staging-api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project'),
+    useFetch(
+      `https://staging-api.modrinth.com/v2/project/${route.params.id}/dependencies`,
+      'project'
+    ),
     get_categories().catch(handleError),
     route.query.i ? getInstance(route.query.i, false).catch(handleError) : Promise.resolve(),
   ])

@@ -32,7 +32,9 @@ const getInstances = async () => {
   let filters = []
   for (const instance of recentInstances.value) {
     if (instance.metadata.linked_data?.modrinth_modpack?.project_id) {
-      filters.push(`NOT"project_id"="${instance.metadata.linked_data?.modrinth_modpack?.project_id}"`)
+      filters.push(
+        `NOT"project_id"="${instance.metadata.linked_data?.modrinth_modpack?.project_id}"`
+      )
     }
   }
   filter.value = filters.join(' AND ')

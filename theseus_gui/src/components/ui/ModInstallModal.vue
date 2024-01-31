@@ -247,9 +247,9 @@ const check_valid = computed(() => {
           </Button>
           <div
             v-tooltip="
-              (profile.metadata.linked_data?.modrinth_modpack.locked
-              || profile.metadata.linked_data?.shared_profile
-              ) && !profile.installedMod
+              (profile.metadata.linked_data?.modrinth_modpack.locked ||
+                profile.metadata.linked_data?.shared_profile) &&
+              !profile.installedMod
                 ? 'Unpair or unlock an instance to add mods.'
                 : ''
             "
@@ -267,7 +267,8 @@ const check_valid = computed(() => {
                   ? 'Installing...'
                   : profile.installedMod
                   ? 'Installed'
-                  : profile.metadata.linked_data?.modrinth_modpack.locked || profile.metadata.linked_data?.shared_profile
+                  : profile.metadata.linked_data?.modrinth_modpack.locked ||
+                    profile.metadata.linked_data?.shared_profile
                   ? 'Paired'
                   : 'Install'
               }}

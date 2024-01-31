@@ -28,7 +28,9 @@ const filteredVersions = computed(() => {
 })
 
 const modpackVersionModal = ref(null)
-const installedVersion = computed(() => props.instance?.metadata?.linked_data?.modrinth_modpack?.version_id)
+const installedVersion = computed(
+  () => props.instance?.metadata?.linked_data?.modrinth_modpack?.version_id
+)
 const installing = computed(() => props.instance.install_stage !== 'installed')
 const inProgress = ref(false)
 

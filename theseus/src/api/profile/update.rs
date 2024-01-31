@@ -6,7 +6,7 @@ use crate::{
     pack::{self, install_from::generate_pack_from_version_id},
     prelude::{ProfilePathId, ProjectPathId},
     profile::get,
-    state::{ProfileInstallStage, Project, LinkedData},
+    state::{LinkedData, ProfileInstallStage, Project},
     LoadingBarType, State,
 };
 use futures::try_join;
@@ -30,11 +30,12 @@ pub async fn update_managed_modrinth_version(
     };
 
     // Extract modrinth pack information, if appropriate
-     let Some(LinkedData::ModrinthModpack{
+    let Some(LinkedData::ModrinthModpack {
         project_id: Some(ref project_id),
         version_id: Some(ref version_id),
         ..
-    }) = profile.metadata.linked_data else {
+    }) = profile.metadata.linked_data
+    else {
         return Err(unmanaged_err().into());
     };
 
@@ -105,11 +106,12 @@ pub async fn repair_managed_modrinth(
     .await?;
 
     // Extract modrinth pack information, if appropriate
-    let Some(LinkedData::ModrinthModpack{
+    let Some(LinkedData::ModrinthModpack {
         project_id: Some(ref project_id),
         version_id: Some(ref version_id),
         ..
-    }) = profile.metadata.linked_data else {
+    }) = profile.metadata.linked_data
+    else {
         return Err(unmanaged_err().into());
     };
 

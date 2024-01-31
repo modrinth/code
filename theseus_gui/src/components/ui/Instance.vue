@@ -82,7 +82,9 @@ const install = async (e) => {
       packs.length === 0 ||
       !packs
         .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.modrinth_modpack?.project_id === props.instance.project_id)
+        .find(
+          (pack) => pack.linked_data?.modrinth_modpack?.project_id === props.instance.project_id
+        )
     ) {
       modLoading.value = true
       await pack_install(

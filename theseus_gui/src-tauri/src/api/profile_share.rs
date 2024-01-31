@@ -19,10 +19,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 
 // invoke('plugin:profile_share|profile_share_get_all',profile)
 #[tauri::command]
-pub async fn profile_share_get_all(
-) -> Result<Vec<SharedProfile>> {
-    let res = shared_profile::get_all()
-    .await?;
+pub async fn profile_share_get_all() -> Result<Vec<SharedProfile>> {
+    let res = shared_profile::get_all().await?;
     Ok(res)
 }
 
@@ -30,57 +28,46 @@ pub async fn profile_share_get_all(
 pub async fn profile_share_install(
     profile: SharedProfile,
 ) -> Result<ProfilePathId> {
-    let res = shared_profile::install(profile)
-    .await?;
+    let res = shared_profile::install(profile).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn profile_share_create(
-    path: ProfilePathId
-) -> Result<()> {    
-    shared_profile::create(path)
-    .await?;
-    Ok(())
-}   
-
-#[tauri::command]
-pub async fn profile_share_inbound_sync(
-    path: ProfilePathId
-) -> Result<()> {
-    shared_profile::inbound_sync(path)
-    .await?;
+pub async fn profile_share_create(path: ProfilePathId) -> Result<()> {
+    shared_profile::create(path).await?;
     Ok(())
 }
 
 #[tauri::command]
-pub async fn profile_share_outbound_sync(
-    path : ProfilePathId
-) -> Result<()> {
+pub async fn profile_share_inbound_sync(path: ProfilePathId) -> Result<()> {
+    shared_profile::inbound_sync(path).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn profile_share_outbound_sync(path: ProfilePathId) -> Result<()> {
     shared_profile::outbound_sync(path).await?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn profile_share_generate_share_link(
-    path : ProfilePathId
+    path: ProfilePathId,
 ) -> Result<String> {
     let res = shared_profile::generate_share_link(path).await?;
     Ok(res)
 }
 
 #[tauri::command]
-pub async fn profile_share_accept_share_link(
-    link : String
-) -> Result<()> {
+pub async fn profile_share_accept_share_link(link: String) -> Result<()> {
     shared_profile::accept_share_link(link).await?;
     Ok(())
 }
 
 #[tauri::command]
 pub async fn profile_share_remove_users(
-    path : ProfilePathId,
-    users: Vec<String>
+    path: ProfilePathId,
+    users: Vec<String>,
 ) -> Result<()> {
     shared_profile::remove_shared_profile_users(path, users).await?;
     Ok(())
@@ -88,8 +75,8 @@ pub async fn profile_share_remove_users(
 
 #[tauri::command]
 pub async fn profile_share_remove_links(
-    path : ProfilePathId,
-    links : Vec<String>
+    path: ProfilePathId,
+    links: Vec<String>,
 ) -> Result<()> {
     shared_profile::remove_shared_profile_links(path, links).await?;
     Ok(())

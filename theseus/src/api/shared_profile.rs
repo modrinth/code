@@ -1,9 +1,20 @@
 use std::path::PathBuf;
 
-use chrono::{DateTime,Utc};
+use crate::{
+    config::MODRINTH_API_URL_INTERNAL,
+    prelude::{
+        LinkedData, ModLoader, ProfilePathId, ProjectMetadata, ProjectPathId,
+    },
+    profile,
+    state::{Profile, Profiles},
+    util::{
+        fetch::{fetch_advanced, REQWEST_CLIENT},
+        io,
+    },
+};
+use chrono::{DateTime, Utc};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
-use crate::{config::MODRINTH_API_URL_INTERNAL, prelude::{LinkedData, ModLoader, ProfilePathId, ProjectMetadata, ProjectPathId}, profile, util::{fetch::{fetch_advanced, REQWEST_CLIENT}, io}, state::{Profile, Profiles}};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SharedProfile {
@@ -23,7 +34,7 @@ pub struct SharedProfile {
     pub overrides: Vec<SharedProfileOverride>,
 
     pub share_links: Option<Vec<SharedProfileLink>>,
-    pub users: Option<Vec<String>>
+    pub users: Option<Vec<String>>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -49,23 +60,33 @@ pub struct SharedProfileOverrideHashes {
 // Create a new shared profile from ProfilePathId
 // This converts the LinkedData to a SharedProfile and uploads it to the Labrinth API
 #[tracing::instrument]
-pub async fn create(
-    profile_id: ProfilePathId,
-) -> crate::Result<()> {
+pub async fn create(profile_id: ProfilePathId) -> crate::Result<()> {
     let state = crate::State::get().await?;
 
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     // Currently existing linked data should fail
     match profile.metadata.linked_data {
         Some(LinkedData::SharedProfile { .. }) => {
-            return Err(crate::ErrorKind::OtherError("Profile already linked to a shared profile".to_string()).as_error());
-        },
+            return Err(crate::ErrorKind::OtherError(
+                "Profile already linked to a shared profile".to_string(),
+            )
+            .as_error());
+        }
         Some(LinkedData::ModrinthModpack { .. }) => {
-            return Err(crate::ErrorKind::OtherError("Profile already linked to a modrinth project".to_string()).as_error());
-        },
+            return Err(crate::ErrorKind::OtherError(
+                "Profile already linked to a modrinth project".to_string(),
+            )
+            .as_error());
+        }
         None => {}
     };
 
@@ -73,40 +94,59 @@ pub async fn create(
     let loader = profile.metadata.loader;
     let loader_version = profile.metadata.loader_version;
     let game_version = profile.metadata.game_version;
-    
-    let modrinth_projects : Vec<_> = profile.projects.iter()
-    .filter_map(|(_, project)|if let ProjectMetadata::Modrinth { ref version, .. } = project.metadata {
-        Some(&version.id)
-    } else {
-        None
-    }).collect();
 
-    let override_files : Vec<_> = profile.projects.iter()
-    .filter_map(|(id, project)|if let ProjectMetadata::Inferred { ..} = project.metadata {
-        Some(id)
-    } else {
-        None
-    }).collect();
-     
+    let modrinth_projects: Vec<_> = profile
+        .projects
+        .iter()
+        .filter_map(|(_, project)| {
+            if let ProjectMetadata::Modrinth { ref version, .. } =
+                project.metadata
+            {
+                Some(&version.id)
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    let override_files: Vec<_> = profile
+        .projects
+        .iter()
+        .filter_map(|(id, project)| {
+            if let ProjectMetadata::Inferred { .. } = project.metadata {
+                Some(id)
+            } else {
+                None
+            }
+        })
+        .collect();
+
     // Create the profile on the Labrinth API
     let response = REQWEST_CLIENT
-    .post(
-        format!("{MODRINTH_API_URL_INTERNAL}client/profile"),
-    ).header("Authorization", &creds.session)
-    .json(&serde_json::json!({
-        "name":  name,
-        "loader": loader.as_api_str(),
-        "loader_version": loader_version.map(|x| x.id).unwrap_or_default(),
-        "game": "minecraft-java",
-        "game_version": game_version,
-        "versions": modrinth_projects,
-    }))
-    .send().await?;
+        .post(format!("{MODRINTH_API_URL_INTERNAL}client/profile"))
+        .header("Authorization", &creds.session)
+        .json(&serde_json::json!({
+            "name":  name,
+            "loader": loader.as_api_str(),
+            "loader_version": loader_version.map(|x| x.id).unwrap_or_default(),
+            "game": "minecraft-java",
+            "game_version": game_version,
+            "versions": modrinth_projects,
+        }))
+        .send()
+        .await?;
 
     let profile_response = response.json::<serde_json::Value>().await?;
 
     // Extract the profile ID from the response
-    let shared_profile_id = profile_response["id"].as_str().ok_or_else(|| crate::ErrorKind::OtherError("Could not parse response from Labrinth API".to_string()))?.to_string();
+    let shared_profile_id = profile_response["id"]
+        .as_str()
+        .ok_or_else(|| {
+            crate::ErrorKind::OtherError(
+                "Could not parse response from Labrinth API".to_string(),
+            )
+        })?
+        .to_string();
 
     // Unmanaged projects
     let mut data = vec![]; // 'data' field, giving installation context to labrinth
@@ -114,26 +154,39 @@ pub async fn create(
 
     for override_file in override_files {
         let path = override_file.get_inner_path_unix();
-        let Some(name) = path.0.split('/').last().map(|x| x.to_string()) else { continue };
+        let Some(name) = path.0.split('/').last().map(|x| x.to_string()) else {
+            continue;
+        };
 
         // Load override to file
         let full_path = &override_file.get_full_path(&profile_id).await?;
         let file_bytes = io::read(full_path).await?;
-        let ext = full_path.extension().and_then(|x| x.to_str()).unwrap_or_default();
-        let mime = project_file_type(ext).ok_or_else(|| crate::ErrorKind::OtherError(format!("Could not determine file type for {}", ext)))?;
+        let ext = full_path
+            .extension()
+            .and_then(|x| x.to_str())
+            .unwrap_or_default();
+        let mime = project_file_type(ext).ok_or_else(|| {
+            crate::ErrorKind::OtherError(format!(
+                "Could not determine file type for {}",
+                ext
+            ))
+        })?;
 
         data.push(serde_json::json!({
-            "file_name": name.clone(), 
+            "file_name": name.clone(),
             "install_path": path
         }));
 
-        let part = reqwest::multipart::Part::bytes(file_bytes).file_name(name.clone()).mime_str(mime)?;
+        let part = reqwest::multipart::Part::bytes(file_bytes)
+            .file_name(name.clone())
+            .mime_str(mime)?;
         parts.push((name.clone(), part));
     }
 
     // Build multipart with 'data' field first
     let mut multipart = reqwest::multipart::Form::new().percent_encode_noop();
-    let json_part = reqwest::multipart::Part::text(serde_json::to_string(&data)?);//mime_str("application/json")?;
+    let json_part =
+        reqwest::multipart::Part::text(serde_json::to_string(&data)?); //mime_str("application/json")?;
     multipart = multipart.part("data", json_part);
     for (name, part) in parts {
         multipart = multipart.part(name, part);
@@ -154,7 +207,8 @@ pub async fn create(
             is_owner: true,
         });
         async { Ok(()) }
-    }).await?;
+    })
+    .await?;
 
     // Sync
     crate::State::sync().await?;
@@ -175,7 +229,10 @@ pub fn project_file_type(ext: &str) -> Option<&str> {
 pub async fn get_all() -> crate::Result<Vec<SharedProfile>> {
     let state = crate::State::get().await?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     // First, get list of shared profiles the user has access to
     #[derive(Deserialize, Serialize, Debug)]
@@ -186,24 +243,24 @@ pub async fn get_all() -> crate::Result<Vec<SharedProfile>> {
         pub created: DateTime<Utc>,
         pub updated: DateTime<Utc>,
         pub icon_url: Option<String>,
-        
+
         pub loader: ModLoader,
-        pub game : String,
-        
+        pub game: String,
+
         pub loader_version: String,
         pub game_version: String,
-        
+
         // Present only if we are the owner
         pub share_links: Option<Vec<SharedProfileLink>>,
         pub users: Option<Vec<String>>,
     }
 
     let response = REQWEST_CLIENT
-    .get(
-        format!("{MODRINTH_API_URL_INTERNAL}client/user"),
-    )
-    .header("Authorization", &creds.session)
-    .send().await?.error_for_status()?;
+        .get(format!("{MODRINTH_API_URL_INTERNAL}client/user"))
+        .header("Authorization", &creds.session)
+        .send()
+        .await?
+        .error_for_status()?;
 
     let profiles = response.json::<Vec<SharedProfileResponse>>().await?;
 
@@ -223,18 +280,28 @@ pub async fn get_all() -> crate::Result<Vec<SharedProfile>> {
 
         let id = profile.id;
         let response = REQWEST_CLIENT
-        .get(
-            format!("{MODRINTH_API_URL_INTERNAL}client/profile/{id}/files"),
-        )
-        .header("Authorization", &creds.session)
-        .send().await?.error_for_status()?;
+            .get(format!(
+                "{MODRINTH_API_URL_INTERNAL}client/profile/{id}/files"
+            ))
+            .header("Authorization", &creds.session)
+            .send()
+            .await?
+            .error_for_status()?;
 
         let files = response.json::<SharedFiles>().await?;
-        
+
         shared_profiles.push(SharedProfile {
             id,
             name: profile.name,
-            is_owned: profile.owner_id == state.credentials.read().await.0.as_ref().map(|x| x.user.id.as_str()).unwrap_or_default(),
+            is_owned: profile.owner_id
+                == state
+                    .credentials
+                    .read()
+                    .await
+                    .0
+                    .as_ref()
+                    .map(|x| x.user.id.as_str())
+                    .unwrap_or_default(),
             owner_id: profile.owner_id,
             loader: profile.loader,
             loader_version: profile.loader_version,
@@ -253,7 +320,9 @@ pub async fn get_all() -> crate::Result<Vec<SharedProfile>> {
 }
 
 #[tracing::instrument]
-pub async fn install(shared_profile : SharedProfile) -> crate::Result<ProfilePathId> {
+pub async fn install(
+    shared_profile: SharedProfile,
+) -> crate::Result<ProfilePathId> {
     let state = crate::State::get().await?;
 
     let linked_data = LinkedData::SharedProfile {
@@ -261,7 +330,7 @@ pub async fn install(shared_profile : SharedProfile) -> crate::Result<ProfilePat
         is_owner: shared_profile.is_owned,
     };
 
-    // Create new profile 
+    // Create new profile
     let profile_id = crate::profile::create::profile_create(
         shared_profile.name,
         shared_profile.game_version,
@@ -272,10 +341,14 @@ pub async fn install(shared_profile : SharedProfile) -> crate::Result<ProfilePat
         Some(linked_data),
         None,
         None,
-    ).await?;
+    )
+    .await?;
 
     // Get the profile
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
 
     // TODO: concurrent requests
@@ -296,14 +369,14 @@ pub async fn install(shared_profile : SharedProfile) -> crate::Result<ProfilePat
             &creds,
         )
         .await?;
-   
-        profile.add_project_bytes_directly(&file_override.install_path, file).await?;
-    }
 
+        profile
+            .add_project_bytes_directly(&file_override.install_path, file)
+            .await?;
+    }
 
     Ok(profile_id)
 }
-
 
 // Structure repesenting a synchronization difference between a local profile and a shared profile
 #[derive(Default, Serialize, Deserialize, Clone, Debug)]
@@ -321,82 +394,116 @@ pub struct SharedModpackFileUpdate {
 }
 
 #[tracing::instrument]
-pub async fn check_updated(profile_id: &ProfilePathId, shared_profile : &SharedProfile) -> crate::Result<SharedModpackFileUpdate> {
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+pub async fn check_updated(
+    profile_id: &ProfilePathId,
+    shared_profile: &SharedProfile,
+) -> crate::Result<SharedModpackFileUpdate> {
+    let profile: Profile =
+        profile::get(profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
 
     // Check if the metadata is the same- if different, we return false with no file updates
-    if profile.metadata.name != shared_profile.name ||
-    profile.metadata.loader != shared_profile.loader || 
-    profile.metadata.loader_version.map(|x| x.id).unwrap_or_default() != shared_profile.loader_version || 
-    profile.metadata.game_version != shared_profile.game_version {
+    if profile.metadata.name != shared_profile.name
+        || profile.metadata.loader != shared_profile.loader
+        || profile
+            .metadata
+            .loader_version
+            .map(|x| x.id)
+            .unwrap_or_default()
+            != shared_profile.loader_version
+        || profile.metadata.game_version != shared_profile.game_version
+    {
         return Ok(SharedModpackFileUpdate::default());
     }
-    
+
     // Check if the projects are the same- we check each override by hash and each modrinth project by version id
     let mut modrinth_projects = shared_profile.versions.clone();
     let mut overrides = shared_profile.overrides.clone();
-    let unsynced_projects : Vec<_> = profile.projects.into_iter().filter_map(|(id, project)|{
-        match project.metadata {
-            ProjectMetadata::Modrinth { ref version, .. } => {
-                if modrinth_projects.contains(&version.id) {
-                    modrinth_projects.retain(|x| x != &version.id);
-                }
-                else {
-                    return Some(id);
-                }
-            },
-            ProjectMetadata::Inferred { .. } => {
-                let Some(matching_override) = overrides.iter().position(|o| o.install_path.to_string_lossy().to_string() == id.get_inner_path_unix().0)
-                else {
-                    return Some(id);
-                };
-
-                if let Some(o) = overrides.get(matching_override) {
-                    if o.hashes.sha512 != project.sha512 {
+    let unsynced_projects: Vec<_> = profile
+        .projects
+        .into_iter()
+        .filter_map(|(id, project)| {
+            match project.metadata {
+                ProjectMetadata::Modrinth { ref version, .. } => {
+                    if modrinth_projects.contains(&version.id) {
+                        modrinth_projects.retain(|x| x != &version.id);
+                    } else {
                         return Some(id);
-                    } 
-                } else {
+                    }
+                }
+                ProjectMetadata::Inferred { .. } => {
+                    let Some(matching_override) =
+                        overrides.iter().position(|o| {
+                            o.install_path.to_string_lossy()
+                                == id.get_inner_path_unix().0
+                        })
+                    else {
+                        return Some(id);
+                    };
+
+                    if let Some(o) = overrides.get(matching_override) {
+                        if o.hashes.sha512 != project.sha512 {
+                            return Some(id);
+                        }
+                    } else {
+                        return Some(id);
+                    }
+                    overrides.remove(matching_override);
+                }
+                ProjectMetadata::Unknown => {
+                    // TODO: What to do for unknown projects?
                     return Some(id);
                 }
-                overrides.remove(matching_override);
             }
-            ProjectMetadata::Unknown => {
-                // TODO: What to do for unknown projects?
-                return Some(id)
-            }
-        }
-        None
-    }).collect();
+            None
+        })
+        .collect();
 
     Ok(SharedModpackFileUpdate {
-        is_synced: modrinth_projects.is_empty() && overrides.is_empty() && unsynced_projects.is_empty(),
+        is_synced: modrinth_projects.is_empty()
+            && overrides.is_empty()
+            && unsynced_projects.is_empty(),
         unsynced_projects,
         missing_versions: modrinth_projects,
         missing_overrides: overrides,
     })
-
 }
 
 // Updates projects for a given ProfilePathId from a SharedProfile
 // This updates the local profile to match the shared profile on the Labrinth API
 #[tracing::instrument]
-pub async fn inbound_sync(
-    profile_id: ProfilePathId,
-) -> crate::Result<()> {
+pub async fn inbound_sync(profile_id: ProfilePathId) -> crate::Result<()> {
     let state = crate::State::get().await?;
 
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
 
     // Get linked
     let shared_profile = match profile.metadata.linked_data {
         Some(LinkedData::SharedProfile { ref profile_id, .. }) => profile_id,
-        _ => return Err(crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()).as_error()),
+        _ => {
+            return Err(crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+            .as_error())
+        }
     };
 
     // Get updated shared profile
-    let shared_profile = get_all().await?.into_iter().find(|x| &x.id == shared_profile).ok_or_else(|| crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()))?;
-    
+    let shared_profile = get_all()
+        .await?
+        .into_iter()
+        .find(|x| &x.id == shared_profile)
+        .ok_or_else(|| {
+            crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+        })?;
+
     let update_data = check_updated(&profile_id, &shared_profile).await?;
     if update_data.is_synced {
         return Ok(());
@@ -425,8 +532,10 @@ pub async fn inbound_sync(
             &creds,
         )
         .await?;
-   
-        profile.add_project_bytes_directly(&file_override.install_path, file).await?;
+
+        profile
+            .add_project_bytes_directly(&file_override.install_path, file)
+            .await?;
     }
 
     Ok(())
@@ -435,27 +544,47 @@ pub async fn inbound_sync(
 // Updates metadata for a given ProfilePathId to the Labrinth API
 // Must be an owner of the shared profile
 #[tracing::instrument]
-pub async fn outbound_sync(
-    profile_id: ProfilePathId,
-) -> crate::Result<()> {
+pub async fn outbound_sync(profile_id: ProfilePathId) -> crate::Result<()> {
     let state = crate::State::get().await?;
 
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     // Get linked
     let shared_profile = match profile.metadata.linked_data {
         Some(LinkedData::SharedProfile { profile_id, .. }) => profile_id,
-        _ => return Err(crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()).as_error()),
+        _ => {
+            return Err(crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+            .as_error())
+        }
     };
 
     // Get updated shared profile
-    let shared_profile = get_all().await?.into_iter().find(|x| x.id == shared_profile).ok_or_else(|| crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()))?;
+    let shared_profile = get_all()
+        .await?
+        .into_iter()
+        .find(|x| x.id == shared_profile)
+        .ok_or_else(|| {
+            crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+        })?;
 
     // Check owner
     if !shared_profile.is_owned {
-        return Err(crate::ErrorKind::OtherError("Profile is not owned by the current user".to_string()).as_error());
+        return Err(crate::ErrorKind::OtherError(
+            "Profile is not owned by the current user".to_string(),
+        )
+        .as_error());
     }
 
     // Check if we are synced
@@ -466,20 +595,35 @@ pub async fn outbound_sync(
     }
 
     let unsynced = update_data.unsynced_projects;
-    let projects : Vec<_> = profile.projects.clone().into_iter().filter(|(id, _)| unsynced.contains(id)).collect();
-    let unsynced_modrinth_projects : Vec<_> = projects.iter()
-    .filter_map(|(_, project)|if let ProjectMetadata::Modrinth { ref version, .. } = project.metadata {
-        Some(&version.id)
-    } else {
-        None
-    }).collect();
+    let projects: Vec<_> = profile
+        .projects
+        .clone()
+        .into_iter()
+        .filter(|(id, _)| unsynced.contains(id))
+        .collect();
+    let unsynced_modrinth_projects: Vec<_> = projects
+        .iter()
+        .filter_map(|(_, project)| {
+            if let ProjectMetadata::Modrinth { ref version, .. } =
+                project.metadata
+            {
+                Some(&version.id)
+            } else {
+                None
+            }
+        })
+        .collect();
 
-    let unsynced_override_files : Vec<_> = projects.iter()
-    .filter_map(|(id, project)|if let ProjectMetadata::Inferred { ..} = project.metadata {
-        Some(id)
-    } else {
-        None
-    }).collect();
+    let unsynced_override_files: Vec<_> = projects
+        .iter()
+        .filter_map(|(id, project)| {
+            if let ProjectMetadata::Inferred { .. } = project.metadata {
+                Some(id)
+            } else {
+                None
+            }
+        })
+        .collect();
 
     // Generate new version set
     let mut new_version_set = shared_profile.versions;
@@ -511,35 +655,49 @@ pub async fn outbound_sync(
     let mut data = vec![]; // 'data' field, giving installation context to labrinth
     for override_file in unsynced_override_files {
         let path = override_file.get_inner_path_unix();
-        let Some(name) = path.0.split('/').last().map(|x| x.to_string()) else { continue };
+        let Some(name) = path.0.split('/').last().map(|x| x.to_string()) else {
+            continue;
+        };
 
         // Load override to file
         let full_path = &override_file.get_full_path(&profile_id).await?;
         let file_bytes = io::read(full_path).await?;
-        let ext = full_path.extension().and_then(|x| x.to_str()).unwrap_or_default();
-        let mime = project_file_type(ext).ok_or_else(|| crate::ErrorKind::OtherError(format!("Could not determine file type for {}", ext)))?;
+        let ext = full_path
+            .extension()
+            .and_then(|x| x.to_str())
+            .unwrap_or_default();
+        let mime = project_file_type(ext).ok_or_else(|| {
+            crate::ErrorKind::OtherError(format!(
+                "Could not determine file type for {}",
+                ext
+            ))
+        })?;
 
         data.push(serde_json::json!({
-            "file_name": name.clone(), 
+            "file_name": name.clone(),
             "install_path": path
         }));
 
-        let part = reqwest::multipart::Part::bytes(file_bytes).file_name(name.clone()).mime_str(mime)?;
+        let part = reqwest::multipart::Part::bytes(file_bytes)
+            .file_name(name.clone())
+            .mime_str(mime)?;
         parts.push((name.clone(), part));
     }
 
     // Build multipart with 'data' field first
     let mut multipart = reqwest::multipart::Form::new().percent_encode_noop();
-    let json_part = reqwest::multipart::Part::text(serde_json::to_string(&data)?);//mime_str("application/json")?;
+    let json_part =
+        reqwest::multipart::Part::text(serde_json::to_string(&data)?); //mime_str("application/json")?;
     multipart = multipart.part("data", json_part);
     for (name, part) in parts {
         multipart = multipart.part(name, part);
     }
-    let response = REQWEST_CLIENT.post(
-        format!("{MODRINTH_API_URL_INTERNAL}client/profile/{id}/override"),
-    )
-    .header("Authorization", &creds.session)
-    .multipart(multipart);
+    let response = REQWEST_CLIENT
+        .post(format!(
+            "{MODRINTH_API_URL_INTERNAL}client/profile/{id}/override"
+        ))
+        .header("Authorization", &creds.session)
+        .multipart(multipart);
 
     response.send().await?.error_for_status()?;
 
@@ -555,25 +713,38 @@ pub async fn remove_shared_profile_users(
 ) -> crate::Result<()> {
     let state = crate::State::get().await?;
 
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     let shared_profile = match profile.metadata.linked_data {
         Some(LinkedData::SharedProfile { profile_id, .. }) => profile_id,
-        _ => return Err(crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()).as_error()),
+        _ => {
+            return Err(crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+            .as_error())
+        }
     };
 
     REQWEST_CLIENT
-    .patch(
-        format!("{MODRINTH_API_URL_INTERNAL}client/profile/{shared_profile}"),
-    )
-    .header("Authorization", &creds.session)
-    .json(&serde_json::json!({
-        "remove_users": users,
-    }))
-    .send().await?.error_for_status()?;
-    
+        .patch(format!(
+            "{MODRINTH_API_URL_INTERNAL}client/profile/{shared_profile}"
+        ))
+        .header("Authorization", &creds.session)
+        .json(&serde_json::json!({
+            "remove_users": users,
+        }))
+        .send()
+        .await?
+        .error_for_status()?;
+
     Ok(())
 }
 
@@ -583,24 +754,37 @@ pub async fn remove_shared_profile_links(
 ) -> crate::Result<()> {
     let state = crate::State::get().await?;
 
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     let shared_profile = match profile.metadata.linked_data {
         Some(LinkedData::SharedProfile { profile_id, .. }) => profile_id,
-        _ => return Err(crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()).as_error()),
+        _ => {
+            return Err(crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+            .as_error())
+        }
     };
 
     REQWEST_CLIENT
-    .patch(
-        format!("{MODRINTH_API_URL_INTERNAL}client/profile/{shared_profile}"),
-    )
-    .header("Authorization", &creds.session)
-    .json(&serde_json::json!({
-        "remove_links": links,
-    }))
-    .send().await?.error_for_status()?;
+        .patch(format!(
+            "{MODRINTH_API_URL_INTERNAL}client/profile/{shared_profile}"
+        ))
+        .header("Authorization", &creds.session)
+        .json(&serde_json::json!({
+            "remove_links": links,
+        }))
+        .send()
+        .await?
+        .error_for_status()?;
 
     Ok(())
 }
@@ -610,47 +794,61 @@ pub async fn generate_share_link(
 ) -> crate::Result<String> {
     let state = crate::State::get().await?;
 
-    let profile : Profile = profile::get(&profile_id, None).await?.ok_or_else(|| crate::ErrorKind::UnmanagedProfileError(profile_id.to_string()))?;
+    let profile: Profile =
+        profile::get(&profile_id, None).await?.ok_or_else(|| {
+            crate::ErrorKind::UnmanagedProfileError(profile_id.to_string())
+        })?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     let shared_profile = match profile.metadata.linked_data {
         Some(LinkedData::SharedProfile { profile_id, .. }) => profile_id,
-        _ => return Err(crate::ErrorKind::OtherError("Profile is not linked to a shared profile".to_string()).as_error()),
+        _ => {
+            return Err(crate::ErrorKind::OtherError(
+                "Profile is not linked to a shared profile".to_string(),
+            )
+            .as_error())
+        }
     };
 
     let response = REQWEST_CLIENT
-    .post(
-        format!("{MODRINTH_API_URL_INTERNAL}client/profile/{shared_profile}/share"),
-    )
-    .header("Authorization", &creds.session)
-    .send().await?.error_for_status()?;
+        .post(format!(
+            "{MODRINTH_API_URL_INTERNAL}client/profile/{shared_profile}/share"
+        ))
+        .header("Authorization", &creds.session)
+        .send()
+        .await?
+        .error_for_status()?;
 
     let link = response.json::<SharedProfileLink>().await?;
 
     Ok(generate_deep_link(&link))
 }
 
-fn generate_deep_link(
-    link: &SharedProfileLink
-) -> String {
+fn generate_deep_link(link: &SharedProfileLink) -> String {
     format!("modrinth://shared_profile/{}", link.id)
 }
 
-pub async fn accept_share_link(
-    link: String,
-) -> crate::Result<()> {
+pub async fn accept_share_link(link: String) -> crate::Result<()> {
     let state = crate::State::get().await?;
 
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     REQWEST_CLIENT
-    .post(
-        format!("{MODRINTH_API_URL_INTERNAL}client/profile/share/{link}/accept"),
-    )
-    .header("Authorization", &creds.session)
-    .send().await?.error_for_status()?;
+        .post(format!(
+            "{MODRINTH_API_URL_INTERNAL}client/profile/share/{link}/accept"
+        ))
+        .header("Authorization", &creds.session)
+        .send()
+        .await?
+        .error_for_status()?;
 
     Ok(())
 }

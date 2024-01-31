@@ -3,12 +3,12 @@
 use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
-use crate::state::LinkedData;
 use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
+use crate::state::LinkedData;
 use crate::state::{InnerProjectPathUnix, ProjectMetadata, SideType};
 
 use crate::util::fetch;
@@ -116,15 +116,14 @@ pub async fn get_mod_full_path(
     project_path: &ProjectPathId,
 ) -> crate::Result<PathBuf> {
     if get(profile_path, Some(true)).await?.is_some() {
-        let full_path = io::canonicalize(
-            project_path.get_full_path(&profile_path).await?,
-        )?;
+        let full_path =
+            io::canonicalize(project_path.get_full_path(profile_path).await?)?;
         return Ok(full_path);
     }
 
     Err(crate::ErrorKind::OtherError(format!(
         "Tried to get the full path of a nonexistent or unloaded project at path {}!",
-        project_path.get_full_path(&profile_path).await?.display()
+        project_path.get_full_path(profile_path).await?.display()
     ))
     .into())
 }
@@ -873,13 +872,13 @@ pub async fn try_update_playtime(path: &ProfilePathId) -> crate::Result<()> {
     let res = if updated_recent_playtime > 0 {
         // Create update struct to send to Labrinth
         let modrinth_pack_version_id =
-            profile.metadata.linked_data.and_then(|l| 
-            if let LinkedData::ModrinthModpack {
-                version_id,
-                ..
-            } = l {
-                Some(version_id)
-            } else { None });
+            profile.metadata.linked_data.and_then(|l| {
+                if let LinkedData::ModrinthModpack { version_id, .. } = l {
+                    Some(version_id)
+                } else {
+                    None
+                }
+            });
         let playtime_update_json = json!({
             "seconds": updated_recent_playtime,
             "loader": profile.metadata.loader.to_string(),

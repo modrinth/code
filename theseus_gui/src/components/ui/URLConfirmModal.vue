@@ -24,7 +24,9 @@ defineExpose({
         'version'
       )
       project.value = await useFetch(
-        `https://staging-api.modrinth.com/v2/project/${encodeURIComponent(version.value.project_id)}`,
+        `https://staging-api.modrinth.com/v2/project/${encodeURIComponent(
+          version.value.project_id
+        )}`,
         'project'
       )
     } else {
@@ -33,7 +35,9 @@ defineExpose({
         'project'
       )
       version.value = await useFetch(
-        `https://staging-api.modrinth.com/v2/version/${encodeURIComponent(project.value.versions[0])}`,
+        `https://staging-api.modrinth.com/v2/version/${encodeURIComponent(
+          project.value.versions[0]
+        )}`,
         'version'
       )
     }

@@ -10,8 +10,8 @@ pub mod pack;
 pub mod process;
 pub mod profile;
 pub mod safety;
-pub mod shared_profile;
 pub mod settings;
+pub mod shared_profile;
 pub mod tags;
 
 pub mod data {
@@ -30,7 +30,7 @@ pub mod prelude {
         event::CommandPayload,
         jre, metadata, pack, process,
         profile::{self, create, Profile},
-        settings,
+        settings, shared_profile,
         state::JavaGlobals,
         state::{Dependency, ProfilePathId, ProjectPathId},
         util::{
@@ -38,6 +38,5 @@ pub mod prelude {
             jre::JavaVersion,
         },
         State,
-        shared_profile,
     };
 }

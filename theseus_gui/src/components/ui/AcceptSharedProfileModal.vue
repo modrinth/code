@@ -14,9 +14,9 @@ defineExpose({
   async show(event) {
     linkId.value = event.id
     sharedProfile.value = await useFetch(
-        `https://staging-api.modrinth.com/_internal/share/${encodeURIComponent(event.id)}`,
-        'shared profile'
-      )
+      `https://staging-api.modrinth.com/_internal/share/${encodeURIComponent(event.id)}`,
+      'shared profile'
+    )
 
     confirmModal.value.show()
   },
