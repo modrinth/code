@@ -7,49 +7,40 @@
     >
       <ModrinthLoginScreen :modal="true" :prev-page="signInAfter" :next-page="signInAfter" />
     </Modal>
-    <OverflowMenu
-      v-if="auth?.user"
-      class="btn btn-transparent headless-button"
-      :options="[
-        {
-          id: 'sign-out',
-          color: 'danger',
-          action: async () => {
-            await mrAuth.logout()
-          },
-          hoverFilledOnly: true,
-        },
-      ]"
-      direction="up"
-      position="right"
-    >
-      <Avatar circle size="sm" :src="auth?.user?.avatar_url" />
-      <template #sign-out> <LogOutIcon /> Sign out </template>
-    </OverflowMenu>
-    <OverflowMenu
-      v-else
-      class="btn btn-transparent headless-button"
-      :options="[
-        {
-          id: 'sign-in',
-          color: 'primary',
-          action: () => {
-            modrinthLoginModal?.show()
-          },
-        },
-      ]"
-      direction="up"
-      position="right"
-    >
-      <Avatar circle size="sm" />
-      <template #sign-in> <LogInIcon /> Sign in </template>
-    </OverflowMenu>
+    <PopoutMenu class="btn btn-transparent collapsed-button" direction="up" position="right">
+      <Avatar class="collapsed-button__icon" circle size="sm" :src="auth?.user?.avatar_url" />
+      <span class="collapsed-button__label">
+        <template v-if="auth?.user">
+          {{ auth.user.username }}
+        </template>
+        <template v-else> Sign in </template>
+      </span>
+      <template #menu>
+        <div class="selection-menu">
+          <template v-if="auth?.user">
+            <Button color="danger" transparent hover-filled-only @click="() => mrAuth.logout()">
+              <LogOutIcon /> Sign out
+            </Button>
+          </template>
+          <template v-else>
+            <Button
+              color="primary"
+              transparent
+              hover-filled-only
+              @click="() => $refs.modrinthLoginModal.show()"
+            >
+              <LogInIcon /> Sign in
+            </Button>
+          </template>
+        </div>
+      </template>
+    </PopoutMenu>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { Avatar, OverflowMenu, LogOutIcon, LogInIcon, Modal } from 'omorphia'
+import { Avatar, Button, PopoutMenu, LogOutIcon, LogInIcon, Modal } from 'omorphia'
 
 import { useTheming } from '@/store/state'
 import { useModrinthAuth } from '@/store/mr_auth.js'
@@ -70,12 +61,26 @@ const signInAfter = async () => {
 </script>
 
 <style scoped lang="scss">
-:deep {
-  .headless-button {
-    padding: 0 !important;
-    border-radius: 99999px;
-  }
+.account-dropdown {
+  width: 100%;
+}
 
+.selection-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+
+  width: max-content;
+
+  .btn {
+    width: 100%;
+    justify-content: start;
+  }
+}
+
+:deep {
   .login-screen-modal {
     .modal-container .modal-body {
       width: auto;

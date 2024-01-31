@@ -13,7 +13,7 @@ import {
   Card,
   TextLogo,
   PlusIcon,
-  HamburgerIcon,
+  Avatar,
 } from 'omorphia'
 
 import { useLoading, useTheming } from '@/store/state'
@@ -28,7 +28,13 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
-import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
+import {
+  MinimizeIcon,
+  MaximizeIcon,
+  ChatIcon,
+  ArrowLeftFromLineIcon,
+  ArrowRightFromLineIcon,
+} from '@/assets/icons'
 import { isDev, getOS, isOffline, showLauncherLogsFolder } from '@/helpers/utils.js'
 import {
   mixpanel_track,
@@ -282,8 +288,14 @@ const toggleSidebar = () => {
     >
       <div class="pages-list">
         <div class="square-collapsed-space">
-          <Button transparent icon-only class="collapsed-button" @click="toggleSidebar">
-            <HamburgerIcon />
+          <Button
+            transparent
+            icon-only
+            class="collapsed-button non-collapse"
+            @click="toggleSidebar"
+          >
+            <ArrowRightFromLineIcon v-if="!sidebarOpen" />
+            <ArrowLeftFromLineIcon v-else />
           </Button>
         </div>
       </div>
@@ -327,10 +339,10 @@ const toggleSidebar = () => {
           :to="`/instance/${encodeURIComponent(instance.path)}`"
           class="btn icon-only collapsed-button"
         >
-          <img
+          <Avatar
             class="collapsed-button__icon"
             :src="iconPathAsUrl(instance.metadata?.icon)"
-            :alt="instance.metadata.name"
+            size="xs"
           />
           <span class="collapsed-button__label">{{ instance.metadata.name }}</span>
         </RouterLink>
@@ -358,7 +370,7 @@ const toggleSidebar = () => {
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
-          <span class="collapsed-button__label">Create Profile</span>
+          <span class="collapsed-button__label">Create profile</span>
         </Button>
         <AccountDropdown />
       </div>
@@ -688,37 +700,44 @@ const toggleSidebar = () => {
   }
 }
 
-.collapsed-button {
-  justify-content: flex-start;
+:deep {
+  .non-collapse {
+    width: var(--sidebar-button-size) !important;
+  }
 
-  // width: var(--sidebar-icon-size);
-  height: var(--sidebar-button-size);
-  width: 100%;
+  .collapsed-button {
+    justify-content: flex-start;
 
-  flex-shrink: 0;
-
-  padding: var(--sidebar-padding) !important;
-  border-radius: 99999px;
-  box-shadow: none;
-
-  white-space: nowrap;
-  overflow: hidden;
-
-  transition: all ease-in-out 0.1s;
-
-  .collapsed-button__icon,
-  svg {
-    width: var(--sidebar-icon-size);
-    height: var(--sidebar-icon-size);
+    // width: var(--sidebar-icon-size);
+    height: var(--sidebar-button-size);
+    width: 100%;
 
     flex-shrink: 0;
 
-    border-radius: var(--radius-xs);
-  }
+    padding: var(--sidebar-padding) !important;
+    border-radius: 99999px;
+    box-shadow: none;
 
-  .collapsed-button__label {
-    opacity: var(--sidebar-label-opacity);
+    white-space: nowrap;
+    overflow: hidden;
+
     transition: all ease-in-out 0.1s;
+
+    .collapsed-button__icon,
+    svg {
+      width: var(--sidebar-icon-size) !important;
+      height: var(--sidebar-icon-size) !important;
+
+      flex-shrink: 0;
+
+      border-radius: var(--radius-xs);
+    }
+
+    .collapsed-button__label {
+      word-spacing: normal; // Why is this even needed?
+      opacity: var(--sidebar-label-opacity);
+      transition: all ease-in-out 0.1s;
+    }
   }
 }
 
