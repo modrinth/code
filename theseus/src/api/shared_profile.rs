@@ -58,7 +58,7 @@ pub struct SharedProfileOverrideHashes {
 }
 
 // Simplified version of SharedProfile- this is what is returned from the Labrinth API
-// This is not used, except for requests where we are not a member of the shared profile 
+// This is not used, except for requests where we are not a member of the shared profile
 // (ie: previewing a shared profile from a link, before accepting it)
 #[derive(Deserialize, Serialize, Debug)]
 pub struct SharedProfileResponse {
@@ -68,18 +68,17 @@ pub struct SharedProfileResponse {
     pub created: DateTime<Utc>,
     pub updated: DateTime<Utc>,
     pub icon_url: Option<String>,
-    
+
     pub loader: ModLoader,
-    pub game : String,
-    
+    pub game: String,
+
     pub loader_version: String,
     pub game_version: String,
-    
+
     // Present only if we are the owner
     pub share_links: Option<Vec<SharedProfileLink>>,
     pub users: Option<Vec<String>>,
 }
-
 
 // Create a new shared profile from ProfilePathId
 // This converts the LinkedData to a SharedProfile and uploads it to the Labrinth API
@@ -253,7 +252,10 @@ pub fn project_file_type(ext: &str) -> Option<&str> {
 pub async fn get_all() -> crate::Result<Vec<SharedProfile>> {
     let state = crate::State::get().await?;
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     let response = REQWEST_CLIENT
         .get(format!("{MODRINTH_API_URL_INTERNAL}client/user"))
@@ -325,7 +327,13 @@ pub async fn install(
     shared_profile_id: String,
 ) -> crate::Result<ProfilePathId> {
     let state = crate::State::get().await?;
-    let shared_profile = get_all().await?.into_iter().find(|x| x.id == shared_profile_id).ok_or_else(|| crate::ErrorKind::OtherError("Profile not found".to_string()))?;
+    let shared_profile = get_all()
+        .await?
+        .into_iter()
+        .find(|x| x.id == shared_profile_id)
+        .ok_or_else(|| {
+            crate::ErrorKind::OtherError("Profile not found".to_string())
+        })?;
 
     let linked_data = LinkedData::SharedProfile {
         profile_id: shared_profile.id,
@@ -858,19 +866,22 @@ pub async fn accept_share_link(link: String) -> crate::Result<()> {
 // Gets a shared profile from a share link
 // This is done without accepting it- so would not include any link information, and is only usable for basic info
 pub async fn get_from_link(
-    link: String
+    link: String,
 ) -> crate::Result<SharedProfileResponse> {
     let state = crate::State::get().await?;
 
     let creds = state.credentials.read().await;
-    let creds = creds.0.as_ref().ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
+    let creds = creds
+        .0
+        .as_ref()
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError)?;
 
     let response = REQWEST_CLIENT
-    .get(
-        format!("{MODRINTH_API_URL_INTERNAL}client/share/{link}"),
-    )
-    .header("Authorization", &creds.session)
-    .send().await?.error_for_status()?;
+        .get(format!("{MODRINTH_API_URL_INTERNAL}client/share/{link}"))
+        .header("Authorization", &creds.session)
+        .send()
+        .await?
+        .error_for_status()?;
 
     let profile = response.json::<SharedProfileResponse>().await?;
 

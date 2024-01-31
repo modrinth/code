@@ -527,7 +527,13 @@
           You are not up to date with the shared profile. Click the button to update your instance.
         </span>
       </label>
-      <Button id="share-sync-sync" @click="inboundSyncSharedProfile" :disabled="props.instance.sync_update_version?.is_synced"> <GlobeIcon /> Sync </Button>
+      <Button
+        id="share-sync-sync"
+        @click="inboundSyncSharedProfile"
+        :disabled="props.instance.sync_update_version?.is_synced"
+      >
+        <GlobeIcon /> Sync
+      </Button>
     </div>
     {{ props.instance.sync_update_version }}
   </Card>

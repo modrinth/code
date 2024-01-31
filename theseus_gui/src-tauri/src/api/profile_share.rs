@@ -1,5 +1,8 @@
 use crate::api::Result;
-use theseus::{prelude::*, shared_profile::{SharedProfile,SharedProfileResponse}};
+use theseus::{
+    prelude::*,
+    shared_profile::{SharedProfile, SharedProfileResponse},
+};
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile_share")
@@ -29,8 +32,7 @@ pub async fn profile_share_get_all() -> Result<Vec<SharedProfile>> {
 pub async fn profile_share_install(
     shared_profile_id: String,
 ) -> Result<ProfilePathId> {
-    let res = shared_profile::install(shared_profile_id)
-    .await?;
+    let res = shared_profile::install(shared_profile_id).await?;
     Ok(res)
 }
 
@@ -70,12 +72,11 @@ pub async fn profile_share_accept_share_link(link: String) -> Result<()> {
 // This is done without accepting it- so would not include any link information, and is only usable for basic info
 #[tauri::command]
 pub async fn profile_share_get_link_id(
-    link : String
+    link: String,
 ) -> Result<SharedProfileResponse> {
     let res = shared_profile::get_from_link(link).await?;
     Ok(res)
 }
-
 
 #[tauri::command]
 pub async fn profile_share_remove_users(
