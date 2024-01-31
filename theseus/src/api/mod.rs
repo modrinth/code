@@ -10,6 +10,7 @@ pub mod pack;
 pub mod process;
 pub mod profile;
 pub mod safety;
+pub mod shared_profile;
 pub mod settings;
 pub mod tags;
 
@@ -37,5 +38,6 @@ pub mod prelude {
             jre::JavaVersion,
         },
         State,
+        shared_profile,
     };
 }

@@ -102,10 +102,10 @@ pub async fn profile_create(
         }
 
         profile.metadata.linked_data = linked_data;
-        if let Some(linked_data) = &mut profile.metadata.linked_data {
-            linked_data.locked = Some(
-                linked_data.project_id.is_some()
-                    && linked_data.version_id.is_some(),
+        if let Some(LinkedData::ModrinthModpack{ project_id, version_id, locked, .. }) = &mut profile.metadata.linked_data {
+            *locked = Some(
+                project_id.is_some()
+                    && version_id.is_some(),
             );
         }
 
