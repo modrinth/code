@@ -20,6 +20,16 @@ export async function share_accept(link) {
   return await invoke('plugin:profile_share|profile_share_accept', { link })
 }
 
+/// Removes users from a shared profile
+export async function remove_users(path, users) {
+  return await invoke('plugin:profile_share|profile_share_remove_users', { path, users })
+}
+
+/// Removes links from a shared profile
+export async function remove_links(path, links) {
+  return await invoke('plugin:profile_share|profile_share_remove_links', { path, links })
+}
+
 /// Install a pack from a shared profile id
 export async function share_install(id) {
   return await invoke('plugin:profile_share|profile_share_install', { id })

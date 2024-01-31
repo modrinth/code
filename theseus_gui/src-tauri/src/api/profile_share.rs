@@ -10,7 +10,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_share_inbound_sync,
             profile_share_outbound_sync,
             profile_share_generate_share_link,
-            profile_share_accept_share_link
+            profile_share_accept_share_link,
+            profile_share_remove_users,
+            profile_share_remove_links
         ])
         .build()
 }
@@ -72,5 +74,23 @@ pub async fn profile_share_accept_share_link(
     link : String
 ) -> Result<()> {
     shared_profile::accept_share_link(link).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn profile_share_remove_users(
+    path : ProfilePathId,
+    users: Vec<String>
+) -> Result<()> {
+    shared_profile::remove_shared_profile_users(path, users).await?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn profile_share_remove_links(
+    path : ProfilePathId,
+    links : Vec<String>
+) -> Result<()> {
+    shared_profile::remove_shared_profile_links(path, links).await?;
     Ok(())
 }

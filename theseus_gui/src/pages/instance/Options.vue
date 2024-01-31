@@ -483,8 +483,8 @@
           </div>
         </div>
         <div class="table-cell table-text manage">
-          <div v-tooltip="'Remove project'">
-            <Button icon-only @click="removeSharedPackUser(user)">
+          <div v-tooltip="'Remove user'">
+            <Button icon-only @click="removeSharedPackUser(user)" :disabled="user === installedSharedProfileData.owner_id">
               <TrashIcon />
             </Button>
           </div>
@@ -633,7 +633,8 @@ import {
   get_all,
   outbound_sync,
   inbound_sync,
-  share_generate
+  share_generate,
+  remove_users,
 } from '@/helpers/shared_profiles.js'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
@@ -1040,6 +1041,10 @@ async function inboundSyncSharedProfile() {
 const shareLink = ref(null)
 async function generateShareLink() {
   shareLink.value = await share_generate(props.instance.path).catch(handleError)
+}
+
+async function removeSharedPackUser(user) {
+  await remove_users(props.instance.path, [user]).catch(handleError)
 }
 
 </script>
