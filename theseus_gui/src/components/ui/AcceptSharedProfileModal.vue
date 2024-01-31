@@ -1,10 +1,8 @@
 <script setup>
 import { Modal, Button } from 'omorphia'
 import { ref } from 'vue'
-import { useFetch } from '@/helpers/fetch.js'
-import SearchCard from '@/components/ui/SearchCard.vue'
 import { handleError } from '@/store/notifications.js'
-import { share_accept, share_install } from '@/helpers/shared_profiles.js'
+import { share_accept, share_install, share_get_link_id } from '@/helpers/shared_profiles.js'
 
 const confirmModal = ref(null)
 const linkId = ref(null)
@@ -12,13 +10,11 @@ const sharedProfile = ref(null)
 
 defineExpose({
   async show(event) {
-    linkId.value = event.id
-    sharedProfile.value = await useFetch(
-        `https://staging-api.modrinth.com/_internal/share/${encodeURIComponent(event.id)}`,
-        'shared profile'
-      )
-
+    console.log('showing accept shared profile modal', event)
+    linkId.value = event.link
+    sharedProfile.value = await share_get_link_id(linkId.value).catch(handleError)
     confirmModal.value.show()
+    console.log('sharedProfile')
   },
 })
 
@@ -30,18 +26,12 @@ async function install() {
 </script>
 
 <template>
-  <Modal ref="confirmModal" :header="`Install ${project?.title}`">
+  <Modal ref="confirmModal" :header="`Install ${sharedProfile?.name}`">
     <div class="modal-body">
-      <SearchCard
-        :project="project"
-        class="project-card"
-        :categories="categories"
-        @open="confirmModal.hide()"
-      />
       <div class="button-row">
         <div class="markdown-body">
           <p>
-            Installing <code>{{ sharedProfile.id }}</code> from user {{ sharedProfile.owner_id }}
+            Installing <code>{{ sharedProfile.name }}</code> from user {{ sharedProfile.owner_id }}
           </p>
         </div>
         <div class="button-group">

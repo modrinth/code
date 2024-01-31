@@ -492,9 +492,6 @@
       </div>
     </div>
     <div v-if="installedSharedProfileData.is_owned" class="adjacent-input">
-      your project
-      {{ props.instance.sync_update_version }}
-      :) 
       <label for="share-sync">
           <span class="label__title">Sync shared profile</span>
           <span class="label__description" v-if="props.instance.sync_update_version?.is_synced">
@@ -511,9 +508,7 @@
             <GlobeIcon /> Revert
           </Button>
     </div>
-    <div v-else>
-      not yours
-      {{ props.instance.sync_update_version }}
+    <div v-else class="adjacent-input">
       <label for="share-sync">
           <span class="label__title">Sync shared profile</span>
           <span class="label__description" v-if="props.instance.sync_update_version?.is_synced">
@@ -523,10 +518,11 @@
             You are not up to date with the shared profile. Click the button to update your instance.
           </span>
       </label>
-          <Button id="share-sync-sync" @click="inboundSyncSharedProfile">
+          <Button id="share-sync-sync" @click="inboundSyncSharedProfile" :disabled="props.instance.sync_update_version?.is_synced">
             <GlobeIcon /> Sync
           </Button>
     </div>
+    {{ props.instance.sync_update_version }}
   </Card>
   <Card>
     <div class="label">
