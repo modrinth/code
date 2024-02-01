@@ -432,7 +432,7 @@ import NavRow from '~/components/ui/NavRow.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import Avatar from '~/components/ui/Avatar.vue'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
-import { commonMessages } from '~/utils/common-messages'
+import { commonMessages } from '~/utils/common-messages.ts'
 
 const { formatMessage } = useVIntl()
 
