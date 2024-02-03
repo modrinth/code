@@ -11,7 +11,7 @@
       :size="mode === 'expanded' ? 'xs' : 'sm'"
       :src="
         selectedAccount
-          ? `https://mc-heads.net/avatar/${selectedAccount.id}/128`
+          ? account_heads[selectedAccount.id]
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
@@ -24,7 +24,7 @@
       :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
     >
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://mc-heads.net/avatar/${selectedAccount.id}/128`" />
+        <Avatar size="xs" :src="account_heads[selectedAccount.id]" />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
@@ -42,7 +42,7 @@
       <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="`https://mc-heads.net/avatar/${account.id}/128`" class="icon" />
+            <Avatar :src="account_heads[account.id]" class="icon" />
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
@@ -111,6 +111,8 @@ import {
   remove_user,
   authenticate_begin_flow,
   authenticate_await_completion,
+  selectedAccount,
+  set_account,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
@@ -118,6 +120,7 @@ import { useTheming } from '@/store/theme.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
 import { process_listener } from '@/helpers/events'
+import { cache_new_user_skin, account_heads } from '@/helpers/skin_manager.js'
 
 defineProps({
   mode: {
@@ -145,18 +148,16 @@ defineExpose({
   refreshValues,
 })
 await refreshValues()
+set_account(accounts.value.find((account) => account.id === settings.value.default_user))
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => settings.value.default_user !== account.id)
 )
 
-const selectedAccount = computed(() =>
-  accounts.value.find((account) => account.id === settings.value.default_user)
-)
-
 async function setAccount(account) {
   settings.value.default_user = account.id
   await set(settings.value).catch(handleError)
+  set_account(account)
   emit('change')
 }
 
@@ -184,7 +185,9 @@ async function login() {
   if (loggedIn) {
     await setAccount(loggedIn)
     await refreshValues()
+    set_account(loggedIn)
   }
+  await cache_new_user_skin(loggedIn).catch(handleError)
 
   loginModal.value.hide()
   mixpanel_track('AccountLogIn')
@@ -196,8 +199,10 @@ const logout = async (id) => {
   if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
+    set_account(accounts.value[0])
   } else {
     emit('change')
+    set_account(null)
   }
   mixpanel_track('AccountLogOut')
 }

@@ -4,6 +4,7 @@
  *  and deserialized into a usable JS object.
  */
 import { invoke } from '@tauri-apps/api/tauri'
+import { ref } from 'vue'
 
 // Example function:
 // User goes to auth_url to complete flow, and when completed, authenticate_await_completion() returns the credentials
@@ -67,4 +68,10 @@ export async function users() {
 // Returns Credentials (of user)
 export async function get_user(user) {
   return await invoke('plugin:auth|auth_get_user', { user })
+}
+
+export const selectedAccount = ref(null)
+
+export function set_account(account) {
+  selectedAccount.value = account
 }

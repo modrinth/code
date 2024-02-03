@@ -11,6 +11,7 @@ import {
   Button,
   Notifications,
   XIcon,
+  AnimatedLogo,
   Card,
 } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
@@ -43,6 +44,8 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
+import { cache_users_skins, get_heads } from '@/helpers/skin_manager.js'
+import { SkinManagerIcon } from '@/assets/icons/index.js'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -58,8 +61,11 @@ const onboardingVideo = ref()
 const failureText = ref(null)
 const os = ref('')
 
+const skinManagerLoaded = ref(false)
+
 defineExpose({
   initialize: async () => {
+    get_heads()
     isLoading.value = false
     const {
       native_decorations,
@@ -113,6 +119,7 @@ defineExpose({
     if (showOnboarding.value) {
       onboardingVideo.value.play()
     }
+    skinManagerLoaded.value = await cache_users_skins().catch(handleError)
   },
   failure: async (e) => {
     isLoading.value = false
@@ -319,6 +326,17 @@ command_listener(async (e) => {
           <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
+          <RouterLink
+            v-if="!offline && skinManagerLoaded"
+            v-tooltip="'Skin Manager'"
+            to="/SkinManager"
+            class="btn icon-only collapsed-button"
+          >
+            <SkinManagerIcon />
+          </RouterLink>
+          <Button v-if="!offline && !skinManagerLoaded" class="btn icon-only collapsed-button" >
+            <AnimatedLogo />
+          </Button>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
           </Suspense>

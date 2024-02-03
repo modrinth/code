@@ -11,6 +11,7 @@ pub mod process;
 pub mod profile;
 pub mod safety;
 pub mod settings;
+pub mod skin_manager;
 pub mod tags;
 
 pub mod data {
