@@ -248,33 +248,22 @@ pub struct ManyUpdateData {
 
 #[post("update")]
 pub async fn update_files(
-    req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let update_data = update_data.into_inner();
-    let mut loader_fields = HashMap::new();
-    let mut game_versions = vec![];
-    for gv in update_data.game_versions.into_iter().flatten() {
-        game_versions.push(serde_json::json!(gv.clone()));
-    }
-    if !game_versions.is_empty() {
-        loader_fields.insert("game_versions".to_string(), game_versions);
-    }
     let update_data = v3::version_file::ManyUpdateData {
         loaders: update_data.loaders.clone(),
         version_types: update_data.version_types.clone(),
-        loader_fields: Some(loader_fields),
+        game_versions: update_data.game_versions.clone(),
         algorithm: update_data.algorithm,
         hashes: update_data.hashes,
     };
 
-    let response =
-        v3::version_file::update_files(req, pool, redis, web::Json(update_data), session_queue)
-            .await
-            .or_else(v2_reroute::flatten_404_error)?;
+    let response = v3::version_file::update_files(pool, redis, web::Json(update_data))
+        .await
+        .or_else(v2_reroute::flatten_404_error)?;
 
     // Convert response to V2 format
     match v2_reroute::extract_ok_json::<HashMap<String, Version>>(response).await {

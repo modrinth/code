@@ -9,6 +9,8 @@ use crate::models::teams::ProjectPermissions;
 use crate::queue::session::AuthQueue;
 use crate::{database, models};
 use actix_web::{web, HttpRequest, HttpResponse};
+use dashmap::DashMap;
+use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -305,27 +307,14 @@ pub struct ManyUpdateData {
     pub algorithm: Option<String>, // Defaults to calculation based on size of hash
     pub hashes: Vec<String>,
     pub loaders: Option<Vec<String>>,
-    pub loader_fields: Option<HashMap<String, Vec<serde_json::Value>>>,
+    pub game_versions: Option<Vec<String>>,
     pub version_types: Option<Vec<VersionType>>,
 }
 pub async fn update_files(
-    req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
     update_data: web::Json<ManyUpdateData>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_option = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::VERSION_READ]),
-    )
-    .await
-    .map(|x| x.1)
-    .ok();
-
     let algorithm = update_data
         .algorithm
         .clone()
@@ -338,16 +327,36 @@ pub async fn update_files(
     )
     .await?;
 
-    let projects = database::models::Project::get_many_ids(
-        &files.iter().map(|x| x.project_id).collect::<Vec<_>>(),
-        &**pool,
-        &redis,
+    // TODO: de-hardcode this and actually use version fields system
+    let update_version_ids = sqlx::query!(
+        "
+        SELECT v.id version_id, v.mod_id mod_id
+        FROM versions v
+        INNER JOIN version_fields vf ON vf.field_id = 3 AND v.id = vf.version_id
+        INNER JOIN loader_field_enum_values lfev ON vf.enum_value = lfev.id AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2::varchar[]))
+        INNER JOIN loaders_versions lv ON lv.version_id = v.id
+        INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
+        WHERE v.mod_id = ANY($1) AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))
+        ORDER BY v.date_published ASC
+        ",
+        &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),
+        &update_data.game_versions.clone().unwrap_or_default(),
+        &update_data.loaders.clone().unwrap_or_default(),
+        &update_data.version_types.clone().unwrap_or_default().iter().map(|x| x.to_string()).collect::<Vec<_>>(),
     )
-    .await?;
-    let all_versions = database::models::Version::get_many(
-        &projects
-            .iter()
-            .flat_map(|x| x.versions.clone())
+        .fetch(&**pool)
+        .try_fold(DashMap::new(), |acc : DashMap<_,Vec<database::models::ids::VersionId>>, m| {
+            acc.entry(database::models::ProjectId(m.mod_id))
+                .or_default()
+                .push(database::models::VersionId(m.version_id));
+            async move { Ok(acc) }
+        })
+        .await?;
+
+    let versions = database::models::Version::get_many(
+        &update_version_ids
+            .into_iter()
+            .filter_map(|x| x.1.last().copied())
             .collect::<Vec<_>>(),
         &**pool,
         &redis,
@@ -355,50 +364,16 @@ pub async fn update_files(
     .await?;
 
     let mut response = HashMap::new();
-
-    for project in projects {
-        for file in files.iter().filter(|x| x.project_id == project.inner.id) {
-            let version = all_versions
-                .iter()
-                .filter(|x| x.inner.project_id == file.project_id)
-                .filter(|x| {
-                    // TODO: Behaviour here is repeated in a few other filtering places, should be abstracted
-                    let mut bool = true;
-
-                    if let Some(version_types) = &update_data.version_types {
-                        bool &= version_types
-                            .iter()
-                            .any(|y| y.as_str() == x.inner.version_type);
-                    }
-                    if let Some(loaders) = &update_data.loaders {
-                        bool &= x.loaders.iter().any(|y| loaders.contains(y));
-                    }
-                    if let Some(loader_fields) = &update_data.loader_fields {
-                        for (key, values) in loader_fields {
-                            bool &= if let Some(x_vf) =
-                                x.version_fields.iter().find(|y| y.field_name == *key)
-                            {
-                                values.iter().any(|v| x_vf.value.contains_json_value(v))
-                            } else {
-                                true
-                            };
-                        }
-                    }
-
-                    bool
-                })
-                .sorted()
-                .last();
-
-            if let Some(version) = version {
-                if is_visible_version(&version.inner, &user_option, &pool, &redis).await? {
-                    if let Some(hash) = file.hashes.get(&algorithm) {
-                        response.insert(
-                            hash.clone(),
-                            models::projects::Version::from(version.clone()),
-                        );
-                    }
-                }
+    for file in files {
+        if let Some(version) = versions
+            .iter()
+            .find(|x| x.inner.project_id == file.project_id)
+        {
+            if let Some(hash) = file.hashes.get(&algorithm) {
+                response.insert(
+                    hash.clone(),
+                    models::projects::Version::from(version.clone()),
+                );
             }
         }
     }

@@ -338,9 +338,7 @@ impl ApiVersion for ApiV3 {
             json["loaders"] = serde_json::to_value(loaders).unwrap();
         }
         if let Some(game_versions) = game_versions {
-            json["loader_fields"] = json!({
-                "game_versions": game_versions,
-            });
+            json["game_versions"] = serde_json::to_value(game_versions).unwrap();
         }
         if let Some(version_types) = version_types {
             json["version_types"] = serde_json::to_value(version_types).unwrap();
