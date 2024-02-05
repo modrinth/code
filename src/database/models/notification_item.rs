@@ -3,7 +3,6 @@ use crate::database::{models::DatabaseError, redis::RedisPool};
 use crate::models::notifications::NotificationBody;
 use chrono::{DateTime, Utc};
 use futures::TryStreamExt;
-use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 const USER_NOTIFICATIONS_NAMESPACE: &str = "user_notifications";
@@ -46,37 +45,15 @@ impl NotificationBuilder {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         redis: &RedisPool,
     ) -> Result<(), DatabaseError> {
-        let mut notifications = Vec::new();
-        for user in users {
-            let id = generate_notification_id(&mut *transaction).await?;
+        let notification_ids =
+            generate_many_notification_ids(users.len(), &mut *transaction).await?;
 
-            notifications.push(Notification {
-                id,
-                user_id: user,
-                body: self.body.clone(),
-                read: false,
-                created: Utc::now(),
-            });
-        }
-
-        Notification::insert_many(&notifications, transaction, redis).await?;
-
-        Ok(())
-    }
-}
-
-impl Notification {
-    pub async fn insert_many(
-        notifications: &[Notification],
-        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-        redis: &RedisPool,
-    ) -> Result<(), DatabaseError> {
-        let notification_ids = notifications.iter().map(|n| n.id.0).collect_vec();
-        let user_ids = notifications.iter().map(|n| n.user_id.0).collect_vec();
-        let bodies = notifications
+        let body = serde_json::value::to_value(&self.body)?;
+        let bodies = notification_ids
             .iter()
-            .map(|n| Ok(serde_json::value::to_value(n.body.clone())?))
-            .collect::<Result<Vec<_>, DatabaseError>>()?;
+            .map(|_| body.clone())
+            .collect::<Vec<_>>();
+
         sqlx::query!(
             "
             INSERT INTO notifications (
@@ -84,22 +61,23 @@ impl Notification {
             )
             SELECT * FROM UNNEST($1::bigint[], $2::bigint[], $3::jsonb[])
             ",
-            &notification_ids[..],
-            &user_ids[..],
+            &notification_ids
+                .into_iter()
+                .map(|x| x.0)
+                .collect::<Vec<_>>()[..],
+            &users.iter().map(|x| x.0).collect::<Vec<_>>()[..],
             &bodies[..],
         )
         .execute(&mut **transaction)
         .await?;
 
-        Notification::clear_user_notifications_cache(
-            notifications.iter().map(|n| &n.user_id),
-            redis,
-        )
-        .await?;
+        Notification::clear_user_notifications_cache(&users, redis).await?;
 
         Ok(())
     }
+}
 
+impl Notification {
     pub async fn get<'a, 'b, E>(
         id: NotificationId,
         executor: E,

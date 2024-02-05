@@ -38,11 +38,15 @@ pub fn random_base62(n: usize) -> u64 {
 /// This method panics if `n` is 0 or greater than 11, since a `u64`
 /// can only represent up to 11 character base62 strings
 pub fn random_base62_rng<R: rand::RngCore>(rng: &mut R, n: usize) -> u64 {
+    random_base62_rng_range(rng, n, n)
+}
+
+pub fn random_base62_rng_range<R: rand::RngCore>(rng: &mut R, n_min: usize, n_max: usize) -> u64 {
     use rand::Rng;
-    assert!(n > 0 && n <= 11);
+    assert!(n_min > 0 && n_max <= 11 && n_min <= n_max);
     // gen_range is [low, high): max value is `MULTIPLES[n] - 1`,
     // which is n characters long when encoded
-    rng.gen_range(MULTIPLES[n - 1]..MULTIPLES[n])
+    rng.gen_range(MULTIPLES[n_min - 1]..MULTIPLES[n_max])
 }
 
 const MULTIPLES: [u64; 12] = [

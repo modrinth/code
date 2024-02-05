@@ -1,6 +1,6 @@
 use super::DatabaseError;
 use crate::models::ids::base62_impl::to_base62;
-use crate::models::ids::random_base62_rng;
+use crate::models::ids::{random_base62_rng, random_base62_rng_range};
 use censor::Censor;
 use serde::{Deserialize, Serialize};
 use sqlx::sqlx_macros::Type;
@@ -37,6 +37,37 @@ macro_rules! generate_ids {
             }
 
             Ok($id_function(id as i64))
+        }
+    };
+}
+
+macro_rules! generate_bulk_ids {
+    ($vis:vis $function_name:ident, $return_type:ty, $select_stmnt:literal, $id_function:expr) => {
+        $vis async fn $function_name(
+            count: usize,
+            con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+        ) -> Result<Vec<$return_type>, DatabaseError> {
+            let mut rng = rand::thread_rng();
+            let mut retry_count = 0;
+
+            // Check if ID is unique
+            loop {
+                let base = random_base62_rng_range(&mut rng, 1, 10) as i64;
+                let ids = (0..count).map(|x| base + x as i64).collect::<Vec<_>>();
+
+                let results = sqlx::query!($select_stmnt, &ids)
+                    .fetch_one(&mut **con)
+                    .await?;
+
+                if !results.exists.unwrap_or(true) {
+                    return Ok(ids.into_iter().map(|x| $id_function(x)).collect());
+                }
+
+                retry_count += 1;
+                if retry_count > ID_RETRY_COUNT {
+                    return Err(DatabaseError::RandomId);
+                }
+            }
         }
     };
 }
@@ -118,6 +149,13 @@ generate_ids!(
     NotificationId,
     8,
     "SELECT EXISTS(SELECT 1 FROM notifications WHERE id=$1)",
+    NotificationId
+);
+
+generate_bulk_ids!(
+    pub generate_many_notification_ids,
+    NotificationId,
+    "SELECT EXISTS(SELECT 1 FROM notifications WHERE id = ANY($1))",
     NotificationId
 );
 
