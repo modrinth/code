@@ -128,9 +128,7 @@ pub async fn paypal_webhook(
             .await?;
 
             if let Some(result) = result {
-                let mtx =
-                    payouts.lock_user_payouts(crate::models::ids::UserId(result.user_id as u64));
-                let _guard = mtx.lock().await;
+                let _guard = payouts.payouts_locks.lock().await;
 
                 sqlx::query!(
                     "
@@ -249,9 +247,7 @@ pub async fn tremendous_webhook(
             .await?;
 
             if let Some(result) = result {
-                let mtx =
-                    payouts.lock_user_payouts(crate::models::ids::UserId(result.user_id as u64));
-                let _guard = mtx.lock().await;
+                let _guard = payouts.payouts_locks.lock().await;
 
                 sqlx::query!(
                     "
@@ -371,8 +367,7 @@ pub async fn create_payout(
         ));
     }
 
-    let mtx = payouts_queue.lock_user_payouts(user.id.into());
-    let _guard = mtx.lock().await;
+    let _guard = payouts_queue.payouts_locks.lock().await;
 
     if user.balance < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(

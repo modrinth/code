@@ -1,4 +1,3 @@
-use crate::models::ids::UserId;
 use crate::models::payouts::{
     PayoutDecimal, PayoutInterval, PayoutMethod, PayoutMethodFee, PayoutMethodType,
 };
@@ -7,7 +6,6 @@ use crate::util::env::parse_var;
 use crate::{database::redis::RedisPool, models::projects::MonetizationStatus};
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
-use dashmap::DashMap;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
@@ -16,13 +14,12 @@ use serde_json::Value;
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::sync::{Mutex, RwLock};
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
-    payouts_locks: DashMap<UserId, Arc<Mutex<()>>>,
+    pub payouts_locks: Mutex<()>,
 }
 
 #[derive(Clone)]
@@ -49,7 +46,7 @@ impl PayoutsQueue {
         PayoutsQueue {
             credential: RwLock::new(None),
             payout_options: RwLock::new(None),
-            payouts_locks: DashMap::new(),
+            payouts_locks: Mutex::new(()),
         }
     }
 
@@ -346,8 +343,14 @@ impl PayoutsQueue {
                     "OEFTMSBA5ELH",
                     "A3CQK6UHNV27",
                 ];
-                const SUPPORTED_METHODS: &[&str] =
-                    &["merchant_cards", "visa", "bank", "ach", "visa_card"];
+                const SUPPORTED_METHODS: &[&str] = &[
+                    "merchant_cards",
+                    "merchant_card",
+                    "visa",
+                    "bank",
+                    "ach",
+                    "visa_card",
+                ];
 
                 if !SUPPORTED_METHODS.contains(&&*product.category)
                     || BLACKLISTED_IDS.contains(&&*product.id)
@@ -505,13 +508,6 @@ impl PayoutsQueue {
         };
 
         Ok(options.options)
-    }
-
-    pub fn lock_user_payouts(&self, user_id: UserId) -> Arc<Mutex<()>> {
-        self.payouts_locks
-            .entry(user_id)
-            .or_insert_with(|| Arc::new(Mutex::new(())))
-            .clone()
     }
 }
 
