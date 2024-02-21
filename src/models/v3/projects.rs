@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 /// The ID of a specific project, encoded as base62 for usage in the API
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Debug, Hash)]
 #[serde(from = "Base62Id")]
 #[serde(into = "Base62Id")]
 pub struct ProjectId(pub u64);

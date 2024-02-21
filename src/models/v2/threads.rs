@@ -30,6 +30,8 @@ pub enum LegacyMessageBody {
         body: String,
         #[serde(default)]
         private: bool,
+        #[serde(default)]
+        hide_identity: bool,
         replying_to: Option<ThreadMessageId>,
         #[serde(default)]
         associated_images: Vec<ImageId>,
@@ -74,11 +76,13 @@ impl From<crate::models::v3::threads::MessageBody> for LegacyMessageBody {
                 private,
                 replying_to,
                 associated_images,
+                hide_identity,
             } => LegacyMessageBody::Text {
                 body,
                 private,
                 replying_to,
                 associated_images,
+                hide_identity,
             },
             crate::models::v3::threads::MessageBody::StatusChange {
                 new_status,

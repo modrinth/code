@@ -14,8 +14,9 @@ extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
 use util::cors::default_cors;
 
+use crate::queue::moderation::AutomatedModerationQueue;
 use crate::{
-    queue::payouts::process_payout,
+    // queue::payouts::process_payout,
     search::indexing::index_projects,
     util::env::{parse_strings_from_var, parse_var},
 };
@@ -52,6 +53,7 @@ pub struct LabrinthConfig {
     pub payouts_queue: web::Data<PayoutsQueue>,
     pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<RwLock<ActiveSockets>>,
+    pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
 }
 
 pub fn app_setup(
@@ -66,6 +68,17 @@ pub fn app_setup(
         "Starting Labrinth on {}",
         dotenvy::var("BIND_ADDR").unwrap()
     );
+
+    let automated_moderation_queue = web::Data::new(AutomatedModerationQueue::default());
+
+    let automated_moderation_queue_ref = automated_moderation_queue.clone();
+    let pool_ref = pool.clone();
+    let redis_pool_ref = redis_pool.clone();
+    actix_rt::spawn(async move {
+        automated_moderation_queue_ref
+            .task(pool_ref, redis_pool_ref)
+            .await;
+    });
 
     let mut scheduler = scheduler::Scheduler::new();
 
@@ -201,25 +214,25 @@ pub fn app_setup(
         });
     }
 
-    {
-        let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
-        let client_ref = clickhouse.clone();
-        scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
-            let pool_ref = pool_ref.clone();
-            let redis_ref = redis_ref.clone();
-            let client_ref = client_ref.clone();
-
-            async move {
-                info!("Started running payouts");
-                let result = process_payout(&pool_ref, &redis_ref, &client_ref).await;
-                if let Err(e) = result {
-                    warn!("Payouts run failed: {:?}", e);
-                }
-                info!("Done running payouts");
-            }
-        });
-    }
+    // {
+    //     let pool_ref = pool.clone();
+    //     let redis_ref = redis_pool.clone();
+    //     let client_ref = clickhouse.clone();
+    //     scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
+    //         let pool_ref = pool_ref.clone();
+    //         let redis_ref = redis_ref.clone();
+    //         let client_ref = client_ref.clone();
+    //
+    //         async move {
+    //             info!("Started running payouts");
+    //             let result = process_payout(&pool_ref, &redis_ref, &client_ref).await;
+    //             if let Err(e) = result {
+    //                 warn!("Payouts run failed: {:?}", e);
+    //             }
+    //             info!("Done running payouts");
+    //         }
+    //     });
+    // }
 
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),
@@ -241,6 +254,7 @@ pub fn app_setup(
         payouts_queue,
         analytics_queue,
         active_sockets,
+        automated_moderation_queue,
     }
 }
 
@@ -272,6 +286,7 @@ pub fn app_config(cfg: &mut web::ServiceConfig, labrinth_config: LabrinthConfig)
     .app_data(web::Data::new(labrinth_config.clickhouse.clone()))
     .app_data(web::Data::new(labrinth_config.maxmind.clone()))
     .app_data(labrinth_config.active_sockets.clone())
+    .app_data(labrinth_config.automated_moderation_queue.clone())
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -396,6 +411,8 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
     failed |= check_var::<u64>("PAYOUTS_BUDGET");
+
+    failed |= check_var::<String>("FLAME_ANVIL_URL");
 
     failed
 }

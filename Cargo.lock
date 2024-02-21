@@ -2343,6 +2343,7 @@ dependencies = [
  "log",
  "maxminddb",
  "meilisearch-sdk",
+ "murmur2",
  "rand",
  "rand_chacha",
  "redis",
@@ -2694,6 +2695,12 @@ dependencies = [
  "wasi",
  "windows-sys 0.48.0",
 ]
+
+[[package]]
+name = "murmur2"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb585ade2549a017db2e35978b77c319214fa4b37cede841e27954dd6e8f3ca8"
 
 [[package]]
 name = "native-tls"

@@ -40,12 +40,12 @@ impl ResponseError for ARError {
                 response.insert_header(("x-ratelimit-reset", reset.to_string()));
                 response.json(ApiError {
                     error: "ratelimit_error",
-                    description: &self.to_string(),
+                    description: self.to_string(),
                 })
             }
             _ => actix_web::HttpResponse::build(self.status_code()).json(ApiError {
                 error: "ratelimit_error",
-                description: &self.to_string(),
+                description: self.to_string(),
             }),
         }
     }

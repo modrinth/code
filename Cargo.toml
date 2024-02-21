@@ -51,6 +51,7 @@ sha1 = { version = "0.6.1", features = ["std"] }
 sha2 = "0.9.9"
 hmac = "0.11.0"
 argon2 = { version = "0.5.0", features = ["std"] }
+murmur2 = "0.1.0"
 bitflags = "2.4.0"
 hex = "0.4.3"
 zxcvbn = "2.2.2"

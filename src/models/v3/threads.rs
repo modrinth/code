@@ -41,6 +41,8 @@ pub enum MessageBody {
         body: String,
         #[serde(default)]
         private: bool,
+        #[serde(default)]
+        hide_identity: bool,
         replying_to: Option<ThreadMessageId>,
         #[serde(default)]
         associated_images: Vec<ImageId>,

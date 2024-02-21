@@ -20,6 +20,7 @@ use crate::models::projects::{
 };
 use crate::models::teams::ProjectPermissions;
 use crate::models::threads::MessageBody;
+use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
@@ -229,6 +230,7 @@ pub struct EditProject {
     pub monetization_status: Option<MonetizationStatus>,
 }
 
+#[allow(clippy::too_many_arguments)]
 pub async fn project_edit(
     req: HttpRequest,
     info: web::Path<(String,)>,
@@ -237,6 +239,7 @@ pub async fn project_edit(
     new_project: web::Json<EditProject>,
     redis: web::Data<RedisPool>,
     session_queue: web::Data<AuthQueue>,
+    moderation_queue: web::Data<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(
         &req,
@@ -362,6 +365,10 @@ pub async fn project_edit(
                     )
                     .execute(&mut *transaction)
                     .await?;
+
+                    moderation_queue
+                        .projects
+                        .insert(project_item.inner.id.into());
                 }
 
                 if status.is_approved() && !project_item.inner.status.is_approved() {

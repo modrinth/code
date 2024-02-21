@@ -137,7 +137,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::ImageError(..) => "invalid_image",
                 CreateError::RerouteError(..) => "reroute_error",
             },
-            description: &self.to_string(),
+            description: self.to_string(),
         })
     }
 }

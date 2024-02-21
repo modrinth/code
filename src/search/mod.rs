@@ -52,7 +52,7 @@ impl actix_web::ResponseError for SearchError {
                 SearchError::InvalidIndex(..) => "invalid_input",
                 SearchError::FormatError(..) => "invalid_input",
             },
-            description: &self.to_string(),
+            description: self.to_string(),
         })
     }
 }

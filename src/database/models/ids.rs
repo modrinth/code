@@ -2,6 +2,8 @@ use super::DatabaseError;
 use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::{random_base62_rng, random_base62_rng_range};
 use censor::Censor;
+use rand::SeedableRng;
+use rand_chacha::ChaCha20Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::sqlx_macros::Type;
 
@@ -12,7 +14,7 @@ macro_rules! generate_ids {
         $vis async fn $function_name(
             con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         ) -> Result<$return_type, DatabaseError> {
-            let mut rng = rand::thread_rng();
+            let mut rng = ChaCha20Rng::from_entropy();
             let length = $id_length;
             let mut id = random_base62_rng(&mut rng, length);
             let mut retry_count = 0;

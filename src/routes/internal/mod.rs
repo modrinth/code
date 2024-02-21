@@ -1,5 +1,6 @@
 pub(crate) mod admin;
 pub mod flows;
+pub mod moderation;
 pub mod pats;
 pub mod session;
 
@@ -12,10 +13,10 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
         actix_web::web::scope("_internal")
             .wrap(default_cors())
             .configure(admin::config)
-            // TODO: write tests that catch these
             .configure(oauth_clients::config)
             .configure(session::config)
             .configure(flows::config)
-            .configure(pats::config),
+            .configure(pats::config)
+            .configure(moderation::config),
     );
 }

@@ -379,6 +379,7 @@ pub async fn thread_send_message(
         body,
         replying_to,
         private,
+        hide_identity,
         ..
     } = &new_message.body
     {
@@ -391,6 +392,12 @@ pub async fn thread_send_message(
         if *private && !user.role.is_mod() {
             return Err(ApiError::InvalidInput(
                 "You are not allowed to send private messages!".to_string(),
+            ));
+        }
+
+        if *hide_identity && !user.role.is_mod() {
+            return Err(ApiError::InvalidInput(
+                "You are not allowed to send masked messages!".to_string(),
             ));
         }
 

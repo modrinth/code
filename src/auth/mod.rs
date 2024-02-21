@@ -72,7 +72,7 @@ impl actix_web::ResponseError for AuthenticationError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: self.error_name(),
-            description: &self.to_string(),
+            description: self.to_string(),
         })
     }
 }

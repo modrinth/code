@@ -123,8 +123,47 @@ pub enum ApiError {
     Mail(#[from] crate::auth::email::MailError),
     #[error("Error while rerouting request: {0}")]
     Reroute(#[from] reqwest::Error),
+    #[error("Unable to read Zip Archive: {0}")]
+    Zip(#[from] zip::result::ZipError),
+    #[error("IO Error: {0}")]
+    Io(#[from] std::io::Error),
     #[error("Resource not found")]
     NotFound,
+}
+
+impl ApiError {
+    pub fn as_api_error<'a>(&self) -> crate::models::error::ApiError<'a> {
+        crate::models::error::ApiError {
+            error: match self {
+                ApiError::Env(..) => "environment_error",
+                ApiError::SqlxDatabase(..) => "database_error",
+                ApiError::Database(..) => "database_error",
+                ApiError::Authentication(..) => "unauthorized",
+                ApiError::CustomAuthentication(..) => "unauthorized",
+                ApiError::Xml(..) => "xml_error",
+                ApiError::Json(..) => "json_error",
+                ApiError::Search(..) => "search_error",
+                ApiError::Indexing(..) => "indexing_error",
+                ApiError::FileHosting(..) => "file_hosting_error",
+                ApiError::InvalidInput(..) => "invalid_input",
+                ApiError::Validation(..) => "invalid_input",
+                ApiError::Payments(..) => "payments_error",
+                ApiError::Discord(..) => "discord_error",
+                ApiError::Turnstile => "turnstile_error",
+                ApiError::Decoding(..) => "decoding_error",
+                ApiError::ImageParse(..) => "invalid_image",
+                ApiError::PasswordHashing(..) => "password_hashing_error",
+                ApiError::PasswordStrengthCheck(..) => "strength_check_error",
+                ApiError::Mail(..) => "mail_error",
+                ApiError::Clickhouse(..) => "clickhouse_error",
+                ApiError::Reroute(..) => "reroute_error",
+                ApiError::NotFound => "not_found",
+                ApiError::Zip(..) => "zip_error",
+                ApiError::Io(..) => "io_error",
+            },
+            description: self.to_string(),
+        }
+    }
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -153,37 +192,12 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Mail(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::Reroute(..) => StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::NotFound => StatusCode::NOT_FOUND,
+            ApiError::Zip(..) => StatusCode::BAD_REQUEST,
+            ApiError::Io(..) => StatusCode::BAD_REQUEST,
         }
     }
 
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(crate::models::error::ApiError {
-            error: match self {
-                ApiError::Env(..) => "environment_error",
-                ApiError::SqlxDatabase(..) => "database_error",
-                ApiError::Database(..) => "database_error",
-                ApiError::Authentication(..) => "unauthorized",
-                ApiError::CustomAuthentication(..) => "unauthorized",
-                ApiError::Xml(..) => "xml_error",
-                ApiError::Json(..) => "json_error",
-                ApiError::Search(..) => "search_error",
-                ApiError::Indexing(..) => "indexing_error",
-                ApiError::FileHosting(..) => "file_hosting_error",
-                ApiError::InvalidInput(..) => "invalid_input",
-                ApiError::Validation(..) => "invalid_input",
-                ApiError::Payments(..) => "payments_error",
-                ApiError::Discord(..) => "discord_error",
-                ApiError::Turnstile => "turnstile_error",
-                ApiError::Decoding(..) => "decoding_error",
-                ApiError::ImageParse(..) => "invalid_image",
-                ApiError::PasswordHashing(..) => "password_hashing_error",
-                ApiError::PasswordStrengthCheck(..) => "strength_check_error",
-                ApiError::Mail(..) => "mail_error",
-                ApiError::Clickhouse(..) => "clickhouse_error",
-                ApiError::Reroute(..) => "reroute_error",
-                ApiError::NotFound => "not_found",
-            },
-            description: &self.to_string(),
-        })
+        HttpResponse::build(self.status_code()).json(self.as_api_error())
     }
 }

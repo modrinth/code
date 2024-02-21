@@ -2,7 +2,7 @@ use super::ApiError;
 use crate::models::projects::Project;
 use crate::models::v2::projects::LegacyProject;
 use crate::queue::session::AuthQueue;
-use crate::routes::v3;
+use crate::routes::internal;
 use crate::{database::redis::RedisPool, routes::v2_reroute};
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
@@ -30,11 +30,11 @@ pub async fn get_projects(
     count: web::Query<ResultCount>,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let response = v3::moderation::get_projects(
+    let response = internal::moderation::get_projects(
         req,
         pool.clone(),
         redis.clone(),
-        web::Query(v3::moderation::ResultCount { count: count.count }),
+        web::Query(internal::moderation::ResultCount { count: count.count }),
         session_queue,
     )
     .await

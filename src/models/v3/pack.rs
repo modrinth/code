@@ -18,7 +18,7 @@ pub struct PackFormat {
     pub dependencies: std::collections::HashMap<PackDependency, String>,
 }
 
-#[derive(Serialize, Deserialize, Validate, Eq, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Validate, Eq, PartialEq, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct PackFile {
     pub path: String,
@@ -54,7 +54,7 @@ fn validate_download_url(values: &[String]) -> Result<(), validator::ValidationE
     Ok(())
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Debug)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Debug, Clone)]
 #[serde(rename_all = "camelCase", from = "String")]
 pub enum PackFileHash {
     Sha1,
@@ -72,7 +72,7 @@ impl From<String> for PackFileHash {
     }
 }
 
-#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Debug)]
+#[derive(Serialize, Deserialize, Eq, PartialEq, Hash, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum EnvType {
     Client,

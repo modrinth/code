@@ -627,10 +627,14 @@ pub async fn process_payout(
         FROM mods m
         INNER JOIN organizations o ON m.organization_id = o.id
         INNER JOIN team_members tm on o.team_id = tm.team_id AND tm.accepted = TRUE
-        WHERE m.id = ANY($1) AND m.monetization_status = $2 AND m.organization_id IS NOT NULL
+        WHERE m.id = ANY($1) AND m.monetization_status = $2 AND m.status = ANY($3) AND m.organization_id IS NOT NULL
         ",
         &project_ids,
         MonetizationStatus::Monetized.as_str(),
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| !x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_all(&mut *transaction)
     .await?;
@@ -640,10 +644,14 @@ pub async fn process_payout(
         SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split
         FROM mods m
         INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE
-        WHERE m.id = ANY($1) AND m.monetization_status = $2
+        WHERE m.id = ANY($1) AND m.monetization_status = $2 AND m.status = ANY($3)
         ",
         &project_ids,
         MonetizationStatus::Monetized.as_str(),
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| !x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_all(&mut *transaction)
     .await?;
