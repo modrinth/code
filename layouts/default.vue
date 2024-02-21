@@ -702,6 +702,9 @@ function runAnalytics() {
       body: {
         url: window.location.href,
       },
+      headers: {
+        Authorization: auth.token,
+      },
     })
       .then(() => {})
       .catch(() => {})

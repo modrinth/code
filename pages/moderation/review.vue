@@ -13,6 +13,13 @@
       <button v-else class="iconified-button push-right" @click="oldestFirst = true">
         <SortAscIcon />Sorting by newest
       </button>
+      <button
+        class="btn btn-highlight"
+        :disabled="projectsFiltered.length === 0"
+        @click="goToProjects()"
+      >
+        <ModerationIcon /> Start moderating
+      </button>
     </div>
     <p v-if="projectType !== 'all'" class="project-count">
       Showing {{ projectsFiltered.length }} {{ projectTypePlural }} of {{ projects.length }} total
@@ -101,6 +108,7 @@ import EyeIcon from '~/assets/images/utils/eye.svg'
 import SortAscIcon from '~/assets/images/utils/sort-asc.svg'
 import SortDescIcon from '~/assets/images/utils/sort-desc.svg'
 import WarningIcon from '~/assets/images/utils/issues.svg'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg'
 import Badge from '~/components/ui/Badge.vue'
 import { formatProjectType } from '~/plugins/shorthands.js'
 
@@ -185,6 +193,22 @@ if (projects.value) {
       return project
     })
   }
+}
+async function goToProjects() {
+  const router = useRouter()
+
+  const project = projectsFiltered.value[0]
+  await router.push({
+    name: 'type-id',
+    params: {
+      type: project.project_type,
+      id: project.slug ? project.slug : project.id,
+    },
+    state: {
+      showChecklist: true,
+      projects: projectsFiltered.value.slice(1).map((x) => (x.slug ? x.slug : x.id)),
+    },
+  })
 }
 </script>
 <style lang="scss" scoped>
