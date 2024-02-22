@@ -872,7 +872,7 @@ async function generateMessage() {
 
     if (updateProjects) {
       try {
-        await useBaseFetch(`moderation/project/${props.project.id}`, {
+        await useBaseFetch(`moderation/project`, {
           internal: true,
           method: 'POST',
           body: {
