@@ -875,9 +875,7 @@ async function generateMessage() {
         await useBaseFetch(`moderation/project`, {
           internal: true,
           method: 'POST',
-          body: {
-            judgements: updateProjects,
-          },
+          body: updateProjects,
         })
       } catch (err) {
         const app = useNuxtApp()
