@@ -87,8 +87,10 @@ pub async fn poll_response(device_code: String) -> crate::Result<OauthSuccess> {
                     }
                     _ => {
                         return Err(crate::ErrorKind::HydraError(format!(
-                            "Unknown error: {}",
-                            failure.error
+                            "Unknown error: {}\n{}\n{:#?}",
+                            failure.error,
+                            failure.error_description,
+                            failure.error_codes
                         ))
                         .as_error());
                     }
