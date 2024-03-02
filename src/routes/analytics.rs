@@ -118,6 +118,7 @@ pub async fn page_view_ingest(
             .into_iter()
             .filter(|x| !FILTERED_HEADERS.contains(&&*x.0))
             .collect(),
+        monetized: true,
     };
 
     if let Some(segments) = url.path_segments() {

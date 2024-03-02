@@ -511,6 +511,7 @@ impl AutomatedModerationQueue {
                                             "
                                             INSERT INTO moderation_external_files (sha1, external_license_id)
                                             SELECT * FROM UNNEST ($1::bytea[], $2::bigint[])
+                                            ON CONFLICT (sha1) DO NOTHING
                                             ",
                                             &insert_hashes[..],
                                             &insert_ids[..]

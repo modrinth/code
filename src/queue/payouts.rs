@@ -6,6 +6,8 @@ use crate::util::env::parse_var;
 use crate::{database::redis::RedisPool, models::projects::MonetizationStatus};
 use base64::Engine;
 use chrono::{DateTime, Datelike, Duration, Utc, Weekday};
+use dashmap::DashMap;
+use futures::TryStreamExt;
 use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::de::DeserializeOwned;
@@ -548,7 +550,7 @@ pub async fn process_payout(
                 r#"
                 SELECT COUNT(1) page_views, project_id
                 FROM views
-                WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)
+                WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0) AND (monetized = TRUE)
                 GROUP BY project_id
                 ORDER BY page_views DESC
                 "#,
@@ -557,7 +559,7 @@ pub async fn process_payout(
             .bind(end.timestamp())
             .fetch_all::<ProjectMultiplier>(),
         client
-            .query("SELECT COUNT(1) FROM views WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0)")
+            .query("SELECT COUNT(1) FROM views WHERE (recorded BETWEEN ? AND ?) AND (project_id != 0) AND (monetized = TRUE)")
             .bind(start.timestamp())
             .bind(end.timestamp())
             .fetch_one::<u64>(),
@@ -636,7 +638,13 @@ pub async fn process_payout(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_all(&mut *transaction)
+    .fetch(&mut *transaction)
+    .try_fold(DashMap::new(), |acc: DashMap<i64, HashMap<i64, Decimal>>, r| {
+        acc.entry(r.id)
+            .or_default()
+            .insert(r.user_id, r.payouts_split);
+        async move { Ok(acc) }
+    })
     .await?;
 
     let project_team_members = sqlx::query!(
@@ -653,20 +661,27 @@ pub async fn process_payout(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_all(&mut *transaction)
+    .fetch(&mut *transaction)
+    .try_fold(
+        DashMap::new(),
+        |acc: DashMap<i64, HashMap<i64, Decimal>>, r| {
+            acc.entry(r.id)
+                .or_default()
+                .insert(r.user_id, r.payouts_split);
+            async move { Ok(acc) }
+        },
+    )
     .await?;
 
     for project_id in project_ids {
         let team_members: HashMap<i64, Decimal> = project_team_members
-            .iter()
-            .filter(|r| r.id == project_id)
-            .map(|r| (r.user_id, r.payouts_split))
-            .collect();
+            .remove(&project_id)
+            .unwrap_or((0, HashMap::new()))
+            .1;
         let org_team_members: HashMap<i64, Decimal> = project_org_members
-            .iter()
-            .filter(|r| r.id == project_id)
-            .map(|r| (r.user_id, r.payouts_split))
-            .collect();
+            .remove(&project_id)
+            .unwrap_or((0, HashMap::new()))
+            .1;
 
         let mut all_team_members = vec![];
 
@@ -711,6 +726,7 @@ pub async fn process_payout(
     let mut clear_cache_users = Vec::new();
     let (mut insert_user_ids, mut insert_project_ids, mut insert_payouts, mut insert_starts) =
         (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    let (mut update_user_ids, mut update_user_balances) = (Vec::new(), Vec::new());
     for (id, project) in projects_map {
         if let Some(value) = &multipliers.values.get(&(id as u64)) {
             let project_multiplier: Decimal =
@@ -728,17 +744,8 @@ pub async fn process_payout(
                         insert_payouts.push(payout);
                         insert_starts.push(start);
 
-                        sqlx::query!(
-                            "
-                            UPDATE users
-                            SET balance = balance + $1
-                            WHERE id = $2
-                            ",
-                            payout,
-                            user_id
-                        )
-                        .execute(&mut *transaction)
-                        .await?;
+                        update_user_ids.push(user_id);
+                        update_user_balances.push(payout);
 
                         clear_cache_users.push(user_id);
                     }
@@ -746,6 +753,19 @@ pub async fn process_payout(
             }
         }
     }
+
+    sqlx::query(
+        "
+        UPDATE users u
+        SET balance = u.balance + v.amount
+        FROM unnest($1::BIGINT[], $2::NUMERIC[]) AS v(id, amount)
+        WHERE u.id = v.id
+        ",
+    )
+    .bind(&update_user_ids)
+    .bind(&update_user_balances)
+    .execute(&mut *transaction)
+    .await?;
 
     sqlx::query!(
         "

@@ -34,6 +34,8 @@ pub struct PageView {
     pub user_id: u64,
     // Modrinth Project ID (used for payouts)
     pub project_id: u64,
+    // whether this view will be monetized / counted for payouts
+    pub monetized: bool,
 
     // The below information is used exclusively for data aggregation and fraud detection
     // (ex: page view botting).

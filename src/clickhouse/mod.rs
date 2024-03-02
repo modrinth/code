@@ -42,14 +42,15 @@ pub async fn init_client_with_database(
 
                 user_id UInt64,
                 project_id UInt64,
+                monetized Bool DEFAULT True,
 
                 ip IPv6,
                 country String,
                 user_agent String,
-                headers Array(Tuple(String, String)),
+                headers Array(Tuple(String, String))
             )
             ENGINE = MergeTree()
-            PRIMARY KEY (project_id, recorded)
+            PRIMARY KEY (project_id, recorded, ip)
             "
         ))
         .execute()
@@ -71,10 +72,10 @@ pub async fn init_client_with_database(
                 ip IPv6,
                 country String,
                 user_agent String,
-                headers Array(Tuple(String, String)),
+                headers Array(Tuple(String, String))
             )
             ENGINE = MergeTree()
-            PRIMARY KEY (project_id, recorded)
+            PRIMARY KEY (project_id, recorded, ip)
             "
         ))
         .execute()
@@ -94,10 +95,10 @@ pub async fn init_client_with_database(
 
                 loader String,
                 game_version String,
-                parent UInt64,
+                parent UInt64
             )
             ENGINE = MergeTree()
-            PRIMARY KEY (project_id, recorded)
+            PRIMARY KEY (project_id, recorded, user_id)
             "
         ))
         .execute()
