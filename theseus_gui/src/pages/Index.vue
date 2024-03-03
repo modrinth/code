@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onUnmounted, shallowRef } from 'vue'
+import { SearchIcon, PlusIcon } from 'omorphia'
+import { onUnmounted, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
@@ -7,8 +8,6 @@ import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
-
-const filter = ref('')
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -22,14 +21,6 @@ const getInstances = async () => {
   recentInstances.value = Object.values(profiles).sort((a, b) => {
     return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
   })
-
-  let filters = []
-  for (const instance of recentInstances.value) {
-    if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
-      filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
-    }
-  }
-  filter.value = filters.join(' AND ')
 }
 
 await getInstances()
@@ -57,6 +48,16 @@ onUnmounted(() => {
       ]"
       :can-paginate="true"
     />
+    <div v-else class="modrinth-intro">
+      <h1>Welcome to the Modrinth app!</h1>
+      <p>
+        Thank you for downloading. Manage your mods, browse Modrinth, and play Minecraft all in one
+        place!
+      </p>
+      <router-link class="btn" to=""><SearchIcon /> Browse content</router-link>
+      <router-link class="btn" to=""><PlusIcon /> Create a profile</router-link>
+      <router-link class="btn" to="">Import from other launchers</router-link>
+    </div>
   </div>
 </template>
 
@@ -67,5 +68,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+
+.modrinth-intro {
 }
 </style>

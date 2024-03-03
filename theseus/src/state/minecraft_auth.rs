@@ -22,6 +22,7 @@ use std::future::Future;
 use uuid::Uuid;
 
 // TODO: proper error handling / messaging (see others)
+// TODO: make sure refreshing timelines are set correctly
 
 const AUTH_JSON: &str = "minecraft_auth.json";
 
@@ -180,8 +181,10 @@ impl MinecraftAuthStore {
 
         minecraft_entitlements(&minecraft_token.access_token).await?;
 
+        let profile_id = profile.id.unwrap_or_default();
+
         let credentials = Credentials {
-            id: profile.id,
+            id: profile_id,
             username: profile.name,
             access_token: minecraft_token.access_token,
             refresh_token: oauth_token.refresh_token,
@@ -189,10 +192,10 @@ impl MinecraftAuthStore {
                 + Duration::seconds(oauth_token.expires_in as i64),
         };
 
-        self.users.insert(profile.id, credentials.clone());
+        self.users.insert(profile_id, credentials.clone());
 
         if self.default_user.is_none() {
-            self.default_user = Some(profile.id);
+            self.default_user = Some(profile_id);
         }
 
         self.save().await?;
@@ -224,8 +227,14 @@ impl MinecraftAuthStore {
             }
 
             if creds.expires < Utc::now() {
+                let cred_id = creds.id;
+                let profile_name = creds.username.clone();
+
+                println!("{}", creds.refresh_token);
                 let oauth_token = oauth_refresh(&creds.refresh_token).await?;
                 let (key, token) = self.refresh_and_get_device_token().await?;
+
+                println!("test past");
 
                 let sisu_authorize = sisu_authorize(
                     None,
@@ -235,17 +244,18 @@ impl MinecraftAuthStore {
                 )
                 .await?;
 
+                println!("sisu authorize past");
+
                 let xbox_token =
                     xsts_authorize(sisu_authorize, &token.token, &key).await?;
-                let minecraft_token = minecraft_token(xbox_token).await?;
-                let profile =
-                    minecraft_profile(&minecraft_token.access_token).await?;
 
-                minecraft_entitlements(&minecraft_token.access_token).await?;
+                println!("xbox authorize past");
+
+                let minecraft_token = minecraft_token(xbox_token).await?;
 
                 let val = Credentials {
-                    id: profile.id,
-                    username: profile.name,
+                    id: cred_id,
+                    username: profile_name,
                     access_token: minecraft_token.access_token,
                     refresh_token: oauth_token.refresh_token,
                     expires: Utc::now()
@@ -538,7 +548,7 @@ async fn minecraft_token(token: DeviceToken) -> crate::Result<MinecraftToken> {
 
 #[derive(Deserialize)]
 struct MinecraftProfile {
-    pub id: Uuid,
+    pub id: Option<Uuid>,
     pub name: String,
 }
 
@@ -553,6 +563,9 @@ async fn minecraft_profile(token: &str) -> crate::Result<MinecraftProfile> {
     .await?;
 
     let text = res.text().await?;
+
+    println!("{token}");
+    println!("{text}");
 
     Ok(serde_json::from_str(&text)?)
 }
