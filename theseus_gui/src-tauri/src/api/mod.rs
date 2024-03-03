@@ -97,4 +97,6 @@ impl_serialize! {
 #[cfg(not(target_os = "macos"))]
 impl_serialize! {
     IO,
+    Callback,
+    Tauri,
 }
