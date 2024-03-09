@@ -124,6 +124,7 @@ const props = defineProps({
 
 const app = useNuxtApp()
 const auth = await useAuth()
+const tags = useTags()
 
 const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
   useBaseFetch(`thread/${props.project.thread_id}`)
@@ -138,10 +139,14 @@ async function setStatus(status) {
       method: 'PATCH',
       body: data,
     })
-    await useBaseFetch(`thread/${props.project.thread_id}/read`, {
-      method: 'POST',
-      body: data,
-    })
+
+    if (tags.value.staffRoles.includes(auth.value.user.role)) {
+      await useBaseFetch(`thread/${props.project.thread_id}/read`, {
+        method: 'POST',
+        body: data,
+      })
+    }
+
     const project = props.project
     project.status = status
     await props.resetProject()
