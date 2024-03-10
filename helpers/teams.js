@@ -6,7 +6,7 @@ export const acceptTeamInvite = async (teamId) => {
 }
 export const removeSelfFromTeam = async (teamId) => {
   const auth = await useAuth()
-  await removeTeamMember(teamId, auth.user.id)
+  await removeTeamMember(teamId, auth.value.user.id)
 }
 export const removeTeamMember = async (teamId, userId) => {
   await useBaseFetch(`team/${teamId}/members/${userId}`, {
