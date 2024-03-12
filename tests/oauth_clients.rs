@@ -113,21 +113,6 @@ async fn get_oauth_client_for_client_creator_succeeds() {
 }
 
 #[actix_rt::test]
-async fn get_oauth_client_for_unrelated_user_fails() {
-    with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
-        let DummyOAuthClientAlpha { client_id, .. } = env.dummy.oauth_client_alpha.clone();
-
-        let resp = env
-            .api
-            .get_oauth_client(client_id.clone(), FRIEND_USER_PAT)
-            .await;
-
-        assert_status!(&resp, StatusCode::UNAUTHORIZED);
-    })
-    .await;
-}
-
-#[actix_rt::test]
 async fn can_delete_oauth_client() {
     with_test_environment(None, |env: TestEnvironment<ApiV3>| async move {
         let client_id = env.dummy.oauth_client_alpha.client_id.clone();

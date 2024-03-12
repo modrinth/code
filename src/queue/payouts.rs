@@ -726,7 +726,7 @@ pub async fn process_payout(
     let mut clear_cache_users = Vec::new();
     let (mut insert_user_ids, mut insert_project_ids, mut insert_payouts, mut insert_starts) =
         (Vec::new(), Vec::new(), Vec::new(), Vec::new());
-    let (mut update_user_ids, mut update_user_balances) = (Vec::new(), Vec::new());
+    let mut update_user_balance: HashMap<i64, Decimal> = HashMap::new();
     for (id, project) in projects_map {
         if let Some(value) = &multipliers.values.get(&(id as u64)) {
             let project_multiplier: Decimal =
@@ -744,8 +744,7 @@ pub async fn process_payout(
                         insert_payouts.push(payout);
                         insert_starts.push(start);
 
-                        update_user_ids.push(user_id);
-                        update_user_balances.push(payout);
+                        *update_user_balance.entry(user_id).or_default() += payout;
 
                         clear_cache_users.push(user_id);
                     }
@@ -754,16 +753,23 @@ pub async fn process_payout(
         }
     }
 
-    sqlx::query(
+    let (mut update_user_ids, mut update_user_balances) = (Vec::new(), Vec::new());
+
+    for (user_id, payout) in update_user_balance {
+        update_user_ids.push(user_id);
+        update_user_balances.push(payout);
+    }
+
+    sqlx::query!(
         "
         UPDATE users u
         SET balance = u.balance + v.amount
         FROM unnest($1::BIGINT[], $2::NUMERIC[]) AS v(id, amount)
         WHERE u.id = v.id
         ",
+        &update_user_ids,
+        &update_user_balances
     )
-    .bind(&update_user_ids)
-    .bind(&update_user_balances)
     .execute(&mut *transaction)
     .await?;
 

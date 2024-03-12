@@ -15,12 +15,6 @@ use validator::Validate;
 
 use super::ApiError;
 use crate::{
-    auth::checks::ValidateAllAuthorized,
-    file_hosting::FileHost,
-    models::{ids::base62_impl::parse_base62, oauth_clients::DeleteOAuthClientQueryParam},
-    util::routes::read_from_payload,
-};
-use crate::{
     auth::{checks::ValidateAuthorized, get_user_from_headers},
     database::{
         models::{
@@ -39,6 +33,11 @@ use crate::{
     queue::session::AuthQueue,
     routes::v3::project_creation::CreateError,
     util::validate::validation_errors_to_string,
+};
+use crate::{
+    file_hosting::FileHost,
+    models::{ids::base62_impl::parse_base62, oauth_clients::DeleteOAuthClientQueryParam},
+    util::routes::read_from_payload,
 };
 
 use crate::database::models::oauth_client_item::OAuthClient as DBOAuthClient;
@@ -80,10 +79,13 @@ pub async fn get_user_clients(
     let target_user = User::get(&info.into_inner(), &**pool, &redis).await?;
 
     if let Some(target_user) = target_user {
+        if target_user.id != current_user.id.into() && !current_user.role.is_admin() {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have permission to see the OAuth clients of this user!".to_string(),
+            ));
+        }
+
         let clients = OAuthClient::get_all_user_clients(target_user.id, &**pool).await?;
-        clients
-            .iter()
-            .validate_all_authorized(Some(&current_user))?;
 
         let response = clients
             .into_iter()
@@ -98,13 +100,10 @@ pub async fn get_user_clients(
 
 #[get("app/{id}")]
 pub async fn get_client(
-    req: HttpRequest,
     id: web::Path<ApiOAuthClientId>,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    let clients = get_clients_inner(&[id.into_inner()], req, pool, redis, session_queue).await?;
+    let clients = get_clients_inner(&[id.into_inner()], pool).await?;
     if let Some(client) = clients.into_iter().next() {
         Ok(HttpResponse::Ok().json(client))
     } else {
@@ -114,11 +113,8 @@ pub async fn get_client(
 
 #[get("apps")]
 pub async fn get_clients(
-    req: HttpRequest,
     info: web::Query<GetOAuthClientsRequest>,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
     let ids: Vec<_> = info
         .ids
@@ -126,7 +122,7 @@ pub async fn get_clients(
         .map(|id| parse_base62(id).map(ApiOAuthClientId))
         .collect::<Result<_, _>>()?;
 
-    let clients = get_clients_inner(&ids, req, pool, redis, session_queue).await?;
+    let clients = get_clients_inner(&ids, pool).await?;
 
     Ok(HttpResponse::Ok().json(clients))
 }
@@ -583,26 +579,10 @@ async fn edit_redirects(
 
 pub async fn get_clients_inner(
     ids: &[ApiOAuthClientId],
-    req: HttpRequest,
     pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
 ) -> Result<Vec<models::oauth_clients::OAuthClient>, ApiError> {
-    let current_user = get_user_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::SESSION_ACCESS]),
-    )
-    .await?
-    .1;
-
     let ids: Vec<OAuthClientId> = ids.iter().map(|i| (*i).into()).collect();
     let clients = OAuthClient::get_many(&ids, &**pool).await?;
-    clients
-        .iter()
-        .validate_all_authorized(Some(&current_user))?;
 
     Ok(clients.into_iter().map(|c| c.into()).collect_vec())
 }

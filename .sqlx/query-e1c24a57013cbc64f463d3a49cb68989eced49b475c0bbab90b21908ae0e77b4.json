@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE users u\n        SET balance = u.balance + v.amount\n        FROM unnest($1::BIGINT[], $2::NUMERIC[]) AS v(id, amount)\n        WHERE u.id = v.id\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int8Array",
+        "NumericArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e1c24a57013cbc64f463d3a49cb68989eced49b475c0bbab90b21908ae0e77b4"
+}
