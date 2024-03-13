@@ -24,6 +24,11 @@ export async function check_image(path) {
   return await invoke('plugin:skin|skin_check_image', { path })
 }
 
+// Returns true if skin is not in library
+export async function check_skin(skin, id) {
+  return await invoke('plugin:skin|skin_check_skin', { skin, id })
+}
+
 // Returns cape info
 export async function get_cape_data(cape, key) {
   return await invoke('plugin:skin|skin_get_cape_data', { cape, key })

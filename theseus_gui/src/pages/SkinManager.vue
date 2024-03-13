@@ -30,12 +30,15 @@
   </Card>
   <div class="content">
     <Card class="instance-card-item">
-      <canvas id="skin_container" />
+      <canvas id="skin_container" class="render" />
       <AnimatedLogo v-if="!loaded_skins" />
-      <div class="project-info">
+      <div class="card-row">
+        <div class="project-info">
           <p class="title">Current Skin</p>
           <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
         </div>
+        <Button v-if="notInLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
+      </div>
     </Card>
     <div class="row">
       <Card class="instance-card-item button-base" @click="handleModal">
@@ -94,7 +97,7 @@
             <Chips v-model="skinArms" :items="['classic', 'slim']" />
           </div>
         </div>
-        <canvas id="new_render" width="0" height="0" />
+        <canvas id="new_render" class="render" width="0" height="0" />
       </div>
       <div class="input-row">
         <p class="input-label">Cape</p>
@@ -258,6 +261,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 import {
   check_image,
+  check_skin,
   loaded_skins,
   get_user_skin_data,
   get_mojang_launcher_path,
@@ -277,6 +281,7 @@ import { IdleAnimation, SkinViewer, WalkingAnimation } from 'skinview3d'
 const themeStore = useTheming()
 const notificationsWrapper = ref(null)
 
+const notInLibrary = ref(false)
 const skinId = ref('')
 const skinUser = ref('')
 const skinModal = ref(null)
@@ -383,6 +388,9 @@ const handleOptionsClick = async (args) => {
     case 'delete':
       await delete_skin(args.item.id).catch(handleError)
       skinSaves.value = await get_skins().catch(handleError)
+      notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+        handleError
+      )
       break
   }
 }
@@ -406,16 +414,9 @@ const next = async () => {
     .filter((e) => e.selected).length
   loading.value = true
   for (const skin of mojang.value.skinNames.filter((skin) => skin.selected)) {
-    const data = await import_skin(skin.name, mojang.value.path)
-      .catch(handleError)
+    const data = await import_skin(skin.name, mojang.value.path).catch(handleError)
     const model = await get_render(data).catch(handleError)
-    await save_skin(
-      selectedAccount.value.id,
-      data,
-      skin.name,
-      model,
-      ''
-    ).catch(handleError)
+    await save_skin(selectedAccount.value.id, data, skin.name, model, '').catch(handleError)
     skin.selected = false
     importedSkins.value++
   }
@@ -434,6 +435,15 @@ const handleModal = async () => {
   skinModal.value.show()
 }
 
+const handleAdd = async () => {
+  const model = await get_render(skinData.value).catch(handleError)
+  await save_skin(selectedAccount.value.id, skinData.value, 'untitled', model, '').catch(
+    handleError
+  )
+  skinSaves.value = await get_skins().catch(handleError)
+  notInLibrary.value = false
+}
+
 const skinClear = async () => {
   validSkin.value = false
   displaySkin.value = null
@@ -445,28 +455,30 @@ const skinClear = async () => {
 }
 
 const handleSkin = async (skin, cape, arms, state) => {
-  if (state.includes('save')) {
-    let data = {}
-    data.skin = skin
-    data.cape = cape
-    data.arms = arms
-    data.unlocked_capes = []
+  let data = {}
+  data.skin = skin
+  data.cape = cape
+  data.arms = arms
+  data.unlocked_capes = []
 
+  if (state.includes('save')) {
     const model = await get_render(data).catch(handleError)
-    await save_skin(
-      selectedAccount.value.id,
-      data,
-      skinName.value.trim(),
-      model,
-      ''
-    ).catch(handleError)
+    await save_skin(selectedAccount.value.id, data, skinName.value.trim(), model, '').catch(
+      handleError
+    )
     skinSaves.value = await get_skins().catch(handleError)
   }
   if (state.includes('upload')) {
     uploadingSkin.value = true
     const capeid = await get_cape_data(cape, 'id').catch(handleError)
-    const uploadedCape = await set_cape(capeid, selectedAccount.value.access_token).catch(handleError)
+    const uploadedCape = await set_cape(capeid, selectedAccount.value.access_token).catch(
+      handleError
+    )
     const uploadedSkin = await set_skin(skin, arms, selectedAccount.value).catch(handleError)
+    skinData.value = data
+    notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+      handleError
+    )
 
     if (uploadedSkin) {
       const renderArms = convert_arms(arms)
@@ -530,17 +542,13 @@ const edit_skin_end = async () => {
   data.unlocked_capes = []
 
   const model = await get_render(data).catch(handleError)
-  await save_skin(
-    skinUser.value,
-    data,
-    skinName.value.trim(),
-    model,
-    skinId.value
-  ).catch(handleError)
+  await save_skin(skinUser.value, data, skinName.value.trim(), model, skinId.value).catch(
+    handleError
+  )
   skinSaves.value = await get_skins().catch(handleError)
   skinClear()
   editSkin.value = false
-  
+
   skinModal.value.hide()
 }
 
@@ -590,6 +598,9 @@ const openskin = async () => {
 
 const create_render = async () => {
   skinData.value = await get_user_skin_data(selectedAccount.value.id).catch(handleError)
+  notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+    handleError
+  )
   const arms = convert_arms(skinData.value.arms)
   const cape = await get_cape_data(skinData.value.cape, 'url').catch(handleError)
   currentRender.value = new SkinViewer({
@@ -608,6 +619,7 @@ const create_render = async () => {
 
 const update_render = async (account) => {
   skinData.value = await get_user_skin_data(account).catch(handleError)
+  notInLibrary.value = await check_skin(skinData.value.skin, account).catch(handleError)
   currentRender.value.loadSkin(skinData.value.skin, {
     model: convert_arms(skinData.value.arms),
   })
@@ -620,11 +632,15 @@ watch(selectedAccount, async (newAccount) => {
   await update_render(newAccount.id)
 })
 
-watch(loaded_skins, async (val) => {
-  if (val) {
-    await update_render(selectedAccount.value.id)
-  }
-})
+watch(
+  loaded_skins,
+  async (val) => {
+    if (val) {
+      await update_render(selectedAccount.value.id)
+    }
+  },
+  { once: true }
+)
 
 watch(skinArms, async (newArms) => {
   if (validSkin.value && newRender.value) {
@@ -778,15 +794,23 @@ onMounted(() => {
   }
 }
 
+.render {
+  cursor: pointer;
+}
+
 .instance-card-item {
   display: inline-block;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   padding: var(--gap-md);
   transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
   margin-bottom: 0;
+
+  .card-row {
+    display: flex;
+    flex-direction: row;
+  }
 
   .mod-image {
     --size: 100%;

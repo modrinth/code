@@ -14,6 +14,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             skin_delete_skin,
             skin_import_skin,
             skin_check_image,
+            skin_check_skin,
             skin_get_cape_data,
             skin_cache_users_skins,
             skin_cache_new_user_skin,
@@ -31,6 +32,13 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[tauri::command]
 pub async fn skin_check_image(path: String) -> Result<bool> {
     Ok(skin_manager::check_image(path).await?)
+}
+
+// Returns true if skin is not in library
+// invoke('plugin:skin|check_skin',skin)
+#[tauri::command]
+pub async fn skin_check_skin(skin: String, id: Uuid) -> Result<bool> {
+    Ok(skin_manager::check_skin(skin, id).await?)
 }
 
 // Sets player's skin

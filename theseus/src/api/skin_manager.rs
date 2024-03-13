@@ -22,6 +22,19 @@ pub async fn check_image(path: String) -> crate::Result<bool> {
     Ok(w == 64 && h == 64)
 }
 
+pub async fn check_skin(skin: String, id: Uuid) -> crate::Result<bool> {
+    let mut val: bool = true;
+    let library: Vec<SkinSave> = get_skins().await?;
+    for save in library {
+        if save.user != id { continue; }
+        if save.skin == skin {
+            val = false;
+            break;
+        }
+    }
+    Ok(val)
+}
+
 pub async fn get_heads() -> crate::Result<HashMap<Uuid, String>> {
     let settings = Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
     let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
