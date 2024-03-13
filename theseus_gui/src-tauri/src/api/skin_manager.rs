@@ -47,65 +47,79 @@ pub async fn skin_set_cape(capeid: String, token: String) -> Result<bool> {
     Ok(skin_manager::set_cape(capeid, token).await?)
 }
 
-// Returns cape info
-// invoke('plugin:skin|skin_set_cape', { capeid, token })
+// Returns cape id or url
+// invoke('plugin:skin|skin_set_cape', { cape, key })
 #[tauri::command]
 pub async fn skin_get_cape_data(cape: String, key: String) -> Result<String> {
     Ok(skin_manager::get_cape_data(cape, key).await?)
 }
 
-// Gets the current skin, cape, and updates the unlocked cape list
-// invoke('plugin:skin|skin_get_player_info', { user, token })
+// Gets the current account's skin data
+// invoke('plugin:skin|skin_get_user_data', { id })
 #[tauri::command]
 pub async fn skin_get_user_skin_data(id: Uuid) -> Result<SkinCache> {
     Ok(skin_manager::get_user_skin_data(id).await?)
 }
 
-// 
-// 
+// Makes api request to mojang, updating all accounts' skin data
+// invoke('plugin:skin|skin_cache_users_skins')
 #[tauri::command]
 pub async fn skin_cache_users_skins() -> Result<bool> {
     Ok(skin_manager::cache_users_skins().await?)
 }
 
-// 
-// 
+// Makes api request to mojang, updating current account's skin data
+// invoke('plugin:skin|skin_cache_new_user_skin', { user })
 #[tauri::command]
 pub async fn skin_cache_new_user_skin(user: Credentials) -> Result<bool> {
     Ok(skin_manager::cache_new_user_skin(user).await?)
 }
 
+// Saves the skin data to the manager
+// invoke('plugin:skin|skin_save_skin', { user, data, name, model, skinid })
 #[tauri::command]
 pub async fn skin_save_skin(user: Uuid, data: SkinCache, name: String, model: String, skinid: String) -> Result<bool> {
     Ok(skin_manager::save_skin(user, data, name, model, skinid).await?)
 }
 
+// Deletes skin save from the manager
+// invoke('plugin:skin|skin_delete_skin', { id })
 #[tauri::command]
 pub async fn skin_delete_skin(id: Uuid) -> Result<bool> {
     Ok(skin_manager::delete_skin(id).await?)
 }
 
+// Gets all account heads from the cache
+// invoke('plugin:skin|skin_get_heads')
 #[tauri::command]
 pub async fn skin_get_heads() -> Result<HashMap<Uuid, String>> {
     Ok(skin_manager::get_heads().await?)
 }
 
+// Gets all saved skins from the manager
+// invoke('plugin:skin|skin_get_skins')
 #[tauri::command]
 pub async fn skin_get_skins() -> Result<Vec<SkinSave>> {
     Ok(skin_manager::get_skins().await?)
 }
 
+// Gets the default mojang launcher path
+// invoke('plugin:skin|skin_get_mojang_launcher_path')
 #[tauri::command]
 pub async fn skin_get_mojang_launcher_path() -> Result<PathBuf> {
     Ok(skin_manager::get_mojang_launcher_path().await?)
 }
 
+// Gets a list of all saved skins in the mojang launcher
+// invoke('plugin:skin|skin_get_mojang_launcher_names', { path })
 #[tauri::command]
 pub async fn skin_get_mojang_launcher_names(path: PathBuf) -> Result<Vec<skin_manager::MojangNames>> {
     Ok(skin_manager::get_mojang_launcher_names(path).await?)
 }
 
+// Adds the skin from the mojang launcher to the manager
+// invoke('plugin:skin|skin_import_skin', { name, path, user })
 #[tauri::command]
-pub async fn skin_import_skin(name: String, path: PathBuf, user: Uuid) -> Result<()> {
-    Ok(skin_manager::import_skin(name, path, user).await?)
+pub async fn skin_import_skin(name: String, path: PathBuf) -> Result<SkinCache> {
+    Ok(skin_manager::import_skin(name, path).await?)
 }

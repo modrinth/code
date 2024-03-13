@@ -70,8 +70,4 @@ export async function get_user(user) {
   return await invoke('plugin:auth|auth_get_user', { user })
 }
 
-export const selectedAccount = ref(null)
-
-export function set_account(account) {
-  selectedAccount.value = account
-}
+export const selectedAccount = ref({})

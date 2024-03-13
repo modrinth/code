@@ -9,12 +9,12 @@ export async function get_user_skin_data(id) {
   return await invoke('plugin:skin|skin_get_user_skin_data', { id })
 }
 
-// Sets users skin : NOTE: always call this after set_cape, not before
+// Sets users skin
 export async function set_skin(skin, arms, user) {
   return await invoke('plugin:skin|skin_set_skin', { skin, arms, user })
 }
 
-// Sets users cape : NOTE: always call this before set_skin, not after
+// Sets users cape
 export async function set_cape(capeid, token) {
   return await invoke('plugin:skin|skin_set_cape', { capeid, token })
 }
@@ -66,16 +66,16 @@ export async function get_mojang_launcher_names(path) {
   return await invoke('plugin:skin|skin_get_mojang_launcher_names', { path })
 }
 
-export async function import_skin(name, path, user) {
-  return await invoke('plugin:skin|skin_import_skin', { name, path, user })
+export async function import_skin(name, path) {
+  return await invoke('plugin:skin|skin_import_skin', { name, path })
 }
 
 export async function get_render(skinData) {
   let arms = skinData.arms
   if (arms == 'classic') arms = 'default'
   const skinViewer = new SkinViewer({
-    width: 200,
-    height: 200,
+    width: 144,
+    height: 144,
     preserveDrawingBuffer: true,
   })
   skinViewer.camera.rotation.x = -0.62
@@ -103,4 +103,6 @@ export async function get_render(skinData) {
 
 export const account_heads = ref({})
 
-const sleep = (ms = 0) => new Promise(resolve => setTimeout(resolve, ms))
+export const loaded_skins = ref(false)
+
+const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms))

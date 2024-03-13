@@ -7,6 +7,7 @@
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
   >
+    <AnimatedLogo v-if="!loaded_skins" />
     <Avatar
       :size="mode === 'expanded' ? 'xs' : 'sm'"
       :src="
@@ -103,6 +104,7 @@ import {
   LogInIcon,
   Modal,
   GlobeIcon,
+  AnimatedLogo,
   ClipboardCopyIcon,
 } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
@@ -112,7 +114,6 @@ import {
   authenticate_begin_flow,
   authenticate_await_completion,
   selectedAccount,
-  set_account,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
@@ -120,7 +121,7 @@ import { useTheming } from '@/store/theme.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import QrcodeVue from 'qrcode.vue'
 import { process_listener } from '@/helpers/events'
-import { cache_new_user_skin, account_heads } from '@/helpers/skin_manager.js'
+import { cache_new_user_skin, account_heads, loaded_skins } from '@/helpers/skin_manager.js'
 
 defineProps({
   mode: {
@@ -143,12 +144,14 @@ const loginModal = ref(null)
 async function refreshValues() {
   settings.value = await get().catch(handleError)
   accounts.value = await users().catch(handleError)
+  selectedAccount.value = accounts.value.find(
+    (account) => account.id === settings.value.default_user
+  )
 }
 defineExpose({
   refreshValues,
 })
 await refreshValues()
-set_account(accounts.value.find((account) => account.id === settings.value.default_user))
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => settings.value.default_user !== account.id)
@@ -157,7 +160,7 @@ const displayAccounts = computed(() =>
 async function setAccount(account) {
   settings.value.default_user = account.id
   await set(settings.value).catch(handleError)
-  set_account(account)
+  selectedAccount.value = account
   emit('change')
 }
 
@@ -185,7 +188,6 @@ async function login() {
   if (loggedIn) {
     await setAccount(loggedIn)
     await refreshValues()
-    set_account(loggedIn)
   }
   await cache_new_user_skin(loggedIn).catch(handleError)
 
@@ -199,10 +201,8 @@ const logout = async (id) => {
   if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
-    set_account(accounts.value[0])
   } else {
     emit('change')
-    set_account(null)
   }
   mixpanel_track('AccountLogOut')
 }
