@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use crate::auth::checks::is_visible_project;
+use crate::auth::checks::{filter_visible_versions, is_visible_project};
 use crate::auth::{filter_visible_projects, get_user_from_headers};
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::project_item::{GalleryItem, ModCategory};
@@ -1011,14 +1011,10 @@ pub async fn dependency_list(
         )
         .await?;
 
-        let mut projects = projects_result
-            .into_iter()
-            .map(models::projects::Project::from)
-            .collect::<Vec<_>>();
-        let mut versions = versions_result
-            .into_iter()
-            .map(models::projects::Version::from)
-            .collect::<Vec<_>>();
+        let mut projects =
+            filter_visible_projects(projects_result, &user_option, &pool, false).await?;
+        let mut versions =
+            filter_visible_versions(versions_result, &user_option, &pool, &redis).await?;
 
         projects.sort_by(|a, b| b.published.cmp(&a.published));
         projects.dedup_by(|a, b| a.id == b.id);

@@ -12,7 +12,7 @@ use crate::models::pats::Scopes;
 use crate::models::projects::{
     License, Link, MonetizationStatus, ProjectId, ProjectStatus, VersionId, VersionStatus,
 };
-use crate::models::teams::ProjectPermissions;
+use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
@@ -614,7 +614,30 @@ async fn project_create_inner(
 
         let mut members = vec![];
 
-        if project_create_data.organization_id.is_none() {
+        if let Some(organization_id) = project_create_data.organization_id {
+            let org = models::Organization::get_id(organization_id.into(), &*pool, &redis)
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput("Invalid organization ID specified!".to_string())
+                })?;
+
+            let team_member =
+                models::TeamMember::get_from_user_id(org.team_id, current_user.id.into(), &*pool)
+                    .await?;
+
+            let perms =
+                OrganizationPermissions::get_permissions_by_role(&current_user.role, &team_member);
+
+            if !perms
+                .map(|x| x.contains(OrganizationPermissions::ADD_PROJECT))
+                .unwrap_or(false)
+            {
+                return Err(CreateError::CustomAuthenticationError(
+                    "You do not have the permissions to create projects in this organization!"
+                        .to_string(),
+                ));
+            }
+        } else {
             members.push(models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
                 role: crate::models::teams::DEFAULT_ROLE.to_owned(),
@@ -626,7 +649,6 @@ async fn project_create_inner(
                 ordering: 0,
             })
         }
-
         let team = models::team_item::TeamBuilder { members };
 
         let team_id = team.insert(&mut *transaction).await?;
