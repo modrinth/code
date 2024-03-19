@@ -18,8 +18,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             skin_get_cape_data,
             skin_cache_users_skins,
             skin_cache_new_user_skin,
-            skin_get_mojang_launcher_path,
-            skin_get_mojang_launcher_names,
+            skin_get_launcher_names,
             skin_save_skin,
             skin_get_skins,
             skin_set_cape
@@ -111,23 +110,16 @@ pub async fn skin_get_skins() -> Result<Vec<SkinSave>> {
     Ok(skin_manager::get_skins().await?)
 }
 
-// Gets the default mojang launcher path
-// invoke('plugin:skin|skin_get_mojang_launcher_path')
-#[tauri::command]
-pub async fn skin_get_mojang_launcher_path() -> Result<PathBuf> {
-    Ok(skin_manager::get_mojang_launcher_path().await?)
-}
-
 // Gets a list of all saved skins in the mojang launcher
-// invoke('plugin:skin|skin_get_mojang_launcher_names', { path })
+// invoke('plugin:skin|skin_get_launcher_names', { path })
 #[tauri::command]
-pub async fn skin_get_mojang_launcher_names(path: PathBuf) -> Result<Vec<skin_manager::MojangNames>> {
-    Ok(skin_manager::get_mojang_launcher_names(path).await?)
+pub async fn skin_get_launcher_names(path: PathBuf, installer: String) -> Result<Vec<skin_manager::MojangNames>> {
+    Ok(skin_manager::get_launcher_names(path, installer).await?)
 }
 
 // Adds the skin from the mojang launcher to the manager
 // invoke('plugin:skin|skin_import_skin', { name, path, user })
 #[tauri::command]
-pub async fn skin_import_skin(name: String, path: PathBuf) -> Result<SkinCache> {
-    Ok(skin_manager::import_skin(name, path).await?)
+pub async fn skin_import_skin(id: String, path: PathBuf, installer: String) -> Result<SkinCache> {
+    Ok(skin_manager::import_skin(id, path, installer).await?)
 }

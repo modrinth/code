@@ -66,7 +66,7 @@
 
   <Modal ref="skinModal" class="modal" header="Change skin" :noblur="!themeStore.advancedRendering">
     <div v-if="!editSkin" class="modal-header">
-      <Chips v-model="changeSkinType" :items="['from file', 'import from launcher']" />
+      <Chips v-model="changeSkinType" :items="['from file', 'import from launcher']" @click="handleModalType" />
     </div>
     <hr v-if="!editSkin" class="card-divider" />
     <div v-if="changeSkinType == 'from file'" class="modal-column">
@@ -94,14 +94,14 @@
           </div>
           <div class="input-row">
             <p class="input-label">Arm style</p>
-            <Chips v-model="skinArms" :items="['classic', 'slim']" />
+            <Chips v-model="skinArms" :items="['classic', 'slim']" @click="handleArms" />
           </div>
         </div>
         <canvas id="new_render" class="render" width="0" height="0" />
       </div>
       <div class="input-row">
         <p class="input-label">Cape</p>
-        <Chips v-model="skinCape" :items="skinData.unlocked_capes" />
+        <Chips v-model="skinCape" :items="skinData.unlocked_capes" @click="handleCape" />
       </div>
       <div v-if="!editSkin" class="input-group push-right">
         <Button @click="skinModal.hide()">
@@ -147,13 +147,14 @@
       </div>
     </div>
     <div v-else class="modal-body">
+      <Chips v-model="importType" :items="['Mojang', 'Curseforge']" @click="handleImportType" />
       <div class="path-selection">
-        <h3>.minecraft path</h3>
+        <h3>{{ importer.display }} path</h3>
         <div class="path-input">
           <div class="iconified-input">
             <FolderOpenIcon />
-            <input v-model="mojang.path" type="text" placeholder="Path to launcher" />
-            <Button @click="() => (mojang.path = '')">
+            <input v-model="importer.path" type="text" placeholder="Path to launcher" />
+            <Button @click="() => (importer.path = '')">
               <XIcon />
             </Button>
           </div>
@@ -170,16 +171,16 @@
           <div class="toggle-all table-cell">
             <Checkbox
               class="select-checkbox"
-              :model-value="mojang.skinNames.every((child) => child.selected)"
+              :model-value="importer.skinNames.every((child) => child.selected)"
               @update:model-value="
-                (newValue) => mojang.skinNames.forEach((child) => (child.selected = newValue))
+                (newValue) => importer.skinNames.forEach((child) => (child.selected = newValue))
               "
             />
           </div>
           <div class="name-cell table-cell">All skins</div>
         </div>
-        <div v-if="mojang.skinNames.length > 0" class="table-content">
-          <div v-for="skin in mojang.skinNames" :key="skin" class="table-row">
+        <div v-if="importer.skinNames.length > 0" class="table-content">
+          <div v-for="skin in importer.skinNames" :key="skin" class="table-row">
             <div class="checkbox-cell table-cell">
               <Checkbox v-model="skin.selected" class="select-checkbox" />
             </div>
@@ -190,12 +191,11 @@
         </div>
         <div v-else class="table-content empty">No skins found</div>
       </div>
-      <div><InfoIcon /> Does not get capes. You may edit them after import</div>
       <div class="button-row">
         <Button
           :disabled="
             loading ||
-            !Array.from(mojang.skinNames)
+            !Array.from(importer.skinNames)
               .flatMap((e) => e)
               .some((e) => e.selected)
           "
@@ -205,11 +205,11 @@
           {{
             loading
               ? 'Importing...'
-              : Array.from(mojang.skinNames)
+              : Array.from(importer.skinNames)
                   .flatMap((e) => e)
                   .some((e) => e.selected)
               ? `Import ${
-                  Array.from(mojang.skinNames)
+                  Array.from(importer.skinNames)
                     .flatMap((e) => e)
                     .filter((e) => e.selected).length
                 } skins`
@@ -244,7 +244,6 @@ import {
   ClipboardCopyIcon,
   AnimatedLogo,
   XIcon,
-  InfoIcon,
   EyeIcon,
   TrashIcon,
 } from 'omorphia'
@@ -258,14 +257,13 @@ import { selectedAccount } from '@/helpers/auth'
 import dayjs from 'dayjs'
 import SkinSave from '@/components/ui/SkinSave.vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-
+import { get_default_launcher_path } from '@/helpers/import.js'
 import {
   check_image,
   check_skin,
   loaded_skins,
   get_user_skin_data,
-  get_mojang_launcher_path,
-  get_mojang_launcher_names,
+  get_launcher_names,
   set_skin,
   save_skin,
   import_skin,
@@ -302,9 +300,12 @@ const editSkin = ref(false)
 const loading = ref(false)
 const importedSkins = ref(0)
 const totalSkins = ref(0)
-const mojang = ref({})
-mojang.value.path = await get_mojang_launcher_path().catch(handleError)
-mojang.value.skinNames = await get_mojang_launcher_names(mojang.value.path).catch(handleError)
+const importer = ref({
+  skinNames: [],
+  path: '',
+  display: ''
+})
+const importType = ref('Mojang')
 
 const skinSaves = ref(await get_skins().catch(handleError))
 
@@ -396,25 +397,25 @@ const handleOptionsClick = async (args) => {
 }
 
 const selectLauncherPath = async () => {
-  mojang.value.path = await open({ multiple: false, directory: true })
+  importer.value.path = await open({ multiple: false, directory: true })
 
-  if (mojang.value.path) {
+  if (importer.value.path) {
     await reload()
   }
 }
 
 const reload = async () => {
-  mojang.value.skinNames = get_mojang_launcher_names(mojang.value.path).catch(handleError)
+  importer.value.skinNames = get_launcher_names(importer.value.path, importType.value).catch(handleError)
 }
 
 const next = async () => {
   importedSkins.value = 0
-  totalSkins.value = Array.from(mojang.value.skinNames)
+  totalSkins.value = Array.from(importer.value.skinNames)
     .flatMap((e) => e)
     .filter((e) => e.selected).length
   loading.value = true
-  for (const skin of mojang.value.skinNames.filter((skin) => skin.selected)) {
-    const data = await import_skin(skin.name, mojang.value.path).catch(handleError)
+  for (const skin of importer.value.skinNames.filter((skin) => skin.selected)) {
+    const data = await import_skin(skin.id, importer.value.path, importType.value).catch(handleError)
     const model = await get_render(data).catch(handleError)
     await save_skin(selectedAccount.value.id, data, skin.name, model, '').catch(handleError)
     skin.selected = false
@@ -454,12 +455,26 @@ const skinClear = async () => {
   }
 }
 
+const handleArms = async () => {
+  if (validSkin.value) {
+    newRender.value.loadSkin(displaySkin.value, { model: convert_arms(skinArms.value) })
+  }
+}
+
+const handleCape = async () => {
+  if (validSkin.value) {
+    if (skinCape.value == 'no cape') newRender.value.resetCape()
+    else newRender.value.loadCape(await get_cape_data(skinCape.value, 'url').catch(handleError))
+  }
+}
+
 const handleSkin = async (skin, cape, arms, state) => {
-  let data = {}
-  data.skin = skin
-  data.cape = cape
-  data.arms = arms
-  data.unlocked_capes = []
+  let data = {
+    skin: skin,
+    cape: cape,
+    arms: arms,
+    unlocked_capes: []
+  }
 
   if (state.includes('save')) {
     const model = await get_render(data).catch(handleError)
@@ -628,6 +643,21 @@ const update_render = async (account) => {
     currentRender.value.loadCape(await get_cape_data(skinData.value.cape, 'url').catch(handleError))
 }
 
+const handleModalType = async () => {
+  if (changeSkinType.value == 'import from launcher') {
+    handleImportType()
+  }
+}
+
+const handleImportType = async () => {
+  if (importType.value == 'Mojang') importer.value.display = '.minecraft'
+  else importer.value.display = importType.value
+  importer.value.path = await get_default_launcher_path(importType.value).catch(handleError)
+    if (importer.value.path !== null) {
+      importer.value.skinNames = await get_launcher_names(importer.value.path, importType.value).catch(handleError)
+    } else importer.value.path = ''
+}
+
 watch(selectedAccount, async (newAccount) => {
   await update_render(newAccount.id)
 })
@@ -641,19 +671,6 @@ watch(
   },
   { once: true }
 )
-
-watch(skinArms, async (newArms) => {
-  if (validSkin.value && newRender.value) {
-    newRender.value.loadSkin(displaySkin.value, { model: convert_arms(newArms) })
-  }
-})
-
-watch(skinCape, async (newCape) => {
-  if (validSkin.value && newRender.value) {
-    if (newCape == 'no cape') newRender.value.resetCape()
-    else newRender.value.loadCape(await get_cape_data(newCape, 'url').catch(handleError))
-  }
-})
 
 function convert_arms(arms) {
   if (arms == 'classic') arms = 'default'

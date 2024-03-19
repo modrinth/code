@@ -63,16 +63,12 @@ export async function get_heads() {
   account_heads.value = await invoke('plugin:skin|skin_get_heads')
 }
 
-export async function get_mojang_launcher_path() {
-  return await invoke('plugin:skin|skin_get_mojang_launcher_path')
+export async function get_launcher_names(path, installer) {
+  return await invoke('plugin:skin|skin_get_launcher_names', { path, installer })
 }
 
-export async function get_mojang_launcher_names(path) {
-  return await invoke('plugin:skin|skin_get_mojang_launcher_names', { path })
-}
-
-export async function import_skin(name, path) {
-  return await invoke('plugin:skin|skin_import_skin', { name, path })
+export async function import_skin(id, path, installer) {
+  return await invoke('plugin:skin|skin_import_skin', { id, path, installer })
 }
 
 export async function get_render(skinData) {
