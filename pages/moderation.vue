@@ -10,9 +10,6 @@
           <NavStackItem link="/moderation/review" label="Review projects">
             <ModerationIcon />
           </NavStackItem>
-          <NavStackItem link="/moderation/messages" label="Messages">
-            <MessageIcon />
-          </NavStackItem>
           <NavStackItem link="/moderation/reports" label="Reports">
             <ReportIcon />
           </NavStackItem>

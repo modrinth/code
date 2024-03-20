@@ -367,37 +367,6 @@
             </div>
           </div>
         </div>
-        <div
-          v-if="currentMember && project.moderator_message"
-          class="universal-card moderation-card"
-        >
-          <h2 class="card-header">Message from the moderators:</h2>
-          <div v-if="project.moderator_message.body">
-            <p v-if="project.moderator_message.message" class="mod-message__title">
-              {{ project.moderator_message.message }}
-            </p>
-          </div>
-          <div
-            class="markdown-body"
-            v-html="
-              renderString(
-                project.moderator_message.body
-                  ? project.moderator_message.body
-                  : project.moderator_message.message
-              )
-            "
-          />
-          <div class="buttons status-buttons">
-            <button
-              v-if="tags.approvedStatuses.includes(project.status)"
-              class="iconified-button"
-              @click="clearMessage"
-            >
-              <ClearIcon />
-              Clear message
-            </button>
-          </div>
-        </div>
       </div>
       <section class="normal-page__content">
         <ProjectMemberHeader
@@ -461,7 +430,9 @@
                 href: `/${project.project_type}/${
                   project.slug ? project.slug : project.id
                 }/moderation`,
-                shown: !!currentMember,
+                shown:
+                  !!currentMember &&
+                  (isRejected(project) || isUnderReview(project) || isStaff(auth.user)),
               },
             ]"
           />
@@ -770,10 +741,12 @@ import {
   Checkbox,
   ChartIcon,
   renderString,
+  isRejected,
+  isUnderReview,
+  isStaff,
 } from 'omorphia'
 import CrownIcon from '~/assets/images/utils/crown.svg'
 import CalendarIcon from '~/assets/images/utils/calendar.svg'
-import ClearIcon from '~/assets/images/utils/clear.svg'
 import DownloadIcon from '~/assets/images/utils/download.svg'
 import UpdateIcon from '~/assets/images/utils/updated.svg'
 import QueuedIcon from '~/assets/images/utils/list-end.svg'
@@ -1041,31 +1014,6 @@ if (!route.name.startsWith('type-id-settings')) {
 }
 
 const onUserCollectProject = useClientTry(userCollectProject)
-
-async function clearMessage() {
-  startLoading()
-
-  try {
-    await useBaseFetch(`project/${project.value.id}`, {
-      method: 'PATCH',
-      body: {
-        moderation_message: null,
-        moderation_message_body: null,
-      },
-    })
-
-    project.value.moderator_message = null
-  } catch (err) {
-    data.$notify({
-      group: 'main',
-      title: 'An error occurred',
-      text: err.data.description,
-      type: 'error',
-    })
-  }
-
-  stopLoading()
-}
 
 async function setProcessing() {
   startLoading()

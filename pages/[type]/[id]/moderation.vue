@@ -75,8 +75,9 @@
       <h2>Messages</h2>
       <p>
         This is a private conversation thread with the Modrinth moderators. They may message you
-        with issues concerning this project. Additionally, you are welcome to start a discussion
-        here regarding this project and its status.
+        with issues concerning this project. This thread is only checked when you submit your
+        project for review. For additional inquiries, contact
+        <a href="https://support.modrinth.com">Modrinth support</a>.
       </p>
       <ConversationThread
         v-if="thread"
@@ -124,7 +125,6 @@ const props = defineProps({
 
 const app = useNuxtApp()
 const auth = await useAuth()
-const tags = useTags()
 
 const { data: thread } = await useAsyncData(`thread/${props.project.thread_id}`, () =>
   useBaseFetch(`thread/${props.project.thread_id}`)
@@ -139,13 +139,6 @@ async function setStatus(status) {
       method: 'PATCH',
       body: data,
     })
-
-    if (tags.value.staffRoles.includes(auth.value.user.role)) {
-      await useBaseFetch(`thread/${props.project.thread_id}/read`, {
-        method: 'POST',
-        body: data,
-      })
-    }
 
     const project = props.project
     project.status = status
