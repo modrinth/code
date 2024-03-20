@@ -14,10 +14,8 @@ use sqlx::PgPool;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("thread")
-            .service(moderation_inbox)
             .service(thread_get)
-            .service(thread_send_message)
-            .service(thread_read),
+            .service(thread_send_message),
     );
     cfg.service(web::scope("message").service(message_delete));
     cfg.service(threads_get);
@@ -100,44 +98,6 @@ pub async fn thread_send_message(
     )
     .await
     .or_else(v2_reroute::flatten_404_error)
-}
-
-#[get("inbox")]
-pub async fn moderation_inbox(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let response = v3::threads::moderation_inbox(req, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)?;
-
-    // Convert response to V2 format
-    match v2_reroute::extract_ok_json::<Vec<Thread>>(response).await {
-        Ok(threads) => {
-            let threads = threads
-                .into_iter()
-                .map(LegacyThread::from)
-                .collect::<Vec<_>>();
-            Ok(HttpResponse::Ok().json(threads))
-        }
-        Err(response) => Ok(response),
-    }
-}
-
-#[post("{id}/read")]
-pub async fn thread_read(
-    req: HttpRequest,
-    info: web::Path<(ThreadId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    // Returns NoContent, so we don't need to convert the response
-    v3::threads::thread_read(req, info, pool, redis, session_queue)
-        .await
-        .or_else(v2_reroute::flatten_404_error)
 }
 
 #[delete("{id}")]

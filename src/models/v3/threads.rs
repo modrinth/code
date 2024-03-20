@@ -32,6 +32,7 @@ pub struct ThreadMessage {
     pub author_id: Option<UserId>,
     pub body: MessageBody,
     pub created: DateTime<Utc>,
+    pub hide_identity: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -41,8 +42,6 @@ pub enum MessageBody {
         body: String,
         #[serde(default)]
         private: bool,
-        #[serde(default)]
-        hide_identity: bool,
         replying_to: Option<ThreadMessageId>,
         #[serde(default)]
         associated_images: Vec<ImageId>,
@@ -116,24 +115,17 @@ impl Thread {
                 })
                 .map(|x| ThreadMessage {
                     id: x.id.into(),
-                    author_id: if users
-                        .iter()
-                        .find(|y| x.author_id == Some(y.id.into()))
-                        .map(|x| x.role.is_mod() && !user.role.is_mod())
-                        .unwrap_or(false)
-                    {
+                    author_id: if x.hide_identity && !user.role.is_mod() {
                         None
                     } else {
                         x.author_id.map(|x| x.into())
                     },
                     body: x.body,
                     created: x.created,
+                    hide_identity: x.hide_identity,
                 })
                 .collect(),
-            members: users
-                .into_iter()
-                .filter(|x| !x.role.is_mod() || user.role.is_mod())
-                .collect(),
+            members: users,
         }
     }
 }

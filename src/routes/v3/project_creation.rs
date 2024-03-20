@@ -615,14 +615,14 @@ async fn project_create_inner(
         let mut members = vec![];
 
         if let Some(organization_id) = project_create_data.organization_id {
-            let org = models::Organization::get_id(organization_id.into(), &*pool, &redis)
+            let org = models::Organization::get_id(organization_id.into(), pool, redis)
                 .await?
                 .ok_or_else(|| {
                     CreateError::InvalidInput("Invalid organization ID specified!".to_string())
                 })?;
 
             let team_member =
-                models::TeamMember::get_from_user_id(org.team_id, current_user.id.into(), &*pool)
+                models::TeamMember::get_from_user_id(org.team_id, current_user.id.into(), pool)
                     .await?;
 
             let perms =

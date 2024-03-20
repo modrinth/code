@@ -355,17 +355,6 @@ pub async fn project_edit(
                     .execute(&mut *transaction)
                     .await?;
 
-                    sqlx::query!(
-                        "
-                        UPDATE threads
-                        SET show_in_mod_inbox = FALSE
-                        WHERE id = $1
-                        ",
-                        project_item.thread_id as db_ids::ThreadId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-
                     moderation_queue
                         .projects
                         .insert(project_item.inner.id.into());
@@ -464,6 +453,7 @@ pub async fn project_edit(
                         old_status: project_item.inner.status,
                     },
                     thread_id: project_item.thread_id,
+                    hide_identity: true,
                 }
                 .insert(&mut transaction)
                 .await?;

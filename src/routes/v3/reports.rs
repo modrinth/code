@@ -435,6 +435,7 @@ pub async fn report_edit(
                     MessageBody::ThreadClosure
                 },
                 thread_id: report.thread_id,
+                hide_identity: true,
             }
             .insert(&mut transaction)
             .await?;
@@ -447,18 +448,6 @@ pub async fn report_edit(
                 ",
                 edit_closed,
                 id as crate::database::models::ids::ReportId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-
-            sqlx::query!(
-                "
-                UPDATE threads
-                SET show_in_mod_inbox = $1
-                WHERE id = $2
-                ",
-                !(edit_closed || report.closed),
-                report.thread_id.0,
             )
             .execute(&mut *transaction)
             .await?;

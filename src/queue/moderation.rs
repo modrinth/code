@@ -612,7 +612,7 @@ impl AutomatedModerationQueue {
 
                             if !mod_messages.is_empty() {
                                 let first_time = database::models::Thread::get(project.thread_id, &pool).await?
-                                    .map(|x| x.messages.iter().all(|x| match x.body { MessageBody::Text { hide_identity, .. } => x.author_id == Some(database::models::UserId(AUTOMOD_ID)) || hide_identity, _ => true}))
+                                    .map(|x| x.messages.iter().all(|x| x.author_id == Some(database::models::UserId(AUTOMOD_ID)) || x.hide_identity))
                                     .unwrap_or(true);
 
                                 let mut transaction = pool.begin().await?;
@@ -621,11 +621,11 @@ impl AutomatedModerationQueue {
                                     body: MessageBody::Text {
                                         body: mod_messages.markdown(true),
                                         private: false,
-                                        hide_identity: false,
                                         replying_to: None,
                                         associated_images: vec![],
                                     },
                                     thread_id: project.thread_id,
+                                    hide_identity: false,
                                 }
                                     .insert(&mut transaction)
                                     .await?;
@@ -645,6 +645,7 @@ impl AutomatedModerationQueue {
                                             old_status: project.inner.status,
                                         },
                                         thread_id: project.thread_id,
+                                        hide_identity: false,
                                     }
                                         .insert(&mut transaction)
                                         .await?;
@@ -733,11 +734,11 @@ impl AutomatedModerationQueue {
                                 body: MessageBody::Text {
                                     body: str,
                                     private: true,
-                                    hide_identity: false,
                                     replying_to: None,
                                     associated_images: vec![],
                                 },
                                 thread_id: project.thread_id,
+                                hide_identity: false,
                             }
                                 .insert(&mut transaction)
                                 .await?;

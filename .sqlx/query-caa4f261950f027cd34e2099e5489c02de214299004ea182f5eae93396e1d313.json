@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created\n            FROM threads_messages tm\n            WHERE tm.id = ANY($1)\n            ",
+  "query": "\n            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created, tm.hide_identity\n            FROM threads_messages tm\n            WHERE tm.id = ANY($1)\n            ",
   "describe": {
     "columns": [
       {
@@ -27,6 +27,11 @@
         "ordinal": 4,
         "name": "created",
         "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "hide_identity",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -39,8 +44,9 @@
       true,
       false,
       false,
+      false,
       false
     ]
   },
-  "hash": "320d73cd900a6e00f0e74b7a8c34a7658d16034b01a35558cb42fa9c16185eb5"
+  "hash": "caa4f261950f027cd34e2099e5489c02de214299004ea182f5eae93396e1d313"
 }

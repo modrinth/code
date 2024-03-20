@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::database::models::image_item;
 use crate::database::models::notification_item::NotificationBuilder;
@@ -24,10 +24,8 @@ use sqlx::PgPool;
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("thread")
-            .route("inbox", web::get().to(moderation_inbox))
             .route("{id}", web::get().to(thread_get))
-            .route("{id}", web::post().to(thread_send_message))
-            .route("{id}/read", web::post().to(thread_read)),
+            .route("{id}", web::post().to(thread_send_message)),
     );
     cfg.service(web::scope("message").route("{id}", web::delete().to(message_delete)));
     cfg.route("threads", web::get().to(threads_get));
@@ -252,7 +250,13 @@ pub async fn filter_authorized_threads(
             &mut thread
                 .messages
                 .iter()
-                .filter_map(|x| x.author_id)
+                .filter_map(|x| {
+                    if x.hide_identity && !user.role.is_mod() {
+                        None
+                    } else {
+                        x.author_id
+                    }
+                })
                 .collect::<Vec<_>>(),
         );
 
@@ -299,7 +303,13 @@ pub async fn thread_get(
                 &mut data
                     .messages
                     .iter()
-                    .filter_map(|x| x.author_id)
+                    .filter_map(|x| {
+                        if x.hide_identity && !user.role.is_mod() {
+                            None
+                        } else {
+                            x.author_id
+                        }
+                    })
                     .collect::<Vec<_>>(),
             );
 
@@ -379,7 +389,6 @@ pub async fn thread_send_message(
         body,
         replying_to,
         private,
-        hide_identity,
         ..
     } = &new_message.body
     {
@@ -392,12 +401,6 @@ pub async fn thread_send_message(
         if *private && !user.role.is_mod() {
             return Err(ApiError::InvalidInput(
                 "You are not allowed to send private messages!".to_string(),
-            ));
-        }
-
-        if *hide_identity && !user.role.is_mod() {
-            return Err(ApiError::InvalidInput(
-                "You are not allowed to send masked messages!".to_string(),
             ));
         }
 
@@ -436,11 +439,12 @@ pub async fn thread_send_message(
             author_id: Some(user.id.into()),
             body: new_message.body.clone(),
             thread_id: thread.id,
+            hide_identity: user.role.is_mod(),
         }
         .insert(&mut transaction)
         .await?;
 
-        let mod_notif = if let Some(project_id) = thread.project_id {
+        if let Some(project_id) = thread.project_id {
             let project = database::models::Project::get_id(project_id, &**pool, &redis).await?;
 
             if let Some(project) = project {
@@ -468,8 +472,6 @@ pub async fn thread_send_message(
                     .await?;
                 }
             }
-
-            !user.role.is_mod()
         } else if let Some(report_id) = thread.report_id {
             let report = database::models::report_item::Report::get(report_id, &**pool).await?;
 
@@ -493,23 +495,7 @@ pub async fn thread_send_message(
                     .await?;
                 }
             }
-
-            !user.role.is_mod()
-        } else {
-            false
-        };
-
-        sqlx::query!(
-            "
-            UPDATE threads
-            SET show_in_mod_inbox = $1
-            WHERE id = $2
-            ",
-            mod_notif,
-            thread.id.0,
-        )
-        .execute(&mut *transaction)
-        .await?;
+        }
 
         if let MessageBody::Text {
             associated_images, ..
@@ -557,72 +543,6 @@ pub async fn thread_send_message(
     } else {
         Err(ApiError::NotFound)
     }
-}
-
-pub async fn moderation_inbox(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    let user = check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::THREAD_READ]),
-    )
-    .await?;
-    let ids = sqlx::query!(
-        "
-        SELECT id
-        FROM threads
-        WHERE show_in_mod_inbox = TRUE
-        "
-    )
-    .fetch_many(&**pool)
-    .try_filter_map(|e| async { Ok(e.right().map(|m| database::models::ThreadId(m.id))) })
-    .try_collect::<Vec<database::models::ThreadId>>()
-    .await?;
-
-    let threads_data = database::models::Thread::get_many(&ids, &**pool).await?;
-    let threads = filter_authorized_threads(threads_data, &user, &pool, &redis).await?;
-    Ok(HttpResponse::Ok().json(threads))
-}
-
-pub async fn thread_read(
-    req: HttpRequest,
-    info: web::Path<(ThreadId,)>,
-    pool: web::Data<PgPool>,
-    redis: web::Data<RedisPool>,
-    session_queue: web::Data<AuthQueue>,
-) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        &req,
-        &**pool,
-        &redis,
-        &session_queue,
-        Some(&[Scopes::THREAD_READ]),
-    )
-    .await?;
-
-    let id = info.into_inner().0;
-    let mut transaction = pool.begin().await?;
-
-    sqlx::query!(
-        "
-        UPDATE threads
-        SET show_in_mod_inbox = FALSE
-        WHERE id = $1
-        ",
-        id.0 as i64,
-    )
-    .execute(&mut *transaction)
-    .await?;
-
-    transaction.commit().await?;
-
-    Ok(HttpResponse::NoContent().body(""))
 }
 
 pub async fn message_delete(

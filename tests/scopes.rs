@@ -836,43 +836,6 @@ pub async fn thread_scopes() {
             .test(req_gen, thread_write)
             .await
             .unwrap();
-
-        // Check moderation inbox
-        // Uses moderator PAT, as only moderators can see the moderation inbox
-        let req_gen =
-            |pat: Option<String>| async move { api.get_moderation_inbox(pat.as_deref()).await };
-        let (_, success) = ScopeTest::new(&test_env)
-            .with_user_id(MOD_USER_ID_PARSED)
-            .test(req_gen, thread_read)
-            .await
-            .unwrap();
-        let thread_id: &str = success[0]["id"].as_str().unwrap();
-
-        // Moderator 'read' thread
-        // Uses moderator PAT, as only moderators can see the moderation inbox
-        let req_gen =
-            |pat: Option<String>| async move { api.read_thread(thread_id, pat.as_deref()).await };
-        ScopeTest::new(&test_env)
-            .with_user_id(MOD_USER_ID_PARSED)
-            .test(req_gen, thread_read)
-            .await
-            .unwrap();
-
-        // Delete that message
-        // First, get message id
-        let resp = api.get_thread(thread_id, USER_USER_PAT).await;
-        let success: serde_json::Value = test::read_body_json(resp).await;
-        let thread_message_id = success["messages"][0]["id"].as_str().unwrap();
-
-        let req_gen = |pat: Option<String>| async move {
-            api.delete_thread_message(thread_message_id, pat.as_deref())
-                .await
-        };
-        ScopeTest::new(&test_env)
-            .with_user_id(MOD_USER_ID_PARSED)
-            .test(req_gen, thread_write)
-            .await
-            .unwrap();
     })
     .await;
 }
