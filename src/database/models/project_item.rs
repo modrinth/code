@@ -5,13 +5,15 @@ use super::{ids::*, User};
 use crate::database::models;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
+use crate::models::ids::base62_impl::parse_base62;
 use crate::models::projects::{MonetizationStatus, ProjectStatus};
 use chrono::{DateTime, Utc};
 use dashmap::{DashMap, DashSet};
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Debug, Display};
+use std::hash::Hash;
 
 pub const PROJECTS_NAMESPACE: &str = "projects";
 pub const PROJECTS_SLUGS_NAMESPACE: &str = "projects_slugs";
@@ -505,7 +507,7 @@ impl Project {
         Project::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: ToString>(
+    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
         project_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -513,301 +515,253 @@ impl Project {
     where
         E: sqlx::Acquire<'a, Database = sqlx::Postgres>,
     {
-        let project_strings = project_strings
-            .iter()
-            .map(|x| x.to_string())
-            .unique()
-            .collect::<Vec<String>>();
-
-        if project_strings.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let mut redis = redis.connect().await?;
-        let mut exec = exec.acquire().await?;
-
-        let mut found_projects = Vec::new();
-        let mut remaining_strings = project_strings.clone();
-
-        let mut project_ids = project_strings
-            .iter()
-            .flat_map(|x| parse_base62(&x.to_string()).map(|x| x as i64))
-            .collect::<Vec<_>>();
-
-        project_ids.append(
-            &mut redis
-                .multi_get::<i64>(
-                    PROJECTS_SLUGS_NAMESPACE,
-                    project_strings.iter().map(|x| x.to_string().to_lowercase()),
-                )
-                .await?
-                .into_iter()
-                .flatten()
-                .collect(),
-        );
-        if !project_ids.is_empty() {
-            let projects = redis
-                .multi_get::<String>(
-                    PROJECTS_NAMESPACE,
-                    project_ids.iter().map(|x| x.to_string()),
-                )
-                .await?;
-            for project in projects {
-                if let Some(project) =
-                    project.and_then(|x| serde_json::from_str::<QueryProject>(&x).ok())
-                {
-                    remaining_strings.retain(|x| {
-                        &to_base62(project.inner.id.0 as u64) != x
-                            && project.inner.slug.as_ref().map(|x| x.to_lowercase())
-                                != Some(x.to_lowercase())
-                    });
-                    found_projects.push(project);
-                    continue;
-                }
-            }
-        }
-        if !remaining_strings.is_empty() {
-            let project_ids_parsed: Vec<i64> = remaining_strings
-                .iter()
-                .flat_map(|x| parse_base62(&x.to_string()).ok())
-                .map(|x| x as i64)
-                .collect();
-            let slugs = remaining_strings
-                .into_iter()
-                .map(|x| x.to_lowercase())
-                .collect::<Vec<_>>();
-
-            let all_version_ids = DashSet::new();
-            let versions: DashMap<ProjectId, Vec<(VersionId, DateTime<Utc>)>> = sqlx::query!(
-                "
-                SELECT DISTINCT mod_id, v.id as id, date_published
-                FROM mods m
-                INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)
-                WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                ",
-                &project_ids_parsed,
-                &slugs,
-                &*crate::models::projects::VersionStatus::iterator()
-                    .filter(|x| x.is_listed())
-                    .map(|x| x.to_string())
-                    .collect::<Vec<String>>()
-            )
-            .fetch(&mut *exec)
-            .try_fold(
-                DashMap::new(),
-                |acc: DashMap<ProjectId, Vec<(VersionId, DateTime<Utc>)>>, m| {
-                    let version_id = VersionId(m.id);
-                    let date_published = m.date_published;
-                    all_version_ids.insert(version_id);
-                    acc.entry(ProjectId(m.mod_id))
-                        .or_default()
-                        .push((version_id, date_published));
-                    async move { Ok(acc) }
-                },
-            )
-            .await?;
-
-            let loader_field_enum_value_ids = DashSet::new();
-            let version_fields: DashMap<ProjectId, Vec<QueryVersionField>> = sqlx::query!(
-                "
-                SELECT DISTINCT mod_id, version_id, field_id, int_value, enum_value, string_value
-                FROM versions v
-                INNER JOIN version_fields vf ON v.id = vf.version_id
-                WHERE v.id = ANY($1)
-                ",
-                &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-            )
-            .fetch(&mut *exec)
-            .try_fold(
-                DashMap::new(),
-                |acc: DashMap<ProjectId, Vec<QueryVersionField>>, m| {
-                    let qvf = QueryVersionField {
-                        version_id: VersionId(m.version_id),
-                        field_id: LoaderFieldId(m.field_id),
-                        int_value: m.int_value,
-                        enum_value: m.enum_value.map(LoaderFieldEnumValueId),
-                        string_value: m.string_value,
-                    };
-
-                    if let Some(enum_value) = m.enum_value {
-                        loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
-                    }
-
-                    acc.entry(ProjectId(m.mod_id)).or_default().push(qvf);
-                    async move { Ok(acc) }
-                },
-            )
-            .await?;
-
-            let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
-                "
-                SELECT DISTINCT id, enum_id, value, ordering, created, metadata
-                FROM loader_field_enum_values lfev
-                WHERE id = ANY($1)  
-                ORDER BY enum_id, ordering, created DESC
-                ",
-                &loader_field_enum_value_ids
+        let val = redis.get_cached_keys_with_slug(
+            PROJECTS_NAMESPACE,
+            PROJECTS_SLUGS_NAMESPACE,
+            false,
+            project_strings,
+            |ids| async move {
+                let mut exec = exec.acquire().await?;
+                let project_ids_parsed: Vec<i64> = ids
                     .iter()
-                    .map(|x| x.0)
-                    .collect::<Vec<_>>()
-            )
-            .fetch(&mut *exec)
-            .map_ok(|m| QueryLoaderFieldEnumValue {
-                id: LoaderFieldEnumValueId(m.id),
-                enum_id: LoaderFieldEnumId(m.enum_id),
-                value: m.value,
-                ordering: m.ordering,
-                created: m.created,
-                metadata: m.metadata,
-            })
-            .try_collect()
-            .await?;
+                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .map(|x| x as i64)
+                    .collect();
+                let slugs = ids
+                    .into_iter()
+                    .map(|x| x.to_string().to_lowercase())
+                    .collect::<Vec<_>>();
 
-            let mods_gallery: DashMap<ProjectId, Vec<GalleryItem>> = sqlx::query!(
-                "
-                SELECT DISTINCT mod_id, mg.image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
-                FROM mods_gallery mg
-                INNER JOIN mods m ON mg.mod_id = m.id
-                WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                ",
-                &project_ids_parsed,
-                &slugs
-            ).fetch(&mut *exec)
-            .try_fold(DashMap::new(), |acc : DashMap<ProjectId, Vec<GalleryItem>>, m| {
-                    acc.entry(ProjectId(m.mod_id))
-                    .or_default()
-                    .push(GalleryItem {
-                        image_url: m.image_url,
-                        featured: m.featured.unwrap_or(false),
-                        name: m.name,
-                        description: m.description,
-                        created: m.created,
+                let all_version_ids = DashSet::new();
+                let versions: DashMap<ProjectId, Vec<(VersionId, DateTime<Utc>)>> = sqlx::query!(
+                    "
+                    SELECT DISTINCT mod_id, v.id as id, date_published
+                    FROM mods m
+                    INNER JOIN versions v ON m.id = v.mod_id AND v.status = ANY($3)
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                    ",
+                    &project_ids_parsed,
+                    &slugs,
+                    &*crate::models::projects::VersionStatus::iterator()
+                        .filter(|x| x.is_listed())
+                        .map(|x| x.to_string())
+                        .collect::<Vec<String>>()
+                )
+                    .fetch(&mut *exec)
+                    .try_fold(
+                        DashMap::new(),
+                        |acc: DashMap<ProjectId, Vec<(VersionId, DateTime<Utc>)>>, m| {
+                            let version_id = VersionId(m.id);
+                            let date_published = m.date_published;
+                            all_version_ids.insert(version_id);
+                            acc.entry(ProjectId(m.mod_id))
+                                .or_default()
+                                .push((version_id, date_published));
+                            async move { Ok(acc) }
+                        },
+                    )
+                    .await?;
+
+                let loader_field_enum_value_ids = DashSet::new();
+                let version_fields: DashMap<ProjectId, Vec<QueryVersionField>> = sqlx::query!(
+                    "
+                    SELECT DISTINCT mod_id, version_id, field_id, int_value, enum_value, string_value
+                    FROM versions v
+                    INNER JOIN version_fields vf ON v.id = vf.version_id
+                    WHERE v.id = ANY($1)
+                    ",
+                    &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+                )
+                    .fetch(&mut *exec)
+                    .try_fold(
+                        DashMap::new(),
+                        |acc: DashMap<ProjectId, Vec<QueryVersionField>>, m| {
+                            let qvf = QueryVersionField {
+                                version_id: VersionId(m.version_id),
+                                field_id: LoaderFieldId(m.field_id),
+                                int_value: m.int_value,
+                                enum_value: m.enum_value.map(LoaderFieldEnumValueId),
+                                string_value: m.string_value,
+                            };
+
+                            if let Some(enum_value) = m.enum_value {
+                                loader_field_enum_value_ids.insert(LoaderFieldEnumValueId(enum_value));
+                            }
+
+                            acc.entry(ProjectId(m.mod_id)).or_default().push(qvf);
+                            async move { Ok(acc) }
+                        },
+                    )
+                    .await?;
+
+                let loader_field_enum_values: Vec<QueryLoaderFieldEnumValue> = sqlx::query!(
+                    "
+                    SELECT DISTINCT id, enum_id, value, ordering, created, metadata
+                    FROM loader_field_enum_values lfev
+                    WHERE id = ANY($1)
+                    ORDER BY enum_id, ordering, created DESC
+                    ",
+                    &loader_field_enum_value_ids
+                        .iter()
+                        .map(|x| x.0)
+                        .collect::<Vec<_>>()
+                )
+                    .fetch(&mut *exec)
+                    .map_ok(|m| QueryLoaderFieldEnumValue {
+                        id: LoaderFieldEnumValueId(m.id),
+                        enum_id: LoaderFieldEnumId(m.enum_id),
+                        value: m.value,
                         ordering: m.ordering,
-                    });
-                    async move { Ok(acc) }
-                }
-            ).await?;
+                        created: m.created,
+                        metadata: m.metadata,
+                    })
+                    .try_collect()
+                    .await?;
 
-            let links: DashMap<ProjectId, Vec<LinkUrl>> = sqlx::query!(
-                "
-                SELECT DISTINCT joining_mod_id as mod_id, joining_platform_id as platform_id, lp.name as platform_name, url, lp.donation as donation
-                FROM mods_links ml
-                INNER JOIN mods m ON ml.joining_mod_id = m.id 
-                INNER JOIN link_platforms lp ON ml.joining_platform_id = lp.id
-                WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                ",
-                &project_ids_parsed,
-                &slugs
-            ).fetch(&mut *exec)
-            .try_fold(DashMap::new(), |acc : DashMap<ProjectId, Vec<LinkUrl>>, m| {
-                    acc.entry(ProjectId(m.mod_id))
-                    .or_default()
-                    .push(LinkUrl {
-                        platform_id: LinkPlatformId(m.platform_id),
-                        platform_name: m.platform_name,
-                        url: m.url,
-                        donation: m.donation,
-                    });
-                    async move { Ok(acc) }
-                }
-            ).await?;
+                let mods_gallery: DashMap<ProjectId, Vec<GalleryItem>> = sqlx::query!(
+                    "
+                    SELECT DISTINCT mod_id, mg.image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
+                    FROM mods_gallery mg
+                    INNER JOIN mods m ON mg.mod_id = m.id
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                    ",
+                    &project_ids_parsed,
+                    &slugs
+                ).fetch(&mut *exec)
+                    .try_fold(DashMap::new(), |acc : DashMap<ProjectId, Vec<GalleryItem>>, m| {
+                        acc.entry(ProjectId(m.mod_id))
+                            .or_default()
+                            .push(GalleryItem {
+                                image_url: m.image_url,
+                                featured: m.featured.unwrap_or(false),
+                                name: m.name,
+                                description: m.description,
+                                created: m.created,
+                                ordering: m.ordering,
+                            });
+                        async move { Ok(acc) }
+                    }
+                    ).await?;
 
-            #[derive(Default)]
-            struct VersionLoaderData {
-                loaders: Vec<String>,
-                project_types: Vec<String>,
-                games: Vec<String>,
-                loader_loader_field_ids: Vec<LoaderFieldId>,
-            }
+                let links: DashMap<ProjectId, Vec<LinkUrl>> = sqlx::query!(
+                    "
+                    SELECT DISTINCT joining_mod_id as mod_id, joining_platform_id as platform_id, lp.name as platform_name, url, lp.donation as donation
+                    FROM mods_links ml
+                    INNER JOIN mods m ON ml.joining_mod_id = m.id
+                    INNER JOIN link_platforms lp ON ml.joining_platform_id = lp.id
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                    ",
+                    &project_ids_parsed,
+                    &slugs
+                ).fetch(&mut *exec)
+                    .try_fold(DashMap::new(), |acc : DashMap<ProjectId, Vec<LinkUrl>>, m| {
+                        acc.entry(ProjectId(m.mod_id))
+                            .or_default()
+                            .push(LinkUrl {
+                                platform_id: LinkPlatformId(m.platform_id),
+                                platform_name: m.platform_name,
+                                url: m.url,
+                                donation: m.donation,
+                            });
+                        async move { Ok(acc) }
+                    }
+                    ).await?;
 
-            let loader_field_ids = DashSet::new();
-            let loaders_ptypes_games: DashMap<ProjectId, VersionLoaderData> = sqlx::query!(
-                "
-                SELECT DISTINCT mod_id,
-                    ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-                    ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-                    ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
-                    ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields
-                FROM versions v
-                INNER JOIN loaders_versions lv ON v.id = lv.version_id
-                INNER JOIN loaders l ON lv.loader_id = l.id
-                INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
-                INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-                INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
-                INNER JOIN games g ON lptg.game_id = g.id
-                LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id
-                WHERE v.id = ANY($1)
-                GROUP BY mod_id
-                ",
-                &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-            ).fetch(&mut *exec)
-            .map_ok(|m| {
-                let project_id = ProjectId(m.mod_id);
-
-                // Add loader fields to the set we need to fetch
-                let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
-                for loader_field_id in loader_loader_field_ids.iter() {
-                    loader_field_ids.insert(*loader_field_id);
+                #[derive(Default)]
+                struct VersionLoaderData {
+                    loaders: Vec<String>,
+                    project_types: Vec<String>,
+                    games: Vec<String>,
+                    loader_loader_field_ids: Vec<LoaderFieldId>,
                 }
 
-                // Add loader + loader associated data to the map
-                let version_loader_data = VersionLoaderData {
-                    loaders: m.loaders.unwrap_or_default(),
-                    project_types: m.project_types.unwrap_or_default(),
-                    games: m.games.unwrap_or_default(),
-                    loader_loader_field_ids,
-                };
+                let loader_field_ids = DashSet::new();
+                let loaders_ptypes_games: DashMap<ProjectId, VersionLoaderData> = sqlx::query!(
+                    "
+                    SELECT DISTINCT mod_id,
+                        ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+                        ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
+                        ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
+                        ARRAY_AGG(DISTINCT lfl.loader_field_id) filter (where lfl.loader_field_id is not null) loader_fields
+                    FROM versions v
+                    INNER JOIN loaders_versions lv ON v.id = lv.version_id
+                    INNER JOIN loaders l ON lv.loader_id = l.id
+                    INNER JOIN loaders_project_types lpt ON lpt.joining_loader_id = l.id
+                    INNER JOIN project_types pt ON pt.id = lpt.joining_project_type_id
+                    INNER JOIN loaders_project_types_games lptg ON lptg.loader_id = l.id AND lptg.project_type_id = pt.id
+                    INNER JOIN games g ON lptg.game_id = g.id
+                    LEFT JOIN loader_fields_loaders lfl ON lfl.loader_id = l.id
+                    WHERE v.id = ANY($1)
+                    GROUP BY mod_id
+                    ",
+                    &all_version_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+                ).fetch(&mut *exec)
+                    .map_ok(|m| {
+                        let project_id = ProjectId(m.mod_id);
 
-                    (project_id, version_loader_data)
+                        // Add loader fields to the set we need to fetch
+                        let loader_loader_field_ids = m.loader_fields.unwrap_or_default().into_iter().map(LoaderFieldId).collect::<Vec<_>>();
+                        for loader_field_id in loader_loader_field_ids.iter() {
+                            loader_field_ids.insert(*loader_field_id);
+                        }
 
-                }
-            ).try_collect().await?;
+                        // Add loader + loader associated data to the map
+                        let version_loader_data = VersionLoaderData {
+                            loaders: m.loaders.unwrap_or_default(),
+                            project_types: m.project_types.unwrap_or_default(),
+                            games: m.games.unwrap_or_default(),
+                            loader_loader_field_ids,
+                        };
 
-            let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
-                "
-                SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
-                FROM loader_fields lf
-                WHERE id = ANY($1)  
-                ",
-                &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-            )
-            .fetch(&mut *exec)
-            .map_ok(|m| QueryLoaderField {
-                id: LoaderFieldId(m.id),
-                field: m.field,
-                field_type: m.field_type,
-                enum_type: m.enum_type.map(LoaderFieldEnumId),
-                min_val: m.min_val,
-                max_val: m.max_val,
-                optional: m.optional,
-            })
-            .try_collect()
-            .await?;
+                        (project_id, version_loader_data)
 
-            let db_projects: Vec<QueryProject> = sqlx::query!(
-                "
-                SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
-                m.icon_url icon_url, m.description description, m.published published,
-                m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
-                m.license_url license_url,
-                m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-                m.webhook_sent, m.color,
-                t.id thread_id, m.monetization_status monetization_status,
-                ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
-                ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories
-                FROM mods m                
-                INNER JOIN threads t ON t.mod_id = m.id
-                LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-                LEFT JOIN categories c ON mc.joining_category_id = c.id
-                WHERE m.id = ANY($1) OR m.slug = ANY($2)
-                GROUP BY t.id, m.id;
-                ",
-                &project_ids_parsed,
-                &slugs,
-            )
-                .fetch_many(&mut *exec)
-                .try_filter_map(|e| async {
-                    Ok(e.right().map(|m| {
+                    }
+                    ).try_collect().await?;
+
+                let loader_fields: Vec<QueryLoaderField> = sqlx::query!(
+                    "
+                    SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional
+                    FROM loader_fields lf
+                    WHERE id = ANY($1)
+                    ",
+                    &loader_field_ids.iter().map(|x| x.0).collect::<Vec<_>>()
+                )
+                    .fetch(&mut *exec)
+                    .map_ok(|m| QueryLoaderField {
+                        id: LoaderFieldId(m.id),
+                        field: m.field,
+                        field_type: m.field_type,
+                        enum_type: m.enum_type.map(LoaderFieldEnumId),
+                        min_val: m.min_val,
+                        max_val: m.max_val,
+                        optional: m.optional,
+                    })
+                    .try_collect()
+                    .await?;
+
+                let projects = sqlx::query!(
+                    "
+                    SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
+                    m.icon_url icon_url, m.description description, m.published published,
+                    m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
+                    m.license_url license_url,
+                    m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
+                    m.webhook_sent, m.color,
+                    t.id thread_id, m.monetization_status monetization_status,
+                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
+                    ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories
+                    FROM mods m
+                    INNER JOIN threads t ON t.mod_id = m.id
+                    LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+                    LEFT JOIN categories c ON mc.joining_category_id = c.id
+                    WHERE m.id = ANY($1) OR m.slug = ANY($2)
+                    GROUP BY t.id, m.id;
+                    ",
+                    &project_ids_parsed,
+                    &slugs,
+                )
+                    .fetch(&mut *exec)
+                    .try_fold(DashMap::new(), |acc, m| {
                         let id = m.id;
                         let project_id = ProjectId(id);
                         let VersionLoaderData {
@@ -815,54 +769,54 @@ impl Project {
                             project_types,
                             games,
                             loader_loader_field_ids,
-                         } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
+                        } = loaders_ptypes_games.remove(&project_id).map(|x|x.1).unwrap_or_default();
                         let mut versions = versions.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let mut gallery = mods_gallery.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let urls = links.remove(&project_id).map(|x| x.1).unwrap_or_default();
                         let version_fields = version_fields.remove(&project_id).map(|x| x.1).unwrap_or_default();
 
                         let loader_fields = loader_fields.iter()
-                        .filter(|x| loader_loader_field_ids.contains(&x.id))
-                        .collect::<Vec<_>>();
+                            .filter(|x| loader_loader_field_ids.contains(&x.id))
+                            .collect::<Vec<_>>();
 
-                    QueryProject {
-                        inner: Project {
-                            id: ProjectId(id),
-                            team_id: TeamId(m.team_id),
-                            organization_id: m.organization_id.map(OrganizationId),
-                            name: m.name.clone(),
-                            summary: m.summary.clone(),
-                            downloads: m.downloads,
-                            icon_url: m.icon_url.clone(),
-                            published: m.published,
-                            updated: m.updated,
-                            license_url: m.license_url.clone(),
-                            status: ProjectStatus::from_string(
-                                &m.status,
-                            ),
-                            requested_status: m.requested_status.map(|x| ProjectStatus::from_string(
-                                &x,
-                            )),
-                            license: m.license.clone(),
-                            slug: m.slug.clone(),
-                            description: m.description.clone(),
-                            follows: m.follows,
-                            moderation_message: m.moderation_message,
-                            moderation_message_body: m.moderation_message_body,
-                            approved: m.approved,
-                            webhook_sent: m.webhook_sent,
-                            color: m.color.map(|x| x as u32),
-                            queued: m.queued,
-                            monetization_status: MonetizationStatus::from_string(
-                                &m.monetization_status,
-                            ),
-                            loaders,
-                        },
-                        categories: m.categories.unwrap_or_default(),
-                        additional_categories: m.additional_categories.unwrap_or_default(),
-                        project_types,
-                        games,
-                        versions: {
+                        let project = QueryProject {
+                            inner: Project {
+                                id: ProjectId(id),
+                                team_id: TeamId(m.team_id),
+                                organization_id: m.organization_id.map(OrganizationId),
+                                name: m.name.clone(),
+                                summary: m.summary.clone(),
+                                downloads: m.downloads,
+                                icon_url: m.icon_url.clone(),
+                                published: m.published,
+                                updated: m.updated,
+                                license_url: m.license_url.clone(),
+                                status: ProjectStatus::from_string(
+                                    &m.status,
+                                ),
+                                requested_status: m.requested_status.map(|x| ProjectStatus::from_string(
+                                    &x,
+                                )),
+                                license: m.license.clone(),
+                                slug: m.slug.clone(),
+                                description: m.description.clone(),
+                                follows: m.follows,
+                                moderation_message: m.moderation_message,
+                                moderation_message_body: m.moderation_message_body,
+                                approved: m.approved,
+                                webhook_sent: m.webhook_sent,
+                                color: m.color.map(|x| x as u32),
+                                queued: m.queued,
+                                monetization_status: MonetizationStatus::from_string(
+                                    &m.monetization_status,
+                                ),
+                                loaders,
+                            },
+                            categories: m.categories.unwrap_or_default(),
+                            additional_categories: m.additional_categories.unwrap_or_default(),
+                            project_types,
+                            games,
+                            versions: {
                                 // Each version is a tuple of (VersionId, DateTime<Utc>)
                                 versions.sort_by(|a, b| a.1.cmp(&b.1));
                                 versions.into_iter().map(|x| x.0).collect()
@@ -872,32 +826,20 @@ impl Project {
                                 gallery
                             },
                             urls,
-                        aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
-                        thread_id: ThreadId(m.thread_id),
-                    }}))
-                })
-                .try_collect::<Vec<QueryProject>>()
-                .await?;
+                            aggregate_version_fields: VersionField::from_query_json(version_fields, &loader_fields, &loader_field_enum_values, true),
+                            thread_id: ThreadId(m.thread_id),
+                        };
 
-            for project in db_projects {
-                redis
-                    .set_serialized_to_json(PROJECTS_NAMESPACE, project.inner.id.0, &project, None)
+                        acc.insert(m.id, (m.slug, project));
+                        async move { Ok(acc) }
+                    })
                     .await?;
-                if let Some(slug) = &project.inner.slug {
-                    redis
-                        .set(
-                            PROJECTS_SLUGS_NAMESPACE,
-                            &slug.to_lowercase(),
-                            &project.inner.id.0.to_string(),
-                            None,
-                        )
-                        .await?;
-                }
-                found_projects.push(project);
-            }
-        }
 
-        Ok(found_projects)
+                Ok(projects)
+            },
+        ).await?;
+
+        Ok(val)
     }
 
     pub async fn get_dependencies<'a, E>(

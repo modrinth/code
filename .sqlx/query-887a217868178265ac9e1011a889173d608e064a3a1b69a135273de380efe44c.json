@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT DISTINCT lf.id, lf.field, lf.field_type, lf.optional, lf.min_val, lf.max_val, lf.enum_type, lfl.loader_id\n                FROM loader_fields lf\n                LEFT JOIN loader_fields_loaders lfl ON lfl.loader_field_id = lf.id\n                WHERE lfl.loader_id = ANY($1)\n                ",
+  "query": "\n                    SELECT DISTINCT id, field, field_type, enum_type, min_val, max_val, optional\n                    FROM loader_fields lf\n                    WHERE id = ANY($1)\n                    ",
   "describe": {
     "columns": [
       {
@@ -20,8 +20,8 @@
       },
       {
         "ordinal": 3,
-        "name": "optional",
-        "type_info": "Bool"
+        "name": "enum_type",
+        "type_info": "Int4"
       },
       {
         "ordinal": 4,
@@ -35,13 +35,8 @@
       },
       {
         "ordinal": 6,
-        "name": "enum_type",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 7,
-        "name": "loader_id",
-        "type_info": "Int4"
+        "name": "optional",
+        "type_info": "Bool"
       }
     ],
     "parameters": {
@@ -53,12 +48,11 @@
       false,
       false,
       false,
-      false,
       true,
       true,
       true,
       false
     ]
   },
-  "hash": "bb6afad07ebfa3b92399bb07aa9e15fa69bd328f44b4bf991e80f6b91fcd3a50"
+  "hash": "887a217868178265ac9e1011a889173d608e064a3a1b69a135273de380efe44c"
 }

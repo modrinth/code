@@ -5,8 +5,11 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::Badges;
 use chrono::{DateTime, Utc};
+use dashmap::DashMap;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Debug, Display};
+use std::hash::Hash;
 
 const USERS_NAMESPACE: &str = "users";
 const USER_USERNAMES_NAMESPACE: &str = "users_usernames";
@@ -132,7 +135,7 @@ impl User {
         User::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: ToString>(
+    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
         users_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -142,123 +145,73 @@ impl User {
     {
         use futures::TryStreamExt;
 
-        let mut redis = redis.connect().await?;
-
-        if users_strings.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let mut found_users = Vec::new();
-        let mut remaining_strings = users_strings
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>();
-
-        let mut user_ids = users_strings
-            .iter()
-            .flat_map(|x| parse_base62(&x.to_string()).map(|x| x as i64))
-            .collect::<Vec<_>>();
-
-        user_ids.append(
-            &mut redis
-                .multi_get::<i64>(
-                    USER_USERNAMES_NAMESPACE,
-                    users_strings.iter().map(|x| x.to_string().to_lowercase()),
-                )
-                .await?
-                .into_iter()
-                .flatten()
-                .collect(),
-        );
-
-        if !user_ids.is_empty() {
-            let users = redis
-                .multi_get::<String>(USERS_NAMESPACE, user_ids.iter().map(|x| x.to_string()))
-                .await?;
-            for user in users {
-                if let Some(user) = user.and_then(|x| serde_json::from_str::<User>(&x).ok()) {
-                    remaining_strings.retain(|x| {
-                        &to_base62(user.id.0 as u64) != x
-                            && user.username.to_lowercase() != x.to_lowercase()
-                    });
-                    found_users.push(user);
-                    continue;
-                }
-            }
-        }
-
-        if !remaining_strings.is_empty() {
-            let user_ids_parsed: Vec<i64> = remaining_strings
-                .iter()
-                .flat_map(|x| parse_base62(&x.to_string()).ok())
-                .map(|x| x as i64)
-                .collect();
-            let db_users: Vec<User> = sqlx::query!(
-                "
-                SELECT id, name, email,
-                    avatar_url, username, bio,
-                    created, role, badges,
-                    balance,
-                    github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
-                    email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
-                    venmo_handle
-                FROM users
-                WHERE id = ANY($1) OR LOWER(username) = ANY($2)
-                ",
-                &user_ids_parsed,
-                &remaining_strings
+        let val = redis.get_cached_keys_with_slug(
+            USERS_NAMESPACE,
+            USER_USERNAMES_NAMESPACE,
+            false,
+            users_strings,
+            |ids| async move {
+                let user_ids: Vec<i64> = ids
+                    .iter()
+                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .map(|x| x as i64)
+                    .collect();
+                let slugs = ids
                     .into_iter()
                     .map(|x| x.to_string().to_lowercase())
-                    .collect::<Vec<_>>(),
-            )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|u| User {
-                    id: UserId(u.id),
-                    github_id: u.github_id,
-                    discord_id: u.discord_id,
-                    gitlab_id: u.gitlab_id,
-                    google_id: u.google_id,
-                    steam_id: u.steam_id,
-                    microsoft_id: u.microsoft_id,
-                    name: u.name,
-                    email: u.email,
-                    email_verified: u.email_verified,
-                    avatar_url: u.avatar_url,
-                    username: u.username,
-                    bio: u.bio,
-                    created: u.created,
-                    role: u.role,
-                    badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
-                    balance: u.balance,
-                    password: u.password,
-                    paypal_id: u.paypal_id,
-                    paypal_country: u.paypal_country,
-                    paypal_email: u.paypal_email,
-                    venmo_handle: u.venmo_handle,
-                    totp_secret: u.totp_secret,
-                }))
-            })
-            .try_collect::<Vec<User>>()
-            .await?;
+                    .collect::<Vec<_>>();
 
-            for user in db_users {
-                redis
-                    .set_serialized_to_json(USERS_NAMESPACE, user.id.0, &user, None)
-                    .await?;
-                redis
-                    .set(
-                        USER_USERNAMES_NAMESPACE,
-                        &user.username.to_lowercase(),
-                        &user.id.0.to_string(),
-                        None,
-                    )
-                    .await?;
-                found_users.push(user);
-            }
-        }
+                let users = sqlx::query!(
+                    "
+                    SELECT id, name, email,
+                        avatar_url, username, bio,
+                        created, role, badges,
+                        balance,
+                        github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
+                        email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
+                        venmo_handle
+                    FROM users
+                    WHERE id = ANY($1) OR LOWER(username) = ANY($2)
+                    ",
+                    &user_ids,
+                    &slugs,
+                )
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc, u| {
+                        let user = User {
+                            id: UserId(u.id),
+                            github_id: u.github_id,
+                            discord_id: u.discord_id,
+                            gitlab_id: u.gitlab_id,
+                            google_id: u.google_id,
+                            steam_id: u.steam_id,
+                            microsoft_id: u.microsoft_id,
+                            name: u.name,
+                            email: u.email,
+                            email_verified: u.email_verified,
+                            avatar_url: u.avatar_url,
+                            username: u.username.clone(),
+                            bio: u.bio,
+                            created: u.created,
+                            role: u.role,
+                            badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
+                            balance: u.balance,
+                            password: u.password,
+                            paypal_id: u.paypal_id,
+                            paypal_country: u.paypal_country,
+                            paypal_email: u.paypal_email,
+                            venmo_handle: u.venmo_handle,
+                            totp_secret: u.totp_secret,
+                        };
 
-        Ok(found_users)
+                        acc.insert(u.id, (Some(u.username), user));
+                        async move { Ok(acc) }
+                    })
+                    .await?;
+
+                Ok(users)
+            }).await?;
+        Ok(val)
     }
 
     pub async fn get_email<'a, E>(email: &str, exec: E) -> Result<Option<UserId>, sqlx::Error>

@@ -48,4 +48,6 @@ pub enum DatabaseError {
     SerdeCacheError(#[from] serde_json::Error),
     #[error("Schema error: {0}")]
     SchemaError(String),
+    #[error("Timeout when waiting for cache subscriber")]
+    CacheTimeout,
 }

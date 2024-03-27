@@ -208,6 +208,13 @@ impl<'a> MinecraftGameVersionBuilder<'a> {
         .fetch_one(exec)
         .await?;
 
+        let mut conn = redis.connect().await?;
+        conn.delete(
+            crate::database::models::loader_fields::LOADER_FIELD_ENUM_VALUES_NAMESPACE,
+            game_versions_enum.id.0,
+        )
+        .await?;
+
         Ok(LoaderFieldEnumValueId(result.id))
     }
 }

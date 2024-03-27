@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,\n                accepted, payouts_split, \n                ordering, user_id\n                FROM team_members\n                WHERE team_id = ANY($1)\n                ORDER BY team_id, ordering;\n                ",
+  "query": "\n                    SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,\n                    accepted, payouts_split,\n                    ordering, user_id\n                    FROM team_members\n                    WHERE team_id = ANY($1)\n                    ORDER BY team_id, ordering;\n                    ",
   "describe": {
     "columns": [
       {
@@ -72,5 +72,5 @@
       false
     ]
   },
-  "hash": "c387574b32f6b70adc88132df96fbbc7dd57a6f633a787dd31aafc0584547345"
+  "hash": "a5007d03b1b5b2a95814a3070d114c55731403dcd75d44420acce8df5bd2009b"
 }

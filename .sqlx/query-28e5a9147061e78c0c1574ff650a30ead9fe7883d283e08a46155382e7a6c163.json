@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color\n                FROM organizations o\n                WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)\n                GROUP BY o.id;\n                ",
+  "query": "\n                        SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color\n                        FROM organizations o\n                        WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)\n                        GROUP BY o.id;\n                        ",
   "describe": {
     "columns": [
       {
@@ -55,5 +55,5 @@
       true
     ]
   },
-  "hash": "4deaf065c12dbfd5f585286001fdf66f60524ec13eab7d922db9290237297849"
+  "hash": "28e5a9147061e78c0c1574ff650a30ead9fe7883d283e08a46155382e7a6c163"
 }

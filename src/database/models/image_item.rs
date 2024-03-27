@@ -2,6 +2,7 @@ use super::ids::*;
 use crate::database::redis::RedisPool;
 use crate::{database::models::DatabaseError, models::images::ImageContext};
 use chrono::{DateTime, Utc};
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 
 const IMAGES_NAMESPACE: &str = "images";
@@ -180,70 +181,44 @@ impl Image {
     {
         use futures::TryStreamExt;
 
-        let mut redis = redis.connect().await?;
-        if image_ids.is_empty() {
-            return Ok(Vec::new());
-        }
+        let val = redis.get_cached_keys(
+            IMAGES_NAMESPACE,
+            &image_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
+            |image_ids| async move {
+                let images = sqlx::query!(
+                    "
+                    SELECT id, url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
+                    FROM uploaded_images
+                    WHERE id = ANY($1)
+                    GROUP BY id;
+                    ",
+                    &image_ids,
+                )
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc, i| {
+                        let img = Image {
+                            id: ImageId(i.id),
+                            url: i.url,
+                            size: i.size as u64,
+                            created: i.created,
+                            owner_id: UserId(i.owner_id),
+                            context: i.context,
+                            project_id: i.mod_id.map(ProjectId),
+                            version_id: i.version_id.map(VersionId),
+                            thread_message_id: i.thread_message_id.map(ThreadMessageId),
+                            report_id: i.report_id.map(ReportId),
+                        };
 
-        let mut found_images = Vec::new();
-        let mut remaining_ids = image_ids.to_vec();
-
-        let image_ids = image_ids.iter().map(|x| x.0).collect::<Vec<_>>();
-
-        if !image_ids.is_empty() {
-            let images = redis
-                .multi_get::<String>(IMAGES_NAMESPACE, image_ids.iter().map(|x| x.to_string()))
-                .await?;
-            for image in images {
-                if let Some(image) = image.and_then(|x| serde_json::from_str::<Image>(&x).ok()) {
-                    remaining_ids.retain(|x| image.id.0 != x.0);
-                    found_images.push(image);
-                    continue;
-                }
-            }
-        }
-
-        if !remaining_ids.is_empty() {
-            let db_images: Vec<Image> = sqlx::query!(
-                "
-                SELECT id, url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
-                FROM uploaded_images
-                WHERE id = ANY($1)
-                GROUP BY id;
-                ",
-                &remaining_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
-            )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|i| {
-                    let id = i.id;
-
-                    Image {
-                        id: ImageId(id),
-                        url: i.url,
-                        size: i.size as u64,
-                        created: i.created,
-                        owner_id: UserId(i.owner_id),
-                        context: i.context,
-                        project_id: i.mod_id.map(ProjectId),
-                        version_id: i.version_id.map(VersionId),
-                        thread_message_id: i.thread_message_id.map(ThreadMessageId),
-                        report_id: i.report_id.map(ReportId),
-                    }
-                }))
-            })
-            .try_collect::<Vec<Image>>()
-            .await?;
-
-            for image in db_images {
-                redis
-                    .set_serialized_to_json(IMAGES_NAMESPACE, image.id.0, &image, None)
+                        acc.insert(i.id, img);
+                        async move { Ok(acc) }
+                    })
                     .await?;
-                found_images.push(image);
-            }
-        }
 
-        Ok(found_images)
+                Ok(images)
+            },
+        ).await?;
+
+        Ok(val)
     }
 
     pub async fn clear_cache(id: ImageId, redis: &RedisPool) -> Result<(), DatabaseError> {

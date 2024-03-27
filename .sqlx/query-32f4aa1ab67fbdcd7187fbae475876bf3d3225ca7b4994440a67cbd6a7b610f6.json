@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering\n                FROM versions v\n                WHERE v.id = ANY($1)\n                ORDER BY v.ordering ASC NULLS LAST, v.date_published ASC;\n                ",
+  "query": "\n                    SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n                    v.changelog changelog, v.date_published date_published, v.downloads downloads,\n                    v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status, v.ordering ordering\n                    FROM versions v\n                    WHERE v.id = ANY($1);\n                    ",
   "describe": {
     "columns": [
       {
@@ -90,5 +90,5 @@
       true
     ]
   },
-  "hash": "8615354803791e238cc037b8a105008014ecd9764d198e62cc1ad18fc3185301"
+  "hash": "32f4aa1ab67fbdcd7187fbae475876bf3d3225ca7b4994440a67cbd6a7b610f6"
 }

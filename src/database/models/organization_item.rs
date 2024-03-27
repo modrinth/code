@@ -1,7 +1,8 @@
-use crate::{
-    database::redis::RedisPool,
-    models::ids::base62_impl::{parse_base62, to_base62},
-};
+use crate::{database::redis::RedisPool, models::ids::base62_impl::parse_base62};
+use dashmap::DashMap;
+use futures::TryStreamExt;
+use std::fmt::{Debug, Display};
+use std::hash::Hash;
 
 use super::{ids::*, TeamMember};
 use serde::{Deserialize, Serialize};
@@ -97,7 +98,7 @@ impl Organization {
         Self::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: ToString>(
+    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
         organization_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -105,120 +106,56 @@ impl Organization {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use futures::stream::TryStreamExt;
-
-        let mut redis = redis.connect().await?;
-
-        if organization_strings.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let mut found_organizations = Vec::new();
-        let mut remaining_strings = organization_strings
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>();
-
-        let mut organization_ids = organization_strings
-            .iter()
-            .flat_map(|x| parse_base62(&x.to_string()).map(|x| x as i64))
-            .collect::<Vec<_>>();
-
-        organization_ids.append(
-            &mut redis
-                .multi_get::<i64>(
-                    ORGANIZATIONS_TITLES_NAMESPACE,
-                    organization_strings
+        let val = redis
+            .get_cached_keys_with_slug(
+                ORGANIZATIONS_NAMESPACE,
+                ORGANIZATIONS_TITLES_NAMESPACE,
+                false,
+                organization_strings,
+                |ids| async move {
+                    let org_ids: Vec<i64> = ids
                         .iter()
+                        .flat_map(|x| parse_base62(&x.to_string()).ok())
+                        .map(|x| x as i64)
+                        .collect();
+                    let slugs = ids
+                        .into_iter()
                         .map(|x| x.to_string().to_lowercase())
-                        .collect::<Vec<_>>(),
-                )
-                .await?
-                .into_iter()
-                .flatten()
-                .collect(),
-        );
+                        .collect::<Vec<_>>();
 
-        if !organization_ids.is_empty() {
-            let organizations = redis
-                .multi_get::<String>(
-                    ORGANIZATIONS_NAMESPACE,
-                    organization_ids.iter().map(|x| x.to_string()),
-                )
-                .await?;
+                    let organizations = sqlx::query!(
+                        "
+                        SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color
+                        FROM organizations o
+                        WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)
+                        GROUP BY o.id;
+                        ",
+                        &org_ids,
+                        &slugs,
+                    )
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc, m| {
+                        let org = Organization {
+                            id: OrganizationId(m.id),
+                            slug: m.slug.clone(),
+                            name: m.name,
+                            team_id: TeamId(m.team_id),
+                            description: m.description,
+                            icon_url: m.icon_url,
+                            color: m.color.map(|x| x as u32),
+                        };
 
-            for organization in organizations {
-                if let Some(organization) =
-                    organization.and_then(|x| serde_json::from_str::<Organization>(&x).ok())
-                {
-                    remaining_strings.retain(|x| {
-                        &to_base62(organization.id.0 as u64) != x
-                            && organization.slug.to_lowercase() != x.to_lowercase()
-                    });
-                    found_organizations.push(organization);
-                    continue;
-                }
-            }
-        }
+                        acc.insert(m.id, (Some(m.slug), org));
+                        async move { Ok(acc) }
+                    })
+                    .await?;
 
-        if !remaining_strings.is_empty() {
-            let organization_ids_parsed: Vec<i64> = remaining_strings
-                .iter()
-                .flat_map(|x| parse_base62(&x.to_string()).ok())
-                .map(|x| x as i64)
-                .collect();
-
-            let organizations: Vec<Organization> = sqlx::query!(
-                "
-                SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color
-                FROM organizations o
-                WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)
-                GROUP BY o.id;
-                ",
-                &organization_ids_parsed,
-                &remaining_strings
-                    .into_iter()
-                    .map(|x| x.to_string().to_lowercase())
-                    .collect::<Vec<_>>(),
+                    Ok(organizations)
+                },
             )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|m| Organization {
-                    id: OrganizationId(m.id),
-                    slug: m.slug,
-                    name: m.name,
-                    team_id: TeamId(m.team_id),
-                    description: m.description,
-                    icon_url: m.icon_url,
-                    color: m.color.map(|x| x as u32),
-                }))
-            })
-            .try_collect::<Vec<Organization>>()
             .await?;
 
-            for organization in organizations {
-                redis
-                    .set_serialized_to_json(
-                        ORGANIZATIONS_NAMESPACE,
-                        organization.id.0,
-                        &organization,
-                        None,
-                    )
-                    .await?;
-                redis
-                    .set(
-                        ORGANIZATIONS_TITLES_NAMESPACE,
-                        &organization.slug.to_lowercase(),
-                        &organization.id.0.to_string(),
-                        None,
-                    )
-                    .await?;
-
-                found_organizations.push(organization);
-            }
-        }
-
-        Ok(found_organizations)
+        Ok(val)
     }
 
     // Gets organization associated with a project ID, if it exists and there is one

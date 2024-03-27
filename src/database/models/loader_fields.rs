@@ -6,6 +6,7 @@ use super::DatabaseError;
 use crate::database::redis::RedisPool;
 use chrono::DateTime;
 use chrono::Utc;
+use dashmap::DashMap;
 use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
@@ -16,7 +17,7 @@ const LOADERS_LIST_NAMESPACE: &str = "loaders";
 const LOADER_FIELDS_NAMESPACE: &str = "loader_fields";
 const LOADER_FIELDS_NAMESPACE_ALL: &str = "loader_fields_all";
 const LOADER_FIELD_ENUMS_ID_NAMESPACE: &str = "loader_field_enums";
-const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str = "loader_field_enum_values";
+pub const LOADER_FIELD_ENUM_VALUES_NAMESPACE: &str = "loader_field_enum_values";
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Game {
@@ -380,75 +381,47 @@ impl LoaderField {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        type RedisLoaderFieldTuple = (LoaderId, Vec<LoaderField>);
-
-        let mut redis = redis.connect().await?;
-
-        let mut loader_ids = loader_ids.to_vec();
-        let cached_fields: Vec<RedisLoaderFieldTuple> = redis
-            .multi_get::<String>(LOADER_FIELDS_NAMESPACE, loader_ids.iter().map(|x| x.0))
-            .await?
-            .into_iter()
-            .flatten()
-            .filter_map(|x: String| serde_json::from_str::<RedisLoaderFieldTuple>(&x).ok())
-            .collect();
-
-        let mut found_loader_fields = HashMap::new();
-        if !cached_fields.is_empty() {
-            for (loader_id, fields) in cached_fields {
-                if loader_ids.contains(&loader_id) {
-                    found_loader_fields.insert(loader_id, fields);
-                    loader_ids.retain(|x| x != &loader_id);
-                }
-            }
-        }
-
-        if !loader_ids.is_empty() {
-            let result = sqlx::query!(
-                "
-                SELECT DISTINCT lf.id, lf.field, lf.field_type, lf.optional, lf.min_val, lf.max_val, lf.enum_type, lfl.loader_id
-                FROM loader_fields lf
-                LEFT JOIN loader_fields_loaders lfl ON lfl.loader_field_id = lf.id
-                WHERE lfl.loader_id = ANY($1)
-                ",
-                &loader_ids.iter().map(|x| x.0).collect::<Vec<_>>()
-            )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().and_then(|r| {
-                    Some((LoaderId(r.loader_id) ,LoaderField {
-                        id: LoaderFieldId(r.id),
-                        field_type: LoaderFieldType::build(&r.field_type, r.enum_type)?,
-                        field: r.field,
-                        optional: r.optional,
-                        min_val: r.min_val,
-                        max_val: r.max_val,
-                    }))
-                }))
-            })
-            .try_collect::<Vec<(LoaderId, LoaderField)>>()
-            .await?;
-
-            let result: Vec<RedisLoaderFieldTuple> = result
-                .into_iter()
-                .fold(
-                    HashMap::new(),
-                    |mut acc: HashMap<LoaderId, Vec<LoaderField>>, x| {
-                        acc.entry(x.0).or_default().push(x.1);
-                        acc
-                    },
+        let val = redis.get_cached_keys_raw(
+            LOADER_FIELDS_NAMESPACE,
+            &loader_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
+            |loader_ids| async move {
+                let result = sqlx::query!(
+                    "
+                    SELECT DISTINCT lf.id, lf.field, lf.field_type, lf.optional, lf.min_val, lf.max_val, lf.enum_type, lfl.loader_id
+                    FROM loader_fields lf
+                    LEFT JOIN loader_fields_loaders lfl ON lfl.loader_field_id = lf.id
+                    WHERE lfl.loader_id = ANY($1)
+                    ",
+                    &loader_ids,
                 )
-                .into_iter()
-                .collect_vec();
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc: DashMap<i32, Vec<LoaderField>>, r| {
+                        if let Some(field_type) = LoaderFieldType::build(&r.field_type, r.enum_type) {
+                            let loader_field = LoaderField {
+                                id: LoaderFieldId(r.id),
+                                field_type,
+                                field: r.field,
+                                optional: r.optional,
+                                min_val: r.min_val,
+                                max_val: r.max_val,
+                            };
 
-            for (k, v) in result.into_iter() {
-                redis
-                    .set_serialized_to_json(LOADER_FIELDS_NAMESPACE, k.0, (k, &v), None)
+                            acc.entry(r.loader_id)
+                                .or_default()
+                                .push(loader_field);
+                        }
+
+                        async move {
+                            Ok(acc)
+                        }
+                    })
                     .await?;
-                found_loader_fields.insert(k, v);
-            }
-        }
-        Ok(found_loader_fields)
+
+                Ok(result)
+            },
+        ).await?;
+
+        Ok(val.into_iter().map(|x| (LoaderId(x.0), x.1)).collect())
     }
 
     // Gets all fields for a given loader(s)
@@ -597,71 +570,51 @@ impl LoaderFieldEnumValue {
         loader_field_enum_ids: &[LoaderFieldEnumId],
         exec: E,
         redis: &RedisPool,
-    ) -> Result<Vec<(LoaderFieldEnumId, Vec<LoaderFieldEnumValue>)>, DatabaseError>
+    ) -> Result<HashMap<LoaderFieldEnumId, Vec<LoaderFieldEnumValue>>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        let mut redis = redis.connect().await?;
-        let mut found_enums = Vec::new();
-        let mut remaining_enums: Vec<LoaderFieldEnumId> = loader_field_enum_ids.to_vec();
-
-        if !remaining_enums.is_empty() {
-            let enums = redis
-                .multi_get::<String>(
-                    LOADER_FIELD_ENUM_VALUES_NAMESPACE,
-                    loader_field_enum_ids.iter().map(|x| x.0),
+        let val = redis.get_cached_keys_raw(
+            LOADER_FIELD_ENUM_VALUES_NAMESPACE,
+            &loader_field_enum_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
+            |loader_field_enum_ids| async move {
+                let values = sqlx::query!(
+                    "
+                    SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values
+                    WHERE enum_id = ANY($1)
+                    ORDER BY enum_id, ordering, created DESC
+                    ",
+                    &loader_field_enum_ids
                 )
-                .await?;
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc: DashMap<i32, Vec<LoaderFieldEnumValue>>, c| {
+                        let value = LoaderFieldEnumValue {
+                            id: LoaderFieldEnumValueId(c.id),
+                            enum_id: LoaderFieldEnumId(c.enum_id),
+                            value: c.value,
+                            ordering: c.ordering,
+                            created: c.created,
+                            metadata: c.metadata.unwrap_or_default(),
+                        };
 
-            for lfe in enums {
-                if let Some(lfe) = lfe.and_then(|x| {
-                    serde_json::from_str::<(LoaderFieldEnumId, Vec<LoaderFieldEnumValue>)>(&x).ok()
-                }) {
-                    remaining_enums.retain(|x| lfe.0 .0 != x.0);
-                    found_enums.push(lfe.1);
-                    continue;
-                }
-            }
-        }
+                        acc.entry(c.enum_id)
+                            .or_default()
+                            .push(value);
 
-        let remaining_enums = remaining_enums.iter().map(|x| x.0).collect::<Vec<_>>();
-        let result = sqlx::query!(
-            "
-            SELECT id, enum_id, value, ordering, metadata, created FROM loader_field_enum_values
-            WHERE enum_id = ANY($1)
-            ORDER BY enum_id, ordering, created DESC
-            ",
-            &remaining_enums
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|c| LoaderFieldEnumValue {
-                id: LoaderFieldEnumValueId(c.id),
-                enum_id: LoaderFieldEnumId(c.enum_id),
-                value: c.value,
-                ordering: c.ordering,
-                created: c.created,
-                metadata: c.metadata.unwrap_or_default(),
-            }))
-        })
-        .try_collect::<Vec<LoaderFieldEnumValue>>()
-        .await?;
+                        async move {
+                            Ok(acc)
+                        }
+                    })
+                    .await?;
 
-        // Convert from an Vec<LoaderFieldEnumValue> to a Vec<(LoaderFieldEnumId, Vec<LoaderFieldEnumValue>)>
-        let cachable_enum_sets: Vec<(LoaderFieldEnumId, Vec<LoaderFieldEnumValue>)> = result
-            .clone()
+                Ok(values)
+            },
+        ).await?;
+
+        Ok(val
             .into_iter()
-            .group_by(|x| x.enum_id) // we sort by enum_id, so this will group all values of the same enum_id together
-            .into_iter()
-            .map(|(k, v)| (k, v.collect::<Vec<_>>().to_vec()))
-            .collect();
-        for (k, v) in cachable_enum_sets.iter() {
-            redis
-                .set_serialized_to_json(LOADER_FIELD_ENUM_VALUES_NAMESPACE, k.0, v, None)
-                .await?;
-        }
-
-        Ok(cachable_enum_sets)
+            .map(|x| (LoaderFieldEnumId(x.0), x.1))
+            .collect())
     }
 
     // Matches filter against metadata of enum values

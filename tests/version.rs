@@ -55,7 +55,7 @@ async fn test_get_version() {
             .unwrap();
         let cached_project: serde_json::Value = serde_json::from_str(&cached_project).unwrap();
         assert_eq!(
-            cached_project["inner"]["project_id"],
+            cached_project["val"]["inner"]["project_id"],
             json!(parse_base62(alpha_project_id).unwrap())
         );
 
@@ -617,6 +617,7 @@ async fn version_ordering_for_specified_orderings_orders_lower_order_first() {
                 USER_USER_PAT,
             )
             .await;
+
         assert_common_version_ids(&versions, vec![new_version_id, alpha_version_id]);
     })
     .await;

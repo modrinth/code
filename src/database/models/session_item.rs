@@ -1,9 +1,12 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
 use crate::database::redis::RedisPool;
-use crate::models::ids::base62_impl::{parse_base62, to_base62};
+use crate::models::ids::base62_impl::parse_base62;
 use chrono::{DateTime, Utc};
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Debug, Display};
+use std::hash::Hash;
 
 const SESSIONS_NAMESPACE: &str = "sessions";
 const SESSIONS_IDS_NAMESPACE: &str = "sessions_ids";
@@ -79,7 +82,7 @@ pub struct Session {
 }
 
 impl Session {
-    pub async fn get<'a, E, T: ToString>(
+    pub async fn get<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
         id: T,
         exec: E,
         redis: &RedisPool,
@@ -120,7 +123,7 @@ impl Session {
         Session::get_many(&ids, exec, redis).await
     }
 
-    pub async fn get_many<'a, E, T: ToString>(
+    pub async fn get_many<'a, E, T: Display + Hash + Eq + PartialEq + Clone + Debug>(
         session_strings: &[T],
         exec: E,
         redis: &RedisPool,
@@ -130,109 +133,60 @@ impl Session {
     {
         use futures::TryStreamExt;
 
-        let mut redis = redis.connect().await?;
-
-        if session_strings.is_empty() {
-            return Ok(Vec::new());
-        }
-
-        let mut found_sessions = Vec::new();
-        let mut remaining_strings = session_strings
-            .iter()
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>();
-
-        let mut session_ids = session_strings
-            .iter()
-            .flat_map(|x| parse_base62(&x.to_string()).map(|x| x as i64))
-            .collect::<Vec<_>>();
-
-        session_ids.append(
-            &mut redis
-                .multi_get::<i64>(
-                    SESSIONS_IDS_NAMESPACE,
-                    session_strings.iter().map(|x| x.to_string()),
+        let val = redis.get_cached_keys_with_slug(
+            SESSIONS_NAMESPACE,
+            SESSIONS_IDS_NAMESPACE,
+            true,
+            session_strings,
+            |ids| async move {
+                let session_ids: Vec<i64> = ids
+                    .iter()
+                    .flat_map(|x| parse_base62(&x.to_string()).ok())
+                    .map(|x| x as i64)
+                    .collect();
+                let slugs = ids
+                    .into_iter()
+                    .map(|x| x.to_string())
+                    .collect::<Vec<_>>();
+                let db_sessions = sqlx::query!(
+                    "
+                    SELECT id, user_id, session, created, last_login, expires, refresh_expires, os, platform,
+                    city, country, ip, user_agent
+                    FROM sessions
+                    WHERE id = ANY($1) OR session = ANY($2)
+                    ORDER BY created DESC
+                    ",
+                    &session_ids,
+                    &slugs,
                 )
-                .await?
-                .into_iter()
-                .flatten()
-                .collect(),
-        );
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc, x| {
+                        let session = Session {
+                            id: SessionId(x.id),
+                            session: x.session.clone(),
+                            user_id: UserId(x.user_id),
+                            created: x.created,
+                            last_login: x.last_login,
+                            expires: x.expires,
+                            refresh_expires: x.refresh_expires,
+                            os: x.os,
+                            platform: x.platform,
+                            city: x.city,
+                            country: x.country,
+                            ip: x.ip,
+                            user_agent: x.user_agent,
+                        };
 
-        if !session_ids.is_empty() {
-            let sessions = redis
-                .multi_get::<String>(
-                    SESSIONS_NAMESPACE,
-                    session_ids.iter().map(|x| x.to_string()),
-                )
-                .await?;
-            for session in sessions {
-                if let Some(session) =
-                    session.and_then(|x| serde_json::from_str::<Session>(&x).ok())
-                {
-                    remaining_strings
-                        .retain(|x| &to_base62(session.id.0 as u64) != x && &session.session != x);
-                    found_sessions.push(session);
-                    continue;
-                }
-            }
-        }
+                        acc.insert(x.id, (Some(x.session), session));
 
-        if !remaining_strings.is_empty() {
-            let session_ids_parsed: Vec<i64> = remaining_strings
-                .iter()
-                .flat_map(|x| parse_base62(&x.to_string()).ok())
-                .map(|x| x as i64)
-                .collect();
-            let db_sessions: Vec<Session> = sqlx::query!(
-                "
-                SELECT id, user_id, session, created, last_login, expires, refresh_expires, os, platform,
-                city, country, ip, user_agent
-                FROM sessions
-                WHERE id = ANY($1) OR session = ANY($2)
-                ORDER BY created DESC
-                ",
-                &session_ids_parsed,
-                &remaining_strings.into_iter().map(|x| x.to_string()).collect::<Vec<_>>(),
-            )
-                .fetch_many(exec)
-                .try_filter_map(|e| async {
-                    Ok(e.right().map(|x| Session {
-                        id: SessionId(x.id),
-                        session: x.session,
-                        user_id: UserId(x.user_id),
-                        created: x.created,
-                        last_login: x.last_login,
-                        expires: x.expires,
-                        refresh_expires: x.refresh_expires,
-                        os: x.os,
-                        platform: x.platform,
-                        city: x.city,
-                        country: x.country,
-                        ip: x.ip,
-                        user_agent: x.user_agent,
-                    }))
-                })
-                .try_collect::<Vec<Session>>()
-                .await?;
-
-            for session in db_sessions {
-                redis
-                    .set_serialized_to_json(SESSIONS_NAMESPACE, session.id.0, &session, None)
+                        async move { Ok(acc) }
+                    })
                     .await?;
-                redis
-                    .set(
-                        SESSIONS_IDS_NAMESPACE,
-                        &session.session,
-                        &session.id.0.to_string(),
-                        None,
-                    )
-                    .await?;
-                found_sessions.push(session);
-            }
-        }
 
-        Ok(found_sessions)
+                Ok(db_sessions)
+            }).await?;
+
+        Ok(val)
     }
 
     pub async fn get_user_sessions<'a, E>(

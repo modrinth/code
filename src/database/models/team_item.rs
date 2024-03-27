@@ -3,6 +3,8 @@ use crate::{
     database::redis::RedisPool,
     models::teams::{OrganizationPermissions, ProjectPermissions},
 };
+use dashmap::DashMap;
+use futures::TryStreamExt;
 use itertools::Itertools;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -203,87 +205,56 @@ impl TeamMember {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use futures::stream::TryStreamExt;
-
         if team_ids.is_empty() {
             return Ok(Vec::new());
         }
 
-        let mut redis = redis.connect().await?;
+        let val = redis.get_cached_keys(
+            TEAMS_NAMESPACE,
+            &team_ids.iter().map(|x| x.0).collect::<Vec<_>>(),
+            |team_ids| async move {
+                let teams = sqlx::query!(
+                    "
+                    SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,
+                    accepted, payouts_split,
+                    ordering, user_id
+                    FROM team_members
+                    WHERE team_id = ANY($1)
+                    ORDER BY team_id, ordering;
+                    ",
+                    &team_ids
+                )
+                    .fetch(exec)
+                    .try_fold(DashMap::new(), |acc: DashMap<i64, Vec<TeamMember>>, m| {
+                        let member = TeamMember {
+                            id: TeamMemberId(m.id),
+                            team_id: TeamId(m.team_id),
+                            role: m.member_role,
+                            is_owner: m.is_owner,
+                            permissions: ProjectPermissions::from_bits(m.permissions as u64)
+                                .unwrap_or_default(),
+                            organization_permissions: m
+                                .organization_permissions
+                                .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
+                            accepted: m.accepted,
+                            user_id: UserId(m.user_id),
+                            payouts_split: m.payouts_split,
+                            ordering: m.ordering,
+                        };
 
-        let mut team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
+                        acc.entry(m.team_id)
+                            .or_default()
+                            .push(member);
 
-        let mut found_teams = Vec::new();
-
-        let teams = redis
-            .multi_get::<String>(
-                TEAMS_NAMESPACE,
-                team_ids_parsed.iter().map(|x| x.to_string()),
-            )
-            .await?;
-
-        for team_raw in teams {
-            if let Some(mut team) = team_raw
-                .clone()
-                .and_then(|x| serde_json::from_str::<Vec<TeamMember>>(&x).ok())
-            {
-                if let Some(team_id) = team.first().map(|x| x.team_id) {
-                    team_ids_parsed.retain(|x| &team_id.0 != x);
-                }
-
-                found_teams.append(&mut team);
-                continue;
-            }
-        }
-
-        if !team_ids_parsed.is_empty() {
-            let teams: Vec<TeamMember> = sqlx::query!(
-                "
-                SELECT id, team_id, role AS member_role, is_owner, permissions, organization_permissions,
-                accepted, payouts_split, 
-                ordering, user_id
-                FROM team_members
-                WHERE team_id = ANY($1)
-                ORDER BY team_id, ordering;
-                ",
-                &team_ids_parsed
-            )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|m| TeamMember {
-                    id: TeamMemberId(m.id),
-                    team_id: TeamId(m.team_id),
-                    role: m.member_role,
-                    is_owner: m.is_owner,
-                    permissions: ProjectPermissions::from_bits(m.permissions as u64)
-                        .unwrap_or_default(),
-                    organization_permissions: m
-                        .organization_permissions
-                        .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
-                    accepted: m.accepted,
-                    user_id: UserId(m.user_id),
-                    payouts_split: m.payouts_split,
-                    ordering: m.ordering,
-                }))
-            })
-            .try_collect::<Vec<TeamMember>>()
-            .await?;
-
-            for (id, mut members) in teams
-                .into_iter()
-                .group_by(|x| x.team_id)
-                .into_iter()
-                .map(|(key, group)| (key, group.collect::<Vec<_>>()))
-                .collect::<Vec<_>>()
-            {
-                redis
-                    .set_serialized_to_json(TEAMS_NAMESPACE, id.0, &members, None)
+                        async move { Ok(acc) }
+                    })
                     .await?;
-                found_teams.append(&mut members);
-            }
-        }
 
-        Ok(found_teams)
+                Ok(teams)
+            },
+        ).await?;
+
+        Ok(val.into_iter().flatten().collect())
     }
 
     pub async fn clear_cache(id: TeamId, redis: &RedisPool) -> Result<(), super::DatabaseError> {
@@ -315,8 +286,6 @@ impl TeamMember {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use futures::stream::TryStreamExt;
-
         let team_ids_parsed: Vec<i64> = team_ids.iter().map(|x| x.0).collect();
 
         let team_members = sqlx::query!(

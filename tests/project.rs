@@ -69,7 +69,10 @@ async fn test_get_project() {
             .unwrap()
             .unwrap();
         let cached_project: serde_json::Value = serde_json::from_str(&cached_project).unwrap();
-        assert_eq!(cached_project["inner"]["slug"], json!(alpha_project_slug));
+        assert_eq!(
+            cached_project["val"]["inner"]["slug"],
+            json!(alpha_project_slug)
+        );
 
         // Make the request again, this time it should be cached
         let resp = api.get_project(alpha_project_id, USER_USER_PAT).await;

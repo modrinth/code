@@ -115,6 +115,8 @@ pub async fn pat_full_test() {
                 "expires": Utc::now() + Duration::days(1), // no longer expired!
             }))
             .to_request();
+
+        println!("PAT ID FOR TEST: {}", id);
         let resp = test_env.call(req).await;
         assert_status!(&resp, StatusCode::NO_CONTENT);
         assert_eq!(mock_pat_test(access_token).await, 200); // Works again

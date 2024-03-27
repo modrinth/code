@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n                SELECT DISTINCT version_id, f.id, f.url, f.filename, f.is_primary, f.size, f.file_type\n                FROM files f\n                WHERE f.version_id = ANY($1)\n                ",
+  "query": "\n                    SELECT DISTINCT version_id, f.id, f.url, f.filename, f.is_primary, f.size, f.file_type\n                    FROM files f\n                    WHERE f.version_id = ANY($1)\n                    ",
   "describe": {
     "columns": [
       {
@@ -54,5 +54,5 @@
       true
     ]
   },
-  "hash": "e72736bb7fca4df41cf34186b1edf04d6b4d496971aaf87ed1a88e7d64eab823"
+  "hash": "b49cd556b85c3e74ebb4f1b7d48930c0456321799f20e63f1c3fd3ea0f03f198"
 }

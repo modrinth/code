@@ -117,8 +117,6 @@ impl AnalyticsQueue {
 
                 let new_count = if let Some((views, monetized)) = raw_views.get_mut(idx) {
                     if let Some(count) = count {
-                        println!("len: {} count: {}", views.len(), count);
-
                         if count > 3 {
                             *monetized = false;
                             continue;
