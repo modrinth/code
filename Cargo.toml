@@ -11,7 +11,6 @@ name = "labrinth"
 path = "src/main.rs"
 
 [dependencies]
-actix = "0.13.1"
 actix-web = "4.4.1"
 actix-rt = "2.9.0"
 actix-multipart = "0.6.1"
@@ -19,12 +18,14 @@ actix-cors = "0.7.0"
 actix-ws = "0.2.5"
 actix-files = "0.6.5"
 actix-web-prom = "0.7.0"
+governor = "0.6.3"
 
 tokio = { version = "1.35.1", features = ["sync"] }
 tokio-stream = "0.1.14"
 
 futures = "0.3.30"
 futures-timer = "3.0.2"
+futures-util = "0.3.30"
 async-trait = "0.1.70"
 dashmap = "5.4.0"
 lazy_static = "1.4.0"

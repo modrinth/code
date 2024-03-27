@@ -1,4 +1,6 @@
+use std::num::NonZeroU32;
 use std::sync::Arc;
+use std::time::Duration;
 
 use actix_web::web;
 use database::redis::RedisPool;
@@ -6,12 +8,13 @@ use log::{info, warn};
 use queue::{
     analytics::AnalyticsQueue, payouts::PayoutsQueue, session::AuthQueue, socket::ActiveSockets,
 };
-use scheduler::Scheduler;
 use sqlx::Postgres;
 use tokio::sync::RwLock;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
+use governor::{Quota, RateLimiter};
+use governor::middleware::StateInformationMiddleware;
 use util::cors::default_cors;
 
 use crate::queue::moderation::AutomatedModerationQueue;
@@ -20,6 +23,7 @@ use crate::{
     search::indexing::index_projects,
     util::env::{parse_strings_from_var, parse_var},
 };
+use crate::util::ratelimit::KeyedRateLimiter;
 
 pub mod auth;
 pub mod clickhouse;
@@ -27,7 +31,6 @@ pub mod database;
 pub mod file_hosting;
 pub mod models;
 pub mod queue;
-pub mod ratelimit;
 pub mod routes;
 pub mod scheduler;
 pub mod search;
@@ -46,7 +49,7 @@ pub struct LabrinthConfig {
     pub clickhouse: Client,
     pub file_host: Arc<dyn file_hosting::FileHost + Send + Sync>,
     pub maxmind: Arc<queue::maxmind::MaxMindIndexer>,
-    pub scheduler: Arc<Scheduler>,
+    pub scheduler: Arc<scheduler::Scheduler>,
     pub ip_salt: Pepper,
     pub search_config: search::SearchConfig,
     pub session_queue: web::Data<AuthQueue>,
@@ -54,6 +57,7 @@ pub struct LabrinthConfig {
     pub analytics_queue: Arc<AnalyticsQueue>,
     pub active_sockets: web::Data<RwLock<ActiveSockets>>,
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
+    pub rate_limiter: KeyedRateLimiter,
 }
 
 pub fn app_setup(
@@ -81,6 +85,25 @@ pub fn app_setup(
     });
 
     let mut scheduler = scheduler::Scheduler::new();
+
+    let limiter: KeyedRateLimiter = Arc::new(
+        RateLimiter::keyed(Quota::per_minute(NonZeroU32::new(300).unwrap()))
+            .with_middleware::<StateInformationMiddleware>(),
+    );
+    let limiter_clone = Arc::clone(&limiter);
+    scheduler.run(Duration::from_secs(60), move || {
+        info!(
+            "Clearing ratelimiter, storage size: {}",
+            limiter_clone.len()
+        );
+        limiter_clone.retain_recent();
+        info!(
+            "Done clearing ratelimiter, storage size: {}",
+            limiter_clone.len()
+        );
+
+        async move {}
+    });
 
     // The interval in seconds at which the local database is indexed
     // for searching.  Defaults to 1 hour if unset.
@@ -255,6 +278,7 @@ pub fn app_setup(
         analytics_queue,
         active_sockets,
         automated_moderation_queue,
+        rate_limiter: limiter,
     }
 }
 

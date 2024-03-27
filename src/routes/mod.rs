@@ -129,6 +129,8 @@ pub enum ApiError {
     Io(#[from] std::io::Error),
     #[error("Resource not found")]
     NotFound,
+    #[error("You are being rate-limited. Please wait {0} milliseconds. 0/{1} remaining.")]
+    RateLimitError(u128, u32),
 }
 
 impl ApiError {
@@ -160,6 +162,7 @@ impl ApiError {
                 ApiError::NotFound => "not_found",
                 ApiError::Zip(..) => "zip_error",
                 ApiError::Io(..) => "io_error",
+                ApiError::RateLimitError(..) => "ratelimit_error",
             },
             description: self.to_string(),
         }
@@ -194,6 +197,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::NotFound => StatusCode::NOT_FOUND,
             ApiError::Zip(..) => StatusCode::BAD_REQUEST,
             ApiError::Io(..) => StatusCode::BAD_REQUEST,
+            ApiError::RateLimitError(..) => StatusCode::TOO_MANY_REQUESTS,
         }
     }
 
