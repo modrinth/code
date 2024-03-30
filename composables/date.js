@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
-// eslint-disable-next-line import/no-named-as-default-member
 dayjs.extend(relativeTime)
 
 export const useCurrentDate = () => useState('currentDate', () => Date.now())

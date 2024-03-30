@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
-// eslint-disable-next-line import/no-named-as-default-member
+
 const { unix } = dayjs
 
 export function useCountryNames(style = 'long') {
