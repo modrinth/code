@@ -65,7 +65,7 @@ pub fn start_logger() -> Option<WorkerGuard> {
             tracing_subscriber::fmt::layer()
                 .with_writer(non_blocking)
                 .with_ansi(false) // disable ANSI escape codes
-                .with_timer(ChronoLocal::rfc3339()),
+                .with_timer(ChronoLocal::rfc_3339()),
         )
         .with(filter)
         .with(tracing_error::ErrorLayer::default());
