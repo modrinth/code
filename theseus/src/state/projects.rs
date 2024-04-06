@@ -232,19 +232,13 @@ async fn read_icon_from_file(
                 .file()
                 .entries()
                 .iter()
-                .position(|f| f.entry().filename() == icon_path);
+                .position(|f| f.filename().as_str().unwrap_or_default() == icon_path);
             if let Some(index) = zip_index_option {
-                let entry = zip_file_reader
-                    .file()
-                    .entries()
-                    .get(index)
-                    .unwrap()
-                    .entry();
                 let mut bytes = Vec::new();
                 if zip_file_reader
-                    .entry(zip_index_option.unwrap())
+                    .reader_with_entry(zip_index_option.unwrap())
                     .await?
-                    .read_to_end_checked(&mut bytes, entry)
+                    .read_to_end_checked(&mut bytes)
                     .await
                     .is_ok()
                 {
@@ -468,7 +462,7 @@ pub async fn infer_data_from_files(
             .file()
             .entries()
             .iter()
-            .position(|f| f.entry().filename() == "META-INF/mods.toml");
+            .position(|f| f.filename().as_str().unwrap_or_default() == "META-INF/mods.toml");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -489,9 +483,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -542,7 +536,7 @@ pub async fn infer_data_from_files(
             .file()
             .entries()
             .iter()
-            .position(|f| f.entry().filename() == "mcmod.info");
+            .position(|f| f.filename().as_str().unwrap_or_default() == "mcmod.info");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -558,9 +552,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -603,7 +597,7 @@ pub async fn infer_data_from_files(
             .file()
             .entries()
             .iter()
-            .position(|f| f.entry().filename() == "fabric.mod.json");
+            .position(|f| f.filename().as_str().unwrap_or_default() == "fabric.mod.json");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -625,9 +619,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -673,7 +667,7 @@ pub async fn infer_data_from_files(
             .file()
             .entries()
             .iter()
-            .position(|f| f.entry().filename() == "quilt.mod.json");
+            .position(|f| f.filename().as_str().unwrap_or_default() == "quilt.mod.json");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -692,9 +686,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -750,7 +744,7 @@ pub async fn infer_data_from_files(
             .file()
             .entries()
             .iter()
-            .position(|f| f.entry().filename() == "pack.mcmeta");
+            .position(|f| f.filename().as_str().unwrap_or_default() == "pack.mcmeta");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -760,9 +754,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
