@@ -210,12 +210,12 @@ const filteredVersions = computed(() => {
     (projectVersion) =>
       (filterGameVersions.value.length === 0 ||
         filterGameVersions.value.some((gameVersion) =>
-          projectVersion.game_versions.includes(gameVersion)
+          projectVersion.game_versions.includes(gameVersion),
         )) &&
       (filterLoader.value.length === 0 ||
         filterLoader.value.some((loader) => projectVersion.loaders.includes(loader))) &&
       (filterVersions.value.length === 0 ||
-        filterVersions.value.includes(projectVersion.version_type))
+        filterVersions.value.includes(projectVersion.version_type)),
   )
 })
 

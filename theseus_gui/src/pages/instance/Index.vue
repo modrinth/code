@@ -165,7 +165,7 @@ breadcrumbs.setName(
   'Instance',
   instance.value.metadata.name.length > 40
     ? instance.value.metadata.name.substring(0, 40) + '...'
-    : instance.value.metadata.name
+    : instance.value.metadata.name,
 )
 
 breadcrumbs.setContext({
@@ -212,7 +212,7 @@ const modrinthVersions = ref([])
 if (!(await isOffline()) && instance.value.metadata.linked_data?.project_id) {
   modrinthVersions.value = await useFetch(
     `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
-    'project'
+    'project',
   )
 }
 
@@ -259,7 +259,7 @@ const handleRightClick = (event) => {
             color: 'primary',
           },
           ...baseOptions,
-        ]
+        ],
   )
 }
 

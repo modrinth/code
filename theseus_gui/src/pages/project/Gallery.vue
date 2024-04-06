@@ -276,7 +276,9 @@ const expandImage = (item, index) => {
         display: flex;
         flex-direction: column;
         max-width: 40rem;
-        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        transition:
+          opacity 0.25s ease-in-out,
+          transform 0.25s ease-in-out;
         text-shadow: 1px 1px 10px #000000d4;
         margin-bottom: 0.25rem;
         gap: 0.5rem;
@@ -297,7 +299,9 @@ const expandImage = (item, index) => {
         background-color: var(--color-raised-bg);
         padding: var(--gap-md);
         border-radius: var(--radius-md);
-        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        transition:
+          opacity 0.25s ease-in-out,
+          transform 0.25s ease-in-out;
       }
     }
   }

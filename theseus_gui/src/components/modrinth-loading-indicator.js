@@ -66,7 +66,7 @@ export default defineComponent({
             zIndex: 6,
           },
         },
-        slots
+        slots,
       )
   },
 })

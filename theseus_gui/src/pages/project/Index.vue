@@ -38,7 +38,7 @@
           class="tags"
           :categories="
             categories.filter(
-              (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
+              (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod',
             )
           "
           type="ignored"
@@ -328,7 +328,7 @@ async function fetchProjectData() {
   breadcrumbs.setName('Project', data.value.title)
   installedVersion.value = instance.value
     ? Object.values(instance.value.projects).find(
-        (p) => p?.metadata?.version?.project_id === data.value.id
+        (p) => p?.metadata?.version?.project_id === data.value.id,
       )?.metadata?.version?.id
     : null
 }
@@ -341,7 +341,7 @@ watch(
     if (route.params.id && route.path.startsWith('/project')) {
       await fetchProjectData()
     }
-  }
+  },
 )
 
 dayjs.extend(relativeTime)
@@ -380,7 +380,7 @@ async function install(version) {
       queuedVersionData = versions.value[0]
     } else {
       queuedVersionData = versions.value.find((v) =>
-        v.game_versions.includes(data.value.game_versions[0])
+        v.game_versions.includes(data.value.game_versions[0]),
       )
     }
   }
@@ -397,7 +397,7 @@ async function install(version) {
         data.value.id,
         queuedVersionData.id,
         data.value.title,
-        data.value.icon_url
+        data.value.icon_url,
       ).catch(handleError)
 
       mixpanel_track('PackInstall', {
@@ -411,7 +411,7 @@ async function install(version) {
         data.value.id,
         queuedVersionData.id,
         data.value.title,
-        data.value.icon_url
+        data.value.icon_url,
       )
     }
   } else {
@@ -424,7 +424,7 @@ async function install(version) {
             v.game_versions.includes(gameVersion) &&
             (data.value.project_type === 'mod'
               ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
-              : true)
+              : true),
         )
         if (!selectedVersion) {
           incompatibilityWarning.value.show(
@@ -433,7 +433,7 @@ async function install(version) {
             versions.value,
             markInstalled,
             data.value.id,
-            data.value.project_type
+            data.value.project_type,
           )
           installing.value = false
           return
@@ -460,7 +460,7 @@ async function install(version) {
             v.game_versions.includes(gameVersion) &&
             (data.value.project_type === 'mod'
               ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
-              : true)
+              : true),
         )
         if (compatible) {
           await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
@@ -482,7 +482,7 @@ async function install(version) {
             [queuedVersionData],
             markInstalled,
             data.value.id,
-            data.value.project_type
+            data.value.project_type,
           )
           installing.value = false
           return
@@ -494,7 +494,7 @@ async function install(version) {
         data.value.id,
         version ? [versions.value.find((v) => v.id === queuedVersionData.id)] : versions.value,
         data.value.title,
-        data.value.project_type
+        data.value.project_type,
       )
     }
   }
@@ -527,7 +527,7 @@ const handleOptionsClick = (args) => {
       break
     case 'copy_link':
       navigator.clipboard.writeText(
-        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
       )
       break
   }

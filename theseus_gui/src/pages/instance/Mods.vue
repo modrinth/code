@@ -505,7 +505,7 @@ const initProjects = (initInstance) => {
       selectionMap.value.get(project.path) ??
         selectionMap.value.get(project.path.slice(0, -9)) ??
         selectionMap.value.get(project.path + '.disabled') ??
-        false
+        false,
     )
   }
   selectionMap.value = newSelectionMap
@@ -517,14 +517,14 @@ watch(
   () => props.instance.projects,
   () => {
     initProjects(props.instance)
-  }
+  },
 )
 
 watch(
   () => props.offline,
   () => {
     if (props.instance) initProjects(props.instance)
-  }
+  },
 )
 
 const modpackVersionModal = ref(null)
@@ -551,11 +551,11 @@ const selected = computed(() =>
     })
     .map((args) => {
       return projects.value.find((x) => x.path === args[0])
-    })
+    }),
 )
 
 const functionValues = computed(() =>
-  selected.value.length > 0 ? selected.value : Array.from(projects.value.values())
+  selected.value.length > 0 ? selected.value : Array.from(projects.value.values()),
 )
 
 const selectableProjectTypes = computed(() => {
@@ -781,7 +781,7 @@ const shareUrls = async () => {
     functionValues.value
       .filter((x) => x.slug)
       .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
-      .join('\n')
+      .join('\n'),
   )
 }
 
@@ -794,7 +794,7 @@ const shareMarkdown = async () => {
         }
         return x.name
       })
-      .join('\n')
+      .join('\n'),
   )
 }
 
@@ -839,7 +839,7 @@ const handleRightClick = (event, mod) => {
       {
         link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
       },
-      [{ name: 'open_link' }, { name: 'copy_link' }]
+      [{ name: 'open_link' }, { name: 'copy_link' }],
     )
   }
 }

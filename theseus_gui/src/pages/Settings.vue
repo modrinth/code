@@ -73,13 +73,13 @@ watch(
     if (setSettings.java_globals.JAVA_8?.path) {
       setSettings.java_globals.JAVA_8.path = setSettings.java_globals.JAVA_8.path.replace(
         'java.exe',
-        'javaw.exe'
+        'javaw.exe',
       )
     }
     if (setSettings.java_globals.JAVA_17?.path) {
       setSettings.java_globals.JAVA_17.path = setSettings.java_globals.JAVA_17?.path.replace(
         'java.exe',
-        'javaw.exe'
+        'javaw.exe',
       )
     }
 
@@ -102,7 +102,7 @@ watch(
 
     await set(setSettings)
   },
-  { deep: true }
+  { deep: true },
 )
 
 const credentials = ref(await getCreds().catch(handleError))

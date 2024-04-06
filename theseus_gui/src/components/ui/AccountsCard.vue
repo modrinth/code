@@ -147,11 +147,11 @@ defineExpose({
 await refreshValues()
 
 const displayAccounts = computed(() =>
-  accounts.value.filter((account) => settings.value.default_user !== account.id)
+  accounts.value.filter((account) => settings.value.default_user !== account.id),
 )
 
 const selectedAccount = computed(() =>
-  accounts.value.find((account) => account.id === settings.value.default_user)
+  accounts.value.find((account) => account.id === settings.value.default_user),
 )
 
 async function setAccount(account) {

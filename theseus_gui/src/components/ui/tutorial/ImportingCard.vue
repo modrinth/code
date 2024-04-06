@@ -36,7 +36,7 @@ const profiles = ref(
     ['ATLauncher', []],
     ['Curseforge', []],
     ['PrismLauncher', []],
-  ])
+  ]),
 )
 
 const loading = ref(false)
@@ -63,7 +63,7 @@ const promises = profileOptions.value.map(async (option) => {
     profileOptions.value.find((profile) => profile.name === option.name).path = path
     profiles.value.set(
       option.name,
-      instances.map((name) => ({ name, selected: false }))
+      instances.map((name) => ({ name, selected: false })),
     )
   } catch (error) {
     // Allow failure silently
@@ -82,11 +82,11 @@ const selectLauncherPath = async () => {
 const reload = async () => {
   const instances = await get_importable_instances(
     selectedProfileType.value.name,
-    selectedProfileType.value.path
+    selectedProfileType.value.path,
   ).catch(handleError)
   profiles.value.set(
     selectedProfileType.value.name,
-    instances.map((name) => ({ name, selected: false }))
+    instances.map((name) => ({ name, selected: false })),
   )
 }
 
@@ -198,14 +198,14 @@ const next = async () => {
           loading
             ? 'Importing...'
             : Array.from(profiles.values())
-                .flatMap((e) => e)
-                .some((e) => e.selected)
-            ? `Import ${
-                Array.from(profiles.values())
                   .flatMap((e) => e)
-                  .filter((e) => e.selected).length
-              } profiles`
-            : 'Select profiles to import'
+                  .some((e) => e.selected)
+              ? `Import ${
+                  Array.from(profiles.values())
+                    .flatMap((e) => e)
+                    .filter((e) => e.selected).length
+                } profiles`
+              : 'Select profiles to import'
         }}
       </Button>
       <Button class="transparent" @click="nextPage"> Next </Button>
