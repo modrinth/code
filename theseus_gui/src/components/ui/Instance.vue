@@ -2,7 +2,6 @@
 import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
 import { list, run } from '@/helpers/profile'
@@ -17,6 +16,7 @@ import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
+import { useInstanceIcon } from '@/composable/instance/icon.js'
 
 const props = defineProps({
   instance: {
@@ -165,6 +165,8 @@ const addContent = async () => {
   })
 }
 
+const avatarSrc = useInstanceIcon(props.instance)
+
 defineExpose({
   install,
   playing,
@@ -186,19 +188,7 @@ onUnmounted(() => unlisten())
 <template>
   <div class="instance">
     <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
-      <Avatar
-        size="lg"
-        :src="
-          props.instance.metadata
-            ? !props.instance.metadata.icon ||
-              (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
-              ? props.instance.metadata.icon
-              : convertFileSrc(props.instance.metadata?.icon)
-            : props.instance.icon_url
-        "
-        alt="Mod card"
-        class="mod-image"
-      />
+      <Avatar size="lg" :src="avatarSrc" alt="Mod card" class="mod-image" />
       <div class="project-info">
         <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
         <p class="description">
@@ -225,7 +215,9 @@ onUnmounted(() => unlisten())
     >
       <StopCircleIcon />
     </div>
-    <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
+    <div v-else class="install cta button-base" @click="install">
+      <DownloadIcon />
+    </div>
     <InstallConfirmModal ref="confirmModal" />
     <ModInstallModal ref="modInstallModal" />
   </div>
