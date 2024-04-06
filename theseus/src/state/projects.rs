@@ -228,32 +228,29 @@ async fn read_icon_from_file(
         let zip_file_reader = ZipFileReader::new(path).await;
         if let Ok(zip_file_reader) = zip_file_reader {
             // Get index of icon file and open it
-            let zip_index_option = zip_file_reader
-                .file()
-                .entries()
-                .iter()
-                .position(|f| f.filename().as_str().unwrap_or_default() == icon_path);
-            if let Some(index) = zip_index_option {
-                let mut bytes = Vec::new();
-                if zip_file_reader
-                    .reader_with_entry(zip_index_option.unwrap())
-                    .await?
-                    .read_to_end_checked(&mut bytes)
-                    .await
-                    .is_ok()
-                {
-                    let bytes = bytes::Bytes::from(bytes);
-                    let path = write_cached_icon(
-                        &icon_path,
-                        cache_dir,
-                        bytes,
-                        io_semaphore,
-                    )
-                    .await?;
+            let zip_index_option =
+                zip_file_reader.file().entries().iter().position(|f| {
+                    f.filename().as_str().unwrap_or_default() == icon_path
+                });
+            let mut bytes = Vec::new();
+            if zip_file_reader
+                .reader_with_entry(zip_index_option.unwrap())
+                .await?
+                .read_to_end_checked(&mut bytes)
+                .await
+                .is_ok()
+            {
+                let bytes = bytes::Bytes::from(bytes);
+                let path = write_cached_icon(
+                    &icon_path,
+                    cache_dir,
+                    bytes,
+                    io_semaphore,
+                )
+                .await?;
 
-                    return Ok(Some(path));
-                }
-            };
+                return Ok(Some(path));
+            }
         }
     }
 
@@ -458,13 +455,12 @@ pub async fn infer_data_from_files(
         };
 
         // Forge
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.filename().as_str().unwrap_or_default() == "META-INF/mods.toml");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default()
+                    == "META-INF/mods.toml"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct ForgeModInfo {
@@ -532,13 +528,11 @@ pub async fn infer_data_from_files(
         }
 
         // Forge
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.filename().as_str().unwrap_or_default() == "mcmod.info");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "mcmod.info"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct ForgeMod {
@@ -593,13 +587,11 @@ pub async fn infer_data_from_files(
         }
 
         // Fabric
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.filename().as_str().unwrap_or_default() == "fabric.mod.json");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "fabric.mod.json"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(untagged)]
             enum FabricAuthor {
@@ -663,13 +655,11 @@ pub async fn infer_data_from_files(
         }
 
         // Quilt
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.filename().as_str().unwrap_or_default() == "quilt.mod.json");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "quilt.mod.json"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             struct QuiltMetadata {
                 pub name: Option<String>,
@@ -740,13 +730,11 @@ pub async fn infer_data_from_files(
         }
 
         // Other
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.filename().as_str().unwrap_or_default() == "pack.mcmeta");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "pack.mcmeta"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             struct Pack {
                 description: Option<String>,

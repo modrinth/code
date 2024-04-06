@@ -7,7 +7,7 @@ use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
 use std::path::{Path, PathBuf};
-use tabled::settings::object::{Column, Columns};
+use tabled::settings::object::Columns;
 use tabled::settings::{Modify, Width};
 use tabled::Tabled;
 use theseus::prelude::*;
@@ -265,7 +265,7 @@ impl ProfileList {
 
         let mut table = table(rows);
         table.with(Modify::new(Columns::new(1..=1)).with(Width::wrap(40)));
-        
+
         println!("{table}");
 
         Ok(())

@@ -15,7 +15,6 @@ use async_zip::base::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde_json::json;
 
-use futures::stream::Buffered;
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
@@ -222,11 +221,7 @@ pub async fn install_zipped_mrpack_files(
         }
 
         for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader
-                .file()
-                .entries()
-                .get(index)
-                .unwrap();
+            let file = zip_reader.file().entries().get(index).unwrap();
 
             let filename = file.filename().as_str().unwrap_or_default();
 
@@ -304,18 +299,17 @@ pub async fn remove_all_related_files(
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&mrpack_file);
 
     // Create zip reader around file
-    let mut zip_reader = ZipFileReader::with_tokio(reader).await.map_err(|_| {
-        crate::Error::from(crate::ErrorKind::InputError(
-            "Failed to read input modpack zip".to_string(),
-        ))
-    })?;
+    let mut zip_reader =
+        ZipFileReader::with_tokio(reader).await.map_err(|_| {
+            crate::Error::from(crate::ErrorKind::InputError(
+                "Failed to read input modpack zip".to_string(),
+            ))
+        })?;
 
     // Extract index of modrinth.index.json
-    let zip_index_option = zip_reader
-        .file()
-        .entries()
-        .iter()
-        .position(|f| f.filename().as_str().unwrap_or_default() == "modrinth.index.json");
+    let zip_index_option = zip_reader.file().entries().iter().position(|f| {
+        f.filename().as_str().unwrap_or_default() == "modrinth.index.json"
+    });
     if let Some(zip_index) = zip_index_option {
         let mut manifest = String::new();
 
@@ -403,12 +397,8 @@ pub async fn remove_all_related_files(
 
         // Iterate over each 'overrides' file and remove it
         for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader
-                .file()
-                .entries()
-                .get(index)
-                .unwrap();
-            
+            let file = zip_reader.file().entries().get(index).unwrap();
+
             let filename = file.filename().as_str().unwrap_or_default();
 
             let file_path = PathBuf::from(filename);

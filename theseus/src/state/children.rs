@@ -13,7 +13,6 @@ use crate::util::fetch::read_json;
 use crate::util::io::IOError;
 use crate::{profile, ErrorKind};
 
-
 use tokio::task::JoinHandle;
 use uuid::Uuid;
 
