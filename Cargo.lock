@@ -5066,7 +5066,7 @@ dependencies = [
  "serde",
  "serde_ini",
  "serde_json",
- "sha1 0.6.1",
+ "sha1_smol",
  "sha2",
  "sys-info",
  "sysinfo",
