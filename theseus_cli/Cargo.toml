@@ -14,9 +14,9 @@ tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
 argh = "0.1"
 paris = { version = "1.5", features = ["macros", "no_logger"] }
-dialoguer = "0.10"
-tabled = "0.5"
-dirs = "4.0"
+dialoguer = "0.11.0"
+tabled = "0.15.0"
+dirs = "5.0.1"
 uuid = {version = "1.1", features = ["v4", "serde"]}
 url = "2.2"
 
@@ -28,7 +28,7 @@ tracing-futures = "0.2"
 tracing-subscriber = {version = "0.3", features = ["env-filter"]}
 dunce = "1.0.3"
 
-webbrowser = "0.7"
+webbrowser = "0.8.13"
 
 [target.'cfg(windows)'.dependencies] 
-winreg = "0.11.0"
+winreg = "0.52.0"

@@ -1,13 +1,14 @@
 //! Profile management subcommand
-use crate::util::{
-    confirm_async, prompt_async, select_async, table, table_path_display,
-};
+use crate::util::table_path_display;
+use crate::util::{confirm_async, prompt_async, select_async, table};
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
 use std::path::{Path, PathBuf};
+use tabled::settings::object::Columns;
+use tabled::settings::{Modify, Width};
 use tabled::Tabled;
 use theseus::prelude::*;
 use theseus::profile::create::profile_create;
@@ -216,12 +217,12 @@ pub struct ProfileList {}
 #[derive(Tabled)]
 struct ProfileRow<'a> {
     name: &'a str,
-    #[field(display_with = "table_path_display")]
+    #[tabled(display_with = "table_path_display")]
     path: &'a Path,
-    #[header("game version")]
+    #[tabled(rename = "game version")]
     game_version: &'a str,
     loader: &'a ModLoader,
-    #[header("loader version")]
+    #[tabled(rename = "loader version")]
     loader_version: &'a str,
 }
 
@@ -262,10 +263,9 @@ impl ProfileList {
         let profiles = profile::list(None).await?;
         let rows = profiles.values().map(ProfileRow::from);
 
-        let table = table(rows).with(
-            tabled::Modify::new(tabled::Column(1..=1))
-                .with(tabled::MaxWidth::wrapping(40)),
-        );
+        let mut table = table(rows);
+        table.with(Modify::new(Columns::new(1..=1)).with(Width::wrap(40)));
+
         println!("{table}");
 
         Ok(())

@@ -100,7 +100,7 @@ defineProps({
             v-for="loader in loaders.filter(
               (l) =>
                 (projectType !== 'mod' && l.supported_project_types?.includes(projectType)) ||
-                (projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name))
+                (projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name)),
             )"
             :key="loader"
           >

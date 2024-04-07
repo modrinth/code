@@ -69,12 +69,12 @@ export const installVersionDependencies = async (profile, version) => {
         continue
       const depVersions = await useFetch(
         `https://api.modrinth.com/v2/project/${dep.project_id}/version`,
-        'dependency versions'
+        'dependency versions',
       )
       const latest = depVersions.find(
         (v) =>
           v.game_versions.includes(profile.metadata.game_version) &&
-          v.loaders.includes(profile.metadata.loader)
+          v.loaders.includes(profile.metadata.loader),
       )
       if (latest) {
         await installMod(profile.path, latest.id).catch(handleError)

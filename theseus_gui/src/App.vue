@@ -107,7 +107,7 @@ defineExpose({
         title: 'Warning',
         text: e.message,
         type: 'warn',
-      })
+      }),
     )
 
     if (showOnboarding.value) {
@@ -127,7 +127,7 @@ const confirmClose = async () => {
     {
       title: 'Modrinth',
       type: 'warning',
-    }
+    },
   )
   return confirmed
 }

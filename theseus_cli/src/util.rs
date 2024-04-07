@@ -1,6 +1,7 @@
 use dialoguer::{Confirm, Input, Select};
 use eyre::Result;
 use std::{borrow::Cow, path::Path};
+use tabled::settings::Style;
 use tabled::{Table, Tabled};
 
 // TODO: make primarily async to avoid copies
@@ -14,11 +15,10 @@ pub fn prompt(prompt: &str, default: Option<String>) -> Result<String> {
     };
     print_prompt(&prompt);
 
-    let mut input = Input::<String>::new();
-    input.with_prompt("").show_default(false);
+    let mut input = Input::<String>::new().with_prompt("").show_default(false);
 
     if let Some(default) = default {
-        input.default(default);
+        input = input.default(default);
     }
 
     Ok(input.interact_text()?.trim().to_owned())
@@ -59,7 +59,7 @@ pub async fn confirm_async(prompt: String, default: bool) -> Result<bool> {
 
 // Table helpers
 pub fn table<T: Tabled>(rows: impl IntoIterator<Item = T>) -> Table {
-    Table::new(rows).with(tabled::Style::psql())
+    Table::new(rows).with(Style::psql()).clone()
 }
 
 pub fn table_path_display(path: &Path) -> String {

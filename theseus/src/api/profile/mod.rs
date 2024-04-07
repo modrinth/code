@@ -608,7 +608,7 @@ pub async fn export_mrpack(
     let mut file = File::create(&export_path)
         .await
         .map_err(|e| IOError::with_path(e, &export_path))?;
-    let mut writer = ZipFileWriter::new(&mut file);
+    let mut writer = ZipFileWriter::with_tokio(&mut file);
 
     // Create mrpack json configuration file
     let version_id = version_id.unwrap_or("1.0.0".to_string());
@@ -660,7 +660,7 @@ pub async fn export_mrpack(
                 .await
                 .map_err(|e| IOError::with_path(e, &path))?;
             let builder = ZipEntryBuilder::new(
-                format!("overrides/{relative_path}"),
+                format!("overrides/{relative_path}").into(),
                 Compression::Deflate,
             );
             writer.write_entry_whole(builder, &data).await?;
@@ -670,7 +670,7 @@ pub async fn export_mrpack(
     // Add modrinth json to the zip
     let data = serde_json::to_vec_pretty(&packfile)?;
     let builder = ZipEntryBuilder::new(
-        "modrinth.index.json".to_string(),
+        "modrinth.index.json".to_string().into(),
         Compression::Deflate,
     );
     writer.write_entry_whole(builder, &data).await?;

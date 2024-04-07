@@ -44,8 +44,8 @@ const breadcrumbs = computed(() => {
     route.meta.useContext === true
       ? breadcrumbData.context
       : route.meta.useRootContext === true
-      ? breadcrumbData.rootContext
-      : null
+        ? breadcrumbData.rootContext
+        : null
   return additionalContext ? [additionalContext, ...route.meta.breadcrumb] : route.meta.breadcrumb
 })
 </script>
