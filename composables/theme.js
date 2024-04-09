@@ -24,6 +24,7 @@ export const useTheme = () =>
 
 export const updateTheme = (value, updatePreference = false) => {
   const theme = useTheme()
+  const cosmetics = useCosmetics()
 
   const themeCookie = useCookie('color-mode', {
     maxAge: 60 * 60 * 24 * 365 * 10,
@@ -40,7 +41,7 @@ export const updateTheme = (value, updatePreference = false) => {
     if (colorSchemeQueryList.matches) {
       theme.value.value = 'light'
     } else {
-      theme.value.value = 'dark'
+      theme.value.value = cosmetics.value.preferredDarkTheme
     }
   } else {
     theme.value.value = value
@@ -53,3 +54,5 @@ export const updateTheme = (value, updatePreference = false) => {
 
   themeCookie.value = theme.value
 }
+
+export const DARK_THEMES = ['dark', 'oled', 'retro']

@@ -24,6 +24,7 @@ const ariaLabelByType = computed(() => `Banner with ${props.messageType} message
   border-radius: var(--size-rounded-card);
   overflow: hidden;
   outline: 2px solid transparent;
+  outline-offset: -2px;
 
   margin-bottom: var(--spacing-card-md);
 

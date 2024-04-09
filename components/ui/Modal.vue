@@ -119,6 +119,7 @@ export default {
     overflow-y: auto;
     width: 600px;
     pointer-events: auto;
+    outline: 3px solid transparent;
 
     .header {
       display: flex;

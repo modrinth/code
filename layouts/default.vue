@@ -433,6 +433,7 @@ import ModalCreation from '~/components/ui/ModalCreation.vue'
 import Avatar from '~/components/ui/Avatar.vue'
 import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
 import { commonMessages } from '~/utils/common-messages.ts'
+import { DARK_THEMES } from '~/composables/theme.js'
 
 const { formatMessage } = useVIntl()
 
@@ -724,7 +725,10 @@ function toggleBrowseMenu() {
   }
 }
 function changeTheme() {
-  updateTheme(app.$colorMode.value === 'dark' ? 'light' : 'dark', true)
+  updateTheme(
+    DARK_THEMES.includes(app.$colorMode.value) ? 'light' : cosmetics.value.preferredDarkTheme,
+    true
+  )
 }
 
 function hideStagingBanner() {
@@ -781,6 +785,15 @@ function hideStagingBanner() {
         a {
           align-items: center;
           display: flex;
+
+          &:not(:focus-visible) {
+            outline: none;
+
+            &.router-link-exact-active {
+              outline: 2px solid transparent;
+              border-radius: 0.25rem;
+            }
+          }
         }
 
         .small-logo {
@@ -909,6 +922,7 @@ function hideStagingBanner() {
               display: flex;
               justify-content: center;
               padding: 0;
+              outline: none;
 
               .user-icon {
                 height: 2rem;
@@ -959,6 +973,7 @@ function hideStagingBanner() {
                 display: flex;
                 padding: 0.5rem 0.75rem;
                 width: 100%;
+                outline: none;
 
                 .icon {
                   margin-right: 0.5rem;
@@ -969,6 +984,7 @@ function hideStagingBanner() {
                 &.router-link-exact-active {
                   color: var(--color-button-text-active);
                   background-color: var(--color-button-bg);
+                  outline: 2px solid transparent;
 
                   &.primary-color {
                     color: var(--color-button-text-active);

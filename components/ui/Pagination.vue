@@ -133,6 +133,7 @@ a {
     background: var(--color-brand);
     color: var(--color-brand-inverted);
     cursor: default;
+    outline: 2px solid transparent;
   }
 
   &.paginate.disabled {

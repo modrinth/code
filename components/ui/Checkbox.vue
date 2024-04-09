@@ -1,7 +1,7 @@
 <template>
   <div
     class="checkbox-outer button-within"
-    :class="{ disabled }"
+    :class="{ disabled, checked: modelValue }"
     role="presentation"
     @click="toggle"
   >
@@ -81,6 +81,12 @@ export default {
 
   &.disabled {
     cursor: not-allowed;
+  }
+
+  &.checked {
+    outline: 2px solid transparent;
+    outline-offset: 4px;
+    border-radius: 0.25rem;
   }
 }
 

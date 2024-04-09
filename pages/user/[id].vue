@@ -4,12 +4,7 @@
     <CollectionCreateModal ref="modal_collection_creation" />
     <div class="user-header-wrapper">
       <div class="user-header">
-        <Avatar
-          :src="previewImage ? previewImage : user.avatar_url"
-          size="md"
-          circle
-          :alt="user.username"
-        />
+        <Avatar :src="user.avatar_url" size="md" circle :alt="user.username" />
         <h1 class="username">
           {{ user.username }}
         </h1>
@@ -22,25 +17,14 @@
             {{ user.username }}
           </h1>
           <div class="card__overlay">
-            <FileInput
-              v-if="isEditing"
-              :max-size="262144"
-              :show-icon="true"
-              :prompt="formatMessage(messages.profileUploadAvatarInput)"
-              accept="image/png,image/jpeg,image/gif,image/webp"
-              class="choose-image iconified-button"
-              @change="showPreviewImage"
-            >
-              <UploadIcon />
-            </FileInput>
-            <button
-              v-else-if="auth.user && auth.user.id === user.id"
+            <NuxtLink
+              v-if="auth.user && auth.user.id === user.id"
+              to="/settings/profile"
               class="iconified-button"
-              @click="isEditing = true"
             >
               <EditIcon />
               {{ formatMessage(commonMessages.editButton) }}
-            </button>
+            </NuxtLink>
             <button
               v-else-if="auth.user"
               class="iconified-button"
@@ -54,123 +38,85 @@
               {{ formatMessage(messages.profileReportButton) }}
             </nuxt-link>
           </div>
-          <template v-if="isEditing">
-            <div class="inputs universal-labels">
-              <label for="user-username">
-                <span class="label__title">
-                  {{ formatMessage(messages.profileEditUsernameLabel) }}
-                </span>
-              </label>
-              <input id="user-username" v-model="user.username" maxlength="39" type="text" />
-              <label for="user-bio">
-                <span class="label__title">
-                  {{ formatMessage(messages.profileEditBioLabel) }}
-                </span>
-              </label>
-              <div class="textarea-wrapper">
-                <textarea id="user-bio" v-model="user.bio" maxlength="160" />
-              </div>
-            </div>
-            <div class="button-group">
-              <button
-                class="iconified-button"
-                @click="
-                  () => {
-                    isEditing = false
-                    user = JSON.parse(JSON.stringify(auth.user))
-                    previewImage = null
-                    icon = null
-                  }
-                "
+          <div class="sidebar__item">
+            <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
+            <Badge v-else-if="projects.length > 0" type="creator" />
+          </div>
+          <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
+          <hr class="card-divider" />
+          <div class="primary-stat">
+            <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
+            <div class="primary-stat__text">
+              <IntlFormatted
+                :message-id="messages.profileDownloadsStats"
+                :values="{ count: formatCompactNumber(sumDownloads) }"
               >
-                <CrossIcon /> {{ formatMessage(commonMessages.cancelButton) }}
-              </button>
-              <button class="iconified-button brand-button" @click="saveChanges">
-                <SaveIcon /> {{ formatMessage(commonMessages.saveButton) }}
-              </button>
+                <template #stat="{ children }">
+                  <span class="primary-stat__counter">
+                    <component :is="() => normalizeChildren(children)" />
+                  </span>
+                </template>
+              </IntlFormatted>
             </div>
-          </template>
-          <template v-else>
-            <div class="sidebar__item">
-              <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
-              <Badge v-else-if="projects.length > 0" type="creator" />
-            </div>
-            <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
-            <hr class="card-divider" />
-            <div class="primary-stat">
-              <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
-              <div class="primary-stat__text">
-                <IntlFormatted
-                  :message-id="messages.profileDownloadsStats"
-                  :values="{ count: formatCompactNumber(sumDownloads) }"
-                >
-                  <template #stat="{ children }">
-                    <span class="primary-stat__counter">
-                      <component :is="() => normalizeChildren(children)" />
-                    </span>
-                  </template>
-                </IntlFormatted>
-              </div>
-            </div>
-            <div class="primary-stat">
-              <HeartIcon class="primary-stat__icon" aria-hidden="true" />
-              <div class="primary-stat__text">
-                <IntlFormatted
-                  :message-id="messages.profileProjectsFollowersStats"
-                  :values="{ count: formatCompactNumber(sumFollows) }"
-                >
-                  <template #stat="{ children }">
-                    <span class="primary-stat__counter">
-                      <component :is="() => normalizeChildren(children)" />
-                    </span>
-                  </template>
-                </IntlFormatted>
-              </div>
-            </div>
-            <div class="stats-block__item secondary-stat">
-              <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
-              <span
-                v-tooltip="
-                  formatMessage(commonMessages.dateAtTimeTooltip, {
-                    date: new Date(user.created),
-                    time: new Date(user.created),
-                  })
-                "
-                class="secondary-stat__text date"
+          </div>
+          <div class="primary-stat">
+            <HeartIcon class="primary-stat__icon" aria-hidden="true" />
+            <div class="primary-stat__text">
+              <IntlFormatted
+                :message-id="messages.profileProjectsFollowersStats"
+                :values="{ count: formatCompactNumber(sumFollows) }"
               >
-                {{
-                  formatMessage(messages.profileJoinedAt, { ago: formatRelativeTime(user.created) })
-                }}
-              </span>
+                <template #stat="{ children }">
+                  <span class="primary-stat__counter">
+                    <component :is="() => normalizeChildren(children)" />
+                  </span>
+                </template>
+              </IntlFormatted>
             </div>
+          </div>
+          <div class="stats-block__item secondary-stat">
+            <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
+            <span
+              v-tooltip="
+                formatMessage(commonMessages.dateAtTimeTooltip, {
+                  date: new Date(user.created),
+                  time: new Date(user.created),
+                })
+              "
+              class="secondary-stat__text date"
+            >
+              {{
+                formatMessage(messages.profileJoinedAt, { ago: formatRelativeTime(user.created) })
+              }}
+            </span>
+          </div>
+          <hr class="card-divider" />
+          <div class="stats-block__item secondary-stat">
+            <UserIcon class="secondary-stat__icon" aria-hidden="true" />
+            <span class="secondary-stat__text">
+              <IntlFormatted :message-id="messages.profileUserId">
+                <template #~id>
+                  <CopyCode :text="user.id" />
+                </template>
+              </IntlFormatted>
+            </span>
+          </div>
+          <template v-if="organizations.length > 0">
             <hr class="card-divider" />
-            <div class="stats-block__item secondary-stat">
-              <UserIcon class="secondary-stat__icon" aria-hidden="true" />
-              <span class="secondary-stat__text">
-                <IntlFormatted :message-id="messages.profileUserId">
-                  <template #~id>
-                    <CopyCode :text="user.id" />
-                  </template>
-                </IntlFormatted>
-              </span>
-            </div>
-            <template v-if="organizations.length > 0">
-              <hr class="card-divider" />
-              <div class="stats-block__item">
-                <IntlFormatted :message-id="messages.profileOrganizations" />
-                <div class="organizations-grid">
-                  <nuxt-link
-                    v-for="org in organizations"
-                    :key="org.id"
-                    v-tooltip="org.name"
-                    class="organization"
-                    :to="`/organization/${org.slug}`"
-                  >
-                    <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="xs" />
-                  </nuxt-link>
-                </div>
+            <div class="stats-block__item">
+              <IntlFormatted :message-id="messages.profileOrganizations" />
+              <div class="organizations-grid">
+                <nuxt-link
+                  v-for="org in organizations"
+                  :key="org.id"
+                  v-tooltip="org.name"
+                  class="organization"
+                  :to="`/organization/${org.slug}`"
+                >
+                  <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="xs" />
+                </nuxt-link>
               </div>
-            </template>
+            </div>
           </template>
         </div>
       </div>
@@ -347,14 +293,10 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
 import UserIcon from '~/assets/images/utils/user.svg'
 import EditIcon from '~/assets/images/utils/edit.svg'
 import HeartIcon from '~/assets/images/utils/heart.svg'
-import CrossIcon from '~/assets/images/utils/x.svg'
-import SaveIcon from '~/assets/images/utils/save.svg'
 import GridIcon from '~/assets/images/utils/grid.svg'
 import ListIcon from '~/assets/images/utils/list.svg'
 import ImageIcon from '~/assets/images/utils/image.svg'
-import UploadIcon from '~/assets/images/utils/upload.svg'
 import WorldIcon from '~/assets/images/utils/world.svg'
-import FileInput from '~/components/ui/FileInput.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import NavRow from '~/components/ui/NavRow.vue'
 import CopyCode from '~/components/ui/CopyCode.vue'
@@ -552,61 +494,6 @@ const sumFollows = computed(() => {
 
   return sum
 })
-
-const isEditing = ref(false)
-const icon = shallowRef(null)
-const previewImage = shallowRef(null)
-
-function showPreviewImage(files) {
-  const reader = new FileReader()
-  icon.value = files[0]
-  reader.readAsDataURL(icon.value)
-  reader.onload = (event) => {
-    previewImage.value = event.target.result
-  }
-}
-
-async function saveChanges() {
-  startLoading()
-  try {
-    if (icon.value) {
-      await useBaseFetch(
-        `user/${auth.value.user.id}/icon?ext=${
-          icon.value.type.split('/')[icon.value.type.split('/').length - 1]
-        }`,
-        {
-          method: 'PATCH',
-          body: icon.value,
-        }
-      )
-    }
-
-    const reqData = {
-      email: user.value.email,
-      bio: user.value.bio,
-    }
-    if (user.value.username !== auth.value.user.username) {
-      reqData.username = user.value.username
-    }
-
-    await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: 'PATCH',
-      body: reqData,
-    })
-    await useAuth(auth.value.token)
-
-    isEditing.value = false
-  } catch (err) {
-    console.error(err)
-    data.$notify({
-      group: 'main',
-      title: formatMessage(commonMessages.errorNotificationTitle),
-      text: err.data.description,
-      type: 'error',
-    })
-  }
-  stopLoading()
-}
 
 function cycleSearchDisplayMode() {
   cosmetics.value.searchDisplayMode.user = data.$cycleValue(

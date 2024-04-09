@@ -74,7 +74,7 @@
 
     <div class="header__row">
       <div class="header__title">
-        <h2>{{ formatMessage(messages.longTitle) }}</h2>
+        <h2>{{ formatMessage(messages.title) }}</h2>
       </div>
       <button
         class="btn btn-primary"
@@ -264,11 +264,7 @@ const deleteModalMessages = defineMessages({
 const messages = defineMessages({
   title: {
     id: 'settings.pats.title',
-    defaultMessage: 'PATs',
-  },
-  longTitle: {
-    id: 'settings.pats.title.long',
-    defaultMessage: 'Personal Access Tokens',
+    defaultMessage: 'Personal access tokens',
   },
   description: {
     id: 'settings.pats.description',

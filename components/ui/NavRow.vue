@@ -134,6 +134,12 @@ export default {
     &.router-link-exact-active {
       color: var(--color-text);
 
+      &:not(:focus-visible) {
+        outline: 2px solid transparent;
+        outline-offset: 6px;
+        border-radius: 0.25rem;
+      }
+
       &::after {
         opacity: 1;
       }
@@ -157,6 +163,8 @@ export default {
     transition: all ease-in-out 0.2s;
     border-radius: var(--size-rounded-max);
     background-color: var(--color-brand);
+    outline: 2px solid transparent;
+    outline-offset: -2px;
 
     @media (prefers-reduced-motion) {
       transition: none !important;

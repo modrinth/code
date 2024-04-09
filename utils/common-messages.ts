@@ -15,6 +15,10 @@ export const commonMessages = defineMessages({
     id: 'button.continue',
     defaultMessage: 'Continue',
   },
+  changesSavedLabel: {
+    id: 'label.changes-saved',
+    defaultMessage: 'Changes saved',
+  },
   createAProjectButton: {
     id: 'button.create-a-project',
     defaultMessage: 'Create a project',
@@ -65,7 +69,7 @@ export const commonMessages = defineMessages({
   },
   listInputView: {
     id: 'input.view.list',
-    defaultMessage: 'List view',
+    defaultMessage: 'Rows view',
   },
   moderationLabel: {
     id: 'label.moderation',
@@ -122,6 +126,10 @@ export const commonMessages = defineMessages({
   unlistedLabel: {
     id: 'label.unlisted',
     defaultMessage: 'Unlisted',
+  },
+  uploadImageButton: {
+    id: 'button.upload-image',
+    defaultMessage: 'Upload image',
   },
   visibilityLabel: {
     id: 'label.visibility',

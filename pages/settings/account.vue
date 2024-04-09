@@ -291,14 +291,6 @@
       </div>
     </Modal>
     <section class="universal-card">
-      <h2>User profile</h2>
-      <p>Visit your user profile to edit your profile information.</p>
-      <NuxtLink class="iconified-button" :to="`/user/${auth.user.username}`">
-        <UserIcon /> Visit your profile
-      </NuxtLink>
-    </section>
-
-    <section class="universal-card">
       <h2>Account security</h2>
 
       <div class="adjacent-input">

@@ -70,6 +70,7 @@ export default {
   box-shadow: none;
   padding: 0;
   width: 100%;
+  outline: none;
 
   :where(.nav-link) {
     --text-color: var(--color-text);
@@ -94,6 +95,9 @@ export default {
   }
 
   &.router-link-exact-active {
+    outline: 2px solid transparent;
+    border-radius: 0.25rem;
+
     .nav-content {
       color: var(--color-button-text-active);
       background-color: var(--color-button-bg);

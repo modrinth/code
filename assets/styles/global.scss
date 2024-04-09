@@ -288,6 +288,29 @@ html {
   --color-ad: #0d1828;
 }
 
+.retro-mode {
+  --color-bg: #191917;
+  --color-raised-bg: #1d1e1b;
+  --color-button-bg: #3a3b38;
+  --color-base: #c3c4b3;
+  --color-secondary: #777a74;
+  --color-contrast: #e6e2d1;
+
+  --color-brand: #4d9227;
+  --color-brand-highlight: #25421e;
+  --color-ad: var(--color-brand-highlight);
+  --color-ad-raised: var(--color-brand);
+  --color-ad-contrast: black;
+  --color-ad-highlight: var(--color-brand);
+
+  --color-red: rgb(232, 32, 13);
+  --color-orange: rgb(232, 141, 13);
+  --color-green: rgb(60, 219, 54);
+  --color-blue: rgb(9, 159, 239);
+  --color-purple: rgb(139, 129, 230);
+  --color-gray: #718096;
+}
+
 body {
   // Defaults
   background-color: var(--color-bg);
@@ -456,4 +479,22 @@ a:focus-visible,
 [tabindex='0']:focus-visible {
   outline: 0.25rem solid #ea80ff;
   border-radius: 0.25rem;
+}
+
+// OMORPHIA FIXES
+.card {
+  outline-offset: -2px;
+}
+
+input {
+  outline: 2px solid transparent !important;
+}
+
+.button-animation {
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+    outline-width 0.2s ease-in-out;
+}
+
+.button-transparent {
+  box-shadow: none;
 }

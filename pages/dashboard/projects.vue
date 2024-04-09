@@ -502,6 +502,7 @@ export default defineNuxtComponent({
   border-radius: var(--size-rounded-sm);
   overflow: hidden;
   margin-top: var(--spacing-card-md);
+  outline: 1px solid transparent;
 
   .grid-table__row {
     display: contents;

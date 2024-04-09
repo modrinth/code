@@ -191,6 +191,9 @@
   "button.sign-out": {
     "message": "Sign out"
   },
+  "button.upload-image": {
+    "message": "Upload image"
+  },
   "collection.button.delete-icon": {
     "message": "Delete icon"
   },
@@ -285,7 +288,10 @@
     "message": "Grid view"
   },
   "input.view.list": {
-    "message": "List view"
+    "message": "Rows view"
+  },
+  "label.changes-saved": {
+    "message": "Changes saved"
   },
   "label.collections": {
     "message": "Collections"
@@ -779,6 +785,114 @@
   "scopes.versionWrite.label": {
     "message": "Write versions"
   },
+  "settings.account.title": {
+    "message": "Account and security"
+  },
+  "settings.appearance.title": {
+    "message": "Appearance"
+  },
+  "settings.applications.title": {
+    "message": "Your applications"
+  },
+  "settings.authorized-apps.title": {
+    "message": "Authorized apps"
+  },
+  "settings.display.banner.developer-mode.button": {
+    "message": "Deactivate developer mode"
+  },
+  "settings.display.banner.developer-mode.description": {
+    "message": "<strong>Developer mode</strong> is active. This will allow you to view the internal IDs of various things throughout Modrinth that may be helpful if you're a developer using the Modrinth API. Click on the Modrinth logo at the bottom of the page 5 times to toggle developer mode."
+  },
+  "settings.display.flags.description": {
+    "message": "Enable or disable certain features on this device."
+  },
+  "settings.display.flags.title": {
+    "message": "Feature flags"
+  },
+  "settings.display.project-list-layouts.datapack": {
+    "message": "Data Packs page"
+  },
+  "settings.display.project-list-layouts.description": {
+    "message": "Select your preferred layout for each page that displays project lists on this device."
+  },
+  "settings.display.project-list-layouts.mod": {
+    "message": "Mods page"
+  },
+  "settings.display.project-list-layouts.modpack": {
+    "message": "Modpacks page"
+  },
+  "settings.display.project-list-layouts.plugin": {
+    "message": "Plugins page"
+  },
+  "settings.display.project-list-layouts.resourcepack": {
+    "message": "Resource Packs page"
+  },
+  "settings.display.project-list-layouts.shader": {
+    "message": "Shaders page"
+  },
+  "settings.display.project-list-layouts.title": {
+    "message": "Project list layouts"
+  },
+  "settings.display.project-list-layouts.user": {
+    "message": "User profile pages"
+  },
+  "settings.display.sidebar.advanced-rendering.description": {
+    "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
+  },
+  "settings.display.sidebar.advanced-rendering.title": {
+    "message": "Advanced rendering"
+  },
+  "settings.display.sidebar.external-links-new-tab.description": {
+    "message": "Make links which go outside of Modrinth open in a new tab. No matter this setting, links on the same domain and in Markdown descriptions will open in the same tab, and links on ads and edit pages will open in a new tab."
+  },
+  "settings.display.sidebar.external-links-new-tab.title": {
+    "message": "Open external links in new tab"
+  },
+  "settings.display.sidebar.hide-app-promos.description": {
+    "message": "Hides the \"Get Modrinth App\" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer."
+  },
+  "settings.display.sidebar.hide-app-promos.title": {
+    "message": "Hide Modrinth App promotions"
+  },
+  "settings.display.sidebar.right-aligned-project-sidebar.description": {
+    "message": "Aligns the project details sidebar to the right of the page's content."
+  },
+  "settings.display.sidebar.right-aligned-project-sidebar.title": {
+    "message": "Right-aligned project sidebar"
+  },
+  "settings.display.sidebar.right-aligned-search-sidebar.description": {
+    "message": "Aligns the search filters sidebar to the right of the search results."
+  },
+  "settings.display.sidebar.right-aligned-search-sidebar.title": {
+    "message": "Right-aligned search sidebar"
+  },
+  "settings.display.theme.dark": {
+    "message": "Dark"
+  },
+  "settings.display.theme.description": {
+    "message": "Select your preferred color theme for Modrinth on this device."
+  },
+  "settings.display.theme.light": {
+    "message": "Light"
+  },
+  "settings.display.theme.oled": {
+    "message": "OLED"
+  },
+  "settings.display.theme.preferred-dark-theme": {
+    "message": "Preferred dark theme"
+  },
+  "settings.display.theme.preferred-light-theme": {
+    "message": "Preferred light theme"
+  },
+  "settings.display.theme.retro": {
+    "message": "Retro"
+  },
+  "settings.display.theme.system": {
+    "message": "Sync with system"
+  },
+  "settings.display.theme.title": {
+    "message": "Color theme"
+  },
   "settings.language.categories.auto": {
     "message": "Automatic"
   },
@@ -858,10 +972,7 @@
     "message": "Edit personal access token"
   },
   "settings.pats.title": {
-    "message": "PATs"
-  },
-  "settings.pats.title.long": {
-    "message": "Personal Access Tokens"
+    "message": "Personal access tokens"
   },
   "settings.pats.token.action.edit": {
     "message": "Edit token"
@@ -880,6 +991,36 @@
   },
   "settings.pats.token.never-used": {
     "message": "Never used"
+  },
+  "settings.profile.bio.description": {
+    "message": "A short description to tell everyone a little bit about you."
+  },
+  "settings.profile.bio.title": {
+    "message": "Bio"
+  },
+  "settings.profile.description": {
+    "message": "Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>."
+  },
+  "settings.profile.profile-info": {
+    "message": "Profile information"
+  },
+  "settings.profile.profile-picture.reset": {
+    "message": "Reset"
+  },
+  "settings.profile.profile-picture.title": {
+    "message": "Profile picture"
+  },
+  "settings.profile.title": {
+    "message": "Public profile"
+  },
+  "settings.profile.username.description": {
+    "message": "A unique case-insensitive name to identify your profile."
+  },
+  "settings.profile.username.title": {
+    "message": "Username"
+  },
+  "settings.profile.visit-profile": {
+    "message": "Visit your profile"
   },
   "settings.sessions.action.revoke-session": {
     "message": "Revoke session"

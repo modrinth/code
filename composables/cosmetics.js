@@ -17,6 +17,7 @@ export const useCosmetics = () =>
         developerMode: false,
         notUsingBlockers: false,
         hideModrinthAppPromos: false,
+        preferredDarkTheme: 'dark',
         searchDisplayMode: {
           mod: 'list',
           plugin: 'list',

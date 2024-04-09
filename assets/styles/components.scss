@@ -25,6 +25,7 @@
     border-radius: var(--size-rounded-card);
     padding: var(--spacing-card-lg);
     gap: var(--spacing-card-md);
+    outline: 1px solid transparent;
 
     .label {
       color: var(--color-heading);
@@ -65,6 +66,7 @@
 
   margin-bottom: var(--spacing-card-md);
   outline: 2px solid transparent;
+  outline-offset: -2px;
 
   box-shadow: var(--shadow-card);
 
@@ -687,7 +689,7 @@ tr.button-transparent {
   }
 
   color: var(--color-text) !important;
-  outline: 2px solid transparent;
+  outline: none !important;
 
   input {
     background: transparent;
@@ -706,6 +708,7 @@ tr.button-transparent {
     cursor: pointer;
     padding-left: 7px;
     padding-top: 10px;
+    outline: 2px solid transparent;
 
     transition: background-color 0.1s ease-in-out;
 
@@ -753,8 +756,13 @@ tr.button-transparent {
     border-bottom-left-radius: var(--size-rounded-sm);
     border-bottom-right-radius: var(--size-rounded-sm);
     box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+    outline: 2px solid transparent;
 
     .multiselect__element {
+      .multiselect__option {
+        outline: 1px solid transparent;
+      }
+
       .multiselect__option--highlight {
         background: var(--color-button-bg-active);
         color: var(--color-text-dark);
@@ -891,31 +899,6 @@ tr.button-transparent {
   .link {
     cursor: pointer;
     text-decoration: underline;
-  }
-}
-
-.card {
-  position: relative;
-  min-height: var(--font-size-2xl);
-  padding: var(--spacing-card-md) var(--spacing-card-lg);
-
-  background: var(--color-raised-bg);
-  border-radius: var(--size-rounded-card);
-  outline: 2px solid transparent;
-
-  margin-bottom: var(--spacing-card-md);
-
-  box-shadow: var(--shadow-card);
-
-  .card__overlay {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    grid-gap: 0.5rem;
-    z-index: 2;
   }
 }
 
@@ -1082,6 +1065,7 @@ button {
   transition: box-shadow 0.1s ease-in-out;
   overflow: hidden;
   max-width: 100%;
+  outline: 2px solid transparent;
 
   .text-input-wrapper__before {
     display: flex;
@@ -1102,9 +1086,10 @@ button {
   textarea {
     border-radius: 0;
     background-color: transparent;
-    box-shadow: unset;
+    box-shadow: unset !important;
     padding-left: 0;
     flex-grow: 1;
+    outline: none !important;
   }
 
   &:focus,
