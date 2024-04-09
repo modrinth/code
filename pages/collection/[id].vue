@@ -510,8 +510,18 @@ try {
       updated: auth.value.user.created,
     })
     ;[{ data: projects, refresh: refreshProjects }] = await Promise.all([
-      useAsyncData(`user/${auth.value.user.id}/follows`, () =>
-        useBaseFetch(`user/${auth.value.user.id}/follows`)
+      useAsyncData(
+        `user/${auth.value.user.id}/follows`,
+        () => useBaseFetch(`user/${auth.value.user.id}/follows`),
+        {
+          transform: (projects) => {
+            for (const project of projects) {
+              project.categories = project.categories.concat(project.loaders)
+            }
+
+            return projects
+          },
+        }
       ),
     ])
     creator = ref(auth.value.user)

@@ -190,12 +190,14 @@
             :follows="project.followers.toString()"
             :icon-url="project.icon_url"
             :categories="project.categories"
+            :client-side="project.client_side"
+            :server-side="project.server_side"
             :status="
               auth.user && (auth.user.id === user.id || tags.staffRoles.includes(auth.user.role))
                 ? project.status
                 : null
             "
-            :type="project.project_type"
+            :type="project.project_types[0] ?? 'project'"
             :color="project.color"
           />
         </div>
@@ -271,6 +273,30 @@ const [
       transform: (projects) => {
         for (const project of projects) {
           project.categories = project.categories.concat(project.loaders)
+
+          if (project.mrpack_loaders) {
+            project.categories = project.categories.concat(project.mrpack_loaders)
+          }
+
+          const singleplayer = project.singleplayer && project.singleplayer[0]
+          const clientAndServer = project.client_and_server && project.client_and_server[0]
+          const clientOnly = project.client_only && project.client_only[0]
+          const serverOnly = project.server_only && project.server_only[0]
+
+          // quick and dirty hack to show envs as legacy
+          if (singleplayer && clientAndServer && !clientOnly && !serverOnly) {
+            project.client_side = 'required'
+            project.server_side = 'required'
+          } else if (singleplayer && clientAndServer && clientOnly && !serverOnly) {
+            project.client_side = 'required'
+            project.server_side = 'unsupported'
+          } else if (singleplayer && clientAndServer && !clientOnly && serverOnly) {
+            project.client_side = 'unsupported'
+            project.server_side = 'required'
+          } else if (singleplayer && clientAndServer && clientOnly && serverOnly) {
+            project.client_side = 'optional'
+            project.server_side = 'optional'
+          }
         }
 
         return projects
