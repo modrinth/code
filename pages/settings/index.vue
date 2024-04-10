@@ -480,6 +480,7 @@ const listTypes = computed(() => {
     background-color: var(--color-bg);
     padding: 1.5rem;
     outline: 2px solid transparent;
+    width: 100%;
 
     .example-card {
       margin: 0;
