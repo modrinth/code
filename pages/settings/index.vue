@@ -41,7 +41,7 @@
               class="theme-icon"
             />
             <MoonIcon
-              v-else-if="cosmetics.preferredDarkTheme === option"
+              v-else-if="(cosmetics.preferredDarkTheme ?? 'dark') === option"
               v-tooltip="formatMessage(colorTheme.preferredDark)"
               class="theme-icon"
             />
@@ -402,14 +402,21 @@ const themeOptions = computed(() => {
 
 onMounted(() => {
   updateSystemTheme()
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (event) => {
+    setSystemTheme(event.matches)
+  })
 })
 
 function updateSystemTheme() {
-  const colorSchemeQueryList = window.matchMedia('(prefers-color-scheme: light)')
-  if (colorSchemeQueryList.matches) {
+  const query = window.matchMedia('(prefers-color-scheme: light)')
+  setSystemTheme(query.matches)
+}
+
+function setSystemTheme(light) {
+  if (light) {
     systemTheme.value = 'light'
   } else {
-    systemTheme.value = cosmetics.value.preferredDarkTheme
+    systemTheme.value = cosmetics.value.preferredDarkTheme ?? 'dark'
   }
 }
 

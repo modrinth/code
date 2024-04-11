@@ -2,6 +2,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   await useAuth()
   await useUser()
   const themeStore = useTheme()
+  const cosmetics = useCosmetics()
 
   nuxtApp.hook('app:mounted', () => {
     if (process.client && themeStore.value.preference === 'system') {
@@ -12,7 +13,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
           if (e.matches) {
             updateTheme('light')
           } else {
-            updateTheme('dark')
+            updateTheme(cosmetics.value.preferredDarkTheme ?? 'dark')
           }
         }
       }
