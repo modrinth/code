@@ -603,9 +603,9 @@ const listTypes = computed(() => {
 }
 
 .project-list-layouts {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   gap: var(--gap-lg);
-  width: fit-content;
 
   .preview-radio .example-card {
     border: 2px solid transparent;
