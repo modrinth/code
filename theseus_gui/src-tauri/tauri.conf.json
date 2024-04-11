@@ -52,7 +52,8 @@
       "category": "Entertainment",
       "copyright": "",
       "deb": {
-        "depends": []
+        "depends": [],
+        "desktopTemplate": "linux/com.modrinth.theseus.desktop.template"
       },
       "externalBin": [],
       "icon": [
