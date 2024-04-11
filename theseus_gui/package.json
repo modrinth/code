@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
-    "lint": "pnpm run lint:js && prettier --check .",
+    "lint": "npm run lint:js && prettier --check .",
     "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write ."
   },
   "dependencies": {
@@ -40,5 +40,5 @@
     "vite": "^5.2.8",
     "vite-plugin-eslint": "^1.8.1"
   },
-  "packageManager": "pnpm@8.6.0"
+  "packageManager": "npm@10.5.2"
 }
