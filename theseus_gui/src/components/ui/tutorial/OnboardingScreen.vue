@@ -111,12 +111,12 @@ onMounted(async () => {
       v-if="page === 1"
       :gallery="[
         {
-          url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109353928265809/Screenshot_2023-07-15_at_4.16.18_PM.png',
+          url: 'https://raw.githubusercontent.com/modrinth/theseus/3646d465d0d262ca84837a55fd2640415f3ffa55/theseus_gui/src/assets/Screenshot_2023-07-15_at_4.16.18_PM.png',
           title: 'Discovery',
           subtitle: 'See the latest and greatest mods and modpacks to play with from Modrinth',
         },
         {
-          url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109354238640238/Screenshot_2023-07-15_at_4.17.43_PM.png',
+          url: 'https://raw.githubusercontent.com/modrinth/theseus/3646d465d0d262ca84837a55fd2640415f3ffa55/theseus_gui/src/assets/Screenshot_2023-07-15_at_4.17.43_PM.png',
           title: 'Profile Management',
           subtitle:
             'Play, manage and search through all the amazing profiles downloaded on your computer at any time, even offline!',
