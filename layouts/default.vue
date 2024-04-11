@@ -199,7 +199,7 @@
               />
               <div class="account-text">
                 <div>@{{ auth.user.username }}</div>
-                <div>{{ formatMessage(messages.visitYourProfile) }}</div>
+                <div>{{ formatMessage(commonMessages.visitYourProfile) }}</div>
               </div>
             </NuxtLink>
             <nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
