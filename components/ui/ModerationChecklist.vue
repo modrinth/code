@@ -275,7 +275,8 @@
     <div class="input-group modpack-buttons">
       <button v-if="!done" class="btn skip-btn" @click="goToNextProject">
         <ExitIcon />
-        Skip
+        <template v-if="futureProjects.length > 0">Skip</template>
+        <template v-else>Exit</template>
       </button>
       <button v-if="currentStepIndex > 0" class="btn" @click="previousPage() && !done">
         <LeftArrowIcon /> Previous
@@ -347,6 +348,10 @@ const props = defineProps({
   project: {
     type: Object,
     default: null,
+  },
+  futureProjects: {
+    type: Array,
+    default: () => [],
   },
   resetProject: {
     type: Function,
@@ -436,9 +441,6 @@ This is the first thing most people will see about your mod other than the Logo,
         'Should indicate any other critical information the user must know before downloading',
         'Should be accessible (no fancy characters / non-standard text, no image-only descriptions, must have English component, etc)',
       ],
-      exceptions: [
-        'Modpacks generally have a more lax requirement to qualify as a sufficient description. Generally, a mod list and a short explainer is approvable.',
-      ],
       options: [
         {
           name: 'Insufficient',
@@ -453,6 +455,24 @@ Currently, it looks like there are some missing details.
               large: true,
             },
           ],
+        },
+        {
+          name: 'Insufficient (default packs)',
+          resultingMessage: `## Insufficient Description
+Per section 2.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations) your project's Description should clearly inform the reader of the content, purpose, and appeal of your project.
+Currently, it looks like there are some missing details.
+What does your modpack add? What features does it have? Why would a user want to download it? Be specific!
+See descriptions like [Simply Optimized](https://modrinth.com/modpack/sop) or [Aged](https://modrinth.com/modpack/aged) for examples of what a good description looks like.
+`,
+        },
+        {
+          name: 'Insufficient (default projects)',
+          resultingMessage: `## Insufficient Description
+Per section 2.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#general-expectations) your project's Description should clearly inform the reader of the content, purpose, and appeal of your project.
+Currently, it looks like there are some missing details.
+What does your project add? What features does it have? Why would a user want to download it? Be specific!
+See descriptions like [Sodium](https://modrinth.com/mod/sodium) or [LambDynamicLights](https://modrinth.com/mod/lambdynamiclights) for examples of what a good description looks like.
+`,
         },
         {
           name: 'Non-english',
@@ -554,10 +574,7 @@ Per section 5.1 of [Modrinth's Content Rules](https://modrinth.com/legal/rules#m
 For a brief rundown of how this works:
 **Client side** refers to a mod that is only required by the client, like [Sodium](https://modrinth.com/mod/sodium).
 **Server side** mods change the behavior of the server without the client needing the mod, like Datapacks, recipes, or server-side behaviors, like [Falling Tree](https://modrinth.com/mod/fallingtree).
-A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).
-However, it looks like your project falls into the latter category and should be *required* on **both** the client and server sides.
-This has been changed accordingly for your convenience. In the future, you can edit your project's environment information on its settings page under "Client-side" and "Server-side".
-0`,
+A mod that adds features, entities, or new blocks and items, generally will be required on **both** the server and the client, for example [Cobblemon](https://modrinth.com/mod/cobblemon).`,
         },
       ],
     },
@@ -594,6 +611,11 @@ Please upload each version of your mod separately, thank you.`,
           name: 'Invalid file type (modpacks)',
           resultingMessage: `## Modpacks on Modrinth
 It looks like you've uploaded your Modpack as a \`.zip\`, unfortunately, this is invalid and is why your project type is "Mod". I recommend taking a look at our support page about [Modrinth Modpacks](https://support.modrinth.com/en/articles/8802250-modpacks-on-modrinth), and once you're ready feel free to resubmit your project as a \`.mrpack\`. Don't forget to delete the old files from your Versions!`,
+        },
+        {
+          name: 'Invalid file type (resourcepacks)',
+          resultingMessage: `## Resource Packs on Modrinth
+It looks like you've selected loaders for your Resource Pack that are causing it to be marked as a different project type. Resource Packs must only be uploaded with the "Resource Pack" loader selected. Please re-upload all versions of your resource pack and make sure to only select "Resource Pack" as the loader.`,
         },
       ],
     },
@@ -974,16 +996,10 @@ async function sendMessage(status) {
   stopLoading()
 }
 
-const futureProjects = ref([])
-
-if (process.client && history && history.state && history.state.projects) {
-  futureProjects.value = history.state.projects
-}
-
 async function goToNextProject() {
   const router = useRouter()
 
-  const project = futureProjects.value[0]
+  const project = props.futureProjects[0]
 
   if (!project) {
     await navigateTo('/moderation/review')
@@ -997,7 +1013,7 @@ async function goToNextProject() {
     },
     state: {
       showChecklist: true,
-      projects: futureProjects.value.slice(1),
+      projects: props.futureProjects.slice(1),
     },
   })
 }

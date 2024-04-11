@@ -437,6 +437,13 @@
             ]"
           />
           <div v-if="auth.user && currentMember" class="input-group">
+            <button
+              v-if="tags.staffRoles.includes(auth.user.role) && !showModerationChecklist"
+              class="iconified-button"
+              @click="showModerationChecklist = true"
+            >
+              <EyeIcon /> Checklist
+            </button>
             <nuxt-link
               :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
               class="iconified-button"
@@ -725,6 +732,7 @@
     <ModerationChecklist
       v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
       :project="project"
+      :future-projects="futureProjects"
       :reset-project="resetProject"
     />
   </div>
@@ -740,6 +748,7 @@ import {
   PlusIcon,
   Checkbox,
   ChartIcon,
+  EyeIcon,
   renderString,
   isRejected,
   isUnderReview,
@@ -1159,8 +1168,10 @@ async function copyId() {
 const collapsedChecklist = ref(false)
 
 const showModerationChecklist = ref(false)
+const futureProjects = ref([])
 if (process.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true
+  futureProjects.value = history.state.projects
 }
 </script>
 <style lang="scss" scoped>
