@@ -78,7 +78,7 @@
           }}
         </Button>
         <Button :link="`/user/${auth.user.username}`">
-          <UserIcon /> {{ formatMessage(messages.visitProfile) }}
+          <UserIcon /> {{ formatMessage(commonMessages.visitYourProfile) }}
         </Button>
       </div>
     </section>
@@ -96,10 +96,10 @@ import {
   UndoIcon,
   XIcon,
 } from 'omorphia'
-import { commonMessages } from '~/utils/common-messages'
+import { commonMessages } from '~/utils/common-messages.ts'
 
 useHead({
-  title: 'Account settings - Modrinth',
+  title: 'Profile settings - Modrinth',
 })
 
 definePageMeta({
@@ -141,10 +141,6 @@ const messages = defineMessages({
   bioDescription: {
     id: 'settings.profile.bio.description',
     defaultMessage: 'A short description to tell everyone a little bit about you.',
-  },
-  visitProfile: {
-    id: 'settings.profile.visit-profile',
-    defaultMessage: 'Visit your profile',
   },
 })
 

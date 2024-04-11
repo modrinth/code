@@ -4,15 +4,12 @@ import RadioButtonIcon from '~/assets/images/utils/radio-button.svg'
 import RadioButtonCheckedIcon from '~/assets/images/utils/radio-button-checked.svg'
 import WarningIcon from '~/assets/images/utils/issues.svg'
 import { isModifierKeyDown } from '~/helpers/events.ts'
+import { commonSettingsMessages } from '~/utils/common-messages.ts'
 
 const vintl = useVIntl()
 const { formatMessage } = vintl
 
 const messages = defineMessages({
-  languagesTitle: {
-    id: 'settings.language.title',
-    defaultMessage: 'Language',
-  },
   languagesDescription: {
     id: 'settings.language.description',
     defaultMessage:
@@ -288,7 +285,7 @@ function getItemLabel(locale: Locale) {
 <template>
   <div>
     <section class="universal-card">
-      <h2>{{ formatMessage(messages.languagesTitle) }}</h2>
+      <h2>{{ formatMessage(commonSettingsMessages.language) }}</h2>
 
       <div class="card-description">
         <IntlFormatted :message-id="messages.languagesDescription">

@@ -88,7 +88,7 @@
                   <NuxtLink class="item button-transparent" :to="`/user/${auth.user.username}`">
                     <div class="title profile-link">
                       <div class="username">@{{ auth.user.username }}</div>
-                      <div class="prompt">{{ formatMessage(messages.visitYourProfile) }}</div>
+                      <div class="prompt">{{ formatMessage(commonMessages.visitYourProfile) }}</div>
                     </div>
                   </NuxtLink>
                   <hr class="divider" />
@@ -492,10 +492,6 @@ const navMenuMessages = defineMessages({
 })
 
 const messages = defineMessages({
-  visitYourProfile: {
-    id: 'layout.label.visit-your-profile',
-    defaultMessage: 'Visit your profile',
-  },
   toggleMenu: {
     id: 'layout.menu-toggle.action',
     defaultMessage: 'Toggle menu',

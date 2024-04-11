@@ -135,4 +135,43 @@ export const commonMessages = defineMessages({
     id: 'label.visibility',
     defaultMessage: 'Visibility',
   },
+  visitYourProfile: {
+    id: 'label.visit-your-profile',
+    defaultMessage: 'Visit your profile',
+  },
+})
+
+export const commonSettingsMessages = defineMessages({
+  appearance: {
+    id: 'settings.appearance.title',
+    defaultMessage: 'Appearance',
+  },
+  language: {
+    id: 'settings.language.title',
+    defaultMessage: 'Language',
+  },
+  profile: {
+    id: 'settings.profile.title',
+    defaultMessage: 'Public profile',
+  },
+  account: {
+    id: 'settings.account.title',
+    defaultMessage: 'Account and security',
+  },
+  authorizedApps: {
+    id: 'settings.authorized-apps.title',
+    defaultMessage: 'Authorized apps',
+  },
+  sessions: {
+    id: 'settings.sessions.title',
+    defaultMessage: 'Sessions',
+  },
+  pats: {
+    id: 'settings.pats.title',
+    defaultMessage: 'Personal access tokens',
+  },
+  applications: {
+    id: 'settings.applications.title',
+    defaultMessage: 'Your applications',
+  },
 })

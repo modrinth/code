@@ -8,45 +8,57 @@
         <aside class="universal-card">
           <NavStack>
             <h3>Display</h3>
-            <NavStackItem link="/settings" :label="formatMessage(messages.appearanceTitle)">
+            <NavStackItem
+              link="/settings"
+              :label="formatMessage(commonSettingsMessages.appearance)"
+            >
               <PaintBrushIcon />
             </NavStackItem>
             <NavStackItem
               v-if="isStaging"
               link="/settings/language"
-              :label="formatMessage(messages.languageTitle)"
+              :label="formatMessage(commonSettingsMessages.language)"
             >
               <LanguagesIcon />
             </NavStackItem>
             <template v-if="auth.user">
               <h3>Account</h3>
-              <NavStackItem link="/settings/profile" :label="formatMessage(messages.profileTitle)">
+              <NavStackItem
+                link="/settings/profile"
+                :label="formatMessage(commonSettingsMessages.profile)"
+              >
                 <UserIcon />
               </NavStackItem>
-              <NavStackItem link="/settings/account" :label="formatMessage(messages.accountTitle)">
+              <NavStackItem
+                link="/settings/account"
+                :label="formatMessage(commonSettingsMessages.account)"
+              >
                 <ShieldIcon />
               </NavStackItem>
               <NavStackItem
                 link="/settings/authorizations"
-                :label="formatMessage(messages.authorizedAppsTitle)"
+                :label="formatMessage(commonSettingsMessages.authorizedApps)"
               >
                 <GridIcon />
               </NavStackItem>
               <NavStackItem
                 link="/settings/sessions"
-                :label="formatMessage(messages.sessionsTitle)"
+                :label="formatMessage(commonSettingsMessages.sessions)"
               >
                 <MonitorSmartphoneIcon />
               </NavStackItem>
             </template>
             <template v-if="auth.user">
               <h3>Developer</h3>
-              <NavStackItem link="/settings/pats" :label="formatMessage(messages.patsTitle)">
+              <NavStackItem
+                link="/settings/pats"
+                :label="formatMessage(commonSettingsMessages.pats)"
+              >
                 <KeyIcon />
               </NavStackItem>
               <NavStackItem
                 link="/settings/applications"
-                :label="formatMessage(messages.applicationsTitle)"
+                :label="formatMessage(commonSettingsMessages.applications)"
               >
                 <ServerIcon />
               </NavStackItem>
@@ -62,7 +74,6 @@
 </template>
 <script setup>
 import {
-  UsersIcon,
   ServerIcon,
   GridIcon,
   PaintBrushIcon,
@@ -75,44 +86,9 @@ import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 import MonitorSmartphoneIcon from '~/assets/images/utils/monitor-smartphone.svg'
 
-import { commonMessages } from '~/utils/common-messages.ts'
+import { commonMessages, commonSettingsMessages } from '~/utils/common-messages.ts'
 
 const { formatMessage } = useVIntl()
-
-const messages = defineMessages({
-  appearanceTitle: {
-    id: 'settings.appearance.title',
-    defaultMessage: 'Appearance',
-  },
-  languageTitle: {
-    id: 'settings.language.title',
-    defaultMessage: 'Language',
-  },
-  profileTitle: {
-    id: 'settings.profile.title',
-    defaultMessage: 'Public profile',
-  },
-  accountTitle: {
-    id: 'settings.account.title',
-    defaultMessage: 'Account and security',
-  },
-  authorizedAppsTitle: {
-    id: 'settings.authorized-apps.title',
-    defaultMessage: 'Authorized apps',
-  },
-  sessionsTitle: {
-    id: 'settings.sessions.title',
-    defaultMessage: 'Sessions',
-  },
-  patsTitle: {
-    id: 'settings.pats.title',
-    defaultMessage: 'Personal access tokens',
-  },
-  applicationsTitle: {
-    id: 'settings.applications.title',
-    defaultMessage: 'Your applications',
-  },
-})
 
 const route = useRoute()
 const auth = await useAuth()

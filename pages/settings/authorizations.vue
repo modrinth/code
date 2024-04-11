@@ -7,7 +7,7 @@
       proceed-label="Revoke"
       @proceed="revokeApp(revokingId)"
     />
-    <h2>Authorizations</h2>
+    <h2>{{ formatMessage(commonSettingsMessages.authorizedApps) }}</h2>
     <p>
       When you authorize an application with your Modrinth account, you grant it access to your
       account. You can manage and review access to your account here at any time.
@@ -89,8 +89,10 @@
 </template>
 <script setup>
 import { Button, TrashIcon, CheckIcon, ConfirmModal, Avatar } from 'omorphia'
-
+import { commonSettingsMessages } from '~/utils/common-messages.ts'
 import { useScopes } from '~/composables/auth/scopes.ts'
+
+const { formatMessage } = useVIntl()
 
 const { scopesToDefinitions } = useScopes()
 

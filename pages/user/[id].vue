@@ -355,18 +355,6 @@ const messages = defineMessages({
     id: 'profile.button.report',
     defaultMessage: 'Report',
   },
-  profileUploadAvatarInput: {
-    id: 'profile.input.upload-avatar',
-    defaultMessage: 'Upload avatar',
-  },
-  profileEditUsernameLabel: {
-    id: 'profile.label.edit-username',
-    defaultMessage: 'Username',
-  },
-  profileEditBioLabel: {
-    id: 'profile.label.edit-bio',
-    defaultMessage: 'Bio',
-  },
   profileNoProjectsLabel: {
     id: 'profile.label.no-projects',
     defaultMessage: 'This user has no projects!',

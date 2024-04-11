@@ -128,7 +128,7 @@
 
     <div class="header__row">
       <div class="header__title">
-        <h2>Applications</h2>
+        <h2>{{ formatMessage(commonSettingsMessages.applications) }}</h2>
       </div>
       <button
         class="btn btn-primary"
@@ -238,6 +238,9 @@ import {
   useScopes,
   getScopeValue,
 } from '~/composables/auth/scopes.ts'
+import { commonSettingsMessages } from '~/utils/common-messages.ts'
+
+const { formatMessage } = useVIntl()
 
 definePageMeta({
   middleware: 'auth',

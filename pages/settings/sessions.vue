@@ -1,6 +1,6 @@
 <template>
   <div class="universal-card">
-    <h2>{{ formatMessage(messages.sessionsTitle) }}</h2>
+    <h2>{{ formatMessage(commonSettingsMessages.sessions) }}</h2>
     <p class="preserve-lines">
       {{ formatMessage(messages.sessionsDescription) }}
     </p>
@@ -57,6 +57,7 @@
 </template>
 <script setup>
 import { XIcon } from 'omorphia'
+import { commonSettingsMessages } from '~/utils/common-messages.ts'
 
 definePageMeta({
   middleware: 'auth',
@@ -87,10 +88,6 @@ const messages = defineMessages({
     id: 'settings.sessions.last-accessed-ago',
     defaultMessage: 'Last accessed {ago}',
   },
-  sessionsTitle: {
-    id: 'settings.sessions.title',
-    defaultMessage: 'Sessions',
-  },
   unknownOsLabel: {
     id: 'settings.sessions.unknown-os',
     defaultMessage: 'Unknown OS',
@@ -102,7 +99,7 @@ const messages = defineMessages({
 })
 
 useHead({
-  title: () => `${formatMessage(messages.sessionsTitle)} - Modrinth`,
+  title: () => `${formatMessage(messages.sessions)} - Modrinth`,
 })
 
 const data = useNuxtApp()
