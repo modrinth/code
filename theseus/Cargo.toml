@@ -61,6 +61,11 @@ whoami = "1.4.0"
 
 discord-rich-presence = "0.2.3"
 
+p256 = { version = "0.13.2", features = ["ecdsa"] }
+rand = "0.8"
+byteorder = "1.5.0"
+base64 = "0.22.0"
+
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.50.0"
 

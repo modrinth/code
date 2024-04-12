@@ -25,11 +25,10 @@ pub enum ErrorKind {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
-    #[error("Minecraft authentication Hydra error: {0}")]
-    HydraError(String),
-
-    #[error("Minecraft authentication task error: {0}")]
-    AuthTaskError(#[from] crate::state::AuthTaskError),
+    #[error("Minecraft authentication error: {0}")]
+    MinecraftAuthenticationError(
+        #[from] crate::state::MinecraftAuthenticationError,
+    ),
 
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),

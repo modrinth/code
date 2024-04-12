@@ -20,6 +20,7 @@ import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import ErrorModal from '@/components/ui/ErrorModal.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
@@ -40,15 +41,14 @@ import { TauriEvent } from '@tauri-apps/api/event'
 import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
 import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
+import { useError } from '@/store/error.js'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
 
-const videoPlaying = ref(false)
 const offline = ref(false)
 const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
@@ -71,7 +71,6 @@ defineExpose({
     } = await get()
     // video should play if the user is not on linux, and has not onboarded
     os.value = await getOS()
-    videoPlaying.value = !fully_onboarded && os.value !== 'Linux'
     const dev = await isDev()
     const version = await getVersion()
     showOnboarding.value = !fully_onboarded
@@ -180,10 +179,17 @@ const isOnBrowse = computed(() => route.path.startsWith('/browse'))
 const loading = useLoading()
 
 const notifications = useNotifications()
-const notificationsWrapper = ref(null)
+const notificationsWrapper = ref()
 
 watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
+})
+
+const error = useError()
+const errorModal = ref()
+
+watch(errorModal, () => {
+  error.setErrorModal(errorModal.value)
 })
 
 document.querySelector('body').addEventListener('click', function (e) {
@@ -245,15 +251,6 @@ command_listener(async (e) => {
 </script>
 
 <template>
-  <StickyTitleBar v-if="videoPlaying" />
-  <video
-    v-if="videoPlaying"
-    ref="onboardingVideo"
-    class="video"
-    src="@/assets/video.mp4"
-    autoplay
-    @ended="videoPlaying = false"
-  />
   <div v-if="failureText" class="failure dark-mode">
     <div class="appbar-failure dark-mode">
       <Button v-if="os != 'MacOS'" icon-only @click="TauriWindow.getCurrent().close()">
@@ -294,7 +291,7 @@ command_listener(async (e) => {
       </Card>
     </div>
   </div>
-  <SplashScreen v-else-if="!videoPlaying && isLoading" app-loading />
+  <SplashScreen v-else-if="isLoading" app-loading />
   <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
     <div class="nav-container">
@@ -389,6 +386,7 @@ command_listener(async (e) => {
   </div>
   <URLConfirmModal ref="urlModal" />
   <Notifications ref="notificationsWrapper" />
+  <ErrorModal ref="errorModal" />
 </template>
 
 <style lang="scss" scoped>
