@@ -57,6 +57,8 @@
       />
       <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
         <template #use> <PlayIcon /> Use </template>
+        <template #left> <ChevronLeftIcon /> Move Left </template>
+        <template #right> <ChevronRightIcon /> Move Right </template>
         <template #edit> <EyeIcon /> Edit </template>
         <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
         <template #delete> <TrashIcon /> Delete </template>
@@ -246,6 +248,8 @@ import {
   XIcon,
   EyeIcon,
   TrashIcon,
+  ChevronRightIcon,
+  ChevronLeftIcon,
 } from 'omorphia'
 import { ref, onMounted, watch, computed } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
@@ -267,7 +271,7 @@ import {
   set_skin,
   save_skin,
   import_skin,
-  delete_skin,
+  update_skins,
   get_skins,
   get_render,
   get_cape_data,
@@ -326,6 +330,13 @@ const filteredResults = computed(() => {
     saves = saves.filter((save) => {
       return save.user === selectedAccount.value.id
     })
+  } else {
+    for (let i=0; i < saves.length; i++) {
+      if (!Object.prototype.hasOwnProperty.call(saves[i].order, selectedAccount.value.id)) {
+        shiftSaves(0, true)
+        saves[i].order[selectedAccount.value.id] = 0
+      }
+    }
   }
 
   if (sortBy.value === 'Name') {
@@ -335,11 +346,11 @@ const filteredResults = computed(() => {
   }
 
   if (sortBy.value === 'Custom') {
-    // Modify to sort by custom ordering
-    // Add an 'order' number to skin creation modal
-    saves.sort((a, b) => {
-      return a.name.localeCompare(b.name)
-    })
+    for (let i=0; i < saves.length; i++) {
+      saves.sort((a, b) => {
+        return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+      })
+    }
   }
 
   if (sortBy.value === 'Date created') {
@@ -356,6 +367,16 @@ const filteredResults = computed(() => {
   return saves
 })
 
+const moveCard = async (move, skin) => {
+  const current = skin.order[selectedAccount.value.id]
+  let target = current + move
+  if (target < 0 || target > filteredResults.value.length - 1) return
+  shiftSaves((target < current) ? target : target + 1, true)
+  skin.order[selectedAccount.value.id] = (target < current) ? target : target + 1
+  shiftSaves((target < current) ? current + 1 : current, false)
+  await update_skins(skinSaves.value).catch(handleError)
+}
+
 const handleRightClick = (event, item) => {
   const baseOptions = [
     {
@@ -365,6 +386,9 @@ const handleRightClick = (event, item) => {
     { type: 'divider' },
     { name: 'edit' },
     { name: 'duplicate' },
+    { type: 'divider' },
+    { name: 'left' },
+    { name: 'right' },
     { type: 'divider' },
     {
       name: 'delete',
@@ -380,6 +404,12 @@ const handleOptionsClick = async (args) => {
     case 'use':
       await handleSkin(args.item.skin, args.item.cape, args.item.arms, 'upload')
       break
+    case 'left':
+      if (sortBy.value === 'Custom') await moveCard(-1, args.item)
+      break
+    case 'right':
+      if (sortBy.value === 'Custom') await moveCard(1, args.item)
+      break
     case 'edit':
       await edit_skin(args.item)
       break
@@ -387,13 +417,23 @@ const handleOptionsClick = async (args) => {
       await duplicate_skin(args.item)
       break
     case 'delete':
-      await delete_skin(args.item.id).catch(handleError)
-      skinSaves.value = await get_skins().catch(handleError)
+      await deleteSkin(args.item).catch(handleError)
       notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
         handleError
       )
       break
   }
+}
+
+const deleteSkin = async (skin) => {
+  skinSaves.value.splice(skinSaves.value.indexOf(skin), 1)
+  let sorted = skinSaves.value.toSorted((a, b) => {
+    return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+  })
+  for (let i = skin.order[selectedAccount.value.id]; i < sorted.length; i++) {
+    sorted[i].order[selectedAccount.value.id]--
+  }
+  await update_skins(skinSaves.value).catch(handleError)
 }
 
 const selectLauncherPath = async () => {
@@ -417,6 +457,8 @@ const next = async () => {
   for (const skin of importer.value.skinNames.filter((skin) => skin.selected)) {
     const data = await import_skin(skin.id, importer.value.path, importType.value).catch(handleError)
     const model = await get_render(data).catch(handleError)
+    shiftSaves(0, true)
+    await update_skins(skinSaves.value).catch(handleError)
     await save_skin(selectedAccount.value.id, data, skin.name, model, '').catch(handleError)
     skin.selected = false
     importedSkins.value++
@@ -477,6 +519,8 @@ const handleSkin = async (skin, cape, arms, state) => {
   }
 
   if (state.includes('save')) {
+    shiftSaves(0, true)
+    await update_skins(skinSaves.value).catch(handleError)
     const model = await get_render(data).catch(handleError)
     await save_skin(selectedAccount.value.id, data, skinName.value.trim(), model, '').catch(
       handleError
@@ -573,9 +617,28 @@ const duplicate_skin = async (args) => {
   data.cape = args.cape
   data.arms = args.arms
   data.unlocked_capes = []
-
+  shiftSaves(0, true)
+  await update_skins(skinSaves.value).catch(handleError)
   await save_skin(selectedAccount.value.id, data, args.name, args.model, '').catch(handleError)
   skinSaves.value = await get_skins().catch(handleError)
+}
+
+const shiftSaves = (index, shiftRight) => {
+  let sorted = skinSaves.value.filter((save) => {
+    return Object.prototype.hasOwnProperty.call(save.order, selectedAccount.value.id)
+  })
+  sorted.sort((a, b) => {
+    return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+  })
+  if (shiftRight) {
+    for (let i = sorted.length - 1; i >= index; i--) {
+      sorted[i].order[selectedAccount.value.id]++
+    }
+  } else {
+    for (let i = index; i < sorted.length; i++) {
+      sorted[i].order[selectedAccount.value.id]--
+    }
+  }
 }
 
 const openskin = async () => {

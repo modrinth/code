@@ -225,6 +225,11 @@ pub async fn save_skin(user: Uuid, data: SkinCache, name: String, model: String,
     } else {
         cache.get(&id).expect("SkinSave should exist, but doesn't").created
     };
+    let order = if skinid.is_empty() {
+        HashMap::from([(user, 0)])
+    } else {
+        cache.get(&id).expect("SkinSave should exist, but doesn't").order.clone()
+    };
     let skin_cache = SkinSave {
         name,
         skin: encoded_img,
@@ -235,6 +240,7 @@ pub async fn save_skin(user: Uuid, data: SkinCache, name: String, model: String,
         model,
         user,
         id,
+        order,
     };
     cache.insert(id, skin_cache);
 
@@ -242,7 +248,7 @@ pub async fn save_skin(user: Uuid, data: SkinCache, name: String, model: String,
     Ok(true)
 }
 
-pub async fn delete_skin(id: Uuid) -> crate::Result<bool> {
+pub async fn update_skins(saves: Vec<SkinSave>) -> crate::Result<()> {
     let settings = Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
     let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
         settings.max_concurrent_writes,
@@ -252,12 +258,12 @@ pub async fn delete_skin(id: Uuid) -> crate::Result<bool> {
         .settings_dir
         .join("skin_manager.json");
 
-    let mut cache = read_json::<HashMap<Uuid, SkinSave>>(&path, &io_semaphore)
-        .await.expect("skin_manager.json should exist, but doesn't");
-    cache.remove(&id);
-
+    let mut cache = HashMap::new();
+    for skin in saves {
+        cache.insert(skin.id, skin);
+    }
     write(&path, &serde_json::to_vec(&cache)?, &io_semaphore).await?;
-    Ok(true)
+    Ok(())
 }
 
 pub async fn get_skins() -> crate::Result<Vec<SkinSave>> {
@@ -454,6 +460,7 @@ pub struct SkinSave {
     name: String,
     user: Uuid,
     id: Uuid,
+    order: HashMap<Uuid, u8>,
     skin: String,
     model: String,
     cape: String,
