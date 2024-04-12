@@ -98,6 +98,7 @@ defineExpose({
             and start a chat using the widget in the bottom right and we will be more than happy to
             assist!
           </p>
+          <p>Debug info: {{ error.message ?? error }}</p>
         </template>
         <template v-else>
           {{ error.message ?? error }}
