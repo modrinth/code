@@ -99,7 +99,7 @@ const messages = defineMessages({
 })
 
 useHead({
-  title: () => `${formatMessage(messages.sessions)} - Modrinth`,
+  title: () => `${formatMessage(commonSettingsMessages.sessions)} - Modrinth`,
 })
 
 const data = useNuxtApp()

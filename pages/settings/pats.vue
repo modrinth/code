@@ -306,7 +306,7 @@ definePageMeta({
 })
 
 useHead({
-  title: `${formatMessage(messages.title)} - Modrinth`,
+  title: `${formatMessage(commonSettingsMessages.pats)} - Modrinth`,
 })
 
 const data = useNuxtApp()
