@@ -133,7 +133,7 @@ export async function export_profile_mrpack(
   includedOverrides,
   versionId,
   description,
-  name
+  name,
 ) {
   return await invoke('plugin:profile|profile_export_mrpack', {
     path,

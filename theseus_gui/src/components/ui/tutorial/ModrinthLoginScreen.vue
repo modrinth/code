@@ -75,7 +75,7 @@ async function signIn() {
   const creds = await login_pass(
     username.value,
     password.value,
-    window.turnstile.getResponse()
+    window.turnstile.getResponse(),
   ).catch(handleError)
   window.turnstile.reset()
 
@@ -102,7 +102,7 @@ async function createAccount() {
     email.value,
     password.value,
     window.turnstile.getResponse(),
-    subscribe.value
+    subscribe.value,
   ).catch(handleError)
   window.turnstile.reset()
 

@@ -340,7 +340,6 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
 
     let file_watcher = new_debouncer(
         Duration::from_secs_f32(2.0),
-        None,
         move |res: DebounceEventResult| {
             futures::executor::block_on(async {
                 tx.send(res).await.unwrap();
@@ -403,9 +402,7 @@ pub async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
                         }
                     });
                 }
-                Err(errors) => errors.iter().for_each(|err| {
-                    tracing::warn!("Unable to watch file: {err}")
-                }),
+                Err(error) => tracing::warn!("Unable to watch file: {error}"),
             }
         }
     });

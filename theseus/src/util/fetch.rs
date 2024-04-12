@@ -337,7 +337,7 @@ pub async fn write_cached_icon(
 
 async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     let hash = tokio::task::spawn_blocking(move || {
-        sha1::Sha1::from(bytes).hexdigest()
+        sha1_smol::Sha1::from(bytes).hexdigest()
     })
     .await?;
 

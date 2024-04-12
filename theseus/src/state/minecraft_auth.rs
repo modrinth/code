@@ -256,7 +256,9 @@ impl MinecraftAuthStore {
             } else {
                 self.users.values().next()
             }
-        } else { self.users.values().next() };
+        } else {
+            self.users.values().next()
+        };
 
         if let Some(creds) = credentials {
             if self.default_user != Some(creds.id) {
@@ -772,8 +774,7 @@ async fn send_signed_request<T: DeserializeOwned>(
     key: &DeviceTokenKey,
     step: MinecraftAuthStep,
 ) -> Result<(HeaderMap, T), MinecraftAuthenticationError> {
-    let auth = authorization
-        .map_or(Vec::new(), |v| v.as_bytes().to_vec());
+    let auth = authorization.map_or(Vec::new(), |v| v.as_bytes().to_vec());
 
     let body = serde_json::to_vec(&raw_body).map_err(|source| {
         MinecraftAuthenticationError::SerializeBody { source, step }

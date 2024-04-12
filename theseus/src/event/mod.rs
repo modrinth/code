@@ -31,7 +31,7 @@ impl EventState {
                 }))
             })
             .await
-            .map(Arc::clone)
+            .cloned()
     }
 
     #[cfg(not(feature = "tauri"))]
