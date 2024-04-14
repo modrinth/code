@@ -213,7 +213,7 @@ pub async fn install_zipped_mrpack_files(
             let filename = file.filename().as_str().unwrap_or_default();
 
             if (filename.starts_with("overrides")
-                || filename.starts_with("client_overrides"))
+                || filename.starts_with("client-overrides"))
                 && !filename.ends_with('/')
             {
                 total_len += 1;
@@ -227,7 +227,7 @@ pub async fn install_zipped_mrpack_files(
 
             let file_path = PathBuf::from(filename);
             if (filename.starts_with("overrides")
-                || filename.starts_with("client_overrides"))
+                || filename.starts_with("client-overrides"))
                 && !filename.ends_with('/')
             {
                 // Reads the file into the 'content' variable
@@ -403,7 +403,7 @@ pub async fn remove_all_related_files(
 
             let file_path = PathBuf::from(filename);
             if (filename.starts_with("overrides")
-                || filename.starts_with("client_overrides"))
+                || filename.starts_with("client-overrides"))
                 && !filename.ends_with('/')
             {
                 let mut new_path = PathBuf::new();
