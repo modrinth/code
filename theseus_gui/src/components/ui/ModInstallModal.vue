@@ -63,12 +63,16 @@ defineExpose({
 
 const profiles = ref([])
 
+function quilt_or_fabric(loaders) {
+  loaders.includes("quilt") || loaders.includes("fabric")
+}
 async function install(instance) {
   instance.installing = true
+  console.log(instance, versions)
   const version = versions.value.find((v) => {
     return (
       v.game_versions.includes(instance.metadata.game_version) &&
-      (v.loaders.includes(instance.metadata.loader) ||
+      (instance.metadata.loader === "quilt" ? quilt_or_fabric(v.loaders) : v.loaders.includes(instance.metadata.loader) ||
         v.loaders.includes('minecraft') ||
         v.loaders.includes('iris') ||
         v.loaders.includes('optifine'))
@@ -166,8 +170,8 @@ const createInstance = async () => {
 
   const loader =
     versions.value[0].loaders[0] !== 'forge' &&
-    versions.value[0].loaders[0] !== 'fabric' &&
-    versions.value[0].loaders[0] !== 'quilt'
+      versions.value[0].loaders[0] !== 'fabric' &&
+      versions.value[0].loaders[0] !== 'quilt'
       ? 'vanilla'
       : versions.value[0].loaders[0]
 
@@ -215,50 +219,27 @@ const check_valid = computed(() => {
 </script>
 
 <template>
-  <Modal
-    ref="installModal"
-    header="Install project to instance"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <Modal ref="installModal" header="Install project to instance" :noblur="!themeStore.advancedRendering">
     <div class="modal-body">
-      <input
-        v-model="searchFilter"
-        autocomplete="off"
-        type="text"
-        class="search"
-        placeholder="Search for an instance"
-      />
+      <input v-model="searchFilter" autocomplete="off" type="text" class="search"
+        placeholder="Search for an instance" />
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
-          <Button
-            color="raised"
-            class="profile-button"
-            @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
-          >
-            <Avatar
-              :src="
-                !profile.metadata.icon ||
-                (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
-                  ? profile.metadata.icon
-                  : tauri.convertFileSrc(profile.metadata?.icon)
-              "
-              class="profile-image"
-            />
+          <Button color="raised" class="profile-button"
+            @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)">
+            <Avatar :src="!profile.metadata.icon ||
+              (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
+              ? profile.metadata.icon
+              : tauri.convertFileSrc(profile.metadata?.icon)
+              " class="profile-image" />
             {{ profile.metadata.name }}
           </Button>
-          <div
-            v-tooltip="
-              profile.metadata.linked_data?.locked && !profile.installedMod
-                ? 'Unpair or unlock an instance to add mods.'
-                : ''
-            "
-          >
-            <Button
-              :disabled="
-                profile.installedMod || profile.installing || profile.metadata.linked_data?.locked
-              "
-              @click="install(profile)"
-            >
+          <div v-tooltip="profile.metadata.linked_data?.locked && !profile.installedMod
+            ? 'Unpair or unlock an instance to add mods.'
+            : ''
+            ">
+            <Button :disabled="profile.installedMod || profile.installing || profile.metadata.linked_data?.locked
+              " @click="install(profile)">
               <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
               <CheckIcon v-else-if="profile.installedMod" />
               {{
@@ -290,13 +271,7 @@ const check_valid = computed(() => {
             </div>
           </div>
           <div class="creation-settings">
-            <input
-              v-model="name"
-              autocomplete="off"
-              type="text"
-              placeholder="Name"
-              class="creation-input"
-            />
+            <input v-model="name" autocomplete="off" type="text" placeholder="Name" class="creation-input" />
             <Button :disabled="creatingInstance === true || !check_valid" @click="createInstance()">
               <RightArrowIcon />
               {{ creatingInstance ? 'Creating...' : 'Create' }}
