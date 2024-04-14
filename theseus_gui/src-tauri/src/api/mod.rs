@@ -88,8 +88,15 @@ macro_rules! impl_serialize {
 }
 
 // Use the macro to implement Serialize for TheseusSerializableError
+#[cfg(target_os = "macos")]
 impl_serialize! {
     IO,
-    Callback,
+    Tauri,
+    Callback
+}
+
+#[cfg(not(target_os = "macos"))]
+impl_serialize! {
+    IO,
     Tauri,
 }

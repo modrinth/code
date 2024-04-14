@@ -4,7 +4,8 @@ import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { ref } from 'vue'
-const finalizedLogin = ref(false)
+import { handleSevereError } from '@/store/error.js'
+const loading = ref(false)
 
 const props = defineProps({
   nextPage: {
@@ -18,15 +19,21 @@ const props = defineProps({
 })
 
 async function login() {
-  const loggedIn = await login_flow().catch(handleError)
+  try {
+    loading.value = true
+    const loggedIn = await login_flow()
 
-  if (loggedIn) {
-    await set_default_user(loggedIn.id).catch(handleError)
+    if (loggedIn) {
+      await set_default_user(loggedIn.id).catch(handleError)
+    }
+
+    await mixpanel.track('AccountLogIn')
+    loading.value = false
+    props.nextPage()
+  } catch (err) {
+    loading.value = false
+    handleSevereError(err)
   }
-
-  finalizedLogin.value = true
-  await mixpanel.track('AccountLogIn')
-  props.nextPage()
 }
 </script>
 
@@ -52,9 +59,9 @@ async function login() {
       <div class="action-row">
         <Button class="transparent" large @click="prevPage"> Back </Button>
         <div class="sign-in-pair">
-          <Button color="primary" large @click="login">
-            <LogInIcon v-if="!finalizedLogin" />
-            {{ finalizedLogin ? 'Finish' : 'Sign in' }}
+          <Button color="primary" large :disabled="loading" @click="login">
+            <LogInIcon />
+            {{ loading ? 'Loading...' : 'Sign in' }}
           </Button>
         </div>
         <Button class="transparent" large @click="nextPage()"> Finish</Button>
