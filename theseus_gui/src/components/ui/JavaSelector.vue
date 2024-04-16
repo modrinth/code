@@ -63,8 +63,7 @@ import {
 } from 'omorphia'
 import {
   auto_install_java,
-  find_jre_17_jres,
-  find_jre_8_jres,
+  find_filtered_jres,
   get_jre,
   test_jre,
 } from '@/helpers/jre.js'
@@ -153,16 +152,9 @@ async function autoDetect() {
   if (!props.compact) {
     detectJavaModal.value.show(props.version, props.modelValue)
   } else {
-    if (props.version == 8) {
-      let versions = await find_jre_8_jres().catch(handleError)
-      if (versions.length > 0) {
-        emit('update:modelValue', versions[0])
-      }
-    } else {
-      let versions = await find_jre_17_jres().catch(handleError)
-      if (versions.length > 0) {
-        emit('update:modelValue', versions[0])
-      }
+    let versions = await find_filtered_jres(props.version).catch(handleError)
+    if (versions.length > 0) {
+      emit('update:modelValue', versions[0])
     }
   }
 }

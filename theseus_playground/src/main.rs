@@ -3,7 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
 use theseus::profile::create::profile_create;
@@ -49,15 +48,6 @@ async fn main() -> theseus::Result<()> {
     }
 
     // Autodetect java globals
-    let jres = jre::get_all_jre().await?;
-    let java_8 = jre::find_filtered_jres("1.8", jres.clone(), false).await?;
-    let java_17 = jre::find_filtered_jres("1.78", jres.clone(), false).await?;
-    let java_18plus =
-        jre::find_filtered_jres("1.18", jres.clone(), true).await?;
-    let java_globals =
-        autodetect_java_globals(java_8, java_17, java_18plus).await?;
-    st.settings.write().await.java_globals = java_globals;
-
     st.settings.write().await.max_concurrent_downloads = 50;
     st.settings.write().await.hooks.post_exit =
         Some("echo This is after Minecraft runs- global setting!".to_string());
