@@ -5,7 +5,6 @@
       <template v-if="step === 'choose_method'">
         <p>
           {{ formatMessage(methodChoiceMessages.description) }}
-          <NuxtTurnstile ref="turnstile" v-model="token" class="turnstile" />
         </p>
 
         <div class="iconified-input">
@@ -23,7 +22,14 @@
           />
         </div>
 
-        <button class="btn btn-primary centered-btn" @click="recovery">
+        <NuxtTurnstile
+          ref="turnstile"
+          v-model="token"
+          class="turnstile"
+          :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
+        />
+
+        <button class="btn btn-primary centered-btn" :disabled="!token" @click="recovery">
           <SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
         </button>
       </template>

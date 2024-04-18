@@ -84,8 +84,6 @@
         />
       </div>
 
-      <NuxtTurnstile ref="turnstile" v-model="token" class="turnstile" />
-
       <Checkbox
         v-model="subscribe"
         class="subscribe-btn"
@@ -108,7 +106,18 @@
         </IntlFormatted>
       </p>
 
-      <button class="btn btn-primary continue-btn centered-btn" @click="createAccount">
+      <NuxtTurnstile
+        ref="turnstile"
+        v-model="token"
+        class="turnstile"
+        :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
+      />
+
+      <button
+        class="btn btn-primary continue-btn centered-btn"
+        :disabled="!token"
+        @click="createAccount"
+      >
         {{ formatMessage(messages.createAccountButton) }} <RightArrowIcon />
       </button>
 

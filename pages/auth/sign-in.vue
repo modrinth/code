@@ -81,9 +81,18 @@
           />
         </div>
 
-        <NuxtTurnstile ref="turnstile" v-model="token" class="turnstile" />
+        <NuxtTurnstile
+          ref="turnstile"
+          v-model="token"
+          class="turnstile"
+          :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
+        />
 
-        <button class="btn btn-primary continue-btn centered-btn" @click="beginPasswordSignIn()">
+        <button
+          class="btn btn-primary continue-btn centered-btn"
+          :disabled="!token"
+          @click="beginPasswordSignIn()"
+        >
           {{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
         </button>
 

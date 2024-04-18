@@ -61,7 +61,17 @@
 }
 
 .turnstile {
-  display: none;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-button-bg);
+  height: 66px;
+
+  iframe {
+    margin: -1px;
+    min-width: calc(100% + 2px);
+  }
 }
 
 .auth-form {

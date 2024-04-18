@@ -366,7 +366,7 @@ export default defineNuxtConfig({
     },
   },
   turnstile: {
-    siteKey: '0x4AAAAAAAHWfmKCm7cUG869',
+    siteKey: '0x4AAAAAAAW3guHM6Eunbgwu',
   },
   nitro: {
     moduleSideEffects: ['@vintl/compact-number/locale-data'],
