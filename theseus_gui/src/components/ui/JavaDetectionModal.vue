@@ -37,9 +37,7 @@
 <script setup>
 import { Modal, PlusIcon, CheckIcon, Button, XIcon } from 'omorphia'
 import { ref } from 'vue'
-import {
-  find_filtered_jres,
-} from '@/helpers/jre.js'
+import { find_filtered_jres } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
@@ -52,7 +50,7 @@ const currentSelected = ref({})
 
 defineExpose({
   show: async (version, currentSelectedJava) => {
-    chosenInstallOptions.value = await find_filtered_jres(version ?? 8).catch(handleError)
+    chosenInstallOptions.value = await find_filtered_jres(version).catch(handleError)
 
     console.log(chosenInstallOptions.value)
     console.log(version)

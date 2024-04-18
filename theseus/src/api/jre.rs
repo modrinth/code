@@ -17,22 +17,25 @@ use crate::{
 // Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
 // Allow higher allows for versions higher than the given version to be returned ('at least')
 pub async fn find_filtered_jres(
-    java_version: u32,
+    java_version: Option<u32>,
 ) -> crate::Result<Vec<JavaVersion>> {
     let jres = jre::get_all_jre().await?;
 
     // Filter out JREs that are not 1.17 or higher
-    Ok(jres
-        .into_iter()
-        .filter(|jre| {
-            let jre_version = extract_java_majorminor_version(&jre.version);
-            if let Ok(jre_version) = jre_version {
-                jre_version.1 == java_version
-            } else {
-                false
-            }
-        })
-        .collect())
+    Ok(if let Some(java_version) = java_version {
+        jres.into_iter()
+            .filter(|jre| {
+                let jre_version = extract_java_majorminor_version(&jre.version);
+                if let Ok(jre_version) = jre_version {
+                    jre_version.1 == java_version
+                } else {
+                    false
+                }
+            })
+            .collect()
+    } else {
+        jres
+    })
 }
 
 #[theseus_macros::debug_pin]

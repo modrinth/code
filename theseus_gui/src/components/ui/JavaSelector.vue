@@ -61,12 +61,7 @@ import {
   FolderSearchIcon,
   DownloadIcon,
 } from 'omorphia'
-import {
-  auto_install_java,
-  find_filtered_jres,
-  get_jre,
-  test_jre,
-} from '@/helpers/jre.js'
+import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
@@ -81,7 +76,10 @@ const props = defineProps({
   },
   modelValue: {
     type: Object,
-    required: true,
+    default: () => ({
+      path: '',
+      version: '',
+    }),
   },
   disabled: {
     type: Boolean,
@@ -162,7 +160,6 @@ async function autoDetect() {
 async function reinstallJava() {
   installingJava.value = true
   const path = await auto_install_java(props.version).catch(handleError)
-  console.log('java path: ' + path)
   let result = await get_jre(path)
 
   console.log('java result ' + result)

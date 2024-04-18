@@ -20,7 +20,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
 // Finds the installation of Java 8, if it exists
 #[tauri::command]
 pub async fn jre_find_filtered_jres(
-    version: u32,
+    version: Option<u32>,
 ) -> Result<Vec<JavaVersion>> {
     Ok(jre::find_filtered_jres(version).await?)
 }
@@ -34,10 +34,7 @@ pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
 
 // Tests JRE of a certain version
 #[tauri::command]
-pub async fn jre_test_jre(
-    path: PathBuf,
-    major_version: u32,
-) -> Result<bool> {
+pub async fn jre_test_jre(path: PathBuf, major_version: u32) -> Result<bool> {
     Ok(jre::test_jre(path, major_version).await?)
 }
 
