@@ -181,7 +181,7 @@
               "
             />
           </nuxt-link>
-          <div class="project__header__content universal-card full-width-inputs">
+          <div class="project__header__content padding-lg full-width-inputs">
             <Avatar
               :src="project.icon_url"
               :alt="project.title"
