@@ -94,14 +94,13 @@
               {{ $formatMoney(auth.user.payout_data.balance, true) }}
             </div>
             <NuxtLink
-              v-if="auth.user.payout_data.balance >= minWithdraw"
+              v-if="auth.user.payout_data.balance > 0"
               class="goto-link"
               to="/dashboard/revenue"
             >
               Withdraw earnings
               <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
             </NuxtLink>
-            <span v-else>${{ minWithdraw }} is the withdraw minimum</span>
           </div>
         </div>
       </section>
@@ -126,8 +125,6 @@ const [{ data: projects }] = await Promise.all([
     useBaseFetch(`user/${auth.value.user.id}/projects`)
   ),
 ])
-
-const minWithdraw = ref(0.26)
 
 const downloadsProjectCount = computed(
   () => projects.value.filter((project) => project.downloads > 0).length
