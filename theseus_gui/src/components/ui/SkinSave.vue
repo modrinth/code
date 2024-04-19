@@ -16,7 +16,7 @@ const emit = defineEmits(['setSkin'])
 <template>
   <div class="instance">
     <Card class="instance-card-item button-base" @click="emit('setSkin', props.data)">
-      <Avatar size="lg" :src="props.data.model" alt="Mod card" class="mod-image" />
+      <Avatar size="lg" :src="props.data.model" alt="Mod card" class="mod-image" draggable ="false" />
       <div class="project-info">
         <p class="title">{{ props.data.name }}</p>
         <p class="description">{{ props.data.arms }}, {{ props.data.cape }}</p>

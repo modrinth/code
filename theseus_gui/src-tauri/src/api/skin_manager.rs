@@ -11,7 +11,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             skin_get_user_skin_data,
             skin_get_heads,
             skin_set_skin,
-            skin_delete_skin,
+            skin_update_skins,
             skin_import_skin,
             skin_check_image,
             skin_check_skin,
@@ -89,11 +89,11 @@ pub async fn skin_save_skin(user: Uuid, data: SkinCache, name: String, model: St
     Ok(skin_manager::save_skin(user, data, name, model, skinid).await?)
 }
 
-// Deletes skin save from the manager
-// invoke('plugin:skin|skin_delete_skin', { id })
+// Updates skin saves from the manager
+// invoke('plugin:skin|skin_update_skins', { id })
 #[tauri::command]
-pub async fn skin_delete_skin(id: Uuid) -> Result<bool> {
-    Ok(skin_manager::delete_skin(id).await?)
+pub async fn skin_update_skins(saves: Vec<SkinSave>) -> Result<()> {
+    Ok(skin_manager::update_skins(saves).await?)
 }
 
 // Gets all account heads from the cache

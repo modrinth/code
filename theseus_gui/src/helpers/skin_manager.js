@@ -49,9 +49,9 @@ export async function save_skin(user, data, name, model, skinid) {
   return await invoke('plugin:skin|skin_save_skin', { user, data, name, model, skinid })
 }
 
-// Removes SkinCache from the manager
-export async function delete_skin(id) {
-  return await invoke('plugin:skin|skin_delete_skin', { id })
+// Updates the skin save
+export async function update_skins(saves) {
+  return await invoke('plugin:skin|skin_update_skins', { saves })
 }
 
 // Gets all saved Skins
