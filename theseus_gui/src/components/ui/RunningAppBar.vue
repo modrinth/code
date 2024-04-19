@@ -198,6 +198,17 @@ const refreshInfo = async () => {
       return x
     },
   )
+
+  currentLoadingBars.value.sort((a, b) => {
+    if (a.loading_bar_uuid < b.loading_bar_uuid) {
+      return -1
+    }
+    if (a.loading_bar_uuid > b.loading_bar_uuid) {
+      return 1
+    }
+    return 0
+  })
+
   if (currentLoadingBars.value.length === 0) {
     showCard.value = false
   } else if (currentLoadingBarCount < currentLoadingBars.value.length) {

@@ -1,13 +1,11 @@
 <script setup>
 import { Button } from 'omorphia'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { get, set } from '@/helpers/settings.js'
 import mixpanel from 'mixpanel-browser'
 import GalleryImage from '@/components/ui/tutorial/GalleryImage.vue'
 import LoginCard from '@/components/ui/tutorial/LoginCard.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
-import { auto_install_java, get_jre } from '@/helpers/jre.js'
-import { handleError } from '@/store/notifications.js'
 
 const page = ref(1)
 
@@ -40,29 +38,6 @@ const finishOnboarding = async () => {
   await set(settings)
   props.finish()
 }
-
-async function fetchSettings() {
-  const fetchSettings = await get().catch(handleError)
-  if (!fetchSettings.java_globals) {
-    fetchSettings.java_globals = {}
-  }
-
-  if (!fetchSettings.java_globals.JAVA_17) {
-    const path1 = await auto_install_java(17).catch(handleError)
-    fetchSettings.java_globals.JAVA_17 = await get_jre(path1).catch(handleError)
-  }
-
-  if (!fetchSettings.java_globals.JAVA_8) {
-    const path2 = await auto_install_java(8).catch(handleError)
-    fetchSettings.java_globals.JAVA_8 = await get_jre(path2).catch(handleError)
-  }
-
-  await set(fetchSettings).catch(handleError)
-}
-
-onMounted(async () => {
-  await fetchSettings()
-})
 </script>
 
 <template>
