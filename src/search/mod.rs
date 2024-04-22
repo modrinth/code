@@ -191,7 +191,7 @@ pub async fn search_for_project(
 
     let offset: usize = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
-    let limit = info.limit.as_deref().unwrap_or("10").parse()?;
+    let limit = info.limit.as_deref().unwrap_or("10").parse::<usize>()?.min(100);
 
     let sort = get_sort_index(config, index)?;
     let meilisearch_index = client.get_index(sort.0).await?;
