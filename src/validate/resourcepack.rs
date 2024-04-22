@@ -10,10 +10,6 @@ impl super::Validator for PackValidator {
         &["zip"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["resourcepack"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["minecraft"]
     }
@@ -45,10 +41,6 @@ pub struct TexturePackValidator;
 impl super::Validator for TexturePackValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["zip"]
-    }
-
-    fn get_project_types(&self) -> &[&str] {
-        &["resourcepack"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {

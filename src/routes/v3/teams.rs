@@ -569,6 +569,7 @@ pub async fn add_team_member(
 
     transaction.commit().await?;
     TeamMember::clear_cache(team_id, &redis).await?;
+    User::clear_project_cache(&[new_member.user_id.into()], &redis).await?;
 
     Ok(HttpResponse::NoContent().body(""))
 }

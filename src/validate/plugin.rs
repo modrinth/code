@@ -9,10 +9,6 @@ impl super::Validator for PluginYmlValidator {
         &["zip", "jar"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["bukkit", "spigot", "paper", "purpur"]
     }
@@ -43,10 +39,6 @@ pub struct BungeeCordValidator;
 impl super::Validator for BungeeCordValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["zip", "jar"]
-    }
-
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
@@ -81,10 +73,6 @@ impl super::Validator for VelocityValidator {
         &["zip", "jar"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["velocity"]
     }
@@ -112,10 +100,6 @@ pub struct SpongeValidator;
 impl super::Validator for SpongeValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["zip", "jar"]
-    }
-
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {

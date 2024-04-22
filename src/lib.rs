@@ -13,17 +13,17 @@ use tokio::sync::RwLock;
 
 extern crate clickhouse as clickhouse_crate;
 use clickhouse_crate::Client;
-use governor::{Quota, RateLimiter};
 use governor::middleware::StateInformationMiddleware;
+use governor::{Quota, RateLimiter};
 use util::cors::default_cors;
 
 use crate::queue::moderation::AutomatedModerationQueue;
+use crate::util::ratelimit::KeyedRateLimiter;
 use crate::{
     queue::payouts::process_payout,
     search::indexing::index_projects,
     util::env::{parse_strings_from_var, parse_var},
 };
-use crate::util::ratelimit::KeyedRateLimiter;
 
 pub mod auth;
 pub mod clickhouse;

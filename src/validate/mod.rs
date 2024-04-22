@@ -77,7 +77,6 @@ pub enum SupportedGameVersions {
 
 pub trait Validator: Sync {
     fn get_file_extensions(&self) -> &[&str];
-    fn get_project_types(&self) -> &[&str];
     fn get_supported_loaders(&self) -> &[&str];
     fn get_supported_game_versions(&self) -> SupportedGameVersions;
     fn validate(
@@ -118,41 +117,28 @@ pub async fn validate_file(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<ValidationResult, ValidationError> {
-    // TODO: This needs to be revisited or removed with v3.
-    // Currently, it checks if the loader is the modpack loader, and extracts the pack data from it.
-    // This (and the funnction that calls this) should be refactored such that
-    // - validators are removed (or altogether reworked)
-    // - if a mrpack is uploaded, the pack data is extracted and usable to extract dependencies automatically
+    let game_versions = version_fields
+        .into_iter()
+        .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
+        .unwrap_or_default();
+    let all_game_versions =
+        MinecraftGameVersion::list(None, None, &mut *transaction, redis).await?;
 
-    // TODO: A test needs to be written for this.
-    match loaders {
-        loaders if loaders == vec![Loader("mrpack".to_string())] => {
-            let game_versions = version_fields
-                .into_iter()
-                .find_map(|v| MinecraftGameVersion::try_from_version_field(&v).ok())
-                .unwrap_or_default();
-            let all_game_versions =
-                MinecraftGameVersion::list(None, None, &mut *transaction, redis).await?;
-            validate_minecraft_file(
-                data,
-                file_extension,
-                "modpack".to_string(),
-                loaders,
-                game_versions,
-                all_game_versions,
-                file_type,
-            )
-            .await
-        }
-        _ => Ok(ValidationResult::Pass),
-    }
+    validate_minecraft_file(
+        data,
+        file_extension,
+        loaders,
+        game_versions,
+        all_game_versions,
+        file_type,
+    )
+    .await
 }
 
 async fn validate_minecraft_file(
     data: bytes::Bytes,
     file_extension: String,
-    mut project_type: String,
-    mut loaders: Vec<Loader>,
+    loaders: Vec<Loader>,
     game_versions: Vec<MinecraftGameVersion>,
     all_game_versions: Vec<MinecraftGameVersion>,
     file_type: Option<FileType>,
@@ -164,19 +150,18 @@ async fn validate_minecraft_file(
         if let Some(file_type) = file_type {
             match file_type {
                 FileType::RequiredResourcePack | FileType::OptionalResourcePack => {
-                    project_type = "resourcepack".to_string();
-                    loaders = vec![Loader("minecraft".to_string())];
+                    return PackValidator.validate(&mut zip);
                 }
                 FileType::Unknown => {}
             }
         }
 
         let mut visited = false;
+        let mut saved_result = None;
         for validator in VALIDATORS {
-            if validator.get_project_types().contains(&&*project_type)
-                && loaders
-                    .iter()
-                    .any(|x| validator.get_supported_loaders().contains(&&*x.0))
+            if loaders
+                .iter()
+                .any(|x| validator.get_supported_loaders().contains(&&*x.0))
                 && game_version_supported(
                     &game_versions,
                     &all_game_versions,
@@ -184,11 +169,28 @@ async fn validate_minecraft_file(
                 )
             {
                 if validator.get_file_extensions().contains(&&*file_extension) {
-                    return validator.validate(&mut zip);
+                    let result = validator.validate(&mut zip)?;
+                    match result {
+                        ValidationResult::PassWithPackDataAndFiles { .. } => {
+                            saved_result = Some(result);
+                        }
+                        ValidationResult::Pass => {
+                            if saved_result.is_none() {
+                                saved_result = Some(result);
+                            }
+                        }
+                        ValidationResult::Warning(_) => {
+                            return Ok(result);
+                        }
+                    }
                 } else {
                     visited = true;
                 }
             }
+        }
+
+        if let Some(result) = saved_result {
+            return Ok(result);
         }
 
         if visited {

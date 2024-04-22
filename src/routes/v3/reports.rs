@@ -435,7 +435,7 @@ pub async fn report_edit(
                     MessageBody::ThreadClosure
                 },
                 thread_id: report.thread_id,
-                hide_identity: true,
+                hide_identity: user.role.is_mod(),
             }
             .insert(&mut transaction)
             .await?;

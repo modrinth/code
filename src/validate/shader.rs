@@ -9,10 +9,6 @@ impl super::Validator for ShaderValidator {
         &["zip"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["shader"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["optifine", "iris"]
     }
@@ -40,10 +36,6 @@ pub struct CanvasShaderValidator;
 impl super::Validator for CanvasShaderValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["zip"]
-    }
-
-    fn get_project_types(&self) -> &[&str] {
-        &["shader"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
@@ -79,10 +71,6 @@ pub struct CoreShaderValidator;
 impl super::Validator for CoreShaderValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["zip"]
-    }
-
-    fn get_project_types(&self) -> &[&str] {
-        &["shader"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {

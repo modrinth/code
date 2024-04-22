@@ -10,10 +10,6 @@ impl super::Validator for QuiltValidator {
         &["jar", "zip"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["quilt"]
     }

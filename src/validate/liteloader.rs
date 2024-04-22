@@ -9,10 +9,6 @@ impl super::Validator for LiteLoaderValidator {
         &["litemod", "jar"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["liteloader"]
     }

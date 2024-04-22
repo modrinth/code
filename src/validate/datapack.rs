@@ -9,10 +9,6 @@ impl super::Validator for DataPackValidator {
         &["zip"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["datapack"]
     }

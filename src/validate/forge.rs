@@ -10,10 +10,6 @@ impl super::Validator for ForgeValidator {
         &["jar", "zip"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["forge"]
     }
@@ -47,10 +43,6 @@ impl super::Validator for LegacyForgeValidator {
         &["jar", "zip"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["mod"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
         &["forge"]
     }
@@ -71,15 +63,13 @@ impl super::Validator for LegacyForgeValidator {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        _archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        if archive.by_name("mcmod.info").is_err() {
-            return Ok(ValidationResult::Warning(
-                "Forge mod file does not contain mcmod.info!",
-            ));
-        };
-
-        //TODO: Check if file is a dev JAR?
+        // if archive.by_name("mcmod.info").is_err() {
+        //     return Ok(ValidationResult::Warning(
+        //         "Forge mod file does not contain mcmod.info!",
+        //     ));
+        // };
 
         Ok(ValidationResult::Pass)
     }

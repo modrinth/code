@@ -1,17 +1,13 @@
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetricsBuilder;
 use env_logger::Env;
-use governor::middleware::StateInformationMiddleware;
-use governor::{Quota, RateLimiter};
 use labrinth::database::redis::RedisPool;
 use labrinth::file_hosting::S3Host;
 use labrinth::search;
-use labrinth::util::ratelimit::{KeyedRateLimiter, RateLimit};
+use labrinth::util::ratelimit::RateLimit;
 use labrinth::{check_env_vars, clickhouse, database, file_hosting, queue};
 use log::{error, info};
-use std::num::NonZeroU32;
 use std::sync::Arc;
-use std::time::Duration;
 
 #[cfg(feature = "jemalloc")]
 #[global_allocator]
@@ -98,7 +94,7 @@ async fn main() -> std::io::Result<()> {
 
     let search_config = search::SearchConfig::new(None);
 
-    let mut labrinth_config = labrinth::app_setup(
+    let labrinth_config = labrinth::app_setup(
         pool.clone(),
         redis_pool.clone(),
         search_config.clone(),

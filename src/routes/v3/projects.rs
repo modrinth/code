@@ -453,7 +453,7 @@ pub async fn project_edit(
                         old_status: project_item.inner.status,
                     },
                     thread_id: project_item.thread_id,
-                    hide_identity: true,
+                    hide_identity: user.role.is_mod(),
                 }
                 .insert(&mut transaction)
                 .await?;

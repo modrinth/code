@@ -13,12 +13,8 @@ impl super::Validator for ModpackValidator {
         &["mrpack"]
     }
 
-    fn get_project_types(&self) -> &[&str] {
-        &["modpack"]
-    }
-
     fn get_supported_loaders(&self) -> &[&str] {
-        &["forge", "fabric", "quilt", "mrpack"]
+        &["mrpack"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
