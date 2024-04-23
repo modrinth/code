@@ -1,5 +1,6 @@
 use super::ids::{ProjectId, UserId};
-use super::CollectionId;
+use super::{CollectionId, ThreadId};
+use crate::database::models;
 use crate::database::models::{DatabaseError, OrganizationId};
 use crate::database::redis::RedisPool;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
@@ -453,6 +454,41 @@ impl User {
             )
             .execute(&mut **transaction)
             .await?;
+
+            let user_collections = sqlx::query!(
+                "
+                SELECT id
+                FROM collections
+                WHERE user_id = $1
+                ",
+                id as UserId,
+            )
+            .fetch_many(&mut **transaction)
+            .try_filter_map(|e| async { Ok(e.right().map(|x| CollectionId(x.id))) })
+            .try_collect::<Vec<_>>()
+            .await?;
+
+            for collection_id in user_collections {
+                models::Collection::remove(collection_id, transaction, &redis).await?;
+            }
+
+            let report_threads = sqlx::query!(
+                "
+                SELECT t.id
+                FROM threads t
+                INNER JOIN reports r ON t.report_id = r.id AND (r.user_id = $1 OR r.reporter = $1)
+                WHERE report_id IS NOT NULL
+                ",
+                id as UserId,
+            )
+            .fetch_many(&mut **transaction)
+            .try_filter_map(|e| async { Ok(e.right().map(|x| ThreadId(x.id))) })
+            .try_collect::<Vec<_>>()
+            .await?;
+
+            for thread_id in report_threads {
+                models::Thread::remove_full(thread_id, transaction).await?;
+            }
 
             sqlx::query!(
                 "

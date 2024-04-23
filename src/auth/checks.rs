@@ -61,8 +61,7 @@ pub async fn filter_visible_projects(
         pool,
         hide_unlisted,
     )
-    .await
-    .unwrap();
+    .await?;
     projects.retain(|x| filtered_project_ids.contains(&x.inner.id));
     Ok(projects.into_iter().map(|x| x.into()).collect())
 }
@@ -193,8 +192,7 @@ pub async fn filter_visible_versions(
         pool,
         redis,
     )
-    .await
-    .unwrap();
+    .await?;
     versions.retain(|x| filtered_version_ids.contains(&x.inner.id));
     Ok(versions.into_iter().map(|x| x.into()).collect())
 }

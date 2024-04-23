@@ -877,7 +877,9 @@ pub async fn upload_file(
     }
 
     let data = data.freeze();
-    let primary = (version_files.iter().all(|x| !x.primary) && !ignore_primary)
+    let primary = (validation_result.is_passed()
+        && version_files.iter().all(|x| !x.primary)
+        && !ignore_primary)
         || force_primary
         || total_files_len == 1;
 
@@ -909,6 +911,12 @@ pub async fn upload_file(
         return Err(CreateError::InvalidInput(
             "Duplicate files are not allowed to be uploaded to Modrinth!".to_string(),
         ));
+    }
+
+    if let ValidationResult::Warning(msg) = validation_result {
+        if primary {
+            return Err(CreateError::InvalidInput(msg.to_string()));
+        }
     }
 
     version_files.push(VersionFileBuilder {
