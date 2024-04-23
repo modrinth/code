@@ -101,8 +101,7 @@ impl Tags {
                 &serde_json::to_vec(&tags_fetch)?,
                 &state.io_semaphore,
             )
-            .await
-            .unwrap();
+            .await?;
 
             let mut old_tags = state.tags.write().await;
             *old_tags = tags_fetch;

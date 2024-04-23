@@ -232,24 +232,26 @@ async fn read_icon_from_file(
                 zip_file_reader.file().entries().iter().position(|f| {
                     f.filename().as_str().unwrap_or_default() == icon_path
                 });
-            let mut bytes = Vec::new();
-            if zip_file_reader
-                .reader_with_entry(zip_index_option.unwrap())
-                .await?
-                .read_to_end_checked(&mut bytes)
-                .await
-                .is_ok()
-            {
-                let bytes = bytes::Bytes::from(bytes);
-                let path = write_cached_icon(
-                    &icon_path,
-                    cache_dir,
-                    bytes,
-                    io_semaphore,
-                )
-                .await?;
+            if let Some(zip_index) = zip_index_option {
+                let mut bytes = Vec::new();
+                if zip_file_reader
+                    .reader_with_entry(zip_index)
+                    .await?
+                    .read_to_end_checked(&mut bytes)
+                    .await
+                    .is_ok()
+                {
+                    let bytes = bytes::Bytes::from(bytes);
+                    let path = write_cached_icon(
+                        &icon_path,
+                        cache_dir,
+                        bytes,
+                        io_semaphore,
+                    )
+                    .await?;
 
-                return Ok(Some(path));
+                    return Ok(Some(path));
+                }
             }
         }
     }
