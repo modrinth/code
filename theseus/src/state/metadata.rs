@@ -146,7 +146,7 @@ impl Metadata {
                 .join("metadata.json.bak");
 
             if metadata_path.exists() {
-                std::fs::copy(&metadata_path, &metadata_backup_path).unwrap();
+                std::fs::copy(&metadata_path, &metadata_backup_path)?;
             }
 
             write(
@@ -154,8 +154,7 @@ impl Metadata {
                 &serde_json::to_vec(&metadata_fetch)?,
                 &state.io_semaphore,
             )
-            .await
-            .unwrap();
+            .await?;
 
             let mut old_metadata = state.metadata.write().await;
             *old_metadata = metadata_fetch;

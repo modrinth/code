@@ -34,6 +34,8 @@ pub enum MinecraftAuthStep {
 
 #[derive(thiserror::Error, Debug)]
 pub enum MinecraftAuthenticationError {
+    #[error("Error reading public key during generation")]
+    ReadingPublicKey,
     #[error("Failed to serialize private key to PEM: {0}")]
     PEMSerialize(#[from] p256::pkcs8::Error),
     #[error("Failed to serialize body to JSON during step {step:?}: {source}")]
@@ -63,6 +65,8 @@ pub enum MinecraftAuthenticationError {
         #[source]
         source: std::io::Error,
     },
+    #[error("Error reading XBOX Session ID header")]
+    NoSessionId,
     #[error("Error reading user hash")]
     NoUserHash,
 }
@@ -415,7 +419,7 @@ async fn sisu_authenticate(
     let session_id = headers
         .get("X-SessionId")
         .and_then(|x| x.to_str().ok())
-        .unwrap()
+        .ok_or_else(|| MinecraftAuthenticationError::NoSessionId)?
         .to_string();
 
     Ok((session_id, res))
@@ -760,8 +764,8 @@ fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
     Ok(DeviceTokenKey {
         id,
         key: signing_key,
-        x: BASE64_URL_SAFE_NO_PAD.encode(encoded_point.x().unwrap()),
-        y: BASE64_URL_SAFE_NO_PAD.encode(encoded_point.y().unwrap()),
+        x: BASE64_URL_SAFE_NO_PAD.encode(encoded_point.x().ok_or_else(|| MinecraftAuthenticationError::ReadingPublicKey)?),
+        y: BASE64_URL_SAFE_NO_PAD.encode(encoded_point.y().ok_or_else(|| MinecraftAuthenticationError::ReadingPublicKey)?),
     })
 }
 
