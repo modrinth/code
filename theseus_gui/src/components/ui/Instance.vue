@@ -17,6 +17,7 @@ import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
+import { handleSevereError } from '@/store/error.js'
 
 const props = defineProps({
   instance: {
@@ -121,7 +122,7 @@ const install = async (e) => {
 const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
-  uuid.value = await run(props.instance.path).catch(handleError)
+  uuid.value = await run(props.instance.path).catch(handleSevereError)
   modLoading.value = false
   playing.value = true
 

@@ -1,7 +1,7 @@
 use crate::api::Result;
 use chrono::{Duration, Utc};
 use tauri::plugin::TauriPlugin;
-use tauri::Manager;
+use tauri::{Manager, UserAttentionType};
 use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
@@ -41,9 +41,18 @@ pub async fn auth_login(app: tauri::AppHandle) -> Result<Option<Credentials>> {
         )?),
     )
     .title("Sign into Modrinth")
+    .always_on_top(true)
+    .center()
     .build()?;
 
+    window.request_user_attention(Some(UserAttentionType::Critical))?;
+
     while (Utc::now() - start) < Duration::minutes(10) {
+        if window.title().is_err() {
+            // user closed window, cancelling flow
+            return Ok(None);
+        }
+
         if window
             .url()
             .as_str()
