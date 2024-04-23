@@ -764,8 +764,16 @@ fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
     Ok(DeviceTokenKey {
         id,
         key: signing_key,
-        x: BASE64_URL_SAFE_NO_PAD.encode(encoded_point.x().ok_or_else(|| MinecraftAuthenticationError::ReadingPublicKey)?),
-        y: BASE64_URL_SAFE_NO_PAD.encode(encoded_point.y().ok_or_else(|| MinecraftAuthenticationError::ReadingPublicKey)?),
+        x: BASE64_URL_SAFE_NO_PAD.encode(
+            encoded_point.x().ok_or_else(|| {
+                MinecraftAuthenticationError::ReadingPublicKey
+            })?,
+        ),
+        y: BASE64_URL_SAFE_NO_PAD.encode(
+            encoded_point.y().ok_or_else(|| {
+                MinecraftAuthenticationError::ReadingPublicKey
+            })?,
+        ),
     })
 }
 

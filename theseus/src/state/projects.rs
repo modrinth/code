@@ -248,12 +248,11 @@ async fn read_icon_from_file(
                         bytes,
                         io_semaphore,
                     )
-                        .await?;
+                    .await?;
 
                     return Ok(Some(path));
                 }
             }
-
         }
     }
 
