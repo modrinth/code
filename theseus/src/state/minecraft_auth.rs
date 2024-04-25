@@ -11,7 +11,7 @@ use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
 use rand::rngs::OsRng;
 use rand::Rng;
 use reqwest::header::HeaderMap;
-use reqwest::Response;
+use reqwest::{Error, Response};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -46,13 +46,14 @@ pub enum MinecraftAuthenticationError {
         source: serde_json::Error,
     },
     #[error(
-        "Failed to deserialize response to JSON during step {step:?}: {source}"
+        "Failed to deserialize response to JSON during step {step:?}: {source}. Status Code: {status_code} Body: {raw}"
     )]
     DeserializeResponse {
         step: MinecraftAuthStep,
         raw: String,
         #[source]
         source: serde_json::Error,
+        status_code: reqwest::StatusCode,
     },
     #[error("Request failed during step {step:?}: {source}")]
     Request {
@@ -81,6 +82,8 @@ pub struct SaveDeviceToken {
     pub x: String,
     pub y: String,
     pub token: DeviceToken,
+    #[serde(default)]
+    modern: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -151,6 +154,7 @@ impl MinecraftAuthStore {
                     x: key.x.clone(),
                     y: key.y.clone(),
                     token: token.clone(),
+                    modern: true,
                 });
                 self.save().await?;
 
@@ -160,13 +164,7 @@ impl MinecraftAuthStore {
 
         let (key, token) = if let Some(ref token) = self.token {
             // reset device token for legacy launcher versions with broken values
-            if self.users.is_empty()
-                && token.token.issue_instant
-                    < DateTime::parse_from_rfc3339(
-                        "2024-04-25T23:59:59.999999999Z",
-                    )
-                    .unwrap()
-            {
+            if self.users.is_empty() && !token.modern {
                 return Ok(generate_key!(
                     self,
                     generate_key,
@@ -487,6 +485,7 @@ async fn oauth_token(
         step: MinecraftAuthStep::GetOAuthToken,
     })?;
 
+    let status = res.status();
     let text = res.text().await.map_err(|source| {
         MinecraftAuthenticationError::Request {
             source,
@@ -499,6 +498,7 @@ async fn oauth_token(
             source,
             raw: text,
             step: MinecraftAuthStep::GetOAuthToken,
+            status_code: status,
         }
     })
 }
@@ -527,6 +527,7 @@ async fn oauth_refresh(
         step: MinecraftAuthStep::RefreshOAuthToken,
     })?;
 
+    let status = res.status();
     let text = res.text().await.map_err(|source| {
         MinecraftAuthenticationError::Request {
             source,
@@ -539,6 +540,7 @@ async fn oauth_refresh(
             source,
             raw: text,
             step: MinecraftAuthStep::RefreshOAuthToken,
+            status_code: status,
         }
     })
 }
@@ -655,6 +657,7 @@ async fn minecraft_token(
         step: MinecraftAuthStep::MinecraftToken,
     })?;
 
+    let status = res.status();
     let text = res.text().await.map_err(|source| {
         MinecraftAuthenticationError::Request {
             source,
@@ -667,6 +670,7 @@ async fn minecraft_token(
             source,
             raw: text,
             step: MinecraftAuthStep::MinecraftToken,
+            status_code: status,
         }
     })
 }
@@ -694,6 +698,7 @@ async fn minecraft_profile(
         step: MinecraftAuthStep::MinecraftProfile,
     })?;
 
+    let status = res.status();
     let text = res.text().await.map_err(|source| {
         MinecraftAuthenticationError::Request {
             source,
@@ -706,6 +711,7 @@ async fn minecraft_profile(
             source,
             raw: text,
             step: MinecraftAuthStep::MinecraftProfile,
+            status_code: status,
         }
     })
 }
@@ -727,6 +733,7 @@ async fn minecraft_entitlements(
     })
         .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
 
+    let status = res.status();
     let text = res.text().await.map_err(|source| {
         MinecraftAuthenticationError::Request {
             source,
@@ -739,6 +746,7 @@ async fn minecraft_entitlements(
             source,
             raw: text,
             step: MinecraftAuthStep::MinecraftEntitlements,
+            status_code: status,
         }
     })
 }
@@ -751,25 +759,33 @@ async fn auth_retry<F>(
 where
     F: Future<Output = Result<Response, reqwest::Error>>,
 {
-    const RETRY_COUNT: usize = 9; // Does command 9 times
+    const RETRY_COUNT: usize = 5; // Does command 9 times
     const RETRY_WAIT: std::time::Duration =
         std::time::Duration::from_millis(250);
 
-    let mut resp = reqwest_request().await?;
+    let mut resp = reqwest_request().await;
     for i in 0..RETRY_COUNT {
-        if resp.status().is_success() {
-            break;
+        match &resp {
+            Ok(_) => {
+                break;
+            }
+            Err(err) => {
+                if err.is_connect() || err.is_timeout() {
+                    if i < RETRY_COUNT - 1 {
+                        tracing::debug!(
+                            "Request failed with connect error, retrying...",
+                        );
+                        tokio::time::sleep(RETRY_WAIT).await;
+                        resp = reqwest_request().await;
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
-        tracing::debug!(
-            "Request failed with status code {}, retrying...",
-            resp.status()
-        );
-        if i < RETRY_COUNT - 1 {
-            tokio::time::sleep(RETRY_WAIT).await;
-        }
-        resp = reqwest_request().await?;
     }
-    Ok(resp)
+
+    resp
 }
 
 pub struct DeviceTokenKey {
@@ -896,16 +912,18 @@ async fn send_signed_request<T: DeserializeOwned>(
     .await
     .map_err(|source| MinecraftAuthenticationError::Request { source, step })?;
 
+    let status = res.status();
     let headers = res.headers().clone();
-    let res = res.text().await.map_err(|source| {
+    let body = res.text().await.map_err(|source| {
         MinecraftAuthenticationError::Request { source, step }
     })?;
 
-    let body = serde_json::from_str(&res).map_err(|source| {
+    let body = serde_json::from_str(&body).map_err(|source| {
         MinecraftAuthenticationError::DeserializeResponse {
             source,
-            raw: res,
+            raw: body,
             step,
+            status_code: status,
         }
     })?;
     Ok((headers, body))
