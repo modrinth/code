@@ -1,10 +1,9 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::jre::{self, JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
 use crate::launcher::io::IOError;
 use crate::prelude::JavaVersion;
-use crate::state::ProfileInstallStage;
+use crate::state::{Credentials, ProfileInstallStage};
 use crate::util::io;
 use crate::{
     process,
@@ -22,7 +21,6 @@ use uuid::Uuid;
 
 mod args;
 
-pub mod auth;
 pub mod download;
 
 // All nones -> disallowed
@@ -119,24 +117,17 @@ pub async fn get_java_version_from_profile(
     if let Some(java) = profile.java.clone().and_then(|x| x.override_version) {
         Ok(Some(java))
     } else {
-        let optimal_keys = match version_info
+        let key = version_info
             .java_version
             .as_ref()
             .map(|it| it.major_version)
-            .unwrap_or(8)
-        {
-            0..=15 => vec![JAVA_8_KEY, JAVA_17_KEY, JAVA_18PLUS_KEY],
-            16..=17 => vec![JAVA_17_KEY, JAVA_18PLUS_KEY],
-            _ => vec![JAVA_18PLUS_KEY],
-        };
+            .unwrap_or(8);
 
         let state = State::get().await?;
         let settings = state.settings.read().await;
 
-        for key in optimal_keys {
-            if let Some(java) = settings.java_globals.get(&key.to_string()) {
-                return Ok(Some(java.clone()));
-            }
+        if let Some(java) = settings.java_globals.get(&format!("JAVA_{key}")) {
+            return Ok(Some(java.clone()));
         }
 
         Ok(None)
@@ -216,23 +207,42 @@ pub async fn install_minecraft(
     )
     .await?;
 
-    let java_version = get_java_version_from_profile(profile, &version_info)
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::OtherError(
-                "Missing correct java installation".to_string(),
-            )
-        })?;
+    // TODO: check if java exists, if not install it add to install step
+
+    let key = version_info
+        .java_version
+        .as_ref()
+        .map(|it| it.major_version)
+        .unwrap_or(8);
+    let (java_version, set_java) = if let Some(java_version) =
+        get_java_version_from_profile(profile, &version_info).await?
+    {
+        (std::path::PathBuf::from(java_version.path), false)
+    } else {
+        let path = crate::api::jre::auto_install_java(key).await?;
+
+        (path, true)
+    };
 
     // Test jre version
-    let java_version = jre::check_jre(java_version.path.clone().into())
+    let java_version = crate::api::jre::check_jre(java_version.clone())
         .await?
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {}",
-                java_version.path
+                "Java path invalid or non-functional: {:?}",
+                java_version
             ))
         })?;
+
+    if set_java {
+        {
+            let mut settings = state.settings.write().await;
+            settings
+                .java_globals
+                .insert(format!("JAVA_{key}"), java_version.clone());
+        }
+        State::sync().await?;
+    }
 
     // Download minecraft (5-90)
     download::download_minecraft(
@@ -368,7 +378,7 @@ pub async fn launch_minecraft(
     wrapper: &Option<String>,
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
-    credentials: &auth::Credentials,
+    credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
@@ -435,14 +445,15 @@ pub async fn launch_minecraft(
         })?;
 
     // Test jre version
-    let java_version = jre::check_jre(java_version.path.clone().into())
-        .await?
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Java path invalid or non-functional: {}",
-                java_version.path
-            ))
-        })?;
+    let java_version =
+        crate::api::jre::check_jre(java_version.path.clone().into())
+            .await?
+            .ok_or_else(|| {
+                crate::ErrorKind::LauncherError(format!(
+                    "Java path invalid or non-functional: {}",
+                    java_version.path
+                ))
+            })?;
 
     let client_path = state
         .directories

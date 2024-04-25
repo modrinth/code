@@ -145,6 +145,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useFetch } from '@/helpers/fetch'
 import { useInstanceIcon } from '@/composable/instance/icon.js'
+import { handleSevereError } from '@/store/error.js'
 
 const route = useRoute()
 
@@ -179,7 +180,7 @@ const options = ref(null)
 
 const startInstance = async (context) => {
   loading.value = true
-  uuid.value = await run(route.params.id).catch(handleError)
+  uuid.value = await run(route.params.id).catch(handleSevereError)
   loading.value = false
   playing.value = true
 
