@@ -4,7 +4,7 @@ use crate::State;
 use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
 use base64::Engine;
 use byteorder::BigEndian;
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Duration, NaiveDate, Utc};
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
 use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
@@ -159,6 +159,22 @@ impl MinecraftAuthStore {
         }
 
         let (key, token) = if let Some(ref token) = self.token {
+            // reset device token for legacy launcher versions with broken values
+            if self.users.is_empty()
+                && token.token.issue_instant
+                    < DateTime::parse_from_rfc3339(
+                        "2024-04-25T23:59:59.999999999Z",
+                    )
+                    .unwrap()
+            {
+                return Ok(generate_key!(
+                    self,
+                    generate_key,
+                    device_token,
+                    SaveDeviceToken
+                ));
+            }
+
             if token.token.not_after > Utc::now() {
                 if let Ok(private_key) =
                     SigningKey::from_pkcs8_pem(&token.private_key)
