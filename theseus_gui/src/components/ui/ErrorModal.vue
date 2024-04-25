@@ -23,7 +23,10 @@ defineExpose({
       supportLink.value =
         'https://support.modrinth.com/en/articles/9038231-minecraft-sign-in-issues'
 
-      if (errorVal.message.includes('existing connection was forcibly closed')) {
+      if (
+        errorVal.message.includes('existing connection was forcibly closed') ||
+        errorVal.message.includes('error sending request for url')
+      ) {
         metadata.value.network = true
       }
       if (errorVal.message.includes('because the target machine actively refused it')) {
