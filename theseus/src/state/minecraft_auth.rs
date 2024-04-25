@@ -434,7 +434,7 @@ async fn sisu_authenticate(
           "RedirectUri": REDIRECT_URL,
           "Sandbox": "RETAIL",
           "TokenType": "code",
-          "TitleId": 1794566092,
+          "TitleId": "1794566092",
         }),
         key,
         MinecraftAuthStep::SisuAuthenicate,
@@ -581,7 +581,7 @@ async fn sisu_authorize(
             "SessionId": session_id,
             "SiteName": "user.auth.xboxlive.com",
             "RelyingParty": "http://xboxlive.com",
-            "UseModernGamertag": "true"
+            "UseModernGamertag": true
         }),
         key,
         MinecraftAuthStep::SisuAuthorize,
@@ -781,7 +781,7 @@ pub struct DeviceTokenKey {
 
 #[tracing::instrument]
 fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
-    let id = Uuid::new_v4().to_string();
+    let id = Uuid::new_v4().to_string().to_uppercase();
 
     let signing_key = SigningKey::random(&mut OsRng);
     let public_key = VerifyingKey::from(&signing_key);
@@ -879,9 +879,9 @@ async fn send_signed_request<T: DeserializeOwned>(
     let res = auth_retry(|| {
         let mut request = REQWEST_CLIENT
             .post(url)
-            .header("Content-Type", "application/json")
+            .header("Content-Type", "application/json; charset=utf-8")
             .header("Accept", "application/json")
-            .header("signature", &signature);
+            .header("Signature", &signature);
 
         if url != "https://sisu.xboxlive.com/authorize" {
             request = request.header("x-xbl-contract-version", "1");
@@ -915,6 +915,6 @@ async fn send_signed_request<T: DeserializeOwned>(
 fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 
-    let bytes: Vec<u8> = (0..64).map(|_| rng.gen()).collect();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.gen::<u8>()).collect();
     bytes.iter().map(|byte| format!("{:02x}", byte)).collect()
 }
