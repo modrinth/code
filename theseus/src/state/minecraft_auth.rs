@@ -15,6 +15,7 @@ use reqwest::Response;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use sha2::Digest;
 use std::collections::HashMap;
 use std::future::Future;
 use uuid::Uuid;
@@ -84,6 +85,7 @@ pub struct SaveDeviceToken {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MinecraftLoginFlow {
+    pub verifier: String,
     pub challenge: String,
     pub session_id: String,
     pub redirect_uri: String,
@@ -192,11 +194,17 @@ impl MinecraftAuthStore {
     pub async fn login_begin(&mut self) -> crate::Result<MinecraftLoginFlow> {
         let (key, token) = self.refresh_and_get_device_token().await?;
 
-        let challenge = generate_oauth_challenge();
+        let verifier = generate_oauth_challenge();
+        let mut hasher = sha2::Sha256::new();
+        hasher.update(&verifier);
+        let result = hasher.finalize();
+        let challenge = BASE64_URL_SAFE_NO_PAD.encode(&result);
+
         let (session_id, redirect_uri) =
             sisu_authenticate(&token.token, &challenge, &key).await?;
 
         Ok(MinecraftLoginFlow {
+            verifier,
             challenge,
             session_id,
             redirect_uri: redirect_uri.msa_oauth_redirect,
@@ -211,7 +219,7 @@ impl MinecraftAuthStore {
     ) -> crate::Result<Credentials> {
         let (key, token) = self.refresh_and_get_device_token().await?;
 
-        let oauth_token = oauth_token(code, &flow.challenge).await?;
+        let oauth_token = oauth_token(code, &flow.verifier).await?;
         let sisu_authorize = sisu_authorize(
             Some(&flow.session_id),
             &oauth_token.access_token,
@@ -403,13 +411,14 @@ async fn sisu_authenticate(
           ],
           "Query": {
             "code_challenge": challenge,
-            "code_challenge_method": "plain",
+            "code_challenge_method": "S256",
             "state": "",
             "prompt": "select_account"
           },
           "RedirectUri": REDIRECT_URL,
           "Sandbox": "RETAIL",
           "TokenType": "code",
+          "TitleId": 1794566092,
         }),
         key,
         MinecraftAuthStep::SisuAuthenicate,
@@ -439,12 +448,12 @@ struct OAuthToken {
 #[tracing::instrument]
 async fn oauth_token(
     code: &str,
-    challenge: &str,
+    verifier: &str,
 ) -> Result<OAuthToken, MinecraftAuthenticationError> {
     let mut query = HashMap::new();
     query.insert("client_id", "00000000402b5328");
     query.insert("code", code);
-    query.insert("code_verifier", challenge);
+    query.insert("code_verifier", &*verifier);
     query.insert("grant_type", "authorization_code");
     query.insert("redirect_uri", "https://login.live.com/oauth20_desktop.srf");
     query.insert("scope", "service::user.auth.xboxlive.com::MBI_SSL");
@@ -885,6 +894,6 @@ async fn send_signed_request<T: DeserializeOwned>(
 fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 
-    let bytes: Vec<u8> = (0..32).map(|_| rng.gen()).collect();
+    let bytes: Vec<u8> = (0..64).map(|_| rng.gen()).collect();
     bytes.iter().map(|byte| format!("{:02x}", byte)).collect()
 }
