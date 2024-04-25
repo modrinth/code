@@ -412,7 +412,7 @@ async fn sisu_authenticate(
           "Query": {
             "code_challenge": challenge,
             "code_challenge_method": "S256",
-            "state": "",
+            "state": generate_oauth_challenge(),
             "prompt": "select_account"
           },
           "RedirectUri": REDIRECT_URL,
@@ -564,6 +564,8 @@ async fn sisu_authorize(
             "Sandbox": "RETAIL",
             "SessionId": session_id,
             "SiteName": "user.auth.xboxlive.com",
+            "RelyingParty": "http://xboxlive.com",
+            "UseModernGamertag": "true"
         }),
         key,
         MinecraftAuthStep::SisuAuthorize,
@@ -863,8 +865,11 @@ async fn send_signed_request<T: DeserializeOwned>(
             .post(url)
             .header("Content-Type", "application/json")
             .header("Accept", "application/json")
-            .header("x-xbl-contract-version", "1")
             .header("signature", &signature);
+
+        if url != "https://sisu.xboxlive.com/authorize" {
+            request = request.header("x-xbl-contract-version", "1");
+        }
 
         if let Some(auth) = authorization {
             request = request.header("Authorization", auth);
