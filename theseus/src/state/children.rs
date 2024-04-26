@@ -604,8 +604,8 @@ impl Children {
     }
 
     // Returns a ref to the child
-    pub fn get(&self, uuid: &Uuid) -> Option<Arc<RwLock<MinecraftChild>>> {
-        self.0.get(uuid).cloned()
+    pub fn get(&self, uuid: Uuid) -> Option<Arc<RwLock<MinecraftChild>>> {
+        self.0.get(&uuid).cloned()
     }
 
     // Gets all PID keys
@@ -615,7 +615,7 @@ impl Children {
 
     // Get exit status of a child by PID
     // Returns None if the child is still running
-    pub async fn exit_status(&self, uuid: &Uuid) -> crate::Result<Option<i32>> {
+    pub async fn exit_status(&self, uuid: Uuid) -> crate::Result<Option<i32>> {
         if let Some(child) = self.get(uuid) {
             let child = child.write().await;
             let status = child.current_child.write().await.try_wait().await?;
@@ -629,7 +629,7 @@ impl Children {
     pub async fn running_keys(&self) -> crate::Result<Vec<Uuid>> {
         let mut keys = Vec::new();
         for key in self.keys() {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.write().await;
                 if child
@@ -655,7 +655,7 @@ impl Children {
         let running_keys = self.running_keys().await?;
         let mut keys = Vec::new();
         for key in running_keys {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.read().await;
                 if child.profile_relative_path == profile_path {
@@ -672,7 +672,7 @@ impl Children {
     ) -> crate::Result<Vec<ProfilePathId>> {
         let mut profiles = Vec::new();
         for key in self.keys() {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.write().await;
                 if child
@@ -695,7 +695,7 @@ impl Children {
     pub async fn running_profiles(&self) -> crate::Result<Vec<Profile>> {
         let mut profiles = Vec::new();
         for key in self.keys() {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.write().await;
                 if child
