@@ -605,11 +605,7 @@ onUnmounted(() => unlistenOffline())
             @update:model-value="onSearchChangeToTop(1)"
           />
         </div>
-        <CategoryFilter
-          :facets="facets"
-          :project-types="Array.of(projectType)"
-          @toggle-facet="toggleFacet"
-        />
+        <CategoryFilter :facets="facets" :project-type="projectType" @toggle-facet="toggleFacet" />
         <div v-if="projectType !== 'datapack'" class="environment">
           <h2>Environments</h2>
           <SearchFilter

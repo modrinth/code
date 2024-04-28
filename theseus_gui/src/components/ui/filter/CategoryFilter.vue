@@ -5,8 +5,8 @@ import { handleError } from '@/store/notifications.js'
 import { formatCategory, formatCategoryHeader, SearchFilter } from 'omorphia'
 
 const props = defineProps({
-  projectTypes: {
-    type: Object,
+  projectType: {
+    type: String,
     required: true,
   },
   facets: {
@@ -21,24 +21,25 @@ function onToggleFacet(elementName) {
   emits('toggleFacet', elementName)
 }
 
-const projectTypes = computed(() => {
-  return props.projectTypes.map((type) => {
-    return type === 'datapack' ? 'mod' : type
-  })
-})
-
 const sortedCategories = computed(() => {
   const values = new Map()
 
-  console.log(projectTypes.value)
-  console.log('hi')
-
-  for (const category of categories.value.filter((cat) => {
-    return projectTypes.value.includes(cat.project_type)
+  outer: for (const category of categories.value.filter((cat) => {
+    return (
+      cat.project_type === (props.projectType === 'datapack' ? 'mod' : props.projectType) ||
+      props.projectType === 'all'
+    )
   })) {
     if (!values.has(category.header)) {
       values.set(category.header, [])
     }
+
+    for (let existingCategory of values.get(category.header)) {
+      if (existingCategory.name === category.name) {
+        continue outer
+      }
+    }
+
     values.get(category.header).push(category)
   }
   return values
