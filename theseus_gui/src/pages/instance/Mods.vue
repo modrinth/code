@@ -364,7 +364,7 @@
     :instance="instance"
     :versions="props.versions"
   />
-  <Teleport to=".side-cards">
+  <Teleport v-if="mounted" to=".side-cards">
     <Card class="filter-panel">
       <CategoryFilter
         :facets="facets"
@@ -401,7 +401,7 @@ import {
   Pagination,
   DropdownSelect,
 } from 'omorphia'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
@@ -460,6 +460,14 @@ const canUpdatePack = computed(() => {
   return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
 })
 const exportModal = ref(null)
+
+// used to make sure to only render teleport (category selector)
+// when the page is fully loading so the sidebar definitely exists
+let mounted = ref(false)
+
+onMounted(() => {
+  mounted.value = true
+})
 
 const initProjects = (initInstance) => {
   projects.value = []
