@@ -106,7 +106,7 @@ pub enum ErrorKind {
 
 #[derive(Debug)]
 pub struct Error {
-    source: tracing_error::TracedError<ErrorKind>,
+    pub source: tracing_error::TracedError<ErrorKind>,
 }
 
 impl std::error::Error for Error {
