@@ -512,7 +512,6 @@ import PrismLauncherLogo from '~/assets/images/external/prism.svg'
 import ATLauncherLogo from '~/assets/images/external/atlauncher.svg'
 import Avatar from '~/components/ui/Avatar.vue'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
-import homepageProjects from '~/generated/homepage.json'
 
 const searchQuery = ref('better')
 const sortType = ref('relevance')
@@ -520,15 +519,27 @@ const sortType = ref('relevance')
 const auth = await useAuth()
 const tags = useTags()
 
-const searchProjects = ref([])
-const notifications = ref([])
-const updateSearchProjects = async () => {}
-
-const val = Math.ceil(homepageProjects.length / 3)
-const rows = shallowRef([
-  homepageProjects.slice(0, val),
-  homepageProjects.slice(val, val * 2),
-  homepageProjects.slice(val * 2, val * 3),
+const [
+  { data: rows },
+  { data: searchProjects, refresh: updateSearchProjects },
+  { data: notifications },
+] = await Promise.all([
+  useAsyncData('projects', () => useBaseFetch('projects_random?count=40'), {
+    transform: (result) => {
+      const val = Math.ceil(result.length / 3)
+      return [result.slice(0, val), result.slice(val, val * 2), result.slice(val * 2, val * 3)]
+    },
+  }),
+  useAsyncData(
+    'demoSearchProjects',
+    () => useBaseFetch(`search?limit=3&query=${searchQuery.value}&index=${sortType.value}`),
+    {
+      transform: (result) => result.hits,
+    }
+  ),
+  useAsyncData('updatedProjects', () => useBaseFetch(`search?limit=3&query=&index=updated`), {
+    transform: (result) => result.hits,
+  }),
 ])
 </script>
 

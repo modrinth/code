@@ -392,7 +392,6 @@
 <script setup>
 import {
   EditIcon,
-  UserIcon,
   SaveIcon,
   TrashIcon,
   PlusIcon,
