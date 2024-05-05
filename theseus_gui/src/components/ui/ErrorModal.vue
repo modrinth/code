@@ -130,10 +130,10 @@ async function loginMinecraft() {
             If nothing is working and you need help, visit
             <a :href="supportLink">our support page</a>
             and start a chat using the widget in the bottom right and we will be more than happy to
-            assist!
+            assist! Make sure to provide the following debug information to the agent:
           </p>
           <details>
-            <summary>Debug info</summary>
+            <summary>Debug information</summary>
             {{ error.message ?? error }}
           </details>
         </template>
