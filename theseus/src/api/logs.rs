@@ -2,7 +2,6 @@ use std::io::{Read, SeekFrom};
 use std::time::SystemTime;
 
 use futures::TryFutureExt;
-use once_cell::unsync::Lazy;
 use serde::{Deserialize, Serialize};
 use tokio::{
     fs::File,
@@ -101,7 +100,7 @@ pub async fn get_logs_from_type(
     clear_contents: Option<bool>,
     logs: &mut Vec<crate::Result<Logs>>,
 ) -> crate::Result<()> {
-    let now = Lazy::<SystemTime, _>::new(|| SystemTime::now());
+    let now = SystemTime::now();
 
     let logs_folder = match log_type {
         LogType::InfoLog => {
