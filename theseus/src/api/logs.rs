@@ -165,8 +165,13 @@ pub async fn get_logs(
     .await?;
 
     let mut logs = logs.into_iter().collect::<crate::Result<Vec<Logs>>>()?;
-    tracing::info!("Log locations: {:#?}", logs.iter().map(|x| x.filename.clone()).collect::<Vec<String>>());
-    logs.sort_by(|a, b| a.age.cmp(&b.age).then(a.filename.cmp(&b.filename)));
+    tracing::info!(
+        "Log locations: {:#?}",
+        logs.iter()
+            .map(|x| x.filename.clone())
+            .collect::<Vec<String>>()
+    );
+    logs.sort_by(|a, b| b.age.cmp(&a.age).then(b.filename.cmp(&a.filename)));
     Ok(logs)
 }
 
@@ -179,8 +184,12 @@ pub async fn get_logs_by_filename(
     let profile_path = profile_path_id.profile_path().await?;
 
     let path = match log_type {
-        LogType::InfoLog => DirectoryInfo::profile_logs_dir(&profile_path).await,
-        LogType::CrashReport => DirectoryInfo::crash_reports_dir(&profile_path).await,
+        LogType::InfoLog => {
+            DirectoryInfo::profile_logs_dir(&profile_path).await
+        }
+        LogType::CrashReport => {
+            DirectoryInfo::crash_reports_dir(&profile_path).await
+        }
     }?
     .join(&filename);
 
@@ -288,8 +297,12 @@ pub async fn delete_logs_by_filename(
     let profile_path = profile_path_id.profile_path().await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => DirectoryInfo::profile_logs_dir(&profile_path).await,
-        LogType::CrashReport => DirectoryInfo::crash_reports_dir(&profile_path).await,
+        LogType::InfoLog => {
+            DirectoryInfo::profile_logs_dir(&profile_path).await
+        }
+        LogType::CrashReport => {
+            DirectoryInfo::crash_reports_dir(&profile_path).await
+        }
     }?;
 
     let path = logs_folder.join(filename);

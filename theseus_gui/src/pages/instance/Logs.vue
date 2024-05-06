@@ -241,7 +241,6 @@ async function getLiveStdLog() {
 
 async function getLogs() {
   return (await get_logs(props.instance.path, true).catch(handleError))
-    .reverse()
     .filter(
       // filter out latest_stdout.log or anything without .log in it
       (log) =>
