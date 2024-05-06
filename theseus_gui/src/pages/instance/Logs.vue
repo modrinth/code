@@ -248,7 +248,7 @@ async function getLogs() {
         log.filename !== 'latest_stdout.log' &&
         log.filename !== 'latest_stdout' &&
         log.stdout !== '' &&
-        log.filename.includes('.log'),
+        (log.filename.includes('.log') || log.filename.endsWith('.txt')),
     )
     .map((log) => {
       log.name = log.filename || 'Unknown'
@@ -291,6 +291,7 @@ watch(selectedLogIndex, async (newIndex) => {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_filename(
       props.instance.path,
+      logs.value[newIndex].log_type,
       logs.value[newIndex].filename,
     ).catch(handleError)
   }
@@ -306,7 +307,7 @@ const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
-    await delete_logs_by_filename(props.instance.path, logs.value[deleteIndex].filename).catch(
+    await delete_logs_by_filename(props.instance.path, logs.value[deleteIndex].log_type, logs.value[deleteIndex].filename).catch(
       handleError,
     )
     await setLogs()

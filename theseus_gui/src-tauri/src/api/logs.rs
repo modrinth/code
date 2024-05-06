@@ -3,6 +3,7 @@ use theseus::{
     logs::{self, CensoredString, LatestLogCursor, Logs},
     prelude::ProfilePathId,
 };
+use theseus::logs::LogType;
 
 /*
 A log is a struct containing the filename string, stdout, and stderr, as follows:
@@ -42,15 +43,17 @@ pub async fn logs_get_logs(
 #[tauri::command]
 pub async fn logs_get_logs_by_filename(
     profile_path: ProfilePathId,
+    log_type: LogType,
     filename: String,
 ) -> Result<Logs> {
-    Ok(logs::get_logs_by_filename(profile_path, filename).await?)
+    Ok(logs::get_logs_by_filename(profile_path, log_type, filename).await?)
 }
 
 /// Get the stdout for a profile by profile id and filename string
 #[tauri::command]
 pub async fn logs_get_output_by_filename(
     profile_path: ProfilePathId,
+    log_type: LogType,
     filename: String,
 ) -> Result<CensoredString> {
     let profile_path = if let Some(p) =
@@ -64,7 +67,7 @@ pub async fn logs_get_output_by_filename(
         .into());
     };
 
-    Ok(logs::get_output_by_filename(&profile_path, &filename).await?)
+    Ok(logs::get_output_by_filename(&profile_path, log_type, &filename).await?)
 }
 
 /// Delete all logs for a profile by profile id
@@ -77,9 +80,10 @@ pub async fn logs_delete_logs(profile_path: ProfilePathId) -> Result<()> {
 #[tauri::command]
 pub async fn logs_delete_logs_by_filename(
     profile_path: ProfilePathId,
+    log_type: LogType,
     filename: String,
 ) -> Result<()> {
-    Ok(logs::delete_logs_by_filename(profile_path, &filename).await?)
+    Ok(logs::delete_logs_by_filename(profile_path, log_type, &filename).await?)
 }
 
 /// Get live log from a cursor

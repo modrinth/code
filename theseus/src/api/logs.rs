@@ -1,21 +1,32 @@
 use std::io::{Read, SeekFrom};
+use std::time::SystemTime;
+
+use futures::TryFutureExt;
+use once_cell::unsync::Lazy;
+use serde::{Deserialize, Serialize};
+use tokio::{
+    fs::File,
+    io::{AsyncReadExt, AsyncSeekExt},
+};
 
 use crate::{
     prelude::{Credentials, DirectoryInfo},
     util::io::{self, IOError},
     {state::ProfilePathId, State},
 };
-use futures::TryFutureExt;
-use serde::Serialize;
-use tokio::{
-    fs::File,
-    io::{AsyncReadExt, AsyncSeekExt},
-};
 
 #[derive(Serialize, Debug)]
 pub struct Logs {
+    pub log_type: LogType,
     pub filename: String,
+    pub age: u64,
     pub output: Option<CensoredString>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Eq, PartialEq)]
+pub enum LogType {
+    InfoLog,
+    CrashReport,
 }
 
 #[derive(Serialize, Debug)]
@@ -54,15 +65,29 @@ impl CensoredString {
 
 impl Logs {
     async fn build(
+        log_type: LogType,
+        age: SystemTime,
         profile_subpath: &ProfilePathId,
         filename: String,
         clear_contents: Option<bool>,
     ) -> crate::Result<Self> {
         Ok(Self {
+            log_type,
+            age: age
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .unwrap_or_else(|_| std::time::Duration::from_secs(0))
+                .as_secs(),
             output: if clear_contents.unwrap_or(false) {
                 None
             } else {
-                Some(get_output_by_filename(profile_subpath, &filename).await?)
+                Some(
+                    get_output_by_filename(
+                        profile_subpath,
+                        log_type,
+                        &filename,
+                    )
+                    .await?,
+                )
             },
             filename,
         })
@@ -70,74 +95,118 @@ impl Logs {
 }
 
 #[tracing::instrument]
-pub async fn get_logs(
-    profile_path: ProfilePathId,
+pub async fn get_logs_from_type(
+    profile_path: &ProfilePathId,
+    log_type: LogType,
     clear_contents: Option<bool>,
-) -> crate::Result<Vec<Logs>> {
-    let profile_path =
-        if let Some(p) = crate::profile::get(&profile_path, None).await? {
-            p.profile_id()
-        } else {
-            return Err(crate::ErrorKind::UnmanagedProfileError(
-                profile_path.to_string(),
-            )
-            .into());
-        };
+    logs: &mut Vec<crate::Result<Logs>>,
+) -> crate::Result<()> {
+    let now = Lazy::<SystemTime, _>::new(|| SystemTime::now());
 
-    let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
-    let mut logs = Vec::new();
+    let logs_folder = match log_type {
+        LogType::InfoLog => {
+            DirectoryInfo::profile_logs_dir(profile_path).await?
+        }
+        LogType::CrashReport => {
+            DirectoryInfo::crash_reports_dir(profile_path).await?
+        }
+    };
     if logs_folder.exists() {
         for entry in std::fs::read_dir(&logs_folder)
             .map_err(|e| IOError::with_path(e, &logs_folder))?
         {
             let entry: std::fs::DirEntry =
                 entry.map_err(|e| IOError::with_path(e, &logs_folder))?;
+            let age = entry.metadata()?.created().unwrap_or_else(|_| *now);
             let path = entry.path();
             if !path.is_file() {
                 continue;
             }
             if let Some(file_name) = path.file_name() {
                 let file_name = file_name.to_string_lossy().to_string();
-
+                tracing::info!("Pushing log file {file_name}");
                 logs.push(
-                    Logs::build(&profile_path, file_name, clear_contents).await,
+                    Logs::build(
+                        log_type,
+                        age,
+                        &profile_path,
+                        file_name,
+                        clear_contents,
+                    )
+                    .await,
                 );
             }
         }
     }
+    Ok(())
+}
+
+#[tracing::instrument]
+pub async fn get_logs(
+    profile_path_id: ProfilePathId,
+    clear_contents: Option<bool>,
+) -> crate::Result<Vec<Logs>> {
+    let profile_path = profile_path_id.profile_path().await?;
+
+    let mut logs = Vec::new();
+    get_logs_from_type(
+        &profile_path,
+        LogType::InfoLog,
+        clear_contents,
+        &mut logs,
+    )
+    .await?;
+    get_logs_from_type(
+        &profile_path,
+        LogType::CrashReport,
+        clear_contents,
+        &mut logs,
+    )
+    .await?;
 
     let mut logs = logs.into_iter().collect::<crate::Result<Vec<Logs>>>()?;
-    logs.sort_by_key(|x| x.filename.clone());
+    tracing::info!("Log locations: {:#?}", logs.iter().map(|x| x.filename.clone()).collect::<Vec<String>>());
+    logs.sort_by(|a, b| a.age.cmp(&b.age).then(a.filename.cmp(&b.filename)));
     Ok(logs)
 }
 
 #[tracing::instrument]
 pub async fn get_logs_by_filename(
-    profile_path: ProfilePathId,
+    profile_path_id: ProfilePathId,
+    log_type: LogType,
     filename: String,
 ) -> crate::Result<Logs> {
-    let profile_path =
-        if let Some(p) = crate::profile::get(&profile_path, None).await? {
-            p.profile_id()
-        } else {
-            return Err(crate::ErrorKind::UnmanagedProfileError(
-                profile_path.to_string(),
-            )
-            .into());
-        };
-    Ok(Logs {
-        output: Some(get_output_by_filename(&profile_path, &filename).await?),
-        filename,
-    })
+    let profile_path = profile_path_id.profile_path().await?;
+
+    let path = match log_type {
+        LogType::InfoLog => DirectoryInfo::profile_logs_dir(&profile_path).await,
+        LogType::CrashReport => DirectoryInfo::crash_reports_dir(&profile_path).await,
+    }?
+    .join(&filename);
+
+    let metadata = std::fs::metadata(&path)?;
+    let age = metadata.created().unwrap_or_else(|_| SystemTime::now());
+
+    Logs::build(log_type, age, &profile_path, filename, Some(true)).await
 }
 
 #[tracing::instrument]
 pub async fn get_output_by_filename(
     profile_subpath: &ProfilePathId,
+    log_type: LogType,
     file_name: &str,
 ) -> crate::Result<CensoredString> {
     let state = State::get().await?;
-    let logs_folder = DirectoryInfo::profile_logs_dir(profile_subpath).await?;
+
+    let logs_folder = match log_type {
+        LogType::InfoLog => {
+            DirectoryInfo::profile_logs_dir(profile_subpath).await?
+        }
+        LogType::CrashReport => {
+            DirectoryInfo::crash_reports_dir(profile_subpath).await?
+        }
+    };
+
     let path = logs_folder.join(file_name);
 
     let credentials: Vec<Credentials> = state
@@ -168,7 +237,7 @@ pub async fn get_output_by_filename(
                 contents = [0; 1024];
             }
             return Ok(CensoredString::censor(result, &credentials));
-        } else if ext == "log" {
+        } else if ext == "log" || ext == "txt" {
             let mut result = String::new();
             let mut contents = [0; 1024];
             let mut file = std::fs::File::open(&path)
@@ -194,16 +263,8 @@ pub async fn get_output_by_filename(
 }
 
 #[tracing::instrument]
-pub async fn delete_logs(profile_path: ProfilePathId) -> crate::Result<()> {
-    let profile_path =
-        if let Some(p) = crate::profile::get(&profile_path, None).await? {
-            p.profile_id()
-        } else {
-            return Err(crate::ErrorKind::UnmanagedProfileError(
-                profile_path.to_string(),
-            )
-            .into());
-        };
+pub async fn delete_logs(profile_path_id: ProfilePathId) -> crate::Result<()> {
+    let profile_path = profile_path_id.profile_path().await?;
 
     let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
     for entry in std::fs::read_dir(&logs_folder)
@@ -220,20 +281,17 @@ pub async fn delete_logs(profile_path: ProfilePathId) -> crate::Result<()> {
 
 #[tracing::instrument]
 pub async fn delete_logs_by_filename(
-    profile_path: ProfilePathId,
+    profile_path_id: ProfilePathId,
+    log_type: LogType,
     filename: &str,
 ) -> crate::Result<()> {
-    let profile_path =
-        if let Some(p) = crate::profile::get(&profile_path, None).await? {
-            p.profile_id()
-        } else {
-            return Err(crate::ErrorKind::UnmanagedProfileError(
-                profile_path.to_string(),
-            )
-            .into());
-        };
+    let profile_path = profile_path_id.profile_path().await?;
 
-    let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;
+    let logs_folder = match log_type {
+        LogType::InfoLog => DirectoryInfo::profile_logs_dir(&profile_path).await,
+        LogType::CrashReport => DirectoryInfo::crash_reports_dir(&profile_path).await,
+    }?;
+
     let path = logs_folder.join(filename);
     io::remove_dir_all(&path).await?;
     Ok(())
@@ -249,19 +307,11 @@ pub async fn get_latest_log_cursor(
 
 #[tracing::instrument]
 pub async fn get_generic_live_log_cursor(
-    profile_path: ProfilePathId,
+    profile_path_id: ProfilePathId,
     log_file_name: &str,
     mut cursor: u64, // 0 to start at beginning of file
 ) -> crate::Result<LatestLogCursor> {
-    let profile_path =
-        if let Some(p) = crate::profile::get(&profile_path, None).await? {
-            p.profile_id()
-        } else {
-            return Err(crate::ErrorKind::UnmanagedProfileError(
-                profile_path.to_string(),
-            )
-            .into());
-        };
+    let profile_path = profile_path_id.profile_path().await?;
 
     let state = State::get().await?;
     let logs_folder = DirectoryInfo::profile_logs_dir(&profile_path).await?;

@@ -65,6 +65,7 @@ p256 = { version = "0.13.2", features = ["ecdsa"] }
 rand = "0.8"
 byteorder = "1.5.0"
 base64 = "0.22.0"
+once_cell = "1.19.0"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.52.0"
