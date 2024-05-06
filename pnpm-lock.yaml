@@ -50,8 +50,8 @@ dependencies:
     specifier: 3.0.0-alpha.2
     version: 3.0.0-alpha.2
   vue3-apexcharts:
-    specifier: ^1.4.4
-    version: 1.4.4(apexcharts@3.45.1)(vue@3.4.8)
+    specifier: ^1.5.2
+    version: 1.5.2(apexcharts@3.45.1)(vue@3.4.8)
   xss:
     specifier: ^1.0.14
     version: 1.0.14
@@ -7175,7 +7175,7 @@ packages:
       vue: 3.4.8(typescript@5.0.4)
       vue-router: 4.2.2(vue@3.4.8)
       vue-select: 4.0.0-beta.6(vue@3.4.8)
-      vue3-apexcharts: 1.4.4(apexcharts@3.45.1)(vue@3.4.8)
+      vue3-apexcharts: 1.5.2(apexcharts@3.45.1)(vue@3.4.8)
       xss: 1.0.14
     dev: false
 
@@ -9549,8 +9549,8 @@ packages:
       typescript: 5.0.4
     dev: true
 
-  /vue3-apexcharts@1.4.4(apexcharts@3.45.1)(vue@3.4.8):
-    resolution: {integrity: sha512-TH89uZrxGjaDvkaYAISvj8+k6Bf1rUKFillc8oJirs5XZEPiwM1ELKZQ786wz0rfPqkSHHny2lqqUCK7Rw+LcQ==}
+  /vue3-apexcharts@1.5.2(apexcharts@3.45.1)(vue@3.4.8):
+    resolution: {integrity: sha512-rGbgUJDjtsyjfRF0uzwDjzt8+M7ICSRAbm1N9KCDiczW8BSpbEZuaEsJDJYnJuLFIIVXIGilYzIcjNBf6NbeYA==}
     peerDependencies:
       apexcharts: '> 3.0.0'
       vue: '> 3.0.0'
