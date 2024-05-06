@@ -124,7 +124,6 @@ pub async fn get_logs_from_type(
             }
             if let Some(file_name) = path.file_name() {
                 let file_name = file_name.to_string_lossy().to_string();
-                tracing::info!("Pushing log file {file_name}");
                 logs.push(
                     Logs::build(
                         log_type,
@@ -165,12 +164,6 @@ pub async fn get_logs(
     .await?;
 
     let mut logs = logs.into_iter().collect::<crate::Result<Vec<Logs>>>()?;
-    tracing::info!(
-        "Log locations: {:#?}",
-        logs.iter()
-            .map(|x| x.filename.clone())
-            .collect::<Vec<String>>()
-    );
     logs.sort_by(|a, b| b.age.cmp(&a.age).then(b.filename.cmp(&a.filename)));
     Ok(logs)
 }
