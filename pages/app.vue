@@ -1,5 +1,5 @@
 <script setup>
-import { TrashIcon, SearchIcon, BoxIcon, SendIcon, EditIcon, DownloadIcon } from 'omorphia'
+import { TrashIcon, SearchIcon, BoxIcon, SendIcon, EditIcon, DownloadIcon, LinkIcon } from 'omorphia'
 import Avatar from '~/components/ui/Avatar.vue'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import Badge from '~/components/ui/Badge.vue'
@@ -17,6 +17,7 @@ const windowsLink = ref(null)
 const linuxLinks = {
   appImage: null,
   deb: null,
+  thirdParty: 'https://support.modrinth.com/en/articles/9298760',
 }
 const macLinks = {
   appleSilicon: null,
@@ -871,6 +872,10 @@ useSeoMeta({
             <a :href="linuxLinks.deb" download="">
               <DownloadIcon />
               <span> Download the Deb </span>
+            </a>
+			<a :href="linuxLinks.thirdParty" download="">
+              <LinkIcon />
+              <span> Third-party packages </span>
             </a>
           </div>
         </div>
