@@ -21,7 +21,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 // Checks if a process has finished by process UUID
 #[tauri::command]
 pub async fn process_has_finished_by_uuid(uuid: Uuid) -> Result<bool> {
-    Ok(process::has_finished_by_uuid(&uuid).await?)
+    Ok(process::has_finished_by_uuid(uuid).await?)
 }
 
 // Gets process exit status by process UUID
@@ -29,7 +29,7 @@ pub async fn process_has_finished_by_uuid(uuid: Uuid) -> Result<bool> {
 pub async fn process_get_exit_status_by_uuid(
     uuid: Uuid,
 ) -> Result<Option<i32>> {
-    Ok(process::get_exit_status_by_uuid(&uuid).await?)
+    Ok(process::get_exit_status_by_uuid(uuid).await?)
 }
 
 // Gets all process UUIDs
@@ -68,11 +68,11 @@ pub async fn process_get_all_running_profiles() -> Result<Vec<Profile>> {
 // Kill a process by process UUID
 #[tauri::command]
 pub async fn process_kill_by_uuid(uuid: Uuid) -> Result<()> {
-    Ok(process::kill_by_uuid(&uuid).await?)
+    Ok(process::kill_by_uuid(uuid).await?)
 }
 
 // Wait for a process to finish by process UUID
 #[tauri::command]
 pub async fn process_wait_for_by_uuid(uuid: Uuid) -> Result<()> {
-    Ok(process::wait_for_by_uuid(&uuid).await?)
+    Ok(process::wait_for_by_uuid(uuid).await?)
 }
