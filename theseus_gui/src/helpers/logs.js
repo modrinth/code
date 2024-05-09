@@ -22,18 +22,22 @@ export async function get_logs(profilePath, clearContents) {
 }
 
 /// Get a profile's log by filename
-export async function get_logs_by_filename(profilePath, filename) {
-  return await invoke('plugin:logs|logs_get_logs_by_filename', { profilePath, filename })
+export async function get_logs_by_filename(profilePath, logType, filename) {
+  return await invoke('plugin:logs|logs_get_logs_by_filename', { profilePath, logType, filename })
 }
 
 /// Get a profile's log text only by filename
-export async function get_output_by_filename(profilePath, filename) {
-  return await invoke('plugin:logs|logs_get_output_by_filename', { profilePath, filename })
+export async function get_output_by_filename(profilePath, logType, filename) {
+  return await invoke('plugin:logs|logs_get_output_by_filename', { profilePath, logType, filename })
 }
 
 /// Delete a profile's log by filename
-export async function delete_logs_by_filename(profilePath, filename) {
-  return await invoke('plugin:logs|logs_delete_logs_by_filename', { profilePath, filename })
+export async function delete_logs_by_filename(profilePath, logType, filename) {
+  return await invoke('plugin:logs|logs_delete_logs_by_filename', {
+    profilePath,
+    logType,
+    filename,
+  })
 }
 
 /// Delete all logs for a given profile
@@ -50,6 +54,7 @@ export async function delete_logs(profilePath) {
     new_file: bool <- the cursor was too far, meaning that the file was likely rotated/reset. This signals to the frontend to clear the log and start over with this struct.
   }
 */
+
 // From latest.log directly
 export async function get_latest_log_cursor(profilePath, cursor) {
   return await invoke('plugin:logs|logs_get_latest_log_cursor', { profilePath, cursor })

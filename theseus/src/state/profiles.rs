@@ -88,6 +88,15 @@ impl ProfilePathId {
             .ok_or(crate::ErrorKind::UTFError(self.0.clone()).as_error())?;
         Ok(self)
     }
+
+    pub async fn profile_path(&self) -> crate::Result<ProfilePathId> {
+        if let Some(p) = crate::profile::get(&self, None).await? {
+            Ok(p.profile_id())
+        } else {
+            Err(crate::ErrorKind::UnmanagedProfileError(self.to_string())
+                .into())
+        }
+    }
 }
 impl std::fmt::Display for ProfilePathId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
