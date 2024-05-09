@@ -11,7 +11,7 @@ use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
 use rand::rngs::OsRng;
 use rand::Rng;
 use reqwest::header::HeaderMap;
-use reqwest::{Error, Response};
+use reqwest::{Response, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -46,6 +46,14 @@ pub enum MinecraftAuthenticationError {
         source: serde_json::Error,
     },
     #[error(
+        "Bad response code during step {step:?}: {status_code}. Body: {raw}"
+    )]
+    BadResponse {
+        step: MinecraftAuthStep,
+        raw: String,
+        status_code: StatusCode,
+    },
+    #[error(
         "Failed to deserialize response to JSON during step {step:?}: {source}. Status Code: {status_code} Body: {raw}"
     )]
     DeserializeResponse {
@@ -53,7 +61,7 @@ pub enum MinecraftAuthenticationError {
         raw: String,
         #[source]
         source: serde_json::Error,
-        status_code: reqwest::StatusCode,
+        status_code: StatusCode,
     },
     #[error("Request failed during step {step:?}: {source}")]
     Request {
@@ -67,10 +75,12 @@ pub enum MinecraftAuthenticationError {
         #[source]
         source: std::io::Error,
     },
-    #[error("Error reading XBOX Session ID header")]
+    #[error("Error reading Xbox Session ID header")]
     NoSessionId,
     #[error("Error reading user hash")]
     NoUserHash,
+    #[error("Associated Xbox account doesn't have a Minecraft profile set up")]
+    NoMinecraftProfile,
 }
 
 const AUTH_JSON: &str = "minecraft_auth.json";
@@ -485,22 +495,7 @@ async fn oauth_token(
         step: MinecraftAuthStep::GetOAuthToken,
     })?;
 
-    let status = res.status();
-    let text = res.text().await.map_err(|source| {
-        MinecraftAuthenticationError::Request {
-            source,
-            step: MinecraftAuthStep::GetOAuthToken,
-        }
-    })?;
-
-    serde_json::from_str(&text).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: text,
-            step: MinecraftAuthStep::GetOAuthToken,
-            status_code: status,
-        }
-    })
+    deserialize_if_ok(res, MinecraftAuthStep::GetOAuthToken, noop_handler)
 }
 
 #[tracing::instrument]
@@ -527,22 +522,7 @@ async fn oauth_refresh(
         step: MinecraftAuthStep::RefreshOAuthToken,
     })?;
 
-    let status = res.status();
-    let text = res.text().await.map_err(|source| {
-        MinecraftAuthenticationError::Request {
-            source,
-            step: MinecraftAuthStep::RefreshOAuthToken,
-        }
-    })?;
-
-    serde_json::from_str(&text).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: text,
-            step: MinecraftAuthStep::RefreshOAuthToken,
-            status_code: status,
-        }
-    })
+    deserialize_if_ok(res, MinecraftAuthStep::RefreshOAuthToken, noop_handler)
 }
 
 #[derive(Deserialize, Debug)]
@@ -657,22 +637,7 @@ async fn minecraft_token(
         step: MinecraftAuthStep::MinecraftToken,
     })?;
 
-    let status = res.status();
-    let text = res.text().await.map_err(|source| {
-        MinecraftAuthenticationError::Request {
-            source,
-            step: MinecraftAuthStep::MinecraftToken,
-        }
-    })?;
-
-    serde_json::from_str(&text).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: text,
-            step: MinecraftAuthStep::MinecraftToken,
-            status_code: status,
-        }
-    })
+    deserialize_if_ok(res, MinecraftAuthStep::MinecraftToken, noop_handler)
 }
 
 #[derive(Deserialize)]
@@ -698,22 +663,16 @@ async fn minecraft_profile(
         step: MinecraftAuthStep::MinecraftProfile,
     })?;
 
-    let status = res.status();
-    let text = res.text().await.map_err(|source| {
-        MinecraftAuthenticationError::Request {
-            source,
-            step: MinecraftAuthStep::MinecraftProfile,
-        }
-    })?;
-
-    serde_json::from_str(&text).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: text,
-            step: MinecraftAuthStep::MinecraftProfile,
-            status_code: status,
-        }
-    })
+    deserialize_if_ok(
+        res,
+        MinecraftAuthStep::MinecraftProfile,
+        |status_code, _| match status_code {
+            StatusCode::NOT_FOUND => {
+                Some(MinecraftAuthenticationError::NoMinecraftProfile)
+            }
+            _ => None,
+        },
+    )
 }
 
 #[derive(Deserialize)]
@@ -733,22 +692,11 @@ async fn minecraft_entitlements(
     })
         .await.map_err(|source| MinecraftAuthenticationError::Request { source, step: MinecraftAuthStep::MinecraftEntitlements })?;
 
-    let status = res.status();
-    let text = res.text().await.map_err(|source| {
-        MinecraftAuthenticationError::Request {
-            source,
-            step: MinecraftAuthStep::MinecraftEntitlements,
-        }
-    })?;
-
-    serde_json::from_str(&text).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: text,
-            step: MinecraftAuthStep::MinecraftEntitlements,
-            status_code: status,
-        }
-    })
+    deserialize_if_ok(
+        res,
+        MinecraftAuthStep::MinecraftEntitlements,
+        noop_handler,
+    )
 }
 
 // auth utils
@@ -912,21 +860,9 @@ async fn send_signed_request<T: DeserializeOwned>(
     .await
     .map_err(|source| MinecraftAuthenticationError::Request { source, step })?;
 
-    let status = res.status();
     let headers = res.headers().clone();
-    let body = res.text().await.map_err(|source| {
-        MinecraftAuthenticationError::Request { source, step }
-    })?;
 
-    let body = serde_json::from_str(&body).map_err(|source| {
-        MinecraftAuthenticationError::DeserializeResponse {
-            source,
-            raw: body,
-            step,
-            status_code: status,
-        }
-    })?;
-    Ok((headers, body))
+    deserialize_if_ok(res, step, noop_handler).map(|v| (headers, v))
 }
 
 #[tracing::instrument]
@@ -935,4 +871,44 @@ fn generate_oauth_challenge() -> String {
 
     let bytes: Vec<u8> = (0..64).map(|_| rng.gen::<u8>()).collect();
     bytes.iter().map(|byte| format!("{:02x}", byte)).collect()
+}
+
+async fn deserialize_if_ok<T, F>(
+    response: Response,
+    step: MinecraftAuthStep,
+    custom_handler: F,
+) -> Result<T, MinecraftAuthenticationError>
+where
+    F: FnOnce(StatusCode, &String) -> Option<MinecraftAuthenticationError>,
+{
+    let status_code = response.status();
+
+    let raw = response.text().await.map_err(|source| {
+        MinecraftAuthenticationError::Request { source, step }
+    })?;
+
+    if status_code.is_success() {
+        serde_json::from_str(&raw).map_err(|source| {
+            MinecraftAuthenticationError::DeserializeResponse {
+                source,
+                raw,
+                step,
+                status_code,
+            }
+        })
+    } else {
+        if let Some(err) = custom_handler(status_code, &raw) {
+            Err(err)
+        } else {
+            Err(MinecraftAuthenticationError::BadResponse {
+                step,
+                raw,
+                status_code,
+            })
+        }
+    }
+}
+
+fn noop_handler(_: StatusCode, _: &String) -> None {
+    None
 }
