@@ -17,7 +17,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use std::collections::HashMap;
-use std::error::Error;
 use std::future::Future;
 use uuid::Uuid;
 
@@ -83,8 +82,6 @@ pub struct SaveDeviceToken {
     pub x: String,
     pub y: String,
     pub token: DeviceToken,
-    #[serde(default)]
-    modern: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -138,7 +135,8 @@ impl MinecraftAuthStore {
     async fn refresh_and_get_device_token(
         &mut self,
         current_date: DateTime<Utc>,
-    ) -> crate::Result<(DeviceTokenKey, DeviceToken, DateTime<Utc>)> {
+        force_generate: bool,
+    ) -> crate::Result<(DeviceTokenKey, DeviceToken, DateTime<Utc>, bool)> {
         macro_rules! generate_key {
             ($self:ident, $generate_key:expr, $device_token:expr, $SaveDeviceToken:path) => {{
                 let key = generate_key()?;
@@ -156,29 +154,19 @@ impl MinecraftAuthStore {
                     x: key.x.clone(),
                     y: key.y.clone(),
                     token: res.value.clone(),
-                    modern: true,
                 });
                 self.save().await?;
 
-                (key, res.value, res.date)
+                (key, res.value, res.date, true)
             }};
         }
 
-        let (key, token, date) = if let Some(ref token) = self.token {
-            // reset device token for legacy launcher versions with broken values
-            if self.users.is_empty() && !token.modern {
-                return Ok(generate_key!(
-                    self,
-                    generate_key,
-                    device_token,
-                    SaveDeviceToken
-                ));
-            }
-
-            if token.token.not_after > Utc::now() {
-                if let Ok(private_key) =
-                    SigningKey::from_pkcs8_pem(&token.private_key)
-                {
+        let (key, token, date, valid_date) = if let Some(ref token) = self.token
+        {
+            if let Ok(private_key) =
+                SigningKey::from_pkcs8_pem(&token.private_key)
+            {
+                if token.token.not_after > Utc::now() && !force_generate {
                     (
                         DeviceTokenKey {
                             id: token.id.clone(),
@@ -188,14 +176,19 @@ impl MinecraftAuthStore {
                         },
                         token.token.clone(),
                         current_date,
+                        false,
                     )
                 } else {
-                    generate_key!(
-                        self,
-                        generate_key,
-                        device_token,
-                        SaveDeviceToken
-                    )
+                    let key = DeviceTokenKey {
+                        id: token.id.clone(),
+                        key: private_key,
+                        x: token.x.clone(),
+                        y: token.y.clone(),
+                    };
+
+                    let res = device_token(&key, current_date).await?;
+
+                    (key, res.value, res.date, true)
                 }
             } else {
                 generate_key!(self, generate_key, device_token, SaveDeviceToken)
@@ -204,13 +197,13 @@ impl MinecraftAuthStore {
             generate_key!(self, generate_key, device_token, SaveDeviceToken)
         };
 
-        Ok((key, token, date))
+        Ok((key, token, date, valid_date))
     }
 
     #[tracing::instrument(skip(self))]
     pub async fn login_begin(&mut self) -> crate::Result<MinecraftLoginFlow> {
-        let (key, token, current_date) =
-            self.refresh_and_get_device_token(Utc::now()).await?;
+        let (key, token, current_date, valid_date) =
+            self.refresh_and_get_device_token(Utc::now(), false).await?;
 
         let verifier = generate_oauth_challenge();
         let mut hasher = sha2::Sha256::new();
@@ -218,16 +211,46 @@ impl MinecraftAuthStore {
         let result = hasher.finalize();
         let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
 
-        let (session_id, redirect_uri) =
-            sisu_authenticate(&token.token, &challenge, &key, current_date)
-                .await?;
+        match sisu_authenticate(&token.token, &challenge, &key, current_date)
+            .await
+        {
+            Ok((session_id, redirect_uri)) => Ok(MinecraftLoginFlow {
+                verifier,
+                challenge,
+                session_id,
+                redirect_uri: redirect_uri.value.msa_oauth_redirect,
+            }),
+            Err(err) => {
+                if !valid_date {
+                    let (key, token, current_date, _) = self
+                        .refresh_and_get_device_token(Utc::now(), false)
+                        .await?;
 
-        Ok(MinecraftLoginFlow {
-            verifier,
-            challenge,
-            session_id,
-            redirect_uri: redirect_uri.value.msa_oauth_redirect,
-        })
+                    let verifier = generate_oauth_challenge();
+                    let mut hasher = sha2::Sha256::new();
+                    hasher.update(&verifier);
+                    let result = hasher.finalize();
+                    let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
+
+                    let (session_id, redirect_uri) = sisu_authenticate(
+                        &token.token,
+                        &challenge,
+                        &key,
+                        current_date,
+                    )
+                    .await?;
+
+                    Ok(MinecraftLoginFlow {
+                        verifier,
+                        challenge,
+                        session_id,
+                        redirect_uri: redirect_uri.value.msa_oauth_redirect,
+                    })
+                } else {
+                    Err(crate::ErrorKind::from(err).into())
+                }
+            }
+        }
     }
 
     #[tracing::instrument(skip(self))]
@@ -236,8 +259,8 @@ impl MinecraftAuthStore {
         code: &str,
         flow: MinecraftLoginFlow,
     ) -> crate::Result<Credentials> {
-        let (key, token, _) =
-            self.refresh_and_get_device_token(Utc::now()).await?;
+        let (key, token, _, _) =
+            self.refresh_and_get_device_token(Utc::now(), false).await?;
 
         let oauth_token = oauth_token(code, &flow.verifier).await?;
         let sisu_authorize = sisu_authorize(
@@ -292,8 +315,9 @@ impl MinecraftAuthStore {
         let profile_name = creds.username.clone();
 
         let oauth_token = oauth_refresh(&creds.refresh_token).await?;
-        let (key, token, current_date) =
-            self.refresh_and_get_device_token(oauth_token.date).await?;
+        let (key, token, current_date, _) = self
+            .refresh_and_get_device_token(oauth_token.date, false)
+            .await?;
 
         let sisu_authorize = sisu_authorize(
             None,
@@ -357,29 +381,15 @@ impl MinecraftAuthStore {
                 match res {
                     Ok(val) => Ok(val),
                     Err(err) => {
-                        println!("SOURCE {:?}", err);
-                        if let Some(source) = err.source() {
-                            println!("slladllaw {:?}", source);
-                            if let Some(source) =
-                                source.downcast_ref::<ErrorKind>()
-                            {
-                                println!("fawlplflk {:?}", source);
-                                if let ErrorKind::MinecraftAuthenticationError(
-                                    ref error,
-                                ) = source
-                                {
-                                    println!("wadaw {:?}", source);
-                                    if let MinecraftAuthenticationError::Request {
-                                        source,
-                                        ..
-                                    } = error
-                                    {
-                                        println!("BOB {:?}", source);
-                                        if source.is_connect() || source.is_timeout() {
-                                            return Ok(Some(old_credentials));
-                                        }
-                                    }
-                                }
+                        if let ErrorKind::MinecraftAuthenticationError(
+                            MinecraftAuthenticationError::Request {
+                                ref source,
+                                ..
+                            },
+                        ) = *err.raw
+                        {
+                            if source.is_connect() || source.is_timeout() {
+                                return Ok(Some(old_credentials));
                             }
                         }
 
