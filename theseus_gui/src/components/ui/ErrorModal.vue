@@ -73,10 +73,6 @@ async function loginMinecraft() {
     <div class="modal-body">
       <div class="markdown-body">
         <template v-if="errorType === 'minecraft_auth'">
-          <p>
-            Signing into Microsoft account is a complex task for the launchers, and there are a lot
-            of things can go wrong.
-          </p>
           <template v-if="metadata.network">
             <h3>Network issues</h3>
             <p>
@@ -106,23 +102,26 @@ async function loginMinecraft() {
             </p>
           </template>
           <template v-else>
-            <h3>Make sure you are signing into the right Microsoft account</h3>
+            <h3>Try another Microsoft account</h3>
             <p>
-              More often than not, this error is caused by you signing into an incorrect Microsoft
-              account which isn't linked to Minecraft. Double check and try again!
+              Double check you've signed in with the right account. You may own Minecraft on a
+              different Microsoft account.
             </p>
-            <h3>Try signing in and launching through the official launcher first</h3>
+            <div class="cta-button">
+              <button class="btn btn-primary" :disabled="loadingMinecraft" @click="loginMinecraft">
+                <LogInIcon /> Try another account
+              </button>
+            </div>
+            <h3>Using PC Game Pass, coming from Bedrock, or just bought the game?</h3>
             <p>
-              If you just bought Minecraft, are coming from the Bedrock Edition world and have never
-              played Java before, or just subscribed to PC Game Pass, you would need to start the
-              game at least once using the
-              <a href="https://www.minecraft.net/en-us/download">official Minecraft Launcher</a>.
-              Once you're done, come back here and sign in!
+              Try signing in with the
+              <a href="https://www.minecraft.net/en-us/download">official Minecraft Launcher</a>
+              first. Once you're done, come back here and sign in!
             </p>
           </template>
           <div class="cta-button">
             <button class="btn btn-primary" :disabled="loadingMinecraft" @click="loginMinecraft">
-              <LogInIcon /> Sign in to Minecraft
+              <LogInIcon /> Try signing in again
             </button>
           </div>
           <hr />
@@ -168,7 +167,7 @@ async function loginMinecraft() {
       </div>
       <div class="input-group push-right">
         <a :href="supportLink" class="btn" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-        <button class="btn" @click="errorModal.hide()"><XIcon /> Close</button>
+        <button class="btn" @clicdck="errorModal.hide()"><XIcon /> Close</button>
       </div>
     </div>
   </Modal>

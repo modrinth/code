@@ -106,7 +106,8 @@ pub enum ErrorKind {
 
 #[derive(Debug)]
 pub struct Error {
-    source: tracing_error::TracedError<ErrorKind>,
+    pub raw: std::sync::Arc<ErrorKind>,
+    pub source: tracing_error::TracedError<std::sync::Arc<ErrorKind>>,
 }
 
 impl std::error::Error for Error {
@@ -123,8 +124,12 @@ impl std::fmt::Display for Error {
 
 impl<E: Into<ErrorKind>> From<E> for Error {
     fn from(source: E) -> Self {
+        let error = Into::<ErrorKind>::into(source);
+        let boxed_error = std::sync::Arc::new(error);
+
         Self {
-            source: Into::<ErrorKind>::into(source).in_current_span(),
+            raw: boxed_error.clone(),
+            source: boxed_error.in_current_span(),
         }
     }
 }
