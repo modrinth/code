@@ -1,7 +1,7 @@
 <template>
   <div class="markdown-body">
     <h1>Rewards Program Information</h1>
-    <p><em>Last modified: August 9, 2023</em></p>
+    <p><em>Last modified: May 13, 2024</em></p>
     <p>
       This page was created for transparency for how the rewards program works on Modrinth. Feel
       free to join our Discord or email
