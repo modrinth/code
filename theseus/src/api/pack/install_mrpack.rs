@@ -8,7 +8,7 @@ use crate::pack::install_from::{
 };
 use crate::prelude::{ModrinthVersion, ProfilePathId, ProjectMetadata};
 use crate::state::{ProfileInstallStage, Profiles, SideType};
-use crate::util::fetch::{fetch_json, fetch_mirrors, write};
+use crate::util::fetch::{fetch_json, fetch_mirrors, write, copy};
 use crate::util::io;
 use crate::{profile, State};
 use async_zip::base::read::seek::ZipFileReader;
@@ -172,9 +172,9 @@ pub async fn install_zipped_mrpack_files(
 
                     let hash = project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
 
-                    let cached_file = if let Some(hash) = hash {
+                    let cached_file_path = if let Some(hash) = hash {
                         let cached_file_path = content_cache_dir.join(&hash[..2]).join(hash);
-                        match tokio::fs::read(cached_file_path).await {
+                        match tokio::fs::read(&cached_file_path).await {
                             Ok(v) => {
                                 // avoid cloning a potentially large amount of bytes
                                 let (file_hash, v) = tokio::task::spawn_blocking(move || {
@@ -183,7 +183,7 @@ pub async fn install_zipped_mrpack_files(
                                 .await?;
 
                                 if file_hash == hash {
-                                    Some(Bytes::from(v))
+                                    Some(cached_file_path)
                                 } else {
                                     tracing::error!(
                                         "File integrity compromised: Cached content file {} ({}) actually has hash {}!",
@@ -205,8 +205,8 @@ pub async fn install_zipped_mrpack_files(
                         None
                     };
 
-                    let file = if let Some(cached_file) = cached_file {
-                        cached_file
+                    let cached_file_path = if let Some(cached_file_path) = cached_file_path {
+                        cached_file_path
                     } else {
                         let creds = state.credentials.read().await;
                         let file = fetch_mirrors(
@@ -221,18 +221,23 @@ pub async fn install_zipped_mrpack_files(
                         )
                         .await?;
 
-                        if let Some(hash) = hash {
-                            match std::fs::create_dir_all(content_cache_dir.join(&hash[..2])) {
-                                Err(e) => tracing::error!("failed to create content cache directory: {}", e),
-                                Ok(_) => {}
-                            }
+                        let (hash, file) = if let Some(hash) = hash {
+                            (hash.to_string(), file)
+                        } else {
+                            tokio::task::spawn_blocking(move || {
+                                (sha1_smol::Sha1::from(&file).hexdigest(), file)
+                            })
+                            .await?
+                        };
 
-                            if let Err(e) = tokio::fs::write(content_cache_dir.join(&hash[..2]).join(hash), &file).await {
-                                tracing::error!("failed to cache content file with hash {}: {}", hash, e)
-                            }
+                        match std::fs::create_dir_all(content_cache_dir.join(&hash[..2])) {
+                            Err(e) => tracing::error!("failed to create content cache directory: {}", e),
+                            Ok(_) => {}
                         }
 
-                        file
+                        let cached_file_path = content_cache_dir.join(&hash[..2]).join(&hash);
+                        write(&cached_file_path, &file, &state.io_semaphore).await?;
+                        cached_file_path
                     };
 
                     let project_path = project.path.to_string();
@@ -246,8 +251,9 @@ pub async fn install_zipped_mrpack_files(
                                     .get_full_path()
                                     .await?
                                     .join(&project_path);
-                                write(&path, &file, &state.io_semaphore)
-                                    .await?;
+
+                                let _semaphore = state.io_semaphore.0.read().await;
+                                tokio::fs::hard_link(cached_file_path, path).await?;
                             }
                             _ => {}
                         };
