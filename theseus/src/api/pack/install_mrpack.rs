@@ -8,17 +8,17 @@ use crate::pack::install_from::{
 };
 use crate::prelude::{ModrinthVersion, ProfilePathId, ProjectMetadata};
 use crate::state::{ProfileInstallStage, Profiles, SideType};
-use crate::util::fetch::{fetch_json, fetch_mirrors, write, copy};
+use crate::util::fetch::{copy, fetch_json, fetch_mirrors, write};
 use crate::util::io;
 use crate::{profile, State};
 use async_zip::base::read::seek::ZipFileReader;
+use bytes::Bytes;
 use reqwest::Method;
 use serde_json::json;
-use bytes::Bytes;
 
 use std::collections::HashMap;
 use std::io::Cursor;
-use std::path::{Component, PathBuf, Path};
+use std::path::{Component, Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::RwLockReadGuard;
 
@@ -172,36 +172,51 @@ pub async fn install_zipped_mrpack_files(
                         }
                     }
 
-                    let hash = project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
+                    let hash =
+                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
 
-                    let cached_file_path = find_cached_file_path(&content_cache_dir, &project, hash).await?;
+                    let cached_file_path = find_cached_file_path(
+                        &content_cache_dir,
+                        &project,
+                        hash,
+                    )
+                    .await?;
 
-                    let cached_file_path = if let Some(cached_file_path) = cached_file_path {
-                        cached_file_path
-                    } else {
-                        let creds = state.credentials.read().await;
-                        let file = fetch_mirrors(
-                            &project
-                                .downloads
-                                .iter()
-                                .map(|x| &**x)
-                                .collect::<Vec<&str>>(),
-                            hash,
-                            &state.fetch_semaphore,
-                            &creds,
-                        )
-                        .await?;
-
-                        let (hash, file) = if let Some(hash) = hash {
-                            (hash.to_string(), file)
+                    let cached_file_path =
+                        if let Some(cached_file_path) = cached_file_path {
+                            cached_file_path
                         } else {
-                            calculate_sha1_hash(file).await?
-                        };
+                            let creds = state.credentials.read().await;
+                            let file = fetch_mirrors(
+                                &project
+                                    .downloads
+                                    .iter()
+                                    .map(|x| &**x)
+                                    .collect::<Vec<&str>>(),
+                                hash,
+                                &state.fetch_semaphore,
+                                &creds,
+                            )
+                            .await?;
 
-                        let cached_file_path = content_cache_dir.join(&hash[..2]).join(&hash);
-                        write_content_cache_file(&state, &content_cache_dir, &cached_file_path, &hash, file).await?;
-                        cached_file_path
-                    };
+                            let (hash, file) = if let Some(hash) = hash {
+                                (hash.to_string(), file)
+                            } else {
+                                calculate_sha1_hash(file).await?
+                            };
+
+                            let cached_file_path =
+                                content_cache_dir.join(&hash[..2]).join(&hash);
+                            write_content_cache_file(
+                                &state,
+                                &content_cache_dir,
+                                &cached_file_path,
+                                &hash,
+                                file,
+                            )
+                            .await?;
+                            cached_file_path
+                        };
 
                     let project_path = project.path.to_string();
 
@@ -215,8 +230,10 @@ pub async fn install_zipped_mrpack_files(
                                     .await?
                                     .join(&project_path);
 
-                                let _semaphore = state.io_semaphore.0.read().await;
-                                tokio::fs::hard_link(cached_file_path, path).await?;
+                                let _semaphore =
+                                    state.io_semaphore.0.read().await;
+                                tokio::fs::hard_link(cached_file_path, path)
+                                    .await?;
                             }
                             _ => {}
                         };
@@ -320,9 +337,17 @@ async fn calculate_sha1_hash(bytes: Bytes) -> crate::Result<(String, Bytes)> {
     .await?)
 }
 
-async fn write_content_cache_file(state: &Arc<RwLockReadGuard<'_, State>>, content_cache_dir: &Path, cached_file_path: &Path, hash: &str, file: Bytes) -> crate::Result<()> {
+async fn write_content_cache_file(
+    state: &Arc<RwLockReadGuard<'_, State>>,
+    content_cache_dir: &Path,
+    cached_file_path: &Path,
+    hash: &str,
+    file: Bytes,
+) -> crate::Result<()> {
     match std::fs::create_dir_all(content_cache_dir.join(&hash[..2])) {
-        Err(e) => tracing::error!("failed to create content cache directory: {}", e),
+        Err(e) => {
+            tracing::error!("failed to create content cache directory: {}", e)
+        }
         Ok(_) => {}
     }
 
@@ -330,7 +355,11 @@ async fn write_content_cache_file(state: &Arc<RwLockReadGuard<'_, State>>, conte
     Ok(())
 }
 
-async fn find_cached_file_path(content_cache_dir: &PathBuf, project: &PackFile, hash: Option<&str>) -> crate::Result<Option<PathBuf>> {
+async fn find_cached_file_path(
+    content_cache_dir: &PathBuf,
+    project: &PackFile,
+    hash: Option<&str>,
+) -> crate::Result<Option<PathBuf>> {
     Ok(if let Some(hash) = hash {
         let cached_file_path = content_cache_dir.join(&hash[..2]).join(hash);
         match tokio::fs::read(&cached_file_path).await {
@@ -339,7 +368,7 @@ async fn find_cached_file_path(content_cache_dir: &PathBuf, project: &PackFile, 
                 let (file_hash, v) = tokio::task::spawn_blocking(move || {
                     (sha1_smol::Sha1::from(&v).hexdigest(), v)
                 })
-                    .await?;
+                .await?;
 
                 if file_hash == hash {
                     Some(cached_file_path)
@@ -350,13 +379,17 @@ async fn find_cached_file_path(content_cache_dir: &PathBuf, project: &PackFile, 
                                     );
                     None
                 }
-            },
+            }
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
                 // cache miss, proceed to download artifact
                 None
-            },
+            }
             Err(e) => {
-                tracing::error!("failed to read file with hash {} from cache: {}", hash, e);
+                tracing::error!(
+                    "failed to read file with hash {} from cache: {}",
+                    hash,
+                    e
+                );
                 None
             }
         }
