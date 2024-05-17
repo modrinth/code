@@ -18,7 +18,9 @@ use bytes::Bytes;
 
 use std::collections::HashMap;
 use std::io::Cursor;
-use std::path::{Component, PathBuf};
+use std::path::{Component, PathBuf, Path};
+use std::sync::Arc;
+use tokio::sync::RwLockReadGuard;
 
 use super::install_from::{
     generate_pack_from_file, generate_pack_from_version_id, CreatePack,
@@ -160,7 +162,7 @@ pub async fn install_zipped_mrpack_files(
                 let content_cache_dir = content_cache_dir.clone();
                 async move {
                     //TODO: Future update: prompt user for optional files in a modpack
-                    if let Some(env) = project.env {
+                    if let Some(env) = &project.env {
                         if env
                             .get(&EnvType::Client)
                             .map(|x| x == &SideType::Unsupported)
@@ -172,38 +174,7 @@ pub async fn install_zipped_mrpack_files(
 
                     let hash = project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
 
-                    let cached_file_path = if let Some(hash) = hash {
-                        let cached_file_path = content_cache_dir.join(&hash[..2]).join(hash);
-                        match tokio::fs::read(&cached_file_path).await {
-                            Ok(v) => {
-                                // avoid cloning a potentially large amount of bytes
-                                let (file_hash, v) = tokio::task::spawn_blocking(move || {
-                                    (sha1_smol::Sha1::from(&v).hexdigest(), v)
-                                })
-                                .await?;
-
-                                if file_hash == hash {
-                                    Some(cached_file_path)
-                                } else {
-                                    tracing::error!(
-                                        "File integrity compromised: Cached content file {} ({}) actually has hash {}!",
-                                        hash, project.path, file_hash
-                                    );
-                                    None
-                                }
-                            },
-                            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                                // cache miss, proceed to download artifact
-                                None
-                            },
-                            Err(e) => {
-                                tracing::error!("failed to read file with hash {} from cache: {}", hash, e);
-                                None
-                            }
-                        }
-                    } else {
-                        None
-                    };
+                    let cached_file_path = find_cached_file_path(&content_cache_dir, &project, hash).await?;
 
                     let cached_file_path = if let Some(cached_file_path) = cached_file_path {
                         cached_file_path
@@ -224,19 +195,11 @@ pub async fn install_zipped_mrpack_files(
                         let (hash, file) = if let Some(hash) = hash {
                             (hash.to_string(), file)
                         } else {
-                            tokio::task::spawn_blocking(move || {
-                                (sha1_smol::Sha1::from(&file).hexdigest(), file)
-                            })
-                            .await?
+                            calculate_sha1_hash(file).await?
                         };
 
-                        match std::fs::create_dir_all(content_cache_dir.join(&hash[..2])) {
-                            Err(e) => tracing::error!("failed to create content cache directory: {}", e),
-                            Ok(_) => {}
-                        }
-
                         let cached_file_path = content_cache_dir.join(&hash[..2]).join(&hash);
-                        write(&cached_file_path, &file, &state.io_semaphore).await?;
+                        write_content_cache_file(&state, &content_cache_dir, &cached_file_path, &hash, file).await?;
                         cached_file_path
                     };
 
@@ -348,6 +311,58 @@ pub async fn install_zipped_mrpack_files(
             "No pack manifest found in mrpack".to_string(),
         )))
     }
+}
+
+async fn calculate_sha1_hash(bytes: Bytes) -> crate::Result<(String, Bytes)> {
+    Ok(tokio::task::spawn_blocking(move || {
+        (sha1_smol::Sha1::from(&bytes).hexdigest(), bytes)
+    })
+    .await?)
+}
+
+async fn write_content_cache_file(state: &Arc<RwLockReadGuard<'_, State>>, content_cache_dir: &Path, cached_file_path: &Path, hash: &str, file: Bytes) -> crate::Result<()> {
+    match std::fs::create_dir_all(content_cache_dir.join(&hash[..2])) {
+        Err(e) => tracing::error!("failed to create content cache directory: {}", e),
+        Ok(_) => {}
+    }
+
+    write(cached_file_path, &file, &state.io_semaphore).await?;
+    Ok(())
+}
+
+async fn find_cached_file_path(content_cache_dir: &PathBuf, project: &PackFile, hash: Option<&str>) -> crate::Result<Option<PathBuf>> {
+    Ok(if let Some(hash) = hash {
+        let cached_file_path = content_cache_dir.join(&hash[..2]).join(hash);
+        match tokio::fs::read(&cached_file_path).await {
+            Ok(v) => {
+                // avoid cloning a potentially large amount of bytes
+                let (file_hash, v) = tokio::task::spawn_blocking(move || {
+                    (sha1_smol::Sha1::from(&v).hexdigest(), v)
+                })
+                    .await?;
+
+                if file_hash == hash {
+                    Some(cached_file_path)
+                } else {
+                    tracing::error!(
+                                        "File integrity compromised: Cached content file {} ({}) actually has hash {}!",
+                                        hash, project.path, file_hash
+                                    );
+                    None
+                }
+            },
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                // cache miss, proceed to download artifact
+                None
+            },
+            Err(e) => {
+                tracing::error!("failed to read file with hash {} from cache: {}", hash, e);
+                None
+            }
+        }
+    } else {
+        None
+    })
 }
 
 #[tracing::instrument(skip(mrpack_file))]
