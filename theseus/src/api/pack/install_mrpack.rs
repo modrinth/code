@@ -14,6 +14,7 @@ use crate::{profile, State};
 use async_zip::base::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde_json::json;
+use bytes::Bytes;
 
 use std::collections::HashMap;
 use std::io::Cursor;
@@ -88,6 +89,7 @@ pub async fn install_zipped_mrpack_files(
     let version_id = create_pack.description.version_id;
     let existing_loading_bar = create_pack.description.existing_loading_bar;
     let profile_path = create_pack.description.profile_path;
+    let content_cache_dir = state.directories.caches_content_dir();
     let icon_exists = icon.is_some();
 
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&file);
@@ -155,6 +157,7 @@ pub async fn install_zipped_mrpack_files(
             None,
             |project| {
                 let profile_path = profile_path.clone();
+                let content_cache_dir = content_cache_dir.clone();
                 async move {
                     //TODO: Future update: prompt user for optional files in a modpack
                     if let Some(env) = project.env {
@@ -167,19 +170,70 @@ pub async fn install_zipped_mrpack_files(
                         }
                     }
 
-                    let creds = state.credentials.read().await;
-                    let file = fetch_mirrors(
-                        &project
-                            .downloads
-                            .iter()
-                            .map(|x| &**x)
-                            .collect::<Vec<&str>>(),
-                        project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                        &state.fetch_semaphore,
-                        &creds,
-                    )
-                    .await?;
-                    drop(creds);
+                    let hash = project.hashes.get(&PackFileHash::Sha1).map(|x| &**x);
+
+                    let cached_file = if let Some(hash) = hash {
+                        let cached_file_path = content_cache_dir.join(&hash[..2]).join(hash);
+                        match tokio::fs::read(cached_file_path).await {
+                            Ok(v) => {
+                                // avoid cloning a potentially large amount of bytes
+                                let (file_hash, v) = tokio::task::spawn_blocking(move || {
+                                    (sha1_smol::Sha1::from(&v).hexdigest(), v)
+                                })
+                                .await?;
+
+                                if file_hash == hash {
+                                    Some(Bytes::from(v))
+                                } else {
+                                    tracing::error!(
+                                        "File integrity compromised: Cached content file {} ({}) actually has hash {}!",
+                                        hash, project.path, file_hash
+                                    );
+                                    None
+                                }
+                            },
+                            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                                // cache miss, proceed to download artifact
+                                None
+                            },
+                            Err(e) => {
+                                tracing::error!("failed to read file with hash {} from cache: {}", hash, e);
+                                None
+                            }
+                        }
+                    } else {
+                        None
+                    };
+
+                    let file = if let Some(cached_file) = cached_file {
+                        cached_file
+                    } else {
+                        let creds = state.credentials.read().await;
+                        let file = fetch_mirrors(
+                            &project
+                                .downloads
+                                .iter()
+                                .map(|x| &**x)
+                                .collect::<Vec<&str>>(),
+                            hash,
+                            &state.fetch_semaphore,
+                            &creds,
+                        )
+                        .await?;
+
+                        if let Some(hash) = hash {
+                            match std::fs::create_dir_all(content_cache_dir.join(&hash[..2])) {
+                                Err(e) => tracing::error!("failed to create content cache directory: {}", e),
+                                Ok(_) => {}
+                            }
+
+                            if let Err(e) = tokio::fs::write(content_cache_dir.join(&hash[..2]).join(hash), &file).await {
+                                tracing::error!("failed to cache content file with hash {}: {}", hash, e)
+                            }
+                        }
+
+                        file
+                    };
 
                     let project_path = project.path.to_string();
 
