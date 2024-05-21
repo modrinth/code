@@ -1,5 +1,13 @@
 <script setup>
-import { TrashIcon, SearchIcon, BoxIcon, SendIcon, EditIcon, DownloadIcon, LinkIcon } from 'omorphia'
+import {
+  TrashIcon,
+  SearchIcon,
+  BoxIcon,
+  SendIcon,
+  EditIcon,
+  DownloadIcon,
+  LinkIcon,
+} from 'omorphia'
 import Avatar from '~/components/ui/Avatar.vue'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import Badge from '~/components/ui/Badge.vue'
@@ -873,7 +881,7 @@ useSeoMeta({
               <DownloadIcon />
               <span> Download the Deb </span>
             </a>
-			<a :href="linuxLinks.thirdParty" download="">
+            <a :href="linuxLinks.thirdParty" download="">
               <LinkIcon />
               <span> Third-party packages </span>
             </a>

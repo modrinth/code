@@ -56,7 +56,8 @@
       banned from using Modrinth's services.
     </p>
     <p>
-      You can view your page views and project downloads in your <a href="https://modrinth.com/dashboard/analytics">analytics dashboard</a>.
+      You can view your page views and project downloads in your
+      <a href="https://modrinth.com/dashboard/analytics">analytics dashboard</a>.
     </p>
     <h2>Frequently Asked Questions</h2>
     <p>
