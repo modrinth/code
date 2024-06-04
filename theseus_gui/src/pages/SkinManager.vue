@@ -57,8 +57,8 @@
       />
       <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
         <template #use> <PlayIcon /> Use </template>
-        <template #left> <ChevronLeftIcon /> Move Left </template>
-        <template #right> <ChevronRightIcon /> Move Right </template>
+        <template v-if="sortBy === 'Custom'" #left> <ChevronLeftIcon /> Move Left </template>
+        <template v-if="sortBy === 'Custom'" #right> <ChevronRightIcon /> Move Right </template>
         <template #edit> <EyeIcon /> Edit </template>
         <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
         <template #delete> <TrashIcon /> Delete </template>
@@ -68,7 +68,11 @@
 
   <Modal ref="skinModal" class="modal" header="Change skin" :noblur="!themeStore.advancedRendering">
     <div v-if="!editSkin" class="modal-header">
-      <Chips v-model="changeSkinType" :items="['from file', 'import from launcher']" @click="handleModalType" />
+      <Chips
+        v-model="changeSkinType"
+        :items="['from file', 'import from launcher']"
+        @click="handleModalType"
+      />
     </div>
     <hr v-if="!editSkin" class="card-divider" />
     <div v-if="changeSkinType == 'from file'" class="modal-column">
@@ -222,6 +226,15 @@
       </div>
     </div>
   </Modal>
+  <ModalConfirm
+    ref="deleteConfirmModal"
+    title="Are you sure you want to delete this skin?"
+    description="If you proceed, the skin will be removed for all users. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    :noblur="!themeStore.advancedRendering"
+    @proceed="deleteSkin"
+  />
   <Notifications ref="notificationsWrapper" />
 </template>
 
@@ -232,6 +245,7 @@ import {
   Card,
   Button,
   Modal,
+  ModalConfirm,
   Chips,
   Checkbox,
   DropdownSelect,
@@ -284,9 +298,11 @@ const themeStore = useTheming()
 const notificationsWrapper = ref(null)
 
 const notInLibrary = ref(false)
+const selectedSkin = ref({})
 const skinId = ref('')
 const skinUser = ref('')
 const skinModal = ref(null)
+const deleteConfirmModal = ref(null)
 const newSkin = ref(null)
 const displaySkin = ref(null)
 const validSkin = ref(false)
@@ -307,7 +323,7 @@ const totalSkins = ref(0)
 const importer = ref({
   skinNames: [],
   path: '',
-  display: ''
+  display: '',
 })
 const importType = ref('Mojang')
 
@@ -331,7 +347,7 @@ const filteredResults = computed(() => {
       return save.user === selectedAccount.value.id
     })
   } else {
-    for (let i=0; i < saves.length; i++) {
+    for (let i = 0; i < saves.length; i++) {
       if (!Object.prototype.hasOwnProperty.call(saves[i].order, selectedAccount.value.id)) {
         shiftSaves(0, true)
         saves[i].order[selectedAccount.value.id] = 0
@@ -346,11 +362,9 @@ const filteredResults = computed(() => {
   }
 
   if (sortBy.value === 'Custom') {
-    for (let i=0; i < saves.length; i++) {
-      saves.sort((a, b) => {
-        return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
-      })
-    }
+    saves.sort((a, b) => {
+      return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+    })
   }
 
   if (sortBy.value === 'Date created') {
@@ -368,17 +382,28 @@ const filteredResults = computed(() => {
 })
 
 const moveCard = async (move, skin) => {
+  let sorted = Array.from(skinSaves.value)
+  if (filters.value === 'Current user') {
+    sorted = sorted.filter((save) => {
+      return save.user === selectedAccount.value.id
+    })
+  }
+  sorted.sort((a, b) => {
+    return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+  })
+
+  const targetIndex = sorted.indexOf(skin) + move
+  if (targetIndex < 0 || targetIndex > sorted.length - 1) return
   const current = skin.order[selectedAccount.value.id]
-  let target = current + move
-  if (target < 0 || target > filteredResults.value.length - 1) return
-  shiftSaves((target < current) ? target : target + 1, true)
-  skin.order[selectedAccount.value.id] = (target < current) ? target : target + 1
-  shiftSaves((target < current) ? current + 1 : current, false)
+  const target = sorted[targetIndex].order[selectedAccount.value.id]
+  shiftSaves(target < current ? target : target + 1, true)
+  skin.order[selectedAccount.value.id] = target < current ? target : target + 1
+  shiftSaves(target < current ? current + 1 : current, false)
   await update_skins(skinSaves.value).catch(handleError)
 }
 
 const handleRightClick = (event, item) => {
-  const baseOptions = [
+  let baseOptions = [
     {
       name: 'use',
       color: 'primary',
@@ -387,14 +412,31 @@ const handleRightClick = (event, item) => {
     { name: 'edit' },
     { name: 'duplicate' },
     { type: 'divider' },
-    { name: 'left' },
-    { name: 'right' },
-    { type: 'divider' },
     {
       name: 'delete',
       color: 'danger',
     },
   ]
+
+  if (sortBy.value === 'Custom') {
+    baseOptions = [
+      {
+        name: 'use',
+        color: 'primary',
+      },
+      { type: 'divider' },
+      { name: 'edit' },
+      { name: 'duplicate' },
+      { type: 'divider' },
+      { name: 'left' },
+      { name: 'right' },
+      { type: 'divider' },
+      {
+        name: 'delete',
+        color: 'danger',
+      },
+    ]
+  }
 
   skinOptions.value.showMenu(event, item, baseOptions)
 }
@@ -417,23 +459,29 @@ const handleOptionsClick = async (args) => {
       await duplicate_skin(args.item)
       break
     case 'delete':
-      await deleteSkin(args.item).catch(handleError)
-      notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
-        handleError
-      )
+      selectedSkin.value = args.item
+      deleteConfirmModal.value.show()
       break
   }
 }
 
-const deleteSkin = async (skin) => {
-  skinSaves.value.splice(skinSaves.value.indexOf(skin), 1)
-  let sorted = skinSaves.value.toSorted((a, b) => {
-    return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+const deleteSkin = async () => {
+  skinSaves.value.splice(skinSaves.value.indexOf(selectedSkin.value), 1)
+  let sorted = skinSaves.value.filter((save) => {
+    return Object.prototype.hasOwnProperty.call(save.order, selectedAccount.value.id)
   })
-  for (let i = skin.order[selectedAccount.value.id]; i < sorted.length; i++) {
-    sorted[i].order[selectedAccount.value.id]--
+  if (sorted.length > 0) {
+    sorted.sort((a, b) => {
+      return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+    })
+    for (let i = selectedSkin.value.order[selectedAccount.value.id]; i < sorted.length; i++) {
+      sorted[i].order[selectedAccount.value.id]--
+    }
   }
   await update_skins(skinSaves.value).catch(handleError)
+  notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+    handleError
+  )
 }
 
 const selectLauncherPath = async () => {
@@ -445,7 +493,9 @@ const selectLauncherPath = async () => {
 }
 
 const reload = async () => {
-  importer.value.skinNames = get_launcher_names(importer.value.path, importType.value).catch(handleError)
+  importer.value.skinNames = get_launcher_names(importer.value.path, importType.value).catch(
+    handleError
+  )
 }
 
 const next = async () => {
@@ -455,7 +505,9 @@ const next = async () => {
     .filter((e) => e.selected).length
   loading.value = true
   for (const skin of importer.value.skinNames.filter((skin) => skin.selected)) {
-    const data = await import_skin(skin.id, importer.value.path, importType.value).catch(handleError)
+    const data = await import_skin(skin.id, importer.value.path, importType.value).catch(
+      handleError
+    )
     const model = await get_render(data).catch(handleError)
     shiftSaves(0, true)
     await update_skins(skinSaves.value).catch(handleError)
@@ -515,7 +567,7 @@ const handleSkin = async (skin, cape, arms, state) => {
     skin: skin,
     cape: cape,
     arms: arms,
-    unlocked_capes: []
+    unlocked_capes: [],
   }
 
   if (state.includes('save')) {
@@ -548,7 +600,7 @@ const handleSkin = async (skin, cape, arms, state) => {
     } else {
       notificationsWrapper.value.addNotification({
         title: 'Error Uploading Skin',
-        text: 'Improper response from Mojang API. Please try again',
+        text: 'Improper response from Mojang API. Please try again soon',
         type: 'error',
       })
     }
@@ -561,7 +613,7 @@ const handleSkin = async (skin, cape, arms, state) => {
     } else {
       notificationsWrapper.value.addNotification({
         title: 'Error Uploading Cape',
-        text: 'Improper response from Mojang API. Please try again',
+        text: 'Improper response from Mojang API. Please try again soon',
         type: 'error',
       })
     }
@@ -696,6 +748,7 @@ const create_render = async () => {
 }
 
 const update_render = async (account) => {
+  if (currentRender.value == null) return
   skinData.value = await get_user_skin_data(account).catch(handleError)
   notInLibrary.value = await check_skin(skinData.value.skin, account).catch(handleError)
   currentRender.value.loadSkin(skinData.value.skin, {
@@ -716,9 +769,12 @@ const handleImportType = async () => {
   if (importType.value == 'Mojang') importer.value.display = '.minecraft'
   else importer.value.display = importType.value
   importer.value.path = await get_default_launcher_path(importType.value).catch(handleError)
-    if (importer.value.path !== null) {
-      importer.value.skinNames = await get_launcher_names(importer.value.path, importType.value).catch(handleError)
-    } else importer.value.path = ''
+  if (importer.value.path !== null) {
+    importer.value.skinNames = await get_launcher_names(
+      importer.value.path,
+      importType.value
+    ).catch(handleError)
+  } else importer.value.path = ''
 }
 
 watch(selectedAccount, async (newAccount) => {
