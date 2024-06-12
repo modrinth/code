@@ -362,7 +362,7 @@ impl AutomatedModerationQueue {
                                         for file in
                                         files.iter().filter(|x| x.version_id == version.id.into())
                                         {
-                                            if let Some(hash) = file.hashes.get(&"sha1".to_string()) {
+                                            if let Some(hash) = file.hashes.get("sha1") {
                                                 if let Some((index, (sha1, _, file_name, _))) = hashes
                                                     .iter()
                                                     .enumerate()

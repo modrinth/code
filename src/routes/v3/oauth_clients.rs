@@ -249,12 +249,6 @@ pub struct OAuthClientEdit {
     )]
     pub name: Option<String>,
 
-    #[validate(
-        custom(function = "crate::util::validate::validate_url"),
-        length(max = 255)
-    )]
-    pub icon_url: Option<Option<String>>,
-
     pub max_scopes: Option<Scopes>,
 
     #[validate(length(min = 1))]
@@ -293,20 +287,12 @@ pub async fn oauth_client_edit(
         .validate()
         .map_err(|e| ApiError::Validation(validation_errors_to_string(e, None)))?;
 
-    if client_updates.icon_url.is_none()
-        && client_updates.name.is_none()
-        && client_updates.max_scopes.is_none()
-    {
-        return Err(ApiError::InvalidInput("No changes provided".to_string()));
-    }
-
     if let Some(existing_client) = OAuthClient::get(client_id.into_inner().into(), &**pool).await? {
         existing_client.validate_authorized(Some(&current_user))?;
 
         let mut updated_client = existing_client.clone();
         let OAuthClientEdit {
             name,
-            icon_url,
             max_scopes,
             redirect_uris,
             url,
@@ -314,10 +300,6 @@ pub async fn oauth_client_edit(
         } = client_updates.into_inner();
         if let Some(name) = name {
             updated_client.name = name;
-        }
-
-        if let Some(icon_url) = icon_url {
-            updated_client.icon_url = icon_url;
         }
 
         if let Some(max_scopes) = max_scopes {

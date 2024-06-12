@@ -40,7 +40,6 @@ async fn can_create_edit_get_oauth_client() {
         let creation_result: OAuthClientCreationResult = test::read_body_json(resp).await;
         let client_id = get_json_val_str(creation_result.client.id);
 
-        let icon_url = Some("https://modrinth.com/icon".to_string());
         let url = Some("https://modrinth.com".to_string());
         let description = Some("test description".to_string());
         let edited_redirect_uris = vec![
@@ -49,7 +48,6 @@ async fn can_create_edit_get_oauth_client() {
         ];
         let edit = OAuthClientEdit {
             name: None,
-            icon_url: Some(icon_url.clone()),
             max_scopes: None,
             redirect_uris: Some(edited_redirect_uris.clone()),
             url: Some(url.clone()),
@@ -66,7 +64,6 @@ async fn can_create_edit_get_oauth_client() {
             .get_user_oauth_clients(FRIEND_USER_ID, FRIEND_USER_PAT)
             .await;
         assert_eq!(1, clients.len());
-        assert_eq!(icon_url, clients[0].icon_url);
         assert_eq!(url, clients[0].url);
         assert_eq!(description, clients[0].description);
         assert_eq!(client_name, clients[0].name);

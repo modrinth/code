@@ -331,12 +331,13 @@ pub async fn update_files(
     let update_version_ids = sqlx::query!(
         "
         SELECT v.id version_id, v.mod_id mod_id
-        FROM versions v
+        FROM mods m
+        INNER JOIN versions v ON m.id = v.mod_id AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))
         INNER JOIN version_fields vf ON vf.field_id = 3 AND v.id = vf.version_id
         INNER JOIN loader_field_enum_values lfev ON vf.enum_value = lfev.id AND (cardinality($2::varchar[]) = 0 OR lfev.value = ANY($2::varchar[]))
         INNER JOIN loaders_versions lv ON lv.version_id = v.id
         INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-        WHERE v.mod_id = ANY($1) AND (cardinality($4::varchar[]) = 0 OR v.version_type = ANY($4))
+        WHERE m.id = ANY($1)
         ORDER BY v.date_published ASC
         ",
         &files.iter().map(|x| x.project_id.0).collect::<Vec<_>>(),

@@ -469,7 +469,7 @@ impl User {
             .await?;
 
             for collection_id in user_collections {
-                models::Collection::remove(collection_id, transaction, &redis).await?;
+                models::Collection::remove(collection_id, transaction, redis).await?;
             }
 
             let report_threads = sqlx::query!(
