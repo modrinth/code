@@ -41,15 +41,32 @@
                 {{ $formatCategoryHeader(header) }}
               </h3>
 
-              <SearchFilter
-                v-for="category in categories.filter((x) => x.project_type === projectType.actual)"
-                :key="category.name"
-                :active-filters="facets"
-                :display-name="$formatCategory(category.name)"
-                :facet-name="`categories:'${encodeURIComponent(category.name)}'`"
-                :icon="header === 'resolutions' ? null : category.icon"
-                @toggle="toggleFacet"
-              />
+              <template v-if="header === 'resolutions'">
+                <SearchFilter
+                  v-for="category in categories.filter(
+                    (x) => x.project_type === projectType.actual
+                  )"
+                  :key="category.name"
+                  :active-filters="orFacets"
+                  :display-name="$formatCategory(category.name)"
+                  :facet-name="`categories:'${encodeURIComponent(category.name)}'`"
+                  :icon="null"
+                  @toggle="toggleOrFacet"
+                />
+              </template>
+              <template v-else>
+                <SearchFilter
+                  v-for="category in categories.filter(
+                    (x) => x.project_type === projectType.actual
+                  )"
+                  :key="category.name"
+                  :active-filters="facets"
+                  :display-name="$formatCategory(category.name)"
+                  :facet-name="`categories:'${encodeURIComponent(category.name)}'`"
+                  :icon="category.icon"
+                  @toggle="toggleFacet"
+                />
+              </template>
             </div>
           </section>
           <section
@@ -67,17 +84,11 @@
             </h3>
             <SearchFilter
               v-for="loader in tags.loaders.filter((x) => {
-                if (
-                  projectType.id === 'mod' &&
-                  !showAllLoaders &&
-                  x.name !== 'forge' &&
-                  x.name !== 'fabric' &&
-                  x.name !== 'quilt' &&
-                  x.name !== 'neoforge'
-                ) {
-                  return false
-                } else if (projectType.id === 'mod' && showAllLoaders) {
-                  return tags.loaderData.modLoaders.includes(x.name)
+                if (projectType.id === 'mod') {
+                  return (
+                    tags.loaderData.modLoaders.includes(x.name) &&
+                    !tags.loaderData.hiddenModLoaders.includes(x.name)
+                  )
                 } else if (projectType.id === 'plugin') {
                   return tags.loaderData.pluginLoaders.includes(x.name)
                 } else if (projectType.id === 'datapack') {
@@ -94,6 +105,23 @@
               :icon="loader.icon"
               @toggle="toggleOrFacet"
             />
+            <template v-if="projectType.id === 'mod' && showAllLoaders">
+              <SearchFilter
+                v-for="loader in tags.loaders.filter((x) => {
+                  return (
+                    tags.loaderData.modLoaders.includes(x.name) &&
+                    tags.loaderData.hiddenModLoaders.includes(x.name)
+                  )
+                })"
+                :key="loader.name"
+                ref="loaderFilters"
+                :active-filters="orFacets"
+                :display-name="$formatCategory(loader.name)"
+                :facet-name="`categories:'${encodeURIComponent(loader.name)}'`"
+                :icon="loader.icon"
+                @toggle="toggleOrFacet"
+              />
+            </template>
             <Checkbox
               v-if="projectType.id === 'mod'"
               v-model="showAllLoaders"

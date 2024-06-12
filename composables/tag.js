@@ -55,6 +55,7 @@ export const useTags = () =>
       ],
       dataPackLoaders: ['datapack'],
       modLoaders: ['forge', 'fabric', 'quilt', 'liteloader', 'modloader', 'rift', 'neoforge'],
+      hiddenModLoaders: ['liteloader', 'modloader', 'rift'],
     },
     projectViewModes: ['list', 'grid', 'gallery'],
     approvedStatuses: ['approved', 'archived', 'unlisted', 'private'],
