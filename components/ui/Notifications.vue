@@ -26,8 +26,8 @@ function stopTimer(notif) {
 </script>
 <style lang="scss" scoped>
 .vue-notification {
-  background: var(--color-special-blue) !important;
-  border-left: 5px solid var(--color-special-blue) !important;
+  background: var(--color-blue) !important;
+  border-left: 5px solid var(--color-blue) !important;
   color: var(--color-brand-inverted) !important;
 
   box-sizing: border-box;
@@ -37,18 +37,18 @@ function stopTimer(notif) {
   margin: 0 5px 5px;
 
   &.success {
-    background: var(--color-special-green) !important;
-    border-left-color: var(--color-special-green) !important;
+    background: var(--color-green) !important;
+    border-left-color: var(--color-green) !important;
   }
 
   &.warn {
-    background: var(--color-special-orange) !important;
-    border-left-color: var(--color-special-orange) !important;
+    background: var(--color-orange) !important;
+    border-left-color: var(--color-orange) !important;
   }
 
   &.error {
-    background: var(--color-special-red) !important;
-    border-left-color: var(--color-special-red) !important;
+    background: var(--color-red) !important;
+    border-left-color: var(--color-red) !important;
   }
 }
 

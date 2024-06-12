@@ -1,6 +1,6 @@
 <template>
   <div>
-    <MessageBanner v-if="cosmetics.developerMode" message-type="warning" class="developer-message">
+    <MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
       <CodeIcon />
       <IntlFormatted :message-id="developerModeBanner.description">
         <template #strong="{ children }">
@@ -137,15 +137,15 @@
       </div>
     </section>
     <section class="universal-card">
-      <h2>{{ formatMessage(featureFlags.title) }}</h2>
-      <p>{{ formatMessage(featureFlags.description) }}</p>
+      <h2>{{ formatMessage(toggleFeatures.title) }}</h2>
+      <p>{{ formatMessage(toggleFeatures.description) }}</p>
       <div class="adjacent-input small">
         <label for="advanced-rendering">
           <span class="label__title">
-            {{ formatMessage(featureFlags.advancedRenderingTitle) }}
+            {{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(featureFlags.advancedRenderingDescription) }}
+            {{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
           </span>
         </label>
         <input
@@ -159,10 +159,10 @@
       <div class="adjacent-input small">
         <label for="external-links-new-tab">
           <span class="label__title">
-            {{ formatMessage(featureFlags.externalLinksNewTabTitle) }}
+            {{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(featureFlags.externalLinksNewTabDescription) }}
+            {{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
           </span>
         </label>
         <input
@@ -176,10 +176,10 @@
       <div class="adjacent-input small">
         <label for="modrinth-app-promos">
           <span class="label__title">
-            {{ formatMessage(featureFlags.hideModrinthAppPromosTitle) }}
+            {{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(featureFlags.hideModrinthAppPromosDescription) }}
+            {{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
           </span>
         </label>
         <input
@@ -193,10 +193,10 @@
       <div class="adjacent-input small">
         <label for="search-layout-toggle">
           <span class="label__title">
-            {{ formatMessage(featureFlags.rightAlignedSearchSidebarTitle) }}
+            {{ formatMessage(toggleFeatures.rightAlignedSearchSidebarTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(featureFlags.rightAlignedSearchSidebarDescription) }}
+            {{ formatMessage(toggleFeatures.rightAlignedSearchSidebarDescription) }}
           </span>
         </label>
         <input
@@ -210,10 +210,10 @@
       <div class="adjacent-input small">
         <label for="project-layout-toggle">
           <span class="label__title">
-            {{ formatMessage(featureFlags.rightAlignedProjectSidebarTitle) }}
+            {{ formatMessage(toggleFeatures.rightAlignedProjectSidebarTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(featureFlags.rightAlignedProjectSidebarDescription) }}
+            {{ formatMessage(toggleFeatures.rightAlignedProjectSidebarDescription) }}
           </span>
         </label>
         <input
@@ -331,10 +331,10 @@ const projectListLayouts = defineMessages({
   },
 })
 
-const featureFlags = defineMessages({
+const toggleFeatures = defineMessages({
   title: {
     id: 'settings.display.flags.title',
-    defaultMessage: 'Feature flags',
+    defaultMessage: 'Toggle features',
   },
   description: {
     id: 'settings.display.flags.description',
@@ -386,6 +386,7 @@ const featureFlags = defineMessages({
 })
 
 const cosmetics = useCosmetics()
+const flags = useFeatureFlags()
 const tags = useTags()
 
 const systemTheme = ref('light')
@@ -394,7 +395,7 @@ const theme = useTheme()
 
 const themeOptions = computed(() => {
   const options = ['system', 'light', 'dark', 'oled']
-  if (cosmetics.value.developerMode || theme.value.preference === 'retro') {
+  if (flags.value.developerMode || theme.value.preference === 'retro') {
     options.push('retro')
   }
   return options
@@ -430,8 +431,8 @@ function updateColorTheme(value) {
 }
 
 function disableDeveloperMode() {
-  cosmetics.value.developerMode = !cosmetics.value.developerMode
-  saveCosmetics()
+  flags.value.developerMode = !flags.value.developerMode
+  saveFeatureFlags()
   addNotification({
     group: 'main',
     title: 'Developer mode deactivated',

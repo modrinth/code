@@ -414,10 +414,10 @@ function getItemLabel(locale: Locale) {
   }
 
   &.errored {
-    border-color: var(--color-special-red);
+    border-color: var(--color-red);
 
     &:hover {
-      border-color: var(--color-special-red);
+      border-color: var(--color-red);
     }
   }
 
@@ -473,7 +473,7 @@ function getItemLabel(locale: Locale) {
 }
 
 .language-load-error {
-  color: var(--color-special-red);
+  color: var(--color-red);
   font-size: var(--font-size-sm);
   margin-left: 0.3rem;
   display: flex;

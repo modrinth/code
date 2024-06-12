@@ -414,7 +414,7 @@ export default {
 
   svg {
     width: auto;
-    color: var(--color-special-orange);
+    color: var(--color-orange);
     height: 1.5rem;
     margin-bottom: -0.25rem;
   }

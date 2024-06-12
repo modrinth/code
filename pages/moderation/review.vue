@@ -233,11 +233,11 @@ async function goToProjects() {
 }
 
 .warning {
-  color: var(--color-special-orange);
+  color: var(--color-orange);
 }
 
 .danger {
-  color: var(--color-special-red);
+  color: var(--color-red);
   font-weight: bold;
 }
 

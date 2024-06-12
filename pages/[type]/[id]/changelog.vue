@@ -157,18 +157,18 @@ function switchPage(page) {
   }
 
   .changelog-bar {
-    --color: var(--color-special-green);
+    --color: var(--color-green);
 
     &.alpha {
-      --color: var(--color-special-red);
+      --color: var(--color-red);
     }
 
     &.release {
-      --color: var(--color-special-green);
+      --color: var(--color-green);
     }
 
     &.beta {
-      --color: var(--color-special-orange);
+      --color: var(--color-orange);
     }
 
     left: 0;

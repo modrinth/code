@@ -82,7 +82,7 @@
       <span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
         fromNow(report.created)
       }}</span>
-      <CopyCode v-if="cosmetics.developerMode" :text="report.id" class="report-id" />
+      <CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
     </div>
   </div>
 </template>
@@ -124,7 +124,7 @@ defineProps({
   },
 })
 
-const cosmetics = useCosmetics()
+const flags = useFeatureFlags()
 </script>
 
 <style lang="scss" scoped>

@@ -502,7 +502,7 @@ export default defineNuxtComponent({
   // 5 wide
   display: flex;
   flex-wrap: wrap;
-  justify-content: start;
+  justify-content: flex-start;
 
   grid-gap: var(--gap-sm);
   margin-top: 0.5rem;

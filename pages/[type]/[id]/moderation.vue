@@ -204,12 +204,12 @@ svg {
   }
 
   &.bad {
-    color: var(--color-special-red);
+    color: var(--color-red);
   }
 }
 
 .warning {
-  color: var(--color-special-orange);
+  color: var(--color-orange);
   font-weight: bold;
 }
 </style>

@@ -14,7 +14,6 @@ export const useCosmetics = () =>
         projectLayout: false,
         advancedRendering: true,
         externalLinksNewTab: true,
-        developerMode: false,
         notUsingBlockers: false,
         hideModrinthAppPromos: false,
         preferredDarkTheme: 'dark',
@@ -37,6 +36,9 @@ export const useCosmetics = () =>
 
 export const saveCosmetics = () => {
   const cosmetics = useCosmetics()
+
+  console.log('SAVING COSMETICS:')
+  console.log(cosmetics)
 
   const cosmeticsCookie = useCookie('cosmetics', {
     maxAge: 60 * 60 * 24 * 365 * 10,

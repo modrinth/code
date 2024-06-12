@@ -798,7 +798,7 @@
     "message": "Enable or disable certain features on this device."
   },
   "settings.display.flags.title": {
-    "message": "Feature flags"
+    "message": "Toggle features"
   },
   "settings.display.project-list-layouts.datapack": {
     "message": "Data Packs page"

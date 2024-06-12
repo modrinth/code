@@ -289,7 +289,7 @@ a:active + .message__author a,
 
 .moderation-color,
 role-moderator {
-  color: var(--color-special-orange);
+  color: var(--color-orange);
 }
 
 .role-admin {
@@ -297,11 +297,11 @@ role-moderator {
 }
 
 .reporter-icon {
-  color: var(--color-special-purple);
+  color: var(--color-purple);
 }
 
 .private-icon {
-  color: var(--color-special-gray);
+  color: var(--color-gray);
 }
 
 @media screen and (min-width: 600px) {

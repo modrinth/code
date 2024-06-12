@@ -1374,7 +1374,7 @@ useSeoMeta({
           display: flex;
           align-items: center;
           padding: var(--gap-sm) 0;
-          color: var(--color-special-gray);
+          color: var(--color-gray);
 
           &.important {
             color: var(--color-contrast);

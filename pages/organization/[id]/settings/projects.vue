@@ -630,7 +630,7 @@ const onBulkEditLinks = useClientTry(async () => {
   gap: var(--spacing-card-xs);
 
   svg {
-    color: var(--color-special-orange);
+    color: var(--color-orange);
   }
 }
 
@@ -658,7 +658,7 @@ const onBulkEditLinks = useClientTry(async () => {
 }
 
 .label-button[data-active='true'] {
-  --background-color: var(--color-special-red);
+  --background-color: var(--color-red);
   --text-color: var(--color-brand-inverted);
 }
 

@@ -428,15 +428,15 @@ const submitForReview = async () => {
     align-items: center;
 
     .required {
-      color: var(--color-special-red);
+      color: var(--color-red);
     }
 
     .suggestion {
-      color: var(--color-special-purple);
+      color: var(--color-purple);
     }
 
     .review {
-      color: var(--color-special-orange);
+      color: var(--color-orange);
     }
   }
 
@@ -467,7 +467,7 @@ const submitForReview = async () => {
     .circle {
       --circle-size: 2rem;
       --background-color: var(--color-bg);
-      --content-color: var(--color-special-gray);
+      --content-color: var(--color-gray);
       width: var(--circle-size);
       height: var(--circle-size);
       border-radius: 50%;
@@ -483,19 +483,19 @@ const submitForReview = async () => {
       }
 
       &.required {
-        --content-color: var(--color-special-red);
+        --content-color: var(--color-red);
       }
 
       &.suggestion {
-        --content-color: var(--color-special-purple);
+        --content-color: var(--color-purple);
       }
 
       &.review {
-        --content-color: var(--color-special-orange);
+        --content-color: var(--color-orange);
       }
 
       &.done {
-        --background-color: var(--color-special-green);
+        --background-color: var(--color-green);
         --content-color: var(--color-brand-inverted);
       }
     }

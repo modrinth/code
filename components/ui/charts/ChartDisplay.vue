@@ -507,7 +507,7 @@ const defaultRanges: Record<number, [string, number] | string> = {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: start;
+  align-items: flex-start;
   gap: var(--gap-md);
 
   .chart-controls__buttons {

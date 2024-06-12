@@ -33,7 +33,7 @@
         </div>
       </div>
     </Modal>
-    <div v-if="cosmetics.developerMode" class="thread-id">
+    <div v-if="flags.developerMode" class="thread-id">
       Thread ID: <CopyCode :text="thread.id" />
     </div>
     <div v-if="sortedMessages.length > 0" class="messages universal-card recessed">
@@ -247,7 +247,7 @@ const props = defineProps({
 const emit = defineEmits(['update-thread'])
 
 const app = useNuxtApp()
-const cosmetics = useCosmetics()
+const flags = useFeatureFlags()
 
 const members = computed(() => {
   const members = {}
