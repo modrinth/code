@@ -128,7 +128,14 @@ pub async fn paypal_webhook(
             .await?;
 
             if let Some(result) = result {
-                let _guard = payouts.payouts_locks.lock().await;
+                sqlx::query!(
+                    "
+                    SELECT balance FROM users WHERE id = $1 FOR UPDATE
+                    ",
+                    result.user_id
+                )
+                .fetch_optional(&mut *transaction)
+                .await?;
 
                 sqlx::query!(
                     "
@@ -194,7 +201,6 @@ pub async fn tremendous_webhook(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     redis: web::Data<RedisPool>,
-    payouts: web::Data<PayoutsQueue>,
     body: String,
 ) -> Result<HttpResponse, ApiError> {
     let signature = req
@@ -247,7 +253,14 @@ pub async fn tremendous_webhook(
             .await?;
 
             if let Some(result) = result {
-                let _guard = payouts.payouts_locks.lock().await;
+                sqlx::query!(
+                    "
+                    SELECT balance FROM users WHERE id = $1 FOR UPDATE
+                    ",
+                    result.user_id
+                )
+                .fetch_optional(&mut *transaction)
+                .await?;
 
                 sqlx::query!(
                     "
@@ -367,8 +380,6 @@ pub async fn create_payout(
         ));
     }
 
-    let _guard = payouts_queue.payouts_locks.lock().await;
-
     if user.balance < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You do not have enough funds to make this payout!".to_string(),
@@ -398,6 +409,16 @@ pub async fn create_payout(
     }
 
     let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        SELECT balance FROM users WHERE id = $1 FOR UPDATE
+        ",
+        user.id.0
+    )
+    .fetch_optional(&mut *transaction)
+    .await?;
+
     let payout_id = generate_payout_id(&mut transaction).await?;
 
     let payout_item = match body.method {

@@ -16,12 +16,11 @@ use serde_json::Value;
 use sqlx::postgres::PgQueryResult;
 use sqlx::PgPool;
 use std::collections::HashMap;
-use tokio::sync::{Mutex, RwLock};
+use tokio::sync::RwLock;
 
 pub struct PayoutsQueue {
     credential: RwLock<Option<PayPalCredentials>>,
     payout_options: RwLock<Option<PayoutMethods>>,
-    pub payouts_locks: Mutex<()>,
 }
 
 #[derive(Clone)]
@@ -48,7 +47,6 @@ impl PayoutsQueue {
         PayoutsQueue {
             credential: RwLock::new(None),
             payout_options: RwLock::new(None),
-            payouts_locks: Mutex::new(()),
         }
     }
 
