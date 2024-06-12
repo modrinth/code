@@ -1,5 +1,4 @@
-use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
-use chrono::{DateTime, NaiveDateTime, Utc};
+use crate::validate::{filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult};
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -7,7 +6,7 @@ pub struct FabricValidator;
 
 impl super::Validator for FabricValidator {
     fn get_file_extensions(&self) -> &[&str] {
-        &["jar", "zip"]
+        &["jar"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
@@ -15,11 +14,7 @@ impl super::Validator for FabricValidator {
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
-        // Time since release of 18w49a, the first fabric version
-        SupportedGameVersions::PastDate(DateTime::from_naive_utc_and_offset(
-            NaiveDateTime::from_timestamp_opt(1543969469, 0).unwrap(),
-            Utc,
-        ))
+        SupportedGameVersions::All
     }
 
     fn validate(
@@ -31,6 +26,8 @@ impl super::Validator for FabricValidator {
                 "No fabric.mod.json present for Fabric file.",
             ));
         }
+
+        filter_out_packs(archive)?;
 
         Ok(ValidationResult::Pass)
     }

@@ -1,4 +1,4 @@
-use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult};
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -26,6 +26,8 @@ impl super::Validator for LiteLoaderValidator {
                 "No litemod.json present for LiteLoader file.",
             ));
         }
+
+        filter_out_packs(archive)?;
 
         Ok(ValidationResult::Pass)
     }

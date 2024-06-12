@@ -102,6 +102,14 @@ impl TestFile {
             )
             .unwrap();
             zip.write_all(fabric_mod_json.as_bytes()).unwrap();
+
+            zip.start_file(
+                "META-INF/mods.toml",
+                FileOptions::default().compression_method(CompressionMethod::Stored),
+            )
+            .unwrap();
+            zip.write_all(fabric_mod_json.as_bytes()).unwrap();
+
             zip.finish().unwrap();
         }
         let bytes = cursor.into_inner();
@@ -117,7 +125,23 @@ impl TestFile {
             "game": "minecraft",
             "versionId": "1.20.1-9.6",
             "name": filename,
-            "files": [],
+            "files": [
+                {
+                    "path": "mods/animatica-0.6+1.20.jar",
+                    "hashes": {
+                        "sha1": "3bcb19c759f313e69d3f7848b03c48f15167b88d",
+                        "sha512": "7d50f3f34479f8b052bfb9e2482603b4906b8984039777dc2513ecf18e9af2b599c9d094e88cec774f8525345859e721a394c8cd7c14a789c9538d2533c71d65"
+                    },
+                    "env": {
+                        "client": "required",
+                        "server": "required"
+                    },
+                    "downloads": [
+                        "https://cdn.modrinth.com/data/PRN43VSY/versions/uNgEPb10/animatica-0.6%2B1.20.jar"
+                    ],
+                    "fileSize": 69810
+                }
+            ],
             "dependencies": {
                 "fabric-loader": "0.14.22",
                 "minecraft": "1.20.1"

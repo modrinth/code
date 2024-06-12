@@ -9,9 +9,11 @@ use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
 use crate::validate::liteloader::LiteLoaderValidator;
 use crate::validate::modpack::ModpackValidator;
+use crate::validate::neoforge::NeoForgeValidator;
 use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
 use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
+use crate::validate::rift::RiftValidator;
 use crate::validate::shader::{CanvasShaderValidator, CoreShaderValidator, ShaderValidator};
 use chrono::{DateTime, Utc};
 use std::io::Cursor;
@@ -23,9 +25,11 @@ mod fabric;
 mod forge;
 mod liteloader;
 mod modpack;
+mod neoforge;
 pub mod plugin;
 mod quilt;
 mod resourcepack;
+mod rift;
 mod shader;
 
 #[derive(Error, Debug)]
@@ -104,6 +108,8 @@ static VALIDATORS: &[&dyn Validator] = &[
     &ShaderValidator,
     &CoreShaderValidator,
     &DataPackValidator,
+    &RiftValidator,
+    &NeoForgeValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
@@ -238,4 +244,23 @@ fn game_version_supported(
             version_ids.iter().any(|x| game_version_ids.contains(x))
         }
     }
+}
+
+pub fn filter_out_packs(
+    archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+) -> Result<ValidationResult, ValidationError> {
+    if (archive.by_name("modlist.html").is_ok() && archive.by_name("manifest.json").is_ok())
+        || archive
+            .file_names()
+            .any(|x| x.starts_with("mods/") && x.ends_with(".jar"))
+        || archive
+            .file_names()
+            .any(|x| x.starts_with("override/mods/") && x.ends_with(".jar"))
+    {
+        return Ok(ValidationResult::Warning(
+            "Invalid modpack file. You must upload a valid .MRPACK file.",
+        ));
+    }
+
+    Ok(ValidationResult::Pass)
 }

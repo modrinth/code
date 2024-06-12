@@ -1,4 +1,4 @@
-use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -24,13 +24,17 @@ impl super::Validator for ForgeValidator {
 
     fn validate(
         &self,
-        _archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        // if archive.by_name("META-INF/mods.toml").is_err() {
-        //     return Ok(ValidationResult::Warning(
-        //         "No mods.toml present for Forge file.",
-        //     ));
-        // }
+        if archive.by_name("META-INF/mods.toml").is_err()
+            && !archive.file_names().any(|x| x.ends_with(".class"))
+        {
+            return Ok(ValidationResult::Warning(
+                "No mods.toml or valid class files present for Forge file.",
+            ));
+        }
+
+        filter_out_packs(archive)?;
 
         Ok(ValidationResult::Pass)
     }
@@ -51,11 +55,11 @@ impl super::Validator for LegacyForgeValidator {
         // Times between versions 1.5.2 to 1.12.2, which all use the legacy way of defining mods
         SupportedGameVersions::Range(
             DateTime::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(1366818300, 0).unwrap(),
+                NaiveDateTime::from_timestamp_opt(0, 0).unwrap(),
                 Utc,
             ),
             DateTime::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(1505810340, 0).unwrap(),
+                NaiveDateTime::from_timestamp_opt(1540122066, 0).unwrap(),
                 Utc,
             ),
         )
@@ -63,13 +67,17 @@ impl super::Validator for LegacyForgeValidator {
 
     fn validate(
         &self,
-        _archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        // if archive.by_name("mcmod.info").is_err() {
-        //     return Ok(ValidationResult::Warning(
-        //         "Forge mod file does not contain mcmod.info!",
-        //     ));
-        // };
+        if archive.by_name("mcmod.info").is_err()
+            && !archive.file_names().any(|x| x.ends_with(".class"))
+        {
+            return Ok(ValidationResult::Warning(
+                "Forge mod file does not contain mcmod.info or valid class files!",
+            ));
+        };
+
+        filter_out_packs(archive)?;
 
         Ok(ValidationResult::Pass)
     }

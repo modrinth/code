@@ -48,6 +48,10 @@ impl super::Validator for ModpackValidator {
             ));
         }
 
+        if pack.files.is_empty() && !archive.file_names().any(|x| x.starts_with("overrides/")) {
+            return Err(ValidationError::InvalidInput("Pack has no files!".into()));
+        }
+
         for file in &pack.files {
             if !file.hashes.contains_key(&PackFileHash::Sha1) {
                 return Err(ValidationError::InvalidInput(

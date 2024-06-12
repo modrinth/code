@@ -217,7 +217,7 @@ impl RedisPool {
         let mut cached_values = cached_values_raw
             .into_iter()
             .filter_map(|(key, val)| {
-                if Utc.timestamp(val.iat + ACTUAL_EXPIRY, 0) < current_time {
+                if Utc.timestamp_opt(val.iat + ACTUAL_EXPIRY, 0).unwrap() < current_time {
                     expired_values.insert(val.key.to_string(), val);
 
                     None
