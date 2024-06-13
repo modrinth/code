@@ -7,6 +7,7 @@ use crate::models::projects::{
     Dependency, FileType, Loader, ProjectId, Version, VersionId, VersionStatus, VersionType,
 };
 use crate::models::v2::projects::LegacyVersion;
+use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::v3::version_creation;
@@ -87,6 +88,7 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    moderation_queue: Data<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let payload = v2_reroute::alter_actix_multipart(
         payload,
@@ -233,6 +235,7 @@ pub async fn version_create(
         redis.clone(),
         file_host,
         session_queue,
+        moderation_queue,
     )
     .await?;
 

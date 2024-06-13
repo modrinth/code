@@ -211,7 +211,6 @@ pub struct EditVersion {
     pub game_versions: Option<Vec<String>>,
     pub loaders: Option<Vec<models::projects::Loader>>,
     pub featured: Option<bool>,
-    pub primary_file: Option<(String, String)>,
     pub downloads: Option<u32>,
     pub status: Option<VersionStatus>,
     pub file_types: Option<Vec<EditVersionFileType>>,
@@ -278,7 +277,6 @@ pub async fn version_edit(
         dependencies: new_version.dependencies,
         loaders,
         featured: new_version.featured,
-        primary_file: new_version.primary_file,
         downloads: new_version.downloads,
         status: new_version.status,
         file_types: new_version.file_types.map(|v| {

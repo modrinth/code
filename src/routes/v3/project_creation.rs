@@ -538,6 +538,11 @@ async fn project_create_inner(
             let version_data = project_create_data.initial_versions.get(index).unwrap();
             // TODO: maybe redundant is this calculation done elsewhere?
 
+            let existing_file_names = created_version
+                .files
+                .iter()
+                .map(|x| x.filename.clone())
+                .collect();
             // Upload the new jar file
             super::version_creation::upload_file(
                 &mut field,
@@ -555,6 +560,7 @@ async fn project_create_inner(
                 version_data.primary_file.is_some(),
                 version_data.primary_file.as_deref() == Some(name),
                 None,
+                existing_file_names,
                 transaction,
                 redis,
             )

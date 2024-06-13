@@ -12,12 +12,13 @@ use crate::models::images::{Image, ImageContext, ImageId};
 use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::pats::Scopes;
-use crate::models::projects::{skip_nulls, DependencyType};
+use crate::models::projects::{skip_nulls, DependencyType, ProjectStatus};
 use crate::models::projects::{
     Dependency, FileType, Loader, ProjectId, Version, VersionFile, VersionId, VersionStatus,
     VersionType,
 };
 use crate::models::teams::ProjectPermissions;
+use crate::queue::moderation::AutomatedModerationQueue;
 use crate::queue::session::AuthQueue;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -102,6 +103,7 @@ pub async fn version_create(
     redis: Data<RedisPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
     session_queue: Data<AuthQueue>,
+    moderation_queue: web::Data<AutomatedModerationQueue>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -115,6 +117,7 @@ pub async fn version_create(
         &mut uploaded_files,
         &client,
         &session_queue,
+        &moderation_queue,
     )
     .await;
 
@@ -144,6 +147,7 @@ async fn version_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
     session_queue: &AuthQueue,
+    moderation_queue: &AutomatedModerationQueue,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenvy::var("CDN_URL")?;
 
@@ -333,6 +337,8 @@ async fn version_create_inner(
                 .clone()
                 .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
 
+            let existing_file_names = version.files.iter().map(|x| x.filename.clone()).collect();
+
             upload_file(
                 &mut field,
                 file_host,
@@ -349,6 +355,7 @@ async fn version_create_inner(
                 version_data.primary_file.is_some(),
                 version_data.primary_file.as_deref() == Some(name),
                 version_data.file_types.get(name).copied().flatten(),
+                existing_file_names,
                 transaction,
                 redis,
             )
@@ -497,6 +504,19 @@ async fn version_create_inner(
     }
 
     models::Project::clear_cache(project_id, None, Some(true), redis).await?;
+
+    let project_status = sqlx::query!(
+        "SELECT status FROM mods WHERE id = $1",
+        project_id as models::ProjectId,
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    if let Some(project_status) = project_status {
+        if project_status.status == ProjectStatus::Processing.as_str() {
+            moderation_queue.projects.insert(project_id.into());
+        }
+    }
 
     Ok(HttpResponse::Ok().json(response))
 }
@@ -706,6 +726,7 @@ async fn upload_file_to_version_inner(
                 true,
                 false,
                 file_data.file_types.get(name).copied().flatten(),
+                version.files.iter().map(|x| x.filename.clone()).collect(),
                 transaction,
                 &redis,
             )
@@ -759,10 +780,17 @@ pub async fn upload_file(
     ignore_primary: bool,
     force_primary: bool,
     file_type: Option<FileType>,
+    other_file_names: Vec<String>,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     redis: &RedisPool,
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
+
+    if other_file_names.contains(&format!("{}.{}", file_name, file_extension)) {
+        return Err(CreateError::InvalidInput(
+            "Duplicate files are not allowed to be uploaded to Modrinth!".to_string(),
+        ));
+    }
 
     if file_name.contains('/') {
         return Err(CreateError::InvalidInput(

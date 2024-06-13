@@ -198,7 +198,6 @@ pub struct EditVersion {
     pub dependencies: Option<Vec<Dependency>>,
     pub loaders: Option<Vec<Loader>>,
     pub featured: Option<bool>,
-    pub primary_file: Option<(String, String)>,
     pub downloads: Option<u32>,
     pub status: Option<VersionStatus>,
     pub file_types: Option<Vec<EditVersionFileType>>,
@@ -485,48 +484,6 @@ pub async fn version_edit_helper(
                     ",
                     featured,
                     id as database::models::ids::VersionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(primary_file) = &new_version.primary_file {
-                let result = sqlx::query!(
-                    "
-                    SELECT f.id id FROM hashes h
-                    INNER JOIN files f ON h.file_id = f.id
-                    WHERE h.algorithm = $2 AND h.hash = $1
-                    ",
-                    primary_file.1.as_bytes(),
-                    primary_file.0
-                )
-                .fetch_optional(&**pool)
-                .await?
-                .ok_or_else(|| {
-                    ApiError::InvalidInput(format!(
-                        "Specified file with hash {} does not exist.",
-                        primary_file.1.clone()
-                    ))
-                })?;
-
-                sqlx::query!(
-                    "
-                    UPDATE files
-                    SET is_primary = FALSE
-                    WHERE (version_id = $1)
-                    ",
-                    id as database::models::ids::VersionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-
-                sqlx::query!(
-                    "
-                    UPDATE files
-                    SET is_primary = TRUE
-                    WHERE (id = $1)
-                    ",
-                    result.id,
                 )
                 .execute(&mut *transaction)
                 .await?;

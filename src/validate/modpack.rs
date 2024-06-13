@@ -88,7 +88,11 @@ impl super::Validator for ModpackValidator {
                     (x.ends_with("jar") || x.ends_with("zip"))
                         && (x.starts_with("overrides/mods")
                             || x.starts_with("client-overrides/mods")
-                            || x.starts_with("server-overrides/mods"))
+                            || x.starts_with("server-overrides/mods")
+                            || x.starts_with("overrides/resourcepacks")
+                            || x.starts_with("server-overrides/resourcepacks")
+                            || x.starts_with("overrides/shaderpacks")
+                            || x.starts_with("client-overrides/shaderpacks"))
                 })
                 .flat_map(|x| x.rsplit('/').next().map(|x| x.to_string()))
                 .collect::<Vec<String>>(),
