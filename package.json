@@ -46,7 +46,7 @@
     "iso-3166-1": "^2.1.1",
     "js-yaml": "^4.1.0",
     "jszip": "^3.10.1",
-    "markdown-it": "^13.0.1",
+    "markdown-it": "13.0.1",
     "omorphia": "^0.7.3",
     "qrcode.vue": "^3.4.0",
     "semver": "^7.5.4",
@@ -54,7 +54,7 @@
     "vue3-apexcharts": "^1.5.2",
     "xss": "^1.0.14"
   },
-  "packageManager": "pnpm@8.6.1",
+  "packageManager": "pnpm@9.3.0",
   "pnpm": {
     "patchedDependencies": {
       "markdown-it@13.0.1": "patches/markdown-it@13.0.1.patch"
