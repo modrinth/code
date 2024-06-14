@@ -371,10 +371,6 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  routeRules: {
-    '/': { prerender: true },
-    '/app': { prerender: true },
-  },
 })
 
 function getApiUrl() {

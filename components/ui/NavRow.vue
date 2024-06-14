@@ -23,85 +23,71 @@
   </nav>
 </template>
 
-<script>
-export default {
-  props: {
-    links: {
-      default: () => [],
-      type: Array,
-    },
-    query: {
-      default: null,
-      type: String,
-    },
-  },
-  data() {
-    return {
-      sliderPositionX: 0,
-      sliderPositionY: 18,
-      selectedElementWidth: 0,
-      activeIndex: -1,
-      oldIndex: -1,
-    }
-  },
-  computed: {
-    filteredLinks() {
-      return this.links.filter((x) => (x.shown === undefined ? true : x.shown))
-    },
-    positionToMoveX() {
-      return `${this.sliderPositionX}px`
-    },
-    positionToMoveY() {
-      return `${this.sliderPositionY}px`
-    },
-    sliderWidth() {
-      return `${this.selectedElementWidth}px`
-    },
-  },
-  watch: {
-    '$route.path': {
-      handler() {
-        this.pickLink()
-      },
-    },
-    '$route.query': {
-      handler() {
-        if (this.query) this.pickLink()
-      },
-    },
-  },
-  mounted() {
-    window.addEventListener('resize', this.pickLink)
-    this.pickLink()
-  },
-  unmounted() {
-    window.removeEventListener('resize', this.pickLink)
-  },
-  methods: {
-    pickLink() {
-      this.activeIndex = this.query
-        ? this.filteredLinks.findIndex(
-            (x) => (x.href === '' ? undefined : x.href) === this.$route.path[this.query]
-          )
-        : this.filteredLinks.findIndex((x) => x.href === decodeURIComponent(this.$route.path))
+<script setup>
+const route = useNativeRoute()
 
-      if (this.activeIndex !== -1) {
-        this.startAnimation()
-      } else {
-        this.oldIndex = -1
-        this.sliderPositionX = 0
-        this.selectedElementWidth = 0
-      }
-    },
-    startAnimation() {
-      const el = this.$refs.linkElements[this.activeIndex].$el
-
-      this.sliderPositionX = el.offsetLeft
-      this.sliderPositionY = el.offsetTop + el.offsetHeight
-      this.selectedElementWidth = el.offsetWidth
-    },
+const props = defineProps({
+  links: {
+    default: () => [],
+    type: Array,
   },
+  query: {
+    default: null,
+    type: String,
+  },
+})
+
+const sliderPositionX = ref(0)
+const sliderPositionY = ref(18)
+const selectedElementWidth = ref(0)
+const activeIndex = ref(-1)
+const oldIndex = ref(-1)
+
+const filteredLinks = computed(() =>
+  props.links.filter((x) => (x.shown === undefined ? true : x.shown))
+)
+const positionToMoveX = computed(() => `${sliderPositionX.value}px`)
+const positionToMoveY = computed(() => `${sliderPositionY.value}px`)
+const sliderWidth = computed(() => `${selectedElementWidth.value}px`)
+
+function pickLink() {
+  console.log('link is picking')
+
+  activeIndex.value = props.query
+    ? filteredLinks.value.findIndex(
+        (x) => (x.href === '' ? undefined : x.href) === route.path[props.query]
+      )
+    : filteredLinks.value.findIndex((x) => x.href === decodeURIComponent(route.path))
+
+  if (activeIndex.value !== -1) {
+    startAnimation()
+  } else {
+    oldIndex.value = -1
+    sliderPositionX.value = 0
+    selectedElementWidth.value = 0
+  }
 }
+
+const linkElements = ref()
+
+function startAnimation() {
+  const el = linkElements.value[activeIndex.value].$el
+
+  sliderPositionX.value = el.offsetLeft
+  sliderPositionY.value = el.offsetTop + el.offsetHeight
+  selectedElementWidth.value = el.offsetWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', pickLink)
+  pickLink()
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', pickLink)
+})
+
+watch(route, () => pickLink())
 </script>
 
 <style lang="scss" scoped>
