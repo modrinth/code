@@ -189,7 +189,7 @@ const $categories = computed(() => {
   }
 
   for (const categoryKey of [...categories.keys()]) {
-    if (categories.get(categoryKey)?.length === 0 ?? false) {
+    if (categories.get(categoryKey)?.length === 0) {
       categories.delete(categoryKey)
     }
   }
