@@ -8,6 +8,9 @@ patchedDependencies:
   markdown-it@13.0.1:
     hash: 3vlxaukqep4gvqytxeznhg6wbq
     path: patches/markdown-it@13.0.1.patch
+  readable-stream@2.3.8:
+    hash: h52dazg37p4h3yox67pw36akse
+    path: patches/readable-stream@2.3.8.patch
 
 importers:
 
@@ -9195,7 +9198,7 @@ snapshots:
     dependencies:
       lie: 3.3.0
       pako: 1.0.11
-      readable-stream: 2.3.8
+      readable-stream: 2.3.8(patch_hash=h52dazg37p4h3yox67pw36akse)
       setimmediate: 1.0.5
 
   keyv@4.5.4:
@@ -9217,7 +9220,7 @@ snapshots:
 
   lazystream@1.0.1:
     dependencies:
-      readable-stream: 2.3.8
+      readable-stream: 2.3.8(patch_hash=h52dazg37p4h3yox67pw36akse)
 
   levn@0.4.1:
     dependencies:
@@ -10255,7 +10258,7 @@ snapshots:
       parse-json: 5.2.0
       type-fest: 0.6.0
 
-  readable-stream@2.3.8:
+  readable-stream@2.3.8(patch_hash=h52dazg37p4h3yox67pw36akse):
     dependencies:
       core-util-is: 1.0.3
       inherits: 2.0.4

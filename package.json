@@ -57,7 +57,8 @@
   "packageManager": "pnpm@9.3.0",
   "pnpm": {
     "patchedDependencies": {
-      "markdown-it@13.0.1": "patches/markdown-it@13.0.1.patch"
+      "markdown-it@13.0.1": "patches/markdown-it@13.0.1.patch",
+      "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
     }
   }
 }
