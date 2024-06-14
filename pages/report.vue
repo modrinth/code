@@ -96,7 +96,7 @@ import { Card, Button, MarkdownEditor, DropdownSelect, SaveIcon } from 'omorphia
 import { useImageUpload } from '~/composables/image-upload.ts'
 
 const tags = useTags()
-const route = useRoute()
+const route = useNativeRoute()
 
 const accessQuery = (id: string): string => {
   return route.query?.[id]?.toString() || ''

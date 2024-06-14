@@ -428,21 +428,21 @@ import {
   Button,
   ReportIcon,
 } from 'omorphia'
-import HamburgerIcon from '~/assets/images/utils/hamburger.svg'
-import CrossIcon from '~/assets/images/utils/x.svg'
-import SearchIcon from '~/assets/images/utils/search.svg'
+import HamburgerIcon from '~/assets/images/utils/hamburger.svg?component'
+import CrossIcon from '~/assets/images/utils/x.svg?component'
+import SearchIcon from '~/assets/images/utils/search.svg?component'
 
-import NotificationIcon from '~/assets/images/sidebar/notifications.svg'
-import SettingsIcon from '~/assets/images/sidebar/settings.svg'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg'
-import HomeIcon from '~/assets/images/sidebar/home.svg'
+import NotificationIcon from '~/assets/images/sidebar/notifications.svg?component'
+import SettingsIcon from '~/assets/images/sidebar/settings.svg?component'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
+import HomeIcon from '~/assets/images/sidebar/home.svg?component'
 
-import MoonIcon from '~/assets/images/utils/moon.svg'
-import SunIcon from '~/assets/images/utils/sun.svg'
-import PlusIcon from '~/assets/images/utils/plus.svg'
-import DropdownIcon from '~/assets/images/utils/dropdown.svg'
-import LogOutIcon from '~/assets/images/utils/log-out.svg'
-import ChartIcon from '~/assets/images/utils/chart.svg'
+import MoonIcon from '~/assets/images/utils/moon.svg?component'
+import SunIcon from '~/assets/images/utils/sun.svg?component'
+import PlusIcon from '~/assets/images/utils/plus.svg?component'
+import DropdownIcon from '~/assets/images/utils/dropdown.svg?component'
+import LogOutIcon from '~/assets/images/utils/log-out.svg?component'
+import ChartIcon from '~/assets/images/utils/chart.svg?component'
 
 import NavRow from '~/components/ui/NavRow.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
@@ -460,7 +460,7 @@ const flags = useFeatureFlags()
 const tags = useTags()
 
 const config = useRuntimeConfig()
-const route = useRoute()
+const route = useNativeRoute()
 const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
 
 const verifyEmailBannerMessages = defineMessages({

@@ -351,21 +351,21 @@ import SearchFilter from '~/components/ui/search/SearchFilter.vue'
 import Checkbox from '~/components/ui/Checkbox.vue'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 
-import ClientIcon from '~/assets/images/categories/client.svg'
-import ServerIcon from '~/assets/images/categories/server.svg'
+import ClientIcon from '~/assets/images/categories/client.svg?component'
+import ServerIcon from '~/assets/images/categories/server.svg?component'
 
-import SearchIcon from '~/assets/images/utils/search.svg'
-import ClearIcon from '~/assets/images/utils/clear.svg'
-import FilterIcon from '~/assets/images/utils/filter.svg'
-import GridIcon from '~/assets/images/utils/grid.svg'
-import ListIcon from '~/assets/images/utils/list.svg'
-import ImageIcon from '~/assets/images/utils/image.svg'
+import SearchIcon from '~/assets/images/utils/search.svg?component'
+import ClearIcon from '~/assets/images/utils/clear.svg?component'
+import FilterIcon from '~/assets/images/utils/filter.svg?component'
+import GridIcon from '~/assets/images/utils/grid.svg?component'
+import ListIcon from '~/assets/images/utils/list.svg?component'
+import ImageIcon from '~/assets/images/utils/image.svg?component'
 
 const sidebarMenuOpen = ref(false)
 const showAllLoaders = ref(false)
 
 const data = useNuxtApp()
-const route = useRoute()
+const route = useNativeRoute()
 
 const cosmetics = useCosmetics()
 const tags = useTags()

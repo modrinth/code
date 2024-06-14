@@ -114,8 +114,8 @@
 
 <script>
 import Checkbox from '~/components/ui/Checkbox.vue'
-import StarIcon from '~/assets/images/utils/star.svg'
-import SaveIcon from '~/assets/images/utils/save.svg'
+import StarIcon from '~/assets/images/utils/star.svg?component'
+import SaveIcon from '~/assets/images/utils/save.svg?component'
 
 export default defineNuxtComponent({
   components: {

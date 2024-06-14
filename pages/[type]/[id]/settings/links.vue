@@ -123,7 +123,7 @@
 
 <script setup>
 import { DropdownSelect } from 'omorphia'
-import SaveIcon from '~/assets/images/utils/save.svg'
+import SaveIcon from '~/assets/images/utils/save.svg?component'
 
 const tags = useTags()
 

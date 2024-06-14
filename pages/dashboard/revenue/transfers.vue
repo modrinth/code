@@ -104,8 +104,8 @@ import {
   capitalizeString,
 } from 'omorphia'
 import dayjs from 'dayjs'
-import TremendousIcon from '~/assets/images/external/tremendous.svg'
-import VenmoIcon from '~/assets/images/external/venmo-small.svg'
+import TremendousIcon from '~/assets/images/external/tremendous.svg?component'
+import VenmoIcon from '~/assets/images/external/venmo-small.svg?component'
 
 const vintl = useVIntl()
 const { formatMessage } = vintl

@@ -631,23 +631,23 @@ import Chips from '~/components/ui/Chips.vue'
 import Checkbox from '~/components/ui/Checkbox.vue'
 import FileInput from '~/components/ui/FileInput.vue'
 
-import FileIcon from '~/assets/images/utils/file.svg'
-import TrashIcon from '~/assets/images/utils/trash.svg'
-import EditIcon from '~/assets/images/utils/edit.svg'
-import DownloadIcon from '~/assets/images/utils/download.svg'
-import StarIcon from '~/assets/images/utils/star.svg'
-import ReportIcon from '~/assets/images/utils/report.svg'
-import SaveIcon from '~/assets/images/utils/save.svg'
-import CrossIcon from '~/assets/images/utils/x.svg'
-import HashIcon from '~/assets/images/utils/hash.svg'
-import PlusIcon from '~/assets/images/utils/plus.svg'
-import TransferIcon from '~/assets/images/utils/transfer.svg'
-import UploadIcon from '~/assets/images/utils/upload.svg'
-import BackIcon from '~/assets/images/utils/left-arrow.svg'
-import BoxIcon from '~/assets/images/utils/box.svg'
-import RightArrowIcon from '~/assets/images/utils/right-arrow.svg'
+import FileIcon from '~/assets/images/utils/file.svg?component'
+import TrashIcon from '~/assets/images/utils/trash.svg?component'
+import EditIcon from '~/assets/images/utils/edit.svg?component'
+import DownloadIcon from '~/assets/images/utils/download.svg?component'
+import StarIcon from '~/assets/images/utils/star.svg?component'
+import ReportIcon from '~/assets/images/utils/report.svg?component'
+import SaveIcon from '~/assets/images/utils/save.svg?component'
+import CrossIcon from '~/assets/images/utils/x.svg?component'
+import HashIcon from '~/assets/images/utils/hash.svg?component'
+import PlusIcon from '~/assets/images/utils/plus.svg?component'
+import TransferIcon from '~/assets/images/utils/transfer.svg?component'
+import UploadIcon from '~/assets/images/utils/upload.svg?component'
+import BackIcon from '~/assets/images/utils/left-arrow.svg?component'
+import BoxIcon from '~/assets/images/utils/box.svg?component'
+import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?component'
 import Modal from '~/components/ui/Modal.vue'
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
+import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
 
 export default defineNuxtComponent({
   components: {
@@ -725,7 +725,7 @@ export default defineNuxtComponent({
   },
   async setup(props) {
     const data = useNuxtApp()
-    const route = useRoute()
+    const route = useNativeRoute()
 
     const auth = await useAuth()
     const tags = useTags()

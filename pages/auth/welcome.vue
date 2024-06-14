@@ -72,7 +72,7 @@ useHead({
 const subscribe = ref(true)
 
 async function continueSignUp() {
-  const route = useRoute()
+  const route = useNativeRoute()
 
   await useAuth(route.query.authToken)
   await useUser()

@@ -157,7 +157,7 @@ if (auth.value.user) {
   await navigateTo('/dashboard')
 }
 
-const route = useRoute()
+const route = useNativeRoute()
 
 const step = ref('choose_method')
 

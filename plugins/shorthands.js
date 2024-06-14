@@ -1,10 +1,12 @@
 import { getProjectTypeForUrlShorthand } from '~/helpers/projects.js'
 
 export default defineNuxtPlugin((nuxtApp) => {
+  const tagStore = useTags()
+
   nuxtApp.provide('formatNumber', formatNumber)
   nuxtApp.provide('capitalizeString', capitalizeString)
   nuxtApp.provide('formatMoney', formatMoney)
-  nuxtApp.provide('formatVersion', (versionsArray) => formatVersions(versionsArray))
+  nuxtApp.provide('formatVersion', (versionsArray) => formatVersions(tagStore, versionsArray))
   nuxtApp.provide('orElse', (first, otherwise) => first ?? otherwise)
   nuxtApp.provide('external', () => {
     const cosmeticsStore = useCosmetics().value
@@ -76,8 +78,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       .sort((a, b) => nuxtApp.$dayjs(b.date_published) - nuxtApp.$dayjs(a.date_published))
   })
   nuxtApp.provide('getProjectTypeForDisplay', (type, categories) => {
-    const tagStore = useTags()
-
     if (type === 'mod') {
       const isPlugin = categories.some((category) => {
         return tagStore.value.loaderData.allPluginLoaders.includes(category)
@@ -111,8 +111,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   )
   nuxtApp.provide('cycleValue', cycleValue)
   nuxtApp.provide('sortedCategories', () => {
-    const tagStore = useTags()
-
     return tagStore.value.categories.slice().sort((a, b) => {
       const headerCompare = a.header.localeCompare(b.header)
       if (headerCompare !== 0) {
@@ -252,8 +250,7 @@ export const formatProjectStatus = (name) => {
   return capitalizeString(name)
 }
 
-export const formatVersions = (versionArray) => {
-  const tag = useTags()
+export const formatVersions = (tag, versionArray) => {
   const allVersions = tag.value.gameVersions.slice().reverse()
   const allReleases = allVersions.filter((x) => x.version_type === 'release')
 

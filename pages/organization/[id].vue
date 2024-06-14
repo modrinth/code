@@ -235,12 +235,12 @@ import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavRow from '~/components/ui/NavRow.vue'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
-import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
+import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 
-import OrganizationIcon from '~/assets/images/utils/organization.svg'
-import DownloadIcon from '~/assets/images/utils/download.svg'
-import CrownIcon from '~/assets/images/utils/crown.svg'
+import OrganizationIcon from '~/assets/images/utils/organization.svg?component'
+import DownloadIcon from '~/assets/images/utils/download.svg?component'
+import CrownIcon from '~/assets/images/utils/crown.svg?component'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 
 const vintl = useVIntl()
@@ -251,7 +251,7 @@ const formatCompactNumber = useCompactNumber()
 const auth = await useAuth()
 const user = await useUser()
 const cosmetics = useCosmetics()
-const route = useRoute()
+const route = useNativeRoute()
 const tags = useTags()
 
 let orgId = useRouteId()

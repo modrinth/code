@@ -521,12 +521,12 @@ import { Multiselect } from 'vue-multiselect'
 import { Avatar, Badge, Card, Checkbox, TransferIcon, CheckIcon, UsersIcon } from 'omorphia'
 
 import ModalConfirm from '~/components/ui/ModalConfirm.vue'
-import DropdownIcon from '~/assets/images/utils/dropdown.svg'
-import SaveIcon from '~/assets/images/utils/save.svg'
-import UserPlusIcon from '~/assets/images/utils/user-plus.svg'
-import UserRemoveIcon from '~/assets/images/utils/user-x.svg'
-import OrganizationIcon from '~/assets/images/utils/organization.svg'
-import CrownIcon from '~/assets/images/utils/crown.svg'
+import DropdownIcon from '~/assets/images/utils/dropdown.svg?component'
+import SaveIcon from '~/assets/images/utils/save.svg?component'
+import UserPlusIcon from '~/assets/images/utils/user-plus.svg?component'
+import UserRemoveIcon from '~/assets/images/utils/user-x.svg?component'
+import OrganizationIcon from '~/assets/images/utils/organization.svg?component'
+import CrownIcon from '~/assets/images/utils/crown.svg?component'
 
 import { removeSelfFromTeam } from '~/helpers/teams.js'
 

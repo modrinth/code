@@ -54,7 +54,7 @@ import {
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 
-const route = useRoute()
+const route = useNativeRoute()
 </script>
 
 <style lang="scss" scoped>

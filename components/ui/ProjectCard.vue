@@ -94,10 +94,10 @@ import Categories from '~/components/ui/search/Categories.vue'
 import Badge from '~/components/ui/Badge.vue'
 import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator.vue'
 
-import CalendarIcon from '~/assets/images/utils/calendar.svg'
-import EditIcon from '~/assets/images/utils/updated.svg'
-import DownloadIcon from '~/assets/images/utils/download.svg'
-import HeartIcon from '~/assets/images/utils/heart.svg'
+import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
+import EditIcon from '~/assets/images/utils/updated.svg?component'
+import DownloadIcon from '~/assets/images/utils/download.svg?component'
+import HeartIcon from '~/assets/images/utils/heart.svg?component'
 import Avatar from '~/components/ui/Avatar.vue'
 
 export default {

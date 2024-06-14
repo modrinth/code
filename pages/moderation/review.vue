@@ -103,12 +103,12 @@
 <script setup>
 import Chips from '~/components/ui/Chips.vue'
 import Avatar from '~/components/ui/Avatar.vue'
-import UnknownIcon from '~/assets/images/utils/unknown.svg'
-import EyeIcon from '~/assets/images/utils/eye.svg'
-import SortAscIcon from '~/assets/images/utils/sort-asc.svg'
-import SortDescIcon from '~/assets/images/utils/sort-desc.svg'
-import WarningIcon from '~/assets/images/utils/issues.svg'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg'
+import UnknownIcon from '~/assets/images/utils/unknown.svg?component'
+import EyeIcon from '~/assets/images/utils/eye.svg?component'
+import SortAscIcon from '~/assets/images/utils/sort-asc.svg?component'
+import SortDescIcon from '~/assets/images/utils/sort-desc.svg?component'
+import WarningIcon from '~/assets/images/utils/issues.svg?component'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
 import Badge from '~/components/ui/Badge.vue'
 import { formatProjectType } from '~/plugins/shorthands.js'
 

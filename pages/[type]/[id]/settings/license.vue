@@ -102,7 +102,7 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import Checkbox from '~/components/ui/Checkbox'
-import SaveIcon from '~/assets/images/utils/save.svg'
+import SaveIcon from '~/assets/images/utils/save.svg?component'
 
 export default defineNuxtComponent({
   components: {

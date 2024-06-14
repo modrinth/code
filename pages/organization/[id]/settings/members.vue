@@ -231,7 +231,7 @@ import {
   Button,
 } from 'omorphia'
 import { ref } from 'vue'
-import CrownIcon from '~/assets/images/utils/crown.svg'
+import CrownIcon from '~/assets/images/utils/crown.svg?component'
 
 import { removeTeamMember } from '~/helpers/teams.js'
 import { isPermission } from '~/utils/permissions.ts'

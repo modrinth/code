@@ -480,7 +480,7 @@ const messages = defineMessages({
 })
 
 const data = useNuxtApp()
-const route = useRoute()
+const route = useNativeRoute()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
 const tags = useTags()

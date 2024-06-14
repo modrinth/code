@@ -8,7 +8,7 @@
 <script setup>
 import ReportView from '~/components/ui/report/ReportView.vue'
 
-const route = useRoute()
+const route = useNativeRoute()
 const auth = await useAuth()
 
 useHead({

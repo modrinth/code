@@ -36,7 +36,7 @@
 <script>
 import { MarkdownEditor } from 'omorphia'
 import Chips from '~/components/ui/Chips.vue'
-import SaveIcon from '~/assets/images/utils/save.svg'
+import SaveIcon from '~/assets/images/utils/save.svg?component'
 import { renderHighlightedString } from '~/helpers/highlight.js'
 import { useImageUpload } from '~/composables/image-upload.ts'
 

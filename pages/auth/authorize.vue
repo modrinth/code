@@ -118,7 +118,7 @@ const messages = defineMessages({
 
 const data = useNuxtApp()
 
-const router = useRoute()
+const router = useNativeRoute()
 const auth = await useAuth()
 const { scopesToDefinitions } = useScopes()
 

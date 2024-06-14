@@ -196,7 +196,7 @@ import {
   Breadcrumbs,
 } from 'omorphia'
 import { all } from 'iso-3166-1'
-import VenmoIcon from '~/assets/images/external/venmo.svg'
+import VenmoIcon from '~/assets/images/external/venmo.svg?component'
 
 const auth = await useAuth()
 const data = useNuxtApp()

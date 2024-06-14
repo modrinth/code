@@ -94,7 +94,7 @@ export const initAuth = async (oldToken = null) => {
 
 export const getAuthUrl = (provider, redirect = '') => {
   const config = useRuntimeConfig()
-  const route = useRoute()
+  const route = useNativeRoute()
 
   if (redirect === '') {
     redirect = route.path

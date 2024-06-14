@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg'
+import CheckIcon from '~/assets/images/utils/check.svg?component'
 
 export default {
   components: {

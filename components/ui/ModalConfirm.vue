@@ -35,8 +35,8 @@
 
 <script>
 import { renderString } from 'omorphia'
-import CrossIcon from '~/assets/images/utils/x.svg'
-import TrashIcon from '~/assets/images/utils/trash.svg'
+import CrossIcon from '~/assets/images/utils/x.svg?component'
+import TrashIcon from '~/assets/images/utils/trash.svg?component'
 import Modal from '~/components/ui/Modal.vue'
 
 export default {

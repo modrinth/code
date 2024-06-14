@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg'
-import ClipboardCopyIcon from '~/assets/images/utils/clipboard-copy.svg'
+import CheckIcon from '~/assets/images/utils/check.svg?component'
+import ClipboardCopyIcon from '~/assets/images/utils/clipboard-copy.svg?component'
 
 export default {
   components: {

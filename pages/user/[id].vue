@@ -285,18 +285,18 @@ import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Badge from '~/components/ui/Badge.vue'
 import { reportUser } from '~/utils/report-helpers.ts'
 
-import ReportIcon from '~/assets/images/utils/report.svg'
-import SunriseIcon from '~/assets/images/utils/sunrise.svg'
-import DownloadIcon from '~/assets/images/utils/download.svg'
-import SettingsIcon from '~/assets/images/utils/settings.svg'
-import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
-import UserIcon from '~/assets/images/utils/user.svg'
-import EditIcon from '~/assets/images/utils/edit.svg'
-import HeartIcon from '~/assets/images/utils/heart.svg'
-import GridIcon from '~/assets/images/utils/grid.svg'
-import ListIcon from '~/assets/images/utils/list.svg'
-import ImageIcon from '~/assets/images/utils/image.svg'
-import WorldIcon from '~/assets/images/utils/world.svg'
+import ReportIcon from '~/assets/images/utils/report.svg?component'
+import SunriseIcon from '~/assets/images/utils/sunrise.svg?component'
+import DownloadIcon from '~/assets/images/utils/download.svg?component'
+import SettingsIcon from '~/assets/images/utils/settings.svg?component'
+import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
+import UserIcon from '~/assets/images/utils/user.svg?component'
+import EditIcon from '~/assets/images/utils/edit.svg?component'
+import HeartIcon from '~/assets/images/utils/heart.svg?component'
+import GridIcon from '~/assets/images/utils/grid.svg?component'
+import ListIcon from '~/assets/images/utils/list.svg?component'
+import ImageIcon from '~/assets/images/utils/image.svg?component'
+import WorldIcon from '~/assets/images/utils/world.svg?component'
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import NavRow from '~/components/ui/NavRow.vue'
 import CopyCode from '~/components/ui/CopyCode.vue'
@@ -304,7 +304,7 @@ import Avatar from '~/components/ui/Avatar.vue'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 
 const data = useNuxtApp()
-const route = useRoute()
+const route = useNativeRoute()
 const auth = await useAuth()
 const cosmetics = useCosmetics()
 const tags = useTags()

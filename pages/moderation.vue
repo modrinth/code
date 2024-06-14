@@ -25,9 +25,9 @@
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 
-import ModrinthIcon from '~/assets/images/utils/modrinth.svg'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg'
-import ReportIcon from '~/assets/images/utils/report.svg'
+import ModrinthIcon from '~/assets/images/utils/modrinth.svg?component'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
+import ReportIcon from '~/assets/images/utils/report.svg?component'
 
 definePageMeta({
   middleware: 'auth',

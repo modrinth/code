@@ -108,14 +108,14 @@
 <script setup>
 import { formatProjectType } from '~/plugins/shorthands.js'
 
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
-import DropdownIcon from '~/assets/images/utils/dropdown.svg'
-import CheckIcon from '~/assets/images/utils/check.svg'
-import CrossIcon from '~/assets/images/utils/x.svg'
-import RequiredIcon from '~/assets/images/utils/asterisk.svg'
-import SuggestionIcon from '~/assets/images/utils/lightbulb.svg'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg'
-import SendIcon from '~/assets/images/utils/send.svg'
+import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
+import DropdownIcon from '~/assets/images/utils/dropdown.svg?component'
+import CheckIcon from '~/assets/images/utils/check.svg?component'
+import CrossIcon from '~/assets/images/utils/x.svg?component'
+import RequiredIcon from '~/assets/images/utils/asterisk.svg?component'
+import SuggestionIcon from '~/assets/images/utils/lightbulb.svg?component'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
+import SendIcon from '~/assets/images/utils/send.svg?component'
 import { acceptTeamInvite, removeTeamMember } from '~/helpers/teams.js'
 
 const props = defineProps({

@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
+import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
 
 export default {
   components: {

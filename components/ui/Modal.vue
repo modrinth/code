@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import CrossIcon from '~/assets/images/utils/x.svg'
+import CrossIcon from '~/assets/images/utils/x.svg?component'
 
 export default {
   components: {

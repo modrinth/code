@@ -46,12 +46,12 @@ import { LibraryIcon, ChartIcon } from 'omorphia'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 
-import DashboardIcon from '~/assets/images/utils/dashboard.svg'
-import CurrencyIcon from '~/assets/images/utils/currency.svg'
-import ListIcon from '~/assets/images/utils/list.svg'
-import ReportIcon from '~/assets/images/utils/report.svg'
-import NotificationsIcon from '~/assets/images/utils/bell.svg'
-import OrganizationIcon from '~/assets/images/utils/organization.svg'
+import DashboardIcon from '~/assets/images/utils/dashboard.svg?component'
+import CurrencyIcon from '~/assets/images/utils/currency.svg?component'
+import ListIcon from '~/assets/images/utils/list.svg?component'
+import ReportIcon from '~/assets/images/utils/report.svg?component'
+import NotificationsIcon from '~/assets/images/utils/bell.svg?component'
+import OrganizationIcon from '~/assets/images/utils/organization.svg?component'
 
 const { formatMessage } = useVIntl()
 
@@ -59,5 +59,5 @@ definePageMeta({
   middleware: 'auth',
 })
 
-const route = useRoute()
+const route = useNativeRoute()
 </script>

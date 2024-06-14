@@ -201,7 +201,7 @@ useHead({
 })
 
 const auth = await useAuth()
-const route = useRoute()
+const route = useNativeRoute()
 
 const redirectTarget = route.query.redirect
 

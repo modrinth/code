@@ -1,4 +1,4 @@
-import { CookieOptions } from '#app'
+import type { CookieOptions } from '#app'
 
 export type ProjectDisplayMode = 'list' | 'grid' | 'gallery'
 export type DarkColorTheme = 'dark' | 'oled' | 'retro'
@@ -58,13 +58,13 @@ export type AllFeatureFlags = {
 
 export type PartialFeatureFlags = Partial<AllFeatureFlags>
 
-const COOKIE_OPTIONS: CookieOptions<PartialFeatureFlags> = {
+const COOKIE_OPTIONS = {
   maxAge: 60 * 60 * 24 * 365 * 10,
   sameSite: 'lax',
   secure: true,
   httpOnly: false,
   path: '/',
-}
+} satisfies CookieOptions<PartialFeatureFlags>
 
 export const useFeatureFlags = () =>
   useState<AllFeatureFlags>('featureFlags', () => {

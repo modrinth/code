@@ -121,7 +121,7 @@ useHead({
 const auth = await useAuth()
 
 const success = ref(false)
-const route = useRoute()
+const route = useNativeRoute()
 
 if (route.query.flow) {
   try {

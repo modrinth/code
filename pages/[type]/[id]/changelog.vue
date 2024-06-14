@@ -67,7 +67,7 @@
   </div>
 </template>
 <script setup>
-import DownloadIcon from '~/assets/images/utils/download.svg'
+import DownloadIcon from '~/assets/images/utils/download.svg?component'
 import { renderHighlightedString } from '~/helpers/highlight.js'
 import VersionFilterControl from '~/components/ui/VersionFilterControl.vue'
 import Pagination from '~/components/ui/Pagination.vue'
@@ -103,7 +103,7 @@ useSeoMeta({
   ogDescription: description,
 })
 
-const route = useRoute()
+const route = useNativeRoute()
 const currentPage = ref(Number(route.query.p ?? 1))
 const filteredVersions = computed(() => {
   const selectedGameVersions = getArrayOrString(route.query.g) ?? []
@@ -127,7 +127,7 @@ function switchPage(page) {
   currentPage.value = page
 
   const router = useRouter()
-  const route = useRoute()
+  const route = useNativeRoute()
 
   router.replace({
     query: {

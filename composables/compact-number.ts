@@ -1,5 +1,5 @@
 import { createFormatter, type Formatter } from '@vintl/compact-number'
-import { IntlController } from '@vintl/vintl/controller'
+import type { IntlController } from '@vintl/vintl/controller'
 
 const formatters = new WeakMap<IntlController<any>, Formatter>()
 
