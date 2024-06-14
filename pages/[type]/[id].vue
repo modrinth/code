@@ -1264,7 +1264,8 @@ const members = computed(() => {
         )
       : x.is_owner
   )
-  const rest = acceptedMembers.filter((x) => x.user.id !== owner.user.id) || []
+
+  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || []
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
