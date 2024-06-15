@@ -305,6 +305,8 @@ export default defineNuxtConfig({
         // @ts-ignore
         globalThis.CF_PAGES_COMMIT_SHA ||
         'unknown',
+
+      turnstile: { siteKey: '0x4AAAAAAAW3guHM6Eunbgwu' },
     },
   },
   typescript: {
@@ -361,9 +363,6 @@ export default defineNuxtConfig({
         )
       }
     },
-  },
-  turnstile: {
-    siteKey: '0x4AAAAAAAW3guHM6Eunbgwu',
   },
   nitro: {
     moduleSideEffects: ['@vintl/compact-number/locale-data'],
