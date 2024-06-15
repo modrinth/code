@@ -574,6 +574,8 @@ const pageCount = computed(() =>
   results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1
 )
 
+const router = useNativeRouter()
+
 function onSearchChange(newPageNumber) {
   noLoad.value = true
 
@@ -586,7 +588,6 @@ function onSearchChange(newPageNumber) {
   refreshSearch()
 
   if (process.client) {
-    const router = useRouter()
     const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
     router.replace({ path: route.path, query: obj })
   }

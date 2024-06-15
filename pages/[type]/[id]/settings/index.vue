@@ -283,7 +283,7 @@ const props = defineProps({
 })
 
 const tags = useTags()
-const router = useRouter()
+const router = useNativeRouter()
 
 const name = ref(props.project.title)
 const slug = ref(props.project.slug)

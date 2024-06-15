@@ -118,6 +118,8 @@ useHead({
 
 const app = useNuxtApp()
 
+const router = useRouter()
+
 const now = app.$dayjs()
 const TIME_24H = 86400000
 const TIME_48H = TIME_24H * 2
@@ -195,8 +197,6 @@ if (projects.value) {
   }
 }
 async function goToProjects() {
-  const router = useRouter()
-
   const project = projectsFiltered.value[0]
   await router.push({
     name: 'type-id',

@@ -151,7 +151,9 @@ useSeoMeta({
   ogDescription: description,
 })
 
+const router = useNativeRouter()
 const route = useNativeRoute()
+
 const currentPage = ref(Number(route.query.p ?? 1))
 const filteredVersions = computed(() => {
   const selectedGameVersions = getArrayOrString(route.query.g) ?? []
@@ -174,9 +176,6 @@ const filteredVersions = computed(() => {
 function switchPage(page) {
   currentPage.value = page
 
-  const router = useRouter()
-  const route = useNativeRoute()
-
   router.replace({
     query: {
       ...route.query,
@@ -186,7 +185,6 @@ function switchPage(page) {
 }
 
 async function handleFiles(files) {
-  const router = useRouter()
   await router.push({
     name: 'type-id-version-version',
     params: {

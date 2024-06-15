@@ -56,7 +56,7 @@
 <script setup>
 import { XIcon as CrossIcon, CheckIcon, Modal, Button } from 'omorphia'
 
-const router = useRouter()
+const router = useNativeRouter()
 
 const name = ref('')
 const slug = ref('')

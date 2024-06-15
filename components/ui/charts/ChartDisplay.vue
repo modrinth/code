@@ -308,7 +308,7 @@ import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from '#c
 
 import PaletteIcon from '~/assets/icons/palette.svg?component'
 
-const router = useRouter()
+const router = useNativeRouter()
 const theme = useTheme()
 
 const props = withDefaults(

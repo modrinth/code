@@ -996,9 +996,9 @@ async function sendMessage(status) {
   stopLoading()
 }
 
-async function goToNextProject() {
-  const router = useRouter()
+const router = useNativeRouter()
 
+async function goToNextProject() {
   const project = props.futureProjects[0]
 
   if (!project) {

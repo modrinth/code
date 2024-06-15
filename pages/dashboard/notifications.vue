@@ -69,7 +69,7 @@ useHead({
 const auth = await useAuth()
 
 const route = useNativeRoute()
-const router = useRouter()
+const router = useNativeRouter()
 
 const history = computed(() => {
   return route.name === 'dashboard-notifications-history'
