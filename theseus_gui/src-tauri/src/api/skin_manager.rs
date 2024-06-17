@@ -43,8 +43,8 @@ pub async fn skin_check_skin(skin: String, id: Uuid) -> Result<bool> {
 // Sets player's skin
 // invoke('plugin:skin|skin_set_skin', { skin, arms, user })
 #[tauri::command]
-pub async fn skin_set_skin(skin: String, arms: String, user: Credentials) -> Result<bool> {
-    Ok(skin_manager::set_skin(skin, arms, user).await?)
+pub async fn skin_set_skin(skin: String, arms: String, creds: Credentials) -> Result<bool> {
+    Ok(skin_manager::set_skin(skin, arms, creds).await?)
 }
 
 // Sets the players cape
@@ -78,8 +78,8 @@ pub async fn skin_cache_users_skins() -> Result<bool> {
 // Makes api request to mojang, updating current account's skin data
 // invoke('plugin:skin|skin_cache_new_user_skin', { user })
 #[tauri::command]
-pub async fn skin_cache_new_user_skin(user: Credentials) -> Result<bool> {
-    Ok(skin_manager::cache_new_user_skin(user).await?)
+pub async fn skin_cache_new_user_skin(creds: Credentials) -> Result<bool> {
+    Ok(skin_manager::cache_new_user_skin(creds).await?)
 }
 
 // Saves the skin data to the manager

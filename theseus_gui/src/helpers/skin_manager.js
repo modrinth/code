@@ -10,8 +10,8 @@ export async function get_user_skin_data(id) {
 }
 
 // Sets users skin
-export async function set_skin(skin, arms, user) {
-  return await invoke('plugin:skin|skin_set_skin', { skin, arms, user })
+export async function set_skin(skin, arms, creds) {
+  return await invoke('plugin:skin|skin_set_skin', { skin, arms, creds })
 }
 
 // Sets users cape
@@ -40,8 +40,8 @@ export async function cache_users_skins() {
 }
 
 // Caches new user on login
-export async function cache_new_user_skin(user) {
-  return await invoke('plugin:skin|skin_cache_new_user_skin', { user })
+export async function cache_new_user_skin(creds) {
+  return await invoke('plugin:skin|skin_cache_new_user_skin', { creds })
 }
 
 // Saves SkinCache to the manager

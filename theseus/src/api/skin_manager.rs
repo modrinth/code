@@ -49,8 +49,8 @@ pub async fn get_heads() -> crate::Result<HashMap<Uuid, String>> {
 }
 
 // Sets player's skin
-pub async fn set_skin(skin: String, arms: String, user: Credentials) -> crate::Result<bool> {
-    let token = user.access_token;
+pub async fn set_skin(skin: String, arms: String, creds: Credentials) -> crate::Result<bool> {
+    let token = creds.access_token;
     let file: Vec<u8> = 
         if let Some(data) = skin.strip_prefix("data:image/png;base64,") {
             STANDARD.decode(data)?
@@ -75,8 +75,8 @@ pub async fn set_skin(skin: String, arms: String, user: Credentials) -> crate::R
 
     let statcode = response.status();
     if statcode.is_success() {
-        let data = parse_skin_data(response.json().await?, user.id).await?;
-        add_to_cache(user.id, data.user, HashMap::new(), data.head).await
+        let data = parse_skin_data(response.json().await?, creds.id).await?;
+        add_to_cache(creds.id, data.user, HashMap::new(), data.head).await
     } else { Ok(false) }
 }
 
@@ -151,8 +151,11 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
     let responses = future::join_all(users.into_iter().map(|user| {
         let client = &client;
         async move {
-            // Fix, refresh access_token needed
-            let token = user.access_token;
+            let token = if user.expires < Utc::now() {
+                minecraft_auth::refresh(user.id).await.unwrap().access_token
+            } else {
+                user.access_token
+            };
             let response: Value = client
                 .get("https://api.minecraftservices.com/minecraft/profile")
                 .header(header::AUTHORIZATION, format!("Bearer {token}"))
@@ -177,16 +180,19 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
 }
 
 // Caches users SkinCache on new login
-pub async fn cache_new_user_skin(user: Credentials) -> crate::Result<bool> {
-    // Fix, refresh access_token needed
-    let token = user.access_token;
+pub async fn cache_new_user_skin(creds: Credentials) -> crate::Result<bool> {
+    let token = if creds.expires < Utc::now() {
+        minecraft_auth::refresh(creds.id).await?.access_token
+    } else {
+        creds.access_token
+    };
     let response = reqwest::Client::new()
         .get("https://api.minecraftservices.com/minecraft/profile")
         .header(header::AUTHORIZATION, format!("Bearer {token}"))
         .send().await?;
     if response.status().is_success() {
-        let data = parse_skin_data(response.json().await?, user.id).await?;
-        add_to_cache(user.id, data.user, data.capes, data.head).await
+        let data = parse_skin_data(response.json().await?, creds.id).await?;
+        add_to_cache(creds.id, data.user, data.capes, data.head).await
     } else {
         Ok(false)
     }
