@@ -75,7 +75,7 @@ const ignoreInstanceGameVersions = ref(false)
 
 const results = shallowRef([])
 const pageCount = computed(() =>
-  results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1
+  results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
 )
 
 function getArrayOrString(x) {
@@ -179,7 +179,9 @@ async function refreshSearch() {
       formattedFacets.push(orFacets.value)
     } else if (projectType.value === 'mod') {
       formattedFacets.push(
-        ['forge', 'fabric', 'quilt', 'neoforge'].map((x) => `categories:'${encodeURIComponent(x)}'`)
+        ['forge', 'fabric', 'quilt', 'neoforge'].map(
+          (x) => `categories:'${encodeURIComponent(x)}'`,
+        ),
       )
     } else if (projectType.value === 'datapack') {
       formattedFacets.push(['datapack'].map((x) => `categories:'${encodeURIComponent(x)}'`))
@@ -230,7 +232,7 @@ async function refreshSearch() {
       const installedMods = await get(instanceContext.value.path, false).then((x) =>
         Object.values(x.projects)
           .filter((x) => x.metadata.project)
-          .map((x) => x.metadata.project.id)
+          .map((x) => x.metadata.project.id),
       )
       installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
       console.log(`facets=${JSON.stringify(formattedFacets)}`)
@@ -262,7 +264,7 @@ async function refreshSearch() {
   if (instanceContext.value) {
     for (val of rawResults.hits) {
       val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
-        (x) => (val.installed = x)
+        (x) => (val.installed = x),
       )
     }
   }
@@ -374,7 +376,7 @@ function getSearchUrl(offset, useObj) {
 const sortedCategories = computed(() => {
   const values = new Map()
   for (const category of categories.value.filter(
-    (cat) => cat.project_type === (projectType.value === 'datapack' ? 'mod' : projectType.value)
+    (cat) => cat.project_type === (projectType.value === 'datapack' ? 'mod' : projectType.value),
   )) {
     if (!values.has(category.header)) {
       values.set(category.header, [])
@@ -478,7 +480,7 @@ watch(
     loading.value = true
     await clearFilters()
     loading.value = false
-  }
+  },
 )
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
@@ -500,7 +502,7 @@ const selectableProjectTypes = computed(() => {
   if (instanceContext.value) {
     if (
       availableGameVersions.value.findIndex(
-        (x) => x.version === instanceContext.value.metadata.game_version
+        (x) => x.version === instanceContext.value.metadata.game_version,
       ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
       values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
@@ -519,7 +521,7 @@ const selectableProjectTypes = computed(() => {
 })
 
 const showVersions = computed(
-  () => instanceContext.value === null || ignoreInstanceGameVersions.value
+  () => instanceContext.value === null || ignoreInstanceGameVersions.value,
 )
 const showLoaders = computed(
   () =>
@@ -527,7 +529,7 @@ const showLoaders = computed(
       projectType.value !== 'resourcepack' &&
       projectType.value !== 'shader' &&
       instanceContext.value === null) ||
-    ignoreInstanceLoaders.value
+    ignoreInstanceLoaders.value,
 )
 
 onUnmounted(() => unlistenOffline())
@@ -605,7 +607,8 @@ onUnmounted(() => unlistenOffline())
             v-for="loader in loaders.filter(
               (l) =>
                 (projectType !== 'mod' && l.supported_project_types?.includes(projectType)) ||
-                (projectType === 'mod' && ['fabric', 'forge', 'quilt', 'neoforge'].includes(l.name))
+                (projectType === 'mod' &&
+                  ['fabric', 'forge', 'quilt', 'neoforge'].includes(l.name)),
             )"
             :key="loader"
           >
@@ -752,12 +755,12 @@ onUnmounted(() => unlistenOffline())
           :categories="[
             ...categories.filter(
               (cat) =>
-                result?.display_categories.includes(cat.name) && cat.project_type === projectType
+                result?.display_categories.includes(cat.name) && cat.project_type === projectType,
             ),
             ...loaders.filter(
               (loader) =>
                 result?.display_categories.includes(loader.name) &&
-                loader.supported_project_types?.includes(projectType)
+                loader.supported_project_types?.includes(projectType),
             ),
           ]"
           :confirm-modal="confirmModal"

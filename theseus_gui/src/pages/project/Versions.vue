@@ -166,18 +166,6 @@ import { releaseColor } from '@/helpers/utils'
 import { computed, ref, watch } from 'vue'
 import { SwapIcon } from '@/assets/icons/index.js'
 
-const filterVersions = ref([])
-const filterLoader = ref(props.instance ? [props.instance?.metadata?.loader] : [])
-const filterGameVersions = ref(props.instance ? [props.instance?.metadata?.game_version] : [])
-
-const currentPage = ref(1)
-
-const clearFilters = () => {
-  filterVersions.value = []
-  filterLoader.value = []
-  filterGameVersions.value = []
-}
-
 const props = defineProps({
   versions: {
     type: Array,
@@ -205,17 +193,29 @@ const props = defineProps({
   },
 })
 
+const filterVersions = ref([])
+const filterLoader = ref(props.instance ? [props.instance?.metadata?.loader] : [])
+const filterGameVersions = ref(props.instance ? [props.instance?.metadata?.game_version] : [])
+
+const currentPage = ref(1)
+
+const clearFilters = () => {
+  filterVersions.value = []
+  filterLoader.value = []
+  filterGameVersions.value = []
+}
+
 const filteredVersions = computed(() => {
   return props.versions.filter(
     (projectVersion) =>
       (filterGameVersions.value.length === 0 ||
         filterGameVersions.value.some((gameVersion) =>
-          projectVersion.game_versions.includes(gameVersion)
+          projectVersion.game_versions.includes(gameVersion),
         )) &&
       (filterLoader.value.length === 0 ||
         filterLoader.value.some((loader) => projectVersion.loaders.includes(loader))) &&
       (filterVersions.value.length === 0 ||
-        filterVersions.value.includes(projectVersion.version_type))
+        filterVersions.value.includes(projectVersion.version_type)),
   )
 })
 

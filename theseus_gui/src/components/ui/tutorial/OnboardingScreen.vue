@@ -1,40 +1,12 @@
 <script setup>
-import {
-  Button,
-  HomeIcon,
-  SearchIcon,
-  LibraryIcon,
-  PlusIcon,
-  SettingsIcon,
-  XIcon,
-  Notifications,
-} from 'omorphia'
-import { appWindow } from '@tauri-apps/api/window'
-import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
-import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
-import FakeAppBar from '@/components/ui/tutorial/FakeAppBar.vue'
-import FakeAccountsCard from '@/components/ui/tutorial/FakeAccountsCard.vue'
-import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
-import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator.js'
-import FakeSearch from '@/components/ui/tutorial/FakeSearch.vue'
-import FakeGridDisplay from '@/components/ui/tutorial/FakeGridDisplay.vue'
-import FakeRowDisplay from '@/components/ui/tutorial/FakeRowDisplay.vue'
-import { onMounted, ref } from 'vue'
-import { window } from '@tauri-apps/api'
-import TutorialTip from '@/components/ui/tutorial/TutorialTip.vue'
-import FakeSettings from '@/components/ui/tutorial/FakeSettings.vue'
+import { Button } from 'omorphia'
+import { ref } from 'vue'
 import { get, set } from '@/helpers/settings.js'
 import mixpanel from 'mixpanel-browser'
 import GalleryImage from '@/components/ui/tutorial/GalleryImage.vue'
 import LoginCard from '@/components/ui/tutorial/LoginCard.vue'
 import StickyTitleBar from '@/components/ui/tutorial/StickyTitleBar.vue'
-import { auto_install_java, get_jre } from '@/helpers/jre.js'
-import { handleError } from '@/store/notifications.js'
-import ImportingCard from '@/components/ui/tutorial/ImportingCard.vue'
-import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import PreImportScreen from '@/components/ui/tutorial/PreImportScreen.vue'
 
-const phase = ref(0)
 const page = ref(1)
 
 const props = defineProps({
@@ -46,15 +18,6 @@ const props = defineProps({
 
 const flow = ref('')
 
-const nextPhase = () => {
-  phase.value++
-  mixpanel.track('TutorialPhase', { page: phase.value })
-}
-
-const prevPhase = () => {
-  phase.value--
-}
-
 const nextPage = (newFlow) => {
   page.value++
   mixpanel.track('OnboardingPage', { page: page.value })
@@ -62,10 +25,6 @@ const nextPage = (newFlow) => {
   if (newFlow) {
     flow.value = newFlow
   }
-}
-
-const endOnboarding = () => {
-  nextPhase()
 }
 
 const prevPage = () => {
@@ -79,44 +38,21 @@ const finishOnboarding = async () => {
   await set(settings)
   props.finish()
 }
-
-async function fetchSettings() {
-  const fetchSettings = await get().catch(handleError)
-  if (!fetchSettings.java_globals) {
-    fetchSettings.java_globals = {}
-  }
-
-  if (!fetchSettings.java_globals.JAVA_17) {
-    const path1 = await auto_install_java(17).catch(handleError)
-    fetchSettings.java_globals.JAVA_17 = await get_jre(path1).catch(handleError)
-  }
-
-  if (!fetchSettings.java_globals.JAVA_8) {
-    const path2 = await auto_install_java(8).catch(handleError)
-    fetchSettings.java_globals.JAVA_8 = await get_jre(path2).catch(handleError)
-  }
-
-  await set(fetchSettings).catch(handleError)
-}
-
-onMounted(async () => {
-  await fetchSettings()
-})
 </script>
 
 <template>
-  <div v-if="phase === 0" class="onboarding">
+  <div class="onboarding">
     <StickyTitleBar />
     <GalleryImage
       v-if="page === 1"
       :gallery="[
         {
-          url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109353928265809/Screenshot_2023-07-15_at_4.16.18_PM.png',
+          url: 'https://launcher-files.modrinth.com/onboarding/home.png',
           title: 'Discovery',
           subtitle: 'See the latest and greatest mods and modpacks to play with from Modrinth',
         },
         {
-          url: 'https://cdn.discordapp.com/attachments/817413688771608587/1131109354238640238/Screenshot_2023-07-15_at_4.17.43_PM.png',
+          url: 'https://launcher-files.modrinth.com/onboarding/discover.png',
           title: 'Profile Management',
           subtitle:
             'Play, manage and search through all the amazing profiles downloaded on your computer at any time, even offline!',
@@ -126,185 +62,7 @@ onMounted(async () => {
     >
       <Button color="primary" @click="nextPage"> Get started </Button>
     </GalleryImage>
-    <LoginCard v-else-if="page === 2" :next-page="nextPage" :prev-page="prevPage" />
-    <ModrinthLoginScreen
-      v-else-if="page === 3"
-      :modal="false"
-      :next-page="nextPage"
-      :prev-page="prevPage"
-      :flow="flow"
-    />
-    <PreImportScreen
-      v-else-if="page === 4"
-      :next-page="endOnboarding"
-      :prev-page="prevPage"
-      :import-page="nextPage"
-    />
-    <ImportingCard v-else-if="page === 5" :next-page="endOnboarding" :prev-page="prevPage" />
-  </div>
-  <div v-else class="container">
-    <StickyTitleBar v-if="phase === 9" />
-    <div v-if="phase < 9" class="nav-container">
-      <div class="nav-section">
-        <FakeAccountsCard :show-demo="phase === 3">
-          <TutorialTip
-            :progress-function="nextPhase"
-            :previous-function="prevPhase"
-            :progress="phase"
-            title="Signing in"
-            description="The Modrinth App uses your Microsoft account to allow you to launch Minecraft. You can sign in with your Microsoft account here, and switch between multiple accounts."
-          />
-        </FakeAccountsCard>
-        <div class="pages-list">
-          <div class="btn icon-only" :class="{ active: phase < 4 }">
-            <HomeIcon />
-          </div>
-          <div
-            class="btn icon-only"
-            :class="{ active: phase === 4 || phase === 5, highlighted: phase === 4 }"
-          >
-            <SearchIcon />
-          </div>
-          <div
-            class="btn icon-only"
-            :class="{
-              active: phase === 6 || phase === 7,
-              highlighted: phase === 6,
-            }"
-          >
-            <LibraryIcon />
-          </div>
-        </div>
-      </div>
-      <div class="settings pages-list">
-        <Button class="sleek-primary" icon-only>
-          <PlusIcon />
-        </Button>
-        <Button icon-only :class="{ active: phase === 8, highlighted: phase === 8 }">
-          <SettingsIcon />
-        </Button>
-      </div>
-    </div>
-    <div v-if="phase < 9" class="view">
-      <div data-tauri-drag-region class="appbar">
-        <section class="navigation-controls">
-          <Breadcrumbs data-tauri-drag-region />
-        </section>
-        <section class="mod-stats">
-          <FakeAppBar
-            :show-running="phase === 7"
-            :show-download="phase === 5"
-            :exit="finishOnboarding"
-          >
-            <template #running>
-              <TutorialTip
-                :progress-function="nextPhase"
-                :previous-function="prevPhase"
-                :progress="phase"
-                title="Playing modpacks"
-                description="When you launch a modpack, you can manage it directly in the title bar here. You can stop the modpack, view the logs, and see all currently running packs."
-              />
-            </template>
-            <template #download>
-              <TutorialTip
-                :progress-function="nextPhase"
-                :previous-function="prevPhase"
-                :progress="phase"
-                title="Installing modpacks"
-                description="When you download a modpack, Modrinth App will automatically install it for you. You can view the progress of the installation here."
-              />
-            </template>
-          </FakeAppBar>
-        </section>
-        <section class="window-controls">
-          <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
-            <MinimizeIcon />
-          </Button>
-          <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
-            <MaximizeIcon />
-          </Button>
-          <Button
-            class="titlebar-button close"
-            icon-only
-            @click="
-              () => {
-                saveWindowState(StateFlags.ALL)
-                window.getCurrent().close()
-              }
-            "
-          >
-            <XIcon />
-          </Button>
-        </section>
-      </div>
-      <div class="router-view">
-        <ModrinthLoadingIndicator
-          offset-height="var(--appbar-height)"
-          offset-width="var(--sidebar-width)"
-        />
-        <Notifications ref="notificationsWrapper" />
-        <FakeRowDisplay v-if="phase < 4 || phase > 8" :show-instance="phase === 2" />
-        <FakeGridDisplay v-if="phase === 6 || phase === 7" :show-instances="phase === 6" />
-        <suspense>
-          <FakeSearch v-if="phase === 4 || phase === 5" :show-search="phase === 4" />
-        </suspense>
-        <FakeSettings v-if="phase === 8" />
-      </div>
-    </div>
-    <TutorialTip
-      v-if="phase === 1"
-      class="first-tip highlighted"
-      :progress-function="nextPhase"
-      :progress="phase"
-      title="Enter the Modrinth App!"
-      description="This is the Modrinth App guide. Key parts are marked with a green shadow. Click 'Next' to
-      proceed. You can leave the tutorial anytime using the Exit button above the plus button on the bottom left."
-    />
-    <div v-if="phase === 1" class="whole-page-shadow" />
-    <TutorialTip
-      v-if="phase === 2"
-      class="sticky-tip"
-      :progress-function="nextPhase"
-      :previous-function="prevPhase"
-      :progress="phase"
-      title="Home page"
-      description="This is the home page. Here you can see all the latest modpacks, mods, and other content on Modrinth. You can also see a few of your installed modpacks here."
-    />
-    <TutorialTip
-      v-if="phase === 4"
-      class="sticky-tip"
-      :progress-function="nextPhase"
-      :previous-function="prevPhase"
-      :progress="phase"
-      title="Searching for content"
-      description="You can search for content on Modrinth by navigating to the search page. You can search for mods, modpacks, and more, and install them directly from here."
-    />
-    <TutorialTip
-      v-if="phase === 6"
-      class="sticky-tip"
-      :progress-function="nextPhase"
-      :previous-function="prevPhase"
-      :progress="phase"
-      title="Modpack library"
-      description="You can view all your installed modpacks in the library. You can launch any modpack from here, or click the card to view more information about it."
-    />
-    <TutorialTip
-      v-if="phase === 8"
-      class="sticky-tip"
-      :progress-function="nextPhase"
-      :previous-function="prevPhase"
-      :progress="phase"
-      title="Settings"
-      description="You will be able to view and change the settings for the Modrinth App here. You can change the appearance, set and download new Java versions, and more."
-    />
-    <TutorialTip
-      v-if="phase === 9"
-      class="final-tip highlighted"
-      :progress-function="finishOnboarding"
-      :progress="phase"
-      title="Enter the Modrinth App!"
-      description="That's it! You're ready to use the Modrinth App. If you need help, you can always join our discord server!"
-    />
+    <LoginCard v-else-if="page === 2" :next-page="finishOnboarding" :prev-page="prevPage" />
   </div>
 </template>
 
@@ -489,7 +247,8 @@ onMounted(async () => {
 }
 
 .onboarding {
-  background: top linear-gradient(0deg, #31375f, rgba(8, 14, 55, 0)),
+  background:
+    top linear-gradient(0deg, #31375f, rgba(8, 14, 55, 0)),
     url(https://cdn.modrinth.com/landing-new/landing-lower.webp);
   background-size: cover;
   height: 100vh;

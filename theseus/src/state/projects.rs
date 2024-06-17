@@ -228,23 +228,16 @@ async fn read_icon_from_file(
         let zip_file_reader = ZipFileReader::new(path).await;
         if let Ok(zip_file_reader) = zip_file_reader {
             // Get index of icon file and open it
-            let zip_index_option = zip_file_reader
-                .file()
-                .entries()
-                .iter()
-                .position(|f| f.entry().filename() == icon_path);
-            if let Some(index) = zip_index_option {
-                let entry = zip_file_reader
-                    .file()
-                    .entries()
-                    .get(index)
-                    .unwrap()
-                    .entry();
+            let zip_index_option =
+                zip_file_reader.file().entries().iter().position(|f| {
+                    f.filename().as_str().unwrap_or_default() == icon_path
+                });
+            if let Some(zip_index) = zip_index_option {
                 let mut bytes = Vec::new();
                 if zip_file_reader
-                    .entry(zip_index_option.unwrap())
+                    .reader_with_entry(zip_index)
                     .await?
-                    .read_to_end_checked(&mut bytes, entry)
+                    .read_to_end_checked(&mut bytes)
                     .await
                     .is_ok()
                 {
@@ -259,7 +252,7 @@ async fn read_icon_from_file(
 
                     return Ok(Some(path));
                 }
-            };
+            }
         }
     }
 
@@ -464,13 +457,12 @@ pub async fn infer_data_from_files(
         };
 
         // Forge
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.entry().filename() == "META-INF/mods.toml");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default()
+                    == "META-INF/mods.toml"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct ForgeModInfo {
@@ -489,9 +481,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -538,13 +530,11 @@ pub async fn infer_data_from_files(
         }
 
         // Forge
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.entry().filename() == "mcmod.info");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "mcmod.info"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct ForgeMod {
@@ -558,9 +548,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -599,13 +589,11 @@ pub async fn infer_data_from_files(
         }
 
         // Fabric
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.entry().filename() == "fabric.mod.json");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "fabric.mod.json"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(untagged)]
             enum FabricAuthor {
@@ -625,9 +613,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -669,13 +657,11 @@ pub async fn infer_data_from_files(
         }
 
         // Quilt
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.entry().filename() == "quilt.mod.json");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "quilt.mod.json"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             struct QuiltMetadata {
                 pub name: Option<String>,
@@ -692,9 +678,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {
@@ -746,13 +732,11 @@ pub async fn infer_data_from_files(
         }
 
         // Other
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.entry().filename() == "pack.mcmeta");
+        let zip_index_option =
+            zip_file_reader.file().entries().iter().position(|f| {
+                f.filename().as_str().unwrap_or_default() == "pack.mcmeta"
+            });
         if let Some(index) = zip_index_option {
-            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             struct Pack {
                 description: Option<String>,
@@ -760,9 +744,9 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if zip_file_reader
-                .entry(index)
+                .reader_with_entry(index)
                 .await?
-                .read_to_string_checked(&mut file_str, file.entry())
+                .read_to_string_checked(&mut file_str)
                 .await
                 .is_ok()
             {

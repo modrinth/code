@@ -12,14 +12,14 @@ pub use crate::{
 
 // Gets whether a child process stored in the state by UUID has finished
 #[tracing::instrument]
-pub async fn has_finished_by_uuid(uuid: &Uuid) -> crate::Result<bool> {
+pub async fn has_finished_by_uuid(uuid: Uuid) -> crate::Result<bool> {
     Ok(get_exit_status_by_uuid(uuid).await?.is_some())
 }
 
 // Gets the exit status of a child process stored in the state by UUID
 #[tracing::instrument]
 pub async fn get_exit_status_by_uuid(
-    uuid: &Uuid,
+    uuid: Uuid,
 ) -> crate::Result<Option<i32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
@@ -71,7 +71,7 @@ pub async fn get_uuids_by_profile_path(
 
 // Kill a child process stored in the state by UUID, as a string
 #[tracing::instrument]
-pub async fn kill_by_uuid(uuid: &Uuid) -> crate::Result<()> {
+pub async fn kill_by_uuid(uuid: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     let children = state.children.read().await;
     if let Some(mchild) = children.get(uuid) {
@@ -85,7 +85,7 @@ pub async fn kill_by_uuid(uuid: &Uuid) -> crate::Result<()> {
 
 // Wait for a child process stored in the state by UUID
 #[tracing::instrument]
-pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
+pub async fn wait_for_by_uuid(uuid: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     let children = state.children.read().await;
     // No error returned for already killed process

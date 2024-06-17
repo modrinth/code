@@ -10,64 +10,32 @@ use crate::util::fetch::{fetch_advanced, fetch_json};
 use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
 use crate::{
-    state::JavaGlobals,
     util::jre::{self, JavaVersion},
     LoadingBarType, State,
 };
 
-pub const JAVA_8_KEY: &str = "JAVA_8";
-pub const JAVA_17_KEY: &str = "JAVA_17";
-pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
-
-// Autodetect JavaSettings default
-// Using the supplied JavaVersions, autodetects the default JavaSettings
-// Make a guess for what the default Java global settings should be
-// Since the JRE paths are passed in as args, this handles the logic for selection. Currently this just pops the last one found
-// TODO: When tauri compiler issue is fixed, this can be be improved (ie: getting JREs in-function)
-pub async fn autodetect_java_globals(
-    mut java_8: Vec<JavaVersion>,
-    mut java_17: Vec<JavaVersion>,
-    mut java_18plus: Vec<JavaVersion>,
-) -> crate::Result<JavaGlobals> {
-    // Simply select last one found for initial guess
-    let mut java_globals = JavaGlobals::new();
-    if let Some(jre) = java_8.pop() {
-        java_globals.insert(JAVA_8_KEY.to_string(), jre);
-    }
-    if let Some(jre) = java_17.pop() {
-        java_globals.insert(JAVA_17_KEY.to_string(), jre);
-    }
-    if let Some(jre) = java_18plus.pop() {
-        java_globals.insert(JAVA_18PLUS_KEY.to_string(), jre);
-    }
-
-    Ok(java_globals)
-}
-
 // Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
 // Allow higher allows for versions higher than the given version to be returned ('at least')
 pub async fn find_filtered_jres(
-    version: &str,
-    jres: Vec<JavaVersion>,
-    allow_higher: bool,
+    java_version: Option<u32>,
 ) -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version(version)?;
+    let jres = jre::get_all_jre().await?;
+
     // Filter out JREs that are not 1.17 or higher
-    Ok(jres
-        .into_iter()
-        .filter(|jre| {
-            let jre_version = extract_java_majorminor_version(&jre.version);
-            if let Ok(jre_version) = jre_version {
-                if allow_higher {
-                    jre_version >= version
+    Ok(if let Some(java_version) = java_version {
+        jres.into_iter()
+            .filter(|jre| {
+                let jre_version = extract_java_majorminor_version(&jre.version);
+                if let Ok(jre_version) = jre_version {
+                    jre_version.1 == java_version
                 } else {
-                    jre_version == version
+                    false
                 }
-            } else {
-                false
-            }
-        })
-        .collect())
+            })
+            .collect()
+    } else {
+        jres
+    })
 }
 
 #[theseus_macros::debug_pin]
@@ -176,17 +144,6 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
     }
 }
 
-// Get all JREs that exist on the system
-pub async fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
-    Ok(jre::get_all_jre().await?)
-}
-
-pub async fn validate_globals() -> crate::Result<bool> {
-    let state = State::get().await?;
-    let settings = state.settings.read().await;
-    Ok(settings.java_globals.is_all_valid().await)
-}
-
 // Validates JRE at a given at a given path
 pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
     Ok(jre::check_java_at_filepath(&path).await)
@@ -196,14 +153,13 @@ pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
 pub async fn test_jre(
     path: PathBuf,
     major_version: u32,
-    minor_version: u32,
 ) -> crate::Result<bool> {
     let jre = match jre::check_java_at_filepath(&path).await {
         Some(jre) => jre,
         None => return Ok(false),
     };
-    let (major, minor) = extract_java_majorminor_version(&jre.version)?;
-    Ok(major == major_version && minor == minor_version)
+    let (major, _) = extract_java_majorminor_version(&jre.version)?;
+    Ok(major == major_version)
 }
 
 // Gets maximum memory in KiB.

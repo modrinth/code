@@ -42,7 +42,7 @@ const getFeaturedModpacks = async () => {
   const response = await useFetch(
     `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
     'featured modpacks',
-    offline.value
+    offline.value,
   )
   if (response) {
     featuredModpacks.value = response.hits
@@ -54,7 +54,7 @@ const getFeaturedMods = async () => {
   const response = await useFetch(
     'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
     'featured mods',
-    offline.value
+    offline.value,
   )
   if (response) {
     featuredMods.value = response.hits

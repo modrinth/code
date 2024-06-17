@@ -21,28 +21,28 @@ defineExpose({
     if (event.event === 'InstallVersion') {
       version.value = await useFetch(
         `https://api.modrinth.com/v2/version/${encodeURIComponent(event.id)}`,
-        'version'
+        'version',
       )
       project.value = await useFetch(
         `https://api.modrinth.com/v2/project/${encodeURIComponent(version.value.project_id)}`,
-        'project'
+        'project',
       )
     } else {
       project.value = await useFetch(
         `https://api.modrinth.com/v2/project/${encodeURIComponent(event.id)}`,
-        'project'
+        'project',
       )
       version.value = await useFetch(
         `https://api.modrinth.com/v2/version/${encodeURIComponent(project.value.versions[0])}`,
-        'version'
+        'version',
       )
     }
     categories.value = (await get_categories().catch(handleError)).filter(
-      (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod'
+      (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod',
     )
     confirmModal.value.show()
     categories.value = (await get_categories().catch(handleError)).filter(
-      (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod'
+      (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod',
     )
     confirmModal.value.show()
   },
@@ -55,7 +55,7 @@ async function install() {
       project.value.id,
       version.value.id,
       project.value.title,
-      project.value.icon_url
+      project.value.icon_url,
     ).catch(handleError)
 
     mixpanel.track('PackInstall', {
@@ -69,7 +69,7 @@ async function install() {
       project.value.id,
       [version.value],
       project.value.title,
-      project.value.project_type
+      project.value.project_type,
     )
   }
 }

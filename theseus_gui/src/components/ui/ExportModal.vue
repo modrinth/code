@@ -63,7 +63,7 @@ const initFiles = async () => {
         } else {
           files.value.push(pathData)
         }
-      })
+      }),
   )
   folders.value = [...newFolders.entries()].map(([name, value]) => [
     {
@@ -97,7 +97,7 @@ const exportPack = async () => {
       filesToExport,
       versionInput.value,
       exportDescription.value,
-      nameInput.value
+      nameInput.value,
     ).catch((err) => handleError(err))
     exportModal.value.hide()
   }

@@ -61,13 +61,7 @@ import {
   FolderSearchIcon,
   DownloadIcon,
 } from 'omorphia'
-import {
-  auto_install_java,
-  find_jre_17_jres,
-  find_jre_8_jres,
-  get_jre,
-  test_jre,
-} from '@/helpers/jre.js'
+import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
@@ -82,7 +76,10 @@ const props = defineProps({
   },
   modelValue: {
     type: Object,
-    required: true,
+    default: () => ({
+      path: '',
+      version: '',
+    }),
   },
   disabled: {
     type: Boolean,
@@ -112,7 +109,7 @@ async function testJava() {
   testingJavaSuccess.value = await test_jre(
     props.modelValue ? props.modelValue.path : '',
     1,
-    props.version
+    props.version,
   )
   testingJava.value = false
 
@@ -153,16 +150,9 @@ async function autoDetect() {
   if (!props.compact) {
     detectJavaModal.value.show(props.version, props.modelValue)
   } else {
-    if (props.version == 8) {
-      let versions = await find_jre_8_jres().catch(handleError)
-      if (versions.length > 0) {
-        emit('update:modelValue', versions[0])
-      }
-    } else {
-      let versions = await find_jre_17_jres().catch(handleError)
-      if (versions.length > 0) {
-        emit('update:modelValue', versions[0])
-      }
+    let versions = await find_filtered_jres(props.version).catch(handleError)
+    if (versions.length > 0) {
+      emit('update:modelValue', versions[0])
     }
   }
 }
@@ -170,7 +160,6 @@ async function autoDetect() {
 async function reinstallJava() {
   installingJava.value = true
   const path = await auto_install_java(props.version).catch(handleError)
-  console.log('java path: ' + path)
   let result = await get_jre(path)
 
   console.log('java result ' + result)

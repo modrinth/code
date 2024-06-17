@@ -57,70 +57,23 @@
       </Button>
     </Card>
   </transition>
-  <Modal ref="loginModal" class="modal" header="Signing in" :noblur="!themeStore.advancedRendering">
-    <div class="modal-body">
-      <QrcodeVue :value="loginUrl" class="qr-code" margin="3" size="160" />
-      <div class="modal-text">
-        <div class="label">Copy this code</div>
-        <div class="code-text">
-          <div class="code">
-            {{ loginCode }}
-          </div>
-          <Button
-            v-tooltip="'Copy code'"
-            icon-only
-            large
-            color="raised"
-            @click="() => clipboardWrite(loginCode)"
-          >
-            <ClipboardCopyIcon />
-          </Button>
-        </div>
-        <div>And enter it on Microsoft's website to sign in.</div>
-        <div class="iconified-input">
-          <LogInIcon />
-          <input type="text" :value="loginUrl" readonly />
-          <Button
-            v-tooltip="'Open link'"
-            icon-only
-            color="raised"
-            @click="() => clipboardWrite(loginUrl)"
-          >
-            <GlobeIcon />
-          </Button>
-        </div>
-      </div>
-    </div>
-  </Modal>
 </template>
 
 <script setup>
-import {
-  Avatar,
-  Button,
-  Card,
-  PlusIcon,
-  TrashIcon,
-  LogInIcon,
-  Modal,
-  GlobeIcon,
-  AnimatedLogo,
-  ClipboardCopyIcon,
-} from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon, AnimatedLogo } from 'omorphia'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
   users,
   remove_user,
-  authenticate_begin_flow,
-  authenticate_await_completion,
+  set_default_user,
+  login as login_flow,
+  get_default_user,
   selectedAccount,
 } from '@/helpers/auth'
-import { get, set } from '@/helpers/settings'
 import { handleError } from '@/store/state.js'
-import { useTheming } from '@/store/theme.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import QrcodeVue from 'qrcode.vue'
 import { process_listener } from '@/helpers/events'
+import { handleSevereError } from '@/store/error.js'
 import { cache_new_user_skin, account_heads, loaded_skins } from '@/helpers/skin_manager.js'
 
 defineProps({
@@ -133,19 +86,14 @@ defineProps({
 
 const emit = defineEmits(['change'])
 
-const loginCode = ref(null)
-
-const themeStore = useTheming()
-const settings = ref({})
-const accounts = ref([])
-const loginUrl = ref('')
-const loginModal = ref(null)
+const accounts = ref({})
+const defaultUser = ref()
 
 async function refreshValues() {
-  settings.value = await get().catch(handleError)
+  defaultUser.value = await get_default_user().catch(handleError)
   accounts.value = await users().catch(handleError)
   selectedAccount.value = accounts.value.find(
-    (account) => account.id === settings.value.default_user
+    (account) => account.id === defaultUser.value
   )
 }
 defineExpose({
@@ -154,36 +102,18 @@ defineExpose({
 await refreshValues()
 
 const displayAccounts = computed(() =>
-  accounts.value.filter((account) => settings.value.default_user !== account.id)
+  accounts.value.filter((account) => defaultUser.value !== account.id),
 )
 
 async function setAccount(account) {
-  settings.value.default_user = account.id
-  await set(settings.value).catch(handleError)
+  defaultUser.value = account.id
+  await set_default_user(account.id).catch(handleError)
   selectedAccount.value = account
   emit('change')
 }
 
-const clipboardWrite = async (a) => {
-  navigator.clipboard.writeText(a)
-}
-
 async function login() {
-  const loginSuccess = await authenticate_begin_flow().catch(handleError)
-
-  loginModal.value.show()
-  loginCode.value = loginSuccess.user_code
-  loginUrl.value = loginSuccess.verification_uri
-  await window.__TAURI_INVOKE__('tauri', {
-    __tauriModule: 'Shell',
-    message: {
-      cmd: 'open',
-      path: loginSuccess.verification_uri,
-    },
-  })
-
-  const loggedIn = await authenticate_await_completion().catch(handleError)
-  loginModal.value.hide()
+  const loggedIn = await login_flow().catch(handleSevereError)
 
   if (loggedIn) {
     await setAccount(loggedIn)
@@ -191,7 +121,6 @@ async function login() {
   }
   await cache_new_user_skin(loggedIn).catch(handleError)
 
-  loginModal.value.hide()
   mixpanel_track('AccountLogIn')
 }
 

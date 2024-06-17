@@ -1,7 +1,7 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use crate::api::Result;
-use theseus::{skin_manager::{self, SkinSave, SkinCache}, auth::Credentials};
+use theseus::{skin_manager::{self, SkinSave, SkinCache}, prelude::Credentials};
 
 use uuid::Uuid;
 

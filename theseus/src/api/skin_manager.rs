@@ -10,9 +10,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use tokio::sync::{RwLock, Semaphore};
 use uuid::Uuid;
-use crate::auth;
+use crate::minecraft_auth;
 use crate::data::DirectoryInfo;
-use crate::prelude::Credentials;
+use crate::state::Credentials;
 use crate::process::Settings;
 use crate::util::fetch::{read_json, write, IoSemaphore};
 
@@ -141,7 +141,7 @@ pub async fn get_user_skin_data(id: Uuid) -> crate::Result<SkinCache> {
 
 // call this on launcher launch
 pub async fn cache_users_skins() -> crate::Result<bool> {
-    let users: Vec<Credentials> = auth::users().await?;
+    let users: Vec<Credentials> = minecraft_auth::users().await?;
 
     let mut user_map: HashMap<Uuid, SkinCache> = HashMap::new();
     let mut cape_map: HashMap<String, CapeData> = HashMap::new();
@@ -151,7 +151,8 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
     let responses = future::join_all(users.into_iter().map(|user| {
         let client = &client;
         async move {
-            let token = auth::refresh(user.id).await.unwrap().access_token;
+            // Fix, refresh access_token needed
+            let token = user.access_token;
             let response: Value = client
                 .get("https://api.minecraftservices.com/minecraft/profile")
                 .header(header::AUTHORIZATION, format!("Bearer {token}"))
@@ -177,7 +178,8 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
 
 // Caches users SkinCache on new login
 pub async fn cache_new_user_skin(user: Credentials) -> crate::Result<bool> {
-    let token = auth::refresh(user.id).await?.access_token;
+    // Fix, refresh access_token needed
+    let token = user.access_token;
     let response = reqwest::Client::new()
         .get("https://api.minecraftservices.com/minecraft/profile")
         .header(header::AUTHORIZATION, format!("Bearer {token}"))

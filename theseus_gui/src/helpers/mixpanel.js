@@ -23,7 +23,7 @@ function optOutTrackingWrapper(originalOptOutTracking) {
   }
 }
 export const mixpanel_opt_out_tracking = optOutTrackingWrapper(
-  mixpanel.opt_out_tracking.bind(mixpanel)
+  mixpanel.opt_out_tracking.bind(mixpanel),
 )
 
 // mixpanel_opt_in_tracking()
@@ -37,7 +37,7 @@ function optInTrackingWrapper(originalOptInTracking) {
   }
 }
 export const mixpanel_opt_in_tracking = optInTrackingWrapper(
-  mixpanel.opt_in_tracking.bind(mixpanel)
+  mixpanel.opt_in_tracking.bind(mixpanel),
 )
 
 // mixpanel_init

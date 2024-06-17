@@ -1,8 +1,8 @@
 [workspace]
+resolver = "2"
 
 members = [
     "theseus",
-    "theseus_cli",
     "theseus_playground",
     "theseus_gui/src-tauri",
     "theseus_macros"

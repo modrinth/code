@@ -17,6 +17,7 @@ import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
+import { handleSevereError } from '@/store/error.js'
 
 const props = defineProps({
   instance: {
@@ -33,7 +34,7 @@ const playing = ref(false)
 
 const uuid = ref(null)
 const modLoading = ref(
-  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
+  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false,
 )
 
 watch(
@@ -42,7 +43,7 @@ watch(
     modLoading.value = props.instance.install_stage
       ? props.instance.install_stage !== 'installed'
       : false
-  }
+  },
 )
 
 const router = useRouter()
@@ -72,7 +73,7 @@ const install = async (e) => {
   modLoading.value = true
   const versions = await useFetch(
     `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
-    'project versions'
+    'project versions',
   )
 
   if (props.instance.project_type === 'modpack') {
@@ -89,7 +90,7 @@ const install = async (e) => {
         props.instance.project_id,
         versions[0].id,
         props.instance.title,
-        props.instance.icon_url
+        props.instance.icon_url,
       ).catch(handleError)
       modLoading.value = false
 
@@ -104,14 +105,14 @@ const install = async (e) => {
         props.instance.project_id,
         versions[0].id,
         props.instance.title,
-        props.instance.icon_url
+        props.instance.icon_url,
       )
   } else {
     modInstallModal.value.show(
       props.instance.project_id,
       versions,
       props.instance.title,
-      props.instance.project_type
+      props.instance.project_type,
     )
   }
 
@@ -121,7 +122,7 @@ const install = async (e) => {
 const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
-  uuid.value = await run(props.instance.path).catch(handleError)
+  uuid.value = await run(props.instance.path).catch(handleSevereError)
   modLoading.value = false
   playing.value = true
 
@@ -267,7 +268,10 @@ onUnmounted(() => unlisten())
   right: calc(var(--gap-md) * 2);
   bottom: 3.25rem;
   opacity: 0;
-  transition: 0.2s ease-in-out bottom, 0.2s ease-in-out opacity, 0.1s ease-in-out filter !important;
+  transition:
+    0.2s ease-in-out bottom,
+    0.2s ease-in-out opacity,
+    0.1s ease-in-out filter !important;
   cursor: pointer;
   box-shadow: var(--shadow-floating);
 

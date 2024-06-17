@@ -25,11 +25,10 @@ pub enum ErrorKind {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
-    #[error("Minecraft authentication Hydra error: {0}")]
-    HydraError(String),
-
-    #[error("Minecraft authentication task error: {0}")]
-    AuthTaskError(#[from] crate::state::AuthTaskError),
+    #[error("Minecraft authentication error: {0}")]
+    MinecraftAuthenticationError(
+        #[from] crate::state::MinecraftAuthenticationError,
+    ),
 
     #[error("I/O error: {0}")]
     IOError(#[from] util::io::IOError),
@@ -113,7 +112,8 @@ pub enum ErrorKind {
 
 #[derive(Debug)]
 pub struct Error {
-    source: tracing_error::TracedError<ErrorKind>,
+    pub raw: std::sync::Arc<ErrorKind>,
+    pub source: tracing_error::TracedError<std::sync::Arc<ErrorKind>>,
 }
 
 impl std::error::Error for Error {
@@ -130,8 +130,12 @@ impl std::fmt::Display for Error {
 
 impl<E: Into<ErrorKind>> From<E> for Error {
     fn from(source: E) -> Self {
+        let error = Into::<ErrorKind>::into(source);
+        let boxed_error = std::sync::Arc::new(error);
+
         Self {
-            source: Into::<ErrorKind>::into(source).in_current_span(),
+            raw: boxed_error.clone(),
+            source: boxed_error.in_current_span(),
         }
     }
 }

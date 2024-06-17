@@ -36,6 +36,9 @@ pub enum TheseusSerializableError {
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
 
+    #[error("Tauri error: {0}")]
+    Tauri(#[from] tauri::Error),
+
     #[cfg(target_os = "macos")]
     #[error("Callback error: {0}")]
     Callback(String),
@@ -89,9 +92,12 @@ macro_rules! impl_serialize {
 #[cfg(target_os = "macos")]
 impl_serialize! {
     IO,
+    Tauri,
     Callback
 }
+
 #[cfg(not(target_os = "macos"))]
 impl_serialize! {
     IO,
+    Tauri,
 }

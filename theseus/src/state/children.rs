@@ -3,7 +3,6 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::Serialize;
 use std::{collections::HashMap, sync::Arc};
-use sysinfo::PidExt;
 use tokio::process::Child;
 use tokio::process::Command;
 use tokio::sync::RwLock;
@@ -13,7 +12,6 @@ use crate::event::ProcessPayloadType;
 use crate::util::fetch::read_json;
 use crate::util::io::IOError;
 use crate::{profile, ErrorKind};
-use sysinfo::{ProcessExt, SystemExt};
 
 use tokio::task::JoinHandle;
 use uuid::Uuid;
@@ -117,7 +115,16 @@ impl ChildType {
             })?;
         let start_time = process.start_time();
         let name = process.name().to_string();
-        let exe = process.exe().to_string_lossy().to_string();
+
+        let Some(path) = process.exe() else {
+            return Err(ErrorKind::LauncherError(format!(
+                "Cached process {} has no accessable path",
+                pid
+            ))
+            .into());
+        };
+
+        let exe = path.to_string_lossy().to_string();
 
         let cached_process = ProcessCache {
             pid,
@@ -357,8 +364,16 @@ impl Children {
             if cached_process.name != process.name() {
                 return Err(ErrorKind::LauncherError(format!("Cached process {} has different name than actual process {}", cached_process.pid, process.name())).into());
             }
-            if cached_process.exe != process.exe().to_string_lossy() {
-                return Err(ErrorKind::LauncherError(format!("Cached process {} has different exe than actual process {}", cached_process.pid, process.exe().to_string_lossy())).into());
+            if let Some(path) = process.exe() {
+                if cached_process.exe != path.to_string_lossy() {
+                    return Err(ErrorKind::LauncherError(format!("Cached process {} has different exe than actual process {}", cached_process.pid, path.to_string_lossy())).into());
+                }
+            } else {
+                return Err(ErrorKind::LauncherError(format!(
+                    "Cached process {} has no accessable path",
+                    cached_process.pid
+                ))
+                .into());
             }
         }
 
@@ -589,8 +604,8 @@ impl Children {
     }
 
     // Returns a ref to the child
-    pub fn get(&self, uuid: &Uuid) -> Option<Arc<RwLock<MinecraftChild>>> {
-        self.0.get(uuid).cloned()
+    pub fn get(&self, uuid: Uuid) -> Option<Arc<RwLock<MinecraftChild>>> {
+        self.0.get(&uuid).cloned()
     }
 
     // Gets all PID keys
@@ -600,7 +615,7 @@ impl Children {
 
     // Get exit status of a child by PID
     // Returns None if the child is still running
-    pub async fn exit_status(&self, uuid: &Uuid) -> crate::Result<Option<i32>> {
+    pub async fn exit_status(&self, uuid: Uuid) -> crate::Result<Option<i32>> {
         if let Some(child) = self.get(uuid) {
             let child = child.write().await;
             let status = child.current_child.write().await.try_wait().await?;
@@ -614,7 +629,7 @@ impl Children {
     pub async fn running_keys(&self) -> crate::Result<Vec<Uuid>> {
         let mut keys = Vec::new();
         for key in self.keys() {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.write().await;
                 if child
@@ -640,7 +655,7 @@ impl Children {
         let running_keys = self.running_keys().await?;
         let mut keys = Vec::new();
         for key in running_keys {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.read().await;
                 if child.profile_relative_path == profile_path {
@@ -657,7 +672,7 @@ impl Children {
     ) -> crate::Result<Vec<ProfilePathId>> {
         let mut profiles = Vec::new();
         for key in self.keys() {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.write().await;
                 if child
@@ -680,7 +695,7 @@ impl Children {
     pub async fn running_profiles(&self) -> crate::Result<Vec<Profile>> {
         let mut profiles = Vec::new();
         for key in self.keys() {
-            if let Some(child) = self.get(&key) {
+            if let Some(child) = self.get(key) {
                 let child = child.clone();
                 let child = child.write().await;
                 if child

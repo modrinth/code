@@ -8,12 +8,13 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::prelude::{JavaVersion, ProfilePathId, ProjectPathId};
-use crate::state::{InnerProjectPathUnix, ProjectMetadata, SideType};
+use crate::state::{
+    Credentials, InnerProjectPathUnix, ProjectMetadata, SideType,
+};
 
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
 use crate::{
-    auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
     state::MinecraftChild,
 };
@@ -608,7 +609,7 @@ pub async fn export_mrpack(
     let mut file = File::create(&export_path)
         .await
         .map_err(|e| IOError::with_path(e, &export_path))?;
-    let mut writer = ZipFileWriter::new(&mut file);
+    let mut writer = ZipFileWriter::with_tokio(&mut file);
 
     // Create mrpack json configuration file
     let version_id = version_id.unwrap_or("1.0.0".to_string());
@@ -660,7 +661,7 @@ pub async fn export_mrpack(
                 .await
                 .map_err(|e| IOError::with_path(e, &path))?;
             let builder = ZipEntryBuilder::new(
-                format!("overrides/{relative_path}"),
+                format!("overrides/{relative_path}").into(),
                 Compression::Deflate,
             );
             writer.write_entry_whole(builder, &data).await?;
@@ -670,7 +671,7 @@ pub async fn export_mrpack(
     // Add modrinth json to the zip
     let data = serde_json::to_vec_pretty(&packfile)?;
     let builder = ZipEntryBuilder::new(
-        "modrinth.index.json".to_string(),
+        "modrinth.index.json".to_string().into(),
         Compression::Deflate,
     );
     writer.write_entry_whole(builder, &data).await?;
@@ -745,20 +746,16 @@ pub async fn run(
     let state = State::get().await?;
 
     // Get default account and refresh credentials (preferred way to log in)
-    let default_account = state.settings.read().await.default_user;
-    let credentials = if let Some(default_account) = default_account {
-        refresh(default_account).await?
-    } else {
-        // If no default account, try to use a logged in account
-        let users = auth::users().await?;
-        let last_account = users.first();
-        if let Some(last_account) = last_account {
-            refresh(last_account.id).await?
-        } else {
-            return Err(crate::ErrorKind::NoCredentialsError.as_error());
-        }
+    let default_account = {
+        let mut write = state.users.write().await;
+
+        write
+            .get_default_credential()
+            .await?
+            .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?
     };
-    run_credentials(path, &credentials).await
+
+    run_credentials(path, &default_account).await
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
@@ -767,7 +764,7 @@ pub async fn run(
 #[theseus_macros::debug_pin]
 pub async fn run_credentials(
     path: &ProfilePathId,
-    credentials: &auth::Credentials,
+    credentials: &Credentials,
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
     let settings = state.settings.read().await;

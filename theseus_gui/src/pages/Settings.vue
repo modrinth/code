@@ -31,16 +31,11 @@ const themeStore = useTheming()
 const accessSettings = async () => {
   const settings = await get()
 
-  if (!settings.java_globals.JAVA_8) settings.java_globals.JAVA_8 = { path: '', version: '' }
-  if (!settings.java_globals.JAVA_17) settings.java_globals.JAVA_17 = { path: '', version: '' }
-
   settings.javaArgs = settings.custom_java_args.join(' ')
   settings.envArgs = settings.custom_env_args.map((x) => x.join('=')).join(' ')
 
   return settings
 }
-
-// const launcherVersion = await get_launcher_version().catch(handleError)
 
 const fetchSettings = await accessSettings().catch(handleError)
 
@@ -63,24 +58,16 @@ watch(
       mixpanel_opt_in_tracking()
     }
 
-    if (setSettings.java_globals.JAVA_8?.path === '') {
-      setSettings.java_globals.JAVA_8 = undefined
-    }
-    if (setSettings.java_globals.JAVA_17?.path === '') {
-      setSettings.java_globals.JAVA_17 = undefined
-    }
+    for (const [key, value] of Object.entries(setSettings.java_globals)) {
+      if (value?.path === '') {
+        value.path = undefined
+      }
 
-    if (setSettings.java_globals.JAVA_8?.path) {
-      setSettings.java_globals.JAVA_8.path = setSettings.java_globals.JAVA_8.path.replace(
-        'java.exe',
-        'javaw.exe'
-      )
-    }
-    if (setSettings.java_globals.JAVA_17?.path) {
-      setSettings.java_globals.JAVA_17.path = setSettings.java_globals.JAVA_17?.path.replace(
-        'java.exe',
-        'javaw.exe'
-      )
+      if (value?.path) {
+        value.path = value.path.replace('java.exe', 'javaw.exe')
+      }
+
+      console.log(`${key}: ${value}`)
     }
 
     setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
@@ -102,7 +89,7 @@ watch(
 
     await set(setSettings)
   },
-  { deep: true }
+  { deep: true },
 )
 
 const credentials = ref(await getCreds().catch(handleError))
@@ -386,6 +373,10 @@ async function refreshDir() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
+      <label for="java-21">
+        <span class="label__title">Java 21 location</span>
+      </label>
+      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_21" :version="21" />
       <label for="java-17">
         <span class="label__title">Java 17 location</span>
       </label>

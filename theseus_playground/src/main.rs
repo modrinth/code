@@ -3,7 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
 use theseus::profile::create::profile_create;
@@ -14,15 +13,20 @@ use theseus::profile::create::profile_create;
 // 3) call the authenticate_await_complete_flow() function to get the credentials (like you would in the frontend)
 pub async fn authenticate_run() -> theseus::Result<Credentials> {
     println!("A browser window will now open, follow the login flow there.");
-    let login = auth::authenticate_begin_flow().await?;
+    let login = minecraft_auth::begin_login().await?;
 
-    println!("URL {}", login.verification_uri.as_str());
-    println!("Code {}", login.user_code.as_str());
-    webbrowser::open(login.verification_uri.as_str())
-        .map_err(|e| IOError::with_path(e, login.verification_uri.as_str()))?;
+    println!("URL {}", login.redirect_uri.as_str());
+    webbrowser::open(login.redirect_uri.as_str())?;
 
-    let credentials = auth::authenticate_await_complete_flow().await?;
-    State::sync().await?;
+    println!("Please enter URL code: ");
+    let mut input = String::new();
+    std::io::stdin()
+        .read_line(&mut input)
+        .expect("error: unable to read user input");
+
+    println!("You entered: {}", input.trim());
+
+    let credentials = minecraft_auth::finish_login(&input, login).await?;
 
     println!("Logged in user {}.", credentials.username);
     Ok(credentials)
@@ -38,16 +42,12 @@ async fn main() -> theseus::Result<()> {
     let st = State::get().await?;
     //State::update();
 
-    // Autodetect java globals
-    let jres = jre::get_all_jre().await?;
-    let java_8 = jre::find_filtered_jres("1.8", jres.clone(), false).await?;
-    let java_17 = jre::find_filtered_jres("1.78", jres.clone(), false).await?;
-    let java_18plus =
-        jre::find_filtered_jres("1.18", jres.clone(), true).await?;
-    let java_globals =
-        autodetect_java_globals(java_8, java_17, java_18plus).await?;
-    st.settings.write().await.java_globals = java_globals;
+    if minecraft_auth::users().await?.is_empty() {
+        println!("No users found, authenticating.");
+        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
+    }
 
+    // Autodetect java globals
     st.settings.write().await.max_concurrent_downloads = 50;
     st.settings.write().await.hooks.post_exit =
         Some("echo This is after Minecraft runs- global setting!".to_string());
@@ -90,12 +90,6 @@ async fn main() -> theseus::Result<()> {
     .await?;
 
     State::sync().await?;
-
-    // Attempt to run game
-    if auth::users().await?.is_empty() {
-        println!("No users found, authenticating.");
-        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
-    }
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process

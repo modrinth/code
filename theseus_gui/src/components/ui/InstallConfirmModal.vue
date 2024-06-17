@@ -36,7 +36,7 @@ async function install() {
     projectId.value,
     version.value,
     title.value,
-    icon.value ? icon.value : null
+    icon.value ? icon.value : null,
   ).catch(handleError)
   mixpanel_track('PackInstall', {
     id: projectId.value,

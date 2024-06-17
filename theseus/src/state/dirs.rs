@@ -165,6 +165,14 @@ impl DirectoryInfo {
     ) -> crate::Result<PathBuf> {
         Ok(profile_id.get_full_path().await?.join("logs"))
     }
+    
+    /// Gets the crash reports dir for a given profile
+    #[inline]
+    pub async fn crash_reports_dir(
+        profile_id: &ProfilePathId,
+    ) -> crate::Result<PathBuf> {
+        Ok(profile_id.get_full_path().await?.join("crash-reports"))
+    }
 
     #[inline]
     pub fn launcher_logs_dir() -> Option<PathBuf> {

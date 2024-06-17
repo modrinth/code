@@ -11,7 +11,7 @@ use crate::state::{ProfileInstallStage, Profiles, SideType};
 use crate::util::fetch::{fetch_json, fetch_mirrors, write};
 use crate::util::io;
 use crate::{profile, State};
-use async_zip::tokio::read::seek::ZipFileReader;
+use async_zip::base::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde_json::json;
 
@@ -93,29 +93,21 @@ pub async fn install_zipped_mrpack_files(
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&file);
 
     // Create zip reader around file
-    let mut zip_reader = ZipFileReader::new(reader).await.map_err(|_| {
-        crate::Error::from(crate::ErrorKind::InputError(
-            "Failed to read input modpack zip".to_string(),
-        ))
-    })?;
+    let mut zip_reader =
+        ZipFileReader::with_tokio(reader).await.map_err(|_| {
+            crate::Error::from(crate::ErrorKind::InputError(
+                "Failed to read input modpack zip".to_string(),
+            ))
+        })?;
 
     // Extract index of modrinth.index.json
-    let zip_index_option = zip_reader
-        .file()
-        .entries()
-        .iter()
-        .position(|f| f.entry().filename() == "modrinth.index.json");
+    let zip_index_option = zip_reader.file().entries().iter().position(|f| {
+        f.filename().as_str().unwrap_or_default() == "modrinth.index.json"
+    });
     if let Some(zip_index) = zip_index_option {
         let mut manifest = String::new();
-        let entry = zip_reader
-            .file()
-            .entries()
-            .get(zip_index)
-            .unwrap()
-            .entry()
-            .clone();
-        let mut reader = zip_reader.entry(zip_index).await?;
-        reader.read_to_string_checked(&mut manifest, &entry).await?;
+        let mut reader = zip_reader.reader_with_entry(zip_index).await?;
+        reader.read_to_string_checked(&mut manifest).await?;
 
         let pack: PackFormat = serde_json::from_str(&manifest)?;
 
@@ -217,34 +209,31 @@ pub async fn install_zipped_mrpack_files(
         let mut total_len = 0;
 
         for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader.file().entries().get(index).unwrap().entry();
+            let file = zip_reader.file().entries().get(index).unwrap();
+            let filename = file.filename().as_str().unwrap_or_default();
 
-            if (file.filename().starts_with("overrides")
-                || file.filename().starts_with("client_overrides"))
-                && !file.filename().ends_with('/')
+            if (filename.starts_with("overrides")
+                || filename.starts_with("client-overrides"))
+                && !filename.ends_with('/')
             {
                 total_len += 1;
             }
         }
 
         for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader
-                .file()
-                .entries()
-                .get(index)
-                .unwrap()
-                .entry()
-                .clone();
+            let file = zip_reader.file().entries().get(index).unwrap();
 
-            let file_path = PathBuf::from(file.filename());
-            if (file.filename().starts_with("overrides")
-                || file.filename().starts_with("client_overrides"))
-                && !file.filename().ends_with('/')
+            let filename = file.filename().as_str().unwrap_or_default();
+
+            let file_path = PathBuf::from(filename);
+            if (filename.starts_with("overrides")
+                || filename.starts_with("client-overrides"))
+                && !filename.ends_with('/')
             {
                 // Reads the file into the 'content' variable
                 let mut content = Vec::new();
-                let mut reader = zip_reader.entry(index).await?;
-                reader.read_to_end_checked(&mut content, &file).await?;
+                let mut reader = zip_reader.reader_with_entry(index).await?;
+                reader.read_to_end_checked(&mut content).await?;
 
                 let mut new_path = PathBuf::new();
                 let components = file_path.components().skip(1);
@@ -310,29 +299,22 @@ pub async fn remove_all_related_files(
     let reader: Cursor<&bytes::Bytes> = Cursor::new(&mrpack_file);
 
     // Create zip reader around file
-    let mut zip_reader = ZipFileReader::new(reader).await.map_err(|_| {
-        crate::Error::from(crate::ErrorKind::InputError(
-            "Failed to read input modpack zip".to_string(),
-        ))
-    })?;
+    let mut zip_reader =
+        ZipFileReader::with_tokio(reader).await.map_err(|_| {
+            crate::Error::from(crate::ErrorKind::InputError(
+                "Failed to read input modpack zip".to_string(),
+            ))
+        })?;
 
     // Extract index of modrinth.index.json
-    let zip_index_option = zip_reader
-        .file()
-        .entries()
-        .iter()
-        .position(|f| f.entry().filename() == "modrinth.index.json");
+    let zip_index_option = zip_reader.file().entries().iter().position(|f| {
+        f.filename().as_str().unwrap_or_default() == "modrinth.index.json"
+    });
     if let Some(zip_index) = zip_index_option {
         let mut manifest = String::new();
-        let entry = zip_reader
-            .file()
-            .entries()
-            .get(zip_index)
-            .unwrap()
-            .entry()
-            .clone();
-        let mut reader = zip_reader.entry(zip_index).await?;
-        reader.read_to_string_checked(&mut manifest, &entry).await?;
+
+        let mut reader = zip_reader.reader_with_entry(zip_index).await?;
+        reader.read_to_string_checked(&mut manifest).await?;
 
         let pack: PackFormat = serde_json::from_str(&manifest)?;
 
@@ -415,18 +397,14 @@ pub async fn remove_all_related_files(
 
         // Iterate over each 'overrides' file and remove it
         for index in 0..zip_reader.file().entries().len() {
-            let file = zip_reader
-                .file()
-                .entries()
-                .get(index)
-                .unwrap()
-                .entry()
-                .clone();
+            let file = zip_reader.file().entries().get(index).unwrap();
 
-            let file_path = PathBuf::from(file.filename());
-            if (file.filename().starts_with("overrides")
-                || file.filename().starts_with("client_overrides"))
-                && !file.filename().ends_with('/')
+            let filename = file.filename().as_str().unwrap_or_default();
+
+            let file_path = PathBuf::from(filename);
+            if (filename.starts_with("overrides")
+                || filename.starts_with("client-overrides"))
+                && !filename.ends_with('/')
             {
                 let mut new_path = PathBuf::new();
                 let components = file_path.components().skip(1);

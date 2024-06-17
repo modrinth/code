@@ -32,6 +32,7 @@ import { useFetch } from '@/helpers/fetch.js'
 import { install as pack_install } from '@/helpers/pack.js'
 import { useTheming } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
+import { handleSevereError } from '@/store/error.js'
 
 const router = useRouter()
 
@@ -50,7 +51,7 @@ const props = defineProps({
 })
 
 const actualInstances = computed(() =>
-  props.instances.filter((x) => x && x.instances && x.instances[0])
+  props.instances.filter((x) => x && x.instances && x.instances[0]),
 )
 
 const modsRow = ref(null)
@@ -129,7 +130,7 @@ const handleProjectClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await run(args.item.path).catch(handleError)
+      await run(args.item.path).catch(handleSevereError)
       mixpanel_track('InstanceStart', {
         loader: args.item.metadata.loader,
         game_version: args.item.metadata.game_version,
@@ -171,7 +172,7 @@ const handleOptionsClick = async (args) => {
     case 'install': {
       const versions = await useFetch(
         `https://api.modrinth.com/v2/project/${args.item.project_id}/version`,
-        'project versions'
+        'project versions',
       )
 
       if (args.item.project_type === 'modpack') {
@@ -179,7 +180,7 @@ const handleOptionsClick = async (args) => {
           args.item.project_id,
           versions[0].id,
           args.item.title,
-          args.item.icon_url
+          args.item.icon_url,
         )
       } else {
         modInstallModal.value.show(args.item.project_id, versions)
@@ -197,7 +198,7 @@ const handleOptionsClick = async (args) => {
       break
     case 'copy_link':
       await navigator.clipboard.writeText(
-        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`
+        `https://modrinth.com/${args.item.project_type}/${args.item.slug}`,
       )
       break
   }

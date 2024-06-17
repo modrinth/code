@@ -54,8 +54,8 @@
           v-model="levelFilters[level.toLowerCase()]"
           class="filter-checkbox"
         >
-          {{ level }}</Checkbox
-        >
+          {{ level }}
+        </Checkbox>
       </div>
     </div>
     <div class="log-text">
@@ -241,14 +241,13 @@ async function getLiveStdLog() {
 
 async function getLogs() {
   return (await get_logs(props.instance.path, true).catch(handleError))
-    .reverse()
     .filter(
       // filter out latest_stdout.log or anything without .log in it
       (log) =>
         log.filename !== 'latest_stdout.log' &&
         log.filename !== 'latest_stdout' &&
         log.stdout !== '' &&
-        log.filename.includes('.log')
+        (log.filename.includes('.log') || log.filename.endsWith('.txt'))
     )
     .map((log) => {
       log.name = log.filename || 'Unknown'
@@ -291,6 +290,7 @@ watch(selectedLogIndex, async (newIndex) => {
     logs.value[newIndex].stdout = 'Loading...'
     logs.value[newIndex].stdout = await get_output_by_filename(
       props.instance.path,
+      logs.value[newIndex].log_type,
       logs.value[newIndex].filename
     ).catch(handleError)
   }
@@ -306,9 +306,11 @@ const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
-    await delete_logs_by_filename(props.instance.path, logs.value[deleteIndex].filename).catch(
-      handleError
-    )
+    await delete_logs_by_filename(
+      props.instance.path,
+      logs.value[deleteIndex].log_type,
+      logs.value[deleteIndex].filename
+    ).catch(handleError)
     await setLogs()
   }
 }
@@ -512,6 +514,7 @@ onUnmounted(() => {
     justify-self: center;
   }
 }
+
 .filter-group {
   display: flex;
   padding: 0.6rem;

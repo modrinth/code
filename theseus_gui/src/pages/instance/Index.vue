@@ -153,6 +153,7 @@ import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useFetch } from '@/helpers/fetch'
+import { handleSevereError } from '@/store/error.js'
 
 const route = useRoute()
 
@@ -165,7 +166,7 @@ breadcrumbs.setName(
   'Instance',
   instance.value.metadata.name.length > 40
     ? instance.value.metadata.name.substring(0, 40) + '...'
-    : instance.value.metadata.name
+    : instance.value.metadata.name,
 )
 
 breadcrumbs.setContext({
@@ -185,7 +186,7 @@ const options = ref(null)
 
 const startInstance = async (context) => {
   loading.value = true
-  uuid.value = await run(route.params.id).catch(handleError)
+  uuid.value = await run(route.params.id).catch(handleSevereError)
   loading.value = false
   playing.value = true
 
@@ -212,7 +213,7 @@ const modrinthVersions = ref([])
 if (!(await isOffline()) && instance.value.metadata.linked_data?.project_id) {
   modrinthVersions.value = await useFetch(
     `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
-    'project'
+    'project',
   )
 }
 
@@ -259,7 +260,7 @@ const handleRightClick = (event) => {
             color: 'primary',
           },
           ...baseOptions,
-        ]
+        ],
   )
 }
 
