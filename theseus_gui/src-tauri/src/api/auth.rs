@@ -12,6 +12,7 @@ pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
             auth_remove_user,
             auth_users,
             auth_get_user,
+            auth_refresh,
         ])
         .build()
 }
@@ -103,4 +104,11 @@ pub async fn auth_users() -> Result<Vec<Credentials>> {
 #[tauri::command]
 pub async fn auth_get_user(user: uuid::Uuid) -> Result<Credentials> {
     Ok(minecraft_auth::get_user(user).await?)
+}
+
+/// Refreshes a credential
+// invoke('plugin:auth|auth_refresh',user)
+#[tauri::command]
+pub async fn auth_refresh(user: uuid::Uuid) -> Result<Credentials> {
+    Ok(minecraft_auth::refresh(user).await?)
 }

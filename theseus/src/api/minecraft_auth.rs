@@ -74,3 +74,18 @@ pub async fn get_user(user: uuid::Uuid) -> crate::Result<Credentials> {
         .clone();
     Ok(user)
 }
+
+/// Refreshes a credential
+#[tracing::instrument]
+pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
+    let state = State::get().await?;
+    let mut users = state.users.write().await;
+
+    let creds = get_user(user).await?;
+    users.refresh_token(&creds).await?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to get nonexistent user with ID {}", creds.id
+        ))
+        .as_error()
+    })
+}

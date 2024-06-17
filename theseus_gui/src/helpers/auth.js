@@ -55,4 +55,9 @@ export async function get_user(user) {
   return await invoke('plugin:auth|auth_get_user', { user })
 }
 
+// Refreshes a credential by UUID
+export async function refresh(user) {
+    return await invoke('plugin:auth|auth_refresh', { user })
+  }
+
 export const selectedAccount = ref({})

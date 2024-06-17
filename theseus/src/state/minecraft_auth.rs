@@ -307,7 +307,7 @@ impl MinecraftAuthStore {
         Ok(credentials)
     }
 
-    async fn refresh_token(
+    pub async fn refresh_token(
         &mut self,
         creds: &Credentials,
     ) -> crate::Result<Option<Credentials>> {
