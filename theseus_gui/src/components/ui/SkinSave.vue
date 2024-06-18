@@ -44,8 +44,8 @@ const emit = defineEmits(['setSkin'])
 }
 
 .instance-card-item {
-  display: inline-block;
-  flex-direction: column;
+  display: block;
+  flex: none;
   align-items: center;
   justify-content: center;
   cursor: pointer;

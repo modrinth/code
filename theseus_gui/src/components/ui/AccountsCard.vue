@@ -118,8 +118,8 @@ async function login() {
   if (loggedIn) {
     await setAccount(loggedIn)
     await refreshValues()
+    await cache_new_user_skin(loggedIn).catch(handleError)
   }
-  await cache_new_user_skin(loggedIn).catch(handleError)
 
   mixpanel_track('AccountLogIn')
 }

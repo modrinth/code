@@ -29,24 +29,30 @@
     </div>
   </Card>
   <div class="content">
-    <Card class="instance-card-item">
-      <canvas id="skin_container" class="render" />
-      <AnimatedLogo v-if="!loaded_skins" />
-      <div class="card-row">
-        <div class="project-info">
-          <p class="title">Current Skin</p>
-          <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
-        </div>
-        <Button v-if="notInLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
-      </div>
-    </Card>
-    <div class="row">
-      <Card class="instance-card-item button-base" @click="handleModal">
-        <PlusIcon size="lg" alt="Mod card" class="mod-image" />
-        <div class="project-info">
-          <p class="title">Add new skin</p>
+    <div class="instance">
+      <Card class="instance-card-item">
+        <canvas id="skin_container" class="render" />
+        <AnimatedLogo v-if="!loaded_skins" />
+        <div class="card-row">
+          <div class="project-info">
+            <p class="title">Current Skin</p>
+            <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
+          </div>
+          <Button v-if="notInLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
         </div>
       </Card>
+    </div>
+    
+    <div class="row">
+      <div class="instance">
+        <Card class="instance-card-item button-base" @click="handleModal">
+          <PlusIcon size="lg" alt="Mod card" class="mod-image" />
+            <div class="project-info">
+              <p class="title">Add new skin</p>
+              <p class="description">&nbsp;</p>
+            </div>
+        </Card>
+      </div>
       <SkinSave
         v-for="skin in filteredResults"
         ref="skinComponents"
@@ -868,7 +874,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  padding: 1rem;
+  gap: 1rem;
 
   .divider {
     display: flex;
@@ -935,8 +941,8 @@ onMounted(() => {
 }
 
 .instance-card-item {
-  display: inline-block;
-  flex-direction: column;
+  display: block;
+  flex: none;
   align-items: center;
   justify-content: center;
   padding: var(--gap-md);
