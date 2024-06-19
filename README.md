@@ -2,7 +2,7 @@
 
 # Modrinth App
 
-<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="Screenshot of the Modrinth App's home page" align="right" width=700>
+<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="Screenshot of the Modrinth App's home page" align="right" width="50%">
 
 The Modrinth App, codenamed theseus, is a modern launcher for Minecraft: Java Edition with a clean look, easy-to-use interface, and deep integration into Modrinth services.
 
