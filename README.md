@@ -10,7 +10,7 @@ The Modrinth App, codenamed theseus, is a modern launcher for Minecraft: Java Ed
 - One-click installation of modpacks
 - Automatic management of Java versions
 - Windows, Mac, and Linux[^1] support
-- Import your instances from CurseForge, Prism[^2], ATLauncher MultiMC[^2], or GDLauncher
+- Import your instances from CurseForge, Prism[^2], ATLauncher, MultiMC[^2], or GDLauncher
 - Supports offline play once you've authenticated with your Minecraft account at least once
 - Fully open source under GPLv3[^3]!
 
