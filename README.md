@@ -37,7 +37,7 @@ Once the commands finish, you'll be viewing a Tauri window with Nuxt.js hot relo
 You can use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to try automatically fixing those problems.
 
 ## License
-The source code of the knossos repository is licensed under the GNU General Public License, Version 3 only, which is provided in the file [LICENSE](https://github.com/modrinth/theseus/blob/master/LICENSE). However, some files are licensed under a different license.
+The source code of the theseus repository is licensed under the GNU General Public License, Version 3 only, which is provided in the file [LICENSE](https://github.com/modrinth/theseus/blob/master/LICENSE). However, some files are licensed under a different license.
 
 Any files depicting the Modrinth branding, including the wrench-in-labyrinth logo, the landing image, and variations thereof, are licensed as follows:
 > All rights reserved. © 2020-2024 Rinth, Inc.
