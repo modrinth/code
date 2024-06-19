@@ -18,7 +18,7 @@ The Modrinth App, codenamed theseus, is a modern launcher for Minecraft: Java Ed
 
 [^2]: Certain features of the OneSix format used by Prism and MultiMC are not yet supported, so some instances may not import correctly, primarily on older Minecraft versions or unsupported mod loaders.
 
-[^3]: Modrinth's logos, branding, and other trademarks are not free for use, see the [licensing section](#license) below.
+[^3]: Modrinth's logos, branding, and other trademarks are not free for use, see the [licensing section](#license) for more information.
 
 ## Contributing
 You're welcome to help contribute to the Modrinth App if you'd like! Please review our [contribution guide](https://support.modrinth.com/en/articles/8802215-contributing-to-modrinth) before attempting to contribute or make a pull request though.
