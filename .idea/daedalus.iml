@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/daedalus/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/daedalus_client/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/daedalus_client_new/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
