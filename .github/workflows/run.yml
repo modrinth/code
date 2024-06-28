@@ -37,7 +37,7 @@ jobs:
         run: |
           docker run -d \
             --name daedalus \
-            -e RUST_LOG=warn,daedalus_client=trace
+            -e RUST_LOG=warn,daedalus_client=trace \
             -e BASE_URL=$BASE_URL \
             -e S3_ACCESS_TOKEN=$S3_ACCESS_TOKEN \
             -e S3_SECRET=$S3_SECRET \
