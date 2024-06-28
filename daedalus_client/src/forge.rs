@@ -1,4 +1,6 @@
-use crate::util::{download_file, fetch_json, fetch_xml, format_url};
+use crate::util::{
+    download_file, fetch_json, fetch_xml, format_url, sha1_async,
+};
 use crate::{insert_mirrored_artifact, Error, MirrorArtifact, UploadFile};
 use chrono::{DateTime, Utc};
 use daedalus::get_path_from_artifact;
@@ -246,6 +248,7 @@ async fn fetch(
             raw: bytes::Bytes,
             loader: &ForgeVersion,
             maven_url: &str,
+            mod_loader: &str,
             upload_files: &DashMap<String, UploadFile>,
             mirror_artifacts: &DashMap<String, MirrorArtifact>,
         ) -> Result<PartialVersionInfo, Error> {
@@ -399,15 +402,27 @@ async fn fetch(
                         .into_iter()
                         .map(|mut lib| {
                             // For all libraries besides the forge lib extracted, we mirror them from maven servers
-                            if lib.name != install_profile.install.path {
-                                // TODO: add mirrors "https://maven.creeperhost.net/", "https://libraries.minecraft.net/"
-                                insert_mirrored_artifact(
-                                    &lib.name,
-                                    lib.url.clone().unwrap_or_else(|| {
-                                        maven_url.to_string()
-                                    }),
-                                    mirror_artifacts,
-                                )?;
+                            // unless the URL is empty/null or available on Minecraft's servers
+                            if let Some(url) = lib.url {
+                                if lib.name != install_profile.install.path
+                                    && !url.is_empty()
+                                    && !url.contains(
+                                        "https://libraries.minecraft.net/",
+                                    )
+                                {
+                                    insert_mirrored_artifact(
+                                        &lib.name,
+                                        None,
+                                        vec![
+                                            url,
+                                            "https://maven.creeperhost.net/"
+                                                .to_string(),
+                                            maven_url.to_string(),
+                                        ],
+                                        false,
+                                        mirror_artifacts,
+                                    )?;
+                                }
                             }
 
                             lib.url = Some(format_url("maven/"));
@@ -468,6 +483,7 @@ async fn fetch(
                 async fn mirror_forge_library(
                     mut zip: ZipFileReader,
                     mut lib: daedalus::minecraft::Library,
+                    maven_url: &str,
                     upload_files: &DashMap<String, UploadFile>,
                     mirror_artifacts: &DashMap<String, MirrorArtifact>,
                 ) -> Result<daedalus::minecraft::Library, Error>
@@ -480,7 +496,9 @@ async fn fetch(
                         if !artifact.url.is_empty() {
                             insert_mirrored_artifact(
                                 &lib.name,
-                                artifact.url.clone(),
+                                Some(artifact.sha1.clone()),
+                                vec![artifact.url.clone()],
+                                true,
                                 mirror_artifacts,
                             )?;
 
@@ -491,10 +509,18 @@ async fn fetch(
                         }
                     } else if let Some(url) = &lib.url {
                         if !url.is_empty() {
-                            // TODO: add mirrors "https://maven.creeperhost.net/", "https://libraries.minecraft.net/"
                             insert_mirrored_artifact(
                                 &lib.name,
-                                url.clone(),
+                                None,
+                                vec![
+                                    url.clone(),
+                                    "https://libraries.minecraft.net/"
+                                        .to_string(),
+                                    "https://maven.creeperhost.net/"
+                                        .to_string(),
+                                    maven_url.to_string(),
+                                ],
+                                false,
                                 mirror_artifacts,
                             )?;
 
@@ -531,6 +557,7 @@ async fn fetch(
                         mirror_forge_library(
                             zip.clone(),
                             lib,
+                            maven_url,
                             upload_files,
                             mirror_artifacts,
                         )
@@ -560,7 +587,7 @@ async fn fetch(
                         value: &str,
                         upload_files: &DashMap<String, UploadFile>,
                         libs: &mut Vec<daedalus::minecraft::Library>,
-                        install_profile_path: Option<&str>,
+                        mod_loader: &str,
                         version: &ForgeVersion,
                     ) -> Result<String, Error> {
                         let extract_file =
@@ -595,11 +622,9 @@ async fn fetch(
                             })?;
 
                         let path = format!(
-                            "{}:{}@{}",
-                            install_profile_path.unwrap_or(&*format!(
-                                "net.minecraftforge:forge:{}",
-                                version.raw
-                            )),
+                            "com.modrinth.daedalus:{}-installer-extracts:{}:{}@{}",
+                            mod_loader,
+                            version.raw,
                             file_name,
                             ext
                         );
@@ -634,7 +659,7 @@ async fn fetch(
                             &entry.client,
                             upload_files,
                             &mut version_info.libraries,
-                            install_profile.path.as_deref(),
+                            mod_loader,
                             loader,
                         )
                         .await?
@@ -649,7 +674,7 @@ async fn fetch(
                             &entry.server,
                             upload_files,
                             &mut version_info.libraries,
-                            install_profile.path.as_deref(),
+                            mod_loader,
                             loader,
                         )
                         .await?
@@ -686,6 +711,7 @@ async fn fetch(
                         raw,
                         loader,
                         maven_url,
+                        mod_loader,
                         upload_files,
                         mirror_artifacts,
                     )

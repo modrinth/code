@@ -1,6 +1,5 @@
 use crate::{Error, ErrorKind};
-use bytes::{Bytes, BytesMut};
-use futures::StreamExt;
+use bytes::Bytes;
 use s3::creds::Credentials;
 use s3::{Bucket, Region};
 use serde::de::DeserializeOwned;
@@ -95,8 +94,9 @@ pub async fn upload_file_to_bucket(
 }
 
 pub async fn upload_url_to_bucket_mirrors(
-    base: String,
+    upload_path: String,
     mirrors: Vec<String>,
+    sha1: Option<String>,
     semaphore: &Arc<Semaphore>,
 ) -> Result<(), Error> {
     if mirrors.is_empty() {
@@ -108,8 +108,9 @@ pub async fn upload_url_to_bucket_mirrors(
 
     for (index, mirror) in mirrors.iter().enumerate() {
         let result = upload_url_to_bucket(
-            &base,
-            &format!("{}{}", mirror, base),
+            upload_path.clone(),
+            mirror.clone(),
+            sha1.clone(),
             semaphore,
         )
         .await;
@@ -124,152 +125,16 @@ pub async fn upload_url_to_bucket_mirrors(
 
 #[tracing::instrument(skip(semaphore))]
 pub async fn upload_url_to_bucket(
-    path: &str,
-    url: &str,
+    path: String,
+    url: String,
+    sha1: Option<String>,
     semaphore: &Arc<Semaphore>,
 ) -> Result<(), Error> {
-    let _permit = semaphore.acquire().await?;
+    let data = download_file(&url, sha1.as_deref(), semaphore).await?;
 
-    const RETRIES: i32 = 3;
-    for attempt in 1..=(RETRIES + 1) {
-        tracing::trace!("Attempting streaming file upload, attempt {attempt}");
+    upload_file_to_bucket(path, data, None, semaphore).await?;
 
-        let result: Result<(), Error> = {
-            let response =
-                REQWEST_CLIENT.get(url).send().await.map_err(|err| {
-                    ErrorKind::Fetch {
-                        inner: err,
-                        item: url.to_string(),
-                    }
-                })?;
-
-            let content_type = response
-                .headers()
-                .get(reqwest::header::CONTENT_TYPE)
-                .and_then(|ct| ct.to_str().ok())
-                .unwrap_or("application/octet-stream")
-                .to_string();
-
-            let total_size = response.content_length().unwrap_or(0);
-
-            const MIN_PART_SIZE: usize = 5 * 1024 * 1024;
-
-            if total_size < MIN_PART_SIZE as u64 {
-                let data =
-                    response.bytes().await.map_err(|err| ErrorKind::Fetch {
-                        inner: err,
-                        item: url.to_string(),
-                    })?;
-                BUCKET.put_object(&path, &data).await.map_err(|err| {
-                    ErrorKind::S3 {
-                        inner: err,
-                        file: path.to_string(),
-                    }
-                })?;
-            } else {
-                let mut stream = response.bytes_stream();
-
-                let multipart = BUCKET
-                    .initiate_multipart_upload(path, &content_type)
-                    .await
-                    .map_err(|err| ErrorKind::S3 {
-                        inner: err,
-                        file: path.to_string(),
-                    })?;
-
-                let mut parts = Vec::new();
-                let mut buffer = BytesMut::new();
-
-                async fn upload_part(
-                    parts: &mut Vec<s3::serde_types::Part>,
-                    buffer: Vec<u8>,
-                    path: &str,
-                    upload_id: &str,
-                    content_type: &str,
-                ) -> Result<(), Error> {
-                    let part = BUCKET
-                        .put_multipart_chunk(
-                            buffer,
-                            path,
-                            (parts.len() + 1) as u32,
-                            upload_id,
-                            content_type,
-                        )
-                        .await
-                        .map_err(|err| ErrorKind::S3 {
-                            inner: err,
-                            file: path.to_string(),
-                        })?;
-
-                    parts.push(part);
-
-                    Ok(())
-                }
-
-                while let Some(chunk) = stream.next().await {
-                    let chunk = chunk.map_err(|err| ErrorKind::Fetch {
-                        inner: err,
-                        item: url.to_string(),
-                    })?;
-
-                    buffer.extend_from_slice(&chunk);
-
-                    if buffer.len() >= MIN_PART_SIZE {
-                        upload_part(
-                            &mut parts,
-                            buffer.to_vec(),
-                            path,
-                            &multipart.upload_id,
-                            &content_type,
-                        )
-                        .await?;
-                        buffer.clear();
-                    }
-                }
-
-                if !buffer.is_empty() {
-                    let part = BUCKET
-                        .put_multipart_chunk(
-                            buffer.to_vec(),
-                            path,
-                            (parts.len() + 1) as u32,
-                            &multipart.upload_id,
-                            &content_type,
-                        )
-                        .await
-                        .map_err(|err| ErrorKind::S3 {
-                            inner: err,
-                            file: path.to_string(),
-                        })?;
-
-                    parts.push(part);
-                }
-
-                BUCKET
-                    .complete_multipart_upload(
-                        path,
-                        &multipart.upload_id,
-                        parts,
-                    )
-                    .await
-                    .map_err(|err| ErrorKind::S3 {
-                        inner: err,
-                        file: path.to_string(),
-                    })?;
-            }
-
-            Ok(())
-        };
-
-        match result {
-            Ok(_) => return Ok(()),
-            Err(_) if attempt <= RETRIES => continue,
-            Err(_) => {
-                result?;
-            }
-        }
-    }
-    unreachable!()
+    Ok(())
 }
 
 #[tracing::instrument(skip(bytes))]
@@ -294,7 +159,7 @@ pub async fn download_file(
     const RETRIES: u32 = 10;
     for attempt in 1..=(RETRIES + 1) {
         let result = REQWEST_CLIENT
-            .get(url)
+            .get(&url.replace("http://", "https://"))
             .send()
             .await
             .and_then(|x| x.error_for_status());

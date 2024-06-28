@@ -72,46 +72,63 @@ async fn main() -> Result<()> {
     futures::future::try_join_all(mirror_artifacts.iter().map(|x| {
         upload_url_to_bucket_mirrors(
             format!("maven/{}", x.key()),
-            x.value().mirrors.iter().map(|x| x.key().clone()).collect(),
+            x.value()
+                .mirrors
+                .iter()
+                .map(|mirror| {
+                    if mirror.entire_url {
+                        mirror.path.clone()
+                    } else {
+                        format!("{}{}", mirror.path, x.key())
+                    }
+                })
+                .collect(),
+            x.sha1.clone(),
             &semaphore,
         )
     }))
     .await?;
 
-    if let Ok(token) = dotenvy::var("CLOUDFLARE_TOKEN") {
-        if let Ok(zone_id) = dotenvy::var("CLOUDFLARE_ZONE_ID") {
-            let cache_clears = upload_files
-                .into_iter()
-                .map(|x| format_url(&x.0))
-                .chain(
-                    mirror_artifacts
-                        .into_iter()
-                        .map(|x| format_url(&format!("maven/{}", x.0))),
-                )
-                .collect::<Vec<_>>();
+    if dotenvy::var("CLOUDFLARE_INTEGRATION")
+        .ok()
+        .and_then(|x| x.parse::<bool>().ok())
+        .unwrap_or(false)
+    {
+        if let Ok(token) = dotenvy::var("CLOUDFLARE_TOKEN") {
+            if let Ok(zone_id) = dotenvy::var("CLOUDFLARE_ZONE_ID") {
+                let cache_clears = upload_files
+                    .into_iter()
+                    .map(|x| format_url(&x.0))
+                    .chain(
+                        mirror_artifacts
+                            .into_iter()
+                            .map(|x| format_url(&format!("maven/{}", x.0))),
+                    )
+                    .collect::<Vec<_>>();
 
-            // Cloudflare ratelimits cache clears to 500 files per request
-            for chunk in cache_clears.chunks(500) {
-                REQWEST_CLIENT.post(format!("https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache"))
-                    .bearer_auth(&token)
-                    .json(&serde_json::json!({
+                // Cloudflare ratelimits cache clears to 500 files per request
+                for chunk in cache_clears.chunks(500) {
+                    REQWEST_CLIENT.post(format!("https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache"))
+                        .bearer_auth(&token)
+                        .json(&serde_json::json!({
                         "files": chunk
                     }))
-                    .send()
-                    .await
-                    .map_err(|err| {
-                        ErrorKind::Fetch {
-                            inner: err,
-                            item: "cloudflare clear cache".to_string(),
-                        }
-                    })?
-                    .error_for_status()
-                    .map_err(|err| {
-                        ErrorKind::Fetch {
-                            inner: err,
-                            item: "cloudflare clear cache".to_string(),
-                        }
-                    })?;
+                        .send()
+                        .await
+                        .map_err(|err| {
+                            ErrorKind::Fetch {
+                                inner: err,
+                                item: "cloudflare clear cache".to_string(),
+                            }
+                        })?
+                        .error_for_status()
+                        .map_err(|err| {
+                            ErrorKind::Fetch {
+                                inner: err,
+                                item: "cloudflare clear cache".to_string(),
+                            }
+                        })?;
+                }
             }
         }
     }
@@ -125,21 +142,37 @@ pub struct UploadFile {
 }
 
 pub struct MirrorArtifact {
-    pub mirrors: DashSet<String>,
+    pub sha1: Option<String>,
+    pub mirrors: DashSet<Mirror>,
 }
 
+#[derive(Eq, PartialEq, Hash)]
+pub struct Mirror {
+    path: String,
+    entire_url: bool,
+}
+
+#[tracing::instrument(skip(mirror_artifacts))]
 pub fn insert_mirrored_artifact(
     artifact: &str,
-    mirror: String,
+    sha1: Option<String>,
+    mirrors: Vec<String>,
+    entire_url: bool,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
 ) -> Result<()> {
-    mirror_artifacts
+    let mut val = mirror_artifacts
         .entry(get_path_from_artifact(artifact)?)
         .or_insert(MirrorArtifact {
+            sha1,
             mirrors: DashSet::new(),
-        })
-        .mirrors
-        .insert(mirror);
+        });
+
+    for mirror in mirrors {
+        val.mirrors.insert(Mirror {
+            path: mirror,
+            entire_url,
+        });
+    }
 
     Ok(())
 }

@@ -17,6 +17,7 @@ pub async fn fetch_fabric(
         "fabric",
         "https://meta.fabricmc.net/v2",
         "https://maven.fabricmc.net/",
+        &[],
         semaphore,
         upload_files,
         mirror_artifacts,
@@ -34,7 +35,11 @@ pub async fn fetch_quilt(
         daedalus::modded::CURRENT_QUILT_FORMAT_VERSION,
         "quilt",
         "https://meta.quiltmc.org/v3",
-        "https://meta.quiltmc.org/",
+        "https://maven.quiltmc.org/repository/release/",
+        &[
+            // This version is broken as it contains invalid library coordinates
+            "0.17.5-beta.4",
+        ],
         semaphore,
         upload_files,
         mirror_artifacts,
@@ -48,6 +53,7 @@ async fn fetch(
     mod_loader: &str,
     meta_url: &str,
     maven_url: &str,
+    skip_versions: &[&str],
     semaphore: Arc<Semaphore>,
     upload_files: &DashMap<String, UploadFile>,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
@@ -76,6 +82,7 @@ async fn fetch(
                     .game_versions
                     .iter()
                     .any(|x| x.loaders.iter().any(|x| x.id == version.version))
+                    && !skip_versions.contains(&&*version.version)
                 {
                     fetch_versions.push(version);
                 }
@@ -98,7 +105,11 @@ async fn fetch(
             (fetch_versions, fetch_intermediary_versions)
         } else {
             (
-                fabric_manifest.loader.iter().collect(),
+                fabric_manifest
+                    .loader
+                    .iter()
+                    .filter(|x| !skip_versions.contains(&&*x.version))
+                    .collect(),
                 fabric_manifest.intermediary.iter().collect(),
             )
         };
@@ -109,7 +120,9 @@ async fn fetch(
         for x in &fetch_intermediary_versions {
             insert_mirrored_artifact(
                 &x.maven,
-                maven_url.to_string(),
+                None,
+                vec![maven_url.to_string()],
+                false,
                 mirror_artifacts,
             )?;
         }
@@ -142,13 +155,24 @@ async fn fetch(
                     let new_name = lib
                         .name
                         .replace(DUMMY_GAME_VERSION, DUMMY_REPLACE_STRING);
+
+                    // Hard-code: This library is not present on fabric's maven, so we fetch it from MC libraries
+                    if &*lib.name == "net.minecraft:launchwrapper:1.12" {
+                        lib.url = Some(
+                            "https://libraries.minecraft.net/".to_string(),
+                        );
+                    }
+
                     // If a library is not intermediary, we add it to mirror artifacts to be mirrored
                     if lib.name == new_name {
                         insert_mirrored_artifact(
                             &new_name,
-                            lib.url
+                            None,
+                            vec![lib
+                                .url
                                 .clone()
-                                .unwrap_or_else(|| maven_url.to_string()),
+                                .unwrap_or_else(|| maven_url.to_string())],
+                            false,
                             mirror_artifacts,
                         )?;
                     } else {
