@@ -3,6 +3,7 @@ name: Run Meta
 on:
   schedule:
     - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   run-docker:
