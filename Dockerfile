@@ -6,7 +6,7 @@ COPY . .
 RUN cargo build --release
 
 
-FROM debian:bullseye-slim
+FROM debian:bookwormg-slim
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates openssl \
