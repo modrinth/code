@@ -74,7 +74,7 @@ import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
-import { cache_new_user_skin, account_heads, loaded_skins } from '@/helpers/skin_manager.js'
+import { cache_new_user_skin, account_heads, loaded_skins, get_heads } from '@/helpers/skin_manager.js'
 
 defineProps({
   mode: {
@@ -119,6 +119,7 @@ async function login() {
     await setAccount(loggedIn)
     await refreshValues()
     await cache_new_user_skin(loggedIn).catch(handleError)
+    get_heads()
   }
 
   mixpanel_track('AccountLogIn')
