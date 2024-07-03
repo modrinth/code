@@ -1,0 +1,11 @@
+
+[workspace]
+resolver = '2'
+members = [
+  './libs/theseus',
+  './libs/theseus_macros',
+	'./apps/theseus_playground',
+]
+
+[profile.release]
+lto = true
