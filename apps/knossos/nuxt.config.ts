@@ -1,3 +1,4 @@
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { promises as fs } from 'fs'
 import { pathToFileURL } from 'node:url'
 import svgLoader from 'vite-svg-loader'
@@ -8,7 +9,7 @@ import { globIterate } from 'glob'
 import { match as matchLocale } from '@formatjs/intl-localematcher'
 import { consola } from 'consola'
 
-const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const STAGING_API_URL = 'https://api.modrinth.com/v2/'
 
 const preloadedFonts = [
   'inter/Inter-Regular.woff2',
@@ -46,6 +47,9 @@ const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>
 }
 
 export default defineNuxtConfig({
+  workspaceDir: '../../',
+  srcDir: 'src',
+  buildDir: '../../dist/apps/knossos/.nuxt',
   app: {
     head: {
       htmlAttrs: {
@@ -80,6 +84,7 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [
+      nxViteTsPaths(),
       svgLoader({
         svgoConfig: {
           plugins: [
@@ -112,10 +117,10 @@ export default defineNuxtConfig({
       } = {}
 
       try {
-        state = JSON.parse(await fs.readFile('./generated/state.json', 'utf8'))
+        state = JSON.parse(await fs.readFile('./src/generated/state.json', 'utf8'))
       } catch {
         // File doesn't exist, create folder
-        await fs.mkdir('./generated', { recursive: true })
+        await fs.mkdir('./src/generated', { recursive: true })
       }
 
       const API_URL = getApiUrl()
@@ -156,7 +161,7 @@ export default defineNuxtConfig({
       state.donationPlatforms = donationPlatforms
       state.reportTypes = reportTypes
 
-      await fs.writeFile('./generated/state.json', JSON.stringify(state))
+      await fs.writeFile('./src/generated/state.json', JSON.stringify(state))
 
       console.log('Tags generated!')
     },
@@ -172,7 +177,7 @@ export default defineNuxtConfig({
         routes.push({
           name: `search-${type}`,
           path: `/${type}`,
-          file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
+          file: resolve(__dirname, 'src/pages/search/[searchProjectType].vue'),
           children: [],
         })
       )
@@ -230,13 +235,13 @@ export default defineNuxtConfig({
         }
       })()
 
-      for await (const localeDir of globIterate('locales/*/', { posix: true })) {
+      for await (const localeDir of globIterate('src/locales/*/', { posix: true })) {
         const tag = basename(localeDir)
         if (isProduction && !enabledLocales.includes(tag) && opts.defaultLocale !== tag) continue
 
         const locale =
           opts.locales.find((locale) => locale.tag === tag) ??
-          opts.locales[opts.locales.push({ tag }) - 1]
+          opts.locales[opts.locales.push({ tag }) - 1]!
 
         const localeFiles = (locale.files ??= [])
 
@@ -244,19 +249,21 @@ export default defineNuxtConfig({
           const fileName = basename(localeFile)
           if (fileName === 'index.json') {
             localeFiles.push({
-              from: `./${localeFile}`,
+              from: `./${relative('./src', localeFile)}`,
               format: 'crowdin',
             })
           } else if (fileName === 'meta.json') {
             const meta: Record<string, { message: string }> = await fs
               .readFile(localeFile, 'utf8')
               .then((date) => JSON.parse(date))
-            locale.meta ??= {}
+            const localeMeta = (locale.meta ??= {})
             for (const key in meta) {
-              locale.meta[key] = meta[key].message
+              const value = meta[key]
+              if (value === undefined) continue
+              localeMeta[key] = value.message
             }
           } else {
-            ;(locale.resources ??= {})[fileName] = `./${localeFile}`
+            ;(locale.resources ??= {})[fileName] = `./${relative('./src', localeFile)}`
           }
         }
 
@@ -314,6 +321,7 @@ export default defineNuxtConfig({
     strict: true,
     typeCheck: true,
     tsConfig: {
+      extends: '../tsconfig.app.json',
       compilerOptions: {
         moduleResolution: 'bundler',
         allowImportingTsExtensions: true,
@@ -366,10 +374,14 @@ export default defineNuxtConfig({
   },
   nitro: {
     moduleSideEffects: ['@vintl/compact-number/locale-data'],
+    output: {
+      dir: '../../dist/apps/knossos/.output',
+    },
   },
   devtools: {
     enabled: true,
   },
+  compatibilityDate: '2024-07-03',
 })
 
 function getApiUrl() {

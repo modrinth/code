@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo/omorphia",
+  "name": "@modrinth/omorphia",
   "version": "0.0.1",
   "main": "./index.js",
   "types": "./index.d.ts",

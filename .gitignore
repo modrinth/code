@@ -47,3 +47,6 @@ Thumbs.db
 .nuxt
 .nitro
 .cache
+
+# knossos generated files
+apps/knossos/src/generated
