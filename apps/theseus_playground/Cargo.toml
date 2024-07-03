@@ -1,0 +1,27 @@
+[package]
+name = "theseus_playground"
+version = "0.0.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+theseus = { path = "../theseus", features = ["cli"] }
+
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tauri = { version = "1.6", features = ["shell-open"] }
+tokio = { version = "1", features = ["full"] }
+thiserror = "1.0"
+url = "2.2"
+webbrowser = "0.8.13"
+dunce = "1.0.3"
+
+tokio-stream = { version = "0.1", features = ["fs"] }
+futures = "0.3"
+daedalus = {version = "0.1.15", features = ["bincode"] }
+uuid = { version = "1.1", features = ["serde", "v4"] }
+
+tracing = "0.1.37"
+tracing-subscriber = "0.3.18"
+tracing-error = "0.2.0"

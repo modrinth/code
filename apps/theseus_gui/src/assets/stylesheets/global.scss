@@ -1,0 +1,137 @@
+:root {
+  font-family: var(--font-standard);
+  color-scheme: dark;
+  --view-width: calc(100% - 5rem);
+  --expanded-view-width: calc(100% - 13rem);
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.card-divider {
+  background-color: var(--color-button-bg);
+  border: none;
+  color: var(--color-button-bg);
+  height: 1px;
+  margin: var(--gap-sm) 0;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+input {
+  border: none !important;
+}
+
+.badge {
+  display: flex;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  align-items: center;
+  background-color: var(--color-bg);
+  padding-block: var(--gap-sm);
+  padding-inline: var(--gap-lg);
+  width: min-content;
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-right: 0.5rem;
+  }
+
+  &.featured {
+    background-color: var(--color-brand-highlight);
+    color: var(--color-contrast);
+  }
+}
+
+.mac {
+  .nav-container {
+    padding-top: calc(var(--gap-md) + 1.75rem);
+  }
+
+  .account-card,
+  .card-section {
+    top: calc(var(--gap-md) + 1.75rem);
+  }
+}
+
+.windows {
+  .fake-appbar {
+    height: 2.5rem !important;
+  }
+
+  .window-controls {
+    display: flex !important;
+  }
+
+  .info-card {
+    right: 8rem;
+  }
+
+  .profile-card {
+    right: 8rem;
+  }
+}
+
+* {
+  scrollbar-width: auto;
+  scrollbar-color: var(--color-button-bg) var(--color-bg);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: var(--gap-md);
+  border: 3px solid var(--color-bg);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-bg);
+  border: 3px solid var(--color-bg);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-button-bg);
+  border-radius: var(--radius-lg);
+  border: 3px solid var(--color-bg);
+}
+
+.highlighted {
+  box-shadow: 0 0 1rem var(--color-brand) !important;
+}
+
+.gecko {
+  background-color: var(--color-raised-bg);
+  box-shadow: none !important;
+}
+
+img {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
