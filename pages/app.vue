@@ -1006,6 +1006,7 @@ useSeoMeta({
   align-items: center;
   text-align: center;
   flex-direction: column;
+  isolation: isolate;
 
   .main-subheader {
     font-size: 1.625rem;
@@ -1040,6 +1041,10 @@ useSeoMeta({
     height: auto;
     mask-image: none;
     z-index: 1;
+  }
+
+  .bottom-transition {
+    z-index: -1;
   }
 }
 
