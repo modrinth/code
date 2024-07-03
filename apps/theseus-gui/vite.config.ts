@@ -2,13 +2,16 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import alias from '@rollup/plugin-alias'
 import { resolve } from 'path'
-import eslint from 'vite-plugin-eslint'
 import svgLoader from 'vite-svg-loader'
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 const projectRootDir = resolve(__dirname)
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  root: __dirname,
+  cacheDir: '../../node_modules/.vite/apps/theseus-gui',
+
   plugins: [
     vue(),
     alias({
@@ -33,7 +36,7 @@ export default defineConfig({
         ],
       },
     }),
-    eslint(),
+    nxViteTsPaths(),
   ],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
@@ -48,6 +51,10 @@ export default defineConfig({
   // https://tauri.studio/v1/api/config#buildconfig.beforedevcommand
   envPrefix: ['VITE_', 'TAURI_'],
   build: {
+    outDir: '../../dist/apps/theseus-gui',
+    emptyOutDir: true,
+    reportCompressedSize: true,
+
     // Tauri supports es2021
     target: process.env.TAURI_PLATFORM == 'windows' ? 'chrome105' : 'safari13',
     // don't minify for debug builds
@@ -56,6 +63,7 @@ export default defineConfig({
     sourcemap: !!process.env.TAURI_DEBUG,
     commonjsOptions: {
       esmExternals: true,
+      transformMixedEsModules: true,
     },
   },
 })

@@ -1,9 +1,9 @@
 {
   "build": {
-    "beforeDevCommand": "pnpm dev",
-    "beforeBuildCommand": "pnpm build",
+    "beforeDevCommand": "nx serve theseus-gui",
+    "beforeBuildCommand": "echo Building Rust Application...",
     "devPath": "http://localhost:1420",
-    "distDir": "../dist",
+    "distDir": "../../dist/apps/theseus-gui",
     "withGlobalTauri": false
   },
   "package": {

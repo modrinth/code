@@ -22,11 +22,13 @@ import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vu
 import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
-import { version } from '../../package.json'
+import { getVersion } from '@tauri-apps/api/app'
 
 const pageOptions = ['Home', 'Library']
 
 const themeStore = useTheming()
+
+const version = await getVersion();
 
 const accessSettings = async () => {
   const settings = await get()

@@ -5,6 +5,7 @@ members = [
   './libs/theseus',
   './libs/theseus_macros',
 	'./apps/theseus_playground',
+  './apps/theseus_gui_rs',
 ]
 
 [profile.dev]
