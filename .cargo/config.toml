@@ -1,2 +1,6 @@
 [build]
 target-dir = 'dist/target'
+
+# Windows has stack overflows when calling from Tauri, so we increase compiler size
+[target.'cfg(windows)']
+rustflags = ["-C", "link-args=/STACK:16777220"]
