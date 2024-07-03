@@ -1,0 +1,51 @@
+# Environment Indicator
+
+:::raw
+<DemoContainer>
+  <EnvironmentIndicator
+    :typeOnly="false"
+    client-side="unsupported"
+    server-side="required"
+    type="mod"
+    :search="true"
+  />
+  <EnvironmentIndicator
+    :type-only="false"
+    client-side="required"
+    server-side="unsupported"
+    type="mod"
+    :search="true"
+  />
+  <EnvironmentIndicator
+    :type-only="false"
+    client-side="required"
+    server-side="required"
+    type="mod"
+    :search="true"
+  />
+</DemoContainer>
+:::
+
+```vue
+<EnvironmentIndicator
+  :type-only="false"
+  :client-side="true"
+  :server-side="true"
+  type="mod"
+  :search="true"
+/>
+<EnvironmentIndicator
+  :type-only="false"
+  :client-side="false"
+  :server-side="true"
+  type="mod"
+  :search="true"
+/>
+<EnvironmentIndicator
+  :type-only="false"
+  :client-side="true"
+  :server-side="false"
+  type="mod"
+  :search="true"
+/>
+```

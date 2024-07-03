@@ -1,0 +1,24 @@
+.VPLink,
+.title,
+.pager-link,
+.link,
+.header-anchor {
+  color: inherit;
+  transition: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+
+  &:active:not(&:disabled) {
+    scale: 1;
+  }
+}
+
+.content-container {
+  max-width: 100% !important;
+}
+
+body {
+  background-color: var(--vp-c-bg);
+}
