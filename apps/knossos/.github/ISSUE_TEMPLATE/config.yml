@@ -1,0 +1,16 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discord
+    about: Ask questions on our Discord Server.
+    url: https://discord.modrinth.com
+  - name: Roadmap
+    about: View our Roadmap. Please do not open issues for items on our roadmap.
+    url: https://roadmap.modrinth.com
+  - name: Discussions (Feature requests)
+    about: |
+      Please use Issues for reporting bugs and suggesting enhancements to existing features.
+      Suggestions for new features should be made as a Discussion.
+    url: https://github.com/orgs/modrinth/discussions/categories/feature-requests
+  - name: Documentation
+    about: Useful documentation about Modrinth, its API, and how you can contribute.
+    url: https://docs.modrinth.com

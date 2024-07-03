@@ -1,0 +1,20 @@
+name: Deploy
+
+on: push
+
+jobs:
+  deploy:
+    if: github.repository_owner == 'modrinth'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Cloudflare Pages deployment
+        uses: WalshyDev/cf-pages-await@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: '9ddae624c98677d68d93df6e524a6061'
+          project: 'knossos'
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          commitHash: ${{ steps.push-changes.outputs.commit-hash }}
