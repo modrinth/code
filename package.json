@@ -1,0 +1,13 @@
+{
+  "name": "@monorepo/source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {},
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "@nx/js": "19.4.0",
+    "@nx/workspace": "19.4.0",
+    "nx": "19.4.0"
+  }
+}
