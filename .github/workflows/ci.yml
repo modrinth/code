@@ -13,27 +13,31 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: install tauri dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libselinux
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      - name: Restore cached npm dependencies
-        id: cache-dependencies-restore
-        uses: actions/cache/restore@v3
-        with:
-          path: |
-            node_modules
-          key: npm-dependencies-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
-      - run: pnpm install --frozen-lockfile
-
-      - name: Cache npm dependencies
-        id: cache-dependencies-save
-        uses: actions/cache/save@v3
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
         with:
-          path: |
-            node_modules
-          key: ${{ steps.cache-dependencies-restore.outputs.cache-primary-key }}
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - uses: nrwl/nx-set-shas@v3
 
@@ -41,4 +45,4 @@ jobs:
       - run: git branch --track main origin/main
         if: ${{ github.event_name == 'pull_request' }}
 
-      - run: pnpm nx affected -t lint test build --parallel=1
+      - run: pnpm nx affected -t lint test build
