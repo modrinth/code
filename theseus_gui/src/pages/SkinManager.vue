@@ -38,28 +38,27 @@
             <p class="title">Current Skin</p>
             <p class="description">{{ skinData.arms }}, {{ skinData.cape }}</p>
           </div>
-          <Button v-if="notInLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
+          <Button v-if="!InLibrary" color="primary" @click="handleAdd"> Add to Library </Button>
         </div>
       </Card>
     </div>
-    
+
     <div class="row">
       <div class="instance">
         <Card class="instance-card-item button-base" @click="handleModal">
           <PlusIcon size="lg" alt="Mod card" class="mod-image" />
-            <div class="project-info">
-              <p class="title">Add new skin</p>
-              <p class="description">&nbsp;</p>
-            </div>
+          <div class="project-info">
+            <p class="title">Add new skin</p>
+            <p class="description">&nbsp;</p>
+          </div>
         </Card>
       </div>
       <SkinSave
         v-for="skin in filteredResults"
-        ref="skinComponents"
         :key="skin"
         :data="skin"
         @contextmenu.prevent.stop="(event) => handleRightClick(event, skin)"
-        @set-skin="(data) => handleSkin(data.skin, data.cape, data.arms, 'upload')"
+        @set-skin="(data) => clickCard(data)"
       />
       <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
         <template #use> <PlayIcon /> Use </template>
@@ -96,7 +95,7 @@
           <div class="input-row">
             <p class="input-label">Name</p>
             <input
-              v-model="skinName"
+              v-model="selectedSkin.name"
               autocomplete="off"
               class="text-input"
               type="text"
@@ -106,38 +105,35 @@
           </div>
           <div class="input-row">
             <p class="input-label">Arm style</p>
-            <Chips v-model="skinArms" :items="['classic', 'slim']" @click="handleArms" />
+            <Chips v-model="selectedSkin.arms" :items="['classic', 'slim']" @click="handleArms" />
           </div>
         </div>
         <canvas id="new_render" class="render" width="0" height="0" />
       </div>
       <div class="input-row">
         <p class="input-label">Cape</p>
-        <Chips v-model="skinCape" :items="skinData.unlocked_capes" @click="handleCape" />
+        <Chips v-model="selectedSkin.cape" :items="skinData.unlocked_capes" @click="handleCape" />
       </div>
       <div v-if="!editSkin" class="input-group push-right">
         <Button @click="skinModal.hide()">
           <XIcon />
           Cancel
         </Button>
-        <Button
-          :disabled="!validSkin || uploadingSkin"
-          @click="handleSkin(newSkin, newCape, newArms, 'upload')"
-        >
+        <Button :disabled="!validSkin || uploadingSkin" @click="handleSkin('upload')">
           <UploadIcon />
           {{ uploadingSkin ? 'Uploading...' : 'Use' }}
         </Button>
         <Button
-          :disabled="!validSkin || uploadingSkin || skinName.trim() == ''"
-          @click="handleSkin(newSkin, newCape, newArms, 'save')"
+          :disabled="!validSkin || uploadingSkin || selectedSkin.name.trim() == ''"
+          @click="handleSkin('save')"
         >
           <SaveIcon />
           Save
         </Button>
         <Button
           color="primary"
-          :disabled="!validSkin || uploadingSkin || skinName.trim() == ''"
-          @click="handleSkin(newSkin, newCape, newArms, 'saveupload')"
+          :disabled="!validSkin || uploadingSkin || selectedSkin.name.trim() == ''"
+          @click="handleSkin('saveupload')"
         >
           <PlusIcon v-if="!uploadingSkin" />
           {{ uploadingSkin ? 'Uploading...' : 'Save & Use' }}
@@ -150,7 +146,7 @@
         </Button>
         <Button
           color="primary"
-          :disabled="!validSkin || skinName.trim() == ''"
+          :disabled="!validSkin || selectedSkin.name.trim() == ''"
           @click="edit_skin_end"
         >
           <SaveIcon />
@@ -218,14 +214,14 @@
             loading
               ? 'Importing...'
               : Array.from(importer.skinNames)
-                  .flatMap((e) => e)
-                  .some((e) => e.selected)
-              ? `Import ${
-                  Array.from(importer.skinNames)
                     .flatMap((e) => e)
-                    .filter((e) => e.selected).length
-                } skins`
-              : 'Select skins to import'
+                    .some((e) => e.selected)
+                ? `Import ${
+                    Array.from(importer.skinNames)
+                      .flatMap((e) => e)
+                      .filter((e) => e.selected).length
+                  } skins`
+                : 'Select skins to import'
           }}
         </Button>
         <ProgressBar v-if="loading" :progress="(importedSkins / (totalSkins + 0.0001)) * 100" />
@@ -303,26 +299,30 @@ import { IdleAnimation, SkinViewer, WalkingAnimation } from 'skinview3d'
 const themeStore = useTheming()
 const notificationsWrapper = ref(null)
 
-const notInLibrary = ref(false)
-const selectedSkin = ref({})
-const skinId = ref('')
-const skinUser = ref('')
 const skinModal = ref(null)
 const deleteConfirmModal = ref(null)
-const newSkin = ref(null)
-const displaySkin = ref(null)
-const validSkin = ref(false)
-const uploadingSkin = ref(false)
+const skinOptions = ref(null)
+// Possibly dont need skinComponents?
 const changeSkinType = ref('from file')
-const skinName = ref('')
+
 const skinData = ref({})
-const skinArms = ref('slim')
-const skinCape = ref('no cape')
+const selectedSkin = ref({
+  arms: 'classic',
+  cape: 'no cape',
+  name: '',
+  skin: '',
+  unlocked_capes: [],
+})
+
+const displaySkin = ref(null)
 const currentRender = ref(null)
 const newRender = ref(null)
-const skinOptions = ref(null)
-const skinComponents = ref([])
+
+const InLibrary = ref(true)
+const validSkin = ref(false)
+const uploadingSkin = ref(false)
 const editSkin = ref(false)
+
 const loading = ref(false)
 const importedSkins = ref(0)
 const totalSkins = ref(0)
@@ -450,7 +450,12 @@ const handleRightClick = (event, item) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'use':
-      await handleSkin(args.item.skin, args.item.cape, args.item.arms, 'upload')
+      selectedSkin.value = {
+        arms: args.item.arms,
+        cape: args.item.cape,
+        skin: args.item.skin,
+      }
+      await handleSkin('upload')
       break
     case 'left':
       if (sortBy.value === 'Custom') await moveCard(-1, args.item)
@@ -485,8 +490,8 @@ const deleteSkin = async () => {
     }
   }
   await update_skins(skinSaves.value).catch(handleError)
-  notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
-    handleError
+  InLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+    handleError,
   )
 }
 
@@ -500,7 +505,7 @@ const selectLauncherPath = async () => {
 
 const reload = async () => {
   importer.value.skinNames = get_launcher_names(importer.value.path, importType.value).catch(
-    handleError
+    handleError,
   )
 }
 
@@ -512,7 +517,7 @@ const next = async () => {
   loading.value = true
   for (const skin of importer.value.skinNames.filter((skin) => skin.selected)) {
     const data = await import_skin(skin.id, importer.value.path, importType.value).catch(
-      handleError
+      handleError,
     )
     const model = await get_render(data).catch(handleError)
     shiftSaves(0, true)
@@ -529,9 +534,6 @@ const next = async () => {
 const handleModal = async () => {
   skinClear()
   changeSkinType.value = 'from file'
-  skinArms.value = 'classic'
-  skinCape.value = 'no cape'
-  skinName.value = ''
   editSkin.value = false
   skinModal.value.show()
 }
@@ -539,16 +541,22 @@ const handleModal = async () => {
 const handleAdd = async () => {
   const model = await get_render(skinData.value).catch(handleError)
   await save_skin(selectedAccount.value.id, skinData.value, 'untitled', model, '').catch(
-    handleError
+    handleError,
   )
   skinSaves.value = await get_skins().catch(handleError)
-  notInLibrary.value = false
+  InLibrary.value = true
 }
 
 const skinClear = async () => {
   validSkin.value = false
   displaySkin.value = null
-  newSkin.value = null
+  selectedSkin.value = {
+    arms: 'classic',
+    cape: 'no cape',
+    name: '',
+    skin: '',
+    unlocked_capes: [],
+  }
   if (newRender.value) {
     newRender.value.resetSkin()
     newRender.value.resetCape()
@@ -557,52 +565,61 @@ const skinClear = async () => {
 
 const handleArms = async () => {
   if (validSkin.value) {
-    newRender.value.loadSkin(displaySkin.value, { model: convert_arms(skinArms.value) })
+    newRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
   }
 }
 
 const handleCape = async () => {
   if (validSkin.value) {
-    if (skinCape.value == 'no cape') newRender.value.resetCape()
-    else newRender.value.loadCape(await get_cape_data(skinCape.value, 'url').catch(handleError))
+    if (selectedSkin.value.cape == 'no cape') newRender.value.resetCape()
+    else
+      newRender.value.loadCape(
+        await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError),
+      )
   }
 }
 
-const handleSkin = async (skin, cape, arms, state) => {
-  let data = {
-    skin: skin,
-    cape: cape,
-    arms: arms,
-    unlocked_capes: [],
-  }
+const clickCard = (data) => {
+  selectedSkin.value = data
+  handleSkin('upload')
+}
 
+const handleSkin = async (state) => {
   if (state.includes('save')) {
     shiftSaves(0, true)
     await update_skins(skinSaves.value).catch(handleError)
-    const model = await get_render(data).catch(handleError)
-    await save_skin(selectedAccount.value.id, data, skinName.value.trim(), model, '').catch(
-      handleError
-    )
+    const model = await get_render(selectedSkin.value).catch(handleError)
+    await save_skin(
+      selectedAccount.value.id,
+      selectedSkin.value,
+      selectedSkin.value.name.trim(),
+      model,
+      '',
+    ).catch(handleError)
     skinSaves.value = await get_skins().catch(handleError)
   }
   if (state.includes('upload')) {
     uploadingSkin.value = true
-    const capeid = await get_cape_data(cape, 'id').catch(handleError)
+    const capeid = await get_cape_data(selectedSkin.value.cape, 'id').catch(handleError)
     const uploadedCape = await set_cape(capeid, selectedAccount.value.access_token).catch(
-      handleError
+      handleError,
     )
-    const uploadedSkin = await set_skin(skin, arms, selectedAccount.value).catch(handleError)
-    skinData.value = data
-    notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
-      handleError
-    )
+    const uploadedSkin = await set_skin(
+      selectedSkin.value.skin,
+      selectedSkin.value.arms,
+      selectedAccount.value,
+    ).catch(handleError)
 
     if (uploadedSkin) {
-      const renderArms = convert_arms(arms)
-      if (!skin.startsWith('data:image/png;base64,')) skin = tauri.convertFileSrc(skin)
-      currentRender.value.loadSkin(skin, { model: renderArms })
-      skinData.value.arms = arms
-      skinData.value.cape = cape
+      skinData.value = selectedSkin.value
+      InLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+        handleError,
+      )
+      const renderArms = convert_arms(selectedSkin.value.arms)
+      if (!selectedSkin.value.skin.startsWith('data:image/png;base64,')) {
+        selectedSkin.value.skin = tauri.convertFileSrc(selectedSkin.value.skin)
+      }
+      currentRender.value.loadSkin(selectedSkin.value.skin, { model: renderArms })
     } else {
       notificationsWrapper.value.addNotification({
         title: 'Error Uploading Skin',
@@ -613,7 +630,7 @@ const handleSkin = async (skin, cape, arms, state) => {
     if (uploadedCape) {
       if (capeid == 'no cape') currentRender.value.resetCape()
       else {
-        const capeurl = await get_cape_data(cape, 'url').catch(handleError)
+        const capeurl = await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError)
         currentRender.value.loadCape(capeurl)
       }
     } else {
@@ -634,9 +651,10 @@ const edit_skin = async (data) => {
   changeSkinType.value = 'from file'
   editSkin.value = true
   displaySkin.value = data.skin
-  skinName.value = data.name
-  skinId.value = data.id
-  skinUser.value = data.user
+  selectedSkin.value.skin = data.skin
+  selectedSkin.value.name = data.name
+  selectedSkin.value.id = data.id
+  selectedSkin.value.user = data.user
   validSkin.value = true
   await skinModal.value.show()
   newRender.value = new SkinViewer({
@@ -644,29 +662,39 @@ const edit_skin = async (data) => {
     width: 247.5,
     height: 330,
   })
-  skinArms.value = data.arms
-  skinCape.value = data.cape
+  selectedSkin.value.arms = data.arms
+  selectedSkin.value.cape = data.cape
   newRender.value.animation = new IdleAnimation()
   newRender.value.controls.enableZoom = false
-  newRender.value.loadSkin(displaySkin.value, { model: convert_arms(skinArms.value) })
+  newRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
+  if (selectedSkin.value.cape !== 'no cape')
+    newRender.value.loadCape(await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError))
 }
 
 const edit_skin_end = async () => {
-  let data = {}
-  data.skin = displaySkin.value
-  data.cape = skinCape.value
-  data.arms = skinArms.value
-  data.unlocked_capes = []
+  const data = {
+    skin: selectedSkin.value.skin,
+    cape: selectedSkin.value.cape,
+    arms: selectedSkin.value.arms,
+    unlocked_capes: [],
+  }
 
   const model = await get_render(data).catch(handleError)
-  await save_skin(skinUser.value, data, skinName.value.trim(), model, skinId.value).catch(
-    handleError
-  )
+  await save_skin(
+    selectedSkin.value.user,
+    data,
+    selectedSkin.value.name.trim(),
+    model,
+    selectedSkin.value.id,
+  ).catch(handleError)
   skinSaves.value = await get_skins().catch(handleError)
   skinClear()
   editSkin.value = false
 
   skinModal.value.hide()
+  InLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+    handleError,
+  )
 }
 
 const duplicate_skin = async (args) => {
@@ -700,7 +728,7 @@ const shiftSaves = (index, shiftRight) => {
 }
 
 const openskin = async () => {
-  newSkin.value = await open({
+  selectedSkin.value.skin = await open({
     multiple: false,
     filters: [
       {
@@ -709,16 +737,16 @@ const openskin = async () => {
       },
     ],
   })
-  if (!newSkin.value) {
+  if (!selectedSkin.value.skin) {
     skinClear()
     return
   }
-  validSkin.value = await check_image(newSkin.value).catch(handleError)
+  validSkin.value = await check_image(selectedSkin.value.skin).catch(handleError)
   if (!validSkin.value) {
     skinClear()
     return
   }
-  displaySkin.value = tauri.convertFileSrc(newSkin.value)
+  displaySkin.value = tauri.convertFileSrc(selectedSkin.value.skin)
   if (!newRender.value)
     newRender.value = new SkinViewer({
       canvas: document.getElementById('new_render'),
@@ -727,15 +755,15 @@ const openskin = async () => {
     })
   newRender.value.animation = new IdleAnimation()
   newRender.value.controls.enableZoom = false
-  newRender.value.loadSkin(displaySkin.value, { model: convert_arms(skinArms.value) })
-  if (skinCape.value !== 'no cape')
-    newRender.value.loadCape(await get_cape_data(skinCape.value, 'url').catch(handleError))
+  newRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
+  if (selectedSkin.value.cape !== 'no cape')
+    newRender.value.loadCape(await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError))
 }
 
 const create_render = async () => {
   skinData.value = await get_user_skin_data(selectedAccount.value.id).catch(handleError)
-  notInLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
-    handleError
+  InLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
+    handleError,
   )
   const arms = convert_arms(skinData.value.arms)
   const cape = await get_cape_data(skinData.value.cape, 'url').catch(handleError)
@@ -756,7 +784,7 @@ const create_render = async () => {
 const update_render = async (account) => {
   if (currentRender.value == null) return
   skinData.value = await get_user_skin_data(account).catch(handleError)
-  notInLibrary.value = await check_skin(skinData.value.skin, account).catch(handleError)
+  InLibrary.value = await check_skin(skinData.value.skin, account).catch(handleError)
   currentRender.value.loadSkin(skinData.value.skin, {
     model: convert_arms(skinData.value.arms),
   })
@@ -778,7 +806,7 @@ const handleImportType = async () => {
   if (importer.value.path !== null) {
     importer.value.skinNames = await get_launcher_names(
       importer.value.path,
-      importType.value
+      importType.value,
     ).catch(handleError)
   } else importer.value.path = ''
 }
@@ -794,7 +822,7 @@ watch(
       await update_render(selectedAccount.value.id)
     }
   },
-  { once: true }
+  { once: true },
 )
 
 function convert_arms(arms) {
@@ -866,7 +894,6 @@ onMounted(() => {
 .modal-row {
   display: flex;
   flex-direction: row;
-  padding: var(--gap-sm);
   gap: var(--gap-sm);
 }
 

@@ -23,12 +23,12 @@ pub async fn check_image(path: String) -> crate::Result<bool> {
 }
 
 pub async fn check_skin(skin: String, id: Uuid) -> crate::Result<bool> {
-    let mut val: bool = true;
+    let mut val: bool = false;
     let library: Vec<SkinSave> = get_skins().await?;
     for save in library {
         if save.user != id { continue; }
         if save.skin == skin {
-            val = false;
+            val = true;
             break;
         }
     }
