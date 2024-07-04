@@ -2,11 +2,11 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 
 jobs:
-  master:
+  main:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
       - uses: nrwl/nx-set-shas@v3
 
       # This line is needed for nx affected to work when CI is running on a PR
-      - run: git branch --track master origin/master
+      - run: git branch --track main origin/main
         if: ${{ github.event_name == 'pull_request' }}
 
       - run: pnpm nx affected -t lint test build --parallel=3
