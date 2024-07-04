@@ -31,8 +31,10 @@
   <div class="content">
     <div class="instance">
       <Card class="instance-card-item">
-        <canvas id="skin_container" class="render" />
-        <AnimatedLogo v-if="!loaded_skins" />
+        <div class="overlap">
+          <canvas id="skin_container" class="render" />
+          <AnimatedLogo v-if="!loaded_skins" />
+        </div>
         <div class="card-row">
           <div class="project-info">
             <p class="title">Current Skin</p>
@@ -850,6 +852,23 @@ onMounted(() => {
     width: 0;
     background: transparent;
   }
+}
+
+.overlap {
+  display: grid;
+  justify-items: start;
+  align-items: end;
+
+  .loading {
+    margin: 0;
+    padding: 0;
+    width: 1rem;
+    height: 1rem;
+  }
+}
+.overlap > * {
+  grid-column-start: 1;
+  grid-row-start: 1;
 }
 
 .modal {

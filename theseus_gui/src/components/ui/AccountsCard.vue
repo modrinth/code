@@ -7,7 +7,8 @@
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
   >
-    <AnimatedLogo v-if="!loaded_skins" />
+  <div class="overlap">
+    <AnimatedLogo v-if="!loaded_skins" class="loading" />
     <Avatar
       :size="mode === 'expanded' ? 'xs' : 'sm'"
       :src="
@@ -16,6 +17,7 @@
           : 'https://launcher-files.modrinth.com/assets/steve_head.png'
       "
     />
+  </div>
   </div>
   <transition name="fade">
     <Card
@@ -306,6 +308,24 @@ onUnmounted(() => {
   margin: auto 0 auto 0.25rem;
   display: flex;
   flex-direction: column;
+}
+
+.overlap {
+  display: grid;
+  justify-items: center;
+  align-items: start;
+
+  .loading {
+    margin: 0;
+    padding: 0;
+    width: 1rem;
+    height: 1rem;
+    transform: scale(.6) translateX(-2rem) translateY(-0.3rem);
+}
+}
+.overlap > * {
+  grid-column-start: 1;
+  grid-row-start: 1;
 }
 
 .text {
