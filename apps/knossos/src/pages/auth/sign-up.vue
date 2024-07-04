@@ -3,45 +3,27 @@
     <h1>{{ formatMessage(messages.signUpWithTitle) }}</h1>
 
     <section class="third-party">
-      <a
-        class="btn discord-btn"
-        :href="getAuthUrl('discord', redirectTarget)"
-      >
+      <a class="btn discord-btn" :href="getAuthUrl('discord', redirectTarget)">
         <SSODiscordIcon />
         <span>Discord</span>
       </a>
-      <a
-        class="btn"
-        :href="getAuthUrl('github', redirectTarget)"
-      >
+      <a class="btn" :href="getAuthUrl('github', redirectTarget)">
         <SSOGitHubIcon />
         <span>GitHub</span>
       </a>
-      <a
-        class="btn"
-        :href="getAuthUrl('microsoft', redirectTarget)"
-      >
+      <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
         <SSOMicrosoftIcon />
         <span>Microsoft</span>
       </a>
-      <a
-        class="btn"
-        :href="getAuthUrl('google', redirectTarget)"
-      >
+      <a class="btn" :href="getAuthUrl('google', redirectTarget)">
         <SSOGoogleIcon />
         <span>Google</span>
       </a>
-      <a
-        class="btn"
-        :href="getAuthUrl('steam', redirectTarget)"
-      >
+      <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
         <SSOSteamIcon />
         <span>Steam</span>
       </a>
-      <a
-        class="btn"
-        :href="getAuthUrl('gitlab', redirectTarget)"
-      >
+      <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
         <SSOGitLabIcon />
         <span>GitLab</span>
       </a>
@@ -51,10 +33,7 @@
 
     <section class="auth-form">
       <div class="iconified-input">
-        <label
-          for="email"
-          hidden
-        >{{ formatMessage(messages.emailLabel) }}</label>
+        <label for="email" hidden>{{ formatMessage(messages.emailLabel) }}</label>
         <MailIcon />
         <input
           id="email"
@@ -63,14 +42,11 @@
           autocomplete="username"
           class="auth-form__input"
           :placeholder="formatMessage(messages.emailLabel)"
-        >
+        />
       </div>
 
       <div class="iconified-input">
-        <label
-          for="username"
-          hidden
-        >{{ formatMessage(messages.usernameLabel) }}</label>
+        <label for="username" hidden>{{ formatMessage(messages.usernameLabel) }}</label>
         <UserIcon />
         <input
           id="username"
@@ -79,14 +55,11 @@
           autocomplete="username"
           class="auth-form__input"
           :placeholder="formatMessage(messages.usernameLabel)"
-        >
+        />
       </div>
 
       <div class="iconified-input">
-        <label
-          for="password"
-          hidden
-        >{{ formatMessage(messages.passwordLabel) }}</label>
+        <label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
         <KeyIcon />
         <input
           id="password"
@@ -95,14 +68,11 @@
           type="password"
           autocomplete="new-password"
           :placeholder="formatMessage(messages.passwordLabel)"
-        >
+        />
       </div>
 
       <div class="iconified-input">
-        <label
-          for="confirm-password"
-          hidden
-        >{{ formatMessage(messages.passwordLabel) }}</label>
+        <label for="confirm-password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
         <KeyIcon />
         <input
           id="confirm-password"
@@ -111,7 +81,7 @@
           autocomplete="new-password"
           class="auth-form__input"
           :placeholder="formatMessage(messages.confirmPasswordLabel)"
-        >
+        />
       </div>
 
       <Checkbox
@@ -124,18 +94,12 @@
       <p>
         <IntlFormatted :message-id="messages.legalDisclaimer">
           <template #terms-link="{ children }">
-            <NuxtLink
-              to="/legal/terms"
-              class="text-link"
-            >
+            <NuxtLink to="/legal/terms" class="text-link">
               <component :is="() => children" />
             </NuxtLink>
           </template>
           <template #privacy-policy-link="{ children }">
-            <NuxtLink
-              to="/legal/privacy"
-              class="text-link"
-            >
+            <NuxtLink to="/legal/privacy" class="text-link">
               <component :is="() => children" />
             </NuxtLink>
           </template>
@@ -159,10 +123,7 @@
 
       <div class="auth-form__additional-options">
         {{ formatMessage(messages.alreadyHaveAccountLabel) }}
-        <NuxtLink
-          class="text-link"
-          :to="signInLink"
-        >
+        <NuxtLink class="text-link" :to="signInLink">
           {{ formatMessage(commonMessages.signInButton) }}
         </NuxtLink>
       </div>

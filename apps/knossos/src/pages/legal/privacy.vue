@@ -123,7 +123,8 @@
     <p>
       When you sign up for our
       <a href="https://blog.modrinth.com/p/creator-monetization-beta">
-        Creator Monetization Program</a>
+        Creator Monetization Program</a
+      >
       (the "CMP"), we collect:
     </p>
     <ul>
@@ -135,7 +136,7 @@
     <h2>Data retention</h2>
     <p>
       View data and download data are anonymized 24 months after being recorded. All personal
-      information will be removed from those records during anonymization.<br>
+      information will be removed from those records during anonymization.<br />
       Data is retained indefinitely. We do not delete any data unless you request it.
     </p>
 
@@ -161,7 +162,7 @@
     <h2>Data Governance</h2>
     <p>
       Database access is limited to the minimum amount of Rinth, Inc. employees required to run the
-      service.<br>
+      service.<br />
       Data is stored in a jurisdiction that is part of the European Economic Area (EEA), encrypted
       both in storage and in transit.
     </p>
@@ -253,9 +254,7 @@
     <p>
       If you are a California resident, California law may provide you with additional rights
       regarding our use of your personal information. To learn more about your California privacy
-      rights, visit <nuxt-link to="/legal/ccpa">
-        this page
-      </nuxt-link>.
+      rights, visit <nuxt-link to="/legal/ccpa"> this page </nuxt-link>.
     </p>
     <p>
       California's "Shine the Light" law (Civil Code Section § 1798.83) permits users of our App
@@ -280,9 +279,9 @@
       <a href="mailto:gdpr@modrinth.com">gdpr@modrinth.com</a> or write us at:
     </p>
     <p>
-      Rinth, Inc.<br>
-      410 North Scottsdale Road<br>
-      Suite 1000<br>
+      Rinth, Inc.<br />
+      410 North Scottsdale Road<br />
+      Suite 1000<br />
       Tempe, AZ 85281
     </p>
 
@@ -294,12 +293,12 @@
       using their online form or by writing at:
     </p>
     <p>
-      Information Commissioner's Office<br>
-      Wycliffe House<br>
-      Water Lane<br>
-      Wilmslow<br>
-      Cheshire<br>
-      SK9 5AF<br>
+      Information Commissioner's Office<br />
+      Wycliffe House<br />
+      Water Lane<br />
+      Wilmslow<br />
+      Cheshire<br />
+      SK9 5AF<br />
       United Kingdom
     </p>
     <p>

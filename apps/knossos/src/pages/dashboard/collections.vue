@@ -4,28 +4,14 @@
     <h2>{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
     <div class="search-row">
       <div class="iconified-input">
-        <label
-          for="search-input"
-          hidden
-        >{{ formatMessage(messages.searchInputLabel) }}</label>
+        <label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>
         <SearchIcon />
-        <input
-          id="search-input"
-          v-model="filterQuery"
-          type="text"
-        >
-        <Button
-          v-if="filterQuery"
-          class="r-btn"
-          @click="() => (filterQuery = '')"
-        >
+        <input id="search-input" v-model="filterQuery" type="text" />
+        <Button v-if="filterQuery" class="r-btn" @click="() => (filterQuery = '')">
           <XIcon />
         </Button>
       </div>
-      <Button
-        color="primary"
-        @click="$refs.modal_creation.show()"
-      >
+      <Button color="primary" @click="$refs.modal_creation.show()">
         <PlusIcon /> {{ formatMessage(messages.createNewButton) }}
       </Button>
     </div>
@@ -35,10 +21,7 @@
         :to="`/collection/following`"
         class="universal-card recessed collection"
       >
-        <Avatar
-          src="https://cdn.modrinth.com/follow-collection.png"
-          class="icon"
-        />
+        <Avatar src="https://cdn.modrinth.com/follow-collection.png" class="icon" />
         <div class="details">
           <span class="title">{{ formatMessage(commonMessages.followedProjectsLabel) }}</span>
           <span class="description">
@@ -65,10 +48,7 @@
         :to="`/collection/${collection.id}`"
         class="universal-card recessed collection"
       >
-        <Avatar
-          :src="collection.icon_url"
-          class="icon"
-        />
+        <Avatar :src="collection.icon_url" class="icon" />
         <div class="details">
           <span class="title">{{ collection.name }}</span>
           <span class="description">

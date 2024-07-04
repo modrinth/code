@@ -14,28 +14,19 @@
         :description="formatMessage(messages.subscribeCheckbox)"
       />
 
-      <button
-        class="btn btn-primary continue-btn centered-btn"
-        @click="continueSignUp"
-      >
+      <button class="btn btn-primary continue-btn centered-btn" @click="continueSignUp">
         {{ formatMessage(commonMessages.continueButton) }} <RightArrowIcon />
       </button>
 
       <p>
         <IntlFormatted :message-id="messages.tosLabel">
           <template #terms-link="{ children }">
-            <NuxtLink
-              to="/legal/terms"
-              class="text-link"
-            >
+            <NuxtLink to="/legal/terms" class="text-link">
               <component :is="() => children" />
             </NuxtLink>
           </template>
           <template #privacy-policy-link="{ children }">
-            <NuxtLink
-              to="/legal/privacy"
-              class="text-link"
-            >
+            <NuxtLink to="/legal/privacy" class="text-link">
               <component :is="() => children" />
             </NuxtLink>
           </template>

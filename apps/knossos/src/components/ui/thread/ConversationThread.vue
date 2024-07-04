@@ -33,16 +33,10 @@
         </div>
       </div>
     </Modal>
-    <div
-      v-if="flags.developerMode"
-      class="thread-id"
-    >
+    <div v-if="flags.developerMode" class="thread-id">
       Thread ID: <CopyCode :text="thread.id" />
     </div>
-    <div
-      v-if="sortedMessages.length > 0"
-      class="messages universal-card recessed"
-    >
+    <div v-if="sortedMessages.length > 0" class="messages universal-card recessed">
       <ThreadMessage
         v-for="message in sortedMessages"
         :key="'message-' + message.id"
@@ -57,11 +51,7 @@
     </div>
     <template v-if="report && report.closed">
       <p>This thread is closed and new messages cannot be sent to it.</p>
-      <button
-        v-if="isStaff(auth.user)"
-        class="iconified-button"
-        @click="reopenReport()"
-      >
+      <button v-if="isStaff(auth.user)" class="iconified-button" @click="reopenReport()">
         <CloseIcon /> Reopen thread
       </button>
     </template>
@@ -82,12 +72,7 @@
         >
           <ReplyIcon /> Reply
         </button>
-        <button
-          v-else
-          class="btn btn-primary"
-          :disabled="!replyBody"
-          @click="sendReply()"
-        >
+        <button v-else class="btn btn-primary" :disabled="!replyBody" @click="sendReply()">
           <SendIcon /> Send
         </button>
         <button
@@ -127,11 +112,7 @@
               >
                 <CloseIcon /> Close with reply
               </button>
-              <button
-                v-else
-                class="iconified-button danger-button"
-                @click="closeReport()"
-              >
+              <button v-else class="iconified-button danger-button" @click="closeReport()">
                 <CloseIcon /> Close thread
               </button>
             </template>
@@ -178,36 +159,32 @@
                   :options="
                     replyBody
                       ? [
-                        {
-                          id: 'withhold-reply',
-                          color: 'danger',
-                          action: () => {
-                            sendReply('withheld')
+                          {
+                            id: 'withhold-reply',
+                            color: 'danger',
+                            action: () => {
+                              sendReply('withheld')
+                            },
+                            hoverFilled: true,
+                            disabled: project.status === 'withheld',
                           },
-                          hoverFilled: true,
-                          disabled: project.status === 'withheld',
-                        },
-                      ]
+                        ]
                       : [
-                        {
-                          id: 'withhold',
-                          color: 'danger',
-                          action: () => {
-                            setStatus('withheld')
+                          {
+                            id: 'withhold',
+                            color: 'danger',
+                            action: () => {
+                              setStatus('withheld')
+                            },
+                            hoverFilled: true,
+                            disabled: project.status === 'withheld',
                           },
-                          hoverFilled: true,
-                          disabled: project.status === 'withheld',
-                        },
-                      ]
+                        ]
                   "
                 >
                   <DropdownIcon style="rotate: 180deg" />
-                  <template #withhold-reply>
-                    <EyeOffIcon /> Withhold with reply
-                  </template>
-                  <template #withhold>
-                    <EyeOffIcon /> Withhold
-                  </template>
+                  <template #withhold-reply> <EyeOffIcon /> Withhold with reply </template>
+                  <template #withhold> <EyeOffIcon /> Withhold </template>
                 </OverflowMenu>
               </div>
             </template>

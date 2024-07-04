@@ -3,26 +3,14 @@
     <Card>
       <div class="content">
         <div>
-          <h1 class="card-title-adjustments">
-            Submit a Report
-          </h1>
+          <h1 class="card-title-adjustments">Submit a Report</h1>
           <div>
             <p>
               Modding should be safe for everyone, so we take abuse and malicious intent seriously
               at Modrinth. If you encounter content that violates our
-              <nuxt-link
-                class="text-link"
-                to="/legal/terms"
-              >
-                Terms of Service
-              </nuxt-link> or our
-              <nuxt-link
-                class="text-link"
-                to="/legal/rules"
-              >
-                Rules
-              </nuxt-link>, please report it to
-              us here.
+              <nuxt-link class="text-link" to="/legal/terms"> Terms of Service </nuxt-link> or our
+              <nuxt-link class="text-link" to="/legal/rules"> Rules </nuxt-link>, please report it
+              to us here.
             </p>
             <p>
               This form is intended exclusively for reporting abuse or harmful content to Modrinth
@@ -60,7 +48,7 @@
               placeholder="ex. project ID"
               autocomplete="off"
               :disabled="reportItem === ''"
-            >
+            />
           </div>
           <div class="report-info-item">
             <label for="report-type">Reason for report</label>
@@ -85,11 +73,7 @@
               possible. <strong>Empty reports will be closed.</strong>
             </p>
           </div>
-          <MarkdownEditor
-            v-model="reportBody"
-            placeholder=""
-            :on-image-upload="onImageUpload"
-          />
+          <MarkdownEditor v-model="reportBody" placeholder="" :on-image-upload="onImageUpload" />
         </div>
         <div class="submit-button">
           <Button

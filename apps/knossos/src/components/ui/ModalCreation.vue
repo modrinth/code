@@ -1,8 +1,5 @@
 <template>
-  <Modal
-    ref="modal"
-    header="Create a project"
-  >
+  <Modal ref="modal" header="Create a project">
     <div class="modal-creation universal-labels">
       <div class="markdown-body">
         <p>New projects are created as drafts and can be found under your profile page.</p>
@@ -18,14 +15,12 @@
         placeholder="Enter project name..."
         autocomplete="off"
         @input="updatedName()"
-      >
+      />
       <label for="slug">
         <span class="label__title">URL<span class="required">*</span></span>
       </label>
       <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">
-          https://modrinth.com/project/
-        </div>
+        <div class="text-input-wrapper__before">https://modrinth.com/project/</div>
         <input
           id="slug"
           v-model="slug"
@@ -33,7 +28,7 @@
           maxlength="64"
           autocomplete="off"
           @input="manualSlug = true"
-        >
+        />
       </div>
       <label for="visibility">
         <span class="label__title">Visibility<span class="required">*</span></span>
@@ -56,27 +51,19 @@
       />
       <label for="additional-information">
         <span class="label__title">Summary<span class="required">*</span></span>
-        <span class="label__description">This appears in search and on the sidebar of your project's page.</span>
+        <span class="label__description"
+          >This appears in search and on the sidebar of your project's page.</span
+        >
       </label>
       <div class="textarea-wrapper">
-        <textarea
-          id="additional-information"
-          v-model="description"
-          maxlength="256"
-        />
+        <textarea id="additional-information" v-model="description" maxlength="256" />
       </div>
       <div class="push-right input-group">
-        <button
-          class="iconified-button"
-          @click="cancel"
-        >
+        <button class="iconified-button" @click="cancel">
           <CrossIcon />
           Cancel
         </button>
-        <button
-          class="iconified-button brand-button"
-          @click="createProject"
-        >
+        <button class="iconified-button brand-button" @click="createProject">
           <CheckIcon />
           Continue
         </button>

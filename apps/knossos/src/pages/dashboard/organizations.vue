@@ -3,14 +3,9 @@
     <OrganizationCreateModal ref="createOrgModal" />
     <section class="universal-card">
       <div class="header__row">
-        <h2 class="header__title">
-          Organizations
-        </h2>
+        <h2 class="header__title">Organizations</h2>
         <div class="input-group">
-          <button
-            class="iconified-button brand-button"
-            @click="openCreateOrgModal"
-          >
+          <button class="iconified-button brand-button" @click="openCreateOrgModal">
             <PlusIcon />
             Create organization
           </button>
@@ -25,11 +20,7 @@
             class="universal-card button-base recessed org"
             :class="{ 'is-disabled': onlyAcceptedMembers(org.members).length === 0 }"
           >
-            <Avatar
-              :src="org.icon_url"
-              :alt="org.name"
-              class="icon"
-            />
+            <Avatar :src="org.icon_url" :alt="org.name" class="icon" />
             <div class="details">
               <div class="title">
                 {{ org.name }}
@@ -43,7 +34,8 @@
                   <span>
                     {{ onlyAcceptedMembers(org.members).length }} member<template
                       v-if="onlyAcceptedMembers(org.members).length !== 1"
-                    >s</template>
+                      >s</template
+                    >
                   </span>
                 </div>
               </span>
@@ -51,9 +43,7 @@
           </nuxt-link>
         </div>
       </template>
-      <template v-else>
-        Make an organization!
-      </template>
+      <template v-else> Make an organization! </template>
     </section>
   </div>
 </template>

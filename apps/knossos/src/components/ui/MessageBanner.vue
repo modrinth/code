@@ -1,10 +1,6 @@
 <template>
   <div class="message-banner">
-    <div
-      class="message-banner__content"
-      :class="cardClassByType"
-      :aria-label="ariaLabelByType"
-    >
+    <div class="message-banner__content" :class="cardClassByType" :aria-label="ariaLabelByType">
       <slot />
     </div>
   </div>

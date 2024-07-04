@@ -5,11 +5,9 @@
     <p><strong>Last reviewed on: </strong><em>August 5th, 2023</em></p>
     <p>
       This Privacy Notice for California Residents supplements the information contained in the
-      <nuxt-link to="/legal/privacy">
-        Privacy Policy
-      </nuxt-link> of Rinth, Inc. (the "Company," "we,"
-      "us" or "our") and applies solely to all visitors, users, and others who reside in the State
-      of California ("consumers" or "you"). We adopt this notice to comply with the California
+      <nuxt-link to="/legal/privacy"> Privacy Policy </nuxt-link> of Rinth, Inc. (the "Company,"
+      "we," "us" or "our") and applies solely to all visitors, users, and others who reside in the
+      State of California ("consumers" or "you"). We adopt this notice to comply with the California
       Consumer Privacy Act of 2018 (CCPA), as it may be amended, modified or supplemented from time
       to time, and any terms defined in the CCPA have the same meaning when used in this notice.
     </p>
@@ -47,7 +45,7 @@
           address, telephone number, passport number, driver's license or state identification card
           number, insurance policy number, education, employment, employment history, bank account
           number, credit card number, debit card number, or any other financial information, medical
-          information, or health insurance information. <br><br>
+          information, or health insurance information. <br /><br />
           Some personal information included in this category may overlap with other categories.
         </td>
         <td>NO</td>
@@ -437,7 +435,8 @@
       We reserve the right to amend this privacy notice at our discretion and at any time. When we
       make changes to this privacy notice, we will post the updated notice on the Service and update
       the notice's effective date.
-      <strong>Your continued use of our Service following the posting of changes constitutes your
+      <strong
+        >Your continued use of our Service following the posting of changes constitutes your
         acceptance of such changes.
       </strong>
     </p>
@@ -445,9 +444,7 @@
     <p>
       If you have any questions or comments about this notice, the ways in which we collect and use
       your information described below and in the
-      <nuxt-link to="/legal/privacy">
-        Privacy Policy
-      </nuxt-link>, your choices and rights regarding
+      <nuxt-link to="/legal/privacy"> Privacy Policy </nuxt-link>, your choices and rights regarding
       such use, or wish to exercise your rights under California law, please do not hesitate to
       contact us at <a href="mailto:support@modrinth.com">support@modrinth.com</a>.
     </p>

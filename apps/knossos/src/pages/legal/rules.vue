@@ -4,9 +4,7 @@
 
     <p>
       These Content Rules are to be considered part of our
-      <nuxt-link to="/legal/terms">
-        Terms of Use
-      </nuxt-link> and apply to any and all User
+      <nuxt-link to="/legal/terms"> Terms of Use </nuxt-link> and apply to any and all User
       Contributions, Gaming Content, and use of Interactive Services (collectively, "Content").
     </p>
 
@@ -16,9 +14,7 @@
       <a href="mailto:support@modrinth.com">support@modrinth.com</a>.
     </p>
 
-    <h2 id="prohibited-content">
-      1. Prohibited Content
-    </h2>
+    <h2 id="prohibited-content">1. Prohibited Content</h2>
 
     <p>
       Content must in their entirety comply with all applicable federal, state, local, and
@@ -42,12 +38,8 @@
         Violate the legal rights (including the rights of publicity and privacy) of others or
         contain any material that could give rise to any civil or criminal liability under
         applicable laws or regulations or that otherwise may be in conflict with our
-        <nuxt-link to="/legal/terms">
-          Terms of Use
-        </nuxt-link> or
-        <nuxt-link to="/legal/privacy">
-          Privacy Policy
-        </nuxt-link>.
+        <nuxt-link to="/legal/terms"> Terms of Use </nuxt-link> or
+        <nuxt-link to="/legal/privacy"> Privacy Policy </nuxt-link>.
       </li>
       <li>
         Promote any illegal activity, or advocate, promote or assist any unlawful act, including
@@ -76,9 +68,7 @@
       </li>
     </ol>
 
-    <h2 id="clear-and-honest-function">
-      2. Clear and Honest Function
-    </h2>
+    <h2 id="clear-and-honest-function">2. Clear and Honest Function</h2>
 
     <p>
       Projects, a form of Content, must make a clear and honest attempt to describe their purpose in
@@ -86,9 +76,7 @@
       Using confusing language or technical jargon when it is not necessary constitutes a violation.
     </p>
 
-    <h3 id="general-expectations">
-      2.1. General Expectations
-    </h3>
+    <h3 id="general-expectations">2.1. General Expectations</h3>
 
     <p>
       From a project description, users should be able to understand what the project does and how
@@ -101,9 +89,7 @@
       <li>any other critical information the user must know before downloading</li>
     </ol>
 
-    <h3 id="accessibility">
-      2.2. Accessibility
-    </h3>
+    <h3 id="accessibility">2.2. Accessibility</h3>
 
     <p>
       Project descriptions must be accessible so that they can be read through a variety of mediums.
@@ -117,9 +103,7 @@
       translations into other languages if desired.
     </p>
 
-    <h2 id="cheats-and-hacks">
-      3. Cheats and Hacks
-    </h2>
+    <h2 id="cheats-and-hacks">3. Cheats and Hacks</h2>
 
     <p>
       Projects cannot contain or download "cheats", which we define as a client-side modification
@@ -146,9 +130,7 @@
       </li>
     </ol>
 
-    <h2 id="copyright-and-legality-of-content">
-      4. Copyright and Reuploads
-    </h2>
+    <h2 id="copyright-and-legality-of-content">4. Copyright and Reuploads</h2>
 
     <p>
       You must own or have the necessary licenses, rights, consents, and permissions to store,
@@ -162,9 +144,7 @@
       which have diverged substantially from the original project.
     </p>
 
-    <h2 id="miscellaneous">
-      5. Miscellaneous
-    </h2>
+    <h2 id="miscellaneous">5. Miscellaneous</h2>
 
     <p>
       There are certain other small aspects to creating projects that all authors should attempt to

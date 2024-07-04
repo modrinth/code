@@ -8,10 +8,7 @@
         </p>
 
         <div class="iconified-input">
-          <label
-            for="email"
-            hidden
-          >
+          <label for="email" hidden>
             {{ formatMessage(methodChoiceMessages.emailUsernameLabel) }}
           </label>
           <MailIcon />
@@ -22,7 +19,7 @@
             autocomplete="username"
             class="auth-form__input"
             :placeholder="formatMessage(methodChoiceMessages.emailUsernamePlaceholder)"
-          >
+          />
         </div>
 
         <NuxtTurnstile
@@ -32,11 +29,7 @@
           :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
         />
 
-        <button
-          class="btn btn-primary centered-btn"
-          :disabled="!token"
-          @click="recovery"
-        >
+        <button class="btn btn-primary centered-btn" :disabled="!token" @click="recovery">
           <SendIcon /> {{ formatMessage(methodChoiceMessages.action) }}
         </button>
       </template>
@@ -44,10 +37,7 @@
         <p>{{ formatMessage(postChallengeMessages.description) }}</p>
 
         <div class="iconified-input">
-          <label
-            for="password"
-            hidden
-          >{{ formatMessage(commonMessages.passwordLabel) }}</label>
+          <label for="password" hidden>{{ formatMessage(commonMessages.passwordLabel) }}</label>
           <KeyIcon />
           <input
             id="password"
@@ -56,14 +46,11 @@
             autocomplete="new-password"
             class="auth-form__input"
             :placeholder="formatMessage(commonMessages.passwordLabel)"
-          >
+          />
         </div>
 
         <div class="iconified-input">
-          <label
-            for="confirm-password"
-            hidden
-          >
+          <label for="confirm-password" hidden>
             {{ formatMessage(commonMessages.passwordLabel) }}
           </label>
           <KeyIcon />
@@ -74,13 +61,10 @@
             autocomplete="new-password"
             class="auth-form__input"
             :placeholder="formatMessage(postChallengeMessages.confirmPasswordLabel)"
-          >
+          />
         </div>
 
-        <button
-          class="auth-form__input btn btn-primary continue-btn"
-          @click="changePassword"
-        >
+        <button class="auth-form__input btn btn-primary continue-btn" @click="changePassword">
           {{ formatMessage(postChallengeMessages.action) }}
         </button>
       </template>

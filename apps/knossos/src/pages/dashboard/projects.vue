@@ -1,9 +1,6 @@
 <template>
   <div>
-    <Modal
-      ref="editLinksModal"
-      header="Edit links"
-    >
+    <Modal ref="editLinksModal" header="Edit links">
       <div class="universal-modal links-modal">
         <p>
           Any links you specify below will be overwritten on each of the selected projects. Any you
@@ -27,7 +24,7 @@
                 editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
               "
               maxlength="2048"
-            >
+            />
             <button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -54,7 +51,7 @@
               :placeholder="
                 editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
               "
-            >
+            />
             <button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -81,7 +78,7 @@
               :placeholder="
                 editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
               "
-            >
+            />
             <button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -92,10 +89,7 @@
               <TrashIcon />
             </button>
           </div>
-          <label
-            for="discord-invite-input"
-            title="An invitation link to your Discord server."
-          >
+          <label for="discord-invite-input" title="An invitation link to your Discord server.">
             <span class="label__title">Discord invite</span>
           </label>
           <div class="input-group shrink-first">
@@ -110,7 +104,7 @@
                   ? 'Existing link will be cleared'
                   : 'Enter a valid Discord invite URL'
               "
-            >
+            />
             <button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -151,17 +145,11 @@
           :collapsing-toggle-style="true"
         />
         <div class="push-right input-group">
-          <button
-            class="iconified-button"
-            @click="$refs.editLinksModal.hide()"
-          >
+          <button class="iconified-button" @click="$refs.editLinksModal.hide()">
             <CrossIcon />
             Cancel
           </button>
-          <button
-            class="iconified-button brand-button"
-            @click="bulkEditLinks()"
-          >
+          <button class="iconified-button brand-button" @click="bulkEditLinks()">
             <SaveIcon />
             Save changes
           </button>
@@ -171,14 +159,9 @@
     <ModalCreation ref="modal_creation" />
     <section class="universal-card">
       <div class="header__row">
-        <h2 class="header__title">
-          Projects
-        </h2>
+        <h2 class="header__title">Projects</h2>
         <div class="input-group">
-          <button
-            class="iconified-button brand-button"
-            @click="$refs.modal_creation.show()"
-          >
+          <button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
             <PlusIcon />
             {{ formatMessage(commonMessages.createAProjectButton) }}
           </button>
@@ -241,11 +224,7 @@
             <div>Status</div>
             <div />
           </div>
-          <div
-            v-for="project in projects"
-            :key="`project-${project.id}`"
-            class="grid-table__row"
-          >
+          <div v-for="project in projects" :key="`project-${project.id}`" class="grid-table__row">
             <div>
               <Checkbox
                 :disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
@@ -300,11 +279,7 @@
             </div>
 
             <div>
-              <Badge
-                v-if="project.status"
-                :type="project.status"
-                class="status"
-              />
+              <Badge v-if="project.status" :type="project.status" class="status" />
             </div>
 
             <div>

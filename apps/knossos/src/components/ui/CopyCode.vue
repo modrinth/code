@@ -1,10 +1,5 @@
 <template>
-  <button
-    class="code"
-    :class="{ copied }"
-    title="Copy code to clipboard"
-    @click="copyText"
-  >
+  <button class="code" :class="{ copied }" title="Copy code to clipboard" @click="copyText">
     <span>{{ text }}</span>
     <CheckIcon v-if="copied" />
     <ClipboardCopyIcon v-else />

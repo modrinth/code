@@ -1,8 +1,5 @@
 <template>
-  <Modal
-    ref="modal"
-    header="Create an organization"
-  >
+  <Modal ref="modal" header="Create an organization">
     <div class="universal-modal modal-creation universal-labels">
       <div class="markdown-body">
         <p>
@@ -21,14 +18,12 @@
         :placeholder="`Enter organization name...`"
         autocomplete="off"
         @input="updateSlug()"
-      >
+      />
       <label for="slug">
         <span class="label__title">URL<span class="required">*</span></span>
       </label>
       <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">
-          https://modrinth.com/organization/
-        </div>
+        <div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
         <input
           id="slug"
           v-model="slug"
@@ -36,28 +31,21 @@
           maxlength="64"
           autocomplete="off"
           @input="manualSlug = true"
-        >
+        />
       </div>
       <label for="additional-information">
         <span class="label__title">Summary<span class="required">*</span></span>
         <span class="label__description">This will appear on your organization's page.</span>
       </label>
       <div class="textarea-wrapper">
-        <textarea
-          id="additional-information"
-          v-model="description"
-          maxlength="256"
-        />
+        <textarea id="additional-information" v-model="description" maxlength="256" />
       </div>
       <div class="push-right input-group">
         <Button @click="modal.hide()">
           <CrossIcon />
           Cancel
         </Button>
-        <Button
-          color="primary"
-          @click="createProject"
-        >
+        <Button color="primary" @click="createProject">
           <CheckIcon />
           Continue
         </Button>

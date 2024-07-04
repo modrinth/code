@@ -32,11 +32,11 @@
               previewImage
                 ? previewImage
                 : project.gallery[editIndex] && project.gallery[editIndex].url
-                  ? project.gallery[editIndex].url
-                  : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                ? project.gallery[editIndex].url
+                : 'https://cdn.modrinth.com/placeholder-banner.svg'
             "
             alt="gallery-preview"
-          >
+          />
         </div>
         <label for="gallery-image-title">
           <span class="label__title">Title</span>
@@ -47,7 +47,7 @@
           type="text"
           maxlength="64"
           placeholder="Enter title..."
-        >
+        />
         <label for="gallery-image-desc">
           <span class="label__title">Description</span>
         </label>
@@ -67,7 +67,7 @@
           v-model="editOrder"
           type="number"
           placeholder="Enter order index..."
-        >
+        />
         <label for="gallery-image-featured">
           <span class="label__title">Featured</span>
           <span class="label__description">
@@ -90,17 +90,11 @@
           class="iconified-button"
           @click="editFeatured = false"
         >
-          <StarIcon
-            fill="currentColor"
-            aria-hidden="true"
-          />
+          <StarIcon fill="currentColor" aria-hidden="true" />
           Unfeature image
         </button>
         <div class="button-group">
-          <button
-            class="iconified-button"
-            @click="$refs.modal_edit_item.hide()"
-          >
+          <button class="iconified-button" @click="$refs.modal_edit_item.hide()">
             <XIcon />
             Cancel
           </button>
@@ -150,12 +144,9 @@
           "
           :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
           @click.stop
-        >
+        />
 
-        <div
-          class="floating"
-          @click.stop
-        >
+        <div class="floating" @click.stop>
           <div class="text">
             <h2 v-if="expandedGalleryItem.title">
               {{ expandedGalleryItem.title }}
@@ -166,10 +157,7 @@
           </div>
           <div class="controls">
             <div class="buttons">
-              <button
-                class="close circle-button"
-                @click="expandedGalleryItem = null"
-              >
+              <button class="close circle-button" @click="expandedGalleryItem = null">
                 <XIcon aria-hidden="true" />
               </button>
               <a
@@ -183,18 +171,9 @@
               >
                 <ExternalIcon aria-hidden="true" />
               </a>
-              <button
-                class="circle-button"
-                @click="zoomedIn = !zoomedIn"
-              >
-                <ExpandIcon
-                  v-if="!zoomedIn"
-                  aria-hidden="true"
-                />
-                <ContractIcon
-                  v-else
-                  aria-hidden="true"
-                />
+              <button class="circle-button" @click="zoomedIn = !zoomedIn">
+                <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+                <ContractIcon v-else aria-hidden="true" />
               </button>
               <button
                 v-if="project.gallery.length > 1"
@@ -215,10 +194,7 @@
         </div>
       </div>
     </div>
-    <div
-      v-if="currentMember"
-      class="card header-buttons"
-    >
+    <div v-if="currentMember" class="card header-buttons">
       <FileInput
         :max-size="524288000"
         :accept="acceptFileTypes"
@@ -239,19 +215,12 @@
       />
     </div>
     <div class="items">
-      <div
-        v-for="(item, index) in project.gallery"
-        :key="index"
-        class="card gallery-item"
-      >
-        <a
-          class="gallery-thumbnail"
-          @click="expandImage(item, index)"
-        >
+      <div v-for="(item, index) in project.gallery" :key="index" class="card gallery-item">
+        <a class="gallery-thumbnail" @click="expandImage(item, index)">
           <img
             :src="item.url ? item.url : 'https://cdn.modrinth.com/placeholder-banner.svg'"
             :alt="item.title ? item.title : 'gallery-image'"
-          >
+          />
         </a>
         <div class="gallery-body">
           <div class="gallery-info">
@@ -268,10 +237,7 @@
             <CalendarIcon />
             {{ $dayjs(item.created).format('MMMM D, YYYY') }}
           </div>
-          <div
-            v-if="currentMember"
-            class="gallery-buttons input-group"
-          >
+          <div v-if="currentMember" class="gallery-buttons input-group">
             <button
               class="iconified-button"
               @click="

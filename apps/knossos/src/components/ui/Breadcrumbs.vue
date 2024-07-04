@@ -1,9 +1,6 @@
 <template>
   <nav class="breadcrumbs">
-    <template
-      v-for="(link, index) in linkStack"
-      :key="index"
-    >
+    <template v-for="(link, index) in linkStack" :key="index">
       <NuxtLink
         :to="link.href"
         class="breadcrumb goto-link"

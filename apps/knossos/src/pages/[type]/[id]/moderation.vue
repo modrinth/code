@@ -6,12 +6,9 @@
       <p v-if="isApproved(project)">
         Your project has been approved by the moderators and you may freely change project
         visibility in
-        <router-link
-          :to="`${getProjectLink(project)}/settings`"
-          class="text-link"
-        >
-          your project's settings
-        </router-link>.
+        <router-link :to="`${getProjectLink(project)}/settings`" class="text-link">
+          your project's settings </router-link
+        >.
       </p>
       <div v-else-if="isUnderReview(project)">
         <p>
@@ -37,13 +34,7 @@
       <template v-else-if="isRejected(project)">
         <p>
           Your project does not currently meet Modrinth's
-          <nuxt-link
-            to="/legal/rules"
-            class="text-link"
-            target="_blank"
-          >
-            content rules
-          </nuxt-link>
+          <nuxt-link to="/legal/rules" class="text-link" target="_blank"> content rules </nuxt-link>
           and the moderators have requested you make changes before it can be approved. Read the
           messages from the moderators below and address their comments before resubmitting.
         </p>
@@ -80,10 +71,7 @@
         </li>
       </ul>
     </section>
-    <section
-      id="messages"
-      class="universal-card"
-    >
+    <section id="messages" class="universal-card">
       <h2>Messages</h2>
       <p>
         This is a private conversation thread with the Modrinth moderators. They may message you

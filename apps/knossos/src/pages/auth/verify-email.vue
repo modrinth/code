@@ -6,10 +6,7 @@
       <section class="auth-form">
         <p>{{ formatMessage(alreadyVerifiedMessages.description) }}</p>
 
-        <NuxtLink
-          class="btn"
-          to="/settings/account"
-        >
+        <NuxtLink class="btn" to="/settings/account">
           <SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
         </NuxtLink>
       </section>
@@ -21,18 +18,10 @@
       <section class="auth-form">
         <p>{{ formatMessage(postVerificationMessages.description) }}</p>
 
-        <NuxtLink
-          v-if="auth.user"
-          class="btn"
-          link="/settings/account"
-        >
+        <NuxtLink v-if="auth.user" class="btn" link="/settings/account">
           <SettingsIcon /> {{ formatMessage(messages.accountSettings) }}
         </NuxtLink>
-        <NuxtLink
-          v-else
-          to="/auth/sign-in"
-          class="btn btn-primary continue-btn centered-btn"
-        >
+        <NuxtLink v-else to="/auth/sign-in" class="btn btn-primary continue-btn centered-btn">
           {{ formatMessage(messages.signIn) }} <RightArrowIcon />
         </NuxtLink>
       </section>
@@ -51,19 +40,11 @@
           </template>
         </p>
 
-        <button
-          v-if="auth.user"
-          class="btn btn-primary continue-btn"
-          @click="resendVerifyEmail"
-        >
+        <button v-if="auth.user" class="btn btn-primary continue-btn" @click="resendVerifyEmail">
           {{ formatMessage(failedVerificationMessages.action) }} <RightArrowIcon />
         </button>
 
-        <NuxtLink
-          v-else
-          to="/auth/sign-in"
-          class="btn btn-primary continue-btn centered-btn"
-        >
+        <NuxtLink v-else to="/auth/sign-in" class="btn btn-primary continue-btn centered-btn">
           {{ formatMessage(messages.signIn) }} <RightArrowIcon />
         </NuxtLink>
       </section>

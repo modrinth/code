@@ -12,23 +12,15 @@
     </p>
     <p>
       These Terms are in addition to and do not in any manner limit the applicability of the
-      <nuxt-link to="/legal/terms">
-        Terms of Use
-      </nuxt-link>, the
-      <nuxt-link to="/legal/rules">
-        Content Rules
-      </nuxt-link>, or the
-      <nuxt-link to="/legal/privacy">
-        Privacy Policy
-      </nuxt-link>.
+      <nuxt-link to="/legal/terms"> Terms of Use </nuxt-link>, the
+      <nuxt-link to="/legal/rules"> Content Rules </nuxt-link>, or the
+      <nuxt-link to="/legal/privacy"> Privacy Policy </nuxt-link>.
     </p>
 
     <h2>Economics</h2>
     <p>
       Rinth shall pay to you the percentage set forth
-      <nuxt-link to="/legal/cmp-info">
-        here
-      </nuxt-link> of net revenue collected by Rinth
+      <nuxt-link to="/legal/cmp-info"> here </nuxt-link> of net revenue collected by Rinth
       attributable to ad impressions displayed on modrinth.com and the Modrinth App excluding
       transaction fees ("Revenue Share"). Rinth shall make Revenue Share payments to you when you
       withdraw funds from Rinth's dashboard. Rinth shall include with each such payment either

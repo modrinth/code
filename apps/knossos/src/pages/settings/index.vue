@@ -1,10 +1,6 @@
 <template>
   <div>
-    <MessageBanner
-      v-if="flags.developerMode"
-      message-type="warning"
-      class="developer-message"
-    >
+    <MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
       <CodeIcon />
       <IntlFormatted :message-id="developerModeBanner.description">
         <template #strong="{ children }">
@@ -28,10 +24,7 @@
           :class="{ selected: theme.preference === option }"
           @click="() => updateColorTheme(option)"
         >
-          <div
-            class="preview"
-            :class="`${option === 'system' ? systemTheme : option}-mode`"
-          >
+          <div class="preview" :class="`${option === 'system' ? systemTheme : option}-mode`">
             <div class="example-card card card">
               <div class="example-icon" />
               <div class="example-text-1" />
@@ -39,14 +32,8 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked
-              v-if="theme.preference === option"
-              class="radio"
-            />
-            <RadioButtonIcon
-              v-else
-              class="radio"
-            />
+            <RadioButtonChecked v-if="theme.preference === option" class="radio" />
+            <RadioButtonIcon v-else class="radio" />
             {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
             <SunIcon
               v-if="'light' === option"
@@ -66,10 +53,7 @@
       <h2>{{ formatMessage(projectListLayouts.title) }}</h2>
       <p>{{ formatMessage(projectListLayouts.description) }}</p>
       <div class="project-lists">
-        <div
-          v-for="projectType in listTypes"
-          :key="projectType.id + '-project-list-layouts'"
-        >
+        <div v-for="projectType in listTypes" :key="projectType.id + '-project-list-layouts'">
           <div class="label">
             <div class="label__title">
               {{
@@ -98,10 +82,7 @@
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
                   class="radio"
                 />
-                <RadioButtonIcon
-                  v-else
-                  class="radio"
-                />
+                <RadioButtonIcon v-else class="radio" />
                 Rows
               </div>
             </button>
@@ -125,10 +106,7 @@
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'"
                   class="radio"
                 />
-                <RadioButtonIcon
-                  v-else
-                  class="radio"
-                />
+                <RadioButtonIcon v-else class="radio" />
                 Grid
               </div>
             </button>
@@ -150,10 +128,7 @@
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'"
                   class="radio"
                 />
-                <RadioButtonIcon
-                  v-else
-                  class="radio"
-                />
+                <RadioButtonIcon v-else class="radio" />
                 Gallery
               </div>
             </button>
@@ -179,7 +154,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        >
+        />
       </div>
       <div class="adjacent-input small">
         <label for="external-links-new-tab">
@@ -196,7 +171,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        >
+        />
       </div>
       <div class="adjacent-input small">
         <label for="modrinth-app-promos">
@@ -213,7 +188,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        >
+        />
       </div>
       <div class="adjacent-input small">
         <label for="search-layout-toggle">
@@ -230,7 +205,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        >
+        />
       </div>
       <div class="adjacent-input small">
         <label for="project-layout-toggle">
@@ -247,7 +222,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        >
+        />
       </div>
     </section>
   </div>

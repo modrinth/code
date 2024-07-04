@@ -28,20 +28,20 @@
           selectedYear !== 'all'
             ? selectedMethod !== 'all'
               ? formatMessage(messages.transfersTotalYearMethod, {
-                amount: $formatMoney(totalAmount),
-                year: selectedYear,
-                method: selectedMethod,
-              })
+                  amount: $formatMoney(totalAmount),
+                  year: selectedYear,
+                  method: selectedMethod,
+                })
               : formatMessage(messages.transfersTotalYear, {
-                amount: $formatMoney(totalAmount),
-                year: selectedYear,
-              })
+                  amount: $formatMoney(totalAmount),
+                  year: selectedYear,
+                })
             : selectedMethod !== 'all'
-              ? formatMessage(messages.transfersTotalMethod, {
+            ? formatMessage(messages.transfersTotalMethod, {
                 amount: $formatMoney(totalAmount),
                 method: selectedMethod,
               })
-              : formatMessage(messages.transfersTotal, { amount: $formatMoney(totalAmount) })
+            : formatMessage(messages.transfersTotal, { amount: $formatMoney(totalAmount) })
         }}
       </p>
       <div
@@ -63,41 +63,16 @@
           </div>
           <div>
             <span class="amount">{{ $formatMoney(payout.amount) }}</span>
-            <template v-if="payout.fee">
-              ⋅ Fee {{ $formatMoney(payout.fee) }}
-            </template>
+            <template v-if="payout.fee"> ⋅ Fee {{ $formatMoney(payout.fee) }} </template>
           </div>
           <div class="payout-status">
             <span>
-              <Badge
-                v-if="payout.status === 'success'"
-                color="green"
-                type="Success"
-              />
-              <Badge
-                v-else-if="payout.status === 'cancelling'"
-                color="yellow"
-                type="Cancelling"
-              />
-              <Badge
-                v-else-if="payout.status === 'cancelled'"
-                color="red"
-                type="Cancelled"
-              />
-              <Badge
-                v-else-if="payout.status === 'failed'"
-                color="red"
-                type="Failed"
-              />
-              <Badge
-                v-else-if="payout.status === 'in-transit'"
-                color="yellow"
-                type="In transit"
-              />
-              <Badge
-                v-else
-                :type="payout.status"
-              />
+              <Badge v-if="payout.status === 'success'" color="green" type="Success" />
+              <Badge v-else-if="payout.status === 'cancelling'" color="yellow" type="Cancelling" />
+              <Badge v-else-if="payout.status === 'cancelled'" color="red" type="Cancelled" />
+              <Badge v-else-if="payout.status === 'failed'" color="red" type="Failed" />
+              <Badge v-else-if="payout.status === 'in-transit'" color="yellow" type="In transit" />
+              <Badge v-else :type="payout.status" />
             </span>
             <template v-if="payout.method">
               <span>⋅</span>

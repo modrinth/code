@@ -148,13 +148,7 @@ defineExpose({
       {{ title }}
     </div>
     <div class="chart">
-      <VueApexCharts
-        ref="chart"
-        type="area"
-        :options="chartOptions"
-        :series="data"
-        height="70"
-      />
+      <VueApexCharts ref="chart" type="area" :options="chartOptions" :series="data" height="70" />
     </div>
   </Card>
 </template>

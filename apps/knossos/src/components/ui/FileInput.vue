@@ -13,7 +13,7 @@
       :accept="accept"
       :disabled="disabled"
       @change="handleChange"
-    >
+    />
   </label>
 </template>
 

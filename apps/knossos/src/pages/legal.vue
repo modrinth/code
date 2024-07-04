@@ -4,66 +4,39 @@
       <aside class="universal-card">
         <h1>Legal</h1>
         <NavStack>
-          <NavStackItem
-            link="/legal/terms"
-            label="Terms of Use"
-          >
+          <NavStackItem link="/legal/terms" label="Terms of Use">
             <HeartHandshakeIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/legal/rules"
-            label="Content Rules"
-          >
+          <NavStackItem link="/legal/rules" label="Content Rules">
             <ScaleIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/legal/copyright"
-            label="Copyright Policy"
-          >
+          <NavStackItem link="/legal/copyright" label="Copyright Policy">
             <CopyrightIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/legal/security"
-            label="Security Notice"
-          >
+          <NavStackItem link="/legal/security" label="Security Notice">
             <ShieldIcon />
           </NavStackItem>
 
           <h3>Privacy</h3>
-          <NavStackItem
-            link="/legal/privacy"
-            label="Privacy Policy"
-          >
+          <NavStackItem link="/legal/privacy" label="Privacy Policy">
             <LockIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/legal/ccpa"
-            label="California Privacy Notice"
-          >
+          <NavStackItem link="/legal/ccpa" label="California Privacy Notice">
             <InfoIcon />
           </NavStackItem>
 
           <h3>Rewards Program</h3>
-          <NavStackItem
-            link="/legal/cmp"
-            label="Rewards Program Terms"
-          >
+          <NavStackItem link="/legal/cmp" label="Rewards Program Terms">
             <CurrencyIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/legal/cmp-info"
-            label="Rewards Program Info"
-          >
+          <NavStackItem link="/legal/cmp-info" label="Rewards Program Info">
             <InfoIcon />
           </NavStackItem>
         </NavStack>
       </aside>
     </div>
     <div class="normal-page__content">
-      <NuxtPage
-        class="universal-card"
-        :route="route"
-      />
+      <NuxtPage class="universal-card" :route="route" />
     </div>
   </div>
 </template>

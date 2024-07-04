@@ -1,9 +1,6 @@
 <template>
   <div>
-    <div
-      v-if="error"
-      class="oauth-items"
-    >
+    <div v-if="error" class="oauth-items">
       <div>
         <h1>{{ formatMessage(commonMessages.errorLabel) }}</h1>
       </div>
@@ -12,25 +9,13 @@
         {{ error.data.description }}
       </p>
     </div>
-    <div
-      v-else
-      class="oauth-items"
-    >
+    <div v-else class="oauth-items">
       <div class="connected-items">
         <div class="profile-pics">
-          <Avatar
-            size="md"
-            :src="app.icon_url"
-          />
+          <Avatar size="md" :src="app.icon_url" />
           <!-- <img class="profile-pic" :src="app.icon_url" alt="User profile picture" /> -->
-          <div class="connection-indicator">
-            →
-          </div>
-          <Avatar
-            size="md"
-            circle
-            :src="auth.user.avatar_url"
-          />
+          <div class="connection-indicator">→</div>
+          <Avatar size="md" circle :src="auth.user.avatar_url" />
           <!-- <img class="profile-pic" :src="auth.user.avatar_url" alt="User profile picture" /> -->
         </div>
       </div>
@@ -52,20 +37,14 @@
               </strong>
             </template>
             <template #creator-link="{ children }">
-              <nuxt-link
-                class="text-link"
-                :to="'/user/' + createdBy.id"
-              >
+              <nuxt-link class="text-link" :to="'/user/' + createdBy.id">
                 <component :is="() => normalizeChildren(children)" />
               </nuxt-link>
             </template>
           </IntlFormatted>
         </div>
         <div class="scope-items">
-          <div
-            v-for="scopeItem in scopeDefinitions"
-            :key="scopeItem"
-          >
+          <div v-for="scopeItem in scopeDefinitions" :key="scopeItem">
             <div class="scope-item">
               <div class="scope-icon">
                 <CheckIcon />
@@ -76,32 +55,18 @@
         </div>
       </div>
       <div class="button-row">
-        <Button
-          class="wide-button"
-          large
-          :action="onReject"
-          :disabled="pending"
-        >
+        <Button class="wide-button" large :action="onReject" :disabled="pending">
           <XIcon />
           {{ formatMessage(messages.decline) }}
         </Button>
-        <Button
-          class="wide-button"
-          color="primary"
-          large
-          :action="onAuthorize"
-          :disabled="pending"
-        >
+        <Button class="wide-button" color="primary" large :action="onAuthorize" :disabled="pending">
           <CheckIcon />
           {{ formatMessage(messages.authorize) }}
         </Button>
       </div>
       <div class="redirection-notice">
         <p class="redirect-instructions">
-          <IntlFormatted
-            :message-id="messages.redirectUrl"
-            :values="{ url: redirectUri }"
-          >
+          <IntlFormatted :message-id="messages.redirectUrl" :values="{ url: redirectUri }">
             <template #redirect-url="{ children }">
               <span class="redirect-url">
                 <component :is="() => normalizeChildren(children)" />

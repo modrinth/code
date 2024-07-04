@@ -4,44 +4,24 @@
       <aside class="universal-card">
         <h1>Dashboard</h1>
         <NavStack>
-          <NavStackItem
-            link="/dashboard"
-            label="Overview"
-          >
+          <NavStackItem link="/dashboard" label="Overview">
             <DashboardIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/dashboard/notifications"
-            label="Notifications"
-          >
+          <NavStackItem link="/dashboard/notifications" label="Notifications">
             <NotificationsIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/dashboard/reports"
-            label="Active reports"
-          >
+          <NavStackItem link="/dashboard/reports" label="Active reports">
             <ReportIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/dashboard/analytics"
-            label="Analytics"
-          >
+          <NavStackItem link="/dashboard/analytics" label="Analytics">
             <ChartIcon />
           </NavStackItem>
 
           <h3>Manage</h3>
-          <NavStackItem
-            v-if="true"
-            link="/dashboard/projects"
-            label="Projects"
-          >
+          <NavStackItem v-if="true" link="/dashboard/projects" label="Projects">
             <ListIcon />
           </NavStackItem>
-          <NavStackItem
-            v-if="true"
-            link="/dashboard/organizations"
-            label="Organizations"
-          >
+          <NavStackItem v-if="true" link="/dashboard/organizations" label="Organizations">
             <OrganizationIcon />
           </NavStackItem>
           <NavStackItem
@@ -50,10 +30,7 @@
           >
             <LibraryIcon />
           </NavStackItem>
-          <NavStackItem
-            link="/dashboard/revenue"
-            label="Revenue"
-          >
+          <NavStackItem link="/dashboard/revenue" label="Revenue">
             <CurrencyIcon />
           </NavStackItem>
         </NavStack>

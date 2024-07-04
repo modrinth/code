@@ -11,17 +11,11 @@
         {{ $formatProjectType(project.project_type).toLowerCase() }}. Make sure to select all tags
         that apply.
       </p>
-      <p
-        v-if="project.versions.length === 0"
-        class="known-errors"
-      >
+      <p v-if="project.versions.length === 0" class="known-errors">
         Please upload a version first in order to select tags!
       </p>
       <template v-else>
-        <template
-          v-for="header in Object.keys(categoryLists)"
-          :key="`categories-${header}`"
-        >
+        <template v-for="header in Object.keys(categoryLists)" :key="`categories-${header}`">
           <div class="label">
             <h4>
               <span class="label__title">{{ $formatCategoryHeader(header) }}</span>

@@ -56,7 +56,7 @@
     <Checkbox
       v-if="
         gameVersionFilters.length > 1 &&
-          gameVersionFilters.some((v) => v.version_type !== 'release')
+        gameVersionFilters.some((v) => v.version_type !== 'release')
       "
       v-model="includeSnapshots"
       label="Show all versions"

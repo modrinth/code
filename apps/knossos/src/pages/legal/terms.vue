@@ -100,9 +100,7 @@
       continue to own all right, title and interest in and to your Gaming Content.
     </p>
     <p>
-      All Gaming Content must abide by the <nuxt-link to="/legal/rules">
-        Content Rules
-      </nuxt-link>.
+      All Gaming Content must abide by the <nuxt-link to="/legal/rules"> Content Rules </nuxt-link>.
     </p>
     <h2>API Usage</h2>
     <p>
@@ -142,10 +140,8 @@
       impressions displayed solely on your project pages. The funds are directly deposited into your
       account, which you can monitor and access via your creator dashboard. Simply enroll in the
       Rewards Program on your dashboard in order to be able to take advantage of this program.
-      Please review the <nuxt-link to="/legal/cmp">
-        Rewards Program Terms
-      </nuxt-link>, as it contains
-      very important language regarding, among other things, your status as an independent
+      Please review the <nuxt-link to="/legal/cmp"> Rewards Program Terms </nuxt-link>, as it
+      contains very important language regarding, among other things, your status as an independent
       contractor, your responsibility to pay taxes, our disclaimers and limitations of liability (in
       addition to our disclaimers and limitations of liability in these Terms of Use).
     </p>
@@ -193,9 +189,7 @@
       </li>
       <li>
         To send, knowingly receive, upload, download, use, or re-use any material which does not
-        comply with the <nuxt-link to="/legal/rules">
-          Content Rules
-        </nuxt-link>.
+        comply with the <nuxt-link to="/legal/rules"> Content Rules </nuxt-link>.
       </li>
       <li>
         To transmit, or procure the sending of, any advertising or promotional material, including
@@ -255,9 +249,7 @@
     </p>
     <p>
       All User Contributions and use of Interactive Services must abide by the
-      <nuxt-link to="/legal/rules">
-        Content Rules
-      </nuxt-link>.
+      <nuxt-link to="/legal/rules"> Content Rules </nuxt-link>.
     </p>
     <p>
       Any User Contribution you post to the site will be considered non-confidential and
@@ -389,9 +381,7 @@
     </ul>
     <p>
       The website from which you are linking, or on which you make certain content accessible, must
-      comply in all respects with the <nuxt-link to="/legal/rules">
-        Content Rules
-      </nuxt-link>.
+      comply in all respects with the <nuxt-link to="/legal/rules"> Content Rules </nuxt-link>.
     </p>
     <p>
       You agree to cooperate with us in causing any unauthorized framing or linking immediately to
@@ -539,9 +529,9 @@
     <h2>Your Comments and Concerns</h2>
     <p>This website is operated by:</p>
     <p>
-      Rinth, Inc.<br>
-      410 North Scottsdale Road<br>
-      Suite 1000<br>
+      Rinth, Inc.<br />
+      410 North Scottsdale Road<br />
+      Suite 1000<br />
       Tempe, AZ 85281
     </p>
     <p>

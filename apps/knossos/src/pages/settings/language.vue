@@ -308,38 +308,25 @@ function getItemLabel(locale: Locale) {
           aria-describedby="language-search-description"
           :disabled="isChanging()"
           @keydown="onSearchKeydown"
-        >
+        />
 
-        <div
-          id="language-search-description"
-          class="visually-hidden"
-        >
+        <div id="language-search-description" class="visually-hidden">
           {{ formatMessage(messages.searchFieldDescription) }}
         </div>
 
-        <div
-          id="language-search-results-announcements"
-          class="visually-hidden"
-          aria-live="polite"
-        >
+        <div id="language-search-results-announcements" class="visually-hidden" aria-live="polite">
           {{
             isQueryEmpty()
               ? ''
               : formatMessage(messages.searchResultsAnnouncement, {
-                matches: $searchResults.get('searchResult')?.length ?? 0,
-              })
+                  matches: $searchResults.get('searchResult')?.length ?? 0,
+                })
           }}
         </div>
       </div>
 
-      <div
-        ref="$languagesList"
-        class="languages-list"
-      >
-        <template
-          v-for="[category, locales] in $displayCategories"
-          :key="category"
-        >
+      <div ref="$languagesList" class="languages-list">
+        <template v-for="[category, locales] in $displayCategories" :key="category">
           <strong class="category-name">
             {{ formatMessage(categoryNames[category]) }}
           </strong>
@@ -352,10 +339,7 @@ function getItemLabel(locale: Locale) {
             {{ formatMessage(messages.noResults) }}
           </div>
 
-          <template
-            v-for="locale in locales"
-            :key="locale.tag"
-          >
+          <template v-for="locale in locales" :key="locale.tag">
             <div
               role="button"
               :aria-pressed="$activeLocale === locale.tag"
@@ -373,24 +357,15 @@ function getItemLabel(locale: Locale) {
               @click="(e) => onItemClick(e, locale)"
               @keydown="(e) => onItemKeydown(e, locale)"
             >
-              <RadioButtonCheckedIcon
-                v-if="$activeLocale === locale.tag"
-                class="radio"
-              />
-              <RadioButtonIcon
-                v-else
-                class="radio"
-              />
+              <RadioButtonCheckedIcon v-if="$activeLocale === locale.tag" class="radio" />
+              <RadioButtonIcon v-else class="radio" />
 
               <div class="language-names">
                 <div class="language-name">
                   {{ locale.auto ? formatMessage(messages.automaticLocale) : locale.displayName }}
                 </div>
 
-                <div
-                  v-if="!locale.auto"
-                  class="language-translated-name"
-                >
+                <div v-if="!locale.auto" class="language-translated-name">
                   {{ locale.translatedName }}
                 </div>
               </div>

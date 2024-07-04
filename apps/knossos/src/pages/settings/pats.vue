@@ -25,14 +25,11 @@
           maxlength="2048"
           type="email"
           :placeholder="formatMessage(createModalMessages.namePlaceholder)"
-        >
+        />
         <label for="pat-scopes">
           <span class="label__title">{{ formatMessage(commonMessages.scopesLabel) }}</span>
         </label>
-        <div
-          id="pat-scopes"
-          class="checkboxes"
-        >
+        <div id="pat-scopes" class="checkboxes">
           <Checkbox
             v-for="scope in scopeList"
             :key="scope"
@@ -44,17 +41,10 @@
         <label for="pat-name">
           <span class="label__title">{{ formatMessage(createModalMessages.expiresLabel) }}</span>
         </label>
-        <input
-          id="pat-name"
-          v-model="expires"
-          type="date"
-        >
+        <input id="pat-name" v-model="expires" type="date" />
         <p />
         <div class="input-group push-right">
-          <button
-            class="iconified-button"
-            @click="$refs.patModal.hide()"
-          >
+          <button class="iconified-button" @click="$refs.patModal.hide()">
             <XIcon />
             {{ formatMessage(commonMessages.cancelButton) }}
           </button>
@@ -104,20 +94,13 @@
     <p>
       <IntlFormatted :message-id="messages.description">
         <template #doc-link="{ children }">
-          <a
-            class="text-link"
-            href="https://docs.modrinth.com"
-          >
+          <a class="text-link" href="https://docs.modrinth.com">
             <component :is="() => children" />
           </a>
         </template>
       </IntlFormatted>
     </p>
-    <div
-      v-for="(pat, index) in pats"
-      :key="pat.id"
-      class="universal-card recessed token"
-    >
+    <div v-for="(pat, index) in pats" :key="pat.id" class="universal-card recessed token">
       <div>
         <div>
           <strong>{{ pat.name }}</strong>
@@ -131,9 +114,9 @@
               v-tooltip="
                 pat.last_used
                   ? formatMessage(commonMessages.dateAtTimeTooltip, {
-                    date: new Date(pat.last_used),
-                    time: new Date(pat.last_used),
-                  })
+                      date: new Date(pat.last_used),
+                      time: new Date(pat.last_used),
+                    })
                   : null
               "
             >

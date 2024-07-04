@@ -8,11 +8,7 @@
           <span class="label__subdescription">
             The description must clearly and honestly describe the purpose and function of the
             project. See section 2.1 of the
-            <nuxt-link
-              to="/legal/rules"
-              class="text-link"
-              target="_blank"
-            >Content Rules</nuxt-link>
+            <nuxt-link to="/legal/rules" class="text-link" target="_blank">Content Rules</nuxt-link>
             for the full requirements.
           </span>
         </span>

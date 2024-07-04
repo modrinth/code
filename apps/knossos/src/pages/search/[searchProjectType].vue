@@ -16,21 +16,15 @@
       }"
       aria-label="Filters"
     >
-      <section
-        class="card filters-card"
-        role="presentation"
-      >
-        <div
-          class="sidebar-menu"
-          :class="{ 'sidebar-menu_open': sidebarMenuOpen }"
-        >
+      <section class="card filters-card" role="presentation">
+        <div class="sidebar-menu" :class="{ 'sidebar-menu_open': sidebarMenuOpen }">
           <button
             :disabled="
               onlyOpenSource === false &&
-                selectedEnvironments.length === 0 &&
-                selectedVersions.length === 0 &&
-                facets.length === 0 &&
-                orFacets.length === 0
+              selectedEnvironments.length === 0 &&
+              selectedVersions.length === 0 &&
+              facets.length === 0 &&
+              orFacets.length === 0
             "
             class="iconified-button"
             @click="clearFilters"
@@ -39,10 +33,7 @@
             Clear filters
           </button>
           <section aria-label="Category filters">
-            <div
-              v-for="(categories, header) in categoriesMap"
-              :key="header"
-            >
+            <div v-for="(categories, header) in categoriesMap" :key="header">
               <h3
                 v-if="categories.filter((x) => x.project_type === projectType.actual).length > 0"
                 class="sidebar-menu-heading"
@@ -141,10 +132,7 @@
               :collapsing-toggle-style="true"
             />
           </section>
-          <section
-            v-if="projectType.id === 'plugin'"
-            aria-label="Platform loader filters"
-          >
+          <section v-if="projectType.id === 'plugin'" aria-label="Platform loader filters">
             <h3
               v-if="
                 tags.loaders.filter((x) => x.supported_project_types.includes(projectType.actual))
@@ -171,9 +159,7 @@
             v-if="!['resourcepack', 'plugin', 'shader', 'datapack'].includes(projectType.id)"
             aria-label="Environment filters"
           >
-            <h3 class="sidebar-menu-heading">
-              Environments
-            </h3>
+            <h3 class="sidebar-menu-heading">Environments</h3>
             <SearchFilter
               :active-filters="selectedEnvironments"
               display-name="Client"
@@ -191,9 +177,7 @@
               <ServerIcon aria-hidden="true" />
             </SearchFilter>
           </section>
-          <h3 class="sidebar-menu-heading">
-            Minecraft versions
-          </h3>
+          <h3 class="sidebar-menu-heading">Minecraft versions</h3>
           <Checkbox
             v-model="showSnapshots"
             label="Show all versions"
@@ -207,8 +191,8 @@
               showSnapshots
                 ? tags.gameVersions.map((x) => x.version)
                 : tags.gameVersions
-                  .filter((it) => it.version_type === 'release')
-                  .map((x) => x.version)
+                    .filter((it) => it.version_type === 'release')
+                    .map((x) => x.version)
             "
             :multiple="true"
             :searchable="true"
@@ -220,9 +204,7 @@
             placeholder="Choose versions..."
             @update:model-value="onSearchChange(1)"
           />
-          <h3 class="sidebar-menu-heading">
-            Open source
-          </h3>
+          <h3 class="sidebar-menu-heading">Open source</h3>
           <Checkbox
             v-model="onlyOpenSource"
             label="Open source only"
@@ -246,10 +228,7 @@
             Filters...
           </button>
           <div class="iconified-input">
-            <label
-              class="hidden"
-              for="search"
-            >Search</label>
+            <label class="hidden" for="search">Search</label>
             <SearchIcon aria-hidden="true" />
             <input
               id="search"
@@ -259,7 +238,7 @@
               :placeholder="`Search ${projectType.display}s...`"
               autocomplete="off"
               @input="onSearchChange(1)"
-            >
+            />
           </div>
         </div>
         <div class="sort-controls">
@@ -317,16 +296,10 @@
         @switch-page="onSearchChange"
       />
       <LogoAnimated v-if="searchLoading && !noLoad" />
-      <div
-        v-else-if="results && results.hits && results.hits.length === 0"
-        class="no-results"
-      >
+      <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
         <p>No results found for your query!</p>
       </div>
-      <div
-        v-else
-        class="search-results-container"
-      >
+      <div v-else class="search-results-container">
         <div
           id="search-results"
           class="project-list"

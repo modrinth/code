@@ -1,9 +1,6 @@
 <template>
   <div>
-    <Modal
-      ref="modalOpen"
-      header="Transfer Projects"
-    >
+    <Modal ref="modalOpen" header="Transfer Projects">
       <div class="universal-modal items">
         <div class="table">
           <div class="table-row table-head">
@@ -13,25 +10,13 @@
                 @update:model-value="toggleSelectedProjects()"
               />
             </div>
-            <div class="table-cell">
-              Icon
-            </div>
-            <div class="table-cell">
-              Name
-            </div>
-            <div class="table-cell">
-              ID
-            </div>
-            <div class="table-cell">
-              Type
-            </div>
+            <div class="table-cell">Icon</div>
+            <div class="table-cell">Name</div>
+            <div class="table-cell">ID</div>
+            <div class="table-cell">Type</div>
             <div class="table-cell" />
           </div>
-          <div
-            v-for="project in props.projects"
-            :key="`project-${project.id}`"
-            class="table-row"
-          >
+          <div v-for="project in props.projects" :key="`project-${project.id}`" class="table-row">
             <div class="table-cell check-cell">
               <Checkbox
                 :disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
@@ -44,10 +29,7 @@
               />
             </div>
             <div class="table-cell">
-              <nuxt-link
-                tabindex="-1"
-                :to="`/project/${project.slug ? project.slug : project.id}`"
-              >
+              <nuxt-link tabindex="-1" :to="`/project/${project.slug ? project.slug : project.id}`">
                 <Avatar
                   :src="project.icon_url"
                   aria-hidden="true"
@@ -99,11 +81,7 @@
             <XIcon />
             Cancel
           </Button>
-          <Button
-            :disabled="!selectedProjects?.length"
-            color="primary"
-            @click="onSubmitHandler()"
-          >
+          <Button :disabled="!selectedProjects?.length" color="primary" @click="onSubmitHandler()">
             <TransferIcon />
             <span>
               Transfer

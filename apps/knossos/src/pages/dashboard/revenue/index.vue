@@ -11,7 +11,8 @@
       </div>
       <p v-else>
         You have made
-        <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong>, which is under the minimum of ${{ minWithdraw }} to withdraw.
+        <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong
+        >, which is under the minimum of ${{ minWithdraw }} to withdraw.
       </p>
       <div class="input-group">
         <nuxt-link
@@ -21,28 +22,15 @@
         >
           <TransferIcon /> Withdraw
         </nuxt-link>
-        <NuxtLink
-          class="iconified-button"
-          to="/dashboard/revenue/transfers"
-        >
+        <NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
           <HistoryIcon /> View transfer history
         </NuxtLink>
       </div>
       <p>
         By uploading projects to Modrinth and withdrawing money from your account, you agree to the
-        <nuxt-link
-          to="/legal/cmp"
-          class="text-link"
-        >
-          Rewards Program Terms
-        </nuxt-link>. For more
+        <nuxt-link to="/legal/cmp" class="text-link"> Rewards Program Terms </nuxt-link>. For more
         information on how the rewards system works, see our information page
-        <nuxt-link
-          to="/legal/cmp-info"
-          class="text-link"
-        >
-          here
-        </nuxt-link>.
+        <nuxt-link to="/legal/cmp-info" class="text-link"> here </nuxt-link>.
       </p>
     </section>
     <section class="universal-card">
@@ -54,19 +42,13 @@
           email
           {{ auth.user.payout_data.paypal_address }}
         </p>
-        <button
-          class="btn"
-          @click="removeAuthProvider('paypal')"
-        >
+        <button class="btn" @click="removeAuthProvider('paypal')">
           <XIcon /> Disconnect account
         </button>
       </template>
       <template v-else>
         <p>Connect your PayPal account to enable withdrawing to your PayPal balance.</p>
-        <a
-          class="btn"
-          :href="`${getAuthUrl('paypal')}&token=${auth.token}`"
-        >
+        <a class="btn" :href="`${getAuthUrl('paypal')}&token=${auth.token}`">
           <PayPalIcon />
           Sign in with PayPal
         </a>
@@ -75,19 +57,11 @@
       <p>
         Tremendous payments are sent to your Modrinth email. To change/set your Modrinth email,
         visit
-        <nuxt-link
-          to="/settings/account"
-          class="text-link"
-        >
-          here
-        </nuxt-link>.
+        <nuxt-link to="/settings/account" class="text-link"> here </nuxt-link>.
       </p>
       <h3>Venmo</h3>
       <p>Enter your Venmo username below to enable withdrawing to your Venmo balance.</p>
-      <label
-        class="hidden"
-        for="venmo"
-      >Venmo address</label>
+      <label class="hidden" for="venmo">Venmo address</label>
       <input
         id="venmo"
         v-model="auth.user.payout_data.venmo_handle"
@@ -95,13 +69,8 @@
         name="search"
         placeholder="@example"
         autocomplete="off"
-      >
-      <button
-        class="btn btn-secondary"
-        @click="updateVenmo"
-      >
-        <SaveIcon /> Save information
-      </button>
+      />
+      <button class="btn btn-secondary" @click="updateVenmo"><SaveIcon /> Save information</button>
     </section>
   </div>
 </template>

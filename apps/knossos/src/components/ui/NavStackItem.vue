@@ -1,20 +1,10 @@
 <template>
-  <NuxtLink
-    v-if="link !== null"
-    class="nav-link button-base"
-    :to="link"
-  >
+  <NuxtLink v-if="link !== null" class="nav-link button-base" :to="link">
     <div class="nav-content">
       <slot />
       <span>{{ label }}</span>
-      <span
-        v-if="beta"
-        class="beta-badge"
-      >BETA</span>
-      <span
-        v-if="chevron"
-        class="chevron"
-      ><ChevronRightIcon /></span>
+      <span v-if="beta" class="beta-badge">BETA</span>
+      <span v-if="chevron" class="chevron"><ChevronRightIcon /></span>
     </div>
   </NuxtLink>
   <button
@@ -26,10 +16,7 @@
     <span class="nav-content">
       <slot />
       <span>{{ label }}</span>
-      <span
-        v-if="beta"
-        class="beta-badge"
-      >BETA</span>
+      <span v-if="beta" class="beta-badge">BETA</span>
     </span>
   </button>
   <span v-else>i forgor 💀</span>

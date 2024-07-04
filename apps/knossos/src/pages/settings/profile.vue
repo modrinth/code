@@ -5,11 +5,7 @@
       <p>
         <IntlFormatted :message-id="messages.description">
           <template #docs-link="{ children }">
-            <a
-              href="https://docs.modrinth.com/"
-              target="_blank"
-              class="text-link"
-            >
+            <a href="https://docs.modrinth.com/" target="_blank" class="text-link">
               <component :is="() => children" />
             </a>
           </template>
@@ -56,45 +52,24 @@
           {{ formatMessage(messages.usernameDescription) }}
         </span>
       </label>
-      <input
-        id="username-field"
-        v-model="username"
-        type="text"
-      >
+      <input id="username-field" v-model="username" type="text" />
       <label for="bio-field">
         <span class="label__title">{{ formatMessage(messages.bioTitle) }}</span>
         <span class="label__description">
           {{ formatMessage(messages.bioDescription) }}
         </span>
       </label>
-      <textarea
-        id="bio-field"
-        v-model="bio"
-        type="text"
-      />
-      <div
-        v-if="hasUnsavedChanges"
-        class="input-group"
-      >
-        <Button
-          color="primary"
-          :action="() => saveChanges()"
-        >
+      <textarea id="bio-field" v-model="bio" type="text" />
+      <div v-if="hasUnsavedChanges" class="input-group">
+        <Button color="primary" :action="() => saveChanges()">
           <SaveIcon /> {{ formatMessage(commonMessages.saveChangesButton) }}
         </Button>
         <Button :action="() => cancel()">
           <XIcon /> {{ formatMessage(commonMessages.cancelButton) }}
         </Button>
       </div>
-      <div
-        v-else
-        class="input-group"
-      >
-        <Button
-          disabled
-          color="primary"
-          :action="() => saveChanges()"
-        >
+      <div v-else class="input-group">
+        <Button disabled color="primary" :action="() => saveChanges()">
           <SaveIcon />
           {{
             saved

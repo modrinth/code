@@ -34,10 +34,7 @@
         >
           {{ members[message.author_id].username }}
         </ConditionalNuxtLink>
-        <ScaleIcon
-          v-if="members[message.author_id].role === 'moderator'"
-          v-tooltip="'Moderator'"
-        />
+        <ScaleIcon v-if="members[message.author_id].role === 'moderator'" v-tooltip="'Moderator'" />
         <ModrinthIcon
           v-else-if="members[message.author_id].role === 'admin'"
           v-tooltip="'Modrinth Team'"
@@ -50,10 +47,7 @@
       </span>
     </template>
     <template v-else>
-      <div
-        class="message__icon backed-svg circle moderation-color"
-        :class="{ raised: raised }"
-      >
+      <div class="message__icon backed-svg circle moderation-color" :class="{ raised: raised }">
         <ScaleIcon />
       </div>
       <span class="message__author moderation-color">
@@ -66,10 +60,7 @@
       class="message__body markdown-body"
       v-html="formattedMessage"
     />
-    <div
-      v-else
-      class="message__body status-message"
-    >
+    <div v-else class="message__body status-message">
       <span v-if="message.body.type === 'deleted'"> posted a message that has been deleted. </span>
       <template v-else-if="message.body.type === 'status_change'">
         <span v-if="message.body.new_status === 'processing'">
@@ -88,10 +79,7 @@
         {{ timeSincePosted }}
       </span>
     </span>
-    <div
-      v-if="isStaff(auth.user) && message.author_id === auth.user.id"
-      class="message__actions"
-    >
+    <div v-if="isStaff(auth.user) && message.author_id === auth.user.id" class="message__actions">
       <OverflowMenu
         class="btn btn-transparent icon-only"
         :options="[
@@ -104,9 +92,7 @@
         ]"
       >
         <MoreHorizontalIcon />
-        <template #delete>
-          <TrashIcon /> Delete
-        </template>
+        <template #delete> <TrashIcon /> Delete </template>
       </OverflowMenu>
     </div>
   </div>

@@ -59,7 +59,7 @@
         maxlength="2048"
         type="text"
         :disabled="!hasPermission"
-      >
+      />
 
       <label for="project-slug">
         <span class="label__title">URL</span>
@@ -75,7 +75,7 @@
           maxlength="64"
           autocomplete="off"
           :disabled="!hasPermission"
-        >
+        />
       </div>
 
       <label for="project-summary">
@@ -92,10 +92,10 @@
       <template
         v-if="
           project.versions?.length !== 0 &&
-            project.project_type !== 'resourcepack' &&
-            project.project_type !== 'plugin' &&
-            project.project_type !== 'shader' &&
-            project.project_type !== 'datapack'
+          project.project_type !== 'resourcepack' &&
+          project.project_type !== 'plugin' &&
+          project.project_type !== 'shader' &&
+          project.project_type !== 'datapack'
         "
       >
         <div class="adjacent-input">
@@ -162,10 +162,7 @@
                   v-if="visibility === 'approved' || visibility === 'archived'"
                   class="good"
                 />
-                <ExitIcon
-                  v-else
-                  class="bad"
-                />
+                <ExitIcon v-else class="bad" />
                 {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible in search
               </li>
               <li>
@@ -173,17 +170,11 @@
                   v-if="visibility === 'unlisted' || visibility === 'private'"
                   class="bad"
                 />
-                <CheckIcon
-                  v-else
-                  class="good"
-                />
+                <CheckIcon v-else class="good" />
                 {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible on profile
               </li>
               <li>
-                <CheckIcon
-                  v-if="visibility !== 'private'"
-                  class="good"
-                />
+                <CheckIcon v-if="visibility !== 'private'" class="good" />
                 <IssuesIcon
                   v-else
                   v-tooltip="{

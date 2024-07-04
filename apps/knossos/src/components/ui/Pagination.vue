@@ -1,8 +1,5 @@
 <template>
-  <div
-    v-if="count > 1"
-    class="columns paginates"
-  >
+  <div v-if="count > 1" class="columns paginates">
     <a
       :class="{ disabled: page === 1 }"
       :tabindex="page === 1 ? -1 : 0"
@@ -22,10 +19,7 @@
       }"
       class="page-number-container"
     >
-      <div
-        v-if="item === '-'"
-        class="has-icon"
-      >
+      <div v-if="item === '-'" class="has-icon">
         <GapIcon />
       </div>
       <a

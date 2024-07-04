@@ -1,16 +1,13 @@
 <template>
-  <span
-    v-if="typeOnly"
-    class="environment"
-  >
+  <span v-if="typeOnly" class="environment">
     <InfoIcon aria-hidden="true" />
     A {{ type }}
   </span>
   <span
     v-else-if="
       !['resourcepack', 'shader'].includes(type) &&
-        !(type === 'plugin' && search) &&
-        !categories.some((x) => tags.loaderData.dataPackLoaders.includes(x))
+      !(type === 'plugin' && search) &&
+      !categories.some((x) => tags.loaderData.dataPackLoaders.includes(x))
     "
     class="environment"
   >
@@ -25,7 +22,7 @@
     <template
       v-else-if="
         (clientSide === 'optional' || clientSide === 'required') &&
-          (serverSide === 'optional' || serverSide === 'unsupported')
+        (serverSide === 'optional' || serverSide === 'unsupported')
       "
     >
       <ClientIcon aria-hidden="true" />
@@ -34,7 +31,7 @@
     <template
       v-else-if="
         (serverSide === 'optional' || serverSide === 'required') &&
-          (clientSide === 'optional' || clientSide === 'unsupported')
+        (clientSide === 'optional' || clientSide === 'unsupported')
       "
     >
       <ServerIcon aria-hidden="true" />

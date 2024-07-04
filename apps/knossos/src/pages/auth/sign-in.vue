@@ -16,12 +16,9 @@
         autocomplete="one-time-code"
         autofocus
         @keyup.enter="begin2FASignIn"
-      >
+      />
 
-      <button
-        class="btn btn-primary continue-btn"
-        @click="begin2FASignIn"
-      >
+      <button class="btn btn-primary continue-btn" @click="begin2FASignIn">
         {{ formatMessage(commonMessages.signInButton) }} <RightArrowIcon />
       </button>
     </template>
@@ -29,45 +26,27 @@
       <h1>{{ formatMessage(messages.signInWithLabel) }}</h1>
 
       <section class="third-party">
-        <a
-          class="btn"
-          :href="getAuthUrl('discord', redirectTarget)"
-        >
+        <a class="btn" :href="getAuthUrl('discord', redirectTarget)">
           <SSODiscordIcon />
           <span>Discord</span>
         </a>
-        <a
-          class="btn"
-          :href="getAuthUrl('github', redirectTarget)"
-        >
+        <a class="btn" :href="getAuthUrl('github', redirectTarget)">
           <SSOGitHubIcon />
           <span>GitHub</span>
         </a>
-        <a
-          class="btn"
-          :href="getAuthUrl('microsoft', redirectTarget)"
-        >
+        <a class="btn" :href="getAuthUrl('microsoft', redirectTarget)">
           <SSOMicrosoftIcon />
           <span>Microsoft</span>
         </a>
-        <a
-          class="btn"
-          :href="getAuthUrl('google', redirectTarget)"
-        >
+        <a class="btn" :href="getAuthUrl('google', redirectTarget)">
           <SSOGoogleIcon />
           <span>Google</span>
         </a>
-        <a
-          class="btn"
-          :href="getAuthUrl('steam', redirectTarget)"
-        >
+        <a class="btn" :href="getAuthUrl('steam', redirectTarget)">
           <SSOSteamIcon />
           <span>Steam</span>
         </a>
-        <a
-          class="btn"
-          :href="getAuthUrl('gitlab', redirectTarget)"
-        >
+        <a class="btn" :href="getAuthUrl('gitlab', redirectTarget)">
           <SSOGitLabIcon />
           <span>GitLab</span>
         </a>
@@ -77,10 +56,7 @@
 
       <section class="auth-form">
         <div class="iconified-input">
-          <label
-            for="email"
-            hidden
-          >{{ formatMessage(messages.emailUsernameLabel) }}</label>
+          <label for="email" hidden>{{ formatMessage(messages.emailUsernameLabel) }}</label>
           <MailIcon />
           <input
             id="email"
@@ -89,14 +65,11 @@
             autocomplete="username"
             class="auth-form__input"
             :placeholder="formatMessage(messages.emailUsernameLabel)"
-          >
+          />
         </div>
 
         <div class="iconified-input">
-          <label
-            for="password"
-            hidden
-          >{{ formatMessage(messages.passwordLabel) }}</label>
+          <label for="password" hidden>{{ formatMessage(messages.passwordLabel) }}</label>
           <KeyIcon />
           <input
             id="password"
@@ -105,7 +78,7 @@
             autocomplete="current-password"
             class="auth-form__input"
             :placeholder="formatMessage(messages.passwordLabel)"
-          >
+          />
         </div>
 
         <NuxtTurnstile
@@ -126,18 +99,12 @@
         <div class="auth-form__additional-options">
           <IntlFormatted :message-id="messages.additionalOptionsLabel">
             <template #forgot-password-link="{ children }">
-              <NuxtLink
-                class="text-link"
-                to="/auth/reset-password"
-              >
+              <NuxtLink class="text-link" to="/auth/reset-password">
                 <component :is="() => children" />
               </NuxtLink>
             </template>
             <template #create-account-link="{ children }">
-              <NuxtLink
-                class="text-link"
-                :to="signUpLink"
-              >
+              <NuxtLink class="text-link" :to="signUpLink">
                 <component :is="() => children" />
               </NuxtLink>
             </template>

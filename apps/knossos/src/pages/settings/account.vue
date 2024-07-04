@@ -9,10 +9,7 @@
       :has-to-type="true"
       @proceed="deleteAccount"
     />
-    <Modal
-      ref="changeEmailModal"
-      :header="`${auth.user.email ? 'Change' : 'Add'} email`"
-    >
+    <Modal ref="changeEmailModal" :header="`${auth.user.email ? 'Change' : 'Add'} email`">
       <div class="universal-modal">
         <p>Your account information is not displayed publicly.</p>
         <label for="email-input"><span class="label__title">Email address</span> </label>
@@ -23,12 +20,9 @@
           type="email"
           :placeholder="`Enter your email address...`"
           @keyup.enter="saveEmail()"
-        >
+        />
         <div class="input-group push-right">
-          <button
-            class="iconified-button"
-            @click="$refs.changeEmailModal.hide()"
-          >
+          <button class="iconified-button" @click="$refs.changeEmailModal.hide()">
             <XIcon />
             Cancel
           </button>
@@ -57,17 +51,11 @@
         >
           <li>Input passwords do not match!</li>
         </ul>
-        <label
-          v-if="removePasswordMode"
-          for="old-password"
-        >
+        <label v-if="removePasswordMode" for="old-password">
           <span class="label__title">Confirm password</span>
           <span class="label__description">Please enter your password to proceed.</span>
         </label>
-        <label
-          v-else-if="auth.user.has_password"
-          for="old-password"
-        >
+        <label v-else-if="auth.user.has_password" for="old-password">
           <span class="label__title">Old password</span>
         </label>
         <input
@@ -78,7 +66,7 @@
           type="password"
           autocomplete="current-password"
           :placeholder="`${removePasswordMode ? 'Confirm' : 'Old'} password`"
-        >
+        />
         <template v-if="!removePasswordMode">
           <label for="new-password"><span class="label__title">New password</span></label>
           <input
@@ -88,8 +76,10 @@
             type="password"
             autocomplete="new-password"
             placeholder="New password"
+          />
+          <label for="confirm-new-password"
+            ><span class="label__title">Confirm new password</span></label
           >
-          <label for="confirm-new-password"><span class="label__title">Confirm new password</span></label>
           <input
             id="confirm-new-password"
             v-model="confirmNewPassword"
@@ -97,14 +87,11 @@
             type="password"
             autocomplete="new-password"
             placeholder="Confirm new password"
-          >
+          />
         </template>
         <p />
         <div class="input-group push-right">
-          <button
-            class="iconified-button"
-            @click="$refs.managePasswordModal.hide()"
-          >
+          <button class="iconified-button" @click="$refs.managePasswordModal.hide()">
             <XIcon />
             Cancel
           </button>
@@ -134,8 +121,8 @@
               class="iconified-button brand-button"
               :disabled="
                 newPassword.length == 0 ||
-                  (auth.user.has_password && oldPassword.length == 0) ||
-                  newPassword !== confirmNewPassword
+                (auth.user.has_password && oldPassword.length == 0) ||
+                newPassword !== confirmNewPassword
               "
               @click="savePassword"
             >
@@ -165,25 +152,14 @@
             type="text"
             placeholder="Enter code..."
             @keyup.enter="removeTwoFactor()"
-          >
-          <p
-            v-if="twoFactorIncorrect"
-            class="known-errors"
-          >
-            The code entered is incorrect!
-          </p>
+          />
+          <p v-if="twoFactorIncorrect" class="known-errors">The code entered is incorrect!</p>
           <div class="input-group push-right">
-            <button
-              class="iconified-button"
-              @click="$refs.manageTwoFactorModal.hide()"
-            >
+            <button class="iconified-button" @click="$refs.manageTwoFactorModal.hide()">
               <XIcon />
               Cancel
             </button>
-            <button
-              class="iconified-button danger-button"
-              @click="removeTwoFactor"
-            >
+            <button class="iconified-button danger-button" @click="removeTwoFactor">
               <TrashIcon />
               Remove 2FA
             </button>
@@ -194,10 +170,11 @@
             <p>
               Two-factor authentication keeps your account secure by requiring access to a second
               device in order to sign in.
-              <br><br>
+              <br /><br />
               Scan the QR code with <a href="https://authy.com/">Authy</a>,
               <a href="https://www.microsoft.com/en-us/security/mobile-authenticator-app">
-                Microsoft Authenticator</a>, or any other 2FA app to begin.
+                Microsoft Authenticator</a
+              >, or any other 2FA app to begin.
             </p>
             <qrcode-vue
               v-if="twoFactorSecret"
@@ -216,7 +193,8 @@
           <template v-if="twoFactorStep === 1">
             <label for="verify-code">
               <span class="label__title">Verify code</span>
-              <span class="label__description">Enter the one-time code from authenticator to verify access.
+              <span class="label__description"
+                >Enter the one-time code from authenticator to verify access.
               </span>
             </label>
             <input
@@ -227,13 +205,8 @@
               autocomplete="one-time-code"
               placeholder="Enter code..."
               @keyup.enter="verifyTwoFactorCode()"
-            >
-            <p
-              v-if="twoFactorIncorrect"
-              class="known-errors"
-            >
-              The code entered is incorrect!
-            </p>
+            />
+            <p v-if="twoFactorIncorrect" class="known-errors">The code entered is incorrect!</p>
           </template>
           <template v-if="twoFactorStep === 2">
             <p>
@@ -243,20 +216,13 @@
             </p>
             <p>Backup codes can only be used once.</p>
             <ul>
-              <li
-                v-for="code in backupCodes"
-                :key="code"
-              >
+              <li v-for="code in backupCodes" :key="code">
                 {{ code }}
               </li>
             </ul>
           </template>
           <div class="input-group push-right">
-            <button
-              v-if="twoFactorStep === 1"
-              class="iconified-button"
-              @click="twoFactorStep = 0"
-            >
+            <button v-if="twoFactorStep === 1" class="iconified-button" @click="twoFactorStep = 0">
               <LeftArrowIcon />
               Back
             </button>
@@ -288,25 +254,14 @@
         </template>
       </div>
     </Modal>
-    <Modal
-      ref="manageProvidersModal"
-      header="Authentication providers"
-    >
+    <Modal ref="manageProvidersModal" header="Authentication providers">
       <div class="universal-modal">
         <div class="table">
           <div class="table-row table-head">
-            <div class="table-cell table-text">
-              Provider
-            </div>
-            <div class="table-cell table-text">
-              Actions
-            </div>
+            <div class="table-cell table-text">Provider</div>
+            <div class="table-cell table-text">Actions</div>
           </div>
-          <div
-            v-for="provider in authProviders"
-            :key="provider.id"
-            class="table-row"
-          >
+          <div v-for="provider in authProviders" :key="provider.id" class="table-row">
             <div class="table-cell table-text">
               <span><component :is="provider.icon" /> {{ provider.display }}</span>
             </div>
@@ -330,10 +285,7 @@
         </div>
         <p />
         <div class="input-group push-right">
-          <button
-            class="iconified-button"
-            @click="$refs.manageProvidersModal.hide()"
-          >
+          <button class="iconified-button" @click="$refs.manageProvidersModal.hide()">
             <XIcon />
             Close
           </button>
@@ -349,10 +301,7 @@
           <span class="label__description">Changes the email associated with your account.</span>
         </label>
         <div>
-          <button
-            class="iconified-button"
-            @click="$refs.changeEmailModal.show()"
-          >
+          <button class="iconified-button" @click="$refs.changeEmailModal.show()">
             <template v-if="auth.user.email">
               <EditIcon />
               Change email
@@ -367,17 +316,11 @@
       <div class="adjacent-input">
         <label for="theme-selector">
           <span class="label__title">Password</span>
-          <span
-            v-if="auth.user.has_password"
-            class="label__description"
-          >
+          <span v-if="auth.user.has_password" class="label__description">
             Change <template v-if="auth.user.auth_providers.length > 0">or remove</template> the
             password used to login to your account.
           </span>
-          <span
-            v-else
-            class="label__description"
-          >
+          <span v-else class="label__description">
             Set a permanent password to login to your account.
           </span>
         </label>
@@ -395,12 +338,8 @@
             "
           >
             <KeyIcon />
-            <template v-if="auth.user.has_password">
-              Change password
-            </template>
-            <template v-else>
-              Add password
-            </template>
+            <template v-if="auth.user.has_password"> Change password </template>
+            <template v-else> Add password </template>
           </button>
         </div>
       </div>
@@ -412,16 +351,9 @@
           </span>
         </label>
         <div>
-          <button
-            class="iconified-button"
-            @click="showTwoFactorModal"
-          >
-            <template v-if="auth.user.has_totp">
-              <TrashIcon /> Remove 2FA
-            </template>
-            <template v-else>
-              <PlusIcon /> Setup 2FA
-            </template>
+          <button class="iconified-button" @click="showTwoFactorModal">
+            <template v-if="auth.user.has_totp"> <TrashIcon /> Remove 2FA </template>
+            <template v-else> <PlusIcon /> Setup 2FA </template>
           </button>
         </div>
       </div>
@@ -434,20 +366,14 @@
           </span>
         </label>
         <div>
-          <button
-            class="iconified-button"
-            @click="$refs.manageProvidersModal.show()"
-          >
+          <button class="iconified-button" @click="$refs.manageProvidersModal.show()">
             <SettingsIcon /> Manage providers
           </button>
         </div>
       </div>
     </section>
 
-    <section
-      id="delete-account"
-      class="universal-card"
-    >
+    <section id="delete-account" class="universal-card">
       <h2>Delete account</h2>
       <p>
         Once you delete your account, there is no going back. Deleting your account will remove all

@@ -1,8 +1,5 @@
 <template>
-  <nuxt-link
-    v-if="isLink"
-    :to="to"
-  >
+  <nuxt-link v-if="isLink" :to="to">
     <slot />
   </nuxt-link>
   <span v-else>
