@@ -148,7 +148,7 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
     let mut head_map: HashMap<Uuid, String> = HashMap::new();
     let client = reqwest::Client::new();
 
-    let responses = future::join_all(users.into_iter().map(|user| {
+    let responses: Vec<Option<Parsed>> = future::join_all(users.into_iter().map(|user| {
         let client = &client;
         async move {
             let token = if user.expires < Utc::now() {
@@ -156,17 +156,22 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
             } else {
                 user.access_token
             };
-            let response: Value = client
+            let response = client
                 .get("https://api.minecraftservices.com/minecraft/profile")
                 .header(header::AUTHORIZATION, format!("Bearer {token}"))
-                .send().await.unwrap()
-                .json().await.unwrap();
+                .send().await.unwrap();
 
-            parse_skin_data(response, user.id).await.unwrap()
+            if response.status().is_success() {
+                parse_skin_data(response.json().await.unwrap(), user.id).await.ok()
+            } else {
+                None
+            }   
         }
     })).await;
 
     for data in responses {
+        if data.is_none() { continue };
+        let data = data.unwrap();
         cape_map.extend(data.capes);
         user_map.insert(data.id, data.user);
         head_map.insert(data.id, data.head);
