@@ -7,6 +7,9 @@ on:
 
 jobs:
   main:
+    strategy:
+      matrix:
+        action: ['lint', 'test', 'build']
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,6 +48,4 @@ jobs:
       - run: git branch --track main origin/main
         if: ${{ github.event_name == 'pull_request' }}
 
-      - run: pnpm nx affected -t lint
-      - run: pnpm nx affected -t test
-      - run: pnpm nx affected -t build
+      - run: pnpm nx affected -t ${{ matrix.action }}
