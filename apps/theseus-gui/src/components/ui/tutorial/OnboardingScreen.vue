@@ -247,8 +247,7 @@ const finishOnboarding = async () => {
 }
 
 .onboarding {
-  background:
-    top linear-gradient(0deg, #31375f, rgba(8, 14, 55, 0)),
+  background: top linear-gradient(0deg, #31375f, rgba(8, 14, 55, 0)),
     url(https://cdn.modrinth.com/landing-new/landing-lower.webp);
   background-size: cover;
   height: 100vh;

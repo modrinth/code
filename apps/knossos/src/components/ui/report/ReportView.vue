@@ -7,7 +7,12 @@
         :link-stack="breadcrumbsStack"
       />
       <h2>Report details</h2>
-      <ReportInfo :report="report" :show-thread="false" :show-message="false" :auth="auth" />
+      <ReportInfo
+        :report="report"
+        :show-thread="false"
+        :show-message="false"
+        :auth="auth"
+      />
     </section>
     <section class="universal-card">
       <h2>Messages</h2>

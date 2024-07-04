@@ -9,9 +9,18 @@
         @mouseenter="stopTimer(item)"
         @mouseleave="setNotificationTimer(item)"
       >
-        <div class="vue-notification-template vue-notification" :class="{ [item.type]: true }">
-          <div class="notification-title" v-html="item.title"></div>
-          <div class="notification-content" v-html="item.text"></div>
+        <div
+          class="vue-notification-template vue-notification"
+          :class="{ [item.type]: true }"
+        >
+          <div
+            class="notification-title"
+            v-html="item.title"
+          />
+          <div
+            class="notification-content"
+            v-html="item.text"
+          />
         </div>
       </div>
     </transition-group>

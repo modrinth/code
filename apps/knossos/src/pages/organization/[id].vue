@@ -1,7 +1,13 @@
 <template>
-  <div v-if="organization" class="normal-page">
+  <div
+    v-if="organization"
+    class="normal-page"
+  >
     <div class="normal-page__sidebar">
-      <div v-if="routeHasSettings" class="universal-card">
+      <div
+        v-if="routeHasSettings"
+        class="universal-card"
+      >
         <Breadcrumbs
           current-title="Settings"
           :link-stack="[
@@ -15,7 +21,10 @@
         />
 
         <div class="page-header__settings">
-          <Avatar size="sm" :src="organization.icon_url" />
+          <Avatar
+            size="sm"
+            :src="organization.icon_url"
+          />
           <div class="title-section">
             <h2 class="settings-title">
               <nuxt-link :to="`/organization/${organization.slug}/settings`">
@@ -32,7 +41,10 @@
         <h2>Organization settings</h2>
 
         <NavStack>
-          <NavStackItem :link="`/organization/${organization.slug}/settings`" label="Overview">
+          <NavStackItem
+            :link="`/organization/${organization.slug}/settings`"
+            label="Overview"
+          >
             <SettingsIcon />
           </NavStackItem>
           <NavStackItem
@@ -59,11 +71,16 @@
       <template v-else>
         <div class="universal-card">
           <div class="page-header__icon">
-            <Avatar size="md" :src="organization.icon_url" />
+            <Avatar
+              size="md"
+              :src="organization.icon_url"
+            />
           </div>
 
           <div class="page-header__text">
-            <h1 class="title">{{ organization.name }}</h1>
+            <h1 class="title">
+              {{ organization.name }}
+            </h1>
 
             <div>
               <span class="organization-label"><OrganizationIcon /> Organization</span>
@@ -74,20 +91,28 @@
                 <p>{{ organization.description }}</p>
               </div>
 
-              <hr class="card-divider" />
+              <hr class="card-divider">
 
               <div class="primary-stat">
-                <UserIcon class="primary-stat__icon" aria-hidden="true" />
+                <UserIcon
+                  class="primary-stat__icon"
+                  aria-hidden="true"
+                />
                 <div class="primary-stat__text">
                   <span class="primary-stat__counter">
                     {{ $formatNumber(acceptedMembers?.length || 0) }}
                   </span>
-                  member<template v-if="acceptedMembers?.length !== 1">s</template>
+                  member<template v-if="acceptedMembers?.length !== 1">
+                    s
+                  </template>
                 </div>
               </div>
 
               <div class="primary-stat">
-                <BoxIcon class="primary-stat__icon" aria-hidden="true" />
+                <BoxIcon
+                  class="primary-stat__icon"
+                  aria-hidden="true"
+                />
                 <div class="primary-stat__text">
                   <span class="primary-stat__counter">
                     {{ $formatNumber(projects?.length || 0) }}
@@ -97,7 +122,10 @@
               </div>
 
               <div class="primary-stat no-margin">
-                <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
+                <DownloadIcon
+                  class="primary-stat__icon"
+                  aria-hidden="true"
+                />
                 <div class="primary-stat__text">
                   <span class="primary-stat__counter">
                     {{ formatCompactNumber(sumDownloads) }}
@@ -114,30 +142,59 @@
             <h3>Members</h3>
           </div>
 
-          <template v-for="member in acceptedMembers" :key="member.user.id">
-            <nuxt-link class="creator button-base" :to="`/user/${member.user.username}`">
-              <Avatar :src="member.user.avatar_url" circle />
+          <template
+            v-for="member in acceptedMembers"
+            :key="member.user.id"
+          >
+            <nuxt-link
+              class="creator button-base"
+              :to="`/user/${member.user.username}`"
+            >
+              <Avatar
+                :src="member.user.avatar_url"
+                circle
+              />
               <p class="name">
                 {{ member.user.username }}
-                <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
+                <CrownIcon
+                  v-if="member.is_owner"
+                  v-tooltip="'Organization owner'"
+                />
               </p>
-              <p class="role">{{ member.role }}</p>
+              <p class="role">
+                {{ member.role }}
+              </p>
             </nuxt-link>
           </template>
         </div>
       </template>
     </div>
-    <div v-if="!routeHasSettings" class="normal-page__content">
-      <ModalCreation ref="modal_creation" :organization-id="organization.id" />
+    <div
+      v-if="!routeHasSettings"
+      class="normal-page__content"
+    >
+      <ModalCreation
+        ref="modal_creation"
+        :organization-id="organization.id"
+      />
       <Promotion />
-      <div v-if="isInvited" class="universal-card information invited">
+      <div
+        v-if="isInvited"
+        class="universal-card information invited"
+      >
         <h2>Invitation to join {{ organization.name }}</h2>
         <p>You have been invited to join {{ organization.name }}.</p>
         <div class="input-group">
-          <button class="iconified-button brand-button" @click="onAcceptInvite">
+          <button
+            class="iconified-button brand-button"
+            @click="onAcceptInvite"
+          >
             <CheckIcon />Accept
           </button>
-          <button class="iconified-button danger-button" @click="onDeclineInvite">
+          <button
+            class="iconified-button danger-button"
+            @click="onDeclineInvite"
+          >
             <XIcon />Decline
           </button>
         </div>
@@ -158,8 +215,14 @@
           ]"
         />
 
-        <div v-if="auth.user && currentMember" class="input-group">
-          <nuxt-link :to="`/organization/${organization.slug}/settings`" class="iconified-button">
+        <div
+          v-if="auth.user && currentMember"
+          class="input-group"
+        >
+          <nuxt-link
+            :to="`/organization/${organization.slug}/settings`"
+            class="iconified-button"
+          >
             <SettingsIcon /> Manage
           </nuxt-link>
         </div>
@@ -169,10 +232,10 @@
           <ProjectCard
             v-for="project in (route.params.projectType !== undefined
               ? projects.filter((x) =>
-                  x.project_types.includes(
-                    route.params.projectType.substr(0, route.params.projectType.length - 1)
-                  )
+                x.project_types.includes(
+                  route.params.projectType.substr(0, route.params.projectType.length - 1)
                 )
+              )
               : projects
             )
               .slice()
@@ -203,13 +266,19 @@
         </div>
       </template>
 
-      <div v-else-if="true" class="error">
-        <UpToDate class="icon" /><br />
+      <div
+        v-else-if="true"
+        class="error"
+      >
+        <UpToDate class="icon" /><br>
         <span class="preserve-lines text">
           This organization doesn't have any projects yet.
           <template v-if="isPermission(currentMember?.organization_permissions, 1 << 4)">
             Would you like to
-            <a class="link" @click="$refs.modal_creation.show()">create one</a>?
+            <a
+              class="link"
+              @click="$refs.modal_creation.show()"
+            >create one</a>?
           </template>
         </span>
       </div>

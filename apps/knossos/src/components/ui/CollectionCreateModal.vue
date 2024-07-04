@@ -1,5 +1,8 @@
 <template>
-  <Modal ref="modal" header="Create a collection">
+  <Modal
+    ref="modal"
+    header="Create a collection"
+  >
     <div class="universal-modal modal-creation universal-labels">
       <div class="markdown-body">
         <p>
@@ -18,20 +21,27 @@
         maxlength="64"
         :placeholder="`Enter collection name...`"
         autocomplete="off"
-      />
+      >
       <label for="additional-information">
         <span class="label__title">Summary<span class="required">*</span></span>
         <span class="label__description">This appears on your collection's page.</span>
       </label>
       <div class="textarea-wrapper">
-        <textarea id="additional-information" v-model="description" maxlength="256" />
+        <textarea
+          id="additional-information"
+          v-model="description"
+          maxlength="256"
+        />
       </div>
       <div class="push-right input-group">
         <Button @click="modal.hide()">
           <CrossIcon />
           Cancel
         </Button>
-        <Button color="primary" @click="create">
+        <Button
+          color="primary"
+          @click="create"
+        >
           <CheckIcon />
           Continue
         </Button>

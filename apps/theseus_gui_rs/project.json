@@ -16,7 +16,10 @@
           }
         ]
       },
-      "outputs": ["{workspaceRoot}/dist/target/theseus_gui_rs", "{workspaceRoot}/dist/apps/theseus-gui"],
+      "outputs": [
+        "{workspaceRoot}/dist/target/theseus_gui_rs",
+        "{workspaceRoot}/dist/apps/theseus-gui"
+      ],
       "configurations": {
         "production": {
           "release": true
@@ -54,7 +57,10 @@
           }
         ]
       },
-      "outputs": ["{workspaceRoot}/dist/target/theseus_gui_rs", "{workspaceRoot}/dist/apps/theseus-gui"],
+      "outputs": [
+        "{workspaceRoot}/dist/target/theseus_gui_rs",
+        "{workspaceRoot}/dist/apps/theseus-gui"
+      ],
       "configurations": {
         "production": {
           "release": true

@@ -306,7 +306,13 @@ defineExpose({
 </script>
 
 <template>
-  <VueApexCharts ref="chart" :type="type" :options="chartOptions" :series="data" class="chart" />
+  <VueApexCharts
+    ref="chart"
+    :type="type"
+    :options="chartOptions"
+    :series="data"
+    class="chart"
+  />
 </template>
 
 <style scoped lang="scss">

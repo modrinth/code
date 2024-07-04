@@ -1,7 +1,14 @@
 <script setup>
 import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from '@modrinth/omorphia'
+import {
+  Card,
+  DownloadIcon,
+  StopCircleIcon,
+  Avatar,
+  AnimatedLogo,
+  PlayIcon,
+} from '@modrinth/omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
@@ -34,7 +41,7 @@ const playing = ref(false)
 
 const uuid = ref(null)
 const modLoading = ref(
-  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false,
+  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
 )
 
 watch(
@@ -43,7 +50,7 @@ watch(
     modLoading.value = props.instance.install_stage
       ? props.instance.install_stage !== 'installed'
       : false
-  },
+  }
 )
 
 const router = useRouter()
@@ -73,7 +80,7 @@ const install = async (e) => {
   modLoading.value = true
   const versions = await useFetch(
     `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
-    'project versions',
+    'project versions'
   )
 
   if (props.instance.project_type === 'modpack') {
@@ -90,7 +97,7 @@ const install = async (e) => {
         props.instance.project_id,
         versions[0].id,
         props.instance.title,
-        props.instance.icon_url,
+        props.instance.icon_url
       ).catch(handleError)
       modLoading.value = false
 
@@ -105,14 +112,14 @@ const install = async (e) => {
         props.instance.project_id,
         versions[0].id,
         props.instance.title,
-        props.instance.icon_url,
+        props.instance.icon_url
       )
   } else {
     modInstallModal.value.show(
       props.instance.project_id,
       versions,
       props.instance.title,
-      props.instance.project_type,
+      props.instance.project_type
     )
   }
 
@@ -268,10 +275,7 @@ onUnmounted(() => unlisten())
   right: calc(var(--gap-md) * 2);
   bottom: 3.25rem;
   opacity: 0;
-  transition:
-    0.2s ease-in-out bottom,
-    0.2s ease-in-out opacity,
-    0.1s ease-in-out filter !important;
+  transition: 0.2s ease-in-out bottom, 0.2s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
   box-shadow: var(--shadow-floating);
 

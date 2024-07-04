@@ -19,7 +19,7 @@
           placeholder="Enter a valid URL"
           maxlength="2048"
           :disabled="!hasPermission"
-        />
+        >
       </div>
       <div class="adjacent-input">
         <label
@@ -38,7 +38,7 @@
           maxlength="2048"
           placeholder="Enter a valid URL"
           :disabled="!hasPermission"
-        />
+        >
       </div>
       <div class="adjacent-input">
         <label
@@ -57,10 +57,13 @@
           maxlength="2048"
           placeholder="Enter a valid URL"
           :disabled="!hasPermission"
-        />
+        >
       </div>
       <div class="adjacent-input">
-        <label id="project-discord-invite" title="An invitation link to your Discord server.">
+        <label
+          id="project-discord-invite"
+          title="An invitation link to your Discord server."
+        >
           <span class="label__title">Discord invite</span>
           <span class="label__description"> An invitation link to your Discord server. </span>
         </label>
@@ -71,7 +74,7 @@
           maxlength="2048"
           placeholder="Enter a valid URL"
           :disabled="!hasPermission"
-        />
+        >
       </div>
       <span class="label">
         <span class="label__title">Donation links</span>
@@ -92,7 +95,7 @@
           placeholder="Enter a valid URL"
           :disabled="!hasPermission"
           @input="updateDonationLinks"
-        />
+        >
         <DropdownSelect
           v-model="donationLink.id"
           name="Donation platform selector"

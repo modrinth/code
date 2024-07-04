@@ -2,7 +2,10 @@
   <div>
     <section class="universal-card">
       <h2>Reports</h2>
-      <ReportsList :auth="auth" moderation />
+      <ReportsList
+        :auth="auth"
+        moderation
+      />
     </section>
   </div>
 </template>

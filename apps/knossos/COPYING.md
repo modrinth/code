@@ -12,7 +12,7 @@ This includes, but may not be limited to, the following files:
 
 - assets/images/404.svg
 - assets/images/logo.svg
-- components/brand/*
+- components/brand/\*
 - static/favicon.ico
 - static/favicon-light.ico
 
@@ -20,4 +20,4 @@ This includes, but may not be limited to, the following files:
 
 The following files are owned by their respective copyright holders and must be used within each of their Brand Guidelines:
 
-- assets/images/external/*
+- assets/images/external/\*

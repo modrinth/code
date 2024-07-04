@@ -4,13 +4,22 @@
       <aside class="universal-card">
         <h1>Moderation</h1>
         <NavStack>
-          <NavStackItem link="/moderation" label="Overview">
+          <NavStackItem
+            link="/moderation"
+            label="Overview"
+          >
             <ModrinthIcon />
           </NavStackItem>
-          <NavStackItem link="/moderation/review" label="Review projects">
+          <NavStackItem
+            link="/moderation/review"
+            label="Review projects"
+          >
             <ModerationIcon />
           </NavStackItem>
-          <NavStackItem link="/moderation/reports" label="Reports">
+          <NavStackItem
+            link="/moderation/reports"
+            label="Reports"
+          >
             <ReportIcon />
           </NavStackItem>
         </NavStack>

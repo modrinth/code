@@ -13,11 +13,20 @@
       :aria-label="description ?? label"
       :aria-checked="modelValue"
     >
-      <CheckIcon v-if="modelValue && !collapsingToggleStyle" aria-hidden="true" />
-      <DropdownIcon v-else-if="collapsingToggleStyle" aria-hidden="true" />
+      <CheckIcon
+        v-if="modelValue && !collapsingToggleStyle"
+        aria-hidden="true"
+      />
+      <DropdownIcon
+        v-else-if="collapsingToggleStyle"
+        aria-hidden="true"
+      />
     </button>
     <!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
-    <p v-if="label" aria-hidden="true">
+    <p
+      v-if="label"
+      aria-hidden="true"
+    >
       {{ label }}
     </p>
     <slot v-else />

@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import alias from '@rollup/plugin-alias'
 import { resolve } from 'path'
 import svgLoader from 'vite-svg-loader'
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 
 const projectRootDir = resolve(__dirname)
 

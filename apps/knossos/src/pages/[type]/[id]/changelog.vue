@@ -31,14 +31,16 @@
               </h2>
               <span v-if="version.author">
                 by
-                <nuxt-link class="text-link" :to="'/user/' + version.author.user.username">{{
+                <nuxt-link
+                  class="text-link"
+                  :to="'/user/' + version.author.user.username"
+                >{{
                   version.author.user.username
                 }}</nuxt-link>
               </span>
               <span>
                 on
-                {{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
-              >
+                {{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span>
             </div>
             <a
               :href="version.primaryFile.url"

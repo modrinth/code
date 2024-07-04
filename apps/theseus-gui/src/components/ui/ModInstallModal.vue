@@ -112,8 +112,7 @@ async function getData() {
           .flatMap((v) => v.loaders)
           .some(
             (value) =>
-              value === profile.metadata.loader ||
-              ['minecraft', 'iris', 'optifine'].includes(value),
+              value === profile.metadata.loader || ['minecraft', 'iris', 'optifine'].includes(value)
           )
       )
     })
@@ -176,7 +175,7 @@ const createInstance = async () => {
     versions.value[0].game_versions[0],
     loader,
     'latest',
-    icon.value,
+    icon.value
   ).catch(handleError)
 
   await installMod(id, versions.value[0].id).catch(handleError)
@@ -265,10 +264,10 @@ const check_valid = computed(() => {
                 profile.installing
                   ? 'Installing...'
                   : profile.installedMod
-                    ? 'Installed'
-                    : profile.metadata.linked_data && profile.metadata.linked_data.locked
-                      ? 'Paired'
-                      : 'Install'
+                  ? 'Installed'
+                  : profile.metadata.linked_data && profile.metadata.linked_data.locked
+                  ? 'Paired'
+                  : 'Install'
               }}
             </Button>
           </div>

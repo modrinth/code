@@ -1,14 +1,23 @@
 <template>
-  <div v-if="showInvitation" class="universal-card information invited">
+  <div
+    v-if="showInvitation"
+    class="universal-card information invited"
+  >
     <h2>Invitation to join project</h2>
     <p>
       You've been invited be a member of this project with the role of '{{ currentMember.role }}'.
     </p>
     <div class="input-group">
-      <button class="iconified-button brand-button" @click="acceptInvite()">
+      <button
+        class="iconified-button brand-button"
+        @click="acceptInvite()"
+      >
         <CheckIcon />Accept
       </button>
-      <button class="iconified-button danger-button" @click="declineInvite()">
+      <button
+        class="iconified-button danger-button"
+        @click="declineInvite()"
+      >
         <CrossIcon />Decline
       </button>
     </div>
@@ -16,8 +25,8 @@
   <div
     v-if="
       currentMember &&
-      nags.filter((x) => x.condition).length > 0 &&
-      (project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
+        nags.filter((x) => x.condition).length > 0 &&
+        (project.status === 'draft' || tags.rejectedStatuses.includes(project.status))
     "
     class="author-actions universal-card"
   >
@@ -53,7 +62,10 @@
         </button>
       </div>
     </div>
-    <div v-if="!collapsed" class="grid-display width-16">
+    <div
+      v-if="!collapsed"
+      class="grid-display width-16"
+    >
       <div
         v-for="nag in nags.filter((x) => x.condition && !x.hide)"
         :key="nag.id"
@@ -77,8 +89,7 @@
             v-tooltip="'Review'"
             aria-label="Review"
             :class="nag.status"
-          />{{ nag.title }}</span
-        >
+          />{{ nag.title }}</span>
         {{ nag.description }}
         <NuxtLink
           v-if="nag.link"
@@ -89,7 +100,10 @@
           }`"
         >
           {{ nag.link.title }}
-          <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
+          <ChevronRightIcon
+            class="featured-header-chevron"
+            aria-hidden="true"
+          />
         </NuxtLink>
         <button
           v-else-if="nag.action"

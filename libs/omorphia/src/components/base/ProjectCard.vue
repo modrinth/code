@@ -68,18 +68,12 @@
 </template>
 
 <script setup>
-import {
-  HeartIcon,
-  DownloadIcon,
-  EditIcon,
-  CalendarIcon,
-} from '../icons'
+import { HeartIcon, DownloadIcon, EditIcon, CalendarIcon } from '../icons'
 import { formatNumber } from '../../helpers'
 import Badge from './Badge.vue'
 import Avatar from './Avatar.vue'
 import Categories from '../search/Categories.vue'
 import EnvironmentIndicator from './EnvironmentIndicator.vue'
-
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'

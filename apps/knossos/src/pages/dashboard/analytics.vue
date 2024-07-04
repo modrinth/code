@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ChartDisplay :projects="projects ?? undefined" :personal="true" />
+    <ChartDisplay
+      :projects="projects ?? undefined"
+      :personal="true"
+    />
   </div>
 </template>
 

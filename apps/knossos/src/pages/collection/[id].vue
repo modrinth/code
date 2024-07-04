@@ -18,13 +18,20 @@
                 <EditIcon />
                 {{ formatMessage(commonMessages.editButton) }}
               </Button>
-              <Button id="delete-collection" @click="() => $refs.deleteModal.show()">
+              <Button
+                id="delete-collection"
+                @click="() => $refs.deleteModal.show()"
+              >
                 <TrashIcon />
                 {{ formatMessage(commonMessages.deleteLabel) }}
               </Button>
             </template>
             <template v-else-if="canEdit && isEditing === true">
-              <PopoutMenu class="btn" position="bottom" direction="right">
+              <PopoutMenu
+                class="btn"
+                position="bottom"
+                direction="right"
+              >
                 <EditIcon /> {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
@@ -72,14 +79,23 @@
               <label for="collection-title">
                 <span class="label__title"> {{ formatMessage(commonMessages.titleLabel) }} </span>
               </label>
-              <input id="collection-title" v-model="name" maxlength="255" type="text" />
+              <input
+                id="collection-title"
+                v-model="name"
+                maxlength="255"
+                type="text"
+              >
               <label for="collection-description">
                 <span class="label__title">
                   {{ formatMessage(commonMessages.descriptionLabel) }}
                 </span>
               </label>
               <div class="textarea-wrapper">
-                <textarea id="collection-description" v-model="summary" maxlength="255" />
+                <textarea
+                  id="collection-description"
+                  v-model="summary"
+                  maxlength="255"
+                />
               </div>
               <label for="visibility">
                 <span class="label__title">
@@ -106,7 +122,10 @@
                 <XIcon />
                 {{ formatMessage(commonMessages.cancelButton) }}
               </Button>
-              <Button color="primary" @click="saveChanges()">
+              <Button
+                color="primary"
+                @click="saveChanges()"
+              >
                 <SaveIcon />
                 {{ formatMessage(commonMessages.saveButton) }}
               </Button>
@@ -115,10 +134,15 @@
           <!-- Content -->
           <template v-if="!isEditing">
             <div class="page-header__icon">
-              <Avatar size="md" :src="collection.icon_url" />
+              <Avatar
+                size="md"
+                :src="collection.icon_url"
+              />
             </div>
             <div class="page-header__text">
-              <h1 class="title">{{ collection.name }}</h1>
+              <h1 class="title">
+                {{ collection.name }}
+              </h1>
 
               <div>
                 <span class="collection-label">
@@ -131,29 +155,44 @@
                   <p>{{ collection.description }}</p>
                 </div>
 
-                <hr class="card-divider" />
+                <hr class="card-divider">
 
-                <div v-if="canEdit" class="primary-stat">
+                <div
+                  v-if="canEdit"
+                  class="primary-stat"
+                >
                   <template v-if="collection.status === 'listed'">
-                    <WorldIcon class="primary-stat__icon" aria-hidden="true" />
+                    <WorldIcon
+                      class="primary-stat__icon"
+                      aria-hidden="true"
+                    />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.publicLabel) }} </strong>
                     </div>
                   </template>
                   <template v-else-if="collection.status === 'unlisted'">
-                    <LinkIcon class="primary-stat__icon" aria-hidden="true" />
+                    <LinkIcon
+                      class="primary-stat__icon"
+                      aria-hidden="true"
+                    />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.unlistedLabel) }} </strong>
                     </div>
                   </template>
                   <template v-else-if="collection.status === 'private'">
-                    <LockIcon class="primary-stat__icon" aria-hidden="true" />
+                    <LockIcon
+                      class="primary-stat__icon"
+                      aria-hidden="true"
+                    />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.privateLabel) }} </strong>
                     </div>
                   </template>
                   <template v-else-if="collection.status === 'rejected'">
-                    <XIcon class="primary-stat__icon" aria-hidden="true" />
+                    <XIcon
+                      class="primary-stat__icon"
+                      aria-hidden="true"
+                    />
                     <div class="primary-stat__text">
                       <strong> {{ formatMessage(commonMessages.rejectedLabel) }} </strong>
                     </div>
@@ -162,8 +201,14 @@
               </div>
 
               <div class="primary-stat">
-                <LibraryIcon class="primary-stat__icon" aria-hidden="true" />
-                <div v-if="projects" class="primary-stat__text">
+                <LibraryIcon
+                  class="primary-stat__icon"
+                  aria-hidden="true"
+                />
+                <div
+                  v-if="projects"
+                  class="primary-stat__text"
+                >
                   <IntlFormatted
                     :message-id="messages.projectsCountLabel"
                     :values="{ count: formatCompactNumber(projects.length || 0) }"
@@ -198,7 +243,10 @@
                 </div>
               </div>
 
-              <div v-if="collection.id !== 'following'" class="metadata-item">
+              <div
+                v-if="collection.id !== 'following'"
+                class="metadata-item"
+              >
                 <div
                   v-tooltip="
                     formatMessage(commonMessages.dateAtTimeTooltip, {
@@ -220,20 +268,31 @@
               </div>
             </div>
 
-            <hr class="card-divider" />
+            <hr class="card-divider">
 
             <div class="collection-info">
-              <h2 class="card-header">{{ formatMessage(messages.curatedByLabel) }}</h2>
+              <h2 class="card-header">
+                {{ formatMessage(messages.curatedByLabel) }}
+              </h2>
               <div class="metadata-item">
                 <nuxt-link
                   class="team-member columns button-transparent"
                   :to="'/user/' + creator.username"
                 >
-                  <Avatar :src="creator.avatar_url" :alt="creator.username" size="sm" circle />
+                  <Avatar
+                    :src="creator.avatar_url"
+                    :alt="creator.username"
+                    size="sm"
+                    circle
+                  />
 
                   <div class="member-info">
-                    <p class="name">{{ creator.username }}</p>
-                    <p class="role">{{ formatMessage(messages.ownerLabel) }}</p>
+                    <p class="name">
+                      {{ creator.username }}
+                    </p>
+                    <p class="role">
+                      {{ formatMessage(messages.ownerLabel) }}
+                    </p>
                   </div>
                 </nuxt-link>
               </div>
@@ -295,10 +354,10 @@
           <ProjectCard
             v-for="project in (route.params.projectType !== undefined
               ? projects.filter(
-                  (x) =>
-                    x.project_type ===
-                    route.params.projectType.substr(0, route.params.projectType.length - 1)
-                )
+                (x) =>
+                  x.project_type ===
+                  route.params.projectType.substr(0, route.params.projectType.length - 1)
+              )
               : projects
             )
               .slice()
@@ -344,18 +403,30 @@
             </button>
           </ProjectCard>
         </div>
-        <div v-else class="error">
-          <UpToDate class="icon" /><br />
-          <span v-if="auth.user && auth.user.id === creator.id" class="preserve-lines text">
+        <div
+          v-else
+          class="error"
+        >
+          <UpToDate class="icon" /><br>
+          <span
+            v-if="auth.user && auth.user.id === creator.id"
+            class="preserve-lines text"
+          >
             <IntlFormatted :message-id="messages.noProjectsAuthLabel">
               <template #create-link="{ children }">
-                <a class="link" @click.prevent="$router.push('/mods')">
+                <a
+                  class="link"
+                  @click.prevent="$router.push('/mods')"
+                >
                   <component :is="() => children" />
                 </a>
               </template>
             </IntlFormatted>
           </span>
-          <span v-else class="text">{{ formatMessage(messages.noProjectsLabel) }}</span>
+          <span
+            v-else
+            class="text"
+          >{{ formatMessage(messages.noProjectsLabel) }}</span>
         </div>
       </div>
     </div>

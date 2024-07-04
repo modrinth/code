@@ -15,29 +15,63 @@
     >
       <NotificationIcon />
     </nuxt-link>
-    <DoubleIcon v-else class="notification__icon">
+    <DoubleIcon
+      v-else
+      class="notification__icon"
+    >
       <template #primary>
-        <nuxt-link v-if="project" :to="getProjectLink(project)" tabindex="-1">
-          <Avatar size="xs" :src="project.icon_url" :raised="raised" no-shadow />
+        <nuxt-link
+          v-if="project"
+          :to="getProjectLink(project)"
+          tabindex="-1"
+        >
+          <Avatar
+            size="xs"
+            :src="project.icon_url"
+            :raised="raised"
+            no-shadow
+          />
         </nuxt-link>
         <nuxt-link
           v-else-if="organization"
           :to="`/organization/${organization.slug}`"
           tabindex="-1"
         >
-          <Avatar size="xs" :src="organization.icon_url" :raised="raised" no-shadow />
+          <Avatar
+            size="xs"
+            :src="organization.icon_url"
+            :raised="raised"
+            no-shadow
+          />
         </nuxt-link>
-        <nuxt-link v-else-if="user" :to="getUserLink(user)" tabindex="-1">
-          <Avatar size="xs" :src="user.avatar_url" :raised="raised" no-shadow />
+        <nuxt-link
+          v-else-if="user"
+          :to="getUserLink(user)"
+          tabindex="-1"
+        >
+          <Avatar
+            size="xs"
+            :src="user.avatar_url"
+            :raised="raised"
+            no-shadow
+          />
         </nuxt-link>
-        <Avatar v-else size="xs" :raised="raised" no-shadow />
+        <Avatar
+          v-else
+          size="xs"
+          :raised="raised"
+          no-shadow
+        />
       </template>
       <template #secondary>
         <ModerationIcon
           v-if="type === 'moderator_message' || type === 'status_change'"
           class="moderation-color"
         />
-        <InvitationIcon v-else-if="type === 'team_invite' && project" class="creator-color" />
+        <InvitationIcon
+          v-else-if="type === 'team_invite' && project"
+          class="creator-color"
+        />
         <InvitationIcon
           v-else-if="type === 'organization_invite' && organization"
           class="creator-color"
@@ -49,37 +83,66 @@
     <div class="notification__title">
       <template v-if="type === 'project_update' && project && version">
         A project you follow,
-        <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link
-        >, has been updated:
+        <nuxt-link
+          :to="getProjectLink(project)"
+          class="title-link"
+        >
+          {{ project.title }}
+        </nuxt-link>, has been updated:
       </template>
       <template v-else-if="type === 'team_invite' && project">
-        <nuxt-link :to="`/user/${invitedBy.username}`" class="iconified-link title-link">
-          <Avatar :src="invitedBy.avatar_url" circle size="xxs" no-shadow :raised="raised" />
+        <nuxt-link
+          :to="`/user/${invitedBy.username}`"
+          class="iconified-link title-link"
+        >
+          <Avatar
+            :src="invitedBy.avatar_url"
+            circle
+            size="xxs"
+            no-shadow
+            :raised="raised"
+          />
           <span class="space">&nbsp;</span>
           <span>{{ invitedBy.username }}</span>
         </nuxt-link>
         <span>
           has invited you to join
-          <nuxt-link :to="getProjectLink(project)" class="title-link">
-            {{ project.title }} </nuxt-link
-          >.
+          <nuxt-link
+            :to="getProjectLink(project)"
+            class="title-link"
+          >
+            {{ project.title }} </nuxt-link>.
         </span>
       </template>
       <template v-else-if="type === 'organization_invite' && organization">
-        <nuxt-link :to="`/user/${invitedBy.username}`" class="iconified-link title-link">
-          <Avatar :src="invitedBy.avatar_url" circle size="xxs" no-shadow :raised="raised" />
+        <nuxt-link
+          :to="`/user/${invitedBy.username}`"
+          class="iconified-link title-link"
+        >
+          <Avatar
+            :src="invitedBy.avatar_url"
+            circle
+            size="xxs"
+            no-shadow
+            :raised="raised"
+          />
           <span class="space">&nbsp;</span>
           <span>{{ invitedBy.username }}</span>
         </nuxt-link>
         <span>
           has invited you to join
-          <nuxt-link :to="`/organization/${organization.slug}`" class="title-link">
-            {{ organization.name }} </nuxt-link
-          >.
+          <nuxt-link
+            :to="`/organization/${organization.slug}`"
+            class="title-link"
+          >
+            {{ organization.name }} </nuxt-link>.
         </span>
       </template>
       <template v-else-if="type === 'status_change' && project">
-        <nuxt-link :to="getProjectLink(project)" class="title-link">
+        <nuxt-link
+          :to="getProjectLink(project)"
+          class="title-link"
+        >
           {{ project.title }}
         </nuxt-link>
         <template v-if="tags.rejectedStatuses.includes(notification.body.new_status)">
@@ -95,34 +158,60 @@
       </template>
       <template v-else-if="type === 'moderator_message' && thread && project && !report">
         Your project,
-        <nuxt-link :to="getProjectLink(project)" class="title-link">{{ project.title }}</nuxt-link
-        >, has received
-        <template v-if="notification.grouped_notifs"> messages </template>
-        <template v-else>a message</template>
+        <nuxt-link
+          :to="getProjectLink(project)"
+          class="title-link"
+        >
+          {{ project.title }}
+        </nuxt-link>, has received
+        <template v-if="notification.grouped_notifs">
+          messages
+        </template>
+        <template v-else>
+          a message
+        </template>
         from the moderators.
       </template>
       <template v-else-if="type === 'moderator_message' && thread && report">
         A moderator replied to your report of
         <template v-if="version">
           version
-          <nuxt-link :to="getVersionLink(project, version)" class="title-link">
+          <nuxt-link
+            :to="getVersionLink(project, version)"
+            class="title-link"
+          >
             {{ version.name }}
           </nuxt-link>
           of project
         </template>
-        <nuxt-link v-if="project" :to="getProjectLink(project)" class="title-link">
+        <nuxt-link
+          v-if="project"
+          :to="getProjectLink(project)"
+          class="title-link"
+        >
           {{ project.title }}
         </nuxt-link>
-        <nuxt-link v-else-if="user" :to="getUserLink(user)" class="title-link">
-          {{ user.username }} </nuxt-link
-        >.
+        <nuxt-link
+          v-else-if="user"
+          :to="getUserLink(user)"
+          class="title-link"
+        >
+          {{ user.username }}
+        </nuxt-link>.
       </template>
-      <nuxt-link v-else :to="notification.link" class="title-link">
+      <nuxt-link
+        v-else
+        :to="notification.link"
+        class="title-link"
+      >
         <span v-html="renderString(notification.title)" />
       </nuxt-link>
       <!--      <span v-else class="known-errors">Error reading notification.</span>-->
     </div>
-    <div v-if="hasBody" class="notification__body">
+    <div
+      v-if="hasBody"
+      class="notification__body"
+    >
       <ThreadSummary
         v-if="type === 'moderator_message' && thread"
         :thread="thread"
@@ -132,7 +221,10 @@
         class="thread-summary"
         :auth="auth"
       />
-      <div v-else-if="type === 'project_update'" class="version-list">
+      <div
+        v-else-if="type === 'project_update'"
+        class="version-list"
+      >
         <div
           v-for="notif in (notification.grouped_notifs
             ? [notification, ...notification.grouped_notifs]
@@ -172,12 +264,18 @@
       </template>
     </div>
     <span class="notification__date">
-      <span v-if="notification.read" class="read-badge"> <ReadIcon /> Read </span>
+      <span
+        v-if="notification.read"
+        class="read-badge"
+      > <ReadIcon /> Read </span>
       <span v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')">
         <CalendarIcon /> Received {{ fromNow(notification.created) }}
       </span>
     </span>
-    <div v-if="compact" class="notification__actions">
+    <div
+      v-if="compact"
+      class="notification__actions"
+    >
       <template v-if="type === 'team_invite' || type === 'organization_invite'">
         <button
           v-tooltip="`Accept`"
@@ -213,8 +311,14 @@
         <CrossIcon />
       </button>
     </div>
-    <div v-else class="notification__actions">
-      <div v-if="type !== null" class="input-group">
+    <div
+      v-else
+      class="notification__actions"
+    >
+      <div
+        v-if="type !== null"
+        class="input-group"
+      >
         <template
           v-if="(type === 'team_invite' || type === 'organization_invite') && !notification.read"
         >
@@ -249,9 +353,15 @@
         >
           <CheckIcon /> Mark as read
         </button>
-        <CopyCode v-if="flags.developerMode" :text="notification.id" />
+        <CopyCode
+          v-if="flags.developerMode"
+          :text="notification.id"
+        />
       </div>
-      <div v-else class="input-group">
+      <div
+        v-else
+        class="input-group"
+      >
         <nuxt-link
           v-if="notification.link && notification.link !== '#'"
           class="iconified-button"
@@ -281,7 +391,10 @@
         >
           <CheckIcon /> Mark as read
         </button>
-        <CopyCode v-if="flags.developerMode" :text="notification.id" />
+        <CopyCode
+          v-if="flags.developerMode"
+          :text="notification.id"
+        />
       </div>
     </div>
   </div>

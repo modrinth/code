@@ -43,23 +43,23 @@
       Update all
     </Button>
 
-<!--    <DropdownButton-->
-<!--      v-if="!isPackLocked"-->
-<!--      :options="['search', 'from_file']"-->
-<!--      default-value="search"-->
-<!--      name="add-content-dropdown"-->
-<!--      color="primary"-->
-<!--      @option-click="handleContentOptionClick"-->
-<!--    >-->
-<!--      <template #search>-->
-<!--        <SearchIcon />-->
-<!--        <span class="no-wrap"> Add content </span>-->
-<!--      </template>-->
-<!--      <template #from_file>-->
-<!--        <FolderOpenIcon />-->
-<!--        <span class="no-wrap"> Add from file </span>-->
-<!--      </template>-->
-<!--    </DropdownButton>-->
+    <!--    <DropdownButton-->
+    <!--      v-if="!isPackLocked"-->
+    <!--      :options="['search', 'from_file']"-->
+    <!--      default-value="search"-->
+    <!--      name="add-content-dropdown"-->
+    <!--      color="primary"-->
+    <!--      @option-click="handleContentOptionClick"-->
+    <!--    >-->
+    <!--      <template #search>-->
+    <!--        <SearchIcon />-->
+    <!--        <span class="no-wrap"> Add content </span>-->
+    <!--      </template>-->
+    <!--      <template #from_file>-->
+    <!--        <FolderOpenIcon />-->
+    <!--        <span class="no-wrap"> Add from file </span>-->
+    <!--      </template>-->
+    <!--    </DropdownButton>-->
   </Card>
   <Pagination
     v-if="projects.length > 0"
@@ -284,22 +284,22 @@
     <h3>No projects found</h3>
     <p class="empty-subtitle">Add a project to get started</p>
     <div class="empty-action">
-<!--      <DropdownButton-->
-<!--        :options="['search', 'from_file']"-->
-<!--        default-value="search"-->
-<!--        name="add-content-dropdown-from-empty"-->
-<!--        color="primary"-->
-<!--        @option-click="handleContentOptionClick"-->
-<!--      >-->
-<!--        <template #search>-->
-<!--          <SearchIcon />-->
-<!--          <span class="no-wrap"> Add content </span>-->
-<!--        </template>-->
-<!--        <template #from_file>-->
-<!--          <FolderOpenIcon />-->
-<!--          <span class="no-wrap"> Add from file </span>-->
-<!--        </template>-->
-<!--      </DropdownButton>-->
+      <!--      <DropdownButton-->
+      <!--        :options="['search', 'from_file']"-->
+      <!--        default-value="search"-->
+      <!--        name="add-content-dropdown-from-empty"-->
+      <!--        color="primary"-->
+      <!--        @option-click="handleContentOptionClick"-->
+      <!--      >-->
+      <!--        <template #search>-->
+      <!--          <SearchIcon />-->
+      <!--          <span class="no-wrap"> Add content </span>-->
+      <!--        </template>-->
+      <!--        <template #from_file>-->
+      <!--          <FolderOpenIcon />-->
+      <!--          <span class="no-wrap"> Add from file </span>-->
+      <!--        </template>-->
+      <!--      </DropdownButton>-->
     </div>
   </div>
   <Pagination
@@ -505,7 +505,7 @@ const initProjects = (initInstance) => {
       selectionMap.value.get(project.path) ??
         selectionMap.value.get(project.path.slice(0, -9)) ??
         selectionMap.value.get(project.path + '.disabled') ??
-        false,
+        false
     )
   }
   selectionMap.value = newSelectionMap
@@ -517,14 +517,14 @@ watch(
   () => props.instance.projects,
   () => {
     initProjects(props.instance)
-  },
+  }
 )
 
 watch(
   () => props.offline,
   () => {
     if (props.instance) initProjects(props.instance)
-  },
+  }
 )
 
 const modpackVersionModal = ref(null)
@@ -551,11 +551,11 @@ const selected = computed(() =>
     })
     .map((args) => {
       return projects.value.find((x) => x.path === args[0])
-    }),
+    })
 )
 
 const functionValues = computed(() =>
-  selected.value.length > 0 ? selected.value : Array.from(projects.value.values()),
+  selected.value.length > 0 ? selected.value : Array.from(projects.value.values())
 )
 
 const selectableProjectTypes = computed(() => {
@@ -781,7 +781,7 @@ const shareUrls = async () => {
     functionValues.value
       .filter((x) => x.slug)
       .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
-      .join('\n'),
+      .join('\n')
   )
 }
 
@@ -794,7 +794,7 @@ const shareMarkdown = async () => {
         }
         return x.name
       })
-      .join('\n'),
+      .join('\n')
   )
 }
 
@@ -839,7 +839,7 @@ const handleRightClick = (event, mod) => {
       {
         link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
       },
-      [{ name: 'open_link' }, { name: 'copy_link' }],
+      [{ name: 'open_link' }, { name: 'copy_link' }]
     )
   }
 }

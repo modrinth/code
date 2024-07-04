@@ -7,10 +7,18 @@
         :items="projectTypes"
         :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x) + 's')"
       />
-      <button v-if="oldestFirst" class="iconified-button push-right" @click="oldestFirst = false">
+      <button
+        v-if="oldestFirst"
+        class="iconified-button push-right"
+        @click="oldestFirst = false"
+      >
         <SortDescIcon />Sorting by oldest
       </button>
-      <button v-else class="iconified-button push-right" @click="oldestFirst = true">
+      <button
+        v-else
+        class="iconified-button push-right"
+        @click="oldestFirst = true"
+      >
         <SortAscIcon />Sorting by newest
       </button>
       <button
@@ -21,16 +29,30 @@
         <ModerationIcon /> Start moderating
       </button>
     </div>
-    <p v-if="projectType !== 'all'" class="project-count">
+    <p
+      v-if="projectType !== 'all'"
+      class="project-count"
+    >
       Showing {{ projectsFiltered.length }} {{ projectTypePlural }} of {{ projects.length }} total
       projects in the queue.
     </p>
-    <p v-else class="project-count">There are {{ projects.length }} projects in the queue.</p>
-    <p v-if="projectsOver24Hours.length > 0" class="warning project-count">
+    <p
+      v-else
+      class="project-count"
+    >
+      There are {{ projects.length }} projects in the queue.
+    </p>
+    <p
+      v-if="projectsOver24Hours.length > 0"
+      class="warning project-count"
+    >
       <WarningIcon /> {{ projectsOver24Hours.length }} {{ projectTypePlural }}
       have been in the queue for over 24 hours.
     </p>
-    <p v-if="projectsOver48Hours.length > 0" class="danger project-count">
+    <p
+      v-if="projectsOver48Hours.length > 0"
+      class="danger project-count"
+    >
       <WarningIcon /> {{ projectsOver48Hours.length }} {{ projectTypePlural }}
       have been in the queue for over 48 hours.
     </p>
@@ -51,7 +73,12 @@
             :to="`/${project.inferred_project_type}/${project.slug}`"
             class="iconified-stacked-link"
           >
-            <Avatar :src="project.icon_url" size="xs" no-shadow raised />
+            <Avatar
+              :src="project.icon_url"
+              size="xs"
+              no-shadow
+              raised
+            />
             <span class="stacked">
               <span class="title">{{ project.name }}</span>
               <span>{{ $formatProjectType(project.inferred_project_type) }}</span>
@@ -65,7 +92,12 @@
             :to="`/user/${project.owner.user.username}`"
             class="iconified-link"
           >
-            <Avatar :src="project.owner.user.avatar_url" circle size="xxs" raised />
+            <Avatar
+              :src="project.owner.user.avatar_url"
+              circle
+              size="xxs"
+              raised
+            />
             <span>{{ project.owner.user.username }}</span>
           </nuxt-link>
           <nuxt-link
@@ -73,7 +105,12 @@
             :to="`/organization/${project.org.slug}`"
             class="iconified-link"
           >
-            <Avatar :src="project.org.icon_url" circle size="xxs" raised />
+            <Avatar
+              :src="project.org.icon_url"
+              circle
+              size="xxs"
+              raised
+            />
             <span>{{ project.org.name }}</span>
           </nuxt-link>
         </div>
@@ -86,17 +123,24 @@
         <nuxt-link
           :to="`/${project.inferred_project_type}/${project.slug}`"
           class="iconified-button raised-button"
-          ><EyeIcon /> View project</nuxt-link
         >
+          <EyeIcon /> View project
+        </nuxt-link>
       </div>
-      <span v-if="project.queued" :class="`submitter-info ${project.age_warning}`">
+      <span
+        v-if="project.queued"
+        :class="`submitter-info ${project.age_warning}`"
+      >
         <WarningIcon v-if="project.age_warning" />
         Submitted
         <span v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')">{{
           fromNow(project.queued)
         }}</span>
       </span>
-      <span v-else class="submitter-info"><UnknownIcon /> Unknown queue date</span>
+      <span
+        v-else
+        class="submitter-info"
+      ><UnknownIcon /> Unknown queue date</span>
     </div>
   </section>
 </template>

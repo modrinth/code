@@ -1,11 +1,19 @@
 <template>
-  <nuxt-link :to="link" class="thread-summary" :class="{ raised: raised }">
+  <nuxt-link
+    :to="link"
+    class="thread-summary"
+    :class="{ raised: raised }"
+  >
     <div class="thread-title-row">
-      <span v-if="report" class="thread-title">Report thread</span>
-      <span v-else class="thread-title">Thread</span>
-      <span class="thread-messages"
-        >{{ props.thread.messages.length }} messages <ChevronRightIcon
-      /></span>
+      <span
+        v-if="report"
+        class="thread-title"
+      >Report thread</span>
+      <span
+        v-else
+        class="thread-title"
+      >Thread</span>
+      <span class="thread-messages">{{ props.thread.messages.length }} messages <ChevronRightIcon /></span>
     </div>
     <template v-if="displayMessages.length > 0">
       <ThreadMessage

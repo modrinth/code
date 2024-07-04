@@ -9,11 +9,18 @@
             {{ $formatProjectType(project.project_type).toLowerCase() }}. You may choose one from
             our list or provide a custom license. You may also provide a custom URL to your chosen
             license; otherwise, the license text will be displayed.
-            <span v-if="license && license.friendly === 'Custom'" class="label__subdescription">
+            <span
+              v-if="license && license.friendly === 'Custom'"
+              class="label__subdescription"
+            >
               Enter a valid
-              <a href="https://spdx.org/licenses/" target="_blank" rel="noopener" class="text-link">
-                SPDX license identifier</a
+              <a
+                href="https://spdx.org/licenses/"
+                target="_blank"
+                rel="noopener"
+                class="text-link"
               >
+                SPDX license identifier</a>
               in the marked area. If your license does not have a SPDX identifier (for example, if
               you created the license yourself or if the license is Minecraft-specific), simply
               check the box and enter the name of the license instead.
@@ -26,8 +33,7 @@
                 rel="noopener"
                 class="text-link"
               >
-                licensing guide</a
-              >
+                licensing guide</a>
               for more information.
             </span>
           </span>
@@ -74,14 +80,14 @@
               'known-error': license.short === '' && showKnownErrors,
             }"
             :disabled="!hasPermission"
-          />
+          >
           <input
             v-model="licenseUrl"
             type="url"
             maxlength="2048"
             placeholder="License URL (optional)"
             :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
-          />
+          >
         </div>
       </div>
       <div class="input-stack">

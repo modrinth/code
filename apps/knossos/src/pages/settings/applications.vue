@@ -7,7 +7,10 @@
       proceed-label="Delete this application"
       @proceed="removeApp(editingId)"
     />
-    <Modal ref="appModal" header="Application information">
+    <Modal
+      ref="appModal"
+      header="Application information"
+    >
       <div class="universal-modal">
         <label for="app-name"><span class="label__title">Name</span> </label>
         <input
@@ -17,10 +20,19 @@
           type="text"
           autocomplete="off"
           placeholder="Enter the application's name..."
-        />
-        <label v-if="editingId" for="app-icon"><span class="label__title">Icon</span> </label>
-        <div v-if="editingId" class="icon-submission">
-          <Avatar size="md" :src="icon" />
+        >
+        <label
+          v-if="editingId"
+          for="app-icon"
+        ><span class="label__title">Icon</span> </label>
+        <div
+          v-if="editingId"
+          class="icon-submission"
+        >
+          <Avatar
+            size="md"
+            :src="icon"
+          />
           <FileInput
             :max-size="262144"
             class="btn"
@@ -31,7 +43,10 @@
             <UploadIcon />
           </FileInput>
         </div>
-        <label v-if="editingId" for="app-url">
+        <label
+          v-if="editingId"
+          for="app-url"
+        >
           <span class="label__title">URL</span>
         </label>
         <input
@@ -42,8 +57,11 @@
           type="url"
           autocomplete="off"
           placeholder="https://example.com"
-        />
-        <label v-if="editingId" for="app-description">
+        >
+        <label
+          v-if="editingId"
+          for="app-description"
+        >
           <span class="label__title">Description</span>
         </label>
         <textarea
@@ -57,7 +75,10 @@
           placeholder="Enter the application's description..."
         />
         <label for="app-scopes"><span class="label__title">Scopes</span> </label>
-        <div id="app-scopes" class="checkboxes">
+        <div
+          id="app-scopes"
+          class="checkboxes"
+        >
           <Checkbox
             v-for="scope in scopeList"
             :key="scope"
@@ -68,7 +89,10 @@
         </div>
         <label for="app-redirect-uris"><span class="label__title">Redirect uris</span> </label>
         <div class="uri-input-list">
-          <div v-for="(_, index) in redirectUris" :key="index">
+          <div
+            v-for="(_, index) in redirectUris"
+            :key="index"
+          >
             <div class="input-group url-input-group-fixes">
               <input
                 v-model="redirectUris[index]"
@@ -76,8 +100,12 @@
                 type="url"
                 autocomplete="off"
                 placeholder="https://example.com/auth/callback"
-              />
-              <Button v-if="index !== 0" icon-only @click="() => redirectUris.splice(index, 1)">
+              >
+              <Button
+                v-if="index !== 0"
+                icon-only
+                @click="() => redirectUris.splice(index, 1)"
+              >
                 <TrashIcon />
               </Button>
               <Button
@@ -91,14 +119,21 @@
             </div>
           </div>
           <div v-if="redirectUris.length <= 0">
-            <Button color="primary" icon-only @click="() => redirectUris.push('')">
+            <Button
+              color="primary"
+              icon-only
+              @click="() => redirectUris.push('')"
+            >
               <PlusIcon /> Add a redirect uri
             </Button>
           </div>
         </div>
 
         <div class="submit-row input-group push-right">
-          <button class="iconified-button" @click="$refs.appModal.hide()">
+          <button
+            class="iconified-button"
+            @click="$refs.appModal.hide()"
+          >
             <XIcon />
             Cancel
           </button>
@@ -150,14 +185,26 @@
     <p>
       Applications can be used to authenticate Modrinth's users with your products. For more
       information, see
-      <a class="text-link" href="https://docs.modrinth.com">Modrinth's API documentation</a>.
+      <a
+        class="text-link"
+        href="https://docs.modrinth.com"
+      >Modrinth's API documentation</a>.
     </p>
-    <div v-for="app in usersApps" :key="app.id" class="universal-card recessed token">
+    <div
+      v-for="app in usersApps"
+      :key="app.id"
+      class="universal-card recessed token"
+    >
       <div class="token-info">
         <div class="token-icon">
-          <Avatar size="sm" :src="app.icon_url" />
+          <Avatar
+            size="sm"
+            :src="app.icon_url"
+          />
           <div>
-            <h2 class="token-title">{{ app.name }}</h2>
+            <h2 class="token-title">
+              {{ app.name }}
+            </h2>
             <div>Created on {{ new Date(app.created).toLocaleDateString() }}</div>
           </div>
         </div>

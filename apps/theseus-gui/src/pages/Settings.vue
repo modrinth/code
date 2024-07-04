@@ -28,7 +28,7 @@ const pageOptions = ['Home', 'Library']
 
 const themeStore = useTheming()
 
-const version = await getVersion();
+const version = await getVersion()
 
 const accessSettings = async () => {
   const settings = await get()
@@ -91,7 +91,7 @@ watch(
 
     await set(setSettings)
   },
-  { deep: true },
+  { deep: true }
 )
 
 const credentials = ref(await getCreds().catch(handleError))

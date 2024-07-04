@@ -25,7 +25,10 @@
     <h3>Withdraw method</h3>
 
     <div class="iconified-input">
-      <label class="hidden" for="search">Search</label>
+      <label
+        class="hidden"
+        for="search"
+      >Search</label>
       <SearchIcon aria-hidden="true" />
       <input
         id="search"
@@ -33,7 +36,7 @@
         name="search"
         placeholder="Search options..."
         autocomplete="off"
-      />
+      >
     </div>
     <div class="withdraw-options-scroll">
       <div class="withdraw-options">
@@ -46,7 +49,10 @@
           :class="{ selected: selectedMethodId === method.id }"
           @click="() => (selectedMethodId = method.id)"
         >
-          <div class="preview" :class="{ 'show-bg': !method.image_url || method.name === 'ACH' }">
+          <div
+            class="preview"
+            :class="{ 'show-bg': !method.image_url || method.name === 'ACH' }"
+          >
             <template v-if="method.image_url && method.name !== 'ACH'">
               <div class="preview-badges">
                 <span class="badge">
@@ -63,9 +69,12 @@
                 class="preview-img"
                 :src="method.image_url"
                 :alt="method.name"
-              />
+              >
             </template>
-            <div v-else class="placeholder">
+            <div
+              v-else
+              class="placeholder"
+            >
               <template v-if="method.type === 'venmo'">
                 <VenmoIcon class="enlarge" />
               </template>
@@ -76,8 +85,14 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="selectedMethodId === method.id" class="radio" />
-            <RadioButtonIcon v-else class="radio" />
+            <RadioButtonChecked
+              v-if="selectedMethodId === method.id"
+              class="radio"
+            />
+            <RadioButtonIcon
+              v-else
+              class="radio"
+            />
             <span>{{ method.name }}</span>
           </div>
         </button>
@@ -103,8 +118,7 @@
         <div>
           <p>
             This method has a fixed transfer amount of
-            <strong>{{ $formatMoney(minWithdrawAmount) }}</strong
-            >.
+            <strong>{{ $formatMoney(minWithdrawAmount) }}</strong>.
           </p>
         </div>
       </template>
@@ -113,8 +127,7 @@
           <p>
             This method has a minimum transfer amount of
             <strong>{{ $formatMoney(minWithdrawAmount) }}</strong> and a maximum transfer amount of
-            <strong>{{ $formatMoney(maxWithdrawAmount) }}</strong
-            >.
+            <strong>{{ $formatMoney(maxWithdrawAmount) }}</strong>.
           </p>
           <input
             id="confirmation"
@@ -123,7 +136,7 @@
             pattern="^\d*(\.\d{0,2})?$"
             autocomplete="off"
             placeholder="Amount to transfer..."
-          />
+          >
           <p>
             You have entered <strong>{{ $formatMoney(parsedAmount) }}</strong> to transfer.
           </p>
@@ -133,12 +146,19 @@
 
     <div class="confirm-text">
       <template v-if="knownErrors.length === 0 && amount">
-        <Checkbox v-if="fees > 0" v-model="agreedFees" description="Consent to fee">
+        <Checkbox
+          v-if="fees > 0"
+          v-model="agreedFees"
+          description="Consent to fee"
+        >
           I acknowledge that an estimated
           {{ $formatMoney(fees) }} will be deducted from the amount I receive to cover
           {{ $formatWallet(selectedMethod.type) }} processing fees.
         </Checkbox>
-        <Checkbox v-model="agreedTransfer" description="Confirm transfer">
+        <Checkbox
+          v-model="agreedTransfer"
+          description="Confirm transfer"
+        >
           <template v-if="selectedMethod.type === 'tremendous'">
             I confirm that I am initiating a transfer and I will receive further instructions on how
             to redeem this payment via email to: {{ withdrawAccount }}
@@ -148,29 +168,44 @@
             {{ $formatWallet(selectedMethod.type) }} account: {{ withdrawAccount }}
           </template>
         </Checkbox>
-        <Checkbox v-model="agreedTerms" class="rewards-checkbox">
+        <Checkbox
+          v-model="agreedTerms"
+          class="rewards-checkbox"
+        >
           I agree to the
-          <nuxt-link to="/legal/cmp" class="text-link">Rewards Program Terms</nuxt-link>
+          <nuxt-link
+            to="/legal/cmp"
+            class="text-link"
+          >
+            Rewards Program Terms
+          </nuxt-link>
         </Checkbox>
       </template>
       <template v-else>
-        <span v-for="(error, index) in knownErrors" :key="index" class="invalid">
+        <span
+          v-for="(error, index) in knownErrors"
+          :key="index"
+          class="invalid"
+        >
           {{ error }}
         </span>
       </template>
     </div>
     <div class="button-group">
-      <nuxt-link to="/dashboard/revenue" class="iconified-button">
+      <nuxt-link
+        to="/dashboard/revenue"
+        class="iconified-button"
+      >
         <XIcon />
         Cancel
       </nuxt-link>
       <button
         :disabled="
           knownErrors.length > 0 ||
-          !amount ||
-          !agreedTransfer ||
-          !agreedTerms ||
-          (fees > 0 && !agreedFees)
+            !amount ||
+            !agreedTransfer ||
+            !agreedTerms ||
+            (fees > 0 && !agreedFees)
         "
         class="iconified-button brand-button"
         @click="withdraw"

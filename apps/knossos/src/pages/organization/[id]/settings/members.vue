@@ -26,8 +26,11 @@
             )
           "
           @keypress.enter="() => onInviteTeamMember(organization.team, currentUsername)"
-        />
-        <label for="username" class="hidden">Username</label>
+        >
+        <label
+          for="username"
+          class="hidden"
+        >Username</label>
         <Button
           color="primary"
           :disabled="
@@ -67,18 +70,35 @@
     >
       <div class="member-header">
         <div class="info">
-          <Avatar :src="member.user.avatar_url" :alt="member.user.username" size="sm" circle />
+          <Avatar
+            :src="member.user.avatar_url"
+            :alt="member.user.username"
+            size="sm"
+            circle
+          />
           <div class="text">
-            <nuxt-link :to="'/user/' + member.user.username" class="name">
+            <nuxt-link
+              :to="'/user/' + member.user.username"
+              class="name"
+            >
               <p>{{ member.user.username }}</p>
-              <CrownIcon v-if="member.is_owner" v-tooltip="'Organization owner'" />
+              <CrownIcon
+                v-if="member.is_owner"
+                v-tooltip="'Organization owner'"
+              />
             </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
         </div>
         <div class="side-buttons">
-          <Badge v-if="member.accepted" type="accepted" />
-          <Badge v-else type="pending" />
+          <Badge
+            v-if="member.accepted"
+            type="accepted"
+          />
+          <Badge
+            v-else
+            type="pending"
+          />
           <Button
             icon-only
             transparent
@@ -111,7 +131,7 @@
                 organizationPermissions.EDIT_MEMBER
               )
             "
-          />
+          >
         </div>
         <div class="adjacent-input">
           <label :for="`member-${member.user.id}-monetization-weight`">
@@ -131,7 +151,7 @@
                 organizationPermissions.EDIT_MEMBER
               )
             "
-          />
+          >
         </div>
         <template v-if="!member.is_owner">
           <span class="label">
@@ -195,10 +215,10 @@
                 currentMember.organization_permissions,
                 organizationPermissions.EDIT_MEMBER
               ) &&
-              !isPermission(
-                currentMember.organization_permissions,
-                organizationPermissions.REMOVE_MEMBER
-              )
+                !isPermission(
+                  currentMember.organization_permissions,
+                  organizationPermissions.REMOVE_MEMBER
+                )
             "
             @click="onRemoveMember(organization.team_id, member)"
           >

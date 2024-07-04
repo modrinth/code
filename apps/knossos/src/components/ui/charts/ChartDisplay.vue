@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div v-if="analytics.error.value" class="universal-card">
+    <div
+      v-if="analytics.error.value"
+      class="universal-card"
+    >
       <h2>
         <span class="label__title">Error</span>
       </h2>
@@ -8,7 +11,10 @@
         {{ analytics.error.value }}
       </div>
     </div>
-    <div v-else class="graphs">
+    <div
+      v-else
+      class="graphs"
+    >
       <div class="graphs__vertical-bar">
         <client-only>
           <CompactChart
@@ -73,13 +79,25 @@
               </span>
             </h2>
             <div class="chart-controls__buttons">
-              <Button v-tooltip="'Toggle project colors'" icon-only @click="onToggleColors">
+              <Button
+                v-tooltip="'Toggle project colors'"
+                icon-only
+                @click="onToggleColors"
+              >
                 <PaletteIcon />
               </Button>
-              <Button v-tooltip="'Download this data as CSV'" icon-only @click="onDownloadSetAsCSV">
+              <Button
+                v-tooltip="'Download this data as CSV'"
+                icon-only
+                @click="onDownloadSetAsCSV"
+              >
                 <DownloadIcon />
               </Button>
-              <Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
+              <Button
+                v-tooltip="'Refresh the chart'"
+                icon-only
+                @click="resetCharts"
+              >
                 <UpdatedIcon />
               </Button>
               <DropdownSelect
@@ -143,7 +161,10 @@
             </div>
             <div class="legend">
               <div class="legend__items">
-                <template v-for="project in selectedDataSetProjects" :key="project">
+                <template
+                  v-for="project in selectedDataSetProjects"
+                  :key="project"
+                >
                   <button
                     v-tooltip="project.title"
                     :class="`legend__item button-base btn-transparent ${
@@ -164,8 +185,10 @@
                           : getDefaultColor(project.id),
                       }"
                       class="legend__item__color"
-                    ></div>
-                    <div class="legend__item__text">{{ project.title }}</div>
+                    />
+                    <div class="legend__item__text">
+                      {{ project.title }}
+                    </div>
                   </button>
                 </template>
               </div>
@@ -176,8 +199,8 @@
           <Card
             v-if="
               analytics.formattedData.value?.downloadsByCountry &&
-              selectedChart === 'downloads' &&
-              analytics.formattedData.value.downloadsByCountry.data.length > 0
+                selectedChart === 'downloads' &&
+                analytics.formattedData.value.downloadsByCountry.data.length > 0
             "
             class="country-downloads"
           >
@@ -199,11 +222,10 @@
                     "
                     alt="Hidden country"
                     class="country-flag"
-                  />
+                  >
                 </div>
                 <div class="country-text">
-                  <strong class="country-name"
-                    ><template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
+                  <strong class="country-name"><template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
                     <template v-else>{{ countryCodeToName(name) }}</template>
                   </strong>
                   <span class="data-point">{{ formatNumber(count) }}</span>
@@ -222,7 +244,7 @@
                       ),
                       backgroundColor: 'var(--color-brand)',
                     }"
-                  ></span>
+                  />
                 </div>
               </div>
             </div>
@@ -230,8 +252,8 @@
           <Card
             v-if="
               analytics.formattedData.value?.viewsByCountry &&
-              selectedChart === 'views' &&
-              analytics.formattedData.value.viewsByCountry.data.length > 0
+                selectedChart === 'views' &&
+                analytics.formattedData.value.viewsByCountry.data.length > 0
             "
             class="country-downloads"
           >
@@ -253,7 +275,7 @@
                     "
                     alt="Hidden country"
                     class="country-flag"
-                  />
+                  >
                 </div>
                 <div class="country-text">
                   <strong class="country-name">
@@ -277,7 +299,7 @@
                       width: `${(count / analytics.formattedData.value.viewsByCountry.sum) * 100}%`,
                       backgroundColor: 'var(--color-blue)',
                     }"
-                  ></span>
+                  />
                 </div>
               </div>
             </div>

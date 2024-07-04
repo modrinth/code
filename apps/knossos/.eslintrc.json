@@ -1,4 +1,4 @@
- {
+{
   "extends": ["@nuxt/eslint-config", "../../.eslintrc.json"],
   "ignorePatterns": ["!**/*", ".nuxt/**", ".output/**", "node_modules"],
   "overrides": [

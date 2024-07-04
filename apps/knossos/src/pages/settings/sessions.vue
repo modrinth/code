@@ -4,7 +4,11 @@
     <p class="preserve-lines">
       {{ formatMessage(messages.sessionsDescription) }}
     </p>
-    <div v-for="session in sessions" :key="session.id" class="universal-card recessed session">
+    <div
+      v-for="session in sessions"
+      :key="session.id"
+      class="universal-card recessed session"
+    >
       <div>
         <div>
           <strong>
@@ -14,7 +18,9 @@
           </strong>
         </div>
         <div>
-          <template v-if="session.city">{{ session.city }}, {{ session.country }} ⋅ </template>
+          <template v-if="session.city">
+            {{ session.city }}, {{ session.country }} ⋅
+          </template>
           <span
             v-tooltip="
               formatMessage(commonMessages.dateAtTimeTooltip, {
@@ -48,7 +54,11 @@
       </div>
       <div class="input-group">
         <i v-if="session.current">{{ formatMessage(messages.currentSessionLabel) }}</i>
-        <button v-else class="iconified-button raised-button" @click="revokeSession(session.id)">
+        <button
+          v-else
+          class="iconified-button raised-button"
+          @click="revokeSession(session.id)"
+        >
           <XIcon /> {{ formatMessage(messages.revokeSessionButton) }}
         </button>
       </div>

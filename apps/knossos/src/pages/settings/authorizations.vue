@@ -12,7 +12,10 @@
       When you authorize an application with your Modrinth account, you grant it access to your
       account. You can manage and review access to your account here at any time.
     </p>
-    <div v-if="appInfoLookup.length === 0" class="universal-card recessed">
+    <div
+      v-if="appInfoLookup.length === 0"
+      class="universal-card recessed"
+    >
       You have not authorized any applications.
     </div>
     <div
@@ -30,12 +33,20 @@
               </h2>
               <div>
                 by
-                <nuxt-link class="text-link" :to="'/user/' + authorization.owner.id">{{
-                  authorization.owner.username
-                }}</nuxt-link>
+                <nuxt-link
+                  class="text-link"
+                  :to="'/user/' + authorization.owner.id"
+                >
+                  {{
+                    authorization.owner.username
+                  }}
+                </nuxt-link>
                 <template v-if="authorization.app.url">
                   <span> ⋅ </span>
-                  <nuxt-link class="text-link" :to="authorization.app.url">
+                  <nuxt-link
+                    class="text-link"
+                    :to="authorization.app.url"
+                  >
                     {{ authorization.app.url }}
                   </nuxt-link>
                 </template>
@@ -48,7 +59,9 @@
             <label for="app-description">
               <span class="label__title"> About this app </span>
             </label>
-            <div id="app-description">{{ authorization.app.description }}</div>
+            <div id="app-description">
+              {{ authorization.app.description }}
+            </div>
           </template>
 
           <label for="app-scope-list">

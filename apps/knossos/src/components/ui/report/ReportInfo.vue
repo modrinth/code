@@ -1,13 +1,21 @@
 <template>
   <div class="report">
-    <div v-if="report.item_type === 'project'" class="item-info">
+    <div
+      v-if="report.item_type === 'project'"
+      class="item-info"
+    >
       <nuxt-link
         :to="`/${$getProjectTypeForUrl(report.project.project_type, report.project.loaders)}/${
           report.project.slug
         }`"
         class="iconified-stacked-link"
       >
-        <Avatar :src="report.project.icon_url" size="xs" no-shadow :raised="raised" />
+        <Avatar
+          :src="report.project.icon_url"
+          size="xs"
+          no-shadow
+          :raised="raised"
+        />
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
@@ -18,26 +26,54 @@
         </div>
       </nuxt-link>
     </div>
-    <div v-else-if="report.item_type === 'user'" class="item-info">
-      <nuxt-link :to="`/user/${report.user.username}`" class="iconified-stacked-link">
-        <Avatar :src="report.user.avatar_url" circle size="xs" no-shadow :raised="raised" />
+    <div
+      v-else-if="report.item_type === 'user'"
+      class="item-info"
+    >
+      <nuxt-link
+        :to="`/user/${report.user.username}`"
+        class="iconified-stacked-link"
+      >
+        <Avatar
+          :src="report.user.avatar_url"
+          circle
+          size="xs"
+          no-shadow
+          :raised="raised"
+        />
         <div class="stacked">
           <span class="title">{{ report.user.username }}</span>
           <span>User</span>
         </div>
       </nuxt-link>
     </div>
-    <div v-else-if="report.item_type === 'version'" class="item-info">
+    <div
+      v-else-if="report.item_type === 'version'"
+      class="item-info"
+    >
       <nuxt-link
         :to="`/project/${report.project.slug}/version/${report.version.id}`"
         class="iconified-link"
       >
-        <div class="backed-svg" :class="{ raised: raised }"><VersionIcon /></div>
+        <div
+          class="backed-svg"
+          :class="{ raised: raised }"
+        >
+          <VersionIcon />
+        </div>
         <span class="title">{{ report.version.name }}</span>
       </nuxt-link>
       of
-      <nuxt-link :to="`/project/${report.project.slug}`" class="iconified-stacked-link">
-        <Avatar :src="report.project.icon_url" size="xs" no-shadow :raised="raised" />
+      <nuxt-link
+        :to="`/project/${report.project.slug}`"
+        class="iconified-stacked-link"
+      >
+        <Avatar
+          :src="report.project.icon_url"
+          size="xs"
+          no-shadow
+          :raised="raised"
+        />
         <div class="stacked">
           <span class="title">{{ report.project.title }}</span>
           <span>{{
@@ -48,15 +84,33 @@
         </div>
       </nuxt-link>
     </div>
-    <div v-else class="item-info">
-      <div class="backed-svg" :class="{ raised: raised }"><UnknownIcon /></div>
+    <div
+      v-else
+      class="item-info"
+    >
+      <div
+        class="backed-svg"
+        :class="{ raised: raised }"
+      >
+        <UnknownIcon />
+      </div>
       <span>Unknown report type</span>
     </div>
     <div class="report-type">
-      <Badge v-if="report.closed" type="closed" />
-      <Badge :type="`Reported for ${report.report_type}`" color="orange" />
+      <Badge
+        v-if="report.closed"
+        type="closed"
+      />
+      <Badge
+        :type="`Reported for ${report.report_type}`"
+        color="orange"
+      />
     </div>
-    <div v-if="showMessage" class="markdown-body" v-html="renderHighlightedString(report.body)" />
+    <div
+      v-if="showMessage"
+      class="markdown-body"
+      v-html="renderHighlightedString(report.body)"
+    />
     <ThreadSummary
       v-if="thread"
       :thread="thread"
@@ -68,7 +122,11 @@
     <div class="reporter-info">
       <ReportIcon class="inline-svg" /> Reported by
       <span v-if="auth.user.id === report.reporterUser.id">you</span>
-      <nuxt-link v-else :to="`/user/${report.reporterUser.username}`" class="iconified-link">
+      <nuxt-link
+        v-else
+        :to="`/user/${report.reporterUser.username}`"
+        class="iconified-link"
+      >
         <Avatar
           :src="report.reporterUser.avatar_url"
           circle
@@ -82,7 +140,11 @@
       <span v-tooltip="$dayjs(report.created).format('MMMM D, YYYY [at] h:mm A')">{{
         fromNow(report.created)
       }}</span>
-      <CopyCode v-if="flags.developerMode" :text="report.id" class="report-id" />
+      <CopyCode
+        v-if="flags.developerMode"
+        :text="report.id"
+        class="report-id"
+      />
     </div>
   </div>
 </template>

@@ -10,7 +10,10 @@
         questions an author might have!
       </p>
       <div class="markdown-editor-spacing">
-        <MarkdownEditor v-model="message" :placeholder="'Enter moderation message'" />
+        <MarkdownEditor
+          v-model="message"
+          :placeholder="'Enter moderation message'"
+        />
       </div>
     </div>
     <div v-else-if="steps[currentStepIndex].id === 'modpack-permissions'">
@@ -20,14 +23,19 @@
           ({{ modPackIndex + 1 }} / {{ modPackData.length }})
         </template>
       </h2>
-      <div v-if="!modPackData">Loading data...</div>
+      <div v-if="!modPackData">
+        Loading data...
+      </div>
       <div v-else-if="modPackData.length === 0">
         <p>All permissions obtained. You may skip this step!</p>
       </div>
       <div v-else-if="!modPackData[modPackIndex]">
         <p>All permission checks complete!</p>
         <div class="input-group modpack-buttons">
-          <button class="btn" @click="modPackIndex -= 1">
+          <button
+            class="btn"
+            @click="modPackIndex -= 1"
+          >
             <LeftArrowIcon />
             Previous
           </button>
@@ -50,7 +58,7 @@
             </button>
           </div>
           <template v-if="modPackData[modPackIndex].status !== 'unidentified'">
-            <div class="universal-labels"></div>
+            <div class="universal-labels" />
             <label for="proof">
               <span class="label__title">Proof</span>
             </label>
@@ -60,7 +68,7 @@
               type="text"
               autocomplete="off"
               placeholder="Enter proof of status..."
-            />
+            >
             <label for="link">
               <span class="label__title">Link</span>
             </label>
@@ -70,7 +78,7 @@
               type="text"
               autocomplete="off"
               placeholder="Enter link of project..."
-            />
+            >
             <label for="title">
               <span class="label__title">Title</span>
             </label>
@@ -80,7 +88,7 @@
               type="text"
               autocomplete="off"
               placeholder="Enter title of project..."
-            />
+            >
           </template>
         </div>
         <div v-else-if="modPackData[modPackIndex].type === 'flame'">
@@ -89,8 +97,7 @@
               :href="modPackData[modPackIndex].url"
               target="_blank"
               class="text-link"
-              >{{ modPackData[modPackIndex].url }}</a
-            >?
+            >{{ modPackData[modPackIndex].url }}</a>?
           </p>
           <div class="input-group">
             <button
@@ -113,18 +120,15 @@
         >
           <p v-if="modPackData[modPackIndex].status === 'unidentified'">
             Does this project provide identification and permission for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
+            <strong>{{ modPackData[modPackIndex].file_name }}</strong>?
           </p>
           <p v-else-if="modPackData[modPackIndex].status === 'with-attribution'">
             Does this project provide attribution for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
+            <strong>{{ modPackData[modPackIndex].file_name }}</strong>?
           </p>
           <p v-else>
             Does this project provide proof of permission for
-            <strong>{{ modPackData[modPackIndex].file_name }}</strong
-            >?
+            <strong>{{ modPackData[modPackIndex].file_name }}</strong>?
           </p>
           <div class="input-group">
             <button
@@ -141,7 +145,11 @@
           </div>
         </div>
         <div class="input-group modpack-buttons">
-          <button class="btn" :disabled="modPackIndex <= 0" @click="modPackIndex -= 1">
+          <button
+            class="btn"
+            :disabled="modPackIndex <= 0"
+            @click="modPackIndex -= 1"
+          >
             <LeftArrowIcon />
             Previous
           </button>
@@ -161,7 +169,10 @@
       <template v-if="steps[currentStepIndex].rules && steps[currentStepIndex].rules.length > 0">
         <strong>Rules guidance:</strong>
         <ul>
-          <li v-for="(rule, index) in steps[currentStepIndex].rules" :key="index">
+          <li
+            v-for="(rule, index) in steps[currentStepIndex].rules"
+            :key="index"
+          >
             {{ rule }}
           </li>
         </ul>
@@ -171,7 +182,10 @@
       >
         <strong>Examples of what to reject:</strong>
         <ul>
-          <li v-for="(example, index) in steps[currentStepIndex].examples" :key="index">
+          <li
+            v-for="(example, index) in steps[currentStepIndex].examples"
+            :key="index"
+          >
             {{ example }}
           </li>
         </ul>
@@ -181,7 +195,10 @@
       >
         <strong>Exceptions:</strong>
         <ul>
-          <li v-for="(exception, index) in steps[currentStepIndex].exceptions" :key="index">
+          <li
+            v-for="(exception, index) in steps[currentStepIndex].exceptions"
+            :key="index"
+          >
             {{ exception }}
           </li>
         </ul>
@@ -189,32 +206,52 @@
       <p v-if="steps[currentStepIndex].id === 'title'">
         <strong>Title:</strong> {{ project.title }}
       </p>
-      <p v-if="steps[currentStepIndex].id === 'slug'"><strong>Slug:</strong> {{ project.slug }}</p>
+      <p v-if="steps[currentStepIndex].id === 'slug'">
+        <strong>Slug:</strong> {{ project.slug }}
+      </p>
       <p v-if="steps[currentStepIndex].id === 'summary'">
         <strong>Summary:</strong> {{ project.description }}
       </p>
       <p v-if="steps[currentStepIndex].id === 'links'">
         <template v-if="project.issues_url">
           <strong>Issues: </strong>
-          <a class="text-link" :href="project.issues_url">{{ project.issues_url }}</a> <br />
+          <a
+            class="text-link"
+            :href="project.issues_url"
+          >{{ project.issues_url }}</a> <br>
         </template>
         <template v-if="project.source_url">
           <strong>Source: </strong>
-          <a class="text-link" :href="project.source_url">{{ project.source_url }}</a> <br />
+          <a
+            class="text-link"
+            :href="project.source_url"
+          >{{ project.source_url }}</a> <br>
         </template>
         <template v-if="project.wiki_url">
           <strong>Wiki: </strong>
-          <a class="text-link" :href="project.wiki_url">{{ project.wiki_url }}</a> <br />
+          <a
+            class="text-link"
+            :href="project.wiki_url"
+          >{{ project.wiki_url }}</a> <br>
         </template>
         <template v-if="project.discord_url">
           <strong>Discord: </strong>
-          <a class="text-link" :href="project.discord_url">{{ project.discord_url }}</a>
-          <br />
+          <a
+            class="text-link"
+            :href="project.discord_url"
+          >{{ project.discord_url }}</a>
+          <br>
         </template>
-        <template v-for="(donation, index) in project.donation_urls" :key="index">
+        <template
+          v-for="(donation, index) in project.donation_urls"
+          :key="index"
+        >
           <strong>{{ donation.platform }}: </strong>
-          <a class="text-link" :href="donation.url">{{ donation.url }}</a>
-          <br />
+          <a
+            class="text-link"
+            :href="donation.url"
+          >{{ donation.url }}</a>
+          <br>
         </template>
       </p>
       <p v-if="steps[currentStepIndex].id === 'categories'">
@@ -226,7 +263,7 @@
         />
       </p>
       <p v-if="steps[currentStepIndex].id === 'side-types'">
-        <strong>Client side:</strong> {{ project.client_side }} <br />
+        <strong>Client side:</strong> {{ project.client_side }} <br>
         <strong>Server side:</strong> {{ project.server_side }}
       </p>
       <div class="options input-group">
@@ -247,7 +284,7 @@
       <div
         v-if="
           selectedOptions[steps[currentStepIndex].id] &&
-          selectedOptions[steps[currentStepIndex].id].length > 0
+            selectedOptions[steps[currentStepIndex].id].length > 0
         "
         class="inputs universal-labels"
       >
@@ -257,28 +294,58 @@
           )"
           :key="index"
         >
-          <div v-for="(filler, idx) in option.fillers" :key="idx">
+          <div
+            v-for="(filler, idx) in option.fillers"
+            :key="idx"
+          >
             <label :for="filler.id">
               <span class="label__title">
                 {{ filler.question }}
-                <span v-if="filler.required" class="required">*</span>
+                <span
+                  v-if="filler.required"
+                  class="required"
+                >*</span>
               </span>
             </label>
-            <div v-if="filler.large" class="markdown-editor-spacing">
-              <MarkdownEditor v-model="filler.value" :placeholder="'Enter moderation message'" />
+            <div
+              v-if="filler.large"
+              class="markdown-editor-spacing"
+            >
+              <MarkdownEditor
+                v-model="filler.value"
+                :placeholder="'Enter moderation message'"
+              />
             </div>
-            <input v-else :id="filler.id" v-model="filler.value" type="text" autocomplete="off" />
+            <input
+              v-else
+              :id="filler.id"
+              v-model="filler.value"
+              type="text"
+              autocomplete="off"
+            >
           </div>
         </div>
       </div>
     </div>
     <div class="input-group modpack-buttons">
-      <button v-if="!done" class="btn skip-btn" @click="goToNextProject">
+      <button
+        v-if="!done"
+        class="btn skip-btn"
+        @click="goToNextProject"
+      >
         <ExitIcon />
-        <template v-if="futureProjects.length > 0">Skip</template>
-        <template v-else>Exit</template>
+        <template v-if="futureProjects.length > 0">
+          Skip
+        </template>
+        <template v-else>
+          Exit
+        </template>
       </button>
-      <button v-if="currentStepIndex > 0" class="btn" @click="previousPage() && !done">
+      <button
+        v-if="currentStepIndex > 0"
+        class="btn"
+        @click="previousPage() && !done"
+      >
         <LeftArrowIcon /> Previous
       </button>
       <button
@@ -297,11 +364,17 @@
         <UpdatedIcon /> Generate message
       </button>
       <template v-if="generatedMessage && !done">
-        <button class="btn btn-green" @click="sendMessage(project.requested_status ?? 'approved')">
+        <button
+          class="btn btn-green"
+          @click="sendMessage(project.requested_status ?? 'approved')"
+        >
           <CheckIcon /> Approve
         </button>
         <div class="joined-buttons">
-          <button class="btn btn-danger" @click="sendMessage('rejected')">
+          <button
+            class="btn btn-danger"
+            @click="sendMessage('rejected')"
+          >
             <CrossIcon /> Reject
           </button>
           <OverflowMenu
@@ -318,11 +391,17 @@
             ]"
           >
             <DropdownIcon style="rotate: 180deg" />
-            <template #withhold> <EyeOffIcon /> Withhold </template>
+            <template #withhold>
+              <EyeOffIcon /> Withhold
+            </template>
           </OverflowMenu>
         </div>
       </template>
-      <button v-if="done" class="btn btn-primary next-project" @click="goToNextProject">
+      <button
+        v-if="done"
+        class="btn btn-primary next-project"
+        @click="goToNextProject"
+      >
         Next project
       </button>
     </div>

@@ -1,8 +1,18 @@
 <template>
-  <Modal ref="modal" :header="title">
+  <Modal
+    ref="modal"
+    :header="title"
+  >
     <div class="modal-delete">
-      <div class="markdown-body" v-html="renderString(description)" />
-      <label v-if="hasToType" for="confirmation" class="confirmation-label">
+      <div
+        class="markdown-body"
+        v-html="renderString(description)"
+      />
+      <label
+        v-if="hasToType"
+        for="confirmation"
+        class="confirmation-label"
+      >
         <span>
           <strong>To verify, type</strong>
           <em class="confirmation-text">{{ confirmationText }}</em>
@@ -17,14 +27,21 @@
           type="text"
           placeholder="Type here..."
           @input="type"
-        />
+        >
       </div>
       <div class="button-group">
-        <button class="iconified-button" @click="cancel">
+        <button
+          class="iconified-button"
+          @click="cancel"
+        >
           <CrossIcon />
           Cancel
         </button>
-        <button class="iconified-button danger-button" :disabled="action_disabled" @click="proceed">
+        <button
+          class="iconified-button danger-button"
+          :disabled="action_disabled"
+          @click="proceed"
+        >
           <TrashIcon />
           {{ proceedLabel }}
         </button>

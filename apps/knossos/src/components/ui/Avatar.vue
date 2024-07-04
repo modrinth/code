@@ -9,7 +9,7 @@
     :alt="alt"
     :loading="loading"
     @load="updatePixelated"
-  />
+  >
   <svg
     v-else
     :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
@@ -24,7 +24,10 @@
     viewBox="0 0 104 104"
     aria-hidden="true"
   >
-    <path fill="none" d="M0 0h103.4v103.4H0z" />
+    <path
+      fill="none"
+      d="M0 0h103.4v103.4H0z"
+    />
     <path
       fill="none"
       stroke="#9a9a9a"

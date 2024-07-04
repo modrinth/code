@@ -1,21 +1,34 @@
 <template>
   <div class="dashboard-overview">
     <section class="universal-card dashboard-header">
-      <Avatar :src="auth.user.avatar_url" size="md" circle :alt="auth.user.username" />
+      <Avatar
+        :src="auth.user.avatar_url"
+        size="md"
+        circle
+        :alt="auth.user.username"
+      />
       <div class="username">
         <h1>
           {{ auth.user.username }}
         </h1>
-        <NuxtLink class="goto-link" :to="`/user/${auth.user.username}`">
+        <NuxtLink
+          class="goto-link"
+          :to="`/user/${auth.user.username}`"
+        >
           Visit your profile
-          <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
+          <ChevronRightIcon
+            class="featured-header-chevron"
+            aria-hidden="true"
+          />
         </NuxtLink>
       </div>
     </section>
     <div class="dashboard-notifications">
       <section class="universal-card">
         <div class="header__row">
-          <h2 class="header__title">Notifications</h2>
+          <h2 class="header__title">
+            Notifications
+          </h2>
           <nuxt-link
             v-if="notifications.length > 0"
             class="goto-link"
@@ -45,9 +58,15 @@
             <ChevronRightIcon />
           </nuxt-link>
         </template>
-        <div v-else class="universal-body">
+        <div
+          v-else
+          class="universal-body"
+        >
           <p>You have no unread notifications.</p>
-          <nuxt-link class="iconified-button" to="/dashboard/notifications/history">
+          <nuxt-link
+            class="iconified-button"
+            to="/dashboard/notifications/history"
+          >
             <HistoryIcon /> View notification history
           </nuxt-link>
         </div>
@@ -59,15 +78,15 @@
         <h2>Analytics</h2>
         <div class="grid-display">
           <div class="grid-display__item">
-            <div class="label">Total downloads</div>
+            <div class="label">
+              Total downloads
+            </div>
             <div class="value">
               {{ $formatNumber(projects.reduce((agg, x) => agg + x.downloads, 0)) }}
             </div>
-            <span
-              >from
+            <span>from
               {{ downloadsProjectCount }}
-              project{{ downloadsProjectCount === 1 ? '' : 's' }}</span
-            >
+              project{{ downloadsProjectCount === 1 ? '' : 's' }}</span>
             <!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
             <!--            >View breakdown-->
             <!--            <ChevronRightIcon-->
@@ -76,20 +95,21 @@
             <!--          /></NuxtLink>-->
           </div>
           <div class="grid-display__item">
-            <div class="label">Total followers</div>
+            <div class="label">
+              Total followers
+            </div>
             <div class="value">
               {{ $formatNumber(projects.reduce((agg, x) => agg + x.followers, 0)) }}
             </div>
             <span>
-              <span
-                >from {{ followersProjectCount }} project{{
-                  followersProjectCount === 1 ? '' : 's'
-                }}</span
-              ></span
-            >
+              <span>from {{ followersProjectCount }} project{{
+                followersProjectCount === 1 ? '' : 's'
+              }}</span></span>
           </div>
           <div class="grid-display__item">
-            <div class="label">Current balance</div>
+            <div class="label">
+              Current balance
+            </div>
             <div class="value">
               {{ $formatMoney(auth.user.payout_data.balance, true) }}
             </div>
@@ -99,7 +119,10 @@
               to="/dashboard/revenue"
             >
               Withdraw earnings
-              <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
+              <ChevronRightIcon
+                class="featured-header-chevron"
+                aria-hidden="true"
+              />
             </NuxtLink>
           </div>
         </div>

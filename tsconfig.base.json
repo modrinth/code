@@ -15,7 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@modrinth/omorphia": ["libs/omorphia/src/index.ts"],
+      "@modrinth/omorphia": ["libs/omorphia/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

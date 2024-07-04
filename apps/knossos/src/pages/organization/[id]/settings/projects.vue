@@ -1,6 +1,9 @@
 <template>
   <div class="normal-page__content">
-    <Modal ref="editLinksModal" header="Edit links">
+    <Modal
+      ref="editLinksModal"
+      header="Edit links"
+    >
       <div class="universal-modal links-modal">
         <p>
           Any links you specify below will be overwritten on each of the selected projects. Any you
@@ -24,7 +27,7 @@
                 editLinks.issues.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
               "
               maxlength="2048"
-            />
+            >
             <Button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -52,7 +55,7 @@
               :placeholder="
                 editLinks.source.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
               "
-            />
+            >
             <Button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -79,7 +82,7 @@
               :placeholder="
                 editLinks.wiki.clear ? 'Existing link will be cleared' : 'Enter a valid URL'
               "
-            />
+            >
             <Button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -90,7 +93,10 @@
               <TrashIcon />
             </Button>
           </div>
-          <label for="discord-invite-input" title="An invitation link to your Discord server.">
+          <label
+            for="discord-invite-input"
+            title="An invitation link to your Discord server."
+          >
             <span class="label__title">Discord invite</span>
           </label>
           <div class="input-group shrink-first">
@@ -105,7 +111,7 @@
                   ? 'Existing link will be cleared'
                   : 'Enter a valid Discord invite URL'
               "
-            />
+            >
             <Button
               v-tooltip="'Clear link'"
               aria-label="Clear link"
@@ -150,18 +156,27 @@
             <XIcon />
             Cancel
           </Button>
-          <Button color="primary" @click="onBulkEditLinks">
+          <Button
+            color="primary"
+            @click="onBulkEditLinks"
+          >
             <SaveIcon />
             Save changes
           </Button>
         </div>
       </div>
     </Modal>
-    <ModalCreation ref="modal_creation" :organization-id="organization.id" />
+    <ModalCreation
+      ref="modal_creation"
+      :organization-id="organization.id"
+    />
     <div class="universal-card">
       <h2>Projects</h2>
       <div class="input-group">
-        <Button color="primary" @click="$refs.modal_creation.show()">
+        <Button
+          color="primary"
+          @click="$refs.modal_creation.show()"
+        >
           <PlusIcon />
           {{ formatMessage(commonMessages.createAProjectButton) }}
         </Button>
@@ -176,7 +191,10 @@
       <template v-else>
         <p>You can edit multiple projects at once by selecting them below.</p>
         <div class="input-group">
-          <Button :disabled="selectedProjects.length === 0" @click="$refs.editLinksModal.show()">
+          <Button
+            :disabled="selectedProjects.length === 0"
+            @click="$refs.editLinksModal.show()"
+          >
             <EditIcon />
             Edit links
           </Button>
@@ -219,14 +237,28 @@
                 "
               />
             </div>
-            <div class="table-cell">Icon</div>
-            <div class="table-cell">Name</div>
-            <div class="table-cell">ID</div>
-            <div class="table-cell">Type</div>
-            <div class="table-cell">Status</div>
+            <div class="table-cell">
+              Icon
+            </div>
+            <div class="table-cell">
+              Name
+            </div>
+            <div class="table-cell">
+              ID
+            </div>
+            <div class="table-cell">
+              Type
+            </div>
+            <div class="table-cell">
+              Status
+            </div>
             <div class="table-cell" />
           </div>
-          <div v-for="project in sortedProjects" :key="`project-${project.id}`" class="table-row">
+          <div
+            v-for="project in sortedProjects"
+            :key="`project-${project.id}`"
+            class="table-row"
+          >
             <div class="table-cell check-cell">
               <Checkbox
                 :disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
@@ -239,7 +271,10 @@
               />
             </div>
             <div class="table-cell">
-              <nuxt-link tabindex="-1" :to="`/project/${project.slug ? project.slug : project.id}`">
+              <nuxt-link
+                tabindex="-1"
+                :to="`/project/${project.slug ? project.slug : project.id}`"
+              >
                 <Avatar
                   :src="project.icon_url"
                   aria-hidden="true"
@@ -279,7 +314,11 @@
             </div>
 
             <div class="table-cell">
-              <Badge v-if="project.status" :type="project.status" class="status" />
+              <Badge
+                v-if="project.status"
+                :type="project.status"
+                class="status"
+              />
             </div>
 
             <div class="table-cell">

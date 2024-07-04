@@ -196,7 +196,7 @@ const refreshInfo = async () => {
       }
 
       return x
-    },
+    }
   )
 
   currentLoadingBars.value.sort((a, b) => {

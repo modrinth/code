@@ -1,12 +1,22 @@
 <template>
-  <article class="project-card base-card padding-bg" :aria-label="name" role="listitem">
+  <article
+    class="project-card base-card padding-bg"
+    :aria-label="name"
+    role="listitem"
+  >
     <nuxt-link
       :title="name"
       class="icon"
       tabindex="-1"
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
     >
-      <Avatar :src="iconUrl" :alt="name" size="md" no-shadow loading="lazy" />
+      <Avatar
+        :src="iconUrl"
+        :alt="name"
+        size="md"
+        no-shadow
+        loading="lazy"
+      />
     </nuxt-link>
     <nuxt-link
       class="gallery"
@@ -15,7 +25,12 @@
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
       :style="color ? `background-color: ${toColor};` : ''"
     >
-      <img v-if="featuredImage" :src="featuredImage" alt="gallery image" loading="lazy" />
+      <img
+        v-if="featuredImage"
+        :src="featuredImage"
+        alt="gallery image"
+        loading="lazy"
+      >
     </nuxt-link>
     <div class="title">
       <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
@@ -23,13 +38,23 @@
           {{ name }}
         </h2>
       </nuxt-link>
-      <p v-if="author" class="author">
+      <p
+        v-if="author"
+        class="author"
+      >
         by
-        <nuxt-link class="title-link" :to="'/user/' + author">
+        <nuxt-link
+          class="title-link"
+          :to="'/user/' + author"
+        >
           {{ author }}
         </nuxt-link>
       </p>
-      <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
+      <Badge
+        v-if="status && status !== 'approved'"
+        :type="status"
+        class="status"
+      />
     </div>
     <p class="description">
       {{ description }}
@@ -52,18 +77,22 @@
       />
     </Categories>
     <div class="stats">
-      <div v-if="downloads" class="stat">
+      <div
+        v-if="downloads"
+        class="stat"
+      >
         <DownloadIcon aria-hidden="true" />
         <p>
-          <strong>{{ $formatNumber(downloads) }}</strong
-          ><span class="stat-label"> download<span v-if="downloads !== '1'">s</span></span>
+          <strong>{{ $formatNumber(downloads) }}</strong><span class="stat-label"> download<span v-if="downloads !== '1'">s</span></span>
         </p>
       </div>
-      <div v-if="follows" class="stat">
+      <div
+        v-if="follows"
+        class="stat"
+      >
         <HeartIcon aria-hidden="true" />
         <p>
-          <strong>{{ $formatNumber(follows) }}</strong
-          ><span class="stat-label"> follower<span v-if="follows !== '1'">s</span></span>
+          <strong>{{ $formatNumber(follows) }}</strong><span class="stat-label"> follower<span v-if="follows !== '1'">s</span></span>
         </p>
       </div>
       <div class="buttons">

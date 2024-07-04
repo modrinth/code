@@ -8,12 +8,25 @@
       />
       <div class="header__row">
         <div class="header__title">
-          <h2 v-if="history">Notification history</h2>
-          <h2 v-else>Notifications</h2>
+          <h2 v-if="history">
+            Notification history
+          </h2>
+          <h2 v-else>
+            Notifications
+          </h2>
         </div>
         <template v-if="!history">
-          <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> View history </Button>
-          <Button v-if="notifications.length > 0" color="danger" @click="readAll()">
+          <Button
+            v-if="hasRead"
+            @click="updateRoute()"
+          >
+            <HistoryIcon /> View history
+          </Button>
+          <Button
+            v-if="notifications.length > 0"
+            color="danger"
+            @click="readAll()"
+          >
             <CheckCheckIcon /> Mark all as read
           </Button>
         </template>
@@ -25,7 +38,9 @@
         :format-label="(x) => (x === 'all' ? 'All' : $formatProjectType(x).replace('_', ' ') + 's')"
         :capitalize="false"
       />
-      <p v-if="pending">Loading notifications...</p>
+      <p v-if="pending">
+        Loading notifications...
+      </p>
       <template v-else-if="error">
         <p>Error loading notifications:</p>
         <pre>
@@ -44,8 +59,14 @@
           @update:notifications="() => refresh()"
         />
       </template>
-      <p v-else>You don't have any unread notifications.</p>
-      <Pagination :page="page" :count="pages" @switch-page="changePage" />
+      <p v-else>
+        You don't have any unread notifications.
+      </p>
+      <Pagination
+        :page="page"
+        :count="pages"
+        @switch-page="changePage"
+      />
     </section>
   </div>
 </template>

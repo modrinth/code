@@ -28,8 +28,7 @@ const flags = shallowReactive(useFeatureFlags().value)
                 :style="`color:var(--color-${
                   DEFAULT_FEATURE_FLAGS[flag] === false ? 'red' : 'green'
                 })`"
-                >{{ DEFAULT_FEATURE_FLAGS[flag] }}</span
-              >
+              >{{ DEFAULT_FEATURE_FLAGS[flag] }}</span>
             </p>
           </span>
         </label>
@@ -39,7 +38,7 @@ const flags = shallowReactive(useFeatureFlags().value)
           class="switch stylized-toggle"
           type="checkbox"
           @change="() => saveFeatureFlags()"
-        />
+        >
       </div>
     </div>
   </div>

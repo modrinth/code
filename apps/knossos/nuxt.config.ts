@@ -1,4 +1,4 @@
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import { promises as fs } from 'fs'
 import { pathToFileURL } from 'node:url'
 import svgLoader from 'vite-svg-loader'

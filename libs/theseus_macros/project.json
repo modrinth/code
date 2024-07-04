@@ -6,9 +6,7 @@
   "targets": {
     "build": {
       "executor": "@monodon/rust:check",
-      "outputs": [
-        "{options.target-dir}"
-      ],
+      "outputs": ["{options.target-dir}"],
       "options": {
         "target-dir": "dist/target/theseus_macros"
       }
@@ -16,9 +14,7 @@
     "test": {
       "cache": true,
       "executor": "@monodon/rust:test",
-      "outputs": [
-        "{options.target-dir}"
-      ],
+      "outputs": ["{options.target-dir}"],
       "options": {
         "target-dir": "dist/target/theseus_macros"
       },
@@ -31,9 +27,7 @@
     "lint": {
       "cache": true,
       "executor": "@monodon/rust:lint",
-      "outputs": [
-        "{options.target-dir}"
-      ],
+      "outputs": ["{options.target-dir}"],
       "options": {
         "target-dir": "dist/target/theseus_macros"
       }

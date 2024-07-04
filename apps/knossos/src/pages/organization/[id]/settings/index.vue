@@ -1,5 +1,13 @@
 <script setup>
-import { Button, FileInput, TrashIcon, Avatar, UploadIcon, SaveIcon, ConfirmModal } from '@modrinth/omorphia'
+import {
+  Button,
+  FileInput,
+  TrashIcon,
+  Avatar,
+  UploadIcon,
+  SaveIcon,
+  ConfirmModal,
+} from '@modrinth/omorphia'
 
 const {
   organization,
@@ -157,13 +165,15 @@ const onDeleteOrganization = useClientTry(async () => {
         maxlength="2048"
         type="text"
         :disabled="!hasPermission"
-      />
+      >
 
       <label for="project-slug">
         <span class="label__title">URL</span>
       </label>
       <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">https://modrinth.com/organization/</div>
+        <div class="text-input-wrapper__before">
+          https://modrinth.com/organization/
+        </div>
         <input
           id="project-slug"
           v-model="slug"
@@ -171,7 +181,7 @@ const onDeleteOrganization = useClientTry(async () => {
           maxlength="64"
           autocomplete="off"
           :disabled="!hasPermission"
-        />
+        >
       </div>
 
       <label for="project-summary">
@@ -186,7 +196,11 @@ const onDeleteOrganization = useClientTry(async () => {
         />
       </div>
       <div class="button-group">
-        <Button color="primary" :disabled="!hasChanges" @click="onSaveChanges">
+        <Button
+          color="primary"
+          :disabled="!hasChanges"
+          @click="onSaveChanges"
+        >
           <SaveIcon />
           Save changes
         </Button>
@@ -202,7 +216,10 @@ const onDeleteOrganization = useClientTry(async () => {
         Deleting your organization will transfer all of its projects to the organization owner. This
         action cannot be undone.
       </p>
-      <Button color="danger" @click="() => $refs.modal_deletion.show()">
+      <Button
+        color="danger"
+        @click="() => $refs.modal_deletion.show()"
+      >
         <TrashIcon />
         Delete organization
       </Button>

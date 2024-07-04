@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 import svgLoader from 'vite-svg-loader'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 
 export default defineConfig({
   root: __dirname,

@@ -1,6 +1,9 @@
 <template>
   <div class="content">
-    <div v-if="currentMember" class="card header-buttons">
+    <div
+      v-if="currentMember"
+      class="card header-buttons"
+    >
       <FileInput
         :max-size="524288000"
         :accept="acceptFileFromProjectType(project.project_type)"
@@ -14,9 +17,15 @@
       <span class="indicator">
         <InfoIcon /> Click to choose a file or drag one onto this page
       </span>
-      <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
+      <DropArea
+        :accept="acceptFileFromProjectType(project.project_type)"
+        @change="handleFiles"
+      />
     </div>
-    <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
+    <VersionFilterControl
+      :versions="props.versions"
+      @switch-page="switchPage"
+    />
     <Pagination
       :page="currentPage"
       :count="Math.ceil(filteredVersions.length / 20)"
@@ -24,7 +33,11 @@
       :link-function="(page) => `?page=${page}`"
       @switch-page="switchPage"
     />
-    <div v-if="filteredVersions.length > 0" id="all-versions" class="universal-card all-versions">
+    <div
+      v-if="filteredVersions.length > 0"
+      id="all-versions"
+      class="universal-card all-versions"
+    >
       <div class="header">
         <div />
         <div>Version</div>
@@ -64,9 +77,21 @@
           {{ version.name }}
         </nuxt-link>
         <div class="version__metadata">
-          <VersionBadge v-if="version.version_type === 'release'" type="release" color="green" />
-          <VersionBadge v-else-if="version.version_type === 'beta'" type="beta" color="orange" />
-          <VersionBadge v-else-if="version.version_type === 'alpha'" type="alpha" color="red" />
+          <VersionBadge
+            v-if="version.version_type === 'release'"
+            type="release"
+            color="green"
+          />
+          <VersionBadge
+            v-else-if="version.version_type === 'beta'"
+            type="beta"
+            color="orange"
+          />
+          <VersionBadge
+            v-else-if="version.version_type === 'alpha'"
+            type="alpha"
+            color="red"
+          />
           <span class="divider" />
           <span class="version_number">{{ version.version_number }}</span>
         </div>

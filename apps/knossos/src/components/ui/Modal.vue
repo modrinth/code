@@ -8,11 +8,20 @@
       class="modal-overlay"
       @click="hide"
     />
-    <div class="modal-container" :class="{ shown: actuallyShown }">
+    <div
+      class="modal-container"
+      :class="{ shown: actuallyShown }"
+    >
       <div class="modal-body">
-        <div v-if="header" class="header">
+        <div
+          v-if="header"
+          class="header"
+        >
           <strong>{{ header }}</strong>
-          <button class="iconified-button icon-only transparent" @click="hide">
+          <button
+            class="iconified-button icon-only transparent"
+            @click="hide"
+          >
             <CrossIcon />
           </button>
         </div>

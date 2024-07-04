@@ -1,6 +1,10 @@
 <template>
   <div>
-    <MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
+    <MessageBanner
+      v-if="flags.developerMode"
+      message-type="warning"
+      class="developer-message"
+    >
       <CodeIcon />
       <IntlFormatted :message-id="developerModeBanner.description">
         <template #strong="{ children }">
@@ -24,16 +28,25 @@
           :class="{ selected: theme.preference === option }"
           @click="() => updateColorTheme(option)"
         >
-          <div class="preview" :class="`${option === 'system' ? systemTheme : option}-mode`">
+          <div
+            class="preview"
+            :class="`${option === 'system' ? systemTheme : option}-mode`"
+          >
             <div class="example-card card card">
-              <div class="example-icon"></div>
-              <div class="example-text-1"></div>
-              <div class="example-text-2"></div>
+              <div class="example-icon" />
+              <div class="example-text-1" />
+              <div class="example-text-2" />
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="theme.preference === option" class="radio" />
-            <RadioButtonIcon v-else class="radio" />
+            <RadioButtonChecked
+              v-if="theme.preference === option"
+              class="radio"
+            />
+            <RadioButtonIcon
+              v-else
+              class="radio"
+            />
             {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
             <SunIcon
               v-if="'light' === option"
@@ -53,7 +66,10 @@
       <h2>{{ formatMessage(projectListLayouts.title) }}</h2>
       <p>{{ formatMessage(projectListLayouts.description) }}</p>
       <div class="project-lists">
-        <div v-for="projectType in listTypes" :key="projectType.id + '-project-list-layouts'">
+        <div
+          v-for="projectType in listTypes"
+          :key="projectType.id + '-project-list-layouts'"
+        >
           <div class="label">
             <div class="label__title">
               {{
@@ -71,10 +87,10 @@
             >
               <div class="preview">
                 <div class="layout-list-mode">
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
                 </div>
               </div>
               <div class="label">
@@ -82,7 +98,10 @@
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
                   class="radio"
                 />
-                <RadioButtonIcon v-else class="radio" />
+                <RadioButtonIcon
+                  v-else
+                  class="radio"
+                />
                 Rows
               </div>
             </button>
@@ -93,12 +112,12 @@
             >
               <div class="preview">
                 <div class="layout-grid-mode">
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
                 </div>
               </div>
               <div class="label">
@@ -106,7 +125,10 @@
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'"
                   class="radio"
                 />
-                <RadioButtonIcon v-else class="radio" />
+                <RadioButtonIcon
+                  v-else
+                  class="radio"
+                />
                 Grid
               </div>
             </button>
@@ -117,10 +139,10 @@
             >
               <div class="preview">
                 <div class="layout-gallery-mode">
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
+                  <div class="example-card card" />
                 </div>
               </div>
               <div class="label">
@@ -128,7 +150,10 @@
                   v-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'"
                   class="radio"
                 />
-                <RadioButtonIcon v-else class="radio" />
+                <RadioButtonIcon
+                  v-else
+                  class="radio"
+                />
                 Gallery
               </div>
             </button>
@@ -154,7 +179,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        />
+        >
       </div>
       <div class="adjacent-input small">
         <label for="external-links-new-tab">
@@ -171,7 +196,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        />
+        >
       </div>
       <div class="adjacent-input small">
         <label for="modrinth-app-promos">
@@ -188,7 +213,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        />
+        >
       </div>
       <div class="adjacent-input small">
         <label for="search-layout-toggle">
@@ -205,7 +230,7 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        />
+        >
       </div>
       <div class="adjacent-input small">
         <label for="project-layout-toggle">
@@ -222,14 +247,21 @@
           class="switch stylized-toggle"
           type="checkbox"
           @change="saveCosmetics"
-        />
+        >
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import { CodeIcon, Button, RadioButtonIcon, RadioButtonChecked, SunIcon, MoonIcon } from '@modrinth/omorphia'
+import {
+  CodeIcon,
+  Button,
+  RadioButtonIcon,
+  RadioButtonChecked,
+  SunIcon,
+  MoonIcon,
+} from '@modrinth/omorphia'
 import { formatProjectType } from '~/plugins/shorthands.js'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import { DARK_THEMES } from '~/composables/theme.js'

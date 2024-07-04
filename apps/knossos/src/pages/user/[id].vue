@@ -4,7 +4,12 @@
     <CollectionCreateModal ref="modal_collection_creation" />
     <div class="user-header-wrapper">
       <div class="user-header">
-        <Avatar :src="user.avatar_url" size="md" circle :alt="user.username" />
+        <Avatar
+          :src="user.avatar_url"
+          size="md"
+          circle
+          :alt="user.username"
+        />
         <h1 class="username">
           {{ user.username }}
         </h1>
@@ -33,19 +38,35 @@
               <ReportIcon aria-hidden="true" />
               {{ formatMessage(messages.profileReportButton) }}
             </button>
-            <nuxt-link v-else class="iconified-button" to="/auth/sign-in">
+            <nuxt-link
+              v-else
+              class="iconified-button"
+              to="/auth/sign-in"
+            >
               <ReportIcon aria-hidden="true" />
               {{ formatMessage(messages.profileReportButton) }}
             </nuxt-link>
           </div>
           <div class="sidebar__item">
-            <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
-            <Badge v-else-if="projects.length > 0" type="creator" />
+            <Badge
+              v-if="tags.staffRoles.includes(user.role)"
+              :type="user.role"
+            />
+            <Badge
+              v-else-if="projects.length > 0"
+              type="creator"
+            />
           </div>
-          <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
-          <hr class="card-divider" />
+          <span
+            v-if="user.bio"
+            class="sidebar__item bio"
+          >{{ user.bio }}</span>
+          <hr class="card-divider">
           <div class="primary-stat">
-            <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
+            <DownloadIcon
+              class="primary-stat__icon"
+              aria-hidden="true"
+            />
             <div class="primary-stat__text">
               <IntlFormatted
                 :message-id="messages.profileDownloadsStats"
@@ -60,7 +81,10 @@
             </div>
           </div>
           <div class="primary-stat">
-            <HeartIcon class="primary-stat__icon" aria-hidden="true" />
+            <HeartIcon
+              class="primary-stat__icon"
+              aria-hidden="true"
+            />
             <div class="primary-stat__text">
               <IntlFormatted
                 :message-id="messages.profileProjectsFollowersStats"
@@ -75,7 +99,10 @@
             </div>
           </div>
           <div class="stats-block__item secondary-stat">
-            <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
+            <SunriseIcon
+              class="secondary-stat__icon"
+              aria-hidden="true"
+            />
             <span
               v-tooltip="
                 formatMessage(commonMessages.dateAtTimeTooltip, {
@@ -90,9 +117,12 @@
               }}
             </span>
           </div>
-          <hr class="card-divider" />
+          <hr class="card-divider">
           <div class="stats-block__item secondary-stat">
-            <UserIcon class="secondary-stat__icon" aria-hidden="true" />
+            <UserIcon
+              class="secondary-stat__icon"
+              aria-hidden="true"
+            />
             <span class="secondary-stat__text">
               <IntlFormatted :message-id="messages.profileUserId">
                 <template #~id>
@@ -102,7 +132,7 @@
             </span>
           </div>
           <template v-if="organizations.length > 0">
-            <hr class="card-divider" />
+            <hr class="card-divider">
             <div class="stats-block__item">
               <IntlFormatted :message-id="messages.profileOrganizations" />
               <div class="organizations-grid">
@@ -113,7 +143,11 @@
                   class="organization"
                   :to="`/organization/${org.slug}`"
                 >
-                  <Avatar :src="org.icon_url" :alt="'Icon for ' + org.name" size="xs" />
+                  <Avatar
+                    :src="org.icon_url"
+                    :alt="'Icon for ' + org.name"
+                    size="xs"
+                  />
                 </nuxt-link>
               </div>
             </div>
@@ -171,10 +205,10 @@
             <ProjectCard
               v-for="project in (route.params.projectType !== undefined
                 ? projects.filter(
-                    (x) =>
-                      x.project_type ===
-                      route.params.projectType.substr(0, route.params.projectType.length - 1)
-                  )
+                  (x) =>
+                    x.project_type ===
+                    route.params.projectType.substr(0, route.params.projectType.length - 1)
+                )
                 : projects
               )
                 .slice()
@@ -203,20 +237,35 @@
             />
           </div>
         </div>
-        <div v-else-if="route.params.projectType !== 'collections'" class="error">
-          <UpToDate class="icon" /><br />
-          <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+        <div
+          v-else-if="route.params.projectType !== 'collections'"
+          class="error"
+        >
+          <UpToDate class="icon" /><br>
+          <span
+            v-if="auth.user && auth.user.id === user.id"
+            class="preserve-lines text"
+          >
             <IntlFormatted :message-id="messages.profileNoProjectsAuthLabel">
               <template #create-link="{ children }">
-                <a class="link" @click.prevent="$refs.modal_creation.show()">
+                <a
+                  class="link"
+                  @click.prevent="$refs.modal_creation.show()"
+                >
                   <component :is="() => children" />
                 </a>
               </template>
             </IntlFormatted>
           </span>
-          <span v-else class="text">{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
+          <span
+            v-else
+            class="text"
+          >{{ formatMessage(messages.profileNoProjectsLabel) }}</span>
         </div>
-        <div v-if="['collections'].includes(route.params.projectType)" class="collections-grid">
+        <div
+          v-if="['collections'].includes(route.params.projectType)"
+          class="collections-grid"
+        >
           <nuxt-link
             v-for="collection in collections"
             :key="collection.id"
@@ -224,9 +273,14 @@
             class="card collection-item"
           >
             <div class="collection">
-              <Avatar :src="collection.icon_url" class="icon" />
+              <Avatar
+                :src="collection.icon_url"
+                class="icon"
+              />
               <div class="details">
-                <h2 class="title">{{ collection.name }}</h2>
+                <h2 class="title">
+                  {{ collection.name }}
+                </h2>
                 <div class="stats">
                   <LibraryIcon />
                   Collection
@@ -237,7 +291,9 @@
               {{ collection.description }}
             </div>
             <div class="stat-bar">
-              <div class="stats"><BoxIcon /> {{ collection.projects?.length || 0 }} projects</div>
+              <div class="stats">
+                <BoxIcon /> {{ collection.projects?.length || 0 }} projects
+              </div>
               <div class="stats">
                 <template v-if="collection.status === 'listed'">
                   <WorldIcon />
@@ -263,17 +319,26 @@
           v-if="route.params.projectType === 'collections' && collections.length === 0"
           class="error"
         >
-          <UpToDate class="icon" /><br />
-          <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
+          <UpToDate class="icon" /><br>
+          <span
+            v-if="auth.user && auth.user.id === user.id"
+            class="preserve-lines text"
+          >
             <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
               <template #create-link="{ children }">
-                <a class="link" @click.prevent="$refs.modal_collection_creation.show()">
+                <a
+                  class="link"
+                  @click.prevent="$refs.modal_collection_creation.show()"
+                >
                   <component :is="() => children" />
                 </a>
               </template>
             </IntlFormatted>
           </span>
-          <span v-else class="text">{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
+          <span
+            v-else
+            class="text"
+          >{{ formatMessage(messages.profileNoCollectionsLabel) }}</span>
         </div>
       </div>
     </div>
@@ -381,7 +446,7 @@ const messages = defineMessages({
 
 let user, projects, organizations, collections
 try {
-  ;[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
+  [{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
     await Promise.all([
       useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
       useAsyncData(

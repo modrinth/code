@@ -55,12 +55,7 @@
         "depends": []
       },
       "externalBin": [],
-      "icon": [
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
-      ],
+      "icon": ["icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
       "identifier": "com.modrinth.theseus",
       "longDescription": "",
       "macOS": {

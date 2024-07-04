@@ -27,5 +27,5 @@
     }
   },
   "files": [],
-  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "lib/**/*.vue"],
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "lib/**/*.vue"]
 }

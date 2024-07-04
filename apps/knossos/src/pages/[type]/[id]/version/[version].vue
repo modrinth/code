@@ -1,5 +1,8 @@
 <template>
-  <div v-if="version" class="version-page">
+  <div
+    v-if="version"
+    class="version-page"
+  >
     <ModalConfirm
       v-if="currentMember"
       ref="modal_confirm"
@@ -9,7 +12,11 @@
       proceed-label="Delete"
       @proceed="deleteVersion()"
     />
-    <Modal v-if="auth.user && currentMember" ref="modal_package_mod" header="Package data pack">
+    <Modal
+      v-if="auth.user && currentMember"
+      ref="modal_package_mod"
+      header="Package data pack"
+    >
       <div class="modal-package-mod universal-labels">
         <div class="markdown-body">
           <p>
@@ -37,11 +44,17 @@
           open-direction="top"
         />
         <div class="button-group">
-          <button class="iconified-button" @click="$refs.modal_package_mod.hide()">
+          <button
+            class="iconified-button"
+            @click="$refs.modal_package_mod.hide()"
+          >
             <CrossIcon />
             Cancel
           </button>
-          <button class="iconified-button brand-button" @click="createDataPackVersion">
+          <button
+            class="iconified-button brand-button"
+            @click="createDataPackVersion"
+          >
             <RightArrowIcon />
             Begin packaging data pack
           </button>
@@ -65,23 +78,34 @@
             type="text"
             placeholder="Enter a version title..."
             maxlength="256"
-          />
+          >
         </template>
         <h2 :class="{ 'sr-only': isEditing }">
           {{ version.name }}
         </h2>
-        <div v-if="version.featured" class="featured">
+        <div
+          v-if="version.featured"
+          class="featured"
+        >
           <StarIcon aria-hidden="true" />
           Featured
         </div>
-        <div v-else-if="featuredVersions.find((x) => x.id === version.id)" class="featured">
+        <div
+          v-else-if="featuredVersions.find((x) => x.id === version.id)"
+          class="featured"
+        >
           <StarIcon aria-hidden="true" />
           Auto-featured
         </div>
       </div>
-      <div v-if="fieldErrors && showKnownErrors" class="known-errors">
+      <div
+        v-if="fieldErrors && showKnownErrors"
+        class="known-errors"
+      >
         <ul>
-          <li v-if="version.version_number === ''">Your version must have a version number.</li>
+          <li v-if="version.version_number === ''">
+            Your version must have a version number.
+          </li>
           <li v-if="version.game_versions.length === 0">
             Your version must have the supported Minecraft versions selected.
           </li>
@@ -93,7 +117,10 @@
           </li>
         </ul>
       </div>
-      <div v-if="isCreating" class="input-group">
+      <div
+        v-if="isCreating"
+        class="input-group"
+      >
         <button
           class="iconified-button brand-button"
           :disabled="shouldPreventActions"
@@ -111,7 +138,10 @@
           Cancel
         </nuxt-link>
       </div>
-      <div v-else-if="isEditing" class="input-group">
+      <div
+        v-else-if="isEditing"
+        class="input-group"
+      >
         <button
           class="iconified-button brand-button"
           :disabled="shouldPreventActions"
@@ -120,10 +150,17 @@
           <SaveIcon aria-hidden="true" />
           Save
         </button>
-        <button class="iconified-button" @click="version.featured = !version.featured">
+        <button
+          class="iconified-button"
+          @click="version.featured = !version.featured"
+        >
           <StarIcon aria-hidden="true" />
-          <template v-if="!version.featured"> Feature version</template>
-          <template v-else> Unfeature version</template>
+          <template v-if="!version.featured">
+            Feature version
+          </template>
+          <template v-else>
+            Unfeature version
+          </template>
         </button>
         <nuxt-link
           v-if="currentMember"
@@ -136,7 +173,10 @@
           Discard changes
         </nuxt-link>
       </div>
-      <div v-else class="input-group">
+      <div
+        v-else
+        class="input-group"
+      >
         <a
           v-if="primaryFile"
           v-tooltip="primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'"
@@ -147,11 +187,19 @@
           <DownloadIcon aria-hidden="true" />
           Download
         </a>
-        <nuxt-link v-if="!auth.user" class="iconified-button" to="/auth/sign-in">
+        <nuxt-link
+          v-if="!auth.user"
+          class="iconified-button"
+          to="/auth/sign-in"
+        >
           <ReportIcon aria-hidden="true" />
           Report
         </nuxt-link>
-        <button v-else class="iconified-button" @click="() => reportVersion(version.id)">
+        <button
+          v-else
+          class="iconified-button"
+          @click="() => reportVersion(version.id)"
+        >
           <ReportIcon aria-hidden="true" />
           Report
         </button>
@@ -168,7 +216,7 @@
         <button
           v-if="
             currentMember &&
-            version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))
+              version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))
           "
           class="iconified-button"
           @click="$refs.modal_package_mod.show()"
@@ -190,7 +238,10 @@
       <h3>Changelog</h3>
       <template v-if="isEditing">
         <div class="changelog-editor-spacing">
-          <MarkdownEditor v-model="version.changelog" :on-image-upload="onImageUpload" />
+          <MarkdownEditor
+            v-model="version.changelog"
+            :on-image-upload="onImageUpload"
+          />
         </div>
       </template>
       <div
@@ -218,27 +269,50 @@
           alt="dependency-icon"
           size="sm"
         />
-        <nuxt-link v-if="!isEditing" :to="dependency.link" class="info">
+        <nuxt-link
+          v-if="!isEditing"
+          :to="dependency.link"
+          class="info"
+        >
           <span class="project-title">
             {{ dependency.project ? dependency.project.title : 'Unknown Project' }}
           </span>
-          <span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+          <span
+            v-if="dependency.version"
+            class="dep-type"
+            :class="dependency.dependency_type"
+          >
             Version {{ dependency.version.version_number }} is
             {{ dependency.dependency_type }}
           </span>
-          <span v-else class="dep-type" :class="dependency.dependency_type">
+          <span
+            v-else
+            class="dep-type"
+            :class="dependency.dependency_type"
+          >
             {{ dependency.dependency_type }}
           </span>
         </nuxt-link>
-        <div v-else class="info">
+        <div
+          v-else
+          class="info"
+        >
           <span class="project-title">
             {{ dependency.project ? dependency.project.title : 'Unknown Project' }}
           </span>
-          <span v-if="dependency.version" class="dep-type" :class="dependency.dependency_type">
+          <span
+            v-if="dependency.version"
+            class="dep-type"
+            :class="dependency.dependency_type"
+          >
             Version {{ dependency.version.version_number }} is
             {{ dependency.dependency_type }}
           </span>
-          <span v-else class="dep-type" :class="dependency.dependency_type">
+          <span
+            v-else
+            class="dep-type"
+            :class="dependency.dependency_type"
+          >
             {{ dependency.dependency_type }}
           </span>
         </div>
@@ -256,15 +330,25 @@
         :key="index"
         class="dependency"
       >
-        <Avatar :src="null" alt="dependency-icon" size="sm" />
+        <Avatar
+          :src="null"
+          alt="dependency-icon"
+          size="sm"
+        />
         <div class="info">
           <span class="project-title">
             {{ dependency.file_name }}
           </span>
-          <span class="dep-type" :class="dependency.dependency_type">Added via overrides</span>
+          <span
+            class="dep-type"
+            :class="dependency.dependency_type"
+          >Added via overrides</span>
         </div>
       </div>
-      <div v-if="isEditing && project.project_type !== 'modpack'" class="add-dependency">
+      <div
+        v-if="isEditing && project.project_type !== 'modpack'"
+        class="add-dependency"
+      >
         <h4>Add dependency</h4>
         <div class="input-group">
           <Multiselect
@@ -284,7 +368,7 @@
               dependencyAddMode === 'project' ? '/slug' : ''
             }`"
             @keyup.enter="addDependency(dependencyAddMode, newDependencyId, newDependencyType)"
-          />
+          >
           <Multiselect
             v-model="newDependencyType"
             class="input"
@@ -309,7 +393,10 @@
     </div>
     <div class="version-page__files universal-card">
       <h3>Files</h3>
-      <div v-if="isEditing && replaceFile" class="file primary">
+      <div
+        v-if="isEditing && replaceFile"
+        class="file primary"
+      >
         <FileIcon />
         <span class="filename">
           <strong>{{ replaceFile.name }}</strong>
@@ -338,7 +425,10 @@
         <span class="filename">
           <strong>{{ file.filename }}</strong>
           <span class="file-size">({{ $formatBytes(file.size) }})</span>
-          <span v-if="primaryFile.hashes.sha1 === file.hashes.sha1" class="file-type">
+          <span
+            v-if="primaryFile.hashes.sha1 === file.hashes.sha1"
+            class="file-type"
+          >
             Primary
           </span>
           <span
@@ -357,8 +447,8 @@
         <multiselect
           v-if="
             version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x)) &&
-            isEditing &&
-            primaryFile.hashes.sha1 !== file.hashes.sha1
+              isEditing &&
+              primaryFile.hashes.sha1 !== file.hashes.sha1
           "
           v-model="oldFileTypes[index]"
           class="raised-multiselect"
@@ -398,7 +488,11 @@
         </a>
       </div>
       <template v-if="isEditing">
-        <div v-for="(file, index) in newFiles" :key="index" class="file">
+        <div
+          v-for="(file, index) in newFiles"
+          :key="index"
+          class="file"
+        >
           <FileIcon />
           <span class="filename">
             <strong>{{ file.name }}</strong>
@@ -495,8 +589,14 @@
         </div>
         <div>
           <h4>Version number</h4>
-          <div v-if="isEditing" class="iconified-input">
-            <label class="hidden" for="version-number">Version number</label>
+          <div
+            v-if="isEditing"
+            class="iconified-input"
+          >
+            <label
+              class="hidden"
+              for="version-number"
+            >Version number</label>
             <HashIcon aria-hidden="true" />
             <input
               id="version-number"
@@ -504,7 +604,7 @@
               type="text"
               autocomplete="off"
               maxlength="54"
-            />
+            >
           </div>
           <span v-else>{{ version.version_number }}</span>
         </div>
@@ -532,7 +632,11 @@
             :hide-selected="true"
             placeholder="Choose loaders..."
           />
-          <Categories v-else :categories="version.loaders" :type="project.actualProjectType" />
+          <Categories
+            v-else
+            :categories="version.loaders"
+            :type="project.actualProjectType"
+          />
         </div>
         <div>
           <h4>Game versions</h4>
@@ -543,8 +647,8 @@
                 showSnapshots
                   ? tags.gameVersions.map((x) => x.version)
                   : tags.gameVersions
-                      .filter((it) => it.version_type === 'release')
-                      .map((x) => x.version)
+                    .filter((it) => it.version_type === 'release')
+                    .map((x) => x.version)
               "
               :loading="tags.gameVersions.length === 0"
               :multiple="true"
@@ -591,15 +695,26 @@
             />
 
             <div class="member-info">
-              <nuxt-link :to="'/user/' + version.author.user.username" class="name">
+              <nuxt-link
+                :to="'/user/' + version.author.user.username"
+                class="name"
+              >
                 <p>
                   {{ version.author.name }}
                 </p>
               </nuxt-link>
-              <p v-if="version.author.role" class="role">
+              <p
+                v-if="version.author.role"
+                class="role"
+              >
                 {{ version.author.role }}
               </p>
-              <p v-else-if="version.author_id === 'GVFjtWTf'" class="role">Archivist</p>
+              <p
+                v-else-if="version.author_id === 'GVFjtWTf'"
+                class="role"
+              >
+                Archivist
+              </p>
             </div>
           </div>
         </div>

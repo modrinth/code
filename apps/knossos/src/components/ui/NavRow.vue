@@ -19,7 +19,7 @@
         opacity: activeIndex === -1 ? 0 : 1,
       }"
       aria-hidden="true"
-    ></div>
+    />
   </nav>
 </template>
 

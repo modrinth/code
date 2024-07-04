@@ -84,7 +84,7 @@
       15-20% of the site's total advertising revenue (so a 80-85% split to creators). The new system
       gives creators more revenue and a more favorable split towards creators (90%).
     </p>
-    <h3></h3>
+    <h3 />
   </div>
 </template>
 
