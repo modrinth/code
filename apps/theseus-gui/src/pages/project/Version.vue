@@ -196,7 +196,7 @@ import {
   Breadcrumbs,
   formatBytes,
   renderString,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { releaseColor } from '@/helpers/utils'
 import { ref, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'

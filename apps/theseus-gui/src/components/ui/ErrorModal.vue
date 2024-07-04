@@ -1,5 +1,5 @@
 <script setup>
-import { Modal, XIcon, IssuesIcon, LogInIcon } from 'omorphia'
+import { Modal, XIcon, IssuesIcon, LogInIcon } from '@modrinth/omorphia'
 import { ChatIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'

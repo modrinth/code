@@ -316,7 +316,7 @@ import {
   Button,
   SortAscendingIcon,
   SortDescendingIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'

@@ -16,7 +16,7 @@ import {
   Button,
   formatCategoryHeader,
   ConfirmModal,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import dayjs from 'dayjs'
 import { useTheming } from '@/store/theme.js'

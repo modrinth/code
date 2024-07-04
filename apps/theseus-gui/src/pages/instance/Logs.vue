@@ -97,7 +97,7 @@ import {
   Checkbox,
   TrashIcon,
   ShareModal,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import {
   delete_logs_by_filename,
   get_logs,

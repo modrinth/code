@@ -1,5 +1,5 @@
 <script setup>
-import { Modal, Button } from 'omorphia'
+import { Modal, Button } from '@modrinth/omorphia'
 import { ref } from 'vue'
 import { useFetch } from '@/helpers/fetch.js'
 import SearchCard from '@/components/ui/SearchCard.vue'

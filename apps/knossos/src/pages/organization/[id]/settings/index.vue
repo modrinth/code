@@ -1,5 +1,5 @@
 <script setup>
-import { Button, FileInput, TrashIcon, Avatar, UploadIcon, SaveIcon, ConfirmModal } from 'omorphia'
+import { Button, FileInput, TrashIcon, Avatar, UploadIcon, SaveIcon, ConfirmModal } from '@modrinth/omorphia'
 
 const {
   organization,

@@ -229,7 +229,7 @@
 </template>
 
 <script setup>
-import { CodeIcon, Button, RadioButtonIcon, RadioButtonChecked, SunIcon, MoonIcon } from 'omorphia'
+import { CodeIcon, Button, RadioButtonIcon, RadioButtonChecked, SunIcon, MoonIcon } from '@modrinth/omorphia'
 import { formatProjectType } from '~/plugins/shorthands.js'
 import MessageBanner from '~/components/ui/MessageBanner.vue'
 import { DARK_THEMES } from '~/composables/theme.js'

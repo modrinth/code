@@ -52,7 +52,7 @@
   </div>
 </template>
 <script setup>
-import { SettingsIcon, RightArrowIcon } from 'omorphia'
+import { SettingsIcon, RightArrowIcon } from '@modrinth/omorphia'
 
 const { formatMessage } = useVIntl()
 

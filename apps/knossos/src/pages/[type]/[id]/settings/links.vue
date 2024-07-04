@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { DropdownSelect } from 'omorphia'
+import { DropdownSelect } from '@modrinth/omorphia'
 import SaveIcon from '~/assets/images/utils/save.svg?component'
 
 const tags = useTags()

@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { ChevronRightIcon, Button, ChevronLeftIcon } from 'omorphia'
+import { ChevronRightIcon, Button, ChevronLeftIcon } from '@modrinth/omorphia'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'

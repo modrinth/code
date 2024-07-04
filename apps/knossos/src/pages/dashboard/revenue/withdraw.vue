@@ -194,7 +194,7 @@ import {
   TransferIcon,
   Checkbox,
   Breadcrumbs,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { all } from 'iso-3166-1'
 import VenmoIcon from '~/assets/images/external/venmo.svg?component'
 

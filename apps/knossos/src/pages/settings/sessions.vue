@@ -56,7 +56,7 @@
   </div>
 </template>
 <script setup>
-import { XIcon } from 'omorphia'
+import { XIcon } from '@modrinth/omorphia'
 import { commonSettingsMessages } from '~/utils/common-messages.ts'
 
 definePageMeta({

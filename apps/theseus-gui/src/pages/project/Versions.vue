@@ -160,7 +160,7 @@ import {
   DownloadIcon,
   Pagination,
   formatNumber,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
 import { computed, ref, watch } from 'vue'

@@ -384,7 +384,7 @@ import {
   UpdatedIcon,
   LibraryIcon,
   BoxIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 
 import WorldIcon from 'assets/images/utils/world.svg'
 import UpToDate from 'assets/images/illustrations/up_to_date.svg'

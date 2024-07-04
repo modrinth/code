@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Checkbox, Modal, XIcon, PlusIcon } from 'omorphia'
+import { Button, Checkbox, Modal, XIcon, PlusIcon } from '@modrinth/omorphia'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'

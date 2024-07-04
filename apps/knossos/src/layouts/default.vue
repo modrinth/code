@@ -427,7 +427,7 @@ import {
   IssuesIcon,
   Button,
   ReportIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?component'
 import CrossIcon from '~/assets/images/utils/x.svg?component'
 import SearchIcon from '~/assets/images/utils/search.svg?component'
@@ -755,7 +755,8 @@ function hideStagingBanner() {
 
 <style lang="scss">
 @import '~/assets/styles/global.scss';
-@import 'omorphia/dist/style.css';
+// TODO: fix this hackery
+@import '../../../../libs/omorphia/src/assets/omorphia';
 
 .layout {
   min-height: 100vh;

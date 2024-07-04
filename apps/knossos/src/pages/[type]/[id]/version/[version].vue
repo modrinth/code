@@ -612,7 +612,7 @@
   </div>
 </template>
 <script>
-import { MarkdownEditor } from 'omorphia'
+import { MarkdownEditor } from '@modrinth/omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 import { inferVersionInfo } from '~/helpers/infer.js'

@@ -126,7 +126,7 @@ import {
   SSOGitLabIcon,
   KeyIcon,
   MailIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 
 const { formatMessage } = useVIntl()
 

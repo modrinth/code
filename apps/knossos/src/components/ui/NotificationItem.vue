@@ -288,7 +288,7 @@
 </template>
 
 <script setup>
-import { renderString } from 'omorphia'
+import { renderString } from '@modrinth/omorphia'
 import InvitationIcon from '~/assets/images/utils/user-plus.svg?component'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
 import NotificationIcon from '~/assets/images/sidebar/notifications.svg?component'

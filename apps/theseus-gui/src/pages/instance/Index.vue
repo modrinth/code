@@ -137,7 +137,7 @@ import {
   XIcon,
   CheckCircleIcon,
   UpdatedIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { get, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,

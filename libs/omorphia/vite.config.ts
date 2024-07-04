@@ -1,23 +1,15 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import svgLoader from 'vite-svg-loader'
-import eslintPlugin from 'vite-plugin-eslint'
 import vue from '@vitejs/plugin-vue'
 import dts from 'vite-plugin-dts'
-import nodeExternals from 'rollup-plugin-node-externals'
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
-  build: {
-    minify: false,
-    lib: {
-      entry: resolve(__dirname, 'lib/index.ts'),
-      name: 'Omorphia',
-      fileName: 'omorphia',
-      formats: ['es'],
-    },
-  },
+  root: __dirname,
+  cacheDir: '../../node_modules/.vite/libs/omorphia',
+
   plugins: [
-    { enforce: 'pre', ...nodeExternals() },
     vue(),
     svgLoader({
       svgoConfig: {
@@ -33,12 +25,29 @@ export default defineConfig({
         ],
       },
     }),
-    eslintPlugin(),
+    nxViteTsPaths(),
     dts(),
   ],
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './lib'),
+
+  build: {
+    outDir: '../../dist/libs/omorphia',
+    emptyOutDir: true,
+    reportCompressedSize: true,
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    lib: {
+      // Could also be a dictionary or array of multiple entry points.
+      entry: 'src/index.ts',
+      name: '@modrinth/omorphia',
+      fileName: 'index',
+      // Change this to the formats you want to support.
+      // Don't forget to update your package.json as well.
+      formats: ['es', 'cjs'],
+    },
+    rollupOptions: {
+      // External packages that should not be bundled into your library.
+      external: [],
     },
   },
 })

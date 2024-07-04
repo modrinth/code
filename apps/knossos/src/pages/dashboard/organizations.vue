@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { PlusIcon, Avatar, UsersIcon } from 'omorphia'
+import { PlusIcon, Avatar, UsersIcon } from '@modrinth/omorphia'
 
 import { useAuth } from '~/composables/auth.js'
 import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'

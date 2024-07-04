@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Card, UserIcon, LockIcon, MailIcon, Checkbox } from 'omorphia'
+import { Button, Card, UserIcon, LockIcon, MailIcon, Checkbox } from '@modrinth/omorphia'
 import {
   DiscordIcon,
   GithubIcon,

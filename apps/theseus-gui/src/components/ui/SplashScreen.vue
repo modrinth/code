@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { AnimatedLogo } from 'omorphia'
+import { AnimatedLogo } from '@modrinth/omorphia'
 
 defineProps({
   appLoading: Boolean,

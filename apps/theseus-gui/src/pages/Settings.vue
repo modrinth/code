@@ -12,7 +12,7 @@ import {
   BoxIcon,
   FolderSearchIcon,
   UpdatedIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { handleError, useTheming } from '@/store/state'
 import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'

@@ -1,5 +1,5 @@
 <script setup>
-import { Button, LogInIcon, Card } from 'omorphia'
+import { Button, LogInIcon, Card } from '@modrinth/omorphia'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'

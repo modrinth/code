@@ -102,7 +102,7 @@ import {
   UnknownIcon,
   DropdownSelect,
   capitalizeString,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import dayjs from 'dayjs'
 import TremendousIcon from '~/assets/images/external/tremendous.svg?component'
 import VenmoIcon from '~/assets/images/external/venmo-small.svg?component'

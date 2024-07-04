@@ -1079,7 +1079,7 @@ import {
   isStaff,
   CheckIcon,
   XIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import CrownIcon from '~/assets/images/utils/crown.svg?component'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
 import DownloadIcon from '~/assets/images/utils/download.svg?component'

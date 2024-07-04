@@ -60,7 +60,7 @@ import {
   XIcon,
   FolderSearchIcon,
   DownloadIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'

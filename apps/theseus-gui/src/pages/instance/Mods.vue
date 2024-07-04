@@ -391,7 +391,7 @@ import {
   CodeIcon,
   Pagination,
   DropdownSelect,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {

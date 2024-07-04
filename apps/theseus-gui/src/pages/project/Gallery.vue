@@ -92,7 +92,7 @@ import {
   XIcon,
   CalendarIcon,
   Button,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { ref } from 'vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 

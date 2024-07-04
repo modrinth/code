@@ -1,6 +1,6 @@
 <script setup>
 import dayjs from 'dayjs'
-import { formatNumber, formatMoney } from 'omorphia'
+import { formatNumber, formatMoney } from '@modrinth/omorphia'
 import VueApexCharts from 'vue3-apexcharts'
 
 const props = defineProps({

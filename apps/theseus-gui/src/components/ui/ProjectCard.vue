@@ -8,7 +8,7 @@ import {
   DownloadIcon,
   HeartIcon,
   CalendarIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'

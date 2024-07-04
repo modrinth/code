@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon } from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, LogInIcon } from '@modrinth/omorphia'
 import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import {
   users,

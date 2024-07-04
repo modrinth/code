@@ -92,7 +92,7 @@
   </div>
 </template>
 <script setup>
-import { Badge, ExitIcon, CheckIcon, IssuesIcon } from 'omorphia'
+import { Badge, ExitIcon, CheckIcon, IssuesIcon } from '@modrinth/omorphia'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
   getProjectLink,

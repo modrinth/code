@@ -110,7 +110,7 @@ import {
   StopCircleIcon,
   TerminalSquareIcon,
   DropdownIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   get_all_running_profiles as getRunningProfiles,

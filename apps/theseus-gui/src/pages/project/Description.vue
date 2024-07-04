@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { Card, renderHighlightedString } from 'omorphia'
+import { Card, renderHighlightedString } from '@modrinth/omorphia'
 
 defineProps({
   project: {

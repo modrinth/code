@@ -76,7 +76,7 @@ import {
   CalendarIcon,
   CheckIcon,
   StarIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref } from 'vue'

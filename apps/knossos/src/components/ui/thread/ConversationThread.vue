@@ -196,7 +196,7 @@
 </template>
 
 <script setup>
-import { OverflowMenu, MarkdownEditor, DropdownIcon } from 'omorphia'
+import { OverflowMenu, MarkdownEditor, DropdownIcon } from '@modrinth/omorphia'
 import { useImageUpload } from '~/composables/image-upload.ts'
 import CopyCode from '~/components/ui/CopyCode.vue'
 import ReplyIcon from '~/assets/images/utils/reply.svg?component'

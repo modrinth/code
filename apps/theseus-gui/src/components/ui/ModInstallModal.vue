@@ -10,7 +10,7 @@ import {
   XIcon,
   RightArrowIcon,
   CheckIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { computed, ref } from 'vue'
 import {
   add_project_from_version as installMod,

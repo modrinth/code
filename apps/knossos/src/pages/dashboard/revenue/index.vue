@@ -75,7 +75,7 @@
   </div>
 </template>
 <script setup>
-import { TransferIcon, HistoryIcon, PayPalIcon, SaveIcon, XIcon } from 'omorphia'
+import { TransferIcon, HistoryIcon, PayPalIcon, SaveIcon, XIcon } from '@modrinth/omorphia'
 
 const auth = await useAuth()
 const minWithdraw = ref(0.01)

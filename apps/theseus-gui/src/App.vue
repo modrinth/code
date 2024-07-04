@@ -12,7 +12,7 @@ import {
   Notifications,
   XIcon,
   Card,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'

@@ -35,7 +35,7 @@
   </Modal>
 </template>
 <script setup>
-import { Modal, PlusIcon, CheckIcon, Button, XIcon } from 'omorphia'
+import { Modal, PlusIcon, CheckIcon, Button, XIcon } from '@modrinth/omorphia'
 import { ref } from 'vue'
 import { find_filtered_jres } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'

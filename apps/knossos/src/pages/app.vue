@@ -7,7 +7,7 @@ import {
   EditIcon,
   DownloadIcon,
   LinkIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Avatar from '~/components/ui/Avatar.vue'
 import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 import Badge from '~/components/ui/Badge.vue'

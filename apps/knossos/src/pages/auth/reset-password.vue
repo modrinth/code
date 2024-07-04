@@ -72,7 +72,7 @@
   </div>
 </template>
 <script setup>
-import { SendIcon, MailIcon, KeyIcon } from 'omorphia'
+import { SendIcon, MailIcon, KeyIcon } from '@modrinth/omorphia'
 
 const { formatMessage } = useVIntl()
 

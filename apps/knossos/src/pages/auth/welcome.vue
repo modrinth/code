@@ -36,7 +36,7 @@
   </div>
 </template>
 <script setup>
-import { Checkbox, RightArrowIcon } from 'omorphia'
+import { Checkbox, RightArrowIcon } from '@modrinth/omorphia'
 
 const { formatMessage } = useVIntl()
 

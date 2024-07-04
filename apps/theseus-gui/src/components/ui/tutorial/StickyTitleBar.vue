@@ -1,5 +1,5 @@
 <script setup>
-import { Button, XIcon } from 'omorphia'
+import { Button, XIcon } from '@modrinth/omorphia'
 import { appWindow } from '@tauri-apps/api/window'
 import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { window } from '@tauri-apps/api'

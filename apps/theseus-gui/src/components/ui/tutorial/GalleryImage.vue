@@ -7,7 +7,7 @@
  * }
  */
 import { computed, ref } from 'vue'
-import { Button, ChevronRightIcon, ChevronLeftIcon } from 'omorphia'
+import { Button, ChevronRightIcon, ChevronLeftIcon } from '@modrinth/omorphia'
 
 const props = defineProps({
   logo: {

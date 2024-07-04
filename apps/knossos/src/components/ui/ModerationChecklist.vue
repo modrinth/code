@@ -341,7 +341,7 @@ import {
   XIcon as CrossIcon,
   EyeOffIcon,
   ExitIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Categories from '~/components/ui/search/Categories.vue'
 
 const props = defineProps({

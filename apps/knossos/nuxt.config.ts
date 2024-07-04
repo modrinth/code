@@ -9,7 +9,7 @@ import { globIterate } from 'glob'
 import { match as matchLocale } from '@formatjs/intl-localematcher'
 import { consola } from 'consola'
 
-const STAGING_API_URL = 'https://api.modrinth.com/v2/'
+const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 
 const preloadedFonts = [
   'inter/Inter-Regular.woff2',
@@ -83,6 +83,7 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    cacheDir: '../../node_modules/.vite/apps/knossos',
     plugins: [
       nxViteTsPaths(),
       svgLoader({

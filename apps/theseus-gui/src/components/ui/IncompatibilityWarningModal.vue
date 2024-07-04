@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from 'omorphia'
+import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from '@modrinth/omorphia'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
 import { handleError, useTheming } from '@/store/state.js'

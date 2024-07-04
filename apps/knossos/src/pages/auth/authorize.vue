@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { Button, XIcon, CheckIcon, Avatar } from 'omorphia'
+import { Button, XIcon, CheckIcon, Avatar } from '@modrinth/omorphia'
 import { useBaseFetch } from '@/composables/fetch.js'
 import { useAuth } from '@/composables/auth.js'
 

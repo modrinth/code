@@ -230,7 +230,7 @@ import {
   Promotion,
   CheckIcon,
   XIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavRow from '~/components/ui/NavRow.vue'

@@ -211,7 +211,7 @@ import {
   InfoIcon,
   FolderSearchIcon,
   UpdatedIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'

@@ -40,7 +40,7 @@
   </Modal>
 </template>
 <script setup>
-import { XIcon as CrossIcon, CheckIcon, Modal, Button } from 'omorphia'
+import { XIcon as CrossIcon, CheckIcon, Modal, Button } from '@modrinth/omorphia'
 
 const router = useNativeRouter()
 

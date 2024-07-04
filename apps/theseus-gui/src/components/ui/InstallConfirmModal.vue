@@ -1,5 +1,5 @@
 <script setup>
-import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
+import { Button, Modal, XIcon, DownloadIcon } from '@modrinth/omorphia'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
 import { mixpanel_track } from '@/helpers/mixpanel'

@@ -530,7 +530,7 @@ import {
   ClipboardCopyIcon,
   Button,
   Toggle,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { SwapIcon } from '@/assets/icons'
 
 import { Multiselect } from 'vue-multiselect'

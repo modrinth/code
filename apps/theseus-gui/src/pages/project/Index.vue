@@ -251,7 +251,7 @@ import {
   CheckIcon,
   GlobeIcon,
   ClipboardCopyIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import {
   BuyMeACoffeeIcon,
   DiscordIcon,

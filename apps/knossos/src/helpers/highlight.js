@@ -15,7 +15,7 @@ import ini from 'highlight.js/lib/languages/ini'
 import yaml from 'highlight.js/lib/languages/yaml'
 import xml from 'highlight.js/lib/languages/xml'
 import properties from 'highlight.js/lib/languages/properties'
-import { md, configuredXss } from 'omorphia'
+import { md, configuredXss } from '@modrinth/omorphia'
 
 /* REGISTRATION */
 // Scripting

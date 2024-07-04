@@ -12,7 +12,7 @@ import {
   EyeIcon,
   ChevronRightIcon,
   ConfirmModal,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'

@@ -298,7 +298,7 @@ import {
   formatNumber,
   DropdownSelect,
   formatCategoryHeader,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import dayjs from 'dayjs'
 import { defineProps, ref, computed } from 'vue'
 

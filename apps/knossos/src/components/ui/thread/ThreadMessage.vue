@@ -109,7 +109,7 @@ import {
   ModrinthIcon,
   ScaleIcon,
   renderString,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Avatar from '~/components/ui/Avatar.vue'
 import Badge from '~/components/ui/Badge.vue'
 import { isStaff } from '~/helpers/users.js'

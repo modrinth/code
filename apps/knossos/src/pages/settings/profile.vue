@@ -95,7 +95,7 @@ import {
   UploadIcon,
   UndoIcon,
   XIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { commonMessages } from '~/utils/common-messages.ts'
 
 useHead({

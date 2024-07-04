@@ -401,7 +401,7 @@ import {
   RightArrowIcon,
   CheckIcon,
   ExternalIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import QrcodeVue from 'qrcode.vue'
 import GitHubIcon from 'assets/icons/auth/sso-github.svg'
 import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'

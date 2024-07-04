@@ -16,13 +16,13 @@ import {
   Promotion,
   XIcon,
   DropdownSelect,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Multiselect from 'vue-multiselect'
 import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
-import { Avatar } from 'omorphia'
+import { Avatar } from '@modrinth/omorphia'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import ModInstallModal from '@/components/ui/ModInstallModal.vue'

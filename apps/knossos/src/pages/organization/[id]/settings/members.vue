@@ -229,7 +229,7 @@ import {
   UserXIcon as UserRemoveIcon,
   DropdownIcon,
   Button,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import { ref } from 'vue'
 import CrownIcon from '~/assets/images/utils/crown.svg?component'
 

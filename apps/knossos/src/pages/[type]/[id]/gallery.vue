@@ -293,7 +293,7 @@ import {
   ImageIcon,
   TransferIcon,
   ConfirmModal,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import FileInput from '~/components/ui/FileInput.vue'
 import DropArea from '~/components/ui/DropArea.vue'
 import Modal from '~/components/ui/Modal.vue'

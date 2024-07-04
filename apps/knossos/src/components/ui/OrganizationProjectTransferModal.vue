@@ -119,7 +119,7 @@ import {
   Modal,
   TransferIcon,
   XIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 
 const modalOpen = ref(null)
 

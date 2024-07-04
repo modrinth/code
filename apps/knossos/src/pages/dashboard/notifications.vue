@@ -50,7 +50,7 @@
   </div>
 </template>
 <script setup>
-import { Button, HistoryIcon } from 'omorphia'
+import { Button, HistoryIcon } from '@modrinth/omorphia'
 import {
   fetchExtraNotificationData,
   groupNotifications,

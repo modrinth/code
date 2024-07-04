@@ -202,7 +202,7 @@
   </div>
 </template>
 <script setup>
-import { PlusIcon, XIcon, Checkbox, TrashIcon, EditIcon, SaveIcon, ConfirmModal } from 'omorphia'
+import { PlusIcon, XIcon, Checkbox, TrashIcon, EditIcon, SaveIcon, ConfirmModal } from '@modrinth/omorphia'
 
 import { commonSettingsMessages } from '~/utils/common-messages.ts'
 import {

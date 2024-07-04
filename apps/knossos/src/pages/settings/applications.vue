@@ -228,7 +228,7 @@ import {
   SaveIcon,
   CopyCode,
   ConfirmModal,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import Modal from '~/components/ui/Modal.vue'
 
 import {

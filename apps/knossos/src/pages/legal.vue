@@ -50,7 +50,7 @@ import {
   ShieldIcon,
   CurrencyIcon,
   CopyrightIcon,
-} from 'omorphia'
+} from '@modrinth/omorphia'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 

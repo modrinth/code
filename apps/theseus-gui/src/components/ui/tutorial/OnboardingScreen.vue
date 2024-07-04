@@ -1,5 +1,5 @@
 <script setup>
-import { Button } from 'omorphia'
+import { Button } from '@modrinth/omorphia'
 import { ref } from 'vue'
 import { get, set } from '@/helpers/settings.js'
 import mixpanel from 'mixpanel-browser'
