@@ -52,3 +52,4 @@ Thumbs.db
 apps/knossos/src/generated
 
 .turbo
+target

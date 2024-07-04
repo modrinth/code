@@ -1,11 +1,10 @@
-
 [workspace]
 resolver = '2'
 members = [
-  './packages/theseus',
-  './packages/theseus_macros',
-	'./apps/theseus_playground',
-  './apps/theseus_gui_rs',
+  './packages/app-lib',
+  './packages/app-macros',
+	'./apps/app-playground',
+  './apps/app/src-tauri'
 ]
 
 [profile.dev]
