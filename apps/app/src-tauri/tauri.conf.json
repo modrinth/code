@@ -1,6 +1,6 @@
 {
   "build": {
-    "beforeDevCommand": "pnpm run filter=@modrinth/app vite:dev",
+    "beforeDevCommand": "pnpm run --filter=@modrinth/app vite:dev",
     "beforeBuildCommand": "pnpm build",
     "devPath": "http://localhost:1420",
     "distDir": "../../../dist/apps/app",
