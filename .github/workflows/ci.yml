@@ -8,6 +8,7 @@ on:
 jobs:
   main:
     strategy:
+      fail-fast: false
       matrix:
         action: ['lint', 'test', 'build']
     runs-on: ubuntu-latest
@@ -17,6 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: install tauri dependencies
+        if: ${{ matrix.action == 'build' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libselinux1
@@ -32,7 +34,8 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v3
+        id: restore-pnpm
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -42,7 +45,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - uses: nrwl/nx-set-shas@v3
+      - name: Save pnpm cache
+        id: save-pnpm
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ steps.restore-pnpm.outputs.cache-primary-key }}
+
+      - uses: nrwl/nx-set-shas@v4
 
       # This line is needed for nx affected to work when CI is running on a PR
       - run: git branch --track main origin/main
