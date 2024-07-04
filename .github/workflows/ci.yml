@@ -16,7 +16,7 @@ jobs:
       - name: install tauri dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libselinux
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libselinux1
 
       - uses: pnpm/action-setup@v4
         with:
