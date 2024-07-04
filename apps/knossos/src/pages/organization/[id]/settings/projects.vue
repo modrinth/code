@@ -300,12 +300,7 @@
 <script setup>
 import { Multiselect } from 'vue-multiselect'
 import {
-  Badge,
-  Checkbox,
   BoxIcon,
-  Modal,
-  Avatar,
-  CopyCode,
   SettingsIcon,
   TrashIcon,
   IssuesIcon,
@@ -313,10 +308,10 @@ import {
   XIcon,
   EditIcon,
   SaveIcon,
-  Button,
   SortAscendingIcon,
   SortDescendingIcon,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { Button, Modal, Avatar, CopyCode, Badge, Checkbox } from '@modrinth/ui'
 
 import ModalCreation from '~/components/ui/ModalCreation.vue'
 import OrganizationProjectTransferModal from '~/components/ui/OrganizationProjectTransferModal.vue'

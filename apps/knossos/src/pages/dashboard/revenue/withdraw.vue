@@ -189,12 +189,10 @@ import {
   SearchIcon,
   RadioButtonIcon,
   RadioButtonChecked,
-  Chips,
   XIcon,
   TransferIcon,
-  Checkbox,
-  Breadcrumbs,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { Chips, Checkbox, Breadcrumbs } from '@modrinth/ui'
 import { all } from 'iso-3166-1'
 import VenmoIcon from '~/assets/images/external/venmo.svg?component'
 

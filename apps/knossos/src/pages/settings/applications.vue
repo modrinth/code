@@ -215,20 +215,8 @@
   </div>
 </template>
 <script setup>
-import {
-  FileInput,
-  UploadIcon,
-  PlusIcon,
-  Avatar,
-  XIcon,
-  Button,
-  Checkbox,
-  TrashIcon,
-  EditIcon,
-  SaveIcon,
-  CopyCode,
-  ConfirmModal,
-} from '@modrinth/omorphia'
+import { UploadIcon, PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from '@modrinth/assets'
+import { CopyCode, ConfirmModal, Button, Checkbox, Avatar, FileInput } from '@modrinth/ui'
 import Modal from '~/components/ui/Modal.vue'
 
 import {

@@ -88,7 +88,8 @@
   </div>
 </template>
 <script setup>
-import { Avatar, BoxIcon, SearchIcon, XIcon, Button, PlusIcon, LinkIcon, LockIcon } from '@modrinth/omorphia'
+import { BoxIcon, SearchIcon, XIcon, PlusIcon, LinkIcon, LockIcon } from '@modrinth/assets'
+import { Avatar, Button } from '@modrinth/ui'
 import WorldIcon from '~/assets/images/utils/world.svg?component'
 import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
 

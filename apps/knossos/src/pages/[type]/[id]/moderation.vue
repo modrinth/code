@@ -92,7 +92,8 @@
   </div>
 </template>
 <script setup>
-import { Badge, ExitIcon, CheckIcon, IssuesIcon } from '@modrinth/omorphia'
+import { ExitIcon, CheckIcon, IssuesIcon } from '@modrinth/assets'
+import { Badge } from '@modrinth/ui'
 import ConversationThread from '~/components/ui/thread/ConversationThread.vue'
 import {
   getProjectLink,

@@ -1,4 +1,3 @@
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { promises as fs } from 'fs'
 import { pathToFileURL } from 'node:url'
 import svgLoader from 'vite-svg-loader'
@@ -47,9 +46,7 @@ const localesCategoriesOverrides: Partial<Record<string, 'fun' | 'experimental'>
 }
 
 export default defineNuxtConfig({
-  workspaceDir: '../../',
-  srcDir: 'src',
-  buildDir: '../../dist/apps/knossos/.nuxt',
+  srcDir: 'src/',
   app: {
     head: {
       htmlAttrs: {
@@ -84,8 +81,10 @@ export default defineNuxtConfig({
   },
   vite: {
     cacheDir: '../../node_modules/.vite/apps/knossos',
+    resolve: {
+      dedupe: ['vue'],
+    },
     plugins: [
-      nxViteTsPaths(),
       svgLoader({
         svgoConfig: {
           plugins: [
@@ -320,9 +319,8 @@ export default defineNuxtConfig({
   typescript: {
     shim: false,
     strict: true,
-    typeCheck: true,
+    typeCheck: false,
     tsConfig: {
-      extends: '../tsconfig.app.json',
       compilerOptions: {
         moduleResolution: 'bundler',
         allowImportingTsExtensions: true,

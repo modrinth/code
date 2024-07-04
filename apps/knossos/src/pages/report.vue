@@ -92,7 +92,8 @@
 </template>
 
 <script setup lang="ts">
-import { Card, Button, MarkdownEditor, DropdownSelect, SaveIcon } from '@modrinth/omorphia'
+import { Card, Button, MarkdownEditor, DropdownSelect } from '@modrinth/ui'
+import { SaveIcon } from '@modrinth/assets'
 import { useImageUpload } from '~/composables/image-upload.ts'
 
 const tags = useTags()

@@ -49,8 +49,8 @@
 </template>
 
 <script setup>
-import { PlusIcon, Avatar, UsersIcon } from '@modrinth/omorphia'
-
+import { PlusIcon, UsersIcon } from '@modrinth/assets'
+import { Avatar } from '@modrinth/ui'
 import { useAuth } from '~/composables/auth.js'
 import OrganizationCreateModal from '~/components/ui/OrganizationCreateModal.vue'
 

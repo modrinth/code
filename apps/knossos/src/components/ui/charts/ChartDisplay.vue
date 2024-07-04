@@ -289,18 +289,11 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Button,
-  UpdatedIcon,
-  DownloadIcon,
-  Card,
-  formatMoney,
-  formatNumber,
-  DropdownSelect,
-  formatCategoryHeader,
-} from '@modrinth/omorphia'
+import { Button, Card, DropdownSelect } from '@modrinth/ui'
+import { formatMoney, formatNumber, formatCategoryHeader } from '@modrinth/utils'
+import { UpdatedIcon, DownloadIcon } from '@modrinth/assets'
 import dayjs from 'dayjs'
-import { defineProps, ref, computed } from 'vue'
+import { computed } from 'vue'
 
 import { analyticsSetToCSVString, intToRgba } from '~/utils/analytics.js'
 

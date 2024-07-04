@@ -94,15 +94,10 @@
   </div>
 </template>
 <script setup>
-import {
-  Badge,
-  Breadcrumbs,
-  XIcon,
-  PayPalIcon,
-  UnknownIcon,
-  DropdownSelect,
-  capitalizeString,
-} from '@modrinth/omorphia'
+import { DropdownSelect } from '@modrinth/ui'
+import { XIcon, PayPalIcon, UnknownIcon } from '@modrinth/assets'
+import { capitalizeString } from '@modrinth/utils'
+import { Badge, Breadcrumbs } from '@modrinth/ui'
 import dayjs from 'dayjs'
 import TremendousIcon from '~/assets/images/external/tremendous.svg?component'
 import VenmoIcon from '~/assets/images/external/venmo-small.svg?component'

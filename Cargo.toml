@@ -2,8 +2,8 @@
 [workspace]
 resolver = '2'
 members = [
-  './libs/theseus',
-  './libs/theseus_macros',
+  './packages/theseus',
+  './packages/theseus_macros',
 	'./apps/theseus_playground',
   './apps/theseus_gui_rs',
 ]

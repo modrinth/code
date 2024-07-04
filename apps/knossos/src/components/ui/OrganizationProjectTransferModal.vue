@@ -109,17 +109,8 @@
 </template>
 
 <script setup>
-import {
-  Checkbox,
-  CopyCode,
-  Avatar,
-  BoxIcon,
-  SettingsIcon,
-  Button,
-  Modal,
-  TransferIcon,
-  XIcon,
-} from '@modrinth/omorphia'
+import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@modrinth/assets'
+import { Button, Modal, Checkbox, CopyCode, Avatar } from '@modrinth/ui'
 
 const modalOpen = ref(null)
 

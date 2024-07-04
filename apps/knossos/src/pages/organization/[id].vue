@@ -129,7 +129,7 @@
     </div>
     <div v-if="!routeHasSettings" class="normal-page__content">
       <ModalCreation ref="modal_creation" :organization-id="organization.id" />
-      <Promotion />
+      <Promotion :external="false" query-param="" />
       <div v-if="isInvited" class="universal-card information invited">
         <h2>Invitation to join {{ organization.name }}</h2>
         <p>You have been invited to join {{ organization.name }}.</p>
@@ -220,17 +220,15 @@
 
 <script setup>
 import {
-  Avatar,
   BoxIcon,
-  Breadcrumbs,
   UserIcon,
   UsersIcon,
   SettingsIcon,
   ChartIcon,
-  Promotion,
   CheckIcon,
   XIcon,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { Avatar, Breadcrumbs, Promotion } from '@modrinth/ui'
 import NavStack from '~/components/ui/NavStack.vue'
 import NavStackItem from '~/components/ui/NavStackItem.vue'
 import NavRow from '~/components/ui/NavRow.vue'

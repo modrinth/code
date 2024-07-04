@@ -88,7 +88,8 @@
   </div>
 </template>
 <script setup>
-import { Button, TrashIcon, CheckIcon, ConfirmModal, Avatar } from '@modrinth/omorphia'
+import { Button, ConfirmModal, Avatar } from '@modrinth/ui'
+import { TrashIcon, CheckIcon } from '@modrinth/assets'
 import { commonSettingsMessages } from '~/utils/common-messages.ts'
 import { useScopes } from '~/composables/auth/scopes.ts'
 

@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { MarkdownEditor } from '@modrinth/omorphia'
+import { MarkdownEditor } from '@modrinth/ui'
 import Chips from '~/components/ui/Chips.vue'
 import SaveIcon from '~/assets/images/utils/save.svg?component'
 import { renderHighlightedString } from '~/helpers/highlight.js'

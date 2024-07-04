@@ -249,7 +249,7 @@
         </div>
       </div>
       <div class="normal-page__content">
-        <Promotion />
+        <Promotion :external="false" query-param="" />
 
         <nav class="navigation-card">
           <NavRow
@@ -364,18 +364,12 @@
 
 <script setup>
 import {
-  Avatar,
-  Button,
   CalendarIcon,
-  Promotion,
   EditIcon,
   XIcon,
   SaveIcon,
   UploadIcon,
   TrashIcon,
-  PopoutMenu,
-  FileInput,
-  DropdownSelect,
   LinkIcon,
   LockIcon,
   GridIcon,
@@ -384,7 +378,8 @@ import {
   UpdatedIcon,
   LibraryIcon,
   BoxIcon,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { PopoutMenu, FileInput, DropdownSelect, Promotion, Avatar, Button } from '@modrinth/ui'
 
 import WorldIcon from 'assets/images/utils/world.svg'
 import UpToDate from 'assets/images/illustrations/up_to_date.svg'

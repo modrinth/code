@@ -220,16 +220,13 @@
 
 <script setup>
 import {
-  Avatar,
-  Checkbox,
   SaveIcon,
-  Badge,
   TransferIcon,
   UserPlusIcon,
   UserXIcon as UserRemoveIcon,
   DropdownIcon,
-  Button,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { Button, Badge, Avatar, Checkbox } from '@modrinth/ui'
 import { ref } from 'vue'
 import CrownIcon from '~/assets/images/utils/crown.svg?component'
 

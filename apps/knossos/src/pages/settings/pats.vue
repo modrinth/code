@@ -202,7 +202,8 @@
   </div>
 </template>
 <script setup>
-import { PlusIcon, XIcon, Checkbox, TrashIcon, EditIcon, SaveIcon, ConfirmModal } from '@modrinth/omorphia'
+import { PlusIcon, XIcon, TrashIcon, EditIcon, SaveIcon } from '@modrinth/assets'
+import { Checkbox, ConfirmModal } from '@modrinth/ui'
 
 import { commonSettingsMessages } from '~/utils/common-messages.ts'
 import {

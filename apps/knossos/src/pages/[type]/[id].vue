@@ -1063,23 +1063,17 @@
 </template>
 <script setup>
 import {
-  Promotion,
-  OverflowMenu,
-  PopoutMenu,
   BookmarkIcon,
   MoreHorizontalIcon,
   ClipboardCopyIcon,
   PlusIcon,
-  Checkbox,
   ChartIcon,
   EyeIcon,
-  renderString,
-  isRejected,
-  isUnderReview,
-  isStaff,
   CheckIcon,
   XIcon,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { Checkbox, Promotion, OverflowMenu, PopoutMenu } from '@modrinth/ui'
+import { renderString, isRejected, isUnderReview, isStaff } from '@modrinth/utils'
 import CrownIcon from '~/assets/images/utils/crown.svg?component'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
 import DownloadIcon from '~/assets/images/utils/download.svg?component'

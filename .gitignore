@@ -50,3 +50,5 @@ Thumbs.db
 
 # knossos generated files
 apps/knossos/src/generated
+
+.turbo

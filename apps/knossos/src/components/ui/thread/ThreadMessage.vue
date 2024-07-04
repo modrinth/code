@@ -100,16 +100,15 @@
 
 <script setup>
 import {
-  OverflowMenu,
   MoreHorizontalIcon,
   TrashIcon,
-  ConditionalNuxtLink,
   MicrophoneIcon,
   LockIcon,
   ModrinthIcon,
   ScaleIcon,
-  renderString,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { OverflowMenu, ConditionalNuxtLink } from '@modrinth/ui'
+import { renderString } from '@modrinth/utils'
 import Avatar from '~/components/ui/Avatar.vue'
 import Badge from '~/components/ui/Badge.vue'
 import { isStaff } from '~/helpers/users.js'

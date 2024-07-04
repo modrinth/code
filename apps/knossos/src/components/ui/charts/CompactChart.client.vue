@@ -1,5 +1,5 @@
 <script setup>
-import { Card } from '@modrinth/omorphia'
+import { Card } from '@modrinth/ui'
 import VueApexCharts from 'vue3-apexcharts'
 
 // let VueApexCharts

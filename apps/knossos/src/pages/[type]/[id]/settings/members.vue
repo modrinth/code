@@ -518,7 +518,8 @@
 
 <script setup>
 import { Multiselect } from 'vue-multiselect'
-import { Avatar, Badge, Card, Checkbox, TransferIcon, CheckIcon, UsersIcon } from '@modrinth/omorphia'
+import { TransferIcon, CheckIcon, UsersIcon } from '@modrinth/assets'
+import { Avatar, Badge, Card, Checkbox } from '@modrinth/ui'
 
 import ModalConfirm from '~/components/ui/ModalConfirm.vue'
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?component'

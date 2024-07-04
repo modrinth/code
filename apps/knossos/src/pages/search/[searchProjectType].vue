@@ -216,7 +216,7 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <Promotion />
+      <Promotion :external="false" query-param="" />
       <div class="card search-controls">
         <div class="search-filter-container">
           <button
@@ -344,7 +344,7 @@
 </template>
 <script setup>
 import { Multiselect } from 'vue-multiselect'
-import { Promotion } from '@modrinth/omorphia'
+import { Promotion } from '@modrinth/ui'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Pagination from '~/components/ui/Pagination.vue'
 import SearchFilter from '~/components/ui/search/SearchFilter.vue'

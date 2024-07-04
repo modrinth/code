@@ -86,16 +86,8 @@
 </template>
 
 <script setup>
-import {
-  Button,
-  UserIcon,
-  SaveIcon,
-  Avatar,
-  FileInput,
-  UploadIcon,
-  UndoIcon,
-  XIcon,
-} from '@modrinth/omorphia'
+import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon } from '@modrinth/assets'
+import { Avatar, FileInput, Button } from '@modrinth/ui'
 import { commonMessages } from '~/utils/common-messages.ts'
 
 useHead({

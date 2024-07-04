@@ -332,16 +332,15 @@
 <script setup>
 import {
   LeftArrowIcon,
-  MarkdownEditor,
   RightArrowIcon,
   UpdatedIcon,
   CheckIcon,
-  OverflowMenu,
   DropdownIcon,
   XIcon as CrossIcon,
   EyeOffIcon,
   ExitIcon,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { MarkdownEditor, OverflowMenu } from '@modrinth/ui'
 import Categories from '~/components/ui/search/Categories.vue'
 
 const props = defineProps({

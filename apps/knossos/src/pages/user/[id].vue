@@ -121,7 +121,7 @@
         </div>
       </div>
       <div class="normal-page__content">
-        <Promotion />
+        <Promotion :external="false" query-param="" />
         <nav class="navigation-card">
           <NavRow
             :links="[
@@ -280,7 +280,8 @@
   </div>
 </template>
 <script setup>
-import { Promotion, LibraryIcon, BoxIcon, LinkIcon, LockIcon, XIcon } from '@modrinth/omorphia'
+import { LibraryIcon, BoxIcon, LinkIcon, LockIcon, XIcon } from '@modrinth/assets'
+import { Promotion } from '@modrinth/ui'
 import ProjectCard from '~/components/ui/ProjectCard.vue'
 import Badge from '~/components/ui/Badge.vue'
 import { reportUser } from '~/utils/report-helpers.ts'

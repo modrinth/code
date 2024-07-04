@@ -135,7 +135,6 @@
 import {
   RightArrowIcon,
   UserIcon,
-  Checkbox,
   SSOGitHubIcon,
   SSOMicrosoftIcon,
   SSOGoogleIcon,
@@ -144,7 +143,8 @@ import {
   KeyIcon,
   MailIcon,
   SSOGitLabIcon,
-} from '@modrinth/omorphia'
+} from '@modrinth/assets'
+import { Checkbox } from '@modrinth/ui'
 
 const { formatMessage } = useVIntl()
 
