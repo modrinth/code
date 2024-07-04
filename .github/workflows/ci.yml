@@ -15,7 +15,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 9
+          version: 8
 
       - name: Restore cached npm dependencies
         id: cache-dependencies-restore
