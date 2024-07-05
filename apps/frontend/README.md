@@ -1,7 +1,27 @@
-![knossos banner](https://user-images.githubusercontent.com/12068027/100479893-d9b5a380-30ac-11eb-9db9-0c09d400f13f.png)
+# ![Frontend Cover](/.github/assets/web_cover.png)
 
-## Modrinth's center for its frontend service
+# Modrinth Web Interface
 
-For contributing information, please see the knossos section of the [Modrinth contributing guide](https://support.modrinth.com/en/articles/8802215-contributing-to-modrinth#h_1bc6570903).
+Welcome to the Modrinth Web Interface! This web-based platform is designed for discovering, downloading, and managing Minecraft mods.
 
-For a detailed explanation on how things work in general, check out the [Nuxt.js docs](https://nuxt.com).
+If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com).
+
+## Development
+
+### Pre-requisites
+
+Before you begin, ensure you have the following installed on your machine:
+
+- [Node.js](https://nodejs.org/en/)
+- [pnpm](https://pnpm.io/)
+
+### Setup
+
+Follow these steps to set up your development environment:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+You should now have a development build of the web interface running with hot-reloading enabled. Any changes you make to the code will automatically refresh the browser.
