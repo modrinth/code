@@ -41,7 +41,7 @@
             class="goto-link view-more-notifs"
             to="/dashboard/notifications"
           >
-            View {{ extraNotifs }} more notification{{ extraNotifs === 1 ? '' : 's' }}
+            View {{ extraNotifs }} more notification{{ extraNotifs === 1 ? "" : "s" }}
             <ChevronRightIcon />
           </nuxt-link>
         </template>
@@ -66,7 +66,7 @@
             <span
               >from
               {{ downloadsProjectCount }}
-              project{{ downloadsProjectCount === 1 ? '' : 's' }}</span
+              project{{ downloadsProjectCount === 1 ? "" : "s" }}</span
             >
             <!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
             <!--            >View breakdown-->
@@ -83,7 +83,7 @@
             <span>
               <span
                 >from {{ followersProjectCount }} project{{
-                  followersProjectCount === 1 ? '' : 's'
+                  followersProjectCount === 1 ? "" : "s"
                 }}</span
               ></span
             >
@@ -108,58 +108,58 @@
   </div>
 </template>
 <script setup>
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
-import HistoryIcon from '~/assets/images/utils/history.svg?component'
-import Avatar from '~/components/ui/Avatar.vue'
-import NotificationItem from '~/components/ui/NotificationItem.vue'
-import { fetchExtraNotificationData, groupNotifications } from '~/helpers/notifications.js'
+import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
+import HistoryIcon from "~/assets/images/utils/history.svg?component";
+import Avatar from "~/components/ui/Avatar.vue";
+import NotificationItem from "~/components/ui/NotificationItem.vue";
+import { fetchExtraNotificationData, groupNotifications } from "~/helpers/notifications.js";
 
 useHead({
-  title: 'Dashboard - Modrinth',
-})
+  title: "Dashboard - Modrinth",
+});
 
-const auth = await useAuth()
+const auth = await useAuth();
 
 const [{ data: projects }] = await Promise.all([
   useAsyncData(`user/${auth.value.user.id}/projects`, () =>
-    useBaseFetch(`user/${auth.value.user.id}/projects`)
+    useBaseFetch(`user/${auth.value.user.id}/projects`),
   ),
-])
+]);
 
 const downloadsProjectCount = computed(
-  () => projects.value.filter((project) => project.downloads > 0).length
-)
+  () => projects.value.filter((project) => project.downloads > 0).length,
+);
 const followersProjectCount = computed(
-  () => projects.value.filter((project) => project.followers > 0).length
-)
+  () => projects.value.filter((project) => project.followers > 0).length,
+);
 
 const { data, refresh } = await useAsyncData(async () => {
-  const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
+  const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`);
 
-  const filteredNotifications = notifications.filter((notif) => !notif.read)
-  const slice = filteredNotifications.slice(0, 30) // send first 30 notifs to be grouped before trimming to 3
+  const filteredNotifications = notifications.filter((notif) => !notif.read);
+  const slice = filteredNotifications.slice(0, 30); // send first 30 notifs to be grouped before trimming to 3
 
   return fetchExtraNotificationData(slice).then((notifications) => {
-    notifications = groupNotifications(notifications).slice(0, 3)
-    return { notifications, extraNotifs: filteredNotifications.length - slice.length }
-  })
-})
+    notifications = groupNotifications(notifications).slice(0, 3);
+    return { notifications, extraNotifs: filteredNotifications.length - slice.length };
+  });
+});
 
 const notifications = computed(() => {
   if (data.value === null) {
-    return []
+    return [];
   }
-  return data.value.notifications
-})
+  return data.value.notifications;
+});
 
-const extraNotifs = computed(() => (data.value ? data.value.extraNotifs : 0))
+const extraNotifs = computed(() => (data.value ? data.value.extraNotifs : 0));
 </script>
 <style lang="scss">
 .dashboard-overview {
   display: grid;
   grid-template:
-    'header header'
-    'notifications analytics' / 1fr auto;
+    "header header"
+    "notifications analytics" / 1fr auto;
   gap: var(--spacing-card-md);
 
   > .universal-card {

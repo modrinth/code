@@ -1,17 +1,18 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+/* eslint-disable no-undef */
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
-export const useCurrentDate = () => useState('currentDate', () => Date.now())
+export const useCurrentDate = () => useState("currentDate", () => Date.now());
 
 export const updateCurrentDate = () => {
-  const currentDate = useCurrentDate()
+  const currentDate = useCurrentDate();
 
-  currentDate.value = Date.now()
-}
+  currentDate.value = Date.now();
+};
 
 export const fromNow = (date) => {
-  const currentDate = useCurrentDate()
-  return dayjs(date).from(currentDate.value)
-}
+  const currentDate = useCurrentDate();
+  return dayjs(date).from(currentDate.value);
+};

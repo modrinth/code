@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
+import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 
 export default {
   components: {
@@ -55,7 +55,7 @@ export default {
       type: Boolean,
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

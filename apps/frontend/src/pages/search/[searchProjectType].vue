@@ -44,7 +44,7 @@
               <template v-if="header === 'resolutions'">
                 <SearchFilter
                   v-for="category in categories.filter(
-                    (x) => x.project_type === projectType.actual
+                    (x) => x.project_type === projectType.actual,
                   )"
                   :key="category.name"
                   :active-filters="orFacets"
@@ -57,7 +57,7 @@
               <template v-else>
                 <SearchFilter
                   v-for="category in categories.filter(
-                    (x) => x.project_type === projectType.actual
+                    (x) => x.project_type === projectType.actual,
                   )"
                   :key="category.name"
                   :active-filters="facets"
@@ -88,13 +88,13 @@
                   return (
                     tags.loaderData.modLoaders.includes(x.name) &&
                     !tags.loaderData.hiddenModLoaders.includes(x.name)
-                  )
+                  );
                 } else if (projectType.id === 'plugin') {
-                  return tags.loaderData.pluginLoaders.includes(x.name)
+                  return tags.loaderData.pluginLoaders.includes(x.name);
                 } else if (projectType.id === 'datapack') {
-                  return tags.loaderData.dataPackLoaders.includes(x.name)
+                  return tags.loaderData.dataPackLoaders.includes(x.name);
                 } else {
-                  return x.supported_project_types.includes(projectType.actual)
+                  return x.supported_project_types.includes(projectType.actual);
                 }
               })"
               :key="loader.name"
@@ -111,7 +111,7 @@
                   return (
                     tags.loaderData.modLoaders.includes(x.name) &&
                     tags.loaderData.hiddenModLoaders.includes(x.name)
-                  )
+                  );
                 })"
                 :key="loader.name"
                 ref="loaderFilters"
@@ -144,7 +144,7 @@
             </h3>
             <SearchFilter
               v-for="loader in tags.loaders.filter((x) =>
-                tags.loaderData.pluginPlatformLoaders.includes(x.name)
+                tags.loaderData.pluginPlatformLoaders.includes(x.name),
               )"
               :key="loader.name"
               ref="platformFilters"
@@ -295,7 +295,7 @@
         class="pagination-before"
         @switch-page="onSearchChange"
       />
-      <LogoAnimated v-if="searchLoading && !noLoad"></LogoAnimated>
+      <LogoAnimated v-if="searchLoading && !noLoad" />
       <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
         <p>No results found for your query!</p>
       </div>
@@ -343,134 +343,134 @@
   </div>
 </template>
 <script setup>
-import { Multiselect } from 'vue-multiselect'
-import { Promotion } from '@modrinth/ui'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
-import Pagination from '~/components/ui/Pagination.vue'
-import SearchFilter from '~/components/ui/search/SearchFilter.vue'
-import Checkbox from '~/components/ui/Checkbox.vue'
-import LogoAnimated from '~/components/brand/LogoAnimated.vue'
+import { Multiselect } from "vue-multiselect";
+import { Promotion } from "@modrinth/ui";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
+import Pagination from "~/components/ui/Pagination.vue";
+import SearchFilter from "~/components/ui/search/SearchFilter.vue";
+import Checkbox from "~/components/ui/Checkbox.vue";
+import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 
-import ClientIcon from '~/assets/images/categories/client.svg?component'
-import ServerIcon from '~/assets/images/categories/server.svg?component'
+import ClientIcon from "~/assets/images/categories/client.svg?component";
+import ServerIcon from "~/assets/images/categories/server.svg?component";
 
-import SearchIcon from '~/assets/images/utils/search.svg?component'
-import ClearIcon from '~/assets/images/utils/clear.svg?component'
-import FilterIcon from '~/assets/images/utils/filter.svg?component'
-import GridIcon from '~/assets/images/utils/grid.svg?component'
-import ListIcon from '~/assets/images/utils/list.svg?component'
-import ImageIcon from '~/assets/images/utils/image.svg?component'
+import SearchIcon from "~/assets/images/utils/search.svg?component";
+import ClearIcon from "~/assets/images/utils/clear.svg?component";
+import FilterIcon from "~/assets/images/utils/filter.svg?component";
+import GridIcon from "~/assets/images/utils/grid.svg?component";
+import ListIcon from "~/assets/images/utils/list.svg?component";
+import ImageIcon from "~/assets/images/utils/image.svg?component";
 
-const sidebarMenuOpen = ref(false)
-const showAllLoaders = ref(false)
+const sidebarMenuOpen = ref(false);
+const showAllLoaders = ref(false);
 
-const data = useNuxtApp()
-const route = useNativeRoute()
+const data = useNuxtApp();
+const route = useNativeRoute();
 
-const cosmetics = useCosmetics()
-const tags = useTags()
+const cosmetics = useCosmetics();
+const tags = useTags();
 
-const query = ref('')
-const facets = ref([])
-const orFacets = ref([])
-const selectedVersions = ref([])
-const onlyOpenSource = ref(false)
-const showSnapshots = ref(false)
-const selectedEnvironments = ref([])
+const query = ref("");
+const facets = ref([]);
+const orFacets = ref([]);
+const selectedVersions = ref([]);
+const onlyOpenSource = ref(false);
+const showSnapshots = ref(false);
+const selectedEnvironments = ref([]);
 const sortTypes = shallowReadonly([
-  { display: 'Relevance', name: 'relevance' },
-  { display: 'Download count', name: 'downloads' },
-  { display: 'Follow count', name: 'follows' },
-  { display: 'Recently published', name: 'newest' },
-  { display: 'Recently updated', name: 'updated' },
-])
-const sortType = ref({ display: 'Relevance', name: 'relevance' })
-const maxResults = ref(20)
-const currentPage = ref(1)
-const projectType = ref({ id: 'mod', display: 'mod', actual: 'mod' })
+  { display: "Relevance", name: "relevance" },
+  { display: "Download count", name: "downloads" },
+  { display: "Follow count", name: "follows" },
+  { display: "Recently published", name: "newest" },
+  { display: "Recently updated", name: "updated" },
+]);
+const sortType = ref({ display: "Relevance", name: "relevance" });
+const maxResults = ref(20);
+const currentPage = ref(1);
+const projectType = ref({ id: "mod", display: "mod", actual: "mod" });
 
 const ogTitle = computed(
-  () => `Search ${projectType.value.display}s${query.value ? ' | ' + query.value : ''}`
-)
+  () => `Search ${projectType.value.display}s${query.value ? " | " + query.value : ""}`,
+);
 const description = computed(
   () =>
-    `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`
-)
+    `Search and browse thousands of Minecraft ${projectType.value.display}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${projectType.value.display}s.`,
+);
 
 useSeoMeta({
   description,
   ogTitle,
   ogDescription: description,
-})
+});
 
 if (route.query.q) {
-  query.value = route.query.q
+  query.value = route.query.q;
 }
 if (route.query.f) {
-  facets.value = getArrayOrString(route.query.f)
+  facets.value = getArrayOrString(route.query.f);
 }
 if (route.query.g) {
-  orFacets.value = getArrayOrString(route.query.g)
+  orFacets.value = getArrayOrString(route.query.g);
 }
 if (route.query.v) {
-  selectedVersions.value = getArrayOrString(route.query.v)
+  selectedVersions.value = getArrayOrString(route.query.v);
 }
 if (route.query.l) {
-  onlyOpenSource.value = route.query.l === 'true'
+  onlyOpenSource.value = route.query.l === "true";
 }
 if (route.query.h) {
-  showSnapshots.value = route.query.h === 'true'
+  showSnapshots.value = route.query.h === "true";
 }
 if (route.query.e) {
-  selectedEnvironments.value = getArrayOrString(route.query.e)
+  selectedEnvironments.value = getArrayOrString(route.query.e);
 }
 if (route.query.s) {
-  sortType.value.name = route.query.s
+  sortType.value.name = route.query.s;
 
   switch (sortType.value.name) {
-    case 'relevance':
-      sortType.value.display = 'Relevance'
-      break
-    case 'downloads':
-      sortType.value.display = 'Downloads'
-      break
-    case 'newest':
-      sortType.value.display = 'Recently published'
-      break
-    case 'updated':
-      sortType.value.display = 'Recently updated'
-      break
-    case 'follows':
-      sortType.value.display = 'Follow count'
-      break
+    case "relevance":
+      sortType.value.display = "Relevance";
+      break;
+    case "downloads":
+      sortType.value.display = "Downloads";
+      break;
+    case "newest":
+      sortType.value.display = "Recently published";
+      break;
+    case "updated":
+      sortType.value.display = "Recently updated";
+      break;
+    case "follows":
+      sortType.value.display = "Follow count";
+      break;
   }
 }
 
 if (route.query.m) {
-  maxResults.value = route.query.m
+  maxResults.value = route.query.m;
 }
 if (route.query.o) {
-  currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1
+  currentPage.value = Math.ceil(route.query.o / maxResults.value) + 1;
 }
 
 projectType.value = tags.value.projectTypes.find(
-  (x) => x.id === route.path.substring(1, route.path.length - 1)
-)
+  (x) => x.id === route.path.substring(1, route.path.length - 1),
+);
 
-const noLoad = ref(false)
+const noLoad = ref(false);
 const {
   data: rawResults,
   refresh: refreshSearch,
   pending: searchLoading,
 } = useLazyFetch(
   () => {
-    const config = useRuntimeConfig()
-    const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl
+    const config = useRuntimeConfig();
+    const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
-    const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
+    const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`];
 
     if (query.value.length > 0) {
-      params.push(`query=${encodeURIComponent(query.value)}`)
+      params.push(`query=${encodeURIComponent(query.value)}`);
     }
 
     if (
@@ -480,318 +480,320 @@ const {
       selectedEnvironments.value.length > 0 ||
       projectType.value
     ) {
-      let formattedFacets = []
+      let formattedFacets = [];
       for (const facet of facets.value) {
-        formattedFacets.push([facet])
+        formattedFacets.push([facet]);
       }
 
       // loaders specifier
       if (orFacets.value.length > 0) {
-        formattedFacets.push(orFacets.value)
-      } else if (projectType.value.id === 'plugin') {
+        formattedFacets.push(orFacets.value);
+      } else if (projectType.value.id === "plugin") {
         formattedFacets.push(
-          tags.value.loaderData.allPluginLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
-        )
-      } else if (projectType.value.id === 'mod') {
+          tags.value.loaderData.allPluginLoaders.map(
+            (x) => `categories:'${encodeURIComponent(x)}'`,
+          ),
+        );
+      } else if (projectType.value.id === "mod") {
         formattedFacets.push(
-          tags.value.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
-        )
-      } else if (projectType.value.id === 'datapack') {
+          tags.value.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`),
+        );
+      } else if (projectType.value.id === "datapack") {
         formattedFacets.push(
-          tags.value.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
-        )
+          tags.value.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`),
+        );
       }
 
       if (selectedVersions.value.length > 0) {
-        const versionFacets = []
+        const versionFacets = [];
         for (const facet of selectedVersions.value) {
-          versionFacets.push('versions:' + facet)
+          versionFacets.push("versions:" + facet);
         }
-        formattedFacets.push(versionFacets)
+        formattedFacets.push(versionFacets);
       }
 
       if (onlyOpenSource.value) {
-        formattedFacets.push(['open_source:true'])
+        formattedFacets.push(["open_source:true"]);
       }
 
       if (selectedEnvironments.value.length > 0) {
-        let environmentFacets = []
+        let environmentFacets = [];
 
-        const includesClient = selectedEnvironments.value.includes('client')
-        const includesServer = selectedEnvironments.value.includes('server')
+        const includesClient = selectedEnvironments.value.includes("client");
+        const includesServer = selectedEnvironments.value.includes("server");
         if (includesClient && includesServer) {
-          environmentFacets = [['client_side:required'], ['server_side:required']]
+          environmentFacets = [["client_side:required"], ["server_side:required"]];
         } else {
           if (includesClient) {
             environmentFacets = [
-              ['client_side:optional', 'client_side:required'],
-              ['server_side:optional', 'server_side:unsupported'],
-            ]
+              ["client_side:optional", "client_side:required"],
+              ["server_side:optional", "server_side:unsupported"],
+            ];
           }
           if (includesServer) {
             environmentFacets = [
-              ['client_side:optional', 'client_side:unsupported'],
-              ['server_side:optional', 'server_side:required'],
-            ]
+              ["client_side:optional", "client_side:unsupported"],
+              ["server_side:optional", "server_side:required"],
+            ];
           }
         }
 
-        formattedFacets = [...formattedFacets, ...environmentFacets]
+        formattedFacets = [...formattedFacets, ...environmentFacets];
       }
 
       if (projectType.value) {
-        formattedFacets.push([`project_type:${projectType.value.actual}`])
+        formattedFacets.push([`project_type:${projectType.value.actual}`]);
       }
 
-      params.push(`facets=${encodeURIComponent(JSON.stringify(formattedFacets))}`)
+      params.push(`facets=${encodeURIComponent(JSON.stringify(formattedFacets))}`);
     }
 
-    const offset = (currentPage.value - 1) * maxResults.value
+    const offset = (currentPage.value - 1) * maxResults.value;
     if (currentPage.value !== 1) {
-      params.push(`offset=${offset}`)
+      params.push(`offset=${offset}`);
     }
 
-    let url = 'search'
+    let url = "search";
 
     if (params.length > 0) {
       for (let i = 0; i < params.length; i++) {
-        url += i === 0 ? `?${params[i]}` : `&${params[i]}`
+        url += i === 0 ? `?${params[i]}` : `&${params[i]}`;
       }
     }
 
-    return `${base}${url}`
+    return `${base}${url}`;
   },
   {
     transform: (hits) => {
-      noLoad.value = false
-      return hits
+      noLoad.value = false;
+      return hits;
     },
-  }
-)
+  },
+);
 
-const results = shallowRef(toRaw(rawResults))
+const results = shallowRef(toRaw(rawResults));
 const pageCount = computed(() =>
-  results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1
-)
+  results.value ? Math.ceil(results.value.total_hits / results.value.limit) : 1,
+);
 
-const router = useNativeRouter()
+const router = useNativeRouter();
 
 function onSearchChange(newPageNumber) {
-  noLoad.value = true
+  noLoad.value = true;
 
-  currentPage.value = newPageNumber
+  currentPage.value = newPageNumber;
 
   if (query.value === null) {
-    return
+    return;
   }
 
-  refreshSearch()
+  refreshSearch();
 
   if (process.client) {
-    const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true)
-    router.replace({ path: route.path, query: obj })
+    const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true);
+    router.replace({ path: route.path, query: obj });
   }
 }
 
 function getSearchUrl(offset, useObj) {
-  const queryItems = []
-  const obj = {}
+  const queryItems = [];
+  const obj = {};
 
   if (query.value) {
-    queryItems.push(`q=${encodeURIComponent(query.value)}`)
-    obj.q = query.value
+    queryItems.push(`q=${encodeURIComponent(query.value)}`);
+    obj.q = query.value;
   }
   if (offset > 0) {
-    queryItems.push(`o=${offset}`)
-    obj.o = offset
+    queryItems.push(`o=${offset}`);
+    obj.o = offset;
   }
   if (facets.value.length > 0) {
-    queryItems.push(`f=${encodeURIComponent(facets.value)}`)
-    obj.f = facets.value
+    queryItems.push(`f=${encodeURIComponent(facets.value)}`);
+    obj.f = facets.value;
   }
   if (orFacets.value.length > 0) {
-    queryItems.push(`g=${encodeURIComponent(orFacets.value)}`)
-    obj.g = orFacets.value
+    queryItems.push(`g=${encodeURIComponent(orFacets.value)}`);
+    obj.g = orFacets.value;
   }
   if (selectedVersions.value.length > 0) {
-    queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`)
-    obj.v = selectedVersions.value
+    queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`);
+    obj.v = selectedVersions.value;
   }
   if (onlyOpenSource.value) {
-    queryItems.push('l=true')
-    obj.l = true
+    queryItems.push("l=true");
+    obj.l = true;
   }
   if (showSnapshots.value) {
-    queryItems.push('h=true')
-    obj.h = true
+    queryItems.push("h=true");
+    obj.h = true;
   }
   if (selectedEnvironments.value.length > 0) {
-    queryItems.push(`e=${encodeURIComponent(selectedEnvironments.value)}`)
-    obj.e = selectedEnvironments.value
+    queryItems.push(`e=${encodeURIComponent(selectedEnvironments.value)}`);
+    obj.e = selectedEnvironments.value;
   }
-  if (sortType.value.name !== 'relevance') {
-    queryItems.push(`s=${encodeURIComponent(sortType.value.name)}`)
-    obj.s = sortType.value.name
+  if (sortType.value.name !== "relevance") {
+    queryItems.push(`s=${encodeURIComponent(sortType.value.name)}`);
+    obj.s = sortType.value.name;
   }
   if (maxResults.value !== 20) {
-    queryItems.push(`m=${encodeURIComponent(maxResults.value)}`)
-    obj.m = maxResults.value
+    queryItems.push(`m=${encodeURIComponent(maxResults.value)}`);
+    obj.m = maxResults.value;
   }
 
-  let url = `${route.path}`
+  let url = `${route.path}`;
 
   if (queryItems.length > 0) {
-    url += `?${queryItems[0]}`
+    url += `?${queryItems[0]}`;
 
     for (let i = 1; i < queryItems.length; i++) {
-      url += `&${queryItems[i]}`
+      url += `&${queryItems[i]}`;
     }
   }
 
-  return useObj ? obj : url
+  return useObj ? obj : url;
 }
 
 const categoriesMap = computed(() => {
-  const categories = {}
+  const categories = {};
 
   for (const category of data.$sortedCategories()) {
     if (categories[category.header]) {
-      categories[category.header].push(category)
+      categories[category.header].push(category);
     } else {
-      categories[category.header] = [category]
+      categories[category.header] = [category];
     }
   }
 
   return Object.keys(categories).reduce((obj, key) => {
-    obj[key] = categories[key]
-    return obj
-  }, {})
-})
+    obj[key] = categories[key];
+    return obj;
+  }, {});
+});
 
 function clearFilters() {
   for (const facet of [...facets.value]) {
-    toggleFacet(facet, true)
+    toggleFacet(facet, true);
   }
   for (const facet of [...orFacets.value]) {
-    toggleOrFacet(facet, true)
+    toggleOrFacet(facet, true);
   }
 
-  onlyOpenSource.value = false
-  selectedVersions.value = []
-  selectedEnvironments.value = []
-  onSearchChange(1)
+  onlyOpenSource.value = false;
+  selectedVersions.value = [];
+  selectedEnvironments.value = [];
+  onSearchChange(1);
 }
 
 function toggleFacet(elementName, doNotSendRequest = false) {
-  const index = facets.value.indexOf(elementName)
+  const index = facets.value.indexOf(elementName);
 
   if (index !== -1) {
-    facets.value.splice(index, 1)
+    facets.value.splice(index, 1);
   } else {
-    facets.value.push(elementName)
+    facets.value.push(elementName);
   }
 
   if (!doNotSendRequest) {
-    onSearchChange(1)
+    onSearchChange(1);
   }
 }
 
 function toggleOrFacet(elementName, doNotSendRequest) {
-  const index = orFacets.value.indexOf(elementName)
+  const index = orFacets.value.indexOf(elementName);
   if (index !== -1) {
-    orFacets.value.splice(index, 1)
+    orFacets.value.splice(index, 1);
   } else {
-    if (elementName === 'categories:purpur') {
-      if (!orFacets.value.includes('categories:paper')) {
-        orFacets.value.push('categories:paper')
+    if (elementName === "categories:purpur") {
+      if (!orFacets.value.includes("categories:paper")) {
+        orFacets.value.push("categories:paper");
       }
-      if (!orFacets.value.includes('categories:spigot')) {
-        orFacets.value.push('categories:spigot')
+      if (!orFacets.value.includes("categories:spigot")) {
+        orFacets.value.push("categories:spigot");
       }
-      if (!orFacets.value.includes('categories:bukkit')) {
-        orFacets.value.push('categories:bukkit')
+      if (!orFacets.value.includes("categories:bukkit")) {
+        orFacets.value.push("categories:bukkit");
       }
-    } else if (elementName === 'categories:paper') {
-      if (!orFacets.value.includes('categories:spigot')) {
-        orFacets.value.push('categories:spigot')
+    } else if (elementName === "categories:paper") {
+      if (!orFacets.value.includes("categories:spigot")) {
+        orFacets.value.push("categories:spigot");
       }
-      if (!orFacets.value.includes('categories:bukkit')) {
-        orFacets.value.push('categories:bukkit')
+      if (!orFacets.value.includes("categories:bukkit")) {
+        orFacets.value.push("categories:bukkit");
       }
-    } else if (elementName === 'categories:spigot') {
-      if (!orFacets.value.includes('categories:bukkit')) {
-        orFacets.value.push('categories:bukkit')
+    } else if (elementName === "categories:spigot") {
+      if (!orFacets.value.includes("categories:bukkit")) {
+        orFacets.value.push("categories:bukkit");
       }
-    } else if (elementName === 'categories:waterfall') {
-      if (!orFacets.value.includes('categories:bungeecord')) {
-        orFacets.value.push('categories:bungeecord')
+    } else if (elementName === "categories:waterfall") {
+      if (!orFacets.value.includes("categories:bungeecord")) {
+        orFacets.value.push("categories:bungeecord");
       }
     }
-    orFacets.value.push(elementName)
+    orFacets.value.push(elementName);
   }
 
   if (!doNotSendRequest) {
-    onSearchChange(1)
+    onSearchChange(1);
   }
 }
 
 function toggleEnv(environment, sendRequest) {
-  const index = selectedEnvironments.value.indexOf(environment)
+  const index = selectedEnvironments.value.indexOf(environment);
   if (index !== -1) {
-    selectedEnvironments.value.splice(index, 1)
+    selectedEnvironments.value.splice(index, 1);
   } else {
-    selectedEnvironments.value.push(environment)
+    selectedEnvironments.value.push(environment);
   }
 
   if (!sendRequest) {
-    onSearchChange(1)
+    onSearchChange(1);
   }
 }
 
 function onSearchChangeToTop(newPageNumber) {
   if (process.client) {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  onSearchChange(newPageNumber)
+  onSearchChange(newPageNumber);
 }
 
 function cycleSearchDisplayMode() {
   cosmetics.value.searchDisplayMode[projectType.value.id] = data.$cycleValue(
     cosmetics.value.searchDisplayMode[projectType.value.id],
-    tags.value.projectViewModes
-  )
-  saveCosmetics()
-  setClosestMaxResults()
+    tags.value.projectViewModes,
+  );
+  saveCosmetics();
+  setClosestMaxResults();
 }
 
-const previousMaxResults = ref(20)
+const previousMaxResults = ref(20);
 const maxResultsForView = ref({
   list: [5, 10, 15, 20, 50, 100],
   grid: [6, 12, 18, 24, 48, 96],
   gallery: [6, 10, 16, 20, 50, 100],
-})
+});
 
 function onMaxResultsChange(newPageNumber) {
   newPageNumber = Math.max(
     1,
     Math.min(
       Math.floor(newPageNumber / (maxResults.value / previousMaxResults.value)),
-      pageCount.value
-    )
-  )
-  previousMaxResults.value = maxResults.value
-  onSearchChange(newPageNumber)
+      pageCount.value,
+    ),
+  );
+  previousMaxResults.value = maxResults.value;
+  onSearchChange(newPageNumber);
 }
 
 function setClosestMaxResults() {
-  const view = cosmetics.value.searchDisplayMode[projectType.value.id]
-  const maxResultsOptions = maxResultsForView.value[view] ?? [20]
-  const currentMax = maxResults.value
+  const view = cosmetics.value.searchDisplayMode[projectType.value.id];
+  const maxResultsOptions = maxResultsForView.value[view] ?? [20];
+  const currentMax = maxResults.value;
   if (!maxResultsOptions.includes(currentMax)) {
     maxResults.value = maxResultsOptions.reduce(function (prev, curr) {
-      return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev
-    })
+      return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax) ? curr : prev;
+    });
   }
 }
 </script>
@@ -870,7 +872,9 @@ function setClosestMaxResults() {
       &.open {
         color: var(--color-button-text-active);
         background-color: var(--color-brand-highlight);
-        box-shadow: inset 0 0 0 transparent, 0 0 0 2px var(--color-brand);
+        box-shadow:
+          inset 0 0 0 transparent,
+          0 0 0 2px var(--color-brand);
       }
     }
 

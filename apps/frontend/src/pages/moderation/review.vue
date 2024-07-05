@@ -37,9 +37,9 @@
     <div
       v-for="project in projectsFiltered.sort((a, b) => {
         if (oldestFirst) {
-          return b.age - a.age
+          return b.age - a.age;
         } else {
-          return a.age - b.age
+          return a.age - b.age;
         }
       })"
       :key="`project-${project.id}`"
@@ -101,105 +101,105 @@
   </section>
 </template>
 <script setup>
-import Chips from '~/components/ui/Chips.vue'
-import Avatar from '~/components/ui/Avatar.vue'
-import UnknownIcon from '~/assets/images/utils/unknown.svg?component'
-import EyeIcon from '~/assets/images/utils/eye.svg?component'
-import SortAscIcon from '~/assets/images/utils/sort-asc.svg?component'
-import SortDescIcon from '~/assets/images/utils/sort-desc.svg?component'
-import WarningIcon from '~/assets/images/utils/issues.svg?component'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
-import Badge from '~/components/ui/Badge.vue'
-import { formatProjectType } from '~/plugins/shorthands.js'
+import Chips from "~/components/ui/Chips.vue";
+import Avatar from "~/components/ui/Avatar.vue";
+import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
+import EyeIcon from "~/assets/images/utils/eye.svg?component";
+import SortAscIcon from "~/assets/images/utils/sort-asc.svg?component";
+import SortDescIcon from "~/assets/images/utils/sort-desc.svg?component";
+import WarningIcon from "~/assets/images/utils/issues.svg?component";
+import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
+import Badge from "~/components/ui/Badge.vue";
+import { formatProjectType } from "~/plugins/shorthands.js";
 
 useHead({
-  title: 'Review projects - Modrinth',
-})
+  title: "Review projects - Modrinth",
+});
 
-const app = useNuxtApp()
+const app = useNuxtApp();
 
-const router = useRouter()
+const router = useRouter();
 
-const now = app.$dayjs()
-const TIME_24H = 86400000
-const TIME_48H = TIME_24H * 2
+const now = app.$dayjs();
+const TIME_24H = 86400000;
+const TIME_48H = TIME_24H * 2;
 
-const { data: projects } = await useAsyncData('moderation/projects?count=1000', () =>
-  useBaseFetch('moderation/projects?count=1000', { internal: true })
-)
-const members = ref([])
-const projectType = ref('all')
-const oldestFirst = ref(true)
+const { data: projects } = await useAsyncData("moderation/projects?count=1000", () =>
+  useBaseFetch("moderation/projects?count=1000", { internal: true }),
+);
+const members = ref([]);
+const projectType = ref("all");
+const oldestFirst = ref(true);
 
 const projectsFiltered = computed(() =>
   projects.value.filter(
     (x) =>
-      projectType.value === 'all' ||
-      app.$getProjectTypeForUrl(x.project_types[0], x.loaders) === projectType.value
-  )
-)
+      projectType.value === "all" ||
+      app.$getProjectTypeForUrl(x.project_types[0], x.loaders) === projectType.value,
+  ),
+);
 
 const projectsOver24Hours = computed(() =>
-  projectsFiltered.value.filter((project) => project.age >= TIME_24H && project.age < TIME_48H)
-)
+  projectsFiltered.value.filter((project) => project.age >= TIME_24H && project.age < TIME_48H),
+);
 const projectsOver48Hours = computed(() =>
-  projectsFiltered.value.filter((project) => project.age >= TIME_48H)
-)
+  projectsFiltered.value.filter((project) => project.age >= TIME_48H),
+);
 const projectTypePlural = computed(() =>
-  projectType.value === 'all'
-    ? 'projects'
-    : (formatProjectType(projectType.value) + 's').toLowerCase()
-)
+  projectType.value === "all"
+    ? "projects"
+    : (formatProjectType(projectType.value) + "s").toLowerCase(),
+);
 
 const projectTypes = computed(() => {
-  const set = new Set()
-  set.add('all')
+  const set = new Set();
+  set.add("all");
 
   if (projects.value) {
     for (const project of projects.value) {
-      set.add(project.inferred_project_type)
+      set.add(project.inferred_project_type);
     }
   }
 
-  return [...set]
-})
+  return [...set];
+});
 
 if (projects.value) {
-  const teamIds = projects.value.map((x) => x.team_id)
-  const organizationIds = projects.value.filter((x) => x.organization).map((x) => x.organization)
+  const teamIds = projects.value.map((x) => x.team_id);
+  const organizationIds = projects.value.filter((x) => x.organization).map((x) => x.organization);
 
-  const url = `teams?ids=${encodeURIComponent(JSON.stringify(teamIds))}`
-  const orgUrl = `organizations?ids=${encodeURIComponent(JSON.stringify(organizationIds))}`
-  const { data: result } = await useAsyncData(url, () => useBaseFetch(url))
-  const { data: orgs } = await useAsyncData(orgUrl, () => useBaseFetch(orgUrl, { apiVersion: 3 }))
+  const url = `teams?ids=${encodeURIComponent(JSON.stringify(teamIds))}`;
+  const orgUrl = `organizations?ids=${encodeURIComponent(JSON.stringify(organizationIds))}`;
+  const { data: result } = await useAsyncData(url, () => useBaseFetch(url));
+  const { data: orgs } = await useAsyncData(orgUrl, () => useBaseFetch(orgUrl, { apiVersion: 3 }));
 
   if (result.value) {
-    members.value = result.value
+    members.value = result.value;
 
     projects.value = projects.value.map((project) => {
       project.owner = members.value
         .flat()
-        .find((x) => x.team_id === project.team_id && x.role === 'Owner')
-      project.org = orgs.value.find((x) => x.id === project.organization)
-      project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE
-      project.age_warning = ''
+        .find((x) => x.team_id === project.team_id && x.role === "Owner");
+      project.org = orgs.value.find((x) => x.id === project.organization);
+      project.age = project.queued ? now - app.$dayjs(project.queued) : Number.MAX_VALUE;
+      project.age_warning = "";
       if (project.age > TIME_24H * 2) {
-        project.age_warning = 'danger'
+        project.age_warning = "danger";
       } else if (project.age > TIME_24H) {
-        project.age_warning = 'warning'
+        project.age_warning = "warning";
       }
       project.inferred_project_type = app.$getProjectTypeForUrl(
         project.project_types[0],
-        project.loaders
-      )
-      return project
-    })
+        project.loaders,
+      );
+      return project;
+    });
   }
 }
 async function goToProjects() {
-  const project = projectsFiltered.value[0]
+  const project = projectsFiltered.value[0];
   await router.push({
-    name: 'type-id',
+    name: "type-id",
     params: {
       type: project.project_types[0],
       id: project.slug ? project.slug : project.id,
@@ -208,7 +208,7 @@ async function goToProjects() {
       showChecklist: true,
       projects: projectsFiltered.value.slice(1).map((x) => (x.slug ? x.slug : x.id)),
     },
-  })
+  });
 }
 </script>
 <style lang="scss" scoped>
@@ -218,7 +218,7 @@ async function goToProjects() {
   gap: var(--spacing-card-sm);
   @media screen and (min-width: 650px) {
     display: grid;
-    grid-template: 'title action' 'date action';
+    grid-template: "title action" "date action";
     grid-template-columns: 1fr auto;
   }
 }

@@ -70,10 +70,10 @@
       class="iconified-button"
       @click="
         () => {
-          selectedLoaders = []
-          selectedGameVersions = []
-          selectedVersionTypes = []
-          updateQuery()
+          selectedLoaders = [];
+          selectedGameVersions = [];
+          selectedVersionTypes = [];
+          updateQuery();
         }
       "
     >
@@ -84,51 +84,51 @@
 </template>
 
 <script setup>
-import { Multiselect } from 'vue-multiselect'
-import Checkbox from '~/components/ui/Checkbox.vue'
-import ClearIcon from '~/assets/images/utils/clear.svg?component'
+import { Multiselect } from "vue-multiselect";
+import Checkbox from "~/components/ui/Checkbox.vue";
+import ClearIcon from "~/assets/images/utils/clear.svg?component";
 
 const props = defineProps({
   versions: {
     type: Array,
     default() {
-      return []
+      return [];
     },
   },
-})
-const emit = defineEmits(['switch-page'])
+});
+const emit = defineEmits(["switch-page"]);
 
-const router = useNativeRouter()
-const route = useNativeRoute()
+const router = useNativeRouter();
+const route = useNativeRoute();
 
-const tags = useTags()
+const tags = useTags();
 
-const tempLoaders = new Set()
-let tempVersions = new Set()
-const tempReleaseChannels = new Set()
+const tempLoaders = new Set();
+let tempVersions = new Set();
+const tempReleaseChannels = new Set();
 
 for (const version of props.versions) {
   for (const loader of version.loaders) {
-    tempLoaders.add(loader)
+    tempLoaders.add(loader);
   }
   for (const gameVersion of version.game_versions) {
-    tempVersions.add(gameVersion)
+    tempVersions.add(gameVersion);
   }
-  tempReleaseChannels.add(version.version_type)
+  tempReleaseChannels.add(version.version_type);
 }
 
-tempVersions = Array.from(tempVersions)
+tempVersions = Array.from(tempVersions);
 
-const loaderFilters = shallowRef(Array.from(tempLoaders))
+const loaderFilters = shallowRef(Array.from(tempLoaders));
 const gameVersionFilters = shallowRef(
-  tags.value.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version))
-)
-const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels))
-const includeSnapshots = ref(route.query.s === 'true')
+  tags.value.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version)),
+);
+const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels));
+const includeSnapshots = ref(route.query.s === "true");
 
-const selectedGameVersions = shallowRef(getArrayOrString(route.query.g) ?? [])
-const selectedLoaders = shallowRef(getArrayOrString(route.query.l) ?? [])
-const selectedVersionTypes = shallowRef(getArrayOrString(route.query.c) ?? [])
+const selectedGameVersions = shallowRef(getArrayOrString(route.query.g) ?? []);
+const selectedLoaders = shallowRef(getArrayOrString(route.query.l) ?? []);
+const selectedVersionTypes = shallowRef(getArrayOrString(route.query.c) ?? []);
 
 async function updateQuery() {
   await router.replace({
@@ -139,8 +139,8 @@ async function updateQuery() {
       c: selectedVersionTypes.value.length === 0 ? undefined : selectedVersionTypes.value,
       s: includeSnapshots.value ? true : undefined,
     },
-  })
-  emit('switch-page', 1)
+  });
+  emit("switch-page", 1);
 }
 </script>
 

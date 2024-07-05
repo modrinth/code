@@ -51,9 +51,9 @@
 </template>
 
 <script>
-import GapIcon from '~/assets/images/utils/gap.svg?component'
-import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?component'
-import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?component'
+import GapIcon from "~/assets/images/utils/gap.svg?component";
+import LeftArrowIcon from "~/assets/images/utils/left-arrow.svg?component";
+import RightArrowIcon from "~/assets/images/utils/right-arrow.svg?component";
 
 export default {
   components: {
@@ -73,47 +73,47 @@ export default {
     linkFunction: {
       type: Function,
       default() {
-        return () => '/'
+        return () => "/";
       },
     },
   },
-  emits: ['switch-page'],
+  emits: ["switch-page"],
   computed: {
     pages() {
-      let pages = []
+      let pages = [];
 
       if (this.count > 7) {
         if (this.page + 3 >= this.count) {
           pages = [
             1,
-            '-',
+            "-",
             this.count - 4,
             this.count - 3,
             this.count - 2,
             this.count - 1,
             this.count,
-          ]
+          ];
         } else if (this.page > 5) {
-          pages = [1, '-', this.page - 1, this.page, this.page + 1, '-', this.count]
+          pages = [1, "-", this.page - 1, this.page, this.page + 1, "-", this.count];
         } else {
-          pages = [1, 2, 3, 4, 5, '-', this.count]
+          pages = [1, 2, 3, 4, 5, "-", this.count];
         }
       } else {
-        pages = Array.from({ length: this.count }, (_, i) => i + 1)
+        pages = Array.from({ length: this.count }, (_, i) => i + 1);
       }
 
-      return pages
+      return pages;
     },
   },
   methods: {
     switchPage(newPage) {
-      this.$emit('switch-page', newPage)
-      if (newPage !== null && newPage !== '' && !isNaN(newPage)) {
-        this.$emit('switch-page', Math.min(Math.max(newPage, 1), this.count))
+      this.$emit("switch-page", newPage);
+      if (newPage !== null && newPage !== "" && !isNaN(newPage)) {
+        this.$emit("switch-page", Math.min(Math.max(newPage, 1), this.count));
       }
     },
   },
-}
+};
 </script>
 
 <style scoped lang="scss">
@@ -126,7 +126,10 @@ a {
   border-radius: 2rem;
   background: var(--color-raised-bg);
 
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   &.page-number.current {

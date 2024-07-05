@@ -133,7 +133,7 @@
                 return {
                   label: formatMessage(getProjectTypeMessage(x, true)),
                   href: `/user/${user.username}/${x}s`,
-                }
+                };
               }),
             ]"
           />
@@ -173,7 +173,7 @@
                 ? projects.filter(
                     (x) =>
                       x.project_type ===
-                      route.params.projectType.substr(0, route.params.projectType.length - 1)
+                      route.params.projectType.substr(0, route.params.projectType.length - 1),
                   )
                 : projects
               )
@@ -280,109 +280,109 @@
   </div>
 </template>
 <script setup>
-import { LibraryIcon, BoxIcon, LinkIcon, LockIcon, XIcon } from '@modrinth/assets'
-import { Promotion } from '@modrinth/ui'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
-import Badge from '~/components/ui/Badge.vue'
-import { reportUser } from '~/utils/report-helpers.ts'
+import { LibraryIcon, BoxIcon, LinkIcon, LockIcon, XIcon } from "@modrinth/assets";
+import { Promotion } from "@modrinth/ui";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
+import Badge from "~/components/ui/Badge.vue";
+import { reportUser } from "~/utils/report-helpers.ts";
 
-import ReportIcon from '~/assets/images/utils/report.svg?component'
-import SunriseIcon from '~/assets/images/utils/sunrise.svg?component'
-import DownloadIcon from '~/assets/images/utils/download.svg?component'
-import SettingsIcon from '~/assets/images/utils/settings.svg?component'
-import UpToDate from '~/assets/images/illustrations/up_to_date.svg?component'
-import UserIcon from '~/assets/images/utils/user.svg?component'
-import EditIcon from '~/assets/images/utils/edit.svg?component'
-import HeartIcon from '~/assets/images/utils/heart.svg?component'
-import GridIcon from '~/assets/images/utils/grid.svg?component'
-import ListIcon from '~/assets/images/utils/list.svg?component'
-import ImageIcon from '~/assets/images/utils/image.svg?component'
-import WorldIcon from '~/assets/images/utils/world.svg?component'
-import ModalCreation from '~/components/ui/ModalCreation.vue'
-import NavRow from '~/components/ui/NavRow.vue'
-import CopyCode from '~/components/ui/CopyCode.vue'
-import Avatar from '~/components/ui/Avatar.vue'
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
+import ReportIcon from "~/assets/images/utils/report.svg?component";
+import SunriseIcon from "~/assets/images/utils/sunrise.svg?component";
+import DownloadIcon from "~/assets/images/utils/download.svg?component";
+import SettingsIcon from "~/assets/images/utils/settings.svg?component";
+import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
+import UserIcon from "~/assets/images/utils/user.svg?component";
+import EditIcon from "~/assets/images/utils/edit.svg?component";
+import HeartIcon from "~/assets/images/utils/heart.svg?component";
+import GridIcon from "~/assets/images/utils/grid.svg?component";
+import ListIcon from "~/assets/images/utils/list.svg?component";
+import ImageIcon from "~/assets/images/utils/image.svg?component";
+import WorldIcon from "~/assets/images/utils/world.svg?component";
+import ModalCreation from "~/components/ui/ModalCreation.vue";
+import NavRow from "~/components/ui/NavRow.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import Avatar from "~/components/ui/Avatar.vue";
+import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 
-const data = useNuxtApp()
-const route = useNativeRoute()
-const auth = await useAuth()
-const cosmetics = useCosmetics()
-const tags = useTags()
+const data = useNuxtApp();
+const route = useNativeRoute();
+const auth = await useAuth();
+const cosmetics = useCosmetics();
+const tags = useTags();
 
-const vintl = useVIntl()
-const { formatMessage } = vintl
+const vintl = useVIntl();
+const { formatMessage } = vintl;
 
-const formatCompactNumber = useCompactNumber()
+const formatCompactNumber = useCompactNumber();
 
-const formatRelativeTime = useRelativeTime()
+const formatRelativeTime = useRelativeTime();
 
 const messages = defineMessages({
   profileDownloadsStats: {
-    id: 'profile.stats.downloads',
+    id: "profile.stats.downloads",
     defaultMessage:
-      '{count, plural, one {<stat>{count}</stat> download} other {<stat>{count}</stat> downloads}}',
+      "{count, plural, one {<stat>{count}</stat> download} other {<stat>{count}</stat> downloads}}",
   },
   profileProjectsFollowersStats: {
-    id: 'profile.stats.projects-followers',
+    id: "profile.stats.projects-followers",
     defaultMessage:
-      '{count, plural, one {<stat>{count}</stat> follower} other {<stat>{count}</stat> followers}} of projects',
+      "{count, plural, one {<stat>{count}</stat> follower} other {<stat>{count}</stat> followers}} of projects",
   },
   profileJoinedAt: {
-    id: 'profile.joined-at',
-    defaultMessage: 'Joined {ago}',
+    id: "profile.joined-at",
+    defaultMessage: "Joined {ago}",
   },
   profileUserId: {
-    id: 'profile.user-id',
-    defaultMessage: 'User ID: {id}',
+    id: "profile.user-id",
+    defaultMessage: "User ID: {id}",
   },
   profileOrganizations: {
-    id: 'profile.label.organizations',
-    defaultMessage: 'Organizations',
+    id: "profile.label.organizations",
+    defaultMessage: "Organizations",
   },
   profileManageProjectsButton: {
-    id: 'profile.button.manage-projects',
-    defaultMessage: 'Manage projects',
+    id: "profile.button.manage-projects",
+    defaultMessage: "Manage projects",
   },
   profileMetaDescription: {
-    id: 'profile.meta.description',
+    id: "profile.meta.description",
     defaultMessage: "Download {username}'s projects on Modrinth",
   },
   profileMetaDescriptionWithBio: {
-    id: 'profile.meta.description-with-bio',
+    id: "profile.meta.description-with-bio",
     defaultMessage: "{bio} - Download {username}'s projects on Modrinth",
   },
   profileReportButton: {
-    id: 'profile.button.report',
-    defaultMessage: 'Report',
+    id: "profile.button.report",
+    defaultMessage: "Report",
   },
   profileNoProjectsLabel: {
-    id: 'profile.label.no-projects',
-    defaultMessage: 'This user has no projects!',
+    id: "profile.label.no-projects",
+    defaultMessage: "This user has no projects!",
   },
   profileNoProjectsAuthLabel: {
-    id: 'profile.label.no-projects-auth',
+    id: "profile.label.no-projects-auth",
     defaultMessage:
       "You don't have any projects.\nWould you like to <create-link>create one</create-link>?",
   },
   profileNoCollectionsLabel: {
-    id: 'profile.label.no-collections',
-    defaultMessage: 'This user has no collections!',
+    id: "profile.label.no-collections",
+    defaultMessage: "This user has no collections!",
   },
   profileNoCollectionsAuthLabel: {
-    id: 'profile.label.no-collections-auth',
+    id: "profile.label.no-collections-auth",
     defaultMessage:
       "You don't have any collections.\nWould you like to <create-link>create one</create-link>?",
   },
   userNotFoundError: {
-    id: 'profile.error.not-found',
-    defaultMessage: 'User not found',
+    id: "profile.error.not-found",
+    defaultMessage: "User not found",
   },
-})
+});
 
-let user, projects, organizations, collections
+let user, projects, organizations, collections;
 try {
-  ;[{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
+  [{ data: user }, { data: projects }, { data: organizations }, { data: collections }] =
     await Promise.all([
       useAsyncData(`user/${route.params.id}`, () => useBaseFetch(`user/${route.params.id}`)),
       useAsyncData(
@@ -391,33 +391,33 @@ try {
         {
           transform: (projects) => {
             for (const project of projects) {
-              project.categories = project.categories.concat(project.loaders)
+              project.categories = project.categories.concat(project.loaders);
               project.project_type = data.$getProjectTypeForUrl(
                 project.project_type,
                 project.categories,
-                tags.value
-              )
+                tags.value,
+              );
             }
 
-            return projects
+            return projects;
           },
-        }
+        },
       ),
       useAsyncData(`user/${route.params.id}/organizations`, () =>
         useBaseFetch(`user/${route.params.id}/organizations`, {
           apiVersion: 3,
-        })
+        }),
       ),
       useAsyncData(`user/${route.params.id}/collections`, () =>
-        useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 })
+        useBaseFetch(`user/${route.params.id}/collections`, { apiVersion: 3 }),
       ),
-    ])
+    ]);
 } catch {
   throw createError({
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.userNotFoundError),
-  })
+  });
 }
 
 if (!user.value) {
@@ -425,77 +425,77 @@ if (!user.value) {
     fatal: true,
     statusCode: 404,
     message: formatMessage(messages.userNotFoundError),
-  })
+  });
 }
 
 if (user.value.username !== route.params.id) {
-  await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 })
+  await navigateTo(`/user/${user.value.username}`, { redirectCode: 301 });
 }
 
-const title = computed(() => `${user.value.username} - Modrinth`)
+const title = computed(() => `${user.value.username} - Modrinth`);
 const description = computed(() =>
   user.value.bio
     ? formatMessage(messages.profileMetaDescriptionWithBio, {
         bio: user.value.bio,
         username: user.value.username,
       })
-    : formatMessage(messages.profileMetaDescription, { username: user.value.username })
-)
+    : formatMessage(messages.profileMetaDescription, { username: user.value.username }),
+);
 
 useSeoMeta({
   title: () => title.value,
   description: () => description.value,
   ogTitle: () => title.value,
   ogDescription: () => description.value,
-  ogImage: () => user.value.avatar_url ?? 'https://cdn.modrinth.com/placeholder.png',
-})
+  ogImage: () => user.value.avatar_url ?? "https://cdn.modrinth.com/placeholder.png",
+});
 
 const projectTypes = computed(() => {
-  const obj = {}
+  const obj = {};
 
   if (collections.value.length > 0) {
-    obj.collection = true
+    obj.collection = true;
   }
 
   for (const project of projects.value) {
-    obj[project.project_type] = true
+    obj[project.project_type] = true;
   }
 
-  delete obj.project
+  delete obj.project;
 
-  return Object.keys(obj)
-})
+  return Object.keys(obj);
+});
 const sumDownloads = computed(() => {
-  let sum = 0
+  let sum = 0;
 
   for (const project of projects.value) {
-    sum += project.downloads
+    sum += project.downloads;
   }
 
-  return sum
-})
+  return sum;
+});
 const sumFollows = computed(() => {
-  let sum = 0
+  let sum = 0;
 
   for (const project of projects.value) {
-    sum += project.followers
+    sum += project.followers;
   }
 
-  return sum
-})
+  return sum;
+});
 
 function cycleSearchDisplayMode() {
   cosmetics.value.searchDisplayMode.user = data.$cycleValue(
     cosmetics.value.searchDisplayMode.user,
-    tags.value.projectViewModes
-  )
-  saveCosmetics()
+    tags.value.projectViewModes,
+  );
+  saveCosmetics();
 }
 </script>
 <script>
 export default defineNuxtComponent({
   methods: {},
-})
+});
 </script>
 
 <style lang="scss" scoped>

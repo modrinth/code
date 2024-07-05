@@ -106,12 +106,12 @@ import {
   LockIcon,
   ModrinthIcon,
   ScaleIcon,
-} from '@modrinth/assets'
-import { OverflowMenu, ConditionalNuxtLink } from '@modrinth/ui'
-import { renderString } from '@modrinth/utils'
-import Avatar from '~/components/ui/Avatar.vue'
-import Badge from '~/components/ui/Badge.vue'
-import { isStaff } from '~/helpers/users.js'
+} from "@modrinth/assets";
+import { OverflowMenu, ConditionalNuxtLink } from "@modrinth/ui";
+import { renderString } from "@modrinth/utils";
+import Avatar from "~/components/ui/Avatar.vue";
+import Badge from "~/components/ui/Badge.vue";
+import { isStaff } from "~/helpers/users.js";
 
 const props = defineProps({
   message: {
@@ -142,34 +142,34 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-})
+});
 
-const emit = defineEmits(['update-thread'])
+const emit = defineEmits(["update-thread"]);
 
 const formattedMessage = computed(() => {
-  const body = renderString(props.message.body.body)
+  const body = renderString(props.message.body.body);
   if (props.forceCompact) {
-    const hasImage = body.includes('<img')
-    const noHtml = body.replace(/<\/?[^>]+(>|$)/g, '')
+    const hasImage = body.includes("<img");
+    const noHtml = body.replace(/<\/?[^>]+(>|$)/g, "");
     if (noHtml.trim()) {
-      return noHtml
+      return noHtml;
     } else if (hasImage) {
-      return 'sent an image.'
+      return "sent an image.";
     } else {
-      return 'sent a message.'
+      return "sent a message.";
     }
   }
-  return body
-})
+  return body;
+});
 
-const formatRelativeTime = useRelativeTime()
-const timeSincePosted = ref(formatRelativeTime(props.message.created))
+const formatRelativeTime = useRelativeTime();
+const timeSincePosted = ref(formatRelativeTime(props.message.created));
 
 async function deleteMessage() {
   await useBaseFetch(`message/${props.message.id}`, {
-    method: 'DELETE',
-  })
-  emit('update-thread')
+    method: "DELETE",
+  });
+  emit("update-thread");
 }
 </script>
 
@@ -194,9 +194,9 @@ async function deleteMessage() {
     --gap-size: var(--spacing-card-sm);
     display: grid;
     grid-template:
-      'icon author actions'
-      'icon body actions'
-      'date date date';
+      "icon author actions"
+      "icon body actions"
+      "date date date";
     grid-template-columns: min-content auto 1fr;
     column-gap: var(--gap-size);
     row-gap: var(--spacing-card-xs);
@@ -312,9 +312,9 @@ role-moderator {
 
     &.has-body {
       grid-template:
-        'icon author actions'
-        'icon body actions'
-        'date date date';
+        "icon author actions"
+        "icon body actions"
+        "date date date";
       grid-template-columns: min-content auto 1fr;
     }
   }
@@ -327,8 +327,8 @@ role-moderator {
 
     &.has-body {
       grid-template:
-        'icon author date actions'
-        'icon body body actions';
+        "icon author date actions"
+        "icon body body actions";
       grid-template-columns: min-content auto 1fr;
       grid-template-rows: min-content 1fr auto;
     }

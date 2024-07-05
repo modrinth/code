@@ -13,7 +13,7 @@ export const computeVersions = (versions, members) => {
   const authorMembers = {}
 
   for (const version of versions.sort(
-    (a, b) => dayjs(a.date_published) - dayjs(b.date_published)
+    (a, b) => dayjs(a.date_published) - dayjs(b.date_published),
   )) {
     if (visitedVersions.includes(version.version_number)) {
       visitedVersions.push(version.version_number)
@@ -53,9 +53,8 @@ export const computeVersions = (versions, members) => {
       const nextVersion = returnVersions[index + 1]
       if (nextVersion && version.changelog && nextVersion.changelog === version.changelog) {
         return { duplicate: true, ...version }
-      } 
-        return { duplicate: false, ...version }
-      
+      }
+      return { duplicate: false, ...version }
     })
     .sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
@@ -80,29 +79,24 @@ export const sortedCategories = (tags) => {
 export const formatNumber = (number, abbreviate = true) => {
   const x = Number(number)
   if (x >= 1000000 && abbreviate) {
-    return `${(x / 1000000).toFixed(2).toString()  }M`
+    return `${(x / 1000000).toFixed(2).toString()}M`
   } else if (x >= 10000 && abbreviate) {
-    return `${(x / 1000).toFixed(1).toString()  }k`
-  } 
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  
+    return `${(x / 1000).toFixed(1).toString()}k`
+  }
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 export function formatMoney(number, abbreviate = false) {
   const x = Number(number)
   if (x >= 1000000 && abbreviate) {
-    return `$${  (x / 1000000).toFixed(2).toString()  }M`
+    return `$${(x / 1000000).toFixed(2).toString()}M`
   } else if (x >= 10000 && abbreviate) {
-    return `$${  (x / 1000).toFixed(2).toString()  }k`
-  } 
-    return (
-      `$${ 
-      x
-        .toFixed(2)
-        .toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
-    )
-  
+    return `$${(x / 1000).toFixed(2).toString()}k`
+  }
+  return `$${x
+    .toFixed(2)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
 }
 
 export const formatBytes = (bytes, decimals = 2) => {
@@ -114,7 +108,7 @@ export const formatBytes = (bytes, decimals = 2) => {
 
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))  } ${  sizes[i]}`
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`
 }
 
 export const capitalizeString = (name) => {

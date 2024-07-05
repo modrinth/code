@@ -34,10 +34,10 @@
 </template>
 
 <script>
-import { renderString } from '@modrinth/utils'
-import CrossIcon from '~/assets/images/utils/x.svg?component'
-import TrashIcon from '~/assets/images/utils/trash.svg?component'
-import Modal from '~/components/ui/Modal.vue'
+import { renderString } from "@modrinth/utils";
+import CrossIcon from "~/assets/images/utils/x.svg?component";
+import TrashIcon from "~/assets/images/utils/trash.svg?component";
+import Modal from "~/components/ui/Modal.vue";
 
 export default {
   components: {
@@ -48,7 +48,7 @@ export default {
   props: {
     confirmationText: {
       type: String,
-      default: '',
+      default: "",
     },
     hasToType: {
       type: Boolean,
@@ -56,46 +56,46 @@ export default {
     },
     title: {
       type: String,
-      default: 'No title defined',
+      default: "No title defined",
       required: true,
     },
     description: {
       type: String,
-      default: 'No description defined',
+      default: "No description defined",
       required: true,
     },
     proceedLabel: {
       type: String,
-      default: 'Proceed',
+      default: "Proceed",
     },
   },
-  emits: ['proceed'],
+  emits: ["proceed"],
   data() {
     return {
       action_disabled: this.hasToType,
-      confirmation_typed: '',
-    }
+      confirmation_typed: "",
+    };
   },
   methods: {
     renderString,
     cancel() {
-      this.$refs.modal.hide()
+      this.$refs.modal.hide();
     },
     proceed() {
-      this.$refs.modal.hide()
-      this.$emit('proceed')
+      this.$refs.modal.hide();
+      this.$emit("proceed");
     },
     type() {
       if (this.hasToType) {
         this.action_disabled =
-          this.confirmation_typed.toLowerCase() !== this.confirmationText.toLowerCase()
+          this.confirmation_typed.toLowerCase() !== this.confirmationText.toLowerCase();
       }
     },
     show() {
-      this.$refs.modal.show()
+      this.$refs.modal.show();
     },
   },
-}
+};
 </script>
 
 <style scoped lang="scss">

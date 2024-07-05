@@ -7,119 +7,119 @@ import {
   EditIcon,
   DownloadIcon,
   LinkIcon,
-} from '@modrinth/assets'
-import Avatar from '~/components/ui/Avatar.vue'
-import LogoAnimated from '~/components/brand/LogoAnimated.vue'
-import Badge from '~/components/ui/Badge.vue'
-import PrismIcon from '~/assets/images/external/prism.svg?component'
-import ATLauncher from '~/assets/images/external/atlauncher.svg?component'
-import CurseForge from '~/assets/images/external/curseforge.svg?component'
-import Checkbox from '~/components/ui/Checkbox.vue'
+} from "@modrinth/assets";
+import Avatar from "~/components/ui/Avatar.vue";
+import LogoAnimated from "~/components/brand/LogoAnimated.vue";
+import Badge from "~/components/ui/Badge.vue";
+import PrismIcon from "~/assets/images/external/prism.svg?component";
+import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
+import CurseForge from "~/assets/images/external/curseforge.svg?component";
+import Checkbox from "~/components/ui/Checkbox.vue";
 
-const os = ref(null)
-const macValue = ref(null)
-const downloadWindows = ref(null)
-const downloadLinux = ref(null)
-const downloadSection = ref(null)
-const windowsLink = ref(null)
+const os = ref(null);
+const macValue = ref(null);
+const downloadWindows = ref(null);
+const downloadLinux = ref(null);
+const downloadSection = ref(null);
+const windowsLink = ref(null);
 const linuxLinks = {
   appImage: null,
   deb: null,
-  thirdParty: 'https://support.modrinth.com/en/articles/9298760',
-}
+  thirdParty: "https://support.modrinth.com/en/articles/9298760",
+};
 const macLinks = {
   appleSilicon: null,
   intel: null,
-}
+};
 
-let downloadLauncher
+let downloadLauncher;
 
 const [{ data: rows }, { data: launcherUpdates }] = await Promise.all([
-  useAsyncData('projects', () => useBaseFetch('projects_random?count=40'), {
+  useAsyncData("projects", () => useBaseFetch("projects_random?count=40"), {
     transform: (homepageProjects) => {
-      const val = Math.ceil(homepageProjects.length / 6)
+      const val = Math.ceil(homepageProjects.length / 6);
       return [
         homepageProjects.slice(0, val),
         homepageProjects.slice(val, val * 2),
         homepageProjects.slice(val * 2, val * 3),
         homepageProjects.slice(val * 3, val * 4),
         homepageProjects.slice(val * 4, val * 5),
-      ]
+      ];
     },
   }),
-  await useAsyncData('launcherUpdates', () =>
-    $fetch('https://launcher-files.modrinth.com/updates.json')
+  await useAsyncData("launcherUpdates", () =>
+    $fetch("https://launcher-files.modrinth.com/updates.json"),
   ),
-])
+]);
 
-macLinks.appleSilicon = launcherUpdates.value.platforms['darwin-aarch64'].install_urls[0]
-macLinks.intel = launcherUpdates.value.platforms['darwin-x86_64'].install_urls[0]
-windowsLink.value = launcherUpdates.value.platforms['windows-x86_64'].install_urls[0]
-linuxLinks.appImage = launcherUpdates.value.platforms['linux-x86_64'].install_urls[1]
-linuxLinks.deb = launcherUpdates.value.platforms['linux-x86_64'].install_urls[0]
+macLinks.appleSilicon = launcherUpdates.value.platforms["darwin-aarch64"].install_urls[0];
+macLinks.intel = launcherUpdates.value.platforms["darwin-x86_64"].install_urls[0];
+windowsLink.value = launcherUpdates.value.platforms["windows-x86_64"].install_urls[0];
+linuxLinks.appImage = launcherUpdates.value.platforms["linux-x86_64"].install_urls[1];
+linuxLinks.deb = launcherUpdates.value.platforms["linux-x86_64"].install_urls[0];
 
 onMounted(() => {
-  os.value = navigator?.platform.toString()
-  os.value = os.value?.includes('Mac')
-    ? 'Mac'
-    : os.value?.includes('Win')
-    ? 'Windows'
-    : os.value?.includes('Linux')
-    ? 'Linux'
-    : null
+  os.value = navigator?.platform.toString();
+  os.value = os.value?.includes("Mac")
+    ? "Mac"
+    : os.value?.includes("Win")
+      ? "Windows"
+      : os.value?.includes("Linux")
+        ? "Linux"
+        : null;
 
-  if (os.value === 'Windows') {
+  if (os.value === "Windows") {
     downloadLauncher = () => {
-      downloadWindows.value.click()
-    }
-  } else if (os.value === 'Linux') {
+      downloadWindows.value.click();
+    };
+  } else if (os.value === "Linux") {
     downloadLauncher = () => {
-      downloadLinux.value.click()
-    }
+      downloadLinux.value.click();
+    };
   } else {
     downloadLauncher = () => {
-      scrollToSection()
-    }
+      scrollToSection();
+    };
   }
-})
+});
 
 watch(macValue, () => {
-  if (macValue.value === 'Download for Apple Silicon') {
-    const link = document.createElement('a')
-    link.href = macLinks.appleSilicon
-    link.download = ''
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  } else if (macValue.value === 'Download for Intel') {
-    const link = document.createElement('a')
-    link.href = macLinks.intel
-    link.download = ''
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  if (macValue.value === "Download for Apple Silicon") {
+    const link = document.createElement("a");
+    link.href = macLinks.appleSilicon;
+    link.download = "";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else if (macValue.value === "Download for Intel") {
+    const link = document.createElement("a");
+    link.href = macLinks.intel;
+    link.download = "";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
-})
+});
 
 const scrollToSection = () => {
   nextTick(() => {
     window.scrollTo({
       top: downloadSection.value.offsetTop,
-      behavior: 'smooth',
-    })
-  })
-}
+      behavior: "smooth",
+    });
+  });
+};
 
-const title = 'Download the Modrinth App!'
+const title = "Download the Modrinth App!";
 const description =
-  'The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.'
+  "The Modrinth App is a unique, open source launcher that allows you to play your favorite mods, and keep them up to date, all in one neat little package.";
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-})
+});
 </script>
 
 <template>
@@ -128,7 +128,7 @@ useSeoMeta({
       <h1 class="main-header">
         Download Modrinth <br v-if="os" />
         App
-        {{ os ? `for ${os}` : '' }}
+        {{ os ? `for ${os}` : "" }}
       </h1>
       <h2 class="main-subheader">
         The Modrinth App is a unique, open source launcher that allows you to play your favorite
@@ -462,7 +462,7 @@ useSeoMeta({
               </div>
               <div class="cell important">Modrinth App</div>
               <div class="cell important">Small</div>
-              <div class="cell important">{{ '< 150 MB' }}</div>
+              <div class="cell important">{{ "< 150 MB" }}</div>
             </div>
             <div class="row">
               <div class="cell">
@@ -532,7 +532,7 @@ useSeoMeta({
               started with the Modrinth App in seconds!
             </p>
           </div>
-          <div class="ring inner-ring">
+          <div class="inner-ring ring">
             <div class="icon-logo">
               <LogoAnimated class="icon" />
             </div>
@@ -996,7 +996,7 @@ useSeoMeta({
 <style scoped lang="scss">
 .landing-hero {
   position: relative;
-  background: #0f1121 url('https://cdn-raw.modrinth.com/app-landing/cube-black.png') no-repeat
+  background: #0f1121 url("https://cdn-raw.modrinth.com/app-landing/cube-black.png") no-repeat
     center 4rem;
   background-size: cover;
   padding: 6rem 1rem 12rem 1rem;
@@ -1619,7 +1619,9 @@ useSeoMeta({
             gap: 1rem;
             border-radius: 1rem;
             border: 1px solid var(--landing-border-color);
-            transition: background 0.5s ease-in-out, transform 0.05s ease-in-out;
+            transition:
+              background 0.5s ease-in-out,
+              transform 0.05s ease-in-out;
             // Removed due to lag on mobile :(
             background: var(--landing-blob-gradient);
 
@@ -1696,7 +1698,8 @@ useSeoMeta({
         rgba(44, 48, 79, 0.35) 0%,
         rgba(32, 35, 50, 0.27) 100%
       );
-      box-shadow: 2px 2px 12px 0px rgba(0, 0, 0, 0.16),
+      box-shadow:
+        2px 2px 12px 0px rgba(0, 0, 0, 0.16),
         2px 2px 64px 0px rgba(57, 61, 94, 0.45) inset;
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
@@ -2003,7 +2006,7 @@ useSeoMeta({
   border-radius: var(--radius-lg);
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     padding: 1px;
@@ -2011,8 +2014,12 @@ useSeoMeta({
     border-radius: 1rem;
     background: var(--landing-border-gradient);
 
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
@@ -2141,7 +2148,8 @@ useSeoMeta({
       rgba(255, 255, 255, 0.35) 0%,
       rgba(255, 255, 255, 0.27) 100%
     ) !important;
-    box-shadow: 2px 2px 64px 0px rgba(255, 255, 255, 0.45) inset,
+    box-shadow:
+      2px 2px 64px 0px rgba(255, 255, 255, 0.45) inset,
       2px 2px 12px 0px rgba(0, 0, 0, 0.16) !important;
     border: none !important;
   }
@@ -2172,7 +2180,7 @@ useSeoMeta({
   }
 
   .landing-hero {
-    background: url('https://cdn-raw.modrinth.com/app-landing/cube-light.png') no-repeat center 4rem;
+    background: url("https://cdn-raw.modrinth.com/app-landing/cube-light.png") no-repeat center 4rem;
     background-size: cover;
   }
 

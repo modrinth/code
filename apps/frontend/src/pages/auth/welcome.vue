@@ -36,60 +36,62 @@
   </div>
 </template>
 <script setup>
-import { Checkbox } from '@modrinth/ui'
-import { RightArrowIcon } from '@modrinth/assets'
+import { Checkbox } from "@modrinth/ui";
+import { RightArrowIcon } from "@modrinth/assets";
 
-const { formatMessage } = useVIntl()
+const { formatMessage } = useVIntl();
 
 const messages = defineMessages({
   subscribeCheckbox: {
-    id: 'auth.welcome.checkbox.subscribe',
-    defaultMessage: 'Subscribe to updates about Modrinth',
+    id: "auth.welcome.checkbox.subscribe",
+    defaultMessage: "Subscribe to updates about Modrinth",
   },
   tosLabel: {
-    id: 'auth.welcome.label.tos',
+    id: "auth.welcome.label.tos",
     defaultMessage:
       "By creating an account, you have agreed to Modrinth's <terms-link>Terms</terms-link> and <privacy-policy-link>Privacy Policy</privacy-policy-link>.",
   },
   welcomeDescription: {
-    id: 'auth.welcome.description',
+    id: "auth.welcome.description",
     defaultMessage:
-      'Thank you for creating an account. You can now follow and create projects, receive updates about your favorite projects, and more!',
+      "Thank you for creating an account. You can now follow and create projects, receive updates about your favorite projects, and more!",
   },
   welcomeLongTitle: {
-    id: 'auth.welcome.long-title',
-    defaultMessage: 'Welcome to Modrinth!',
+    id: "auth.welcome.long-title",
+    defaultMessage: "Welcome to Modrinth!",
   },
   welcomeTitle: {
-    id: 'auth.welcome.title',
-    defaultMessage: 'Welcome',
+    id: "auth.welcome.title",
+    defaultMessage: "Welcome",
   },
-})
+});
 
 useHead({
   title: () => `${formatMessage(messages.welcomeTitle)} - Modrinth`,
-})
+});
 
-const subscribe = ref(true)
+const subscribe = ref(true);
 
 async function continueSignUp() {
-  const route = useNativeRoute()
+  const route = useNativeRoute();
 
-  await useAuth(route.query.authToken)
-  await useUser()
+  await useAuth(route.query.authToken);
+  await useUser();
 
   if (subscribe.value) {
     try {
-      await useBaseFetch('auth/email/subscribe', {
-        method: 'POST',
-      })
-    } catch {}
+      await useBaseFetch("auth/email/subscribe", {
+        method: "POST",
+      });
+    } catch {
+      /* empty */
+    }
   }
 
   if (route.query.redirect) {
-    await navigateTo(route.query.redirect)
+    await navigateTo(route.query.redirect);
   } else {
-    await navigateTo('/dashboard')
+    await navigateTo("/dashboard");
   }
 }
 </script>

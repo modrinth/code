@@ -15,7 +15,7 @@ export default {
     categories: {
       type: Array,
       default() {
-        return []
+        return [];
       },
     },
     type: {
@@ -24,9 +24,9 @@ export default {
     },
   },
   setup() {
-    const tags = useTags()
+    const tags = useTags();
 
-    return { tags }
+    return { tags };
   },
   computed: {
     categoriesFiltered() {
@@ -34,11 +34,11 @@ export default {
         .concat(this.tags.loaders)
         .filter(
           (x) =>
-            this.categories.includes(x.name) && (!x.project_type || x.project_type === this.type)
-        )
+            this.categories.includes(x.name) && (!x.project_type || x.project_type === this.type),
+        );
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

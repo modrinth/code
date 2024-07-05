@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg?component'
+import CheckIcon from "~/assets/images/utils/check.svg?component";
 
 export default {
   components: {
@@ -42,32 +42,32 @@ export default {
       default: true,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ["update:modelValue"],
   computed: {
     selected: {
       get() {
-        return this.modelValue
+        return this.modelValue;
       },
       set(value) {
-        this.$emit('update:modelValue', value)
+        this.$emit("update:modelValue", value);
       },
     },
   },
   created() {
     if (this.items.length > 0 && this.neverEmpty) {
-      this.selected = this.items[0]
+      this.selected = this.items[0];
     }
   },
   methods: {
     toggleItem(item) {
       if (this.selected === item && !this.neverEmpty) {
-        this.selected = null
+        this.selected = null;
       } else {
-        this.selected = item
+        this.selected = item;
       }
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -95,7 +95,9 @@ export default {
   .selected {
     color: var(--color-button-text-active);
     background-color: var(--color-brand-highlight);
-    box-shadow: inset 0 0 0 transparent, 0 0 0 2px var(--color-brand);
+    box-shadow:
+      inset 0 0 0 transparent,
+      0 0 0 2px var(--color-brand);
   }
 }
 </style>

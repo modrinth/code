@@ -86,7 +86,9 @@
                 v-model="selectedRange"
                 :options="selectableRanges"
                 name="Time range"
-                :display-name="(o: typeof selectableRanges[number] | undefined) => o?.label || 'Custom'"
+                :display-name="
+                  (o: (typeof selectableRanges)[number] | undefined) => o?.label || 'Custom'
+                "
               />
             </div>
           </div>
@@ -218,7 +220,7 @@
                     :style="{
                       width: formatPercent(
                         count,
-                        analytics.formattedData.value.downloadsByCountry.sum
+                        analytics.formattedData.value.downloadsByCountry.sum,
                       ),
                       backgroundColor: 'var(--color-brand)',
                     }"
@@ -266,7 +268,7 @@
                   v-tooltip="
                     `${
                       Math.round(
-                        (count / analytics.formattedData.value.viewsByCountry.sum) * 10000
+                        (count / analytics.formattedData.value.viewsByCountry.sum) * 10000,
                       ) / 100
                     }%`
                   "
@@ -289,56 +291,56 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card, DropdownSelect } from '@modrinth/ui'
-import { formatMoney, formatNumber, formatCategoryHeader } from '@modrinth/utils'
-import { UpdatedIcon, DownloadIcon } from '@modrinth/assets'
-import dayjs from 'dayjs'
-import { computed } from 'vue'
+import { Button, Card, DropdownSelect } from "@modrinth/ui";
+import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
+import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
+import dayjs from "dayjs";
+import { computed } from "vue";
 
-import { analyticsSetToCSVString, intToRgba } from '~/utils/analytics.js'
+import { analyticsSetToCSVString, intToRgba } from "~/utils/analytics.js";
 
-import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from '#components'
+import { UiChartsCompactChart as CompactChart, UiChartsChart as Chart } from "#components";
 
-import PaletteIcon from '~/assets/icons/palette.svg?component'
+import PaletteIcon from "~/assets/icons/palette.svg?component";
 
-const router = useNativeRouter()
-const theme = useTheme()
+const router = useNativeRouter();
+const theme = useTheme();
 
 const props = withDefaults(
   defineProps<{
-    projects?: any[]
+    projects?: any[];
     /**
      * @deprecated Use `ranges` instead
      */
-    resoloutions?: Record<string, number>
-    ranges?: Record<number, [string, number] | string>
-    personal?: boolean
+    resoloutions?: Record<string, number>;
+    ranges?: Record<number, [string, number] | string>;
+    personal?: boolean;
   }>(),
   {
     projects: undefined,
     resoloutions: () => defaultResoloutions,
     ranges: () => defaultRanges,
     personal: false,
-  }
-)
+  },
+);
 
-const projects = ref(props.projects || [])
+const projects = ref(props.projects || []);
 
 const selectableRanges = Object.entries(props.ranges).map(([duration, extra]) => ({
-  label: typeof extra === 'string' ? extra : extra[0],
+  label: typeof extra === "string" ? extra : extra[0],
   value: Number(duration),
-  res: typeof extra === 'string' ? Number(duration) : extra[1],
-}))
+  res: typeof extra === "string" ? Number(duration) : extra[1],
+}));
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
   get: () => {
-    const id = (router.currentRoute.value.query?.chart as string | undefined) || 'downloads'
+    const id = (router.currentRoute.value.query?.chart as string | undefined) || "downloads";
     // if the id is anything but the 3 charts we have or undefined, throw an error
-    if (!['downloads', 'views', 'revenue'].includes(id)) {
-      throw new Error(`Unknown chart ${id}`)
+    if (!["downloads", "views", "revenue"].includes(id)) {
+      throw new Error(`Unknown chart ${id}`);
     }
-    return id
+    return id;
   },
   set: (chart) => {
     router.push({
@@ -346,153 +348,153 @@ const selectedChart = computed({
         ...router.currentRoute.value.query,
         chart,
       },
-    })
+    });
   },
-})
+});
 
 // Chart refs
-const downloadsChart = ref()
-const viewsChart = ref()
-const revenueChart = ref()
-const tinyDownloadChart = ref()
-const tinyViewChart = ref()
-const tinyRevenueChart = ref()
+const downloadsChart = ref();
+const viewsChart = ref();
+const revenueChart = ref();
+const tinyDownloadChart = ref();
+const tinyViewChart = ref();
+const tinyRevenueChart = ref();
 
-const selectedDisplayProjects = ref(props.projects || [])
+const selectedDisplayProjects = ref(props.projects || []);
 
 const removeProjectFromDisplay = (id: string) => {
-  selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id)
-}
+  selectedDisplayProjects.value = selectedDisplayProjects.value.filter((p) => p.id !== id);
+};
 
 const addProjectToDisplay = (id: string) => {
   selectedDisplayProjects.value = [
     ...selectedDisplayProjects.value,
     props.projects?.find((p) => p.id === id),
-  ].filter(Boolean)
-}
+  ].filter(Boolean);
+};
 
 const projectIsOnDisplay = (id: string) => {
-  return selectedDisplayProjects.value?.some((p) => p.id === id) ?? false
-}
+  return selectedDisplayProjects.value?.some((p) => p.id === id) ?? false;
+};
 
 const resetCharts = () => {
-  downloadsChart.value?.resetChart()
-  viewsChart.value?.resetChart()
-  revenueChart.value?.resetChart()
+  downloadsChart.value?.resetChart();
+  viewsChart.value?.resetChart();
+  revenueChart.value?.resetChart();
 
-  tinyDownloadChart.value?.resetChart()
-  tinyViewChart.value?.resetChart()
-  tinyRevenueChart.value?.resetChart()
-}
+  tinyDownloadChart.value?.resetChart();
+  tinyViewChart.value?.resetChart();
+  tinyRevenueChart.value?.resetChart();
+};
 
 const isUsingProjectColors = computed({
   get: () => {
     return (
-      router.currentRoute.value.query?.colors === 'true' ||
+      router.currentRoute.value.query?.colors === "true" ||
       router.currentRoute.value.query?.colors === undefined
-    )
+    );
   },
   set: (newValue) => {
     router.push({
       query: {
         ...router.currentRoute.value.query,
-        colors: newValue ? 'true' : 'false',
+        colors: newValue ? "true" : "false",
       },
-    })
+    });
   },
-})
+});
 
 const analytics = useFetchAllAnalytics(
   resetCharts,
   projects,
   selectedDisplayProjects,
-  props.personal
-)
+  props.personal,
+);
 
-const { startDate, endDate, timeRange, timeResolution } = analytics
+const { startDate, endDate, timeRange, timeResolution } = analytics;
 
 const selectedRange = computed({
   get: () => {
     return (
       selectableRanges.find((option) => option.value === timeRange.value) || {
-        label: 'Custom',
+        label: "Custom",
         value: timeRange.value,
       }
-    )
+    );
   },
   set: (newRange: { label: string; value: number; res?: number }) => {
-    timeRange.value = newRange.value
-    startDate.value = Date.now() - timeRange.value * 60 * 1000
-    endDate.value = Date.now()
+    timeRange.value = newRange.value;
+    startDate.value = Date.now() - timeRange.value * 60 * 1000;
+    endDate.value = Date.now();
 
     if (newRange?.res) {
-      timeResolution.value = newRange.res
+      timeResolution.value = newRange.res;
     }
   },
-})
+});
 
 const selectedDataSet = computed(() => {
   switch (selectedChart.value) {
-    case 'downloads':
-      return analytics.totalData.value.downloads
-    case 'views':
-      return analytics.totalData.value.views
-    case 'revenue':
-      return analytics.totalData.value.revenue
+    case "downloads":
+      return analytics.totalData.value.downloads;
+    case "views":
+      return analytics.totalData.value.views;
+    case "revenue":
+      return analytics.totalData.value.revenue;
     default:
-      throw new Error(`Unknown chart ${selectedChart.value}`)
+      throw new Error(`Unknown chart ${selectedChart.value}`);
   }
-})
+});
 const selectedDataSetProjects = computed(() => {
   return selectedDataSet.value.projectIds
     .map((id) => props.projects?.find((p) => p?.id === id))
-    .filter(Boolean)
-})
+    .filter(Boolean);
+});
 
 const downloadSelectedSetAsCSV = () => {
-  const selectedChartName = selectedChart.value
+  const selectedChartName = selectedChart.value;
 
-  const csv = analyticsSetToCSVString(selectedDataSet.value)
+  const csv = analyticsSetToCSVString(selectedDataSet.value);
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
 
-  const link = document.createElement('a')
-  const url = URL.createObjectURL(blob)
-  link.setAttribute('href', url)
-  link.setAttribute('download', `${selectedChartName}-data.csv`)
-  link.style.visibility = 'hidden'
-  document.body.appendChild(link)
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", `${selectedChartName}-data.csv`);
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
 
-  link.click()
-}
+  link.click();
+};
 
-const onDownloadSetAsCSV = useClientTry(async () => await downloadSelectedSetAsCSV())
+const onDownloadSetAsCSV = useClientTry(async () => await downloadSelectedSetAsCSV());
 const onToggleColors = () => {
-  isUsingProjectColors.value = !isUsingProjectColors.value
-}
+  isUsingProjectColors.value = !isUsingProjectColors.value;
+};
 </script>
 
 <script lang="ts">
 const defaultResoloutions: Record<string, number> = {
-  '5 minutes': 5,
-  '30 minutes': 30,
-  'An hour': 60,
-  '12 hours': 720,
-  'A day': 1440,
-  'A week': 10080,
-}
+  "5 minutes": 5,
+  "30 minutes": 30,
+  "An hour": 60,
+  "12 hours": 720,
+  "A day": 1440,
+  "A week": 10080,
+};
 
 const defaultRanges: Record<number, [string, number] | string> = {
-  30: ['Last 30 minutes', 1],
-  60: ['Last hour', 5],
-  720: ['Last 12 hours', 15],
-  1440: ['Last day', 60],
-  10080: ['Last week', 720],
-  43200: ['Last month', 1440],
-  129600: ['Last quarter', 10080],
-  525600: ['Last year', 20160],
-  1051200: ['Last two years', 40320],
-}
+  30: ["Last 30 minutes", 1],
+  60: ["Last hour", 5],
+  720: ["Last 12 hours", 15],
+  1440: ["Last day", 60],
+  10080: ["Last week", 720],
+  43200: ["Last month", 1440],
+  129600: ["Last quarter", 10080],
+  525600: ["Last year", 20160],
+  1051200: ["Last two years", 40320],
+};
 </script>
 
 <style scoped lang="scss">
@@ -590,7 +592,9 @@ const defaultRanges: Record<number, [string, number] | string> = {
 .chart-button-base__selected {
   color: var(--color-contrast);
   background-color: var(--color-brand-highlight);
-  box-shadow: inset 0 0 0 transparent, 0 0 0 2px var(--color-brand);
+  box-shadow:
+    inset 0 0 0 transparent,
+    0 0 0 2px var(--color-brand);
 
   &:hover {
     background-color: var(--color-brand-highlight);
@@ -662,7 +666,7 @@ const defaultRanges: Record<number, [string, number] | string> = {
 
 .country-value {
   display: grid;
-  grid-template-areas: 'flag text bar';
+  grid-template-areas: "flag text bar";
   grid-template-columns: auto 1fr 10rem;
   align-items: center;
   justify-content: space-between;

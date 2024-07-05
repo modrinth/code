@@ -282,8 +282,8 @@
               :title="formatMessage(commonMessages.notificationsLabel)"
               @click="
                 () => {
-                  isMobileMenuOpen = false
-                  isBrowseMenuOpen = false
+                  isMobileMenuOpen = false;
+                  isBrowseMenuOpen = false;
                 }
               "
             >
@@ -426,294 +426,294 @@ import {
   XIcon,
   IssuesIcon,
   ReportIcon,
-} from '@modrinth/assets'
-import { Button } from '@modrinth/ui'
-import HamburgerIcon from '~/assets/images/utils/hamburger.svg?component'
-import CrossIcon from '~/assets/images/utils/x.svg?component'
-import SearchIcon from '~/assets/images/utils/search.svg?component'
+} from "@modrinth/assets";
+import { Button } from "@modrinth/ui";
+import HamburgerIcon from "~/assets/images/utils/hamburger.svg?component";
+import CrossIcon from "~/assets/images/utils/x.svg?component";
+import SearchIcon from "~/assets/images/utils/search.svg?component";
 
-import NotificationIcon from '~/assets/images/sidebar/notifications.svg?component'
-import SettingsIcon from '~/assets/images/sidebar/settings.svg?component'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
-import HomeIcon from '~/assets/images/sidebar/home.svg?component'
+import NotificationIcon from "~/assets/images/sidebar/notifications.svg?component";
+import SettingsIcon from "~/assets/images/sidebar/settings.svg?component";
+import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
+import HomeIcon from "~/assets/images/sidebar/home.svg?component";
 
-import MoonIcon from '~/assets/images/utils/moon.svg?component'
-import SunIcon from '~/assets/images/utils/sun.svg?component'
-import PlusIcon from '~/assets/images/utils/plus.svg?component'
-import DropdownIcon from '~/assets/images/utils/dropdown.svg?component'
-import LogOutIcon from '~/assets/images/utils/log-out.svg?component'
-import ChartIcon from '~/assets/images/utils/chart.svg?component'
+import MoonIcon from "~/assets/images/utils/moon.svg?component";
+import SunIcon from "~/assets/images/utils/sun.svg?component";
+import PlusIcon from "~/assets/images/utils/plus.svg?component";
+import DropdownIcon from "~/assets/images/utils/dropdown.svg?component";
+import LogOutIcon from "~/assets/images/utils/log-out.svg?component";
+import ChartIcon from "~/assets/images/utils/chart.svg?component";
 
-import NavRow from '~/components/ui/NavRow.vue'
-import ModalCreation from '~/components/ui/ModalCreation.vue'
-import Avatar from '~/components/ui/Avatar.vue'
-import { getProjectTypeMessage } from '~/utils/i18n-project-type.ts'
-import { commonMessages } from '~/utils/common-messages.ts'
-import { DARK_THEMES } from '~/composables/theme.js'
+import NavRow from "~/components/ui/NavRow.vue";
+import ModalCreation from "~/components/ui/ModalCreation.vue";
+import Avatar from "~/components/ui/Avatar.vue";
+import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
+import { commonMessages } from "~/utils/common-messages.ts";
+import { DARK_THEMES } from "~/composables/theme.js";
 
-const { formatMessage } = useVIntl()
+const { formatMessage } = useVIntl();
 
-const app = useNuxtApp()
-const auth = await useAuth()
-const cosmetics = useCosmetics()
-const flags = useFeatureFlags()
-const tags = useTags()
+const app = useNuxtApp();
+const auth = await useAuth();
+const cosmetics = useCosmetics();
+const flags = useFeatureFlags();
+const tags = useTags();
 
-const config = useRuntimeConfig()
-const route = useNativeRoute()
-const link = config.public.siteUrl + route.path.replace(/\/+$/, '')
+const config = useRuntimeConfig();
+const route = useNativeRoute();
+const link = config.public.siteUrl + route.path.replace(/\/+$/, "");
 
 const verifyEmailBannerMessages = defineMessages({
   title: {
-    id: 'layout.banner.verify-email.title',
-    defaultMessage: 'For security purposes, please verify your email address on Modrinth.',
+    id: "layout.banner.verify-email.title",
+    defaultMessage: "For security purposes, please verify your email address on Modrinth.",
   },
   action: {
-    id: 'layout.banner.verify-email.action',
-    defaultMessage: 'Re-send verification email',
+    id: "layout.banner.verify-email.action",
+    defaultMessage: "Re-send verification email",
   },
-})
+});
 
 const addEmailBannerMessages = defineMessages({
   title: {
-    id: 'layout.banner.add-email.title',
-    defaultMessage: 'For security purposes, please enter your email on Modrinth.',
+    id: "layout.banner.add-email.title",
+    defaultMessage: "For security purposes, please enter your email on Modrinth.",
   },
   action: {
-    id: 'layout.banner.add-email.button',
-    defaultMessage: 'Visit account settings',
+    id: "layout.banner.add-email.button",
+    defaultMessage: "Visit account settings",
   },
-})
+});
 
 const stagingBannerMessages = defineMessages({
   title: {
-    id: 'layout.banner.staging.title',
-    defaultMessage: 'You’re viewing Modrinth’s staging environment.',
+    id: "layout.banner.staging.title",
+    defaultMessage: "You’re viewing Modrinth’s staging environment.",
   },
   description: {
-    id: 'layout.banner.staging.description',
+    id: "layout.banner.staging.description",
     defaultMessage:
-      'The staging environment is running on a copy of the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.',
+      "The staging environment is running on a copy of the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance.",
   },
-})
+});
 
 const navMenuMessages = defineMessages({
   home: {
-    id: 'layout.nav.home',
-    defaultMessage: 'Home',
+    id: "layout.nav.home",
+    defaultMessage: "Home",
   },
   search: {
-    id: 'layout.nav.search',
-    defaultMessage: 'Search',
+    id: "layout.nav.search",
+    defaultMessage: "Search",
   },
-})
+});
 
 const messages = defineMessages({
   toggleMenu: {
-    id: 'layout.menu-toggle.action',
-    defaultMessage: 'Toggle menu',
+    id: "layout.menu-toggle.action",
+    defaultMessage: "Toggle menu",
   },
   yourAvatarAlt: {
-    id: 'layout.avatar.alt',
-    defaultMessage: 'Your avatar',
+    id: "layout.avatar.alt",
+    defaultMessage: "Your avatar",
   },
   getModrinthApp: {
-    id: 'layout.action.get-modrinth-app',
-    defaultMessage: 'Get Modrinth App',
+    id: "layout.action.get-modrinth-app",
+    defaultMessage: "Get Modrinth App",
   },
   changeTheme: {
-    id: 'layout.action.change-theme',
-    defaultMessage: 'Change theme',
+    id: "layout.action.change-theme",
+    defaultMessage: "Change theme",
   },
-})
+});
 
 const footerMessages = defineMessages({
   openSource: {
-    id: 'layout.footer.open-source',
-    defaultMessage: 'Modrinth is <github-link>open source</github-link>.',
+    id: "layout.footer.open-source",
+    defaultMessage: "Modrinth is <github-link>open source</github-link>.",
   },
   companyTitle: {
-    id: 'layout.footer.company.title',
-    defaultMessage: 'Company',
+    id: "layout.footer.company.title",
+    defaultMessage: "Company",
   },
   terms: {
-    id: 'layout.footer.company.terms',
-    defaultMessage: 'Terms',
+    id: "layout.footer.company.terms",
+    defaultMessage: "Terms",
   },
   privacy: {
-    id: 'layout.footer.company.privacy',
-    defaultMessage: 'Privacy',
+    id: "layout.footer.company.privacy",
+    defaultMessage: "Privacy",
   },
   rules: {
-    id: 'layout.footer.company.rules',
-    defaultMessage: 'Rules',
+    id: "layout.footer.company.rules",
+    defaultMessage: "Rules",
   },
   careers: {
-    id: 'layout.footer.company.careers',
-    defaultMessage: 'Careers',
+    id: "layout.footer.company.careers",
+    defaultMessage: "Careers",
   },
   resourcesTitle: {
-    id: 'layout.footer.resources.title',
-    defaultMessage: 'Resources',
+    id: "layout.footer.resources.title",
+    defaultMessage: "Resources",
   },
   support: {
-    id: 'layout.footer.resources.support',
-    defaultMessage: 'Support',
+    id: "layout.footer.resources.support",
+    defaultMessage: "Support",
   },
   blog: {
-    id: 'layout.footer.resources.blog',
-    defaultMessage: 'Blog',
+    id: "layout.footer.resources.blog",
+    defaultMessage: "Blog",
   },
   docs: {
-    id: 'layout.footer.resources.docs',
-    defaultMessage: 'Docs',
+    id: "layout.footer.resources.docs",
+    defaultMessage: "Docs",
   },
   status: {
-    id: 'layout.footer.resources.status',
-    defaultMessage: 'Status',
+    id: "layout.footer.resources.status",
+    defaultMessage: "Status",
   },
   interactTitle: {
-    id: 'layout.footer.interact.title',
-    defaultMessage: 'Interact',
+    id: "layout.footer.interact.title",
+    defaultMessage: "Interact",
   },
   legalDisclaimer: {
-    id: 'layout.footer.legal-disclaimer',
+    id: "layout.footer.legal-disclaimer",
     defaultMessage:
-      'NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.',
+      "NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
   },
-})
+});
 
 useHead({
   link: [
     {
-      rel: 'canonical',
+      rel: "canonical",
       href: link,
     },
   ],
-})
+});
 useSeoMeta({
-  title: 'Modrinth',
+  title: "Modrinth",
   description: () =>
     formatMessage({
-      id: 'layout.meta.description',
+      id: "layout.meta.description",
       defaultMessage:
-        'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. ' +
-        'Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
+        "Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. " +
+        "Discover and publish projects on Modrinth with a modern, easy to use interface and API.",
     }),
-  publisher: 'Modrinth',
-  themeColor: '#1bd96a',
-  colorScheme: 'dark light',
+  publisher: "Modrinth",
+  themeColor: "#1bd96a",
+  colorScheme: "dark light",
 
   // OpenGraph
-  ogTitle: 'Modrinth',
-  ogSiteName: 'Modrinth',
+  ogTitle: "Modrinth",
+  ogSiteName: "Modrinth",
   ogDescription: () =>
     formatMessage({
-      id: 'layout.meta.og-description',
-      defaultMessage: 'Discover and publish Minecraft content!',
+      id: "layout.meta.og-description",
+      defaultMessage: "Discover and publish Minecraft content!",
     }),
-  ogType: 'website',
-  ogImage: 'https://cdn.modrinth.com/modrinth-new.png',
+  ogType: "website",
+  ogImage: "https://cdn.modrinth.com/modrinth-new.png",
   ogUrl: link,
 
   // Twitter
-  twitterCard: 'summary',
-  twitterSite: '@modrinth',
-})
+  twitterCard: "summary",
+  twitterSite: "@modrinth",
+});
 
-const developerModeCounter = ref(0)
+const developerModeCounter = ref(0);
 
-const isDropdownOpen = ref(false)
-const isMobileMenuOpen = ref(false)
-const isBrowseMenuOpen = ref(false)
+const isDropdownOpen = ref(false);
+const isMobileMenuOpen = ref(false);
+const isBrowseMenuOpen = ref(false);
 const navRoutes = computed(() => [
   {
-    label: formatMessage(getProjectTypeMessage('mod', true)),
-    href: '/mods',
+    label: formatMessage(getProjectTypeMessage("mod", true)),
+    href: "/mods",
   },
   {
-    label: formatMessage(getProjectTypeMessage('plugin', true)),
-    href: '/plugins',
+    label: formatMessage(getProjectTypeMessage("plugin", true)),
+    href: "/plugins",
   },
   {
-    label: formatMessage(getProjectTypeMessage('datapack', true)),
-    href: '/datapacks',
+    label: formatMessage(getProjectTypeMessage("datapack", true)),
+    href: "/datapacks",
   },
   {
-    label: formatMessage(getProjectTypeMessage('shader', true)),
-    href: '/shaders',
+    label: formatMessage(getProjectTypeMessage("shader", true)),
+    href: "/shaders",
   },
   {
-    label: formatMessage(getProjectTypeMessage('resourcepack', true)),
-    href: '/resourcepacks',
+    label: formatMessage(getProjectTypeMessage("resourcepack", true)),
+    href: "/resourcepacks",
   },
   {
-    label: formatMessage(getProjectTypeMessage('modpack', true)),
-    href: '/modpacks',
+    label: formatMessage(getProjectTypeMessage("modpack", true)),
+    href: "/modpacks",
   },
-])
+]);
 
 onMounted(() => {
   if (window && process.client) {
-    window.history.scrollRestoration = 'auto'
+    window.history.scrollRestoration = "auto";
   }
 
-  runAnalytics()
-})
+  runAnalytics();
+});
 
 watch(
   () => route.path,
   () => {
-    isMobileMenuOpen.value = false
-    isBrowseMenuOpen.value = false
+    isMobileMenuOpen.value = false;
+    isBrowseMenuOpen.value = false;
 
     if (process.client) {
-      document.body.style.overflowY = 'scroll'
-      document.body.setAttribute('tabindex', '-1')
-      document.body.removeAttribute('tabindex')
+      document.body.style.overflowY = "scroll";
+      document.body.setAttribute("tabindex", "-1");
+      document.body.removeAttribute("tabindex");
     }
 
-    updateCurrentDate()
-    runAnalytics()
-  }
-)
+    updateCurrentDate();
+    runAnalytics();
+  },
+);
 
 function developerModeIncrement() {
   if (developerModeCounter.value >= 5) {
-    flags.value.developerMode = !flags.value.developerMode
-    developerModeCounter.value = 0
-    saveFeatureFlags()
+    flags.value.developerMode = !flags.value.developerMode;
+    developerModeCounter.value = 0;
+    saveFeatureFlags();
     if (flags.value.developerMode) {
       app.$notify({
-        group: 'main',
-        title: 'Developer mode activated',
-        text: 'Developer mode has been enabled',
-        type: 'success',
-      })
+        group: "main",
+        title: "Developer mode activated",
+        text: "Developer mode has been enabled",
+        type: "success",
+      });
     } else {
       app.$notify({
-        group: 'main',
-        title: 'Developer mode deactivated',
-        text: 'Developer mode has been disabled',
-        type: 'success',
-      })
+        group: "main",
+        title: "Developer mode deactivated",
+        text: "Developer mode has been disabled",
+        type: "success",
+      });
     }
   } else {
-    developerModeCounter.value++
+    developerModeCounter.value++;
   }
 }
 
 async function logoutUser() {
-  await logout()
+  await logout();
 }
 
 function runAnalytics() {
-  const config = useRuntimeConfig()
-  const replacedUrl = config.public.apiBaseUrl.replace('v2/', '')
+  const config = useRuntimeConfig();
+  const replacedUrl = config.public.apiBaseUrl.replace("v2/", "");
 
   setTimeout(() => {
     $fetch(`${replacedUrl}analytics/view`, {
-      method: 'POST',
+      method: "POST",
       body: {
         url: window.location.href,
       },
@@ -722,39 +722,39 @@ function runAnalytics() {
       },
     })
       .then(() => {})
-      .catch(() => {})
-  })
+      .catch(() => {});
+  });
 }
 function toggleMobileMenu() {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
   if (isMobileMenuOpen.value) {
-    isBrowseMenuOpen.value = false
+    isBrowseMenuOpen.value = false;
   }
 }
 function toggleBrowseMenu() {
-  isBrowseMenuOpen.value = !isBrowseMenuOpen.value
+  isBrowseMenuOpen.value = !isBrowseMenuOpen.value;
 
   if (isBrowseMenuOpen.value) {
-    isMobileMenuOpen.value = false
+    isMobileMenuOpen.value = false;
   }
 }
 function changeTheme() {
   updateTheme(
     DARK_THEMES.includes(app.$colorMode.value)
-      ? 'light'
-      : cosmetics.value.preferredDarkTheme ?? 'dark',
-    true
-  )
+      ? "light"
+      : cosmetics.value.preferredDarkTheme ?? "dark",
+    true,
+  );
 }
 
 function hideStagingBanner() {
-  cosmetics.value.hideStagingBanner = true
-  saveCosmetics()
+  cosmetics.value.hideStagingBanner = true;
+  saveCosmetics();
 }
 </script>
 
 <style lang="scss">
-@import '~/assets/styles/global.scss';
+@import "~/assets/styles/global.scss";
 // @import '@modrinth/assets';
 
 .layout {
@@ -863,7 +863,7 @@ function hideStagingBanner() {
               align-items: flex-start;
 
               &--alpha::after {
-                content: 'Alpha';
+                content: "Alpha";
                 background-color: var(--color-warning-bg);
                 color: var(--color-warning-text);
                 border-radius: 1rem;
@@ -909,7 +909,7 @@ function hideStagingBanner() {
               &::after {
                 background-color: var(--color-brand);
                 border-radius: var(--size-rounded-max);
-                content: '';
+                content: "";
                 height: 0.5rem;
                 position: absolute;
                 right: 0.25rem;
@@ -941,8 +941,10 @@ function hideStagingBanner() {
               outline: none;
 
               .user-icon {
-                height: 2rem;
-                width: 2rem;
+                min-height: unset;
+                min-width: unset;
+                height: 2rem !important;
+                width: 2rem !important;
                 outline: 2px solid var(--color-raised-bg);
                 transition: outline-color 0.1s ease-in-out;
               }
@@ -966,8 +968,11 @@ function hideStagingBanner() {
               right: -1rem;
               transform: scaleY(0.9);
               transform-origin: top;
-              transition: all 0.1s ease-in-out 0.05s, color 0s ease-in-out 0s,
-                background-color 0s ease-in-out 0s, border-color 0s ease-in-out 0s;
+              transition:
+                all 0.1s ease-in-out 0.05s,
+                color 0s ease-in-out 0s,
+                background-color 0s ease-in-out 0s,
+                border-color 0s ease-in-out 0s;
               visibility: hidden;
               width: max-content;
               z-index: 1;
@@ -1192,7 +1197,7 @@ function hideStagingBanner() {
             &::after {
               background-color: var(--color-brand);
               border-radius: var(--size-rounded-max);
-              content: '';
+              content: "";
               height: 0.5rem;
               position: absolute;
               left: 1.5rem;
@@ -1276,10 +1281,10 @@ function hideStagingBanner() {
     text-align: center;
     display: grid;
     grid-template:
-      'logo-info  logo-info  logo-info' auto
-      'links-1    links-2    links-3' auto
-      'buttons    buttons    buttons' auto
-      'notice     notice     notice' auto
+      "logo-info  logo-info  logo-info" auto
+      "links-1    links-2    links-3" auto
+      "buttons    buttons    buttons" auto
+      "notice     notice     notice" auto
       / 1fr 1fr 1fr;
     max-width: 1280px;
 
@@ -1357,8 +1362,8 @@ function hideStagingBanner() {
       display: grid;
       margin-inline: auto;
       grid-template:
-        'logo-info  links-1 links-2 links-3 buttons' auto
-        'notice     notice  notice  notice  notice' auto;
+        "logo-info  links-1 links-2 links-3 buttons" auto
+        "notice     notice  notice  notice  notice" auto;
       text-align: unset;
 
       .logo-info {
@@ -1415,7 +1420,7 @@ function hideStagingBanner() {
   border-bottom: 2px solid var(--color-red);
   display: grid;
   gap: 0.5rem;
-  grid-template: 'title actions' 'description actions';
+  grid-template: "title actions" "description actions";
   padding-block: var(--gap-xl);
   padding-inline: max(calc((100% - 80rem) / 2 + var(--gap-md)), var(--gap-xl));
 

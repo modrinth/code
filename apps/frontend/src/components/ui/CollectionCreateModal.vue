@@ -4,8 +4,8 @@
       <div class="markdown-body">
         <p>
           Your new collection will be created as a public collection with
-          {{ projectIds.length > 0 ? projectIds.length : 'no' }}
-          {{ projectIds.length !== 1 ? 'projects' : 'project' }}.
+          {{ projectIds.length > 0 ? projectIds.length : "no" }}
+          {{ projectIds.length !== 1 ? "projects" : "project" }}.
         </p>
       </div>
       <label for="name">
@@ -40,61 +40,61 @@
   </Modal>
 </template>
 <script setup>
-import { XIcon as CrossIcon, CheckIcon } from '@modrinth/assets'
-import { Modal, Button } from '@modrinth/ui'
+import { XIcon as CrossIcon, CheckIcon } from "@modrinth/assets";
+import { Modal, Button } from "@modrinth/ui";
 
-const router = useNativeRouter()
+const router = useNativeRouter();
 
-const name = ref('')
-const description = ref('')
+const name = ref("");
+const description = ref("");
 
-const modal = ref()
+const modal = ref();
 
 const props = defineProps({
   projectIds: {
     type: Array,
     default() {
-      return []
+      return [];
     },
   },
-})
+});
 
 async function create() {
-  startLoading()
+  startLoading();
   try {
-    const result = await useBaseFetch('collection', {
-      method: 'POST',
+    const result = await useBaseFetch("collection", {
+      method: "POST",
       body: {
         name: name.value.trim(),
         description: description.value.trim(),
         projects: props.projectIds,
       },
       apiVersion: 3,
-    })
+    });
 
-    await initUserCollections()
+    await initUserCollections();
 
-    modal.value.hide()
-    await router.push(`/collection/${result.id}`)
+    modal.value.hide();
+    await router.push(`/collection/${result.id}`);
   } catch (err) {
     addNotification({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err?.data?.description || err?.message || err,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 function show() {
-  name.value = ''
-  description.value = ''
-  modal.value.show()
+  name.value = "";
+  description.value = "";
+  modal.value.show();
 }
 
 defineExpose({
   show,
-})
+});
 </script>
 
 <style scoped lang="scss">

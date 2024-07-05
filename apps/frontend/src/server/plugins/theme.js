@@ -1,38 +1,43 @@
+// eslint-disable-next-line no-undef
 export default defineNitroPlugin((nitroApp) => {
-  nitroApp.hooks.hook('render:html', (html, { event }) => {
+  nitroApp.hooks.hook("render:html", (html, { event }) => {
     try {
-      const cookies = parseCookies(event)
+      // eslint-disable-next-line no-undef
+      const cookies = parseCookies(event);
 
-      if (cookies && cookies['color-mode']) {
-        const theme = JSON.parse(cookies['color-mode'])
+      if (cookies && cookies["color-mode"]) {
+        const theme = JSON.parse(cookies["color-mode"]);
 
-        html.htmlAttrs.push(`class="${theme.value}-mode"`)
+        html.htmlAttrs.push(`class="${theme.value}-mode"`);
       } else {
-        html.htmlAttrs.push(`class="dark-mode"`)
+        html.htmlAttrs.push(`class="dark-mode"`);
       }
 
       // Reset cookie attributes to correct ones
       if (cookies) {
         const opts = {
           maxAge: 60 * 60 * 24 * 365 * 10,
-          sameSite: 'lax',
+          sameSite: "lax",
           secure: true,
           httpOnly: false,
-          path: '/',
-        }
+          path: "/",
+        };
 
-        if (cookies['auth-token']) {
-          setCookie(event, 'auth-token', cookies['auth-token'], opts)
+        if (cookies["auth-token"]) {
+          // eslint-disable-next-line no-undef
+          setCookie(event, "auth-token", cookies["auth-token"], opts);
         }
-        if (cookies['color-mode']) {
-          setCookie(event, 'color-mode', cookies['color-mode'], opts)
+        if (cookies["color-mode"]) {
+          // eslint-disable-next-line no-undef
+          setCookie(event, "color-mode", cookies["color-mode"], opts);
         }
         if (cookies.cosmetics) {
-          setCookie(event, 'cosmetics', cookies.cosmetics, opts)
+          // eslint-disable-next-line no-undef
+          setCookie(event, "cosmetics", cookies.cosmetics, opts);
         }
       }
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-  })
-})
+  });
+});

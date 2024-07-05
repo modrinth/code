@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import CrossIcon from '~/assets/images/utils/x.svg?component'
+import CrossIcon from "~/assets/images/utils/x.svg?component";
 
 export default {
   components: {
@@ -39,31 +39,31 @@ export default {
     },
   },
   setup() {
-    const cosmetics = useCosmetics()
+    const cosmetics = useCosmetics();
 
-    return { cosmetics }
+    return { cosmetics };
   },
   data() {
     return {
       shown: false,
       actuallyShown: false,
-    }
+    };
   },
   methods: {
     show() {
-      this.shown = true
+      this.shown = true;
       setTimeout(() => {
-        this.actuallyShown = true
-      }, 50)
+        this.actuallyShown = true;
+      }, 50);
     },
     hide() {
-      this.actuallyShown = false
+      this.actuallyShown = false;
       setTimeout(() => {
-        this.shown = false
-      }, 300)
+        this.shown = false;
+      }, 300);
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>

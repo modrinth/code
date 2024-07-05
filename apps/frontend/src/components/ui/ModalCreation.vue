@@ -73,10 +73,10 @@
 </template>
 
 <script>
-import { Multiselect } from 'vue-multiselect'
-import CrossIcon from '~/assets/images/utils/x.svg?component'
-import CheckIcon from '~/assets/images/utils/right-arrow.svg?component'
-import Modal from '~/components/ui/Modal.vue'
+import { Multiselect } from "vue-multiselect";
+import CrossIcon from "~/assets/images/utils/x.svg?component";
+import CheckIcon from "~/assets/images/utils/right-arrow.svg?component";
+import Modal from "~/components/ui/Modal.vue";
 
 export default {
   components: {
@@ -93,122 +93,122 @@ export default {
     },
   },
   setup() {
-    const tags = useTags()
+    const tags = useTags();
 
-    return { tags }
+    return { tags };
   },
   data() {
     return {
-      name: '',
-      slug: '',
-      description: '',
+      name: "",
+      slug: "",
+      description: "",
       manualSlug: false,
       visibilities: [
         {
-          actual: 'approved',
-          display: 'Public',
+          actual: "approved",
+          display: "Public",
         },
         {
-          actual: 'private',
-          display: 'Private',
+          actual: "private",
+          display: "Private",
         },
         {
-          actual: 'unlisted',
-          display: 'Unlisted',
+          actual: "unlisted",
+          display: "Unlisted",
         },
       ],
       visibility: {
-        actual: 'approved',
-        display: 'Public',
+        actual: "approved",
+        display: "Public",
       },
-    }
+    };
   },
   methods: {
     cancel() {
-      this.$refs.modal.hide()
+      this.$refs.modal.hide();
     },
     async createProject() {
-      startLoading()
+      startLoading();
 
-      const formData = new FormData()
+      const formData = new FormData();
 
-      const auth = await useAuth()
+      const auth = await useAuth();
 
       const projectData = {
         title: this.name.trim(),
-        project_type: 'mod',
+        project_type: "mod",
         slug: this.slug,
         description: this.description.trim(),
-        body: '',
+        body: "",
         requested_status: this.visibility.actual,
         initial_versions: [],
         team_members: [
           {
             user_id: auth.value.user.id,
             name: auth.value.user.username,
-            role: 'Owner',
+            role: "Owner",
           },
         ],
         categories: [],
-        client_side: 'required',
-        server_side: 'required',
-        license_id: 'LicenseRef-Unknown',
+        client_side: "required",
+        server_side: "required",
+        license_id: "LicenseRef-Unknown",
         is_draft: true,
-      }
+      };
 
       if (this.organizationId) {
-        projectData.organization_id = this.organizationId
+        projectData.organization_id = this.organizationId;
       }
 
-      formData.append('data', JSON.stringify(projectData))
+      formData.append("data", JSON.stringify(projectData));
 
       try {
-        await useBaseFetch('project', {
-          method: 'POST',
+        await useBaseFetch("project", {
+          method: "POST",
           body: formData,
           headers: {
-            'Content-Disposition': formData,
+            "Content-Disposition": formData,
           },
-        })
+        });
 
-        this.$refs.modal.hide()
+        this.$refs.modal.hide();
         await this.$router.push({
-          name: 'type-id',
+          name: "type-id",
           params: {
-            type: 'project',
+            type: "project",
             id: this.slug,
           },
-        })
+        });
       } catch (err) {
         this.$notify({
-          group: 'main',
-          title: 'An error occurred',
+          group: "main",
+          title: "An error occurred",
           text: err.data.description,
-          type: 'error',
-        })
+          type: "error",
+        });
       }
-      stopLoading()
+      stopLoading();
     },
     show() {
-      this.projectType = this.tags.projectTypes[0].display
-      this.name = ''
-      this.slug = ''
-      this.description = ''
-      this.manualSlug = false
-      this.$refs.modal.show()
+      this.projectType = this.tags.projectTypes[0].display;
+      this.name = "";
+      this.slug = "";
+      this.description = "";
+      this.manualSlug = false;
+      this.$refs.modal.show();
     },
     updatedName() {
       if (!this.manualSlug) {
         this.slug = this.name
           .trim()
           .toLowerCase()
-          .replaceAll(' ', '-')
-          .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-          .replaceAll(/--+/gm, '-')
+          .replaceAll(" ", "-")
+          .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, "")
+          .replaceAll(/--+/gm, "-");
       }
     },
   },
-}
+};
 </script>
 
 <style scoped lang="scss">

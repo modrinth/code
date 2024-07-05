@@ -48,25 +48,25 @@
   </span>
 </template>
 <script setup>
-import InfoIcon from '~/assets/images/utils/info.svg?component'
-import ClientIcon from '~/assets/images/utils/client.svg?component'
-import GlobeIcon from '~/assets/images/utils/globe.svg?component'
-import ServerIcon from '~/assets/images/utils/server.svg?component'
+import InfoIcon from "~/assets/images/utils/info.svg?component";
+import ClientIcon from "~/assets/images/utils/client.svg?component";
+import GlobeIcon from "~/assets/images/utils/globe.svg?component";
+import ServerIcon from "~/assets/images/utils/server.svg?component";
 
 defineProps({
   type: {
     type: String,
-    default: 'mod',
+    default: "mod",
   },
   serverSide: {
     type: String,
     required: false,
-    default: '',
+    default: "",
   },
   clientSide: {
     type: String,
     required: false,
-    default: '',
+    default: "",
   },
   typeOnly: {
     type: Boolean,
@@ -87,12 +87,12 @@ defineProps({
     type: Array,
     required: false,
     default() {
-      return []
+      return [];
     },
   },
-})
+});
 
-const tags = useTags()
+const tags = useTags();
 </script>
 <style lang="scss" scoped>
 .environment {

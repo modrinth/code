@@ -214,8 +214,8 @@ html {
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
 
-  --landing-maze-bg: url('https://cdn.modrinth.com/landing-new/landing-light.webp');
-  --landing-maze-gradient-bg: url('https://cdn.modrinth.com/landing-new/landing-lower-light.webp');
+  --landing-maze-bg: url("https://cdn.modrinth.com/landing-new/landing-light.webp");
+  --landing-maze-gradient-bg: url("https://cdn.modrinth.com/landing-new/landing-lower-light.webp");
   --landing-maze-outer-bg: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
 
   --landing-color-heading: #000;
@@ -341,9 +341,9 @@ html {
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
-  --landing-maze-bg: url('https://cdn.modrinth.com/landing-new/landing.webp');
+  --landing-maze-bg: url("https://cdn.modrinth.com/landing-new/landing.webp");
   --landing-maze-gradient-bg: linear-gradient(0deg, #31375f 0%, rgba(8, 14, 55, 0) 100%),
-    url('https://cdn.modrinth.com/landing-new/landing-lower.webp');
+    url("https://cdn.modrinth.com/landing-new/landing-lower.webp");
   --landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
 
   --landing-color-heading: #fff;
@@ -537,18 +537,22 @@ textarea {
   font-weight: var(--font-weight-medium);
   border: none;
   outline: 2px solid transparent;
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
   transition: box-shadow 0.1s ease-in-out;
   min-height: 40px;
 
   &:focus,
   &:focus-visible {
-    box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
+    box-shadow:
+      inset 0 0 0 transparent,
+      0 0 0 0.25rem var(--color-brand-shadow);
     color: var(--color-button-text-active);
   }
 
   &:disabled,
-  &[disabled='true'] {
+  &[disabled="true"] {
     opacity: 0.6;
     pointer-events: none;
     cursor: not-allowed;
@@ -565,7 +569,7 @@ textarea {
 }
 
 button,
-input[type='button'] {
+input[type="button"] {
   cursor: pointer;
   border: none;
   outline: 2px solid transparent;
@@ -581,13 +585,13 @@ kbd {
   font-size: 0.85em !important;
 }
 
-@import '~/assets/styles/layout.scss';
-@import '~/assets/styles/utils.scss';
-@import '~/assets/styles/components.scss';
+@import "~/assets/styles/layout.scss";
+@import "~/assets/styles/utils.scss";
+@import "~/assets/styles/components.scss";
 
 button:focus-visible,
 a:focus-visible,
-[tabindex='0']:focus-visible {
+[tabindex="0"]:focus-visible {
   outline: 0.25rem solid #ea80ff;
   border-radius: 0.25rem;
 }
@@ -602,7 +606,10 @@ input {
 }
 
 .button-animation {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline-width 0.2s ease-in-out;
 }
 

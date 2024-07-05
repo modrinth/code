@@ -92,139 +92,139 @@
 </template>
 
 <script setup lang="ts">
-import { Card, Button, MarkdownEditor, DropdownSelect } from '@modrinth/ui'
-import { SaveIcon } from '@modrinth/assets'
-import { useImageUpload } from '~/composables/image-upload.ts'
+import { Card, Button, MarkdownEditor, DropdownSelect } from "@modrinth/ui";
+import { SaveIcon } from "@modrinth/assets";
+import { useImageUpload } from "~/composables/image-upload.ts";
 
-const tags = useTags()
-const route = useNativeRoute()
+const tags = useTags();
+const route = useNativeRoute();
 
 const accessQuery = (id: string): string => {
-  return route.query?.[id]?.toString() || ''
-}
+  return route.query?.[id]?.toString() || "";
+};
 
-const submitLoading = ref<boolean>(false)
+const submitLoading = ref<boolean>(false);
 
-const uploadedImageIDs = ref<string[]>([])
+const uploadedImageIDs = ref<string[]>([]);
 
-const reportBody = ref<string>(accessQuery('body'))
-const reportItem = ref<string>(accessQuery('item'))
-const reportItemID = ref<string>(accessQuery('itemID'))
-const reportType = ref<string>('')
+const reportBody = ref<string>(accessQuery("body"));
+const reportItem = ref<string>(accessQuery("item"));
+const reportItemID = ref<string>(accessQuery("itemID"));
+const reportType = ref<string>("");
 
-const reportItems = ['project', 'version', 'user']
-const reportTypes = computed(() => tags.value.reportTypes)
+const reportItems = ["project", "version", "user"];
+const reportTypes = computed(() => tags.value.reportTypes);
 
 const canSubmit = computed(() => {
   return (
-    reportItem.value !== '' &&
-    reportItemID.value !== '' &&
-    reportType.value !== '' &&
-    reportBody.value !== ''
-  )
-})
+    reportItem.value !== "" &&
+    reportItemID.value !== "" &&
+    reportType.value !== "" &&
+    reportBody.value !== ""
+  );
+});
 
 const submissionValidation = () => {
   if (!canSubmit.value) {
-    throw new Error('Please fill out all required fields')
+    throw new Error("Please fill out all required fields");
   }
 
-  if (reportItem.value === '') {
-    throw new Error('Please select a report item')
+  if (reportItem.value === "") {
+    throw new Error("Please select a report item");
   }
 
-  if (reportItemID.value === '') {
-    throw new Error('Please enter a report item ID')
+  if (reportItemID.value === "") {
+    throw new Error("Please enter a report item ID");
   }
 
-  if (reportType.value === '') {
-    throw new Error('Please select a report type')
+  if (reportType.value === "") {
+    throw new Error("Please select a report type");
   }
 
-  if (reportBody.value === '') {
-    throw new Error('Please enter a report body')
+  if (reportBody.value === "") {
+    throw new Error("Please enter a report body");
   }
 
-  return true
-}
+  return true;
+};
 
 const capitalizeString = (value?: string) => {
-  if (!value) return ''
-  return value?.charAt(0).toUpperCase() + value?.slice(1)
-}
+  if (!value) return "";
+  return value?.charAt(0).toUpperCase() + value?.slice(1);
+};
 
 const submitReport = async () => {
-  submitLoading.value = true
+  submitLoading.value = true;
 
   let data: {
-    [key: string]: unknown
+    [key: string]: unknown;
   } = {
     report_type: reportType.value,
     item_type: reportItem.value,
     item_id: reportItemID.value,
     body: reportBody.value,
-  }
+  };
 
   function takeNLast<T>(arr: T[], n: number): T[] {
-    return arr.slice(Math.max(arr.length - n, 0))
+    return arr.slice(Math.max(arr.length - n, 0));
   }
 
   if (uploadedImageIDs.value.length > 0) {
     data = {
       ...data,
       uploaded_images: takeNLast(uploadedImageIDs.value, 10),
-    }
+    };
   }
 
   try {
-    submissionValidation()
+    submissionValidation();
   } catch (error) {
-    submitLoading.value = false
+    submitLoading.value = false;
 
     if (error instanceof Error) {
       addNotification({
-        group: 'main',
-        title: 'An error occurred',
+        group: "main",
+        title: "An error occurred",
         text: error.message,
-        type: 'error',
-      })
+        type: "error",
+      });
     }
 
-    return
+    return;
   }
 
   try {
-    const response = (await useBaseFetch('report', {
-      method: 'POST',
+    const response = (await useBaseFetch("report", {
+      method: "POST",
       body: data,
-    })) as { id: string }
+    })) as { id: string };
 
-    submitLoading.value = false
+    submitLoading.value = false;
 
     if (response?.id) {
-      navigateTo(`/dashboard/report/${response.id}`)
+      navigateTo(`/dashboard/report/${response.id}`);
     }
   } catch (error) {
-    submitLoading.value = false
+    submitLoading.value = false;
 
     if (error instanceof Error) {
       addNotification({
-        group: 'main',
-        title: 'An error occurred',
+        group: "main",
+        title: "An error occurred",
         text: error.message,
-        type: 'error',
-      })
+        type: "error",
+      });
     }
 
-    throw error
+    throw error;
   }
-}
+};
 
 const onImageUpload = async (file: File) => {
-  const item = await useImageUpload(file, { context: 'report' })
-  uploadedImageIDs.value.push(item.id)
-  return item.url
-}
+  const item = await useImageUpload(file, { context: "report" });
+  uploadedImageIDs.value.push(item.id);
+  return item.url;
+};
 </script>
 
 <style scoped lang="scss">

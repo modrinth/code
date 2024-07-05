@@ -18,10 +18,10 @@
   </div>
 </template>
 <script setup>
-const notifications = useNotifications()
+const notifications = useNotifications();
 
 function stopTimer(notif) {
-  clearTimeout(notif.timer)
+  clearTimeout(notif.timer);
 }
 </script>
 <style lang="scss" scoped>

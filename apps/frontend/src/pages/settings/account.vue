@@ -179,7 +179,7 @@
             <qrcode-vue
               v-if="twoFactorSecret"
               :value="`otpauth://totp/${encodeURIComponent(
-                auth.user.email
+                auth.user.email,
               )}?secret=${twoFactorSecret}&issuer=Modrinth`"
               :size="250"
               :margin="2"
@@ -255,15 +255,15 @@
     <Modal ref="manageProvidersModal" header="Authentication providers">
       <div class="universal-modal">
         <div class="table">
-          <div class="table-row table-head">
-            <div class="table-cell table-text">Provider</div>
-            <div class="table-cell table-text">Actions</div>
+          <div class="table-head table-row">
+            <div class="table-text table-cell">Provider</div>
+            <div class="table-text table-cell">Actions</div>
           </div>
           <div v-for="provider in authProviders" :key="provider.id" class="table-row">
-            <div class="table-cell table-text">
+            <div class="table-text table-cell">
               <span><component :is="provider.icon" /> {{ provider.display }}</span>
             </div>
-            <div class="table-cell table-text manage">
+            <div class="table-text manage table-cell">
               <button
                 v-if="auth.user.auth_providers.includes(provider.id)"
                 class="btn"
@@ -327,11 +327,11 @@
             class="iconified-button"
             @click="
               () => {
-                oldPassword = ''
-                newPassword = ''
-                confirmNewPassword = ''
-                removePasswordMode = false
-                $refs.managePasswordModal.show()
+                oldPassword = '';
+                newPassword = '';
+                confirmNewPassword = '';
+                removePasswordMode = false;
+                $refs.managePasswordModal.show();
               }
             "
           >
@@ -401,218 +401,218 @@ import {
   RightArrowIcon,
   CheckIcon,
   ExternalIcon,
-} from '@modrinth/assets'
-import QrcodeVue from 'qrcode.vue'
-import GitHubIcon from 'assets/icons/auth/sso-github.svg'
-import MicrosoftIcon from 'assets/icons/auth/sso-microsoft.svg'
-import GoogleIcon from 'assets/icons/auth/sso-google.svg'
-import SteamIcon from 'assets/icons/auth/sso-steam.svg'
-import DiscordIcon from 'assets/icons/auth/sso-discord.svg'
-import KeyIcon from 'assets/icons/auth/key.svg'
-import GitLabIcon from 'assets/icons/auth/sso-gitlab.svg'
-import ModalConfirm from '~/components/ui/ModalConfirm.vue'
-import Modal from '~/components/ui/Modal.vue'
+} from "@modrinth/assets";
+import QrcodeVue from "qrcode.vue";
+import GitHubIcon from "assets/icons/auth/sso-github.svg";
+import MicrosoftIcon from "assets/icons/auth/sso-microsoft.svg";
+import GoogleIcon from "assets/icons/auth/sso-google.svg";
+import SteamIcon from "assets/icons/auth/sso-steam.svg";
+import DiscordIcon from "assets/icons/auth/sso-discord.svg";
+import KeyIcon from "assets/icons/auth/key.svg";
+import GitLabIcon from "assets/icons/auth/sso-gitlab.svg";
+import ModalConfirm from "~/components/ui/ModalConfirm.vue";
+import Modal from "~/components/ui/Modal.vue";
 
 useHead({
-  title: 'Account settings - Modrinth',
-})
+  title: "Account settings - Modrinth",
+});
 
 definePageMeta({
-  middleware: 'auth',
-})
+  middleware: "auth",
+});
 
-const data = useNuxtApp()
-const auth = await useAuth()
+const data = useNuxtApp();
+const auth = await useAuth();
 
-const changeEmailModal = ref()
-const email = ref(auth.value.user.email)
+const changeEmailModal = ref();
+const email = ref(auth.value.user.email);
 async function saveEmail() {
   if (!email.value) {
-    return
+    return;
   }
 
-  startLoading()
+  startLoading();
   try {
     await useBaseFetch(`auth/email`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: {
         email: email.value,
       },
-    })
-    changeEmailModal.value.hide()
-    await useAuth(auth.value.token)
+    });
+    changeEmailModal.value.hide();
+    await useAuth(auth.value.token);
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 
-const managePasswordModal = ref()
-const removePasswordMode = ref(false)
-const oldPassword = ref('')
-const newPassword = ref('')
-const confirmNewPassword = ref('')
+const managePasswordModal = ref();
+const removePasswordMode = ref(false);
+const oldPassword = ref("");
+const newPassword = ref("");
+const confirmNewPassword = ref("");
 async function savePassword() {
   if (newPassword.value !== confirmNewPassword.value) {
-    return
+    return;
   }
 
-  startLoading()
+  startLoading();
   try {
     await useBaseFetch(`auth/password`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: {
         old_password: auth.value.user.has_password ? oldPassword.value : null,
         new_password: removePasswordMode.value ? null : newPassword.value,
       },
-    })
-    managePasswordModal.value.hide()
-    await useAuth(auth.value.token)
+    });
+    managePasswordModal.value.hide();
+    await useAuth(auth.value.token);
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 
-const manageTwoFactorModal = ref()
-const twoFactorSecret = ref(null)
-const twoFactorFlow = ref(null)
-const twoFactorStep = ref(0)
+const manageTwoFactorModal = ref();
+const twoFactorSecret = ref(null);
+const twoFactorFlow = ref(null);
+const twoFactorStep = ref(0);
 async function showTwoFactorModal() {
-  twoFactorStep.value = 0
-  twoFactorCode.value = null
-  twoFactorIncorrect.value = false
+  twoFactorStep.value = 0;
+  twoFactorCode.value = null;
+  twoFactorIncorrect.value = false;
   if (auth.value.user.has_totp) {
-    manageTwoFactorModal.value.show()
-    return
+    manageTwoFactorModal.value.show();
+    return;
   }
 
-  twoFactorSecret.value = null
-  twoFactorFlow.value = null
-  backupCodes.value = []
-  manageTwoFactorModal.value.show()
+  twoFactorSecret.value = null;
+  twoFactorFlow.value = null;
+  backupCodes.value = [];
+  manageTwoFactorModal.value.show();
 
-  startLoading()
+  startLoading();
   try {
-    const res = await useBaseFetch('auth/2fa/get_secret', {
-      method: 'POST',
-    })
+    const res = await useBaseFetch("auth/2fa/get_secret", {
+      method: "POST",
+    });
 
-    twoFactorSecret.value = res.secret
-    twoFactorFlow.value = res.flow
+    twoFactorSecret.value = res.secret;
+    twoFactorFlow.value = res.flow;
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 
-const twoFactorIncorrect = ref(false)
-const twoFactorCode = ref(null)
-const backupCodes = ref([])
+const twoFactorIncorrect = ref(false);
+const twoFactorCode = ref(null);
+const backupCodes = ref([]);
 async function verifyTwoFactorCode() {
-  startLoading()
+  startLoading();
   try {
-    const res = await useBaseFetch('auth/2fa', {
-      method: 'POST',
+    const res = await useBaseFetch("auth/2fa", {
+      method: "POST",
       body: {
-        code: twoFactorCode.value ? twoFactorCode.value : '',
+        code: twoFactorCode.value ? twoFactorCode.value : "",
         flow: twoFactorFlow.value,
       },
-    })
+    });
 
-    backupCodes.value = res.backup_codes
-    twoFactorStep.value = 2
-    await useAuth(auth.value.token)
+    backupCodes.value = res.backup_codes;
+    twoFactorStep.value = 2;
+    await useAuth(auth.value.token);
   } catch (err) {
-    twoFactorIncorrect.value = true
+    twoFactorIncorrect.value = true;
   }
-  stopLoading()
+  stopLoading();
 }
 
 async function removeTwoFactor() {
-  startLoading()
+  startLoading();
   try {
-    await useBaseFetch('auth/2fa', {
-      method: 'DELETE',
+    await useBaseFetch("auth/2fa", {
+      method: "DELETE",
       body: {
-        code: twoFactorCode.value ? twoFactorCode.value.toString() : '',
+        code: twoFactorCode.value ? twoFactorCode.value.toString() : "",
       },
-    })
-    manageTwoFactorModal.value.hide()
-    await useAuth(auth.value.token)
+    });
+    manageTwoFactorModal.value.hide();
+    await useAuth(auth.value.token);
   } catch (err) {
-    twoFactorIncorrect.value = true
+    twoFactorIncorrect.value = true;
   }
-  stopLoading()
+  stopLoading();
 }
 
 const authProviders = [
   {
-    id: 'github',
-    display: 'GitHub',
+    id: "github",
+    display: "GitHub",
     icon: GitHubIcon,
   },
   {
-    id: 'gitlab',
-    display: 'GitLab',
+    id: "gitlab",
+    display: "GitLab",
     icon: GitLabIcon,
   },
   {
-    id: 'steam',
-    display: 'Steam',
+    id: "steam",
+    display: "Steam",
     icon: SteamIcon,
   },
   {
-    id: 'discord',
-    display: 'Discord',
+    id: "discord",
+    display: "Discord",
     icon: DiscordIcon,
   },
   {
-    id: 'microsoft',
-    display: 'Microsoft',
+    id: "microsoft",
+    display: "Microsoft",
     icon: MicrosoftIcon,
   },
   {
-    id: 'google',
-    display: 'Google',
+    id: "google",
+    display: "Google",
     icon: GoogleIcon,
   },
-]
+];
 
 async function deleteAccount() {
-  startLoading()
+  startLoading();
   try {
     await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: 'DELETE',
-    })
+      method: "DELETE",
+    });
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
 
-  useCookie('auth-token').value = null
-  window.location.href = '/'
+  useCookie("auth-token").value = null;
+  window.location.href = "/";
 
-  stopLoading()
+  stopLoading();
 }
 </script>
 <style lang="scss" scoped>
