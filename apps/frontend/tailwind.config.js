@@ -13,17 +13,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        secondary: "var(--color-secondary)",
         icon: "var(--color-icon)",
-        text: {
-          DEFAULT: "var(--color-text)",
-          inactive: "var(--color-text-inactive)",
-          dark: "var(--color-text-dark)",
-          inverted: "var(--color-text-inverted)",
-        },
+        // Text
+        primary: "var(--color-text)",
+        secondary: "var(--color-secondary)",
+        inactive: "var(--color-text-inactive)",
+        dark: "var(--color-text-dark)",
+        inverted: "var(--color-text-inverted)",
         heading: "var(--color-heading)",
         bg: {
           DEFAULT: "var(--color-bg)",
+          red: "var(--color-red-bg)",
           raised: "var(--color-bg-raised)",
         },
         divider: {
@@ -76,7 +76,6 @@ module.exports = {
           hover: "var(--color-link-hover)",
           active: "var(--color-link-active)",
         },
-        redBg: "var(--color-red-bg)",
         warning: {
           bg: "var(--color-warning-bg)",
           text: "var(--color-warning-text)",
