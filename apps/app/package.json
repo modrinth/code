@@ -35,7 +35,6 @@
     "vue-virtual-scroller": "2.0.0-beta.8"
   },
   "devDependencies": {
-    "@rollup/plugin-alias": "^5.1.0",
     "@tauri-apps/cli": "^1.5.11",
     "@vitejs/plugin-vue": "^5.0.4",
     "eslint": "^8.57.0",

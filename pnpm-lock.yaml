@@ -37,7 +37,7 @@ importers:
         version: 1.11.11
       floating-vue:
         specifier: ^5.2.2
-        version: 5.2.2(@nuxt/kit@3.12.3(rollup@4.18.0))(vue@3.4.31(typescript@5.5.3))
+        version: 5.2.2(@nuxt/kit@3.12.3)(vue@3.4.31(typescript@5.5.3))
       mixpanel-browser:
         specifier: ^2.49.0
         version: 2.53.0
@@ -46,7 +46,7 @@ importers:
         version: 1.3.4
       omorphia:
         specifier: ^0.4.41
-        version: 0.4.41(@nuxt/kit@3.12.3(rollup@4.18.0))(typescript@5.5.3)
+        version: 0.4.41(@nuxt/kit@3.12.3)(typescript@5.5.3)
       pinia:
         specifier: ^2.1.7
         version: 2.1.7(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))
@@ -69,9 +69,6 @@ importers:
         specifier: 2.0.0-beta.8
         version: 2.0.0-beta.8(vue@3.4.31(typescript@5.5.3))
     devDependencies:
-      '@rollup/plugin-alias':
-        specifier: ^5.1.0
-        version: 5.1.0(rollup@4.18.0)
       '@tauri-apps/cli':
         specifier: ^1.5.11
         version: 1.6.0
@@ -7059,6 +7056,34 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@nuxt/kit@3.12.3':
+    dependencies:
+      '@nuxt/schema': 3.12.3
+      c12: 1.11.1(magicast@0.3.4)
+      consola: 3.2.3
+      defu: 6.1.4
+      destr: 2.0.3
+      globby: 14.0.2
+      hash-sum: 2.0.0
+      ignore: 5.3.1
+      jiti: 1.21.6
+      klona: 2.0.6
+      knitwork: 1.1.0
+      mlly: 1.7.1
+      pathe: 1.1.2
+      pkg-types: 1.1.3
+      scule: 1.3.0
+      semver: 7.6.2
+      ufo: 1.5.3
+      unctx: 2.3.1
+      unimport: 3.7.2
+      untyped: 1.4.2
+    transitivePeerDependencies:
+      - magicast
+      - rollup
+      - supports-color
+    optional: true
+
   '@nuxt/kit@3.12.3(magicast@0.3.4)(rollup@4.18.0)':
     dependencies:
       '@nuxt/schema': 3.12.3(rollup@4.18.0)
@@ -7114,30 +7139,21 @@ snapshots:
       - supports-color
     optional: true
 
-  '@nuxt/kit@3.12.3(rollup@4.18.0)':
+  '@nuxt/schema@3.12.3':
     dependencies:
-      '@nuxt/schema': 3.12.3(rollup@4.18.0)
-      c12: 1.11.1(magicast@0.3.4)
+      compatx: 0.1.8
       consola: 3.2.3
       defu: 6.1.4
-      destr: 2.0.3
-      globby: 14.0.2
-      hash-sum: 2.0.0
-      ignore: 5.3.1
-      jiti: 1.21.6
-      klona: 2.0.6
-      knitwork: 1.1.0
-      mlly: 1.7.1
+      hookable: 5.5.3
       pathe: 1.1.2
       pkg-types: 1.1.3
       scule: 1.3.0
-      semver: 7.6.2
+      std-env: 3.7.0
       ufo: 1.5.3
-      unctx: 2.3.1
-      unimport: 3.7.2(rollup@4.18.0)
+      uncrypto: 0.1.3
+      unimport: 3.7.2
       untyped: 1.4.2
     transitivePeerDependencies:
-      - magicast
       - rollup
       - supports-color
     optional: true
@@ -9887,21 +9903,21 @@ snapshots:
     optionalDependencies:
       '@nuxt/kit': 3.12.3(rollup@3.29.4)
 
-  floating-vue@2.0.0-beta.24(@nuxt/kit@3.12.3(rollup@4.18.0))(vue@3.4.31(typescript@5.5.3)):
+  floating-vue@2.0.0-beta.24(@nuxt/kit@3.12.3)(vue@3.4.31(typescript@5.5.3)):
     dependencies:
       '@floating-ui/dom': 1.1.1
       vue: 3.4.31(typescript@5.5.3)
       vue-resize: 2.0.0-alpha.1(vue@3.4.31(typescript@5.5.3))
     optionalDependencies:
-      '@nuxt/kit': 3.12.3(rollup@4.18.0)
+      '@nuxt/kit': 3.12.3
 
-  floating-vue@5.2.2(@nuxt/kit@3.12.3(rollup@4.18.0))(vue@3.4.31(typescript@5.5.3)):
+  floating-vue@5.2.2(@nuxt/kit@3.12.3)(vue@3.4.31(typescript@5.5.3)):
     dependencies:
       '@floating-ui/dom': 1.1.1
       vue: 3.4.31(typescript@5.5.3)
       vue-resize: 2.0.0-alpha.1(vue@3.4.31(typescript@5.5.3))
     optionalDependencies:
-      '@nuxt/kit': 3.12.3(rollup@4.18.0)
+      '@nuxt/kit': 3.12.3
 
   for-each@0.3.3:
     dependencies:
@@ -11068,11 +11084,11 @@ snapshots:
 
   ohash@1.1.3: {}
 
-  omorphia@0.4.41(@nuxt/kit@3.12.3(rollup@4.18.0))(typescript@5.5.3):
+  omorphia@0.4.41(@nuxt/kit@3.12.3)(typescript@5.5.3):
     dependencies:
       chart.js: 4.4.3
       dayjs: 1.11.11
-      floating-vue: 2.0.0-beta.24(@nuxt/kit@3.12.3(rollup@4.18.0))(vue@3.4.31(typescript@5.5.3))
+      floating-vue: 2.0.0-beta.24(@nuxt/kit@3.12.3)(vue@3.4.31(typescript@5.5.3))
       highlight.js: 11.9.0
       markdown-it: 13.0.2
       qrcode.vue: 3.4.1(vue@3.4.31(typescript@5.5.3))
@@ -12204,6 +12220,25 @@ snapshots:
       hookable: 5.5.3
 
   unicorn-magic@0.1.0: {}
+
+  unimport@3.7.2:
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@3.29.4)
+      acorn: 8.12.1
+      escape-string-regexp: 5.0.0
+      estree-walker: 3.0.3
+      fast-glob: 3.3.2
+      local-pkg: 0.5.0
+      magic-string: 0.30.10
+      mlly: 1.7.1
+      pathe: 1.1.2
+      pkg-types: 1.1.3
+      scule: 1.3.0
+      strip-literal: 2.1.0
+      unplugin: 1.11.0
+    transitivePeerDependencies:
+      - rollup
+    optional: true
 
   unimport@3.7.2(rollup@3.29.4):
     dependencies:
