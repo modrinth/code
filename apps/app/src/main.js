@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import router from '@/routes'
 import App from '@/App.vue'
 import { createPinia } from 'pinia'
-import '../../../libs/omorphia/src/assets/omorphia.scss'
+import '@modrinth/assets/omorphia.scss'
 import '@/assets/stylesheets/global.scss'
 import 'floating-vue/dist/style.css'
 import FloatingVue from 'floating-vue'
@@ -11,6 +11,24 @@ import loadCssMixin from './mixins/macCssFix.js'
 import { get } from '@/helpers/settings'
 import { invoke } from '@tauri-apps/api'
 import { isDev } from './helpers/utils.js'
+import { createPlugin } from '@vintl/vintl/plugin'
+
+const VIntlPlugin = createPlugin({
+  controllerOpts: {
+    defaultLocale: 'en-US',
+    locale: 'en-US',
+    locales: [
+      {
+        tag: 'en-US',
+        meta: {
+          displayName: 'American English',
+        },
+      },
+    ],
+  },
+  globalMixin: true,
+  injectInto: [],
+})
 
 const pinia = createPinia()
 
@@ -19,14 +37,15 @@ app.use(router)
 app.use(pinia)
 app.use(FloatingVue)
 app.mixin(loadCssMixin)
+app.use(VIntlPlugin)
 
 const mountedApp = app.mount('#app')
 
 const raw_invoke = async (plugin, fn, args) => {
-  if (plugin == '') {
-    return await invoke(fn, args)
+  if (plugin === '') {
+    await invoke(fn, args)
   } else {
-    return await invoke('plugin:' + plugin + '|' + fn, args)
+    await invoke('plugin:' + plugin + '|' + fn, args)
   }
 }
 isDev()

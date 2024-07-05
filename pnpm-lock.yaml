@@ -29,6 +29,9 @@ importers:
       '@tauri-apps/api':
         specifier: ^1.5.3
         version: 1.6.0
+      '@vintl/vintl':
+        specifier: ^4.4.1
+        version: 4.4.1(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))
       dayjs:
         specifier: ^1.11.10
         version: 1.11.11
@@ -78,6 +81,9 @@ importers:
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
+      eslint-config-custom:
+        specifier: workspace:*
+        version: link:../../packages/eslint-config-custom
       eslint-config-prettier:
         specifier: ^9.1.0
         version: 9.1.0(eslint@8.57.0)

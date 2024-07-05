@@ -20,6 +20,7 @@
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@tauri-apps/api": "^1.5.3",
+    "@vintl/vintl": "^4.4.1",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",
     "mixpanel-browser": "^2.49.0",
@@ -34,15 +35,16 @@
     "vue-virtual-scroller": "2.0.0-beta.8"
   },
   "devDependencies": {
-    "tsconfig": "workspace:*",
     "@rollup/plugin-alias": "^5.1.0",
     "@tauri-apps/cli": "^1.5.11",
     "@vitejs/plugin-vue": "^5.0.4",
     "eslint": "^8.57.0",
+    "eslint-config-custom": "workspace:*",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.24.0",
     "prettier": "^3.2.5",
     "sass": "^1.74.1",
+    "tsconfig": "workspace:*",
     "vite": "^5.2.8",
     "vite-plugin-eslint": "^1.8.1"
   },

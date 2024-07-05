@@ -1,9 +1,12 @@
 {
-  "extends": "tsconfig/base.json",
-  "include": ["."],
-  "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
-    "lib": ["esnext", "dom"],
-    "noImplicitAny": false
-  }
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "target": "ESNext"
+  },
+  "exclude": ["node_modules", "dist"]
 }

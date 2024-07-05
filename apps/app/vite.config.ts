@@ -1,7 +1,5 @@
-import alias from '@rollup/plugin-alias'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
-import eslint from 'vite-plugin-eslint'
 import svgLoader from 'vite-svg-loader'
 
 import vue from '@vitejs/plugin-vue'
@@ -10,16 +8,16 @@ const projectRootDir = resolve(__dirname)
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  resolve: {
+    alias: [
+      {
+        find: '@',
+        replacement: resolve(projectRootDir, 'src'),
+      },
+    ],
+  },
   plugins: [
     vue(),
-    alias({
-      entries: [
-        {
-          find: '@',
-          replacement: resolve(projectRootDir, 'src'),
-        },
-      ],
-    }),
     svgLoader({
       svgoConfig: {
         plugins: [
@@ -34,7 +32,7 @@ export default defineConfig({
         ],
       },
     }),
-    eslint(),
+    // eslint(),
   ],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
