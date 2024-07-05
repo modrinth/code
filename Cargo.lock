@@ -5200,7 +5200,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "theseus_gui_rs"
+name = "theseus_gui"
 version = "0.7.2"
 dependencies = [
  "chrono",

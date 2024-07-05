@@ -48,5 +48,9 @@ Thumbs.db
 .nitro
 .cache
 
-# knossos generated files
-apps/knossos/src/generated
+# frontend generated files
+apps/frontend/src/generated
+
+.turbo
+target
+generated

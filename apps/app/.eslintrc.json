@@ -1,0 +1,21 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": ["eslint:recommended", "plugin:vue/vue3-recommended", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["vue"],
+  "rules": {
+    "no-console": "off",
+    "vue/no-v-html": "off",
+    "comma-dangle": ["error", "only-multiline"],
+    "vue/comment-directive": "off",
+    "vue/multi-word-component-names": "off",
+    "import/no-named-as-default": "off"
+  }
+}
