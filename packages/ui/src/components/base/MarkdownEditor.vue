@@ -292,10 +292,10 @@ import {
 import { markdownCommands, modrinthMarkdownEditorKeymap } from '@modrinth/utils/codemirror'
 import { renderHighlightedString } from '@modrinth/utils/highlight'
 import Modal from '../modal/Modal.vue'
-import Button from "./Button.vue"
-import Toggle from "./Toggle.vue"
-import FileInput from "./FileInput.vue"
-import Chips from "./Chips.vue"
+import Button from './Button.vue'
+import Toggle from './Toggle.vue'
+import FileInput from './FileInput.vue'
+import Chips from './Chips.vue'
 
 const props = withDefaults(
   defineProps<{
@@ -319,7 +319,7 @@ const props = withDefaults(
     placeholder: 'Write something...',
     maxLength: undefined,
     maxHeight: undefined,
-  }
+  },
 )
 
 const editorRef = ref<HTMLDivElement>()
@@ -368,6 +368,7 @@ onMounted(() => {
       if (clipboardData.files && clipboardData.files.length > 0 && props.onImageUpload) {
         // If the user is pasting a file, upload it if there's an included handler and insert the link.
         uploadImagesFromList(clipboardData.files)
+          // eslint-disable-next-line func-names -- who the fuck did this?
           .then(function (url) {
             const selection = markdownCommands.yankSelection(view)
             const altText = selection || 'Replace this with a description'
@@ -490,7 +491,7 @@ function runEditorCommand(command: (view: EditorView) => boolean, editor: Editor
 const composeCommandButton = (
   name: string,
   icon: Component,
-  command: (view: EditorView) => boolean
+  command: (view: EditorView) => boolean,
 ) => {
   return {
     label: name,
@@ -518,7 +519,7 @@ const BUTTONS: ButtonGroupMap = {
       composeCommandButton(
         'Strikethrough',
         StrikethroughIcon,
-        markdownCommands.toggleStrikethrough
+        markdownCommands.toggleStrikethrough,
       ),
       composeCommandButton('Code', CodeIcon, markdownCommands.toggleCodeBlock),
       composeCommandButton('Spoiler', ScanEyeIcon, markdownCommands.toggleSpoiler),
@@ -590,7 +591,7 @@ watch(
                   height: '100%',
                   overflow: 'visible',
                 },
-              })
+              }),
             ),
           ],
         })
@@ -599,7 +600,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 
 const currentValue = toRef(props, 'modelValue')
@@ -618,7 +619,7 @@ watch(
   },
   {
     immediate: true,
-  }
+  },
 )
 
 const updateCurrentValue = (newValue: string) => {
@@ -737,15 +738,14 @@ const canInsertImage = computed(() => {
 })
 
 const youtubeRegex =
-  /^(?:https?:)?(?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))([a-zA-Z0-9_-]{7,15})(?:[?&][a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*$/
+  /^(?:https?:)?(?:\/\/)?(?:youtu\.be\/|(?:www\.|m\.)?youtube\.com\/(?:watch|v|embed)(?:\.php)?(?:\?.*v=|\/))(?<temp1>[a-zA-Z0-9_-]{7,15})(?:[?&][a-zA-Z0-9_-]+=[a-zA-Z0-9_-]+)*$/
 
 const videoMarkdown = computed(() => {
   const match = youtubeRegex.exec(linkUrl.value)
   if (match) {
     return `<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/${match[1]}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`
   }
-    return ''
-
+  return ''
 })
 
 const linkModal = ref<InstanceType<typeof Modal> | null>(null)
@@ -784,7 +784,10 @@ function openVideoModal() {
   border: 2px dashed var(--color-gray);
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    scale 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   &:hover {

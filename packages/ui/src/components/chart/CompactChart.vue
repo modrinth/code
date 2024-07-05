@@ -109,7 +109,7 @@ const chartOptions = ref({
   },
   tooltip: {
     custom({ series, seriesIndex, dataPointIndex, w }) {
-      // eslint-disable-next-line no-console
+       
       console.log(seriesIndex, w)
       return `<div class="bar-tooltip">${series
         .map((value) =>

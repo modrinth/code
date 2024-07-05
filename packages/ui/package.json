@@ -5,7 +5,7 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
-    "lint": "eslint ."
+    "lint": "eslint ./src --fix"
   },
   "devDependencies": {
     "@vintl/unplugin": "^1.5.1",

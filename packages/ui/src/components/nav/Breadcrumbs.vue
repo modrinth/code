@@ -16,6 +16,7 @@
 
 <script setup>
 import { ChevronRightIcon } from '@modrinth/assets'
+
 defineProps({
   linkStack: {
     type: Array,

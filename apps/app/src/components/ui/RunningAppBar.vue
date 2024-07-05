@@ -103,13 +103,8 @@
 </template>
 
 <script setup>
-import {
-  DownloadIcon,
-  StopCircleIcon,
-  TerminalSquareIcon,
-  DropdownIcon,
-} from '@modrinth/assets'
-import { Button, Card, } from '@modrinth/ui'
+import { DownloadIcon, StopCircleIcon, TerminalSquareIcon, DropdownIcon } from '@modrinth/assets'
+import { Button, Card } from '@modrinth/ui'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   get_all_running_profiles as getRunningProfiles,

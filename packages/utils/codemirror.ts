@@ -20,7 +20,7 @@ const toggleStrikethrough: Command = ({ state, dispatch }) => {
 
 const toggleCodeBlock: Command = ({ state, dispatch }) => {
   const lineBreak = state.lineBreak
-  const codeBlockMark = lineBreak + '```' + lineBreak
+  const codeBlockMark = `${lineBreak  }\`\`\`${  lineBreak}`
   return toggleAround(state, dispatch, codeBlockMark, codeBlockMark)
 }
 
@@ -258,7 +258,7 @@ const insertNewlineContinueMark: Command = (view): boolean => {
 
   const listMark = lastNode.getChild('ListMark')
   if (listMark) {
-    cancelPatterns.push(state.doc.sliceString(listMark.from, listMark.to) + ' ')
+    cancelPatterns.push(`${state.doc.sliceString(listMark.from, listMark.to)  } `)
   }
 
   // Skip if current line matches any of the cancel patterns
@@ -340,7 +340,7 @@ const incrementMark = (mark: string): string => {
   const match = numberedListRegex.exec(mark)
   if (match) {
     const number = parseInt(match[1])
-    return (number + 1).toString() + '.'
+    return `${(number + 1).toString()  }.`
   }
   return mark
 }

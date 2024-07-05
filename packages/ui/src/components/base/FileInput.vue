@@ -15,6 +15,7 @@
 <script>
 import { fileIsValid } from '@modrinth/utils'
 import { defineComponent } from 'vue'
+
 export default defineComponent({
   props: {
     prompt: {

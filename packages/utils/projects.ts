@@ -50,12 +50,12 @@ export const getProjectTypeForUrl = (type, loaders, tags) => {
       return 'plugin'
     } else if (isMod) {
       return 'mod'
-    } else {
+    } 
       return 'mod'
-    }
-  } else {
+    
+  } 
     return type
-  }
+  
 }
 
 export const getProjectLink = (project) => {
@@ -66,10 +66,10 @@ export const getProjectLink = (project) => {
 
 export const getVersionLink = (project, version) => {
   if (version) {
-    return getProjectLink(project) + '/version/' + version.id
-  } else {
+    return `${getProjectLink(project)  }/version/${  version.id}`
+  } 
     return getProjectLink(project)
-  }
+  
 }
 
 export const isApproved = (project) => {

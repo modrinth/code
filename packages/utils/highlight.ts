@@ -50,7 +50,7 @@ hljs.registerAliases(['html', 'htm', 'xhtml', 'mcui', 'fxml'], { languageName: '
 export const renderHighlightedString = (string) =>
   configuredXss.process(
     md({
-      highlight: function (str, lang) {
+      highlight (str, lang) {
         if (lang && hljs.getLanguage(lang)) {
           try {
             return hljs.highlight(str, { language: lang }).value

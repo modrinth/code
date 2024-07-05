@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-let emit = defineEmits<{ 'update:modelValue': [number] }>()
+const emit = defineEmits<{ 'update:modelValue': [number] }>()
 
 interface Props {
   modelValue?: number
@@ -78,7 +78,7 @@ const props = withDefaults(defineProps<Props>(), {
   unit: '',
 })
 
-let currentValue = ref(Math.max(props.min, props.modelValue))
+const currentValue = ref(Math.max(props.min, props.modelValue))
 
 const inputValueValid = (newValue: number) => {
   if (newValue < props.min) {
@@ -97,7 +97,7 @@ const inputValueValid = (newValue: number) => {
 const onInputWithSnap = (value: string) => {
   let parsedValue = parseInt(value)
 
-  for (let snapPoint of props.snapPoints) {
+  for (const snapPoint of props.snapPoints) {
     const distance = Math.abs(snapPoint - parsedValue)
 
     if (distance < props.snapRange) {

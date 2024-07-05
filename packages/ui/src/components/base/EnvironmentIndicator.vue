@@ -97,7 +97,7 @@ withDefaults(
     alwaysShow: false,
     search: false,
     categories: () => [],
-  }
+  },
 )
 </script>
 <style lang="scss" scoped>

@@ -67,9 +67,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { XIcon, SearchIcon } from '@modrinth/assets'
 import Avatar from '../base/Avatar.vue'
 import Button from '../base/Button.vue'
-import { XIcon, SearchIcon } from '@modrinth/assets'
 
 const props = defineProps({
   options: {

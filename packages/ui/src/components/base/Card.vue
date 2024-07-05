@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import Button from './Button.vue'
 import { DropdownIcon } from '@modrinth/assets'
-
 import { reactive } from 'vue'
+import Button from './Button.vue'
 
 const props = withDefaults(
   defineProps<{

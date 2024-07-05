@@ -9,9 +9,9 @@ import {
   MastodonIcon,
   RedditIcon,
 } from '@modrinth/assets'
-import { Button, Modal } from '../index'
 import { computed, ref, nextTick } from 'vue'
 import QrcodeVue from 'qrcode.vue'
+import { Button, Modal } from '../index'
 
 const props = defineProps({
   header: {
@@ -87,19 +87,19 @@ const sendEmail = computed(
   () =>
     `mailto:user@test.com
     ?subject=${encodeURIComponent(props.shareTitle)}
-    &body=` + encodeURIComponent(content.value)
+    &body=${  encodeURIComponent(content.value)}`
 )
 
 const sendTweet = computed(
-  () => `https://twitter.com/intent/tweet?text=` + encodeURIComponent(content.value)
+  () => `https://twitter.com/intent/tweet?text=${  encodeURIComponent(content.value)}`
 )
 
-const sendToot = computed(() => `https://tootpick.org/#text=` + encodeURIComponent(content.value))
+const sendToot = computed(() => `https://tootpick.org/#text=${  encodeURIComponent(content.value)}`)
 
 const postOnReddit = computed(
   () =>
-    `https://www.reddit.com/submit?title=${encodeURIComponent(props.shareTitle)}&text=` +
-    encodeURIComponent(content.value)
+    `https://www.reddit.com/submit?title=${encodeURIComponent(props.shareTitle)}&text=${ 
+    encodeURIComponent(content.value)}`
 )
 
 defineExpose({

@@ -70,18 +70,18 @@
 <script setup>
 import { HeartIcon, DownloadIcon, EditIcon, CalendarIcon } from '@modrinth/assets'
 import { formatNumber } from '@modrinth/utils'
-import Badge from './Badge.vue'
-import Avatar from './Avatar.vue'
-import Categories from '../search/Categories.vue'
-import EnvironmentIndicator from './EnvironmentIndicator.vue'
-
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime.js'
-dayjs.extend(relativeTime)
+import { defineComponent } from 'vue'
+import Categories from '../search/Categories.vue'
+import Badge from './Badge.vue'
+import Avatar from './Avatar.vue'
+import EnvironmentIndicator from './EnvironmentIndicator.vue'
 </script>
 
 <script>
-import { defineComponent } from 'vue'
+
+dayjs.extend(relativeTime)
 export default defineComponent({
   props: {
     id: {
@@ -200,7 +200,7 @@ export default defineComponent({
       const b = color & 0xff
       const g = (color & 0xff00) >>> 8
       const r = (color & 0xff0000) >>> 16
-      return 'rgba(' + [r, g, b, 1].join(',') + ')'
+      return `rgba(${  [r, g, b, 1].join(',')  })`
     },
     createdDate() {
       return dayjs(this.createdAt).format('MMMM D, YYYY [at] h:mm:ss A')

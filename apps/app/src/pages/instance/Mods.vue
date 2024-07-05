@@ -284,22 +284,22 @@
     <h3>No projects found</h3>
     <p class="empty-subtitle">Add a project to get started</p>
     <div class="empty-action">
-      <!--      <DropdownButton-->
-      <!--        :options="['search', 'from_file']"-->
-      <!--        default-value="search"-->
-      <!--        name="add-content-dropdown-from-empty"-->
-      <!--        color="primary"-->
-      <!--        @option-click="handleContentOptionClick"-->
-      <!--      >-->
-      <!--        <template #search>-->
-      <!--          <SearchIcon />-->
-      <!--          <span class="no-wrap"> Add content </span>-->
-      <!--        </template>-->
-      <!--        <template #from_file>-->
-      <!--          <FolderOpenIcon />-->
-      <!--          <span class="no-wrap"> Add from file </span>-->
-      <!--        </template>-->
-      <!--      </DropdownButton>-->
+      <DropdownButton
+        :options="['search', 'from_file']"
+        default-value="search"
+        name="add-content-dropdown-from-empty"
+        color="primary"
+        @option-click="handleContentOptionClick"
+      >
+        <template #search>
+          <SearchIcon />
+          <span class="no-wrap"> Add content </span>
+        </template>
+        <template #from_file>
+          <FolderOpenIcon />
+          <span class="no-wrap"> Add from file </span>
+        </template>
+      </DropdownButton>
     </div>
   </div>
   <Pagination

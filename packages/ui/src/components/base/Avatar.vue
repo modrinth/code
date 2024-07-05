@@ -75,7 +75,7 @@ defineProps({
 })
 
 function updatePixelated() {
-  pixelated.value = !!(img.value && img.value.naturalWidth && img.value.naturalWidth <= 96)
+  pixelated.value = Boolean(img.value && img.value.naturalWidth && img.value.naturalWidth <= 96)
 }
 </script>
 

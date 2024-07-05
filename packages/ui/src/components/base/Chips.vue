@@ -13,11 +13,11 @@
   </div>
 </template>
 <script setup>
-import Button from './Button.vue'
 import { CheckIcon } from '@modrinth/assets'
 </script>
 <script>
 import { defineComponent } from 'vue'
+import Button from './Button.vue'
 
 export default defineComponent({
   props: {

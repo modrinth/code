@@ -50,7 +50,7 @@ export const configuredXss = new xss.FilterXSS({
           for (const remove of source.remove) {
             value = value.replace(remove, '')
           }
-          return name + '="' + xss.escapeAttrValue(value) + '"'
+          return `${name  }="${  xss.escapeAttrValue(value)  }"`
         }
       }
     }
@@ -63,7 +63,7 @@ export const configuredXss = new xss.FilterXSS({
           allowedClasses.push(className)
         }
       }
-      return name + '="' + xss.escapeAttrValue(allowedClasses.join(' ')) + '"'
+      return `${name  }="${  xss.escapeAttrValue(allowedClasses.join(' '))  }"`
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
@@ -100,9 +100,9 @@ export const configuredXss = new xss.FilterXSS({
             )}&n=-1`,
             cssFilter
           )
-        } else {
+        } 
           return xss.safeAttrValue(tag, name, url.toString(), cssFilter)
-        }
+        
       } catch (err) {
         /* empty */
       }

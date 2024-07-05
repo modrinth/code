@@ -53,9 +53,9 @@ export const computeVersions = (versions, members) => {
       const nextVersion = returnVersions[index + 1]
       if (nextVersion && version.changelog && nextVersion.changelog === version.changelog) {
         return { duplicate: true, ...version }
-      } else {
+      } 
         return { duplicate: false, ...version }
-      }
+      
     })
     .sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 }
@@ -78,31 +78,31 @@ export const sortedCategories = (tags) => {
 }
 
 export const formatNumber = (number, abbreviate = true) => {
-  const x = +number
+  const x = Number(number)
   if (x >= 1000000 && abbreviate) {
-    return (x / 1000000).toFixed(2).toString() + 'M'
+    return `${(x / 1000000).toFixed(2).toString()  }M`
   } else if (x >= 10000 && abbreviate) {
-    return (x / 1000).toFixed(1).toString() + 'k'
-  } else {
+    return `${(x / 1000).toFixed(1).toString()  }k`
+  } 
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  }
+  
 }
 
 export function formatMoney(number, abbreviate = false) {
-  const x = +number
+  const x = Number(number)
   if (x >= 1000000 && abbreviate) {
-    return '$' + (x / 1000000).toFixed(2).toString() + 'M'
+    return `$${  (x / 1000000).toFixed(2).toString()  }M`
   } else if (x >= 10000 && abbreviate) {
-    return '$' + (x / 1000).toFixed(2).toString() + 'k'
-  } else {
+    return `$${  (x / 1000).toFixed(2).toString()  }k`
+  } 
     return (
-      '$' +
+      `$${ 
       x
         .toFixed(2)
         .toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
     )
-  }
+  
 }
 
 export const formatBytes = (bytes, decimals = 2) => {
@@ -114,7 +114,7 @@ export const formatBytes = (bytes, decimals = 2) => {
 
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))  } ${  sizes[i]}`
 }
 
 export const capitalizeString = (name) => {
