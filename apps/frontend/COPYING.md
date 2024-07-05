@@ -4,7 +4,7 @@ The source code of the knossos repository is licensed under the GNU Affero Gener
 
 ## Modrinth logo
 
-Any files depicting the Modrinth branding, including the wrench-in-labyrinth logo, the landing image, and variations thereof, are licensed as follows:
+The use of Modrinth branding elements, including but not limited to the wrench-in-labyrinth logo, the landing image, and any variations thereof, is strictly prohibited without explicit written permission from Rinth, Inc. This includes trademarks, logos, or other branding elements.
 
 > All rights reserved. © 2020-2024 Rinth, Inc.
 
