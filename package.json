@@ -1,7 +1,6 @@
 {
   "name": "@modrinth/monorepo",
   "version": "0.0.0",
-  "license": "MIT",
   "private": true,
   "scripts": {
     "build": "turbo run build --filter=@modrinth/frontend",
