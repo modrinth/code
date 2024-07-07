@@ -1,129 +1,132 @@
+/* eslint-disable no-undef */
 export const useAuth = async (oldToken = null) => {
-  const auth = useState('auth', () => ({
+  const auth = useState("auth", () => ({
     user: null,
-    token: '',
+    token: "",
     headers: {},
-  }))
+  }));
 
   if (!auth.value.user || oldToken) {
-    auth.value = await initAuth(oldToken)
+    auth.value = await initAuth(oldToken);
   }
 
-  return auth
-}
+  return auth;
+};
 
 export const initAuth = async (oldToken = null) => {
   const auth = {
     user: null,
-    token: '',
+    token: "",
+  };
+
+  if (oldToken === "none") {
+    return auth;
   }
 
-  if (oldToken === 'none') {
-    return auth
-  }
-
-  const route = useRoute()
-  const authCookie = useCookie('auth-token', {
+  const route = useRoute();
+  const authCookie = useCookie("auth-token", {
     maxAge: 60 * 60 * 24 * 365 * 10,
-    sameSite: 'lax',
+    sameSite: "lax",
     secure: true,
     httpOnly: false,
-    path: '/',
-  })
+    path: "/",
+  });
 
   if (oldToken) {
-    authCookie.value = oldToken
+    authCookie.value = oldToken;
   }
 
-  if (route.query.code && !route.fullPath.includes('new_account=true')) {
-    authCookie.value = route.query.code
+  if (route.query.code && !route.fullPath.includes("new_account=true")) {
+    authCookie.value = route.query.code;
   }
 
   if (authCookie.value) {
-    auth.token = authCookie.value
+    auth.token = authCookie.value;
 
-    if (!auth.token || !auth.token.startsWith('mra_')) {
-      return auth
+    if (!auth.token || !auth.token.startsWith("mra_")) {
+      return auth;
     }
 
     try {
       auth.user = await useBaseFetch(
-        'user',
+        "user",
         {
           headers: {
             Authorization: auth.token,
           },
         },
-        true
-      )
-    } catch {}
+        true,
+      );
+    } catch {
+      /* empty */
+    }
   }
 
   if (!auth.user && auth.token) {
     try {
       const session = await useBaseFetch(
-        'session/refresh',
+        "session/refresh",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
             Authorization: auth.token,
           },
         },
-        true
-      )
+        true,
+      );
 
-      auth.token = session.session
-      authCookie.value = auth.token
+      auth.token = session.session;
+      authCookie.value = auth.token;
 
       auth.user = await useBaseFetch(
-        'user',
+        "user",
         {
           headers: {
             Authorization: auth.token,
           },
         },
-        true
-      )
+        true,
+      );
     } catch {
-      authCookie.value = null
+      authCookie.value = null;
     }
   }
 
-  return auth
-}
+  return auth;
+};
 
-export const getAuthUrl = (provider, redirect = '') => {
-  const config = useRuntimeConfig()
-  const route = useNativeRoute()
+export const getAuthUrl = (provider, redirect = "") => {
+  const config = useRuntimeConfig();
+  const route = useNativeRoute();
 
-  if (redirect === '') {
-    redirect = route.path
+  if (redirect === "") {
+    redirect = route.path;
   }
-  const fullURL = `${config.public.siteUrl}${redirect}`
+  const fullURL = `${config.public.siteUrl}${redirect}`;
 
-  return `${config.public.apiBaseUrl}auth/init?url=${fullURL}&provider=${provider}`
-}
+  return `${config.public.apiBaseUrl}auth/init?url=${fullURL}&provider=${provider}`;
+};
 
 export const removeAuthProvider = async (provider) => {
-  startLoading()
+  startLoading();
   try {
-    const auth = await useAuth()
+    const auth = await useAuth();
 
-    await useBaseFetch('auth/provider', {
-      method: 'DELETE',
+    await useBaseFetch("auth/provider", {
+      method: "DELETE",
       body: {
         provider,
       },
-    })
-    await useAuth(auth.value.token)
+    });
+    await useAuth(auth.value.token);
   } catch (err) {
-    const data = useNuxtApp()
+    const data = useNuxtApp();
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
-}
+  stopLoading();
+};

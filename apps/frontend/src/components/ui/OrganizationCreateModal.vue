@@ -54,51 +54,51 @@
   </Modal>
 </template>
 <script setup>
-import { XIcon as CrossIcon, CheckIcon } from '@modrinth/assets'
-import { Modal, Button } from '@modrinth/ui'
+import { XIcon as CrossIcon, CheckIcon } from "@modrinth/assets";
+import { Modal, Button } from "@modrinth/ui";
 
-const router = useNativeRouter()
+const router = useNativeRouter();
 
-const name = ref('')
-const slug = ref('')
-const description = ref('')
-const manualSlug = ref(false)
+const name = ref("");
+const slug = ref("");
+const description = ref("");
+const manualSlug = ref(false);
 
-const modal = ref()
+const modal = ref();
 
 async function createProject() {
-  startLoading()
+  startLoading();
   try {
     const value = {
       name: name.value.trim(),
       description: description.value.trim(),
-      slug: slug.value.trim().replace(/ +/g, ''),
-    }
+      slug: slug.value.trim().replace(/ +/g, ""),
+    };
 
-    const result = await useBaseFetch('organization', {
-      method: 'POST',
+    const result = await useBaseFetch("organization", {
+      method: "POST",
       body: JSON.stringify(value),
       apiVersion: 3,
-    })
+    });
 
-    modal.value.hide()
+    modal.value.hide();
 
-    await router.push(`/organization/${result.slug}`)
+    await router.push(`/organization/${result.slug}`);
   } catch (err) {
-    console.error(err)
+    console.error(err);
     addNotification({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 function show() {
-  name.value = ''
-  description.value = ''
-  modal.value.show()
+  name.value = "";
+  description.value = "";
+  modal.value.show();
 }
 
 function updateSlug() {
@@ -106,15 +106,15 @@ function updateSlug() {
     slug.value = name.value
       .trim()
       .toLowerCase()
-      .replaceAll(' ', '-')
-      .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
-      .replaceAll(/--+/gm, '-')
+      .replaceAll(" ", "-")
+      .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, "")
+      .replaceAll(/--+/gm, "-");
   }
 }
 
 defineExpose({
   show,
-})
+});
 </script>
 
 <style scoped lang="scss">

@@ -456,7 +456,7 @@
   }
 
   &:disabled,
-  &[disabled='true'] {
+  &[disabled="true"] {
     cursor: not-allowed;
     filter: grayscale(50%);
     opacity: 0.5;
@@ -502,7 +502,7 @@ tr.button-transparent {
   }
 
   &:disabled > *,
-  &[disabled='true'] > * {
+  &[disabled="true"] > * {
     cursor: not-allowed;
     filter: grayscale(50%);
     opacity: 0.5;
@@ -511,7 +511,10 @@ tr.button-transparent {
 }
 
 .button-within {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   &:focus-visible:not(&.disabled),
@@ -530,7 +533,7 @@ tr.button-transparent {
     box-shadow: none;
 
     &disabled,
-    &[disabled='true'] {
+    &[disabled="true"] {
       cursor: not-allowed;
       box-shadow: none;
     }
@@ -544,7 +547,9 @@ tr.button-transparent {
 
   color: var(--text-color);
   background-color: var(--background-color);
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
   border-radius: var(--size-rounded-sm);
 }
 
@@ -560,7 +565,10 @@ tr.button-transparent {
   cursor: pointer;
   width: fit-content;
   height: fit-content;
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    scale 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   text-decoration: none;
@@ -603,7 +611,9 @@ tr.button-transparent {
   border-radius: var(--size-rounded-sm);
   color: var(--text-color);
   background-color: var(--background-color);
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
 
   svg {
     min-width: 1.25rem;
@@ -826,7 +836,7 @@ tr.button-transparent {
   background: var(--color-button-bg);
 
   &:after {
-    content: '';
+    content: "";
     position: absolute;
     top: 7px;
     left: 7px;
@@ -1065,7 +1075,9 @@ button {
   background: var(--color-button-bg);
   width: fit-content;
   border-radius: var(--size-rounded-sm);
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
   transition: box-shadow 0.1s ease-in-out;
   overflow: hidden;
   max-width: 100%;
@@ -1099,7 +1111,9 @@ button {
   &:focus,
   &:focus-visible,
   &:focus-within {
-    box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
+    box-shadow:
+      inset 0 0 0 transparent,
+      0 0 0 0.25rem var(--color-brand-shadow);
     color: var(--color-button-text-active);
   }
 }
@@ -1436,15 +1450,15 @@ svg.inline-svg {
     height: var(--_size, var(--icon-16)) !important;
     border: 1px solid var(--color-button-border);
 
-    &[data-size='32'] {
+    &[data-size="32"] {
       --_size: var(--icon-32);
     }
 
-    &[data-shape='circle'] {
+    &[data-shape="circle"] {
       border-radius: var(--radius-max) !important;
     }
 
-    &[data-shape='square'] {
+    &[data-shape="square"] {
       border-radius: calc(2.25 * (var(--_size) / 16)) !important;
     }
   }

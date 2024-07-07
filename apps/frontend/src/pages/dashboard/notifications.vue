@@ -50,110 +50,110 @@
   </div>
 </template>
 <script setup>
-import { Button } from '@modrinth/ui'
-import { HistoryIcon } from '@modrinth/assets'
+import { Button } from "@modrinth/ui";
+import { HistoryIcon } from "@modrinth/assets";
 import {
   fetchExtraNotificationData,
   groupNotifications,
   markAsRead,
-} from '~/helpers/notifications.js'
-import NotificationItem from '~/components/ui/NotificationItem.vue'
-import Chips from '~/components/ui/Chips.vue'
-import CheckCheckIcon from '~/assets/images/utils/check-check.svg?component'
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
-import Pagination from '~/components/ui/Pagination.vue'
+} from "~/helpers/notifications.js";
+import NotificationItem from "~/components/ui/NotificationItem.vue";
+import Chips from "~/components/ui/Chips.vue";
+import CheckCheckIcon from "~/assets/images/utils/check-check.svg?component";
+import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
+import Pagination from "~/components/ui/Pagination.vue";
 
 useHead({
-  title: 'Notifications - Modrinth',
-})
+  title: "Notifications - Modrinth",
+});
 
-const auth = await useAuth()
+const auth = await useAuth();
 
-const route = useNativeRoute()
-const router = useNativeRouter()
+const route = useNativeRoute();
+const router = useNativeRouter();
 
 const history = computed(() => {
-  return route.name === 'dashboard-notifications-history'
-})
+  return route.name === "dashboard-notifications-history";
+});
 
-const selectedType = ref('all')
-const page = ref(1)
+const selectedType = ref("all");
+const page = ref(1);
 
-const perPage = ref(50)
+const perPage = ref(50);
 
 const { data, pending, error, refresh } = await useAsyncData(
   async () => {
-    const pageNum = page.value - 1
+    const pageNum = page.value - 1;
 
-    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`)
-    const showRead = history.value
-    const hasRead = notifications.some((notif) => notif.read)
+    const notifications = await useBaseFetch(`user/${auth.value.user.id}/notifications`);
+    const showRead = history.value;
+    const hasRead = notifications.some((notif) => notif.read);
 
     const types = [
       ...new Set(
         notifications
           .filter((notification) => {
-            return showRead || !notification.read
+            return showRead || !notification.read;
           })
-          .map((notification) => notification.type)
+          .map((notification) => notification.type),
       ),
-    ]
+    ];
 
     const filteredNotifications = notifications.filter(
       (notification) =>
-        (selectedType.value === 'all' || notification.type === selectedType.value) &&
-        (showRead || !notification.read)
-    )
-    const pages = Math.ceil(filteredNotifications.length / perPage.value)
+        (selectedType.value === "all" || notification.type === selectedType.value) &&
+        (showRead || !notification.read),
+    );
+    const pages = Math.ceil(filteredNotifications.length / perPage.value);
 
     return fetchExtraNotificationData(
-      filteredNotifications.slice(pageNum * perPage.value, perPage.value + pageNum * perPage.value)
+      filteredNotifications.slice(pageNum * perPage.value, perPage.value + pageNum * perPage.value),
     ).then((notifications) => {
       return {
         notifications,
-        types: types.length > 1 ? ['all', ...types] : types,
+        types: types.length > 1 ? ["all", ...types] : types,
         pages,
         hasRead,
-      }
-    })
+      };
+    });
   },
-  { watch: [page, history, selectedType] }
-)
+  { watch: [page, history, selectedType] },
+);
 
 const notifications = computed(() => {
   if (data.value === null) {
-    return []
+    return [];
   }
-  return groupNotifications(data.value.notifications, history.value)
-})
-const notifTypes = computed(() => data.value.types)
-const pages = computed(() => data.value.pages)
-const hasRead = computed(() => data.value.hasRead)
+  return groupNotifications(data.value.notifications, history.value);
+});
+const notifTypes = computed(() => data.value.types);
+const pages = computed(() => data.value.pages);
+const hasRead = computed(() => data.value.hasRead);
 
 function updateRoute() {
   if (history.value) {
-    router.push('/dashboard/notifications')
+    router.push("/dashboard/notifications");
   } else {
-    router.push('/dashboard/notifications/history')
+    router.push("/dashboard/notifications/history");
   }
-  selectedType.value = 'all'
-  page.value = 1
+  selectedType.value = "all";
+  page.value = 1;
 }
 
 async function readAll() {
   const ids = notifications.value.flatMap((notification) => [
     notification.id,
     ...(notification.grouped_notifs ? notification.grouped_notifs.map((notif) => notif.id) : []),
-  ])
+  ]);
 
-  const updateNotifs = await markAsRead(ids)
-  allNotifs.value = updateNotifs(allNotifs.value)
+  const updateNotifs = await markAsRead(ids);
+  allNotifs.value = updateNotifs(allNotifs.value);
 }
 
 function changePage(newPage) {
-  page.value = newPage
+  page.value = newPage;
   if (process.client) {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }
 </script>

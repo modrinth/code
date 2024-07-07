@@ -3,9 +3,9 @@ import {
   type FeatureFlag,
   DEFAULT_FEATURE_FLAGS,
   saveFeatureFlags,
-} from '~/composables/featureFlags.ts'
+} from "~/composables/featureFlags.ts";
 
-const flags = shallowReactive(useFeatureFlags().value)
+const flags = shallowReactive(useFeatureFlags().value);
 </script>
 
 <template>
@@ -19,7 +19,7 @@ const flags = shallowReactive(useFeatureFlags().value)
       >
         <label :for="`toggle-${flag}`">
           <span class="label__title">
-            {{ flag.replaceAll('_', ' ') }}
+            {{ flag.replaceAll("_", " ") }}
           </span>
           <span class="label__description">
             <p>

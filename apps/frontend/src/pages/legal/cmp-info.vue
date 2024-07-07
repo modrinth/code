@@ -90,12 +90,12 @@
 
 <script setup>
 const description =
-  'Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.'
+  "Information about the Rewards Program of Modrinth, an open source modding platform focused on Minecraft.";
 
 useSeoMeta({
-  title: 'Rewards Program Information - Modrinth',
+  title: "Rewards Program Information - Modrinth",
   description,
-  ogTitle: 'Rewards Program Information',
+  ogTitle: "Rewards Program Information",
   ogDescription: description,
-})
+});
 </script>

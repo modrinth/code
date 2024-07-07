@@ -199,7 +199,7 @@
               <BoxIcon />
               <span>{{
                 $formatProjectType(
-                  $getProjectTypeForDisplay(project.actualProjectType, project.loaders)
+                  $getProjectTypeForDisplay(project.actualProjectType, project.loaders),
                 )
               }}</span>
             </nuxt-link>
@@ -759,7 +759,7 @@
                 $router.push(
                   `/${project.project_type}/${
                     project.slug ? project.slug : project.id
-                  }/version/${encodeURI(version.displayUrlEnding)}`
+                  }/version/${encodeURI(version.displayUrlEnding)}`,
                 )
               "
             >
@@ -784,7 +784,7 @@
                   {{ version.name }}
                 </nuxt-link>
                 <div v-if="version.game_versions.length > 0" class="game-version item">
-                  {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
+                  {{ version.loaders.map((x) => $formatCategory(x)).join(", ") }}
                   {{ $formatVersion(version.game_versions) }}
                 </div>
                 <Badge v-if="version.version_type === 'release'" type="release" color="green" />
@@ -1071,89 +1071,89 @@ import {
   EyeIcon,
   CheckIcon,
   XIcon,
-} from '@modrinth/assets'
-import { Checkbox, Promotion, OverflowMenu, PopoutMenu } from '@modrinth/ui'
-import { renderString, isRejected, isUnderReview, isStaff } from '@modrinth/utils'
-import CrownIcon from '~/assets/images/utils/crown.svg?component'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
-import DownloadIcon from '~/assets/images/utils/download.svg?component'
-import UpdateIcon from '~/assets/images/utils/updated.svg?component'
-import QueuedIcon from '~/assets/images/utils/list-end.svg?component'
-import CodeIcon from '~/assets/images/sidebar/mod.svg?component'
-import ExternalIcon from '~/assets/images/utils/external.svg?component'
-import ReportIcon from '~/assets/images/utils/report.svg?component'
-import HeartIcon from '~/assets/images/utils/heart.svg?component'
-import IssuesIcon from '~/assets/images/utils/issues.svg?component'
-import WikiIcon from '~/assets/images/utils/wiki.svg?component'
-import DiscordIcon from '~/assets/images/external/discord.svg?component'
-import BuyMeACoffeeLogo from '~/assets/images/external/bmac.svg?component'
-import PatreonIcon from '~/assets/images/external/patreon.svg?component'
-import KoFiIcon from '~/assets/images/external/kofi.svg?component'
-import PayPalIcon from '~/assets/images/external/paypal.svg?component'
-import OpenCollectiveIcon from '~/assets/images/external/opencollective.svg?component'
-import UnknownIcon from '~/assets/images/utils/unknown-donation.svg?component'
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
-import BoxIcon from '~/assets/images/utils/box.svg?component'
-import Badge from '~/components/ui/Badge.vue'
-import Categories from '~/components/ui/search/Categories.vue'
-import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator.vue'
-import Modal from '~/components/ui/Modal.vue'
-import NavRow from '~/components/ui/NavRow.vue'
-import CopyCode from '~/components/ui/CopyCode.vue'
-import Avatar from '~/components/ui/Avatar.vue'
-import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
-import ProjectMemberHeader from '~/components/ui/ProjectMemberHeader.vue'
-import MessageBanner from '~/components/ui/MessageBanner.vue'
-import SettingsIcon from '~/assets/images/utils/settings.svg?component'
-import UsersIcon from '~/assets/images/utils/users.svg?component'
-import CategoriesIcon from '~/assets/images/utils/tags.svg?component'
-import DescriptionIcon from '~/assets/images/utils/align-left.svg?component'
-import LinksIcon from '~/assets/images/utils/link.svg?component'
-import CopyrightIcon from '~/assets/images/utils/copyright.svg?component'
-import LicenseIcon from '~/assets/images/utils/book-text.svg?component'
-import GalleryIcon from '~/assets/images/utils/image.svg?component'
-import VersionIcon from '~/assets/images/utils/version.svg?component'
-import { reportProject } from '~/utils/report-helpers.ts'
-import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
-import { userCollectProject } from '~/composables/user.js'
-import CollectionCreateModal from '~/components/ui/CollectionCreateModal.vue'
-import OrganizationIcon from '~/assets/images/utils/organization.svg?component'
-import ModerationChecklist from '~/components/ui/ModerationChecklist.vue'
-import ModeratorIcon from '~/assets/images/sidebar/admin.svg?component'
-import { getVersionsToDisplay } from '~/helpers/projects.js'
+} from "@modrinth/assets";
+import { Checkbox, Promotion, OverflowMenu, PopoutMenu } from "@modrinth/ui";
+import { renderString, isRejected, isUnderReview, isStaff } from "@modrinth/utils";
+import CrownIcon from "~/assets/images/utils/crown.svg?component";
+import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
+import DownloadIcon from "~/assets/images/utils/download.svg?component";
+import UpdateIcon from "~/assets/images/utils/updated.svg?component";
+import QueuedIcon from "~/assets/images/utils/list-end.svg?component";
+import CodeIcon from "~/assets/images/sidebar/mod.svg?component";
+import ExternalIcon from "~/assets/images/utils/external.svg?component";
+import ReportIcon from "~/assets/images/utils/report.svg?component";
+import HeartIcon from "~/assets/images/utils/heart.svg?component";
+import IssuesIcon from "~/assets/images/utils/issues.svg?component";
+import WikiIcon from "~/assets/images/utils/wiki.svg?component";
+import DiscordIcon from "~/assets/images/external/discord.svg?component";
+import BuyMeACoffeeLogo from "~/assets/images/external/bmac.svg?component";
+import PatreonIcon from "~/assets/images/external/patreon.svg?component";
+import KoFiIcon from "~/assets/images/external/kofi.svg?component";
+import PayPalIcon from "~/assets/images/external/paypal.svg?component";
+import OpenCollectiveIcon from "~/assets/images/external/opencollective.svg?component";
+import UnknownIcon from "~/assets/images/utils/unknown-donation.svg?component";
+import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
+import BoxIcon from "~/assets/images/utils/box.svg?component";
+import Badge from "~/components/ui/Badge.vue";
+import Categories from "~/components/ui/search/Categories.vue";
+import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
+import Modal from "~/components/ui/Modal.vue";
+import NavRow from "~/components/ui/NavRow.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import Avatar from "~/components/ui/Avatar.vue";
+import NavStack from "~/components/ui/NavStack.vue";
+import NavStackItem from "~/components/ui/NavStackItem.vue";
+import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
+import MessageBanner from "~/components/ui/MessageBanner.vue";
+import SettingsIcon from "~/assets/images/utils/settings.svg?component";
+import UsersIcon from "~/assets/images/utils/users.svg?component";
+import CategoriesIcon from "~/assets/images/utils/tags.svg?component";
+import DescriptionIcon from "~/assets/images/utils/align-left.svg?component";
+import LinksIcon from "~/assets/images/utils/link.svg?component";
+import CopyrightIcon from "~/assets/images/utils/copyright.svg?component";
+import LicenseIcon from "~/assets/images/utils/book-text.svg?component";
+import GalleryIcon from "~/assets/images/utils/image.svg?component";
+import VersionIcon from "~/assets/images/utils/version.svg?component";
+import { reportProject } from "~/utils/report-helpers.ts";
+import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
+import { userCollectProject } from "~/composables/user.js";
+import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
+import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
+import ModeratorIcon from "~/assets/images/sidebar/admin.svg?component";
+import { getVersionsToDisplay } from "~/helpers/projects.js";
 
-const data = useNuxtApp()
-const route = useNativeRoute()
-const config = useRuntimeConfig()
+const data = useNuxtApp();
+const route = useNativeRoute();
+const config = useRuntimeConfig();
 
-const auth = await useAuth()
-const user = await useUser()
-const cosmetics = useCosmetics()
-const tags = useTags()
-const flags = useFeatureFlags()
+const auth = await useAuth();
+const user = await useUser();
+const cosmetics = useCosmetics();
+const tags = useTags();
+const flags = useFeatureFlags();
 
-const displayCollectionsSearch = ref('')
+const displayCollectionsSearch = ref("");
 const collections = computed(() =>
   user.value && user.value.collections
     ? user.value.collections.filter((x) =>
-        x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase())
+        x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
       )
-    : []
-)
+    : [],
+);
 
 if (
   !route.params.id ||
   !(
     tags.value.projectTypes.find((x) => x.id === route.params.type) ||
-    route.params.type === 'project'
+    route.params.type === "project"
   )
 ) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: 'The page could not be found',
-  })
+    message: "The page could not be found",
+  });
 }
 
 let project,
@@ -1164,9 +1164,9 @@ let project,
   featuredVersions,
   versions,
   organization,
-  resetOrganization
+  resetOrganization;
 try {
-  ;[
+  [
     { data: project, refresh: resetProject },
     { data: allMembers, refresh: resetMembers },
     { data: dependencies },
@@ -1177,15 +1177,15 @@ try {
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
       transform: (project) => {
         if (project) {
-          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type))
+          project.actualProjectType = JSON.parse(JSON.stringify(project.project_type));
           project.project_type = data.$getProjectTypeForUrl(
             project.project_type,
             project.loaders,
-            tags.value
-          )
+            tags.value,
+          );
         }
 
-        return project
+        return project;
       },
     }),
     useAsyncData(
@@ -1194,89 +1194,89 @@ try {
       {
         transform: (members) => {
           members.forEach((it, index) => {
-            members[index].avatar_url = it.user.avatar_url
-            members[index].name = it.user.username
-          })
+            members[index].avatar_url = it.user.avatar_url;
+            members[index].name = it.user.username;
+          });
 
-          return members
+          return members;
         },
-      }
+      },
     ),
     useAsyncData(`project/${route.params.id}/dependencies`, () =>
-      useBaseFetch(`project/${route.params.id}/dependencies`)
+      useBaseFetch(`project/${route.params.id}/dependencies`),
     ),
     useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-      useBaseFetch(`project/${route.params.id}/version?featured=true`)
+      useBaseFetch(`project/${route.params.id}/version?featured=true`),
     ),
     useAsyncData(`project/${route.params.id}/version`, () =>
-      useBaseFetch(`project/${route.params.id}/version`)
+      useBaseFetch(`project/${route.params.id}/version`),
     ),
     useAsyncData(`project/${route.params.id}/organization`, () =>
-      useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 })
+      useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
     ),
-  ])
+  ]);
 
-  versions = shallowRef(toRaw(versions))
-  featuredVersions = shallowRef(toRaw(featuredVersions))
+  versions = shallowRef(toRaw(versions));
+  featuredVersions = shallowRef(toRaw(featuredVersions));
 } catch (error) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: 'Project not found',
-  })
+    message: "Project not found",
+  });
 }
 
 if (!project.value) {
   throw createError({
     fatal: true,
     statusCode: 404,
-    message: 'Project not found',
-  })
+    message: "Project not found",
+  });
 }
 
 if (project.value.project_type !== route.params.type || route.params.id !== project.value.slug) {
-  let path = route.fullPath.split('/')
-  path.splice(0, 3)
-  path = path.filter((x) => x)
+  let path = route.fullPath.split("/");
+  path.splice(0, 3);
+  path = path.filter((x) => x);
 
   await navigateTo(
     `/${project.value.project_type}/${project.value.slug}${
-      path.length > 0 ? `/${path.join('/')}` : ''
+      path.length > 0 ? `/${path.join("/")}` : ""
     }`,
-    { redirectCode: 301, replace: true }
-  )
+    { redirectCode: 301, replace: true },
+  );
 }
 
 // Members should be an array of all members, without the accepted ones, and with the user with the Owner role at the start
 // The rest of the members should be sorted by role, then by name
 const members = computed(() => {
-  const acceptedMembers = allMembers.value.filter((x) => x.accepted)
+  const acceptedMembers = allMembers.value.filter((x) => x.accepted);
   const owner = acceptedMembers.find((x) =>
     organization.value
       ? organization.value.members.some(
-          (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner
+          (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
         )
-      : x.is_owner
-  )
+      : x.is_owner,
+  );
 
-  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || []
+  const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || [];
 
   rest.sort((a, b) => {
     if (a.role === b.role) {
-      return a.user.username.localeCompare(b.user.username)
+      return a.user.username.localeCompare(b.user.username);
     } else {
-      return a.role.localeCompare(b.role)
+      return a.role.localeCompare(b.role);
     }
-  })
+  });
 
-  return owner ? [owner, ...rest] : rest
-})
+  return owner ? [owner, ...rest] : rest;
+});
 
 const currentMember = computed(() => {
-  let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null
+  let val = auth.value.user ? allMembers.value.find((x) => x.user.id === auth.value.user.id) : null;
 
   if (!val && auth.value.user && organization.value && organization.value.members) {
-    val = organization.value.members.find((x) => x.user.id === auth.value.user.id)
+    val = organization.value.members.find((x) => x.user.id === auth.value.user.id);
   }
 
   if (!val && auth.value.user && tags.value.staffRoles.includes(auth.value.user.role)) {
@@ -1284,195 +1284,195 @@ const currentMember = computed(() => {
       team_id: project.team_id,
       user: auth.value.user,
       role: auth.value.role,
-      permissions: auth.value.user.role === 'admin' ? 1023 : 12,
+      permissions: auth.value.user.role === "admin" ? 1023 : 12,
       accepted: true,
       payouts_split: 0,
       avatar_url: auth.value.user.avatar_url,
       name: auth.value.user.username,
-    }
+    };
   }
 
-  return val
-})
+  return val;
+});
 
-versions.value = data.$computeVersions(versions.value, allMembers.value)
+versions.value = data.$computeVersions(versions.value, allMembers.value);
 
 // Q: Why do this instead of computing the versions of featuredVersions?
 // A: It will incorrectly generate the version slugs because it doesn't have the full context of
 //    all the versions. For example, if version 1.1.0 for Forge is featured but 1.1.0 for Fabric
 //    is not, but the Fabric one was uploaded first, the Forge version would link to the Fabric
 ///   version
-const featuredIds = featuredVersions.value.map((x) => x.id)
-featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id))
+const featuredIds = featuredVersions.value.map((x) => x.id);
+featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id));
 
 featuredVersions.value.sort((a, b) => {
-  const aLatest = a.game_versions[a.game_versions.length - 1]
-  const bLatest = b.game_versions[b.game_versions.length - 1]
-  const gameVersions = tags.value.gameVersions.map((e) => e.version)
-  return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest)
-})
+  const aLatest = a.game_versions[a.game_versions.length - 1];
+  const bLatest = b.game_versions[b.game_versions.length - 1];
+  const gameVersions = tags.value.gameVersions.map((e) => e.version);
+  return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest);
+});
 
 const licenseIdDisplay = computed(() => {
-  const id = project.value.license.id
+  const id = project.value.license.id;
 
-  if (id === 'LicenseRef-All-Rights-Reserved') {
-    return 'ARR'
-  } else if (id.includes('LicenseRef')) {
-    return id.replaceAll('LicenseRef-', '').replaceAll('-', ' ')
+  if (id === "LicenseRef-All-Rights-Reserved") {
+    return "ARR";
+  } else if (id.includes("LicenseRef")) {
+    return id.replaceAll("LicenseRef-", "").replaceAll("-", " ");
   } else {
-    return id
+    return id;
   }
-})
-const featuredGalleryImage = computed(() => project.value.gallery.find((img) => img.featured))
+});
+const featuredGalleryImage = computed(() => project.value.gallery.find((img) => img.featured));
 
 const projectTypeDisplay = computed(() =>
   data.$formatProjectType(
-    data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders)
-  )
-)
+    data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
+  ),
+);
 
-const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`)
+const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`);
 const description = computed(
   () =>
     `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
       project.value.title
-    } by ${members.value.find((x) => x.is_owner)?.user?.username || 'a Creator'} on Modrinth`
-)
+    } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
+);
 
-if (!route.name.startsWith('type-id-settings')) {
+if (!route.name.startsWith("type-id-settings")) {
   useSeoMeta({
     title: () => title.value,
     description: () => description.value,
     ogTitle: () => title.value,
     ogDescription: () => project.value.description,
-    ogImage: () => project.value.icon_url ?? 'https://cdn.modrinth.com/placeholder.png',
+    ogImage: () => project.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
     robots: () =>
-      project.value.status === 'approved' || project.value.status === 'archived'
-        ? 'all'
-        : 'noindex',
-  })
+      project.value.status === "approved" || project.value.status === "archived"
+        ? "all"
+        : "noindex",
+  });
 }
 
-const onUserCollectProject = useClientTry(userCollectProject)
+const onUserCollectProject = useClientTry(userCollectProject);
 
 async function setProcessing() {
-  startLoading()
+  startLoading();
 
   try {
     await useBaseFetch(`project/${project.value.id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: {
-        status: 'processing',
+        status: "processing",
       },
-    })
+    });
 
-    project.value.status = 'processing'
+    project.value.status = "processing";
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
 
-  stopLoading()
+  stopLoading();
 }
 
-const modalLicense = ref(null)
-const licenseText = ref('')
+const modalLicense = ref(null);
+const licenseText = ref("");
 async function getLicenseData() {
   try {
-    const text = await useBaseFetch(`tag/license/${project.value.license.id}`)
-    licenseText.value = text.body || 'License text could not be retrieved.'
+    const text = await useBaseFetch(`tag/license/${project.value.license.id}`);
+    licenseText.value = text.body || "License text could not be retrieved.";
   } catch {
-    licenseText.value = 'License text could not be retrieved.'
+    licenseText.value = "License text could not be retrieved.";
   }
 
-  modalLicense.value.show()
+  modalLicense.value.show();
 }
 
 async function patchProject(resData, quiet = false) {
-  let result = false
-  startLoading()
+  let result = false;
+  startLoading();
 
   try {
     await useBaseFetch(`project/${project.value.id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: resData,
-    })
+    });
 
     for (const key in resData) {
-      project.value[key] = resData[key]
+      project.value[key] = resData[key];
     }
 
     if (resData.license_id) {
-      project.value.license.id = resData.license_id
+      project.value.license.id = resData.license_id;
     }
     if (resData.license_url) {
-      project.value.license.url = resData.license_url
+      project.value.license.url = resData.license_url;
     }
 
-    result = true
+    result = true;
     if (!quiet) {
       data.$notify({
-        group: 'main',
-        title: 'Project updated',
-        text: 'Your project has been updated.',
-        type: 'success',
-      })
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+        group: "main",
+        title: "Project updated",
+        text: "Your project has been updated.",
+        type: "success",
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+      type: "error",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  stopLoading()
+  stopLoading();
 
-  return result
+  return result;
 }
 
 async function patchIcon(icon) {
-  let result = false
-  startLoading()
+  let result = false;
+  startLoading();
 
   try {
     await useBaseFetch(
       `project/${project.value.id}/icon?ext=${
-        icon.type.split('/')[icon.type.split('/').length - 1]
+        icon.type.split("/")[icon.type.split("/").length - 1]
       }`,
       {
-        method: 'PATCH',
+        method: "PATCH",
         body: icon,
-      }
-    )
-    await resetProject()
-    result = true
+      },
+    );
+    await resetProject();
+    result = true;
     data.$notify({
-      group: 'main',
-      title: 'Project icon updated',
+      group: "main",
+      title: "Project icon updated",
       text: "Your project's icon has been updated.",
-      type: 'success',
-    })
+      type: "success",
+    });
   } catch (err) {
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
 
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  stopLoading()
-  return result
+  stopLoading();
+  return result;
 }
 
 async function updateMembers() {
@@ -1482,32 +1482,32 @@ async function updateMembers() {
     {
       transform: (members) => {
         members.forEach((it, index) => {
-          members[index].avatar_url = it.user.avatar_url
-          members[index].name = it.user.username
-        })
+          members[index].avatar_url = it.user.avatar_url;
+          members[index].name = it.user.username;
+        });
 
-        return members
+        return members;
       },
-    }
-  )
+    },
+  );
 }
 
 async function copyId() {
-  await navigator.clipboard.writeText(project.value.id)
+  await navigator.clipboard.writeText(project.value.id);
 }
 
-const collapsedChecklist = ref(false)
+const collapsedChecklist = ref(false);
 
-const showModerationChecklist = ref(false)
-const futureProjects = ref([])
+const showModerationChecklist = ref(false);
+const futureProjects = ref([]);
 if (process.client && history && history.state && history.state.showChecklist) {
-  showModerationChecklist.value = true
-  futureProjects.value = history.state.projects
+  showModerationChecklist.value = true;
+  futureProjects.value = history.state.projects;
 }
 
 const showFeaturedVersions = computed(
-  () => !flags.value.removeFeaturedVersions && featuredVersions.value.length > 0
-)
+  () => !flags.value.removeFeaturedVersions && featuredVersions.value.length > 0,
+);
 </script>
 <style lang="scss" scoped>
 .header {
@@ -1599,7 +1599,9 @@ const showFeaturedVersions = computed(
       margin-top: calc(-3rem - var(--spacing-card-lg) - 4px);
       margin-left: -4px;
       z-index: 1;
-      box-shadow: -2px -2px 0 2px var(--color-raised-bg), 2px -2px 0 2px var(--color-raised-bg);
+      box-shadow:
+        -2px -2px 0 2px var(--color-raised-bg),
+        2px -2px 0 2px var(--color-raised-bg);
     }
   }
 
@@ -1706,7 +1708,7 @@ const showFeaturedVersions = computed(
     }
 
     &:not(:last-child)::after {
-      content: '•';
+      content: "•";
       margin: 0 0.25rem;
     }
   }

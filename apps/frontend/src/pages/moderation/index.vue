@@ -32,11 +32,11 @@
   </div>
 </template>
 <script setup>
-import { formatNumber } from '~/plugins/shorthands.js'
+import { formatNumber } from "~/plugins/shorthands.js";
 
 useHead({
-  title: 'Staff overview - Modrinth',
-})
+  title: "Staff overview - Modrinth",
+});
 
-const { data: stats } = await useAsyncData('statistics', () => useBaseFetch('statistics'))
+const { data: stats } = await useAsyncData("statistics", () => useBaseFetch("statistics"));
 </script>

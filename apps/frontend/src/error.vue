@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import Logo404 from '~/assets/images/404.svg'
+import Logo404 from "~/assets/images/404.svg";
 
 defineProps({
   error: {
@@ -31,11 +31,11 @@ defineProps({
     default() {
       return {
         statusCode: 1000,
-        message: 'Unknown error',
-      }
+        message: "Unknown error",
+      };
     },
   },
-})
+});
 </script>
 
 <style lang="scss" scoped>

@@ -35,19 +35,19 @@
 </template>
 
 <script setup>
-import ModrinthIcon from '~/assets/images/logo.svg?component'
-import ModeratorIcon from '~/assets/images/sidebar/admin.svg?component'
-import CreatorIcon from '~/assets/images/utils/box.svg?component'
-import ListIcon from '~/assets/images/utils/list.svg?component'
-import EyeOffIcon from '~/assets/images/utils/eye-off.svg?component'
-import DraftIcon from '~/assets/images/utils/file-text.svg?component'
-import CrossIcon from '~/assets/images/utils/x.svg?component'
-import ArchiveIcon from '~/assets/images/utils/archive.svg?component'
-import ProcessingIcon from '~/assets/images/utils/updated.svg?component'
-import CheckIcon from '~/assets/images/utils/check.svg?component'
-import LockIcon from '~/assets/images/utils/lock.svg?component'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
-import CloseIcon from '~/assets/images/utils/check-circle.svg?component'
+import ModrinthIcon from "~/assets/images/logo.svg?component";
+import ModeratorIcon from "~/assets/images/sidebar/admin.svg?component";
+import CreatorIcon from "~/assets/images/utils/box.svg?component";
+import ListIcon from "~/assets/images/utils/list.svg?component";
+import EyeOffIcon from "~/assets/images/utils/eye-off.svg?component";
+import DraftIcon from "~/assets/images/utils/file-text.svg?component";
+import CrossIcon from "~/assets/images/utils/x.svg?component";
+import ArchiveIcon from "~/assets/images/utils/archive.svg?component";
+import ProcessingIcon from "~/assets/images/utils/updated.svg?component";
+import CheckIcon from "~/assets/images/utils/check.svg?component";
+import LockIcon from "~/assets/images/utils/lock.svg?component";
+import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
+import CloseIcon from "~/assets/images/utils/check-circle.svg?component";
 
 defineProps({
   type: {
@@ -56,9 +56,9 @@ defineProps({
   },
   color: {
     type: String,
-    default: '',
+    default: "",
   },
-})
+});
 </script>
 
 <style lang="scss" scoped>

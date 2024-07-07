@@ -163,12 +163,12 @@
                       {{ notification.title }} has been updated!
                     </nuxt-link>
                     <p class="notif-desc">
-                      Version {{ ['1.1.2', '1.0.3', '15.1'][index] }} has been released for
+                      Version {{ ["1.1.2", "1.0.3", "15.1"][index] }} has been released for
                       {{
                         $capitalizeString(
                           notification.display_categories[
                             notification.display_categories.length - 1
-                          ]
+                          ],
                         )
                       }}
                       {{ notification.versions[notification.versions.length - 1] }}
@@ -504,43 +504,43 @@
   </div>
 </template>
 <script setup>
-import { Multiselect } from 'vue-multiselect'
-import SearchIcon from '~/assets/images/utils/search.svg?component'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
-import ModrinthIcon from '~/assets/images/logo.svg?component'
-import PrismLauncherLogo from '~/assets/images/external/prism.svg?component'
-import ATLauncherLogo from '~/assets/images/external/atlauncher.svg?component'
-import Avatar from '~/components/ui/Avatar.vue'
-import ProjectCard from '~/components/ui/ProjectCard.vue'
+import { Multiselect } from "vue-multiselect";
+import SearchIcon from "~/assets/images/utils/search.svg?component";
+import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
+import ModrinthIcon from "~/assets/images/logo.svg?component";
+import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
+import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
+import Avatar from "~/components/ui/Avatar.vue";
+import ProjectCard from "~/components/ui/ProjectCard.vue";
 
-const searchQuery = ref('better')
-const sortType = ref('relevance')
+const searchQuery = ref("better");
+const sortType = ref("relevance");
 
-const auth = await useAuth()
-const tags = useTags()
+const auth = await useAuth();
+const tags = useTags();
 
 const [
   { data: rows },
   { data: searchProjects, refresh: updateSearchProjects },
   { data: notifications },
 ] = await Promise.all([
-  useAsyncData('projects', () => useBaseFetch('projects_random?count=40'), {
+  useAsyncData("projects", () => useBaseFetch("projects_random?count=40"), {
     transform: (result) => {
-      const val = Math.ceil(result.length / 3)
-      return [result.slice(0, val), result.slice(val, val * 2), result.slice(val * 2, val * 3)]
+      const val = Math.ceil(result.length / 3);
+      return [result.slice(0, val), result.slice(val, val * 2), result.slice(val * 2, val * 3)];
     },
   }),
   useAsyncData(
-    'demoSearchProjects',
+    "demoSearchProjects",
     () => useBaseFetch(`search?limit=3&query=${searchQuery.value}&index=${sortType.value}`),
     {
       transform: (result) => result.hits,
-    }
+    },
   ),
-  useAsyncData('updatedProjects', () => useBaseFetch(`search?limit=3&query=&index=updated`), {
+  useAsyncData("updatedProjects", () => useBaseFetch(`search?limit=3&query=&index=updated`), {
     transform: (result) => result.hits,
   }),
-])
+]);
 </script>
 
 <style lang="scss" scoped>
@@ -592,7 +592,7 @@ const [
   width: 100%;
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     z-index: 1;
     inset: 0;
@@ -683,7 +683,9 @@ const [
         gap: 1rem;
         border-radius: 1rem;
         border: 1px solid var(--landing-border-color);
-        transition: background 0.5s ease-in-out, transform 0.05s ease-in-out;
+        transition:
+          background 0.5s ease-in-out,
+          transform 0.05s ease-in-out;
         // Removed due to lag on mobile :(
 
         &:hover {
@@ -793,7 +795,7 @@ const [
         z-index: 1;
 
         &:after {
-          content: '';
+          content: "";
           position: absolute;
           z-index: -1;
           inset: 0 0 -0.75rem -0.75rem;
@@ -824,7 +826,9 @@ const [
               }
 
               input {
-                box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
+                box-shadow:
+                  inset 0 0 0 transparent,
+                  0 0 0 0.25rem var(--color-brand-shadow);
                 color: var(--color-button-text-active);
               }
             }
@@ -990,7 +994,9 @@ const [
         width: 4rem;
         height: 4rem;
         background: #020305;
-        box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16), inset 2px 2px 32px #393d5e;
+        box-shadow:
+          2px 2px 12px rgba(0, 0, 0, 0.16),
+          inset 2px 2px 32px #393d5e;
         border-radius: 1rem;
 
         svg {
@@ -1063,7 +1069,7 @@ const [
   border-radius: 1rem;
 
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     padding: 1px;
@@ -1071,8 +1077,12 @@ const [
     border-radius: 1rem;
     background: var(--landing-border-gradient);
 
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }

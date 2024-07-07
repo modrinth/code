@@ -9,7 +9,7 @@
         <div class="gallery-file-input">
           <div class="file-header">
             <ImageIcon />
-            <strong>{{ editFile ? editFile.name : 'Current image' }}</strong>
+            <strong>{{ editFile ? editFile.name : "Current image" }}</strong>
             <FileInput
               v-if="editIndex === -1"
               class="iconified-button raised-button"
@@ -19,8 +19,8 @@
               should-always-reset
               @change="
                 (x) => {
-                  editFile = x[0]
-                  showPreviewImage()
+                  editFile = x[0];
+                  showPreviewImage();
                 }
               "
             >
@@ -32,8 +32,8 @@
               previewImage
                 ? previewImage
                 : project.gallery[editIndex] && project.gallery[editIndex].url
-                ? project.gallery[editIndex].url
-                : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                  ? project.gallery[editIndex].url
+                  : 'https://cdn.modrinth.com/placeholder-banner.svg'
             "
             alt="gallery-preview"
           />
@@ -235,20 +235,20 @@
         <div class="gallery-bottom">
           <div class="gallery-created">
             <CalendarIcon />
-            {{ $dayjs(item.created).format('MMMM D, YYYY') }}
+            {{ $dayjs(item.created).format("MMMM D, YYYY") }}
           </div>
           <div v-if="currentMember" class="gallery-buttons input-group">
             <button
               class="iconified-button"
               @click="
                 () => {
-                  resetEdit()
-                  editIndex = index
-                  editTitle = item.title
-                  editDescription = item.description
-                  editFeatured = item.featured
-                  editOrder = item.ordering
-                  $refs.modal_edit_item.show()
+                  resetEdit();
+                  editIndex = index;
+                  editTitle = item.title;
+                  editDescription = item.description;
+                  editFeatured = item.featured;
+                  editOrder = item.ordering;
+                  $refs.modal_edit_item.show();
                 }
               "
             >
@@ -259,8 +259,8 @@
               class="iconified-button"
               @click="
                 () => {
-                  deleteIndex = index
-                  $refs.modal_confirm.show()
+                  deleteIndex = index;
+                  $refs.modal_confirm.show();
                 }
               "
             >
@@ -292,25 +292,25 @@ import {
   InfoIcon,
   ImageIcon,
   TransferIcon,
-} from '@modrinth/assets'
-import { ConfirmModal } from '@modrinth/ui'
-import FileInput from '~/components/ui/FileInput.vue'
-import DropArea from '~/components/ui/DropArea.vue'
-import Modal from '~/components/ui/Modal.vue'
+} from "@modrinth/assets";
+import { ConfirmModal } from "@modrinth/ui";
+import FileInput from "~/components/ui/FileInput.vue";
+import DropArea from "~/components/ui/DropArea.vue";
+import Modal from "~/components/ui/Modal.vue";
 
-import { isPermission } from '~/utils/permissions.ts'
+import { isPermission } from "~/utils/permissions.ts";
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {}
+      return {};
     },
   },
   currentMember: {
     type: Object,
     default() {
-      return null
+      return null;
     },
   },
   resetProject: {
@@ -318,17 +318,17 @@ const props = defineProps({
     required: true,
     default: () => {},
   },
-})
+});
 
-const title = `${props.project.title} - Gallery`
-const description = `View ${props.project.gallery.length} images of ${props.project.title} on Modrinth.`
+const title = `${props.project.title} - Gallery`;
+const description = `View ${props.project.gallery.length} images of ${props.project.title} on Modrinth.`;
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-})
+});
 </script>
 
 <script>
@@ -342,185 +342,185 @@ export default defineNuxtComponent({
       deleteIndex: -1,
 
       editIndex: -1,
-      editTitle: '',
-      editDescription: '',
+      editTitle: "",
+      editDescription: "",
       editFeatured: false,
       editOrder: null,
       editFile: null,
       previewImage: null,
       shouldPreventActions: false,
-    }
+    };
   },
   computed: {
     acceptFileTypes() {
-      return 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
+      return "image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp";
     },
   },
   mounted() {
     this._keyListener = function (e) {
       if (this.expandedGalleryItem) {
-        e.preventDefault()
-        if (e.key === 'Escape') {
-          this.expandedGalleryItem = null
-        } else if (e.key === 'ArrowLeft') {
-          this.previousImage()
-        } else if (e.key === 'ArrowRight') {
-          this.nextImage()
+        e.preventDefault();
+        if (e.key === "Escape") {
+          this.expandedGalleryItem = null;
+        } else if (e.key === "ArrowLeft") {
+          this.previousImage();
+        } else if (e.key === "ArrowRight") {
+          this.nextImage();
         }
       }
-    }
+    };
 
-    document.addEventListener('keydown', this._keyListener.bind(this))
+    document.addEventListener("keydown", this._keyListener.bind(this));
   },
   methods: {
     nextImage() {
-      this.expandedGalleryIndex++
+      this.expandedGalleryIndex++;
       if (this.expandedGalleryIndex >= this.project.gallery.length) {
-        this.expandedGalleryIndex = 0
+        this.expandedGalleryIndex = 0;
       }
-      this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex]
+      this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex];
     },
     previousImage() {
-      this.expandedGalleryIndex--
+      this.expandedGalleryIndex--;
       if (this.expandedGalleryIndex < 0) {
-        this.expandedGalleryIndex = this.project.gallery.length - 1
+        this.expandedGalleryIndex = this.project.gallery.length - 1;
       }
-      this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex]
+      this.expandedGalleryItem = this.project.gallery[this.expandedGalleryIndex];
     },
     expandImage(item, index) {
-      this.expandedGalleryItem = item
-      this.expandedGalleryIndex = index
-      this.zoomedIn = false
+      this.expandedGalleryItem = item;
+      this.expandedGalleryIndex = index;
+      this.zoomedIn = false;
     },
     resetEdit() {
-      this.editIndex = -1
-      this.editTitle = ''
-      this.editDescription = ''
-      this.editFeatured = false
-      this.editOrder = null
-      this.editFile = null
-      this.previewImage = null
+      this.editIndex = -1;
+      this.editTitle = "";
+      this.editDescription = "";
+      this.editFeatured = false;
+      this.editOrder = null;
+      this.editFile = null;
+      this.previewImage = null;
     },
     handleFiles(files) {
-      this.resetEdit()
-      this.editFile = files[0]
+      this.resetEdit();
+      this.editFile = files[0];
 
-      this.showPreviewImage()
-      this.$refs.modal_edit_item.show()
+      this.showPreviewImage();
+      this.$refs.modal_edit_item.show();
     },
     showPreviewImage() {
-      const reader = new FileReader()
+      const reader = new FileReader();
       if (this.editFile instanceof Blob) {
-        reader.readAsDataURL(this.editFile)
+        reader.readAsDataURL(this.editFile);
         reader.onload = (event) => {
-          this.previewImage = event.target.result
-        }
+          this.previewImage = event.target.result;
+        };
       }
     },
     async createGalleryItem() {
-      this.shouldPreventActions = true
-      startLoading()
+      this.shouldPreventActions = true;
+      startLoading();
 
       try {
         let url = `project/${this.project.id}/gallery?ext=${
           this.editFile
-            ? this.editFile.type.split('/')[this.editFile.type.split('/').length - 1]
+            ? this.editFile.type.split("/")[this.editFile.type.split("/").length - 1]
             : null
-        }&featured=${this.editFeatured}`
+        }&featured=${this.editFeatured}`;
 
         if (this.editTitle) {
-          url += `&title=${encodeURIComponent(this.editTitle)}`
+          url += `&title=${encodeURIComponent(this.editTitle)}`;
         }
         if (this.editDescription) {
-          url += `&description=${encodeURIComponent(this.editDescription)}`
+          url += `&description=${encodeURIComponent(this.editDescription)}`;
         }
         if (this.editOrder) {
-          url += `&ordering=${this.editOrder}`
+          url += `&ordering=${this.editOrder}`;
         }
 
         await useBaseFetch(url, {
-          method: 'POST',
+          method: "POST",
           body: this.editFile,
-        })
-        await this.resetProject()
+        });
+        await this.resetProject();
 
-        this.$refs.modal_edit_item.hide()
+        this.$refs.modal_edit_item.hide();
       } catch (err) {
         this.$notify({
-          group: 'main',
-          title: 'An error occurred',
+          group: "main",
+          title: "An error occurred",
           text: err.data ? err.data.description : err,
-          type: 'error',
-        })
+          type: "error",
+        });
       }
 
-      stopLoading()
-      this.shouldPreventActions = false
+      stopLoading();
+      this.shouldPreventActions = false;
     },
     async editGalleryItem() {
-      this.shouldPreventActions = true
-      startLoading()
+      this.shouldPreventActions = true;
+      startLoading();
 
       try {
         let url = `project/${this.project.id}/gallery?url=${encodeURIComponent(
-          this.project.gallery[this.editIndex].url
-        )}&featured=${this.editFeatured}`
+          this.project.gallery[this.editIndex].url,
+        )}&featured=${this.editFeatured}`;
 
         if (this.editTitle) {
-          url += `&title=${encodeURIComponent(this.editTitle)}`
+          url += `&title=${encodeURIComponent(this.editTitle)}`;
         }
         if (this.editDescription) {
-          url += `&description=${encodeURIComponent(this.editDescription)}`
+          url += `&description=${encodeURIComponent(this.editDescription)}`;
         }
         if (this.editOrder) {
-          url += `&ordering=${this.editOrder}`
+          url += `&ordering=${this.editOrder}`;
         }
 
         await useBaseFetch(url, {
-          method: 'PATCH',
-        })
+          method: "PATCH",
+        });
 
-        await this.resetProject()
-        this.$refs.modal_edit_item.hide()
+        await this.resetProject();
+        this.$refs.modal_edit_item.hide();
       } catch (err) {
         this.$notify({
-          group: 'main',
-          title: 'An error occurred',
+          group: "main",
+          title: "An error occurred",
           text: err.data ? err.data.description : err,
-          type: 'error',
-        })
+          type: "error",
+        });
       }
 
-      stopLoading()
-      this.shouldPreventActions = false
+      stopLoading();
+      this.shouldPreventActions = false;
     },
     async deleteGalleryImage() {
-      startLoading()
+      startLoading();
 
       try {
         await useBaseFetch(
           `project/${this.project.id}/gallery?url=${encodeURIComponent(
-            this.project.gallery[this.deleteIndex].url
+            this.project.gallery[this.deleteIndex].url,
           )}`,
           {
-            method: 'DELETE',
-          }
-        )
+            method: "DELETE",
+          },
+        );
 
-        await this.resetProject()
+        await this.resetProject();
       } catch (err) {
         this.$notify({
-          group: 'main',
-          title: 'An error occurred',
+          group: "main",
+          title: "An error occurred",
           text: err.data ? err.data.description : err,
-          type: 'error',
-        })
+          type: "error",
+        });
       }
 
-      stopLoading()
+      stopLoading();
     },
   },
-})
+});
 </script>
 
 <style lang="scss" scoped>
@@ -637,7 +637,9 @@ export default defineNuxtComponent({
         display: flex;
         flex-direction: column;
         max-width: 40rem;
-        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        transition:
+          opacity 0.25s ease-in-out,
+          transform 0.25s ease-in-out;
         text-shadow: 1px 1px 10px #000000d4;
         margin-bottom: 0.25rem;
         gap: 0.5rem;
@@ -658,7 +660,9 @@ export default defineNuxtComponent({
         background-color: var(--color-raised-bg);
         padding: var(--spacing-card-md);
         border-radius: var(--size-rounded-card);
-        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        transition:
+          opacity 0.25s ease-in-out,
+          transform 0.25s ease-in-out;
       }
     }
   }

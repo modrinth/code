@@ -1,6 +1,7 @@
-import FloatingVue from 'floating-vue'
-import 'floating-vue/dist/style.css'
+import FloatingVue from "floating-vue";
+import "floating-vue/dist/style.css";
 
+// eslint-disable-next-line no-undef
 export default defineNuxtPlugin(({ vueApp }) => {
-  vueApp.use(FloatingVue)
-})
+  vueApp.use(FloatingVue);
+});

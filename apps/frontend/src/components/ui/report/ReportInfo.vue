@@ -12,7 +12,7 @@
           <span class="title">{{ report.project.title }}</span>
           <span>{{
             $formatProjectType(
-              $getProjectTypeForUrl(report.project.project_type, report.project.loaders)
+              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -42,7 +42,7 @@
           <span class="title">{{ report.project.title }}</span>
           <span>{{
             $formatProjectType(
-              $getProjectTypeForUrl(report.project.project_type, report.project.loaders)
+              $getProjectTypeForUrl(report.project.project_type, report.project.loaders),
             )
           }}</span>
         </div>
@@ -88,14 +88,14 @@
 </template>
 
 <script setup>
-import { renderHighlightedString } from '~/helpers/highlight.js'
-import Avatar from '~/components/ui/Avatar.vue'
-import Badge from '~/components/ui/Badge.vue'
-import ReportIcon from '~/assets/images/utils/report.svg?component'
-import UnknownIcon from '~/assets/images/utils/unknown.svg?component'
-import VersionIcon from '~/assets/images/utils/version.svg?component'
-import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
-import CopyCode from '~/components/ui/CopyCode.vue'
+import { renderHighlightedString } from "~/helpers/highlight.js";
+import Avatar from "~/components/ui/Avatar.vue";
+import Badge from "~/components/ui/Badge.vue";
+import ReportIcon from "~/assets/images/utils/report.svg?component";
+import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
+import VersionIcon from "~/assets/images/utils/version.svg?component";
+import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
 
 defineProps({
   report: {
@@ -122,9 +122,9 @@ defineProps({
     type: Object,
     required: true,
   },
-})
+});
 
-const flags = useFeatureFlags()
+const flags = useFeatureFlags();
 </script>
 
 <style lang="scss" scoped>

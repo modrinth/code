@@ -1,58 +1,59 @@
+/* eslint-disable no-undef */
 export const useTheme = () =>
-  useState('theme', () => {
-    const colorMode = useCookie('color-mode', {
+  useState("theme", () => {
+    const colorMode = useCookie("color-mode", {
       maxAge: 60 * 60 * 24 * 365 * 10,
-      sameSite: 'lax',
+      sameSite: "lax",
       secure: true,
       httpOnly: false,
-      path: '/',
-    })
+      path: "/",
+    });
 
     if (!colorMode.value) {
       colorMode.value = {
-        value: 'dark',
-        preference: 'system',
-      }
+        value: "dark",
+        preference: "system",
+      };
     }
 
-    if (colorMode.value.preference !== 'system') {
-      colorMode.value.value = colorMode.value.preference
+    if (colorMode.value.preference !== "system") {
+      colorMode.value.value = colorMode.value.preference;
     }
 
-    return colorMode.value
-  })
+    return colorMode.value;
+  });
 
 export const updateTheme = (value, updatePreference = false) => {
-  const theme = useTheme()
-  const cosmetics = useCosmetics()
+  const theme = useTheme();
+  const cosmetics = useCosmetics();
 
-  const themeCookie = useCookie('color-mode', {
+  const themeCookie = useCookie("color-mode", {
     maxAge: 60 * 60 * 24 * 365 * 10,
-    sameSite: 'lax',
+    sameSite: "lax",
     secure: true,
     httpOnly: false,
-    path: '/',
-  })
+    path: "/",
+  });
 
-  if (value === 'system') {
-    theme.value.preference = 'system'
+  if (value === "system") {
+    theme.value.preference = "system";
 
-    const colorSchemeQueryList = window.matchMedia('(prefers-color-scheme: light)')
+    const colorSchemeQueryList = window.matchMedia("(prefers-color-scheme: light)");
     if (colorSchemeQueryList.matches) {
-      theme.value.value = 'light'
+      theme.value.value = "light";
     } else {
-      theme.value.value = cosmetics.value.preferredDarkTheme
+      theme.value.value = cosmetics.value.preferredDarkTheme;
     }
   } else {
-    theme.value.value = value
-    if (updatePreference) theme.value.preference = value
+    theme.value.value = value;
+    if (updatePreference) theme.value.preference = value;
   }
 
   if (process.client) {
-    document.documentElement.className = `${theme.value.value}-mode`
+    document.documentElement.className = `${theme.value.value}-mode`;
   }
 
-  themeCookie.value = theme.value
-}
+  themeCookie.value = theme.value;
+};
 
-export const DARK_THEMES = ['dark', 'oled', 'retro']
+export const DARK_THEMES = ["dark", "oled", "retro"];

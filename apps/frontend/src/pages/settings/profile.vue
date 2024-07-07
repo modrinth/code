@@ -36,8 +36,8 @@
             v-if="previewImage"
             :action="
               () => {
-                icon = null
-                previewImage = null
+                icon = null;
+                previewImage = null;
               }
             "
           >
@@ -86,137 +86,137 @@
 </template>
 
 <script setup>
-import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon } from '@modrinth/assets'
-import { Avatar, FileInput, Button } from '@modrinth/ui'
-import { commonMessages } from '~/utils/common-messages.ts'
+import { UserIcon, SaveIcon, UploadIcon, UndoIcon, XIcon } from "@modrinth/assets";
+import { Avatar, FileInput, Button } from "@modrinth/ui";
+import { commonMessages } from "~/utils/common-messages.ts";
 
 useHead({
-  title: 'Profile settings - Modrinth',
-})
+  title: "Profile settings - Modrinth",
+});
 
 definePageMeta({
-  middleware: 'auth',
-})
+  middleware: "auth",
+});
 
-const { formatMessage } = useVIntl()
+const { formatMessage } = useVIntl();
 
 const messages = defineMessages({
   title: {
-    id: 'settings.profile.profile-info',
-    defaultMessage: 'Profile information',
+    id: "settings.profile.profile-info",
+    defaultMessage: "Profile information",
   },
   description: {
-    id: 'settings.profile.description',
+    id: "settings.profile.description",
     defaultMessage:
-      'Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>.',
+      "Your profile information is publicly viewable on Modrinth and through the <docs-link>Modrinth API</docs-link>.",
   },
   profilePicture: {
-    id: 'settings.profile.profile-picture.title',
-    defaultMessage: 'Profile picture',
+    id: "settings.profile.profile-picture.title",
+    defaultMessage: "Profile picture",
   },
   profilePictureReset: {
-    id: 'settings.profile.profile-picture.reset',
-    defaultMessage: 'Reset',
+    id: "settings.profile.profile-picture.reset",
+    defaultMessage: "Reset",
   },
   usernameTitle: {
-    id: 'settings.profile.username.title',
-    defaultMessage: 'Username',
+    id: "settings.profile.username.title",
+    defaultMessage: "Username",
   },
   usernameDescription: {
-    id: 'settings.profile.username.description',
-    defaultMessage: 'A unique case-insensitive name to identify your profile.',
+    id: "settings.profile.username.description",
+    defaultMessage: "A unique case-insensitive name to identify your profile.",
   },
   bioTitle: {
-    id: 'settings.profile.bio.title',
-    defaultMessage: 'Bio',
+    id: "settings.profile.bio.title",
+    defaultMessage: "Bio",
   },
   bioDescription: {
-    id: 'settings.profile.bio.description',
-    defaultMessage: 'A short description to tell everyone a little bit about you.',
+    id: "settings.profile.bio.description",
+    defaultMessage: "A short description to tell everyone a little bit about you.",
   },
-})
+});
 
-const auth = await useAuth()
+const auth = await useAuth();
 
-const username = ref(auth.value.user.username)
-const bio = ref(auth.value.user.bio)
-const avatarUrl = ref(auth.value.user.avatar_url)
-const icon = shallowRef(null)
-const previewImage = shallowRef(null)
-const saved = ref(false)
+const username = ref(auth.value.user.username);
+const bio = ref(auth.value.user.bio);
+const avatarUrl = ref(auth.value.user.avatar_url);
+const icon = shallowRef(null);
+const previewImage = shallowRef(null);
+const saved = ref(false);
 
 const hasUnsavedChanges = computed(
   () =>
     username.value !== auth.value.user.username ||
     bio.value !== auth.value.user.bio ||
-    previewImage.value
-)
+    previewImage.value,
+);
 
 function showPreviewImage(files) {
-  const reader = new FileReader()
-  icon.value = files[0]
-  reader.readAsDataURL(icon.value)
+  const reader = new FileReader();
+  icon.value = files[0];
+  reader.readAsDataURL(icon.value);
   reader.onload = (event) => {
-    previewImage.value = event.target.result
-  }
+    previewImage.value = event.target.result;
+  };
 }
 
 function cancel() {
-  icon.value = null
-  previewImage.value = null
-  username.value = auth.value.user.username
-  bio.value = auth.value.user.bio
+  icon.value = null;
+  previewImage.value = null;
+  username.value = auth.value.user.username;
+  bio.value = auth.value.user.bio;
 }
 
 async function saveChanges() {
-  startLoading()
+  startLoading();
   try {
     if (icon.value) {
       await useBaseFetch(
         `user/${auth.value.user.id}/icon?ext=${
-          icon.value.type.split('/')[icon.value.type.split('/').length - 1]
+          icon.value.type.split("/")[icon.value.type.split("/").length - 1]
         }`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           body: icon.value,
-        }
-      )
-      icon.value = null
-      previewImage.value = null
+        },
+      );
+      icon.value = null;
+      previewImage.value = null;
     }
 
-    const body = {}
+    const body = {};
 
     if (auth.value.user.username !== username.value) {
-      body.username = username.value
+      body.username = username.value;
     }
 
     if (auth.value.user.bio !== bio.value) {
-      body.bio = bio.value
+      body.bio = bio.value;
     }
 
     await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body,
-    })
-    await useAuth(auth.value.token)
-    avatarUrl.value = auth.value.user.avatar_url
-    saved.value = true
+    });
+    await useAuth(auth.value.token);
+    avatarUrl.value = auth.value.user.avatar_url;
+    saved.value = true;
   } catch (err) {
     addNotification({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err
         ? err.data
           ? err.data.description
             ? err.data.description
             : err.data
           : err
-        : 'aaaaahhh',
-      type: 'error',
-    })
+        : "aaaaahhh",
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 </script>
 <style lang="scss" scoped>

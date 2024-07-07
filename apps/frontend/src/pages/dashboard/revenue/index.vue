@@ -75,34 +75,34 @@
   </div>
 </template>
 <script setup>
-import { TransferIcon, HistoryIcon, PayPalIcon, SaveIcon, XIcon } from '@modrinth/assets'
+import { TransferIcon, HistoryIcon, PayPalIcon, SaveIcon, XIcon } from "@modrinth/assets";
 
-const auth = await useAuth()
-const minWithdraw = ref(0.01)
+const auth = await useAuth();
+const minWithdraw = ref(0.01);
 
 async function updateVenmo() {
-  startLoading()
+  startLoading();
   try {
     const data = {
       venmo_handle: auth.value.user.payout_data.venmo_handle ?? null,
-    }
+    };
 
     await useBaseFetch(`user/${auth.value.user.id}`, {
-      method: 'PATCH',
+      method: "PATCH",
       body: data,
       apiVersion: 3,
-    })
-    await useAuth(auth.value.token)
+    });
+    await useAuth(auth.value.token);
   } catch (err) {
-    const data = useNuxtApp()
+    const data = useNuxtApp();
     data.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 </script>
 <style lang="scss" scoped>

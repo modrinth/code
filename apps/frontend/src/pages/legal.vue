@@ -50,11 +50,11 @@ import {
   ShieldIcon,
   CurrencyIcon,
   CopyrightIcon,
-} from '@modrinth/assets'
-import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
+} from "@modrinth/assets";
+import NavStack from "~/components/ui/NavStack.vue";
+import NavStackItem from "~/components/ui/NavStackItem.vue";
 
-const route = useNativeRoute()
+const route = useNativeRoute();
 </script>
 
 <style lang="scss" scoped>

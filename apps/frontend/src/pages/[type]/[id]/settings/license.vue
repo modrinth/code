@@ -100,9 +100,9 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
-import Checkbox from '~/components/ui/Checkbox'
-import SaveIcon from '~/assets/images/utils/save.svg?component'
+import Multiselect from "vue-multiselect";
+import Checkbox from "~/components/ui/Checkbox";
+import SaveIcon from "~/assets/images/utils/save.svg?component";
 
 export default defineNuxtComponent({
   components: {
@@ -114,13 +114,13 @@ export default defineNuxtComponent({
     project: {
       type: Object,
       default() {
-        return {}
+        return {};
       },
     },
     currentMember: {
       type: Object,
       default() {
-        return null
+        return null;
       },
     },
     patchProject: {
@@ -128,170 +128,170 @@ export default defineNuxtComponent({
       default() {
         return () => {
           this.$notify({
-            group: 'main',
-            title: 'An error occurred',
-            text: 'Patch project function not found',
-            type: 'error',
-          })
-        }
+            group: "main",
+            title: "An error occurred",
+            text: "Patch project function not found",
+            type: "error",
+          });
+        };
       },
     },
   },
   data() {
     return {
-      licenseUrl: '',
-      license: { friendly: '', short: '', requiresOnlyOrLater: false },
-      allowOrLater: this.project.license.id.includes('-or-later'),
-      nonSpdxLicense: this.project.license.id.includes('LicenseRef-'),
+      licenseUrl: "",
+      license: { friendly: "", short: "", requiresOnlyOrLater: false },
+      allowOrLater: this.project.license.id.includes("-or-later"),
+      nonSpdxLicense: this.project.license.id.includes("LicenseRef-"),
       showKnownErrors: false,
-    }
+    };
   },
   async setup(props) {
     const defaultLicenses = shallowRef([
-      { friendly: 'Custom', short: '' },
+      { friendly: "Custom", short: "" },
       {
-        friendly: 'All Rights Reserved/No License',
-        short: 'All-Rights-Reserved',
+        friendly: "All Rights Reserved/No License",
+        short: "All-Rights-Reserved",
       },
-      { friendly: 'Apache License 2.0', short: 'Apache-2.0' },
+      { friendly: "Apache License 2.0", short: "Apache-2.0" },
       {
         friendly: 'BSD 2-Clause "Simplified" License',
-        short: 'BSD-2-Clause',
+        short: "BSD-2-Clause",
       },
       {
         friendly: 'BSD 3-Clause "New" or "Revised" License',
-        short: 'BSD-3-Clause',
+        short: "BSD-3-Clause",
       },
       {
-        friendly: 'CC Zero (Public Domain equivalent)',
-        short: 'CC0-1.0',
+        friendly: "CC Zero (Public Domain equivalent)",
+        short: "CC0-1.0",
       },
-      { friendly: 'CC-BY 4.0', short: 'CC-BY-4.0' },
+      { friendly: "CC-BY 4.0", short: "CC-BY-4.0" },
       {
-        friendly: 'CC-BY-SA 4.0',
-        short: 'CC-BY-SA-4.0',
-      },
-      {
-        friendly: 'CC-BY-NC 4.0',
-        short: 'CC-BY-NC-4.0',
+        friendly: "CC-BY-SA 4.0",
+        short: "CC-BY-SA-4.0",
       },
       {
-        friendly: 'CC-BY-NC-SA 4.0',
-        short: 'CC-BY-NC-SA-4.0',
+        friendly: "CC-BY-NC 4.0",
+        short: "CC-BY-NC-4.0",
       },
       {
-        friendly: 'CC-BY-ND 4.0',
-        short: 'CC-BY-ND-4.0',
+        friendly: "CC-BY-NC-SA 4.0",
+        short: "CC-BY-NC-SA-4.0",
       },
       {
-        friendly: 'CC-BY-NC-ND 4.0',
-        short: 'CC-BY-NC-ND-4.0',
+        friendly: "CC-BY-ND 4.0",
+        short: "CC-BY-ND-4.0",
       },
       {
-        friendly: 'GNU Affero General Public License v3',
-        short: 'AGPL-3.0',
+        friendly: "CC-BY-NC-ND 4.0",
+        short: "CC-BY-NC-ND-4.0",
+      },
+      {
+        friendly: "GNU Affero General Public License v3",
+        short: "AGPL-3.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: 'GNU Lesser General Public License v2.1',
-        short: 'LGPL-2.1',
+        friendly: "GNU Lesser General Public License v2.1",
+        short: "LGPL-2.1",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: 'GNU Lesser General Public License v3',
-        short: 'LGPL-3.0',
+        friendly: "GNU Lesser General Public License v3",
+        short: "LGPL-3.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: 'GNU General Public License v2',
-        short: 'GPL-2.0',
+        friendly: "GNU General Public License v2",
+        short: "GPL-2.0",
         requiresOnlyOrLater: true,
       },
       {
-        friendly: 'GNU General Public License v3',
-        short: 'GPL-3.0',
+        friendly: "GNU General Public License v3",
+        short: "GPL-3.0",
         requiresOnlyOrLater: true,
       },
-      { friendly: 'ISC License', short: 'ISC' },
-      { friendly: 'MIT License', short: 'MIT' },
-      { friendly: 'Mozilla Public License 2.0', short: 'MPL-2.0' },
-      { friendly: 'zlib License', short: 'Zlib' },
-    ])
+      { friendly: "ISC License", short: "ISC" },
+      { friendly: "MIT License", short: "MIT" },
+      { friendly: "Mozilla Public License 2.0", short: "MPL-2.0" },
+      { friendly: "zlib License", short: "Zlib" },
+    ]);
 
-    const licenseUrl = ref(props.project.license.url)
+    const licenseUrl = ref(props.project.license.url);
 
-    const licenseId = props.project.license.id
+    const licenseId = props.project.license.id;
     const trimmedLicenseId = licenseId
-      .replaceAll('-only', '')
-      .replaceAll('-or-later', '')
-      .replaceAll('LicenseRef-', '')
+      .replaceAll("-only", "")
+      .replaceAll("-or-later", "")
+      .replaceAll("LicenseRef-", "");
 
     const license = ref(
       defaultLicenses.value.find((x) => x.short === trimmedLicenseId) ?? {
-        friendly: 'Custom',
-        short: licenseId.replaceAll('LicenseRef-', ''),
-      }
-    )
+        friendly: "Custom",
+        short: licenseId.replaceAll("LicenseRef-", ""),
+      },
+    );
 
-    if (licenseId === 'LicenseRef-Unknown') {
+    if (licenseId === "LicenseRef-Unknown") {
       license.value = {
-        friendly: 'Unknown',
-        short: licenseId.replaceAll('LicenseRef-', ''),
-      }
+        friendly: "Unknown",
+        short: licenseId.replaceAll("LicenseRef-", ""),
+      };
     }
 
     return {
       defaultLicenses,
       licenseUrl,
       license,
-    }
+    };
   },
   computed: {
     hasPermission() {
-      const EDIT_DETAILS = 1 << 2
-      return (this.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS
+      const EDIT_DETAILS = 1 << 2;
+      return (this.currentMember.permissions & EDIT_DETAILS) === EDIT_DETAILS;
     },
     licenseId() {
-      let id = ''
-      if (this.license === null) return id
+      let id = "";
+      if (this.license === null) return id;
       if (
-        (this.nonSpdxLicense && this.license.friendly === 'Custom') ||
-        this.license.short === 'All-Rights-Reserved' ||
-        this.license.short === 'Unknown'
+        (this.nonSpdxLicense && this.license.friendly === "Custom") ||
+        this.license.short === "All-Rights-Reserved" ||
+        this.license.short === "Unknown"
       ) {
-        id += 'LicenseRef-'
+        id += "LicenseRef-";
       }
-      id += this.license.short
+      id += this.license.short;
       if (this.license.requiresOnlyOrLater) {
-        id += this.allowOrLater ? '-or-later' : '-only'
+        id += this.allowOrLater ? "-or-later" : "-only";
       }
-      if (this.nonSpdxLicense && this.license.friendly === 'Custom') {
-        id = id.replaceAll(' ', '-')
+      if (this.nonSpdxLicense && this.license.friendly === "Custom") {
+        id = id.replaceAll(" ", "-");
       }
-      return id
+      return id;
     },
     patchData() {
-      const data = {}
+      const data = {};
 
       if (this.licenseId !== this.project.license.id) {
-        data.license_id = this.licenseId
-        data.license_url = this.licenseUrl ? this.licenseUrl : null
+        data.license_id = this.licenseId;
+        data.license_url = this.licenseUrl ? this.licenseUrl : null;
       } else if (this.licenseUrl !== this.project.license.url) {
-        data.license_url = this.licenseUrl ? this.licenseUrl : null
+        data.license_url = this.licenseUrl ? this.licenseUrl : null;
       }
 
-      return data
+      return data;
     },
     hasChanges() {
-      return Object.keys(this.patchData).length > 0
+      return Object.keys(this.patchData).length > 0;
     },
   },
   methods: {
     saveChanges() {
       if (this.hasChanges) {
-        this.patchProject(this.patchData)
+        this.patchProject(this.patchData);
       }
     },
   },
-})
+});
 </script>

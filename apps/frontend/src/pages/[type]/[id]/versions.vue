@@ -39,7 +39,7 @@
           $router.push(
             `/${project.project_type}/${
               project.slug ? project.slug : project.id
-            }/version/${encodeURI(version.displayUrlEnding)}`
+            }/version/${encodeURI(version.displayUrlEnding)}`,
           )
         "
       >
@@ -72,7 +72,7 @@
         </div>
         <div class="version__supports">
           <span>
-            {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
+            {{ version.loaders.map((x) => $formatCategory(x)).join(", ") }}
           </span>
           <span>{{ $formatVersion(version.game_versions) }}</span>
         </div>
@@ -83,7 +83,7 @@
           </span>
           <span>
             Published on
-            <strong>{{ $dayjs(version.date_published).format('MMM D, YYYY') }}</strong>
+            <strong>{{ $dayjs(version.date_published).format("MMM D, YYYY") }}</strong>
           </span>
         </div>
       </div>
@@ -98,104 +98,104 @@
   </div>
 </template>
 <script setup>
-import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
-import DownloadIcon from '~/assets/images/utils/download.svg?component'
-import UploadIcon from '~/assets/images/utils/upload.svg?component'
-import InfoIcon from '~/assets/images/utils/info.svg?component'
-import VersionBadge from '~/components/ui/Badge.vue'
-import FileInput from '~/components/ui/FileInput.vue'
-import DropArea from '~/components/ui/DropArea.vue'
-import Pagination from '~/components/ui/Pagination.vue'
-import VersionFilterControl from '~/components/ui/VersionFilterControl.vue'
+import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import DownloadIcon from "~/assets/images/utils/download.svg?component";
+import UploadIcon from "~/assets/images/utils/upload.svg?component";
+import InfoIcon from "~/assets/images/utils/info.svg?component";
+import VersionBadge from "~/components/ui/Badge.vue";
+import FileInput from "~/components/ui/FileInput.vue";
+import DropArea from "~/components/ui/DropArea.vue";
+import Pagination from "~/components/ui/Pagination.vue";
+import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {}
+      return {};
     },
   },
   versions: {
     type: Array,
     default() {
-      return []
+      return [];
     },
   },
   members: {
     type: Array,
     default() {
-      return []
+      return [];
     },
   },
   currentMember: {
     type: Object,
     default() {
-      return null
+      return null;
     },
   },
-})
+});
 
-const data = useNuxtApp()
+const data = useNuxtApp();
 
-const title = `${props.project.title} - Versions`
+const title = `${props.project.title} - Versions`;
 const description = `Download and browse ${props.versions.length} ${
   props.project.title
 } versions. ${data.$formatNumber(props.project.downloads)} total downloads. Last updated ${data
   .$dayjs(props.project.updated)
-  .format('MMM D, YYYY')}.`
+  .format("MMM D, YYYY")}.`;
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-})
+});
 
-const router = useNativeRouter()
-const route = useNativeRoute()
+const router = useNativeRouter();
+const route = useNativeRoute();
 
-const currentPage = ref(Number(route.query.p ?? 1))
+const currentPage = ref(Number(route.query.p ?? 1));
 const filteredVersions = computed(() => {
-  const selectedGameVersions = getArrayOrString(route.query.g) ?? []
-  const selectedLoaders = getArrayOrString(route.query.l) ?? []
-  const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
+  const selectedGameVersions = getArrayOrString(route.query.g) ?? [];
+  const selectedLoaders = getArrayOrString(route.query.l) ?? [];
+  const selectedVersionTypes = getArrayOrString(route.query.c) ?? [];
 
   return props.versions.filter(
     (projectVersion) =>
       (selectedGameVersions.length === 0 ||
         selectedGameVersions.some((gameVersion) =>
-          projectVersion.game_versions.includes(gameVersion)
+          projectVersion.game_versions.includes(gameVersion),
         )) &&
       (selectedLoaders.length === 0 ||
         selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
       (selectedVersionTypes.length === 0 ||
-        selectedVersionTypes.includes(projectVersion.version_type))
-  )
-})
+        selectedVersionTypes.includes(projectVersion.version_type)),
+  );
+});
 
 function switchPage(page) {
-  currentPage.value = page
+  currentPage.value = page;
 
   router.replace({
     query: {
       ...route.query,
       p: currentPage.value !== 1 ? currentPage.value : undefined,
     },
-  })
+  });
 }
 
 async function handleFiles(files) {
   await router.push({
-    name: 'type-id-version-version',
+    name: "type-id-version-version",
     params: {
       type: props.project.project_type,
       id: props.project.slug ? props.project.slug : props.project.id,
-      version: 'create',
+      version: "create",
     },
     state: {
       newPrimaryFile: files[0],
     },
-  })
+  });
 }
 </script>
 
@@ -219,7 +219,7 @@ async function handleFiles(files) {
 
   .header {
     display: grid;
-    grid-template: 'download title supports stats';
+    grid-template: "download title supports stats";
     grid-template-columns: calc(2.25rem + var(--spacing-card-sm)) 1.25fr 1fr 1fr;
     color: var(--color-text-dark);
     font-size: var(--font-size-md);
@@ -249,9 +249,9 @@ async function handleFiles(files) {
   .version-button {
     display: grid;
     grid-template:
-      'download title supports stats'
-      'download metadata supports stats'
-      'download dummy supports stats';
+      "download title supports stats"
+      "download metadata supports stats"
+      "download dummy supports stats";
     grid-template-columns: calc(2.25rem + var(--spacing-card-sm)) 1.25fr 1fr 1fr;
     column-gap: var(--spacing-card-sm);
     justify-content: left;
@@ -294,7 +294,7 @@ async function handleFiles(files) {
 @media screen and (max-width: 1024px) {
   .all-versions {
     .header {
-      grid-template: 'download title';
+      grid-template: "download title";
       grid-template-columns: calc(2.25rem + var(--spacing-card-sm)) 1fr;
 
       div:nth-child(3) {
@@ -307,7 +307,7 @@ async function handleFiles(files) {
     }
 
     .version-button {
-      grid-template: 'download title' 'download metadata' 'download supports' 'download stats';
+      grid-template: "download title" "download metadata" "download supports" "download stats";
       grid-template-columns: calc(2.25rem + var(--spacing-card-sm)) 1fr;
       row-gap: var(--spacing-card-xs);
 

@@ -81,16 +81,16 @@ import {
   ShieldIcon,
   KeyIcon,
   LanguagesIcon,
-} from '@modrinth/assets'
-import NavStack from '~/components/ui/NavStack.vue'
-import NavStackItem from '~/components/ui/NavStackItem.vue'
-import MonitorSmartphoneIcon from '~/assets/images/utils/monitor-smartphone.svg?component'
+} from "@modrinth/assets";
+import NavStack from "~/components/ui/NavStack.vue";
+import NavStackItem from "~/components/ui/NavStackItem.vue";
+import MonitorSmartphoneIcon from "~/assets/images/utils/monitor-smartphone.svg?component";
 
-import { commonMessages, commonSettingsMessages } from '~/utils/common-messages.ts'
+import { commonMessages, commonSettingsMessages } from "~/utils/common-messages.ts";
 
-const { formatMessage } = useVIntl()
+const { formatMessage } = useVIntl();
 
-const route = useNativeRoute()
-const auth = await useAuth()
-const isStaging = useRuntimeConfig().public.siteUrl !== 'https://modrinth.com'
+const route = useNativeRoute();
+const auth = await useAuth();
+const isStaging = useRuntimeConfig().public.siteUrl !== "https://modrinth.com";
 </script>

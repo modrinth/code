@@ -35,8 +35,8 @@
 </template>
 
 <script setup>
-const pixelated = ref(false)
-const img = ref(null)
+const pixelated = ref(false);
+const img = ref(null);
 
 defineProps({
   src: {
@@ -45,13 +45,13 @@ defineProps({
   },
   alt: {
     type: String,
-    default: '',
+    default: "",
   },
   size: {
     type: String,
-    default: 'sm',
+    default: "sm",
     validator(value) {
-      return ['xxs', 'xs', 'sm', 'md', 'lg'].includes(value)
+      return ["xxs", "xs", "sm", "md", "lg"].includes(value);
     },
   },
   circle: {
@@ -64,19 +64,19 @@ defineProps({
   },
   loading: {
     type: String,
-    default: 'eager',
+    default: "eager",
   },
   raised: {
     type: Boolean,
     default: false,
   },
-})
+});
 
 function updatePixelated() {
   if (img.value && img.value.naturalWidth && img.value.naturalWidth <= 96) {
-    pixelated.value = true
+    pixelated.value = true;
   } else {
-    pixelated.value = false
+    pixelated.value = false;
   }
 }
 </script>
@@ -85,8 +85,10 @@ function updatePixelated() {
 .avatar {
   border-radius: var(--size-rounded-icon);
   box-shadow: var(--shadow-inset-lg), var(--shadow-card);
-  height: var(--size);
-  width: var(--size);
+  min-height: var(--size);
+  min-width: var(--size);
+  max-height: var(--size);
+  max-width: var(--size);
   background-color: var(--color-button-bg);
   object-fit: contain;
 

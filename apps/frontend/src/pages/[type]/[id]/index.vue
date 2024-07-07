@@ -7,17 +7,17 @@
 </template>
 
 <script>
-import { renderHighlightedString } from '~/helpers/highlight.js'
+import { renderHighlightedString } from "~/helpers/highlight.js";
 
 export default defineNuxtComponent({
   props: {
     project: {
       type: Object,
       default() {
-        return {}
+        return {};
       },
     },
   },
   methods: { renderHighlightedString },
-})
+});
 </script>

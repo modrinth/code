@@ -3,8 +3,8 @@
     <Modal ref="modalOpen" header="Transfer Projects">
       <div class="universal-modal items">
         <div class="table">
-          <div class="table-row table-head">
-            <div class="table-cell check-cell">
+          <div class="table-head table-row">
+            <div class="check-cell table-cell">
               <Checkbox
                 :model-value="selectedProjects.length === props.projects.length"
                 @update:model-value="toggleSelectedProjects()"
@@ -17,7 +17,7 @@
             <div class="table-cell" />
           </div>
           <div v-for="project in props.projects" :key="`project-${project.id}`" class="table-row">
-            <div class="table-cell check-cell">
+            <div class="check-cell table-cell">
               <Checkbox
                 :disabled="(project.permissions & EDIT_DETAILS) === EDIT_DETAILS"
                 :model-value="selectedProjects.includes(project)"
@@ -59,9 +59,9 @@
               <span>{{
                 $formatProjectType(
                   $getProjectTypeForDisplay(
-                    project.project_types?.[0] ?? 'project',
-                    project.loaders
-                  )
+                    project.project_types?.[0] ?? "project",
+                    project.loaders,
+                  ),
                 )
               }}</span>
             </div>
@@ -88,13 +88,13 @@
               <span>
                 {{
                   selectedProjects.length === props.projects.length
-                    ? 'All'
+                    ? "All"
                     : selectedProjects.length
                 }}
               </span>
               <span>
-                {{ ' ' }}
-                {{ selectedProjects.length === 1 ? 'project' : 'projects' }}
+                {{ " " }}
+                {{ selectedProjects.length === 1 ? "project" : "projects" }}
               </span>
             </span>
           </Button>
@@ -109,39 +109,39 @@
 </template>
 
 <script setup>
-import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from '@modrinth/assets'
-import { Button, Modal, Checkbox, CopyCode, Avatar } from '@modrinth/ui'
+import { BoxIcon, SettingsIcon, TransferIcon, XIcon } from "@modrinth/assets";
+import { Button, Modal, Checkbox, CopyCode, Avatar } from "@modrinth/ui";
 
-const modalOpen = ref(null)
+const modalOpen = ref(null);
 
 const props = defineProps({
   projects: {
     type: Array,
     required: true,
   },
-})
+});
 
 // define emit for submission
-const emit = defineEmits(['submit'])
+const emit = defineEmits(["submit"]);
 
-const selectedProjects = ref([])
+const selectedProjects = ref([]);
 
 const toggleSelectedProjects = () => {
   if (selectedProjects.value.length === props.projects.length) {
-    selectedProjects.value = []
+    selectedProjects.value = [];
   } else {
-    selectedProjects.value = props.projects
+    selectedProjects.value = props.projects;
   }
-}
+};
 
 const onSubmitHandler = () => {
   if (selectedProjects.value.length === 0) {
-    return
+    return;
   }
-  emit('submit', selectedProjects.value)
-  selectedProjects.value = []
-  modalOpen.value?.hide()
-}
+  emit("submit", selectedProjects.value);
+  selectedProjects.value = [];
+  modalOpen.value?.hide();
+};
 </script>
 
 <style lang="scss" scoped>
@@ -175,7 +175,7 @@ const onSubmitHandler = () => {
 
     .table-row {
       display: grid;
-      grid-template: 'checkbox icon name type settings' 'checkbox icon id type settings';
+      grid-template: "checkbox icon name type settings" "checkbox icon id type settings";
       grid-template-columns:
         min-content min-content minmax(min-content, 2fr)
         minmax(min-content, 1fr) min-content;
@@ -207,7 +207,7 @@ const onSubmitHandler = () => {
     }
 
     .table-head {
-      grid-template: 'checkbox settings';
+      grid-template: "checkbox settings";
       grid-template-columns: min-content minmax(min-content, 1fr);
 
       :nth-child(2),
@@ -222,7 +222,7 @@ const onSubmitHandler = () => {
   @media screen and (max-width: 560px) {
     .table-row {
       display: grid;
-      grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
+      grid-template: "checkbox icon name settings" "checkbox icon id settings" "checkbox icon type settings" "checkbox icon status settings";
       grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
 
       :nth-child(5) {
@@ -231,7 +231,7 @@ const onSubmitHandler = () => {
     }
 
     .table-head {
-      grid-template: 'checkbox settings';
+      grid-template: "checkbox settings";
       grid-template-columns: min-content minmax(min-content, 1fr);
     }
   }

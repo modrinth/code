@@ -1,27 +1,28 @@
-const whitelistedParams = ['flow', 'error']
+/* eslint-disable no-undef */
+const whitelistedParams = ["flow", "error"];
 
 export default defineNuxtRouteMiddleware(async (_to, from) => {
-  const config = useRuntimeConfig()
-  const auth = await useAuth()
+  const config = useRuntimeConfig();
+  const auth = await useAuth();
 
   if (!auth.value.user) {
-    const fullPath = from.fullPath
+    const fullPath = from.fullPath;
 
-    const url = new URL(fullPath, config.public.apiBaseUrl)
+    const url = new URL(fullPath, config.public.apiBaseUrl);
 
     const extractedParams = whitelistedParams.reduce((acc, param) => {
       if (url.searchParams.has(param)) {
-        acc[param] = url.searchParams.get(param)
-        url.searchParams.delete(param)
+        acc[param] = url.searchParams.get(param);
+        url.searchParams.delete(param);
       }
-      return acc
-    }, {})
+      return acc;
+    }, {});
 
-    const redirectPath = encodeURIComponent(url.pathname + url.search)
+    const redirectPath = encodeURIComponent(url.pathname + url.search);
 
     return await navigateTo(
       {
-        path: '/auth/sign-in',
+        path: "/auth/sign-in",
         query: {
           redirect: redirectPath,
           ...extractedParams,
@@ -29,7 +30,7 @@ export default defineNuxtRouteMiddleware(async (_to, from) => {
       },
       {
         replace: true,
-      }
-    )
+      },
+    );
   }
-})
+});

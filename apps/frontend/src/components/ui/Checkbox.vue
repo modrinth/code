@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg?component'
-import DropdownIcon from '~/assets/images/utils/dropdown.svg?component'
+import CheckIcon from "~/assets/images/utils/check.svg?component";
+import DropdownIcon from "~/assets/images/utils/dropdown.svg?component";
 
 export default {
   components: {
@@ -36,7 +36,7 @@ export default {
   props: {
     label: {
       type: String,
-      default: '',
+      default: "",
     },
     disabled: {
       type: Boolean,
@@ -56,15 +56,15 @@ export default {
       default: false,
     },
   },
-  emits: ['update:modelValue'],
+  emits: ["update:modelValue"],
   methods: {
     toggle() {
       if (!this.disabled) {
-        this.$emit('update:modelValue', !this.modelValue)
+        this.$emit("update:modelValue", !this.modelValue);
       }
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -105,7 +105,9 @@ export default {
   color: var(--color-button-text);
   background-color: var(--color-button-bg);
   border-radius: var(--size-rounded-control);
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
 
   &.checked {
     background-color: var(--color-brand);

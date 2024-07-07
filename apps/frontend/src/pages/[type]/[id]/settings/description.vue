@@ -34,11 +34,11 @@
 </template>
 
 <script>
-import { MarkdownEditor } from '@modrinth/ui'
-import Chips from '~/components/ui/Chips.vue'
-import SaveIcon from '~/assets/images/utils/save.svg?component'
-import { renderHighlightedString } from '~/helpers/highlight.js'
-import { useImageUpload } from '~/composables/image-upload.ts'
+import { MarkdownEditor } from "@modrinth/ui";
+import Chips from "~/components/ui/Chips.vue";
+import SaveIcon from "~/assets/images/utils/save.svg?component";
+import { renderHighlightedString } from "~/helpers/highlight.js";
+import { useImageUpload } from "~/composables/image-upload.ts";
 
 export default defineNuxtComponent({
   components: {
@@ -50,19 +50,19 @@ export default defineNuxtComponent({
     project: {
       type: Object,
       default() {
-        return {}
+        return {};
       },
     },
     allMembers: {
       type: Array,
       default() {
-        return []
+        return [];
       },
     },
     currentMember: {
       type: Object,
       default() {
-        return null
+        return null;
       },
     },
     patchProject: {
@@ -70,54 +70,54 @@ export default defineNuxtComponent({
       default() {
         return () => {
           this.$notify({
-            group: 'main',
-            title: 'An error occurred',
-            text: 'Patch project function not found',
-            type: 'error',
-          })
-        }
+            group: "main",
+            title: "An error occurred",
+            text: "Patch project function not found",
+            type: "error",
+          });
+        };
       },
     },
   },
   data() {
     return {
       description: this.project.body,
-      bodyViewMode: 'source',
-    }
+      bodyViewMode: "source",
+    };
   },
   computed: {
     patchData() {
-      const data = {}
+      const data = {};
 
       if (this.description !== this.project.body) {
-        data.body = this.description
+        data.body = this.description;
       }
 
-      return data
+      return data;
     },
     hasChanges() {
-      return Object.keys(this.patchData).length > 0
+      return Object.keys(this.patchData).length > 0;
     },
   },
   created() {
-    this.EDIT_BODY = 1 << 3
+    this.EDIT_BODY = 1 << 3;
   },
   methods: {
     renderHighlightedString,
     saveChanges() {
       if (this.hasChanges) {
-        this.patchProject(this.patchData)
+        this.patchProject(this.patchData);
       }
     },
     async onUploadHandler(file) {
       const response = await useImageUpload(file, {
-        context: 'project',
+        context: "project",
         projectID: this.project.id,
-      })
-      return response.url
+      });
+      return response.url;
     },
   },
-})
+});
 </script>
 
 <style scoped>

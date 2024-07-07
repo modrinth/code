@@ -37,7 +37,7 @@
               </span>
               <span>
                 on
-                {{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
+                {{ $dayjs(version.date_published).format("MMM D, YYYY") }}</span
               >
             </div>
             <a
@@ -67,73 +67,73 @@
   </div>
 </template>
 <script setup>
-import DownloadIcon from '~/assets/images/utils/download.svg?component'
-import { renderHighlightedString } from '~/helpers/highlight.js'
-import VersionFilterControl from '~/components/ui/VersionFilterControl.vue'
-import Pagination from '~/components/ui/Pagination.vue'
+import DownloadIcon from "~/assets/images/utils/download.svg?component";
+import { renderHighlightedString } from "~/helpers/highlight.js";
+import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
+import Pagination from "~/components/ui/Pagination.vue";
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {}
+      return {};
     },
   },
   versions: {
     type: Array,
     default() {
-      return []
+      return [];
     },
   },
   members: {
     type: Array,
     default() {
-      return []
+      return [];
     },
   },
-})
+});
 
-const title = `${props.project.title} - Changelog`
-const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`
+const title = `${props.project.title} - Changelog`;
+const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`;
 
 useSeoMeta({
   title,
   description,
   ogTitle: title,
   ogDescription: description,
-})
+});
 
-const router = useNativeRouter()
-const route = useNativeRoute()
+const router = useNativeRouter();
+const route = useNativeRoute();
 
-const currentPage = ref(Number(route.query.p ?? 1))
+const currentPage = ref(Number(route.query.p ?? 1));
 const filteredVersions = computed(() => {
-  const selectedGameVersions = getArrayOrString(route.query.g) ?? []
-  const selectedLoaders = getArrayOrString(route.query.l) ?? []
-  const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
+  const selectedGameVersions = getArrayOrString(route.query.g) ?? [];
+  const selectedLoaders = getArrayOrString(route.query.l) ?? [];
+  const selectedVersionTypes = getArrayOrString(route.query.c) ?? [];
 
   return props.versions.filter(
     (projectVersion) =>
       (selectedGameVersions.length === 0 ||
         selectedGameVersions.some((gameVersion) =>
-          projectVersion.game_versions.includes(gameVersion)
+          projectVersion.game_versions.includes(gameVersion),
         )) &&
       (selectedLoaders.length === 0 ||
         selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
       (selectedVersionTypes.length === 0 ||
-        selectedVersionTypes.includes(projectVersion.version_type))
-  )
-})
+        selectedVersionTypes.includes(projectVersion.version_type)),
+  );
+});
 
 function switchPage(page) {
-  currentPage.value = page
+  currentPage.value = page;
 
   router.replace({
     query: {
       ...route.query,
       p: currentPage.value !== 1 ? currentPage.value : undefined,
     },
-  })
+  });
 }
 </script>
 
@@ -181,7 +181,7 @@ function switchPage(page) {
     background-color: var(--color);
 
     &:before {
-      content: '';
+      content: "";
       width: 1rem;
       height: 1rem;
       position: absolute;

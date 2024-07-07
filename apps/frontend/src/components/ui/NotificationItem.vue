@@ -184,8 +184,8 @@
           class="iconified-button square-button brand-button button-transparent"
           @click="
             () => {
-              acceptTeamInvite(notification.body.team_id)
-              read()
+              acceptTeamInvite(notification.body.team_id);
+              read();
             }
           "
         >
@@ -196,8 +196,8 @@
           class="iconified-button square-button danger-button button-transparent"
           @click="
             () => {
-              removeSelfFromTeam(notification.body.team_id)
-              read()
+              removeSelfFromTeam(notification.body.team_id);
+              read();
             }
           "
         >
@@ -222,8 +222,8 @@
             class="iconified-button brand-button"
             @click="
               () => {
-                acceptTeamInvite(notification.body.team_id)
-                read()
+                acceptTeamInvite(notification.body.team_id);
+                read();
               }
             "
           >
@@ -233,8 +233,8 @@
             class="iconified-button danger-button"
             @click="
               () => {
-                removeSelfFromTeam(notification.body.team_id)
-                read()
+                removeSelfFromTeam(notification.body.team_id);
+                read();
               }
             "
           >
@@ -288,29 +288,29 @@
 </template>
 
 <script setup>
-import { renderString } from '@modrinth/utils'
-import InvitationIcon from '~/assets/images/utils/user-plus.svg?component'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg?component'
-import NotificationIcon from '~/assets/images/sidebar/notifications.svg?component'
-import ReadIcon from '~/assets/images/utils/check-circle.svg?component'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?component'
-import VersionIcon from '~/assets/images/utils/version.svg?component'
-import CheckIcon from '~/assets/images/utils/check.svg?component'
-import CrossIcon from '~/assets/images/utils/x.svg?component'
-import ExternalIcon from '~/assets/images/utils/external.svg?component'
-import ThreadSummary from '~/components/ui/thread/ThreadSummary.vue'
-import { getProjectLink, getVersionLink } from '~/helpers/projects.js'
-import { getUserLink } from '~/helpers/users.js'
-import { acceptTeamInvite, removeSelfFromTeam } from '~/helpers/teams.js'
-import { markAsRead } from '~/helpers/notifications.js'
-import DoubleIcon from '~/components/ui/DoubleIcon.vue'
-import Avatar from '~/components/ui/Avatar.vue'
-import Badge from '~/components/ui/Badge.vue'
-import CopyCode from '~/components/ui/CopyCode.vue'
-import Categories from '~/components/ui/search/Categories.vue'
+import { renderString } from "@modrinth/utils";
+import InvitationIcon from "~/assets/images/utils/user-plus.svg?component";
+import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
+import NotificationIcon from "~/assets/images/sidebar/notifications.svg?component";
+import ReadIcon from "~/assets/images/utils/check-circle.svg?component";
+import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
+import VersionIcon from "~/assets/images/utils/version.svg?component";
+import CheckIcon from "~/assets/images/utils/check.svg?component";
+import CrossIcon from "~/assets/images/utils/x.svg?component";
+import ExternalIcon from "~/assets/images/utils/external.svg?component";
+import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
+import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
+import { getUserLink } from "~/helpers/users.js";
+import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
+import { markAsRead } from "~/helpers/notifications.js";
+import DoubleIcon from "~/components/ui/DoubleIcon.vue";
+import Avatar from "~/components/ui/Avatar.vue";
+import Badge from "~/components/ui/Badge.vue";
+import CopyCode from "~/components/ui/CopyCode.vue";
+import Categories from "~/components/ui/search/Categories.vue";
 
-const app = useNuxtApp()
-const emit = defineEmits(['update:notifications'])
+const app = useNuxtApp();
+const emit = defineEmits(["update:notifications"]);
 
 const props = defineProps({
   notification: {
@@ -333,34 +333,34 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-})
+});
 
-const flags = useFeatureFlags()
-const tags = useTags()
+const flags = useFeatureFlags();
+const tags = useTags();
 
 const type = computed(() =>
-  !props.notification.body || props.notification.body.type === 'legacy_markdown'
+  !props.notification.body || props.notification.body.type === "legacy_markdown"
     ? null
-    : props.notification.body.type
-)
-const thread = computed(() => props.notification.extra_data.thread)
-const report = computed(() => props.notification.extra_data.report)
-const project = computed(() => props.notification.extra_data.project)
-const version = computed(() => props.notification.extra_data.version)
-const user = computed(() => props.notification.extra_data.user)
-const organization = computed(() => props.notification.extra_data.organization)
-const invitedBy = computed(() => props.notification.extra_data.invited_by)
+    : props.notification.body.type,
+);
+const thread = computed(() => props.notification.extra_data.thread);
+const report = computed(() => props.notification.extra_data.report);
+const project = computed(() => props.notification.extra_data.project);
+const version = computed(() => props.notification.extra_data.version);
+const user = computed(() => props.notification.extra_data.user);
+const organization = computed(() => props.notification.extra_data.organization);
+const invitedBy = computed(() => props.notification.extra_data.invited_by);
 
 const threadLink = computed(() => {
   if (report.value) {
-    return `/dashboard/report/${report.value.id}`
+    return `/dashboard/report/${report.value.id}`;
   } else if (project.value) {
-    return `${getProjectLink(project.value)}/moderation#messages`
+    return `${getProjectLink(project.value)}/moderation#messages`;
   }
-  return '#'
-})
+  return "#";
+});
 
-const hasBody = computed(() => !type.value || thread.value || type.value === 'project_update')
+const hasBody = computed(() => !type.value || thread.value || type.value === "project_update");
 
 async function read() {
   try {
@@ -369,54 +369,54 @@ async function read() {
       ...(props.notification.grouped_notifs
         ? props.notification.grouped_notifs.map((notif) => notif.id)
         : []),
-    ]
-    const updateNotifs = await markAsRead(ids)
-    const newNotifs = updateNotifs(props.notifications)
-    emit('update:notifications', newNotifs)
+    ];
+    const updateNotifs = await markAsRead(ids);
+    const newNotifs = updateNotifs(props.notifications);
+    emit("update:notifications", newNotifs);
   } catch (err) {
     app.$notify({
-      group: 'main',
-      title: 'Error marking notification as read',
+      group: "main",
+      title: "Error marking notification as read",
       text: err.data ? err.data.description : err,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
 }
 
 async function performAction(notification, actionIndex) {
-  startLoading()
+  startLoading();
   try {
-    await read()
+    await read();
 
     if (actionIndex !== null) {
       await useBaseFetch(`${notification.actions[actionIndex].action_route[1]}`, {
         method: notification.actions[actionIndex].action_route[0].toUpperCase(),
-      })
+      });
     }
   } catch (err) {
     app.$notify({
-      group: 'main',
-      title: 'An error occurred',
+      group: "main",
+      title: "An error occurred",
       text: err.data.description,
-      type: 'error',
-    })
+      type: "error",
+    });
   }
-  stopLoading()
+  stopLoading();
 }
 
 function getMessages() {
-  const messages = []
+  const messages = [];
   if (props.notification.body.message_id) {
-    messages.push(props.notification.body.message_id)
+    messages.push(props.notification.body.message_id);
   }
   if (props.notification.grouped_notifs) {
     for (const notif of props.notification.grouped_notifs) {
       if (notif.body.message_id) {
-        messages.push(notif.body.message_id)
+        messages.push(notif.body.message_id);
       }
     }
   }
-  return messages
+  return messages;
 }
 </script>
 
@@ -424,35 +424,35 @@ function getMessages() {
 .notification {
   display: grid;
   grid-template:
-    'icon title'
-    'actions actions'
-    'date date';
+    "icon title"
+    "actions actions"
+    "date date";
   grid-template-columns: min-content 1fr;
   grid-template-rows: min-content min-content min-content;
   gap: var(--spacing-card-sm);
 
   &.compact {
     grid-template:
-      'icon title actions'
-      'date date date';
+      "icon title actions"
+      "date date date";
     grid-template-columns: min-content 1fr auto;
     grid-template-rows: auto min-content;
   }
 
   &.has-body {
     grid-template:
-      'icon title'
-      'body body'
-      'actions actions'
-      'date date';
+      "icon title"
+      "body body"
+      "actions actions"
+      "date date";
     grid-template-columns: min-content 1fr;
     grid-template-rows: min-content auto auto min-content;
 
     &.compact {
       grid-template:
-        'icon title actions'
-        'body body body'
-        'date date date';
+        "icon title actions"
+        "body body body"
+        "date date date";
       grid-template-columns: min-content 1fr auto;
       grid-template-rows: min-content auto min-content;
     }

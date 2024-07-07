@@ -24,8 +24,8 @@
 </template>
 
 <script setup>
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?component'
-import ThreadMessage from '~/components/ui/thread/ThreadMessage.vue'
+import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
+import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 
 const props = defineProps({
   thread: {
@@ -49,36 +49,36 @@ const props = defineProps({
     type: Array,
     required: false,
     default() {
-      return []
+      return [];
     },
   },
   auth: {
     type: Object,
     required: true,
   },
-})
+});
 
-const app = useNuxtApp()
+const app = useNuxtApp();
 
 const members = computed(() => {
-  const members = {}
+  const members = {};
   for (const member of props.thread.members) {
-    members[member.id] = member
+    members[member.id] = member;
   }
-  members[props.auth.user.id] = props.auth.user
-  return members
-})
+  members[props.auth.user.id] = props.auth.user;
+  return members;
+});
 
 const displayMessages = computed(() => {
   const sortedMessages = props.thread.messages
     .slice()
-    .sort((a, b) => app.$dayjs(a.created) - app.$dayjs(b.created))
+    .sort((a, b) => app.$dayjs(a.created) - app.$dayjs(b.created));
   if (props.messages.length > 0) {
-    return sortedMessages.filter((msg) => props.messages.includes(msg.id))
+    return sortedMessages.filter((msg) => props.messages.includes(msg.id));
   } else {
-    return sortedMessages.length > 0 ? [sortedMessages[sortedMessages.length - 1]] : []
+    return sortedMessages.length > 0 ? [sortedMessages[sortedMessages.length - 1]] : [];
   }
-})
+});
 </script>
 
 <style lang="scss" scoped>

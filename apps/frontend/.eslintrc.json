@@ -1,6 +1,10 @@
 {
-  "extends": ["@nuxt/eslint-config"],
-  "ignorePatterns": ["!**/*", ".nuxt/**", ".output/**", "node_modules"],
+  "extends": ["@nuxt/eslint-config", "plugin:prettier/recommended", "prettier"],
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "ignorePatterns": [".nuxt/**", ".output/**", "node_modules"],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx", "*.vue"],

@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg?component'
-import ClipboardCopyIcon from '~/assets/images/utils/clipboard-copy.svg?component'
+import CheckIcon from "~/assets/images/utils/check.svg?component";
+import ClipboardCopyIcon from "~/assets/images/utils/clipboard-copy.svg?component";
 
 export default {
   components: {
@@ -24,15 +24,15 @@ export default {
   data() {
     return {
       copied: false,
-    }
+    };
   },
   methods: {
     async copyText() {
-      await navigator.clipboard.writeText(this.text)
-      this.copied = true
+      await navigator.clipboard.writeText(this.text);
+      this.copied = true;
     },
   },
-}
+};
 </script>
 
 <style lang="scss" scoped>
@@ -48,7 +48,10 @@ export default {
   width: min-content;
   border-radius: 10px;
   user-select: text;
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   span {
