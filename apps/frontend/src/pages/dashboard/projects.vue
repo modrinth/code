@@ -159,7 +159,7 @@
     <ModalCreation ref="modal_creation" />
     <section class="universal-card">
       <div class="header__row">
-        <h2 class="header__title">Projects</h2>
+        <h2 class="header__title text-2xl">Projects</h2>
         <div class="input-group">
           <button class="iconified-button brand-button" @click="$refs.modal_creation.show()">
             <PlusIcon />

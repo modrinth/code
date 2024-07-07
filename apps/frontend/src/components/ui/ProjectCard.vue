@@ -19,7 +19,7 @@
     </nuxt-link>
     <div class="title">
       <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
-        <h2 class="name">
+        <h2 class="name !text-2xl">
           {{ name }}
         </h2>
       </nuxt-link>

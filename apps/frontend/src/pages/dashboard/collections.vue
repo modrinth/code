@@ -1,7 +1,7 @@
 <template>
   <div class="universal-card">
     <CollectionCreateModal ref="modal_creation" />
-    <h2>{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
+    <h2 class="text-2xl">{{ formatMessage(commonMessages.collectionsLabel) }}</h2>
     <div class="search-row">
       <div class="iconified-input">
         <label for="search-input" hidden>{{ formatMessage(messages.searchInputLabel) }}</label>

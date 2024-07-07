@@ -74,7 +74,7 @@
 
     <div class="header__row">
       <div class="header__title">
-        <h2>{{ formatMessage(commonSettingsMessages.pats) }}</h2>
+        <h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.pats) }}</h2>
       </div>
       <button
         class="btn btn-primary"

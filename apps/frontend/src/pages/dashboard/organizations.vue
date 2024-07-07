@@ -3,7 +3,7 @@
     <OrganizationCreateModal ref="createOrgModal" />
     <section class="universal-card">
       <div class="header__row">
-        <h2 class="header__title">Organizations</h2>
+        <h2 class="header__title text-2xl">Organizations</h2>
         <div class="input-group">
           <button class="iconified-button brand-button" @click="openCreateOrgModal">
             <PlusIcon />

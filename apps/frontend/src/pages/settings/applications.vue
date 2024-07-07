@@ -128,7 +128,7 @@
 
     <div class="header__row">
       <div class="header__title">
-        <h2>{{ formatMessage(commonSettingsMessages.applications) }}</h2>
+        <h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.applications) }}</h2>
       </div>
       <button
         class="btn btn-primary"
@@ -152,7 +152,7 @@
       information, see
       <a class="text-link" href="https://docs.modrinth.com">Modrinth's API documentation</a>.
     </p>
-    <div v-for="app in usersApps" :key="app.id" class="universal-card recessed token">
+    <div v-for="app in usersApps" :key="app.id" class="universal-card recessed token mt-4">
       <div class="token-info">
         <div class="token-icon">
           <Avatar size="sm" :src="app.icon_url" />

@@ -285,7 +285,7 @@ function getItemLabel(locale: Locale) {
 <template>
   <div>
     <section class="universal-card">
-      <h2>{{ formatMessage(commonSettingsMessages.language) }}</h2>
+      <h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.language) }}</h2>
 
       <div class="card-description">
         <IntlFormatted :message-id="messages.languagesDescription">

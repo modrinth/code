@@ -8,8 +8,8 @@
       />
       <div class="header__row">
         <div class="header__title">
-          <h2 v-if="history">Notification history</h2>
-          <h2 v-else>Notifications</h2>
+          <h2 v-if="history" class="text-2xl">Notification history</h2>
+          <h2 v-else class="text-2xl">Notifications</h2>
         </div>
         <template v-if="!history">
           <Button v-if="hasRead" @click="updateRoute()"> <HistoryIcon /> View history </Button>

@@ -15,7 +15,7 @@
     <div class="dashboard-notifications">
       <section class="universal-card">
         <div class="header__row">
-          <h2 class="header__title">Notifications</h2>
+          <h2 class="header__title text-2xl">Notifications</h2>
           <nuxt-link
             v-if="notifications.length > 0"
             class="goto-link"
@@ -38,7 +38,7 @@
           />
           <nuxt-link
             v-if="extraNotifs > 0"
-            class="goto-link view-more-notifs"
+            class="goto-link view-more-notifs mt-4"
             to="/dashboard/notifications"
           >
             View {{ extraNotifs }} more notification{{ extraNotifs === 1 ? "" : "s" }}
@@ -47,7 +47,7 @@
         </template>
         <div v-else class="universal-body">
           <p>You have no unread notifications.</p>
-          <nuxt-link class="iconified-button" to="/dashboard/notifications/history">
+          <nuxt-link class="iconified-button !mt-4" to="/dashboard/notifications/history">
             <HistoryIcon /> View notification history
           </nuxt-link>
         </div>

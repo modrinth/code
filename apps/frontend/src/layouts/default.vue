@@ -328,10 +328,10 @@
       <div class="logo-info" role="region" aria-label="Modrinth information">
         <BrandTextLogo
           aria-hidden="true"
-          class="text-logo button-base"
+          class="text-logo button-base mb-4"
           @click="developerModeIncrement()"
         />
-        <p>
+        <p class="mb-4">
           <IntlFormatted :message-id="footerMessages.openSource">
             <template #github-link="{ children }">
               <a
@@ -345,8 +345,8 @@
             </template>
           </IntlFormatted>
         </p>
-        <p>
-          {{ config.public.owner }}/{{ config.public.slug }} {{ config.public.branch }}@<a
+        <p class="mb-4">
+          {{ config.public.branch }}@<a
             :target="$external()"
             :href="
               'https://github.com/' +

@@ -1,7 +1,7 @@
 <template>
   <div>
     <MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
-      <CodeIcon />
+      <CodeIcon class="inline-flex" />
       <IntlFormatted :message-id="developerModeBanner.description">
         <template #strong="{ children }">
           <strong>
@@ -14,9 +14,9 @@
       </Button>
     </MessageBanner>
     <section class="universal-card">
-      <h2>{{ formatMessage(colorTheme.title) }}</h2>
+      <h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
       <p>{{ formatMessage(colorTheme.description) }}</p>
-      <div class="theme-options">
+      <div class="theme-options mt-4">
         <button
           v-for="option in themeOptions"
           :key="option"
@@ -50,8 +50,8 @@
       </div>
     </section>
     <section class="universal-card">
-      <h2>{{ formatMessage(projectListLayouts.title) }}</h2>
-      <p>{{ formatMessage(projectListLayouts.description) }}</p>
+      <h2 class="text-2xl">{{ formatMessage(projectListLayouts.title) }}</h2>
+      <p class="mb-4">{{ formatMessage(projectListLayouts.description) }}</p>
       <div class="project-lists">
         <div v-for="projectType in listTypes" :key="projectType.id + '-project-list-layouts'">
           <div class="label">
@@ -137,8 +137,8 @@
       </div>
     </section>
     <section class="universal-card">
-      <h2>{{ formatMessage(toggleFeatures.title) }}</h2>
-      <p>{{ formatMessage(toggleFeatures.description) }}</p>
+      <h2 class="text-2xl">{{ formatMessage(toggleFeatures.title) }}</h2>
+      <p class="mb-4">{{ formatMessage(toggleFeatures.description) }}</p>
       <div class="adjacent-input small">
         <label for="advanced-rendering">
           <span class="label__title">
