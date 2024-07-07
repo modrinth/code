@@ -1,13 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./components/**/*.{js,vue,ts}",
-    "./layouts/**/*.vue",
-    "./pages/**/*.vue",
-    "./plugins/**/*.{js,ts}",
-    "./app.vue",
-    "./error.vue",
-    // monorepo
+    "./src/components/**/*.{js,vue,ts}",
+    "./src/layouts/**/*.vue",
+    "./src/pages/**/*.vue",
+    "./src/plugins/**/*.{js,ts}",
+    "./src/app.vue",
+    "./src/error.vue",
+    // monorepo - TODO: migrate this to its own package
     "../../packages/**/*.{js,vue,ts}",
   ],
   theme: {
