@@ -776,10 +776,10 @@ pub async fn run_credentials(
     })?;
 
     let java_args = profile
-    .java
-    .as_ref()
-    .and_then(|it| it.extra_arguments.as_ref())
-    .unwrap_or(&settings.custom_java_args);
+        .java
+        .as_ref()
+        .and_then(|it| it.extra_arguments.as_ref())
+        .unwrap_or(&settings.custom_java_args);
 
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
