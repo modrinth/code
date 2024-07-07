@@ -787,7 +787,7 @@ pub async fn run_credentials(
         // TODO: Improve Hook parameters
         
         let full_path = path.get_full_path().await?;
-        let jre_key = get_optimal_jre_key(&path).await.unwrap();
+        let jre_key = get_optimal_jre_key(&path).await?;
         let cmd_with_hook_parameters = hook
             .replace("$INST_NAME", profile.metadata.name.as_str())
             .replace("$INST_ID", profile.metadata.name.as_str())
