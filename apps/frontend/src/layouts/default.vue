@@ -328,7 +328,7 @@
       <div class="logo-info" role="region" aria-label="Modrinth information">
         <BrandTextLogo
           aria-hidden="true"
-          class="text-logo button-base mb-4"
+          class="text-logo button-base mx-auto mb-4 lg:mx-0"
           @click="developerModeIncrement()"
         />
         <p class="mb-4">
