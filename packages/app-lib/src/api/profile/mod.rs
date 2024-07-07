@@ -787,13 +787,13 @@ pub async fn run_credentials(
         // TODO: Improve Hook parameters
         
         let full_path = path.get_full_path().await?;
+        let jre_key = get_optimal_jre_key(&path).await.unwrap();
         let cmd_with_hook_parameters = hook
             .replace("$INST_NAME", profile.metadata.name.as_str())
             .replace("$INST_ID", profile.metadata.name.as_str())
             .replace("$INST_DIR", full_path.to_str().unwrap())
             .replace("$INST_MC_DIR", full_path.to_str().unwrap())
-            // TODO: Avoid harcoding Java executable
-            .replace("$INST_JAVA", settings.java_globals.get(&"JAVA_21".to_string()).unwrap().path.as_str())
+            .replace("$INST_JAVA", jre_key.unwrap().path.as_str())
             // TODO: Pass the args correctly
             .replace("$INST_JAVA_ARGS", java_args.join(" ").as_str());
 
