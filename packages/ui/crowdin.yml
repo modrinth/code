@@ -1,0 +1,8 @@
+project_id: 518556
+preserve_hierarchy: true
+commit_message: '[ci skip]'
+
+files:
+  - source: /locales/en-US/*
+    dest: /%original_file_name%
+    translation: /locales/%locale%/%original_file_name%
