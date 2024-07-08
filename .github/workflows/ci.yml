@@ -25,6 +25,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-turbo-
 
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf libselinux1
+
       - name: Setup PNPM
         uses: pnpm/action-setup@v2
         with:
@@ -41,12 +46,9 @@ jobs:
 
       - name: Build
         run: pnpm build
-        continue-on-error: true
 
       - name: Lint
         run: pnpm lint
-        continue-on-error: true
 
       - name: Test
         run: pnpm test
-        continue-on-error: true
