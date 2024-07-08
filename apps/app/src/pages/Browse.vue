@@ -1,27 +1,7 @@
 <script setup>
 import { computed, nextTick, ref, readonly, shallowRef, watch, onUnmounted } from 'vue'
 import { ClearIcon, SearchIcon, ClientIcon, ServerIcon, XIcon } from '@modrinth/assets'
-import {
-  Pagination,
-  Checkbox,
-  Button,
-  ClearIcon,
-  SearchIcon,
-  SearchFilter,
-  Card,
-  ClientIcon,
-  ServerIcon,
-  NavRow,
-  formatCategory,
-  Promotion,
-  XIcon,
-  DropdownSelect,
-  Promotion,
-  NavRow,
-  Card,
-  SearchFilter,
-} from '@modrinth/ui'
-import { formatCategoryHeader, formatCategory } from '@modrinth/utils'
+import { formatCategory } from '@modrinth/utils'
 import Multiselect from 'vue-multiselect'
 import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'

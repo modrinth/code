@@ -403,7 +403,7 @@ import {
   Card,
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, onUnmounted, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
