@@ -1,0 +1,6 @@
+button:focus-visible,
+a:focus-visible,
+[tabindex='0']:focus-visible {
+  outline: 0.25rem solid #ea80ff;
+  border-radius: 0.25rem;
+}
