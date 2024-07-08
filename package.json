@@ -7,7 +7,7 @@
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
     "app:dev": "turbo run dev --filter=@modrinth/app",
-    "build": "turbo run lint",
+    "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test"
   },
