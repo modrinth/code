@@ -1,0 +1,80 @@
+{
+  "omorphia.component.badge.label.accepted": {
+    "defaultMessage": "Accepted"
+  },
+  "omorphia.component.badge.label.approved": {
+    "defaultMessage": "Approved"
+  },
+  "omorphia.component.badge.label.archived": {
+    "defaultMessage": "Archived"
+  },
+  "omorphia.component.badge.label.closed": {
+    "defaultMessage": "Closed"
+  },
+  "omorphia.component.badge.label.creator": {
+    "defaultMessage": "Creator"
+  },
+  "omorphia.component.badge.label.draft": {
+    "defaultMessage": "Draft"
+  },
+  "omorphia.component.badge.label.failed": {
+    "defaultMessage": "Failed"
+  },
+  "omorphia.component.badge.label.listed": {
+    "defaultMessage": "Listed"
+  },
+  "omorphia.component.badge.label.moderator": {
+    "defaultMessage": "Moderator"
+  },
+  "omorphia.component.badge.label.modrinth-team": {
+    "defaultMessage": "Modrinth Team"
+  },
+  "omorphia.component.badge.label.pending": {
+    "defaultMessage": "Pending"
+  },
+  "omorphia.component.badge.label.private": {
+    "defaultMessage": "Private"
+  },
+  "omorphia.component.badge.label.processed": {
+    "defaultMessage": "Processed"
+  },
+  "omorphia.component.badge.label.rejected": {
+    "defaultMessage": "Rejected"
+  },
+  "omorphia.component.badge.label.returned": {
+    "defaultMessage": "Returned"
+  },
+  "omorphia.component.badge.label.scheduled": {
+    "defaultMessage": "Scheduled"
+  },
+  "omorphia.component.badge.label.under-review": {
+    "defaultMessage": "Under review"
+  },
+  "omorphia.component.badge.label.unlisted": {
+    "defaultMessage": "Unlisted"
+  },
+  "omorphia.component.badge.label.withheld": {
+    "defaultMessage": "Withheld"
+  },
+  "omorphia.component.copy.action.copy": {
+    "defaultMessage": "Copy code to clipboard"
+  },
+  "omorphia.component.environment-indicator.label.client": {
+    "defaultMessage": "Client"
+  },
+  "omorphia.component.environment-indicator.label.client-and-server": {
+    "defaultMessage": "Client and server"
+  },
+  "omorphia.component.environment-indicator.label.client-or-server": {
+    "defaultMessage": "Client or server"
+  },
+  "omorphia.component.environment-indicator.label.server": {
+    "defaultMessage": "Server"
+  },
+  "omorphia.component.environment-indicator.label.type": {
+    "defaultMessage": "A {type}"
+  },
+  "omorphia.component.environment-indicator.label.unsupported": {
+    "defaultMessage": "Unsupported"
+  }
+}
