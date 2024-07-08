@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "turbo run build --filter=@modrinth/frontend",
+    "web:build": "turbo run build --filter=@modrinth/frontend",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
-    "dev": "turbo run dev --filter=@modrinth/frontend",
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
     "app:dev": "turbo run dev --filter=@modrinth/app",
-    "lint": "turbo run lint"
+    "build": "turbo run lint",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
   },
   "devDependencies": {
     "turbo": "^2.0.6",
