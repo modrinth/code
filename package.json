@@ -14,5 +14,10 @@
     "turbo": "^2.0.6",
     "vue": "^3.4.31"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.4.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+    }
+  }
 }
