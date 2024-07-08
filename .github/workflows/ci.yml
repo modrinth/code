@@ -2,42 +2,48 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
   pull_request:
-
-permissions:
-  actions: read
-  contents: read
+    types: [opened, synchronize]
 
 jobs:
-  main:
+  build:
+    name: Build, Test, and Lint
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out code
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-      
-      - uses: pnpm/action-setup@v2
+          fetch-depth: 2
+
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
         with:
-          version: 8
-      
-      
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
-      # Connect your workspace on nx.app and uncomment this to enable task distribution.
-      # The "--stop-agents-after" is optional, but allows idle agents to shut down once the "build" targets have been requested
-      # - run: pnpm dlx nx-cloud start-ci-run --distribute-on="5 linux-medium-js" --stop-agents-after="build"
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
 
-      
-      # Cache node_modules
-      - uses: actions/setup-node@v3
+      - name: Setup Node.JS environment
+        uses: actions/setup-node@v3
         with:
           node-version: 20
           cache: 'pnpm'
-       
-      - run: pnpm install --frozen-lockfile
-      - uses: nrwl/nx-set-shas@v4
 
-      # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
-      # - run: pnpm exec nx-cloud record -- echo Hello World
-      - run: pnpm exec nx affected -t lint test build
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test
+        run: pnpm test

@@ -19,6 +19,7 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
+    "@modrinth/app-lib": "workspace:*",
     "@tauri-apps/api": "^1.5.3",
     "@vintl/vintl": "^4.4.1",
     "dayjs": "^1.11.10",

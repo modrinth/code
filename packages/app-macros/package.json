@@ -1,0 +1,9 @@
+{
+  "name": "@modrinth/app-macros",
+  "scripts": {
+    "build": "cargo build",
+    "lint": "cargo clippy",
+    "fix": "cargo fmt && cargo clippy --fix",
+    "test": "cargo test"
+  }
+}

@@ -7,7 +7,6 @@
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "dev": "turbo run dev --filter=@modrinth/frontend",
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
-    "// app:dev": "Do not run this, this is broken. To run Modrinth app, use `cargo tauri dev`",
     "app:dev": "turbo run dev --filter=@modrinth/app",
     "lint": "turbo run lint"
   },

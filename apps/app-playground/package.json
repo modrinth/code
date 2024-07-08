@@ -1,0 +1,10 @@
+{
+  "name": "@modrinth/app-playground",
+  "scripts": {
+    "build": "cargo build",
+    "lint": "cargo clippy",
+    "fix": "cargo fmt && cargo clippy --fix",
+    "dev": "cargo run",
+    "test": "cargo test"
+  }
+}
