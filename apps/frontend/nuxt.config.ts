@@ -374,9 +374,6 @@ export default defineNuxtConfig({
   },
   nitro: {
     moduleSideEffects: ["@vintl/compact-number/locale-data"],
-    output: {
-      dir: "../../dist/apps/knossos/.output",
-    },
   },
   devtools: {
     enabled: true,

@@ -1,9 +1,9 @@
 {
   "build": {
     "beforeDevCommand": "pnpm run --filter=@modrinth/app vite:dev",
-    "beforeBuildCommand": "pnpm build",
+    "beforeBuildCommand": "pnpm vite:build",
     "devPath": "http://localhost:1420",
-    "distDir": "../../../dist/apps/app",
+    "distDir": "../dist",
     "withGlobalTauri": false
   },
   "package": {
