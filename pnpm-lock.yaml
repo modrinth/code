@@ -22,6 +22,9 @@ importers:
 
   apps/app:
     dependencies:
+      '@modrinth/app-lib':
+        specifier: workspace:*
+        version: link:../../packages/app-lib
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
@@ -107,6 +110,8 @@ importers:
       vite-plugin-eslint:
         specifier: ^1.8.1
         version: 1.8.1(eslint@8.57.0)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1))
+
+  apps/app-playground: {}
 
   apps/frontend:
     dependencies:
@@ -261,6 +266,14 @@ importers:
       vue-tsc:
         specifier: ^2.0.24
         version: 2.0.24(typescript@5.5.3)
+
+  packages/app-lib:
+    dependencies:
+      '@modrinth/app-macros':
+        specifier: workspace:*
+        version: link:../app-macros
+
+  packages/app-macros: {}
 
   packages/assets:
     devDependencies:
