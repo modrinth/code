@@ -1,11 +1,10 @@
 [workspace]
-resolver = "2"
-
+resolver = '2'
 members = [
-    "theseus",
-    "theseus_playground",
-    "theseus_gui/src-tauri",
-    "theseus_macros"
+  './packages/app-lib',
+  './packages/app-macros',
+	'./apps/app-playground',
+  './apps/app/src-tauri'
 ]
 
 [profile.dev]
