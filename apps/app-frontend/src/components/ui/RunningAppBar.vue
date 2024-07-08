@@ -335,8 +335,12 @@ onBeforeUnmount(() => {
   width: 1.25rem !important;
   height: 1.25rem !important;
 
+  svg {
+    min-width: 1.25rem;
+  }
+
   &.stop {
-    --text-color: var(--color-red) !important;
+    color: var(--color-red);
   }
 }
 

@@ -224,7 +224,7 @@
               <TrashIcon />
             </Button>
           </div>
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"/>
           <div
             v-else
             v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
@@ -1112,8 +1112,12 @@ onUnmounted(() => {
 </style>
 <style lang="scss">
 .updating-indicator {
+  height: 2.25rem !important;
+  width: 2.25rem !important;
+
   svg {
-    margin-left: 0.5rem !important;
+    height: 1.25rem !important;
+    width: 1.25rem !important;
   }
 }
 
