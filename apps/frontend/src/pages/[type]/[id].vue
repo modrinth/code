@@ -161,7 +161,7 @@
           :class="{ 'has-featured-image': featuredGalleryImage }"
         >
           <nuxt-link
-            class="project__gallery"
+            class="project__gallery relative"
             tabindex="-1"
             :to="
               '/' +
@@ -186,14 +186,14 @@
               :src="project.icon_url"
               :alt="project.title"
               size="md"
-              class="project__icon"
+              class="project__icon relative"
               no-shadow
             />
             <h1 class="title">
               {{ project.title }}
             </h1>
             <nuxt-link
-              class="title-link project-type"
+              class="title-link project-type flex items-center gap-1"
               :to="`/${$getProjectTypeForUrl(project.actualProjectType, project.loaders)}s`"
             >
               <BoxIcon />

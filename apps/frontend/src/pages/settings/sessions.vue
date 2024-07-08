@@ -1,10 +1,10 @@
 <template>
   <div class="universal-card">
-    <h2>{{ formatMessage(commonSettingsMessages.sessions) }}</h2>
+    <h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.sessions) }}</h2>
     <p class="preserve-lines">
       {{ formatMessage(messages.sessionsDescription) }}
     </p>
-    <div v-for="session in sessions" :key="session.id" class="universal-card recessed session">
+    <div v-for="session in sessions" :key="session.id" class="universal-card recessed session mt-4">
       <div>
         <div>
           <strong>

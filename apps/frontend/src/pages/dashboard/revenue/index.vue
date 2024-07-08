@@ -1,7 +1,7 @@
 <template>
   <div>
     <section class="universal-card">
-      <h2>Revenue</h2>
+      <h2 class="text-2xl">Revenue</h2>
       <div v-if="auth.user.payout_data.balance >= minWithdraw">
         <p>
           You have
@@ -14,7 +14,7 @@
         <strong>{{ $formatMoney(auth.user.payout_data.balance) }}</strong
         >, which is under the minimum of ${{ minWithdraw }} to withdraw.
       </p>
-      <div class="input-group">
+      <div class="input-group mt-4">
         <nuxt-link
           v-if="auth.user.payout_data.balance >= minWithdraw"
           class="iconified-button brand-button"
@@ -34,7 +34,7 @@
       </p>
     </section>
     <section class="universal-card">
-      <h2>Payout methods</h2>
+      <h2 class="text-2xl">Payout methods</h2>
       <h3>PayPal</h3>
       <template v-if="auth.user.auth_providers.includes('paypal')">
         <p>
@@ -42,13 +42,13 @@
           email
           {{ auth.user.payout_data.paypal_address }}
         </p>
-        <button class="btn" @click="removeAuthProvider('paypal')">
+        <button class="btn mt-4" @click="removeAuthProvider('paypal')">
           <XIcon /> Disconnect account
         </button>
       </template>
       <template v-else>
         <p>Connect your PayPal account to enable withdrawing to your PayPal balance.</p>
-        <a class="btn" :href="`${getAuthUrl('paypal')}&token=${auth.token}`">
+        <a class="btn mt-4" :href="`${getAuthUrl('paypal')}&token=${auth.token}`">
           <PayPalIcon />
           Sign in with PayPal
         </a>
@@ -65,6 +65,7 @@
       <input
         id="venmo"
         v-model="auth.user.payout_data.venmo_handle"
+        class="mt-4"
         type="search"
         name="search"
         placeholder="@example"

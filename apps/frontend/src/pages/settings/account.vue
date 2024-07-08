@@ -291,7 +291,7 @@
       </div>
     </Modal>
     <section class="universal-card">
-      <h2>Account security</h2>
+      <h2 class="text-2xl">Account security</h2>
 
       <div class="adjacent-input">
         <label for="theme-selector">

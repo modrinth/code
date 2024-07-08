@@ -53,8 +53,18 @@
         >, has been updated:
       </template>
       <template v-else-if="type === 'team_invite' && project">
-        <nuxt-link :to="`/user/${invitedBy.username}`" class="iconified-link title-link">
-          <Avatar :src="invitedBy.avatar_url" circle size="xxs" no-shadow :raised="raised" />
+        <nuxt-link
+          :to="`/user/${invitedBy.username}`"
+          class="iconified-link title-link inline-flex"
+        >
+          <Avatar
+            :src="invitedBy.avatar_url"
+            circle
+            size="xxs"
+            no-shadow
+            :raised="raised"
+            class="inline-flex"
+          />
           <span class="space">&nbsp;</span>
           <span>{{ invitedBy.username }}</span>
         </nuxt-link>
@@ -66,8 +76,18 @@
         </span>
       </template>
       <template v-else-if="type === 'organization_invite' && organization">
-        <nuxt-link :to="`/user/${invitedBy.username}`" class="iconified-link title-link">
-          <Avatar :src="invitedBy.avatar_url" circle size="xxs" no-shadow :raised="raised" />
+        <nuxt-link
+          :to="`/user/${invitedBy.username}`"
+          class="iconified-link title-link inline-flex"
+        >
+          <Avatar
+            :src="invitedBy.avatar_url"
+            circle
+            size="xxs"
+            no-shadow
+            :raised="raised"
+            class="inline-flex"
+          />
           <span class="space">&nbsp;</span>
           <span>{{ invitedBy.username }}</span>
         </nuxt-link>
@@ -172,9 +192,12 @@
       </template>
     </div>
     <span class="notification__date">
-      <span v-if="notification.read" class="read-badge"> <ReadIcon /> Read </span>
-      <span v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')">
-        <CalendarIcon /> Received {{ fromNow(notification.created) }}
+      <span v-if="notification.read" class="read-badge inline-flex"> <ReadIcon /> Read </span>
+      <span
+        v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm A')"
+        class="inline-flex"
+      >
+        <CalendarIcon class="mr-1" /> Received {{ fromNow(notification.created) }}
       </span>
     </span>
     <div v-if="compact" class="notification__actions">

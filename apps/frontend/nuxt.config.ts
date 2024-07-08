@@ -300,7 +300,7 @@ export default defineNuxtConfig({
       featureFlagOverrides: getFeatureFlagOverrides(),
 
       owner: process.env.VERCEL_GIT_REPO_OWNER || "modrinth",
-      slug: process.env.VERCEL_GIT_REPO_SLUG || "knossos",
+      slug: process.env.VERCEL_GIT_REPO_SLUG || "code",
       branch:
         process.env.VERCEL_GIT_COMMIT_REF ||
         process.env.CF_PAGES_BRANCH ||

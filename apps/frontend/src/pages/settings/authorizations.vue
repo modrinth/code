@@ -7,7 +7,7 @@
       proceed-label="Revoke"
       @proceed="revokeApp(revokingId)"
     />
-    <h2>{{ formatMessage(commonSettingsMessages.authorizedApps) }}</h2>
+    <h2 class="text-2xl">{{ formatMessage(commonSettingsMessages.authorizedApps) }}</h2>
     <p>
       When you authorize an application with your Modrinth account, you grant it access to your
       account. You can manage and review access to your account here at any time.
@@ -18,7 +18,7 @@
     <div
       v-for="authorization in appInfoLookup"
       :key="authorization.id"
-      class="universal-card recessed token"
+      class="universal-card recessed token mt-4"
     >
       <div class="token-content">
         <div>
