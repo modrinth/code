@@ -92,12 +92,6 @@ importers:
       eslint-config-custom:
         specifier: workspace:*
         version: link:../../packages/eslint-config-custom
-      eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.0(eslint@8.57.0)
-      eslint-plugin-vue:
-        specifier: ^9.24.0
-        version: 9.27.0(eslint@8.57.0)
       prettier:
         specifier: ^3.2.5
         version: 3.3.2
@@ -110,9 +104,6 @@ importers:
       vite:
         specifier: ^5.2.8
         version: 5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1)
-      vite-plugin-eslint:
-        specifier: ^1.8.1
-        version: 1.8.1(eslint@8.57.0)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1))
 
   apps/app-playground: {}
 
@@ -4961,11 +4952,6 @@ packages:
       rollup:
         optional: true
 
-  rollup@2.79.1:
-    resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
-    engines: {node: '>=10.0.0'}
-    hasBin: true
-
   rollup@3.29.4:
     resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
@@ -5639,12 +5625,6 @@ packages:
         optional: true
       vue-tsc:
         optional: true
-
-  vite-plugin-eslint@1.8.1:
-    resolution: {integrity: sha512-PqdMf3Y2fLO9FsNPmMX+//2BF5SF8nEWspZdgl4kSt7UvHDRHVVfHvxsD7ULYzZrJDGRxR81Nq7TOFgwMnUang==}
-    peerDependencies:
-      eslint: '>=7'
-      vite: '>=2'
 
   vite-plugin-inspect@0.8.4:
     resolution: {integrity: sha512-G0N3rjfw+AiiwnGw50KlObIHYWfulVwaCBUBLh2xTW9G1eM9ocE5olXkEYUbwyTmX+azM8duubi+9w5awdCz+g==}
@@ -7649,6 +7629,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.5
       '@types/json-schema': 7.0.15
+    optional: true
 
   '@types/estree@1.0.5': {}
 
@@ -9160,10 +9141,6 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-config-prettier@9.1.0(eslint@8.57.0):
-    dependencies:
-      eslint: 8.57.0
-
   eslint-config-prettier@9.1.0(eslint@9.6.0):
     dependencies:
       eslint: 9.6.0
@@ -9370,20 +9347,6 @@ snapshots:
       regjsparser: 0.10.0
       semver: 7.6.2
       strip-indent: 3.0.0
-    transitivePeerDependencies:
-      - supports-color
-
-  eslint-plugin-vue@9.27.0(eslint@8.57.0):
-    dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
-      eslint: 8.57.0
-      globals: 13.24.0
-      natural-compare: 1.4.0
-      nth-check: 2.1.1
-      postcss-selector-parser: 6.1.0
-      semver: 7.6.2
-      vue-eslint-parser: 9.4.3(eslint@8.57.0)
-      xml-name-validator: 4.0.0
     transitivePeerDependencies:
       - supports-color
 
@@ -11287,10 +11250,6 @@ snapshots:
     optionalDependencies:
       rollup: 4.18.0
 
-  rollup@2.79.1:
-    optionalDependencies:
-      fsevents: 2.3.3
-
   rollup@3.29.4:
     optionalDependencies:
       fsevents: 2.3.3
@@ -12102,14 +12061,6 @@ snapshots:
       typescript: 5.5.3
       vue-tsc: 2.0.24(typescript@5.5.3)
 
-  vite-plugin-eslint@1.8.1(eslint@8.57.0)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1)):
-    dependencies:
-      '@rollup/pluginutils': 4.2.1
-      '@types/eslint': 8.56.10
-      eslint: 8.57.0
-      rollup: 2.79.1
-      vite: 5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1)
-
   vite-plugin-inspect@0.8.4(@nuxt/kit@3.12.3(magicast@0.3.4)(rollup@4.18.0))(rollup@4.18.0)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1)):
     dependencies:
       '@antfu/utils': 0.7.10
@@ -12205,19 +12156,6 @@ snapshots:
       vue: 3.4.31(typescript@5.5.3)
 
   vue-devtools-stub@0.1.0: {}
-
-  vue-eslint-parser@9.4.3(eslint@8.57.0):
-    dependencies:
-      debug: 4.3.5
-      eslint: 8.57.0
-      eslint-scope: 7.2.2
-      eslint-visitor-keys: 3.4.3
-      espree: 9.6.1
-      esquery: 1.5.0
-      lodash: 4.17.21
-      semver: 7.6.2
-    transitivePeerDependencies:
-      - supports-color
 
   vue-eslint-parser@9.4.3(eslint@9.6.0):
     dependencies:
