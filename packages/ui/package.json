@@ -5,7 +5,8 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
-    "lint": "eslint ./src --fix"
+    "lint": "eslint . && prettier --check .",
+    "fix": "eslint . --fix && prettier --write ."
   },
   "devDependencies": {
     "@vintl/unplugin": "^1.5.1",

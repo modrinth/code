@@ -5,7 +5,8 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
-    "lint": "eslint *.*"
+    "lint": "eslint . && prettier --check .",
+    "fix": "eslint . --fix && prettier --write ."
   },
   "devDependencies": {
     "eslint-config-custom": "workspace:*",

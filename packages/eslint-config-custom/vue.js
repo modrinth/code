@@ -12,7 +12,13 @@ const project = resolve(process.cwd(), 'tsconfig.json')
  */
 
 module.exports = {
-  extends: ['@vercel/style-guide/eslint/browser', '@vue/eslint-config-typescript'].map(
+  extends: [
+    '@vercel/style-guide/eslint/browser',
+    '@vue/eslint-config-typescript',
+    'eslint-config-prettier',
+    'eslint-config-turbo',
+  ]
+  .map(
     require.resolve,
   ),
   parserOptions: {
@@ -33,6 +39,8 @@ module.exports = {
     camelcase: 'off',
     'no-console': 'off',
     'no-bitwise': 'off',
-    // add specific rules configurations here
+    'unicorn/filename-case': 'off',
+    'comma-dangle': ['error', 'only-multiline'],
+    'vue/no-v-html': 'off',
   },
 }

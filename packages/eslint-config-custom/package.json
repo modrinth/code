@@ -8,6 +8,8 @@
     "@vercel/style-guide": "^5.2.0",
     "@vue/eslint-config-typescript": "^12.0.0",
     "eslint-config-turbo": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "eslint-config-prettier": "^8.10.0",
+    "eslint-plugin-prettier": "^4.2.1"
   }
 }

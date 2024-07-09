@@ -7,11 +7,12 @@
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
     "app:dev": "turbo run dev --filter=@modrinth/app",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "test": "turbo run test"
+    "build": "turbo run build --continue",
+    "lint": "turbo run lint --continue",
+    "test": "turbo run test --continue"
   },
   "devDependencies": {
+    "prettier": "^3.3.2",
     "turbo": "^2.0.6",
     "vue": "^3.4.31"
   },
@@ -20,5 +21,11 @@
     "patchedDependencies": {
       "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
     }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true,
+    "endOfLine": "auto"
   }
 }
