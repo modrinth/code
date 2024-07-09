@@ -1,7 +1,7 @@
 {
   "name": "@modrinth/app",
   "scripts": {
-    "build": "tauri build --debug",
+    "build": "tauri build",
     "dev": "tauri dev",
     "test": "cargo test",
     "lint": "cargo fmt --check && cargo clippy -- -D warnings",
