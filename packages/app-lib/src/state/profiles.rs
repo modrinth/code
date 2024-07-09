@@ -20,10 +20,7 @@ use notify_debouncer_mini::Debouncer;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashMap, path::{Path, PathBuf}, path};
 use uuid::Uuid;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
@@ -65,7 +62,6 @@ impl ProfilePathId {
             .ok_or_else(|| {
                 crate::ErrorKind::FSError(format!(
                     "Path {path:?} does not correspond to a profile",
-                    path = path
                 ))
             })?;
         Ok(Self(path))
@@ -157,7 +153,8 @@ impl ProjectPathId {
         let profiles_dir: PathBuf = std::fs::canonicalize(
             State::get().await?.directories.profiles_dir().await,
         )?;
-        let path: PathBuf = std::fs::canonicalize(path)?;
+        // Normal canonizing resolves symlinks, which results in "path not corresponding to profile" error
+        let path = path::absolute(path.to_path_buf())?;
         let path = path
             .strip_prefix(profiles_dir)
             .ok()
@@ -165,7 +162,6 @@ impl ProjectPathId {
             .ok_or_else(|| {
                 crate::ErrorKind::FSError(format!(
                     "Path {path:?} does not correspond to a profile",
-                    path = path
                 ))
             })?;
         Ok(Self(path))
