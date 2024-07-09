@@ -90,9 +90,9 @@ pub async fn import_gdlauncher(
             .clone()
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
-        prof.metadata.icon = icon.clone();
-        prof.metadata.game_version = game_version.clone();
-        prof.metadata.loader_version = loader_version.clone();
+      prof.metadata.icon.clone_from(&icon);
+      prof.metadata.game_version.clone_from(&game_version);
+      prof.metadata.loader_version.clone_from(&loader_version);
         prof.metadata.loader = mod_loader;
 
         async { Ok(()) }
