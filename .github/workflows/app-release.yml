@@ -72,7 +72,6 @@ jobs:
 
       - name: build app (macos)
         uses: tauri-apps/tauri-action@v0
-        working-directory: ./apps/app
         id: build_os_mac
         if: startsWith(matrix.platform, 'macos')
         env:
@@ -88,20 +87,21 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           args: --target universal-apple-darwin
+          working-directory: ./apps/app
 
       - name: build app
         uses: tauri-apps/tauri-action@v0
-        working-directory: ./apps/app
         id: build_os
         if: "!startsWith(matrix.platform, 'macos')"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+        with:
+          working-directory: ./apps/app
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v3
-        working-directory: ./apps/app
         if: startsWith(matrix.platform, 'macos')
         with:
           name: ${{ matrix.platform }}
@@ -109,7 +109,6 @@ jobs:
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v3
-        working-directory: ./apps/app
         if: "!startsWith(matrix.platform, 'macos')"
         with:
           name: ${{ matrix.platform }}
