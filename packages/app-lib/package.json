@@ -2,7 +2,7 @@
   "name": "@modrinth/app-lib",
   "scripts": {
     "build": "cargo build",
-    "lint": "cargo clippy",
+    "lint": "cargo fmt --check && cargo clippy -- -D warnings",
     "fix": "cargo fmt && cargo clippy --fix",
     "test": "cargo test"
   },

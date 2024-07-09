@@ -11,5 +11,6 @@
       "cache": false,
       "persistent": true
     }
-  }
+  },
+  "ui": "tui"
 }
