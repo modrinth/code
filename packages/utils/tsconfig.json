@@ -1,6 +1,6 @@
 {
   "extends": "tsconfig/base.json",
-  "include": ["."],
+  "include": [".", ".eslintrc.js"],
   "exclude": ["dist", "build", "node_modules"],
   "compilerOptions": {
     "lib": ["esnext", "dom"],

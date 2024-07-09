@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import tags from "~/generated/state.json";
 
 export const useTags = () =>

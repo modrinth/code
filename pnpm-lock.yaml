@@ -238,6 +238,9 @@ importers:
 
   packages/assets:
     devDependencies:
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../eslint-config-custom
@@ -384,6 +387,9 @@ importers:
         specifier: ^1.0.14
         version: 1.0.15
     devDependencies:
+      eslint:
+        specifier: ^8.57.0
+        version: 8.57.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../eslint-config-custom

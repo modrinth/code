@@ -1,4 +1,3 @@
-/* eslint-disable no-extra-semi */
 import { promises as fs } from "fs";
 import { pathToFileURL } from "node:url";
 import svgLoader from "vite-svg-loader";
