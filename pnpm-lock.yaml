@@ -31,6 +31,10 @@ importers:
       '@modrinth/app-lib':
         specifier: workspace:*
         version: link:../../packages/app-lib
+    devDependencies:
+      '@tauri-apps/cli':
+        specifier: ^1.6.0
+        version: 1.6.0
 
   apps/app-frontend:
     dependencies:
