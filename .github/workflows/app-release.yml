@@ -40,14 +40,6 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      - name: Setup rust cache
-        uses: actions/cache@v4
-        with:
-          path: target/**
-          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-rust-target-
-
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
