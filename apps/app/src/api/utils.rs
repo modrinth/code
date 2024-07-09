@@ -100,7 +100,6 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
         #[cfg(target_os = "linux")]
         {
             use std::fs::metadata;
-            use std::path::PathBuf;
 
             if path.to_string_lossy().to_string().contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
