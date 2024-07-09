@@ -1,7 +1,7 @@
 {
   "build": {
-    "beforeDevCommand": "turbo run dev --filter=@modrinth/app-frontend",
-    "beforeBuildCommand": "turbo run build --filter=@modrinth/app-frontend",
+    "beforeDevCommand": "pnpm turbo run dev --filter=@modrinth/app-frontend",
+    "beforeBuildCommand": "pnpm turbo run build --filter=@modrinth/app-frontend",
     "devPath": "http://localhost:1420",
     "distDir": "../app-frontend/dist",
     "withGlobalTauri": false
