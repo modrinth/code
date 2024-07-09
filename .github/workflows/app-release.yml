@@ -1,10 +1,22 @@
-name: 'Tauri GUI Release'
+name: 'Modrinth App build'
 on:
   push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+    paths:
+      - 'apps/app/**'
+      - 'apps/app-frontend/**'
+      - 'packages/app-lib/**'
+      - 'packages/app-macros/**'
+      - 'packages/assets/**'
+      - 'packages/ui/**'
+      - 'packages/utils/**'
   workflow_dispatch:
 
 jobs:
-  test-tauri:
+  build:
     strategy:
       fail-fast: false
       matrix:
