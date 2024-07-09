@@ -125,7 +125,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     selectedValue.value = newValue
-  }
+  },
 )
 
 const toggleDropdown = () => {
@@ -212,7 +212,9 @@ const isChildOfDropdown = (element) => {
     cursor: pointer;
     user-select: none;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+    box-shadow:
+      var(--shadow-inset-sm),
+      0 0 0 0 transparent;
 
     transition: 0.05s;
 
@@ -253,7 +255,9 @@ const isChildOfDropdown = (element) => {
     z-index: 10;
     max-height: 18.75rem;
     overflow-y: auto;
-    box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+    box-shadow:
+      var(--shadow-inset-sm),
+      0 0 0 0 transparent;
 
     .option {
       background-color: var(--color-button-bg);

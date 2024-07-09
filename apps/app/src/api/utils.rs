@@ -107,7 +107,7 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
                 let new_path = match metadata(&path)?.is_dir() {
                     true => path,
                     false => {
-                        let mut path2 = PathBuf::from(path);
+                        let mut path2 = path.clone();
                         path2.pop();
                         path2
                     }

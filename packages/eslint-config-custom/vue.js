@@ -23,7 +23,7 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ['node_modules/', 'dist/', '.eslintrc.js'],
+  ignorePatterns: ['node_modules/', 'dist/', '.eslintrc.js', '*.d.ts'],
 
   rules: {
     'import/no-default-export': 'off',
