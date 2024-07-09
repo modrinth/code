@@ -25,9 +25,15 @@ importers:
 
   apps/app:
     dependencies:
+      '@modrinth/app-frontend':
+        specifier: workspace:*
+        version: link:../app-frontend
       '@modrinth/app-lib':
         specifier: workspace:*
         version: link:../../packages/app-lib
+
+  apps/app-frontend:
+    dependencies:
       '@modrinth/assets':
         specifier: workspace:*
         version: link:../../packages/assets
