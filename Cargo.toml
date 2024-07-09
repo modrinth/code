@@ -7,17 +7,6 @@ members = [
   './apps/app'
 ]
 
-[profile.dev]
-opt-level = 0
-debug = true
-debug-assertions = true
-overflow-checks = true
-lto = false
-panic = 'unwind'
-incremental = true
-codegen-units = 256
-rpath = false
-
 # Optimize for speed and reduce size on release builds
 [profile.release]
 panic = "abort" # Strip expensive panic clean-up logic
