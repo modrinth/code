@@ -21,7 +21,8 @@
     "dev": {
       "cache": false,
       "persistent": true
-    }
+    },
+    "test": {}
   },
   "ui": "tui"
 }
