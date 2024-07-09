@@ -3,7 +3,7 @@ name: Deploy frontend
 on: push
 
 jobs:
-  deploy:
+  wait:
     if: github.repository_owner == 'modrinth'
     runs-on: ubuntu-latest
     permissions:
