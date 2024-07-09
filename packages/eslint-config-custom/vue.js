@@ -2,25 +2,17 @@ const { resolve } = require('node:path')
 
 const project = resolve(process.cwd(), 'tsconfig.json')
 
-/*
- * This is a custom ESLint configuration for use with
- * internal that utilize VueJS.
- *
- * This config extends the Vercel Engineering Style Guide.
- * For more information, see https://github.com/vercel/style-guide
- *
- */
-
 module.exports = {
   extends: [
-    '@vercel/style-guide/eslint/browser',
-    '@vue/eslint-config-typescript',
-    'eslint-config-prettier',
-    'eslint-config-turbo',
-  ]
-  .map(
-    require.resolve,
-  ),
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:vue/vue3-recommended',
+    'plugin:prettier/recommended',
+    'prettier',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
+    'turbo',
+  ],
   parserOptions: {
     ecmaVersion: 'latest',
   },

@@ -11,9 +11,8 @@
     "tauri:build": "tauri build",
     "tauri:dev": "tauri dev",
     "dev": "tauri dev",
-    "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
-    "lint": "pnpm run lint:js && prettier --check .",
-    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write ."
+    "lint": "eslint . && prettier --check .",
+    "fix": "eslint . --fix && prettier --write ."
   },
   "dependencies": {
     "@modrinth/assets": "workspace:*",
@@ -40,13 +39,10 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-vue": "^9.24.0",
     "prettier": "^3.2.5",
     "sass": "^1.74.1",
     "tsconfig": "workspace:*",
-    "vite": "^5.2.8",
-    "vite-plugin-eslint": "^1.8.1"
+    "vite": "^5.2.8"
   },
   "packageManager": "pnpm@9.4.0"
 }
