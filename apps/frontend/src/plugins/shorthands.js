@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { getProjectTypeForUrlShorthand } from "~/helpers/projects.js";
 
 export default defineNuxtPlugin((nuxtApp) => {

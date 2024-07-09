@@ -1,0 +1,12 @@
+{
+  "name": "@modrinth/app-lib",
+  "scripts": {
+    "build": "cargo build --release",
+    "lint": "cargo fmt --check && cargo clippy -- -D warnings",
+    "fix": "cargo fmt && cargo clippy --fix",
+    "test": "cargo test"
+  },
+  "dependencies": {
+    "@modrinth/app-macros": "workspace:*"
+  }
+}

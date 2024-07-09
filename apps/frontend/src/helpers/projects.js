@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const getProjectTypeForUrl = (type, categories) => {
   return getProjectTypeForUrlShorthand(type, categories);
 };

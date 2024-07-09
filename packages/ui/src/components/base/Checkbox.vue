@@ -46,7 +46,7 @@ const props = withDefaults(
     modelValue: false,
     clickEvent: () => {},
     collapsingToggleStyle: false,
-  }
+  },
 )
 
 function toggle() {
@@ -89,7 +89,9 @@ function toggle() {
   color: var(--color-contrast);
   background-color: var(--color-button-bg);
   border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent;
 
   &.checked {
     background-color: var(--color-brand);

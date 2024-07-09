@@ -35,10 +35,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
-const pixelated = ref(false);
-const img = ref(null);
+const pixelated = ref(false)
+const img = ref(null)
 
 defineProps({
   src: {
@@ -47,13 +47,13 @@ defineProps({
   },
   alt: {
     type: String,
-    default: "",
+    default: '',
   },
   size: {
     type: String,
-    default: "sm",
+    default: 'sm',
     validator(value) {
-      return ["xxs", "xs", "sm", "md", "lg", "none"].includes(value);
+      return ['xxs', 'xs', 'sm', 'md', 'lg', 'none'].includes(value)
     },
   },
   circle: {
@@ -66,16 +66,16 @@ defineProps({
   },
   loading: {
     type: String,
-    default: "lazy",
+    default: 'lazy',
   },
   raised: {
     type: Boolean,
     default: false,
   },
-});
+})
 
 function updatePixelated() {
-  pixelated.value = Boolean(img.value && img.value.naturalWidth && img.value.naturalWidth <= 96);
+  pixelated.value = Boolean(img.value && img.value.naturalWidth && img.value.naturalWidth <= 96)
 }
 </script>
 

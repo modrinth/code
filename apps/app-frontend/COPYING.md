@@ -10,4 +10,4 @@ The use of Modrinth branding elements, including but not limited to the wrench-i
 
 This includes, but may not be limited to, the following files:
 
-- theseus_gui/src-tauri/icons/*
+- theseus_gui/src-tauri/icons/\*

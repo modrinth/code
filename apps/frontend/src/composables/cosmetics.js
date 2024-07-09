@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const useCosmetics = () =>
   useState("cosmetics", () => {
     const cosmetics = useCookie("cosmetics", {
