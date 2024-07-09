@@ -1,0 +1,18 @@
+// Create the variables used by everything
+@import 'styles/variables';
+// Normalize styling across browsers to a standard stripped down form
+@import 'styles/normalize';
+
+// Add Omorphia base classes
+@import 'styles/classes';
+
+// Apply default styles
+@import 'styles/defaults';
+// Apply code block highlighting styles
+@import 'styles/highlightjs';
+
+// Finally, apply accessibility-related global styling
+@import 'styles/accessibility';
+
+// Fonts
+@import 'styles/inter';

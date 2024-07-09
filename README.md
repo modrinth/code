@@ -1,45 +1,39 @@
-<img src="https://github.com/modrinth/theseus/assets/6166773/51d1ca87-05c0-445a-bd18-ddd1117f7f12" alt="modrinth app: theseus (desktop app)">
+# ![Modrinth Logo on Mount Olympus](/.github/assets/monorepo_cover.png)
 
-# Modrinth App
+![Issues](https://img.shields.io/github/issues-raw/Modrinth/olympus?color=c78aff&label=issues&style=for-the-badge)
+![Pull Requests](https://img.shields.io/github/issues-pr-raw/Modrinth/olympus?color=c78aff&label=PRs&style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/Modrinth/olympus?color=c78aff&label=contributors&style=for-the-badge)
+![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/Modrinth/olympus?color=c78aff&label=commits&style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/Modrinth/olympus?color=c78aff&label=last%20commit&style=for-the-badge)
 
-<img src="https://cdn-raw.modrinth.com/app-landing/app-screenshot.webp" alt="Screenshot of the Modrinth App's home page" align="right" width="50%">
+## Modrinth Monorepo
 
-The Modrinth App, codenamed theseus, is a modern launcher for Minecraft: Java Edition with a clean look, easy-to-use interface, and deep integration into Modrinth services.
+Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/olympus?color=black&label=) contributors!
 
-### Features
-- One-click installation of modpacks
-- Automatic management of Java versions
-- Windows, Mac, and Linux[^1] support
-- Import your instances from CurseForge, Prism[^2], ATLauncher, MultiMC[^2], or GDLauncher
-- Supports offline play once you've authenticated with your Minecraft account at least once
-- Fully open source under GPLv3[^3]!
-
-[^1]: While Linux is supported, due to the wide range of distributions out there, your mileage may vary with how well the Modrinth App works on your system. We officially distribute `.deb` and `.AppImage` packages, but third party packages have been created for a number of other package platforms. Additionally, some have reported lag issues running on Linux, we believe this to be due to an upstream Tauri issue, which we hope improves with further development.
-
-[^2]: Certain features of the OneSix format used by Prism and MultiMC are not yet supported, so some instances may not import correctly, primarily on older Minecraft versions or unsupported mod loaders.
-
-[^3]: Modrinth's logos, branding, and other trademarks are not free for use, see the [licensing section](#license) for more information.
-
-## Contributing
-You're welcome to help contribute to the Modrinth App if you'd like! Please review our [contribution guide](https://support.modrinth.com/en/articles/8802215-contributing-to-modrinth) before attempting to contribute or make a pull request though.
+If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
 
 ## Development
-To get started, install [pnpm](https://pnpm.io/), [Rust](https://www.rust-lang.org/tools/install), and the [Tauri prerequisites](https://tauri.app/v1/guides/getting-started/prerequisites/#installing) for your system. Then, run the following commands:
 
-```
-cd theseus_gui
-pnpm install
-pnpm run tauri dev
-```
+This repository contains two primary packages. For detailed development information, please refer to their respective READMEs:
 
-Once the commands finish, you'll be viewing a Tauri window with Nuxt.js hot reloading.
+- [Web Interface](apps/frontend/README.md)
+- [Desktop App](apps/app/README.md)
 
-You can use `pnpm run lint` to find any eslint problems, and `pnpm run fix` to try automatically fixing those problems.
+## Contributing
+
+We welcome contributions! Before submitting any contributions, please read our [contributing guidelines](https://support.modrinth.com/en/articles/8802215-contributing-to-modrinth).
+
+If you plan to fork this repository for your own purposes, please review our [copying guidelines](COPYING.md).
+
+## Security
+
+If you discover a security vulnerability within our codebase, please follow our [responsible disclosure guidelines](https://modrinth.com/legal/security).
+
+## Support
+
+If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.gg/modrinth).
 
 ## License
-The source code of the theseus repository is licensed under the GNU General Public License, Version 3 only, which is provided in the file [LICENSE](https://github.com/modrinth/theseus/blob/master/LICENSE). However, some files are licensed under a different license.
 
-Any files depicting the Modrinth branding, including the wrench-in-labyrinth logo, the landing image, and variations thereof, are licensed as follows:
-> All rights reserved. © 2020-2024 Rinth, Inc.
-
-Forking is permitted under the GPLv3, however do be aware that you must remove all Modrinth branding, including logos, brand colors, background images, or anything else that is related to trademarks or copyrights held by Rinth, Inc.
+All packages in this repository are licensed under their respective licenses. Refer to the LICENSE file in each package for more information.

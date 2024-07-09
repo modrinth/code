@@ -1,0 +1,22 @@
+diff --git a/lib/_stream_readable.js b/lib/_stream_readable.js
+index 3af95cb2dbf1e9fa93d261b030b0b090df507ff7..376e6979c13264d80d96e045ddbba5258d219373 100644
+--- a/lib/_stream_readable.js
++++ b/lib/_stream_readable.js
+@@ -169,7 +169,7 @@ function ReadableState(options, stream) {
+   this.decoder = null;
+   this.encoding = null;
+   if (options.encoding) {
+-    if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
++    if (!StringDecoder) StringDecoder = require('string_decoder').StringDecoder;
+     this.decoder = new StringDecoder(options.encoding);
+     this.encoding = options.encoding;
+   }
+@@ -325,7 +325,7 @@ Readable.prototype.isPaused = function () {
+ 
+ // backwards compatibility.
+ Readable.prototype.setEncoding = function (enc) {
+-  if (!StringDecoder) StringDecoder = require('string_decoder/').StringDecoder;
++  if (!StringDecoder) StringDecoder = require('string_decoder').StringDecoder;
+   this._readableState.decoder = new StringDecoder(enc);
+   this._readableState.encoding = enc;
+   return this;
