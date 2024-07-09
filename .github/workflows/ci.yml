@@ -55,6 +55,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
 
+      - name: Setup rust cache
+        uses: actions/cache@v4
+        with:
+          path: target/**
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-target-
+
       - name: Install dependencies
         run: pnpm install
 
