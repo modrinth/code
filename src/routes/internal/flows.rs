@@ -250,7 +250,7 @@ impl AuthProvider {
                 let client_id = dotenvy::var("GITHUB_CLIENT_ID")?;
 
                 format!(
-                    "https://github.com/login/oauth/authorize?client_id={}&state={}&scope=read%3Auser%20user%3Aemail&redirect_uri={}",
+                    "https://github.com/login/oauth/authorize?client_id={}&prompt=select_account&state={}&scope=read%3Auser%20user%3Aemail&redirect_uri={}",
                     client_id,
                     state,
                     redirect_uri,
