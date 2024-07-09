@@ -1,7 +1,7 @@
 use std::{collections::HashMap, path::PathBuf};
 
 use crate::api::Result;
-use theseus::{skin_manager::{self, SkinSave, SkinCache}, prelude::Credentials};
+use theseus::{skin_manager::{self, SkinSave, SkinCache, Filters}, prelude::Credentials};
 
 use uuid::Uuid;
 
@@ -21,7 +21,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             skin_get_launcher_names,
             skin_save_skin,
             skin_get_skins,
-            skin_set_cape
+            skin_set_cape,
+            skin_get_filters,
+            skin_save_filters
         ])
         .build()
 }
@@ -38,6 +40,20 @@ pub async fn skin_check_image(path: String) -> Result<bool> {
 #[tauri::command]
 pub async fn skin_check_skin(skin: String, id: Uuid) -> Result<bool> {
     Ok(skin_manager::check_skin(skin, id).await?)
+}
+
+// Returns filter options
+// invoke('plugin:skin|get_filters')
+#[tauri::command]
+pub async fn skin_get_filters() -> Result<Filters> {
+    Ok(skin_manager::get_filters().await?)
+}
+
+// Saves filter options
+// invoke('plugin:skin|save_filters',sort)
+#[tauri::command]
+pub async fn skin_save_filters(filters: Filters) -> Result<bool> {
+    Ok(skin_manager::save_filters(filters).await?)
 }
 
 // Sets player's skin

@@ -42,7 +42,7 @@ import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
-import { cache_users_skins, get_heads, loaded_skins } from '@/helpers/skin_manager.js'
+import { save_filters } from '@/helpers/skin_manager.js'
 import { SkinManagerIcon } from '@/assets/icons/index.js'
 
 const themeStore = useTheming()
@@ -60,7 +60,6 @@ const os = ref('')
 
 defineExpose({
   initialize: async () => {
-    get_heads()
     isLoading.value = false
     const {
       native_decorations,
@@ -113,8 +112,6 @@ defineExpose({
     if (showOnboarding.value) {
       onboardingVideo.value.play()
     }
-    loaded_skins.value = await cache_users_skins().catch(handleError)
-    get_heads()
   },
   failure: async (e) => {
     isLoading.value = false
@@ -152,6 +149,7 @@ const handleClose = async () => {
       return
     }
   }
+  await save_filters()
   await await_sync()
   await TauriWindow.getCurrent().close()
 }

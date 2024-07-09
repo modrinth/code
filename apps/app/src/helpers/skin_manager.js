@@ -19,6 +19,16 @@ export async function set_cape(capeid, token) {
   return await invoke('plugin:skin|skin_set_cape', { capeid, token })
 }
 
+// Gets skin filter options
+export async function get_filters() {
+  Filters.value = await invoke('plugin:skin|skin_get_filters')
+}
+
+// Saves skin filter options
+export async function save_filters() {
+  return await invoke('plugin:skin|skin_save_filters', { filters: Filters.value })
+}
+
 // Returns true if image is 64x64
 export async function check_image(path) {
   return await invoke('plugin:skin|skin_check_image', { path })
@@ -105,5 +115,10 @@ export async function get_render(skinData) {
 export const account_heads = ref({})
 
 export const loaded_skins = ref(false)
+
+export const Filters = ref({
+  sort: '',
+  filter: ''
+})
 
 const sleep = (ms = 0) => new Promise((resolve) => setTimeout(resolve, ms))

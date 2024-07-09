@@ -77,7 +77,7 @@ import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
-import { cache_new_user_skin, account_heads, loaded_skins, get_heads } from '@/helpers/skin_manager.js'
+import { cache_users_skins, cache_new_user_skin, account_heads, loaded_skins, get_heads, get_filters } from '@/helpers/skin_manager.js'
 
 defineProps({
   mode: {
@@ -161,8 +161,16 @@ const unlisten = await process_listener(async (e) => {
   }
 })
 
+const refreshSkins = async () => {
+  get_heads()
+  loaded_skins.value = await cache_users_skins().catch(handleError)
+  get_heads()
+  get_filters()
+}
+
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
+  refreshSkins()
 })
 
 onBeforeUnmount(() => {

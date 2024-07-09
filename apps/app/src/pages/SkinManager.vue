@@ -10,7 +10,7 @@
     <div class="labeled_button">
       <span>Sort by</span>
       <DropdownSelect
-        v-model="sortBy"
+        v-model="Filters.sort"
         class="sort-dropdown"
         name="Sort Dropdown"
         :options="['Name', 'Custom', 'Date created', 'Date modified']"
@@ -20,7 +20,7 @@
     <div class="labeled_button">
       <span>Filter by</span>
       <DropdownSelect
-        v-model="filters"
+        v-model="Filters.filter"
         class="filter-dropdown"
         name="Filter Dropdown"
         :options="['Current user', 'All users']"
@@ -64,8 +64,8 @@
       />
       <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
         <template #use> <PlayIcon /> Use </template>
-        <template v-if="sortBy === 'Custom'" #left> <ChevronLeftIcon /> Move Left </template>
-        <template v-if="sortBy === 'Custom'" #right> <ChevronRightIcon /> Move Right </template>
+        <template v-if="Filters.sort === 'Custom'" #left> <ChevronLeftIcon /> Move Left </template>
+        <template v-if="Filters.sort === 'Custom'" #right> <ChevronRightIcon /> Move Right </template>
         <template #edit> <EyeIcon /> Edit </template>
         <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
         <template #delete> <TrashIcon /> Delete </template>
@@ -271,7 +271,7 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon,
 } from '@modrinth/assets'
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, onBeforeUnmount } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError, useTheming } from '@/store/state.js'
 import { useNotifications } from '@/store/notifications.js'
@@ -297,6 +297,8 @@ import {
   get_cape_data,
   get_heads,
   set_cape,
+  save_filters,
+  Filters,
 } from '@/helpers/skin_manager.js'
 import { IdleAnimation, SkinViewer, WalkingAnimation } from 'skinview3d'
 
@@ -340,8 +342,6 @@ const importType = ref('Mojang')
 const skinSaves = ref(await get_skins().catch(handleError))
 
 const search = ref('')
-const filters = ref('Current user')
-const sortBy = ref('Name')
 
 watch(notificationsWrapper, () => {
   useNotifications().setNotifs(notificationsWrapper.value)
@@ -352,7 +352,7 @@ const filteredResults = computed(() => {
     return save.name.toLowerCase().includes(search.value.toLowerCase())
   })
 
-  if (filters.value === 'Current user') {
+  if (Filters.value.filter === 'Current user') {
     saves = saves.filter((save) => {
       return save.user === selectedAccount.value.id
     })
@@ -365,25 +365,25 @@ const filteredResults = computed(() => {
     }
   }
 
-  if (sortBy.value === 'Name') {
+  if (Filters.value.sort === 'Name') {
     saves.sort((a, b) => {
       return a.name.localeCompare(b.name)
     })
   }
 
-  if (sortBy.value === 'Custom') {
+  if (Filters.value.sort === 'Custom') {
     saves.sort((a, b) => {
       return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
     })
   }
 
-  if (sortBy.value === 'Date created') {
+  if (Filters.value.sort === 'Date created') {
     saves.sort((a, b) => {
       return dayjs(b.created).diff(dayjs(a.created))
     })
   }
 
-  if (sortBy.value === 'Date modified') {
+  if (Filters.value.sort === 'Date modified') {
     saves.sort((a, b) => {
       return dayjs(b.updated).diff(dayjs(a.updated))
     })
@@ -393,7 +393,7 @@ const filteredResults = computed(() => {
 
 const moveCard = async (move, skin) => {
   let sorted = Array.from(skinSaves.value)
-  if (filters.value === 'Current user') {
+  if (Filters.value.filter === 'Current user') {
     sorted = sorted.filter((save) => {
       return save.user === selectedAccount.value.id
     })
@@ -428,7 +428,7 @@ const handleRightClick = (event, item) => {
     },
   ]
 
-  if (sortBy.value === 'Custom') {
+  if (Filters.value.sort === 'Custom') {
     baseOptions = [
       {
         name: 'use',
@@ -462,10 +462,10 @@ const handleOptionsClick = async (args) => {
       await handleSkin('upload')
       break
     case 'left':
-      if (sortBy.value === 'Custom') await moveCard(-1, args.item)
+      if (Filters.value.sort === 'Custom') await moveCard(-1, args.item)
       break
     case 'right':
-      if (sortBy.value === 'Custom') await moveCard(1, args.item)
+      if (Filters.value.sort === 'Custom') await moveCard(1, args.item)
       break
     case 'edit':
       await edit_skin(args.item)
@@ -834,8 +834,12 @@ function convert_arms(arms) {
   return arms
 }
 
-onMounted(() => {
-  create_render()
+onMounted(async () => {
+  await create_render()
+})
+
+onBeforeUnmount(async () => {
+  await save_filters()
 })
 </script>
 
