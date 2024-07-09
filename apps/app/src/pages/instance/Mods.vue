@@ -144,6 +144,7 @@
               Toggle
             </Button>
           </div>
+          <div class="end">{{ functionValues.length }} / {{ search.length }} Selected</div>
         </div>
       </div>
       <div v-if="showingOptions && selected.length > 0" class="more-box">
@@ -864,9 +865,15 @@ const handleContentOptionClick = async (args) => {
 }
 
 watch(selectAll, () => {
-  for (const [key, value] of Array.from(selectionMap.value)) {
-    if (value !== selectAll.value) {
-      selectionMap.value.set(key, selectAll.value)
+  if (selectAll.value) {
+    for (const value of search.value) {
+      selectionMap.value.set(value.path, selectAll.value)
+    }
+  } else {
+    for (const [key, value] of Array.from(selectionMap.value)) {
+      if (value !== selectAll.value) {
+        selectionMap.value.set(key, selectAll.value)
+      }
     }
   }
 })
@@ -915,6 +922,10 @@ onUnmounted(() => {
       flex-direction: row;
       align-items: center;
       gap: var(--gap-md);
+
+      .end {
+        margin-left: auto;
+      }
     }
   }
 }
