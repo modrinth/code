@@ -80,11 +80,19 @@ pub async fn get_user(user: uuid::Uuid) -> crate::Result<Credentials> {
 pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
     let mut users = state.users.write().await;
-
-    let creds = get_user(user).await?;
+    let creds = users
+        .users
+        .get(&user)
+        .ok_or_else(|| {
+            crate::ErrorKind::OtherError(format!(
+                "Tried to get nonexistent user with ID {user}"
+            ))
+            .as_error()
+        })?
+        .clone();
     users.refresh_token(&creds).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
-            "Tried to get nonexistent user with ID {}", creds.id
+            "Tried to get nonexistent user with ID {user}"
         ))
         .as_error()
     })
