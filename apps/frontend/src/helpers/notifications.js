@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { useNuxtApp } from "#imports";
 
 async function getBulk(type, ids, apiVersion = 2) {
