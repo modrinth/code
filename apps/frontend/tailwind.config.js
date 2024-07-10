@@ -24,7 +24,7 @@ module.exports = {
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",
-          raised: "var(--color-bg-raised)",
+          raised: "var(--color-raised-bg)",
         },
         divider: {
           DEFAULT: "var(--color-divider)",

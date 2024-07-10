@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const useTheme = () =>
   useState("theme", () => {
     const colorMode = useCookie("color-mode", {
