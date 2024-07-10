@@ -28,7 +28,7 @@ defineExpose({
       (x) =>
         x.text === notification.text &&
         x.title === notification.title &&
-        x.type === notification.type
+        x.type === notification.type,
     )
     if (existingNotif) {
       setNotificationTimer(existingNotif)

@@ -88,7 +88,8 @@ pub async fn download_version_info(
             let partial = d::modded::fetch_partial_version(&loader.url).await?;
             info = d::modded::merge_partial_version(partial, info);
         }
-        info.id = version_id.clone();
+
+        info.id.clone_from(&version_id);
 
         write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
         Ok(info)

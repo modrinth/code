@@ -1,5 +1,5 @@
 {
   "extends": "tsconfig/vue.json",
-  "include": ["."],
+  "include": [".", ".eslintrc.js"],
   "exclude": ["dist", "build", "node_modules"]
 }

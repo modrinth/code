@@ -90,7 +90,7 @@ impl ProfilePathId {
     }
 
     pub async fn profile_path(&self) -> crate::Result<ProfilePathId> {
-        if let Some(p) = crate::profile::get(&self, None).await? {
+        if let Some(p) = crate::profile::get(self, None).await? {
             Ok(p.profile_id())
         } else {
             Err(crate::ErrorKind::UnmanagedProfileError(self.to_string())
