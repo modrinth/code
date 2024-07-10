@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const acceptTeamInvite = async (teamId) => {
   await useBaseFetch(`team/${teamId}/join`, {
     apiVersion: 3,

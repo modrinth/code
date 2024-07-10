@@ -1,4 +1,3 @@
-/* eslint-disable no-extra-semi */
 import { promises as fs } from "fs";
 import { pathToFileURL } from "node:url";
 import svgLoader from "vite-svg-loader";
@@ -374,9 +373,6 @@ export default defineNuxtConfig({
   },
   nitro: {
     moduleSideEffects: ["@vintl/compact-number/locale-data"],
-    output: {
-      dir: "../../dist/apps/knossos/.output",
-    },
   },
   devtools: {
     enabled: true,

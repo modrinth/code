@@ -67,7 +67,7 @@ const props = withDefaults(
     page: 1,
     count: 1,
     linkFunction: (page: number) => void page,
-  }
+  },
 )
 
 const pages = computed(() => {
@@ -116,7 +116,10 @@ a {
   background: var(--color-raised-bg);
   cursor: pointer;
 
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   @media (prefers-reduced-motion) {

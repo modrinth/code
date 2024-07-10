@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import JSZip from "jszip";
 import TOML from "@ltd/j-toml";
 
@@ -132,7 +131,7 @@ export const createDataPackVersion = async function (
     primaryZipReader.file("quilt.mod.json", JSON.stringify(quiltModJson));
   }
   if (loaders.includes("forge")) {
-    primaryZipReader.file("META-INF/mods.toml", TOML.stringify(forgeModsToml, { newline: "\n" }));
+    primaryZipReader.file("META-INF/mods.toml", TOML.stringify(forgeModsToml, { newline: "\n" })); // eslint-disable-line import/no-named-as-default-member
   }
 
   if (!newForge && loaders.includes("forge")) {

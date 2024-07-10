@@ -46,7 +46,7 @@ const props = defineProps({
 })
 
 const accentedButton = computed(() =>
-  ['danger', 'primary', 'red', 'orange', 'green', 'blue', 'purple', 'gray'].includes(props.color)
+  ['danger', 'primary', 'red', 'orange', 'green', 'blue', 'purple', 'gray'].includes(props.color),
 )
 </script>
 
