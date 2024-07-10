@@ -3,16 +3,29 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "turbo run build --filter=@modrinth/frontend",
-    "dev": "turbo run dev --filter=@modrinth/frontend",
+    "web:build": "turbo run build --filter=@modrinth/frontend",
+    "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
-    "// app:dev": "Do not run this, this is broken. To run Modrinth app, use `cargo tauri dev`",
     "app:dev": "turbo run dev --filter=@modrinth/app",
-    "lint": "turbo run lint"
+    "build": "turbo run build --continue",
+    "lint": "turbo run lint --continue",
+    "test": "turbo run test --continue"
   },
   "devDependencies": {
+    "prettier": "^3.3.2",
     "turbo": "^2.0.6",
     "vue": "^3.4.31"
   },
-  "packageManager": "pnpm@9.4.0"
+  "packageManager": "pnpm@9.4.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "readable-stream@2.3.8": "patches/readable-stream@2.3.8.patch"
+    }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "semi": false,
+    "singleQuote": true,
+    "endOfLine": "auto"
+  }
 }
