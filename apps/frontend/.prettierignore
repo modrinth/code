@@ -1,0 +1,4 @@
+**/.nuxt
+**/dist
+**/.output
+src/generated/**

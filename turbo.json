@@ -1,0 +1,28 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": [".nuxt/**", "dist/**", ".output/**", "target/**"],
+      "env": [
+        "NODE_ENV",
+        "SITE_URL",
+        "BASE_URL",
+        "FLAG_OVERRIDES",
+        "BROWSER_BASE_URL",
+        "RATE_LIMIT_IGNORE_KEY",
+        "VERCEL_*",
+        "CF_PAGES_*",
+        "HEROKU_APP_NAME"
+      ]
+    },
+    "lint": {},
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "test": {}
+  },
+  "ui": "tui"
+}

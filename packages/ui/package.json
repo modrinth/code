@@ -1,0 +1,38 @@
+{
+  "name": "@modrinth/ui",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "fix": "eslint . --fix && prettier --write ."
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "@vintl/unplugin": "^1.5.1",
+    "@vintl/vintl": "^4.4.1",
+    "eslint-config-custom": "workspace:*",
+    "tsconfig": "workspace:*",
+    "vue": "^3.4.31"
+  },
+  "dependencies": {
+    "@modrinth/assets": "workspace:*",
+    "@modrinth/utils": "workspace:*",
+    "@codemirror/commands": "^6.3.2",
+    "@codemirror/lang-markdown": "^6.2.3",
+    "@codemirror/language": "^6.9.3",
+    "@codemirror/state": "^6.3.2",
+    "@codemirror/view": "^6.22.1",
+    "@types/markdown-it": "^14.1.1",
+    "apexcharts": "^3.44.0",
+    "dayjs": "^1.11.10",
+    "floating-vue": "2.0.0-beta.24",
+    "highlight.js": "^11.9.0",
+    "markdown-it": "^13.0.2",
+    "qrcode.vue": "^3.4.1",
+    "vue-select": "4.0.0-beta.6",
+    "vue3-apexcharts": "^1.4.4",
+    "xss": "^1.0.14"
+  }
+}

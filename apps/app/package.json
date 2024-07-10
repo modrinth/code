@@ -1,0 +1,17 @@
+{
+  "name": "@modrinth/app",
+  "scripts": {
+    "build": "tauri build",
+    "dev": "tauri dev",
+    "test": "cargo test",
+    "lint": "cargo fmt --check && cargo clippy -- -D warnings",
+    "fix": "cargo fmt && cargo clippy --fix"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.6.0"
+  },
+  "dependencies": {
+    "@modrinth/app-lib": "workspace:*",
+    "@modrinth/app-frontend": "workspace:*"
+  }
+}

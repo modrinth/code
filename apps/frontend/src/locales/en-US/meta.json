@@ -1,0 +1,10 @@
+{
+  "displayName": {
+    "description": "Please enter the name of the language in its specific variant or regional form (e.g., English (US) for American English, not just English). If the language does not have any specific variant, simply enter the name of the language (e.g., Français, Deutsch).",
+    "message": "English (United States)"
+  },
+  "searchTerms": {
+    "description": "Please provide additional search terms associated with the language, if needed, to enhance the search functionality (e.g., American English, Deutschland). Each search term should be entered on a separate line. Translate as a hyphen (-) if no additional terms are needed.",
+    "message": "USA\nAmerican English"
+  }
+}
