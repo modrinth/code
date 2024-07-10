@@ -322,7 +322,7 @@ const selectedSkin = ref({
 
 const displaySkin = ref(null)
 const currentRender = ref(null)
-const newRender = ref(null)
+const modalRender = ref(null)
 
 const InLibrary = ref(true)
 const validSkin = ref(false)
@@ -536,10 +536,15 @@ const next = async () => {
 }
 
 const handleModal = async () => {
-  skinClear()
   changeSkinType.value = 'from file'
   editSkin.value = false
-  skinModal.value.show()
+  validSkin.value = true
+  displaySkin.value = skinData.value.skin
+  selectedSkin.value.skin = skinData.value.skin
+  await skinModal.value.show()
+  selectedSkin.value.arms = skinData.value.arms
+  selectedSkin.value.cape = skinData.value.cape
+  await create_modal_render()
 }
 
 const handleAdd = async () => {
@@ -561,23 +566,23 @@ const skinClear = async () => {
     skin: '',
     unlocked_capes: [],
   }
-  if (newRender.value) {
-    newRender.value.resetSkin()
-    newRender.value.resetCape()
+  if (modalRender.value) {
+    modalRender.value.resetSkin()
+    modalRender.value.resetCape()
   }
 }
 
 const handleArms = async () => {
   if (validSkin.value) {
-    newRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
+    modalRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
   }
 }
 
 const handleCape = async () => {
   if (validSkin.value) {
-    if (selectedSkin.value.cape == 'no cape') newRender.value.resetCape()
+    if (selectedSkin.value.cape == 'no cape') modalRender.value.resetCape()
     else
-      newRender.value.loadCape(
+      modalRender.value.loadCape(
         await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError),
       )
   }
@@ -608,6 +613,7 @@ const handleSkin = async (state) => {
     const uploadedCape = await set_cape(capeid, selectedAccount.value.access_token).catch(
       handleError,
     )
+    console.log(selectedSkin.value.skin)
     const uploadedSkin = await set_skin(
       selectedSkin.value.skin,
       selectedSkin.value.arms,
@@ -615,15 +621,18 @@ const handleSkin = async (state) => {
     ).catch(handleError)
 
     if (uploadedSkin) {
-      skinData.value = selectedSkin.value
+      if (!selectedSkin.value.skin.startsWith('data:image/png;base64,')) {
+        skinData.value.skin = tauri.convertFileSrc(selectedSkin.value.skin)
+      } else {
+        skinData.value.skin = selectedSkin.value.skin
+      }
+      skinData.value.arms = selectedSkin.value.arms
+      skinData.value.cape = selectedSkin.value.cape
       InLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
         handleError,
       )
       const renderArms = convert_arms(selectedSkin.value.arms)
-      if (!selectedSkin.value.skin.startsWith('data:image/png;base64,')) {
-        selectedSkin.value.skin = tauri.convertFileSrc(selectedSkin.value.skin)
-      }
-      currentRender.value.loadSkin(selectedSkin.value.skin, { model: renderArms })
+      currentRender.value.loadSkin(skinData.value.skin, { model: renderArms })
     } else {
       notificationsWrapper.value.addNotification({
         title: 'Error Uploading Skin',
@@ -654,25 +663,16 @@ const handleSkin = async (state) => {
 const edit_skin = async (data) => {
   changeSkinType.value = 'from file'
   editSkin.value = true
+  validSkin.value = true
   displaySkin.value = data.skin
   selectedSkin.value.skin = data.skin
   selectedSkin.value.name = data.name
   selectedSkin.value.id = data.id
   selectedSkin.value.user = data.user
-  validSkin.value = true
   await skinModal.value.show()
-  newRender.value = new SkinViewer({
-    canvas: document.getElementById('new_render'),
-    width: 247.5,
-    height: 330,
-  })
   selectedSkin.value.arms = data.arms
   selectedSkin.value.cape = data.cape
-  newRender.value.animation = new IdleAnimation()
-  newRender.value.controls.enableZoom = false
-  newRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
-  if (selectedSkin.value.cape !== 'no cape')
-    newRender.value.loadCape(await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError))
+  await create_modal_render()
 }
 
 const edit_skin_end = async () => {
@@ -751,17 +751,20 @@ const openskin = async () => {
     return
   }
   displaySkin.value = tauri.convertFileSrc(selectedSkin.value.skin)
-  if (!newRender.value)
-    newRender.value = new SkinViewer({
+  create_modal_render()
+}
+
+const create_modal_render = async () => {
+    modalRender.value = new SkinViewer({
       canvas: document.getElementById('new_render'),
       width: 247.5,
       height: 330,
     })
-  newRender.value.animation = new IdleAnimation()
-  newRender.value.controls.enableZoom = false
-  newRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
+    modalRender.value.animation = new IdleAnimation()
+    modalRender.value.controls.enableZoom = false
+  modalRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
   if (selectedSkin.value.cape !== 'no cape')
-    newRender.value.loadCape(await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError))
+    modalRender.value.loadCape(await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError))
 }
 
 const create_render = async () => {
