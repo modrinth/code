@@ -31,7 +31,6 @@ const handleSearchContent = async () => {
     query: { i: props.instance.path },
   })
 }
-
 </script>
 
 <template>
@@ -40,17 +39,18 @@ const handleSearchContent = async () => {
 
     <OverflowMenu
       :options="[
-          {
-            'id': 'search',
-            'action': () => handleSearchContent,
-          },
-          {
-            'id': 'from_file',
-            'action': () => handleAddContentFromFile
-          }
-        ]"
-      class="btn btn-primary btn-dropdown-animation icon-only">
-      <DropdownIcon/>
+        {
+          id: 'search',
+          action: () => handleSearchContent,
+        },
+        {
+          id: 'from_file',
+          action: () => handleAddContentFromFile,
+        },
+      ]"
+      class="btn btn-primary btn-dropdown-animation icon-only"
+    >
+      <DropdownIcon />
       <template #search>
         <SearchIcon />
         <span class="no-wrap"> Search </span>

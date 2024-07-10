@@ -42,7 +42,7 @@
       <UpdatedIcon />
       Update all
     </Button>
-    <AddContentButton v-if="!isPackLocked" :instance="instance"/>
+    <AddContentButton v-if="!isPackLocked" :instance="instance" />
   </Card>
   <Pagination
     v-if="projects.length > 0"
@@ -224,7 +224,7 @@
               <TrashIcon />
             </Button>
           </div>
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"/>
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator" />
           <div
             v-else
             v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
@@ -266,7 +266,7 @@
     </div>
     <h3>No projects found</h3>
     <p class="empty-subtitle">Add a project to get started</p>
-    <AddContentButton :instance="instance"/>
+    <AddContentButton :instance="instance" />
   </div>
   <Pagination
     v-if="projects.length > 0"

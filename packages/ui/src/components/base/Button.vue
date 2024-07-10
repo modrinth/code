@@ -50,26 +50,27 @@ const accentedButton = computed(() =>
 )
 
 const classes = computed(() => {
-  const color = props.color;
+  const color = props.color
   return {
-  'icon-only': props.iconOnly,
-  'btn-large': props.large,
-  'btn-danger': color === 'danger',
-  'btn-primary': color === 'primary',
-  'btn-secondary': color === 'secondary',
-  'btn-highlight': color === 'highlight',
-  'btn-red': color === 'red',
-  'btn-orange': color === 'orange',
-  'btn-green': color === 'green',
-  'btn-blue': color === 'blue',
-  'btn-purple': color === 'purple',
-  'btn-gray': color === 'gray',
-  'btn-transparent': props.transparent,
-  'btn-hover-filled': props.hoverFilled,
-  'btn-hover-filled-only': props.hoverFilledOnly,
-  'btn-outline': props.outline,
-  'color-accent-contrast': accentedButton,
-}})
+    'icon-only': props.iconOnly,
+    'btn-large': props.large,
+    'btn-danger': color === 'danger',
+    'btn-primary': color === 'primary',
+    'btn-secondary': color === 'secondary',
+    'btn-highlight': color === 'highlight',
+    'btn-red': color === 'red',
+    'btn-orange': color === 'orange',
+    'btn-green': color === 'green',
+    'btn-blue': color === 'blue',
+    'btn-purple': color === 'purple',
+    'btn-gray': color === 'gray',
+    'btn-transparent': props.transparent,
+    'btn-hover-filled': props.hoverFilled,
+    'btn-hover-filled-only': props.hoverFilledOnly,
+    'btn-outline': props.outline,
+    'color-accent-contrast': accentedButton,
+  }
+})
 </script>
 
 <template>
@@ -95,12 +96,7 @@ const classes = computed(() => {
     <ExternalIcon v-if="external && !iconOnly" class="external-icon" />
     <UnknownIcon v-if="!$slots.default" />
   </a>
-  <button
-    v-else
-    class="btn"
-    :class="classes"
-    @click="action"
-  >
+  <button v-else class="btn" :class="classes" @click="action">
     <slot />
     <UnknownIcon v-if="!$slots.default" />
   </button>
