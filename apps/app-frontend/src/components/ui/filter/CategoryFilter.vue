@@ -1,9 +1,9 @@
 <script setup>
-import {computed, ref} from 'vue'
-import {get_categories, sortByNameOrNumber} from '@/helpers/tags.js'
-import {handleError} from '@/store/notifications.js'
-import {SearchFilter} from '@modrinth/ui'
-import {formatCategory, formatCategoryHeader} from '@modrinth/utils'
+import { computed, ref } from 'vue'
+import { get_categories, sortByNameOrNumber } from '@/helpers/tags.js'
+import { handleError } from '@/store/notifications.js'
+import { SearchFilter } from '@modrinth/ui'
+import { formatCategory, formatCategoryHeader } from '@modrinth/utils'
 
 const props = defineProps({
   projectType: {
