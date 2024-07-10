@@ -45,7 +45,7 @@
         </section>
         <section class="nav-group columns" role="presentation">
           <section class="nav" aria-label="Page links">
-            <UiNavTabs class="navigation" :links="navRoutes" />
+            <NavRow class="navigation" :links="navRoutes" />
           </section>
           <section class="column-grow user-outer" aria-label="Account links">
             <section class="user-controls">
