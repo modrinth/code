@@ -174,7 +174,7 @@ pub async fn edit_icon(
         match profiles.0.get_mut(path) {
             Some(ref mut profile) => {
                 if icon.starts_with("http") {
-                    profile.set_icon_http(&icon);
+                    profile.set_icon_http(icon);
                 } else {
                     let bytes = io::read(&icon).await?;
 
@@ -183,7 +183,7 @@ pub async fn edit_icon(
                             &state.directories.caches_dir(),
                             &state.io_semaphore,
                             bytes::Bytes::from(bytes),
-                            &icon,
+                            icon,
                         )
                         .await?;
                 }
