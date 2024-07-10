@@ -223,9 +223,9 @@ async fn import_atlauncher_unmanaged(
                     && description.version_id.is_some(),
             ),
         });
-        prof.metadata.icon = description.icon.clone();
-        prof.metadata.game_version = game_version.clone();
-        prof.metadata.loader_version = loader_version.clone();
+        prof.metadata.icon.clone_from(&description.icon);
+        prof.metadata.game_version.clone_from(&game_version);
+        prof.metadata.loader_version.clone_from(&loader_version);
         prof.metadata.loader = mod_loader;
 
         async { Ok(()) }
