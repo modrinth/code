@@ -11,7 +11,7 @@ import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/m
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
-import useMemorySlider from "@/composables/useMemorySlider.js";
+import useMemorySlider from '@/composables/useMemorySlider.js'
 
 const pageOptions = ['Home', 'Library']
 
@@ -32,7 +32,7 @@ const fetchSettings = await accessSettings().catch(handleError)
 
 const settings = ref(fetchSettings)
 const settingsDir = ref(settings.value.loaded_config_dir)
-const {maxMemory, snapPoints} = await useMemorySlider()
+const { maxMemory, snapPoints } = await useMemorySlider()
 
 watch(
   settings,

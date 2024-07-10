@@ -566,7 +566,7 @@ import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
-import useMemorySlider from "@/composables/useMemorySlider.js";
+import useMemorySlider from '@/composables/useMemorySlider.js'
 
 const breadcrumbs = useBreadcrumbs()
 

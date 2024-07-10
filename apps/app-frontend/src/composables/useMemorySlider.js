@@ -1,6 +1,6 @@
-import {ref, computed} from "vue";
-import {get_max_memory} from "@/helpers/jre.js";
-import {handleError} from "@/store/notifications.js";
+import { ref, computed } from 'vue'
+import { get_max_memory } from '@/helpers/jre.js'
+import { handleError } from '@/store/notifications.js'
 
 export default async function () {
   const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
@@ -17,5 +17,5 @@ export default async function () {
     return points
   })
 
-  return {maxMemory, snapPoints}
+  return { maxMemory, snapPoints }
 }
