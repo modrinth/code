@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export const scopeMessages = defineMessages({
   userReadEmailLabel: {
     id: "scopes.userReadEmail.label",

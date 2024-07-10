@@ -1,8 +1,7 @@
-/* eslint-disable no-undef */
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
-dayjs.extend(relativeTime);
+dayjs.extend(relativeTime); // eslint-disable-line import/no-named-as-default-member
 
 export const useCurrentDate = () => useState("currentDate", () => Date.now());
 

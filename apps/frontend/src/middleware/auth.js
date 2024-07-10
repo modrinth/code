@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const whitelistedParams = ["flow", "error"];
 
 export default defineNuxtRouteMiddleware(async (_to, from) => {

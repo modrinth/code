@@ -13,7 +13,7 @@ const props = withDefaults(
     collapsible: false,
     defaultCollapsed: false,
     noAutoBody: false,
-  }
+  },
 )
 
 const state = reactive({
