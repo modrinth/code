@@ -1,7 +1,5 @@
 <template>
-  <nav
-    class="relative flex w-fit overflow-clip rounded-full bg-[var(--color-raised-bg)] p-1 text-sm font-bold"
-  >
+  <nav class="relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold">
     <NuxtLink
       v-for="(link, index) in filteredLinks"
       v-show="link.shown === undefined ? true : link.shown"
