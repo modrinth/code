@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 /**
  * Extracts the [id] from the route params and returns it as a ref.
  *

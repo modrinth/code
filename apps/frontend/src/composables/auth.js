@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const useAuth = async (oldToken = null) => {
   const auth = useState("auth", () => ({
     user: null,

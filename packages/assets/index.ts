@@ -54,7 +54,6 @@ import _DashboardIcon from './icons/dashboard.svg?component'
 import _DownloadIcon from './icons/download.svg?component'
 import _DropdownIcon from './icons/dropdown.svg?component'
 import _EditIcon from './icons/edit.svg?component'
-import _ExitIcon from './icons/x.svg?component'
 import _ExpandIcon from './icons/expand.svg?component'
 import _ExternalIcon from './icons/external.svg?component'
 import _EyeIcon from './icons/eye.svg?component'
@@ -205,7 +204,7 @@ export const DashboardIcon = _DashboardIcon
 export const DownloadIcon = _DownloadIcon
 export const DropdownIcon = _DropdownIcon
 export const EditIcon = _EditIcon
-export const ExitIcon = _ExitIcon
+export const ExitIcon = _XIcon
 export const ExpandIcon = _ExpandIcon
 export const ExternalIcon = _ExternalIcon
 export const EyeIcon = _EyeIcon

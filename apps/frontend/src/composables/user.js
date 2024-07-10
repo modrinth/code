@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const useUser = async (force = false) => {
   const user = useState("user", () => {});
 

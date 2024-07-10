@@ -102,8 +102,13 @@ onBeforeUnmount(() => {
     box-shadow: var(--shadow-floating);
     z-index: 10;
     opacity: 0;
-    transition: bottom 0.125s ease-in-out, top 0.125s ease-in-out, left 0.125s ease-in-out,
-      right 0.125s ease-in-out, opacity 0.125s ease-in-out, scale 0.125s ease-in-out;
+    transition:
+      bottom 0.125s ease-in-out,
+      top 0.125s ease-in-out,
+      left 0.125s ease-in-out,
+      right 0.125s ease-in-out,
+      opacity 0.125s ease-in-out,
+      scale 0.125s ease-in-out;
 
     @media (prefers-reduced-motion) {
       transition: none !important;

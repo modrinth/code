@@ -1,5 +1,5 @@
 <template>
-  <span :class="'badge flex items-center gap-2 ' + color + ' type--' + type">
+  <span :class="'badge flex items-center gap-1 ' + color + ' type--' + type">
     <template v-if="color"> <span class="circle" /> {{ $capitalizeString(type) }}</template>
 
     <!-- User roles -->
