@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export default defineNuxtPlugin(async (nuxtApp) => {
   await useAuth();
   await useUser();

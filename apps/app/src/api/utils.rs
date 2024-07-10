@@ -37,6 +37,7 @@ pub fn get_os() -> OS {
     os
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(clippy::enum_variant_names)]
 pub enum OS {
     Windows,
     Linux,
@@ -99,14 +100,13 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
         #[cfg(target_os = "linux")]
         {
             use std::fs::metadata;
-            use std::path::PathBuf;
 
             if path.to_string_lossy().to_string().contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
                 let new_path = match metadata(&path)?.is_dir() {
                     true => path,
                     false => {
-                        let mut path2 = PathBuf::from(path);
+                        let mut path2 = path.clone();
                         path2.pop();
                         path2
                     }

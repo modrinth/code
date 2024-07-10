@@ -5,9 +5,11 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
-    "lint": "eslint ./src --fix"
+    "lint": "eslint . && prettier --check .",
+    "fix": "eslint . --fix && prettier --write ."
   },
   "devDependencies": {
+    "eslint": "^8.57.0",
     "@vintl/unplugin": "^1.5.1",
     "@vintl/vintl": "^4.4.1",
     "eslint-config-custom": "workspace:*",
