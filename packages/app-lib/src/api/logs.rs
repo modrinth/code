@@ -114,7 +114,10 @@ pub async fn get_logs_from_type(
         {
             let entry: std::fs::DirEntry =
                 entry.map_err(|e| IOError::with_path(e, &logs_folder))?;
-            let age = entry.metadata()?.created().unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+            let age = entry
+                .metadata()?
+                .created()
+                .unwrap_or(SystemTime::UNIX_EPOCH);
             let path = entry.path();
             if !path.is_file() {
                 continue;
@@ -125,7 +128,7 @@ pub async fn get_logs_from_type(
                     Logs::build(
                         log_type,
                         age,
-                        &profile_path,
+                        profile_path,
                         file_name,
                         clear_contents,
                     )
@@ -184,7 +187,7 @@ pub async fn get_logs_by_filename(
     .join(&filename);
 
     let metadata = std::fs::metadata(&path)?;
-    let age = metadata.created().unwrap_or_else(|_| SystemTime::UNIX_EPOCH);
+    let age = metadata.created().unwrap_or(SystemTime::UNIX_EPOCH);
 
     Logs::build(log_type, age, &profile_path, filename, Some(true)).await
 }

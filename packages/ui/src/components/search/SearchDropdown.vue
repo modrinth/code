@@ -130,7 +130,7 @@ const selectOption = (option) => {
 const onFocus = () => {
   if (!props.disabled) {
     focusedOptionIndex.value = props.options.findIndex(
-      (option) => option === props.modelValue.value
+      (option) => option === props.modelValue.value,
     )
     dropdownVisible.value = true
   }
@@ -197,7 +197,9 @@ const isChildOfDropdown = (element) => {
     cursor: pointer;
     user-select: none;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+    box-shadow:
+      var(--shadow-inset-sm),
+      0 0 0 0 transparent;
 
     &.disabled {
       cursor: not-allowed;
@@ -315,7 +317,9 @@ const isChildOfDropdown = (element) => {
 }
 
 .text-input {
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent !important;
+  box-shadow:
+    var(--shadow-inset-sm),
+    0 0 0 0 transparent !important;
   width: 100%;
 
   transition: 0.05s;

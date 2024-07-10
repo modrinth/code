@@ -50,7 +50,7 @@ const share = () => {
       : {
           title: props.shareTitle.toString(),
           text: content.value,
-        }
+        },
   )
 }
 
@@ -87,19 +87,20 @@ const sendEmail = computed(
   () =>
     `mailto:user@test.com
     ?subject=${encodeURIComponent(props.shareTitle)}
-    &body=${  encodeURIComponent(content.value)}`
+    &body=${encodeURIComponent(content.value)}`,
 )
 
 const sendTweet = computed(
-  () => `https://twitter.com/intent/tweet?text=${  encodeURIComponent(content.value)}`
+  () => `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.value)}`,
 )
 
-const sendToot = computed(() => `https://tootpick.org/#text=${  encodeURIComponent(content.value)}`)
+const sendToot = computed(() => `https://tootpick.org/#text=${encodeURIComponent(content.value)}`)
 
 const postOnReddit = computed(
   () =>
-    `https://www.reddit.com/submit?title=${encodeURIComponent(props.shareTitle)}&text=${ 
-    encodeURIComponent(content.value)}`
+    `https://www.reddit.com/submit?title=${encodeURIComponent(props.shareTitle)}&text=${encodeURIComponent(
+      content.value,
+    )}`,
 )
 
 defineExpose({
