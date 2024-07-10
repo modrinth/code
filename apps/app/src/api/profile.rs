@@ -330,11 +330,11 @@ pub async fn profile_edit(
             }
         }
 
-        prof.java = edit_profile.java.clone();
+        prof.java.clone_from(&edit_profile.java);
         prof.memory = edit_profile.memory;
         prof.resolution = edit_profile.resolution;
         prof.fullscreen = edit_profile.fullscreen;
-        prof.hooks = edit_profile.hooks.clone();
+        prof.hooks.clone_from(&edit_profile.hooks);
 
         prof.metadata.date_modified = chrono::Utc::now();
 

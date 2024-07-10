@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const useNotifications = () => useState("notifications", () => []);
 
 export const addNotification = (notification) => {

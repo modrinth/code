@@ -35,7 +35,7 @@ const props = withDefaults(
   {
     external: true,
     queryParam: '',
-  }
+  },
 )
 
 const target = computed(() => (props.external ? '_blank' : '_self'))

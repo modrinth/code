@@ -137,9 +137,9 @@ pub async fn import_curseforge(
                 .clone()
                 .unwrap_or_else(|| backup_name.to_string());
             prof.install_stage = ProfileInstallStage::PackInstalling;
-            prof.metadata.icon = icon.clone();
-            prof.metadata.game_version = game_version.clone();
-            prof.metadata.loader_version = loader_version.clone();
+            prof.metadata.icon.clone_from(&icon);
+            prof.metadata.game_version.clone_from(&game_version);
+            prof.metadata.loader_version.clone_from(&loader_version);
             prof.metadata.loader = mod_loader;
 
             async { Ok(()) }
@@ -151,9 +151,10 @@ pub async fn import_curseforge(
             prof.metadata.name = override_title
                 .clone()
                 .unwrap_or_else(|| backup_name.to_string());
-            prof.metadata.icon = icon.clone();
-            prof.metadata.game_version =
-                minecraft_instance.game_version.clone();
+            prof.metadata.icon.clone_from(&icon);
+            prof.metadata
+                .game_version
+                .clone_from(&minecraft_instance.game_version);
             prof.metadata.loader_version = None;
             prof.metadata.loader = ModLoader::Vanilla;
 

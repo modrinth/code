@@ -226,7 +226,10 @@
 // CLICKABLES/BUTTONS
 a,
 .clickable {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    scale 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   &:active:not(&:disabled) {
@@ -267,7 +270,10 @@ a,
 }
 
 .button-within {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+  transition:
+    opacity 0.5s ease-in-out,
+    filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out,
     outline 0.2s ease-in-out;
 
   &:focus-visible:not(&.disabled),
@@ -311,7 +317,9 @@ a,
     box-sizing: border-box;
 
     background-color: transparent;
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out,
+    transition:
+      background-color 0.2s ease-in-out,
+      border-color 0.2s ease-in-out,
       color 0.2s ease-in-out;
     box-shadow: none;
   }
@@ -659,7 +667,10 @@ a,
   .table-row {
     display: grid;
 
-    transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+    transition:
+      opacity 0.5s ease-in-out,
+      filter 0.2s ease-in-out,
+      scale 0.05s ease-in-out,
       outline 0.2s ease-in-out;
 
     &.selectable:focus-visible,

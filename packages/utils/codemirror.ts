@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 
 import { insertNewlineAndIndent } from '@codemirror/commands'
@@ -20,7 +21,7 @@ const toggleStrikethrough: Command = ({ state, dispatch }) => {
 
 const toggleCodeBlock: Command = ({ state, dispatch }) => {
   const lineBreak = state.lineBreak
-  const codeBlockMark = `${lineBreak  }\`\`\`${  lineBreak}`
+  const codeBlockMark = `${lineBreak}\`\`\`${lineBreak}`
   return toggleAround(state, dispatch, codeBlockMark, codeBlockMark)
 }
 
@@ -87,7 +88,7 @@ type Dispatch = (tr: Transaction) => void
 const surroundedByText = (
   state: EditorState,
   open: string,
-  close: string
+  close: string,
 ): 'inclusive' | 'exclusive' | 'none' => {
   const { from, to } = state.selection.main
 
@@ -113,7 +114,7 @@ const toggleAround = (
   state: EditorState,
   dispatch: Dispatch,
   open: string,
-  close: string
+  close: string,
 ): boolean => {
   const { from, to } = state.selection.main
 
@@ -258,7 +259,7 @@ const insertNewlineContinueMark: Command = (view): boolean => {
 
   const listMark = lastNode.getChild('ListMark')
   if (listMark) {
-    cancelPatterns.push(`${state.doc.sliceString(listMark.from, listMark.to)  } `)
+    cancelPatterns.push(`${state.doc.sliceString(listMark.from, listMark.to)} `)
   }
 
   // Skip if current line matches any of the cancel patterns
@@ -340,7 +341,7 @@ const incrementMark = (mark: string): string => {
   const match = numberedListRegex.exec(mark)
   if (match) {
     const number = parseInt(match[1])
-    return `${(number + 1).toString()  }.`
+    return `${(number + 1).toString()}.`
   }
   return mark
 }

@@ -97,7 +97,7 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
   const inferFunctions = {
     // Forge 1.13+ and NeoForge
     "META-INF/mods.toml": async (file, zip) => {
-      const metadata = TOML.parse(file, { joiner: "\n" });
+      const metadata = TOML.parse(file, { joiner: "\n" }); // eslint-disable-line import/no-named-as-default-member
 
       if (metadata.mods && metadata.mods.length > 0) {
         let versionNum = metadata.mods[0].version;

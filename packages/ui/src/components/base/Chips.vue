@@ -95,7 +95,9 @@ export default defineComponent({
   .selected {
     color: var(--color-contrast);
     background-color: var(--color-brand-highlight);
-    box-shadow: inset 0 0 0 transparent, 0 0 0 2px var(--color-brand);
+    box-shadow:
+      inset 0 0 0 transparent,
+      0 0 0 2px var(--color-brand);
   }
 }
 </style>

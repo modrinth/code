@@ -1070,6 +1070,7 @@ fn get_date_header(headers: &HeaderMap) -> DateTime<Utc> {
 }
 
 #[tracing::instrument]
+#[allow(clippy::format_collect)]
 fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 
