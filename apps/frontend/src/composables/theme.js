@@ -48,7 +48,7 @@ export const updateTheme = (value, updatePreference = false) => {
     if (updatePreference) theme.value.preference = value;
   }
 
-  if (process.client) {
+  if (import.meta.client) {
     document.documentElement.className = `${theme.value.value}-mode`;
   }
 

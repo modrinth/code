@@ -80,6 +80,14 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    define: {
+      global: {},
+    },
+    esbuild: {
+      define: {
+        global: "globalThis",
+      },
+    },
     cacheDir: "../../node_modules/.vite/apps/knossos",
     resolve: {
       dedupe: ["vue"],
