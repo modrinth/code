@@ -589,7 +589,7 @@ function onSearchChange(newPageNumber) {
 
   refreshSearch();
 
-  if (process.client) {
+  if (import.meta.client) {
     const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true);
     router.replace({ path: route.path, query: obj });
   }
@@ -751,7 +751,7 @@ function toggleEnv(environment, sendRequest) {
 }
 
 function onSearchChangeToTop(newPageNumber) {
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
