@@ -465,7 +465,7 @@ const {
 } = useLazyFetch(
   () => {
     const config = useRuntimeConfig();
-    const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl;
+    const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
     const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`];
 
