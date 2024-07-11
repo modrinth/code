@@ -11,7 +11,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             skin_get_user_skin_data,
             skin_get_heads,
             skin_set_skin,
-            skin_update_skins,
+            skin_delete_skin,
             skin_import_skin,
             skin_check_image,
             skin_check_skin,
@@ -22,6 +22,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             skin_save_skin,
             skin_get_skins,
             skin_set_cape,
+            skin_get_order,
+            skin_save_order,
             skin_get_filters,
             skin_save_filters
         ])
@@ -94,22 +96,22 @@ pub async fn skin_cache_users_skins() -> Result<bool> {
 // Makes api request to mojang, updating current account's skin data
 // invoke('plugin:skin|skin_cache_new_user_skin', { user })
 #[tauri::command]
-pub async fn skin_cache_new_user_skin(creds: Credentials) -> Result<bool> {
+pub async fn skin_cache_new_user_skin(creds: Credentials) -> Result<()> {
     Ok(skin_manager::cache_new_user_skin(creds).await?)
 }
 
 // Saves the skin data to the manager
 // invoke('plugin:skin|skin_save_skin', { user, data, name, model, skinid })
 #[tauri::command]
-pub async fn skin_save_skin(user: Uuid, data: SkinCache, name: String, model: String, skinid: String) -> Result<bool> {
+pub async fn skin_save_skin(user: Uuid, data: SkinCache, name: String, model: String, skinid: String) -> Result<()> {
     Ok(skin_manager::save_skin(user, data, name, model, skinid).await?)
 }
 
 // Updates skin saves from the manager
 // invoke('plugin:skin|skin_update_skins', { id })
 #[tauri::command]
-pub async fn skin_update_skins(saves: Vec<SkinSave>) -> Result<()> {
-    Ok(skin_manager::update_skins(saves).await?)
+pub async fn skin_delete_skin(id: Uuid) -> Result<()> {
+    Ok(skin_manager::delete_skin(id).await?)
 }
 
 // Gets all account heads from the cache
@@ -124,6 +126,20 @@ pub async fn skin_get_heads() -> Result<HashMap<Uuid, String>> {
 #[tauri::command]
 pub async fn skin_get_skins() -> Result<Vec<SkinSave>> {
     Ok(skin_manager::get_skins().await?)
+}
+
+// Gets custom skin order
+// invoke('plugin:skin|skin_get_order')
+#[tauri::command]
+pub async fn skin_get_order(user: Uuid) -> Result<Vec<Uuid>> {
+    Ok(skin_manager::get_order(user).await?)
+}
+
+// Saves custom skin order
+// invoke('plugin:skin|skin_save_order')
+#[tauri::command]
+pub async fn skin_save_order(order: Vec<Uuid>, user: Uuid) -> Result<()> {
+    Ok(skin_manager::save_order(order, user).await?)
 }
 
 // Gets a list of all saved skins in the mojang launcher

@@ -34,7 +34,7 @@ export async function check_image(path) {
   return await invoke('plugin:skin|skin_check_image', { path })
 }
 
-// Returns true if skin is not in library
+// Returns true if skin is in library
 export async function check_skin(skin, id) {
   return await invoke('plugin:skin|skin_check_skin', { skin, id })
 }
@@ -59,9 +59,19 @@ export async function save_skin(user, data, name, model, skinid) {
   return await invoke('plugin:skin|skin_save_skin', { user, data, name, model, skinid })
 }
 
-// Updates the skin save
-export async function update_skins(saves) {
-  return await invoke('plugin:skin|skin_update_skins', { saves })
+// Deletes the skin save
+export async function delete_skin(id) {
+  return await invoke('plugin:skin|skin_delete_skin', { id })
+}
+
+// Gets custom skin order
+export async function get_order(user) {
+  return await invoke('plugin:skin|skin_get_order', { user })
+}
+
+// Saves custom skin order
+export async function save_order(order, user) {
+  return await invoke('plugin:skin|skin_save_order', { order, user })
 }
 
 // Gets all saved Skins

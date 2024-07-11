@@ -291,7 +291,9 @@ import {
   set_skin,
   save_skin,
   import_skin,
-  update_skins,
+  delete_skin,
+  get_order,
+  save_order,
   get_skins,
   get_render,
   get_cape_data,
@@ -340,6 +342,7 @@ const importer = ref({
 const importType = ref('Mojang')
 
 const skinSaves = ref(await get_skins().catch(handleError))
+const skinOrder = ref([])
 
 const search = ref('')
 
@@ -356,13 +359,6 @@ const filteredResults = computed(() => {
     saves = saves.filter((save) => {
       return save.user === selectedAccount.value.id
     })
-  } else {
-    for (let i = 0; i < saves.length; i++) {
-      if (!Object.prototype.hasOwnProperty.call(saves[i].order, selectedAccount.value.id)) {
-        shiftSaves(0, true)
-        saves[i].order[selectedAccount.value.id] = 0
-      }
-    }
   }
 
   if (Filters.value.sort === 'Name') {
@@ -373,7 +369,7 @@ const filteredResults = computed(() => {
 
   if (Filters.value.sort === 'Custom') {
     saves.sort((a, b) => {
-      return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
+      return skinOrder.value.indexOf(a.id) - skinOrder.value.indexOf(b.id)
     })
   }
 
@@ -391,25 +387,25 @@ const filteredResults = computed(() => {
   return saves
 })
 
-const moveCard = async (move, skin) => {
-  let sorted = Array.from(skinSaves.value)
+const moveCard = async (move, id) => {
+  let order = Array.from(skinOrder.value)
   if (Filters.value.filter === 'Current user') {
-    sorted = sorted.filter((save) => {
-      return save.user === selectedAccount.value.id
+    let saves = Array.from(skinSaves.value).sort((a, b) => {
+      return skinOrder.value.indexOf(a.id) - skinOrder.value.indexOf(b.id)
+    })
+    order = order.filter((_, i) => {
+      return saves[i].user === selectedAccount.value.id
     })
   }
-  sorted.sort((a, b) => {
-    return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
-  })
+  let index = order.indexOf(id)
+  if (index == 0 && move == -1) return
+  if (index == order.length - 1 && move == 1) return
 
-  const targetIndex = sorted.indexOf(skin) + move
-  if (targetIndex < 0 || targetIndex > sorted.length - 1) return
-  const current = skin.order[selectedAccount.value.id]
-  const target = sorted[targetIndex].order[selectedAccount.value.id]
-  shiftSaves(target < current ? target : target + 1, true)
-  skin.order[selectedAccount.value.id] = target < current ? target : target + 1
-  shiftSaves(target < current ? current + 1 : current, false)
-  await update_skins(skinSaves.value).catch(handleError)
+  let targetIndex = skinOrder.value.indexOf(order[index + move])
+  let currentIndex = skinOrder.value.indexOf(id)
+  skinOrder.value.splice(currentIndex, 1)
+  skinOrder.value.splice(targetIndex, 0, id)
+  await save_order(skinOrder.value, selectedAccount.value.id)
 }
 
 const handleRightClick = (event, item) => {
@@ -462,10 +458,10 @@ const handleOptionsClick = async (args) => {
       await handleSkin('upload')
       break
     case 'left':
-      if (Filters.value.sort === 'Custom') await moveCard(-1, args.item)
+      if (Filters.value.sort === 'Custom') await moveCard(-1, args.item.id)
       break
     case 'right':
-      if (Filters.value.sort === 'Custom') await moveCard(1, args.item)
+      if (Filters.value.sort === 'Custom') await moveCard(1, args.item.id)
       break
     case 'edit':
       await edit_skin(args.item)
@@ -482,18 +478,7 @@ const handleOptionsClick = async (args) => {
 
 const deleteSkin = async () => {
   skinSaves.value.splice(skinSaves.value.indexOf(selectedSkin.value), 1)
-  let sorted = skinSaves.value.filter((save) => {
-    return Object.prototype.hasOwnProperty.call(save.order, selectedAccount.value.id)
-  })
-  if (sorted.length > 0) {
-    sorted.sort((a, b) => {
-      return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
-    })
-    for (let i = selectedSkin.value.order[selectedAccount.value.id]; i < sorted.length; i++) {
-      sorted[i].order[selectedAccount.value.id]--
-    }
-  }
-  await update_skins(skinSaves.value).catch(handleError)
+  await delete_skin(selectedSkin.value.id).catch(handleError)
   InLibrary.value = await check_skin(skinData.value.skin, selectedAccount.value.id).catch(
     handleError,
   )
@@ -524,13 +509,12 @@ const next = async () => {
       handleError,
     )
     const model = await get_render(data).catch(handleError)
-    shiftSaves(0, true)
-    await update_skins(skinSaves.value).catch(handleError)
     await save_skin(selectedAccount.value.id, data, skin.name, model, '').catch(handleError)
     skin.selected = false
     importedSkins.value++
   }
   skinSaves.value = await get_skins().catch(handleError)
+  skinOrder.value = await get_order(selectedAccount.value.id).catch(handleError)
   loading.value = false
   skinModal.value.hide()
 }
@@ -553,6 +537,7 @@ const handleAdd = async () => {
     handleError,
   )
   skinSaves.value = await get_skins().catch(handleError)
+  skinOrder.value = await get_order(selectedAccount.value.id).catch(handleError)
   InLibrary.value = true
 }
 
@@ -595,8 +580,6 @@ const clickCard = (data) => {
 
 const handleSkin = async (state) => {
   if (state.includes('save')) {
-    shiftSaves(0, true)
-    await update_skins(skinSaves.value).catch(handleError)
     const model = await get_render(selectedSkin.value).catch(handleError)
     await save_skin(
       selectedAccount.value.id,
@@ -606,6 +589,7 @@ const handleSkin = async (state) => {
       '',
     ).catch(handleError)
     skinSaves.value = await get_skins().catch(handleError)
+    skinOrder.value = await get_order(selectedAccount.value.id).catch(handleError)
   }
   if (state.includes('upload')) {
     uploadingSkin.value = true
@@ -613,7 +597,6 @@ const handleSkin = async (state) => {
     const uploadedCape = await set_cape(capeid, selectedAccount.value.access_token).catch(
       handleError,
     )
-    console.log(selectedSkin.value.skin)
     const uploadedSkin = await set_skin(
       selectedSkin.value.skin,
       selectedSkin.value.arms,
@@ -707,28 +690,9 @@ const duplicate_skin = async (args) => {
   data.cape = args.cape
   data.arms = args.arms
   data.unlocked_capes = []
-  shiftSaves(0, true)
-  await update_skins(skinSaves.value).catch(handleError)
   await save_skin(selectedAccount.value.id, data, args.name, args.model, '').catch(handleError)
   skinSaves.value = await get_skins().catch(handleError)
-}
-
-const shiftSaves = (index, shiftRight) => {
-  let sorted = skinSaves.value.filter((save) => {
-    return Object.prototype.hasOwnProperty.call(save.order, selectedAccount.value.id)
-  })
-  sorted.sort((a, b) => {
-    return a.order[selectedAccount.value.id] - b.order[selectedAccount.value.id]
-  })
-  if (shiftRight) {
-    for (let i = sorted.length - 1; i >= index; i--) {
-      sorted[i].order[selectedAccount.value.id]++
-    }
-  } else {
-    for (let i = index; i < sorted.length; i++) {
-      sorted[i].order[selectedAccount.value.id]--
-    }
-  }
+  skinOrder.value = await get_order(selectedAccount.value.id).catch(handleError)
 }
 
 const openskin = async () => {
@@ -819,6 +783,7 @@ const handleImportType = async () => {
 }
 
 watch(selectedAccount, async (newAccount) => {
+  skinOrder.value = await get_order(newAccount.id).catch(handleError)
   await update_render(newAccount.id)
 })
 

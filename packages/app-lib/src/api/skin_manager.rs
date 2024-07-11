@@ -50,11 +50,13 @@ pub async fn save_filters(filters: Filters) -> crate::Result<bool> {
         return Ok(false);
     };
     let mut cache = get_cache().await?;
-    if filters.filter == cache.filters.filter && filters.sort == cache.filters.sort {
+    if filters.filter == cache.filters.filter
+        && filters.sort == cache.filters.sort
+    {
         return Ok(false);
     };
     cache.filters = filters;
-    Ok(save_to_cache(cache).await?)
+    save_to_cache(cache).await
 }
 
 // Sets player's skin
@@ -195,7 +197,7 @@ pub async fn cache_users_skins() -> crate::Result<bool> {
 }
 
 // Caches users SkinCache on new login
-pub async fn cache_new_user_skin(creds: Credentials) -> crate::Result<bool> {
+pub async fn cache_new_user_skin(creds: Credentials) -> crate::Result<()> {
     let token = if creds.expires < Utc::now() {
         minecraft_auth::refresh(creds.id).await?.access_token
     } else {
@@ -208,10 +210,20 @@ pub async fn cache_new_user_skin(creds: Credentials) -> crate::Result<bool> {
         .await?;
     if response.status().is_success() {
         let data = parse_skin_data(response.json().await?, creds.id).await?;
-        add_to_cache(creds.id, data.user, data.capes, data.head).await
-    } else {
-        Ok(false)
-    }
+        add_to_cache(creds.id, data.user, data.capes, data.head).await?;
+    };
+
+    let mut manager = get_manager().await?;
+    let mut order = match manager.order.get(&creds.id) {
+        Some(v) => v.to_vec(),
+        None => Vec::new(),
+    };
+    for (_, save) in &manager.saves {
+        if order.contains(&save.id) { continue };
+        order.push(save.id)
+    };
+    manager.order.insert(creds.id, order);
+    save_to_manager(manager).await
 }
 
 // Saves skin data to the skin manager
@@ -220,28 +232,11 @@ pub async fn save_skin(
     data: SkinCache,
     name: String,
     model: String,
-    skinid: String,
-) -> crate::Result<bool> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
-    let path = crate::State::get()
-        .await?
-        .directories
-        .settings_dir
-        .join("skin_manager.json");
+    skin_id: String,
+) -> crate::Result<()> {
+    let mut manager = get_manager().await?;
 
-    let mut cache: HashMap<Uuid, SkinSave> = if let Ok(json) =
-        read_json::<HashMap<Uuid, SkinSave>>(&path, &io_semaphore).await
-    {
-        json
-    } else {
-        HashMap::new()
-    };
-
-    let encoded_img = if data.skin.starts_with("data:image/png;base64,") {
+    let skin = if data.skin.starts_with("data:image/png;base64,") {
         data.skin
     } else {
         format!(
@@ -250,31 +245,36 @@ pub async fn save_skin(
         )
     };
 
-    let id = if skinid.is_empty() {
-        Uuid::new_v4()
+    let id = if skin_id.is_empty() {
+        let id = Uuid::new_v4();
+
+        let mut new_order: HashMap<Uuid, Vec<Uuid>> = HashMap::new();
+        for (account, mut order) in manager.order {
+            if account == user {
+                order.insert(0, id)
+            } else {
+                order.push(id)
+            };
+            new_order.insert(account, order);
+        }
+        manager.order = new_order;
+
+        id
     } else {
-        Uuid::parse_str(&skinid)?
+        Uuid::parse_str(&skin_id)?
     };
-    let created = if skinid.is_empty() {
+    let created = if skin_id.is_empty() {
         Utc::now()
     } else {
-        cache
+        manager
+            .saves
             .get(&id)
             .expect("SkinSave should exist, but doesn't")
             .created
     };
-    let order = if skinid.is_empty() {
-        HashMap::from([(user, 0)])
-    } else {
-        cache
-            .get(&id)
-            .expect("SkinSave should exist, but doesn't")
-            .order
-            .clone()
-    };
     let skin_cache = SkinSave {
         name,
-        skin: encoded_img,
+        skin,
         cape: data.cape,
         arms: data.arms,
         created,
@@ -282,53 +282,46 @@ pub async fn save_skin(
         model,
         user,
         id,
-        order,
     };
-    cache.insert(id, skin_cache);
+    manager.saves.insert(id, skin_cache);
 
-    write(&path, &serde_json::to_vec(&cache)?, &io_semaphore).await?;
-    Ok(true)
+    save_to_manager(manager).await
 }
 
-pub async fn update_skins(saves: Vec<SkinSave>) -> crate::Result<()> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
-    let path = crate::State::get()
-        .await?
-        .directories
-        .settings_dir
-        .join("skin_manager.json");
+// Replace with delete_skin
+pub async fn delete_skin(id: Uuid) -> crate::Result<()> {
+    let mut manager = get_manager().await?;
+    manager.saves.remove(&id);
 
-    let mut cache = HashMap::new();
-    for skin in saves {
-        cache.insert(skin.id, skin);
+    let mut new_order: HashMap<Uuid, Vec<Uuid>> = HashMap::new();
+    for (account, mut order) in manager.order {
+        match order.iter().position(|x| *x == id) {
+            Some(i) => order.remove(i),
+            None => continue,
+        };
+        new_order.insert(account, order);
     }
-    write(&path, &serde_json::to_vec(&cache)?, &io_semaphore).await?;
-    Ok(())
+    manager.order = new_order;
+    save_to_manager(manager).await
 }
 
 pub async fn get_skins() -> crate::Result<Vec<SkinSave>> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
-    let path = crate::State::get()
-        .await?
-        .directories
-        .settings_dir
-        .join("skin_manager.json");
+    Ok(get_manager().await?.saves.into_values().collect())
+}
 
-    if let Ok(json) =
-        read_json::<HashMap<Uuid, SkinSave>>(&path, &io_semaphore).await
-    {
-        Ok(json.into_values().collect())
-    } else {
-        Ok(Vec::new())
-    }
+pub async fn get_order(user: Uuid) -> crate::Result<Vec<Uuid>> {
+    Ok(get_manager()
+        .await?
+        .order
+        .get(&user)
+        .expect("User data should exist, but doesn't")
+        .to_vec())
+}
+
+pub async fn save_order(order: Vec<Uuid>, user: Uuid) -> crate::Result<()> {
+    let mut manager = get_manager().await?;
+    manager.order.insert(user, order);
+    save_to_manager(manager).await
 }
 
 // Gets list of skins to import
@@ -536,11 +529,10 @@ async fn get_cache() -> crate::Result<Cache> {
         .await
         .join("skindata.json");
 
-    let cache: Cache =
-        if let Ok(json) = read_json::<Cache>(&path, &io_semaphore).await {
-            json
-        } else {
-            Cache {
+    Ok(
+        match read_json::<Cache>(&path, &io_semaphore).await {
+            Ok(cache) => cache,
+            Err(_) => Cache {
                 capes: HashMap::new(),
                 users: HashMap::new(),
                 heads: HashMap::new(),
@@ -548,9 +540,47 @@ async fn get_cache() -> crate::Result<Cache> {
                     sort: "Name".to_string(),
                     filter: "Current user".to_string(),
                 },
-            }
-        };
-    Ok(cache)
+            },
+        }
+    )
+}
+
+async fn save_to_manager(manager: SkinManager) -> crate::Result<()> {
+    let settings =
+        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
+    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
+        settings.max_concurrent_writes,
+    )));
+    let path = crate::State::get()
+        .await?
+        .directories
+        .settings_dir
+        .join("skin_manager.json");
+
+    write(&path, &serde_json::to_vec(&manager)?, &io_semaphore).await
+}
+
+async fn get_manager() -> crate::Result<SkinManager> {
+    let settings =
+        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
+    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
+        settings.max_concurrent_writes,
+    )));
+    let path = crate::State::get()
+        .await?
+        .directories
+        .settings_dir
+        .join("skin_manager.json");
+
+    Ok(
+        match read_json::<SkinManager>(&path, &io_semaphore).await {
+            Ok(cache) => cache,
+            Err(_) => SkinManager {
+                saves: HashMap::new(),
+                order: HashMap::new(),
+            },
+        }
+    )
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -580,13 +610,17 @@ pub struct SkinCache {
     arms: String,
     unlocked_capes: Vec<String>,
 }
+#[derive(Serialize, Deserialize, Clone, Debug)]
+struct SkinManager {
+    saves: HashMap<Uuid, SkinSave>,
+    order: HashMap<Uuid, Vec<Uuid>>,
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SkinSave {
     name: String,
     user: Uuid,
     id: Uuid,
-    order: HashMap<Uuid, u8>,
     skin: String,
     model: String,
     cape: String,

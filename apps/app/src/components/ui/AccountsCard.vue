@@ -95,14 +95,14 @@ const defaultUser = ref()
 async function refreshValues() {
   defaultUser.value = await get_default_user().catch(handleError)
   accounts.value = await users().catch(handleError)
-  selectedAccount.value = accounts.value.find(
-    (account) => account.id === defaultUser.value
-  )
 }
 defineExpose({
   refreshValues,
 })
 await refreshValues()
+selectedAccount.value = accounts.value.find(
+    (account) => account.id === defaultUser.value
+  )
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.id),
@@ -119,10 +119,10 @@ async function login() {
   const loggedIn = await login_flow().catch(handleSevereError)
 
   if (loggedIn) {
-    await setAccount(loggedIn)
-    await refreshValues()
     await cache_new_user_skin(loggedIn).catch(handleError)
     get_heads()
+    await setAccount(loggedIn)
+    await refreshValues()
   }
 
   mixpanel_track('AccountLogIn')
@@ -131,7 +131,7 @@ async function login() {
 const logout = async (id) => {
   await remove_user(id).catch(handleError)
   await refreshValues()
-  if (!selectedAccount.value && accounts.value.length > 0) {
+  if (accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
   } else {
