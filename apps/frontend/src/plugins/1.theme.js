@@ -5,7 +5,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const cosmetics = useCosmetics();
 
   nuxtApp.hook("app:mounted", () => {
-    if (process.client && themeStore.value.preference === "system") {
+    if (import.meta.client && themeStore.value.preference === "system") {
       const colorSchemeQueryList = window.matchMedia("(prefers-color-scheme: light)");
 
       const setColorScheme = (e) => {

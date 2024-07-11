@@ -130,7 +130,7 @@ useHead({
 const user = await useUser();
 const auth = await useAuth();
 
-if (process.client) {
+if (import.meta.client) {
   await initUserFollows();
 }
 
