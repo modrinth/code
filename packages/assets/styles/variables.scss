@@ -15,6 +15,9 @@ html {
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --radius-max: 999999999px;
+
+  --color-tooltip-text: var(--color-base);
+  --color-tooltip-bg: var(--color-button-bg);
 }
 
 .light-mode,
@@ -52,9 +55,6 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
-
-  --color-tooltip-text: var(--color-accent-contrast);
-  --color-tooltip-bg: var(--color-base);
 
   --color-ad: #d6e6f9;
   --color-ad-raised: #b1c8e4;
@@ -95,9 +95,6 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
-
-  --color-tooltip-text: var(--color-base);
-  --color-tooltip-bg: var(--color-button-bg);
 
   --color-ad: #1f324a;
   --color-ad-raised: #2e4057;
