@@ -99,6 +99,10 @@
                     </span>
                   </button>
                   <hr class="divider" />
+                  <NuxtLink class="item button-transparent" to="/servers/manage">
+                    <ServerIcon class="icon" />
+                    <span class="title">{{ formatMessage(commonMessages.serversLabel) }}</span>
+                  </NuxtLink>
                   <NuxtLink class="item button-transparent" to="/dashboard/collections">
                     <LibraryIcon class="icon" />
                     <span class="title">{{ formatMessage(commonMessages.collectionsLabel) }}</span>
@@ -426,6 +430,7 @@ import {
   XIcon,
   IssuesIcon,
   ReportIcon,
+  ServerIcon,
 } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 import HamburgerIcon from "~/assets/images/utils/hamburger.svg?component";

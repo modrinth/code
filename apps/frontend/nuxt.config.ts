@@ -300,8 +300,10 @@ export default defineNuxtConfig({
     apiBaseUrl: process.env.BASE_URL ?? globalThis.BASE_URL ?? getApiUrl(),
     // @ts-ignore
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
+    pyroBaseUrl: process.env.PYRO_BASE_URL,
     public: {
       apiBaseUrl: getApiUrl(),
+      pyroBaseUrl: process.env.PYRO_BASE_URL,
       siteUrl: getDomain(),
       production: isProduction(),
       featureFlagOverrides: getFeatureFlagOverrides(),
