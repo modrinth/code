@@ -20,7 +20,12 @@ use notify_debouncer_mini::Debouncer;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
-use std::{collections::HashMap, path::{Path, PathBuf}, path};
+use std::{
+    collections::HashMap,
+    ffi::OsStr,
+    path,
+    path::{Path, PathBuf},
+};
 use uuid::Uuid;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
@@ -481,7 +486,9 @@ impl Profile {
                     .map_err(|e| IOError::with_path(e, &new_path))?
                 {
                     let subpath = subpath.map_err(IOError::from)?.path();
-                    if subpath.is_file() {
+                    if subpath.is_file()
+                        && subpath.file_name() != Some(OsStr::new(".DS_Store"))
+                    {
                         files.push(subpath);
                     }
                 }
