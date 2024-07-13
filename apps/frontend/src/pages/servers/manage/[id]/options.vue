@@ -4,13 +4,13 @@
       <aside class="universal-card">
         <NavStack>
           <NavStackItem :link="`/servers/manage/${serverId}/options`" label="General">
-            <GeneralIcon />
+            <CogIcon />
           </NavStackItem>
           <NavStackItem :link="`/servers/manage/${serverId}/options/properties`" label="Properties">
-            <PropertiesIcon />
+            <ListIcon />
           </NavStackItem>
           <NavStackItem :link="`/servers/manage/${serverId}/options/info`" label="Info">
-            <InfoIcon />
+            <FileIcon />
           </NavStackItem>
         </NavStack>
       </aside>
@@ -25,9 +25,7 @@
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 
-import GeneralIcon from "~/assets/images/utils/navtabs/cog.svg?component";
-import InfoIcon from "~/assets/images/utils/file.svg?component";
-import PropertiesIcon from "~/assets/images/utils/list.svg?component";
+import { CogIcon, FileIcon, ListIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id;

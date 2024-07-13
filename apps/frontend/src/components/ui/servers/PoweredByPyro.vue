@@ -6,5 +6,5 @@
 </template>
 
 <script setup>
-import PyroIcon from '~/assets/images/pyro.svg?component'
+import { PyroIcon } from "@modrinth/assets";
 </script>
