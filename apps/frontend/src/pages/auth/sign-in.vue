@@ -85,7 +85,7 @@
           ref="turnstile"
           v-model="token"
           class="turnstile"
-          :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
+          :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
         />
 
         <button
