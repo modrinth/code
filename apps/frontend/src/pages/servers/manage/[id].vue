@@ -104,7 +104,17 @@
 
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
-import { HomeIcon, CubeIcon, CloudIcon, CogIcon, CopyIcon, PlayIcon, BoxIcon, LoaderIcon, LeftArrowIcon } from "@modrinth/assets";
+import {
+  HomeIcon,
+  CubeIcon,
+  CloudIcon,
+  CogIcon,
+  CopyIcon,
+  PlayIcon,
+  BoxIcon,
+  LoaderIcon,
+  LeftArrowIcon,
+} from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id;
