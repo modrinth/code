@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :href="`/servers/manage/${serverId}`"
-    class="flex flex-row items-center rounded-3xl bg-[var(--color-raised-bg)] p-4"
+    class="flex flex-row items-center rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
   >
     <UiAvatar no-shadow size="md" :src="''" alt="Server Icon" />
@@ -21,13 +21,13 @@
           <span class="text-sm font-semibold">Minecraft</span>
         </div>
 
-        <div class="h-6 w-0.5 bg-[var(--color-button-border)]"></div>
+        <div class="h-6 w-0.5 bg-button-border"></div>
         <div class="flex flex-row items-center gap-2">
           <LoaderIcon />
           <span class="text-sm font-semibold capitalize"> {{ loader }} {{ version }} </span>
         </div>
 
-        <div class="h-6 w-0.5 bg-[var(--color-button-border)]"></div>
+        <div class="h-6 w-0.5 bg-button-border"></div>
         <div class="flex flex-row items-center gap-2">
           <BoxIcon />
           <span class="text-sm font-semibold">

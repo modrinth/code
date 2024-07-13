@@ -1,7 +1,7 @@
 <template>
   <div data-pyro-server-stats class="flex flex-row items-center gap-6">
     <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-[var(--color-raised-bg)] p-8"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
@@ -21,7 +21,7 @@
     </div>
 
     <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-[var(--color-raised-bg)] p-8"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
@@ -41,7 +41,7 @@
     </div>
 
     <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-[var(--color-raised-bg)] p-8"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">

@@ -3,7 +3,7 @@
     <div
       v-for="n in count"
       :key="n"
-      class="relative h-[128px] w-full animate-pulse rounded-3xl bg-[var(--color-raised-bg)] p-4"
+      class="relative h-[128px] w-full animate-pulse rounded-3xl bg-bg-raised p-4"
     />
   </div>
 </template>

@@ -32,7 +32,7 @@
               data && data.game.charAt(0).toUpperCase() + data.game.slice(1)
             }}</span>
           </div>
-          <div class="h-6 w-0.5 bg-[var(--color-button-border)]"></div>
+          <div class="h-6 w-0.5 bg-button-border"></div>
           <div class="flex flex-row items-center gap-2">
             <LoaderIcon />
             <span class="text-sm font-semibold"
@@ -40,7 +40,7 @@
               {{ data?.version }}</span
             >
           </div>
-          <div class="h-6 w-0.5 bg-[var(--color-button-border)]"></div>
+          <div class="h-6 w-0.5 bg-button-border"></div>
           <div class="flex flex-row items-center gap-2">
             <BoxIcon />
             <span class="text-sm font-semibold">{{ data?.mods.length }} mods</span>

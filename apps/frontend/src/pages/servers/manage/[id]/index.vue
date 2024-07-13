@@ -7,7 +7,7 @@
       :storage-usage-bytes="stats.storage_usage_bytes"
       :storage-total-bytes="stats.storage_total_bytes"
     />
-    <div class="relative w-full overflow-hidden rounded-2xl bg-[var(--color-raised-bg)] p-8">
+    <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="experimental-styles-within flex flex-row items-center justify-between">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
         <Button color="secondary">

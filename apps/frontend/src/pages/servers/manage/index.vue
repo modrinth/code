@@ -36,7 +36,7 @@
 
     <div v-if="status !== 'success'" data-pyro-status>
       <div
-        class="relative flex max-h-[128px] w-full flex-row rounded-3xl bg-[var(--color-raised-bg)] p-4"
+        class="relative flex max-h-[128px] w-full flex-row rounded-3xl bg-bg-raised p-4"
       >
         <Transition name="fade">
           <div v-if="status === 'error'" class="flex h-full w-full items-center gap-6">
