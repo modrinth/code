@@ -21,7 +21,7 @@
           v-for="option in themeOptions"
           :key="option"
           class="preview-radio button-base"
-          :class="{ selected: theme.preference === option }"
+          :class="{ selected: theme.preferred === option }"
           @click="() => updateColorTheme(option)"
         >
           <div class="preview" :class="`${option === 'system' ? systemTheme : option}-mode`">
@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="theme.preference === option" class="radio" />
+            <RadioButtonChecked v-if="theme.preferred === option" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
             <SunIcon
@@ -153,7 +153,6 @@
           v-model="cosmetics.advancedRendering"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
@@ -170,7 +169,6 @@
           v-model="cosmetics.externalLinksNewTab"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
@@ -187,7 +185,6 @@
           v-model="cosmetics.hideModrinthAppPromos"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
@@ -204,7 +201,6 @@
           v-model="cosmetics.searchLayout"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
@@ -221,19 +217,19 @@
           v-model="cosmetics.projectLayout"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
     </section>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { CodeIcon, RadioButtonIcon, RadioButtonChecked, SunIcon, MoonIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 import { formatProjectType } from "~/plugins/shorthands.js";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import { DARK_THEMES } from "~/composables/theme.js";
+import { DarkThemes, type Theme } from "~/plugins/theme.ts";
+import type { DisplayLocation } from "~/plugins/cosmetics";
 
 useHead({
   title: "Display settings - Modrinth",
@@ -330,6 +326,10 @@ const projectListLayouts = defineMessages({
     id: "settings.display.project-list-layouts.user",
     defaultMessage: "User profile pages",
   },
+  collection: {
+    id: "settings.display.project-list.layouts.collection",
+    defaultMessage: "Collection",
+  },
 });
 
 const toggleFeatures = defineMessages({
@@ -390,45 +390,32 @@ const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
 const tags = useTags();
 
-const systemTheme = ref("light");
-
 const theme = useTheme();
 
+// On the server the value of native theme can be 'unknown'. To ensure we're
+// hydrating correctly, we need to make sure we aren't using 'unknown' or
+// otherwise wait until we are mounted and supposedly hydrated at this point...
+
+const systemTheme = useMountedValue((mounted) => {
+  if (import.meta.server && theme.native !== "unknown") return theme.native;
+
+  return mounted ? theme.native : theme.active;
+});
+
 const themeOptions = computed(() => {
-  const options = ["system", "light", "dark", "oled"];
-  if (flags.value.developerMode || theme.value.preference === "retro") {
+  const options: Theme[] = ["system", "light", "dark", "oled"];
+  if (flags.value.developerMode || theme.preferred === "retro") {
     options.push("retro");
   }
   return options;
 });
 
-onMounted(() => {
-  updateSystemTheme();
-  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
-    setSystemTheme(event.matches);
-  });
-});
-
-function updateSystemTheme() {
-  const query = window.matchMedia("(prefers-color-scheme: light)");
-  setSystemTheme(query.matches);
-}
-
-function setSystemTheme(light) {
-  if (light) {
-    systemTheme.value = "light";
-  } else {
-    systemTheme.value = cosmetics.value.preferredDarkTheme ?? "dark";
-  }
-}
-
-function updateColorTheme(value) {
-  if (DARK_THEMES.includes(value)) {
+function updateColorTheme(value: Theme) {
+  if (DarkThemes.includes(value)) {
     cosmetics.value.preferredDarkTheme = value;
-    saveCosmetics();
-    updateSystemTheme();
   }
-  updateTheme(value, true);
+
+  theme.preferred = value;
 }
 
 function disableDeveloperMode() {
@@ -445,16 +432,18 @@ function disableDeveloperMode() {
 const listTypes = computed(() => {
   const types = tags.value.projectTypes.map((type) => {
     return {
-      id: type.id,
+      id: type.id as DisplayLocation,
       name: formatProjectType(type.id) + "s",
       display: "the " + formatProjectType(type.id).toLowerCase() + "s search page",
     };
   });
+
   types.push({
-    id: "user",
+    id: "user" as DisplayLocation,
     name: "User profiles",
     display: "user pages",
   });
+
   return types;
 });
 </script>
