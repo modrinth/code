@@ -301,7 +301,7 @@ import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 
 const data = useNuxtApp();

@@ -327,7 +327,7 @@ import { getUserLink } from "~/helpers/users.js";
 import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
 import { markAsRead } from "~/helpers/notifications.js";
 import DoubleIcon from "~/components/ui/DoubleIcon.vue";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import Badge from "~/components/ui/Badge.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";

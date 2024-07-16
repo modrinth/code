@@ -305,7 +305,7 @@ import { Multiselect } from "vue-multiselect";
 import Badge from "~/components/ui/Badge.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import Modal from "~/components/ui/Modal.vue";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 

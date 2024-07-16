@@ -446,7 +446,7 @@ import ChartIcon from "~/assets/images/utils/chart.svg?component";
 
 import NavRow from "~/components/ui/NavRow.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
 import { DARK_THEMES } from "~/composables/theme.js";
@@ -941,10 +941,7 @@ function hideStagingBanner() {
               outline: none;
 
               .user-icon {
-                min-height: unset;
-                min-width: unset;
-                height: 2rem !important;
-                width: 2rem !important;
+                --size: 2rem !important;
                 outline: 2px solid var(--color-raised-bg);
                 transition: outline-color 0.1s ease-in-out;
               }

@@ -1100,7 +1100,7 @@ import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
 import Modal from "~/components/ui/Modal.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";

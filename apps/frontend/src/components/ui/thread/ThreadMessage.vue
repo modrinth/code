@@ -109,7 +109,7 @@ import {
 } from "@modrinth/assets";
 import { OverflowMenu, ConditionalNuxtLink } from "@modrinth/ui";
 import { renderString } from "@modrinth/utils";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import Badge from "~/components/ui/Badge.vue";
 import { isStaff } from "~/helpers/users.js";
 

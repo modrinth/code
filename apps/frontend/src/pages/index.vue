@@ -510,7 +510,7 @@ import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
 import ModrinthIcon from "~/assets/images/logo.svg?component";
 import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
 import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 
 const searchQuery = ref("better");

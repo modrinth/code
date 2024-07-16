@@ -102,7 +102,7 @@
 </template>
 <script setup>
 import Chips from "~/components/ui/Chips.vue";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
 import EyeIcon from "~/assets/images/utils/eye.svg?component";
 import SortAscIcon from "~/assets/images/utils/sort-asc.svg?component";

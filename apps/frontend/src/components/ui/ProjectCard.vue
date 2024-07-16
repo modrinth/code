@@ -98,7 +98,7 @@ import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
 import EditIcon from "~/assets/images/utils/updated.svg?component";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
 import HeartIcon from "~/assets/images/utils/heart.svg?component";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 
 export default {
   components: {

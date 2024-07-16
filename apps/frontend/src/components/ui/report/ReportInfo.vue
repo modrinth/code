@@ -89,7 +89,7 @@
 
 <script setup>
 import { renderHighlightedString } from "~/helpers/highlight.js";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import Badge from "~/components/ui/Badge.vue";
 import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UnknownIcon from "~/assets/images/utils/unknown.svg?component";

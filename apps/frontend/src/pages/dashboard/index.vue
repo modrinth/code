@@ -110,7 +110,7 @@
 <script setup>
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 import HistoryIcon from "~/assets/images/utils/history.svg?component";
-import Avatar from "~/components/ui/Avatar.vue";
+import { Avatar } from "@modrinth/ui";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
 import { fetchExtraNotificationData, groupNotifications } from "~/helpers/notifications.js";
 
