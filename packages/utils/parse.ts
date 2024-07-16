@@ -35,23 +35,31 @@ export const configuredXss = new FilterXSS({
     if (tag === 'iframe' && name === 'src') {
       const allowedSources = [
         {
-          regex:
-            /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}(\?&autoplay=[0-1]{1})?$/,
-          remove: ['&autoplay=1'], // Prevents autoplay
+          url: /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}/,
+          allowedParameters: [/start=\d+/, /end=\d+/],
         },
         {
-          regex: /^https?:\/\/(www\.)?discord\.com\/widget\?id=\d{18,19}(&theme=\w+)?$/,
-          remove: [/&theme=\w+/],
+          url: /^https?:\/\/(www\.)?discord\.com\/widget/,
+          allowedParameters: [/id=\d{18,19}/],
         },
       ]
 
+      const url = new URL(value)
+
       for (const source of allowedSources) {
-        if (source.regex.test(value)) {
-          for (const remove of source.remove) {
-            value = value.replace(remove, '')
-          }
-          return `${name}="${escapeAttrValue(value)}"`
+        if (!source.url.test(url.href)) {
+          continue
         }
+
+        const newSearchParams = new URLSearchParams()
+        url.searchParams.forEach((value, key) => {
+          if (!source.allowedParameters.some((param) => param.test(`${key}=${value}`))) {
+            newSearchParams.delete(key)
+          }
+        })
+
+        url.search = newSearchParams.toString()
+        return `${name}="${escapeAttrValue(url.toString())}"`
       }
     }
 
