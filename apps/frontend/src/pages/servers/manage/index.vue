@@ -10,10 +10,11 @@
           v-if="status === 'error'"
           type="button"
           alt="Try to load servers again"
-          class=""
+          class="flex items-center gap-2 text-sm font-bold"
           @click="() => refreshNuxtData('serversList')"
         >
           <UpdatedIcon />
+          Retry
         </button>
         <div class="relative w-72 text-sm">
           <label class="sr-only" for="search">Search</label>
@@ -35,9 +36,7 @@
     </div>
 
     <div v-if="status !== 'success'" data-pyro-status>
-      <div
-        class="relative flex max-h-[128px] w-full flex-row rounded-3xl bg-bg-raised p-4"
-      >
+      <div class="relative flex max-h-[128px] w-full flex-row rounded-3xl bg-bg-raised p-4">
         <Transition name="fade">
           <div v-if="status === 'error'" class="flex h-full w-full items-center gap-6">
             <img
