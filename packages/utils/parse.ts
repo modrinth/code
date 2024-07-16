@@ -1,9 +1,9 @@
 import MarkdownIt from 'markdown-it'
-import xss from 'xss'
+import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
 
-export const configuredXss = new xss.FilterXSS({
+export const configuredXss = new FilterXSS({
   whiteList: {
-    ...xss.whiteList,
+    ...whiteList,
     summary: [],
     h1: ['id'],
     h2: ['id'],
@@ -14,12 +14,12 @@ export const configuredXss = new xss.FilterXSS({
     kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
-    img: [...xss.whiteList.img, 'usemap', 'style'],
+    img: [...(whiteList.img || []), 'usemap', 'style'],
     map: ['name'],
-    area: [...xss.whiteList.a, 'coords'],
-    a: [...xss.whiteList.a, 'rel'],
-    td: [...xss.whiteList.td, 'style'],
-    th: [...xss.whiteList.th, 'style'],
+    area: [...(whiteList.a || []), 'coords'],
+    a: [...(whiteList.a || []), 'rel'],
+    td: [...(whiteList.td || []), 'style'],
+    th: [...(whiteList.th || []), 'style'],
     picture: [],
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
   },
@@ -50,20 +50,20 @@ export const configuredXss = new xss.FilterXSS({
           for (const remove of source.remove) {
             value = value.replace(remove, '')
           }
-          return `${name}="${xss.escapeAttrValue(value)}"`
+          return `${name}="${escapeAttrValue(value)}"`
         }
       }
     }
 
     // For Highlight.JS
     if (name === 'class' && ['pre', 'code', 'span'].includes(tag)) {
-      const allowedClasses = []
+      const allowedClasses: string[] = []
       for (const className of value.split(/\s/g)) {
         if (className.startsWith('hljs-') || className.startsWith('language-')) {
           allowedClasses.push(className)
         }
       }
-      return `${name}="${xss.escapeAttrValue(allowedClasses.join(' '))}"`
+      return `${name}="${escapeAttrValue(allowedClasses.join(' '))}"`
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
@@ -92,7 +92,7 @@ export const configuredXss = new xss.FilterXSS({
         ]
 
         if (!allowedHostnames.includes(url.hostname)) {
-          return xss.safeAttrValue(
+          return safeAttrValue(
             tag,
             name,
             `https://wsrv.nl/?url=${encodeURIComponent(
@@ -101,13 +101,13 @@ export const configuredXss = new xss.FilterXSS({
             cssFilter,
           )
         }
-        return xss.safeAttrValue(tag, name, url.toString(), cssFilter)
+        return safeAttrValue(tag, name, url.toString(), cssFilter)
       } catch (err) {
         /* empty */
       }
     }
 
-    return xss.safeAttrValue(tag, name, value, cssFilter)
+    return safeAttrValue(tag, name, value, cssFilter)
   },
 })
 
@@ -129,7 +129,7 @@ export const md = (options = {}) => {
     const token = tokens[idx]
     const index = token.attrIndex('href')
 
-    if (index !== -1) {
+    if (token.attrs && index !== -1) {
       const href = token.attrs[index][1]
 
       try {
@@ -152,4 +152,4 @@ export const md = (options = {}) => {
   return md
 }
 
-export const renderString = (string) => configuredXss.process(md().render(string))
+export const renderString = (string: string) => configuredXss.process(md().render(string))
