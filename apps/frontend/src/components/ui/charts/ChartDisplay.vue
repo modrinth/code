@@ -321,7 +321,7 @@ const analytics = useFetchAllAnalytics(
 
 const { startDate, endDate, timeRange, timeResolution } = analytics;
 
-const internalRange: Ref<RangeObject> = ref(defaultRanges[defaultRanges.length - 1]);
+const internalRange: Ref<RangeObject> = ref(props.ranges.find((r) => r.getLabel([new Date(), new Date()]) === "Last month")!);
 const selectedRange = computed({
   get: () => {
     return internalRange.value;
