@@ -1,5 +1,22 @@
 <template>
   <div>
+    <Modal header="Select date range" ref="dateRangeModal">
+      <div class="modal-body">
+        <div>
+          <h2>Rolling Ranges</h2>
+          <div class="button-group left">
+            <Button v-for="range in ranges" :key="range.getLabel([new Date(), new Date()])"
+              @click="changeRangeModal(range)"
+              :class="`button-base ${selectedRange === range ? 'button-base__selected' : ''}`">
+              {{ range.getLabel([new Date(), new Date()]) }}
+            </Button>
+          </div>
+        </div>
+        <div>
+          <h2>Fixed Ranges</h2>
+        </div>
+      </div>
+    </Modal>
     <div v-if="analytics.error.value" class="universal-card">
       <h2>
         <span class="label__title">Error</span>
@@ -17,9 +34,9 @@
             :labels="analytics.formattedData.value.downloads.chart.labels"
             suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
             :class="`clickable chart-button-base button-base ${selectedChart === 'downloads'
-      ? 'chart-button-base__selected button-base__selected'
-      : ''
-      }`" :onclick="() => (selectedChart = 'downloads')" role="button" />
+              ? 'chart-button-base__selected button-base__selected'
+              : ''
+              }`" :onclick="() => (selectedChart = 'downloads')" role="button" />
         </client-only>
         <client-only>
           <CompactChart v-if="analytics.formattedData.value.views" ref="tinyViewChart" :title="`Views`"
@@ -28,14 +45,14 @@
             :labels="analytics.formattedData.value.views.chart.labels"
             suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
             :class="`clickable chart-button-base button-base ${selectedChart === 'views' ? 'chart-button-base__selected button-base__selected' : ''
-      }`" :onclick="() => (selectedChart = 'views')" role="button" />
+              }`" :onclick="() => (selectedChart = 'views')" role="button" />
         </client-only>
         <client-only>
           <CompactChart v-if="analytics.formattedData.value.revenue" ref="tinyRevenueChart" :title="`Revenue`"
             color="var(--color-purple)" :value="formatMoney(analytics.formattedData.value.revenue.sum, false)"
             :data="analytics.formattedData.value.revenue.chart.sumData"
             :labels="analytics.formattedData.value.revenue.chart.labels" is-money :class="`clickable chart-button-base button-base ${selectedChart === 'revenue' ? 'chart-button-base__selected button-base__selected' : ''
-      }`" :onclick="() => (selectedChart = 'revenue')" role="button" />
+              }`" :onclick="() => (selectedChart = 'revenue')" role="button" />
         </client-only>
       </div>
       <div class="graphs__main-graph">
@@ -59,7 +76,7 @@
               <Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
                 <UpdatedIcon />
               </Button>
-              <Button v-tooltip="'Select date range'" icon-only @click="">
+              <Button v-tooltip="'Select date range'" icon-only @click="openDateRangeModal">
                 <CalendarIcon />
               </Button>
               <!-- <DropdownSelect
@@ -81,44 +98,44 @@
                   :labels="analytics.formattedData.value.downloads.chart.labels"
                   suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
                   :colors="isUsingProjectColors
-      ? analytics.formattedData.value.downloads.chart.colors
-      : analytics.formattedData.value.downloads.chart.defaultColors
-      " />
+              ? analytics.formattedData.value.downloads.chart.colors
+              : analytics.formattedData.value.downloads.chart.defaultColors
+              " />
                 <Chart v-if="analytics.formattedData.value.views && selectedChart === 'views'" ref="viewsChart"
                   type="line" name="View data" :hide-legend="true"
                   :data="analytics.formattedData.value.views.chart.data"
                   :labels="analytics.formattedData.value.views.chart.labels"
                   suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
                   :colors="isUsingProjectColors
-      ? analytics.formattedData.value.views.chart.colors
-      : analytics.formattedData.value.views.chart.defaultColors
-      " />
+              ? analytics.formattedData.value.views.chart.colors
+              : analytics.formattedData.value.views.chart.defaultColors
+              " />
                 <Chart v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'" ref="revenueChart"
                   type="line" name="Revenue data" :hide-legend="true"
                   :data="analytics.formattedData.value.revenue.chart.data"
                   :labels="analytics.formattedData.value.revenue.chart.labels" is-money
                   suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='2' x2='12' y2='22'></line><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'></path></svg>"
                   :colors="isUsingProjectColors
-      ? analytics.formattedData.value.revenue.chart.colors
-      : analytics.formattedData.value.revenue.chart.defaultColors
-      " />
+              ? analytics.formattedData.value.revenue.chart.colors
+              : analytics.formattedData.value.revenue.chart.defaultColors
+              " />
               </client-only>
             </div>
             <div class="legend">
               <div class="legend__items">
                 <template v-for="project in selectedDataSetProjects" :key="project">
                   <button v-tooltip="project.title" :class="`legend__item button-base btn-transparent ${!projectIsOnDisplay(project.id) ? 'btn-dimmed' : ''
-      }`" @click="() =>
-      projectIsOnDisplay(project.id) &&
-        analytics.validProjectIds.value.includes(project.id)
-        ? removeProjectFromDisplay(project.id)
-        : addProjectToDisplay(project.id)
-      ">
+              }`" @click="() =>
+              projectIsOnDisplay(project.id) &&
+                analytics.validProjectIds.value.includes(project.id)
+                ? removeProjectFromDisplay(project.id)
+                : addProjectToDisplay(project.id)
+              ">
                     <div :style="{
-      '--color-brand': isUsingProjectColors
-        ? intToRgba(project.color, project.id, theme.active ?? undefined)
-        : getDefaultColor(project.id),
-    }" class="legend__item__color"></div>
+              '--color-brand': isUsingProjectColors
+                ? intToRgba(project.color, project.id, theme.active ?? undefined)
+                : getDefaultColor(project.id),
+            }" class="legend__item__color"></div>
                     <div class="legend__item__text">{{ project.title }}</div>
                   </button>
                 </template>
@@ -128,9 +145,9 @@
         </div>
         <div class="country-data">
           <Card v-if="analytics.formattedData.value?.downloadsByCountry &&
-      selectedChart === 'downloads' &&
-      analytics.formattedData.value.downloadsByCountry.data.length > 0
-      " class="country-downloads">
+              selectedChart === 'downloads' &&
+              analytics.formattedData.value.downloadsByCountry.data.length > 0
+              " class="country-downloads">
             <label>
               <span class="label__title">Downloads by region</span>
             </label>
@@ -139,9 +156,9 @@
                 class="country-value">
                 <div class="country-flag-container">
                   <img :src="name.toLowerCase() === 'xx' || !name
-      ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-      : countryCodeToFlag(name)
-      " alt="Hidden country" class="country-flag" />
+              ? 'https://cdn.modrinth.com/placeholder-banner.svg'
+              : countryCodeToFlag(name)
+              " alt="Hidden country" class="country-flag" />
                 </div>
                 <div class="country-text">
                   <strong class="country-name"><template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
@@ -150,22 +167,22 @@
                   <span class="data-point">{{ formatNumber(count) }}</span>
                 </div>
                 <div v-tooltip="formatPercent(count, analytics.formattedData.value.downloadsByCountry.sum)
-      " class="percentage-bar">
+              " class="percentage-bar">
                   <span :style="{
-      width: formatPercent(
-        count,
-        analytics.formattedData.value.downloadsByCountry.sum,
-      ),
-      backgroundColor: 'var(--color-brand)',
-    }"></span>
+              width: formatPercent(
+                count,
+                analytics.formattedData.value.downloadsByCountry.sum,
+              ),
+              backgroundColor: 'var(--color-brand)',
+            }"></span>
                 </div>
               </div>
             </div>
           </Card>
           <Card v-if="analytics.formattedData.value?.viewsByCountry &&
-      selectedChart === 'views' &&
-      analytics.formattedData.value.viewsByCountry.data.length > 0
-      " class="country-downloads">
+              selectedChart === 'views' &&
+              analytics.formattedData.value.viewsByCountry.data.length > 0
+              " class="country-downloads">
             <label>
               <span class="label__title">Page views by region</span>
             </label>
@@ -174,9 +191,9 @@
                 class="country-value">
                 <div class="country-flag-container">
                   <img :src="name.toLowerCase() === 'xx' || !name
-      ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-      : countryCodeToFlag(name)
-      " alt="Hidden country" class="country-flag" />
+              ? 'https://cdn.modrinth.com/placeholder-banner.svg'
+              : countryCodeToFlag(name)
+              " alt="Hidden country" class="country-flag" />
                 </div>
                 <div class="country-text">
                   <strong class="country-name">
@@ -186,14 +203,14 @@
                   <span class="data-point">{{ formatNumber(count) }}</span>
                 </div>
                 <div v-tooltip="`${Math.round(
-      (count / analytics.formattedData.value.viewsByCountry.sum) * 10000,
-    ) / 100
-      }%`
-      " class="percentage-bar">
+              (count / analytics.formattedData.value.viewsByCountry.sum) * 10000,
+            ) / 100
+              }%`
+              " class="percentage-bar">
                   <span :style="{
-      width: `${(count / analytics.formattedData.value.viewsByCountry.sum) * 100}%`,
-      backgroundColor: 'var(--color-blue)',
-    }"></span>
+              width: `${(count / analytics.formattedData.value.viewsByCountry.sum) * 100}%`,
+              backgroundColor: 'var(--color-blue)',
+            }"></span>
                 </div>
               </div>
             </div>
@@ -205,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card, DropdownSelect } from "@modrinth/ui";
+import { Button, Card, DropdownSelect, Modal } from "@modrinth/ui";
 import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
 import { UpdatedIcon, DownloadIcon, CalendarIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
@@ -260,6 +277,9 @@ const selectedChart = computed({
   },
 });
 
+// Modal ref
+const dateRangeModal = ref();
+
 // Chart refs
 const downloadsChart = ref();
 const viewsChart = ref();
@@ -295,6 +315,15 @@ const resetCharts = () => {
   tinyRevenueChart.value?.resetChart();
 };
 
+const openDateRangeModal = () => {
+  dateRangeModal.value.show();
+}
+
+const changeRangeModal = (range: RangeObject) => {
+  selectedRange.value = range;
+  dateRangeModal.value.hide();
+}
+
 const isUsingProjectColors = computed({
   get: () => {
     return (
@@ -321,25 +350,26 @@ const analytics = useFetchAllAnalytics(
 
 const { startDate, endDate, timeRange, timeResolution } = analytics;
 
-const internalRange: Ref<RangeObject> = ref(props.ranges.find((r) => r.getLabel([new Date(), new Date()]) === "Last month")!);
+const internalRange: Ref<RangeObject> = ref(props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === "Last month")!);
 const selectedRange = computed({
   get: () => {
     return internalRange.value;
   },
   set: (newRange) => {
-    const ranges = newRange.getDates(new Date());
-    timeRange.value = ranges.endDate.getTime() - ranges.startDate.getTime();
-    startDate.value = ranges.startDate.getMilliseconds();
-    endDate.value = ranges.endDate.getMilliseconds();
+    const ranges = newRange.getDates(dayjs());
+    startDate.value = ranges.startDate;
+    endDate.value = ranges.endDate;
 
     if (newRange.timeResolution) {
       timeResolution.value = newRange.timeResolution;
     }
+
+    internalRange.value = newRange;
   },
 });
 
 const formattedCategorySubtitle = computed(() => {
-  return selectedRange.value.getLabel([dayjs(startDate.value).toDate(), dayjs(endDate.value).toDate()]);
+  return internalRange.value.getLabel([dayjs(startDate.value), dayjs(endDate.value)]);
 });
 
 const selectedDataSet = computed(() => {
@@ -396,83 +426,84 @@ const defaultResoloutions: Record<string, number> = {
   "A week": 10080,
 };
 
-type DateRange = { startDate: Date; endDate: Date };
+type DateRange = { startDate: dayjs.Dayjs; endDate: dayjs.Dayjs };
 
 type RangeObject = {
-  getLabel: (dateRange: [Date, Date]) => string;
-  getDates: (currentDate: Date) => DateRange;
+  getLabel: (dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => string;
+  getDates: (currentDate: dayjs.Dayjs) => DateRange;
+  // A time resolution in minutes.
   timeResolution?: number;
 };
 
 const defaultRanges: RangeObject[] = [
   {
     getLabel: () => "Last 30 minutes",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getTime() - 30 * 60 * 1000),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(30, 'minute'),
       endDate: currentDate,
     }),
     timeResolution: 1,
   },
   {
     getLabel: () => "Last hour",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getTime() - 60 * 60 * 1000),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(1, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 5,
   },
   {
     getLabel: () => "Last 12 hours",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getTime() - 12 * 60 * 60 * 1000),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(12, 'hour'),
       endDate: currentDate,
     }),
     timeResolution: 15,
   },
   {
     getLabel: () => "Last day",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getTime() - 24 * 60 * 60 * 1000),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(1, 'day'),
       endDate: currentDate,
     }),
     timeResolution: 60,
   },
   {
     getLabel: () => "Last week",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(7, 'day'),
       endDate: currentDate,
     }),
     timeResolution: 720,
   },
   {
     getLabel: () => "Last month",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(1, 'month').startOf('month'),
       endDate: currentDate,
     }),
     timeResolution: 1440,
   },
   {
     getLabel: () => "Last quarter",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getFullYear(), Math.floor(currentDate.getMonth() / 3) * 3 - 3, 1),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(3, 'month').startOf('quarter'),
       endDate: currentDate,
     }),
     timeResolution: 10080,
   },
   {
     getLabel: () => "Last year",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getFullYear() - 1, 0, 1),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(1, 'year').startOf('year'),
       endDate: currentDate,
     }),
     timeResolution: 20160,
   },
   {
     getLabel: () => "Last two years",
-    getDates: (currentDate: Date) => ({
-      startDate: new Date(currentDate.getFullYear() - 2, 0, 1),
+    getDates: (currentDate: dayjs.Dayjs) => ({
+      startDate: dayjs(currentDate).subtract(2, 'year').startOf('year'),
       endDate: currentDate,
     }),
     timeResolution: 40320,
@@ -687,6 +718,17 @@ const defaultRanges: RangeObject[] = [
       height: 100%;
     }
   }
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-md);
+  padding: var(--gap-lg);
+}
+
+.button-group.left {
+  float: left;
 }
 
 @media (max-width: 768px) {

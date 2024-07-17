@@ -308,8 +308,8 @@ export const useFetchAllAnalytics = (
   const timeResolution = ref(1440); // 1 day
   const timeRange = ref(43200); // 30 days
 
-  const startDate = ref(Date.now() - timeRange.value * 60 * 1000);
-  const endDate = ref(Date.now());
+  const startDate = ref(dayjs().subtract(timeRange.value, "minutes"));
+  const endDate = ref(dayjs());
 
   const downloadData = ref(null);
   const viewData = ref(null);
@@ -394,8 +394,8 @@ export const useFetchAllAnalytics = (
     [() => startDate.value, () => endDate.value, () => timeResolution.value, () => projects.value],
     async () => {
       const q = {
-        start_date: dayjs(startDate.value).toISOString(),
-        end_date: dayjs(endDate.value).toISOString(),
+        start_date: startDate.value.toISOString(),
+        end_date: endDate.value.toISOString(),
         resolution_minutes: timeResolution.value,
       };
 
