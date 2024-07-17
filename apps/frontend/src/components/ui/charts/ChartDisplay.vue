@@ -328,8 +328,13 @@ const selectedRange = computed({
   },
   set: (newRange) => {
     const ranges = newRange.getDates(new Date());
+    timeRange.value = ranges.endDate.getTime() - ranges.startDate.getTime();
     startDate.value = ranges.startDate.getMilliseconds();
     endDate.value = ranges.endDate.getMilliseconds();
+
+    if (newRange.timeResolution) {
+      timeResolution.value = newRange.timeResolution;
+    }
   },
 });
 
@@ -396,7 +401,7 @@ type DateRange = { startDate: Date; endDate: Date };
 type RangeObject = {
   getLabel: (dateRange: [Date, Date]) => string;
   getDates: (currentDate: Date) => DateRange;
-  updateInterval: number;
+  timeResolution?: number;
 };
 
 const defaultRanges: RangeObject[] = [
@@ -406,7 +411,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getTime() - 30 * 60 * 1000),
       endDate: currentDate,
     }),
-    updateInterval: 1,
+    timeResolution: 1,
   },
   {
     getLabel: () => "Last hour",
@@ -414,7 +419,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getTime() - 60 * 60 * 1000),
       endDate: currentDate,
     }),
-    updateInterval: 5,
+    timeResolution: 5,
   },
   {
     getLabel: () => "Last 12 hours",
@@ -422,7 +427,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getTime() - 12 * 60 * 60 * 1000),
       endDate: currentDate,
     }),
-    updateInterval: 15,
+    timeResolution: 15,
   },
   {
     getLabel: () => "Last day",
@@ -430,7 +435,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getTime() - 24 * 60 * 60 * 1000),
       endDate: currentDate,
     }),
-    updateInterval: 60,
+    timeResolution: 60,
   },
   {
     getLabel: () => "Last week",
@@ -438,7 +443,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000),
       endDate: currentDate,
     }),
-    updateInterval: 720,
+    timeResolution: 720,
   },
   {
     getLabel: () => "Last month",
@@ -446,7 +451,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
       endDate: currentDate,
     }),
-    updateInterval: 1440,
+    timeResolution: 1440,
   },
   {
     getLabel: () => "Last quarter",
@@ -454,7 +459,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getFullYear(), Math.floor(currentDate.getMonth() / 3) * 3 - 3, 1),
       endDate: currentDate,
     }),
-    updateInterval: 10080,
+    timeResolution: 10080,
   },
   {
     getLabel: () => "Last year",
@@ -462,7 +467,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getFullYear() - 1, 0, 1),
       endDate: currentDate,
     }),
-    updateInterval: 20160,
+    timeResolution: 20160,
   },
   {
     getLabel: () => "Last two years",
@@ -470,7 +475,7 @@ const defaultRanges: RangeObject[] = [
       startDate: new Date(currentDate.getFullYear() - 2, 0, 1),
       endDate: currentDate,
     }),
-    updateInterval: 40320,
+    timeResolution: 40320,
   },
 ];
 </script>
