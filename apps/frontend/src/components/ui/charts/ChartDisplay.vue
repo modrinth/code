@@ -11,57 +11,31 @@
     <div v-else class="graphs">
       <div class="graphs__vertical-bar">
         <client-only>
-          <CompactChart
-            v-if="analytics.formattedData.value.downloads"
-            ref="tinyDownloadChart"
-            :title="`Downloads since ${dayjs(startDate).format('MMM D, YYYY')}`"
-            color="var(--color-brand)"
-            :value="formatNumber(analytics.formattedData.value.downloads.sum, false)"
+          <CompactChart v-if="analytics.formattedData.value.downloads" ref="tinyDownloadChart" :title="`Downloads`"
+            color="var(--color-brand)" :value="formatNumber(analytics.formattedData.value.downloads.sum, false)"
             :data="analytics.formattedData.value.downloads.chart.sumData"
             :labels="analytics.formattedData.value.downloads.chart.labels"
             suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
-            :class="`clickable chart-button-base button-base ${
-              selectedChart === 'downloads'
-                ? 'chart-button-base__selected button-base__selected'
-                : ''
-            }`"
-            :onclick="() => (selectedChart = 'downloads')"
-            role="button"
-          />
+            :class="`clickable chart-button-base button-base ${selectedChart === 'downloads'
+      ? 'chart-button-base__selected button-base__selected'
+      : ''
+      }`" :onclick="() => (selectedChart = 'downloads')" role="button" />
         </client-only>
         <client-only>
-          <CompactChart
-            v-if="analytics.formattedData.value.views"
-            ref="tinyViewChart"
-            :title="`Page views since ${dayjs(startDate).format('MMM D, YYYY')}`"
-            color="var(--color-blue)"
-            :value="formatNumber(analytics.formattedData.value.views.sum, false)"
+          <CompactChart v-if="analytics.formattedData.value.views" ref="tinyViewChart" :title="`Views`"
+            color="var(--color-blue)" :value="formatNumber(analytics.formattedData.value.views.sum, false)"
             :data="analytics.formattedData.value.views.chart.sumData"
             :labels="analytics.formattedData.value.views.chart.labels"
             suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
-            :class="`clickable chart-button-base button-base ${
-              selectedChart === 'views' ? 'chart-button-base__selected button-base__selected' : ''
-            }`"
-            :onclick="() => (selectedChart = 'views')"
-            role="button"
-          />
+            :class="`clickable chart-button-base button-base ${selectedChart === 'views' ? 'chart-button-base__selected button-base__selected' : ''
+      }`" :onclick="() => (selectedChart = 'views')" role="button" />
         </client-only>
         <client-only>
-          <CompactChart
-            v-if="analytics.formattedData.value.revenue"
-            ref="tinyRevenueChart"
-            :title="`Revenue since ${dayjs(startDate).format('MMM D, YYYY')}`"
-            color="var(--color-purple)"
-            :value="formatMoney(analytics.formattedData.value.revenue.sum, false)"
+          <CompactChart v-if="analytics.formattedData.value.revenue" ref="tinyRevenueChart" :title="`Revenue`"
+            color="var(--color-purple)" :value="formatMoney(analytics.formattedData.value.revenue.sum, false)"
             :data="analytics.formattedData.value.revenue.chart.sumData"
-            :labels="analytics.formattedData.value.revenue.chart.labels"
-            is-money
-            :class="`clickable chart-button-base button-base ${
-              selectedChart === 'revenue' ? 'chart-button-base__selected button-base__selected' : ''
-            }`"
-            :onclick="() => (selectedChart = 'revenue')"
-            role="button"
-          />
+            :labels="analytics.formattedData.value.revenue.chart.labels" is-money :class="`clickable chart-button-base button-base ${selectedChart === 'revenue' ? 'chart-button-base__selected button-base__selected' : ''
+      }`" :onclick="() => (selectedChart = 'revenue')" role="button" />
         </client-only>
       </div>
       <div class="graphs__main-graph">
@@ -70,6 +44,9 @@
             <h2>
               <span class="label__title">
                 {{ formatCategoryHeader(selectedChart) }}
+              </span>
+              <span class="label__subtitle">
+                {{ formattedCategorySubtitle }}
               </span>
             </h2>
             <div class="chart-controls__buttons">
@@ -82,91 +59,66 @@
               <Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
                 <UpdatedIcon />
               </Button>
-              <DropdownSelect
+              <Button v-tooltip="'Select date range'" icon-only @click="">
+                <CalendarIcon />
+              </Button>
+              <!-- <DropdownSelect
                 v-model="selectedRange"
                 :options="selectableRanges"
                 name="Time range"
                 :display-name="
                   (o: (typeof selectableRanges)[number] | undefined) => o?.label || 'Custom'
                 "
-              />
+              /> -->
             </div>
           </div>
           <div class="chart-area">
             <div class="chart">
               <client-only>
-                <Chart
-                  v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
-                  ref="downloadsChart"
-                  type="line"
-                  name="Download data"
-                  :hide-legend="true"
+                <Chart v-if="analytics.formattedData.value.downloads && selectedChart === 'downloads'"
+                  ref="downloadsChart" type="line" name="Download data" :hide-legend="true"
                   :data="analytics.formattedData.value.downloads.chart.data"
                   :labels="analytics.formattedData.value.downloads.chart.labels"
                   suffix="<svg xmlns='http://www.w3.org/2000/svg' class='h-6 w-6' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2'><path stroke-linecap='round' stroke-linejoin='round' d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4' /></svg>"
-                  :colors="
-                    isUsingProjectColors
-                      ? analytics.formattedData.value.downloads.chart.colors
-                      : analytics.formattedData.value.downloads.chart.defaultColors
-                  "
-                />
-                <Chart
-                  v-if="analytics.formattedData.value.views && selectedChart === 'views'"
-                  ref="viewsChart"
-                  type="line"
-                  name="View data"
-                  :hide-legend="true"
+                  :colors="isUsingProjectColors
+      ? analytics.formattedData.value.downloads.chart.colors
+      : analytics.formattedData.value.downloads.chart.defaultColors
+      " />
+                <Chart v-if="analytics.formattedData.value.views && selectedChart === 'views'" ref="viewsChart"
+                  type="line" name="View data" :hide-legend="true"
                   :data="analytics.formattedData.value.views.chart.data"
                   :labels="analytics.formattedData.value.views.chart.labels"
                   suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>"
-                  :colors="
-                    isUsingProjectColors
-                      ? analytics.formattedData.value.views.chart.colors
-                      : analytics.formattedData.value.views.chart.defaultColors
-                  "
-                />
-                <Chart
-                  v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'"
-                  ref="revenueChart"
-                  type="line"
-                  name="Revenue data"
-                  :hide-legend="true"
+                  :colors="isUsingProjectColors
+      ? analytics.formattedData.value.views.chart.colors
+      : analytics.formattedData.value.views.chart.defaultColors
+      " />
+                <Chart v-if="analytics.formattedData.value.revenue && selectedChart === 'revenue'" ref="revenueChart"
+                  type="line" name="Revenue data" :hide-legend="true"
                   :data="analytics.formattedData.value.revenue.chart.data"
-                  :labels="analytics.formattedData.value.revenue.chart.labels"
-                  is-money
+                  :labels="analytics.formattedData.value.revenue.chart.labels" is-money
                   suffix="<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='2' x2='12' y2='22'></line><path d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'></path></svg>"
-                  :colors="
-                    isUsingProjectColors
-                      ? analytics.formattedData.value.revenue.chart.colors
-                      : analytics.formattedData.value.revenue.chart.defaultColors
-                  "
-                />
+                  :colors="isUsingProjectColors
+      ? analytics.formattedData.value.revenue.chart.colors
+      : analytics.formattedData.value.revenue.chart.defaultColors
+      " />
               </client-only>
             </div>
             <div class="legend">
               <div class="legend__items">
                 <template v-for="project in selectedDataSetProjects" :key="project">
-                  <button
-                    v-tooltip="project.title"
-                    :class="`legend__item button-base btn-transparent ${
-                      !projectIsOnDisplay(project.id) ? 'btn-dimmed' : ''
-                    }`"
-                    @click="
-                      () =>
-                        projectIsOnDisplay(project.id) &&
-                        analytics.validProjectIds.value.includes(project.id)
-                          ? removeProjectFromDisplay(project.id)
-                          : addProjectToDisplay(project.id)
-                    "
-                  >
-                    <div
-                      :style="{
-                        '--color-brand': isUsingProjectColors
-                          ? intToRgba(project.color, project.id, theme.active ?? undefined)
-                          : getDefaultColor(project.id),
-                      }"
-                      class="legend__item__color"
-                    ></div>
+                  <button v-tooltip="project.title" :class="`legend__item button-base btn-transparent ${!projectIsOnDisplay(project.id) ? 'btn-dimmed' : ''
+      }`" @click="() =>
+      projectIsOnDisplay(project.id) &&
+        analytics.validProjectIds.value.includes(project.id)
+        ? removeProjectFromDisplay(project.id)
+        : addProjectToDisplay(project.id)
+      ">
+                    <div :style="{
+      '--color-brand': isUsingProjectColors
+        ? intToRgba(project.color, project.id, theme.active ?? undefined)
+        : getDefaultColor(project.id),
+    }" class="legend__item__color"></div>
                     <div class="legend__item__text">{{ project.title }}</div>
                   </button>
                 </template>
@@ -175,87 +127,56 @@
           </div>
         </div>
         <div class="country-data">
-          <Card
-            v-if="
-              analytics.formattedData.value?.downloadsByCountry &&
-              selectedChart === 'downloads' &&
-              analytics.formattedData.value.downloadsByCountry.data.length > 0
-            "
-            class="country-downloads"
-          >
+          <Card v-if="analytics.formattedData.value?.downloadsByCountry &&
+      selectedChart === 'downloads' &&
+      analytics.formattedData.value.downloadsByCountry.data.length > 0
+      " class="country-downloads">
             <label>
               <span class="label__title">Downloads by region</span>
             </label>
             <div class="country-values">
-              <div
-                v-for="[name, count] in analytics.formattedData.value.downloadsByCountry.data"
-                :key="name"
-                class="country-value"
-              >
+              <div v-for="[name, count] in analytics.formattedData.value.downloadsByCountry.data" :key="name"
+                class="country-value">
                 <div class="country-flag-container">
-                  <img
-                    :src="
-                      name.toLowerCase() === 'xx' || !name
-                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-                        : countryCodeToFlag(name)
-                    "
-                    alt="Hidden country"
-                    class="country-flag"
-                  />
+                  <img :src="name.toLowerCase() === 'xx' || !name
+      ? 'https://cdn.modrinth.com/placeholder-banner.svg'
+      : countryCodeToFlag(name)
+      " alt="Hidden country" class="country-flag" />
                 </div>
                 <div class="country-text">
-                  <strong class="country-name"
-                    ><template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
+                  <strong class="country-name"><template v-if="name.toLowerCase() === 'xx' || !name">Hidden</template>
                     <template v-else>{{ countryCodeToName(name) }}</template>
                   </strong>
                   <span class="data-point">{{ formatNumber(count) }}</span>
                 </div>
-                <div
-                  v-tooltip="
-                    formatPercent(count, analytics.formattedData.value.downloadsByCountry.sum)
-                  "
-                  class="percentage-bar"
-                >
-                  <span
-                    :style="{
-                      width: formatPercent(
-                        count,
-                        analytics.formattedData.value.downloadsByCountry.sum,
-                      ),
-                      backgroundColor: 'var(--color-brand)',
-                    }"
-                  ></span>
+                <div v-tooltip="formatPercent(count, analytics.formattedData.value.downloadsByCountry.sum)
+      " class="percentage-bar">
+                  <span :style="{
+      width: formatPercent(
+        count,
+        analytics.formattedData.value.downloadsByCountry.sum,
+      ),
+      backgroundColor: 'var(--color-brand)',
+    }"></span>
                 </div>
               </div>
             </div>
           </Card>
-          <Card
-            v-if="
-              analytics.formattedData.value?.viewsByCountry &&
-              selectedChart === 'views' &&
-              analytics.formattedData.value.viewsByCountry.data.length > 0
-            "
-            class="country-downloads"
-          >
+          <Card v-if="analytics.formattedData.value?.viewsByCountry &&
+      selectedChart === 'views' &&
+      analytics.formattedData.value.viewsByCountry.data.length > 0
+      " class="country-downloads">
             <label>
               <span class="label__title">Page views by region</span>
             </label>
             <div class="country-values">
-              <div
-                v-for="[name, count] in analytics.formattedData.value.viewsByCountry.data"
-                :key="name"
-                class="country-value"
-              >
+              <div v-for="[name, count] in analytics.formattedData.value.viewsByCountry.data" :key="name"
+                class="country-value">
                 <div class="country-flag-container">
-                  <img
-                    :src="
-                      name.toLowerCase() === 'xx' || !name
-                        ? 'https://cdn.modrinth.com/placeholder-banner.svg'
-                        : countryCodeToFlag(name)
-                    "
-                    alt="Hidden country"
-                    class="country-flag"
-                  />
+                  <img :src="name.toLowerCase() === 'xx' || !name
+      ? 'https://cdn.modrinth.com/placeholder-banner.svg'
+      : countryCodeToFlag(name)
+      " alt="Hidden country" class="country-flag" />
                 </div>
                 <div class="country-text">
                   <strong class="country-name">
@@ -264,22 +185,15 @@
                   </strong>
                   <span class="data-point">{{ formatNumber(count) }}</span>
                 </div>
-                <div
-                  v-tooltip="
-                    `${
-                      Math.round(
-                        (count / analytics.formattedData.value.viewsByCountry.sum) * 10000,
-                      ) / 100
-                    }%`
-                  "
-                  class="percentage-bar"
-                >
-                  <span
-                    :style="{
-                      width: `${(count / analytics.formattedData.value.viewsByCountry.sum) * 100}%`,
-                      backgroundColor: 'var(--color-blue)',
-                    }"
-                  ></span>
+                <div v-tooltip="`${Math.round(
+      (count / analytics.formattedData.value.viewsByCountry.sum) * 10000,
+    ) / 100
+      }%`
+      " class="percentage-bar">
+                  <span :style="{
+      width: `${(count / analytics.formattedData.value.viewsByCountry.sum) * 100}%`,
+      backgroundColor: 'var(--color-blue)',
+    }"></span>
                 </div>
               </div>
             </div>
@@ -293,7 +207,7 @@
 <script setup lang="ts">
 import { Button, Card, DropdownSelect } from "@modrinth/ui";
 import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
-import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
+import { UpdatedIcon, DownloadIcon, CalendarIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
@@ -313,7 +227,7 @@ const props = withDefaults(
      * @deprecated Use `ranges` instead
      */
     resoloutions?: Record<string, number>;
-    ranges?: Record<number, [string, number] | string>;
+    ranges?: RangeObject[];
     personal?: boolean;
   }>(),
   {
@@ -325,12 +239,6 @@ const props = withDefaults(
 );
 
 const projects = ref(props.projects || []);
-
-const selectableRanges = Object.entries(props.ranges).map(([duration, extra]) => ({
-  label: typeof extra === "string" ? extra : extra[0],
-  value: Number(duration),
-  res: typeof extra === "string" ? Number(duration) : extra[1],
-}));
 
 // const selectedChart = ref('downloads')
 const selectedChart = computed({
@@ -413,24 +321,20 @@ const analytics = useFetchAllAnalytics(
 
 const { startDate, endDate, timeRange, timeResolution } = analytics;
 
+const internalRange: Ref<RangeObject> = ref(defaultRanges[defaultRanges.length - 1]);
 const selectedRange = computed({
   get: () => {
-    return (
-      selectableRanges.find((option) => option.value === timeRange.value) || {
-        label: "Custom",
-        value: timeRange.value,
-      }
-    );
+    return internalRange.value;
   },
-  set: (newRange: { label: string; value: number; res?: number }) => {
-    timeRange.value = newRange.value;
-    startDate.value = Date.now() - timeRange.value * 60 * 1000;
-    endDate.value = Date.now();
+  set: (newRange) => {
+    const ranges = newRange.getDates(new Date());
+    startDate.value = ranges.startDate.getMilliseconds();
+    endDate.value = ranges.endDate.getMilliseconds();
+  },
+});
 
-    if (newRange?.res) {
-      timeResolution.value = newRange.res;
-    }
-  },
+const formattedCategorySubtitle = computed(() => {
+  return selectedRange.value.getLabel([dayjs(startDate.value).toDate(), dayjs(endDate.value).toDate()]);
 });
 
 const selectedDataSet = computed(() => {
@@ -475,6 +379,9 @@ const onToggleColors = () => {
 </script>
 
 <script lang="ts">
+/**
+ * @deprecated Use `ranges` instead
+ */
 const defaultResoloutions: Record<string, number> = {
   "5 minutes": 5,
   "30 minutes": 30,
@@ -484,17 +391,88 @@ const defaultResoloutions: Record<string, number> = {
   "A week": 10080,
 };
 
-const defaultRanges: Record<number, [string, number] | string> = {
-  30: ["Last 30 minutes", 1],
-  60: ["Last hour", 5],
-  720: ["Last 12 hours", 15],
-  1440: ["Last day", 60],
-  10080: ["Last week", 720],
-  43200: ["Last month", 1440],
-  129600: ["Last quarter", 10080],
-  525600: ["Last year", 20160],
-  1051200: ["Last two years", 40320],
+type DateRange = { startDate: Date; endDate: Date };
+
+type RangeObject = {
+  getLabel: (dateRange: [Date, Date]) => string;
+  getDates: (currentDate: Date) => DateRange;
+  updateInterval: number;
 };
+
+const defaultRanges: RangeObject[] = [
+  {
+    getLabel: () => "Last 30 minutes",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getTime() - 30 * 60 * 1000),
+      endDate: currentDate,
+    }),
+    updateInterval: 1,
+  },
+  {
+    getLabel: () => "Last hour",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getTime() - 60 * 60 * 1000),
+      endDate: currentDate,
+    }),
+    updateInterval: 5,
+  },
+  {
+    getLabel: () => "Last 12 hours",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getTime() - 12 * 60 * 60 * 1000),
+      endDate: currentDate,
+    }),
+    updateInterval: 15,
+  },
+  {
+    getLabel: () => "Last day",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getTime() - 24 * 60 * 60 * 1000),
+      endDate: currentDate,
+    }),
+    updateInterval: 60,
+  },
+  {
+    getLabel: () => "Last week",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000),
+      endDate: currentDate,
+    }),
+    updateInterval: 720,
+  },
+  {
+    getLabel: () => "Last month",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1),
+      endDate: currentDate,
+    }),
+    updateInterval: 1440,
+  },
+  {
+    getLabel: () => "Last quarter",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getFullYear(), Math.floor(currentDate.getMonth() / 3) * 3 - 3, 1),
+      endDate: currentDate,
+    }),
+    updateInterval: 10080,
+  },
+  {
+    getLabel: () => "Last year",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getFullYear() - 1, 0, 1),
+      endDate: currentDate,
+    }),
+    updateInterval: 20160,
+  },
+  {
+    getLabel: () => "Last two years",
+    getDates: (currentDate: Date) => ({
+      startDate: new Date(currentDate.getFullYear() - 2, 0, 1),
+      endDate: currentDate,
+    }),
+    updateInterval: 40320,
+  },
+];
 </script>
 
 <style scoped lang="scss">
@@ -513,6 +491,16 @@ const defaultRanges: Record<number, [string, number] | string> = {
     * {
       width: auto;
       min-height: auto;
+    }
+  }
+
+  h2 {
+    display: flex;
+    flex-direction: column;
+
+    .label__subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
     }
   }
 }
@@ -679,6 +667,7 @@ const defaultRanges: Record<number, [string, number] | string> = {
     flex-direction: column;
     gap: var(--gap-xs);
   }
+
   .percentage-bar {
     grid-area: bar;
     width: 100%;
@@ -687,6 +676,7 @@ const defaultRanges: Record<number, [string, number] | string> = {
     border: 1px solid var(--color-button-bg);
     border-radius: var(--radius-sm);
     overflow: hidden;
+
     span {
       display: block;
       height: 100%;
