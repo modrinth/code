@@ -369,7 +369,7 @@ const selectedRange = computed({
 });
 
 const formattedCategorySubtitle = computed(() => {
-  return internalRange.value.getLabel([dayjs(startDate.value), dayjs(endDate.value)]);
+  return selectedRange.value.getLabel([dayjs(startDate.value), dayjs(endDate.value)]);
 });
 
 const selectedDataSet = computed(() => {
