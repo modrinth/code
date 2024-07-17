@@ -489,7 +489,6 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode.user,
     tags.value.projectViewModes,
   );
-  saveCosmetics();
 }
 </script>
 <script>
