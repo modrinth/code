@@ -2,11 +2,9 @@
 
 use uuid::Uuid;
 
-use crate::state::{MinecraftChild, ProfilePathId};
+use crate::state::MinecraftChild;
 pub use crate::{
-    state::{
-        Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
-    },
+    state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
     State,
 };
 
@@ -42,8 +40,7 @@ pub async fn get_all_running_uuids() -> crate::Result<Vec<Uuid>> {
 
 // Gets the Profile paths of each *running* stored process in the state
 #[tracing::instrument]
-pub async fn get_all_running_profile_paths() -> crate::Result<Vec<ProfilePathId>>
-{
+pub async fn get_all_running_profile_paths() -> crate::Result<Vec<String>> {
     let state = State::get().await?;
     let children = state.children.read().await;
     children.running_profile_paths().await
@@ -60,7 +57,7 @@ pub async fn get_all_running_profiles() -> crate::Result<Vec<Profile>> {
 // Gets the UUID of each stored process in the state by profile path
 #[tracing::instrument]
 pub async fn get_uuids_by_profile_path(
-    profile_path: ProfilePathId,
+    profile_path: &str,
 ) -> crate::Result<Vec<Uuid>> {
     let state = State::get().await?;
     let children = state.children.read().await;

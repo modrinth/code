@@ -14,21 +14,10 @@ use std::collections::HashMap;
 const AUTH_JSON: &str = "auth.json";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct ModrinthUser {
-    pub id: String,
-    pub username: String,
-    pub name: Option<String>,
-    pub avatar_url: Option<String>,
-    pub bio: Option<String>,
-    pub created: DateTime<Utc>,
-    pub role: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthCredentials {
     pub session: String,
     pub expires_at: DateTime<Utc>,
-    pub user: ModrinthUser,
+    pub user: crate::state::cache::User,
 }
 
 #[derive(Serialize)]
@@ -232,7 +221,6 @@ pub async fn login_password(
         None,
         None,
         semaphore,
-        &CredentialsStore(None),
     )
     .await?;
     let value = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
@@ -283,7 +271,6 @@ pub async fn login_2fa(
         None,
         None,
         semaphore,
-        &CredentialsStore(None),
     )
     .await?;
 
@@ -314,7 +301,6 @@ pub async fn create_account(
         None,
         None,
         semaphore,
-        &CredentialsStore(None),
     )
     .await?;
     let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
@@ -336,7 +322,6 @@ pub async fn refresh_credentials(
             Some(("Authorization", token)),
             None,
             semaphore,
-            &CredentialsStore(None),
         )
         .await
         .ok()
@@ -358,7 +343,7 @@ pub async fn refresh_credentials(
 async fn fetch_info(
     token: &str,
     semaphore: &FetchSemaphore,
-) -> crate::Result<ModrinthUser> {
+) -> crate::Result<crate::state::cache::User> {
     let result = fetch_advanced(
         Method::GET,
         &format!("{MODRINTH_API_URL}user"),
@@ -367,7 +352,6 @@ async fn fetch_info(
         Some(("Authorization", token)),
         None,
         semaphore,
-        &CredentialsStore(None),
     )
     .await?;
     let value = serde_json::from_slice(&result)?;

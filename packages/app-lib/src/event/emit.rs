@@ -4,7 +4,6 @@ use crate::{
         CommandPayload, EventError, LoadingBar, LoadingBarType,
         ProcessPayloadType, ProfilePayloadType,
     },
-    prelude::ProfilePathId,
     state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
@@ -297,8 +296,7 @@ pub async fn emit_process(
 // emit_profile(path, event)
 #[allow(unused_variables)]
 pub async fn emit_profile(
-    uuid: Uuid,
-    profile_path_id: &ProfilePathId,
+    profile_path_id: &str,
     name: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
@@ -311,8 +309,7 @@ pub async fn emit_profile(
             .emit_all(
                 "profile",
                 ProfilePayload {
-                    uuid,
-                    profile_path_id: profile_path_id.clone(),
+                    profile_path_id: profile_path_id.to_string(),
                     path,
                     name: name.to_string(),
                     event,

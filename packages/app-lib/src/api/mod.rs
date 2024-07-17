@@ -14,11 +14,9 @@ pub mod tags;
 
 pub mod data {
     pub use crate::state::{
-        Credentials, DirectoryInfo, Hooks, JavaSettings, LinkedData,
-        MemorySettings, ModLoader, ModrinthCredentials,
-        ModrinthCredentialsResult, ModrinthProject, ModrinthTeamMember,
-        ModrinthUser, ModrinthVersion, ProfileMetadata, ProjectMetadata,
-        Settings, Theme, WindowSize,
+        Credentials, DirectoryInfo, Hooks, LinkedData, MemorySettings,
+        ModLoader, ModrinthCredentials, ModrinthCredentialsResult, Settings,
+        Theme, WindowSize,
     };
 }
 
@@ -29,12 +27,8 @@ pub mod prelude {
         jre, metadata, minecraft_auth, pack, process,
         profile::{self, create, Profile},
         settings,
-        state::JavaGlobals,
-        state::{Dependency, ProfilePathId, ProjectPathId},
-        util::{
-            io::{canonicalize, IOError},
-            jre::JavaVersion,
-        },
+        state::Dependency,
+        util::io::{canonicalize, IOError},
         State,
     };
 }

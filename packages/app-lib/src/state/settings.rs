@@ -1,127 +1,158 @@
 //! Theseus settings file
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
-use tokio::fs;
-
-use super::{DirectoryInfo, JavaGlobals};
-
-// TODO: convert to semver?
-const CURRENT_FORMAT_VERSION: u32 = 1;
 
 // Types
 /// Global Theseus settings
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Settings {
-    pub theme: Theme,
-    pub memory: MemorySettings,
-    #[serde(default)]
-    pub force_fullscreen: bool,
-    pub game_resolution: WindowSize,
-    pub custom_java_args: Vec<String>,
-    pub custom_env_args: Vec<(String, String)>,
-    pub java_globals: JavaGlobals,
-    pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
     pub max_concurrent_writes: usize,
-    pub version: u32,
-    pub collapsed_navigation: bool,
-    #[serde(default)]
-    pub disable_discord_rpc: bool,
-    #[serde(default)]
-    pub hide_on_process: bool,
-    #[serde(default)]
-    pub native_decorations: bool,
-    #[serde(default)]
+
+    pub theme: Theme,
     pub default_page: DefaultPage,
-    #[serde(default)]
-    pub developer_mode: bool,
-    #[serde(default)]
-    pub opt_out_analytics: bool,
-    #[serde(default)]
+    pub collapsed_navigation: bool,
     pub advanced_rendering: bool,
-    #[serde(default)]
-    pub fully_onboarded: bool,
-    #[serde(default = "DirectoryInfo::get_initial_settings_dir")]
-    pub loaded_config_dir: Option<PathBuf>,
+    pub native_decorations: bool,
+
+    pub telemetry: bool,
+    pub discord_rpc: bool,
+    pub developer_mode: bool,
+
+    pub onboarded: bool,
+
+    pub extra_launch_args: Vec<String>,
+    pub custom_env_vars: Vec<(String, String)>,
+    pub memory: MemorySettings,
+    pub force_fullscreen: bool,
+    pub game_resolution: WindowSize,
+    pub hide_on_process_start: bool,
+    pub hooks: Hooks,
 }
 
 impl Settings {
-    #[tracing::instrument]
-    pub async fn init(file: &Path) -> crate::Result<Self> {
-        let mut rescued = false;
+    pub async fn get(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Self> {
+        let res = sqlx::query!(
+            "
+            SELECT
+                max_concurrent_writes, max_concurrent_downloads,
+                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,
+                discord_rpc, developer_mode, telemetry,
+                onboarded,
+                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
+                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
+                hook_pre_launch, hook_wrapper, hook_post_exit
+            FROM settings
+            "
+        )
+            .fetch_one(exec)
+            .await?;
 
-        let settings = if file.exists() {
-            let loaded_settings = fs::read(&file)
-                .await
-                .map_err(|err| {
-                    crate::ErrorKind::FSError(format!(
-                        "Error reading settings file: {err}"
-                    ))
-                    .as_error()
-                })
-                .and_then(|it| {
-                    serde_json::from_slice::<Settings>(&it)
-                        .map_err(crate::Error::from)
-                });
-            // settings is corrupted. Back up the file and create a new one
-            if let Err(ref err) = loaded_settings {
-                tracing::error!("Failed to load settings file: {err}. ");
-                let backup_file = file.with_extension("json.bak");
-                tracing::error!("Corrupted settings file will be backed up as {}, and a new settings file will be created.", backup_file.display());
-                let _ = fs::rename(file, backup_file).await;
-                rescued = true;
-            }
-            loaded_settings.ok()
-        } else {
-            None
-        };
-
-        if let Some(settings) = settings {
-            Ok(settings)
-        } else {
-            // Create new settings file
-            let settings = Self {
-                theme: Theme::Dark,
-                memory: MemorySettings::default(),
-                force_fullscreen: false,
-                game_resolution: WindowSize::default(),
-                custom_java_args: Vec::new(),
-                custom_env_args: Vec::new(),
-                java_globals: JavaGlobals::new(),
-                hooks: Hooks::default(),
-                max_concurrent_downloads: 10,
-                max_concurrent_writes: 10,
-                version: CURRENT_FORMAT_VERSION,
-                collapsed_navigation: false,
-                disable_discord_rpc: false,
-                hide_on_process: false,
-                native_decorations: false,
-                default_page: DefaultPage::Home,
-                developer_mode: false,
-                opt_out_analytics: false,
-                advanced_rendering: true,
-                fully_onboarded: rescued, // If we rescued the settings file, we should consider the user fully onboarded
-
-                // By default, the config directory is the same as the settings directory
-                loaded_config_dir: DirectoryInfo::get_initial_settings_dir(),
-            };
-            if rescued {
-                settings.sync(file).await?;
-            }
-            Ok(settings)
-        }
+        Ok(Self {
+            max_concurrent_downloads: res.max_concurrent_downloads as usize,
+            max_concurrent_writes: res.max_concurrent_writes as usize,
+            theme: Theme::from_string(&res.theme),
+            default_page: DefaultPage::from_string(&res.default_page),
+            collapsed_navigation: res.collapsed_navigation == 1,
+            advanced_rendering: res.advanced_rendering == 1,
+            native_decorations: res.native_decorations == 1,
+            telemetry: res.telemetry == 1,
+            discord_rpc: res.discord_rpc == 1,
+            developer_mode: res.developer_mode == 1,
+            onboarded: res.onboarded == 1,
+            extra_launch_args: res
+                .extra_launch_args
+                .and_then(|x| serde_json::from_str(&x).ok())
+                .unwrap_or_default(),
+            custom_env_vars: res
+                .custom_env_vars
+                .and_then(|x| serde_json::from_str(&x).ok())
+                .unwrap_or_default(),
+            memory: MemorySettings {
+                maximum: res.mc_memory_max as u32,
+            },
+            force_fullscreen: res.mc_force_fullscreen == 1,
+            game_resolution: WindowSize(
+                res.mc_game_resolution_x as u16,
+                res.mc_game_resolution_y as u16,
+            ),
+            hide_on_process_start: res.hide_on_process_start == 1,
+            hooks: Hooks {
+                pre_launch: res.hook_pre_launch,
+                wrapper: res.hook_wrapper,
+                post_exit: res.hook_post_exit,
+            },
+        })
     }
 
-    #[tracing::instrument(skip(self))]
-    pub async fn sync(&self, to: &Path) -> crate::Result<()> {
-        fs::write(to, serde_json::to_vec(self)?)
-            .await
-            .map_err(|err| {
-                crate::ErrorKind::FSError(format!(
-                    "Error saving settings to file: {err}"
-                ))
-                .as_error()
-            })?;
+    pub async fn update(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let max_concurrent_writes = self.max_concurrent_writes as i32;
+        let max_concurrent_downloads = self.max_concurrent_downloads as i32;
+        let theme = self.theme.as_str();
+        let default_page = self.default_page.as_str();
+        let extra_launch_args = serde_json::to_string(&self.extra_launch_args)?;
+        let custom_env_vars = serde_json::to_string(&self.custom_env_vars)?;
+
+        sqlx::query!(
+            "
+            UPDATE settings
+            SET
+                max_concurrent_writes = $1,
+                max_concurrent_downloads = $2,
+
+                theme = $3,
+                default_page = $4,
+                collapsed_navigation = $5,
+                advanced_rendering = $6,
+                native_decorations = $7,
+
+                discord_rpc = $8,
+                developer_mode = $9,
+                telemetry = $10,
+
+                onboarded = $11,
+
+                extra_launch_args = jsonb($12),
+                custom_env_vars = jsonb($13),
+                mc_memory_max = $14,
+                mc_force_fullscreen = $15,
+                mc_game_resolution_x = $16,
+                mc_game_resolution_y = $17,
+                hide_on_process_start = $18,
+
+                hook_pre_launch = $19,
+                hook_wrapper = $20,
+                hook_post_exit = $21
+            ",
+            max_concurrent_writes,
+            max_concurrent_downloads,
+            theme,
+            default_page,
+            self.collapsed_navigation,
+            self.advanced_rendering,
+            self.native_decorations,
+            self.discord_rpc,
+            self.developer_mode,
+            self.telemetry,
+            self.onboarded,
+            extra_launch_args,
+            custom_env_vars,
+            self.memory.maximum,
+            self.force_fullscreen,
+            self.game_resolution.0,
+            self.game_resolution.1,
+            self.hide_on_process_start,
+            self.hooks.pre_launch,
+            self.hooks.wrapper,
+            self.hooks.post_exit,
+        )
+        .execute(exec)
+        .await?;
+
         Ok(())
     }
 }
@@ -135,37 +166,40 @@ pub enum Theme {
     Oled,
 }
 
+impl Theme {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Theme::Dark => "dark",
+            Theme::Light => "light",
+            Theme::Oled => "oled",
+        }
+    }
+
+    pub fn from_string(string: &str) -> Theme {
+        match string {
+            "dark" => Theme::Dark,
+            "light" => Theme::Light,
+            "oled" => Theme::Oled,
+            _ => Theme::Dark,
+        }
+    }
+}
+
 /// Minecraft memory settings
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct MemorySettings {
     pub maximum: u32,
 }
 
-impl Default for MemorySettings {
-    fn default() -> Self {
-        Self { maximum: 2048 }
-    }
-}
-
 /// Game window size
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct WindowSize(pub u16, pub u16);
 
-impl Default for WindowSize {
-    fn default() -> Self {
-        Self(854, 480)
-    }
-}
-
 /// Game initialization hooks
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
-#[serde(default)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Hooks {
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub pre_launch: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub wrapper: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub post_exit: Option<String>,
 }
 
@@ -176,8 +210,19 @@ pub enum DefaultPage {
     Library,
 }
 
-impl Default for DefaultPage {
-    fn default() -> Self {
-        Self::Home
+impl DefaultPage {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            DefaultPage::Home => "home",
+            DefaultPage::Library => "library",
+        }
+    }
+
+    pub fn from_string(string: &str) -> Self {
+        match string {
+            "home" => Self::Home,
+            "library" => Self::Library,
+            _ => Self::Home,
+        }
     }
 }

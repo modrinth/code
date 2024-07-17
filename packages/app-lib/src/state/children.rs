@@ -1,4 +1,4 @@
-use super::{Profile, ProfilePathId};
+use super::Profile;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use serde::Serialize;
@@ -37,7 +37,7 @@ pub struct ProcessCache {
     pub start_time: u64,
     pub name: String,
     pub exe: String,
-    pub profile_relative_path: ProfilePathId,
+    pub profile_relative_path: String,
     pub post_command: Option<String>,
 }
 impl ChildType {
@@ -94,7 +94,7 @@ impl ChildType {
     pub async fn cache_process(
         &self,
         uuid: uuid::Uuid,
-        profile_path_id: ProfilePathId,
+        profile_path_id: String,
         post_command: Option<String>,
     ) -> crate::Result<()> {
         let pid = match self {
@@ -198,7 +198,7 @@ impl ChildType {
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub uuid: Uuid,
-    pub profile_relative_path: ProfilePathId,
+    pub profile_relative_path: String,
     pub manager: Option<JoinHandle<crate::Result<i32>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<ChildType>>,
     pub last_updated_playtime: DateTime<Utc>, // The last time we updated the playtime for the associated profile
@@ -272,7 +272,7 @@ impl Children {
     pub async fn insert_new_process(
         &mut self,
         uuid: Uuid,
-        profile_relative_path: ProfilePathId,
+        profile_relative_path: &str,
         mut mc_command: Command,
         post_command: Option<String>, // Command to run after minecraft.
         censor_strings: HashMap<String, String>,
@@ -293,7 +293,7 @@ impl Children {
         child
             .cache_process(
                 uuid,
-                profile_relative_path.clone(),
+                profile_relative_path.to_string(),
                 post_command.clone(),
             )
             .await?;
@@ -303,7 +303,7 @@ impl Children {
             post_command,
             pid,
             current_child.clone(),
-            profile_relative_path.clone(),
+            profile_relative_path.to_string(),
         )));
 
         emit_process(
@@ -319,7 +319,7 @@ impl Children {
         // Create MinecraftChild
         let mchild = MinecraftChild {
             uuid,
-            profile_relative_path,
+            profile_relative_path: profile_relative_path.to_string(),
             current_child,
             manager,
             last_updated_playtime,
@@ -438,7 +438,7 @@ impl Children {
         post_command: Option<String>,
         mut current_pid: u32,
         current_child: Arc<RwLock<ChildType>>,
-        associated_profile: ProfilePathId,
+        associated_profile: String,
     ) -> crate::Result<i32> {
         let current_child = current_child.clone();
 
@@ -459,7 +459,7 @@ impl Children {
                 .num_seconds();
             if diff >= 60 {
                 if let Err(e) = profile::edit(&associated_profile, |prof| {
-                    prof.metadata.recent_time_played += diff as u64;
+                    prof.recent_time_played += diff as u64;
                     async { Ok(()) }
                 })
                 .await
@@ -479,7 +479,7 @@ impl Children {
             .signed_duration_since(last_updated_playtime)
             .num_seconds();
         if let Err(e) = profile::edit(&associated_profile, |prof| {
-            prof.metadata.recent_time_played += diff as u64;
+            prof.recent_time_played += diff as u64;
             async { Ok(()) }
         })
         .await
@@ -547,9 +547,10 @@ impl Children {
             let mut cmd = hook.split(' ');
             if let Some(command) = cmd.next() {
                 let mut command = Command::new(command);
-                command
-                    .args(&cmd.collect::<Vec<&str>>())
-                    .current_dir(associated_profile.get_full_path().await?);
+                command.args(&cmd.collect::<Vec<&str>>()).current_dir(
+                    crate::api::profile::get_full_path(&associated_profile)
+                        .await?,
+                );
                 Some(command)
             } else {
                 None
@@ -650,7 +651,7 @@ impl Children {
     // Gets all PID keys of running children with a given profile path
     pub async fn running_keys_with_profile(
         &self,
-        profile_path: ProfilePathId,
+        profile_path: &str,
     ) -> crate::Result<Vec<Uuid>> {
         let running_keys = self.running_keys().await?;
         let mut keys = Vec::new();
@@ -667,9 +668,7 @@ impl Children {
     }
 
     // Gets all profiles of running children
-    pub async fn running_profile_paths(
-        &self,
-    ) -> crate::Result<Vec<ProfilePathId>> {
+    pub async fn running_profile_paths(&self) -> crate::Result<Vec<String>> {
         let mut profiles = Vec::new();
         for key in self.keys() {
             if let Some(child) = self.get(key) {
@@ -708,7 +707,6 @@ impl Children {
                 {
                     if let Some(prof) = crate::api::profile::get(
                         &child.profile_relative_path.clone(),
-                        None,
                     )
                     .await?
                     {

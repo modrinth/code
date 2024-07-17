@@ -1,9 +1,9 @@
 //! Logic for launching Minecraft
+use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::io::IOError;
-use crate::prelude::JavaVersion;
-use crate::state::{Credentials, ProfileInstallStage};
+use crate::state::{Credentials, JavaVersion, ProfileInstallStage};
 use crate::util::io;
 use crate::{
     process,
@@ -13,6 +13,7 @@ use crate::{
 use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::{RuleAction, VersionInfo};
+use daedalus::modded::LoaderVersion;
 use st::Profile;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -114,22 +115,66 @@ pub async fn get_java_version_from_profile(
     profile: &Profile,
     version_info: &VersionInfo,
 ) -> crate::Result<Option<JavaVersion>> {
-    if let Some(java) = profile.java.clone().and_then(|x| x.override_version) {
-        Ok(Some(java))
-    } else {
-        let key = version_info
-            .java_version
-            .as_ref()
-            .map(|it| it.major_version)
-            .unwrap_or(8);
+    if let Some(java) = profile.java_path.as_ref() {
+        let java = crate::api::jre::check_jre(std::path::PathBuf::from(java))
+            .await
+            .ok()
+            .flatten();
 
-        let state = State::get().await?;
-        let settings = state.settings.read().await;
-
-        if let Some(java) = settings.java_globals.get(&format!("JAVA_{key}")) {
-            return Ok(Some(java.clone()));
+        if let Some(java) = java {
+            return Ok(Some(java));
         }
+    }
 
+    let key = version_info
+        .java_version
+        .as_ref()
+        .map(|it| it.major_version)
+        .unwrap_or(8);
+
+    let state = State::get().await?;
+
+    let java_version = JavaVersion::get(key, &state.pool).await?;
+
+    Ok(java_version)
+}
+
+pub async fn get_loader_version_from_profile(
+    game_version: &str,
+    loader: ModLoader,
+    loader_version: Option<&str>,
+) -> crate::Result<Option<LoaderVersion>> {
+    if loader == ModLoader::Vanilla {
+        return Ok(None);
+    }
+
+    let version = loader_version.unwrap_or("latest");
+
+    let filter = |it: &LoaderVersion| match version {
+        "latest" => true,
+        "stable" => it.stable,
+        id => it.id == *id,
+    };
+
+    let versions =
+        crate::api::metadata::get_loader_versions(loader.as_meta_str()).await?;
+
+    let loaders = versions.game_versions.into_iter().find(|x| {
+        x.id.replace(daedalus::modded::DUMMY_REPLACE_STRING, game_version)
+            == game_version
+    });
+
+    if let Some(loaders) = loaders {
+        let loader_version = loaders.loaders.iter().find(|x| filter(x)).or(
+            if version == "stable" {
+                loaders.loaders.first()
+            } else {
+                None
+            },
+        );
+
+        Ok(loader_version.cloned())
+    } else {
         Ok(None)
     }
 }
@@ -141,59 +186,56 @@ pub async fn install_minecraft(
     existing_loading_bar: Option<LoadingBarId>,
     repairing: bool,
 ) -> crate::Result<()> {
-    let sync_projects = existing_loading_bar.is_some();
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::MinecraftDownload {
             // If we are downloading minecraft for a profile, provide its name and uuid
-            profile_name: profile.metadata.name.clone(),
-            profile_path: profile.get_profile_full_path().await?,
+            profile_name: profile.name.clone(),
+            profile_path: profile.path.clone(),
         },
         100.0,
         "Downloading Minecraft",
     )
     .await?;
 
-    crate::api::profile::edit(&profile.profile_id(), |prof| {
+    crate::api::profile::edit(&profile.path, |prof| {
         prof.install_stage = ProfileInstallStage::Installing;
 
         async { Ok(()) }
     })
     .await?;
-    State::sync().await?;
-
-    if sync_projects {
-        Profile::sync_projects_task(profile.profile_id(), true);
-    }
 
     let state = State::get().await?;
-    let instance_path =
-        &io::canonicalize(profile.get_profile_full_path().await?)?;
-    let metadata = state.metadata.read().await;
 
-    let version_index = metadata
-        .minecraft
+    let instance_path =
+        crate::api::profile::get_full_path(&profile.path).await?;
+    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
+
+    let version_index = minecraft
         .versions
         .iter()
-        .position(|it| it.id == profile.metadata.game_version)
+        .position(|it| it.id == profile.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
-            profile.metadata.game_version
+            profile.game_version
         )))?;
-    let version = &metadata.minecraft.versions[version_index];
+    let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
-        <= metadata
-            .minecraft
+        <= minecraft
             .versions
             .iter()
             .position(|x| x.id == "22w16a")
             .unwrap_or(0);
 
-    let version_jar = profile
-        .metadata
-        .loader_version
-        .as_ref()
-        .map_or(version.id.clone(), |it| {
+    let loader_version = get_loader_version_from_profile(
+        &profile.game_version,
+        profile.loader,
+        profile.loader_version.as_deref(),
+    )
+    .await?;
+
+    let version_jar =
+        loader_version.as_ref().map_or(version.id.clone(), |it| {
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
@@ -201,7 +243,7 @@ pub async fn install_minecraft(
     let mut version_info = download::download_version_info(
         &state,
         version,
-        profile.metadata.loader_version.as_ref(),
+        loader_version.as_ref(),
         Some(repairing),
         Some(&loading_bar),
     )
@@ -235,13 +277,7 @@ pub async fn install_minecraft(
         })?;
 
     if set_java {
-        {
-            let mut settings = state.settings.write().await;
-            settings
-                .java_globals
-                .insert(format!("JAVA_{key}"), java_version.clone());
-        }
-        State::sync().await?;
+        java_version.upsert(&state.pool).await?;
     }
 
     // Download minecraft (5-90)
@@ -274,7 +310,7 @@ pub async fn install_minecraft(
                     client => client_path.to_string_lossy(),
                     server => "";
                 "MINECRAFT_VERSION":
-                    client => profile.metadata.game_version.clone(),
+                    client => profile.game_version.clone(),
                     server => "";
                 "ROOT":
                     client => instance_path.to_string_lossy(),
@@ -356,13 +392,12 @@ pub async fn install_minecraft(
         }
     }
 
-    crate::api::profile::edit(&profile.profile_id(), |prof| {
+    crate::api::profile::edit(&profile.path, |prof| {
         prof.install_stage = ProfileInstallStage::Installed;
 
         async { Ok(()) }
     })
     .await?;
-    State::sync().await?;
     emit_loading(&loading_bar, 1.0, Some("Finished installing")).await?;
 
     Ok(())
@@ -396,41 +431,43 @@ pub async fn launch_minecraft(
     }
 
     let state = State::get().await?;
-    let metadata = state.metadata.read().await;
 
-    let instance_path = profile.get_profile_full_path().await?;
-    let instance_path = &io::canonicalize(instance_path)?;
+    let instance_path =
+        crate::api::profile::get_full_path(&profile.path).await?;
 
-    let version_index = metadata
-        .minecraft
+    let minecraft = crate::api::metadata::get_minecraft_versions().await?;
+    let version_index = minecraft
         .versions
         .iter()
-        .position(|it| it.id == profile.metadata.game_version)
+        .position(|it| it.id == profile.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {}",
-            profile.metadata.game_version
+            profile.game_version
         )))?;
-    let version = &metadata.minecraft.versions[version_index];
+    let version = &minecraft.versions[version_index];
     let minecraft_updated = version_index
-        <= metadata
-            .minecraft
+        <= minecraft
             .versions
             .iter()
             .position(|x| x.id == "22w16a")
             .unwrap_or(0);
 
-    let version_jar = profile
-        .metadata
-        .loader_version
-        .as_ref()
-        .map_or(version.id.clone(), |it| {
+    let loader_version = get_loader_version_from_profile(
+        &profile.game_version,
+        profile.loader,
+        profile.loader_version.as_deref(),
+    )
+    .await?;
+
+    let version_jar =
+        loader_version.as_ref().map_or(version.id.clone(), |it| {
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
     let version_info = download::download_version_info(
         &state,
         version,
-        profile.metadata.loader_version.as_ref(),
+        loader_version.as_ref(),
         None,
         None,
     )
@@ -474,11 +511,11 @@ pub async fn launch_minecraft(
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
-        process::get_uuids_by_profile_path(profile.profile_id()).await?;
+        process::get_uuids_by_profile_path(&profile.path).await?;
     if let Some(uuid) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
-            "Profile {} is already running at UUID: {uuid}",
-            profile.profile_id()
+            "Profile {} is already running at path: {uuid}",
+            profile.path
         ))
         .as_error());
     }
@@ -513,7 +550,7 @@ pub async fn launch_minecraft(
                 credentials,
                 &version.id,
                 &version_info.asset_index.id,
-                instance_path,
+                &instance_path,
                 &state.directories.assets_dir().await,
                 &version.type_,
                 *resolution,
@@ -561,13 +598,12 @@ pub async fn launch_minecraft(
         io::write(&options_path, options_string).await?;
     }
 
-    crate::api::profile::edit(&profile.profile_id(), |prof| {
-        prof.metadata.last_played = Some(Utc::now());
+    crate::api::profile::edit(&profile.path, |prof| {
+        prof.last_played = Some(Utc::now());
 
         async { Ok(()) }
     })
     .await?;
-    State::sync().await?;
 
     let mut censor_strings = HashMap::new();
     let username = whoami::username();
@@ -603,8 +639,8 @@ pub async fn launch_minecraft(
 
         let window = EventState::get_main_window().await?;
         if let Some(window) = window {
-            let settings = state.settings.read().await;
-            if settings.hide_on_process {
+            let settings = crate::state::Settings::get(&state.pool).await?;
+            if settings.hide_on_process_start {
                 window.minimize()?;
             }
         }
@@ -614,7 +650,7 @@ pub async fn launch_minecraft(
         // Add game played to discord rich presence
         let _ = state
             .discord_rpc
-            .set_activity(&format!("Playing {}", profile.metadata.name), true)
+            .set_activity(&format!("Playing {}", profile.name), true)
             .await;
     }
 
@@ -624,7 +660,7 @@ pub async fn launch_minecraft(
     state_children
         .insert_new_process(
             Uuid::new_v4(),
-            profile.profile_id(),
+            &profile.path,
             command,
             post_exit_hook,
             censor_strings,

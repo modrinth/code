@@ -39,6 +39,7 @@ async fn main() -> theseus::Result<()> {
     let _log_guard = theseus::start_logger();
 
     // Initialize state
+    State::init().await?;
     let st = State::get().await?;
     //State::update();
 
@@ -46,14 +47,6 @@ async fn main() -> theseus::Result<()> {
         println!("No users found, authenticating.");
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }
-
-    // Autodetect java globals
-    st.settings.write().await.max_concurrent_downloads = 50;
-    st.settings.write().await.hooks.post_exit =
-        Some("echo This is after Minecraft runs- global setting!".to_string());
-    // Changed the settings, so need to reset the semaphore
-    st.reset_fetch_semaphore().await;
-
     //
     // st.settings
     //     .write()
@@ -63,7 +56,7 @@ async fn main() -> theseus::Result<()> {
     // Clear profiles
     println!("Clearing profiles.");
     {
-        let h = profile::list(None).await?;
+        let h = profile::list().await?;
         for (path, _) in h.into_iter() {
             profile::remove(&path).await?;
         }
@@ -73,7 +66,7 @@ async fn main() -> theseus::Result<()> {
 
     let name = "Example".to_string();
     let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Vanilla;
+    let modloader = ModLoader::Fabric;
     let loader_version = "stable".to_string();
 
     let profile_path = profile_create(
@@ -85,11 +78,8 @@ async fn main() -> theseus::Result<()> {
         None,
         None,
         None,
-        None,
     )
     .await?;
-
-    State::sync().await?;
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process

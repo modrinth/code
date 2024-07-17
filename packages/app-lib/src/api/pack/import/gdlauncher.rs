@@ -2,12 +2,7 @@ use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    prelude::{ModLoader, Profile, ProfilePathId},
-    state::ProfileInstallStage,
-    util::io,
-    State,
-};
+use crate::{prelude::ModLoader, state::ProfileInstallStage, util::io, State};
 
 use super::{copy_dotminecraft, recache_icon};
 
@@ -41,7 +36,7 @@ pub async fn is_valid_gdlauncher(instance_folder: PathBuf) -> bool {
 
 pub async fn import_gdlauncher(
     gdlauncher_instance_folder: PathBuf, // instance's folder
-    profile_path: ProfilePathId,         // path to profile
+    profile_path: &str,                  // path to profile
 ) -> crate::Result<()> {
     // Load config.json
     let config: String =
@@ -74,10 +69,10 @@ pub async fn import_gdlauncher(
     let loader_version = config.loader.loader_version;
 
     let loader_version = if mod_loader != ModLoader::Vanilla {
-        crate::profile::create::get_loader_version_from_loader(
-            game_version.clone(),
+        crate::launcher::get_loader_version_from_profile(
+            &game_version,
             mod_loader,
-            loader_version,
+            loader_version.as_deref(),
         )
         .await?
     } else {
@@ -85,15 +80,15 @@ pub async fn import_gdlauncher(
     };
 
     // Set profile data to created default profile
-    crate::api::profile::edit(&profile_path, |prof| {
-        prof.metadata.name = override_title
+    crate::api::profile::edit(profile_path, |prof| {
+        prof.name = override_title
             .clone()
             .unwrap_or_else(|| backup_name.to_string());
         prof.install_stage = ProfileInstallStage::PackInstalling;
-        prof.metadata.icon.clone_from(&icon);
-        prof.metadata.game_version.clone_from(&game_version);
-        prof.metadata.loader_version.clone_from(&loader_version);
-        prof.metadata.loader = mod_loader;
+        prof.icon_path = icon.clone().map(|x| x.to_string_lossy().to_string());
+        prof.game_version.clone_from(&game_version);
+        prof.loader_version = loader_version.clone().map(|x| x.id);
+        prof.loader = mod_loader;
 
         async { Ok(()) }
     })
@@ -102,32 +97,20 @@ pub async fn import_gdlauncher(
     // Copy in contained folders as overrides
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path.clone(),
+        profile_path,
         gdlauncher_instance_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) =
-        crate::api::profile::get(&profile_path, None).await?
-    {
+    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
         crate::launcher::install_minecraft(
             &profile_val,
             Some(loading_bar),
             false,
         )
         .await?;
-        {
-            let state = State::get().await?;
-            let mut file_watcher = state.file_watcher.write().await;
-            Profile::watch_fs(
-                &profile_val.get_profile_full_path().await?,
-                &mut file_watcher,
-            )
-            .await?;
-        }
-        State::sync().await?;
     }
 
     Ok(())

@@ -42,19 +42,8 @@ pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
 ) -> crate::Result<Bytes> {
-    fetch_advanced(
-        Method::GET,
-        url,
-        sha1,
-        None,
-        None,
-        None,
-        semaphore,
-        credentials,
-    )
-    .await
+    fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore).await
 }
 
 #[tracing::instrument(skip(json_body, semaphore))]
@@ -64,22 +53,13 @@ pub async fn fetch_json<T>(
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
-    let result = fetch_advanced(
-        method,
-        url,
-        sha1,
-        json_body,
-        None,
-        None,
-        semaphore,
-        credentials,
-    )
-    .await?;
+    let result =
+        fetch_advanced(method, url, sha1, json_body, None, None, semaphore)
+            .await?;
     let value = serde_json::from_slice(&result)?;
     Ok(value)
 }
@@ -96,7 +76,6 @@ pub async fn fetch_advanced(
     header: Option<(&str, &str)>,
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
 ) -> crate::Result<Bytes> {
     let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
@@ -112,11 +91,12 @@ pub async fn fetch_advanced(
             req = req.header(header.0, header.1);
         }
 
-        if url.starts_with("https://cdn.modrinth.com") {
-            if let Some(creds) = &credentials.0 {
-                req = req.header("Authorization", &creds.session);
-            }
-        }
+        // TODO: add back with db creds
+        // if url.starts_with("https://cdn.modrinth.com") {
+        //     if let Some(creds) = &credentials.0 {
+        //         req = req.header("Authorization", &creds.session);
+        //     }
+        // }
 
         let result = req.send().await;
         match result {
@@ -202,7 +182,7 @@ pub async fn fetch_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch(mirror, sha1, semaphore, credentials).await;
+        let result = fetch(mirror, sha1, semaphore).await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;

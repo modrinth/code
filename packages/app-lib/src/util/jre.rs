@@ -1,6 +1,6 @@
 use super::io;
+use crate::state::JavaVersion;
 use futures::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -13,13 +13,6 @@ use winreg::{
     enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
     RegKey,
 };
-
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
-pub struct JavaVersion {
-    pub path: String,
-    pub version: String,
-    pub architecture: String,
-}
 
 // Entrypoint function (Windows)
 // Returns a Vec of unique JavaVersions from the PATH, Windows Registry Keys and common Java locations
@@ -317,12 +310,17 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Extract version info from it
     if let Some(arch) = java_arch {
         if let Some(version) = java_version {
-            let path = java.to_string_lossy().to_string();
-            return Some(JavaVersion {
-                path,
-                version: version.to_string(),
-                architecture: arch.to_string(),
-            });
+            if let Ok((_, major_version)) =
+                extract_java_majorminor_version(version)
+            {
+                let path = java.to_string_lossy().to_string();
+                return Some(JavaVersion {
+                    major_version,
+                    path,
+                    version: version.to_string(),
+                    architecture: arch.to_string(),
+                });
+            }
         }
     }
     None

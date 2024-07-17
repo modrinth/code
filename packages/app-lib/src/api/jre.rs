@@ -4,13 +4,13 @@ use serde::Deserialize;
 use std::path::PathBuf;
 
 use crate::event::emit::{emit_loading, init_loading};
-use crate::state::CredentialsStore;
+use crate::state::JavaVersion;
 use crate::util::fetch::{fetch_advanced, fetch_json};
 
 use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
 use crate::{
-    util::jre::{self, JavaVersion},
+    util::jre::{self},
     LoadingBarType, State,
 };
 
@@ -67,7 +67,6 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 None,
                 None,
                 &state.fetch_semaphore,
-                &CredentialsStore(None),
             ).await?;
     emit_loading(&loading_bar, 10.0, Some("Downloading java version")).await?;
 
@@ -80,7 +79,6 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             None,
             Some((&loading_bar, 80.0)),
             &state.fetch_semaphore,
-            &CredentialsStore(None),
         )
         .await?;
 

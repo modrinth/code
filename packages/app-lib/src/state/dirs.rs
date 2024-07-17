@@ -4,8 +4,6 @@ use std::path::PathBuf;
 
 use tokio::sync::RwLock;
 
-use super::{ProfilePathId, Settings};
-
 pub const SETTINGS_FILE_NAME: &str = "settings.json";
 pub const CACHES_FOLDER_NAME: &str = "caches";
 pub const LAUNCHER_LOGS_FOLDER_NAME: &str = "launcher_logs";
@@ -24,22 +22,22 @@ impl DirectoryInfo {
     // init() is not needed for this function
     pub fn get_initial_settings_dir() -> Option<PathBuf> {
         Self::env_path("THESEUS_CONFIG_DIR")
-            .or_else(|| Some(dirs::config_dir()?.join("com.modrinth.theseus")))
+            .or_else(|| Some(dirs::data_dir()?.join("ModrinthApp")))
     }
 
     #[inline]
-    pub fn get_initial_settings_file() -> crate::Result<PathBuf> {
+    pub fn get_database_file() -> crate::Result<PathBuf> {
         let settings_dir = Self::get_initial_settings_dir().ok_or(
             crate::ErrorKind::FSError(
                 "Could not find valid config dir".to_string(),
             ),
         )?;
-        Ok(settings_dir.join("settings.json"))
+        Ok(settings_dir.join("app.db"))
     }
 
     /// Get all paths needed for Theseus to operate properly
     #[tracing::instrument]
-    pub fn init(settings: &Settings) -> crate::Result<Self> {
+    pub fn init() -> crate::Result<Self> {
         // Working directory
         let working_dir = std::env::current_dir().map_err(|err| {
             crate::ErrorKind::FSError(format!(
@@ -59,17 +57,9 @@ impl DirectoryInfo {
             ))
         })?;
 
-        // config directory (for instances, etc.)
-        // by default this is the same as the settings directory
-        let config_dir = settings.loaded_config_dir.clone().ok_or(
-            crate::ErrorKind::FSError(
-                "Could not find valid config dir".to_string(),
-            ),
-        )?;
-
         Ok(Self {
-            settings_dir,
-            config_dir: RwLock::new(config_dir),
+            settings_dir: settings_dir.clone(),
+            config_dir: RwLock::new(settings_dir),
             working_dir,
         })
     }
@@ -161,17 +151,23 @@ impl DirectoryInfo {
     /// Gets the logs dir for a given profile
     #[inline]
     pub async fn profile_logs_dir(
-        profile_id: &ProfilePathId,
+        &self,
+        profile_path: &str,
     ) -> crate::Result<PathBuf> {
-        Ok(profile_id.get_full_path().await?.join("logs"))
+        Ok(self.profiles_dir().await.join(profile_path).join("logs"))
     }
 
     /// Gets the crash reports dir for a given profile
     #[inline]
     pub async fn crash_reports_dir(
-        profile_id: &ProfilePathId,
+        &self,
+        profile_path: &str,
     ) -> crate::Result<PathBuf> {
-        Ok(profile_id.get_full_path().await?.join("crash-reports"))
+        Ok(self
+            .profiles_dir()
+            .await
+            .join(profile_path)
+            .join("crash-reports"))
     }
 
     #[inline]

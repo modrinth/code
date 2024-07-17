@@ -5,7 +5,6 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
-use crate::prelude::ProfilePathId;
 use crate::state::SafeProcesses;
 
 pub mod emit;
@@ -162,28 +161,28 @@ pub enum LoadingBarType {
         version: u32,
     },
     PackFileDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         pack_name: String,
         icon: Option<String>,
         pack_version: String,
     },
     PackDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         pack_name: String,
         icon: Option<PathBuf>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
     MinecraftDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ProfileUpdate {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ZipExtract {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ConfigChange {
@@ -248,8 +247,7 @@ pub enum ProcessPayloadType {
 
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
-    pub uuid: Uuid,
-    pub profile_path_id: ProfilePathId,
+    pub profile_path_id: String,
     pub path: PathBuf,
     pub name: String,
     pub event: ProfilePayloadType,

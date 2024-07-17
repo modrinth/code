@@ -7,7 +7,6 @@ use crate::{
         import::{self, copy_dotminecraft},
         install_from::{self, CreatePackDescription, PackDependency},
     },
-    prelude::{Profile, ProfilePathId},
     util::io,
     State,
 };
@@ -178,9 +177,9 @@ async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
 pub async fn import_mmc(
-    mmc_base_path: PathBuf,      // path to base mmc folder
-    instance_folder: String,     // instance folder in mmc_base_path
-    profile_path: ProfilePathId, // path to profile
+    mmc_base_path: PathBuf,  // path to base mmc folder
+    instance_folder: String, // instance folder in mmc_base_path
+    profile_path: &str,      // path to profile
 ) -> crate::Result<()> {
     let mmc_instance_path = mmc_base_path
         .join("instances")
@@ -208,7 +207,7 @@ pub async fn import_mmc(
         project_id: instance_cfg.managed_pack_id,
         version_id: instance_cfg.managed_pack_version_id,
         existing_loading_bar: None,
-        profile_path: profile_path.clone(),
+        profile_path: profile_path.to_string(),
     };
 
     // Managed pack
@@ -260,7 +259,7 @@ pub async fn import_mmc(
 }
 
 async fn import_mmc_unmanaged(
-    profile_path: ProfilePathId,
+    profile_path: &str,
     minecraft_folder: PathBuf,
     backup_name: String,
     description: CreatePackDescription,
@@ -302,7 +301,7 @@ async fn import_mmc_unmanaged(
 
     // Sets profile information to be that loaded from mmc-pack.json and instance.cfg
     install_from::set_profile_information(
-        profile_path.clone(),
+        profile_path.to_string(),
         &description,
         &backup_name,
         &dependencies,
@@ -313,32 +312,20 @@ async fn import_mmc_unmanaged(
     // Moves .minecraft folder over (ie: overrides such as resourcepacks, mods, etc)
     let state = State::get().await?;
     let loading_bar = copy_dotminecraft(
-        profile_path.clone(),
+        profile_path,
         minecraft_folder,
         &state.io_semaphore,
         None,
     )
     .await?;
 
-    if let Some(profile_val) =
-        crate::api::profile::get(&profile_path, None).await?
-    {
+    if let Some(profile_val) = crate::api::profile::get(profile_path).await? {
         crate::launcher::install_minecraft(
             &profile_val,
             Some(loading_bar),
             false,
         )
         .await?;
-        {
-            let state = State::get().await?;
-            let mut file_watcher = state.file_watcher.write().await;
-            Profile::watch_fs(
-                &profile_val.get_profile_full_path().await?,
-                &mut file_watcher,
-            )
-            .await?;
-        }
-        State::sync().await?;
     }
     Ok(())
 }
