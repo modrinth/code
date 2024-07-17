@@ -5,10 +5,9 @@
         <div>
           <h2>Rolling Ranges</h2>
           <div class="button-group left">
-            <Button v-for="range in ranges" :key="range.getLabel([new Date(), new Date()])"
-              @click="changeRangeModal(range)"
+            <Button v-for="range in ranges" :key="range.getLabel([dayjs(), dayjs()])" @click="changeRangeModal(range)"
               :class="`button-base ${selectedRange === range ? 'button-base__selected' : ''}`">
-              {{ range.getLabel([new Date(), new Date()]) }}
+              {{ range.getLabel([dayjs(), dayjs()]) }}
             </Button>
           </div>
         </div>
@@ -487,7 +486,7 @@ const defaultRanges: RangeObject[] = [
   {
     getLabel: () => "Last quarter",
     getDates: (currentDate: dayjs.Dayjs) => ({
-      startDate: dayjs(currentDate).subtract(3, 'month').startOf('quarter'),
+      startDate: dayjs(currentDate).subtract(3, 'month').startOf('month'),
       endDate: currentDate,
     }),
     timeResolution: 10080,
