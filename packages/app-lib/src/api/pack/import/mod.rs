@@ -115,17 +115,17 @@ pub async fn import_instance(
     let res = match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
-                base_path,            // path to base mmc folder
-                instance_folder,      // instance folder in mmc_base_path
-                profile_path, // path to profile
+                base_path,       // path to base mmc folder
+                instance_folder, // instance folder in mmc_base_path
+                profile_path,    // path to profile
             )
             .await
         }
         ImportLauncherType::ATLauncher => {
             atlauncher::import_atlauncher(
-                base_path,            // path to atlauncher folder
-                instance_folder,      // instance folder in atlauncher
-                profile_path, // path to profile
+                base_path,       // path to atlauncher folder
+                instance_folder, // instance folder in atlauncher
+                profile_path,    // path to profile
             )
             .await
         }

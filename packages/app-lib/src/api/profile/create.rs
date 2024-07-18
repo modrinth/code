@@ -115,8 +115,7 @@ pub async fn profile_create(
                 .await?;
         }
 
-        emit_profile(&profile.path, &profile.name, ProfilePayloadType::Created)
-            .await?;
+        emit_profile(&profile.path, ProfilePayloadType::Created).await?;
 
         profile.upsert(&state.pool).await?;
 
@@ -177,8 +176,7 @@ pub async fn profile_create_from_duplicate(
         .await?;
 
     // emit profile edited
-    emit_profile(&profile.path, &profile.name, ProfilePayloadType::Edited)
-        .await?;
+    emit_profile(&profile.path, ProfilePayloadType::Edited).await?;
     Ok(profile_path_id)
 }
 

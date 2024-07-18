@@ -249,7 +249,6 @@ pub enum ProcessPayloadType {
 pub struct ProfilePayload {
     pub profile_path_id: String,
     pub path: PathBuf,
-    pub name: String,
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]

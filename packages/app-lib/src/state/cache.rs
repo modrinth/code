@@ -1,7 +1,8 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
+use crate::state::ProjectType;
 use crate::util::fetch::{fetch_json, FetchSemaphore};
 use chrono::{DateTime, Utc};
-use dashmap::DashSet;
+use dashmap::{DashMap, DashSet};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -10,7 +11,6 @@ use std::hash::Hash;
 use std::path::PathBuf;
 
 // 1 day
-const DEFAULT_EXPIRY: i64 = 60 * 60 * 24;
 const DEFAULT_ID: &'static str = "0";
 
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
@@ -29,6 +29,8 @@ pub enum CacheValueType {
     Loaders,
     GameVersions,
     DonationPlatforms,
+    FileHash,
+    FileUpdate,
 }
 
 impl CacheValueType {
@@ -47,6 +49,8 @@ impl CacheValueType {
             CacheValueType::Loaders => "loaders",
             CacheValueType::GameVersions => "game_versions",
             CacheValueType::DonationPlatforms => "donation_platforms",
+            CacheValueType::FileHash => "file_hash",
+            CacheValueType::FileUpdate => "file_update",
         }
     }
 
@@ -65,7 +69,17 @@ impl CacheValueType {
             "loaders" => CacheValueType::Loaders,
             "game_versions" => CacheValueType::GameVersions,
             "donation_platforms" => CacheValueType::DonationPlatforms,
+            "file_hash" => CacheValueType::FileHash,
+            "file_update" => CacheValueType::FileUpdate,
             _ => CacheValueType::Project,
+        }
+    }
+
+    pub fn expiry(&self) -> i64 {
+        match self {
+            CacheValueType::File => 60 * 60 * 24 * 30, // 30 days
+            CacheValueType::FileHash => 60 * 60 * 24 * 30, // 30 days
+            _ => 60 * 60 * 24,                         // 24 hours
         }
     }
 }
@@ -93,6 +107,25 @@ pub enum CacheValue {
     Loaders(Vec<Loader>),
     GameVersions(Vec<GameVersion>),
     DonationPlatforms(Vec<DonationPlatform>),
+
+    FileHash(CachedFileHash),
+    FileUpdate(CachedFileUpdate),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CachedFileUpdate {
+    pub hash: String,
+    pub game_version: String,
+    pub loader: String,
+    pub update_version_id: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CachedFileHash {
+    pub path: String,
+    pub file_name: String,
+    pub size: u64,
+    pub hash: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -103,8 +136,8 @@ pub struct CachedLoaderManifest {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CachedFile {
-    hash: String,
-    metadata: FileMetadata,
+    pub hash: String,
+    pub metadata: FileMetadata,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -301,29 +334,38 @@ impl CacheValue {
             CacheValue::DonationPlatforms(_) => {
                 CacheValueType::DonationPlatforms
             }
+            CacheValue::FileHash(_) => CacheValueType::FileHash,
+            CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
         }
     }
 
-    fn get_key(&self) -> &str {
+    fn get_key(&self) -> String {
         match self {
-            CacheValue::Project(project) => &project.id,
-            CacheValue::Version(version) => &version.id,
-            CacheValue::User(user) => &user.id,
+            CacheValue::Project(project) => project.id.clone(),
+            CacheValue::Version(version) => version.id.clone(),
+            CacheValue::User(user) => user.id.clone(),
             CacheValue::Team(members) => members
                 .iter()
                 .next()
                 .map(|x| x.team_id.as_str())
-                .unwrap_or(DEFAULT_ID),
-            CacheValue::Organization(org) => &org.id,
-            CacheValue::File(file) => &file.hash,
-            CacheValue::LoaderManifest(loader) => &loader.loader,
+                .unwrap_or(DEFAULT_ID)
+                .to_string(),
+            CacheValue::Organization(org) => org.id.clone(),
+            CacheValue::File(file) => file.hash.clone(),
+            CacheValue::LoaderManifest(loader) => loader.loader.clone(),
             // These values can only have one key/val pair, so we specify the same key
             CacheValue::MinecraftManifest(_)
             | CacheValue::Categories(_)
             | CacheValue::ReportTypes(_)
             | CacheValue::Loaders(_)
             | CacheValue::GameVersions(_)
-            | CacheValue::DonationPlatforms(_) => DEFAULT_ID,
+            | CacheValue::DonationPlatforms(_) => DEFAULT_ID.to_string(),
+            CacheValue::FileHash(hash) => {
+                format!("{}-{}", hash.size, hash.path)
+            }
+            CacheValue::FileUpdate(hash) => {
+                format!("{}-{}-{}", hash.hash, hash.loader, hash.game_version)
+            }
         }
     }
 
@@ -342,7 +384,9 @@ impl CacheValue {
             | CacheValue::Version(_)
             | CacheValue::Team { .. }
             | CacheValue::File { .. }
-            | CacheValue::LoaderManifest { .. } => None,
+            | CacheValue::LoaderManifest { .. }
+            | CacheValue::FileHash(_)
+            | CacheValue::FileUpdate(_) => None,
         }
     }
 }
@@ -452,7 +496,9 @@ impl_cache_methods!(
     (Team, Vec<TeamMember>),
     (Organization, Organization),
     (File, CachedFile),
-    (LoaderManifest, CachedLoaderManifest)
+    (LoaderManifest, CachedLoaderManifest),
+    (FileHash, CachedFileHash),
+    (FileUpdate, CachedFileUpdate)
 );
 
 impl_cache_method_singular!(
@@ -598,7 +644,7 @@ impl CachedEntry {
 
     async fn fetch_many(
         type_: CacheValueType,
-        keys: DashSet<impl Display + Eq + PartialEq + Hash + Serialize>,
+        mut keys: DashSet<impl Display + Eq + PartialEq + Hash + Serialize>,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<Self>> {
         macro_rules! fetch_original_values {
@@ -625,7 +671,8 @@ impl CachedEntry {
                         alias: data.get_alias().map(|x| x.to_string()),
                         type_: CacheValueType::$type,
                         data,
-                        expires: Utc::now().timestamp() + DEFAULT_EXPIRY,
+                        expires: Utc::now().timestamp()
+                            + CacheValueType::$type.expiry(),
                     }
                 })
                 .collect()
@@ -648,7 +695,8 @@ impl CachedEntry {
                         )
                         .await?,
                     ),
-                    expires: Utc::now().timestamp() + DEFAULT_EXPIRY,
+                    expires: Utc::now().timestamp()
+                        + CacheValueType::$type.expiry(),
                 }]
             }};
         }
@@ -694,32 +742,46 @@ impl CachedEntry {
                     CacheValue::Organization
                 )
             }
-            CacheValueType::File => fetch_json::<HashMap<String, Version>>(
-                Method::POST,
-                &*format!("{}version_files", MODRINTH_API_URL),
-                None,
-                Some(serde_json::json!({
-                    "algorithm": "sha1",
-                    "hashes": keys,
-                })),
-                &fetch_semaphore,
-            )
-            .await?
-            .into_iter()
-            .map(|(hash, version)| Self {
-                id: hash.clone(),
-                alias: None,
-                type_: CacheValueType::File,
-                data: CacheValue::File(CachedFile {
-                    hash,
-                    metadata: FileMetadata::Modrinth {
-                        project_id: version.project_id,
-                        version_id: version.id,
-                    },
-                }),
-                expires: Utc::now().timestamp() + DEFAULT_EXPIRY,
-            })
-            .collect(),
+            CacheValueType::File => {
+                let mut versions = fetch_json::<HashMap<String, Version>>(
+                    Method::POST,
+                    &*format!("{}version_files", MODRINTH_API_URL),
+                    None,
+                    Some(serde_json::json!({
+                        "algorithm": "sha1",
+                        "hashes": &keys,
+                    })),
+                    &fetch_semaphore,
+                )
+                .await?;
+
+                let mut vals = Vec::new();
+
+                for key in keys {
+                    let hash = key.to_string();
+
+                    let metadata = if let Some(version) = versions.remove(&hash)
+                    {
+                        FileMetadata::Modrinth {
+                            project_id: version.project_id,
+                            version_id: version.id,
+                        }
+                    } else {
+                        FileMetadata::Unknown
+                    };
+
+                    vals.push(Self {
+                        id: hash.clone(),
+                        alias: None,
+                        type_: CacheValueType::File,
+                        data: CacheValue::File(CachedFile { hash, metadata }),
+                        expires: Utc::now().timestamp()
+                            + CacheValueType::File.expiry(),
+                    })
+                }
+
+                vals
+            }
             CacheValueType::LoaderManifest => {
                 let fetch_urls = keys
                     .iter()
@@ -753,7 +815,8 @@ impl CachedEntry {
                         loader: fetch_urls[index].0.to_string(),
                         manifest: metadata,
                     }),
-                    expires: Utc::now().timestamp() + DEFAULT_EXPIRY,
+                    expires: Utc::now().timestamp()
+                        + CacheValueType::LoaderManifest.expiry(),
                 })
                 .collect()
             }
@@ -807,6 +870,150 @@ impl CachedEntry {
                     "tag/donation_platform",
                     CacheValue::DonationPlatforms
                 )
+            }
+            CacheValueType::FileHash => {
+                // TODO: Replace state call here
+                let state = crate::State::get().await?;
+                let profiles_dir = state.directories.profiles_dir().await;
+
+                async fn hash_file(
+                    profiles_dir: &PathBuf,
+                    path: String,
+                ) -> crate::Result<CachedEntry> {
+                    let path =
+                        path.split_once('-').map(|x| x.1).unwrap_or_default();
+
+                    let full_path = profiles_dir.join(path);
+
+                    let mut file = tokio::fs::File::open(&full_path).await?;
+                    let size = file.metadata().await?.len();
+
+                    let mut hasher = sha1_smol::Sha1::new();
+
+                    let mut buffer = [0u8; 65536]; // 64KiB
+                    loop {
+                        use tokio::io::AsyncReadExt;
+                        let bytes_read = file.read(&mut buffer).await?;
+                        if bytes_read == 0 {
+                            break;
+                        }
+                        hasher.update(&buffer[..bytes_read]);
+                    }
+
+                    let hash = hasher.digest().to_string();
+
+                    let data = CacheValue::FileHash(CachedFileHash {
+                        path: path.to_string(),
+                        file_name: full_path
+                            .file_name()
+                            .and_then(|x| x.to_str())
+                            .unwrap_or_default()
+                            .to_string(),
+                        size,
+                        hash,
+                    });
+
+                    Ok(CachedEntry {
+                        id: path.to_string(),
+                        alias: None,
+                        type_: CacheValueType::FileHash,
+                        data,
+                        expires: Utc::now().timestamp()
+                            + CacheValueType::FileHash.expiry(),
+                    })
+                }
+
+                use futures::stream::StreamExt;
+                let results: Vec<_> = futures::stream::iter(keys)
+                    .map(|x| hash_file(&profiles_dir, x.to_string()))
+                    .buffer_unordered(16) // hash 16 files at once
+                    .collect::<Vec<_>>()
+                    .await
+                    .into_iter()
+                    .map(|x| x.ok())
+                    .flatten()
+                    .collect();
+
+                results
+            }
+            CacheValueType::FileUpdate => {
+                // TODO: switch to update individual once back-end route exists
+                let mut filtered_keys: Vec<((String, String), Vec<String>)> =
+                    Vec::new();
+                keys.iter().for_each(|x| {
+                    let string = x.key().to_string();
+                    let key = string.splitn(3, '-').collect::<Vec<_>>();
+
+                    if key.len() == 3 {
+                        let hash = key[0];
+                        let loader = key[1];
+                        let game_version = key[2];
+
+                        if let Some(values) =
+                            filtered_keys.iter_mut().find(|x| {
+                                x.0 .0 == loader && x.0 .1 == game_version
+                            })
+                        {
+                            values.1.push(hash.to_string());
+                        } else {
+                            filtered_keys.push((
+                                (loader.to_string(), game_version.to_string()),
+                                vec![hash.to_string()],
+                            ))
+                        }
+                    }
+                });
+
+                let version_update_url =
+                    format!("{}version_files/update", MODRINTH_API_URL);
+                let variations =
+                    futures::future::try_join_all(filtered_keys.iter().map(
+                        |((loader, game_version), hashes)| {
+                            fetch_json::<HashMap<String, Version>>(
+                                Method::POST,
+                                &version_update_url,
+                                None,
+                                Some(serde_json::json!({
+                                    "algorithm": "sha1",
+                                    "hashes": hashes,
+                                    "loaders": [loader],
+                                    "game_versions": [game_version]
+                                })),
+                                fetch_semaphore,
+                            )
+                        },
+                    ))
+                    .await?;
+
+                let mut vals = Vec::new();
+
+                for (index, mut variation) in variations.into_iter().enumerate()
+                {
+                    let ((loader, game_version), hashes) =
+                        &filtered_keys[index];
+
+                    for hash in hashes {
+                        let version_id = variation.remove(hash).map(|x| x.id);
+
+                        let data = CacheValue::FileUpdate(CachedFileUpdate {
+                            hash: hash.clone(),
+                            game_version: game_version.clone(),
+                            loader: loader.clone(),
+                            update_version_id: version_id,
+                        });
+
+                        vals.push(Self {
+                            id: data.get_key(),
+                            alias: None,
+                            type_: CacheValueType::FileUpdate,
+                            data,
+                            expires: Utc::now().timestamp()
+                                + CacheValueType::FileUpdate.expiry(),
+                        })
+                    }
+                }
+
+                vals
             }
         })
     }

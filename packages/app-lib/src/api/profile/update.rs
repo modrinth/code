@@ -42,8 +42,7 @@ pub async fn update_managed_modrinth_version(
     )
     .await?;
 
-    emit_profile(profile_path, &profile.name, ProfilePayloadType::Edited)
-        .await?;
+    emit_profile(profile_path, ProfilePayloadType::Edited).await?;
 
     Ok(())
 }
@@ -66,29 +65,14 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
     // For repairing specifically, first we remove all installed projects (to ensure we do remove ones that aren't in the pack)
     // We do a project removal followed by removing everything in the .mrpack, to ensure we only
     // remove relevant projects and not things like save files
-    // TODO: fix
-    // let projects_map = profile.projects.clone();
-    // let stream = futures::stream::iter(
-    //     projects_map
-    //         .into_iter()
-    //         .map(Ok::<(ProjectPathId, Project), crate::Error>),
-    // );
-    // loading_try_for_each_concurrent(
-    //     stream,
-    //     None,
-    //     None,
-    //     0.0,
-    //     0,
-    //     None,
-    //     |(project_id, _)| {
-    //         let profile = profile.clone();
-    //         async move {
-    //             profile.remove_project(&project_id, Some(true)).await?;
-    //             Ok(())
-    //         }
-    //     },
-    // )
-    // .await?;
+    let state = crate::State::get().await?;
+    let projects_map = profile
+        .get_projects(&state.pool, &state.fetch_semaphore)
+        .await?;
+
+    for (file, _) in projects_map {
+        crate::state::Profile::remove_project(&profile.path, &file).await?;
+    }
 
     // Extract modrinth pack information, if appropriate
     let linked_data = profile.linked_data.as_ref().ok_or_else(unmanaged_err)?;
@@ -104,8 +88,7 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
     )
     .await?;
 
-    emit_profile(profile_path, &profile.name, ProfilePayloadType::Edited)
-        .await?;
+    emit_profile(profile_path, ProfilePayloadType::Edited).await?;
 
     Ok(())
 }

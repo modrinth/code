@@ -297,7 +297,6 @@ pub async fn emit_process(
 #[allow(unused_variables)]
 pub async fn emit_profile(
     profile_path_id: &str,
-    name: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
@@ -311,7 +310,6 @@ pub async fn emit_profile(
                 ProfilePayload {
                     profile_path_id: profile_path_id.to_string(),
                     path,
-                    name: name.to_string(),
                     event,
                 },
             )

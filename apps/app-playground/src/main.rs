@@ -65,7 +65,7 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
 
     let name = "Example".to_string();
-    let game_version = "1.19.2".to_string();
+    let game_version = "1.21".to_string();
     let modloader = ModLoader::Fabric;
     let loader_version = "stable".to_string();
 
@@ -80,6 +80,36 @@ async fn main() -> theseus::Result<()> {
         None,
     )
     .await?;
+
+    profile::add_project_from_version(&profile_path, "oIVA3FbL").await?;
+    profile::add_project_from_version(&profile_path, "RncWhTxD").await?;
+    profile::add_project_from_version(&profile_path, "xhN1IvHi").await?;
+    profile::add_project_from_version(&profile_path, "c6RfHyKW").await?;
+
+    {
+        let iris = profile::add_project_from_version(&profile_path, "kuOV4Ece")
+            .await?;
+        let new_path =
+            profile::toggle_disable_project(&profile_path, &iris).await?;
+        profile::toggle_disable_project(&profile_path, &new_path).await?;
+    }
+
+    let fast_grass =
+        profile::add_project_from_version(&profile_path, "1lpmCieT").await?;
+    profile::remove_project(&profile_path, &fast_grass).await?;
+
+    let lithium =
+        profile::add_project_from_version(&profile_path, "5a3sPIH2").await?;
+    profile::toggle_disable_project(&profile_path, &lithium).await?;
+
+    let projects = profile::get_projects(&profile_path).await?;
+
+    for (path, file) in projects {
+        println!(
+            "{path} {} {:?} {:?}",
+            file.file_name, file.update_version_id, file.metadata
+        )
+    }
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process

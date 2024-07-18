@@ -249,8 +249,6 @@ pub async fn install_minecraft(
     )
     .await?;
 
-    // TODO: check if java exists, if not install it add to install step
-
     let key = version_info
         .java_version
         .as_ref()

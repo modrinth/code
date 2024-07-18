@@ -91,7 +91,7 @@ pub async fn fetch_advanced(
             req = req.header(header.0, header.1);
         }
 
-        // TODO: add back with db creds
+        // TODO: fix add back with db creds
         // if url.starts_with("https://cdn.modrinth.com") {
         //     if let Some(creds) = &credentials.0 {
         //         req = req.header("Authorization", &creds.session);

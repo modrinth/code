@@ -45,14 +45,9 @@ mod mr_auth;
 
 pub use self::mr_auth::*;
 
-// TODO: Add directory changing support again
-// TODO: Add converter for legacy stuff
 // TODO: UI: Change so new settings model works
 // TODO: UI: Change so new java version API works
-// TODO: Profile projects read from disk & cache
-// TODO: re-add instance groups
-// TODO: profile management methods
-// TODO: add back file watcher
+// TODO: pass credentials to modrinth cdn
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State

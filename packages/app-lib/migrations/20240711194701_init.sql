@@ -94,14 +94,6 @@ CREATE TABLE cache (
     PRIMARY KEY (id, data_type)
 );
 
-CREATE TABLE path_hashes (
-    path TEXT NOT NULL,
-    hash BLOB NOT NULL,
-    file_size INTEGER NOT NULL,
-
-    PRIMARY KEY (path)
-);
-
 CREATE TABLE profiles (
     path TEXT NOT NULL,
     install_stage TEXT NOT NULL,
