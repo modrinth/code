@@ -104,7 +104,7 @@ import UploadIcon from "~/assets/images/utils/upload.svg?component";
 import InfoIcon from "~/assets/images/utils/info.svg?component";
 import { Badge } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
-import DropArea from "~/components/ui/DropArea.vue";
+import { DropArea } from "@modrinth/ui";
 import Pagination from "~/components/ui/Pagination.vue";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 
