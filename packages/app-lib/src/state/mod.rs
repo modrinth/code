@@ -9,9 +9,8 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
-use sqlx::migrate::MigrateDatabase;
-use sqlx::sqlite::SqlitePoolOptions;
-use sqlx::{Connection, Sqlite, SqliteConnection, SqlitePool};
+use crate::state::fs_watcher::FileWatcher;
+use sqlx::SqlitePool;
 
 // Submodules
 mod dirs;
@@ -41,6 +40,8 @@ pub use self::minecraft_auth::*;
 mod cache;
 pub use self::cache::*;
 
+mod db;
+pub mod fs_watcher;
 mod mr_auth;
 
 pub use self::mr_auth::*;
@@ -48,6 +49,8 @@ pub use self::mr_auth::*;
 // TODO: UI: Change so new settings model works
 // TODO: UI: Change so new java version API works
 // TODO: pass credentials to modrinth cdn
+// TODO: add language requiring restart for discord, concurrent writes/fetches changes
+// TODO: get rid of unneccessary locking + atomics in discord
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
@@ -79,6 +82,8 @@ pub struct State {
     pub discord_rpc: DiscordGuard,
 
     pub(crate) pool: SqlitePool,
+
+    pub(crate) file_watcher: FileWatcher,
 }
 
 impl State {
@@ -90,13 +95,15 @@ impl State {
         Ok(())
     }
 
-    /// Get the current launcher state, initializing it if needed
+    /// Get the current launcher state, waiting for initialization
     pub async fn get() -> crate::Result<Arc<Self>> {
         if !LAUNCHER_STATE.initialized() {
             while !LAUNCHER_STATE.initialized() {}
         }
 
-        Ok(Arc::clone(LAUNCHER_STATE.get().unwrap()))
+        Ok(Arc::clone(
+            LAUNCHER_STATE.get().expect("State is not initialized!"),
+        ))
     }
 
     pub fn initialized() -> bool {
@@ -115,35 +122,16 @@ impl State {
 
         let directories = DirectoryInfo::init()?;
 
-        // TODO: move to own file
-        // db code
-        let uri =
-            format!("sqlite:{}", DirectoryInfo::get_database_file()?.display());
-
-        if !Sqlite::database_exists(&uri).await? {
-            Sqlite::create_database(&uri).await?;
-        }
-
-        let mut conn: SqliteConnection =
-            SqliteConnection::connect(&uri).await?;
-        sqlx::migrate!().run(&mut conn).await?;
-
-        let pool = SqlitePoolOptions::new()
-            .max_connections(100)
-            .connect(&uri)
-            .await?;
-        // end db code
+        let pool = db::connect().await?;
 
         let settings = Settings::get(&pool).await?;
 
         emit_loading(&loading_bar, 10.0, None).await?;
 
-        let fetch_semaphore = FetchSemaphore(RwLock::new(Semaphore::new(
-            settings.max_concurrent_downloads,
-        )));
-        let io_semaphore = IoSemaphore(RwLock::new(Semaphore::new(
-            settings.max_concurrent_writes,
-        )));
+        let fetch_semaphore =
+            FetchSemaphore(Semaphore::new(settings.max_concurrent_downloads));
+        let io_semaphore =
+            IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
         emit_loading(&loading_bar, 10.0, None).await?;
 
         let is_offline = !fetch::check_internet(3).await;
@@ -168,6 +156,9 @@ impl State {
 
         let children = Children::new();
 
+        let file_watcher = fs_watcher::init_watcher().await?;
+        fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
+
         // Starts a loop of checking if we are online, and updating
         Self::offine_check_loop();
 
@@ -185,6 +176,7 @@ impl State {
             safety_processes: RwLock::new(safety_processes),
             modrinth_auth_flow: RwLock::new(None),
             pool,
+            file_watcher,
         }))
     }
 

@@ -9,15 +9,15 @@ use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
 use std::time::{self, Duration};
-use tokio::sync::{RwLock, Semaphore};
+use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncWriteExt};
 
 use super::io::{self, IOError};
 
 #[derive(Debug)]
-pub struct IoSemaphore(pub RwLock<Semaphore>);
+pub struct IoSemaphore(pub Semaphore);
 #[derive(Debug)]
-pub struct FetchSemaphore(pub RwLock<Semaphore>);
+pub struct FetchSemaphore(pub Semaphore);
 
 lazy_static! {
     pub static ref REQWEST_CLIENT: reqwest::Client = {
@@ -77,8 +77,7 @@ pub async fn fetch_advanced(
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
 ) -> crate::Result<Bytes> {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
@@ -216,8 +215,7 @@ pub async fn post_json<T>(
 where
     T: DeserializeOwned,
 {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     let mut req = REQWEST_CLIENT.post(url).json(&json_body);
     if let Some(creds) = &credentials.0 {
@@ -237,8 +235,7 @@ pub async fn read_json<T>(
 where
     T: DeserializeOwned,
 {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     let json = io::read(path).await?;
     let json = serde_json::from_slice::<T>(&json)?;
@@ -252,8 +249,7 @@ pub async fn write<'a>(
     bytes: &[u8],
     semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     if let Some(parent) = path.parent() {
         io::create_dir_all(parent).await?;
@@ -277,8 +273,7 @@ pub async fn copy(
     let src: &Path = src.as_ref();
     let dest = dest.as_ref();
 
-    let io_semaphore = semaphore.0.read().await;
-    let _permit = io_semaphore.acquire().await?;
+    let _permit = semaphore.0.acquire().await?;
 
     if let Some(parent) = dest.parent() {
         io::create_dir_all(parent).await?;

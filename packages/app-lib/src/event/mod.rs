@@ -255,7 +255,6 @@ pub struct ProfilePayload {
 #[serde(rename_all = "snake_case")]
 pub enum ProfilePayloadType {
     Created,
-    Added, // also triggered when Created
     Synced,
     Edited,
     Removed,

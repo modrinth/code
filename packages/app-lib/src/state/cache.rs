@@ -1,17 +1,16 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
-use crate::state::ProjectType;
 use crate::util::fetch::{fetch_json, FetchSemaphore};
 use chrono::{DateTime, Utc};
-use dashmap::{DashMap, DashSet};
+use dashmap::DashSet;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::Hash;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 // 1 day
-const DEFAULT_ID: &'static str = "0";
+const DEFAULT_ID: &str = "0";
 
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 #[serde(rename_all = "snake_case")]
@@ -611,7 +610,7 @@ impl CachedEntry {
                     .await?;
 
             if !values.is_empty() {
-                Self::upsert_many(&*values, &mut *exec).await?;
+                Self::upsert_many(&values, &mut *exec).await?;
 
                 return_vals.append(&mut values);
             }
@@ -620,7 +619,7 @@ impl CachedEntry {
         if !expired_keys.is_empty()
             && cache_behaviour == CacheBehaviour::StaleWhileRevalidate
         {
-            let _ = tokio::task::spawn(async move {
+            tokio::task::spawn(async move {
                 // TODO: if possible- find a way to do this without invoking state get
                 let state = crate::state::State::get().await?;
 
@@ -632,7 +631,7 @@ impl CachedEntry {
                 .await?;
 
                 if !values.is_empty() {
-                    Self::upsert_many(&*values, &state.pool).await?;
+                    Self::upsert_many(&values, &state.pool).await?;
                 }
 
                 Ok::<(), crate::Error>(())
@@ -644,7 +643,7 @@ impl CachedEntry {
 
     async fn fetch_many(
         type_: CacheValueType,
-        mut keys: DashSet<impl Display + Eq + PartialEq + Hash + Serialize>,
+        keys: DashSet<impl Display + Eq + Hash + Serialize>,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<Self>> {
         macro_rules! fetch_original_values {
@@ -745,13 +744,13 @@ impl CachedEntry {
             CacheValueType::File => {
                 let mut versions = fetch_json::<HashMap<String, Version>>(
                     Method::POST,
-                    &*format!("{}version_files", MODRINTH_API_URL),
+                    &format!("{}version_files", MODRINTH_API_URL),
                     None,
                     Some(serde_json::json!({
                         "algorithm": "sha1",
                         "hashes": &keys,
                     })),
-                    &fetch_semaphore,
+                    fetch_semaphore,
                 )
                 .await?;
 
@@ -877,7 +876,7 @@ impl CachedEntry {
                 let profiles_dir = state.directories.profiles_dir().await;
 
                 async fn hash_file(
-                    profiles_dir: &PathBuf,
+                    profiles_dir: &Path,
                     path: String,
                 ) -> crate::Result<CachedEntry> {
                     let path =
@@ -930,8 +929,7 @@ impl CachedEntry {
                     .collect::<Vec<_>>()
                     .await
                     .into_iter()
-                    .map(|x| x.ok())
-                    .flatten()
+                    .filter_map(|x| x.ok())
                     .collect();
 
                 results

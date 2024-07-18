@@ -105,6 +105,9 @@ CREATE TABLE profiles (
     mod_loader TEXT NOT NULL,
     mod_loader_version TEXT NULL,
 
+    -- array of strings
+    groups JSONB NOT NULL,
+
     linked_project_id TEXT NULL,
     linked_version_id TEXT NULL,
     locked INTEGER NULL,

@@ -368,7 +368,7 @@ pub async fn set_profile_information(
     let mod_loader = mod_loader.unwrap_or(ModLoader::Vanilla);
     let loader_version = if mod_loader != ModLoader::Vanilla {
         crate::launcher::get_loader_version_from_profile(
-            &game_version,
+            game_version,
             mod_loader,
             loader_version.cloned().as_deref(),
         )

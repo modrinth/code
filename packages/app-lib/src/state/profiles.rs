@@ -1,5 +1,5 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{CacheBehaviour, CachedEntry, CachedFile, FileMetadata};
+use crate::state::{CacheBehaviour, CachedEntry, FileMetadata};
 use crate::util;
 use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
@@ -21,6 +21,8 @@ pub struct Profile {
     pub game_version: String,
     pub loader: ModLoader,
     pub loader_version: Option<String>,
+
+    pub groups: Vec<String>,
 
     pub linked_data: Option<LinkedData>,
 
@@ -217,6 +219,7 @@ impl Profile {
             SELECT
                 path, install_stage, name, icon_path,
                 game_version, mod_loader, mod_loader_version,
+                json(groups) as "groups!: serde_json::Value",
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
@@ -240,15 +243,28 @@ impl Profile {
             game_version: x.game_version,
             loader: ModLoader::from_str(&x.mod_loader),
             loader_version: x.mod_loader_version,
-            linked_data: None,
+            groups: serde_json::from_value(x.groups).unwrap_or_default(),
+            linked_data: if let Some(project_id) = x.linked_project_id {
+                if let Some(version_id) = x.linked_version_id {
+                    x.locked.map(|locked| LinkedData {
+                        project_id,
+                        version_id,
+                        locked: locked == 1,
+                    })
+                } else {
+                    None
+                }
+            } else {
+                None
+            },
             created: Utc
                 .timestamp_opt(x.created, 0)
                 .single()
-                .unwrap_or_else(|| Utc::now()),
+                .unwrap_or_else(Utc::now),
             modified: Utc
                 .timestamp_opt(x.modified, 0)
                 .single()
-                .unwrap_or_else(|| Utc::now()),
+                .unwrap_or_else(Utc::now),
             last_played: x
                 .last_played
                 .and_then(|x| Utc.timestamp_opt(x, 0).single()),
@@ -268,11 +284,8 @@ impl Profile {
             game_resolution: if let Some(x_res) =
                 x.override_mc_game_resolution_x
             {
-                if let Some(y_res) = x.override_mc_game_resolution_y {
-                    Some(WindowSize(x_res as u16, y_res as u16))
-                } else {
-                    None
-                }
+                x.override_mc_game_resolution_y
+                    .map(|y_res| WindowSize(x_res as u16, y_res as u16))
             } else {
                 None
             },
@@ -293,6 +306,7 @@ impl Profile {
             SELECT
                 path, install_stage, name, icon_path,
                 game_version, mod_loader, mod_loader_version,
+                json(groups) as "groups!: serde_json::Value",
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
@@ -315,15 +329,17 @@ impl Profile {
                         game_version: x.game_version,
                         loader: ModLoader::from_str(&x.mod_loader),
                         loader_version: x.mod_loader_version,
+                        groups: serde_json::from_value(x.groups)
+                            .unwrap_or_default(),
                         linked_data: if let Some(project_id) = x.linked_project_id {
                             if let Some(version_id) = x.linked_version_id {
-                                if let Some(locked) = x.locked {
-                                    Some(LinkedData {
-                                        project_id,
-                                        version_id,
-                                        locked: locked == 1,
-                                    })
-                                } else { None }
+                                x.locked.map(|locked|
+                                LinkedData {
+                                    project_id,
+                                    version_id,
+                                    locked: locked == 1,
+                                }
+                                )
                             } else { None }
                         } else { None },
                         created: Utc.timestamp_opt(x.created, 0).single().unwrap_or_else(Utc::now),
@@ -340,13 +356,10 @@ impl Profile {
                         }),
                         force_fullscreen: x.override_mc_force_fullscreen.map(|x| x == 1),
                         game_resolution: if let Some(x_res) = x.override_mc_game_resolution_x {
-                            if let Some(y_res) = x.override_mc_game_resolution_y {
-                                Some(WindowSize(
-                                    x_res as u16,
-                                    y_res as u16,
-                                ))
-                            } else { None }
-
+                            x.override_mc_game_resolution_y.map(|y_res| WindowSize(
+                                x_res as u16,
+                                y_res as u16,
+                            ))
                         } else { None },
                         hooks: Hooks {
                             pre_launch: x.override_hook_pre_launch,
@@ -369,6 +382,8 @@ impl Profile {
     ) -> crate::Result<()> {
         let install_stage = self.install_stage.as_str();
         let mod_loader = self.loader.as_str();
+
+        let groups = serde_json::to_string(&self.groups)?;
 
         let linked_data_project_id =
             self.linked_data.as_ref().map(|x| x.project_id.clone());
@@ -396,6 +411,7 @@ impl Profile {
             INSERT INTO profiles (
                 path, install_stage, name, icon_path,
                 game_version, mod_loader, mod_loader_version,
+                groups,
                 linked_project_id, linked_version_id, locked,
                 created, modified, last_played,
                 submitted_time_played, recent_time_played,
@@ -406,12 +422,13 @@ impl Profile {
             VALUES (
                 $1, $2, $3, $4,
                 $5, $6, $7,
-                $8, $9, $10,
-                $11, $12, $13,
-                $14, $15,
-                $16, $17, $18,
-                $19, $20, $21, $22,
-                $23, $24, $25
+                jsonb($8),
+                $9, $10, $11,
+                $12, $13, $14,
+                $15, $16,
+                $17, jsonb($18), jsonb($19),
+                $20, $21, $22, $23,
+                $24, $25, $26
             )
             ON CONFLICT (path) DO UPDATE SET
                 install_stage = $2,
@@ -422,28 +439,30 @@ impl Profile {
                 mod_loader = $6,
                 mod_loader_version = $7,
 
-                linked_project_id = $8,
-                linked_version_id = $9,
-                locked = $10,
+                groups = jsonb($8),
 
-                created = $11,
-                modified = $12,
-                last_played = $13,
+                linked_project_id = $9,
+                linked_version_id = $10,
+                locked = $11,
 
-                submitted_time_played = $14,
-                recent_time_played = $15,
+                created = $12,
+                modified = $13,
+                last_played = $14,
 
-                override_java_path = $16,
-                override_extra_launch_args = jsonb($17),
-                override_custom_env_vars = jsonb($18),
-                override_mc_memory_max = $19,
-                override_mc_force_fullscreen = $20,
-                override_mc_game_resolution_x = $21,
-                override_mc_game_resolution_y = $22,
+                submitted_time_played = $15,
+                recent_time_played = $16,
 
-                override_hook_pre_launch = $23,
-                override_hook_wrapper = $24,
-                override_hook_post_exit = $25
+                override_java_path = $17,
+                override_extra_launch_args = jsonb($18),
+                override_custom_env_vars = jsonb($19),
+                override_mc_memory_max = $20,
+                override_mc_force_fullscreen = $21,
+                override_mc_game_resolution_x = $22,
+                override_mc_game_resolution_y = $23,
+
+                override_hook_pre_launch = $24,
+                override_hook_wrapper = $25,
+                override_hook_post_exit = $26
             ",
             self.path,
             install_stage,
@@ -452,6 +471,7 @@ impl Profile {
             self.game_version,
             mod_loader,
             self.loader_version,
+            groups,
             linked_data_project_id,
             linked_data_version_id,
             linked_data_locked,
@@ -571,7 +591,7 @@ impl Profile {
             &keys.iter().map(|s| &*s.cache_key).collect::<Vec<_>>(),
             None,
             exec,
-            &fetch_semaphore,
+            fetch_semaphore,
         )
         .await?;
 
@@ -579,7 +599,7 @@ impl Profile {
             &file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>(),
             None,
             exec,
-            &fetch_semaphore,
+            fetch_semaphore,
         )
         .await?;
 
@@ -598,7 +618,7 @@ impl Profile {
             &file_updates.iter().map(|x| &**x).collect::<Vec<_>>(),
             Some(CacheBehaviour::Bypass),
             exec,
-            &fetch_semaphore,
+            fetch_semaphore,
         )
         .await?;
 
@@ -656,72 +676,6 @@ impl Profile {
         Ok(files)
     }
 
-    // pub fn crash_task(path: ProfilePathId) {
-    //     tokio::task::spawn(async move {
-    //         let res = async {
-    //             let profile = crate::api::profile::get(&path).await?;
-    //
-    //             if let Some(profile) = profile {
-    //                 // Hide warning if profile is not yet installed
-    //                 if profile.install_stage == ProfileInstallStage::Installed {
-    //                     emit_warning(&format!("Profile {} has crashed! Visit the logs page to see a crash report.", profile.metadata.name)).await?;
-    //                 }
-    //             }
-    //
-    //             Ok::<(), crate::Error>(())
-    //         }
-    //             .await;
-    //
-    //         match res {
-    //             Ok(()) => {}
-    //             Err(err) => {
-    //                 tracing::warn!(
-    //                     "Unable to send crash report to frontend: {err}"
-    //                 )
-    //             }
-    //         };
-    //     });
-    // }
-
-    // #[tracing::instrument(skip(watcher))]
-    // #[theseus_macros::debug_pin]
-    // pub async fn watch_fs(
-    //     profile_path: &Path,
-    //     watcher: &mut Debouncer<RecommendedWatcher>,
-    // ) -> crate::Result<()> {
-    //     async fn watch_path(
-    //         profile_path: &Path,
-    //         watcher: &mut Debouncer<RecommendedWatcher>,
-    //         path: &str,
-    //     ) -> crate::Result<()> {
-    //         let path = profile_path.join(path);
-    //
-    //         io::create_dir_all(&path).await?;
-    //
-    //         watcher
-    //             .watcher()
-    //             .watch(&profile_path.join(path), RecursiveMode::Recursive)?;
-    //
-    //         Ok(())
-    //     }
-    //
-    //     watch_path(profile_path, watcher, ProjectType::Mod.get_folder())
-    //         .await?;
-    //     watch_path(profile_path, watcher, ProjectType::ShaderPack.get_folder())
-    //         .await?;
-    //     watch_path(
-    //         profile_path,
-    //         watcher,
-    //         ProjectType::ResourcePack.get_folder(),
-    //     )
-    //     .await?;
-    //     watch_path(profile_path, watcher, ProjectType::DataPack.get_folder())
-    //         .await?;
-    //     watch_path(profile_path, watcher, "crash-reports").await?;
-    //
-    //     Ok(())
-    // }
-
     #[tracing::instrument(skip(exec))]
     #[theseus_macros::debug_pin]
     pub async fn add_project_version<'a, E>(
@@ -735,7 +689,7 @@ impl Profile {
         E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
     {
         let version =
-            CachedEntry::get_version(&version_id, None, exec, fetch_semaphore)
+            CachedEntry::get_version(version_id, None, exec, fetch_semaphore)
                 .await?
                 .ok_or_else(|| {
                     crate::ErrorKind::InputError(format!(

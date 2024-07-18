@@ -365,9 +365,8 @@ pub async fn remove_all_related_files(
         // Iterate over all Modrinth project file paths in the json, and remove them
         // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
         for file in pack.files {
-            let path: PathBuf = profile::get_full_path(&profile_path)
-                .await?
-                .join(file.path.to_string());
+            let path: PathBuf =
+                profile::get_full_path(&profile_path).await?.join(file.path);
             if path.exists() {
                 io::remove_file(&path).await?;
             }

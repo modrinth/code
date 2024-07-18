@@ -250,11 +250,11 @@ pub async fn update_all_projects(
         .await?;
 
         let state = State::get().await?;
-        let keys = profile.get_projects(&state.pool, &state.fetch_semaphore).await?
+        let keys = profile
+            .get_projects(&state.pool, &state.fetch_semaphore)
+            .await?
             .into_iter()
-            .filter(|(_, project)| {
-                project.update_version_id.is_some()
-            })
+            .filter(|(_, project)| project.update_version_id.is_some())
             .map(|x| x.0)
             .collect::<Vec<_>>();
         let len = keys.len();
@@ -323,7 +323,7 @@ pub async fn update_project(
                 )
                 .await?;
 
-                if path != project_path.clone() {
+                if path != project_path {
                     Profile::remove_project(profile_path, project_path).await?;
                 }
 
@@ -441,8 +441,8 @@ pub async fn export_mrpack(
     _name: Option<String>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
-    let io_semaphore = state.io_semaphore.0.read().await;
-    let _permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;
+    let _permit: tokio::sync::SemaphorePermit =
+        state.io_semaphore.0.acquire().await?;
     let profile = get(profile_path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to export a nonexistent or unloaded profile at path {}!",
@@ -476,9 +476,9 @@ pub async fn export_mrpack(
         create_mrpack_json(&profile, version_id, description).await?;
     let included_candidates_set =
         HashSet::<_>::from_iter(included_export_candidates.iter());
-    packfile.files.retain(|f| {
-        included_candidates_set.contains(&f.path)
-    });
+    packfile
+        .files
+        .retain(|f| included_candidates_set.contains(&f.path));
 
     // Build vec of all files in the folder
     let mut path_list = Vec::new();
@@ -503,8 +503,7 @@ pub async fn export_mrpack(
         let relative_path = pack_get_relative_path(&profile_base_path, &path)?;
 
         if packfile.files.iter().any(|f| f.path == relative_path)
-            || !included_candidates_set
-                .contains(&relative_path)
+            || !included_candidates_set.contains(&relative_path)
         {
             continue;
         }
@@ -580,7 +579,8 @@ pub async fn get_pack_export_candidates(
             {
                 let path: PathBuf = entry.path();
 
-                path_list.push(pack_get_relative_path(&profile_base_dir, &path)?);
+                path_list
+                    .push(pack_get_relative_path(&profile_base_dir, &path)?);
             }
         } else {
             // One layer of files/folders if its a file
@@ -590,8 +590,12 @@ pub async fn get_pack_export_candidates(
     Ok(path_list)
 }
 
-fn pack_get_relative_path(profile_path: &PathBuf, path: &PathBuf) -> crate::Result<String> {
-    Ok(path.strip_prefix(profile_path)
+fn pack_get_relative_path(
+    profile_path: &PathBuf,
+    path: &PathBuf,
+) -> crate::Result<String> {
+    Ok(path
+        .strip_prefix(profile_path)
         .map_err(|_| {
             crate::ErrorKind::FSError(format!(
                 "Path {path:?} does not correspond to a profile",
@@ -700,8 +704,8 @@ pub async fn run_credentials(
     }
 
     let mc_process = crate::launcher::launch_minecraft(
-        &*java_args,
-        &*env_args,
+        &java_args,
+        &env_args,
         &mc_set_options,
         &wrapper,
         &memory,

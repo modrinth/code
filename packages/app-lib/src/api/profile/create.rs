@@ -82,6 +82,7 @@ pub async fn profile_create(
         game_version,
         loader: modloader,
         loader_version: loader.map(|x| x.id),
+        groups: Vec::new(),
         linked_data,
         created: Utc::now(),
         modified: Utc::now(),
@@ -110,12 +111,19 @@ pub async fn profile_create(
                     &state.directories.caches_dir(),
                     &state.io_semaphore,
                     bytes::Bytes::from(bytes),
-                    &icon,
+                    icon,
                 )
                 .await?;
         }
 
         emit_profile(&profile.path, ProfilePayloadType::Created).await?;
+
+        crate::state::fs_watcher::watch_profile(
+            &profile.path,
+            &state.file_watcher,
+            &state.directories,
+        )
+        .await?;
 
         profile.upsert(&state.pool).await?;
 
@@ -141,7 +149,7 @@ pub async fn profile_create_from_duplicate(
     copy_from: &str,
 ) -> crate::Result<String> {
     // Original profile
-    let profile = profile::get(&copy_from).await?.ok_or_else(|| {
+    let profile = profile::get(copy_from).await?.ok_or_else(|| {
         ErrorKind::UnmanagedProfileError(copy_from.to_string())
     })?;
 
