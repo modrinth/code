@@ -92,7 +92,7 @@
 <script>
 import Categories from "~/components/ui/search/Categories.vue";
 import { Badge } from "@modrinth/ui";
-import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
+import { EnvironmentIndicator } from "@modrinth/ui";
 
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
 import EditIcon from "~/assets/images/utils/updated.svg?component";

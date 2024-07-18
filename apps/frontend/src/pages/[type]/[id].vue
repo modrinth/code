@@ -1096,7 +1096,7 @@ import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component"
 import BoxIcon from "~/assets/images/utils/box.svg?component";
 import { Badge } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
-import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
+import { EnvironmentIndicator } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import { CopyCode } from "@modrinth/ui";
