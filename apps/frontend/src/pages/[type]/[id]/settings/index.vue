@@ -245,7 +245,7 @@ import { Multiselect } from "vue-multiselect";
 
 import { Avatar } from "@modrinth/ui";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
-import FileInput from "~/components/ui/FileInput.vue";
+import { FileInput } from "@modrinth/ui";
 
 import UploadIcon from "~/assets/images/utils/upload.svg?component";
 import SaveIcon from "~/assets/images/utils/save.svg?component";

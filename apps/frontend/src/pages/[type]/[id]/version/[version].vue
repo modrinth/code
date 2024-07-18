@@ -629,7 +629,7 @@ import Categories from "~/components/ui/search/Categories.vue";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import { Chips } from "@modrinth/ui";
 import { Checkbox } from "@modrinth/ui";
-import FileInput from "~/components/ui/FileInput.vue";
+import { FileInput } from "@modrinth/ui";
 
 import FileIcon from "~/assets/images/utils/file.svg?component";
 import TrashIcon from "~/assets/images/utils/trash.svg?component";
