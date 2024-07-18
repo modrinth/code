@@ -304,13 +304,10 @@ export const useFetchAllAnalytics = (
   projects,
   selectedProjects,
   personalRevenue = false,
+  startDate = ref(dayjs().subtract(30, "days")),
+  endDate = ref(dayjs()),
+  timeResolution = ref(1440),
 ) => {
-  const timeResolution = ref(1440); // 1 day
-  const timeRange = ref(43200); // 30 days
-
-  const startDate = ref(dayjs().subtract(timeRange.value, "minutes"));
-  const endDate = ref(dayjs());
-
   const downloadData = ref(null);
   const viewData = ref(null);
   const revenueData = ref(null);
@@ -442,7 +439,6 @@ export const useFetchAllAnalytics = (
   return {
     // Configuration
     timeResolution,
-    timeRange,
 
     startDate,
     endDate,
