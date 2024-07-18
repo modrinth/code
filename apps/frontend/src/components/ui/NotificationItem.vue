@@ -326,7 +326,7 @@ import { getProjectLink, getVersionLink } from "~/helpers/projects.js";
 import { getUserLink } from "~/helpers/users.js";
 import { acceptTeamInvite, removeSelfFromTeam } from "~/helpers/teams.js";
 import { markAsRead } from "~/helpers/notifications.js";
-import DoubleIcon from "~/components/ui/DoubleIcon.vue";
+import { DoubleIcon } from "@modrinth/ui";
 import { Avatar } from "@modrinth/ui";
 import { Badge } from "@modrinth/ui";
 import { CopyCode } from "@modrinth/ui";
