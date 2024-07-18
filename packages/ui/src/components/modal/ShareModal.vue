@@ -91,7 +91,6 @@ const sendEmail = computed(
   () =>
     `mailto:user@test.com
     ?subject=${encodeURIComponent(props.shareTitle)}
-    &body=${encodeURIComponent(content.value)}`
     &body=${encodeURIComponent(content.value)}`,
 )
 
