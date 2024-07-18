@@ -3,11 +3,6 @@ html {
   --dark-color-base: #b0bac5;
   --dark-color-contrast: #ecf9fb;
 
-  --color-ad: rgba(125, 75, 162, 0.2);
-  --color-ad-raised: rgba(190, 140, 243, 0.5);
-  --color-ad-contrast: black;
-  --color-ad-highlight: var(--color-purple);
-
   --gap-xs: 0.25rem;
   --gap-sm: 0.5rem;
   --gap-md: 0.75rem;
@@ -60,6 +55,11 @@ html {
 
   --color-tooltip-text: var(--color-accent-contrast);
   --color-tooltip-bg: var(--color-base);
+
+  --color-ad: #d6e6f9;
+  --color-ad-raised: #b1c8e4;
+  --color-ad-contrast: var(--color-text);
+  --color-ad-highlight: #088cdb;
 }
 
 .dark-mode,
@@ -98,6 +98,11 @@ html {
 
   --color-tooltip-text: var(--color-base);
   --color-tooltip-bg: var(--color-button-bg);
+
+  --color-ad: #1f324a;
+  --color-ad-raised: #2e4057;
+  --color-ad-contrast: var(--color-text);
+  --color-ad-highlight: #088cdb;
 }
 
 .oled-mode {
@@ -105,4 +110,6 @@ html {
   --color-bg: #000000;
   --color-raised-bg: #101013;
   --color-button-bg: #222329;
+
+  --color-ad: #0d1828;
 }
