@@ -8,13 +8,10 @@ import {
   DownloadIcon,
   LinkIcon,
 } from "@modrinth/assets";
-import { Avatar } from "@modrinth/ui";
-import { AnimatedLogo } from "@modrinth/ui";
-import { Badge } from "@modrinth/ui";
+import { Avatar, AnimatedLogo, Badge, Checkbox } from "@modrinth/ui";
 import PrismIcon from "~/assets/images/external/prism.svg?component";
 import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
 import CurseForge from "~/assets/images/external/curseforge.svg?component";
-import { Checkbox } from "@modrinth/ui";
 
 const os = ref(null);
 const macValue = ref(null);

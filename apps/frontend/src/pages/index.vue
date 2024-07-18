@@ -505,12 +505,12 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
+import { Avatar } from "@modrinth/ui";
 import SearchIcon from "~/assets/images/utils/search.svg?component";
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
 import ModrinthIcon from "~/assets/images/logo.svg?component";
 import PrismLauncherLogo from "~/assets/images/external/prism.svg?component";
 import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
-import { Avatar } from "@modrinth/ui";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 
 const searchQuery = ref("better");

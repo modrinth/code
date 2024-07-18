@@ -98,13 +98,11 @@
   </div>
 </template>
 <script setup>
+import { Badge, FileInput, DropArea } from "@modrinth/ui";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
 import UploadIcon from "~/assets/images/utils/upload.svg?component";
 import InfoIcon from "~/assets/images/utils/info.svg?component";
-import { Badge } from "@modrinth/ui";
-import { FileInput } from "@modrinth/ui";
-import { DropArea } from "@modrinth/ui";
 import Pagination from "~/components/ui/Pagination.vue";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 

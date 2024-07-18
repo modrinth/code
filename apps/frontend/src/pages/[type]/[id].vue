@@ -1072,7 +1072,16 @@ import {
   CheckIcon,
   XIcon,
 } from "@modrinth/assets";
-import { Checkbox, Promotion, OverflowMenu, PopoutMenu } from "@modrinth/ui";
+import {
+  Checkbox,
+  Promotion,
+  OverflowMenu,
+  PopoutMenu,
+  Badge,
+  EnvironmentIndicator,
+  CopyCode,
+  Avatar,
+} from "@modrinth/ui";
 import { renderString, isRejected, isUnderReview, isStaff } from "@modrinth/utils";
 import CrownIcon from "~/assets/images/utils/crown.svg?component";
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";
@@ -1094,13 +1103,9 @@ import OpenCollectiveIcon from "~/assets/images/external/opencollective.svg?comp
 import UnknownIcon from "~/assets/images/utils/unknown-donation.svg?component";
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 import BoxIcon from "~/assets/images/utils/box.svg?component";
-import { Badge } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
-import { EnvironmentIndicator } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 import NavRow from "~/components/ui/NavRow.vue";
-import { CopyCode } from "@modrinth/ui";
-import { Avatar } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";

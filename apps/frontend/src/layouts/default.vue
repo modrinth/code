@@ -427,7 +427,7 @@ import {
   IssuesIcon,
   ReportIcon,
 } from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
+import { Button, Avatar } from "@modrinth/ui";
 import HamburgerIcon from "~/assets/images/utils/hamburger.svg?component";
 import CrossIcon from "~/assets/images/utils/x.svg?component";
 import SearchIcon from "~/assets/images/utils/search.svg?component";
@@ -446,7 +446,6 @@ import ChartIcon from "~/assets/images/utils/chart.svg?component";
 
 import NavRow from "~/components/ui/NavRow.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import { Avatar } from "@modrinth/ui";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
 import { DARK_THEMES } from "~/composables/theme.js";
