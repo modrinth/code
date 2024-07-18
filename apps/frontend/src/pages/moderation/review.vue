@@ -109,7 +109,7 @@ import SortAscIcon from "~/assets/images/utils/sort-asc.svg?component";
 import SortDescIcon from "~/assets/images/utils/sort-desc.svg?component";
 import WarningIcon from "~/assets/images/utils/issues.svg?component";
 import ModerationIcon from "~/assets/images/sidebar/admin.svg?component";
-import Badge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import { formatProjectType } from "~/plugins/shorthands.js";
 
 useHead({

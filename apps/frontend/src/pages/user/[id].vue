@@ -283,7 +283,7 @@
 import { LibraryIcon, BoxIcon, LinkIcon, LockIcon, XIcon } from "@modrinth/assets";
 import { Promotion } from "@modrinth/ui";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import Badge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import { reportUser } from "~/utils/report-helpers.ts";
 
 import ReportIcon from "~/assets/images/utils/report.svg?component";

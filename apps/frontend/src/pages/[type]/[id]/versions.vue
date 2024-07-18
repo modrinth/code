@@ -64,9 +64,9 @@
           {{ version.name }}
         </nuxt-link>
         <div class="version__metadata">
-          <VersionBadge v-if="version.version_type === 'release'" type="release" color="green" />
-          <VersionBadge v-else-if="version.version_type === 'beta'" type="beta" color="orange" />
-          <VersionBadge v-else-if="version.version_type === 'alpha'" type="alpha" color="red" />
+          <Badge v-if="version.version_type === 'release'" type="release" color="green" />
+          <Badge v-else-if="version.version_type === 'beta'" type="beta" color="orange" />
+          <Badge v-else-if="version.version_type === 'alpha'" type="alpha" color="red" />
           <span class="divider" />
           <span class="version_number">{{ version.version_number }}</span>
         </div>
@@ -102,7 +102,7 @@ import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
 import UploadIcon from "~/assets/images/utils/upload.svg?component";
 import InfoIcon from "~/assets/images/utils/info.svg?component";
-import VersionBadge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import Pagination from "~/components/ui/Pagination.vue";

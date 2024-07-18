@@ -91,7 +91,7 @@
 
 <script>
 import Categories from "~/components/ui/search/Categories.vue";
-import Badge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
 
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";

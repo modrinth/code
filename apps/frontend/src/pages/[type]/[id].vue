@@ -1094,7 +1094,7 @@ import OpenCollectiveIcon from "~/assets/images/external/opencollective.svg?comp
 import UnknownIcon from "~/assets/images/utils/unknown-donation.svg?component";
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 import BoxIcon from "~/assets/images/utils/box.svg?component";
-import Badge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 import EnvironmentIndicator from "~/components/ui/EnvironmentIndicator.vue";
 import Modal from "~/components/ui/Modal.vue";

@@ -10,7 +10,7 @@ import {
 } from "@modrinth/assets";
 import { Avatar } from "@modrinth/ui";
 import { AnimatedLogo } from "@modrinth/ui";
-import Badge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import PrismIcon from "~/assets/images/external/prism.svg?component";
 import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
 import CurseForge from "~/assets/images/external/curseforge.svg?component";

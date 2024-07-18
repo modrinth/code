@@ -622,7 +622,7 @@ import { reportVersion } from "~/utils/report-helpers.ts";
 import { useImageUpload } from "~/composables/image-upload.ts";
 
 import { Avatar } from "@modrinth/ui";
-import Badge from "~/components/ui/Badge.vue";
+import { Badge } from "@modrinth/ui";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
