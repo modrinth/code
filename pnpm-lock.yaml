@@ -196,8 +196,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(@formatjs/intl@2.10.4(typescript@5.5.3))
       '@vintl/nuxt':
-        specifier: ^1.8.0
-        version: 1.9.0(@vue/compiler-core@3.4.31)(magicast@0.3.4)(rollup@4.18.0)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1))(vue@3.4.31(typescript@5.5.3))(webpack@5.92.1)
+        specifier: ^1.9.2
+        version: 1.9.2(@vue/compiler-core@3.4.31)(magicast@0.3.4)(rollup@4.18.0)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1))(vue@3.4.31(typescript@5.5.3))(webpack@5.92.1)
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.39)
@@ -2155,8 +2155,8 @@ packages:
     peerDependencies:
       '@formatjs/intl': ^2.7.1
 
-  '@vintl/nuxt@1.9.0':
-    resolution: {integrity: sha512-W0RPt6vfk0eWbrPmC/O5PuPEyVfQD6IlgxFw+U3k+K5//miHIZHEQ+fzSv4yLTm9at0/PwLVu74jTgKI4LDt3Q==}
+  '@vintl/nuxt@1.9.2':
+    resolution: {integrity: sha512-+2MRe1ikAVMAoCsvkwmm1Z4Ap2GG0+OhVHEJEp324CIGwS98VLM4j8Y4sTItwKBzQAsa3t63AZpbBIp2SsuC3w==}
 
   '@vintl/unplugin@1.5.2':
     resolution: {integrity: sha512-mNOu/Y0elbATzD852ZhzI0Yw12VFuMnE/P1EbX/N+qLj7F2OWOefCtc88fi9NnaL13wsDSaH9PCuA7VJ/KA5iQ==}
@@ -7912,7 +7912,7 @@ snapshots:
       '@formatjs/intl': 2.10.4(typescript@5.5.3)
       intl-messageformat: 10.5.14
 
-  '@vintl/nuxt@1.9.0(@vue/compiler-core@3.4.31)(magicast@0.3.4)(rollup@4.18.0)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1))(vue@3.4.31(typescript@5.5.3))(webpack@5.92.1)':
+  '@vintl/nuxt@1.9.2(@vue/compiler-core@3.4.31)(magicast@0.3.4)(rollup@4.18.0)(typescript@5.5.3)(vite@5.3.3(@types/node@20.14.9)(sass@1.77.6)(terser@5.31.1))(vue@3.4.31(typescript@5.5.3))(webpack@5.92.1)':
     dependencies:
       '@formatjs/intl': 2.10.4(typescript@5.5.3)
       '@formatjs/intl-localematcher': 0.5.4
@@ -11883,7 +11883,7 @@ snapshots:
 
   unimport@3.7.2:
     dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
+      '@rollup/pluginutils': 5.1.0(rollup@3.29.4)
       acorn: 8.12.1
       escape-string-regexp: 5.0.0
       estree-walker: 3.0.3
@@ -11962,7 +11962,7 @@ snapshots:
 
   unplugin@1.11.0:
     dependencies:
-      acorn: 8.12.0
+      acorn: 8.12.1
       chokidar: 3.6.0
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.6.2
