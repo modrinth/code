@@ -109,7 +109,7 @@ import { createVirtualScroller } from 'vue-typed-virtual-list'
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)
 
-const VirtualScroller = createVirtualScroller();
+const VirtualScroller = createVirtualScroller()
 
 const route = useRoute()
 
@@ -412,8 +412,11 @@ function handleUserScroll() {
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveStdLog()
-    const logContainerElement = logContainer.value.$el;
-    const scroll = logContainerElement.scrollHeight - logContainerElement.scrollTop - logContainerElement.clientHeight
+    const logContainerElement = logContainer.value.$el
+    const scroll =
+      logContainerElement.scrollHeight -
+      logContainerElement.scrollTop -
+      logContainerElement.clientHeight
     // const scroll = logContainer.value.$el.scrollHeight - logContainer.value.$el.scrollTop - logContainer.value.$el.clientHeight
 
     // Allow resetting of userScrolled if the user scrolls to the bottom

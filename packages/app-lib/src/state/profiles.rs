@@ -151,7 +151,7 @@ impl From<InnerProjectPathUnix> for RawProjectPath {
 pub struct ProjectPathId(pub PathBuf);
 impl ProjectPathId {
     // Create a new ProjectPathId from a full file path
-    pub async fn from_fs_path(path: &PathBuf) -> crate::Result<Self> {
+    pub async fn from_fs_path(path: &Path) -> crate::Result<Self> {
         // This is avoiding dunce::canonicalize deliberately. On Windows, paths will always be convert to UNC,
         // but this is ok because we are stripping that with the prefix. Using std::fs avoids different behaviors with dunce that
         // come with too-long paths
@@ -159,7 +159,7 @@ impl ProjectPathId {
             State::get().await?.directories.profiles_dir().await,
         )?;
         // Normal canonizing resolves symlinks, which results in "path not corresponding to profile" error
-        let path = path::absolute(path.to_path_buf())?;
+        let path = path::absolute(path)?;
         let path = path
             .strip_prefix(profiles_dir)
             .ok()

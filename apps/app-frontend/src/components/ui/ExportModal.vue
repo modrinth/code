@@ -50,7 +50,7 @@ const initFiles = async () => {
         disabled:
           folder === 'profile.json' ||
           folder.startsWith('modrinth_logs') ||
-          folder.startsWith('.fabric')
+          folder.startsWith('.fabric'),
       }))
       .filter((pathData) => !pathData.path.includes('.DS_Store'))
       .forEach((pathData) => {

@@ -489,12 +489,12 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
 ])
 
 const filteredLoaders = computed(() => {
-  return loaders.value.filter(loader => {
-    return (projectType.value === 'mod' || projectType.value === 'modpack')
+  return loaders.value.filter((loader) => {
+    return projectType.value === 'mod' || projectType.value === 'modpack'
       ? loader.supported_project_types[0] === 'mod'
-      : loader.supported_project_types[0] === projectType.value;
-  });
-});
+      : loader.supported_project_types[0] === projectType.value
+  })
+})
 
 const selectableProjectTypes = computed(() => {
   const values = [
@@ -527,9 +527,7 @@ const showVersions = computed(
   () => instanceContext.value === null || ignoreInstanceGameVersions.value,
 )
 
-const isModProject = computed(
-  () => ['modpack', 'mod'].includes(projectType.value)
-)
+const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.value))
 
 onUnmounted(() => unlistenOffline())
 </script>

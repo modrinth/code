@@ -33,7 +33,7 @@ const props = defineProps({
   openInNewTab: {
     type: Boolean,
     default: true,
-  }
+  },
 })
 
 const shareModal = ref(null)
@@ -94,9 +94,7 @@ const sendEmail = computed(
     &body=${encodeURIComponent(content.value)}`,
 )
 
-const targetParameter = computed(
-  () => props.openInNewTab ? "_blank" : "_self"
-)
+const targetParameter = computed(() => (props.openInNewTab ? '_blank' : '_self'))
 
 const sendTweet = computed(
   () => `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.value)}`,
@@ -145,7 +143,12 @@ defineExpose({
           <Button v-if="canShare" v-tooltip="'Share'" icon-only @click="share">
             <ShareIcon />
           </Button>
-          <a v-tooltip="'Send as an email'" class="btn icon-only" :href="sendEmail" :target="targetParameter">
+          <a
+            v-tooltip="'Send as an email'"
+            class="btn icon-only"
+            :href="sendEmail"
+            :target="targetParameter"
+          >
             <MailIcon />
           </a>
           <a

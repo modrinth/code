@@ -81,12 +81,12 @@ const props = withDefaults(defineProps<Props>(), {
 const currentValue = ref(Math.max(props.min, props.modelValue))
 
 const inputValueValid = (inputValue: number) => {
-  let newValue = inputValue || props.min;
+  let newValue = inputValue || props.min
 
   if (props.forceStep) {
-    newValue -= newValue % props.step;
+    newValue -= newValue % props.step
   }
-  newValue = Math.max(props.min, Math.min(newValue, props.max));
+  newValue = Math.max(props.min, Math.min(newValue, props.max))
 
   currentValue.value = newValue
   emit('update:modelValue', currentValue.value)

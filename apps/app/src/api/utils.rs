@@ -82,7 +82,7 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(path: PathBuf) -> Result<()> {
+pub fn show_in_folder(mut path: PathBuf) -> Result<()> {
     {
         #[cfg(target_os = "windows")]
         {
@@ -100,7 +100,6 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
         #[cfg(target_os = "linux")]
         {
             use std::fs::metadata;
-            use std::path::PathBuf;
 
             let path_string = path.to_string_lossy().to_string();
 
@@ -108,9 +107,8 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
                 Command::new("xdg-open").arg(&path).spawn()?;
             } else if path_string.contains(',') {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
-                let mut parent_path = PathBuf::from(path);
-                parent_path.pop();
-                Command::new("xdg-open").arg(&parent_path).spawn()?;
+                path.pop();
+                Command::new("xdg-open").arg(&path).spawn()?;
             } else {
                 Command::new("dbus-send")
                     .args([
