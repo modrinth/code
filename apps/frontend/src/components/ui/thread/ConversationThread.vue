@@ -211,7 +211,7 @@ import ThreadMessage from "~/components/ui/thread/ThreadMessage.vue";
 import { isStaff } from "~/helpers/users.js";
 import { isApproved, isRejected } from "~/helpers/projects.js";
 import Modal from "~/components/ui/Modal.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
+import { Checkbox } from "@modrinth/ui";
 
 const props = defineProps({
   thread: {

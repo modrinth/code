@@ -349,7 +349,7 @@ import { AnimatedLogo } from "@modrinth/ui";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import Pagination from "~/components/ui/Pagination.vue";
 import SearchFilter from "~/components/ui/search/SearchFilter.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
+import { Checkbox } from "@modrinth/ui";
 
 import ClientIcon from "~/assets/images/categories/client.svg?component";
 import ServerIcon from "~/assets/images/categories/server.svg?component";

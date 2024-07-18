@@ -303,7 +303,7 @@
 import { Multiselect } from "vue-multiselect";
 
 import { Badge } from "@modrinth/ui";
-import Checkbox from "~/components/ui/Checkbox.vue";
+import { Checkbox } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 import { Avatar } from "@modrinth/ui";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
