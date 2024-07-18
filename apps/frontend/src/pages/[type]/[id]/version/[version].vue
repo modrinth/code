@@ -627,7 +627,7 @@ import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
-import Chips from "~/components/ui/Chips.vue";
+import { Chips } from "@modrinth/ui";
 import { Checkbox } from "@modrinth/ui";
 import FileInput from "~/components/ui/FileInput.vue";
 

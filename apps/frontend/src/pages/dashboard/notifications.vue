@@ -58,7 +58,7 @@ import {
   markAsRead,
 } from "~/helpers/notifications.js";
 import NotificationItem from "~/components/ui/NotificationItem.vue";
-import Chips from "~/components/ui/Chips.vue";
+import { Chips } from "@modrinth/ui";
 import CheckCheckIcon from "~/assets/images/utils/check-check.svg?component";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import Pagination from "~/components/ui/Pagination.vue";
