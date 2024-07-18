@@ -214,7 +214,7 @@ import {
   getScopeValue,
 } from "~/composables/auth/scopes.ts";
 
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 
 const { formatMessage } = useVIntl();

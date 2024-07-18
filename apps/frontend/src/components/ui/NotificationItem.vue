@@ -329,7 +329,7 @@ import { markAsRead } from "~/helpers/notifications.js";
 import DoubleIcon from "~/components/ui/DoubleIcon.vue";
 import { Avatar } from "@modrinth/ui";
 import { Badge } from "@modrinth/ui";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 
 const app = useNuxtApp();

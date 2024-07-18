@@ -95,7 +95,7 @@ import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UnknownIcon from "~/assets/images/utils/unknown.svg?component";
 import VersionIcon from "~/assets/images/utils/version.svg?component";
 import ThreadSummary from "~/components/ui/thread/ThreadSummary.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 
 defineProps({
   report: {

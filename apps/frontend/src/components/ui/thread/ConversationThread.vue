@@ -199,7 +199,7 @@
 import { OverflowMenu, MarkdownEditor } from "@modrinth/ui";
 import { DropdownIcon } from "@modrinth/assets";
 import { useImageUpload } from "~/composables/image-upload.ts";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 import ReplyIcon from "~/assets/images/utils/reply.svg?component";
 import SendIcon from "~/assets/images/utils/send.svg?component";
 import CloseIcon from "~/assets/images/utils/check-circle.svg?component";

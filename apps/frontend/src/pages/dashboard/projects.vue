@@ -307,7 +307,7 @@ import { Checkbox } from "@modrinth/ui";
 import Modal from "~/components/ui/Modal.vue";
 import { Avatar } from "@modrinth/ui";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 
 import SettingsIcon from "~/assets/images/utils/settings.svg?component";
 import TrashIcon from "~/assets/images/utils/trash.svg?component";

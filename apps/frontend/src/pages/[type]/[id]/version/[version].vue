@@ -624,7 +624,7 @@ import { useImageUpload } from "~/composables/image-upload.ts";
 import { Avatar } from "@modrinth/ui";
 import { Badge } from "@modrinth/ui";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 import Categories from "~/components/ui/search/Categories.vue";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import { Chips } from "@modrinth/ui";

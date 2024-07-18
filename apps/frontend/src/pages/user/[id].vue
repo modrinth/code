@@ -300,7 +300,7 @@ import ImageIcon from "~/assets/images/utils/image.svg?component";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import NavRow from "~/components/ui/NavRow.vue";
-import CopyCode from "~/components/ui/CopyCode.vue";
+import { CopyCode } from "@modrinth/ui";
 import { Avatar } from "@modrinth/ui";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 
