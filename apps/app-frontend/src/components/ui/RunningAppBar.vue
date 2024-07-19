@@ -23,7 +23,7 @@
       <span class="circle running" />
       <div ref="profileButton" class="running-text">
         <router-link :to="`/instance/${encodeURIComponent(selectedProfile.path)}`">
-          {{ selectedProfile.metadata.name }}
+          {{ selectedProfile.name }}
         </router-link>
         <div
           v-if="currentProcesses.length > 1"
@@ -80,7 +80,7 @@
         class="profile-button"
         @click="selectProfile(profile)"
       >
-        <div class="text"><span class="circle running" /> {{ profile.metadata.name }}</div>
+        <div class="text"><span class="circle running" /> {{ profile.name }}</div>
         <Button
           v-tooltip="'Stop instance'"
           icon-only
@@ -136,13 +136,11 @@ const offline = ref(await isOffline().catch(handleError))
 const refreshInternet = async () => {
   offline.value = await refreshOffline().catch(handleError)
 }
-
-const unlistenProcess = await process_listener(async () => {
-  await refresh()
-})
-
 const unlistenRefresh = await offline_listener(async (b) => {
   offline.value = b
+})
+
+const unlistenProcess = await process_listener(async () => {
   await refresh()
 })
 
@@ -159,8 +157,8 @@ const stop = async (path) => {
     await killProfile(processes[0])
 
     mixpanel_track('InstanceStop', {
-      loader: currentProcesses.value[0].metadata.loader,
-      game_version: currentProcesses.value[0].metadata.game_version,
+      loader: currentProcesses.value[0].loader,
+      game_version: currentProcesses.value[0].game_version,
       source: 'AppBar',
     })
   } catch (e) {
@@ -182,8 +180,8 @@ const refreshInfo = async () => {
       if (x.bar_type.type === 'java_download') {
         x.title = 'Downloading Java ' + x.bar_type.version
       }
-      if (x.bar_type.profile_name) {
-        x.title = x.bar_type.profile_name
+      if (x.bar_type.profile_path) {
+        x.title = x.bar_type.profile_path
       }
       if (x.bar_type.pack_name) {
         x.title = x.bar_type.pack_name

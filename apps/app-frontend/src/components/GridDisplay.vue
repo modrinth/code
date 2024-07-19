@@ -127,46 +127,46 @@ const sortBy = ref('Name')
 
 const filteredResults = computed(() => {
   let instances = props.instances.filter((instance) => {
-    return instance.metadata.name.toLowerCase().includes(search.value.toLowerCase())
+    return instance.name.toLowerCase().includes(search.value.toLowerCase())
   })
 
   if (sortBy.value === 'Name') {
     instances.sort((a, b) => {
-      return a.metadata.name.localeCompare(b.metadata.name)
+      return a.name.localeCompare(b.name)
     })
   }
 
   if (sortBy.value === 'Game version') {
     instances.sort((a, b) => {
-      return a.metadata.game_version.localeCompare(b.metadata.game_version)
+      return a.game_version.localeCompare(b.game_version)
     })
   }
 
   if (sortBy.value === 'Last played') {
     instances.sort((a, b) => {
-      return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
+      return dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0))
     })
   }
 
   if (sortBy.value === 'Date created') {
     instances.sort((a, b) => {
-      return dayjs(b.metadata.date_created).diff(dayjs(a.metadata.date_created))
+      return dayjs(b.date_created).diff(dayjs(a.date_created))
     })
   }
 
   if (sortBy.value === 'Date modified') {
     instances.sort((a, b) => {
-      return dayjs(b.metadata.date_modified).diff(dayjs(a.metadata.date_modified))
+      return dayjs(b.date_modified).diff(dayjs(a.date_modified))
     })
   }
 
   if (filters.value === 'Custom instances') {
     instances = instances.filter((instance) => {
-      return !instance.metadata?.linked_data
+      return !instance.linked_data
     })
   } else if (filters.value === 'Downloaded modpacks') {
     instances = instances.filter((instance) => {
-      return instance.metadata?.linked_data
+      return instance.linked_data
     })
   }
 
@@ -174,7 +174,7 @@ const filteredResults = computed(() => {
 
   if (group.value === 'Loader') {
     instances.forEach((instance) => {
-      const loader = formatCategoryHeader(instance.metadata.loader)
+      const loader = formatCategoryHeader(instance.loader)
       if (!instanceMap.has(loader)) {
         instanceMap.set(loader, [])
       }
@@ -183,19 +183,19 @@ const filteredResults = computed(() => {
     })
   } else if (group.value === 'Game version') {
     instances.forEach((instance) => {
-      if (!instanceMap.has(instance.metadata.game_version)) {
-        instanceMap.set(instance.metadata.game_version, [])
+      if (!instanceMap.has(instance.game_version)) {
+        instanceMap.set(instance.game_version, [])
       }
 
-      instanceMap.get(instance.metadata.game_version).push(instance)
+      instanceMap.get(instance.game_version).push(instance)
     })
   } else if (group.value === 'Category') {
     instances.forEach((instance) => {
-      if (instance.metadata.groups.length === 0) {
-        instance.metadata.groups.push('None')
+      if (instance.groups.length === 0) {
+        instance.groups.push('None')
       }
 
-      for (const category of instance.metadata.groups) {
+      for (const category of instance.groups) {
         if (!instanceMap.has(category)) {
           instanceMap.set(category, [])
         }

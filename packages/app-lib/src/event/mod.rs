@@ -5,8 +5,6 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
-use crate::state::SafeProcesses;
-
 pub mod emit;
 
 // Global event state
@@ -139,15 +137,6 @@ impl Drop for LoadingBarId {
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
                 bars.remove(&loader_uuid);
             }
-            // complete calls state, and since a  LoadingBarId is created in state initialization, we only complete if its already initializaed
-            // to avoid an infinite loop.
-            if crate::State::initialized() {
-                let _ = SafeProcesses::complete(
-                    crate::state::ProcessType::LoadingBar,
-                    loader_uuid,
-                )
-                .await;
-            }
         });
     }
 }
@@ -248,7 +237,6 @@ pub enum ProcessPayloadType {
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
     pub profile_path_id: String,
-    pub path: PathBuf,
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]

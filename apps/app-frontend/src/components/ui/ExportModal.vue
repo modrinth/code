@@ -23,7 +23,7 @@ defineExpose({
 })
 
 const exportModal = ref(null)
-const nameInput = ref(props.instance.metadata.name)
+const nameInput = ref(props.instance.name)
 const exportDescription = ref('')
 const versionInput = ref('1.0.0')
 const files = ref([])

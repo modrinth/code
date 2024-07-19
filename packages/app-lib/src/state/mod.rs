@@ -28,9 +28,6 @@ pub use self::children::*;
 mod java_globals;
 pub use self::java_globals::*;
 
-mod safe_processes;
-pub use self::safe_processes::*;
-
 mod discord;
 pub use self::discord::*;
 
@@ -46,11 +43,14 @@ mod mr_auth;
 
 pub use self::mr_auth::*;
 
-// TODO: UI: Change so new settings model works
-// TODO: UI: Change so new java version API works
+// TODO: possible memcache for cache entries to improve perf
+// TODO: cache children too (ex: version file req should cache version too)
+// TODO: Java Version API
+// TODO: UI: Profile Options
+// TODO: UI: Profile Content Fully Integrate (and improve perf)
+// TODO: UI: Settings Java Versions
 // TODO: pass credentials to modrinth cdn
-// TODO: add language requiring restart for discord, concurrent writes/fetches changes
-// TODO: get rid of unneccessary locking + atomics in discord
+// TODO: get rid of unnecessary locking + atomics in discord
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
@@ -69,8 +69,6 @@ pub struct State {
 
     /// Reference to minecraft process children
     pub children: RwLock<Children>,
-    /// Launcher processes that should be safely exited on shutdown
-    pub(crate) safety_processes: RwLock<SafeProcesses>,
     /// Launcher user account info
     pub(crate) users: RwLock<MinecraftAuthStore>,
     /// Modrinth Credentials Store
@@ -145,8 +143,6 @@ impl State {
             creds_fut,
         }?;
 
-        let safety_processes = SafeProcesses::new();
-
         let discord_rpc = DiscordGuard::init(is_offline).await?;
         if settings.discord_rpc && !is_offline {
             // Add default Idling to discord rich presence
@@ -173,7 +169,6 @@ impl State {
             children: RwLock::new(children),
             credentials: RwLock::new(creds),
             discord_rpc,
-            safety_processes: RwLock::new(safety_processes),
             modrinth_auth_flow: RwLock::new(None),
             pool,
             file_watcher,

@@ -26,7 +26,6 @@ pub async fn profile_create(
     icon_path: Option<String>,      // the icon for the profile
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
-    no_watch: Option<bool>,
 ) -> crate::Result<String> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
@@ -160,7 +159,6 @@ pub async fn profile_create_from_duplicate(
         profile.loader_version.clone(),
         profile.icon_path.clone(),
         profile.linked_data.clone(),
-        Some(true),
         Some(true),
     )
     .await?;

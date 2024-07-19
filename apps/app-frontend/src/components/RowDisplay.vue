@@ -17,8 +17,6 @@ import Instance from '@/components/ui/Instance.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ProjectCard from '@/components/ui/ProjectCard.vue'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
@@ -28,11 +26,10 @@ import { handleError } from '@/store/notifications.js'
 import { duplicate, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import { useFetch } from '@/helpers/fetch.js'
-import { install as pack_install } from '@/helpers/pack.js'
 import { useTheming } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { handleSevereError } from '@/store/error.js'
+import { install as installVersion } from '@/store/install.js'
 
 const router = useRouter()
 
@@ -58,9 +55,7 @@ const modsRow = ref(null)
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 const rows = ref(null)
-const confirmModal = ref(null)
 const deleteConfirmModal = ref(null)
-const modInstallModal = ref(null)
 
 const themeStore = useTheming()
 const currentDeleteInstance = ref(null)
@@ -132,8 +127,8 @@ const handleOptionsClick = async (args) => {
     case 'play':
       await run(args.item.path).catch(handleSevereError)
       mixpanel_track('InstanceStart', {
-        loader: args.item.metadata.loader,
-        game_version: args.item.metadata.game_version,
+        loader: args.item.loader,
+        game_version: args.item.game_version,
       })
       break
     case 'stop':
@@ -141,13 +136,13 @@ const handleOptionsClick = async (args) => {
         await kill_by_uuid(u).catch(handleError)
       }
       mixpanel_track('InstanceStop', {
-        loader: args.item.metadata.loader,
-        game_version: args.item.metadata.game_version,
+        loader: args.item.loader,
+        game_version: args.item.game_version,
       })
       break
     case 'add_content':
       await router.push({
-        path: `/browse/${args.item.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        path: `/browse/${args.item.loader === 'vanilla' ? 'datapack' : 'mod'}`,
         query: { i: args.item.path },
       })
       break
@@ -170,21 +165,8 @@ const handleOptionsClick = async (args) => {
       await navigator.clipboard.writeText(args.item.path)
       break
     case 'install': {
-      const versions = await useFetch(
-        `https://api.modrinth.com/v2/project/${args.item.project_id}/version`,
-        'project versions',
-      )
+      await installVersion(args.item.project_id, null, null, 'ProjectCardContextMenu')
 
-      if (args.item.project_type === 'modpack') {
-        await pack_install(
-          args.item.project_id,
-          versions[0].id,
-          args.item.title,
-          args.item.icon_url,
-        )
-      } else {
-        modInstallModal.value.show(args.item.project_id, versions)
-      }
       break
     }
     case 'open_link':
@@ -243,7 +225,7 @@ onUnmounted(() => {
         <router-link :to="row.route">{{ row.label }}</router-link>
         <ChevronRightIcon />
       </div>
-      <section v-if="row.instances[0].metadata" ref="modsRow" class="instances">
+      <section v-if="row.instance" ref="modsRow" class="instances">
         <Instance
           v-for="instance in row.instances.slice(0, maxInstancesPerRow)"
           :key="(instance?.project_id || instance?.id) + instance.install_stage"
@@ -258,8 +240,6 @@ onUnmounted(() => {
           ref="instanceComponents"
           class="item"
           :project="project"
-          :confirm-modal="confirmModal"
-          :mod-install-modal="modInstallModal"
           @contextmenu.prevent.stop="(event) => handleProjectClick(event, project)"
         />
       </section>
@@ -278,8 +258,6 @@ onUnmounted(() => {
     <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
     <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
   </ContextMenu>
-  <InstallConfirmModal ref="confirmModal" />
-  <ModInstallModal ref="modInstallModal" />
 </template>
 <style lang="scss" scoped>
 .content {

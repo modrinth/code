@@ -84,7 +84,7 @@ pub enum PackDependency {
     Minecraft,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase", tag = "type")]
 pub enum CreatePackLocation {
     // Create a pack from a modrinth version ID (such as a modpack)

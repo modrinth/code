@@ -616,7 +616,7 @@ impl Profile {
             .collect::<Vec<_>>();
         let file_updates = CachedEntry::get_file_update_many(
             &file_updates.iter().map(|x| &**x).collect::<Vec<_>>(),
-            Some(CacheBehaviour::Bypass),
+            None,
             exec,
             fetch_semaphore,
         )

@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use theseus::pack::install_from::{get_profile_from_pack, CreatePackLocation};
+use theseus::pack::install_mrpack::install_zipped_mrpack;
 use theseus::prelude::*;
 
 use theseus::profile::create::profile_create;
@@ -69,38 +71,25 @@ async fn main() -> theseus::Result<()> {
     let modloader = ModLoader::Fabric;
     let loader_version = "stable".to_string();
 
+    let pack = CreatePackLocation::FromVersionId {
+        project_id: "1KVo5zza".to_string(),
+        version_id: "lKloE8SA".to_string(),
+        title: "Fabulously Optimized".to_string(),
+        icon_url: Some("https://cdn.modrinth.com/data/1KVo5zza/d8152911f8fd5d7e9a8c499fe89045af81fe816e.png".to_string()),
+    };
+
+    let profile = get_profile_from_pack(pack.clone());
     let profile_path = profile_create(
-        name.clone(),
-        game_version,
-        modloader,
-        Some(loader_version),
-        None,
+        profile.name,
+        profile.game_version,
+        profile.modloader,
+        profile.loader_version,
         None,
         None,
         None,
     )
     .await?;
-
-    profile::add_project_from_version(&profile_path, "oIVA3FbL").await?;
-    profile::add_project_from_version(&profile_path, "RncWhTxD").await?;
-    profile::add_project_from_version(&profile_path, "xhN1IvHi").await?;
-    profile::add_project_from_version(&profile_path, "c6RfHyKW").await?;
-
-    {
-        let iris = profile::add_project_from_version(&profile_path, "kuOV4Ece")
-            .await?;
-        let new_path =
-            profile::toggle_disable_project(&profile_path, &iris).await?;
-        profile::toggle_disable_project(&profile_path, &new_path).await?;
-    }
-
-    let fast_grass =
-        profile::add_project_from_version(&profile_path, "1lpmCieT").await?;
-    profile::remove_project(&profile_path, &fast_grass).await?;
-
-    let lithium =
-        profile::add_project_from_version(&profile_path, "5a3sPIH2").await?;
-    profile::toggle_disable_project(&profile_path, &lithium).await?;
+    install_zipped_mrpack(pack, profile_path.to_string()).await?;
 
     let projects = profile::get_projects(&profile_path).await?;
 

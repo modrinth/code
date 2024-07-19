@@ -10,6 +10,7 @@ import {
   NavRow,
   Card,
   SearchFilter,
+  Avatar,
 } from '@modrinth/ui'
 import { formatCategoryHeader, formatCategory } from '@modrinth/utils'
 import Multiselect from 'vue-multiselect'
@@ -17,14 +18,15 @@ import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
-import { Avatar } from '@modrinth/ui'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
-import { check_installed, get, get as getInstance } from '@/helpers/profile.js'
+import {
+  check_installed,
+  get,
+  get as getInstance,
+  get_projects as getInstanceProjects,
+} from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { isOffline } from '@/helpers/utils'
 import { offline_listener } from '@/helpers/events'
@@ -36,10 +38,6 @@ const offline = ref(await isOffline())
 const unlistenOffline = await offline_listener((b) => {
   offline.value = b
 })
-
-const confirmModal = ref(null)
-const modInstallModal = ref(null)
-const incompatibilityWarningModal = ref(null)
 
 const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setContext({ name: 'Browse', link: route.path, query: route.query })
@@ -65,6 +63,7 @@ const maxResults = ref(20)
 const currentPage = ref(1)
 const projectType = ref(route.params.projectType)
 const instanceContext = ref(null)
+const instanceProjects = ref(null)
 const ignoreInstanceLoaders = ref(false)
 const ignoreInstanceGameVersions = ref(false)
 
@@ -88,7 +87,10 @@ if (route.query.il) {
   ignoreInstanceLoaders.value = route.query.il === 'true'
 }
 if (route.query.i) {
-  instanceContext.value = await getInstance(route.query.i, true)
+  ;[instanceContext.value, instanceProjects.value] = await Promise.all([
+    getInstance(route.query.i).catch(handleError),
+    getInstanceProjects(route.query.i).catch(handleError),
+  ])
 }
 if (route.query.q) {
   query.value = route.query.q
@@ -152,10 +154,10 @@ async function refreshSearch() {
   }
   if (instanceContext.value) {
     if (!ignoreInstanceLoaders.value && projectType.value === 'mod') {
-      orFacets.value = [`categories:${encodeURIComponent(instanceContext.value.metadata.loader)}`]
+      orFacets.value = [`categories:${encodeURIComponent(instanceContext.value.loader)}`]
     }
     if (!ignoreInstanceGameVersions.value) {
-      selectedVersions.value = [instanceContext.value.metadata.game_version]
+      selectedVersions.value = [instanceContext.value.game_version]
     }
   }
   if (
@@ -224,11 +226,10 @@ async function refreshSearch() {
     }
 
     if (hideAlreadyInstalled.value) {
-      const installedMods = await get(instanceContext.value.path, false).then((x) =>
-        Object.values(x.projects)
-          .filter((x) => x.metadata.project)
-          .map((x) => x.metadata.project.id),
-      )
+      const installedMods = Object.values(instanceProjects.value)
+        .filter((x) => x.metadata.type === 'modrinth')
+        .map((x) => x.metadata.project_id)
+
       installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
       console.log(`facets=${JSON.stringify(formattedFacets)}`)
     }
@@ -258,8 +259,8 @@ async function refreshSearch() {
   }
   if (instanceContext.value) {
     for (val of rawResults.hits) {
-      val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
-        (x) => (val.installed = x),
+      val.installed = Object.values(instanceProjects.value).some(
+        (x) => x.metadata.type === 'modrinth' && x.metadata.project_id === val.project_id,
       )
     }
   }
@@ -497,13 +498,13 @@ const selectableProjectTypes = computed(() => {
   if (instanceContext.value) {
     if (
       availableGameVersions.value.findIndex(
-        (x) => x.version === instanceContext.value.metadata.game_version,
+        (x) => x.version === instanceContext.value.game_version,
       ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
       values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
     }
 
-    if (instanceContext.value.metadata.loader !== 'vanilla') {
+    if (instanceContext.value.loader !== 'vanilla') {
       values.unshift({ label: 'Mods', href: '/browse/mod' })
     }
   } else {
@@ -536,27 +537,19 @@ onUnmounted(() => unlistenOffline())
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
           <Avatar
-            :src="
-              !instanceContext.metadata.icon ||
-              (instanceContext.metadata.icon && instanceContext.metadata.icon.startsWith('http'))
-                ? instanceContext.metadata.icon
-                : convertFileSrc(instanceContext.metadata.icon)
-            "
-            :alt="instanceContext.metadata.name"
+            :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
+            :alt="instanceContext.name"
             size="sm"
           />
           <div class="small-instance_info">
             <span class="title">{{
-              instanceContext.metadata.name.length > 20
-                ? instanceContext.metadata.name.substring(0, 20) + '...'
-                : instanceContext.metadata.name
+              instanceContext.name.length > 20
+                ? instanceContext.name.substring(0, 20) + '...'
+                : instanceContext.name
             }}</span>
             <span>
-              {{
-                instanceContext.metadata.loader.charAt(0).toUpperCase() +
-                instanceContext.metadata.loader.slice(1)
-              }}
-              {{ instanceContext.metadata.game_version }}
+              {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
+              {{ instanceContext.game_version }}
             </span>
           </div>
         </router-link>
@@ -758,9 +751,6 @@ onUnmounted(() => unlistenOffline())
                 loader.supported_project_types?.includes(projectType),
             ),
           ]"
-          :confirm-modal="confirmModal"
-          :mod-install-modal="modInstallModal"
-          :incompatibility-warning-modal="incompatibilityWarningModal"
           :installed="result.installed"
         />
       </section>
@@ -774,9 +764,6 @@ onUnmounted(() => unlistenOffline())
       <br />
     </div>
   </div>
-  <InstallConfirmModal ref="confirmModal" />
-  <ModInstallModal ref="modInstallModal" />
-  <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 </template>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>

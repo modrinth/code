@@ -78,7 +78,7 @@ impl CacheValueType {
         match self {
             CacheValueType::File => 60 * 60 * 24 * 30, // 30 days
             CacheValueType::FileHash => 60 * 60 * 24 * 30, // 30 days
-            _ => 60 * 60 * 24,                         // 24 hours
+            _ => 60 * 60 * 30, // 30 minutes
         }
     }
 }
@@ -163,12 +163,18 @@ pub struct Project {
     pub slug: Option<String>,
     pub project_type: String,
     pub team: String,
+    pub organization: Option<String>,
     pub title: String,
     pub description: String,
     pub body: String,
 
     pub published: DateTime<Utc>,
     pub updated: DateTime<Utc>,
+    pub approved: Option<DateTime<Utc>>,
+
+    pub status: String,
+
+    pub license: License,
 
     pub client_side: SideType,
     pub server_side: SideType,
@@ -184,6 +190,38 @@ pub struct Project {
     pub versions: Vec<String>,
 
     pub icon_url: Option<String>,
+
+    pub issues_url: Option<String>,
+    pub source_url: Option<String>,
+    pub wiki_url: Option<String>,
+    pub discord_url: Option<String>,
+    pub donation_urls: Option<Vec<DonationLink>>,
+    pub gallery: Vec<GalleryItem>,
+    pub color: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct License {
+    pub id: String,
+    pub name: String,
+    pub url: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GalleryItem {
+    pub url: String,
+    pub featured: bool,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub created: DateTime<Utc>,
+    pub ordering: i64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct DonationLink {
+    pub id: String,
+    pub platform: String,
+    pub url: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
@@ -359,6 +397,7 @@ impl CacheValue {
             | CacheValue::Loaders(_)
             | CacheValue::GameVersions(_)
             | CacheValue::DonationPlatforms(_) => DEFAULT_ID.to_string(),
+
             CacheValue::FileHash(hash) => {
                 format!("{}-{}", hash.size, hash.path)
             }
@@ -544,6 +583,15 @@ impl CachedEntry {
     where
         E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
     {
+        use std::time::Instant;
+        let now = Instant::now();
+
+        println!("start {type_:?} keys: {keys:?}");
+
+        if keys.is_empty() {
+            return Ok(Vec::new());
+        }
+
         let cache_behaviour = cache_behaviour.unwrap_or_default();
 
         let remaining_keys = DashSet::new();
@@ -604,6 +652,11 @@ impl CachedEntry {
             }
         }
 
+        let time = now.elapsed();
+        println!("query {type_:?} keys: {remaining_keys:?}, elapsed: {:.2?}", time);
+        let now = Instant::now();
+
+
         if !remaining_keys.is_empty() {
             let mut values =
                 Self::fetch_many(type_, remaining_keys, fetch_semaphore)
@@ -615,6 +668,9 @@ impl CachedEntry {
                 return_vals.append(&mut values);
             }
         }
+
+        let time = now.elapsed();
+        println!("FETCH {type_:?} DONE, elapsed: {:.2?}", time);
 
         if !expired_keys.is_empty()
             && cache_behaviour == CacheBehaviour::StaleWhileRevalidate
@@ -728,7 +784,7 @@ impl CachedEntry {
             CacheValueType::Team => {
                 fetch_original_values!(
                     Team,
-                    MODRINTH_API_URL,
+                    MODRINTH_API_URL_V3,
                     "teams",
                     CacheValue::Team
                 )
@@ -877,10 +933,10 @@ impl CachedEntry {
 
                 async fn hash_file(
                     profiles_dir: &Path,
-                    path: String,
+                    key: String,
                 ) -> crate::Result<CachedEntry> {
                     let path =
-                        path.split_once('-').map(|x| x.1).unwrap_or_default();
+                        key.split_once('-').map(|x| x.1).unwrap_or_default();
 
                     let full_path = profiles_dir.join(path);
 
@@ -913,7 +969,7 @@ impl CachedEntry {
                     });
 
                     Ok(CachedEntry {
-                        id: path.to_string(),
+                        id: key.clone(),
                         alias: None,
                         type_: CacheValueType::FileHash,
                         data,

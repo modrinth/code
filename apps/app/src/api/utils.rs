@@ -16,9 +16,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             show_in_folder,
             show_launcher_logs_folder,
             progress_bars_list,
-            safety_check_safe_loading_bars,
             get_opening_command,
-            await_sync,
             is_offline,
             refresh_offline
         ])
@@ -52,12 +50,6 @@ pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
-}
-
-// Check if there are any safe loading bars running
-#[tauri::command]
-pub async fn safety_check_safe_loading_bars() -> Result<bool> {
-    Ok(theseus::safety::check_safe_loading_bars().await?)
 }
 
 // cfg only on mac os
@@ -163,14 +155,6 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
-}
-
-// Waits for state to be synced
-#[tauri::command]
-pub async fn await_sync() -> Result<()> {
-    State::sync().await?;
-    tracing::debug!("State synced");
-    Ok(())
 }
 
 /// Check if theseus is currently in offline mode, without a refresh attempt

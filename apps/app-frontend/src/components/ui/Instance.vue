@@ -1,22 +1,18 @@
 <script setup>
-import { onUnmounted, ref, watch } from 'vue'
+import { onUnmounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { DownloadIcon, StopCircleIcon, PlayIcon } from '@modrinth/assets'
+import { StopCircleIcon, PlayIcon } from '@modrinth/assets'
 import { Card, Avatar, AnimatedLogo } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import { install as pack_install } from '@/helpers/pack'
-import { list, run } from '@/helpers/profile'
+import { run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
-import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { handleSevereError } from '@/store/error.js'
 
@@ -29,32 +25,15 @@ const props = defineProps({
   },
 })
 
-const confirmModal = ref(null)
-const modInstallModal = ref(null)
 const playing = ref(false)
 
 const uuid = ref(null)
-const modLoading = ref(
-  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false,
-)
-
-watch(
-  () => props.instance,
-  () => {
-    modLoading.value = props.instance.install_stage
-      ? props.instance.install_stage !== 'installed'
-      : false
-  },
-)
+const modLoading = computed(() => props.instance.install_stage !== 'installed')
 
 const router = useRouter()
 
 const seeInstance = async () => {
-  const instancePath = props.instance.metadata
-    ? `/instance/${encodeURIComponent(props.instance.path)}/`
-    : `/project/${encodeURIComponent(props.instance.project_id)}/`
-
-  await router.push(instancePath)
+  await router.push(`/instance/${encodeURIComponent(props.instance.path)}/`)
 }
 
 const checkProcess = async () => {
@@ -69,57 +48,6 @@ const checkProcess = async () => {
   uuid.value = null
 }
 
-const install = async (e) => {
-  e?.stopPropagation()
-  modLoading.value = true
-  const versions = await useFetch(
-    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
-    'project versions',
-  )
-
-  if (props.instance.project_type === 'modpack') {
-    const packs = Object.values(await list(true).catch(handleError))
-
-    if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
-    ) {
-      modLoading.value = true
-      await pack_install(
-        props.instance.project_id,
-        versions[0].id,
-        props.instance.title,
-        props.instance.icon_url,
-      ).catch(handleError)
-      modLoading.value = false
-
-      mixpanel_track('PackInstall', {
-        id: props.instance.project_id,
-        version_id: versions[0].id,
-        title: props.instance.title,
-        source: 'InstanceCard',
-      })
-    } else
-      confirmModal.value.show(
-        props.instance.project_id,
-        versions[0].id,
-        props.instance.title,
-        props.instance.icon_url,
-      )
-  } else {
-    modInstallModal.value.show(
-      props.instance.project_id,
-      versions,
-      props.instance.title,
-      props.instance.project_type,
-    )
-  }
-
-  modLoading.value = false
-}
-
 const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
@@ -128,8 +56,8 @@ const play = async (e, context) => {
   playing.value = true
 
   mixpanel_track('InstancePlay', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     source: context,
   })
 }
@@ -148,8 +76,8 @@ const stop = async (e, context) => {
   } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
 
   mixpanel_track('InstanceStop', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     source: context,
   })
 
@@ -162,13 +90,12 @@ const openFolder = async () => {
 
 const addContent = async () => {
   await router.push({
-    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
     query: { i: props.instance.path },
   })
 }
 
 defineExpose({
-  install,
   playing,
   play,
   stop,
@@ -190,46 +117,32 @@ onUnmounted(() => unlisten())
     <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
         size="lg"
-        :src="
-          props.instance.metadata
-            ? !props.instance.metadata.icon ||
-              (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
-              ? props.instance.metadata.icon
-              : convertFileSrc(props.instance.metadata?.icon)
-            : props.instance.icon_url
-        "
+        :src="props.instance.icon_path ? convertFileSrc(props.instance.icon_path) : null"
         alt="Mod card"
         class="mod-image"
       />
       <div class="project-info">
-        <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
+        <p class="title">{{ props.instance.name }}</p>
         <p class="description">
-          {{ props.instance.metadata?.loader }}
-          {{ props.instance.metadata?.game_version || props.instance.latest_version }}
+          {{ props.instance.loader }}
+          {{ props.instance.game_version }}
         </p>
       </div>
     </Card>
     <div
-      v-if="props.instance.metadata && playing === false && modLoading === false"
-      class="install cta button-base"
-      @click="(e) => play(e, 'InstanceCard')"
-    >
-      <PlayIcon />
-    </div>
-    <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-      <AnimatedLogo class="loading-indicator" />
-    </div>
-    <div
-      v-else-if="playing === true"
+      v-if="playing === true"
       class="stop cta button-base"
       @click="(e) => stop(e, 'InstanceCard')"
       @mousehover="checkProcess"
     >
       <StopCircleIcon />
     </div>
-    <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
-    <InstallConfirmModal ref="confirmModal" />
-    <ModInstallModal ref="modInstallModal" />
+    <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
+      <AnimatedLogo class="loading-indicator" />
+    </div>
+    <div v-else class="install cta button-base" @click="(e) => play(e, 'InstanceCard')">
+      <PlayIcon />
+    </div>
   </div>
 </template>
 

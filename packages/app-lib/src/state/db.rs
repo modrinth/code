@@ -1,7 +1,7 @@
 use crate::state::DirectoryInfo;
 use sqlx::migrate::MigrateDatabase;
 use sqlx::sqlite::SqlitePoolOptions;
-use sqlx::{Connection, Pool, Sqlite, SqliteConnection};
+use sqlx::{Connection, Pool, Sqlite};
 
 pub(crate) async fn connect() -> crate::Result<Pool<Sqlite>> {
     let uri =
@@ -11,13 +11,12 @@ pub(crate) async fn connect() -> crate::Result<Pool<Sqlite>> {
         Sqlite::create_database(&uri).await?;
     }
 
-    let mut conn: SqliteConnection = SqliteConnection::connect(&uri).await?;
-    sqlx::migrate!().run(&mut conn).await?;
-
     let pool = SqlitePoolOptions::new()
         .max_connections(100)
         .connect(&uri)
         .await?;
+
+    sqlx::migrate!().run(&pool).await?;
 
     Ok(pool)
 }

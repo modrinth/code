@@ -22,8 +22,8 @@ const version = await getVersion()
 const accessSettings = async () => {
   const settings = await get()
 
-  settings.javaArgs = settings.custom_java_args.join(' ')
-  settings.envArgs = settings.custom_env_args.map((x) => x.join('=')).join(' ')
+  settings.launchArgs = settings.extra_launch_args.join(' ')
+  settings.envVars = settings.custom_env_vars.map((x) => x.join('=')).join(' ')
 
   return settings
 }
@@ -31,7 +31,7 @@ const accessSettings = async () => {
 const fetchSettings = await accessSettings().catch(handleError)
 
 const settings = ref(fetchSettings)
-const settingsDir = ref(settings.value.loaded_config_dir)
+// const settingsDir = ref(settings.value.loaded_config_dir)
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
 watch(
@@ -43,26 +43,26 @@ watch(
 
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
-    if (setSettings.opt_out_analytics) {
+    if (setSettings.telemetry) {
       mixpanel_opt_out_tracking()
     } else {
       mixpanel_opt_in_tracking()
     }
 
-    for (const [key, value] of Object.entries(setSettings.java_globals)) {
-      if (value?.path === '') {
-        value.path = undefined
-      }
+    // for (const [key, value] of Object.entries(setSettings.java_globals)) {
+    //   if (value?.path === '') {
+    //     value.path = undefined
+    //   }
+    //
+    //   if (value?.path) {
+    //     value.path = value.path.replace('java.exe', 'javaw.exe')
+    //   }
+    //
+    //   console.log(`${key}: ${value}`)
+    // }
 
-      if (value?.path) {
-        value.path = value.path.replace('java.exe', 'javaw.exe')
-      }
-
-      console.log(`${key}: ${value}`)
-    }
-
-    setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
-    setSettings.custom_env_args = setSettings.envArgs
+    setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
+    setSettings.custom_env_vars = setSettings.envVars
       .trim()
       .split(/\s+/)
       .filter(Boolean)
@@ -96,31 +96,31 @@ async function signInAfter() {
   credentials.value = await getCreds().catch(handleError)
 }
 
-async function findLauncherDir() {
-  const newDir = await open({
-    multiple: false,
-    directory: true,
-    title: 'Select a new app directory',
-  })
-
-  const writeable = await is_dir_writeable(newDir)
-
-  if (!writeable) {
-    handleError('The selected directory does not have proper permissions for write access.')
-    return
-  }
-
-  if (newDir) {
-    settingsDir.value = newDir
-    await refreshDir()
-  }
-}
-
-async function refreshDir() {
-  await change_config_dir(settingsDir.value).catch(handleError)
-  settings.value = await accessSettings().catch(handleError)
-  settingsDir.value = settings.value.loaded_config_dir
-}
+// async function findLauncherDir() {
+//   const newDir = await open({
+//     multiple: false,
+//     directory: true,
+//     title: 'Select a new app directory',
+//   })
+//
+//   const writeable = await is_dir_writeable(newDir)
+//
+//   if (!writeable) {
+//     handleError('The selected directory does not have proper permissions for write access.')
+//     return
+//   }
+//
+//   if (newDir) {
+//     settingsDir.value = newDir
+//     await refreshDir()
+//   }
+// }
+//
+// async function refreshDir() {
+//   await change_config_dir(settingsDir.value).catch(handleError)
+//   settings.value = await accessSettings().catch(handleError)
+//   settingsDir.value = settings.value.loaded_config_dir
+// }
 </script>
 
 <template>
@@ -161,19 +161,19 @@ async function refreshDir() {
           The directory where the launcher stores all of its files.
         </span>
       </label>
-      <div class="app-directory">
-        <div class="iconified-input">
-          <BoxIcon />
-          <input id="appDir" v-model="settingsDir" type="text" class="input" />
-          <Button @click="findLauncherDir">
-            <FolderSearchIcon />
-          </Button>
-        </div>
-        <Button large @click="refreshDir">
-          <UpdatedIcon />
-          Refresh
-        </Button>
-      </div>
+      <!--      <div class="app-directory">-->
+      <!--        <div class="iconified-input">-->
+      <!--          <BoxIcon />-->
+      <!--          <input id="appDir" v-model="settingsDir" type="text" class="input" />-->
+      <!--          <Button @click="findLauncherDir">-->
+      <!--            <FolderSearchIcon />-->
+      <!--          </Button>-->
+      <!--        </div>-->
+      <!--        <Button large @click="refreshDir">-->
+      <!--          <UpdatedIcon />-->
+      <!--          Refresh-->
+      <!--        </Button>-->
+      <!--      </div>-->
     </Card>
     <Card>
       <div class="label">
@@ -230,11 +230,11 @@ async function refreshDir() {
         </label>
         <Toggle
           id="minimize-launcher"
-          :model-value="settings.hide_on_process"
-          :checked="settings.hide_on_process"
+          :model-value="settings.hide_on_process_start"
+          :checked="settings.hide_on_process_start"
           @update:model-value="
             (e) => {
-              settings.hide_on_process = e
+              settings.hide_on_process_start = e
             }
           "
         />
@@ -285,10 +285,11 @@ async function refreshDir() {
       <div class="adjacent-input">
         <label for="max-downloads">
           <span class="label__title">Maximum concurrent downloads</span>
-          <span class="label__description"
-            >The maximum amount of files the launcher can download at the same time. Set this to a
-            lower value if you have a poor internet connection.</span
-          >
+          <span class="label__description">
+            The maximum amount of files the launcher can download at the same time. Set this to a
+            lower value if you have a poor internet connection. (app restart required to take
+            effect)
+          </span>
         </label>
         <Slider
           id="max-downloads"
@@ -302,10 +303,11 @@ async function refreshDir() {
       <div class="adjacent-input">
         <label for="max-writes">
           <span class="label__title">Maximum concurrent writes</span>
-          <span class="label__description"
-            >The maximum amount of files the launcher can write to the disk at once. Set this to a
-            lower value if you are frequently getting I/O errors.</span
-          >
+          <span class="label__description">
+            The maximum amount of files the launcher can write to the disk at once. Set this to a
+            lower value if you are frequently getting I/O errors. (app restart required to take
+            effect)
+          </span>
         </label>
         <Slider
           id="max-writes"
@@ -324,37 +326,38 @@ async function refreshDir() {
       </div>
       <div class="adjacent-input">
         <label for="opt-out-analytics">
-          <span class="label__title">Disable analytics</span>
+          <span class="label__title">Telemetry</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
-            customize your experience. By enabling this option, you opt out and your data will no
+            customize your experience. By disabling this option, you opt out and your data will no
             longer be collected.
           </span>
         </label>
         <Toggle
           id="opt-out-analytics"
-          :model-value="settings.opt_out_analytics"
-          :checked="settings.opt_out_analytics"
+          :model-value="settings.telemetry"
+          :checked="settings.telemetry"
           @update:model-value="
             (e) => {
-              settings.opt_out_analytics = e
+              settings.telemetry = e
             }
           "
         />
       </div>
       <div class="adjacent-input">
         <label for="disable-discord-rpc">
-          <span class="label__title">Disable Discord RPC</span>
+          <span class="label__title">Discord RPC</span>
           <span class="label__description">
-            Disables the Discord Rich Presence integration. 'Modrinth' will no longer show up as a
-            game or app you are using on your Discord profile. This does not disable any
-            instance-specific Discord Rich Presence integrations, such as those added by mods.
+            Manages the Discord Rich Presence integration. Disabling this will cause 'Modrinth' to
+            no longer show up as a game or app you are using on your Discord profile. This does not
+            disable any instance-specific Discord Rich Presence integrations, such as those added by
+            mods. (app restart required to take effect)
           </span>
         </label>
         <Toggle
           id="disable-discord-rpc"
-          v-model="settings.disable_discord_rpc"
-          :checked="settings.disable_discord_rpc"
+          v-model="settings.discord_rpc"
+          :checked="settings.discord_rpc"
         />
       </div>
     </Card>
@@ -364,25 +367,25 @@ async function refreshDir() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
-      <label for="java-21">
-        <span class="label__title">Java 21 location</span>
-      </label>
-      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_21" :version="21" />
-      <label for="java-17">
-        <span class="label__title">Java 17 location</span>
-      </label>
-      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_17" :version="17" />
-      <label for="java-8">
-        <span class="label__title">Java 8 location</span>
-      </label>
-      <JavaSelector id="java-8" v-model="settings.java_globals.JAVA_8" :version="8" />
+      <!--      <label for="java-21">-->
+      <!--        <span class="label__title">Java 21 location</span>-->
+      <!--      </label>-->
+      <!--      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_21" :version="21" />-->
+      <!--      <label for="java-17">-->
+      <!--        <span class="label__title">Java 17 location</span>-->
+      <!--      </label>-->
+      <!--      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_17" :version="17" />-->
+      <!--      <label for="java-8">-->
+      <!--        <span class="label__title">Java 8 location</span>-->
+      <!--      </label>-->
+      <!--      <JavaSelector id="java-8" v-model="settings.java_globals.JAVA_8" :version="8" />-->
       <hr class="card-divider" />
       <label for="java-args">
         <span class="label__title">Java arguments</span>
       </label>
       <input
         id="java-args"
-        v-model="settings.javaArgs"
+        v-model="settings.launchArgs"
         autocomplete="off"
         type="text"
         class="installation-input"
@@ -393,7 +396,7 @@ async function refreshDir() {
       </label>
       <input
         id="env-vars"
-        v-model="settings.envArgs"
+        v-model="settings.envVars"
         autocomplete="off"
         type="text"
         class="installation-input"
@@ -526,7 +529,7 @@ async function refreshDir() {
       <div>
         <label>
           <span class="label__title">App version</span>
-          <span class="label__description">Theseus v{{ version }} </span>
+          <span class="label__description">Modrinth App v{{ version }} </span>
         </label>
       </div>
     </Card>

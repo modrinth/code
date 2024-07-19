@@ -47,15 +47,14 @@ pub async fn process_get_all_running_uuids() -> Result<Vec<Uuid>> {
 // Gets all process UUIDs by profile path
 #[tauri::command]
 pub async fn process_get_uuids_by_profile_path(
-    profile_path: ProfilePathId,
+    profile_path: &str,
 ) -> Result<Vec<Uuid>> {
     Ok(process::get_uuids_by_profile_path(profile_path).await?)
 }
 
 // Gets the Profile paths of each *running* stored process in the state
 #[tauri::command]
-pub async fn process_get_all_running_profile_paths(
-) -> Result<Vec<ProfilePathId>> {
+pub async fn process_get_all_running_profile_paths() -> Result<Vec<String>> {
     Ok(process::get_all_running_profile_paths().await?)
 }
 

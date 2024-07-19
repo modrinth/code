@@ -26,13 +26,13 @@ const offline = ref(await isOffline())
 const getInstances = async () => {
   const profiles = await list(true).catch(handleError)
   recentInstances.value = Object.values(profiles).sort((a, b) => {
-    return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
+    return dayjs(b.last_played ?? 0).diff(dayjs(a.last_played ?? 0))
   })
 
   let filters = []
   for (const instance of recentInstances.value) {
-    if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
-      filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
+    if (instance.linked_data && instance.linked_data.project_id) {
+      filters.push(`NOT"project_id"="${instance.linked_data.project_id}"`)
     }
   }
   filter.value = filters.join(' AND ')
@@ -105,6 +105,7 @@ onUnmounted(() => {
           label: 'Jump back in',
           route: '/library',
           instances: recentInstances,
+          instance: true,
           downloaded: true,
         },
         {

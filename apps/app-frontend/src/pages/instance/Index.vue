@@ -2,20 +2,10 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card" @contextmenu.prevent.stop="handleRightClick">
-        <Avatar
-          size="lg"
-          :src="
-            !instance.metadata.icon ||
-            (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
-              ? instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
-          "
-        />
+        <Avatar size="lg" :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null" />
         <div class="instance-info">
-          <h2 class="name">{{ instance.metadata.name }}</h2>
-          <span class="metadata">
-            {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
-          </span>
+          <h2 class="name">{{ instance.name }}</h2>
+          <span class="metadata"> {{ instance.loader }} {{ instance.game_version }} </span>
         </div>
         <span class="button-group">
           <Button v-if="instance.install_stage !== 'installed'" disabled class="instance-button">
@@ -161,13 +151,13 @@ const instance = ref(await get(route.params.id).catch(handleError))
 
 breadcrumbs.setName(
   'Instance',
-  instance.value.metadata.name.length > 40
-    ? instance.value.metadata.name.substring(0, 40) + '...'
-    : instance.value.metadata.name,
+  instance.value.name.length > 40
+    ? instance.value.name.substring(0, 40) + '...'
+    : instance.value.name,
 )
 
 breadcrumbs.setContext({
-  name: instance.value.metadata.name,
+  name: instance.value.name,
   link: route.path,
   query: route.query,
 })
@@ -188,8 +178,8 @@ const startInstance = async (context) => {
   playing.value = true
 
   mixpanel_track('InstanceStart', {
-    loader: instance.value.metadata.loader,
-    game_version: instance.value.metadata.game_version,
+    loader: instance.value.loader,
+    game_version: instance.value.game_version,
     source: context,
   })
 }
@@ -207,9 +197,9 @@ const checkProcess = async () => {
 
 // Get information on associated modrinth versions, if any
 const modrinthVersions = ref([])
-if (!(await isOffline()) && instance.value.metadata.linked_data?.project_id) {
+if (!(await isOffline()) && instance.value.linked_data && instance.value.linked_data.project_id) {
   modrinthVersions.value = await useFetch(
-    `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
+    `https://api.modrinth.com/v2/project/${instance.value.linked_data.project_id}/version`,
     'project',
   )
 }
@@ -225,8 +215,8 @@ const stopInstance = async (context) => {
   } else await kill_by_uuid(uuid.value).catch(handleError)
 
   mixpanel_track('InstanceStop', {
-    loader: instance.value.metadata.loader,
-    game_version: instance.value.metadata.game_version,
+    loader: instance.value.loader,
+    game_version: instance.value.game_version,
     source: context,
   })
 }
@@ -271,7 +261,7 @@ const handleOptionsClick = async (args) => {
       break
     case 'add_content':
       await router.push({
-        path: `/browse/${instance.value.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        path: `/browse/${instance.value.loader === 'vanilla' ? 'datapack' : 'mod'}`,
         query: { i: route.params.id },
       })
       break

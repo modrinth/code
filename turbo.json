@@ -23,6 +23,5 @@
       "persistent": true
     },
     "test": {}
-  },
-  "ui": "tui"
+  }
 }

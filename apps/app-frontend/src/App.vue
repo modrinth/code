@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
 import {
   HomeIcon,
@@ -36,12 +36,14 @@ import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
-import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
-import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
+import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
+import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
+import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
+import { useInstall } from '@/store/install.js'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -62,16 +64,16 @@ defineExpose({
     const {
       native_decorations,
       theme,
-      opt_out_analytics,
+      telemetry,
       collapsed_navigation,
       advanced_rendering,
-      fully_onboarded,
+      onboarded,
     } = await get()
     // video should play if the user is not on linux, and has not onboarded
     os.value = await getOS()
     const dev = await isDev()
     const version = await getVersion()
-    showOnboarding.value = !fully_onboarded
+    showOnboarding.value = !onboarded
 
     nativeDecorations.value = native_decorations
     if (os.value !== 'MacOS') appWindow.setDecorations(native_decorations)
@@ -81,10 +83,10 @@ defineExpose({
     themeStore.advancedRendering = advanced_rendering
 
     mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
-    if (opt_out_analytics) {
+    if (telemetry) {
       mixpanel_opt_out_tracking()
     }
-    mixpanel_track('Launched', { version, dev, fully_onboarded })
+    mixpanel_track('Launched', { version, dev, onboarded })
 
     if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -118,47 +120,8 @@ defineExpose({
   },
 })
 
-const confirmClose = async () => {
-  const confirmed = await confirm(
-    'An action is currently in progress. Are you sure you want to exit?',
-    {
-      title: 'Modrinth',
-      type: 'warning',
-    },
-  )
-  return confirmed
-}
-
 const handleClose = async () => {
-  if (failureText.value != null) {
-    await TauriWindow.getCurrent().close()
-    return
-  }
-  // State should respond immeiately if it's safe to close
-  // If not, code is deadlocked or worse, so wait 2 seconds and then ask the user to confirm closing
-  // (Exception: if the user is changing config directory, which takes control of the state, and it's taking a significant amount of time for some reason)
-  const isSafe = await Promise.race([
-    check_safe_loading_bars_complete(),
-    new Promise((r) => setTimeout(r, 2000)),
-  ])
-  if (!isSafe) {
-    const response = await confirmClose()
-    if (!response) {
-      return
-    }
-  }
-  await await_sync()
   await TauriWindow.getCurrent().close()
-}
-
-const openSupport = async () => {
-  window.__TAURI_INVOKE__('tauri', {
-    __tauriModule: 'Shell',
-    message: {
-      cmd: 'open',
-      path: 'https://discord.gg/modrinth',
-    },
-  })
 }
 
 TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
@@ -179,15 +142,22 @@ const loading = useLoading()
 const notifications = useNotifications()
 const notificationsWrapper = ref()
 
-watch(notificationsWrapper, () => {
-  notifications.setNotifs(notificationsWrapper.value)
-})
-
 const error = useError()
 const errorModal = ref()
 
-watch(errorModal, () => {
+const install = useInstall()
+const modInstallModal = ref()
+const installConfirmModal = ref()
+const incompatibilityWarningModal = ref()
+
+onMounted(() => {
+  notifications.setNotifs(notificationsWrapper.value)
+
   error.setErrorModal(errorModal.value)
+
+  install.setIncompatibilityWarningModal(incompatibilityWarningModal)
+  install.setInstallConfirmModal(installConfirmModal)
+  install.setModInstallModal(modInstallModal)
 })
 
 document.querySelector('body').addEventListener('click', function (e) {
@@ -284,7 +254,7 @@ command_listener(async (e) => {
         <div class="button-row push-right">
           <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
 
-          <Button @click="openSupport"><ChatIcon />Get support</Button>
+          <a class="btn" href="https://support.modrinth.com"> <ChatIcon /> Get support </a>
         </div>
       </Card>
     </div>
@@ -385,6 +355,9 @@ command_listener(async (e) => {
   <URLConfirmModal ref="urlModal" />
   <Notifications ref="notificationsWrapper" />
   <ErrorModal ref="errorModal" />
+  <ModInstallModal ref="modInstallModal" />
+  <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
+  <InstallConfirmModal ref="installConfirmModal" />
 </template>
 
 <style lang="scss" scoped>
@@ -584,55 +557,6 @@ command_listener(async (e) => {
   }
 }
 
-.instance-list {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 70%;
-  margin: 0.4rem;
-
-  p:nth-child(1) {
-    font-size: 0.6rem;
-  }
-
-  & > p {
-    color: var(--color-base);
-    margin: 0.8rem 0;
-    font-size: 0.7rem;
-    line-height: 0.8125rem;
-    font-weight: 500;
-    text-transform: uppercase;
-  }
-}
-
-.user-section {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 4.375rem;
-
-  section {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    text-align: left;
-    margin-left: 0.5rem;
-  }
-
-  .username {
-    margin-bottom: 0.3rem;
-    font-weight: 400;
-    line-height: 1.25rem;
-    color: var(--color-contrast);
-  }
-
-  a {
-    font-weight: 400;
-    color: var(--color-secondary);
-  }
-}
-
 .nav-section {
   display: flex;
   flex-direction: column;
@@ -641,14 +565,6 @@ command_listener(async (e) => {
   width: 100%;
   height: 100%;
   gap: 1rem;
-}
-
-.video {
-  margin-top: 2.25rem;
-  width: 100vw;
-  height: calc(100vh - 2.25rem);
-  object-fit: cover;
-  border-radius: var(--radius-md);
 }
 
 .button-row {

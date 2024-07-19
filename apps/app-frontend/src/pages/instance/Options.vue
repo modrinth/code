@@ -147,7 +147,7 @@
       autocomplete="off"
       maxlength="80"
       type="text"
-      :disabled="instance.metadata.linked_data"
+      :disabled="instance.linked_data"
     />
 
     <div class="adjacent-input">
@@ -358,7 +358,7 @@
       />
     </div>
   </Card>
-  <Card v-if="instance.metadata.linked_data">
+  <Card v-if="instance.linked_data">
     <div class="label">
       <h3>
         <span class="label__title size-card-header">Modpack</span>
@@ -366,9 +366,7 @@
     </div>
     <div class="adjacent-input">
       <label for="general-modpack-info">
-        <span class="label__description">
-          <strong>Modpack: </strong> {{ instance.metadata.name }}
-        </span>
+        <span class="label__description"> <strong>Modpack: </strong> {{ instance.name }} </span>
         <span class="label__description">
           <strong>Version: </strong>
           {{
@@ -414,7 +412,7 @@
       </Button>
     </div>
 
-    <div v-if="props.instance.metadata.linked_data.project_id" class="adjacent-input">
+    <div v-if="props.instance.linked_data.project_id" class="adjacent-input">
       <label for="change-modpack-version">
         <span class="label__title">Change modpack version</span>
         <span class="label__description">
@@ -502,7 +500,7 @@
     </div>
   </Card>
   <ModpackVersionModal
-    v-if="instance.metadata.linked_data"
+    v-if="instance.linked_data"
     ref="modpackVersionModal"
     :instance="instance"
     :versions="props.versions"
@@ -553,12 +551,7 @@ import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import {
-  get_fabric_versions,
-  get_forge_versions,
-  get_neoforge_versions,
-  get_quilt_versions,
-} from '@/helpers/metadata.js'
+import { get_loader_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
@@ -587,9 +580,9 @@ const props = defineProps({
 
 const themeStore = useTheming()
 
-const title = ref(props.instance.metadata.name)
-const icon = ref(props.instance.metadata.icon)
-const groups = ref(props.instance.metadata.groups)
+const title = ref(props.instance.name)
+const icon = ref(props.instance.icon_path)
+const groups = ref(props.instance.groups)
 
 const modpackVersionModal = ref(null)
 
@@ -597,7 +590,7 @@ const instancesList = Object.values(await list(true))
 const availableGroups = ref([
   ...new Set(
     instancesList.reduce((acc, obj) => {
-      return acc.concat(obj.metadata.groups)
+      return acc.concat(obj.groups)
     }, []),
   ),
 ])
@@ -663,7 +656,7 @@ const unlinkModpack = ref(false)
 
 const inProgress = ref(false)
 const installing = computed(() => props.instance.install_stage !== 'installed')
-const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
+const installedVersion = computed(() => props.instance?.linked_data?.version_id)
 const installedVersionData = computed(() => {
   if (!installedVersion.value) return null
   return props.versions.find((version) => version.id === installedVersion.value)
@@ -709,8 +702,8 @@ const editProfileObject = computed(() => {
     metadata: {
       name: title.value.trim().substring(0, 32) ?? 'Instance',
       groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
-      loader_version: props.instance.metadata.loader_version,
-      linked_data: props.instance.metadata.linked_data,
+      loader_version: props.instance.loader_version,
+      linked_data: props.instance.linked_data,
     },
     java: {},
   }
@@ -758,10 +751,10 @@ const editProfileObject = computed(() => {
   }
 
   if (unlinkModpack.value) {
-    editProfile.metadata.linked_data = null
+    editProfile.linked_data = null
   }
 
-  breadcrumbs.setName('Instance', editProfile.metadata.name)
+  breadcrumbs.setName('Instance', editProfile.name)
 
   return editProfile
 })
@@ -771,8 +764,8 @@ const repairing = ref(false)
 async function duplicateProfile() {
   await duplicate(props.instance.path).catch(handleError)
   mixpanel_track('InstanceDuplicate', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 }
 
@@ -782,14 +775,14 @@ async function repairProfile(force) {
   repairing.value = false
 
   mixpanel_track('InstanceRepair', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 }
 
 async function unpairProfile() {
   const editProfile = props.instance
-  editProfile.metadata.linked_data = null
+  editProfile.linked_data = null
   await edit(props.instance.path, editProfile)
   installedVersion.value = null
   installedVersionData.value = null
@@ -798,13 +791,13 @@ async function unpairProfile() {
 
 async function unlockProfile() {
   const editProfile = props.instance
-  editProfile.metadata.linked_data.locked = false
+  editProfile.linked_data.locked = false
   await edit(props.instance.path, editProfile)
   modalConfirmUnlock.value.hide()
 }
 
 const isPackLocked = computed(() => {
-  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
+  return props.instance.linked_data && props.instance.linked_data.locked
 })
 
 async function repairModpack() {
@@ -813,8 +806,8 @@ async function repairModpack() {
   inProgress.value = false
 
   mixpanel_track('InstanceRepair', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 }
 
@@ -825,8 +818,8 @@ async function removeProfile() {
   removing.value = false
 
   mixpanel_track('InstanceRemove', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 
   await router.push({ path: '/' })
@@ -843,10 +836,10 @@ const [
   all_game_versions,
   loaders,
 ] = await Promise.all([
-  get_fabric_versions().then(shallowRef).catch(handleError),
-  get_forge_versions().then(shallowRef).catch(handleError),
-  get_quilt_versions().then(shallowRef).catch(handleError),
-  get_neoforge_versions().then(shallowRef).catch(handleError),
+  get_loader_versions('fabric').then(shallowRef).catch(handleError),
+  get_loader_versions('forge').then(shallowRef).catch(handleError),
+  get_loader_versions('quilt').then(shallowRef).catch(handleError),
+  get_loader_versions('neo').then(shallowRef).catch(handleError),
   get_game_versions().then(shallowRef).catch(handleError),
   get_loaders()
     .then((value) =>
@@ -859,8 +852,8 @@ const [
 ])
 loaders.value.unshift('vanilla')
 
-const loader = ref(props.instance.metadata.loader)
-const gameVersion = ref(props.instance.metadata.game_version)
+const loader = ref(props.instance.loader)
+const gameVersion = ref(props.instance.game_version)
 const selectableGameVersions = computed(() => {
   return all_game_versions.value
     .filter((item) => {
@@ -896,9 +889,7 @@ const selectableLoaderVersions = computed(() => {
   return []
 })
 const loaderVersionIndex = ref(
-  selectableLoaderVersions.value.findIndex(
-    (x) => x.id === props.instance.metadata.loader_version?.id,
-  ),
+  selectableLoaderVersions.value.findIndex((x) => x.id === props.instance.loader_version?.id),
 )
 
 const isValid = computed(() => {

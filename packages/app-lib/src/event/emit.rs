@@ -1,10 +1,7 @@
 use super::LoadingBarId;
-use crate::{
-    event::{
-        CommandPayload, EventError, LoadingBar, LoadingBarType,
-        ProcessPayloadType, ProfilePayloadType,
-    },
-    state::{ProcessType, SafeProcesses},
+use crate::event::{
+    CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
+    ProfilePayloadType,
 };
 use futures::prelude::*;
 
@@ -55,7 +52,6 @@ pub async fn init_loading(
     title: &str,
 ) -> crate::Result<LoadingBarId> {
     let key = init_loading_unsafe(bar_type, total, title).await?;
-    SafeProcesses::add_uuid(ProcessType::LoadingBar, key.0).await?;
     Ok(key)
 }
 
@@ -301,7 +297,6 @@ pub async fn emit_profile(
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let path = profile_path_id.get_full_path().await?;
         let event_state = crate::EventState::get().await?;
         event_state
             .app
@@ -309,7 +304,6 @@ pub async fn emit_profile(
                 "profile",
                 ProfilePayload {
                     profile_path_id: profile_path_id.to_string(),
-                    path,
                     event,
                 },
             )

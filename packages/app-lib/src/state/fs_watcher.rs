@@ -46,7 +46,6 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                             }
                         }
 
-                        println!("WATCHER: new_path: {profile_path:?} event path: {:?}", e.path);
                         if let Some(profile_path) = profile_path {
                             if e.path
                                 .components()
