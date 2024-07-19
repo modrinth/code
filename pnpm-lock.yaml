@@ -48,7 +48,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/utils
       '@tauri-apps/api':
-        specifier: ^1.5.3
+        specifier: ^1.6.0
         version: 1.6.0
       '@vintl/vintl':
         specifier: ^4.4.1
@@ -88,7 +88,7 @@ importers:
         version: 2.0.0-beta.8(vue@3.4.31(typescript@5.5.3))
     devDependencies:
       '@tauri-apps/cli':
-        specifier: ^1.5.11
+        specifier: ^1.6.0
         version: 1.6.0
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
@@ -11833,7 +11833,7 @@ snapshots:
 
   unimport@3.7.2:
     dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@3.29.4)
+      '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
       acorn: 8.12.1
       escape-string-regexp: 5.0.0
       estree-walker: 3.0.3
