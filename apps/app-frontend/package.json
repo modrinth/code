@@ -13,7 +13,7 @@
     "@modrinth/assets": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
-    "@tauri-apps/api": "^1.5.3",
+    "@tauri-apps/api": "^1.6.0",
     "@vintl/vintl": "^4.4.1",
     "dayjs": "^1.11.10",
     "floating-vue": "^5.2.2",
@@ -28,7 +28,7 @@
     "vue-typed-virtual-list": "^1.0.10"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.5.11",
+    "@tauri-apps/cli": "^1.6.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "eslint": "^8.57.0",
     "eslint-config-custom": "workspace:*",
