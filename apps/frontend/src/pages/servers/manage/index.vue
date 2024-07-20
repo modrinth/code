@@ -108,10 +108,12 @@ useHead({
   title: "Servers - Modrinth",
 });
 
+const auth = await useAuth();
+
 const { data, status } = await useLazyAsyncData("serversList", async () => {
   const response = await usePyroFetch<{
     servers: Server[];
-  }>(0, "servers");
+  }>(auth.value.token, "servers");
   return response.servers;
 });
 

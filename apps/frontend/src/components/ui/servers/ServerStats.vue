@@ -1,8 +1,6 @@
 <template>
   <div data-pyro-server-stats class="flex flex-row items-center gap-6">
-    <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
-    >
+    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ (Math.round(cpuPercent * 100) / 100).toFixed(2) }}%
@@ -20,9 +18,7 @@
       <CPUIcon />
     </div>
 
-    <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
-    >
+    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ Math.floor((ramUsageBytes / ramTotalBytes) * 100) }}%
@@ -40,9 +36,7 @@
       <DBIcon />
     </div>
 
-    <div
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
-    >
+    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ (Math.round((storageUsageBytes / 1e9) * 100) / 100).toFixed(2) }} GB
@@ -74,24 +68,24 @@
 </template>
 
 <script setup lang="ts">
-import type { Stats as StatsType } from '~/types/servers'
+import type { Stats as StatsType } from "~/types/servers";
 
 import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 
 type Stats = Omit<
   StatsType,
-  | 'cpu_percent'
-  | 'ram_usage_bytes'
-  | 'ram_total_bytes'
-  | 'storage_usage_bytes'
-  | 'storage_total_bytes'
+  | "cpu_percent"
+  | "ram_usage_bytes"
+  | "ram_total_bytes"
+  | "storage_usage_bytes"
+  | "storage_total_bytes"
 > & {
-  cpuPercent: number
-  ramUsageBytes: number
-  ramTotalBytes: number
-  storageUsageBytes: number
-  storageTotalBytes: number
-}
+  cpuPercent: number;
+  ramUsageBytes: number;
+  ramTotalBytes: number;
+  storageUsageBytes: number;
+  storageTotalBytes: number;
+};
 
-defineProps<Stats>()
+defineProps<Stats>();
 </script>

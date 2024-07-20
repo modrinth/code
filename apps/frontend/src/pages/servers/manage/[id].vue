@@ -202,8 +202,10 @@ type ServerDetails = {
   }[];
 };
 
+const auth = await useAuth();
+
 const { data, status } = await useLazyAsyncData("serversList", async () => {
-  return await usePyroFetch<ServerDetails>(0, `servers/${serverId}`);
+  return await usePyroFetch<ServerDetails>(auth.value.token, `servers/${serverId}`);
 });
 </script>
 
