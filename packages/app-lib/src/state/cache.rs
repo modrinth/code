@@ -78,7 +78,7 @@ impl CacheValueType {
         match self {
             CacheValueType::File => 60 * 60 * 24 * 30, // 30 days
             CacheValueType::FileHash => 60 * 60 * 24 * 30, // 30 days
-            _ => 60 * 60 * 30, // 30 minutes
+            _ => 60 * 60 * 30,                         // 30 minutes
         }
     }
 }
@@ -145,14 +145,6 @@ pub enum FileMetadata {
     Modrinth {
         project_id: String,
         version_id: String,
-    },
-    Inferred {
-        title: Option<String>,
-        description: Option<String>,
-        authors: Vec<String>,
-        version: Option<String>,
-        icon: Option<PathBuf>,
-        project_type: Option<String>,
     },
     Unknown,
 }
@@ -352,6 +344,16 @@ pub struct GameVersion {
 }
 
 impl CacheValue {
+    fn get_entry(self) -> CachedEntry {
+        CachedEntry {
+            id: self.get_key(),
+            alias: self.get_alias(),
+            type_: self.get_type(),
+            expires: Utc::now().timestamp() + self.get_type().expiry(),
+            data: Some(self),
+        }
+    }
+
     fn get_type(&self) -> CacheValueType {
         match self {
             CacheValue::Project(_) => CacheValueType::Project,
@@ -407,11 +409,13 @@ impl CacheValue {
         }
     }
 
-    fn get_alias(&self) -> Option<&str> {
+    fn get_alias(&self) -> Option<String> {
         match self {
-            CacheValue::Project(project) => project.slug.as_deref(),
-            CacheValue::User(user) => Some(&user.username),
-            CacheValue::Organization(org) => Some(&org.slug),
+            CacheValue::Project(project) => {
+                project.slug.clone().map(|x| x.to_lowercase())
+            }
+            CacheValue::User(user) => Some(user.username.to_lowercase()),
+            CacheValue::Organization(org) => Some(org.slug.to_lowercase()),
 
             CacheValue::MinecraftManifest(_)
             | CacheValue::Categories(_)
@@ -429,8 +433,11 @@ impl CacheValue {
     }
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Copy, Clone)]
 pub enum CacheBehaviour {
+    /// Serve expired data. If fetch fails / launcher is offline, errors are ignored
+    /// and expired data is served
+    StaleWhileRevalidateSkipOffline,
     // Serve expired data, revalidate in background
     StaleWhileRevalidate,
     // Must revalidate if data is expired
@@ -441,7 +448,7 @@ pub enum CacheBehaviour {
 
 impl Default for CacheBehaviour {
     fn default() -> Self {
-        Self::StaleWhileRevalidate
+        Self::StaleWhileRevalidateSkipOffline
     }
 }
 
@@ -451,7 +458,7 @@ pub struct CachedEntry {
     alias: Option<String>,
     #[serde(rename = "data_type")]
     type_: CacheValueType,
-    data: CacheValue,
+    data: Option<CacheValue>,
     expires: i64,
 }
 
@@ -486,7 +493,7 @@ macro_rules! impl_cache_methods {
                         let entry =
                             CachedEntry::get_many(CacheValueType::$variant, ids, cache_behaviour, exec, fetch_semaphore).await?;
 
-                        Ok(entry.into_iter().filter_map(|x| if let CacheValue::$variant(value) = x.data {
+                        Ok(entry.into_iter().filter_map(|x| if let Some(CacheValue::$variant(value)) = x.data {
                             Some(value)
                         } else {
                             None
@@ -515,7 +522,7 @@ macro_rules! impl_cache_method_singular {
                         let entry =
                             CachedEntry::get(CacheValueType::$variant, DEFAULT_ID, cache_behaviour, exec, fetch_semaphore).await?;
 
-                        if let Some(CacheValue::$variant(value)) = entry.map(|x| x.data) {
+                        if let Some(CacheValue::$variant(value)) = entry.map(|x| x.data).flatten() {
                             Ok(Some(value))
                         } else {
                             Ok(None)
@@ -606,46 +613,58 @@ impl CachedEntry {
 
         if cache_behaviour != CacheBehaviour::Bypass {
             let type_ = type_.as_str();
-            let keys = serde_json::to_string(&keys)?;
+            let serialized_keys = serde_json::to_string(&keys)?;
+            let lowercased_keys = serde_json::to_string(
+                &keys.iter().map(|x| x.to_lowercase()).collect::<Vec<_>>(),
+            )?;
 
             // unsupported type NULL of column #3 ("data"), so cannot be compile time type checked
             // https://github.com/launchbadge/sqlx/issues/1979
             let query = sqlx::query!(
                 r#"
-                SELECT id, data_type, json(data) as "data!: serde_json::Value", alias, expires
+                SELECT id, data_type, json(data) as "data?: serde_json::Value", alias, expires
                 FROM cache
                 WHERE data_type = $1 AND (
                     id IN (SELECT value FROM json_each($2))
                     OR
-                    alias IN (SELECT value FROM json_each($2))
+                    alias IN (SELECT value FROM json_each($3))
                 )
                 "#,
                 type_,
-                keys
+                serialized_keys,
+                lowercased_keys
             )
             .fetch_all(&mut *exec)
             .await?;
 
             for row in query {
-                if let Ok(data) = serde_json::from_value(row.data) {
-                    if row.expires <= Utc::now().timestamp() {
-                        if cache_behaviour == CacheBehaviour::MustRevalidate {
-                            continue;
-                        } else {
-                            expired_keys.insert(row.id.clone());
-                        }
+                if row.expires <= Utc::now().timestamp() {
+                    if cache_behaviour == CacheBehaviour::MustRevalidate {
+                        continue;
+                    } else {
+                        expired_keys.insert(row.id.clone());
                     }
+                }
 
-                    remaining_keys.remove(&*row.id);
-                    if let Some(alias) = row.alias.as_deref() {
-                        remaining_keys.remove(alias);
-                    }
+                remaining_keys.retain(|x| {
+                    x != &&*row.id
+                        && !row
+                            .alias
+                            .as_ref()
+                            .map(|y| y.to_lowercase() == x.to_lowercase())
+                            .unwrap_or(false)
+                });
 
+                if let Some(data) = row
+                    .data
+                    .map(|x| serde_json::from_value::<CacheValue>(x).ok())
+                    .flatten()
+                {
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,
                         type_: CacheValueType::from_str(&row.data_type),
-                        data,
+                        data: Some(data),
                         expires: row.expires,
                     });
                 }
@@ -653,19 +672,45 @@ impl CachedEntry {
         }
 
         let time = now.elapsed();
-        println!("query {type_:?} keys: {remaining_keys:?}, elapsed: {:.2?}", time);
+        println!(
+            "query {type_:?} keys: {remaining_keys:?}, elapsed: {:.2?}",
+            time
+        );
         let now = Instant::now();
 
-
         if !remaining_keys.is_empty() {
-            let mut values =
-                Self::fetch_many(type_, remaining_keys, fetch_semaphore)
-                    .await?;
+            let res = Self::fetch_many(
+                type_,
+                remaining_keys.clone(),
+                fetch_semaphore,
+            )
+            .await;
 
-            if !values.is_empty() {
-                Self::upsert_many(&values, &mut *exec).await?;
+            if res.is_err()
+                && cache_behaviour
+                    == CacheBehaviour::StaleWhileRevalidateSkipOffline
+            {
+                for key in remaining_keys {
+                    expired_keys.insert(key.to_string());
+                }
+            } else {
+                let values = res?;
 
-                return_vals.append(&mut values);
+                Self::upsert_many(
+                    &values.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
+                    &mut *exec,
+                )
+                .await?;
+
+                if !values.is_empty() {
+                    return_vals.append(
+                        &mut values
+                            .into_iter()
+                            .filter(|(_, include)| *include)
+                            .map(|x| x.0)
+                            .collect::<Vec<_>>(),
+                    );
+                }
             }
         }
 
@@ -673,7 +718,9 @@ impl CachedEntry {
         println!("FETCH {type_:?} DONE, elapsed: {:.2?}", time);
 
         if !expired_keys.is_empty()
-            && cache_behaviour == CacheBehaviour::StaleWhileRevalidate
+            && (cache_behaviour == CacheBehaviour::StaleWhileRevalidate
+                || cache_behaviour
+                    == CacheBehaviour::StaleWhileRevalidateSkipOffline)
         {
             tokio::task::spawn(async move {
                 // TODO: if possible- find a way to do this without invoking state get
@@ -684,7 +731,10 @@ impl CachedEntry {
                     expired_keys,
                     &state.fetch_semaphore,
                 )
-                .await?;
+                .await?
+                .into_iter()
+                .map(|x| x.0)
+                .collect::<Vec<_>>();
 
                 if !values.is_empty() {
                     Self::upsert_many(&values, &state.pool).await?;
@@ -701,10 +751,10 @@ impl CachedEntry {
         type_: CacheValueType,
         keys: DashSet<impl Display + Eq + Hash + Serialize>,
         fetch_semaphore: &FetchSemaphore,
-    ) -> crate::Result<Vec<Self>> {
+    ) -> crate::Result<Vec<(Self, bool)>> {
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
-                fetch_json::<Vec<_>>(
+                let results = fetch_json::<Vec<_>>(
                     Method::GET,
                     &*format!(
                         "{}{}?ids={}",
@@ -718,29 +768,43 @@ impl CachedEntry {
                 )
                 .await?
                 .into_iter()
-                .map(|x| {
-                    let data = $cache_variant(x);
+                .map($cache_variant)
+                .collect::<Vec<_>>();
 
-                    Self {
-                        id: data.get_key().to_string(),
-                        alias: data.get_alias().map(|x| x.to_string()),
-                        type_: CacheValueType::$type,
-                        data,
-                        expires: Utc::now().timestamp()
-                            + CacheValueType::$type.expiry(),
+                let values = dashmap::DashMap::new();
+                for key in keys {
+                    let key = key.to_string();
+                    let lower_case_key = key.to_lowercase();
+                    if let Some(data) = results.iter().find(|x| {
+                        x.get_key() == key
+                            || x.get_alias()
+                                .map(|x| x == lower_case_key)
+                                .unwrap_or(false)
+                    }) {
+                        values.insert(data.get_key(), data.clone().get_entry());
+                    } else {
+                        values.insert(
+                            key.clone(),
+                            Self {
+                                id: key,
+                                alias: None,
+                                type_: CacheValueType::$type,
+                                data: None,
+                                expires: Utc::now().timestamp()
+                                    + CacheValueType::$type.expiry(),
+                            },
+                        );
                     }
-                })
-                .collect()
+                }
+
+                values.into_iter().map(|(_, val)| (val, true)).collect()
             }};
         }
 
         macro_rules! fetch_original_value {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
-                vec![Self {
-                    id: DEFAULT_ID.to_string(),
-                    alias: None,
-                    type_: CacheValueType::$type,
-                    data: $cache_variant(
+                vec![(
+                    $cache_variant(
                         fetch_json(
                             Method::GET,
                             &*format!("{}{}", $api_url, $url_suffix),
@@ -749,10 +813,10 @@ impl CachedEntry {
                             &fetch_semaphore,
                         )
                         .await?,
-                    ),
-                    expires: Utc::now().timestamp()
-                        + CacheValueType::$type.expiry(),
-                }]
+                    )
+                    .get_entry(),
+                    true,
+                )]
             }};
         }
 
@@ -782,20 +846,67 @@ impl CachedEntry {
                 )
             }
             CacheValueType::Team => {
-                fetch_original_values!(
-                    Team,
-                    MODRINTH_API_URL_V3,
-                    "teams",
-                    CacheValue::Team
+                let mut values = vec![];
+
+                fetch_json::<Vec<Vec<TeamMember>>>(
+                    Method::GET,
+                    &*format!(
+                        "{MODRINTH_API_URL_V3}teams?ids={}",
+                        serde_json::to_string(&keys)?
+                    ),
+                    None,
+                    None,
+                    &fetch_semaphore,
                 )
+                .await?
+                .into_iter()
+                .for_each(|team| {
+                    for member in &team {
+                        values.push((
+                            CacheValue::User(member.user.clone()).get_entry(),
+                            false,
+                        ));
+                    }
+
+                    values.push((CacheValue::Team(team).get_entry(), true))
+                });
+
+                values
             }
             CacheValueType::Organization => {
-                fetch_original_values!(
-                    Organization,
-                    MODRINTH_API_URL_V3,
-                    "organizations",
-                    CacheValue::Organization
+                let mut values = vec![];
+
+                fetch_json::<Vec<Organization>>(
+                    Method::GET,
+                    &*format!(
+                        "{MODRINTH_API_URL_V3}organizations?ids={}",
+                        serde_json::to_string(&keys)?
+                    ),
+                    None,
+                    None,
+                    &fetch_semaphore,
                 )
+                .await?
+                .into_iter()
+                .for_each(|org| {
+                    for member in &org.members {
+                        values.push((
+                            CacheValue::User(member.user.clone()).get_entry(),
+                            false,
+                        ));
+                    }
+
+                    values.push((
+                        CacheValue::Team(org.members.clone()).get_entry(),
+                        false,
+                    ));
+                    values.push((
+                        CacheValue::Organization(org).get_entry(),
+                        true,
+                    ));
+                });
+
+                values
             }
             CacheValueType::File => {
                 let mut versions = fetch_json::<HashMap<String, Version>>(
@@ -817,22 +928,26 @@ impl CachedEntry {
 
                     let metadata = if let Some(version) = versions.remove(&hash)
                     {
+                        let version_id = version.id.clone();
+                        let project_id = version.project_id.clone();
+                        vals.push((
+                            CacheValue::Version(version).get_entry(),
+                            false,
+                        ));
+
                         FileMetadata::Modrinth {
-                            project_id: version.project_id,
-                            version_id: version.id,
+                            project_id,
+                            version_id,
                         }
                     } else {
                         FileMetadata::Unknown
                     };
 
-                    vals.push(Self {
-                        id: hash.clone(),
-                        alias: None,
-                        type_: CacheValueType::File,
-                        data: CacheValue::File(CachedFile { hash, metadata }),
-                        expires: Utc::now().timestamp()
-                            + CacheValueType::File.expiry(),
-                    })
+                    vals.push((
+                        CacheValue::File(CachedFile { hash, metadata })
+                            .get_entry(),
+                        true,
+                    ))
                 }
 
                 vals
@@ -862,16 +977,15 @@ impl CachedEntry {
                 .await?
                 .into_iter()
                 .enumerate()
-                .map(|(index, metadata)| Self {
-                    id: fetch_urls[index].0.to_string(),
-                    alias: None,
-                    type_: CacheValueType::LoaderManifest,
-                    data: CacheValue::LoaderManifest(CachedLoaderManifest {
-                        loader: fetch_urls[index].0.to_string(),
-                        manifest: metadata,
-                    }),
-                    expires: Utc::now().timestamp()
-                        + CacheValueType::LoaderManifest.expiry(),
+                .map(|(index, metadata)| {
+                    (
+                        CacheValue::LoaderManifest(CachedLoaderManifest {
+                            loader: fetch_urls[index].0.to_string(),
+                            manifest: metadata,
+                        })
+                        .get_entry(),
+                        true,
+                    )
                 })
                 .collect()
             }
@@ -934,7 +1048,7 @@ impl CachedEntry {
                 async fn hash_file(
                     profiles_dir: &Path,
                     key: String,
-                ) -> crate::Result<CachedEntry> {
+                ) -> crate::Result<(CachedEntry, bool)> {
                     let path =
                         key.split_once('-').map(|x| x.1).unwrap_or_default();
 
@@ -957,25 +1071,20 @@ impl CachedEntry {
 
                     let hash = hasher.digest().to_string();
 
-                    let data = CacheValue::FileHash(CachedFileHash {
-                        path: path.to_string(),
-                        file_name: full_path
-                            .file_name()
-                            .and_then(|x| x.to_str())
-                            .unwrap_or_default()
-                            .to_string(),
-                        size,
-                        hash,
-                    });
-
-                    Ok(CachedEntry {
-                        id: key.clone(),
-                        alias: None,
-                        type_: CacheValueType::FileHash,
-                        data,
-                        expires: Utc::now().timestamp()
-                            + CacheValueType::FileHash.expiry(),
-                    })
+                    Ok((
+                        CacheValue::FileHash(CachedFileHash {
+                            path: path.to_string(),
+                            file_name: full_path
+                                .file_name()
+                                .and_then(|x| x.to_str())
+                                .unwrap_or_default()
+                                .to_string(),
+                            size,
+                            hash,
+                        })
+                        .get_entry(),
+                        true,
+                    ))
                 }
 
                 use futures::stream::StreamExt;
@@ -991,6 +1100,8 @@ impl CachedEntry {
                 results
             }
             CacheValueType::FileUpdate => {
+                let mut vals = Vec::new();
+
                 // TODO: switch to update individual once back-end route exists
                 let mut filtered_keys: Vec<((String, String), Vec<String>)> =
                     Vec::new();
@@ -1015,6 +1126,18 @@ impl CachedEntry {
                                 vec![hash.to_string()],
                             ))
                         }
+                    } else {
+                        vals.push((
+                            Self {
+                                id: string,
+                                alias: None,
+                                type_: CacheValueType::FileUpdate,
+                                data: None,
+                                expires: Utc::now().timestamp()
+                                    + CacheValueType::FileUpdate.expiry(),
+                            },
+                            true,
+                        ))
                     }
                 });
 
@@ -1039,31 +1162,36 @@ impl CachedEntry {
                     ))
                     .await?;
 
-                let mut vals = Vec::new();
-
                 for (index, mut variation) in variations.into_iter().enumerate()
                 {
                     let ((loader, game_version), hashes) =
                         &filtered_keys[index];
 
                     for hash in hashes {
-                        let version_id = variation.remove(hash).map(|x| x.id);
+                        let version = variation.remove(hash);
 
-                        let data = CacheValue::FileUpdate(CachedFileUpdate {
-                            hash: hash.clone(),
-                            game_version: game_version.clone(),
-                            loader: loader.clone(),
-                            update_version_id: version_id,
-                        });
+                        let version_id = if let Some(version) = version {
+                            let version_id = version.id.clone();
+                            vals.push((
+                                CacheValue::Version(version).get_entry(),
+                                false,
+                            ));
 
-                        vals.push(Self {
-                            id: data.get_key(),
-                            alias: None,
-                            type_: CacheValueType::FileUpdate,
-                            data,
-                            expires: Utc::now().timestamp()
-                                + CacheValueType::FileUpdate.expiry(),
-                        })
+                            Some(version_id)
+                        } else {
+                            None
+                        };
+
+                        vals.push((
+                            CacheValue::FileUpdate(CachedFileUpdate {
+                                hash: hash.clone(),
+                                game_version: game_version.clone(),
+                                loader: loader.clone(),
+                                update_version_id: version_id,
+                            })
+                            .get_entry(),
+                            true,
+                        ))
                     }
                 }
 
@@ -1072,18 +1200,7 @@ impl CachedEntry {
         })
     }
 
-    /// Update/sets a value in the cache to the given value. Avoid using if possible:
-    /// stick to `Self::get` and `Self::get_many`.
-    pub(crate) async fn upsert(
-        self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<()> {
-        Self::upsert_many(&[self], exec).await
-    }
-
-    /// Update/sets values in the cache to the given values. Avoid using if possible:
-    /// stick to `Self::get` and `Self::get_many`.
-    pub(crate) async fn upsert_many(
+    async fn upsert_many(
         items: &[Self],
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {

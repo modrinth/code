@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
 import {
   HomeIcon,
@@ -21,11 +21,11 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
-import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
+import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS, isOffline, showLauncherLogsFolder } from '@/helpers/utils.js'
+import { isDev, getOS, showLauncherLogsFolder } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
@@ -49,7 +49,14 @@ const themeStore = useTheming()
 const urlModal = ref(null)
 const isLoading = ref(true)
 
-const offline = ref(false)
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
+
 const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
@@ -95,11 +102,6 @@ defineExpose({
     } else {
       document.getElementsByTagName('html')[0].classList.add('windows')
     }
-
-    offline.value = await isOffline()
-    await offline_listener((b) => {
-      offline.value = b
-    })
 
     await warning_listener((e) =>
       notificationsWrapper.value.addNotification({

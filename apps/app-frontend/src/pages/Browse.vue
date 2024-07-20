@@ -21,22 +21,17 @@ import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { useFetch } from '@/helpers/fetch.js'
-import {
-  check_installed,
-  get,
-  get as getInstance,
-  get_projects as getInstanceProjects,
-} from '@/helpers/profile.js'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { isOffline } from '@/helpers/utils'
-import { offline_listener } from '@/helpers/events'
-
 const router = useRouter()
 const route = useRoute()
 
-const offline = ref(await isOffline())
-const unlistenOffline = await offline_listener((b) => {
-  offline.value = b
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
 })
 
 const breadcrumbs = useBreadcrumbs()
@@ -527,8 +522,6 @@ const showLoaders = computed(
       instanceContext.value === null) ||
     ignoreInstanceLoaders.value,
 )
-
-onUnmounted(() => unlistenOffline())
 </script>
 
 <template>

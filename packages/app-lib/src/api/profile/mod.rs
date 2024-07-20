@@ -8,8 +8,8 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CachedEntry, Credentials, FileMetadata, JavaVersion, ProfileFile,
-    ProjectType, SideType,
+    CacheBehaviour, CachedEntry, Credentials, FileMetadata, JavaVersion,
+    ProfileFile, ProjectType, SideType,
 };
 
 use crate::util::fetch;
@@ -72,7 +72,7 @@ pub async fn get_projects(
 
     if let Some(profile) = get(path).await? {
         let files = profile
-            .get_projects(&state.pool, &state.fetch_semaphore)
+            .get_projects(None, &state.pool, &state.fetch_semaphore)
             .await?;
 
         Ok(files)
@@ -251,7 +251,11 @@ pub async fn update_all_projects(
 
         let state = State::get().await?;
         let keys = profile
-            .get_projects(&state.pool, &state.fetch_semaphore)
+            .get_projects(
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            )
             .await?
             .into_iter()
             .filter(|(_, project)| project.update_version_id.is_some())
@@ -309,7 +313,11 @@ pub async fn update_project(
     if let Some(profile) = get(profile_path).await? {
         let state = State::get().await?;
         if let Some((_, file)) = profile
-            .get_projects(&state.pool, &state.fetch_semaphore)
+            .get_projects(
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            )
             .await?
             .remove(project_path)
         {
@@ -551,14 +559,6 @@ pub async fn export_mrpack(
 pub async fn get_pack_export_candidates(
     profile_path: &str,
 ) -> crate::Result<Vec<String>> {
-    // First, get a dummy mrpack json for the files within
-    let profile: Profile = get(profile_path).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path
-        ))
-    })?;
-
     let mut path_list: Vec<String> = Vec::new();
 
     let profile_base_dir = get_full_path(profile_path).await?;
@@ -746,7 +746,7 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
         let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
 
         for (_, project) in profile
-            .get_projects(&state.pool, &state.fetch_semaphore)
+            .get_projects(None, &state.pool, &state.fetch_semaphore)
             .await?
         {
             if let FileMetadata::Modrinth { version_id, .. } = project.metadata
@@ -817,7 +817,11 @@ pub async fn create_mrpack_json(
 
     let state = State::get().await?;
     let projects = profile
-        .get_projects(&state.pool, &state.fetch_semaphore)
+        .get_projects(
+            Some(CacheBehaviour::MustRevalidate),
+            &state.pool,
+            &state.fetch_semaphore,
+        )
         .await?
         .into_iter()
         .filter_map(|(path, file)| match file.metadata {

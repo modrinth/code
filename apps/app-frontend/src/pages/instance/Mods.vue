@@ -409,18 +409,17 @@ import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
-import { $fetch } from 'ofetch'
 import {
   get_organization_many,
   get_project_many,
   get_team_many,
   get_version_many,
 } from '@/helpers/cache.js'
+import { profile_listener } from '@/helpers/events.js'
 
 const router = useRouter()
 
@@ -449,193 +448,115 @@ const props = defineProps({
   },
 })
 
-const profileProjects = await get_projects(props.instance.path)
-const fetchProjects = []
-const fetchVersions = []
-const selectionMap = ref(new Map())
-
-for (const [key, value] of Object.entries(profileProjects)) {
-  if (value.metadata.type === 'modrinth') {
-    fetchProjects.push(value.metadata.project_id)
-    fetchVersions.push(value.metadata.version_id)
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (
+    event.profile_path_id === props.instance.path &&
+    event.event === 'synced' &&
+    props.instance.install_stage !== 'pack_installing'
+  ) {
+    await initProjects()
   }
-}
+})
 
-const [modrinthProjects, modrinthVersions] = await Promise.all([
-  await get_project_many(fetchProjects).catch(handleError),
-  await get_version_many(fetchVersions).catch(handleError),
-])
-
-const [modrinthTeams, modrinthOrganizations] = await Promise.all([
-  await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError),
-  await get_organization_many(modrinthProjects.map((x) => x.organization).filter((x) => !!x)).catch(
-    handleError,
-  ),
-])
-
-const projects = ref([])
-for (const [path, file] of Object.entries(profileProjects)) {
-  if (file.metadata.type === 'modrinth') {
-    const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
-    const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
-    const org = project.organization
-      ? modrinthOrganizations.find((x) => x.id === project.organization)
-      : null
-
-    const team = modrinthTeams.find((x) => x[0].team_id === project.team)
-
-    let owner = org ? org.name : team.find((x) => x.is_owner).user.username
-
-    console.log(path)
-    console.log(file)
-    console.log(project)
-    console.log(version)
-    console.log(org)
-    console.log(team)
-
-    projects.value.push({
-      path,
-      name: project.title,
-      slug: project.slug,
-      author: owner,
-      version: version.version_number,
-      file_name: file.file_name,
-      icon: project.icon_url,
-      disabled: file.file_name.endsWith('.disabled'),
-      updateVersion: file.update_version_id,
-      outdated: !!file.update_version_id,
-      project_type: project.project_type,
-      id: project.id,
-    })
-
-    continue
-  }
-
-  if (file.metadata.type === 'inferred') {
-    projects.value.push({
-      path,
-      name: file.metadata.title ?? file.file_name,
-      author: file.metadata.authors[0],
-      version: file.metadata.version,
-      file_name: file.file_name,
-      icon: file.metadata.icon ? convertFileSrc(file.metadata.icon) : null,
-      disabled: file.disabled,
-      outdated: false,
-      project_type: file.metadata.project_type,
-    })
-  } else {
-    projects.value.push({
-      path,
-      name: file.file_name.replace('.disabled', ''),
-      author: '',
-      version: null,
-      file_name: file.file_name,
-      icon: null,
-      disabled: file.file_name.endsWith('.disabled'),
-      outdated: false,
-      project_type: null,
-    })
-  }
-}
-
-console.log(projects.value)
-
-const newSelectionMap = new Map()
-for (const project of projects.value) {
-  newSelectionMap.set(
-    project.path,
-    selectionMap.value.get(project.path) ??
-      selectionMap.value.get(project.path.slice(0, -9)) ??
-      selectionMap.value.get(project.path + '.disabled') ??
-      false,
-  )
-}
-selectionMap.value = newSelectionMap
+onUnmounted(() => {
+  unlistenProfiles()
+})
 
 const showingOptions = ref(false)
 const isPackLocked = computed(() => {
   return props.instance.linked_data && props.instance.linked_data.locked
 })
 const canUpdatePack = computed(() => {
-  if (!props.instance.linked_data) return false
-  return props.instance.linked_data.version_id !== props.instance.modrinth_update_version
+  if (!props.instance.linked_data || !props.versions) return false
+  return props.instance.linked_data.version_id !== props.versions[0].id
 })
 const exportModal = ref(null)
 
-const initProjects = (initInstance) => {
-  // projects.value = []
-  // if (!initInstance || !initInstance.projects) return
-  // for (const [path, project] of Object.entries(initInstance.projects)) {
-  //   if (project.metadata.type === 'modrinth' && !props.offline) {
-  //     let owner = project.metadata.members.find((x) => x.role === 'Owner')
-  //     projects.value.push({
-  //       path,
-  //       name: project.metadata.project.title,
-  //       slug: project.metadata.project.slug,
-  //       author: owner ? owner.user.username : null,
-  //       version: project.metadata.version.version_number,
-  //       file_name: project.file_name,
-  //       icon: project.metadata.project.icon_url,
-  //       updateVersion: project.metadata.update_version,
-  //       outdated: !!project.metadata.update_version,
-  //       project_type: project.metadata.project.project_type,
-  //       id: project.metadata.project.id,
-  //     })
-  //   } else if (project.metadata.type === 'inferred') {
-  //     projects.value.push({
-  //       path,
-  //       name: project.metadata.title ?? project.file_name,
-  //       author: project.metadata.authors[0],
-  //       version: project.metadata.version,
-  //       file_name: project.file_name,
-  //       icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-  //       disabled: project.disabled,
-  //       outdated: false,
-  //       project_type: project.metadata.project_type,
-  //     })
-  //   } else {
-  //     projects.value.push({
-  //       path,
-  //       name: project.file_name,
-  //       author: '',
-  //       version: null,
-  //       file_name: project.file_name,
-  //       icon: null,
-  //       disabled: project.disabled,
-  //       outdated: false,
-  //       project_type: null,
-  //     })
-  //   }
-  // }
-  //
-  // const newSelectionMap = new Map()
-  // for (const project of projects.value) {
-  //   newSelectionMap.set(
-  //     project.path,
-  //     selectionMap.value.get(project.path) ??
-  //       selectionMap.value.get(project.path.slice(0, -9)) ??
-  //       selectionMap.value.get(project.path + '.disabled') ??
-  //       false,
-  //   )
-  // }
-  // selectionMap.value = newSelectionMap
+const projects = ref([])
+const selectionMap = ref(new Map())
+
+const initProjects = async () => {
+  const newProjects = []
+
+  const profileProjects = await get_projects(props.instance.path)
+  const fetchProjects = []
+  const fetchVersions = []
+
+  for (const value of Object.values(profileProjects)) {
+    if (value.metadata.type === 'modrinth') {
+      fetchProjects.push(value.metadata.project_id)
+      fetchVersions.push(value.metadata.version_id)
+    }
+  }
+
+  const [modrinthProjects, modrinthVersions] = await Promise.all([
+    await get_project_many(fetchProjects).catch(handleError),
+    await get_version_many(fetchVersions).catch(handleError),
+  ])
+
+  const [modrinthTeams, modrinthOrganizations] = await Promise.all([
+    await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError),
+    await get_organization_many(
+      modrinthProjects.map((x) => x.organization).filter((x) => !!x),
+    ).catch(handleError),
+  ])
+
+  for (const [path, file] of Object.entries(profileProjects)) {
+    if (file.metadata.type === 'modrinth') {
+      const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
+      const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
+      const org = project.organization
+        ? modrinthOrganizations.find((x) => x.id === project.organization)
+        : null
+
+      const team = modrinthTeams.find((x) => x[0].team_id === project.team)
+
+      let owner = org ? org.name : team.find((x) => x.is_owner).user.username
+
+      newProjects.push({
+        path,
+        name: project.title,
+        slug: project.slug,
+        author: owner,
+        version: version.version_number,
+        file_name: file.file_name,
+        icon: project.icon_url,
+        disabled: file.file_name.endsWith('.disabled'),
+        updateVersion: file.update_version_id,
+        outdated: !!file.update_version_id,
+        project_type: project.project_type,
+        id: project.id,
+      })
+    } else {
+      newProjects.push({
+        path,
+        name: file.file_name.replace('.disabled', ''),
+        author: '',
+        version: null,
+        file_name: file.file_name,
+        icon: null,
+        disabled: file.file_name.endsWith('.disabled'),
+        outdated: false,
+        project_type: file.project_type,
+      })
+    }
+  }
+
+  projects.value = newProjects
+
+  const newSelectionMap = new Map()
+  for (const project of projects.value) {
+    newSelectionMap.set(
+      project.path,
+      selectionMap.value.get(project.path) ??
+        selectionMap.value.get(project.path.slice(0, -9)) ??
+        selectionMap.value.get(project.path + '.disabled') ??
+        false,
+    )
+  }
+  selectionMap.value = newSelectionMap
 }
-
-initProjects(props.instance)
-
-watch(
-  () => props.instance.projects,
-  () => {
-    initProjects(props.instance)
-  },
-)
-
-watch(
-  () => props.offline,
-  () => {
-    if (props.instance) initProjects(props.instance)
-  },
-)
+await initProjects()
 
 const modpackVersionModal = ref(null)
 const installing = computed(() => props.instance.install_stage !== 'installed')

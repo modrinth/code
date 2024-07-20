@@ -1,11 +1,11 @@
 //! Authentication flow interface
-use reqwest::Method;
-use serde::Deserialize;
-use std::path::PathBuf;
-
 use crate::event::emit::{emit_loading, init_loading};
 use crate::state::JavaVersion;
 use crate::util::fetch::{fetch_advanced, fetch_json};
+use dashmap::DashMap;
+use reqwest::Method;
+use serde::Deserialize;
+use std::path::PathBuf;
 
 use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
@@ -13,6 +13,18 @@ use crate::{
     util::jre::{self},
     LoadingBarType, State,
 };
+
+pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
+    let state = State::get().await?;
+
+    Ok(JavaVersion::get_all(&state.pool).await?)
+}
+
+pub async fn set_java_version(java_version: JavaVersion) -> crate::Result<()> {
+    let state = State::get().await?;
+    java_version.upsert(&state.pool).await?;
+    Ok(())
+}
 
 // Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
 // Allow higher allows for versions higher than the given version to be returned ('at least')

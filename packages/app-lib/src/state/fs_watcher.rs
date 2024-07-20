@@ -37,11 +37,15 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                         let mut found = false;
                         for component in e.path.components() {
                             if found {
-                                profile_path = Some(component.as_os_str().to_string_lossy());
+                                profile_path = Some(
+                                    component.as_os_str().to_string_lossy(),
+                                );
                                 break;
                             }
 
-                            if component.as_os_str() == crate::state::dirs::PROFILES_FOLDER_NAME {
+                            if component.as_os_str()
+                                == crate::state::dirs::PROFILES_FOLDER_NAME
+                            {
                                 found = true;
                             }
                         }
@@ -51,19 +55,20 @@ pub async fn init_watcher() -> crate::Result<FileWatcher> {
                                 .components()
                                 .any(|x| x.as_os_str() == "crash-reports")
                                 && e.path
-                                .extension()
-                                .map(|x| x == "txt")
-                                .unwrap_or(false)
+                                    .extension()
+                                    .map(|x| x == "txt")
+                                    .unwrap_or(false)
                             {
                                 crash_task(profile_path.to_string());
-                            } else if !visited_profiles.contains(&profile_path) {
+                            } else if !visited_profiles.contains(&profile_path)
+                            {
                                 let path = profile_path.to_string();
                                 tokio::spawn(async move {
                                     let _ = emit_profile(
                                         &path,
                                         ProfilePayloadType::Synced,
                                     )
-                                        .await;
+                                    .await;
                                 });
                                 visited_profiles.push(profile_path);
                             }

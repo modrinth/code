@@ -131,11 +131,11 @@ import {
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import { offline_listener, process_listener, profile_listener } from '@/helpers/events'
+import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
-import { isOffline, showProfileInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -162,7 +162,13 @@ breadcrumbs.setContext({
   query: route.query,
 })
 
-const offline = ref(await isOffline())
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
 
 const loadingBar = useLoading()
 
@@ -197,7 +203,7 @@ const checkProcess = async () => {
 
 // Get information on associated modrinth versions, if any
 const modrinthVersions = ref([])
-if (!(await isOffline()) && instance.value.linked_data && instance.value.linked_data.project_id) {
+if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
   modrinthVersions.value = await useFetch(
     `https://api.modrinth.com/v2/project/${instance.value.linked_data.project_id}/version`,
     'project',
@@ -295,14 +301,9 @@ const unlistenProcesses = await process_listener((e) => {
   if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
 
-const unlistenOffline = await offline_listener((b) => {
-  offline.value = b
-})
-
 onUnmounted(() => {
   unlistenProcesses()
   unlistenProfiles()
-  unlistenOffline()
 })
 </script>
 

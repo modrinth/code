@@ -200,7 +200,6 @@
         :project="data"
         :versions="versions"
         :members="members"
-        :dependencies="dependencies"
         :instance="instance"
         :install="install"
         :installed="installed"
@@ -256,7 +255,6 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import { isOffline } from '@/helpers/utils'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -274,15 +272,12 @@ const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
 const members = shallowRef([])
-const dependencies = shallowRef([])
 const categories = shallowRef([])
 const instance = ref(null)
 const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
-
-const offline = ref(await isOffline())
 
 async function fetchProjectData() {
   const project = await get_project(route.params.id).catch(handleError)
@@ -299,34 +294,6 @@ async function fetchProjectData() {
 
   versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
-  const projectIds = new Set()
-  const versionIds = new Set()
-
-  for (const version of versions.value) {
-    if (version.dependencies) {
-      for (const dependency of version.dependencies) {
-        if (dependency.project_id) {
-          projectIds.add(dependency.project_id)
-        }
-        if (dependency.version_id) {
-          versionIds.add(dependency.version_id)
-        }
-      }
-    }
-  }
-
-  if (projectIds.size > 0 || versionIds.size > 0) {
-    const [projectDeps, versionDeps] = await Promise.all([
-      get_project_many([...projectIds]),
-      get_version_many([...versionIds]),
-    ])
-
-    dependencies.value = {
-      projects: projectDeps,
-      versions: versionDeps,
-    }
-  }
-
   if (instanceProjects.value) {
     const installedFile = Object.values(instanceProjects.value).find(
       (x) => x.metadata.type === 'modrinth' && x.metadata.project_id === data.value.id,
@@ -339,7 +306,7 @@ async function fetchProjectData() {
   breadcrumbs.setName('Project', data.value.title)
 }
 
-if (!offline.value) await fetchProjectData()
+await fetchProjectData()
 
 watch(
   () => route.params.id,

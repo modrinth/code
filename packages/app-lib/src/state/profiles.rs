@@ -1,5 +1,5 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{CacheBehaviour, CachedEntry, FileMetadata};
+use crate::state::{CacheBehaviour, CachedEntry, CachedFile, FileMetadata};
 use crate::util;
 use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
@@ -135,6 +135,7 @@ pub struct ProfileFile {
     pub size: u64,
     pub metadata: FileMetadata,
     pub update_version_id: Option<String>,
+    pub project_type: ProjectType,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Copy)]
@@ -536,6 +537,7 @@ impl Profile {
 
     pub async fn get_projects<'a, E>(
         &self,
+        cache_behaviour: Option<CacheBehaviour>,
         exec: E,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<DashMap<String, ProfileFile>>
@@ -587,7 +589,7 @@ impl Profile {
             }
         }
 
-        let mut file_hashes = CachedEntry::get_file_hash_many(
+        let file_hashes = CachedEntry::get_file_hash_many(
             &keys.iter().map(|s| &*s.cache_key).collect::<Vec<_>>(),
             None,
             exec,
@@ -595,15 +597,7 @@ impl Profile {
         )
         .await?;
 
-        let file_info = CachedEntry::get_file_many(
-            &file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>(),
-            None,
-            exec,
-            fetch_semaphore,
-        )
-        .await?;
-
-        let file_updates = file_info
+        let file_updates = file_hashes
             .iter()
             .map(|x| {
                 format!(
@@ -614,62 +608,78 @@ impl Profile {
                 )
             })
             .collect::<Vec<_>>();
-        let file_updates = CachedEntry::get_file_update_many(
-            &file_updates.iter().map(|x| &**x).collect::<Vec<_>>(),
-            None,
-            exec,
-            fetch_semaphore,
-        )
-        .await?;
+
+        let file_hashes_ref =
+            file_hashes.iter().map(|x| &*x.hash).collect::<Vec<_>>();
+        let file_updates_ref =
+            file_updates.iter().map(|x| &**x).collect::<Vec<_>>();
+        let (mut file_info, file_updates) = tokio::try_join!(
+            CachedEntry::get_file_many(
+                &file_hashes_ref,
+                cache_behaviour,
+                exec,
+                fetch_semaphore,
+            ),
+            CachedEntry::get_file_update_many(
+                &file_updates_ref,
+                cache_behaviour,
+                exec,
+                fetch_semaphore,
+            )
+        )?;
 
         let files = DashMap::new();
 
-        for file in file_info {
-            if let Some(hash_index) =
-                file_hashes.iter().position(|x| x.hash == file.hash)
+        for hash in file_hashes {
+            let info_index = file_info.iter().position(|x| x.hash == hash.hash);
+            let file =
+                info_index.map(|x| file_info.remove(x)).unwrap_or_else(|| {
+                    CachedFile {
+                        hash: hash.hash.clone(),
+                        metadata: FileMetadata::Unknown,
+                    }
+                });
+
+            if let Some(initial_file_index) =
+                keys.iter().position(|x| x.file_name == hash.file_name)
             {
-                let hash = file_hashes.remove(hash_index);
+                let initial_file = keys.remove(initial_file_index);
 
-                if let Some(initial_file_index) =
-                    keys.iter().position(|x| x.file_name == hash.file_name)
+                let path = format!(
+                    "{}/{}",
+                    initial_file.project_type.get_folder(),
+                    initial_file.file_name
+                );
+
+                let update_version_id = if let Some(update) = file_updates
+                    .iter()
+                    .find(|x| x.hash == hash.hash)
+                    .and_then(|x| x.update_version_id.as_ref())
                 {
-                    let initial_file = keys.remove(initial_file_index);
-
-                    let path = format!(
-                        "{}/{}",
-                        initial_file.project_type.get_folder(),
-                        initial_file.file_name
-                    );
-
-                    let update_version_id = if let Some(update) = file_updates
-                        .iter()
-                        .find(|x| x.hash == hash.hash)
-                        .and_then(|x| x.update_version_id.as_ref())
+                    if let FileMetadata::Modrinth { version_id, .. } =
+                        &file.metadata
                     {
-                        if let FileMetadata::Modrinth { version_id, .. } =
-                            &file.metadata
-                        {
-                            if version_id != update {
-                                Some(update.clone())
-                            } else {
-                                None
-                            }
+                        if version_id != update {
+                            Some(update.clone())
                         } else {
                             None
                         }
                     } else {
                         None
-                    };
+                    }
+                } else {
+                    None
+                };
 
-                    let file = ProfileFile {
-                        update_version_id,
-                        hash: hash.hash,
-                        file_name: initial_file.file_name,
-                        size: initial_file.size,
-                        metadata: file.metadata,
-                    };
-                    files.insert(path, file);
-                }
+                let file = ProfileFile {
+                    update_version_id,
+                    hash: hash.hash,
+                    file_name: initial_file.file_name,
+                    size: initial_file.size,
+                    metadata: file.metadata,
+                    project_type: initial_file.project_type,
+                };
+                files.insert(path, file);
             }
         }
 

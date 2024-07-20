@@ -644,13 +644,10 @@ pub async fn launch_minecraft(
         }
     }
 
-    if !*state.offline.read().await {
-        // Add game played to discord rich presence
-        let _ = state
-            .discord_rpc
-            .set_activity(&format!("Playing {}", profile.name), true)
-            .await;
-    }
+    let _ = state
+        .discord_rpc
+        .set_activity(&format!("Playing {}", profile.name), true)
+        .await;
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes

@@ -8,7 +8,7 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use std::time::{self, Duration};
+use std::time::{self};
 use tokio::sync::Semaphore;
 use tokio::{fs::File, io::AsyncWriteExt};
 
@@ -189,18 +189,6 @@ pub async fn fetch_mirrors(
     }
 
     unreachable!()
-}
-
-/// Using labrinth API, checks if an internet response can be found, with a timeout in seconds
-#[tracing::instrument]
-#[theseus_macros::debug_pin]
-pub async fn check_internet(timeout: u64) -> bool {
-    REQWEST_CLIENT
-        .get("https://launcher-files.modrinth.com/detect.txt")
-        .timeout(Duration::from_secs(timeout))
-        .send()
-        .await
-        .is_ok()
 }
 
 /// Posts a JSON to a URL

@@ -1,12 +1,11 @@
 //! Theseus state management system
-use crate::event::emit::{emit_loading, emit_offline, init_loading_unsafe};
+use crate::event::emit::{emit_loading, init_loading_unsafe};
 
 use crate::event::LoadingBarType;
 use crate::loading_join;
 
-use crate::util::fetch::{self, FetchSemaphore, IoSemaphore};
+use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
-use std::time::Duration;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
 use crate::state::fs_watcher::FileWatcher;
@@ -43,22 +42,15 @@ mod mr_auth;
 
 pub use self::mr_auth::*;
 
-// TODO: possible memcache for cache entries to improve perf
-// TODO: cache children too (ex: version file req should cache version too)
-// TODO: Java Version API
+// TODO: Cache home page queries?
 // TODO: UI: Profile Options
-// TODO: UI: Profile Content Fully Integrate (and improve perf)
 // TODO: UI: Settings Java Versions
 // TODO: pass credentials to modrinth cdn
-// TODO: get rid of unnecessary locking + atomics in discord
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
-    /// Whether or not the launcher is currently operating in 'offline mode'
-    pub offline: RwLock<bool>,
-
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
 
@@ -132,8 +124,6 @@ impl State {
             IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
         emit_loading(&loading_bar, 10.0, None).await?;
 
-        let is_offline = !fetch::check_internet(3).await;
-
         let users_fut = MinecraftAuthStore::init(&directories, &io_semaphore);
         let creds_fut = CredentialsStore::init(&directories, &io_semaphore);
         // Launcher data
@@ -143,8 +133,8 @@ impl State {
             creds_fut,
         }?;
 
-        let discord_rpc = DiscordGuard::init(is_offline).await?;
-        if settings.discord_rpc && !is_offline {
+        let discord_rpc = DiscordGuard::init().await?;
+        if settings.discord_rpc {
             // Add default Idling to discord rich presence
             // Force add to avoid recursion
             let _ = discord_rpc.force_set_activity("Idling...", true).await;
@@ -155,13 +145,9 @@ impl State {
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
 
-        // Starts a loop of checking if we are online, and updating
-        Self::offine_check_loop();
-
         emit_loading(&loading_bar, 10.0, None).await?;
 
         Ok(Arc::new(Self {
-            offline: RwLock::new(is_offline),
             directories,
             fetch_semaphore,
             io_semaphore,
@@ -175,46 +161,12 @@ impl State {
         }))
     }
 
-    /// Starts a loop of checking if we are online, and updating
-    pub fn offine_check_loop() {
-        tokio::task::spawn(async {
-            loop {
-                let state = Self::get().await;
-                if let Ok(state) = state {
-                    let _ = state.refresh_offline().await;
-                }
-
-                // Wait 5 seconds
-                tokio::time::sleep(Duration::from_secs(5)).await;
-            }
-        });
-    }
-
     /// Updates state with data from the web, if we are online
     pub fn update() {
         tokio::task::spawn(async {
-            if let Ok(state) = crate::State::get().await {
-                if !*state.offline.read().await {
-                    let res6 = CredentialsStore::update_creds();
+            let res6 = CredentialsStore::update_creds();
 
-                    let _ = res6.await;
-                }
-            }
+            let _ = res6.await;
         });
-    }
-
-    /// Refreshes whether or not the launcher should be offline, by whether or not there is an internet connection
-    pub async fn refresh_offline(&self) -> crate::Result<()> {
-        let is_online = fetch::check_internet(3).await;
-
-        let mut offline = self.offline.write().await;
-
-        if *offline != is_online {
-            return Ok(());
-        }
-
-        emit_offline(!is_online).await?;
-        *offline = !is_online;
-        Ok(())
     }
 }

@@ -1,3 +1,4 @@
+use crate::state::CacheBehaviour;
 use crate::{
     event::{
         emit::{emit_profile, init_loading},
@@ -67,7 +68,11 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
     // remove relevant projects and not things like save files
     let state = crate::State::get().await?;
     let projects_map = profile
-        .get_projects(&state.pool, &state.fetch_semaphore)
+        .get_projects(
+            Some(CacheBehaviour::MustRevalidate),
+            &state.pool,
+            &state.fetch_semaphore,
+        )
         .await?;
 
     for (file, _) in projects_map {

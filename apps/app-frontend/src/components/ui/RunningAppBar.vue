@@ -15,7 +15,7 @@
     </Button>
     <div v-if="offline" class="status">
       <span class="circle stopped" />
-      <div class="running-text clickable" @click="refreshInternet()">
+      <div class="running-text">
         <span> Offline </span>
       </div>
     </div>
@@ -111,10 +111,9 @@ import {
   kill_by_uuid as killProfile,
   get_uuids_by_profile_path as getProfileProcesses,
 } from '@/helpers/process'
-import { loading_listener, process_listener, offline_listener } from '@/helpers/events'
+import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
-import { refreshOffline, isOffline } from '@/helpers/utils.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
@@ -132,12 +131,12 @@ const showProfiles = ref(false)
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
 const selectedProfile = ref(currentProcesses.value[0])
 
-const offline = ref(await isOffline().catch(handleError))
-const refreshInternet = async () => {
-  offline.value = await refreshOffline().catch(handleError)
-}
-const unlistenRefresh = await offline_listener(async (b) => {
-  offline.value = b
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
 })
 
 const unlistenProcess = await process_listener(async () => {
@@ -265,7 +264,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutsideProfile)
   unlistenProcess()
   unlistenLoading()
-  unlistenRefresh()
 })
 </script>
 

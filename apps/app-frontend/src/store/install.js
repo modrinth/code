@@ -8,10 +8,10 @@ import {
   remove_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import { useFetch } from '@/helpers/fetch.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { mixpanel_track } from '@/helpers/mixpanel.js'
+import dayjs from 'dayjs'
 
 export const useInstall = defineStore('installStore', {
   state: () => ({
@@ -45,7 +45,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
   const project = await get_project(projectId).catch(handleError)
 
   if (project.project_type === 'modpack') {
-    const version = versionId ?? project.versions[0]
+    const version = versionId ?? project.versions[project.versions.length - 1]
     const packs = Object.values(await list(true).catch(handleError))
 
     if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
@@ -65,17 +65,21 @@ export const install = async (projectId, versionId, instancePath, source, callba
     }
   } else {
     if (instancePath) {
-      const [instance, instanceProjects, projectVersions] = await Promise.all([
+      const [instance, instanceProjects, versions] = await Promise.all([
         await get(instancePath).catch(handleError),
         await get_projects(instancePath).catch(handleError),
         await get_version_many(project.versions),
       ])
 
+      const projectVersions = versions.sort(
+        (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+      )
+
       let version
       if (versionId) {
         version = projectVersions.find((x) => x.id === versionId)
       } else {
-        projectVersions.find(
+        version = projectVersions.find(
           (v) =>
             v.game_versions.includes(instance.game_version) &&
             (project.project_type === 'mod'
@@ -119,7 +123,9 @@ export const install = async (projectId, versionId, instancePath, source, callba
         install.showIncompatibilityWarningModal(instance, project, projectVersions, callback)
       }
     } else {
-      const versions = await get_version_many(project.versions).catch(handleError)
+      const versions = (await get_version_many(project.versions).catch(handleError)).sort(
+        (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+      )
 
       const install = useInstall()
       install.showModInstallModal(project, versions, callback)
@@ -158,10 +164,13 @@ export const installVersionDependencies = async (profile, version) => {
         (await check_installed(profile.path, dep.project_id).catch(handleError))
       )
         continue
-      const depVersions = await useFetch(
-        `https://api.modrinth.com/v2/project/${dep.project_id}/version`,
-        'dependency versions',
+
+      const depProject = await get_project(dep.project_id).catch(handleError)
+
+      const depVersions = (await get_version_many(depProject.versions).catch(handleError)).sort(
+        (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
       )
+
       const latest = depVersions.find(
         (v) => v.game_versions.includes(profile.game_version) && v.loaders.includes(profile.loader),
       )

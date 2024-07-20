@@ -1,7 +1,7 @@
 use crate::state::DirectoryInfo;
 use sqlx::migrate::MigrateDatabase;
 use sqlx::sqlite::SqlitePoolOptions;
-use sqlx::{Connection, Pool, Sqlite};
+use sqlx::{Pool, Sqlite};
 
 pub(crate) async fn connect() -> crate::Result<Pool<Sqlite>> {
     let uri =

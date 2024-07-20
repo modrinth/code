@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use theseus::{
     handler,
     prelude::{CommandPayload, DirectoryInfo},
-    State,
 };
 
 use crate::api::Result;
@@ -16,9 +15,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             show_in_folder,
             show_launcher_logs_folder,
             progress_bars_list,
-            get_opening_command,
-            is_offline,
-            refresh_offline
+            get_opening_command
         ])
         .build()
 }
@@ -155,21 +152,4 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
-}
-
-/// Check if theseus is currently in offline mode, without a refresh attempt
-#[tauri::command]
-pub async fn is_offline() -> Result<bool> {
-    let state = State::get().await?;
-    let offline = *state.offline.read().await;
-    Ok(offline)
-}
-
-/// Refreshes whether or not theseus is in offline mode, and returns the new value
-#[tauri::command]
-pub async fn refresh_offline() -> Result<bool> {
-    let state = State::get().await?;
-    state.refresh_offline().await?;
-    let offline = *state.offline.read().await;
-    Ok(offline)
 }

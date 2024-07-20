@@ -51,9 +51,15 @@ const toTransparent = computed(() => {
 const install = async (e) => {
   e?.stopPropagation()
   installing.value = true
-  await installVersion(props.project.project_id, null, props.instance.path, 'ProjectCard', () => {
-    installing.value = false
-  })
+  await installVersion(
+    props.project.project_id,
+    null,
+    props.instance ? props.instance.path : null,
+    'ProjectCard',
+    () => {
+      installing.value = false
+    },
+  )
 }
 </script>
 

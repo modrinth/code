@@ -59,7 +59,7 @@ dunce = "1.0.3"
 
 whoami = "1.4.0"
 
-discord-rich-presence = "0.2.3"
+discord-rich-presence = "0.2.4"
 
 p256 = { version = "0.13.2", features = ["ecdsa"] }
 rand = "0.8"

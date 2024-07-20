@@ -1,13 +1,12 @@
-use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    LinkedData, ProfileInstallStage, Project as ModrinthProject, SideType,
-    Version as ModrinthVersion,
+    CachedEntry, LinkedData, ProfileInstallStage,
+    SideType
 };
 use crate::util::fetch::{
-    fetch, fetch_advanced, fetch_json, write_cached_icon,
+    fetch, fetch_advanced, write_cached_icon,
 };
 use crate::util::io;
 use crate::State;
@@ -215,14 +214,18 @@ pub async fn generate_pack_from_version_id(
 
     emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
     let creds = state.credentials.read().await;
-    let version: ModrinthVersion = fetch_json(
-        Method::GET,
-        &format!("{}version/{}", MODRINTH_API_URL, version_id),
+    let version = CachedEntry::get_version(
+        &version_id,
         None,
-        None,
+        &state.pool,
         &state.fetch_semaphore,
     )
-    .await?;
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Invalid version ID specified!".to_string(),
+        )
+    })?;
     emit_loading(&loading_bar, 10.0, None).await?;
 
     let (url, hash) =
@@ -252,14 +255,18 @@ pub async fn generate_pack_from_version_id(
     .await?;
     emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
 
-    let project: ModrinthProject = fetch_json(
-        Method::GET,
-        &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
+    let project = CachedEntry::get_project(
+        &version.project_id,
         None,
-        None,
+        &state.pool,
         &state.fetch_semaphore,
     )
-    .await?;
+    .await?
+    .ok_or_else(|| {
+        crate::ErrorKind::InputError(
+            "Invalid project ID specified!".to_string(),
+        )
+    })?;
 
     emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
     let icon = if let Some(icon_url) = project.icon_url {

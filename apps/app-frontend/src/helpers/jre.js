@@ -14,6 +14,14 @@ JavaVersion {
 
 */
 
+export async function get_java_versions() {
+  return await invoke('plugin:jre|get_java_versions')
+}
+
+export async function set_java_version(version) {
+  return await invoke('plugin:jre|set_java_version', { version })
+}
+
 // Finds all the installation of Java 7, if it exists
 // Returns [JavaVersion]
 export async function find_filtered_jres(version) {

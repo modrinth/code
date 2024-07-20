@@ -228,22 +228,6 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
     Ok(())
 }
 
-// emit_offline(bool)
-// This is used to emit an event to the frontend that the app is offline after a refresh (or online)
-#[allow(dead_code)]
-#[allow(unused_variables)]
-pub async fn emit_offline(offline: bool) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all("offline", offline)
-            .map_err(EventError::from)?;
-    }
-    Ok(())
-}
-
 // emit_command(CommandPayload::Something { something })
 // ie: installing a pack, opening an .mrpack, etc
 // Generally used for url deep links and file opens that we we want to handle in the frontend

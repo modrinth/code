@@ -1,4 +1,3 @@
-use crate::config::MODRINTH_API_URL;
 use crate::event::emit::{
     emit_loading, init_or_edit_loading, loading_try_for_each_concurrent,
 };
@@ -6,15 +5,14 @@ use crate::event::LoadingBarType;
 use crate::pack::install_from::{
     set_profile_information, EnvType, PackFile, PackFileHash,
 };
-use crate::state::{ProfileInstallStage, SideType, Version as ModrinthVersion};
-use crate::util::fetch::{fetch_json, fetch_mirrors, write};
+use crate::state::{
+    CacheBehaviour, CachedEntry, FileMetadata, ProfileInstallStage, SideType,
+};
+use crate::util::fetch::{fetch_mirrors, write};
 use crate::util::io;
 use crate::{profile, State};
 use async_zip::base::read::seek::ZipFileReader;
-use reqwest::Method;
-use serde_json::json;
 
-use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
 
@@ -336,37 +334,57 @@ pub async fn remove_all_related_files(
         let all_hashes = pack
             .files
             .iter()
-            .filter_map(|f| Some(f.hashes.get(&PackFileHash::Sha512)?.clone()))
+            .filter_map(|f| Some(f.hashes.get(&PackFileHash::Sha1)?.clone()))
             .collect::<Vec<_>>();
-        let creds = state.credentials.read().await;
 
         // First, get project info by hash
-        let files_url = format!("{}version_files", MODRINTH_API_URL);
-
-        let hash_projects = fetch_json::<HashMap<String, ModrinthVersion>>(
-            Method::POST,
-            &files_url,
+        let file_infos = CachedEntry::get_file_many(
+            &all_hashes.iter().map(|x| &**x).collect::<Vec<_>>(),
             None,
-            Some(json!({
-                "hashes": all_hashes,
-                "algorithm": "sha512",
-            })),
+            &state.pool,
             &state.fetch_semaphore,
         )
         .await?;
-        let to_remove = hash_projects
-            .into_values()
-            .map(|p| p.project_id)
+
+        let to_remove = file_infos
+            .into_iter()
+            .filter_map(|p| {
+                if let FileMetadata::Modrinth { project_id, .. } = p.metadata {
+                    Some(project_id)
+                } else {
+                    None
+                }
+            })
             .collect::<Vec<_>>();
+
         let profile = profile::get(&profile_path).await?.ok_or_else(|| {
             crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
         })?;
+        let profile_full_path = profile::get_full_path(&profile_path).await?;
+
+        for (file_path, project) in profile
+            .get_projects(
+                Some(CacheBehaviour::MustRevalidate),
+                &state.pool,
+                &state.fetch_semaphore,
+            )
+            .await?
+        {
+            if let FileMetadata::Modrinth { project_id, .. } = &project.metadata
+            {
+                if to_remove.contains(&project_id) {
+                    let path = profile_full_path.join(file_path);
+                    if path.exists() {
+                        io::remove_file(&path).await?;
+                    }
+                }
+            }
+        }
 
         // Iterate over all Modrinth project file paths in the json, and remove them
         // (There should be few, but this removes any files the .mrpack intended as Modrinth projects but were unrecognized)
         for file in pack.files {
-            let path: PathBuf =
-                profile::get_full_path(&profile_path).await?.join(file.path);
+            let path: PathBuf = profile_full_path.join(file.path);
             if path.exists() {
                 io::remove_file(&path).await?;
             }

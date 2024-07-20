@@ -3,12 +3,11 @@ import { ref, onUnmounted, shallowRef, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
-import { offline_listener, profile_listener } from '@/helpers/events'
+import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
-import { isOffline } from '@/helpers/utils'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -21,7 +20,13 @@ breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
 const recentInstances = shallowRef([])
 
-const offline = ref(await isOffline())
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
 
 const getInstances = async () => {
   const profiles = await list(true).catch(handleError)
@@ -74,13 +79,6 @@ const unlistenProfile = await profile_listener(async (e) => {
   }
 })
 
-const unlistenOffline = await offline_listener(async (b) => {
-  offline.value = b
-  if (!b) {
-    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-  }
-})
-
 // computed sums of recentInstances, featuredModpacks, featuredMods, treating them as arrays if they are not
 const total = computed(() => {
   return (
@@ -92,7 +90,6 @@ const total = computed(() => {
 
 onUnmounted(() => {
   unlistenProfile()
-  unlistenOffline()
 })
 </script>
 
