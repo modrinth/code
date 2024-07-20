@@ -488,6 +488,14 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   refreshSearch(),
 ])
 
+const filteredLoaders = computed(() => {
+  return loaders.value.filter((loader) => {
+    return projectType.value === 'mod' || projectType.value === 'modpack'
+      ? loader.supported_project_types[0] === 'mod'
+      : loader.supported_project_types[0] === projectType.value
+  })
+})
+
 const selectableProjectTypes = computed(() => {
   const values = [
     { label: 'Shaders', href: `/browse/shader` },
@@ -518,14 +526,8 @@ const selectableProjectTypes = computed(() => {
 const showVersions = computed(
   () => instanceContext.value === null || ignoreInstanceGameVersions.value,
 )
-const showLoaders = computed(
-  () =>
-    (projectType.value !== 'datapack' &&
-      projectType.value !== 'resourcepack' &&
-      projectType.value !== 'shader' &&
-      instanceContext.value === null) ||
-    ignoreInstanceLoaders.value,
-)
+
+const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.value))
 
 onUnmounted(() => unlistenOffline())
 </script>
@@ -596,17 +598,9 @@ onUnmounted(() => unlistenOffline())
         >
           <ClearIcon /> Clear filters
         </Button>
-        <div v-if="showLoaders" class="loaders">
+        <div v-if="isModProject || projectType === 'shader'" class="loaders">
           <h2>Loaders</h2>
-          <div
-            v-for="loader in loaders.filter(
-              (l) =>
-                (projectType !== 'mod' && l.supported_project_types?.includes(projectType)) ||
-                (projectType === 'mod' &&
-                  ['fabric', 'forge', 'quilt', 'neoforge'].includes(l.name)),
-            )"
-            :key="loader"
-          >
+          <div v-for="loader in filteredLoaders" :key="loader">
             <SearchFilter
               :active-filters="orFacets"
               :icon="loader.icon"
@@ -656,7 +650,7 @@ onUnmounted(() => unlistenOffline())
             />
           </div>
         </div>
-        <div v-if="projectType !== 'datapack'" class="environment">
+        <div v-if="isModProject" class="environment">
           <h2>Environments</h2>
           <SearchFilter
             :active-filters="selectedEnvironments"

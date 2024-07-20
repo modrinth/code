@@ -318,9 +318,7 @@ onMounted(() => {
   }
 }
 
-:deep {
-  .checkbox {
-    border: none;
-  }
+:deep(.checkbox) {
+  border: none;
 }
 </style>
