@@ -555,14 +555,12 @@ async function signInAfter() {
   margin: 1rem 0;
 }
 
-:deep {
-  .login-screen-modal {
-    .modal-container .modal-body {
-      width: auto;
+:deep(.login-screen-modal) {
+  .modal-container .modal-body {
+    width: auto;
 
-      .content {
-        background: none;
-      }
+    .content {
+      background: none;
     }
   }
 }

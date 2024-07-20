@@ -71,7 +71,7 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(path: PathBuf) -> Result<()> {
+pub fn show_in_folder(mut path: PathBuf) -> Result<()> {
     {
         #[cfg(target_os = "windows")]
         {
@@ -90,19 +90,26 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
         {
             use std::fs::metadata;
 
-            if path.to_string_lossy().to_string().contains(',') {
-                // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
-                let new_path = match metadata(&path)?.is_dir() {
-                    true => path,
-                    false => {
-                        let mut path2 = path.clone();
-                        path2.pop();
-                        path2
-                    }
-                };
-                Command::new("xdg-open").arg(&new_path).spawn()?;
-            } else {
+            let path_string = path.to_string_lossy().to_string();
+
+            if metadata(&path)?.is_dir() {
                 Command::new("xdg-open").arg(&path).spawn()?;
+            } else if path_string.contains(',') {
+                // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
+                path.pop();
+                Command::new("xdg-open").arg(&path).spawn()?;
+            } else {
+                Command::new("dbus-send")
+                    .args([
+                        "--session",
+                        "--dest=org.freedesktop.FileManager1",
+                        "--type=method_call",
+                        "/org/freedesktop/FileManager1",
+                        "org.freedesktop.FileManager1.ShowItems",
+                        format!("array:string:file://{}", path_string).as_str(),
+                        "string:\"\"",
+                    ])
+                    .spawn()?;
             }
         }
 

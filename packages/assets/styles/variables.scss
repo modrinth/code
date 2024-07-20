@@ -15,6 +15,9 @@ html {
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
   --radius-max: 999999999px;
+
+  --color-tooltip-text: var(--color-base);
+  --color-tooltip-bg: var(--color-button-bg);
 }
 
 .light-mode,
@@ -23,6 +26,7 @@ html {
   --color-raised-bg: #ffffff;
   --color-super-raised-bg: #e9e9e9;
   --color-button-bg: hsl(220, 13%, 91%);
+  --color-scrollbar: #96a2b0;
 
   --color-base: hsl(221, 39%, 11%);
   --color-secondary: #6b7280;
@@ -40,9 +44,9 @@ html {
   --color-brand-highlight: rgba(0, 175, 92, 0.25);
   --color-brand-shadow: rgba(0, 175, 92, 0.7);
 
-  --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
-  --shadow-inset: inset 0px -2px 2px hsla(221, 39%, 11%, 0.05);
-  --shadow-inset-sm: inset 0px -1px 2px hsla(221, 39%, 11%, 0.15);
+  --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 91%, 0.1);
+  --shadow-inset: inset 0px -2px 2px hsla(221, 39%, 91%, 0.05);
+  --shadow-inset-sm: inset 0px -1px 2px hsla(221, 39%, 91%, 0.15);
 
   --shadow-raised-lg: 0px 2px 4px hsla(221, 39%, 11%, 0.2);
   --shadow-raised: 0.3px 0.5px 0.6px hsl(var(--shadow-color) / 0.15),
@@ -52,9 +56,6 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
-
-  --color-tooltip-text: var(--color-accent-contrast);
-  --color-tooltip-bg: var(--color-base);
 
   --color-ad: #d6e6f9;
   --color-ad-raised: #b1c8e4;
@@ -68,6 +69,7 @@ html {
   --color-raised-bg: #26292f;
   --color-super-raised-bg: #40434a;
   --color-button-bg: hsl(222, 13%, 30%);
+  --color-scrollbar: var(--color-button-bg);
 
   --color-base: var(--dark-color-base);
   --color-secondary: #96a2b0;
@@ -95,9 +97,6 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
-
-  --color-tooltip-text: var(--color-base);
-  --color-tooltip-bg: var(--color-button-bg);
 
   --color-ad: #1f324a;
   --color-ad-raised: #2e4057;

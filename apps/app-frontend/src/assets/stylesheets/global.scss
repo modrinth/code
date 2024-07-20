@@ -100,13 +100,13 @@ input {
 
 * {
   scrollbar-width: auto;
-  scrollbar-color: var(--color-button-bg) var(--color-bg);
+  scrollbar-color: var(--color-scrollbar) var(--color-bg);
 }
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
   width: var(--gap-md);
-  border: 3px solid var(--color-bg);
+  border: 3px solid var(--color-scrollbar);
 }
 
 *::-webkit-scrollbar-track {
@@ -115,7 +115,7 @@ input {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--color-button-bg);
+  background-color: var(--color-scrollbar);
   border-radius: var(--radius-lg);
   border: 3px solid var(--color-bg);
 }

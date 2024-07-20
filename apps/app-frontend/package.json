@@ -25,7 +25,7 @@
     "vue": "^3.4.21",
     "vue-multiselect": "3.0.0-beta.3",
     "vue-router": "4.3.0",
-    "vue-virtual-scroller": "2.0.0-beta.8"
+    "vue-typed-virtual-list": "^1.0.10"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.11",

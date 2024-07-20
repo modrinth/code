@@ -287,6 +287,7 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
         .arg("-cp")
         .arg(file_path.parent().unwrap())
         .arg("JavaInfo")
+        .env_remove("_JAVA_OPTIONS")
         .output()
         .ok()?;
 

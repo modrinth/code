@@ -30,6 +30,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  openInNewTab: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const shareModal = ref(null)
@@ -90,6 +94,8 @@ const sendEmail = computed(
     &body=${encodeURIComponent(content.value)}`,
 )
 
+const targetParameter = computed(() => (props.openInNewTab ? '_blank' : '_self'))
+
 const sendTweet = computed(
   () => `https://twitter.com/intent/tweet?text=${encodeURIComponent(content.value)}`,
 )
@@ -137,14 +143,19 @@ defineExpose({
           <Button v-if="canShare" v-tooltip="'Share'" icon-only @click="share">
             <ShareIcon />
           </Button>
-          <a v-tooltip="'Send as an email'" class="btn icon-only" target="_blank" :href="sendEmail">
+          <a
+            v-tooltip="'Send as an email'"
+            class="btn icon-only"
+            :href="sendEmail"
+            :target="targetParameter"
+          >
             <MailIcon />
           </a>
           <a
             v-if="link"
             v-tooltip="'Open link in browser'"
             class="btn icon-only"
-            target="_blank"
+            :target="targetParameter"
             :href="url"
           >
             <GlobeIcon />
@@ -152,7 +163,7 @@ defineExpose({
           <a
             v-tooltip="'Toot about it'"
             class="btn mastodon icon-only"
-            target="_blank"
+            :target="targetParameter"
             :href="sendToot"
           >
             <MastodonIcon />
@@ -160,7 +171,7 @@ defineExpose({
           <a
             v-tooltip="'Tweet about it'"
             class="btn twitter icon-only"
-            target="_blank"
+            :target="targetParameter"
             :href="sendTweet"
           >
             <TwitterIcon />
@@ -168,7 +179,7 @@ defineExpose({
           <a
             v-tooltip="'Share on Reddit'"
             class="btn reddit icon-only"
-            target="_blank"
+            :target="targetParameter"
             :href="postOnReddit"
           >
             <RedditIcon />

@@ -760,6 +760,7 @@ impl Profile {
 
             if archive.by_name("fabric.mod.json").is_ok()
                 || archive.by_name("quilt.mod.json").is_ok()
+                || archive.by_name("META-INF/neoforge.mods.toml").is_ok()
                 || archive.by_name("META-INF/mods.toml").is_ok()
                 || archive.by_name("mcmod.info").is_ok()
             {

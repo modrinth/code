@@ -322,6 +322,7 @@
     ref="shareModal"
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
+    :open-in-new-tab="false"
   />
   <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
   <ModpackVersionModal
@@ -1139,6 +1140,7 @@ onUnmounted(() => {
   }
 }
 </style>
+
 <style lang="scss">
 .updating-indicator {
   height: 2.25rem !important;
@@ -1148,10 +1150,6 @@ onUnmounted(() => {
     height: 1.25rem !important;
     width: 1.25rem !important;
   }
-}
-
-.v-popper--theme-tooltip .v-popper__inner {
-  background: #fff !important;
 }
 
 .select-checkbox {
