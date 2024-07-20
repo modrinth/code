@@ -20,13 +20,11 @@ export default defineNuxtRouteMiddleware(async (_to, from) => {
     }
   }
 
-  const redirect = encodeURIComponent(url.pathname + url.search);
-
   return await navigateTo(
     {
       path: "/auth/sign-in",
       query: {
-        redirect,
+        redirect: `${url.pathname}${url.search}`,
         ...extractedParams,
       },
     },
