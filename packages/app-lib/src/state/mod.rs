@@ -43,8 +43,6 @@ mod mr_auth;
 pub use self::mr_auth::*;
 
 // TODO: Cache home page queries?
-// TODO: UI: Profile Options
-// TODO: UI: Settings Java Versions
 // TODO: pass credentials to modrinth cdn
 
 // Global state

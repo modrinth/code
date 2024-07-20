@@ -4,7 +4,7 @@ import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, UpdatedIcon } from '@
 import { Card, Slider, DropdownSelect, Toggle, Modal, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
 import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
-import { get_max_memory } from '@/helpers/jre'
+import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
@@ -83,6 +83,19 @@ watch(
   },
   { deep: true },
 )
+
+const javaVersions = ref(await get_java_versions().catch(handleError))
+async function updateJavaVersion(version) {
+  if (version?.path === '') {
+    version.path = undefined
+  }
+
+  if (version?.path) {
+    version.path = version.path.replace('java.exe', 'javaw.exe')
+  }
+
+  await set_java_version(version).catch(handleError)
+}
 
 const credentials = ref(await getCreds().catch(handleError))
 const loginScreenModal = ref()
@@ -368,18 +381,17 @@ async function signInAfter() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
-      <!--      <label for="java-21">-->
-      <!--        <span class="label__title">Java 21 location</span>-->
-      <!--      </label>-->
-      <!--      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_21" :version="21" />-->
-      <!--      <label for="java-17">-->
-      <!--        <span class="label__title">Java 17 location</span>-->
-      <!--      </label>-->
-      <!--      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_17" :version="17" />-->
-      <!--      <label for="java-8">-->
-      <!--        <span class="label__title">Java 8 location</span>-->
-      <!--      </label>-->
-      <!--      <JavaSelector id="java-8" v-model="settings.java_globals.JAVA_8" :version="8" />-->
+      <template v-for="version in [21, 17, 8]">
+        <label :for="'java-' + version">
+          <span class="label__title">Java {{ version }} location</span>
+        </label>
+        <JavaSelector
+          :id="'java-selector-' + version"
+          v-model="javaVersions[version]"
+          :version="version"
+          @update:model-value="updateJavaVersion"
+        />
+      </template>
       <hr class="card-divider" />
       <label for="java-args">
         <span class="label__title">Java arguments</span>

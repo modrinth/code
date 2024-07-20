@@ -18,8 +18,8 @@ export async function get_java_versions() {
   return await invoke('plugin:jre|get_java_versions')
 }
 
-export async function set_java_version(version) {
-  return await invoke('plugin:jre|set_java_version', { version })
+export async function set_java_version(javaVersion) {
+  return await invoke('plugin:jre|set_java_version', { javaVersion })
 }
 
 // Finds all the installation of Java 7, if it exists

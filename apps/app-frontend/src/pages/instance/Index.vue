@@ -141,6 +141,8 @@ import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useFetch } from '@/helpers/fetch'
 import { handleSevereError } from '@/store/error.js'
+import { get_project, get_version_many } from '@/helpers/cache.js'
+import dayjs from 'dayjs'
 
 const route = useRoute()
 
@@ -204,9 +206,10 @@ const checkProcess = async () => {
 // Get information on associated modrinth versions, if any
 const modrinthVersions = ref([])
 if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
-  modrinthVersions.value = await useFetch(
-    `https://api.modrinth.com/v2/project/${instance.value.linked_data.project_id}/version`,
-    'project',
+  const project = await get_project(instance.value.linked_data.project_id).catch(handleError)
+
+  modrinthVersions.value = (await get_version_many(project.versions).catch(handleError)).sort(
+    (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
   )
 }
 
