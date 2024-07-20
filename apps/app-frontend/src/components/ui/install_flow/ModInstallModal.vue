@@ -230,7 +230,7 @@ const createInstance = async () => {
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in shownProfiles" :key="profile.name" class="option">
           <Button
-            color="raised"
+            transparent
             class="profile-button"
             @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
           >

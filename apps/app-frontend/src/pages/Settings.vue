@@ -31,14 +31,13 @@ const accessSettings = async () => {
 const fetchSettings = await accessSettings().catch(handleError)
 
 const settings = ref(fetchSettings)
-console.log(fetchSettings)
 // const settingsDir = ref(settings.value.loaded_config_dir)
-// const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
-const maxMemory = ref(100000)
+
+const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
+
 watch(
   settings,
   async (oldSettings, newSettings) => {
-    console.log('hellooo')
     if (oldSettings.loaded_config_dir !== newSettings.loaded_config_dir) {
       return
     }
@@ -85,17 +84,14 @@ watch(
   { deep: true },
 )
 
-console.log('hellooo')
 const credentials = ref(await getCreds().catch(handleError))
 const loginScreenModal = ref()
 
-console.log('hellooo')
 async function logOut() {
   await logout().catch(handleError)
   credentials.value = await getCreds().catch(handleError)
 }
 
-console.log('hellooo')
 async function signInAfter() {
   loginScreenModal.value.hide()
   credentials.value = await getCreds().catch(handleError)
@@ -170,7 +166,7 @@ async function signInAfter() {
       <!--        <div class="iconified-input">-->
       <!--          <BoxIcon />-->
       <!--          <input id="appDir" v-model="settingsDir" type="text" class="input" />-->
-      <!--          <Button @click="findLauncherDir">-->
+      <!--          <Button class="r-btn" @click="findLauncherDir">-->
       <!--            <FolderSearchIcon />-->
       <!--          </Button>-->
       <!--        </div>-->

@@ -20,7 +20,7 @@
           class="text-input"
           autocomplete="off"
         />
-        <Button @click="() => (searchFilter = '')">
+        <Button class="r-btn" @click="() => (searchFilter = '')">
           <XIcon />
         </Button>
       </div>
@@ -42,24 +42,7 @@
       <UpdatedIcon />
       Update all
     </Button>
-
-    <!--    <DropdownButton-->
-    <!--      v-if="!isPackLocked"-->
-    <!--      :options="['search', 'from_file']"-->
-    <!--      default-value="search"-->
-    <!--      name="add-content-dropdown"-->
-    <!--      color="primary"-->
-    <!--      @option-click="handleContentOptionClick"-->
-    <!--    >-->
-    <!--      <template #search>-->
-    <!--        <SearchIcon />-->
-    <!--        <span class="no-wrap"> Add content </span>-->
-    <!--      </template>-->
-    <!--      <template #from_file>-->
-    <!--        <FolderOpenIcon />-->
-    <!--        <span class="no-wrap"> Add from file </span>-->
-    <!--      </template>-->
-    <!--    </DropdownButton>-->
+    <AddContentButton v-if="!isPackLocked" :instance="instance" />
   </Card>
   <Pagination
     v-if="projects.length > 0"
@@ -241,7 +224,7 @@
               <TrashIcon />
             </Button>
           </div>
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator" />
           <div
             v-else
             v-tooltip="isPackLocked ? 'Unlock this instance to update mods.' : 'Update project'"
@@ -283,24 +266,7 @@
     </div>
     <h3>No projects found</h3>
     <p class="empty-subtitle">Add a project to get started</p>
-    <div class="empty-action">
-      <DropdownButton
-        :options="['search', 'from_file']"
-        default-value="search"
-        name="add-content-dropdown-from-empty"
-        color="primary"
-        @option-click="handleContentOptionClick"
-      >
-        <template #search>
-          <SearchIcon />
-          <span class="no-wrap"> Add content </span>
-        </template>
-        <template #from_file>
-          <FolderOpenIcon />
-          <span class="no-wrap"> Add from file </span>
-        </template>
-      </DropdownButton>
-    </div>
+    <AddContentButton :instance="instance" />
   </div>
   <Pagination
     v-if="projects.length > 0"
@@ -372,7 +338,6 @@ import {
   SearchIcon,
   UpdatedIcon,
   FolderOpenIcon,
-  // DropdownButton,
   XIcon,
   ShareIcon,
   DropdownIcon,
@@ -395,7 +360,6 @@ import {
 } from '@modrinth/ui'
 import { formatProjectType } from '@modrinth/utils'
 import { computed, onUnmounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import {
   add_project_from_path,
   get,
@@ -407,12 +371,12 @@ import {
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
-import { open } from '@tauri-apps/api/dialog'
 import { listen } from '@tauri-apps/api/event'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import AddContentButton from '@/components/ui/AddContentButton.vue'
 import {
   get_organization_many,
   get_project_many,
@@ -420,8 +384,6 @@ import {
   get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
-
-const router = useRouter()
 
 const props = defineProps({
   instance: {
@@ -875,23 +837,6 @@ const handleRightClick = (event, mod) => {
   }
 }
 
-const handleContentOptionClick = async (args) => {
-  if (args.option === 'search') {
-    await router.push({
-      path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
-      query: { i: props.instance.path },
-    })
-  } else if (args.option === 'from_file') {
-    const newProject = await open({ multiple: true })
-    if (!newProject) return
-
-    for (const project of newProject) {
-      await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
-    }
-    initProjects(await get(props.instance.path).catch(handleError))
-  }
-}
-
 watch(selectAll, () => {
   for (const [key, value] of Array.from(selectionMap.value)) {
     if (value !== selectAll.value) {
@@ -903,7 +848,7 @@ watch(selectAll, () => {
 const unlisten = await listen('tauri://file-drop', async (event) => {
   for (const file of event.payload) {
     if (file.endsWith('.mrpack')) continue
-    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+    await add_project_from_path(props.instance.path, file).catch(handleError)
   }
   initProjects(await get(props.instance.path).catch(handleError))
 })
@@ -996,12 +941,20 @@ onUnmounted(() => {
     }
   }
 
-  .btn {
+  :deep(.btn) {
     height: 2.5rem;
   }
 
   .dropdown-input {
     flex-grow: 1;
+
+    .animated-dropdown {
+      width: unset;
+
+      :deep(.selected) {
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
+      }
+    }
 
     .iconified-input {
       width: 100%;
@@ -1188,8 +1141,12 @@ onUnmounted(() => {
 </style>
 <style lang="scss">
 .updating-indicator {
+  height: 2.25rem !important;
+  width: 2.25rem !important;
+
   svg {
-    margin-left: 0.5rem !important;
+    height: 1.25rem !important;
+    width: 1.25rem !important;
   }
 }
 
