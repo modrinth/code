@@ -392,6 +392,14 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  routeRules: {
+    "/**": {
+      headers: {
+        "Accept-CH": "Sec-CH-Prefers-Color-Scheme",
+        "Critical-CH": "Sec-CH-Prefers-Color-Scheme",
+      },
+    },
+  },
   compatibilityDate: "2024-07-03",
 });
 
