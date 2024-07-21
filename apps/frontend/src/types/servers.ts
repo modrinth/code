@@ -9,6 +9,8 @@ export interface Mod {
 
 export interface Server {
   server_id: string;
+  name: string;
+  state: string;
   net: {
     ip: string;
     port: number;
@@ -17,7 +19,8 @@ export interface Server {
   modpack: string;
   game: string;
   loader: string;
-  version: string;
+  loader_version: string;
+  mc_version: string;
   mods: Mod[];
 }
 

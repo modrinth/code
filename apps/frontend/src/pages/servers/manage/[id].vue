@@ -24,7 +24,7 @@
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
             <img
-              src="~/assets/images/games/minecraft-java-edition.png"
+              src="~/assets/images/games/minecraft.png"
               alt="Minecraft Java Edition"
               class="size-5"
             />

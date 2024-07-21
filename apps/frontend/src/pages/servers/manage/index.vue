@@ -79,11 +79,14 @@
         v-for="server in filteredData"
         :key="server.server_id"
         :server-id="server.server_id"
+        :name="server.name"
+        :state="server.state"
         :net="server.net"
         :modpack="server.modpack"
         :game="server.game"
         :loader="server.loader"
-        :version="server.version"
+        :loader_version="server.loader_version"
+        :mc_version="server.mc_version"
         :mods="server.mods"
       />
     </ul>
