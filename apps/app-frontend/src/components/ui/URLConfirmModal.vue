@@ -20,20 +20,20 @@ defineExpose({
   async show(event) {
     if (event.event === 'InstallVersion') {
       version.value = await useFetch(
-        `https://api.modrinth.com/v2/versions/${encodeURIComponent(event.id)}`,
+        `https://api.modrinth.com/v2/version/${encodeURIComponent(event.id)}`,
         'version',
       )
       project.value = await useFetch(
-        `https://api.modrinth.com/v2/projects/${encodeURIComponent(version.value.project_id)}`,
+        `https://api.modrinth.com/v2/project/${encodeURIComponent(version.value.project_id)}`,
         'project',
       )
     } else {
       project.value = await useFetch(
-        `https://api.modrinth.com/v2/projects/${encodeURIComponent(event.id)}`,
+        `https://api.modrinth.com/v2/project/${encodeURIComponent(event.id)}`,
         'project',
       )
       version.value = await useFetch(
-        `https://api.modrinth.com/v2/versions/${encodeURIComponent(project.value.versions[0])}`,
+        `https://api.modrinth.com/v2/version/${encodeURIComponent(project.value.versions[0])}`,
         'version',
       )
     }
