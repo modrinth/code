@@ -40,8 +40,12 @@ export async function usePyroFetch<T>(
       Accept: accept,
       Authorization: `Bearer ${authToken}`,
       "ngrok-skip-browser-warning": "true",
+      "X-Pinggy-No-Screen": "true",
       "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*",
       "Access-Control-Allow-Headers": "*",
+      "User-Agent": "Pyro/1.0 (https://pyro.host)",
+      Vary: "Accept",
     },
   };
 

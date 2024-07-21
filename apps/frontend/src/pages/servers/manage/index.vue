@@ -51,8 +51,8 @@
             <div class="leading-[165%]">
               <h1 class="m-0 mb-2 text-2xl font-semibold">Unable to load servers</h1>
               <p class="max-w-2xl">
-                Your servers are safe, but we could not load them due to a technical issue on our
-                end. Please try again later. If this issue persists, please contact
+                Your servers are safe, but could not be loaded due to a technical issue on our end.
+                Please try again later. If this issue persists, please contact
                 <a
                   class="text-[var(--color-link)]"
                   href="https://discord.modrinth.com/"
@@ -116,7 +116,7 @@ const auth = await useAuth();
 const { data, status } = await useLazyAsyncData("serversList", async () => {
   const response = await usePyroFetch<{
     servers: Server[];
-  }>(auth.value.token, "servers");
+  }>(auth.value.token, "");
   return response.servers;
 });
 
