@@ -39,3 +39,11 @@ export async function get_organization(id) {
 export async function get_organization_many(ids) {
   return await invoke('plugin:cache|get_organization_many', { ids })
 }
+
+export async function get_search_results(id) {
+  return await invoke('plugin:cache|get_search_results', { id })
+}
+
+export async function get_search_results_many(ids) {
+  return await invoke('plugin:cache|get_search_results_many', { ids })
+}

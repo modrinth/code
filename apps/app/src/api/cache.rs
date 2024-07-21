@@ -32,7 +32,8 @@ impl_cache_methods!(
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
-    (Organization, Organization)
+    (Organization, Organization),
+    (SearchResults, SearchResults)
 );
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
@@ -48,6 +49,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_team_many,
             get_organization,
             get_organization_many,
+            get_search_results,
+            get_search_results_many,
         ])
         .build()
 }

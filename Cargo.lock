@@ -1020,6 +1020,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "daedalus"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b8590e725889bb981febb438f133f8ef6b62f610f92835c961338e771222b1a"
+dependencies = [
+ "bytes",
+ "chrono",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "darling"
 version = "0.20.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5604,7 +5617,7 @@ dependencies = [
  "byteorder",
  "bytes",
  "chrono",
- "daedalus",
+ "daedalus 0.2.2",
  "dashmap",
  "dirs",
  "discord-rich-presence",
@@ -5653,7 +5666,7 @@ version = "0.7.2"
 dependencies = [
  "chrono",
  "cocoa 0.25.0",
- "daedalus",
+ "daedalus 0.2.2",
  "dashmap",
  "dirs",
  "futures",
@@ -5694,7 +5707,7 @@ dependencies = [
 name = "theseus_playground"
 version = "0.0.0"
 dependencies = [
- "daedalus",
+ "daedalus 0.1.27",
  "dunce",
  "futures",
  "serde",

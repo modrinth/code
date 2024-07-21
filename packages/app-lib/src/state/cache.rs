@@ -30,6 +30,7 @@ pub enum CacheValueType {
     DonationPlatforms,
     FileHash,
     FileUpdate,
+    SearchResults,
 }
 
 impl CacheValueType {
@@ -50,6 +51,7 @@ impl CacheValueType {
             CacheValueType::DonationPlatforms => "donation_platforms",
             CacheValueType::FileHash => "file_hash",
             CacheValueType::FileUpdate => "file_update",
+            CacheValueType::SearchResults => "search_results",
         }
     }
 
@@ -70,6 +72,7 @@ impl CacheValueType {
             "donation_platforms" => CacheValueType::DonationPlatforms,
             "file_hash" => CacheValueType::FileHash,
             "file_update" => CacheValueType::FileUpdate,
+            "search_results" => CacheValueType::SearchResults,
             _ => CacheValueType::Project,
         }
     }
@@ -109,6 +112,46 @@ pub enum CacheValue {
 
     FileHash(CachedFileHash),
     FileUpdate(CachedFileUpdate),
+    SearchResults(SearchResults),
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResults {
+    pub search: String,
+    pub result: SearchResult,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchResult {
+    pub hits: Vec<SearchEntry>,
+    pub offset: u32,
+    pub limit: u32,
+    pub total_hits: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SearchEntry {
+    pub project_id: String,
+    pub project_type: String,
+    pub slug: Option<String>,
+    pub author: String,
+    pub title: String,
+    pub description: String,
+    pub categories: Vec<String>,
+    pub display_categories: Vec<String>,
+    pub versions: Vec<String>,
+    pub downloads: i32,
+    pub follows: i32,
+    pub icon_url: String,
+    pub date_created: DateTime<Utc>,
+    pub date_modified: DateTime<Utc>,
+    pub latest_version: String,
+    pub license: String,
+    pub client_side: String,
+    pub server_side: String,
+    pub gallery: Vec<String>,
+    pub featured_gallery: Option<String>,
+    pub color: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -375,6 +418,7 @@ impl CacheValue {
             }
             CacheValue::FileHash(_) => CacheValueType::FileHash,
             CacheValue::FileUpdate(_) => CacheValueType::FileUpdate,
+            CacheValue::SearchResults(_) => CacheValueType::SearchResults,
         }
     }
 
@@ -406,6 +450,7 @@ impl CacheValue {
             CacheValue::FileUpdate(hash) => {
                 format!("{}-{}-{}", hash.hash, hash.loader, hash.game_version)
             }
+            CacheValue::SearchResults(search) => search.search.clone(),
         }
     }
 
@@ -428,7 +473,8 @@ impl CacheValue {
             | CacheValue::File { .. }
             | CacheValue::LoaderManifest { .. }
             | CacheValue::FileHash(_)
-            | CacheValue::FileUpdate(_) => None,
+            | CacheValue::FileUpdate(_)
+            | CacheValue::SearchResults(_) => None,
         }
     }
 }
@@ -543,7 +589,8 @@ impl_cache_methods!(
     (File, CachedFile),
     (LoaderManifest, CachedLoaderManifest),
     (FileHash, CachedFileHash),
-    (FileUpdate, CachedFileUpdate)
+    (FileUpdate, CachedFileUpdate),
+    (SearchResults, SearchResults)
 );
 
 impl_cache_method_singular!(
@@ -1196,6 +1243,43 @@ impl CachedEntry {
                 }
 
                 vals
+            }
+            CacheValueType::SearchResults => {
+                let fetch_urls = keys
+                    .iter()
+                    .map(|x| {
+                        (
+                            x.key().to_string(),
+                            format!("{MODRINTH_API_URL}search{}", x.key()),
+                        )
+                    })
+                    .collect::<Vec<_>>();
+
+                futures::future::try_join_all(fetch_urls.iter().map(
+                    |(_, url)| {
+                        fetch_json(
+                            Method::GET,
+                            url,
+                            None,
+                            None,
+                            fetch_semaphore,
+                        )
+                    },
+                ))
+                .await?
+                .into_iter()
+                .enumerate()
+                .map(|(index, result)| {
+                    (
+                        CacheValue::SearchResults(SearchResults {
+                            search: fetch_urls[index].0.to_string(),
+                            result,
+                        })
+                        .get_entry(),
+                        true,
+                    )
+                })
+                .collect()
             }
         })
     }

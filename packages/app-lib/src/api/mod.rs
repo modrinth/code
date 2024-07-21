@@ -17,8 +17,8 @@ pub mod data {
         Credentials, Dependency, DirectoryInfo, FileMetadata, Hooks,
         JavaVersion, LinkedData, MemorySettings, ModLoader,
         ModrinthCredentials, ModrinthCredentialsResult, Organization,
-        ProfileFile, Project, ProjectType, Settings, TeamMember, Theme, User,
-        Version, WindowSize,
+        ProfileFile, Project, ProjectType, SearchResult, SearchResults,
+        Settings, TeamMember, Theme, User, Version, WindowSize,
     };
 }
 
@@ -26,7 +26,7 @@ pub mod prelude {
     pub use crate::{
         data::*,
         event::CommandPayload,
-        jre, metadata, minecraft_auth, pack, process,
+        jre, metadata, minecraft_auth, mr_auth, pack, process,
         profile::{self, create, Profile},
         settings,
         util::io::{canonicalize, IOError},

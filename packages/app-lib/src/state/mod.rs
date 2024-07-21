@@ -2,7 +2,6 @@
 use crate::event::emit::{emit_loading, init_loading_unsafe};
 
 use crate::event::LoadingBarType;
-use crate::loading_join;
 
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
@@ -42,8 +41,8 @@ mod mr_auth;
 
 pub use self::mr_auth::*;
 
-// TODO: Cache home page queries?
 // TODO: pass credentials to modrinth cdn
+// TODO: fix empty teams not caching
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
@@ -61,10 +60,6 @@ pub struct State {
     pub children: RwLock<Children>,
     /// Launcher user account info
     pub(crate) users: RwLock<MinecraftAuthStore>,
-    /// Modrinth Credentials Store
-    pub credentials: RwLock<CredentialsStore>,
-    /// Modrinth auth flow
-    pub modrinth_auth_flow: RwLock<Option<ModrinthAuthFlow>>,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -122,14 +117,9 @@ impl State {
             IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
         emit_loading(&loading_bar, 10.0, None).await?;
 
-        let users_fut = MinecraftAuthStore::init(&directories, &io_semaphore);
-        let creds_fut = CredentialsStore::init(&directories, &io_semaphore);
-        // Launcher data
-        let (users, creds) = loading_join! {
-            Some(&loading_bar), 70.0, Some("Loading metadata");
-            users_fut,
-            creds_fut,
-        }?;
+        let users =
+            MinecraftAuthStore::init(&directories, &io_semaphore).await?;
+        emit_loading(&loading_bar, 70.0, None).await?;
 
         let discord_rpc = DiscordGuard::init().await?;
         if settings.discord_rpc {
@@ -151,20 +141,9 @@ impl State {
             io_semaphore,
             users: RwLock::new(users),
             children: RwLock::new(children),
-            credentials: RwLock::new(creds),
             discord_rpc,
-            modrinth_auth_flow: RwLock::new(None),
             pool,
             file_watcher,
         }))
-    }
-
-    /// Updates state with data from the web, if we are online
-    pub fn update() {
-        tokio::task::spawn(async {
-            let res6 = CredentialsStore::update_creds();
-
-            let _ = res6.await;
-        });
     }
 }

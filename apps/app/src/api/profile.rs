@@ -339,8 +339,10 @@ pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
 
         prof.modified = chrono::Utc::now();
 
-        prof.custom_env_vars.clone_from(&edit_profile.custom_env_vars);
-        prof.extra_launch_args.clone_from(&edit_profile.extra_launch_args);
+        prof.custom_env_vars
+            .clone_from(&edit_profile.custom_env_vars);
+        prof.extra_launch_args
+            .clone_from(&edit_profile.extra_launch_args);
 
         async { Ok(()) }
     })

@@ -1,7 +1,6 @@
 //! Functions for fetching infromation from the Internet
 use crate::event::emit::emit_loading;
 use crate::event::LoadingBarId;
-use crate::state::CredentialsStore;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use reqwest::Method;
@@ -171,7 +170,6 @@ pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
         return Err(crate::ErrorKind::InputError(
@@ -198,7 +196,6 @@ pub async fn post_json<T>(
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
-    credentials: &CredentialsStore,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
@@ -206,9 +203,9 @@ where
     let _permit = semaphore.0.acquire().await?;
 
     let mut req = REQWEST_CLIENT.post(url).json(&json_body);
-    if let Some(creds) = &credentials.0 {
-        req = req.header("Authorization", &creds.session);
-    }
+    // if let Some(creds) = &credentials.0 {
+    //     req = req.header("Authorization", &creds.session);
+    // }
 
     let result = req.send().await?.error_for_status()?;
 

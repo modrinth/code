@@ -1,13 +1,8 @@
 use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{
-    CachedEntry, LinkedData, ProfileInstallStage,
-    SideType
-};
-use crate::util::fetch::{
-    fetch, fetch_advanced, write_cached_icon,
-};
+use crate::state::{CachedEntry, LinkedData, ProfileInstallStage, SideType};
+use crate::util::fetch::{fetch, fetch_advanced, write_cached_icon};
 use crate::util::io;
 use crate::State;
 
@@ -213,7 +208,6 @@ pub async fn generate_pack_from_version_id(
     };
 
     emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
-    let creds = state.credentials.read().await;
     let version = CachedEntry::get_version(
         &version_id,
         None,
@@ -272,7 +266,6 @@ pub async fn generate_pack_from_version_id(
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
         let icon_bytes = fetch(&icon_url, None, &state.fetch_semaphore).await?;
-        drop(creds);
 
         let filename = icon_url.rsplit('/').next();
 

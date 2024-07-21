@@ -18,6 +18,7 @@ use daedalus::{
     modded::LoaderVersion,
 };
 use futures::prelude::*;
+use reqwest::Method;
 use tokio::sync::OnceCell;
 
 #[tracing::instrument(skip(st, version))]
@@ -81,10 +82,24 @@ pub async fn download_version_info(
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
         tracing::info!("Downloading version info for version {}", &version.id);
-        let mut info = d::minecraft::fetch_version_info(version).await?;
+        let mut info = fetch_json(
+            Method::GET,
+            &version.url,
+            None,
+            None,
+            &st.fetch_semaphore,
+        )
+        .await?;
 
         if let Some(loader) = loader {
-            let partial = d::modded::fetch_partial_version(&loader.url).await?;
+            let partial: d::modded::PartialVersionInfo = fetch_json(
+                Method::GET,
+                &loader.url,
+                None,
+                None,
+                &st.fetch_semaphore,
+            )
+            .await?;
             info = d::modded::merge_partial_version(partial, info);
         }
 
@@ -166,7 +181,14 @@ pub async fn download_assets_index(
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        let index = d::minecraft::fetch_assets_index(version).await?;
+        let index = fetch_json(
+            Method::GET,
+            &version.asset_index.url,
+            None,
+            None,
+            &st.fetch_semaphore,
+        )
+        .await?;
         write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore).await?;
         tracing::info!("Fetched assets index");
         Ok(index)
@@ -273,38 +295,42 @@ pub async fn download_libraries(
                     }
                 }
 
+                if !library.downloadable {
+                    tracing::trace!("Skipped non-downloadable library {}", &library.name);
+                    return Ok(());
+                }
+
                 tokio::try_join! {
                     async {
                         let artifact_path = d::get_path_from_artifact(&library.name)?;
                         let path = st.directories.libraries_dir().await.join(&artifact_path);
 
-                        match library.downloads {
-                            _ if path.exists() && !force => Ok(()),
-                            Some(d::minecraft::LibraryDownloads {
-                                artifact: Some(ref artifact),
-                                ..
-                            }) => {
+                        if path.exists() && !force {
+                            return Ok(());
+                        }
+
+                        if let Some(d::minecraft::LibraryDownloads { artifact: Some(ref artifact), ..}) = library.downloads {
+                            if !artifact.url.is_empty(){
                                 let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore)
                                     .await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
                                 tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
-                                Ok::<_, crate::Error>(())
-                            }
-                            _ => {
-                                let url = [
-                                    library
-                                        .url
-                                        .as_deref()
-                                        .unwrap_or("https://libraries.minecraft.net/"),
-                                    &artifact_path
-                                ].concat();
-
-                                let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
-                                write(&path, &bytes, &st.io_semaphore).await?;
-                                tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
-                                Ok::<_, crate::Error>(())
+                                return Ok::<_, crate::Error>(());
                             }
                         }
+
+                        let url = [
+                            library
+                                .url
+                                .as_deref()
+                                .unwrap_or("https://libraries.minecraft.net/"),
+                            &artifact_path
+                        ].concat();
+
+                        let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
+                        write(&path, &bytes, &st.io_semaphore).await?;
+                        tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
+                        Ok::<_, crate::Error>(())
                     },
                     async {
                         // HACK: pseudo try block using or else

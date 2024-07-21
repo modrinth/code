@@ -18,7 +18,6 @@ mod macos;
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
     State::init().await?;
-    State::update();
 
     let s = State::get().await?;
     s.children.write().await.rescue_cache().await?;
@@ -150,6 +149,7 @@ fn main() {
             is_dev,
             toggle_decorations,
             api::auth::auth_login,
+            api::mr_auth::modrinth_auth_login,
         ]);
 
     builder

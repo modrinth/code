@@ -73,7 +73,7 @@ CREATE TABLE minecraft_device_tokens (
 );
 
 CREATE TABLE modrinth_users (
-    id INTEGER NOT NULL,
+    id TEXT NOT NULL,
     active INTEGER NOT NULL DEFAULT FALSE,
     session_id TEXT NOT NULL,
     expires INTEGER NOT NULL,

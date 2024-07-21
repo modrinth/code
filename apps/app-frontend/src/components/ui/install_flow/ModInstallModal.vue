@@ -229,17 +229,17 @@ const createInstance = async () => {
       />
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in shownProfiles" :key="profile.name" class="option">
-          <Button
-            transparent
-            class="profile-button"
-            @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
+          <router-link
+            class="btn btn-transparent profile-button"
+            :to="`/instance/${encodeURIComponent(profile.path)}`"
+            @click="installModal.hide()"
           >
             <Avatar
-              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_url) : null"
+              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_path) : null"
               class="profile-image"
             />
             {{ profile.name }}
-          </Button>
+          </router-link>
           <div
             v-tooltip="
               profile.linked_data?.locked && !profile.installedMod

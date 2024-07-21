@@ -286,7 +286,7 @@ async function fetchProjectData() {
   ;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
     await Promise.all([
       get_version_many(project.versions).catch(handleError),
-      get_team(project.team),
+      get_team(project.team).catch(handleError),
       get_categories().catch(handleError),
       route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
       route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),

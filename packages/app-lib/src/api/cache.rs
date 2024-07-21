@@ -1,5 +1,6 @@
 use crate::state::{
-    CachedEntry, Organization, Project, TeamMember, User, Version,
+    CachedEntry, Organization, Project, SearchResults, TeamMember, User,
+    Version,
 };
 
 macro_rules! impl_cache_methods {
@@ -36,5 +37,6 @@ impl_cache_methods!(
     (Version, Version),
     (User, User),
     (Team, Vec<TeamMember>),
-    (Organization, Organization)
+    (Organization, Organization),
+    (SearchResults, SearchResults)
 );

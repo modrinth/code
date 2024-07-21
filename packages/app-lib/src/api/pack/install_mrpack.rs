@@ -161,7 +161,6 @@ pub async fn install_zipped_mrpack_files(
                         }
                     }
 
-                    let creds = state.credentials.read().await;
                     let file = fetch_mirrors(
                         &project
                             .downloads
@@ -170,10 +169,8 @@ pub async fn install_zipped_mrpack_files(
                             .collect::<Vec<&str>>(),
                         project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                         &state.fetch_semaphore,
-                        &creds,
                     )
                     .await?;
-                    drop(creds);
 
                     let project_path = project.path.to_string();
 

@@ -13,16 +13,15 @@ pub fn debug_pin(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let sig = &input.sig;
     let body = &input.block;
 
-    #[cfg(debug_assertions)]
-    let result = quote! {
-        #(#attrs)*
-        #vis #sig {
-            Box::pin(async move {
-                #body
-            }).await
-        }
-    };
-    #[cfg(not(debug_assertions))]
+    // #[cfg(debug_assertions)]
+    // let result = quote! {
+    //     #(#attrs)*
+    //     #vis #sig {
+    //         Box::pin(async move {
+    //             #body
+    //         }).await
+    //     }
+    // };
     let result = quote! {
         #(#attrs)*
         #vis #sig {

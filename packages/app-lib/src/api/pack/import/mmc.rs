@@ -201,11 +201,11 @@ pub async fn import_mmc(
     };
 
     // Create description from instance.cfg
-    let description = CreatePackDescription {
+    let mut description = CreatePackDescription {
         icon,
         override_title: instance_cfg.name,
-        project_id: instance_cfg.managed_pack_id,
-        version_id: instance_cfg.managed_pack_version_id,
+        project_id: None,
+        version_id: None,
         existing_loading_bar: None,
         profile_path: profile_path.to_string(),
     };
@@ -216,6 +216,9 @@ pub async fn import_mmc(
     if instance_cfg.managed_pack.unwrap_or(false) {
         match instance_cfg.managed_pack_type {
             Some(MMCManagedPackType::Modrinth) => {
+                description.project_id = instance_cfg.managed_pack_id;
+                description.version_id = instance_cfg.managed_pack_version_id;
+
                 // Modrinth Managed Pack
                 // Kept separate as we may in the future want to add special handling for modrinth managed packs
                 let backup_name = "Imported Modrinth Modpack".to_string();

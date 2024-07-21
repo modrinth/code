@@ -12,6 +12,7 @@ import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/m
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
+import { get_user } from '@/helpers/cache.js'
 
 const pageOptions = ['Home', 'Library']
 
@@ -97,17 +98,27 @@ async function updateJavaVersion(version) {
   await set_java_version(version).catch(handleError)
 }
 
-const credentials = ref(await getCreds().catch(handleError))
+async function fetchCredentials() {
+  const creds = await getCreds().catch(handleError)
+  console.log(creds)
+  if (creds && creds.user_id) {
+    creds.user = await get_user(creds.user_id).catch(handleError)
+  }
+  credentials.value = creds
+}
+
+const credentials = ref()
+await fetchCredentials()
+
 const loginScreenModal = ref()
 
 async function logOut() {
   await logout().catch(handleError)
-  credentials.value = await getCreds().catch(handleError)
+  await fetchCredentials()
 }
 
 async function signInAfter() {
-  loginScreenModal.value.hide()
-  credentials.value = await getCreds().catch(handleError)
+  await fetchCredentials()
 }
 
 // async function findLauncherDir() {
@@ -145,13 +156,7 @@ async function signInAfter() {
           <span class="label__title size-card-header">General settings</span>
         </h3>
       </div>
-      <Modal
-        ref="loginScreenModal"
-        class="login-screen-modal"
-        :noblur="!themeStore.advancedRendering"
-      >
-        <ModrinthLoginScreen :modal="true" :prev-page="signInAfter" :next-page="signInAfter" />
-      </Modal>
+      <ModrinthLoginScreen ref="loginScreenModal" :callback="signInAfter" />
       <div class="adjacent-input">
         <label for="theme">
           <span class="label__title">Manage account</span>
@@ -565,16 +570,6 @@ async function signInAfter() {
 
 .card-divider {
   margin: 1rem 0;
-}
-
-:deep(.login-screen-modal) {
-  .modal-container .modal-body {
-    width: auto;
-
-    .content {
-      background: none;
-    }
-  }
 }
 
 .app-directory {

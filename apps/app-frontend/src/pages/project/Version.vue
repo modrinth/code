@@ -242,7 +242,7 @@ watch(
 )
 
 const author = computed(() =>
-  props.members.find((member) => member.user.id === version.value.author_id),
+  props.members ? props.members.find((member) => member.user.id === version.value.author_id) : null,
 )
 
 const displayDependencies = ref({})

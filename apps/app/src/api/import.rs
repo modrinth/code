@@ -9,7 +9,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("import")
         .invoke_handler(tauri::generate_handler![
             import_get_importable_instances,
-            // import_import_instance,
+            import_import_instance,
             import_is_valid_importable_instance,
             import_get_default_launcher_path,
         ])
@@ -30,22 +30,22 @@ pub async fn import_get_importable_instances(
 /// Import an instance from a launcher type and base path
 /// profile_path should be a blank profile for this purpose- if the function fails, it will be deleted
 /// eg: import_instance(ImportLauncherType::MultiMC, PathBuf::from("C:/MultiMC"), "Instance 1")
-// #[tauri::command]
-// pub async fn import_import_instance(
-//     profile_path: &str,
-//     launcher_type: ImportLauncherType,
-//     base_path: PathBuf,
-//     instance_folder: String,
-// ) -> Result<()> {
-//     import::import_instance(
-//         profile_path,
-//         launcher_type,
-//         base_path,
-//         instance_folder,
-//     )
-//     .await?;
-//     Ok(())
-// }
+#[tauri::command]
+pub async fn import_import_instance(
+    profile_path: &str,
+    launcher_type: ImportLauncherType,
+    base_path: PathBuf,
+    instance_folder: String,
+) -> Result<()> {
+    import::import_instance(
+        profile_path,
+        launcher_type,
+        base_path,
+        instance_folder,
+    )
+    .await?;
+    Ok(())
+}
 
 /// Checks if this instance is valid for importing, given a certain launcher type
 /// eg: is_valid_importable_instance(PathBuf::from("C:/MultiMC/Instance 1"), ImportLauncherType::MultiMC)

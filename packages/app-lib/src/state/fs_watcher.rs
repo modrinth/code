@@ -92,7 +92,7 @@ pub(crate) async fn watch_profiles_init(
         for profile_dir in profiles_dir {
             if let Ok(file_name) = profile_dir.map(|x| x.file_name()) {
                 if let Some(file_name) = file_name.to_str() {
-                    if file_name.starts_with(".DS_STORE") {
+                    if file_name.starts_with(".DS_Store") {
                         continue;
                     };
 

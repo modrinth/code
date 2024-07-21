@@ -115,8 +115,6 @@ pub async fn profile_create(
                 .await?;
         }
 
-        emit_profile(&profile.path, ProfilePayloadType::Created).await?;
-
         crate::state::fs_watcher::watch_profile(
             &profile.path,
             &state.file_watcher,
@@ -125,6 +123,8 @@ pub async fn profile_create(
         .await?;
 
         profile.upsert(&state.pool).await?;
+
+        emit_profile(&profile.path, ProfilePayloadType::Created).await?;
 
         if !skip_install_profile.unwrap_or(false) {
             crate::launcher::install_minecraft(&profile, None, false).await?;

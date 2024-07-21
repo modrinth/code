@@ -20,9 +20,10 @@ import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import { useFetch } from '@/helpers/fetch.js'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { get_search_results } from '@/helpers/cache.js'
+import { debounce } from '@/helpers/utils.js'
 const router = useRouter()
 const route = useRoute()
 
@@ -141,8 +142,6 @@ if (route.query.ai) {
 }
 
 async function refreshSearch() {
-  const base = 'https://api.modrinth.com/v2/'
-
   const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
   if (query.value.length > 0) {
     params.push(`query=${query.value.replace(/ /g, '+')}`)
@@ -226,7 +225,6 @@ async function refreshSearch() {
         .map((x) => x.metadata.project_id)
 
       installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
-      console.log(`facets=${JSON.stringify(formattedFacets)}`)
     }
 
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
@@ -242,24 +240,24 @@ async function refreshSearch() {
     }
   }
 
-  let val = `${base}${url}`
-
-  let rawResults = await useFetch(val, 'search results', offline.value)
+  let rawResults = await get_search_results(`?${url}`)
   if (!rawResults) {
     rawResults = {
-      hits: [],
-      total_hits: 0,
-      limit: 1,
+      result: {
+        hits: [],
+        total_hits: 0,
+        limit: 1,
+      },
     }
   }
   if (instanceContext.value) {
-    for (val of rawResults.hits) {
+    for (const val of rawResults.result.hits) {
       val.installed = Object.values(instanceProjects.value).some(
         (x) => x.metadata.type === 'modrinth' && x.metadata.project_id === val.project_id,
       )
     }
   }
-  results.value = rawResults
+  results.value = rawResults.result
 }
 
 async function onSearchChange(newPageNumber) {
@@ -277,6 +275,8 @@ async function onSearchChange(newPageNumber) {
     breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
   }
 }
+
+const debouncedSearchChange = debounce(() => onSearchChange(1), 200)
 
 const searchWrapper = ref(null)
 async function onSearchChangeToTop(newPageNumber) {
@@ -682,9 +682,10 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
           <input
             v-model="query"
             autocomplete="off"
+            spellcheck="false"
             type="text"
             :placeholder="`Search ${projectType}s...`"
-            @input="onSearchChange(1)"
+            @input="debouncedSearchChange()"
           />
           <Button class="r-btn" @click="() => clearSearch()">
             <XIcon />
