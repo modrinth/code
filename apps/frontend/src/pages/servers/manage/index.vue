@@ -116,7 +116,7 @@ const auth = await useAuth();
 const { data, status } = await useLazyAsyncData("serversList", async () => {
   const response = await usePyroFetch<{
     servers: Server[];
-  }>(auth.value.token, "");
+  }>(auth.value.token, "servers");
   return response.servers;
 });
 
