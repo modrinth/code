@@ -1,9 +1,16 @@
 <template>
-  <div v-if="status === 'success'" data-pyro-server-manager-root
-    class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6">
+  <div
+    v-if="data && status === 'success'"
+    data-pyro-server-manager-root
+    class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
+  >
     <div class="flex flex-row items-center gap-6 pt-4">
-      <UiAvatar no-shadow size="lg"
-        src="https://cdn.modrinth.com/data/23niDfW7/20644fac7c3890555049874f2cfb1040d10a5126.jpeg" alt="Server Icon" />
+      <UiAvatar
+        no-shadow
+        size="lg"
+        src="https://cdn.modrinth.com/data/23niDfW7/20644fac7c3890555049874f2cfb1040d10a5126.jpeg"
+        alt="Server Icon"
+      />
       <div class="flex flex-col gap-4">
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
           <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
@@ -16,7 +23,11 @@
         </h1>
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
-            <img src="~/assets/images/games/minecraft.png" alt="Minecraft Java Edition" class="size-5" />
+            <img
+              src="~/assets/images/games/minecraft.png"
+              alt="Minecraft Java Edition"
+              class="size-5"
+            />
             <span class="text-sm font-semibold">{{
               data && data.game.charAt(0).toUpperCase() + data.game.slice(1)
             }}</span>
@@ -24,8 +35,12 @@
           <div class="h-6 w-0.5 bg-button-border"></div>
           <div class="flex flex-row items-center gap-2">
             <LoaderIcon />
-            <span class="text-sm font-semibold">{{ data && data.loader.charAt(0).toUpperCase() + data.loader.slice(1) }}
-              {{ data?.version }}</span>
+            <span class="text-sm font-semibold"
+              >{{
+                data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
+              }}
+              {{ data?.mc_version }}</span
+            >
           </div>
           <div class="h-6 w-0.5 bg-button-border"></div>
           <div class="flex flex-row items-center gap-2">
@@ -37,28 +52,30 @@
     </div>
 
     <div class="flex flex-row items-center justify-between">
-      <UiNavTabs :links="[
-        {
-          icon: HomeIcon,
-          label: 'Overview',
-          href: `/servers/manage/${serverId}`,
-        },
-        {
-          icon: CubeIcon,
-          label: 'Content',
-          href: `/servers/manage/${serverId}/content`,
-        },
-        {
-          icon: CloudIcon,
-          label: 'Backups',
-          href: `/servers/manage/${serverId}/backups`,
-        },
-        {
-          icon: CogIcon,
-          label: 'Options',
-          href: `/servers/manage/${serverId}/options`,
-        },
-      ]" />
+      <UiNavTabs
+        :links="[
+          {
+            icon: HomeIcon,
+            label: 'Overview',
+            href: `/servers/manage/${serverId}`,
+          },
+          {
+            icon: CubeIcon,
+            label: 'Content',
+            href: `/servers/manage/${serverId}/content`,
+          },
+          {
+            icon: CloudIcon,
+            label: 'Backups',
+            href: `/servers/manage/${serverId}/backups`,
+          },
+          {
+            icon: CogIcon,
+            label: 'Options',
+            href: `/servers/manage/${serverId}/options`,
+          },
+        ]"
+      />
 
       <div class="flex flex-row gap-2">
         <Button transparent onclick="navigator.clipboard.writeText('{{ data?.net.ip }}')">
@@ -74,39 +91,65 @@
     </div>
 
     <div data-pyro-mount class="h-full w-full">
-      <NuxtPage :route="route" :transition="{
-        name: 'page',
-        mode: 'out-in',
-      }" />
+      <NuxtPage
+        :route="route"
+        :transition="{
+          name: 'page',
+          mode: 'out-in',
+        }"
+      />
     </div>
 
     <UiServersPoweredByPyro />
   </div>
 
-  <div v-else-if="status === 'pending' || data.state === 'installing'"
-    class="flex h-screen w-full items-center justify-center">
+  <div
+    v-else-if="!data || status === 'pending' || data.state === 'installing'"
+    class="flex h-screen w-full items-center justify-center"
+  >
     <PyroIcon class="pyro-logo-animation size-32 opacity-10" />
   </div>
 
-  <div v-else-if="status === 'error'"
-    class="relative -mt-12 flex h-screen min-h-[400px] w-full flex-1 items-center justify-center">
-    <div class="bg-loading-animation absolute inset-0 -mt-8" style="
+  <div
+    v-else-if="status === 'error'"
+    class="relative -mt-12 flex h-screen min-h-[400px] w-full flex-1 items-center justify-center"
+  >
+    <div
+      class="bg-loading-animation absolute inset-0 -mt-8"
+      style="
         background: linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64)),
           linear-gradient(180deg, rgba(131, 66, 66, 0.275) 0%, rgba(202, 14, 14, 0.9) 97.29%);
-      "></div>
+      "
+    ></div>
     <div
-      class="bg-loading-animation pointer-events-none absolute inset-0 mx-auto flex h-full w-full max-w-7xl select-none items-center justify-center">
-      <img src="~/assets/images/games/bg-mock.png" alt="Background"
-        class="absolute inset-0 mt-12 h-full w-full object-fill" />
+      class="bg-loading-animation pointer-events-none absolute inset-0 mx-auto flex h-full w-full max-w-7xl select-none items-center justify-center"
+    >
+      <img
+        src="~/assets/images/games/bg-mock.png"
+        alt="Background"
+        class="absolute inset-0 mt-12 h-full w-full object-fill"
+      />
     </div>
     <div
-      class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-[#FF496E] bg-[#270B11] p-8">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="size-8 text-[#FF496E]">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+      class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-[#FF496E] bg-[#270B11] p-8"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-8 text-[#FF496E]"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+        />
       </svg>
-      <h1 class="m-0 inline-flex items-center gap-2 text-4xl font-bold text-[var(--color-contrast)]">
+      <h1
+        class="m-0 inline-flex items-center gap-2 text-4xl font-bold text-[var(--color-contrast)]"
+      >
         Server not found
       </h1>
       <p class="max-w-sm text-center leading-relaxed text-secondary">
@@ -173,7 +216,9 @@ const { data, status } = await useLazyAsyncData("serversList", async () => {
 }
 
 .pyro-logo-animation {
-  animation: zoom-in 0.8s linear(0 0%,
+  animation: zoom-in 0.8s
+    linear(
+      0 0%,
       0.01 0.8%,
       0.04 1.6%,
       0.161 3.3%,
@@ -200,7 +245,8 @@ const { data, status } = await useLazyAsyncData("serversList", async () => {
       1 65.2%,
       0.996 70.2%,
       1.001 87.2%,
-      1 100%);
+      1 100%
+    );
 }
 
 @keyframes fade-bg-in {
