@@ -165,7 +165,7 @@ async function refreshDir() {
         <div class="iconified-input">
           <BoxIcon />
           <input id="appDir" v-model="settingsDir" type="text" class="input" />
-          <Button @click="findLauncherDir">
+          <Button class="r-btn" @click="findLauncherDir">
             <FolderSearchIcon />
           </Button>
         </div>
@@ -551,14 +551,12 @@ async function refreshDir() {
   margin: 1rem 0;
 }
 
-:deep {
-  .login-screen-modal {
-    .modal-container .modal-body {
-      width: auto;
+:deep(.login-screen-modal) {
+  .modal-container .modal-body {
+    width: auto;
 
-      .content {
-        background: none;
-      }
+    .content {
+      background: none;
     }
   }
 }

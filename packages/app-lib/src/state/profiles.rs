@@ -22,6 +22,8 @@ use serde::{Deserialize, Serialize};
 use std::io::Cursor;
 use std::{
     collections::HashMap,
+    ffi::OsStr,
+    path,
     path::{Path, PathBuf},
 };
 use uuid::Uuid;
@@ -65,7 +67,6 @@ impl ProfilePathId {
             .ok_or_else(|| {
                 crate::ErrorKind::FSError(format!(
                     "Path {path:?} does not correspond to a profile",
-                    path = path
                 ))
             })?;
         Ok(Self(path))
@@ -150,14 +151,15 @@ impl From<InnerProjectPathUnix> for RawProjectPath {
 pub struct ProjectPathId(pub PathBuf);
 impl ProjectPathId {
     // Create a new ProjectPathId from a full file path
-    pub async fn from_fs_path(path: &PathBuf) -> crate::Result<Self> {
+    pub async fn from_fs_path(path: &Path) -> crate::Result<Self> {
         // This is avoiding dunce::canonicalize deliberately. On Windows, paths will always be convert to UNC,
         // but this is ok because we are stripping that with the prefix. Using std::fs avoids different behaviors with dunce that
         // come with too-long paths
         let profiles_dir: PathBuf = std::fs::canonicalize(
             State::get().await?.directories.profiles_dir().await,
         )?;
-        let path: PathBuf = std::fs::canonicalize(path)?;
+        // Normal canonizing resolves symlinks, which results in "path not corresponding to profile" error
+        let path = path::absolute(path)?;
         let path = path
             .strip_prefix(profiles_dir)
             .ok()
@@ -165,7 +167,6 @@ impl ProjectPathId {
             .ok_or_else(|| {
                 crate::ErrorKind::FSError(format!(
                     "Path {path:?} does not correspond to a profile",
-                    path = path
                 ))
             })?;
         Ok(Self(path))
@@ -485,7 +486,9 @@ impl Profile {
                     .map_err(|e| IOError::with_path(e, &new_path))?
                 {
                     let subpath = subpath.map_err(IOError::from)?.path();
-                    if subpath.is_file() {
+                    if subpath.is_file()
+                        && subpath.file_name() != Some(OsStr::new(".DS_Store"))
+                    {
                         files.push(subpath);
                     }
                 }
@@ -609,6 +612,7 @@ impl Profile {
             })?;
             if archive.by_name("fabric.mod.json").is_ok()
                 || archive.by_name("quilt.mod.json").is_ok()
+                || archive.by_name("META-INF/neoforge.mods.toml").is_ok()
                 || archive.by_name("META-INF/mods.toml").is_ok()
                 || archive.by_name("mcmod.info").is_ok()
             {

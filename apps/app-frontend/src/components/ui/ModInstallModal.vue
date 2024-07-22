@@ -228,7 +228,7 @@ const check_valid = computed(() => {
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
           <Button
-            color="raised"
+            transparent
             class="profile-button"
             @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
           >

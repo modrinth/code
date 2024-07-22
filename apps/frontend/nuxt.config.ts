@@ -80,6 +80,14 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    define: {
+      global: {},
+    },
+    esbuild: {
+      define: {
+        global: "globalThis",
+      },
+    },
     cacheDir: "../../node_modules/.vite/apps/knossos",
     resolve: {
       dedupe: ["vue"],
@@ -382,6 +390,14 @@ export default defineNuxtConfig({
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
+    },
+  },
+  routeRules: {
+    "/**": {
+      headers: {
+        "Accept-CH": "Sec-CH-Prefers-Color-Scheme",
+        "Critical-CH": "Sec-CH-Prefers-Color-Scheme",
+      },
     },
   },
   compatibilityDate: "2024-07-03",

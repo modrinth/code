@@ -33,7 +33,7 @@ impl ProjectType {
     pub fn get_from_loaders(loaders: Vec<String>) -> Option<Self> {
         if loaders
             .iter()
-            .any(|x| ["fabric", "forge", "quilt"].contains(&&**x))
+            .any(|x| ["fabric", "forge", "quilt", "neoforge"].contains(&&**x))
         {
             Some(ProjectType::Mod)
         } else if loaders.iter().any(|x| x == "datapack") {
