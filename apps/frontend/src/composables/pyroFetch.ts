@@ -43,7 +43,7 @@ export async function usePyroFetch<T>(
       "X-Pinggy-No-Screen": "true",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "*",
-      "Access-Control-Allow-Headers": "*",
+      "Access-Control-Allow-Headers": "Authorization",
       "User-Agent": "Pyro/1.0 (https://pyro.host)",
       Vary: "Accept",
     },
