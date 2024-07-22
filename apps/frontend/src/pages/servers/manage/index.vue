@@ -3,9 +3,9 @@
     data-pyro-server-list-root
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-4 sm:px-6"
   >
-    <div class="relative flex h-fit w-full flex-row items-center justify-between">
+    <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
       <h1 class="text-4xl font-bold text-[var(--color-contrast)]">Servers</h1>
-      <div class="flex flex-row items-center gap-4">
+      <div class="flex w-full flex-row items-center justify-end gap-4">
         <button
           v-if="status === 'error'"
           type="button"
@@ -16,7 +16,7 @@
           <UpdatedIcon />
           Retry
         </button>
-        <div class="relative w-72 text-sm">
+        <div class="relative mb-4 w-full text-sm md:mb-0 md:w-72">
           <label class="sr-only" for="search">Search</label>
           <SearchIcon
             class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
