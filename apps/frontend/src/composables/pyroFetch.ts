@@ -11,11 +11,15 @@ export async function usePyroFetch<T>(
   accept: TAccept = "application/json",
   body?: Record<string, any>,
 ): Promise<T> {
+  const timeout = 10000;
+  let retryAmount = 3;
+
+  const config = useRuntimeConfig();
+
   if (!authToken) {
     throw new Error("Cannot pyrofetch without auth (10000)");
   }
 
-  const config = useRuntimeConfig();
   let base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
 
   if (!base) {
@@ -47,11 +51,14 @@ export async function usePyroFetch<T>(
       "User-Agent": "Pyro/1.0 (https://pyro.host)",
       Vary: "Accept",
     },
+    timeout,
+    retry: retryAmount,
   };
 
-  if ((method === "POST" || method === "PUT" || method === "PATCH") && body) {
+  if ((method === "POST" || method === "PUT" || method === "PATCH" || method == "DELETE") && body) {
     request.headers["Content-Type"] = "application/json";
     request.body = JSON.stringify(body);
+    request.retry = 0;
   }
 
   // Known issue when wrapping $fetch
