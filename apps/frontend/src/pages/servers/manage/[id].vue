@@ -1,4 +1,5 @@
 <template>
+  <!--  && data.state === 'running' -->
   <div
     v-if="data && status === 'success'"
     data-pyro-server-manager-root
@@ -8,7 +9,6 @@
       <UiAvatar
         no-shadow
         size="lg"
-        src="https://cdn.modrinth.com/data/23niDfW7/20644fac7c3890555049874f2cfb1040d10a5126.jpeg"
         alt="Server Icon"
       />
       <div class="flex flex-col gap-4">

@@ -40,7 +40,7 @@
       <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
         <div v-if="game" class="flex flex-row items-center gap-2">
           <img src="~/assets/images/games/minecraft.png" :alt="`${game} Logo`" class="size-5" />
-          <span class="text-sm font-semibold">{{ game[0].toUpperCase() + game.slice(1) }}</span>
+          <span class="text-sm font-semibold">{{ game[0].toUpperCase() + game.slice(1) }} {{ mc_version }}</span>
         </div>
 
         <div v-if="loader && loader_version" class="h-6 w-0.5 bg-button-border"></div>

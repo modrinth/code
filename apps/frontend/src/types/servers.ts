@@ -24,6 +24,11 @@ export interface Server {
   mods: Mod[];
 }
 
+export interface WSAuth {
+  url: string;
+  token: string;
+}
+
 export interface Servers {
   servers: Server[];
 }

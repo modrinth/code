@@ -11,10 +11,9 @@ export async function usePyroFetch<T>(
   accept: TAccept = "application/json",
   body?: Record<string, any>,
 ): Promise<T> {
+  const config = useRuntimeConfig();
   const timeout = 10000;
   let retryAmount = 3;
-
-  const config = useRuntimeConfig();
 
   if (!authToken) {
     throw new Error("Cannot pyrofetch without auth (10000)");
