@@ -75,7 +75,7 @@
     </div>
 
     <ul v-else class="flex flex-col gap-4">
-      <div v-if="filteredData.length === 0" class="flex h-full items-center justify-center">
+      <div v-if="filteredData && filteredData.length === 0" class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found</p>
       </div>
       <div v-else>
