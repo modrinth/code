@@ -4,7 +4,7 @@
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-4 sm:px-6"
   >
     <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
-      <h1 class="text-4xl font-bold text-[var(--color-contrast)]">Servers</h1>
+      <h1 class="text-contrast text-4xl font-bold">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
         <button
           v-if="status === 'error'"
@@ -71,24 +71,29 @@
     </div>
 
     <div v-else-if="!data || data.length === 0" class="flex h-full items-center justify-center">
-      <p class="text-[var(--color-contrast)]">No servers found</p>
+      <p class="text-contrast">No servers found</p>
     </div>
 
     <ul v-else class="flex flex-col gap-4">
-      <ServerListing
-        v-for="server in filteredData"
-        :key="server.server_id"
-        :server-id="server.server_id"
-        :name="server.name"
-        :state="server.state"
-        :net="server.net"
-        :modpack="server.modpack"
-        :game="server.game"
-        :loader="server.loader"
-        :loader_version="server.loader_version"
-        :mc_version="server.mc_version"
-        :mods="server.mods"
-      />
+      <div v-if="filteredData.length === 0" class="flex h-full items-center justify-center">
+        <p class="text-contrast">No servers found</p>
+      </div>
+      <div v-else>
+        <ServerListing
+          v-for="server in filteredData"
+          :key="server.server_id"
+          :server-id="server.server_id"
+          :name="server.name"
+          :state="server.state"
+          :net="server.net"
+          :modpack="server.modpack"
+          :game="server.game"
+          :loader="server.loader"
+          :loader_version="server.loader_version"
+          :mc_version="server.mc_version"
+          :mods="server.mods"
+        />
+      </div>
     </ul>
 
     <UiServersPoweredByPyro />
