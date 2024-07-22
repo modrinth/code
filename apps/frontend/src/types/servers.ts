@@ -16,11 +16,11 @@ export interface Server {
     port: number;
     domain: string;
   };
-  modpack: string;
+  modpack: string | null;
   game: string;
-  loader: string;
-  loader_version: string;
-  mc_version: string;
+  loader: string | null;
+  loader_version: string | null;
+  mc_version: string | null;
   mods: Mod[];
 }
 
