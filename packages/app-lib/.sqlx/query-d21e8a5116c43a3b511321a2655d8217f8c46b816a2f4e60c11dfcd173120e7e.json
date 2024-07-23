@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM minecraft_users WHERE uuid = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "d21e8a5116c43a3b511321a2655d8217f8c46b816a2f4e60c11dfcd173120e7e"
+}

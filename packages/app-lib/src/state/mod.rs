@@ -44,6 +44,7 @@ pub use self::mr_auth::*;
 // TODO: pass credentials to modrinth cdn
 // TODO: fix empty teams not caching
 // TODO: optimize file hashing
+// TODO: make cache key / api requests ignore fetch semaphore (causes freezing in app)∑
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
