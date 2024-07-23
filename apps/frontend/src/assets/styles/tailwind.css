@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Monocraft';
+  src: url('/fonts/Monocraft.ttf') format('truetype');
+}
+
+.monocraft-font {
+  font-family: 'Monocraft Regular', monospace;
+}
+
 h1,
 h2,
 h3 {

@@ -1,45 +1,76 @@
 <template>
   <div data-pyro-server-stats class="flex flex-row items-center gap-6">
-    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
-      <div class="flex flex-row items-center gap-2">
-        <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-          {{ (Math.round(cpuPercent * 100) / 100).toFixed(2) }}%
-        </h2>
-        <ChevronRightIcon />
+    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised">
+      <div class="p-8">
+        <div class="flex flex-row items-center gap-2">
+          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
+            {{
+              lerp(
+                Math.round(data.current.cpu_percent * 100) / 100,
+                Math.round(data.past.cpu_percent * 100) / 100,
+              ).toFixed(2)
+            }}%
+          </h2>
+          <ChevronRightIcon />
+        </div>
+        <h3>CPU Usage</h3>
+        <CPUIcon />
       </div>
-      <h3>CPU Usage</h3>
+      <ClientOnly>
+        <VueApexCharts
+          ref="chart"
+          type="area"
+          height="150"
+          :options="chartOptions"
+          :series="[
+            {
+              name: 'Chart',
+              data: data.graph.cpu,
+            },
+          ]"
+          class="chart absolute bottom-0 w-full"
+        />
+      </ClientOnly>
+    </div>
 
-      <img
-        src="https://media.discordapp.net/attachments/1155367404948439081/1254644496486891684/magicpattern-svg-chart-1718988459205_1.png?ex=667a3e3e&is=6678ecbe&hm=ffd0591b51e5da05238563c28f7075942801dfc2d69660d8e206006763d040d1&=&format=webp&quality=lossless&width=820&height=200"
-        alt=""
-        class="absolute bottom-0 left-0 right-0 w-full"
-      />
+    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised">
+      <div class="p-8">
+        <div class="flex flex-row items-center gap-2">
+          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
+            {{
+              lerp(
+                Math.floor((data.current.ram_usage_bytes / data.current.ram_total_bytes) * 100),
+                Math.floor((data.past.ram_usage_bytes / data.past.ram_total_bytes) * 100),
+              )
+            }}%
+          </h2>
+          <ChevronRightIcon />
+        </div>
+        <h3>Memory Usage</h3>
 
-      <CPUIcon />
+        <DBIcon />
+      </div>
+      <ClientOnly>
+        <VueApexCharts
+          ref="chart"
+          type="area"
+          height="150"
+          :options="chartOptions"
+          :series="[
+            {
+              name: 'Chart',
+              data: data.graph.ram,
+            },
+          ]"
+          class="chart absolute bottom-0 w-full"
+        />
+      </ClientOnly>
     </div>
 
     <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-          {{ Math.floor((ramUsageBytes / ramTotalBytes) * 100) }}%
-        </h2>
-        <ChevronRightIcon />
-      </div>
-      <h3>Memory Usage</h3>
-
-      <img
-        src="https://media.discordapp.net/attachments/1155367404948439081/1254644527671676950/magicpattern-svg-chart-1718988637752_1.png?ex=667a3e45&is=6678ecc5&hm=ee30b5eda2612da25329c9d07f3b5625c0c79f4f93c1cab8fc607b485e1089f2&=&format=webp&quality=lossless&width=820&height=440"
-        alt=""
-        class="absolute bottom-0 left-0 right-0 w-full"
-      />
-
-      <DBIcon />
-    </div>
-
-    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
-      <div class="flex flex-row items-center gap-2">
-        <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-          {{ (Math.round((storageUsageBytes / 1e9) * 100) / 100).toFixed(2) }} GB
+          {{ (Math.round((data.current.storage_total_bytes / 1e9) * 100) / 100).toFixed(2) }} GB
         </h2>
         <!-- make mb when not decimal -->
         <ChevronRightIcon />
@@ -51,41 +82,128 @@
           <FolderOpenIcon />
           <p>World</p>
         </div>
-        <div class="flex flex-row items-center gap-2 text-sm">
+        <NuxtLink
+          :to="`/servers/manage/${serverId}/options/properties`"
+          class="flex flex-row items-center gap-2 text-sm"
+        >
           <FileTextIcon />
           <p>Server Properties</p>
-        </div>
+        </NuxtLink>
         <div class="flex flex-row items-center gap-2 text-sm">
           <FileTextIcon />
 
           <p>Paper Configuration</p>
         </div>
       </div>
-
-      <FolderOpenIcon />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Stats as StatsType } from "~/types/servers";
+import type { Stats } from "~/types/servers";
 
 import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 
-type Stats = Omit<
-  StatsType,
-  | "cpu_percent"
-  | "ram_usage_bytes"
-  | "ram_total_bytes"
-  | "storage_usage_bytes"
-  | "storage_total_bytes"
-> & {
-  cpuPercent: number;
-  ramUsageBytes: number;
-  ramTotalBytes: number;
-  storageUsageBytes: number;
-  storageTotalBytes: number;
+const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
+
+const route = useNativeRoute();
+const serverId = route.params.id;
+
+defineProps({
+  data: {
+    type: Object as PropType<Stats>,
+    required: true,
+  },
+});
+
+const lerp = (a: number, b: number) => {
+  // fix this :)
+  return a;
 };
 
-defineProps<Stats>();
+const chartOptions = ref({
+  chart: {
+    id: "cpu",
+    fontFamily:
+      "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+    foreColor: "var(--color-base)",
+    toolbar: {
+      show: false,
+    },
+    zoom: {
+      enabled: false,
+      autoScaleYaxis: false,
+    },
+    sparkline: {
+      enabled: true,
+    },
+    animations: {
+      enabled: true,
+      easing: "easeinout",
+      dynamicAnimation: {
+        speed: 1000,
+      },
+    },
+  },
+  stroke: {
+    curve: "smooth",
+  },
+  fill: {
+    colors: ["var(--color-brand)"],
+    type: "gradient",
+    opacity: 1,
+    gradient: {
+      shade: "light",
+      type: "vertical",
+      shadeIntensity: 0,
+      gradientToColors: ["var(--color-brand)"],
+      inverseColors: true,
+      opacityFrom: 0.5,
+      opacityTo: 0,
+      stops: [0, 100],
+      colorStops: [],
+    },
+  },
+  grid: {
+    show: false,
+  },
+  legend: {
+    show: false,
+  },
+  colors: ["var(--color-brand)"],
+  dataLabels: {
+    enabled: false,
+  },
+  xaxis: {
+    categories: ["1", "2", "3", "4", "5", "6", "7 ", "8", "9", "10"],
+    labels: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+    tooltip: {
+      enabled: false,
+    },
+  },
+  yaxis: {
+    labels: {
+      show: false,
+    },
+    axisBorder: {
+      show: false,
+    },
+    axisTicks: {
+      show: false,
+    },
+    tooltip: {
+      enabled: false,
+    },
+    tickAmount: 10,
+    min: 0,
+    max: 100,
+    stepSize: 5,
+  },
+  tooltip: {},
+});
 </script>

@@ -2,11 +2,16 @@
   <section class="card">
     <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
     <div
-      v-for="(property, index) in properties"
+      v-for="(property, index) in liveProperties"
       :key="index"
       class="mb-4 flex justify-between gap-4"
     >
-      <label :for="index" class="block text-lg font-semibold">{{ index.split("-").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") }}</label>
+      <label :for="index" class="block text-lg font-semibold">{{
+        index
+          .split("-")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ")
+      }}</label>
       <div v-if="typeof property === 'boolean'">
         <Checkbox id="property.id" :model-value="property" />
       </div>
@@ -15,7 +20,7 @@
           :id="index"
           type="number"
           class="w-full rounded border p-2"
-          v-model.number="properties[index]"
+          v-model.number="liveProperties[index]"
         />
       </div>
       <div v-else-if="typeof property === 'object'">
@@ -26,15 +31,10 @@
         ></textarea>
       </div>
       <div v-else>
-        <input
-          :id="index"
-          :value="property"
-          type="text"
-          class="w-full rounded border p-2"
-        />
+        <input :id="index" :value="property" type="text" class="w-full rounded border p-2" />
       </div>
     </div>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="submit" class="btn btn-primary" @click="() => saveProperties()">Save</button>
   </section>
 </template>
 
@@ -42,7 +42,11 @@
 import { ref, watch } from "vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 
-const changedPropertiesState = useState('changedProperties', () => shallowRef({}));
+const route = useNativeRoute();
+const serverId = route.params.id as string;
+const auth = await useAuth();
+
+const changedPropertiesState = ref({});
 
 const { formatMessage } = useVIntl();
 const messages = defineMessages({
@@ -52,88 +56,46 @@ const messages = defineMessages({
   },
 });
 
-const properties = ref({
-  "accepts-transfers": false,
-  "allow-flight": false,
-  "allow-nether": true,
-  "broadcast-console-to-ops": true,
-  "broadcast-rcon-to-ops": true,
-  "difficulty": "hard",
-  "enable-command-block": false,
-  "enable-jmx-monitoring": false,
-  "enable-query": true,
-  "enable-rcon": false,
-  "enable-status": true,
-  "enforce-secure-profile": true,
-  "enforce-whitelist": false,
-  "entity-broadcast-range-percentage": 100,
-  "force-gamemode": false,
-  "function-permission-level": 2,
-  "gamemode": "survival",
-  "generate-structures": true,
-  "generator-settings": {},
-  "hardcore": false,
-  "hide-online-players": false,
-  "initial-disabled-packs": "",
-  "initial-enabled-packs": "vanilla",
-  "level-name": "world",
-  "level-seed": 4680095729451076540,
-  "level-type": "minecraft:normal",
-  "log-ips": true,
-  "max-chained-neighbor-updates": 1000000,
-  "max-players": 40,
-  "max-tick-time": 60000,
-  "max-world-size": 29999984,
-  "motd": "Welcome to§r\n§3Deep Season SMP",
-  "network-compression-threshold": 256,
-  "online-mode": true,
-  "op-permission-level": 4,
-  "player-idle-timeout": 0,
-  "prevent-proxy-connections": false,
-  "pvp": true,
-  "query.port": 25578,
-  "rate-limit": 0,
-  "rcon.password": "",
-  "rcon.port": 25575,
-  "region-file-compression": "deflate",
-  "require-resource-pack": true,
-  "resource-pack": "http://45.153.48.36:25567/7618426846192410215.zip",
-  "resource-pack-id": "",
-  "resource-pack-prompt": "",
-  "resource-pack-sha1": "1802a5eef0b222196c40541ccf40f87f82a7b250",
-  "server-ip": "0.0.0.0",
-  "server-port": 25565,
-  "simulation-distance": 10,
-  "spawn-animals": true,
-  "spawn-monsters": true,
-  "spawn-npcs": true,
-  "spawn-protection": 0,
-  "sync-chunk-writes": true,
-  "text-filtering-config": "",
-  "use-native-transport": true,
-  "view-distance": 10,
-  "white-list": true
+// "generator-settings": {},
+const { data: properties, status } = await useLazyAsyncData("serverProps", async () => {
+  const data = await usePyroFetch<string>(auth.value.token, `servers/${serverId}/config/server`);
+  return data;
 });
 
-const updateProperty = (key: string, value: any) => {
-};
+const liveProperties = ref(JSON.parse(JSON.stringify(properties.value)));
 
-// TODO: EVERYTHING HERE IS BROKEN. HI WANDER
-watch(properties, async (newProperties, oldProperties) => {
-  console.log(newProperties);
-  console.log(oldProperties);
-  let changed
-  for (const key in newProperties) {
-    if (newProperties[key] !== oldProperties[key]) {
-      console.log("hi");
-      changed = key;
-      break;
+watch(
+  liveProperties,
+  (newProperties) => {
+    changedPropertiesState.value = {};
+    let changed = [];
+    for (const key in newProperties) {
+      // @ts-ignore https://typescript.tv/errors/#ts7053
+      if (newProperties[key] !== properties.value[key]) {
+        changed.push(key);
+      }
     }
-  }
-  console.log(changed);
-  changedPropertiesState[changed] = newProperties[changed];
-  properties[changed] = oldProperties[changed];
+    console.log(changed);
+    // @ts-ignore
+    for (const key of changed) {
+      // @ts-ignore
+      changedPropertiesState.value[key] = newProperties[key];
+    }
+  },
+  { deep: true },
+);
+
+const saveProperties = async () => {
   console.log(changedPropertiesState.value);
-  console.log(properties.value);
-}, { deep: true });
+  const hifero = await usePyroFetch(
+    auth.value.token,
+    `servers/${serverId}/config/server`,
+    0,
+    "PUT",
+    "application/json",
+    changedPropertiesState.value,
+  );
+  console.log(hifero);
+  refreshNuxtData("serverProps");
+};
 </script>

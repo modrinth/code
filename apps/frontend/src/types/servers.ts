@@ -29,14 +29,32 @@ export interface WSAuth {
   token: string;
 }
 
+export interface WSEvent {
+  event: string;
+  message: string;
+}
+
 export interface Servers {
   servers: Server[];
 }
 
 export interface Stats {
-  cpu_percent: number;
-  ram_usage_bytes: number;
-  ram_total_bytes: number;
-  storage_usage_bytes: number;
-  storage_total_bytes: number;
+  current: {
+    cpu_percent: number;
+    ram_usage_bytes: number;
+    ram_total_bytes: number;
+    storage_usage_bytes: number;
+    storage_total_bytes: number;
+  },
+  past: {
+    cpu_percent: number;
+    ram_usage_bytes: number;
+    ram_total_bytes: number;
+    storage_usage_bytes: number;
+    storage_total_bytes: number;
+  },
+  graph: {
+    cpu: number[];
+    ram: number[];
+  }
 }

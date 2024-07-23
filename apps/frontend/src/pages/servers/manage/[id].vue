@@ -6,11 +6,7 @@
     class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
   >
     <div class="flex flex-row items-center gap-6 pt-4">
-      <UiAvatar
-        no-shadow
-        size="lg"
-        alt="Server Icon"
-      />
+      <UiAvatar no-shadow size="lg" alt="Server Icon" />
       <div class="flex flex-col gap-4">
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
           <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
@@ -28,21 +24,22 @@
               alt="Minecraft Java Edition"
               class="size-5"
             />
-            <span class="text-sm font-semibold">{{
-              data && data.game.charAt(0).toUpperCase() + data.game.slice(1)
-            }}</span>
+            <span class="text-sm font-semibold">
+              {{ data && data.game.charAt(0).toUpperCase() + data.game.slice(1) }}
+              {{ data?.mc_version }}
+            </span>
           </div>
-          <div class="h-6 w-0.5 bg-button-border"></div>
+          <div class="h-6 w-0.5 bg-[#26252b]"></div>
           <div class="flex flex-row items-center gap-2">
             <LoaderIcon />
-            <span class="text-sm font-semibold"
-              >{{
+            <span class="text-sm font-semibold">
+              {{
                 data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
               }}
               {{ data?.mc_version }}</span
             >
           </div>
-          <div class="h-6 w-0.5 bg-button-border"></div>
+          <div class="h-6 w-0.5 bg-[#26252b]"></div>
           <div class="flex flex-row items-center gap-2">
             <BoxIcon />
             <span class="text-sm font-semibold">{{ data?.mods.length }} mods</span>
@@ -78,7 +75,7 @@
       />
 
       <div class="flex flex-row gap-2">
-        <Button transparent onclick="navigator.clipboard.writeText('{{ data?.net.ip }}')">
+        <Button transparent @click="copyText(data.net.ip)">
           <CopyIcon />
 
           Copy IP
@@ -242,6 +239,10 @@ const auth = await useAuth();
 const { data, status } = await useLazyAsyncData("specificServer", async () => {
   return await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
 });
+
+const copyText = (ip: string) => {
+  navigator.clipboard.writeText(ip);
+};
 </script>
 
 <style>

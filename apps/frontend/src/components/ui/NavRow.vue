@@ -51,8 +51,6 @@ const positionToMoveY = computed(() => `${sliderPositionY.value}px`);
 const sliderWidth = computed(() => `${selectedElementWidth.value}px`);
 
 function pickLink() {
-  console.log("link is picking");
-
   activeIndex.value = props.query
     ? filteredLinks.value.findIndex(
         (x) => (x.href === "" ? undefined : x.href) === route.path[props.query],
