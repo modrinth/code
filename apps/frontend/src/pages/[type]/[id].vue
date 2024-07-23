@@ -738,6 +738,14 @@
             />
           </template>
           <template v-if="showFeaturedVersions">
+            <div
+              v-if="project.project_type === 'modpack'"
+              class="flex w-full items-center justify-center"
+            >
+              <NuxtLink :to="`/servers/new/${project.id}`">
+                <Button class="btn btn-primary"> <SendIcon /> Create a server </Button>
+              </NuxtLink>
+            </div>
             <div class="featured-header">
               <h2 class="card-header">Featured versions</h2>
               <nuxt-link
@@ -1073,6 +1081,7 @@ import {
   XIcon,
 } from "@modrinth/assets";
 import { Checkbox, Promotion, OverflowMenu, PopoutMenu } from "@modrinth/ui";
+import { SendIcon } from "@modrinth/assets";
 import { renderString, isRejected, isUnderReview, isStaff } from "@modrinth/utils";
 import CrownIcon from "~/assets/images/utils/crown.svg?component";
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";

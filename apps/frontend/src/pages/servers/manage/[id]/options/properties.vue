@@ -75,7 +75,6 @@ watch(
         changed.push(key);
       }
     }
-    console.log(changed);
     // @ts-ignore
     for (const key of changed) {
       // @ts-ignore
@@ -86,8 +85,7 @@ watch(
 );
 
 const saveProperties = async () => {
-  console.log(changedPropertiesState.value);
-  const hifero = await usePyroFetch(
+  await usePyroFetch(
     auth.value.token,
     `servers/${serverId}/config/server`,
     0,
@@ -95,7 +93,6 @@ const saveProperties = async () => {
     "application/json",
     changedPropertiesState.value,
   );
-  console.log(hifero);
   refreshNuxtData("serverProps");
 };
 </script>

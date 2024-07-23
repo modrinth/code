@@ -6,7 +6,7 @@
     class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
   >
     <div class="flex flex-row items-center gap-6 pt-4">
-      <UiAvatar no-shadow size="lg" alt="Server Icon" />
+      <UiAvatar no-shadow size="lg" alt="Server Icon" :src="project.icon_url" />
       <div class="flex flex-col gap-4">
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
           <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
@@ -239,6 +239,9 @@ const auth = await useAuth();
 const { data, status } = await useLazyAsyncData("specificServer", async () => {
   return await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
 });
+
+const pid: any = await toRaw(useBaseFetch(`version/${await data.value.modpack}`));
+const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
 
 const copyText = (ip: string) => {
   navigator.clipboard.writeText(ip);

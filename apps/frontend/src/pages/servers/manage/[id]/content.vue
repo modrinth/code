@@ -16,12 +16,12 @@
       class="display-mode--list [&>article[class*='project-card_base-card_padding-bg']]:mt-4 [&>article[class*='project-card_base-card_padding-bg']]:bg-button-bg [&>article[class*='project-card_base-card_padding-bg']]:shadow-none"
     >
       <UiProjectCard
-        :id="'23niDfW7'"
-        icon-url="https://cdn.modrinth.com/data/23niDfW7/20644fac7c3890555049874f2cfb1040d10a5126.jpeg"
-        name="Better Adventures++"
-        description="A modified version of Flowstate's Better Adventures+ modpack that adds a few mods I feel keep the spirit of the original, while adding extra content, features, and structures"
-        client-side="required"
-        server-side="required"
+        :id="project.id"
+        :icon-url="project.icon_url"
+        :name="project.title"
+        :description="project.description"
+        :client-side="project.client"
+        :server-side="project.server"
         type="modpack"
         :show-updated-date="false"
         :show-created-date="false"
@@ -35,6 +35,19 @@ import { Button } from "@modrinth/ui";
 import { EditIcon } from "@modrinth/assets";
 
 const { formatMessage } = useVIntl();
+const route = useNativeRoute();
+const serverId = route.params.id;
+
+const auth = await useAuth();
+
+import type { Server } from "~/types/servers";
+
+const data = await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
+
+const pid: any = await toRaw(useBaseFetch(`version/${data.modpack}`));
+const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
+
+console.log(project);
 
 const messages = defineMessage({
   currentInstanceLabel: {
