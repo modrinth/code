@@ -4,12 +4,8 @@ import { useRouter } from 'vue-router'
 import { StopCircleIcon, PlayIcon } from '@modrinth/assets'
 import { Card, Avatar, AnimatedLogo } from '@modrinth/ui'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { run } from '@/helpers/profile'
-import {
-  get_all_running_profile_paths,
-  get_uuids_by_profile_path,
-  kill_by_uuid,
-} from '@/helpers/process'
+import { kill, run } from '@/helpers/profile'
+import { get_by_profile_path } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { handleError } from '@/store/state.js'
 import { showProfileInFolder } from '@/helpers/utils.js'
@@ -27,7 +23,6 @@ const props = defineProps({
 
 const playing = ref(false)
 
-const uuid = ref(null)
 const modLoading = computed(() => props.instance.install_stage !== 'installed')
 
 const router = useRouter()
@@ -37,23 +32,16 @@ const seeInstance = async () => {
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths().catch(handleError)
+  const runningProcesses = await get_by_profile_path(props.instance.path).catch(handleError)
 
-  if (runningPaths.includes(props.instance.path)) {
-    playing.value = true
-    return
-  }
-
-  playing.value = false
-  uuid.value = null
+  playing.value = runningProcesses.length > 0
 }
 
 const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
-  uuid.value = await run(props.instance.path).catch(handleSevereError)
+  await run(props.instance.path).catch(handleSevereError)
   modLoading.value = false
-  playing.value = true
 
   mixpanel_track('InstancePlay', {
     loader: props.instance.loader,
@@ -66,22 +54,13 @@ const stop = async (e, context) => {
   e?.stopPropagation()
   playing.value = false
 
-  // If we lost the uuid for some reason, such as a user navigating
-  // from-then-back to this page, we will get all uuids by the instance path.
-  // For-each uuid, kill the process.
-  if (!uuid.value) {
-    const uuids = await get_uuids_by_profile_path(props.instance.path).catch(handleError)
-    uuid.value = uuids[0]
-    uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
-  } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
+  await kill(props.instance.path).catch(handleError)
 
   mixpanel_track('InstanceStop', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     source: context,
   })
-
-  uuid.value = null
 }
 
 const openFolder = async () => {
@@ -96,7 +75,6 @@ const addContent = async () => {
 }
 
 defineExpose({
-  playing,
   play,
   stop,
   seeInstance,
@@ -106,7 +84,7 @@ defineExpose({
 })
 
 const unlisten = await process_listener((e) => {
-  if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
+  if (e.event === 'finished' && e.profile_path_id === props.instance.path) playing.value = false
 })
 
 onUnmounted(() => unlisten())

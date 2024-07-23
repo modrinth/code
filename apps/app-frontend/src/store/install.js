@@ -46,7 +46,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
 
   if (project.project_type === 'modpack') {
     const version = versionId ?? project.versions[project.versions.length - 1]
-    const packs = Object.values(await list(true).catch(handleError))
+    const packs = await list().catch(handleError)
 
     if (packs.length === 0 || !packs.find((pack) => pack.linked_data?.project_id === project.id)) {
       await packInstall(project.id, version, project.title, project.icon_url).catch(handleError)

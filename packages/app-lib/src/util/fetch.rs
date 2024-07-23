@@ -65,7 +65,6 @@ where
 
 /// Downloads a file with retry and checksum functionality
 #[tracing::instrument(skip(json_body, semaphore))]
-#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn fetch_advanced(
     method: Method,
@@ -165,7 +164,7 @@ pub async fn fetch_advanced(
 
 /// Downloads a file from specified mirrors
 #[tracing::instrument(skip(semaphore))]
-#[theseus_macros::debug_pin]
+
 pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
@@ -191,7 +190,7 @@ pub async fn fetch_mirrors(
 
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
-#[theseus_macros::debug_pin]
+
 pub async fn post_json<T>(
     url: &str,
     json_body: serde_json::Value,

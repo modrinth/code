@@ -2,7 +2,6 @@
 resolver = '2'
 members = [
   './packages/app-lib',
-  './packages/app-macros',
 	'./apps/app-playground',
   './apps/app'
 ]

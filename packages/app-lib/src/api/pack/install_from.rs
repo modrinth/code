@@ -176,7 +176,7 @@ pub fn get_profile_from_pack(
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn generate_pack_from_version_id(
     project_id: String,
     version_id: String,
@@ -301,7 +301,7 @@ pub async fn generate_pack_from_version_id(
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn generate_pack_from_file(
     path: PathBuf,
     profile_path: String,
@@ -322,7 +322,7 @@ pub async fn generate_pack_from_file(
 
 /// Sets generated profile attributes to the pack ones (using profile::edit)
 /// This includes the pack name, icon, game version, loader version, and loader
-#[theseus_macros::debug_pin]
+
 pub async fn set_profile_information(
     profile_path: String,
     description: &CreatePackDescription,

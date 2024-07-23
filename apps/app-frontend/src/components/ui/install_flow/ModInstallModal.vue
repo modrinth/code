@@ -77,7 +77,7 @@ defineExpose({
 
     onInstall.value = callback
 
-    const profilesVal = await list(true).then(Object.values).catch(handleError)
+    const profilesVal = await list().catch(handleError)
     for (let profile of profilesVal) {
       profile.installing = false
       profile.installedMod = await check_installed(profile.path, project.value.id).catch(

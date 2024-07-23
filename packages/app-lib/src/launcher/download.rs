@@ -58,7 +58,7 @@ pub async fn download_minecraft(
 }
 
 #[tracing::instrument(skip_all, fields(version = version.id.as_str(), loader = ?loader))]
-#[theseus_macros::debug_pin]
+
 pub async fn download_version_info(
     st: &State,
     version: &GameVersion,
@@ -118,7 +118,7 @@ pub async fn download_version_info(
 }
 
 #[tracing::instrument(skip_all)]
-#[theseus_macros::debug_pin]
+
 pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
@@ -161,7 +161,7 @@ pub async fn download_client(
 }
 
 #[tracing::instrument(skip_all)]
-#[theseus_macros::debug_pin]
+
 pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
@@ -202,7 +202,7 @@ pub async fn download_assets_index(
 }
 
 #[tracing::instrument(skip(st, index))]
-#[theseus_macros::debug_pin]
+
 pub async fn download_assets(
     st: &State,
     with_legacy: bool,
@@ -266,7 +266,6 @@ pub async fn download_assets(
 }
 
 #[tracing::instrument(skip(st, libraries))]
-#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn download_libraries(
     st: &State,

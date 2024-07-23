@@ -25,7 +25,7 @@ use super::install_from::{
 /// Wrapper around install_pack_files that generates a pack creation description, and
 /// attempts to install the pack files. If it fails, it will remove the profile (fail safely)
 /// Install a modpack from a mrpack file (a modrinth .zip format)
-#[theseus_macros::debug_pin]
+
 pub async fn install_zipped_mrpack(
     location: CreatePackLocation,
     profile_path: String,
@@ -68,7 +68,7 @@ pub async fn install_zipped_mrpack(
 
 /// Install all pack files from a description
 /// Does not remove the profile if it fails
-#[theseus_macros::debug_pin]
+
 pub async fn install_zipped_mrpack_files(
     create_pack: CreatePack,
     ignore_lock: bool,
@@ -283,7 +283,7 @@ pub async fn install_zipped_mrpack_files(
 }
 
 #[tracing::instrument(skip(mrpack_file))]
-#[theseus_macros::debug_pin]
+
 pub async fn remove_all_related_files(
     profile_path: String,
     mrpack_file: bytes::Bytes,

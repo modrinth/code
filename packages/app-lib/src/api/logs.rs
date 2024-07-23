@@ -212,13 +212,10 @@ pub async fn get_output_by_filename(
 
     let path = logs_folder.join(file_name);
 
-    let credentials: Vec<Credentials> = state
-        .users
-        .read()
-        .await
-        .users
-        .clone()
-        .into_values()
+    let credentials = Credentials::get_all(&state.pool)
+        .await?
+        .into_iter()
+        .map(|x| x.1)
         .collect();
 
     // Load .gz file into String
@@ -359,13 +356,10 @@ pub async fn get_generic_live_log_cursor(
     let output = String::from_utf8_lossy(&buffer).to_string(); // Convert to String
     let cursor = cursor + bytes_read as u64; // Update cursor
 
-    let credentials: Vec<Credentials> = state
-        .users
-        .read()
-        .await
-        .users
-        .clone()
-        .into_values()
+    let credentials = Credentials::get_all(&state.pool)
+        .await?
+        .into_iter()
+        .map(|x| x.1)
         .collect();
     let output = CensoredString::censor(output, &credentials);
     Ok(LatestLogCursor {

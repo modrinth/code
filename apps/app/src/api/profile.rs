@@ -4,13 +4,13 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
-use uuid::Uuid;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("profile")
         .invoke_handler(tauri::generate_handler![
             profile_remove,
             profile_get,
+            profile_get_many,
             profile_get_projects,
             profile_get_optimal_jre_key,
             profile_get_full_path,
@@ -27,9 +27,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             profile_update_managed_modrinth_version,
             profile_repair_managed_modrinth,
             profile_run,
-            profile_run_wait,
             profile_run_credentials,
-            profile_run_wait_credentials,
+            profile_kill,
             profile_edit,
             profile_edit_icon,
             profile_export_mrpack,
@@ -52,6 +51,13 @@ pub async fn profile_remove(path: &str) -> Result<()> {
 pub async fn profile_get(path: &str) -> Result<Option<Profile>> {
     let res = profile::get(&path).await?;
     Ok(res)
+}
+
+#[tauri::command]
+pub async fn profile_get_many(paths: Vec<String>) -> Result<Vec<Profile>> {
+    let ids = paths.iter().map(|x| &**x).collect::<Vec<&str>>();
+    let entries = profile::get_many(&*ids).await?;
+    Ok(entries)
 }
 
 #[tauri::command]
@@ -93,7 +99,7 @@ pub async fn profile_get_optimal_jre_key(
 // Get a copy of the profile set
 // invoke('plugin:profile|profile_list')
 #[tauri::command]
-pub async fn profile_list() -> Result<dashmap::DashMap<String, Profile>> {
+pub async fn profile_list() -> Result<Vec<Profile>> {
     let res = profile::list().await?;
     Ok(res)
 }
@@ -243,19 +249,10 @@ pub async fn profile_get_pack_export_candidates(
 // for the actual Child in the state.
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
-pub async fn profile_run(path: &str) -> Result<Uuid> {
-    let minecraft_child = profile::run(&path).await?;
-    let uuid = minecraft_child.read().await.uuid;
-    Ok(uuid)
-}
+pub async fn profile_run(path: &str) -> Result<Process> {
+    let process = profile::run(&path).await?;
 
-// Run Minecraft using a profile using the default credentials, and wait for the result
-// invoke('plugin:profile|profile_run_wait', path)
-#[tauri::command]
-pub async fn profile_run_wait(path: &str) -> Result<()> {
-    let proc_lock = profile::run(&path).await?;
-    let mut proc = proc_lock.write().await;
-    Ok(process::wait_for(&mut proc).await?)
+    Ok(process)
 }
 
 // Run Minecraft using a profile using chosen credentials
@@ -266,23 +263,17 @@ pub async fn profile_run_wait(path: &str) -> Result<()> {
 pub async fn profile_run_credentials(
     path: &str,
     credentials: Credentials,
-) -> Result<Uuid> {
-    let minecraft_child = profile::run_credentials(&path, &credentials).await?;
-    let uuid = minecraft_child.read().await.uuid;
+) -> Result<Process> {
+    let process = profile::run_credentials(&path, &credentials).await?;
 
-    Ok(uuid)
+    Ok(process)
 }
 
-// Run Minecraft using a profile using the chosen credentials, and wait for the result
-// invoke('plugin:profile|profile_run_wait', {path, credentials)
 #[tauri::command]
-pub async fn profile_run_wait_credentials(
-    path: &str,
-    credentials: Credentials,
-) -> Result<()> {
-    let proc_lock = profile::run_credentials(&path, &credentials).await?;
-    let mut proc = proc_lock.write().await;
-    Ok(process::wait_for(&mut proc).await?)
+pub async fn profile_kill(path: &str) -> Result<()> {
+    profile::kill(&path).await?;
+
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

@@ -103,7 +103,7 @@ pub async fn get_importable_instances(
 
 // Import an instance from a launcher type and base path
 // Note: this *deletes* the submitted empty profile
-#[theseus_macros::debug_pin]
+
 #[tracing::instrument]
 pub async fn import_instance(
     profile_path: &str, // This should be a blank profile
@@ -195,7 +195,7 @@ pub fn get_default_launcher_path(
 }
 
 /// Checks if this PathBuf is a valid instance for the given launcher type
-#[theseus_macros::debug_pin]
+
 #[tracing::instrument]
 pub async fn is_valid_importable_instance(
     instance_path: PathBuf,
@@ -219,7 +219,7 @@ pub async fn is_valid_importable_instance(
 }
 
 /// Caches an image file in the filesystem into the cache directory, and returns the path to the cached file.
-#[theseus_macros::debug_pin]
+
 #[tracing::instrument]
 pub async fn recache_icon(
     icon_path: PathBuf,
@@ -294,7 +294,7 @@ pub async fn copy_dotminecraft(
 
 /// Recursively get a list of all subfiles in src
 /// uses async recursion
-#[theseus_macros::debug_pin]
+
 #[async_recursion::async_recursion]
 #[tracing::instrument]
 pub async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {

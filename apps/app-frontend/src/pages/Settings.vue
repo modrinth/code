@@ -51,18 +51,6 @@ watch(
       mixpanel_opt_in_tracking()
     }
 
-    // for (const [key, value] of Object.entries(setSettings.java_globals)) {
-    //   if (value?.path === '') {
-    //     value.path = undefined
-    //   }
-    //
-    //   if (value?.path) {
-    //     value.path = value.path.replace('java.exe', 'javaw.exe')
-    //   }
-    //
-    //   console.log(`${key}: ${value}`)
-    // }
-
     setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
     setSettings.custom_env_vars = setSettings.envVars
       .trim()

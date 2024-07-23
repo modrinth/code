@@ -42,8 +42,6 @@ async fn main() -> theseus::Result<()> {
 
     // Initialize state
     State::init().await?;
-    let st = State::get().await?;
-    //State::update();
 
     if minecraft_auth::users().await?.is_empty() {
         println!("No users found, authenticating.");
@@ -59,8 +57,8 @@ async fn main() -> theseus::Result<()> {
     println!("Clearing profiles.");
     {
         let h = profile::list().await?;
-        for (path, _) in h.into_iter() {
-            profile::remove(&path).await?;
+        for profile in h.into_iter() {
+            profile::remove(&profile.path).await?;
         }
     }
 
@@ -102,26 +100,15 @@ async fn main() -> theseus::Result<()> {
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
-    let proc_lock = profile::run(&profile_path).await?;
-    let uuid = proc_lock.read().await.uuid;
-    let pid = proc_lock.read().await.current_child.read().await.id();
+    let process = profile::run(&profile_path).await?;
 
-    println!("Minecraft UUID: {}", uuid);
-    println!("Minecraft PID: {:?}", pid);
+    println!("Minecraft PID: {}", process.pid);
 
-    println!(
-        "All running process UUID {:?}",
-        process::get_all_running_uuids().await?
-    );
-    println!(
-        "All running process paths {:?}",
-        process::get_all_running_profile_paths().await?
-    );
+    println!("All running process UUID {:?}", process::get_all().await?);
 
     // hold the lock to the process until it ends
     println!("Waiting for process to end...");
-    let mut proc = proc_lock.write().await;
-    process::wait_for(&mut proc).await?;
+    process.wait_for().await?;
 
     Ok(())
 }

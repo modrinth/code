@@ -45,6 +45,10 @@ export async function get(path) {
   return await invoke('plugin:profile|profile_get', { path })
 }
 
+export async function get_many(paths) {
+  return await invoke('plugin:profile|profile_get_many', { paths })
+}
+
 // Get a profile's projects
 // Returns a map of a path to profile file
 export async function get_projects(path) {
@@ -71,8 +75,8 @@ export async function get_optimal_jre_key(path) {
 
 // Get a copy of the profile set
 // Returns hashmap of path -> Profile
-export async function list(clearProjects) {
-  return await invoke('plugin:profile|profile_list', { clearProjects })
+export async function list() {
+  return await invoke('plugin:profile|profile_list')
 }
 
 export async function check_installed(path, projectId) {
@@ -169,10 +173,8 @@ export async function run(path) {
   return await invoke('plugin:profile|profile_run', { path })
 }
 
-// Run Minecraft using a pathed profile
-// Waits for end
-export async function run_wait(path) {
-  return await invoke('plugin:profile|profile_run_wait', { path })
+export async function kill(path) {
+  return await invoke('plugin:profile|profile_kill', { path })
 }
 
 // Edits a profile

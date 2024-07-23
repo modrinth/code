@@ -121,9 +121,20 @@ impl ModrinthCredentials {
 
     pub async fn upsert(
         &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
     ) -> crate::Result<()> {
         let expires = self.expires.timestamp();
+
+        if self.active {
+            sqlx::query!(
+                "
+                UPDATE modrinth_users
+                SET active = FALSE
+                "
+            )
+            .execute(exec)
+            .await?;
+        }
 
         sqlx::query!(
             "

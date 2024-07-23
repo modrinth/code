@@ -46,7 +46,7 @@ CREATE TABLE java_versions (
 );
 
 CREATE TABLE minecraft_users (
-    uuid BLOB NOT NULL,
+    uuid TEXT NOT NULL,
     active INTEGER NOT NULL DEFAULT FALSE,
     username TEXT NOT NULL,
     access_token TEXT NOT NULL,
@@ -60,7 +60,7 @@ CREATE UNIQUE INDEX minecraft_users_active ON minecraft_users(active);
 CREATE TABLE minecraft_device_tokens (
     id INTEGER NOT NULL CHECK (id = 0),
 
-    uuid BLOB NOT NULL,
+    uuid TEXT NOT NULL,
     private_key TEXT NOT NULL,
     x TEXT NOT NULL,
     y TEXT NOT NULL,
@@ -141,7 +141,6 @@ CREATE TABLE profiles (
 
 CREATE TABLE processes (
     pid INTEGER NOT NULL,
-    uuid BLOB NOT NULL,
     start_time INTEGER NOT NULL,
     name TEXT NOT NULL,
     executable TEXT NOT NULL,
@@ -150,5 +149,6 @@ CREATE TABLE processes (
 
     UNIQUE (pid),
     PRIMARY KEY (pid),
-    FOREIGN KEY (profile_path) REFERENCES profile(path)
+    FOREIGN KEY (profile_path) REFERENCES profiles(path)
 );
+CREATE INDEX processes_profile_path ON processes(profile_path);

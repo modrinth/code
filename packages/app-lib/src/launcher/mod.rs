@@ -3,11 +3,11 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::io::IOError;
-use crate::state::{Credentials, JavaVersion, ProfileInstallStage};
+use crate::state::{Credentials, JavaVersion, Process, ProfileInstallStage};
 use crate::util::io;
 use crate::{
     process,
-    state::{self as st, MinecraftChild},
+    state::{self as st},
     State,
 };
 use chrono::Utc;
@@ -16,9 +16,7 @@ use daedalus::minecraft::{RuleAction, VersionInfo};
 use daedalus::modded::LoaderVersion;
 use st::Profile;
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::process::Command;
-use uuid::Uuid;
 
 mod args;
 
@@ -180,7 +178,7 @@ pub async fn get_loader_version_from_profile(
 }
 
 #[tracing::instrument(skip(profile))]
-#[theseus_macros::debug_pin]
+
 pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<LoadingBarId>,
@@ -402,7 +400,6 @@ pub async fn install_minecraft(
 }
 
 #[tracing::instrument(skip_all)]
-#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn launch_minecraft(
     java_args: &[String],
@@ -414,7 +411,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
-) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
+) -> crate::Result<Process> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::Installing
     {
@@ -509,11 +506,11 @@ pub async fn launch_minecraft(
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
-        process::get_uuids_by_profile_path(&profile.path).await?;
-    if let Some(uuid) = existing_processes.first() {
+        process::get_by_profile_path(&profile.path).await?;
+    if let Some(process) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
-            "Profile {} is already running at path: {uuid}",
-            profile.path
+            "Profile {} is already running at path: {}",
+            profile.path, process.pid
         ))
         .as_error());
     }
@@ -651,14 +648,11 @@ pub async fn launch_minecraft(
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
-    let mut state_children = state.children.write().await;
-    state_children
-        .insert_new_process(
-            Uuid::new_v4(),
-            &profile.path,
-            command,
-            post_exit_hook,
-            censor_strings,
-        )
-        .await
+    Process::insert_new_process(
+        &profile.path,
+        command,
+        post_exit_hook,
+        &state.pool,
+    )
+    .await
 }

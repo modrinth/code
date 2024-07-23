@@ -578,7 +578,7 @@ const groups = ref(props.instance.groups)
 
 const modpackVersionModal = ref(null)
 
-const instancesList = Object.values(await list())
+const instancesList = await list()
 const availableGroups = ref([
   ...new Set(
     instancesList.reduce((acc, obj) => {

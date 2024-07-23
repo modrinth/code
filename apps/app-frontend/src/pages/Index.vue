@@ -31,7 +31,7 @@ window.addEventListener('online', () => {
 const getInstances = async () => {
   const profiles = await list().catch(handleError)
 
-  recentInstances.value = Object.values(profiles).sort((a, b) => {
+  recentInstances.value = profiles.sort((a, b) => {
     const dateA = dayjs(a.last_played ?? 0)
     const dateB = dayjs(b.last_played ?? 0)
 

@@ -16,7 +16,7 @@ pub mod data {
     pub use crate::state::{
         Credentials, Dependency, DirectoryInfo, FileMetadata, Hooks,
         JavaVersion, LinkedData, MemorySettings, ModLoader,
-        ModrinthCredentials, ModrinthCredentialsResult, Organization,
+        ModrinthCredentials, ModrinthCredentialsResult, Organization, Process,
         ProfileFile, Project, ProjectType, SearchResult, SearchResults,
         Settings, TeamMember, Theme, User, Version, WindowSize,
     };

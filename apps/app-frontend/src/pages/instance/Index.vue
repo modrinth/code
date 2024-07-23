@@ -16,7 +16,6 @@
             color="danger"
             class="instance-button"
             @click="stopInstance('InstancePage')"
-            @mouseover="checkProcess"
           >
             <StopCircleIcon />
             Stop
@@ -26,7 +25,6 @@
             color="primary"
             class="instance-button"
             @click="startInstance('InstancePage')"
-            @mouseover="checkProcess"
           >
             <PlayIcon />
             Play
@@ -125,12 +123,8 @@ import {
   CheckCircleIcon,
   UpdatedIcon,
 } from '@modrinth/assets'
-import { get, run } from '@/helpers/profile'
-import {
-  get_all_running_profile_paths,
-  get_uuids_by_profile_path,
-  kill_by_uuid,
-} from '@/helpers/process'
+import { get, kill, run } from '@/helpers/profile'
+import { get_by_profile_path } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
@@ -174,14 +168,13 @@ window.addEventListener('online', () => {
 
 const loadingBar = useLoading()
 
-const uuid = ref(null)
 const playing = ref(false)
 const loading = ref(false)
 const options = ref(null)
 
 const startInstance = async (context) => {
   loading.value = true
-  uuid.value = await run(route.params.id).catch(handleSevereError)
+  run(route.params.id).catch(handleSevereError)
   loading.value = false
   playing.value = true
 
@@ -193,14 +186,9 @@ const startInstance = async (context) => {
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths().catch(handleError)
-  if (runningPaths.includes(instance.value.path)) {
-    playing.value = true
-    return
-  }
+  const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
 
-  playing.value = false
-  uuid.value = null
+  playing.value = runningProcesses.length > 0
 }
 
 // Get information on associated modrinth versions, if any
@@ -219,11 +207,7 @@ await checkProcess()
 
 const stopInstance = async (context) => {
   playing.value = false
-  if (!uuid.value) {
-    const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
-    uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
-    uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
-  } else await kill_by_uuid(uuid.value).catch(handleError)
+  await kill(route.params.id).catch(handleError)
 
   mixpanel_track('InstanceStop', {
     loader: instance.value.loader,
@@ -303,7 +287,7 @@ const unlistenProfiles = await profile_listener(async (event) => {
 })
 
 const unlistenProcesses = await process_listener((e) => {
-  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
+  if (e.event === 'finished' && e.profile_path_id === route.params.id) playing.value = false
 })
 
 onUnmounted(() => {

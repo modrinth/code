@@ -5,7 +5,7 @@ use crate::event::LoadingBarType;
 
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
-use tokio::sync::{OnceCell, RwLock, Semaphore};
+use tokio::sync::{OnceCell, Semaphore};
 
 use crate::state::fs_watcher::FileWatcher;
 use sqlx::SqlitePool;
@@ -20,8 +20,8 @@ pub use self::profiles::*;
 mod settings;
 pub use self::settings::*;
 
-mod children;
-pub use self::children::*;
+mod process;
+pub use self::process::*;
 
 mod java_globals;
 pub use self::java_globals::*;
@@ -43,6 +43,7 @@ pub use self::mr_auth::*;
 
 // TODO: pass credentials to modrinth cdn
 // TODO: fix empty teams not caching
+// TODO: optimize file hashing
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
@@ -56,11 +57,6 @@ pub struct State {
     /// Semaphore used to limit concurrent I/O and avoid errors
     pub io_semaphore: IoSemaphore,
 
-    /// Reference to minecraft process children
-    pub children: RwLock<Children>,
-    /// Launcher user account info
-    pub(crate) users: RwLock<MinecraftAuthStore>,
-
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
 
@@ -71,9 +67,11 @@ pub struct State {
 
 impl State {
     pub async fn init() -> crate::Result<()> {
-        LAUNCHER_STATE
+        let state = LAUNCHER_STATE
             .get_or_try_init(Self::initialize_state)
             .await?;
+
+        Process::garbage_collect(&state.pool).await?;
 
         Ok(())
     }
@@ -94,7 +92,7 @@ impl State {
     }
 
     #[tracing::instrument]
-    #[theseus_macros::debug_pin]
+
     async fn initialize_state() -> crate::Result<Arc<Self>> {
         let loading_bar = init_loading_unsafe(
             LoadingBarType::StateInit,
@@ -117,18 +115,12 @@ impl State {
             IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
         emit_loading(&loading_bar, 10.0, None).await?;
 
-        let users =
-            MinecraftAuthStore::init(&directories, &io_semaphore).await?;
-        emit_loading(&loading_bar, 70.0, None).await?;
-
         let discord_rpc = DiscordGuard::init().await?;
         if settings.discord_rpc {
             // Add default Idling to discord rich presence
             // Force add to avoid recursion
             let _ = discord_rpc.force_set_activity("Idling...", true).await;
         }
-
-        let children = Children::new();
 
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
@@ -139,8 +131,6 @@ impl State {
             directories,
             fetch_semaphore,
             io_semaphore,
-            users: RwLock::new(users),
-            children: RwLock::new(children),
             discord_rpc,
             pool,
             file_watcher,

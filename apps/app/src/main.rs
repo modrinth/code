@@ -19,8 +19,6 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
     State::init().await?;
 
-    let s = State::get().await?;
-    s.children.write().await.rescue_cache().await?;
     Ok(())
 }
 

@@ -5,8 +5,9 @@ use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
 use chrono::{DateTime, TimeZone, Utc};
 use dashmap::DashMap;
-use futures::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::convert::TryFrom;
+use std::convert::TryInto;
 use std::path::{Path, PathBuf};
 
 // Represent a Minecraft instance.
@@ -210,33 +211,40 @@ impl ProjectType {
     }
 }
 
-impl Profile {
-    pub async fn get(
-        path: &str,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<Option<Self>> {
-        let res = sqlx::query!(
-            r#"
-            SELECT
-                path, install_stage, name, icon_path,
-                game_version, mod_loader, mod_loader_version,
-                json(groups) as "groups!: serde_json::Value",
-                linked_project_id, linked_version_id, locked,
-                created, modified, last_played,
-                submitted_time_played, recent_time_played,
-                override_java_path,
-                json(override_extra_launch_args) as "override_extra_launch_args!: serde_json::Value", json(override_custom_env_vars) as "override_custom_env_vars!: serde_json::Value",
-                override_mc_memory_max, override_mc_force_fullscreen, override_mc_game_resolution_x, override_mc_game_resolution_y,
-                override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
-            FROM profiles
-            WHERE path = $1
-            "#,
-            path
-        )
-            .fetch_optional(exec)
-            .await?;
+struct ProfileQueryResult {
+    path: String,
+    install_stage: String,
+    name: String,
+    icon_path: Option<String>,
+    game_version: String,
+    mod_loader: String,
+    mod_loader_version: Option<String>,
+    groups: serde_json::Value,
+    linked_project_id: Option<String>,
+    linked_version_id: Option<String>,
+    locked: Option<i64>,
+    created: i64,
+    modified: i64,
+    last_played: Option<i64>,
+    submitted_time_played: i64,
+    recent_time_played: i64,
+    override_java_path: Option<String>,
+    override_extra_launch_args: serde_json::Value,
+    override_custom_env_vars: serde_json::Value,
+    override_mc_memory_max: Option<i64>,
+    override_mc_force_fullscreen: Option<i64>,
+    override_mc_game_resolution_x: Option<i64>,
+    override_mc_game_resolution_y: Option<i64>,
+    override_hook_pre_launch: Option<String>,
+    override_hook_wrapper: Option<String>,
+    override_hook_post_exit: Option<String>,
+}
 
-        Ok(res.map(|x| Profile {
+impl TryFrom<ProfileQueryResult> for Profile {
+    type Error = crate::Error;
+
+    fn try_from(x: ProfileQueryResult) -> Result<Self, Self::Error> {
+        Ok(Profile {
             path: x.path,
             install_stage: ProfileInstallStage::from_str(&x.install_stage),
             name: x.name,
@@ -259,16 +267,16 @@ impl Profile {
                 None
             },
             created: Utc
-                .timestamp_opt(x.created, 0)
+                .timestamp_opt(x.created as i64, 0)
                 .single()
                 .unwrap_or_else(Utc::now),
             modified: Utc
-                .timestamp_opt(x.modified, 0)
+                .timestamp_opt(x.modified as i64, 0)
                 .single()
                 .unwrap_or_else(Utc::now),
             last_played: x
                 .last_played
-                .and_then(|x| Utc.timestamp_opt(x, 0).single()),
+                .and_then(|x| Utc.timestamp_opt(x as i64, 0).single()),
             submitted_time_played: x.submitted_time_played as u64,
             recent_time_played: x.recent_time_played as u64,
             java_path: x.override_java_path,
@@ -295,14 +303,14 @@ impl Profile {
                 wrapper: x.override_hook_wrapper,
                 post_exit: x.override_hook_post_exit,
             },
-        }))
+        })
     }
+}
 
-    pub async fn get_all(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
-    ) -> crate::Result<DashMap<String, Self>> {
-        // TODO: remove duplicated code
-        let res = sqlx::query!(
+macro_rules! select_profiles_with_predicate {
+    ($predicate:tt, $param:ident) => {
+        sqlx::query_as!(
+            ProfileQueryResult,
             r#"
             SELECT
                 path, install_stage, name, icon_path,
@@ -317,64 +325,50 @@ impl Profile {
                 override_hook_pre_launch, override_hook_wrapper, override_hook_post_exit
             FROM profiles
             "#
+                + $predicate,
+            $param
         )
-            .fetch(exec)
-            .try_fold(DashMap::new(), |acc, x| {
-                acc.insert(
-                    x.path.clone(),
-                    Profile {
-                        path: x.path,
-                        install_stage: ProfileInstallStage::from_str(&x.install_stage),
-                        name: x.name,
-                        icon_path: x.icon_path,
-                        game_version: x.game_version,
-                        loader: ModLoader::from_str(&x.mod_loader),
-                        loader_version: x.mod_loader_version,
-                        groups: serde_json::from_value(x.groups)
-                            .unwrap_or_default(),
-                        linked_data: if let Some(project_id) = x.linked_project_id {
-                            if let Some(version_id) = x.linked_version_id {
-                                x.locked.map(|locked|
-                                LinkedData {
-                                    project_id,
-                                    version_id,
-                                    locked: locked == 1,
-                                }
-                                )
-                            } else { None }
-                        } else { None },
-                        created: Utc.timestamp_opt(x.created, 0).single().unwrap_or_else(Utc::now),
-                        modified: Utc.timestamp_opt(x.modified, 0).single().unwrap_or_else(Utc::now),
-                        last_played: x.last_played.and_then(|x| Utc.timestamp_opt(x, 0).single()),
-                        submitted_time_played: x.submitted_time_played as u64,
-                        recent_time_played: x.recent_time_played as u64,
-                        java_path: x.override_java_path,
-                        extra_launch_args: serde_json::from_value(x
-                            .override_extra_launch_args).ok(),
-                        custom_env_vars: serde_json::from_value(x.override_custom_env_vars).ok(),
-                        memory: x.override_mc_memory_max.map(|x| MemorySettings {
-                            maximum: x as u32,
-                        }),
-                        force_fullscreen: x.override_mc_force_fullscreen.map(|x| x == 1),
-                        game_resolution: if let Some(x_res) = x.override_mc_game_resolution_x {
-                            x.override_mc_game_resolution_y.map(|y_res| WindowSize(
-                                x_res as u16,
-                                y_res as u16,
-                            ))
-                        } else { None },
-                        hooks: Hooks {
-                            pre_launch: x.override_hook_pre_launch,
-                            wrapper: x.override_hook_wrapper,
-                            post_exit: x.override_hook_post_exit,
-                        },
-                    },
-                );
+    };
+}
 
-                async move { Ok(acc) }
-            })
+impl Profile {
+    pub async fn get(
+        path: &str,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        Ok(Self::get_many(&[path], exec).await?.into_iter().next())
+    }
+
+    pub async fn get_many(
+        paths: &[&str],
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Vec<Self>> {
+        let ids = serde_json::to_string(&paths)?;
+        let results = select_profiles_with_predicate!(
+            "WHERE path IN (SELECT value FROM json_each($1))",
+            ids
+        )
+        .fetch_all(exec)
+        .await?;
+
+        results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<crate::Result<Vec<_>>>()
+    }
+
+    pub async fn get_all(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Vec<Self>> {
+        let true_val = 1;
+        let results = select_profiles_with_predicate!("WHERE 1=$1", true_val)
+            .fetch_all(exec)
             .await?;
 
-        Ok(res)
+        results
+            .into_iter()
+            .map(|r| r.try_into())
+            .collect::<crate::Result<Vec<_>>>()
     }
 
     pub async fn upsert(
@@ -687,7 +681,6 @@ impl Profile {
     }
 
     #[tracing::instrument(skip(exec))]
-    #[theseus_macros::debug_pin]
     pub async fn add_project_version<'a, E>(
         profile_path: &str,
         version_id: &str,
@@ -739,7 +732,7 @@ impl Profile {
     }
 
     #[tracing::instrument(skip(bytes))]
-    #[theseus_macros::debug_pin]
+
     pub async fn add_project_bytes(
         profile_path: &str,
         file_name: &str,

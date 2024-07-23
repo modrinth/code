@@ -50,7 +50,6 @@ pub async fn find_filtered_jres(
     })
 }
 
-#[theseus_macros::debug_pin]
 pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 

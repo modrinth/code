@@ -16,7 +16,6 @@ use tracing::{info, trace};
 // Creates a profile of a given name and adds it to the in-memory state
 // Returns relative filepath as ProfilePathId which can be used to access it in the State
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
     name: String,         // the name of the profile, and relative path

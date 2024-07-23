@@ -6,6 +6,7 @@ use discord_rich_presence::{
 };
 use tokio::sync::RwLock;
 
+use crate::state::{Process, Profile};
 use crate::State;
 
 pub struct DiscordGuard {
@@ -170,19 +171,18 @@ impl DiscordGuard {
             println!("Discord is disabled, clearing activity");
             return self.clear_activity(true).await;
         }
-        if let Some(existing_child) = state
-            .children
-            .read()
-            .await
-            .running_profile_paths()
-            .await?
-            .first()
-        {
-            self.set_activity(
-                &format!("Playing {}", existing_child),
-                reconnect_if_fail,
-            )
-            .await?;
+
+        let running_profiles = Process::get_all(&state.pool).await?;
+        if let Some(existing_child) = running_profiles.first() {
+            let prof =
+                Profile::get(&existing_child.profile_path, &state.pool).await?;
+            if let Some(prof) = prof {
+                self.set_activity(
+                    &format!("Playing {}", prof.name),
+                    reconnect_if_fail,
+                )
+                .await?;
+            }
         } else {
             self.set_activity("Idling...", reconnect_if_fail).await?;
         }

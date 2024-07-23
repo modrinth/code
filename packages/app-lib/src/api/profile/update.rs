@@ -13,7 +13,7 @@ use futures::try_join;
 
 /// Updates a managed modrinth pack to the version specified by new_version_id
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn update_managed_modrinth_version(
     profile_path: &String,
     new_version_id: &String,
@@ -50,7 +50,7 @@ pub async fn update_managed_modrinth_version(
 
 /// Repair a managed modrinth pack by 'updating' it to the current version
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
     let profile = get(profile_path).await?.ok_or_else(|| {
         crate::ErrorKind::UnmanagedProfileError(profile_path.to_string())
@@ -101,7 +101,7 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
 /// Replace a managed modrinth pack with a new version
 /// If new_version_id is None, the pack is 'reinstalled' in-place
 #[tracing::instrument(skip(profile))]
-#[theseus_macros::debug_pin]
+
 async fn replace_managed_modrinth(
     profile_path: &str,
     profile: &crate::state::Profile,

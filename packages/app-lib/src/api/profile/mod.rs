@@ -9,15 +9,12 @@ use crate::pack::install_from::{
 };
 use crate::state::{
     CacheBehaviour, CachedEntry, Credentials, FileMetadata, JavaVersion,
-    ProfileFile, ProjectType, SideType,
+    Process, ProfileFile, ProjectType, SideType,
 };
 
+use crate::event::{emit::emit_profile, ProfilePayloadType};
 use crate::util::fetch;
 use crate::util::io::{self, IOError};
-use crate::{
-    event::{emit::emit_profile, ProfilePayloadType},
-    state::MinecraftChild,
-};
 pub use crate::{state::Profile, State};
 use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
@@ -62,6 +59,13 @@ pub async fn get(path: &str) -> crate::Result<Option<Profile>> {
     let profile = Profile::get(path, &state.pool).await?;
 
     Ok(profile)
+}
+
+#[tracing::instrument]
+pub async fn get_many(paths: &[&str]) -> crate::Result<Vec<Profile>> {
+    let state = State::get().await?;
+    let profiles = Profile::get_many(paths, &state.pool).await?;
+    Ok(profiles)
 }
 
 #[tracing::instrument]
@@ -215,7 +219,7 @@ pub async fn get_optimal_jre_key(
 
 /// Get a copy of the profile set
 #[tracing::instrument]
-pub async fn list() -> crate::Result<DashMap<String, Profile>> {
+pub async fn list() -> crate::Result<Vec<Profile>> {
     let state = State::get().await?;
     let profiles = Profile::get_all(&state.pool).await?;
     Ok(profiles)
@@ -234,7 +238,7 @@ pub async fn install(path: &str, force: bool) -> crate::Result<()> {
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn update_all_projects(
     profile_path: &str,
 ) -> crate::Result<HashMap<String, String>> {
@@ -304,7 +308,7 @@ pub async fn update_all_projects(
 /// Updates a project to the latest version
 /// Uses and returns the relative path to the project
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn update_project(
     profile_path: &str,
     project_path: &str,
@@ -439,7 +443,7 @@ pub async fn remove_project(
 /// Exports the profile to a Modrinth-formatted .mrpack file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 // #[tracing::instrument(skip_all)]
-// #[theseus_macros::debug_pin]
+//
 pub async fn export_mrpack(
     profile_path: &str,
     export_path: PathBuf,
@@ -611,18 +615,12 @@ fn pack_get_relative_path(
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
-pub async fn run(path: &str) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+pub async fn run(path: &str) -> crate::Result<Process> {
     let state = State::get().await?;
 
-    // Get default account and refresh credentials (preferred way to log in)
-    let default_account = {
-        let mut write = state.users.write().await;
-
-        write
-            .get_default_credential()
-            .await?
-            .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?
-    };
+    let default_account = Credentials::get_active(&state.pool)
+        .await?
+        .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
     run_credentials(path, &default_account).await
 }
@@ -630,11 +628,11 @@ pub async fn run(path: &str) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 /// Run Minecraft using a profile, and credentials for authentication
 /// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip(credentials))]
-#[theseus_macros::debug_pin]
+
 pub async fn run_credentials(
     path: &str,
     credentials: &Credentials,
-) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+) -> crate::Result<Process> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
     let mut profile = get(path).await?.ok_or_else(|| {
@@ -703,7 +701,7 @@ pub async fn run_credentials(
         mc_set_options.push(("fullscreen".to_string(), "true".to_string()));
     }
 
-    let mc_process = crate::launcher::launch_minecraft(
+    crate::launcher::launch_minecraft(
         &java_args,
         &env_args,
         &mc_set_options,
@@ -714,13 +712,21 @@ pub async fn run_credentials(
         post_exit_hook,
         &mut profile,
     )
-    .await?;
-    Ok(mc_process)
+    .await
+}
+
+pub async fn kill(path: &str) -> crate::Result<()> {
+    let processes = crate::api::process::get_by_profile_path(path).await?;
+
+    for process in processes {
+        process.kill().await?;
+    }
+
+    Ok(())
 }
 
 /// Update playtime- sending a request to the server to update the playtime
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
 pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
     let state = State::get().await?;
 

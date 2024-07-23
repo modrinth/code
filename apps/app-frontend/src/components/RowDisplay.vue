@@ -17,13 +17,9 @@ import Instance from '@/components/ui/Instance.vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import ProjectCard from '@/components/ui/ProjectCard.vue'
-import {
-  get_all_running_profile_paths,
-  get_uuids_by_profile_path,
-  kill_by_uuid,
-} from '@/helpers/process.js'
+import { get_by_profile_path } from '@/helpers/process.js'
 import { handleError } from '@/store/notifications.js'
-import { duplicate, remove, run } from '@/helpers/profile.js'
+import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { useTheming } from '@/store/state.js'
@@ -85,23 +81,24 @@ const handleInstanceRightClick = async (event, passedInstance) => {
     },
   ]
 
-  const running = await get_all_running_profile_paths().catch(handleError)
+  const runningProcesses = await get_by_profile_path(passedInstance.path).catch(handleError)
 
-  const options = running.includes(passedInstance.path)
-    ? [
-        {
-          name: 'stop',
-          color: 'danger',
-        },
-        ...baseOptions,
-      ]
-    : [
-        {
-          name: 'play',
-          color: 'primary',
-        },
-        ...baseOptions,
-      ]
+  const options =
+    runningProcesses.length > 0
+      ? [
+          {
+            name: 'stop',
+            color: 'danger',
+          },
+          ...baseOptions,
+        ]
+      : [
+          {
+            name: 'play',
+            color: 'primary',
+          },
+          ...baseOptions,
+        ]
 
   instanceOptions.value.showMenu(event, passedInstance, options)
 }
@@ -132,9 +129,7 @@ const handleOptionsClick = async (args) => {
       })
       break
     case 'stop':
-      for (const u of await get_uuids_by_profile_path(args.item.path).catch(handleError)) {
-        await kill_by_uuid(u).catch(handleError)
-      }
+      await kill(args.item.path).catch(handleError)
       mixpanel_track('InstanceStop', {
         loader: args.item.loader,
         game_version: args.item.game_version,

@@ -221,7 +221,7 @@ pub enum CommandPayload {
 
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
-    pub uuid: Uuid, // processes in state are going to be identified by UUIDs, as they might change to different processes
+    pub profile_path_id: String,
     pub pid: u32,
     pub event: ProcessPayloadType,
     pub message: String,
@@ -230,7 +230,6 @@ pub struct ProcessPayload {
 #[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
-    Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process
     Finished,
 }
 

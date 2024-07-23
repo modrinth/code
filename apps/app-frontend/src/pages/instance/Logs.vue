@@ -99,7 +99,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch
 import dayjs from 'dayjs'
 import isToday from 'dayjs/plugin/isToday'
 import isYesterday from 'dayjs/plugin/isYesterday'
-import { get_uuids_by_profile_path } from '@/helpers/process.js'
+import { get_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
@@ -209,9 +209,9 @@ const processedLogs = computed(() => {
 
 async function getLiveStdLog() {
   if (route.params.id) {
-    const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
+    const processes = await get_by_profile_path(route.params.id).catch(handleError)
     let returnValue
-    if (uuids.length === 0) {
+    if (processes.length === 0) {
       returnValue = emptyText.join('\n')
     } else {
       const logCursor = await get_latest_log_cursor(

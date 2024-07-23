@@ -116,7 +116,7 @@ pub async fn is_valid_atlauncher(instance_folder: PathBuf) -> bool {
 }
 
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn import_atlauncher(
     atlauncher_base_path: PathBuf, // path to base atlauncher folder
     instance_folder: String,       // instance folder in atlauncher_base_path
