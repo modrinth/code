@@ -6,13 +6,23 @@
         <span class="label__title">{{ formatMessage(messages.servernameTitle) }}</span>
         <span class="label__description">{{ formatMessage(messages.servernameDescription) }}</span>
       </label>
-      <input id="servername-field" type="text" value="BetterAdventures++ Server" />
+      <input v-model="newName" :placeholder="data.name" />
+      <button type="submit" class="btn btn-primary" @click="() => updateServerName()">Save</button>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { Server } from "~/types/servers";
+import { ref } from "vue";
+
 const { formatMessage } = useVIntl();
+
+const route = useNativeRoute();
+const serverId = route.params.id;
+
+const auth = await useAuth();
+
 const messages = defineMessages({
   title: {
     id: "server.options.general.title",
@@ -31,4 +41,16 @@ const messages = defineMessages({
     defaultMessage: "A name to help identify your server.",
   },
 });
+
+const { data, status } = await useLazyAsyncData("Server", async () => {
+  return await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
+});
+
+const newName = ref("");
+
+const updateServerName = async () => {
+  await usePyroFetch(auth.value.token, `servers/${serverId}/name`, 0, "POST", "application/json", {
+    name: newName.value,
+  });
+};
 </script>

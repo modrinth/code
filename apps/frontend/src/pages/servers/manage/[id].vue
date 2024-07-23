@@ -36,7 +36,7 @@
               {{
                 data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
               }}
-              {{ data?.mc_version }}</span
+              {{ data?.loader_version }}</span
             >
           </div>
           <div class="h-6 w-0.5 bg-[#26252b]"></div>
