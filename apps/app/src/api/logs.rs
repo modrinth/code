@@ -54,7 +54,7 @@ pub async fn logs_get_output_by_filename(
     filename: String,
 ) -> Result<CensoredString> {
     Ok(
-        logs::get_output_by_filename(&profile_path, log_type, &filename)
+        logs::get_output_by_filename(profile_path, log_type, &filename)
             .await?,
     )
 }

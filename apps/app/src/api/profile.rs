@@ -41,7 +41,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 // invoke('plugin:profile|profile_add_path',path)
 #[tauri::command]
 pub async fn profile_remove(path: &str) -> Result<()> {
-    profile::remove(&path).await?;
+    profile::remove(path).await?;
     Ok(())
 }
 
@@ -49,14 +49,14 @@ pub async fn profile_remove(path: &str) -> Result<()> {
 // invoke('plugin:profile|profile_add_path',path)
 #[tauri::command]
 pub async fn profile_get(path: &str) -> Result<Option<Profile>> {
-    let res = profile::get(&path).await?;
+    let res = profile::get(path).await?;
     Ok(res)
 }
 
 #[tauri::command]
 pub async fn profile_get_many(paths: Vec<String>) -> Result<Vec<Profile>> {
     let ids = paths.iter().map(|x| &**x).collect::<Vec<&str>>();
-    let entries = profile::get_many(&*ids).await?;
+    let entries = profile::get_many(&ids).await?;
     Ok(entries)
 }
 
@@ -64,7 +64,7 @@ pub async fn profile_get_many(paths: Vec<String>) -> Result<Vec<Profile>> {
 pub async fn profile_get_projects(
     path: &str,
 ) -> Result<DashMap<String, ProfileFile>> {
-    let res = profile::get_projects(&path).await?;
+    let res = profile::get_projects(path).await?;
     Ok(res)
 }
 
@@ -72,7 +72,7 @@ pub async fn profile_get_projects(
 // invoke('plugin:profile|profile_get_full_path',path)
 #[tauri::command]
 pub async fn profile_get_full_path(path: &str) -> Result<PathBuf> {
-    let res = profile::get_full_path(&path).await?;
+    let res = profile::get_full_path(path).await?;
     Ok(res)
 }
 
@@ -83,7 +83,7 @@ pub async fn profile_get_mod_full_path(
     path: &str,
     project_path: &str,
 ) -> Result<PathBuf> {
-    let res = profile::get_mod_full_path(&path, &project_path).await?;
+    let res = profile::get_mod_full_path(path, project_path).await?;
     Ok(res)
 }
 
@@ -92,7 +92,7 @@ pub async fn profile_get_mod_full_path(
 pub async fn profile_get_optimal_jre_key(
     path: &str,
 ) -> Result<Option<JavaVersion>> {
-    let res = profile::get_optimal_jre_key(&path).await?;
+    let res = profile::get_optimal_jre_key(path).await?;
     Ok(res)
 }
 
@@ -128,7 +128,7 @@ pub async fn profile_check_installed(
 /// invoke('plugin:profile|profile_install')
 #[tauri::command]
 pub async fn profile_install(path: &str, force: bool) -> Result<()> {
-    profile::install(&path, force).await?;
+    profile::install(path, force).await?;
     Ok(())
 }
 
@@ -136,7 +136,7 @@ pub async fn profile_install(path: &str, force: bool) -> Result<()> {
 /// invoke('plugin:profile|profile_update_all')
 #[tauri::command]
 pub async fn profile_update_all(path: &str) -> Result<HashMap<String, String>> {
-    Ok(profile::update_all_projects(&path).await?)
+    Ok(profile::update_all_projects(path).await?)
 }
 
 /// Updates a specified project
@@ -146,7 +146,7 @@ pub async fn profile_update_project(
     path: &str,
     project_path: &str,
 ) -> Result<String> {
-    Ok(profile::update_project(&path, &project_path, None).await?)
+    Ok(profile::update_project(path, project_path, None).await?)
 }
 
 // Adds a project to a profile from a version ID
@@ -156,7 +156,7 @@ pub async fn profile_add_project_from_version(
     path: &str,
     version_id: &str,
 ) -> Result<String> {
-    Ok(profile::add_project_from_version(&path, version_id).await?)
+    Ok(profile::add_project_from_version(path, version_id).await?)
 }
 
 // Adds a project to a profile from a path
@@ -167,7 +167,7 @@ pub async fn profile_add_project_from_path(
     project_path: &Path,
     project_type: Option<ProjectType>,
 ) -> Result<String> {
-    let res = profile::add_project_from_path(&path, project_path, project_type)
+    let res = profile::add_project_from_path(path, project_path, project_type)
         .await?;
     Ok(res)
 }
@@ -179,7 +179,7 @@ pub async fn profile_toggle_disable_project(
     path: &str,
     project_path: &str,
 ) -> Result<String> {
-    Ok(profile::toggle_disable_project(&path, &project_path).await?)
+    Ok(profile::toggle_disable_project(path, project_path).await?)
 }
 
 // Removes a project from a profile
@@ -189,7 +189,7 @@ pub async fn profile_remove_project(
     path: &str,
     project_path: &str,
 ) -> Result<()> {
-    profile::remove_project(&path, &project_path).await?;
+    profile::remove_project(path, project_path).await?;
     Ok(())
 }
 
@@ -208,7 +208,7 @@ pub async fn profile_update_managed_modrinth_version(
 // Repairs a managed Modrinth profile by updating it to the current version
 #[tauri::command]
 pub async fn profile_repair_managed_modrinth(path: &str) -> Result<()> {
-    Ok(profile::update::repair_managed_modrinth(&path).await?)
+    Ok(profile::update::repair_managed_modrinth(path).await?)
 }
 
 // Exports a profile to a .mrpack file (export_location should end in .mrpack)
@@ -223,7 +223,7 @@ pub async fn profile_export_mrpack(
     name: Option<String>, // only used to cache
 ) -> Result<()> {
     profile::export_mrpack(
-        &path,
+        path,
         export_location,
         included_overrides,
         version_id,
@@ -239,7 +239,7 @@ pub async fn profile_export_mrpack(
 pub async fn profile_get_pack_export_candidates(
     profile_path: &str,
 ) -> Result<Vec<String>> {
-    let candidates = profile::get_pack_export_candidates(&profile_path).await?;
+    let candidates = profile::get_pack_export_candidates(profile_path).await?;
     Ok(candidates)
 }
 
@@ -249,7 +249,7 @@ pub async fn profile_get_pack_export_candidates(
 // invoke('plugin:profile|profile_run', path)
 #[tauri::command]
 pub async fn profile_run(path: &str) -> Result<Process> {
-    let process = profile::run(&path).await?;
+    let process = profile::run(path).await?;
 
     Ok(process)
 }
@@ -263,14 +263,14 @@ pub async fn profile_run_credentials(
     path: &str,
     credentials: Credentials,
 ) -> Result<Process> {
-    let process = profile::run_credentials(&path, &credentials).await?;
+    let process = profile::run_credentials(path, &credentials).await?;
 
     Ok(process)
 }
 
 #[tauri::command]
 pub async fn profile_kill(path: &str) -> Result<()> {
-    profile::kill(&path).await?;
+    profile::kill(path).await?;
 
     Ok(())
 }
@@ -301,14 +301,14 @@ pub struct EditProfile {
 // invoke('plugin:profile|profile_edit', {path, editProfile})
 #[tauri::command]
 pub async fn profile_edit(path: &str, edit_profile: EditProfile) -> Result<()> {
-    profile::edit(&path, |prof| {
+    profile::edit(path, |prof| {
         if let Some(name) = edit_profile.name.clone() {
             prof.name = name;
         }
         if let Some(game_version) = edit_profile.game_version.clone() {
             prof.game_version = game_version;
         }
-        if let Some(loader) = edit_profile.loader.clone() {
+        if let Some(loader) = edit_profile.loader {
             prof.loader = loader;
         }
         prof.loader_version.clone_from(&edit_profile.loader_version);
@@ -348,6 +348,6 @@ pub async fn profile_edit_icon(
     path: &str,
     icon_path: Option<&Path>,
 ) -> Result<()> {
-    profile::edit_icon(&path, icon_path).await?;
+    profile::edit_icon(path, icon_path).await?;
     Ok(())
 }
