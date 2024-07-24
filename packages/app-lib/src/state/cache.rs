@@ -122,6 +122,7 @@ impl CacheValueType {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
+#[allow(clippy::large_enum_variant)]
 pub enum CacheValue {
     Project(Project),
 

@@ -118,7 +118,7 @@ impl ModLoader {
         }
     }
 
-    pub fn from_str(val: &str) -> Self {
+    pub fn from_string(val: &str) -> Self {
         match val {
             "vanilla" => Self::Vanilla,
             "forge" => Self::Forge,
@@ -257,7 +257,7 @@ impl TryFrom<ProfileQueryResult> for Profile {
             name: x.name,
             icon_path: x.icon_path,
             game_version: x.game_version,
-            loader: ModLoader::from_str(&x.mod_loader),
+            loader: ModLoader::from_string(&x.mod_loader),
             loader_version: x.mod_loader_version,
             groups: serde_json::from_value(x.groups).unwrap_or_default(),
             linked_data: if let Some(project_id) = x.linked_project_id {
@@ -787,7 +787,7 @@ impl Profile {
 
         cache_file_hash(
             bytes.clone(),
-            &profile_path,
+            profile_path,
             &project_path,
             hash,
             exec,

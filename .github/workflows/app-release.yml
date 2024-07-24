@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - launcher-db-overhual
     tags:
       - 'v*'
     paths:

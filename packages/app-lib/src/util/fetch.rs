@@ -89,13 +89,7 @@ pub async fn fetch_advanced(
         && (url.starts_with("https://cdn.modrinth.com")
             || url.starts_with("https://api.modrinth.com"))
     {
-        if let Some(creds) =
-            crate::state::ModrinthCredentials::get_active(exec).await?
-        {
-            Some(creds)
-        } else {
-            None
-        }
+        crate::state::ModrinthCredentials::get_active(exec).await?
     } else {
         None
     };

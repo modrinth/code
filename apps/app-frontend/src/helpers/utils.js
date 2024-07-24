@@ -1,11 +1,4 @@
-import {
-  add_project_from_version as installMod,
-  check_installed,
-  get_full_path,
-  get_mod_full_path,
-} from '@/helpers/profile'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/notifications.js'
+import { get_full_path, get_mod_full_path } from '@/helpers/profile'
 import { invoke } from '@tauri-apps/api/tauri'
 
 export async function isDev() {
@@ -55,6 +48,7 @@ export function debounce(fn, wait) {
     if (timer) {
       clearTimeout(timer) // clear any pre-existing timer
     }
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const context = this // get the current context
     timer = setTimeout(() => {
       fn.apply(context, args) // call the function if time expires

@@ -43,72 +43,72 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     State::init().await?;
 
-    // if minecraft_auth::users().await?.is_empty() {
-    //     println!("No users found, authenticating.");
-    //     authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
-    // }
-    // //
-    // // st.settings
-    // //     .write()
-    // //     .await
-    // //     .java_globals
-    // //     .insert(JAVA_8_KEY.to_string(), check_jre(path).await?.unwrap());
-    // // Clear profiles
-    // println!("Clearing profiles.");
-    // {
-    //     let h = profile::list().await?;
-    //     for profile in h.into_iter() {
-    //         profile::remove(&profile.path).await?;
-    //     }
-    // }
+    if minecraft_auth::users().await?.is_empty() {
+        println!("No users found, authenticating.");
+        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
+    }
     //
-    // println!("Creating/adding profile.");
-    //
+    // st.settings
+    //     .write()
+    //     .await
+    //     .java_globals
+    //     .insert(JAVA_8_KEY.to_string(), check_jre(path).await?.unwrap());
+    // Clear profiles
+    println!("Clearing profiles.");
+    {
+        let h = profile::list().await?;
+        for profile in h.into_iter() {
+            profile::remove(&profile.path).await?;
+        }
+    }
+
+    println!("Creating/adding profile.");
+
     // let name = "Example".to_string();
     // let game_version = "1.21".to_string();
     // let modloader = ModLoader::Fabric;
     // let loader_version = "stable".to_string();
-    //
-    // let pack = CreatePackLocation::FromVersionId {
-    //     project_id: "1KVo5zza".to_string(),
-    //     version_id: "lKloE8SA".to_string(),
-    //     title: "Fabulously Optimized".to_string(),
-    //     icon_url: Some("https://cdn.modrinth.com/data/1KVo5zza/d8152911f8fd5d7e9a8c499fe89045af81fe816e.png".to_string()),
-    // };
-    //
-    // let profile = get_profile_from_pack(pack.clone());
-    // let profile_path = profile_create(
-    //     profile.name,
-    //     profile.game_version,
-    //     profile.modloader,
-    //     profile.loader_version,
-    //     None,
-    //     None,
-    //     None,
-    // )
-    // .await?;
-    // install_zipped_mrpack(pack, profile_path.to_string()).await?;
-    //
-    // let projects = profile::get_projects(&profile_path).await?;
-    //
-    // for (path, file) in projects {
-    //     println!(
-    //         "{path} {} {:?} {:?}",
-    //         file.file_name, file.update_version_id, file.metadata
-    //     )
-    // }
-    //
-    // println!("running");
-    // // Run a profile, running minecraft and store the RwLock to the process
-    // let process = profile::run(&profile_path).await?;
-    //
-    // println!("Minecraft PID: {}", process.pid);
-    //
-    // println!("All running process UUID {:?}", process::get_all().await?);
-    //
-    // // hold the lock to the process until it ends
-    // println!("Waiting for process to end...");
-    // process.wait_for().await?;
+
+    let pack = CreatePackLocation::FromVersionId {
+        project_id: "1KVo5zza".to_string(),
+        version_id: "lKloE8SA".to_string(),
+        title: "Fabulously Optimized".to_string(),
+        icon_url: Some("https://cdn.modrinth.com/data/1KVo5zza/d8152911f8fd5d7e9a8c499fe89045af81fe816e.png".to_string()),
+    };
+
+    let profile = get_profile_from_pack(pack.clone());
+    let profile_path = profile_create(
+        profile.name,
+        profile.game_version,
+        profile.modloader,
+        profile.loader_version,
+        None,
+        None,
+        None,
+    )
+    .await?;
+    install_zipped_mrpack(pack, profile_path.to_string()).await?;
+
+    let projects = profile::get_projects(&profile_path).await?;
+
+    for (path, file) in projects {
+        println!(
+            "{path} {} {:?} {:?}",
+            file.file_name, file.update_version_id, file.metadata
+        )
+    }
+
+    println!("running");
+    // Run a profile, running minecraft and store the RwLock to the process
+    let process = profile::run(&profile_path).await?;
+
+    println!("Minecraft PID: {}", process.pid);
+
+    println!("All running process UUID {:?}", process::get_all().await?);
+
+    // hold the lock to the process until it ends
+    println!("Waiting for process to end...");
+    process.wait_for().await?;
 
     Ok(())
 }

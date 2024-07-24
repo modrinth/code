@@ -185,10 +185,8 @@ pub async fn install_zipped_mrpack_files(
                                         .await?
                                         .join(&project_path);
 
-                                let bytes = bytes::Bytes::from(file);
-
                                 cache_file_hash(
-                                    bytes.clone(),
+                                    file.clone(),
                                     &profile_path,
                                     &project_path,
                                     project
@@ -199,7 +197,7 @@ pub async fn install_zipped_mrpack_files(
                                 )
                                 .await?;
 
-                                write(&path, &bytes, &state.io_semaphore)
+                                write(&path, &file, &state.io_semaphore)
                                     .await?;
                             }
                             _ => {}
@@ -265,7 +263,7 @@ pub async fn install_zipped_mrpack_files(
                         &profile::get_full_path(&profile_path)
                             .await?
                             .join(new_path),
-                        &*bytes,
+                        &bytes,
                         &state.io_semaphore,
                     )
                     .await?;

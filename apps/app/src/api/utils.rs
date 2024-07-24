@@ -71,7 +71,7 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(mut path: PathBuf) -> Result<()> {
+pub fn show_in_folder(path: PathBuf) -> Result<()> {
     {
         #[cfg(target_os = "windows")]
         {
@@ -90,6 +90,7 @@ pub fn show_in_folder(mut path: PathBuf) -> Result<()> {
         {
             use std::fs::metadata;
 
+            let mut path = path;
             let path_string = path.to_string_lossy().to_string();
 
             if metadata(&path)?.is_dir() {
