@@ -785,14 +785,8 @@ impl Profile {
         let project_path =
             format!("{}/{}", project_type.get_folder(), file_name);
 
-        cache_file_hash(
-            bytes.clone(),
-            profile_path,
-            &project_path,
-            hash,
-            exec,
-        )
-        .await?;
+        cache_file_hash(bytes.clone(), profile_path, &project_path, hash, exec)
+            .await?;
 
         util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;

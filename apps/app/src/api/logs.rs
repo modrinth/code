@@ -53,10 +53,7 @@ pub async fn logs_get_output_by_filename(
     log_type: LogType,
     filename: String,
 ) -> Result<CensoredString> {
-    Ok(
-        logs::get_output_by_filename(profile_path, log_type, &filename)
-            .await?,
-    )
+    Ok(logs::get_output_by_filename(profile_path, log_type, &filename).await?)
 }
 
 /// Delete all logs for a profile by profile id
