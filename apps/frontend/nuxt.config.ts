@@ -47,9 +47,6 @@ const localesCategoriesOverrides: Partial<Record<string, "fun" | "experimental">
 
 export default defineNuxtConfig({
   srcDir: "src/",
-  features: {
-    inlineStyles: false,
-  },
   app: {
     head: {
       htmlAttrs: {
