@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use theseus::pack::install_from::{get_profile_from_pack, CreatePackLocation};
+use theseus::pack::install_mrpack::install_zipped_mrpack;
 use theseus::prelude::*;
 
 use theseus::profile::create::profile_create;
@@ -39,21 +41,12 @@ async fn main() -> theseus::Result<()> {
     let _log_guard = theseus::start_logger();
 
     // Initialize state
-    let st = State::get().await?;
-    //State::update();
+    State::init().await?;
 
     if minecraft_auth::users().await?.is_empty() {
         println!("No users found, authenticating.");
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }
-
-    // Autodetect java globals
-    st.settings.write().await.max_concurrent_downloads = 50;
-    st.settings.write().await.hooks.post_exit =
-        Some("echo This is after Minecraft runs- global setting!".to_string());
-    // Changed the settings, so need to reset the semaphore
-    st.reset_fetch_semaphore().await;
-
     //
     // st.settings
     //     .write()
@@ -63,56 +56,59 @@ async fn main() -> theseus::Result<()> {
     // Clear profiles
     println!("Clearing profiles.");
     {
-        let h = profile::list(None).await?;
-        for (path, _) in h.into_iter() {
-            profile::remove(&path).await?;
+        let h = profile::list().await?;
+        for profile in h.into_iter() {
+            profile::remove(&profile.path).await?;
         }
     }
 
     println!("Creating/adding profile.");
 
-    let name = "Example".to_string();
-    let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Vanilla;
-    let loader_version = "stable".to_string();
+    // let name = "Example".to_string();
+    // let game_version = "1.21".to_string();
+    // let modloader = ModLoader::Fabric;
+    // let loader_version = "stable".to_string();
 
+    let pack = CreatePackLocation::FromVersionId {
+        project_id: "1KVo5zza".to_string(),
+        version_id: "lKloE8SA".to_string(),
+        title: "Fabulously Optimized".to_string(),
+        icon_url: Some("https://cdn.modrinth.com/data/1KVo5zza/d8152911f8fd5d7e9a8c499fe89045af81fe816e.png".to_string()),
+    };
+
+    let profile = get_profile_from_pack(pack.clone());
     let profile_path = profile_create(
-        name.clone(),
-        game_version,
-        modloader,
-        Some(loader_version),
-        None,
-        None,
+        profile.name,
+        profile.game_version,
+        profile.modloader,
+        profile.loader_version,
         None,
         None,
         None,
     )
     .await?;
+    install_zipped_mrpack(pack, profile_path.to_string()).await?;
 
-    State::sync().await?;
+    let projects = profile::get_projects(&profile_path).await?;
+
+    for (path, file) in projects {
+        println!(
+            "{path} {} {:?} {:?}",
+            file.file_name, file.update_version_id, file.metadata
+        )
+    }
 
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
-    let proc_lock = profile::run(&profile_path).await?;
-    let uuid = proc_lock.read().await.uuid;
-    let pid = proc_lock.read().await.current_child.read().await.id();
+    let process = profile::run(&profile_path).await?;
 
-    println!("Minecraft UUID: {}", uuid);
-    println!("Minecraft PID: {:?}", pid);
+    println!("Minecraft PID: {}", process.pid);
 
-    println!(
-        "All running process UUID {:?}",
-        process::get_all_running_uuids().await?
-    );
-    println!(
-        "All running process paths {:?}",
-        process::get_all_running_profile_paths().await?
-    );
+    println!("All running process UUID {:?}", process::get_all().await?);
 
     // hold the lock to the process until it ends
     println!("Waiting for process to end...");
-    let mut proc = proc_lock.write().await;
-    process::wait_for(&mut proc).await?;
+    process.wait_for().await?;
 
     Ok(())
 }

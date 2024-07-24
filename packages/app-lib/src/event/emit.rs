@@ -1,11 +1,7 @@
 use super::LoadingBarId;
-use crate::{
-    event::{
-        CommandPayload, EventError, LoadingBar, LoadingBarType,
-        ProcessPayloadType, ProfilePayloadType,
-    },
-    prelude::ProfilePathId,
-    state::{ProcessType, SafeProcesses},
+use crate::event::{
+    CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
+    ProfilePayloadType,
 };
 use futures::prelude::*;
 
@@ -49,20 +45,19 @@ const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
 /// total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
 /// title is the title of the loading bar
 /// The app will wait for this loading bar to finish before exiting, as it is considered safe.
-#[theseus_macros::debug_pin]
+
 pub async fn init_loading(
     bar_type: LoadingBarType,
     total: f64,
     title: &str,
 ) -> crate::Result<LoadingBarId> {
     let key = init_loading_unsafe(bar_type, total, title).await?;
-    SafeProcesses::add_uuid(ProcessType::LoadingBar, key.0).await?;
     Ok(key)
 }
 
 /// An unsafe loading bar can be created without adding it to the SafeProcesses list,
 /// meaning that the app won't ask to wait for it to finish before exiting.
-#[theseus_macros::debug_pin]
+
 pub async fn init_loading_unsafe(
     bar_type: LoadingBarType,
     total: f64,
@@ -149,7 +144,7 @@ pub async fn edit_loading(
 // By convention, fraction is the fraction of the progress bar that is filled
 #[allow(unused_variables)]
 #[tracing::instrument(level = "debug")]
-#[theseus_macros::debug_pin]
+
 pub async fn emit_loading(
     key: &LoadingBarId,
     increment_frac: f64,
@@ -233,22 +228,6 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
     Ok(())
 }
 
-// emit_offline(bool)
-// This is used to emit an event to the frontend that the app is offline after a refresh (or online)
-#[allow(dead_code)]
-#[allow(unused_variables)]
-pub async fn emit_offline(offline: bool) -> crate::Result<()> {
-    #[cfg(feature = "tauri")]
-    {
-        let event_state = crate::EventState::get().await?;
-        event_state
-            .app
-            .emit_all("offline", offline)
-            .map_err(EventError::from)?;
-    }
-    Ok(())
-}
-
 // emit_command(CommandPayload::Something { something })
 // ie: installing a pack, opening an .mrpack, etc
 // Generally used for url deep links and file opens that we we want to handle in the frontend
@@ -270,7 +249,7 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
 // emit_process(uuid, pid, event, message)
 #[allow(unused_variables)]
 pub async fn emit_process(
-    uuid: Uuid,
+    profile_path: &str,
     pid: u32,
     event: ProcessPayloadType,
     message: &str,
@@ -283,7 +262,7 @@ pub async fn emit_process(
             .emit_all(
                 "process",
                 ProcessPayload {
-                    uuid,
+                    profile_path_id: profile_path.to_string(),
                     pid,
                     event,
                     message: message.to_string(),
@@ -297,24 +276,18 @@ pub async fn emit_process(
 // emit_profile(path, event)
 #[allow(unused_variables)]
 pub async fn emit_profile(
-    uuid: Uuid,
-    profile_path_id: &ProfilePathId,
-    name: &str,
+    profile_path_id: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
     {
-        let path = profile_path_id.get_full_path().await?;
         let event_state = crate::EventState::get().await?;
         event_state
             .app
             .emit_all(
                 "profile",
                 ProfilePayload {
-                    uuid,
-                    profile_path_id: profile_path_id.clone(),
-                    path,
-                    name: name.to_string(),
+                    profile_path_id: profile_path_id.to_string(),
                     event,
                 },
             )
@@ -382,7 +355,7 @@ macro_rules! loading_join {
 // If message is Some(t) you will overwrite this loading bar's message with a custom one
 // num_futs is the number of futures that will be run, which is needed as we allow Iterator to be passed in, which doesn't have a size
 #[tracing::instrument(skip(stream, f))]
-#[theseus_macros::debug_pin]
+
 pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,

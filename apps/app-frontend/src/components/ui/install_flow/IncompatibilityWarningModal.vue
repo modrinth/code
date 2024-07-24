@@ -3,6 +3,7 @@
     ref="incompatibleModal"
     header="Incompatibility warning"
     :noblur="!themeStore.advancedRendering"
+    :on-hide="onInstall"
   >
     <div class="modal-body">
       <p>
@@ -12,13 +13,11 @@
       </p>
       <table>
         <tr class="header">
-          <th>{{ instance?.metadata.name }}</th>
-          <th>{{ projectTitle }}</th>
+          <th>{{ instance?.name }}</th>
+          <th>{{ project.title }}</th>
         </tr>
         <tr class="content">
-          <td class="data">
-            {{ instance?.metadata.loader }} {{ instance?.metadata.game_version }}
-          </td>
+          <td class="data">{{ instance?.loader }} {{ instance?.game_version }}</td>
           <td>
             <DropdownSelect
               v-if="versions?.length > 1"
@@ -68,34 +67,25 @@ const themeStore = useTheming()
 
 const instance = ref(null)
 const project = ref(null)
-const projectType = ref(null)
-const projectTitle = ref(null)
 const versions = ref(null)
 const selectedVersion = ref(null)
 const incompatibleModal = ref(null)
 const installing = ref(false)
 
-let markInstalled = () => {}
+let onInstall = ref(() => {})
 
 defineExpose({
-  show: (
-    instanceVal,
-    projectTitleVal,
-    selectedVersions,
-    extMarkInstalled,
-    projectIdVal,
-    projectTypeVal,
-  ) => {
+  show: (instanceVal, projectVal, projectVersions, callback) => {
     instance.value = instanceVal
-    projectTitle.value = projectTitleVal
-    versions.value = selectedVersions
-    selectedVersion.value = selectedVersions[0]
+    versions.value = projectVersions
+    selectedVersion.value = projectVersions[0]
 
-    project.value = projectIdVal
-    projectType.value = projectTypeVal
+    project.value = projectVal
+
+    onInstall.value = callback
+    installing.value = false
 
     incompatibleModal.value.show()
-    markInstalled = extMarkInstalled
 
     mixpanel_track('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
   },
@@ -105,16 +95,16 @@ const install = async () => {
   installing.value = true
   await installMod(instance.value.path, selectedVersion.value.id).catch(handleError)
   installing.value = false
-  markInstalled()
+  onInstall.value(selectedVersion.value.id)
   incompatibleModal.value.hide()
 
   mixpanel_track('ProjectInstall', {
-    loader: instance.value.metadata.loader,
-    game_version: instance.value.metadata.game_version,
+    loader: instance.value.loader,
+    game_version: instance.value.game_version,
     id: project.value,
     version_id: selectedVersion.value.id,
-    project_type: projectType.value,
-    title: projectTitle.value,
+    project_type: project.value.project_type,
+    title: project.value.title,
     source: 'ProjectIncompatibilityWarningModal',
   })
 }

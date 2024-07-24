@@ -14,10 +14,10 @@ import {
   check_installed,
   get,
   list,
+  create,
 } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
-import { create } from '@/helpers/profile'
-import { installVersionDependencies } from '@/helpers/utils'
+import { installVersionDependencies } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
@@ -27,13 +27,12 @@ import { tauri } from '@tauri-apps/api'
 const themeStore = useTheming()
 const router = useRouter()
 
-const versions = ref([])
-const project = ref('')
-const projectTitle = ref('')
-const projectType = ref('')
+const versions = ref()
+const project = ref()
 
-const installModal = ref(null)
+const installModal = ref()
 const searchFilter = ref('')
+
 const showCreation = ref(false)
 const icon = ref(null)
 const name = ref(null)
@@ -42,33 +41,65 @@ const loader = ref(null)
 const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
-defineExpose({
-  show: async (projectId, selectedVersions, title, type) => {
-    project.value = projectId
-    versions.value = selectedVersions
-    projectTitle.value = title
-    projectType.value = type
+const profiles = ref([])
 
-    installModal.value.show()
+const shownProfiles = computed(() =>
+  profiles.value
+    .filter((profile) => {
+      return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+    })
+    .filter((profile) => {
+      let loaders = versions.value.flatMap((v) => v.loaders)
+
+      return (
+        versions.value.flatMap((v) => v.game_versions).includes(profile.game_version) &&
+        (project.value.project_type === 'mod'
+          ? loaders.includes(profile.loader) || loaders.includes('minecraft')
+          : true)
+      )
+    }),
+)
+
+let onInstall = ref(() => {})
+
+defineExpose({
+  show: async (projectVal, versionsVal, callback) => {
+    project.value = projectVal
+    versions.value = versionsVal
     searchFilter.value = ''
 
-    profiles.value = await getData()
+    showCreation.value = false
+    name.value = null
+    icon.value = null
+    display_icon.value = null
+    gameVersion.value = null
+    loader.value = null
+
+    onInstall.value = callback
+
+    const profilesVal = await list().catch(handleError)
+    for (let profile of profilesVal) {
+      profile.installing = false
+      profile.installedMod = await check_installed(profile.path, project.value.id).catch(
+        handleError,
+      )
+    }
+    profiles.value = profilesVal
+
+    installModal.value.show()
 
     mixpanel_track('ProjectInstallStart', { source: 'ProjectInstallModal' })
   },
 })
 
-const profiles = ref([])
-
 async function install(instance) {
   instance.installing = true
   const version = versions.value.find((v) => {
     return (
-      v.game_versions.includes(instance.metadata.game_version) &&
-      (v.loaders.includes(instance.metadata.loader) ||
-        v.loaders.includes('minecraft') ||
-        v.loaders.includes('iris') ||
-        v.loaders.includes('optifine'))
+      v.game_versions.includes(instance.game_version) &&
+      (project.value.project_type === 'mod'
+        ? v.loaders.includes(instance.loader) || v.loaders.includes('minecraft')
+        : true)
     )
   })
 
@@ -85,45 +116,18 @@ async function install(instance) {
   instance.installing = false
 
   mixpanel_track('ProjectInstall', {
-    loader: instance.metadata.loader,
-    game_version: instance.metadata.game_version,
-    id: project.value,
+    loader: instance.loader,
+    game_version: instance.game_version,
+    id: project.value.id,
     version_id: version.id,
-    project_type: projectType.value,
-    title: projectTitle.value,
+    project_type: project.value.project_type,
+    title: project.value.title,
     source: 'ProjectInstallModal',
   })
+
+  onInstall.value(version.id)
 }
 
-async function getData() {
-  const projects = await list(true).then(Object.values).catch(handleError)
-
-  const filtered = projects
-    .filter((profile) => {
-      return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-    })
-    .filter((profile) => {
-      return (
-        versions.value.flatMap((v) => v.game_versions).includes(profile.metadata.game_version) &&
-        versions.value
-          .flatMap((v) => v.loaders)
-          .some(
-            (value) =>
-              value === profile.metadata.loader ||
-              ['minecraft', 'iris', 'optifine'].includes(value),
-          )
-      )
-    })
-
-  for (let profile of filtered) {
-    profile.installing = false
-    profile.installedMod = await check_installed(profile.path, project.value).catch(handleError)
-  }
-
-  return filtered
-}
-
-const alreadySentCreation = ref(false)
 const toggleCreation = () => {
   showCreation.value = !showCreation.value
   name.value = null
@@ -132,8 +136,7 @@ const toggleCreation = () => {
   gameVersion.value = null
   loader.value = null
 
-  if (!alreadySentCreation.value) {
-    alreadySentCreation.value = false
+  if (showCreation.value) {
     mixpanel_track('InstanceCreateStart', { source: 'ProjectInstallModal' })
   }
 }
@@ -197,18 +200,16 @@ const createInstance = async () => {
     game_version: versions.value[0].game_versions[0],
     id: project.value,
     version_id: versions.value[0].id,
-    project_type: projectType.value,
-    title: projectTitle.value,
+    project_type: project.value.project_type,
+    title: project.value.title,
     source: 'ProjectInstallModal',
   })
+
+  onInstall.value(versions.value[0].id)
 
   if (installModal.value) installModal.value.hide()
   creatingInstance.value = false
 }
-
-const check_valid = computed(() => {
-  return name.value
-})
 </script>
 
 <template>
@@ -216,6 +217,7 @@ const check_valid = computed(() => {
     ref="installModal"
     header="Install project to instance"
     :noblur="!themeStore.advancedRendering"
+    :on-hide="onInstall"
   >
     <div class="modal-body">
       <input
@@ -226,34 +228,27 @@ const check_valid = computed(() => {
         placeholder="Search for an instance"
       />
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
-        <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
-          <Button
-            transparent
-            class="profile-button"
-            @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
+        <div v-for="profile in shownProfiles" :key="profile.name" class="option">
+          <router-link
+            class="btn btn-transparent profile-button"
+            :to="`/instance/${encodeURIComponent(profile.path)}`"
+            @click="installModal.hide()"
           >
             <Avatar
-              :src="
-                !profile.metadata.icon ||
-                (profile.metadata.icon && profile.metadata.icon.startsWith('http'))
-                  ? profile.metadata.icon
-                  : tauri.convertFileSrc(profile.metadata?.icon)
-              "
+              :src="profile.icon_path ? tauri.convertFileSrc(profile.icon_path) : null"
               class="profile-image"
             />
-            {{ profile.metadata.name }}
-          </Button>
+            {{ profile.name }}
+          </router-link>
           <div
             v-tooltip="
-              profile.metadata.linked_data?.locked && !profile.installedMod
+              profile.linked_data?.locked && !profile.installedMod
                 ? 'Unpair or unlock an instance to add mods.'
                 : ''
             "
           >
             <Button
-              :disabled="
-                profile.installedMod || profile.installing || profile.metadata.linked_data?.locked
-              "
+              :disabled="profile.installedMod || profile.installing || profile.linked_data?.locked"
               @click="install(profile)"
             >
               <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
@@ -263,7 +258,7 @@ const check_valid = computed(() => {
                   ? 'Installing...'
                   : profile.installedMod
                     ? 'Installed'
-                    : profile.metadata.linked_data && profile.metadata.linked_data.locked
+                    : profile.linked_data && profile.linked_data.locked
                       ? 'Paired'
                       : 'Install'
               }}
@@ -294,7 +289,7 @@ const check_valid = computed(() => {
               placeholder="Name"
               class="creation-input"
             />
-            <Button :disabled="creatingInstance === true || !check_valid" @click="createInstance()">
+            <Button :disabled="creatingInstance === true || !name" @click="createInstance()">
               <RightArrowIcon />
               {{ creatingInstance ? 'Creating...' : 'Create' }}
             </Button>

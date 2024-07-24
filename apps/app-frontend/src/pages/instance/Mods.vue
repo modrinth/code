@@ -281,7 +281,7 @@
       <div class="markdown-body">
         <p>
           Are you sure you want to remove
-          <strong>{{ functionValues.length }} project(s)</strong> from {{ instance.metadata.name }}?
+          <strong>{{ functionValues.length }} project(s)</strong> from {{ instance.name }}?
           <br />
           This action <strong>cannot</strong> be undone.
         </p>
@@ -304,7 +304,7 @@
             >{{ Array.from(projects.values()).filter((x) => x.disabled).length }} disabled
             project(s)</strong
           >
-          from {{ instance.metadata.name }}?
+          from {{ instance.name }}?
           <br />
           This action <strong>cannot</strong> be undone.
         </p>
@@ -326,7 +326,7 @@
   />
   <ExportModal v-if="projects.length > 0" ref="exportModal" :instance="instance" />
   <ModpackVersionModal
-    v-if="instance.metadata.linked_data"
+    v-if="instance.linked_data"
     ref="modpackVersionModal"
     :instance="instance"
     :versions="props.versions"
@@ -364,6 +364,7 @@ import { computed, onUnmounted, ref, watch } from 'vue'
 import {
   add_project_from_path,
   get,
+  get_projects,
   remove_project,
   toggle_disable_project,
   update_all,
@@ -372,12 +373,18 @@ import {
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { listen } from '@tauri-apps/api/event'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
 import ExportModal from '@/components/ui/ExportModal.vue'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import AddContentButton from '@/components/ui/AddContentButton.vue'
+import {
+  get_organization_many,
+  get_project_many,
+  get_team_many,
+  get_version_many,
+} from '@/helpers/cache.js'
+import { profile_listener } from '@/helpers/events.js'
 
 const props = defineProps({
   instance: {
@@ -404,64 +411,101 @@ const props = defineProps({
   },
 })
 
-const projects = ref([])
-const selectionMap = ref(new Map())
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (
+    event.profile_path_id === props.instance.path &&
+    event.event === 'synced' &&
+    props.instance.install_stage !== 'pack_installing'
+  ) {
+    await initProjects()
+  }
+})
+
+onUnmounted(() => {
+  unlistenProfiles()
+})
+
 const showingOptions = ref(false)
 const isPackLocked = computed(() => {
-  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
+  return props.instance.linked_data && props.instance.linked_data.locked
 })
 const canUpdatePack = computed(() => {
-  if (!props.instance.metadata.linked_data) return false
-  return props.instance.metadata.linked_data.version_id !== props.instance.modrinth_update_version
+  if (!props.instance.linked_data || !props.versions || !props.versions[0]) return false
+  return props.instance.linked_data.version_id !== props.versions[0].id
 })
 const exportModal = ref(null)
 
-const initProjects = (initInstance) => {
-  projects.value = []
-  if (!initInstance || !initInstance.projects) return
-  for (const [path, project] of Object.entries(initInstance.projects)) {
-    if (project.metadata.type === 'modrinth' && !props.offline) {
-      let owner = project.metadata.members.find((x) => x.role === 'Owner')
-      projects.value.push({
+const projects = ref([])
+const selectionMap = ref(new Map())
+
+const initProjects = async () => {
+  const newProjects = []
+
+  const profileProjects = await get_projects(props.instance.path)
+  const fetchProjects = []
+  const fetchVersions = []
+
+  for (const value of Object.values(profileProjects)) {
+    if (value.metadata) {
+      fetchProjects.push(value.metadata.project_id)
+      fetchVersions.push(value.metadata.version_id)
+    }
+  }
+
+  const [modrinthProjects, modrinthVersions] = await Promise.all([
+    await get_project_many(fetchProjects).catch(handleError),
+    await get_version_many(fetchVersions).catch(handleError),
+  ])
+
+  const [modrinthTeams, modrinthOrganizations] = await Promise.all([
+    await get_team_many(modrinthProjects.map((x) => x.team)).catch(handleError),
+    await get_organization_many(
+      modrinthProjects.map((x) => x.organization).filter((x) => !!x),
+    ).catch(handleError),
+  ])
+
+  for (const [path, file] of Object.entries(profileProjects)) {
+    if (file.metadata) {
+      const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
+      const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
+      const org = project.organization
+        ? modrinthOrganizations.find((x) => x.id === project.organization)
+        : null
+
+      const team = modrinthTeams.find((x) => x[0].team_id === project.team)
+
+      let owner = org ? org.name : team.find((x) => x.is_owner).user.username
+
+      newProjects.push({
         path,
-        name: project.metadata.project.title,
-        slug: project.metadata.project.slug,
-        author: owner ? owner.user.username : null,
-        version: project.metadata.version.version_number,
-        file_name: project.file_name,
-        icon: project.metadata.project.icon_url,
-        disabled: project.disabled,
-        updateVersion: project.metadata.update_version,
-        outdated: !!project.metadata.update_version,
-        project_type: project.metadata.project.project_type,
-        id: project.metadata.project.id,
-      })
-    } else if (project.metadata.type === 'inferred') {
-      projects.value.push({
-        path,
-        name: project.metadata.title ?? project.file_name,
-        author: project.metadata.authors[0],
-        version: project.metadata.version,
-        file_name: project.file_name,
-        icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-        disabled: project.disabled,
-        outdated: false,
-        project_type: project.metadata.project_type,
+        name: project.title,
+        slug: project.slug,
+        author: owner,
+        version: version.version_number,
+        file_name: file.file_name,
+        icon: project.icon_url,
+        disabled: file.file_name.endsWith('.disabled'),
+        updateVersion: file.update_version_id,
+        outdated: !!file.update_version_id,
+        project_type: project.project_type,
+        id: project.id,
       })
     } else {
-      projects.value.push({
+      newProjects.push({
         path,
-        name: project.file_name,
+        name: file.file_name.replace('.disabled', ''),
         author: '',
         version: null,
-        file_name: project.file_name,
+        file_name: file.file_name,
         icon: null,
-        disabled: project.disabled,
+        disabled: file.file_name.endsWith('.disabled'),
         outdated: false,
-        project_type: null,
+        project_type: file.project_type,
       })
     }
   }
+
+  projects.value = newProjects
 
   const newSelectionMap = new Map()
   for (const project of projects.value) {
@@ -475,22 +519,7 @@ const initProjects = (initInstance) => {
   }
   selectionMap.value = newSelectionMap
 }
-
-initProjects(props.instance)
-
-watch(
-  () => props.instance.projects,
-  () => {
-    initProjects(props.instance)
-  },
-)
-
-watch(
-  () => props.offline,
-  () => {
-    if (props.instance) initProjects(props.instance)
-  },
-)
+await initProjects()
 
 const modpackVersionModal = ref(null)
 const installing = computed(() => props.instance.install_stage !== 'installed')
@@ -633,8 +662,8 @@ const updateAll = async () => {
   }
 
   mixpanel_track('InstanceUpdateAll', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     count: setProjects.length,
     selected: selected.value.length > 1,
   })
@@ -659,8 +688,8 @@ const updateProject = async (mod) => {
   mod.updateVersion = null
 
   mixpanel_track('InstanceProjectUpdate', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     id: mod.id,
     name: mod.name,
     project_type: mod.project_type,
@@ -686,8 +715,8 @@ const toggleDisableMod = async (mod) => {
       mod.path = newPath
       mod.disabled = !mod.disabled
       mixpanel_track('InstanceProjectDisable', {
-        loader: props.instance.metadata.loader,
-        game_version: props.instance.metadata.game_version,
+        loader: props.instance.loader,
+        game_version: props.instance.game_version,
         id: mod.id,
         name: mod.name,
         project_type: mod.project_type,
@@ -707,8 +736,8 @@ const removeMod = async (mod) => {
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
   mixpanel_track('InstanceProjectRemove', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
     id: mod.id,
     name: mod.name,
     project_type: mod.project_type,
@@ -820,7 +849,7 @@ watch(selectAll, () => {
 const unlisten = await listen('tauri://file-drop', async (event) => {
   for (const file of event.payload) {
     if (file.endsWith('.mrpack')) continue
-    await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
+    await add_project_from_path(props.instance.path, file).catch(handleError)
   }
   initProjects(await get(props.instance.path).catch(handleError))
 })
