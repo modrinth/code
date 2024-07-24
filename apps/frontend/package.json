@@ -38,6 +38,7 @@
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@vintl/vintl": "^4.4.1",
+    "ansi-to-html": "^0.7.2",
     "dayjs": "^1.11.7",
     "floating-vue": "2.0.0-beta.20",
     "fuse.js": "^6.6.2",

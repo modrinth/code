@@ -32,7 +32,7 @@
             style="white-space: pre; word-wrap: break-word; width: 100%; line-height: 170%"
           >
             <template #item="{ index, offset, ref }">
-              <Log v-if="ref" :log-line="ref" />
+              <LogParser v-if="ref" :log="ref" />
             </template>
           </VirtualScroller>
         </div>
@@ -52,7 +52,7 @@ import type { Stats, WSAuth, WSEvent } from "~/types/servers";
 import { useNotifications } from "@/composables/notifs";
 import { defineComponent } from "vue";
 import { createVirtualScroller } from "vue-typed-virtual-list";
-import Log from "~/components/ui/servers/Log.vue";
+import LogParser from "~/components/ui/servers/LogParser.vue";
 
 const VirtualScroller = createVirtualScroller<string>();
 

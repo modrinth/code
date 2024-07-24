@@ -57,24 +57,68 @@ interface IntServer {
 
 const createServer = async () => {
   loading = true;
-  const server: IntServer = await usePyroFetch(
-    auth.value.token,
-    `servers/create`,
-    0,
-    "POST",
-    "application/json",
-    {
-      name: serverName.value,
-      specs: {
-        cpu: 4.0,
-        memory_mb: 8192,
-        swap_mb: 8192,
-      },
-      source: {
-        modrinthid: pack.versions.slice(-1)[0],
-      },
+
+  let path = "servers/create";
+  const version = 0;
+  const body = {
+    name: serverName.value,
+    specs: {
+      cpu: 4.0,
+      memory_mb: 8192,
+      swap_mb: 8192,
     },
-  );
+    source: {
+      modrinthid: pack.versions.slice(-1)[0],
+    },
+    user_id: auth.value.user.id,
+  };
+  const method = "POST";
+
+  const config = useRuntimeConfig();
+
+  const timeout = 10000;
+  let retryAmount = 3;
+
+  let base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
+
+  if (!base) {
+    throw new Error(
+      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables (10001)",
+    );
+  }
+
+  if (base.endsWith("/")) {
+    base = base.slice(0, -1);
+  }
+
+  if (path.startsWith("/")) {
+    path = path.slice(1);
+  }
+
+  const fullUrl: string = `${base}/modrinth/v${version}/${path}`;
+
+  const request: any = {
+    method,
+    headers: {
+      Accept: "application/json",
+      "ngrok-skip-browser-warning": "true",
+      "X-Pinggy-No-Screen": "true",
+      "X-Master-Key": "3fYRT/6OZ8EO9IzR7aYp2N1ukR3NDrey4/geRvYI9TbYLT1hdAHc8MR0KSjZ2EQ9",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "*",
+      "User-Agent": "Pyro/1.0 (https://pyro.host)",
+      "Content-Type": "application/json",
+      retry: 0,
+      Vary: "Accept",
+    },
+    timeout,
+    retry: retryAmount,
+  };
+
+  request.body = JSON.stringify(body);
+
+  const server: IntServer = await $fetch(fullUrl, request);
+
   const serverId = server.uuid;
 
   await new Promise((resolve) => setTimeout(resolve, 3000));
