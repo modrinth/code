@@ -17,7 +17,7 @@ use crate::{
 pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
     let state = State::get().await?;
 
-    Ok(JavaVersion::get_all(&state.pool).await?)
+    JavaVersion::get_all(&state.pool).await
 }
 
 pub async fn set_java_version(java_version: JavaVersion) -> crate::Result<()> {
@@ -78,6 +78,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 None,
                 None,
                 &state.fetch_semaphore,
+                &state.pool,
             ).await?;
     emit_loading(&loading_bar, 10.0, Some("Downloading java version")).await?;
 
@@ -90,10 +91,11 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             None,
             Some((&loading_bar, 80.0)),
             &state.fetch_semaphore,
+            &state.pool,
         )
         .await?;
 
-        let path = state.directories.java_versions_dir().await;
+        let path = state.directories.java_versions_dir();
 
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
             .map_err(|_| {

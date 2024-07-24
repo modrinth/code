@@ -221,7 +221,7 @@ async function refreshSearch() {
 
     if (hideAlreadyInstalled.value) {
       const installedMods = Object.values(instanceProjects.value)
-        .filter((x) => x.metadata.type === 'modrinth')
+        .filter((x) => x.metadata)
         .map((x) => x.metadata.project_id)
 
       installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
@@ -253,7 +253,7 @@ async function refreshSearch() {
   if (instanceContext.value) {
     for (const val of rawResults.result.hits) {
       val.installed = Object.values(instanceProjects.value).some(
-        (x) => x.metadata.type === 'modrinth' && x.metadata.project_id === val.project_id,
+        (x) => x.metadata && x.metadata.project_id === val.project_id,
       )
     }
   }

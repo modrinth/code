@@ -498,7 +498,7 @@ impl DeviceTokenPair {
         Ok(None)
     }
 
-    async fn upsert(
+    pub async fn upsert(
         &self,
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
@@ -509,7 +509,7 @@ impl DeviceTokenPair {
             .key
             .key
             .to_pkcs8_pem(LineEnding::default())
-            .map_err(|err| MinecraftAuthenticationError::PEMSerialize(err))?
+            .map_err(MinecraftAuthenticationError::PEMSerialize)?
             .to_string();
         let display_claims = serde_json::to_string(&self.token.display_claims)?;
 

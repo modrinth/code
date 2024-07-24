@@ -1,11 +1,12 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::{CacheBehaviour, CachedEntry, CachedFile, FileMetadata};
+use crate::state::{cache_file_hash, CacheBehaviour, CachedEntry};
 use crate::util;
 use crate::util::fetch::{write_cached_icon, FetchSemaphore, IoSemaphore};
 use crate::util::io::{self};
 use chrono::{DateTime, TimeZone, Utc};
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use std::convert::TryFrom;
 use std::convert::TryInto;
 use std::path::{Path, PathBuf};
@@ -134,9 +135,15 @@ pub struct ProfileFile {
     pub hash: String,
     pub file_name: String,
     pub size: u64,
-    pub metadata: FileMetadata,
+    pub metadata: Option<FileMetadata>,
     pub update_version_id: Option<String>,
     pub project_type: ProjectType,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FileMetadata {
+    pub project_id: String,
+    pub version_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Copy)]
@@ -267,16 +274,16 @@ impl TryFrom<ProfileQueryResult> for Profile {
                 None
             },
             created: Utc
-                .timestamp_opt(x.created as i64, 0)
+                .timestamp_opt(x.created, 0)
                 .single()
                 .unwrap_or_else(Utc::now),
             modified: Utc
-                .timestamp_opt(x.modified as i64, 0)
+                .timestamp_opt(x.modified, 0)
                 .single()
                 .unwrap_or_else(Utc::now),
             last_played: x
                 .last_played
-                .and_then(|x| Utc.timestamp_opt(x as i64, 0).single()),
+                .and_then(|x| Utc.timestamp_opt(x, 0).single()),
             submitted_time_played: x.submitted_time_played as u64,
             recent_time_played: x.recent_time_played as u64,
             java_path: x.override_java_path,
@@ -529,18 +536,16 @@ impl Profile {
         Ok(())
     }
 
-    pub async fn get_projects<'a, E>(
+    pub async fn get_projects(
         &self,
         cache_behaviour: Option<CacheBehaviour>,
-        exec: E,
+        pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
-    ) -> crate::Result<DashMap<String, ProfileFile>>
-    where
-        E: sqlx::Acquire<'a, Database = sqlx::Sqlite> + Copy,
-    {
+    ) -> crate::Result<DashMap<String, ProfileFile>> {
         let path = crate::api::profile::get_full_path(&self.path).await?;
 
         struct InitialScanFile {
+            path: String,
             file_name: String,
             project_type: ProjectType,
             size: u64,
@@ -569,6 +574,11 @@ impl Profile {
                                 .len();
 
                             keys.push(InitialScanFile {
+                                path: format!(
+                                    "{}/{folder}/{}",
+                                    self.path,
+                                    file_name.replace(".disabled", "")
+                                ),
                                 file_name: file_name.to_string(),
                                 project_type,
                                 size: file_size,
@@ -586,7 +596,7 @@ impl Profile {
         let file_hashes = CachedEntry::get_file_hash_many(
             &keys.iter().map(|s| &*s.cache_key).collect::<Vec<_>>(),
             None,
-            exec,
+            pool,
             fetch_semaphore,
         )
         .await?;
@@ -611,13 +621,13 @@ impl Profile {
             CachedEntry::get_file_many(
                 &file_hashes_ref,
                 cache_behaviour,
-                exec,
+                pool,
                 fetch_semaphore,
             ),
             CachedEntry::get_file_update_many(
                 &file_updates_ref,
                 cache_behaviour,
-                exec,
+                pool,
                 fetch_semaphore,
             )
         )?;
@@ -626,16 +636,10 @@ impl Profile {
 
         for hash in file_hashes {
             let info_index = file_info.iter().position(|x| x.hash == hash.hash);
-            let file =
-                info_index.map(|x| file_info.remove(x)).unwrap_or_else(|| {
-                    CachedFile {
-                        hash: hash.hash.clone(),
-                        metadata: FileMetadata::Unknown,
-                    }
-                });
+            let file = info_index.map(|x| file_info.remove(x));
 
             if let Some(initial_file_index) =
-                keys.iter().position(|x| x.file_name == hash.file_name)
+                keys.iter().position(|x| x.path == hash.path)
             {
                 let initial_file = keys.remove(initial_file_index);
 
@@ -648,13 +652,11 @@ impl Profile {
                 let update_version_id = if let Some(update) = file_updates
                     .iter()
                     .find(|x| x.hash == hash.hash)
-                    .and_then(|x| x.update_version_id.as_ref())
+                    .map(|x| x.update_version_id.clone())
                 {
-                    if let FileMetadata::Modrinth { version_id, .. } =
-                        &file.metadata
-                    {
-                        if version_id != update {
-                            Some(update.clone())
+                    if let Some(metadata) = &file {
+                        if metadata.version_id != update {
+                            Some(update)
                         } else {
                             None
                         }
@@ -670,7 +672,10 @@ impl Profile {
                     hash: hash.hash,
                     file_name: initial_file.file_name,
                     size: initial_file.size,
-                    metadata: file.metadata,
+                    metadata: file.map(|x| FileMetadata {
+                        project_id: x.project_id,
+                        version_id: x.version_id,
+                    }),
                     project_type: initial_file.project_type,
                 };
                 files.insert(path, file);
@@ -680,19 +685,16 @@ impl Profile {
         Ok(files)
     }
 
-    #[tracing::instrument(skip(exec))]
-    pub async fn add_project_version<'a, E>(
+    #[tracing::instrument(skip(pool))]
+    pub async fn add_project_version(
         profile_path: &str,
         version_id: &str,
-        exec: E,
+        pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
         io_semaphore: &IoSemaphore,
-    ) -> crate::Result<String>
-    where
-        E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
-    {
+    ) -> crate::Result<String> {
         let version =
-            CachedEntry::get_version(version_id, None, exec, fetch_semaphore)
+            CachedEntry::get_version(version_id, None, pool, fetch_semaphore)
                 .await?
                 .ok_or_else(|| {
                     crate::ErrorKind::InputError(format!(
@@ -717,6 +719,7 @@ impl Profile {
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
             fetch_semaphore,
+            pool,
         )
         .await?;
 
@@ -724,8 +727,10 @@ impl Profile {
             profile_path,
             &file.filename,
             bytes,
+            file.hashes.get("sha1").map(|x| &**x),
             ProjectType::get_from_loaders(version.loaders.clone()),
             io_semaphore,
+            pool,
         )
         .await?;
         Ok(path)
@@ -737,8 +742,10 @@ impl Profile {
         profile_path: &str,
         file_name: &str,
         bytes: bytes::Bytes,
+        hash: Option<&str>,
         project_type: Option<ProjectType>,
         io_semaphore: &IoSemaphore,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<String> {
         let project_type = if let Some(project_type) = project_type {
             project_type
@@ -777,6 +784,15 @@ impl Profile {
         let path = crate::api::profile::get_full_path(profile_path).await?;
         let project_path =
             format!("{}/{}", project_type.get_folder(), file_name);
+
+        cache_file_hash(
+            bytes.clone(),
+            &profile_path,
+            &project_path,
+            hash,
+            exec,
+        )
+        .await?;
 
         util::fetch::write(&path.join(&project_path), &bytes, io_semaphore)
             .await?;

@@ -13,7 +13,7 @@ macro_rules! impl_cache_methods {
                 ) -> crate::Result<Option<$type>>
                 {
                     let state = crate::State::get().await?;
-                    Ok(CachedEntry::[<get_ $variant:snake _many>](&[id], None, &state.pool, &state.fetch_semaphore).await?.into_iter().next())
+                    Ok(CachedEntry::[<get_ $variant:snake _many>](&[id], None, &state.pool, &state.api_semaphore).await?.into_iter().next())
                 }
 
                 #[tracing::instrument]
@@ -23,7 +23,7 @@ macro_rules! impl_cache_methods {
                 {
                     let state = crate::State::get().await?;
                     let entries =
-                        CachedEntry::[<get_ $variant:snake _many>](ids, None, &state.pool, &state.fetch_semaphore).await?;
+                        CachedEntry::[<get_ $variant:snake _many>](ids, None, &state.pool, &state.api_semaphore).await?;
 
                     Ok(entries)
                 }

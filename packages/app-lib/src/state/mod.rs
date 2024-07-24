@@ -41,10 +41,7 @@ mod mr_auth;
 
 pub use self::mr_auth::*;
 
-// TODO: pass credentials to modrinth cdn
-// TODO: fix empty teams not caching
-// TODO: optimize file hashing
-// TODO: make cache key / api requests ignore fetch semaphore (causes freezing in app)∑
+mod legacy_converter;
 
 // Global state
 // RwLock on state only has concurrent reads, except for config dir change which takes control of the State
@@ -57,6 +54,9 @@ pub struct State {
     pub fetch_semaphore: FetchSemaphore,
     /// Semaphore used to limit concurrent I/O and avoid errors
     pub io_semaphore: IoSemaphore,
+    /// Semaphore to limit concurrent API requests. This is separate from the fetch semaphore
+    /// to keep API functionality while the app is performing intensive tasks.
+    pub api_semaphore: FetchSemaphore,
 
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
@@ -93,7 +93,6 @@ impl State {
     }
 
     #[tracing::instrument]
-
     async fn initialize_state() -> crate::Result<Arc<Self>> {
         let loading_bar = init_loading_unsafe(
             LoadingBarType::StateInit,
@@ -102,18 +101,28 @@ impl State {
         )
         .await?;
 
-        let directories = DirectoryInfo::init()?;
-
         let pool = db::connect().await?;
 
-        let settings = Settings::get(&pool).await?;
+        legacy_converter::migrate_legacy_data(&pool).await?;
 
-        emit_loading(&loading_bar, 10.0, None).await?;
+        let mut settings = Settings::get(&pool).await?;
 
         let fetch_semaphore =
             FetchSemaphore(Semaphore::new(settings.max_concurrent_downloads));
         let io_semaphore =
             IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
+        let api_semaphore =
+            FetchSemaphore(Semaphore::new(settings.max_concurrent_downloads));
+
+        DirectoryInfo::move_launcher_directory(
+            &mut settings,
+            &pool,
+            &io_semaphore,
+        )
+        .await?;
+
+        let directories = DirectoryInfo::init(settings.custom_dir).await?;
+
         emit_loading(&loading_bar, 10.0, None).await?;
 
         let discord_rpc = DiscordGuard::init().await?;
@@ -132,6 +141,7 @@ impl State {
             directories,
             fetch_semaphore,
             io_semaphore,
+            api_semaphore,
             discord_rpc,
             pool,
             file_watcher,

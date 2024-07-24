@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -107,6 +107,21 @@
         "name": "hook_post_exit",
         "ordinal": 20,
         "type_info": "Text"
+      },
+      {
+        "name": "custom_dir",
+        "ordinal": 21,
+        "type_info": "Text"
+      },
+      {
+        "name": "prev_custom_dir",
+        "ordinal": 22,
+        "type_info": "Text"
+      },
+      {
+        "name": "migrated",
+        "ordinal": 23,
+        "type_info": "Int64"
       }
     ],
     "parameters": {
@@ -133,8 +148,11 @@
       false,
       true,
       true,
-      true
+      true,
+      true,
+      true,
+      false
     ]
   },
-  "hash": "680770fa2ce8a786fa8bb957f2d5cabf47a8b537f32911fcfabf08f63b255bc0"
+  "hash": "03d1aeddf7788320530c447a82342aecdb4099ce183dd9106c4bcc47604cb080"
 }

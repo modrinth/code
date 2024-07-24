@@ -6,7 +6,7 @@ use crate::pack::install_from::{
     set_profile_information, EnvType, PackFile, PackFileHash,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, FileMetadata, ProfileInstallStage, SideType,
+    cache_file_hash, CacheBehaviour, CachedEntry, ProfileInstallStage, SideType,
 };
 use crate::util::fetch::{fetch_mirrors, write};
 use crate::util::io;
@@ -169,6 +169,7 @@ pub async fn install_zipped_mrpack_files(
                             .collect::<Vec<&str>>(),
                         project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
                         &state.fetch_semaphore,
+                        &state.pool,
                     )
                     .await?;
 
@@ -183,7 +184,22 @@ pub async fn install_zipped_mrpack_files(
                                     profile::get_full_path(&profile_path)
                                         .await?
                                         .join(&project_path);
-                                write(&path, &file, &state.io_semaphore)
+
+                                let bytes = bytes::Bytes::from(file);
+
+                                cache_file_hash(
+                                    bytes.clone(),
+                                    &profile_path,
+                                    &project_path,
+                                    project
+                                        .hashes
+                                        .get(&PackFileHash::Sha1)
+                                        .map(|x| &**x),
+                                    &state.pool,
+                                )
+                                .await?;
+
+                                write(&path, &bytes, &state.io_semaphore)
                                     .await?;
                             }
                             _ => {}
@@ -234,11 +250,22 @@ pub async fn install_zipped_mrpack_files(
                 }
 
                 if new_path.file_name().is_some() {
+                    let bytes = bytes::Bytes::from(content);
+
+                    cache_file_hash(
+                        bytes.clone(),
+                        &profile_path,
+                        &new_path.to_string_lossy(),
+                        None,
+                        &state.pool,
+                    )
+                    .await?;
+
                     write(
                         &profile::get_full_path(&profile_path)
                             .await?
                             .join(new_path),
-                        &content,
+                        &*bytes,
                         &state.io_semaphore,
                     )
                     .await?;
@@ -339,19 +366,13 @@ pub async fn remove_all_related_files(
             &all_hashes.iter().map(|x| &**x).collect::<Vec<_>>(),
             None,
             &state.pool,
-            &state.fetch_semaphore,
+            &state.api_semaphore,
         )
         .await?;
 
         let to_remove = file_infos
             .into_iter()
-            .filter_map(|p| {
-                if let FileMetadata::Modrinth { project_id, .. } = p.metadata {
-                    Some(project_id)
-                } else {
-                    None
-                }
-            })
+            .map(|p| p.project_id)
             .collect::<Vec<_>>();
 
         let profile = profile::get(&profile_path).await?.ok_or_else(|| {
@@ -363,13 +384,12 @@ pub async fn remove_all_related_files(
             .get_projects(
                 Some(CacheBehaviour::MustRevalidate),
                 &state.pool,
-                &state.fetch_semaphore,
+                &state.api_semaphore,
             )
             .await?
         {
-            if let FileMetadata::Modrinth { project_id, .. } = &project.metadata
-            {
-                if to_remove.contains(&project_id) {
+            if let Some(metadata) = &project.metadata {
+                if to_remove.contains(&metadata.project_id) {
                     let path = profile_full_path.join(file_path);
                     if path.exists() {
                         io::remove_file(&path).await?;

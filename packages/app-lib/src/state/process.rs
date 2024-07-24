@@ -137,10 +137,10 @@ impl Process {
             force_update: bool,
         ) {
             let diff = Utc::now()
-                .signed_duration_since(last_updated_playtime.clone())
+                .signed_duration_since(*last_updated_playtime)
                 .num_seconds();
             if diff >= 60 || force_update {
-                if let Err(e) = profile::edit(&profile_path, |prof| {
+                if let Err(e) = profile::edit(profile_path, |prof| {
                     prof.recent_time_played += diff as u64;
                     async { Ok(()) }
                 })

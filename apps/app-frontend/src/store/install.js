@@ -99,7 +99,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
           : true)
       ) {
         for (const [path, file] of Object.entries(instanceProjects)) {
-          if (file.metadata.type === 'modrinth' && file.metadata.project_id === project.id) {
+          if (file.metadata && file.metadata.project_id === project.id) {
             await remove_project(instance.path, path)
           }
         }

@@ -30,7 +30,7 @@ pub async fn profile_create(
     let state = State::get().await?;
 
     let mut path = profile::sanitize_profile_name(&name);
-    let mut full_path = state.directories.profiles_dir().await.join(&path);
+    let mut full_path = state.directories.profiles_dir().join(&path);
     if full_path.exists() {
         let mut new_path;
         let mut new_full_path;
@@ -38,8 +38,7 @@ pub async fn profile_create(
 
         loop {
             new_path = format!("{path} ({which})");
-            new_full_path =
-                state.directories.profiles_dir().await.join(&new_path);
+            new_full_path = state.directories.profiles_dir().join(&new_path);
             if !new_full_path.exists() {
                 break;
             }

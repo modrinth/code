@@ -71,7 +71,7 @@ pub async fn repair_managed_modrinth(profile_path: &str) -> crate::Result<()> {
         .get_projects(
             Some(CacheBehaviour::MustRevalidate),
             &state.pool,
-            &state.fetch_semaphore,
+            &state.api_semaphore,
         )
         .await?;
 

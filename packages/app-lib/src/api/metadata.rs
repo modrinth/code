@@ -9,7 +9,7 @@ pub async fn get_minecraft_versions() -> crate::Result<VersionManifest> {
     let minecraft_versions = CachedEntry::get_minecraft_manifest(
         None,
         &state.pool,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
     )
     .await?
     .ok_or_else(|| {
@@ -26,7 +26,7 @@ pub async fn get_loader_versions(loader: &str) -> crate::Result<Manifest> {
         loader,
         None,
         &state.pool,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
     )
     .await?
     .ok_or_else(|| {

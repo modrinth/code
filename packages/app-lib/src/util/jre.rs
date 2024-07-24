@@ -190,7 +190,7 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
         let state = State::get().await.map_err(|_| JREError::StateError)?;
 
         let mut jre_paths = HashSet::new();
-        let base_path = state.directories.java_versions_dir().await;
+        let base_path = state.directories.java_versions_dir();
 
         if base_path.is_dir() {
             if let Ok(dir) = std::fs::read_dir(base_path) {

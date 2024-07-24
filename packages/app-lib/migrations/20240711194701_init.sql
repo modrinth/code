@@ -31,6 +31,10 @@ CREATE TABLE settings (
     hook_wrapper TEXT NULL,
     hook_post_exit TEXT NULL,
 
+    custom_dir TEXT NULL,
+    prev_custom_dir TEXT NULL,
+    migrated INTEGER NOT NULL DEFAULT FALSE,
+
     PRIMARY KEY (id)
 );
 

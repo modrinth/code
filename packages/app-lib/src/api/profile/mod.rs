@@ -8,8 +8,8 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Credentials, FileMetadata, JavaVersion,
-    Process, ProfileFile, ProjectType, SideType,
+    CacheBehaviour, CachedEntry, Credentials, JavaVersion, Process,
+    ProfileFile, ProjectType, SideType,
 };
 
 use crate::event::{emit::emit_profile, ProfilePayloadType};
@@ -43,7 +43,7 @@ pub async fn remove(path: &str) -> crate::Result<()> {
 
     let mut transaction = state.pool.begin().await?;
 
-    Profile::remove(&path, &mut transaction).await?;
+    Profile::remove(path, &mut transaction).await?;
 
     emit_profile(path, ProfilePayloadType::Removed).await?;
 
@@ -76,7 +76,7 @@ pub async fn get_projects(
 
     if let Some(profile) = get(path).await? {
         let files = profile
-            .get_projects(None, &state.pool, &state.fetch_semaphore)
+            .get_projects(None, &state.pool, &state.api_semaphore)
             .await?;
 
         Ok(files)
@@ -90,9 +90,9 @@ pub async fn get_projects(
 #[tracing::instrument]
 pub async fn get_full_path(path: &str) -> crate::Result<PathBuf> {
     let state = State::get().await?;
-    let profiles_dir = state.directories.profiles_dir().await;
+    let profiles_dir = state.directories.profiles_dir();
 
-    let full_path = io::canonicalize(profiles_dir.join(&path))?;
+    let full_path = io::canonicalize(profiles_dir.join(path))?;
     Ok(full_path)
 }
 
@@ -228,8 +228,8 @@ pub async fn list() -> crate::Result<Vec<Profile>> {
 /// Installs/Repairs a profile
 #[tracing::instrument]
 pub async fn install(path: &str, force: bool) -> crate::Result<()> {
-    if let Some(mut profile) = get(path).await? {
-        crate::launcher::install_minecraft(&mut profile, None, force).await?;
+    if let Some(profile) = get(path).await? {
+        crate::launcher::install_minecraft(&profile, None, force).await?;
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(path.to_string())
             .as_error());
@@ -238,7 +238,6 @@ pub async fn install(path: &str, force: bool) -> crate::Result<()> {
 }
 
 #[tracing::instrument]
-
 pub async fn update_all_projects(
     profile_path: &str,
 ) -> crate::Result<HashMap<String, String>> {
@@ -258,7 +257,7 @@ pub async fn update_all_projects(
             .get_projects(
                 Some(CacheBehaviour::MustRevalidate),
                 &state.pool,
-                &state.fetch_semaphore,
+                &state.api_semaphore,
             )
             .await?
             .into_iter()
@@ -308,7 +307,6 @@ pub async fn update_all_projects(
 /// Updates a project to the latest version
 /// Uses and returns the relative path to the project
 #[tracing::instrument]
-
 pub async fn update_project(
     profile_path: &str,
     project_path: &str,
@@ -320,7 +318,7 @@ pub async fn update_project(
             .get_projects(
                 Some(CacheBehaviour::MustRevalidate),
                 &state.pool,
-                &state.fetch_semaphore,
+                &state.api_semaphore,
             )
             .await?
             .remove(project_path)
@@ -403,8 +401,10 @@ pub async fn add_project_from_path(
         profile_path,
         &file_name,
         bytes::Bytes::from(file),
+        None,
         project_type,
         &state.io_semaphore,
+        &state.pool,
     )
     .await?;
 
@@ -442,8 +442,7 @@ pub async fn remove_project(
 
 /// Exports the profile to a Modrinth-formatted .mrpack file
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
-// #[tracing::instrument(skip_all)]
-//
+#[tracing::instrument(skip_all)]
 pub async fn export_mrpack(
     profile_path: &str,
     export_path: PathBuf,
@@ -635,7 +634,7 @@ pub async fn run_credentials(
 ) -> crate::Result<Process> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
-    let mut profile = get(path).await?.ok_or_else(|| {
+    let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to run a nonexistent or unloaded profile at path {}!",
             path
@@ -710,7 +709,7 @@ pub async fn run_credentials(
         &resolution,
         credentials,
         post_exit_hook,
-        &mut profile,
+        &profile,
     )
     .await
 }
@@ -752,19 +751,20 @@ pub async fn try_update_playtime(path: &str) -> crate::Result<()> {
         let mut hashmap: HashMap<String, serde_json::Value> = HashMap::new();
 
         for (_, project) in profile
-            .get_projects(None, &state.pool, &state.fetch_semaphore)
+            .get_projects(None, &state.pool, &state.api_semaphore)
             .await?
         {
-            if let FileMetadata::Modrinth { version_id, .. } = project.metadata
-            {
-                hashmap.insert(version_id, playtime_update_json.clone());
+            if let Some(metadata) = project.metadata {
+                hashmap
+                    .insert(metadata.version_id, playtime_update_json.clone());
             }
         }
 
         fetch::post_json(
             "https://api.modrinth.com/analytics/playtime",
             serde_json::to_value(hashmap)?,
-            &state.fetch_semaphore,
+            &state.api_semaphore,
+            &state.pool,
         )
         .await
     } else {
@@ -824,14 +824,12 @@ pub async fn create_mrpack_json(
         .get_projects(
             Some(CacheBehaviour::MustRevalidate),
             &state.pool,
-            &state.fetch_semaphore,
+            &state.api_semaphore,
         )
         .await?
         .into_iter()
         .filter_map(|(path, file)| match file.metadata {
-            FileMetadata::Modrinth { version_id, .. } => {
-                Some((path, version_id))
-            }
+            Some(metadata) => Some((path, metadata.version_id)),
             _ => None,
         })
         .collect::<Vec<_>>();
@@ -839,7 +837,7 @@ pub async fn create_mrpack_json(
         &projects.iter().map(|x| &*x.1).collect::<Vec<_>>(),
         None,
         &state.pool,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
     )
     .await?;
 

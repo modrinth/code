@@ -68,6 +68,10 @@ watch(
       setSettings.hooks.post_exit = null
     }
 
+    if (!setSettings.custom_dir) {
+      setSettings.custom_dir = null
+    }
+
     await set(setSettings)
   },
   { deep: true },
@@ -109,31 +113,17 @@ async function signInAfter() {
   await fetchCredentials()
 }
 
-// async function findLauncherDir() {
-//   const newDir = await open({
-//     multiple: false,
-//     directory: true,
-//     title: 'Select a new app directory',
-//   })
-//
-//   const writeable = await is_dir_writeable(newDir)
-//
-//   if (!writeable) {
-//     handleError('The selected directory does not have proper permissions for write access.')
-//     return
-//   }
-//
-//   if (newDir) {
-//     settingsDir.value = newDir
-//     await refreshDir()
-//   }
-// }
-//
-// async function refreshDir() {
-//   await change_config_dir(settingsDir.value).catch(handleError)
-//   settings.value = await accessSettings().catch(handleError)
-//   settingsDir.value = settings.value.loaded_config_dir
-// }
+async function findLauncherDir() {
+  const newDir = await open({
+    multiple: false,
+    directory: true,
+    title: 'Select a new app directory',
+  })
+
+  if (newDir) {
+    settings.value.custom_dir = newDir
+  }
+}
 </script>
 
 <template>
@@ -168,19 +158,15 @@ async function signInAfter() {
           The directory where the launcher stores all of its files.
         </span>
       </label>
-      <!--      <div class="app-directory">-->
-      <!--        <div class="iconified-input">-->
-      <!--          <BoxIcon />-->
-      <!--          <input id="appDir" v-model="settingsDir" type="text" class="input" />-->
-      <!--          <Button class="r-btn" @click="findLauncherDir">-->
-      <!--            <FolderSearchIcon />-->
-      <!--          </Button>-->
-      <!--        </div>-->
-      <!--        <Button large @click="refreshDir">-->
-      <!--          <UpdatedIcon />-->
-      <!--          Refresh-->
-      <!--        </Button>-->
-      <!--      </div>-->
+      <div class="app-directory">
+        <div class="iconified-input">
+          <BoxIcon />
+          <input id="appDir" v-model="settings.custom_dir" type="text" class="input" />
+          <Button class="r-btn" @click="findLauncherDir">
+            <FolderSearchIcon />
+          </Button>
+        </div>
+      </div>
     </Card>
     <Card>
       <div class="label">

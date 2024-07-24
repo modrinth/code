@@ -291,10 +291,9 @@ pub async fn install_minecraft(
         let client_path = state
             .directories
             .version_dir(&version_jar)
-            .await
             .join(format!("{version_jar}.jar"));
 
-        let libraries_dir = state.directories.libraries_dir().await;
+        let libraries_dir = state.directories.libraries_dir();
 
         if let Some(ref mut data) = version_info.data {
             processor_rules! {
@@ -490,7 +489,6 @@ pub async fn launch_minecraft(
     let client_path = state
         .directories
         .version_dir(&version_jar)
-        .await
         .join(format!("{version_jar}.jar"));
 
     let args = version_info.arguments.clone().unwrap_or_default();
@@ -519,10 +517,10 @@ pub async fn launch_minecraft(
             args::get_jvm_arguments(
                 args.get(&d::minecraft::ArgumentType::Jvm)
                     .map(|x| x.as_slice()),
-                &state.directories.version_natives_dir(&version_jar).await,
-                &state.directories.libraries_dir().await,
+                &state.directories.version_natives_dir(&version_jar),
+                &state.directories.libraries_dir(),
                 &args::get_class_paths(
-                    &state.directories.libraries_dir().await,
+                    &state.directories.libraries_dir(),
                     version_info.libraries.as_slice(),
                     &client_path,
                     &java_version.architecture,
@@ -546,7 +544,7 @@ pub async fn launch_minecraft(
                 &version.id,
                 &version_info.asset_index.id,
                 &instance_path,
-                &state.directories.assets_dir().await,
+                &state.directories.assets_dir(),
                 &version.type_,
                 *resolution,
                 &java_version.architecture,

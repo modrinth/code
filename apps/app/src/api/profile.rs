@@ -113,9 +113,8 @@ pub async fn profile_check_installed(
 
     if let Ok(projects) = profile::get_projects(path).await {
         Ok(projects.into_iter().any(|(_, project)| {
-            if let FileMetadata::Modrinth { project_id, .. } = &project.metadata
-            {
-                check_project_id == project_id
+            if let Some(metadata) = &project.metadata {
+                check_project_id == metadata.project_id
             } else {
                 false
             }

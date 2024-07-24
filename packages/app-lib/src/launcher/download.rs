@@ -72,7 +72,6 @@ pub async fn download_version_info(
     let path = st
         .directories
         .version_dir(&version_id)
-        .await
         .join(format!("{version_id}.json"));
 
     let res = if path.exists() && !force.unwrap_or(false) {
@@ -87,7 +86,8 @@ pub async fn download_version_info(
             &version.url,
             None,
             None,
-            &st.fetch_semaphore,
+            &st.api_semaphore,
+            &st.pool,
         )
         .await?;
 
@@ -97,7 +97,8 @@ pub async fn download_version_info(
                 &loader.url,
                 None,
                 None,
-                &st.fetch_semaphore,
+                &st.api_semaphore,
+                &st.pool,
             )
             .await?;
             info = d::modded::merge_partial_version(partial, info);
@@ -139,7 +140,6 @@ pub async fn download_client(
     let path = st
         .directories
         .version_dir(version)
-        .await
         .join(format!("{version}.jar"));
 
     if !path.exists() || force {
@@ -147,6 +147,7 @@ pub async fn download_client(
             &client_download.url,
             Some(&client_download.sha1),
             &st.fetch_semaphore,
+            &st.pool,
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -172,7 +173,6 @@ pub async fn download_assets_index(
     let path = st
         .directories
         .assets_index_dir()
-        .await
         .join(format!("{}.json", &version.asset_index.id));
 
     let res = if path.exists() && !force {
@@ -187,6 +187,7 @@ pub async fn download_assets_index(
             None,
             None,
             &st.fetch_semaphore,
+            &st.pool,
         )
         .await?;
         write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore).await?;
@@ -224,7 +225,7 @@ pub async fn download_assets(
             None,
             |(name, asset)| async move {
                 let hash = &asset.hash;
-                let resource_path = st.directories.object_dir(hash).await;
+                let resource_path = st.directories.object_dir(hash);
                 let url = format!(
                     "https://resources.download.minecraft.net/{sub_hash}/{hash}",
                     sub_hash = &hash[..2]
@@ -235,7 +236,7 @@ pub async fn download_assets(
                     async {
                         if !resource_path.exists() || force {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore))
+                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore, &st.pool))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched asset with hash {hash}");
@@ -243,13 +244,13 @@ pub async fn download_assets(
                         Ok::<_, crate::Error>(())
                     },
                     async {
-                        let resource_path = st.directories.legacy_assets_dir().await.join(
+                        let resource_path = st.directories.legacy_assets_dir().join(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
                         );
 
                         if with_legacy && !resource_path.exists() || force {
                             let resource = fetch_cell
-                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore))
+                                .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore, &st.pool))
                                 .await?;
                             write(&resource_path, resource, &st.io_semaphore).await?;
                             tracing::trace!("Fetched legacy asset with hash {hash}");
@@ -280,8 +281,8 @@ pub async fn download_libraries(
     tracing::debug!("Loading libraries");
 
     tokio::try_join! {
-        io::create_dir_all(st.directories.libraries_dir().await),
-        io::create_dir_all(st.directories.version_natives_dir(version).await)
+        io::create_dir_all(st.directories.libraries_dir()),
+        io::create_dir_all(st.directories.version_natives_dir(version))
     }?;
     let num_files = libraries.len();
     loading_try_for_each_concurrent(
@@ -302,7 +303,7 @@ pub async fn download_libraries(
                 tokio::try_join! {
                     async {
                         let artifact_path = d::get_path_from_artifact(&library.name)?;
-                        let path = st.directories.libraries_dir().await.join(&artifact_path);
+                        let path = st.directories.libraries_dir().join(&artifact_path);
 
                         if path.exists() && !force {
                             return Ok(());
@@ -310,7 +311,7 @@ pub async fn download_libraries(
 
                         if let Some(d::minecraft::LibraryDownloads { artifact: Some(ref artifact), ..}) = library.downloads {
                             if !artifact.url.is_empty(){
-                                let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore)
+                                let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore, &st.pool)
                                     .await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
                                 tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
@@ -326,7 +327,7 @@ pub async fn download_libraries(
                             &artifact_path
                         ].concat();
 
-                        let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
+                        let bytes = fetch(&url, None, &st.fetch_semaphore, &st.pool).await?;
                         write(&path, &bytes, &st.io_semaphore).await?;
                         tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
                         Ok::<_, crate::Error>(())
@@ -350,10 +351,10 @@ pub async fn download_libraries(
                             );
 
                             if let Some(native) = classifiers.get(&parsed_key) {
-                                let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore).await?;
+                                let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore, &st.pool).await?;
                                 let reader = std::io::Cursor::new(&data);
                                 if let Ok(mut archive) = zip::ZipArchive::new(reader) {
-                                    match archive.extract(st.directories.version_natives_dir(version).await) {
+                                    match archive.extract(st.directories.version_natives_dir(version)) {
                                         Ok(_) => tracing::debug!("Fetched native {}", &library.name),
                                         Err(err) => tracing::error!("Failed extracting native {}. err: {}", &library.name, err)
                                     }

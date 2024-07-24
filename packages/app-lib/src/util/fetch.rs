@@ -41,8 +41,10 @@ pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
-    fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore).await
+    fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore, exec)
+        .await
 }
 
 #[tracing::instrument(skip(json_body, semaphore))]
@@ -52,13 +54,15 @@ pub async fn fetch_json<T>(
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
-    let result =
-        fetch_advanced(method, url, sha1, json_body, None, None, semaphore)
-            .await?;
+    let result = fetch_advanced(
+        method, url, sha1, json_body, None, None, semaphore, exec,
+    )
+    .await?;
     let value = serde_json::from_slice(&result)?;
     Ok(value)
 }
@@ -74,8 +78,27 @@ pub async fn fetch_advanced(
     header: Option<(&str, &str)>,
     loading_bar: Option<(&LoadingBarId, f64)>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<Bytes> {
     let _permit = semaphore.0.acquire().await?;
+
+    let creds = if !header
+        .as_ref()
+        .map(|x| &*x.0.to_lowercase() == "authorization")
+        .unwrap_or(false)
+        && (url.starts_with("https://cdn.modrinth.com")
+            || url.starts_with("https://api.modrinth.com"))
+    {
+        if let Some(creds) =
+            crate::state::ModrinthCredentials::get_active(exec).await?
+        {
+            Some(creds)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
         let mut req = REQWEST_CLIENT.request(method.clone(), url);
@@ -88,12 +111,9 @@ pub async fn fetch_advanced(
             req = req.header(header.0, header.1);
         }
 
-        // TODO: fix add back with db creds
-        // if url.starts_with("https://cdn.modrinth.com") {
-        //     if let Some(creds) = &credentials.0 {
-        //         req = req.header("Authorization", &creds.session);
-        //     }
-        // }
+        if let Some(ref creds) = creds {
+            req = req.header("Authorization", &creds.session);
+        }
 
         let result = req.send().await;
         match result {
@@ -164,11 +184,11 @@ pub async fn fetch_advanced(
 
 /// Downloads a file from specified mirrors
 #[tracing::instrument(skip(semaphore))]
-
 pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
         return Err(crate::ErrorKind::InputError(
@@ -178,7 +198,7 @@ pub async fn fetch_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = fetch(mirror, sha1, semaphore).await;
+        let result = fetch(mirror, sha1, semaphore, exec).await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;
@@ -190,11 +210,11 @@ pub async fn fetch_mirrors(
 
 /// Posts a JSON to a URL
 #[tracing::instrument(skip(json_body, semaphore))]
-
 pub async fn post_json<T>(
     url: &str,
     json_body: serde_json::Value,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
@@ -202,9 +222,12 @@ where
     let _permit = semaphore.0.acquire().await?;
 
     let mut req = REQWEST_CLIENT.post(url).json(&json_body);
-    // if let Some(creds) = &credentials.0 {
-    //     req = req.header("Authorization", &creds.session);
-    // }
+
+    if let Some(creds) =
+        crate::state::ModrinthCredentials::get_active(exec).await?
+    {
+        req = req.header("Authorization", &creds.session);
+    }
 
     let result = req.send().await?.error_for_status()?;
 
@@ -294,7 +317,7 @@ pub async fn write_cached_icon(
     Ok(path)
 }
 
-async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
+pub async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     let hash = tokio::task::spawn_blocking(move || {
         sha1_smol::Sha1::from(bytes).hexdigest()
     })

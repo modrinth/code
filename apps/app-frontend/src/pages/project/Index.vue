@@ -296,7 +296,7 @@ async function fetchProjectData() {
 
   if (instanceProjects.value) {
     const installedFile = Object.values(instanceProjects.value).find(
-      (x) => x.metadata.type === 'modrinth' && x.metadata.project_id === data.value.id,
+      (x) => x.metadata && x.metadata.project_id === data.value.id,
     )
     if (installedFile) {
       installed.value = true

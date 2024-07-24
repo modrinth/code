@@ -13,9 +13,12 @@ pub async fn authenticate_finish_flow(
 ) -> crate::Result<ModrinthCredentialsResult> {
     let state = crate::State::get().await?;
 
-    let creds =
-        crate::state::finish_login_flow(response, &state.fetch_semaphore)
-            .await?;
+    let creds = crate::state::finish_login_flow(
+        response,
+        &state.api_semaphore,
+        &state.pool,
+    )
+    .await?;
 
     if let ModrinthCredentialsResult::Credentials(creds) = &creds {
         creds.upsert(&state.pool).await?;
@@ -34,7 +37,8 @@ pub async fn login_password(
         username,
         password,
         challenge,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
+        &state.pool,
     )
     .await?;
 
@@ -52,7 +56,8 @@ pub async fn login_2fa(
 ) -> crate::Result<ModrinthCredentials> {
     let state = crate::State::get().await?;
     let creds =
-        crate::state::login_2fa(code, flow, &state.fetch_semaphore).await?;
+        crate::state::login_2fa(code, flow, &state.api_semaphore, &state.pool)
+            .await?;
 
     creds.upsert(&state.pool).await?;
 
@@ -74,7 +79,8 @@ pub async fn create_account(
         password,
         challenge,
         sign_up_newsletter,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
+        &state.pool,
     )
     .await?;
 
@@ -98,11 +104,9 @@ pub async fn logout() -> crate::Result<()> {
 #[tracing::instrument]
 pub async fn get_credentials() -> crate::Result<Option<ModrinthCredentials>> {
     let state = crate::State::get().await?;
-    let current = ModrinthCredentials::get_and_refresh(
-        &state.pool,
-        &state.fetch_semaphore,
-    )
-    .await?;
+    let current =
+        ModrinthCredentials::get_and_refresh(&state.pool, &state.api_semaphore)
+            .await?;
 
     Ok(current)
 }

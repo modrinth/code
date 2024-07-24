@@ -1,9 +1,10 @@
 use crate::config::{META_URL, MODRINTH_API_URL, MODRINTH_API_URL_V3};
-use crate::util::fetch::{fetch_json, FetchSemaphore};
+use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::Hash;
@@ -84,6 +85,39 @@ impl CacheValueType {
             _ => 60 * 60 * 30,                         // 30 minutes
         }
     }
+
+    pub fn get_empty_entry(self, key: String) -> CachedEntry {
+        CachedEntry {
+            id: key,
+            alias: None,
+            expires: Utc::now().timestamp() + self.expiry(),
+            type_: self,
+            data: None,
+        }
+    }
+
+    pub fn case_sensitive_alias(&self) -> Option<bool> {
+        match self {
+            CacheValueType::Project
+            | CacheValueType::User
+            | CacheValueType::Organization => Some(false),
+
+            CacheValueType::FileHash => Some(true),
+
+            CacheValueType::MinecraftManifest
+            | CacheValueType::Categories
+            | CacheValueType::ReportTypes
+            | CacheValueType::Loaders
+            | CacheValueType::GameVersions
+            | CacheValueType::DonationPlatforms
+            | CacheValueType::Version
+            | CacheValueType::Team
+            | CacheValueType::File
+            | CacheValueType::LoaderManifest
+            | CacheValueType::FileUpdate
+            | CacheValueType::SearchResults => None,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -159,13 +193,12 @@ pub struct CachedFileUpdate {
     pub hash: String,
     pub game_version: String,
     pub loader: String,
-    pub update_version_id: Option<String>,
+    pub update_version_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CachedFileHash {
     pub path: String,
-    pub file_name: String,
     pub size: u64,
     pub hash: String,
 }
@@ -179,17 +212,8 @@ pub struct CachedLoaderManifest {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct CachedFile {
     pub hash: String,
-    pub metadata: FileMetadata,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-#[serde(tag = "type", rename_all = "snake_case")]
-pub enum FileMetadata {
-    Modrinth {
-        project_id: String,
-        version_id: String,
-    },
-    Unknown,
+    pub project_id: String,
+    pub version_id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -445,7 +469,7 @@ impl CacheValue {
             | CacheValue::DonationPlatforms(_) => DEFAULT_ID.to_string(),
 
             CacheValue::FileHash(hash) => {
-                format!("{}-{}", hash.size, hash.path)
+                format!("{}-{}", hash.size, hash.path.replace(".disabled", ""))
             }
             CacheValue::FileUpdate(hash) => {
                 format!("{}-{}-{}", hash.hash, hash.loader, hash.game_version)
@@ -456,11 +480,13 @@ impl CacheValue {
 
     fn get_alias(&self) -> Option<String> {
         match self {
-            CacheValue::Project(project) => {
-                project.slug.clone().map(|x| x.to_lowercase())
+            CacheValue::Project(project) => project.slug.clone(),
+            CacheValue::User(user) => Some(user.username.clone()),
+            CacheValue::Organization(org) => Some(org.slug.clone()),
+
+            CacheValue::FileHash(_) => {
+                Some(format!("{}.disabled", self.get_key()))
             }
-            CacheValue::User(user) => Some(user.username.to_lowercase()),
-            CacheValue::Organization(org) => Some(org.slug.to_lowercase()),
 
             CacheValue::MinecraftManifest(_)
             | CacheValue::Categories(_)
@@ -472,7 +498,6 @@ impl CacheValue {
             | CacheValue::Team { .. }
             | CacheValue::File { .. }
             | CacheValue::LoaderManifest { .. }
-            | CacheValue::FileHash(_)
             | CacheValue::FileUpdate(_)
             | CacheValue::SearchResults(_) => None,
         }
@@ -513,31 +538,29 @@ macro_rules! impl_cache_methods {
         impl CachedEntry {
             $(
                 paste::paste! {
-                    #[tracing::instrument(skip(exec, fetch_semaphore))]
-                    pub async fn [<get_ $variant:snake>] <'a, E>(
+                    #[tracing::instrument(skip(pool, fetch_semaphore))]
+                    #[allow(dead_code)]
+                    pub async fn [<get_ $variant:snake>](
                         id: &str,
                         cache_behaviour: Option<CacheBehaviour>,
-                        exec: E,
+                        pool: &SqlitePool,
                         fetch_semaphore: &FetchSemaphore,
                     ) -> crate::Result<Option<$type>>
-                    where
-                        E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
                     {
-                        Ok(Self::[<get_ $variant:snake _many>](&[id], cache_behaviour, exec, fetch_semaphore).await?.into_iter().next())
+                        Ok(Self::[<get_ $variant:snake _many>](&[id], cache_behaviour, pool, fetch_semaphore).await?.into_iter().next())
                     }
 
-                    #[tracing::instrument(skip(exec, fetch_semaphore))]
-                    pub async fn [<get_ $variant:snake _many>] <'a, E>(
+                    #[tracing::instrument(skip(pool, fetch_semaphore))]
+                    #[allow(dead_code)]
+                    pub async fn [<get_ $variant:snake _many>](
                         ids: &[&str],
                         cache_behaviour: Option<CacheBehaviour>,
-                        exec: E,
+                        pool: &SqlitePool,
                         fetch_semaphore: &FetchSemaphore,
                     ) -> crate::Result<Vec<$type>>
-                    where
-                        E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
                     {
                         let entry =
-                            CachedEntry::get_many(CacheValueType::$variant, ids, cache_behaviour, exec, fetch_semaphore).await?;
+                            CachedEntry::get_many(CacheValueType::$variant, ids, cache_behaviour, pool, fetch_semaphore).await?;
 
                         Ok(entry.into_iter().filter_map(|x| if let Some(CacheValue::$variant(value)) = x.data {
                             Some(value)
@@ -556,17 +579,16 @@ macro_rules! impl_cache_method_singular {
         impl CachedEntry {
             $(
                 paste::paste! {
-                    #[tracing::instrument(skip(exec, fetch_semaphore))]
-                    pub async fn [<get_ $variant:snake>] <'a, E>(
+                    #[tracing::instrument(skip(pool, fetch_semaphore))]
+                    #[allow(dead_code)]
+                    pub async fn [<get_ $variant:snake>] (
                         cache_behaviour: Option<CacheBehaviour>,
-                        exec: E,
+                        pool: &SqlitePool,
                         fetch_semaphore: &FetchSemaphore,
                     ) -> crate::Result<Option<$type>>
-                    where
-                        E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
                     {
                         let entry =
-                            CachedEntry::get(CacheValueType::$variant, DEFAULT_ID, cache_behaviour, exec, fetch_semaphore).await?;
+                            CachedEntry::get(CacheValueType::$variant, DEFAULT_ID, cache_behaviour, pool, fetch_semaphore).await?;
 
                         if let Some(CacheValue::$variant(value)) = entry.map(|x| x.data).flatten() {
                             Ok(Some(value))
@@ -603,22 +625,19 @@ impl_cache_method_singular!(
 );
 
 impl CachedEntry {
-    #[tracing::instrument(skip(exec, fetch_semaphore))]
-    pub async fn get<'a, E>(
+    #[tracing::instrument(skip(pool, fetch_semaphore))]
+    pub async fn get(
         type_: CacheValueType,
         key: &str,
         cache_behaviour: Option<CacheBehaviour>,
-        exec: E,
+        pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
-    ) -> crate::Result<Option<Self>>
-    where
-        E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
-    {
+    ) -> crate::Result<Option<Self>> {
         Ok(Self::get_many(
             type_,
             &[key],
             cache_behaviour,
-            exec,
+            pool,
             fetch_semaphore,
         )
         .await?
@@ -626,17 +645,14 @@ impl CachedEntry {
         .next())
     }
 
-    #[tracing::instrument(skip(conn, fetch_semaphore))]
-    pub async fn get_many<'a, E>(
+    #[tracing::instrument(skip(pool, fetch_semaphore))]
+    pub async fn get_many(
         type_: CacheValueType,
         keys: &[&str],
         cache_behaviour: Option<CacheBehaviour>,
-        conn: E,
+        pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
-    ) -> crate::Result<Vec<Self>>
-    where
-        E: sqlx::Acquire<'a, Database = sqlx::Sqlite>,
-    {
+    ) -> crate::Result<Vec<Self>> {
         use std::time::Instant;
         let now = Instant::now();
 
@@ -656,14 +672,16 @@ impl CachedEntry {
         let mut return_vals = Vec::new();
         let expired_keys = DashSet::new();
 
-        let mut exec = conn.acquire().await?;
-
         if cache_behaviour != CacheBehaviour::Bypass {
-            let type_ = type_.as_str();
+            let type_str = type_.as_str();
             let serialized_keys = serde_json::to_string(&keys)?;
-            let lowercased_keys = serde_json::to_string(
-                &keys.iter().map(|x| x.to_lowercase()).collect::<Vec<_>>(),
-            )?;
+            let alias_keys = if type_.case_sensitive_alias().unwrap_or(true) {
+                serialized_keys.clone()
+            } else {
+                serde_json::to_string(
+                    &keys.iter().map(|x| x.to_lowercase()).collect::<Vec<_>>(),
+                )?
+            };
 
             // unsupported type NULL of column #3 ("data"), so cannot be compile time type checked
             // https://github.com/launchbadge/sqlx/issues/1979
@@ -677,11 +695,11 @@ impl CachedEntry {
                     alias IN (SELECT value FROM json_each($3))
                 )
                 "#,
-                type_,
+                type_str,
                 serialized_keys,
-                lowercased_keys
+                alias_keys
             )
-            .fetch_all(&mut *exec)
+            .fetch_all(pool)
             .await?;
 
             for row in query {
@@ -698,14 +716,20 @@ impl CachedEntry {
                         && !row
                             .alias
                             .as_ref()
-                            .map(|y| y.to_lowercase() == x.to_lowercase())
+                            .map(|y| {
+                                if type_.case_sensitive_alias().unwrap_or(true)
+                                {
+                                    x == y
+                                } else {
+                                    y.to_lowercase() == x.to_lowercase()
+                                }
+                            })
                             .unwrap_or(false)
                 });
 
                 if let Some(data) = row
                     .data
-                    .map(|x| serde_json::from_value::<CacheValue>(x).ok())
-                    .flatten()
+                    .and_then(|x| serde_json::from_value::<CacheValue>(x).ok())
                 {
                     return_vals.push(Self {
                         id: row.id,
@@ -730,6 +754,7 @@ impl CachedEntry {
                 type_,
                 remaining_keys.clone(),
                 fetch_semaphore,
+                pool,
             )
             .await;
 
@@ -745,7 +770,7 @@ impl CachedEntry {
 
                 Self::upsert_many(
                     &values.iter().map(|x| x.0.clone()).collect::<Vec<_>>(),
-                    &mut *exec,
+                    pool,
                 )
                 .await?;
 
@@ -776,7 +801,8 @@ impl CachedEntry {
                 let values = Self::fetch_many(
                     type_,
                     expired_keys,
-                    &state.fetch_semaphore,
+                    &state.api_semaphore,
+                    &state.pool,
                 )
                 .await?
                 .into_iter()
@@ -798,10 +824,11 @@ impl CachedEntry {
         type_: CacheValueType,
         keys: DashSet<impl Display + Eq + Hash + Serialize>,
         fetch_semaphore: &FetchSemaphore,
+        pool: &SqlitePool,
     ) -> crate::Result<Vec<(Self, bool)>> {
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
-                let results = fetch_json::<Vec<_>>(
+                let mut results = fetch_json::<Vec<_>>(
                     Method::GET,
                     &*format!(
                         "{}{}?ids={}",
@@ -812,39 +839,55 @@ impl CachedEntry {
                     None,
                     None,
                     &fetch_semaphore,
+                    pool,
                 )
                 .await?
                 .into_iter()
                 .map($cache_variant)
                 .collect::<Vec<_>>();
 
-                let values = dashmap::DashMap::new();
+                let mut values = vec![];
+                let visited_keys = DashSet::new();
+
                 for key in keys {
                     let key = key.to_string();
                     let lower_case_key = key.to_lowercase();
-                    if let Some(data) = results.iter().find(|x| {
+                    let case_sensitive = CacheValueType::$type
+                        .case_sensitive_alias()
+                        .unwrap_or(true);
+
+                    if let Some(position) = results.iter().position(|x| {
                         x.get_key() == key
                             || x.get_alias()
-                                .map(|x| x == lower_case_key)
+                                .map(|x| {
+                                    if case_sensitive {
+                                        x == key
+                                    } else {
+                                        x == lower_case_key
+                                    }
+                                })
                                 .unwrap_or(false)
                     }) {
-                        values.insert(data.get_key(), data.clone().get_entry());
-                    } else {
-                        values.insert(
-                            key.clone(),
-                            Self {
-                                id: key,
-                                alias: None,
-                                type_: CacheValueType::$type,
-                                data: None,
-                                expires: Utc::now().timestamp()
-                                    + CacheValueType::$type.expiry(),
-                            },
-                        );
+                        visited_keys.insert(key);
+                        if !case_sensitive {
+                            visited_keys.insert(lower_case_key);
+                        }
+
+                        let result = results.remove(position);
+
+                        values.push((result.get_entry(), true));
+                    } else if !visited_keys.contains(&key)
+                        && (case_sensitive
+                            || !visited_keys.contains(&lower_case_key))
+                    {
+                        values.push((
+                            CacheValueType::$type.get_empty_entry(key),
+                            true,
+                        ));
                     }
                 }
 
-                values.into_iter().map(|(_, val)| (val, true)).collect()
+                values
             }};
         }
 
@@ -858,6 +901,7 @@ impl CachedEntry {
                             None,
                             None,
                             &fetch_semaphore,
+                            pool,
                         )
                         .await?,
                     )
@@ -893,65 +937,102 @@ impl CachedEntry {
                 )
             }
             CacheValueType::Team => {
-                let mut values = vec![];
-
-                fetch_json::<Vec<Vec<TeamMember>>>(
+                let mut teams = fetch_json::<Vec<Vec<TeamMember>>>(
                     Method::GET,
-                    &*format!(
+                    &format!(
                         "{MODRINTH_API_URL_V3}teams?ids={}",
                         serde_json::to_string(&keys)?
                     ),
                     None,
                     None,
-                    &fetch_semaphore,
+                    fetch_semaphore,
+                    pool,
                 )
-                .await?
-                .into_iter()
-                .for_each(|team| {
-                    for member in &team {
-                        values.push((
-                            CacheValue::User(member.user.clone()).get_entry(),
-                            false,
-                        ));
-                    }
+                .await?;
 
-                    values.push((CacheValue::Team(team).get_entry(), true))
-                });
+                let mut values = vec![];
+                for key in keys {
+                    let key = key.to_string();
+
+                    if let Some(position) = teams.iter().position(|x| {
+                        x.first().map(|x| x.team_id == key).unwrap_or(false)
+                    }) {
+                        let team = teams.remove(position);
+
+                        for member in &team {
+                            values.push((
+                                CacheValue::User(member.user.clone())
+                                    .get_entry(),
+                                false,
+                            ));
+                        }
+
+                        values.push((CacheValue::Team(team).get_entry(), true))
+                    } else {
+                        values.push((
+                            CacheValueType::Team.get_empty_entry(key),
+                            true,
+                        ))
+                    }
+                }
 
                 values
             }
             CacheValueType::Organization => {
-                let mut values = vec![];
-
-                fetch_json::<Vec<Organization>>(
+                let mut orgs = fetch_json::<Vec<Organization>>(
                     Method::GET,
-                    &*format!(
+                    &format!(
                         "{MODRINTH_API_URL_V3}organizations?ids={}",
                         serde_json::to_string(&keys)?
                     ),
                     None,
                     None,
-                    &fetch_semaphore,
+                    fetch_semaphore,
+                    pool,
                 )
-                .await?
-                .into_iter()
-                .for_each(|org| {
-                    for member in &org.members {
+                .await?;
+
+                let mut values = vec![];
+                let visited_keys = DashSet::new();
+
+                for key in keys {
+                    let id = key.to_string();
+                    let slug = id.to_lowercase();
+
+                    if let Some(position) = orgs.iter().position(|x| {
+                        x.id == id || x.slug.to_lowercase() == slug
+                    }) {
+                        visited_keys.insert(id);
+                        visited_keys.insert(slug);
+
+                        let org = orgs.remove(position);
+
+                        for member in &org.members {
+                            values.push((
+                                CacheValue::User(member.user.clone())
+                                    .get_entry(),
+                                false,
+                            ));
+                        }
+
                         values.push((
-                            CacheValue::User(member.user.clone()).get_entry(),
+                            CacheValue::Team(org.members.clone()).get_entry(),
                             false,
                         ));
-                    }
 
-                    values.push((
-                        CacheValue::Team(org.members.clone()).get_entry(),
-                        false,
-                    ));
-                    values.push((
-                        CacheValue::Organization(org).get_entry(),
-                        true,
-                    ));
-                });
+                        values.push((
+                            CacheValue::Organization(org).get_entry(),
+                            true,
+                        ));
+                    } else if !visited_keys.contains(&id)
+                        && !visited_keys.contains(&slug)
+                    {
+                        values.push((
+                            CacheValueType::Organization.get_empty_entry(id),
+                            true,
+                        ));
+                    }
+                }
 
                 values
             }
@@ -965,6 +1046,7 @@ impl CachedEntry {
                         "hashes": &keys,
                     })),
                     fetch_semaphore,
+                    pool,
                 )
                 .await?;
 
@@ -973,8 +1055,7 @@ impl CachedEntry {
                 for key in keys {
                     let hash = key.to_string();
 
-                    let metadata = if let Some(version) = versions.remove(&hash)
-                    {
+                    if let Some(version) = versions.remove(&hash) {
                         let version_id = version.id.clone();
                         let project_id = version.project_id.clone();
                         vals.push((
@@ -982,19 +1063,30 @@ impl CachedEntry {
                             false,
                         ));
 
-                        FileMetadata::Modrinth {
-                            project_id,
-                            version_id,
-                        }
-                    } else {
-                        FileMetadata::Unknown
-                    };
+                        println!("found hash {hash} {version_id} {project_id}");
 
-                    vals.push((
-                        CacheValue::File(CachedFile { hash, metadata })
+                        vals.push((
+                            CacheValue::File(CachedFile {
+                                hash,
+                                version_id,
+                                project_id,
+                            })
                             .get_entry(),
-                        true,
-                    ))
+                            true,
+                        ))
+                    } else {
+                        vals.push((
+                            Self {
+                                id: hash,
+                                alias: None,
+                                type_: CacheValueType::File,
+                                data: None,
+                                expires: Utc::now().timestamp()
+                                    + CacheValueType::File.expiry(),
+                            },
+                            true,
+                        ))
+                    };
                 }
 
                 vals
@@ -1018,6 +1110,7 @@ impl CachedEntry {
                             None,
                             None,
                             fetch_semaphore,
+                            pool,
                         )
                     },
                 ))
@@ -1090,7 +1183,7 @@ impl CachedEntry {
             CacheValueType::FileHash => {
                 // TODO: Replace state call here
                 let state = crate::State::get().await?;
-                let profiles_dir = state.directories.profiles_dir().await;
+                let profiles_dir = state.directories.profiles_dir();
 
                 async fn hash_file(
                     profiles_dir: &Path,
@@ -1106,7 +1199,7 @@ impl CachedEntry {
 
                     let mut hasher = sha1_smol::Sha1::new();
 
-                    let mut buffer = [0u8; 65536]; // 64KiB
+                    let mut buffer = vec![0u8; 262144]; // 256KiB
                     loop {
                         use tokio::io::AsyncReadExt;
                         let bytes_read = file.read(&mut buffer).await?;
@@ -1121,11 +1214,6 @@ impl CachedEntry {
                     Ok((
                         CacheValue::FileHash(CachedFileHash {
                             path: path.to_string(),
-                            file_name: full_path
-                                .file_name()
-                                .and_then(|x| x.to_str())
-                                .unwrap_or_default()
-                                .to_string(),
                             size,
                             hash,
                         })
@@ -1137,7 +1225,7 @@ impl CachedEntry {
                 use futures::stream::StreamExt;
                 let results: Vec<_> = futures::stream::iter(keys)
                     .map(|x| hash_file(&profiles_dir, x.to_string()))
-                    .buffer_unordered(16) // hash 16 files at once
+                    .buffer_unordered(64) // hash 64 files at once
                     .collect::<Vec<_>>()
                     .await
                     .into_iter()
@@ -1175,14 +1263,7 @@ impl CachedEntry {
                         }
                     } else {
                         vals.push((
-                            Self {
-                                id: string,
-                                alias: None,
-                                type_: CacheValueType::FileUpdate,
-                                data: None,
-                                expires: Utc::now().timestamp()
-                                    + CacheValueType::FileUpdate.expiry(),
-                            },
+                            CacheValueType::FileUpdate.get_empty_entry(string),
                             true,
                         ))
                     }
@@ -1204,6 +1285,7 @@ impl CachedEntry {
                                     "game_versions": [game_version]
                                 })),
                                 fetch_semaphore,
+                                pool,
                             )
                         },
                     ))
@@ -1217,28 +1299,32 @@ impl CachedEntry {
                     for hash in hashes {
                         let version = variation.remove(hash);
 
-                        let version_id = if let Some(version) = version {
+                        if let Some(version) = version {
                             let version_id = version.id.clone();
                             vals.push((
                                 CacheValue::Version(version).get_entry(),
                                 false,
                             ));
 
-                            Some(version_id)
+                            println!("found update {hash} {game_version} {loader} {version_id}");
+                            vals.push((
+                                CacheValue::FileUpdate(CachedFileUpdate {
+                                    hash: hash.clone(),
+                                    game_version: game_version.clone(),
+                                    loader: loader.clone(),
+                                    update_version_id: version_id,
+                                })
+                                .get_entry(),
+                                true,
+                            ));
                         } else {
-                            None
+                            vals.push((
+                                CacheValueType::FileUpdate.get_empty_entry(
+                                    format!("{hash}-{loader}-{game_version}"),
+                                ),
+                                true,
+                            ))
                         };
-
-                        vals.push((
-                            CacheValue::FileUpdate(CachedFileUpdate {
-                                hash: hash.clone(),
-                                game_version: game_version.clone(),
-                                loader: loader.clone(),
-                                update_version_id: version_id,
-                            })
-                            .get_entry(),
-                            true,
-                        ))
                     }
                 }
 
@@ -1263,6 +1349,7 @@ impl CachedEntry {
                             None,
                             None,
                             fetch_semaphore,
+                            pool,
                         )
                     },
                 ))
@@ -1314,4 +1401,33 @@ impl CachedEntry {
 
         Ok(())
     }
+}
+
+pub async fn cache_file_hash(
+    bytes: bytes::Bytes,
+    profile_path: &str,
+    path: &str,
+    known_hash: Option<&str>,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+) -> crate::Result<()> {
+    let size = bytes.len();
+
+    let hash = if let Some(known_hash) = known_hash {
+        known_hash.to_string()
+    } else {
+        sha1_async(bytes).await?
+    };
+
+    CachedEntry::upsert_many(
+        &[CacheValue::FileHash(CachedFileHash {
+            path: format!("{}/{}", profile_path, path),
+            size: size as u64,
+            hash,
+        })
+        .get_entry()],
+        exec,
+    )
+    .await?;
+
+    Ok(())
 }

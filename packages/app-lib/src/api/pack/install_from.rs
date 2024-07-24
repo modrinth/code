@@ -212,7 +212,7 @@ pub async fn generate_pack_from_version_id(
         &version_id,
         None,
         &state.pool,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
     )
     .await?
     .ok_or_else(|| {
@@ -245,6 +245,7 @@ pub async fn generate_pack_from_version_id(
         None,
         Some((&loading_bar, 70.0)),
         &state.fetch_semaphore,
+        &state.pool,
     )
     .await?;
     emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
@@ -253,7 +254,7 @@ pub async fn generate_pack_from_version_id(
         &version.project_id,
         None,
         &state.pool,
-        &state.fetch_semaphore,
+        &state.api_semaphore,
     )
     .await?
     .ok_or_else(|| {
@@ -265,7 +266,8 @@ pub async fn generate_pack_from_version_id(
     emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
-        let icon_bytes = fetch(&icon_url, None, &state.fetch_semaphore).await?;
+        let icon_bytes =
+            fetch(&icon_url, None, &state.fetch_semaphore, &state.pool).await?;
 
         let filename = icon_url.rsplit('/').next();
 

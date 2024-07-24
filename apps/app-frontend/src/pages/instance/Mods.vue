@@ -446,7 +446,7 @@ const initProjects = async () => {
   const fetchVersions = []
 
   for (const value of Object.values(profileProjects)) {
-    if (value.metadata.type === 'modrinth') {
+    if (value.metadata) {
       fetchProjects.push(value.metadata.project_id)
       fetchVersions.push(value.metadata.version_id)
     }
@@ -465,7 +465,7 @@ const initProjects = async () => {
   ])
 
   for (const [path, file] of Object.entries(profileProjects)) {
-    if (file.metadata.type === 'modrinth') {
+    if (file.metadata) {
       const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
       const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
       const org = project.organization

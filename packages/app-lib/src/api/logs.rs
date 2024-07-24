@@ -103,11 +103,9 @@ pub async fn get_logs_from_type(
     let state = State::get().await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => {
-            state.directories.profile_logs_dir(profile_path).await?
-        }
+        LogType::InfoLog => state.directories.profile_logs_dir(profile_path),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_path).await?
+            state.directories.crash_reports_dir(profile_path)
         }
     };
 
@@ -178,11 +176,9 @@ pub async fn get_logs_by_filename(
     let state = State::get().await?;
 
     let path = match log_type {
-        LogType::InfoLog => {
-            state.directories.profile_logs_dir(profile_path).await?
-        }
+        LogType::InfoLog => state.directories.profile_logs_dir(profile_path),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_path).await?
+            state.directories.crash_reports_dir(profile_path)
         }
     }
     .join(&filename);
@@ -202,11 +198,9 @@ pub async fn get_output_by_filename(
     let state = State::get().await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => {
-            state.directories.profile_logs_dir(profile_subpath).await?
-        }
+        LogType::InfoLog => state.directories.profile_logs_dir(profile_subpath),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_subpath).await?
+            state.directories.crash_reports_dir(profile_subpath)
         }
     };
 
@@ -266,8 +260,7 @@ pub async fn get_output_by_filename(
 pub async fn delete_logs(profile_path_id: &str) -> crate::Result<()> {
     let state = State::get().await?;
 
-    let logs_folder =
-        state.directories.profile_logs_dir(profile_path_id).await?;
+    let logs_folder = state.directories.profile_logs_dir(profile_path_id);
     for entry in std::fs::read_dir(&logs_folder)
         .map_err(|e| IOError::with_path(e, &logs_folder))?
     {
@@ -289,11 +282,9 @@ pub async fn delete_logs_by_filename(
     let state = State::get().await?;
 
     let logs_folder = match log_type {
-        LogType::InfoLog => {
-            state.directories.profile_logs_dir(profile_path_id).await?
-        }
+        LogType::InfoLog => state.directories.profile_logs_dir(profile_path_id),
         LogType::CrashReport => {
-            state.directories.crash_reports_dir(profile_path_id).await?
+            state.directories.crash_reports_dir(profile_path_id)
         }
     };
 
@@ -317,8 +308,7 @@ pub async fn get_generic_live_log_cursor(
     mut cursor: u64, // 0 to start at beginning of file
 ) -> crate::Result<LatestLogCursor> {
     let state = State::get().await?;
-    let logs_folder =
-        state.directories.profile_logs_dir(profile_path_id).await?;
+    let logs_folder = state.directories.profile_logs_dir(profile_path_id);
     let path = logs_folder.join(log_file_name);
     if !path.exists() {
         // Allow silent failure if latest.log doesn't exist (as the instance may have been launched, but not yet created the file)

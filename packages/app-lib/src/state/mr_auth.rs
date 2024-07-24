@@ -38,6 +38,7 @@ impl ModrinthCredentials {
                     Some(("Authorization", &*creds.session)),
                     None,
                     semaphore,
+                    exec,
                 )
                 .await
                 .ok()
@@ -50,7 +51,7 @@ impl ModrinthCredentials {
 
                     Ok(Some(creds))
                 } else {
-                    Self::remove(&*creds.user_id, exec).await?;
+                    Self::remove(&creds.user_id, exec).await?;
 
                     Ok(None)
                 }
@@ -185,13 +186,14 @@ async fn get_result_from_res(
     code_key: &str,
     response: HashMap<String, Value>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentialsResult> {
     if let Some(flow) = response.get("flow").and_then(|x| x.as_str()) {
         Ok(ModrinthCredentialsResult::TwoFactorRequired {
             flow: flow.to_string(),
         })
     } else if let Some(code) = response.get(code_key).and_then(|x| x.as_str()) {
-        let info = fetch_info(code, semaphore).await?;
+        let info = fetch_info(code, semaphore, exec).await?;
 
         Ok(ModrinthCredentialsResult::Credentials(
             ModrinthCredentials {
@@ -219,9 +221,10 @@ async fn get_result_from_res(
 async fn get_creds_from_res(
     response: HashMap<String, Value>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentials> {
     if let Some(code) = response.get("session").and_then(|x| x.as_str()) {
-        let info = fetch_info(code, semaphore).await?;
+        let info = fetch_info(code, semaphore, exec).await?;
 
         Ok(ModrinthCredentials {
             session: code.to_string(),
@@ -254,8 +257,9 @@ pub fn get_login_url(provider: &str) -> String {
 pub async fn finish_login_flow(
     response: HashMap<String, Value>,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<ModrinthCredentialsResult> {
-    get_result_from_res("code", response, semaphore).await
+    get_result_from_res("code", response, semaphore, exec).await
 }
 
 pub async fn login_password(
@@ -263,6 +267,7 @@ pub async fn login_password(
     password: &str,
     challenge: &str,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<ModrinthCredentialsResult> {
     let resp = fetch_advanced(
         Method::POST,
@@ -276,17 +281,19 @@ pub async fn login_password(
         None,
         None,
         semaphore,
+        exec,
     )
     .await?;
     let value = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
 
-    get_result_from_res("session", value, semaphore).await
+    get_result_from_res("session", value, semaphore, exec).await
 }
 
 pub async fn login_2fa(
     code: &str,
     flow: &str,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<ModrinthCredentials> {
     let resp = fetch_advanced(
         Method::POST,
@@ -299,12 +306,13 @@ pub async fn login_2fa(
         None,
         None,
         semaphore,
+        exec,
     )
     .await?;
 
     let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
 
-    get_creds_from_res(response, semaphore).await
+    get_creds_from_res(response, semaphore, exec).await
 }
 
 pub async fn create_account(
@@ -314,6 +322,7 @@ pub async fn create_account(
     challenge: &str,
     sign_up_newsletter: bool,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
 ) -> crate::Result<ModrinthCredentials> {
     let resp = fetch_advanced(
         Method::POST,
@@ -329,16 +338,18 @@ pub async fn create_account(
         None,
         None,
         semaphore,
+        exec,
     )
     .await?;
     let response = serde_json::from_slice::<HashMap<String, Value>>(&resp)?;
 
-    get_creds_from_res(response, semaphore).await
+    get_creds_from_res(response, semaphore, exec).await
 }
 
 async fn fetch_info(
     token: &str,
     semaphore: &FetchSemaphore,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
 ) -> crate::Result<crate::state::cache::User> {
     let result = fetch_advanced(
         Method::GET,
@@ -348,6 +359,7 @@ async fn fetch_info(
         Some(("Authorization", token)),
         None,
         semaphore,
+        exec,
     )
     .await?;
     let value = serde_json::from_slice(&result)?;

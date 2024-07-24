@@ -27,6 +27,10 @@ pub struct Settings {
     pub game_resolution: WindowSize,
     pub hide_on_process_start: bool,
     pub hooks: Hooks,
+
+    pub custom_dir: Option<String>,
+    pub prev_custom_dir: Option<String>,
+    pub migrated: bool,
 }
 
 impl Settings {
@@ -42,7 +46,8 @@ impl Settings {
                 onboarded,
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
-                hook_pre_launch, hook_wrapper, hook_post_exit
+                hook_pre_launch, hook_wrapper, hook_post_exit,
+                custom_dir, prev_custom_dir, migrated
             FROM settings
             "
         )
@@ -83,6 +88,9 @@ impl Settings {
                 wrapper: res.hook_wrapper,
                 post_exit: res.hook_post_exit,
             },
+            custom_dir: res.custom_dir,
+            prev_custom_dir: res.prev_custom_dir,
+            migrated: res.migrated == 1,
         })
     }
 
@@ -126,7 +134,11 @@ impl Settings {
 
                 hook_pre_launch = $19,
                 hook_wrapper = $20,
-                hook_post_exit = $21
+                hook_post_exit = $21,
+
+                custom_dir = $22,
+                prev_custom_dir = $23,
+                migrated = $24
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -149,6 +161,9 @@ impl Settings {
             self.hooks.pre_launch,
             self.hooks.wrapper,
             self.hooks.post_exit,
+            self.custom_dir,
+            self.prev_custom_dir,
+            self.migrated
         )
         .execute(exec)
         .await?;
