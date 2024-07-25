@@ -1,15 +1,15 @@
-# ![Modrinth Logo on Mount Olympus](/.github/assets/monorepo_cover.png)
+# ![Modrinth Monorepo Cover](/.github/assets/monorepo_cover.png)
 
-![Issues](https://img.shields.io/github/issues-raw/Modrinth/olympus?color=c78aff&label=issues&style=for-the-badge)
-![Pull Requests](https://img.shields.io/github/issues-pr-raw/Modrinth/olympus?color=c78aff&label=PRs&style=for-the-badge)
-![Contributors](https://img.shields.io/github/contributors/Modrinth/olympus?color=c78aff&label=contributors&style=for-the-badge)
-![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
-![Commit Activity](https://img.shields.io/github/commit-activity/m/Modrinth/olympus?color=c78aff&label=commits&style=for-the-badge)
-![Last Commit](https://img.shields.io/github/last-commit/Modrinth/olympus?color=c78aff&label=last%20commit&style=for-the-badge)
+![Issues](https://img.shields.io/github/issues-raw/Modrinth/code?color=c78aff&label=issues&style=for-the-badge)
+![Pull Requests](https://img.shields.io/github/issues-pr-raw/Modrinth/code?color=c78aff&label=PRs&style=for-the-badge)
+![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=c78aff&label=contributors&style=for-the-badge)
+![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/code/badge?style=flat&logoColor=white&color=c78aff&style=for-the-badge)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/Modrinth/code?color=c78aff&label=commits&style=for-the-badge)
+![Last Commit](https://img.shields.io/github/last-commit/Modrinth/code?color=c78aff&label=last%20commit&style=for-the-badge)
 
 ## Modrinth Monorepo
 
-Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/olympus?color=black&label=) contributors!
+Welcome to the Modrinth Monorepo, the primary codebase for the Modrinth web interface and app. It contains ![Lines](https://img.shields.io/endpoint?url=https://ghloc.vercel.app/api/modrinth/olympus/badge?logoColor=white&color=black&label=) lines of code and has ![Contributors](https://img.shields.io/github/contributors/Modrinth/code?color=black&label=) contributors!
 
 If you're not a developer and you've stumbled upon this repository, you can access the web interface on the [Modrinth website](https://modrinth.com) and download the latest release of the app [here](https://modrinth.com/app).
 
