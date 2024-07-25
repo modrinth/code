@@ -78,20 +78,19 @@
       <h3>Storage Usage</h3>
 
       <div class="flex flex-col gap-2 pt-3">
-        <div class="flex flex-row items-center gap-2 text-sm">
+        <div class="flex h-5 flex-row items-center gap-2 text-sm">
           <FolderOpenIcon />
           <p>World</p>
         </div>
         <NuxtLink
           :to="`/servers/manage/${serverId}/options/properties`"
-          class="flex flex-row items-center gap-2 text-sm"
+          class="flex h-5 flex-row items-center gap-2 text-sm"
         >
           <FileTextIcon />
           <p>Server Properties</p>
         </NuxtLink>
-        <div class="flex flex-row items-center gap-2 text-sm">
+        <div class="flex h-5 flex-row items-center gap-2 text-sm">
           <FileTextIcon />
-
           <p>Paper Configuration</p>
         </div>
       </div>
@@ -123,7 +122,7 @@ const lerp = (a: number, b: number) => {
 
 const chartOptions = ref({
   chart: {
-    id: "cpu",
+    id: "stats",
     fontFamily:
       "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
     foreColor: "var(--color-base)",
@@ -204,6 +203,8 @@ const chartOptions = ref({
     max: 100,
     stepSize: 5,
   },
-  tooltip: {},
+  tooltip: {
+    enabled: false,
+  },
 });
 </script>

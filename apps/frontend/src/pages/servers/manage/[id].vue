@@ -37,7 +37,7 @@
           </div>
           <div class="h-6 w-0.5 bg-[#26252b]"></div>
           <div class="flex flex-row items-center gap-2">
-            <LoaderIcon />
+            <LoaderIcon v-if="data.loader" :loader="data.loader" />
             <span class="text-sm font-semibold">
               {{
                 data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
@@ -224,11 +224,11 @@ import {
   CopyIcon,
   PlayIcon,
   BoxIcon,
-  LoaderIcon,
   LeftArrowIcon,
 } from "@modrinth/assets";
 import { useServerStore } from "~~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
+import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

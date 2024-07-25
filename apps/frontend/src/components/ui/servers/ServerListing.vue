@@ -47,7 +47,7 @@
 
         <div v-if="loader && loader_version" class="h-6 w-0.5 bg-button-border"></div>
         <div v-if="loader && loader_version" class="flex flex-row items-center gap-2">
-          <LoaderIcon />
+          <LoaderIcon v-if="loader" :loader="loader" />
           <span class="text-sm font-semibold capitalize"> {{ loader }} {{ loader_version }} </span>
         </div>
 
@@ -68,7 +68,8 @@
 <script setup lang="ts">
 import type { Server } from "~/types/servers";
 
-import { ChevronRightIcon, BoxIcon, LoaderIcon } from "@modrinth/assets";
+import { ChevronRightIcon, BoxIcon } from "@modrinth/assets";
+import LoaderIcon from "./LoaderIcon.vue";
 
 const props = withDefaults(defineProps<Server>(), {
   server_id: "",

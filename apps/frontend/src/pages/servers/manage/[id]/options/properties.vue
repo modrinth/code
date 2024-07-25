@@ -1,52 +1,58 @@
 <template>
-  <section class="card">
-    <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
-    <div
-      v-for="(property, index) in liveProperties"
-      :key="index"
-      class="mb-4 flex justify-between gap-4"
-    >
-      <label :for="index as unknown as string" class="block text-lg font-semibold">{{
-        index
-          .toString()
-          .split("-")
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(" ")
-      }}</label>
-      <div v-if="typeof property === 'boolean'">
-        <Checkbox id="property.id" :model-value="property" />
-      </div>
-      <div v-else-if="typeof property === 'number'">
-        <input
-          :id="index as unknown as string"
-          type="number"
-          class="w-full rounded border p-2"
-          v-model.number="liveProperties[index]"
-        />
-      </div>
-      <div v-else-if="typeof property === 'object'">
-        <textarea
-          :id="index as unknown as string"
-          :value="JSON.stringify(property, null, 2)"
-          class="w-full rounded border p-2"
-        ></textarea>
-      </div>
-      <div v-else>
-        <input
-          :id="index as unknown as string"
-          :value="property"
-          type="text"
-          class="w-full rounded border p-2"
-        />
-      </div>
+  <div>
+    <div v-if="properties && status === 'success'">
+      <section class="card">
+        <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
+        <div
+          v-for="(property, index) in liveProperties"
+          :key="index"
+          class="mb-4 flex justify-between gap-4"
+        >
+          <label :for="index as unknown as string" class="block text-lg font-semibold">{{
+            index
+              .toString()
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+          }}</label>
+          <div v-if="typeof property === 'boolean'">
+            <Checkbox id="property.id" :model-value="property" />
+          </div>
+          <div v-else-if="typeof property === 'number'">
+            <input
+              :id="index as unknown as string"
+              type="number"
+              class="w-full rounded border p-2"
+              v-model.number="liveProperties[index]"
+            />
+          </div>
+          <div v-else-if="typeof property === 'object'">
+            <textarea
+              :id="index as unknown as string"
+              :value="JSON.stringify(property, null, 2)"
+              class="w-full rounded border p-2"
+            ></textarea>
+          </div>
+          <div v-else>
+            <input
+              :id="index as unknown as string"
+              :value="property"
+              type="text"
+              class="w-full rounded border p-2"
+            />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" @click="() => saveProperties()">Save</button>
+      </section>
     </div>
-    <button type="submit" class="btn btn-primary" @click="() => saveProperties()">Save</button>
-  </section>
+    <PyroLoading v-else-if="status === 'pending'" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
+import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
