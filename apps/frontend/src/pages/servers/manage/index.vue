@@ -75,14 +75,17 @@
     </div>
 
     <ul v-else>
-      <div v-if="filteredData && filteredData.length === 0" class="flex h-full items-center justify-center">
+      <div
+        v-if="filteredData && filteredData.length === 0"
+        class="flex h-full items-center justify-center"
+      >
         <p class="text-contrast">No servers found</p>
       </div>
       <div class="flex flex-col gap-4" v-else>
         <ServerListing
           v-for="server in filteredData"
           :key="server.server_id"
-          :server-id="server.server_id"
+          :server_id="server.server_id"
           :name="server.name"
           :state="server.state"
           :net="server.net"
@@ -92,6 +95,8 @@
           :loader_version="server.loader_version"
           :mc_version="server.mc_version"
           :mods="server.mods"
+          :modpack_id="server.modpack_id"
+          :project="server.project"
         />
       </div>
     </ul>

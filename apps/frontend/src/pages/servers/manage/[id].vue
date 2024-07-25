@@ -6,7 +6,13 @@
     class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
   >
     <div class="flex flex-row items-center gap-6 pt-4">
-      <UiAvatar no-shadow size="lg" alt="Server Icon" :src="project.icon_url" />
+      <UiAvatar
+        v-if="data && data.project"
+        no-shadow
+        size="lg"
+        alt="Server Icon"
+        :src="data.project.icon_url"
+      />
       <div class="flex flex-col gap-4">
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
           <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
@@ -100,9 +106,7 @@
     <UiServersPoweredByPyro />
   </div>
 
-  <div v-else-if="status === 'pending'" class="flex h-screen w-full items-center justify-center">
-    <PyroIcon class="pyro-logo-animation size-32 opacity-10" />
-  </div>
+  <PyroLoading v-else-if="status === 'pending'" />
 
   <div
     v-else-if="data && data.state === 'installing'"
@@ -222,98 +226,24 @@ import {
   BoxIcon,
   LoaderIcon,
   LeftArrowIcon,
-  PyroIcon,
 } from "@modrinth/assets";
+import { useServerStore } from "~~/stores/servers";
+import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const route = useNativeRoute();
-const serverId = route.params.id;
+const serverId = route.params.id as string;
+const serverStore = useServerStore();
 
 definePageMeta({
   middleware: "auth",
 });
 
-import type { Server } from "~/types/servers";
-
-const auth = await useAuth();
-
-const { data, status } = await useLazyAsyncData("specificServer", async () => {
-  return await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
-});
-
-const pid: any = await toRaw(useBaseFetch(`version/${await data.value.modpack}`));
-const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
+await serverStore.fetchServerData(serverId);
+const { data, status } = await useLazyAsyncData("specificServer", async () =>
+  serverStore.getServerData(serverId),
+);
 
 const copyText = (ip: string) => {
   navigator.clipboard.writeText(ip);
 };
 </script>
-
-<style>
-.page-enter-active,
-.page-leave-active {
-  transition: all 0.1s;
-}
-
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-}
-
-@keyframes zoom-in {
-  0% {
-    transform: scale(0.5);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-.pyro-logo-animation {
-  animation: zoom-in 0.8s
-    linear(
-      0 0%,
-      0.01 0.8%,
-      0.04 1.6%,
-      0.161 3.3%,
-      0.816 9.4%,
-      1.046 11.9%,
-      1.189 14.4%,
-      1.231 15.7%,
-      1.254 17%,
-      1.259 17.8%,
-      1.257 18.6%,
-      1.236 20.45%,
-      1.194 22.3%,
-      1.057 27%,
-      0.999 29.4%,
-      0.955 32.1%,
-      0.942 33.5%,
-      0.935 34.9%,
-      0.933 36.65%,
-      0.939 38.4%,
-      1 47.3%,
-      1.011 49.95%,
-      1.017 52.6%,
-      1.016 56.4%,
-      1 65.2%,
-      0.996 70.2%,
-      1.001 87.2%,
-      1 100%
-    );
-}
-
-@keyframes fade-bg-in {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 0.6;
-  }
-}
-
-.bg-loading-animation {
-  animation: fade-bg-in 0.12s linear forwards;
-}
-</style>

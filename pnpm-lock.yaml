@@ -131,6 +131,9 @@ importers:
       '@modrinth/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      '@pinia/nuxt':
+        specifier: ^0.5.1
+        version: 0.5.1(magicast@0.3.4)(rollup@4.18.0)(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))
       '@vintl/vintl':
         specifier: ^4.4.1
         version: 4.4.1(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))
@@ -164,6 +167,9 @@ importers:
       pathe:
         specifier: ^1.1.2
         version: 1.1.2
+      pinia:
+        specifier: ^2.1.7
+        version: 2.1.7(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))
       qrcode.vue:
         specifier: ^3.4.0
         version: 3.4.1(vue@3.4.31(typescript@5.5.3))
@@ -1656,6 +1662,9 @@ packages:
   '@parcel/watcher@2.4.1':
     resolution: {integrity: sha512-HNjmfLQEVRZmHRET336f20H/8kOozUGwk7yajvsonjNxbj2wBTK1WsQuHkD5yYh9RxFGL2EyDHryOihOwUoKDA==}
     engines: {node: '>= 10.0.0'}
+
+  '@pinia/nuxt@0.5.1':
+    resolution: {integrity: sha512-6wT6TqY81n+7/x3Yhf0yfaJVKkZU42AGqOR0T3+UvChcaOJhSma7OWPN64v+ptYlznat+fS1VTwNAcbi2lzHnw==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -7410,6 +7419,18 @@ snapshots:
       '@parcel/watcher-win32-arm64': 2.4.1
       '@parcel/watcher-win32-ia32': 2.4.1
       '@parcel/watcher-win32-x64': 2.4.1
+
+  '@pinia/nuxt@0.5.1(magicast@0.3.4)(rollup@4.18.0)(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))':
+    dependencies:
+      '@nuxt/kit': 3.12.3(magicast@0.3.4)(rollup@4.18.0)
+      pinia: 2.1.7(typescript@5.5.3)(vue@3.4.31(typescript@5.5.3))
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - magicast
+      - rollup
+      - supports-color
+      - typescript
+      - vue
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

@@ -337,7 +337,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@nuxtjs/turnstile"],
+  modules: ["@vintl/nuxt", "@nuxtjs/turnstile", '@pinia/nuxt',],
   vintl: {
     defaultLocale: "en-US",
     locales: [

@@ -1,10 +1,10 @@
 <template>
   <NuxtLink
-    :href="`/servers/manage/${serverId}`"
+    :href="`/servers/manage/${server_id}`"
     class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
   >
-    <UiAvatar no-shadow size="md" :src="''" alt="Server Icon" />
+    <UiAvatar no-shadow size="md" :src="icon_url" alt="Server Icon" />
     <div class="ml-8 flex flex-col gap-3">
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold">{{ name }}</h2>
@@ -40,7 +40,9 @@
       <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
         <div v-if="game" class="flex flex-row items-center gap-2">
           <img src="~/assets/images/games/minecraft.png" :alt="`${game} Logo`" class="size-5" />
-          <span class="text-sm font-semibold">{{ game[0].toUpperCase() + game.slice(1) }} {{ mc_version }}</span>
+          <span class="text-sm font-semibold"
+            >{{ game[0].toUpperCase() + game.slice(1) }} {{ mc_version }}</span
+          >
         </div>
 
         <div v-if="loader && loader_version" class="h-6 w-0.5 bg-button-border"></div>
@@ -64,11 +66,28 @@
 </template>
 
 <script setup lang="ts">
-import type { Server as ServerType } from "~/types/servers";
+import type { Server } from "~/types/servers";
 
 import { ChevronRightIcon, BoxIcon, LoaderIcon } from "@modrinth/assets";
 
-type ServerProps = Omit<ServerType, "server_id"> & { serverId: string };
+const props = withDefaults(defineProps<Server>(), {
+  server_id: "",
+  name: "",
+  state: "",
+  net: {
+    // @ts-ignore
+    ip: "",
+    port: 0,
+    domain: "",
+  },
+  modpack: "",
+  game: "",
+  loader: "",
+  loader_version: "",
+  mc_version: "",
+});
 
-defineProps<ServerProps>();
+const pid: any = await toRaw(useBaseFetch(`version/${await props.modpack}`));
+const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
+const icon_url = project.icon_url;
 </script>

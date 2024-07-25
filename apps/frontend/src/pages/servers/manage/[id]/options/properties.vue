@@ -6,8 +6,9 @@
       :key="index"
       class="mb-4 flex justify-between gap-4"
     >
-      <label :for="index" class="block text-lg font-semibold">{{
+      <label :for="index as unknown as string" class="block text-lg font-semibold">{{
         index
+          .toString()
           .split("-")
           .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
           .join(" ")
@@ -17,7 +18,7 @@
       </div>
       <div v-else-if="typeof property === 'number'">
         <input
-          :id="index"
+          :id="index as unknown as string"
           type="number"
           class="w-full rounded border p-2"
           v-model.number="liveProperties[index]"
@@ -25,13 +26,18 @@
       </div>
       <div v-else-if="typeof property === 'object'">
         <textarea
-          :id="index"
+          :id="index as unknown as string"
           :value="JSON.stringify(property, null, 2)"
           class="w-full rounded border p-2"
         ></textarea>
       </div>
       <div v-else>
-        <input :id="index" :value="property" type="text" class="w-full rounded border p-2" />
+        <input
+          :id="index as unknown as string"
+          :value="property"
+          type="text"
+          class="w-full rounded border p-2"
+        />
       </div>
     </div>
     <button type="submit" class="btn btn-primary" @click="() => saveProperties()">Save</button>

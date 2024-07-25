@@ -7,6 +7,65 @@ export interface Mod {
   };
 }
 
+interface License {
+  id: string;
+  name: string;
+  url: string;
+}
+
+interface DonationUrl {
+  id: string;
+  platform: string;
+  url: string;
+}
+
+interface GalleryItem {
+  url: string;
+  featured: boolean;
+  title: string;
+  description: string;
+  created: string;
+  ordering: number;
+}
+
+interface Project {
+  slug: string;
+  title: string;
+  description: string;
+  categories: string[];
+  client_side: 'required' | 'optional';
+  server_side: 'required' | 'optional';
+  body: string;
+  status: 'approved' | 'pending' | 'rejected';
+  requested_status: 'approved' | 'pending' | 'rejected';
+  additional_categories: string[];
+  issues_url: string;
+  source_url: string;
+  wiki_url: string;
+  discord_url: string;
+  donation_urls: DonationUrl[];
+  project_type: 'mod' | 'resourcepack' | 'map' | 'plugin'; // Adjust types as needed
+  downloads: number;
+  icon_url: string;
+  color: number;
+  thread_id: string;
+  monetization_status: 'monetized' | 'non-monetized';
+  id: string;
+  team: string;
+  body_url: string | null;
+  moderator_message: string | null;
+  published: string;
+  updated: string;
+  approved: string;
+  queued: string;
+  followers: number;
+  license: License;
+  versions: string[];
+  game_versions: string[];
+  loaders: string[];
+  gallery: GalleryItem[];
+}
+
 export interface Server {
   server_id: string;
   name: string;
@@ -17,6 +76,8 @@ export interface Server {
     domain: string;
   };
   modpack: string | null;
+  modpack_id: string | null;
+  project: Project | null;
   game: string;
   loader: string | null;
   loader_version: string | null;
