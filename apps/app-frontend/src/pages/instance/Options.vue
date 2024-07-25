@@ -25,7 +25,7 @@
           <XIcon />
           Cancel
         </button>
-        <button class="btn btn-danger" :disabled="action_disabled" @click="unlockProfile">
+        <button class="btn btn-danger" @click="unlockProfile">
           <LockIcon />
           Unlock
         </button>
@@ -50,7 +50,7 @@
           <XIcon />
           Cancel
         </button>
-        <button class="btn btn-danger" :disabled="action_disabled" @click="unpairProfile">
+        <button class="btn btn-danger" @click="unpairProfile">
           <XIcon />
           Unpair
         </button>
@@ -117,21 +117,13 @@
       <span class="label__title">Icon</span>
     </label>
     <div class="input-group">
-      <Avatar
-        :src="!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon)"
-        size="md"
-        class="project__icon"
-      />
+      <Avatar :src="icon ? convertFileSrc(icon) : icon" size="md" class="project__icon" />
       <div class="input-stack">
         <button id="instance-icon" class="btn" @click="setIcon">
           <UploadIcon />
           Select icon
         </button>
-        <button
-          :disabled="!(!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon))"
-          class="btn"
-          @click="resetIcon"
-        >
+        <button :disabled="!icon" class="btn" @click="resetIcon">
           <TrashIcon />
           Remove icon
         </button>
@@ -147,7 +139,7 @@
       autocomplete="off"
       maxlength="80"
       type="text"
-      :disabled="instance.metadata.linked_data"
+      :disabled="instance.linked_data"
     />
 
     <div class="adjacent-input">
@@ -358,7 +350,7 @@
       />
     </div>
   </Card>
-  <Card v-if="instance.metadata.linked_data">
+  <Card v-if="instance.linked_data">
     <div class="label">
       <h3>
         <span class="label__title size-card-header">Modpack</span>
@@ -366,9 +358,7 @@
     </div>
     <div class="adjacent-input">
       <label for="general-modpack-info">
-        <span class="label__description">
-          <strong>Modpack: </strong> {{ instance.metadata.name }}
-        </span>
+        <span class="label__description"> <strong>Modpack: </strong> {{ instance.name }} </span>
         <span class="label__description">
           <strong>Version: </strong>
           {{
@@ -414,7 +404,7 @@
       </Button>
     </div>
 
-    <div v-if="props.instance.metadata.linked_data.project_id" class="adjacent-input">
+    <div v-if="instance.linked_data.project_id" class="adjacent-input">
       <label for="change-modpack-version">
         <span class="label__title">Change modpack version</span>
         <span class="label__description">
@@ -502,7 +492,7 @@
     </div>
   </Card>
   <ModpackVersionModal
-    v-if="instance.metadata.linked_data"
+    v-if="instance.linked_data"
     ref="modpackVersionModal"
     :instance="instance"
     :versions="props.versions"
@@ -553,12 +543,7 @@ import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import {
-  get_fabric_versions,
-  get_forge_versions,
-  get_neoforge_versions,
-  get_quilt_versions,
-} from '@/helpers/metadata.js'
+import { get_loader_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
@@ -587,17 +572,17 @@ const props = defineProps({
 
 const themeStore = useTheming()
 
-const title = ref(props.instance.metadata.name)
-const icon = ref(props.instance.metadata.icon)
-const groups = ref(props.instance.metadata.groups)
+const title = ref(props.instance.name)
+const icon = ref(props.instance.icon_path)
+const groups = ref(props.instance.groups)
 
 const modpackVersionModal = ref(null)
 
-const instancesList = Object.values(await list(true))
+const instancesList = await list()
 const availableGroups = ref([
   ...new Set(
     instancesList.reduce((acc, obj) => {
-      return acc.concat(obj.metadata.groups)
+      return acc.concat(obj.groups)
     }, []),
   ),
 ])
@@ -632,18 +617,18 @@ const globalSettings = await get().catch(handleError)
 const modalConfirmUnlock = ref(null)
 const modalConfirmUnpair = ref(null)
 
-const javaSettings = props.instance.java ?? {}
-
-const overrideJavaInstall = ref(!!javaSettings.override_version)
+const overrideJavaInstall = ref(!!props.instance.java_path)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
-const javaInstall = ref(optimalJava ?? javaSettings.override_version ?? { path: '', version: '' })
+const javaInstall = ref({ path: optimalJava.path ?? props.instance.java_path })
 
-const overrideJavaArgs = ref(!!javaSettings.extra_arguments)
-const javaArgs = ref((javaSettings.extra_arguments ?? globalSettings.custom_java_args).join(' '))
+const overrideJavaArgs = ref(!!props.instance.extra_launch_args)
+const javaArgs = ref(
+  (props.instance.extra_launch_args ?? globalSettings.extra_launch_args).join(' '),
+)
 
-const overrideEnvVars = ref(!!javaSettings.custom_env_args)
+const overrideEnvVars = ref(!!props.instance.custom_env_vars)
 const envVars = ref(
-  (javaSettings.custom_env_args ?? globalSettings.custom_env_args)
+  (props.instance.custom_env_vars ?? globalSettings.custom_env_vars)
     .map((x) => x.join('='))
     .join(' '),
 )
@@ -652,18 +637,22 @@ const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
 const maxMemory = Math.floor((await get_max_memory().catch(handleError)) / 1024)
 
-const overrideWindowSettings = ref(!!props.instance.resolution || !!props.instance.fullscreen)
-const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
-const overrideHooks = ref(!!props.instance.hooks)
+const overrideWindowSettings = ref(
+  !!props.instance.game_resolution || !!props.instance.force_fullscreen,
+)
+const resolution = ref(props.instance.game_resolution ?? globalSettings.game_resolution)
+const overrideHooks = ref(
+  props.instance.hooks.pre_launch || props.instance.hooks.wrapper || props.instance.hooks.post_exit,
+)
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
-const fullscreenSetting = ref(!!props.instance.fullscreen)
+const fullscreenSetting = ref(!!props.instance.force_fullscreen)
 
 const unlinkModpack = ref(false)
 
 const inProgress = ref(false)
 const installing = computed(() => props.instance.install_stage !== 'installed')
-const installedVersion = computed(() => props.instance?.metadata?.linked_data?.version_id)
+const installedVersion = computed(() => props.instance?.linked_data?.version_id)
 const installedVersionData = computed(() => {
   if (!installedVersion.value) return null
   return props.versions.find((version) => version.id === installedVersion.value)
@@ -706,34 +695,29 @@ const getLocalVersion = (path) => {
 
 const editProfileObject = computed(() => {
   const editProfile = {
-    metadata: {
-      name: title.value.trim().substring(0, 32) ?? 'Instance',
-      groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
-      loader_version: props.instance.metadata.loader_version,
-      linked_data: props.instance.metadata.linked_data,
-    },
+    name: title.value.trim().substring(0, 32) ?? 'Instance',
+    groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
+    loader_version: props.instance.loader_version,
+    linked_data: props.instance.linked_data,
     java: {},
+    hooks: {},
   }
 
   if (overrideJavaInstall.value) {
     if (javaInstall.value.path !== '') {
-      editProfile.java.override_version = javaInstall.value
-      editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
-        'java.exe',
-        'javaw.exe',
-      )
+      editProfile.java_path = javaInstall.value.path.replace('java.exe', 'javaw.exe')
     }
   }
 
   if (overrideJavaArgs.value) {
     if (javaArgs.value !== '') {
-      editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/).filter(Boolean)
+      editProfile.extra_launch_args = javaArgs.value.trim().split(/\s+/).filter(Boolean)
     }
   }
 
   if (overrideEnvVars.value) {
     if (envVars.value !== '') {
-      editProfile.java.custom_env_args = envVars.value
+      editProfile.custom_env_vars = envVars.value
         .trim()
         .split(/\s+/)
         .filter(Boolean)
@@ -746,10 +730,10 @@ const editProfileObject = computed(() => {
   }
 
   if (overrideWindowSettings.value) {
-    editProfile.fullscreen = fullscreenSetting.value
+    editProfile.force_fullscreen = fullscreenSetting.value
 
     if (!fullscreenSetting.value) {
-      editProfile.resolution = resolution.value
+      editProfile.game_resolution = resolution.value
     }
   }
 
@@ -758,10 +742,10 @@ const editProfileObject = computed(() => {
   }
 
   if (unlinkModpack.value) {
-    editProfile.metadata.linked_data = null
+    editProfile.linked_data = null
   }
 
-  breadcrumbs.setName('Instance', editProfile.metadata.name)
+  breadcrumbs.setName('Instance', editProfile.name)
 
   return editProfile
 })
@@ -771,8 +755,8 @@ const repairing = ref(false)
 async function duplicateProfile() {
   await duplicate(props.instance.path).catch(handleError)
   mixpanel_track('InstanceDuplicate', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 }
 
@@ -782,14 +766,14 @@ async function repairProfile(force) {
   repairing.value = false
 
   mixpanel_track('InstanceRepair', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 }
 
 async function unpairProfile() {
   const editProfile = props.instance
-  editProfile.metadata.linked_data = null
+  editProfile.linked_data = null
   await edit(props.instance.path, editProfile)
   installedVersion.value = null
   installedVersionData.value = null
@@ -798,13 +782,13 @@ async function unpairProfile() {
 
 async function unlockProfile() {
   const editProfile = props.instance
-  editProfile.metadata.linked_data.locked = false
+  editProfile.linked_data.locked = false
   await edit(props.instance.path, editProfile)
   modalConfirmUnlock.value.hide()
 }
 
 const isPackLocked = computed(() => {
-  return props.instance.metadata.linked_data && props.instance.metadata.linked_data.locked
+  return props.instance.linked_data && props.instance.linked_data.locked
 })
 
 async function repairModpack() {
@@ -813,8 +797,8 @@ async function repairModpack() {
   inProgress.value = false
 
   mixpanel_track('InstanceRepair', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 }
 
@@ -825,8 +809,8 @@ async function removeProfile() {
   removing.value = false
 
   mixpanel_track('InstanceRemove', {
-    loader: props.instance.metadata.loader,
-    game_version: props.instance.metadata.game_version,
+    loader: props.instance.loader,
+    game_version: props.instance.game_version,
   })
 
   await router.push({ path: '/' })
@@ -843,10 +827,10 @@ const [
   all_game_versions,
   loaders,
 ] = await Promise.all([
-  get_fabric_versions().then(shallowRef).catch(handleError),
-  get_forge_versions().then(shallowRef).catch(handleError),
-  get_quilt_versions().then(shallowRef).catch(handleError),
-  get_neoforge_versions().then(shallowRef).catch(handleError),
+  get_loader_versions('fabric').then(shallowRef).catch(handleError),
+  get_loader_versions('forge').then(shallowRef).catch(handleError),
+  get_loader_versions('quilt').then(shallowRef).catch(handleError),
+  get_loader_versions('neo').then(shallowRef).catch(handleError),
   get_game_versions().then(shallowRef).catch(handleError),
   get_loaders()
     .then((value) =>
@@ -859,8 +843,8 @@ const [
 ])
 loaders.value.unshift('vanilla')
 
-const loader = ref(props.instance.metadata.loader)
-const gameVersion = ref(props.instance.metadata.game_version)
+const loader = ref(props.instance.loader)
+const gameVersion = ref(props.instance.game_version)
 const selectableGameVersions = computed(() => {
   return all_game_versions.value
     .filter((item) => {
@@ -896,9 +880,7 @@ const selectableLoaderVersions = computed(() => {
   return []
 })
 const loaderVersionIndex = ref(
-  selectableLoaderVersions.value.findIndex(
-    (x) => x.id === props.instance.metadata.loader_version?.id,
-  ),
+  selectableLoaderVersions.value.findIndex((x) => x.id === props.instance.loader_version),
 )
 
 const isValid = computed(() => {
@@ -910,10 +892,9 @@ const isValid = computed(() => {
 
 const isChanged = computed(() => {
   return (
-    loader.value != props.instance.metadata.loader ||
-    gameVersion.value != props.instance.metadata.game_version ||
-    JSON.stringify(selectableLoaderVersions.value[loaderVersionIndex.value]) !==
-      JSON.stringify(props.instance.metadata.loader_version)
+    loader.value !== props.instance.loader ||
+    gameVersion.value !== props.instance.game_version ||
+    selectableLoaderVersions.value[loaderVersionIndex.value].id !== props.instance.loader_version
   )
 })
 
@@ -924,11 +905,11 @@ async function saveGvLoaderEdits() {
   editing.value = true
 
   let editProfile = editProfileObject.value
-  editProfile.metadata.loader = loader.value
-  editProfile.metadata.game_version = gameVersion.value
+  editProfile.loader = loader.value
+  editProfile.game_version = gameVersion.value
 
   if (loader.value !== 'vanilla') {
-    editProfile.metadata.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value]
+    editProfile.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value].id
   }
   await edit(props.instance.path, editProfile).catch(handleError)
   await repairProfile(false)

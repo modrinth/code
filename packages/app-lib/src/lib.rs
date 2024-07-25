@@ -22,5 +22,4 @@ pub use api::*;
 pub use error::*;
 pub use event::{EventState, LoadingBar, LoadingBarType};
 pub use logger::start_logger;
-pub use state::InnerProjectPathUnix;
 pub use state::State;

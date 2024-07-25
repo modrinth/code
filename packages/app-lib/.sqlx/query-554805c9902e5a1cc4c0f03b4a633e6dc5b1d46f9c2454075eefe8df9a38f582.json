@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            DELETE FROM modrinth_users WHERE id = $1\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "554805c9902e5a1cc4c0f03b4a633e6dc5b1d46f9c2454075eefe8df9a38f582"
+}

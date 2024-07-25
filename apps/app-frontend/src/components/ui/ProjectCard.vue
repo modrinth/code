@@ -6,10 +6,8 @@ import { computed, ref } from 'vue'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRouter } from 'vue-router'
-import { useFetch } from '@/helpers/fetch.js'
-import { list } from '@/helpers/profile.js'
-import { handleError } from '@/store/notifications.js'
-import { install as pack_install } from '@/helpers/pack.js'
+import { install as installVersion } from '@/store/install.js'
+
 dayjs.extend(relativeTime)
 
 const router = useRouter()
@@ -17,18 +15,6 @@ const installing = ref(false)
 
 const props = defineProps({
   project: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-  confirmModal: {
-    type: Object,
-    default() {
-      return {}
-    },
-  },
-  modInstallModal: {
     type: Object,
     default() {
       return {}
@@ -65,40 +51,15 @@ const toTransparent = computed(() => {
 const install = async (e) => {
   e?.stopPropagation()
   installing.value = true
-  const versions = await useFetch(
-    `https://api.modrinth.com/v2/project/${props.project.project_id}/version`,
-    'project versions',
-  )
-
-  if (props.project.project_type === 'modpack') {
-    const packs = Object.values(await list(true).catch(handleError))
-
-    if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === props.project.project_id)
-    ) {
-      installing.value = true
-      await pack_install(
-        props.project.project_id,
-        versions[0].id,
-        props.project.title,
-        props.project.icon_url,
-      ).catch(handleError)
+  await installVersion(
+    props.project.project_id,
+    null,
+    props.instance ? props.instance.path : null,
+    'ProjectCard',
+    () => {
       installing.value = false
-    } else
-      props.confirmModal.show(
-        props.project.project_id,
-        versions[0].id,
-        props.project.title,
-        props.project.icon_url,
-      )
-  } else {
-    props.modInstallModal.show(props.project.project_id, versions)
-  }
-
-  installing.value = false
+    },
+  )
 }
 </script>
 

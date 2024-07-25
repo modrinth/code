@@ -4,26 +4,17 @@
       <Card v-if="instance" class="small-instance">
         <router-link class="instance" :to="`/instance/${encodeURIComponent(instance.path)}`">
           <Avatar
-            :src="
-              !instance.metadata.icon ||
-              (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
-                ? instance.metadata.icon
-                : convertFileSrc(instance.metadata?.icon)
-            "
-            :alt="instance.metadata.name"
+            :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null"
+            :alt="instance.name"
             size="sm"
           />
           <div class="small-instance_info">
             <span class="title">{{
-              instance.metadata.name.length > 20
-                ? instance.metadata.name.substring(0, 20) + '...'
-                : instance.metadata.name
+              instance.name.length > 20 ? instance.name.substring(0, 20) + '...' : instance.name
             }}</span>
             <span>
-              {{
-                instance.metadata.loader.charAt(0).toUpperCase() + instance.metadata.loader.slice(1)
-              }}
-              {{ instance.metadata.game_version }}
+              {{ instance.loader.charAt(0).toUpperCase() + instance.loader.slice(1) }}
+              {{ instance.game_version }}
             </span>
           </div>
         </router-link>
@@ -209,7 +200,6 @@
         :project="data"
         :versions="versions"
         :members="members"
-        :dependencies="dependencies"
         :instance="instance"
         :install="install"
         :installed="installed"
@@ -218,9 +208,6 @@
       />
     </div>
   </div>
-  <InstallConfirmModal ref="confirmModal" />
-  <ModInstallModal ref="modInstallModal" />
-  <IncompatibilityWarningModal ref="incompatibilityWarning" />
   <ContextMenu ref="options" @option-clicked="handleOptionsClick">
     <template #install> <DownloadIcon /> Install </template>
     <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
@@ -263,79 +250,63 @@ import {
   OpenCollectiveIcon,
 } from '@/assets/external'
 import { get_categories } from '@/helpers/tags'
-import { install as packInstall } from '@/helpers/pack'
-import {
-  list,
-  add_project_from_version as installMod,
-  check_installed,
-  get as getInstance,
-  remove_project,
-} from '@/helpers/profile'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import { installVersionDependencies, isOffline } from '@/helpers/utils'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
-import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { install as installVersion } from '@/store/install.js'
+import { get_project, get_project_many, get_team, get_version_many } from '@/helpers/cache.js'
+
+dayjs.extend(relativeTime)
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
-
-const confirmModal = ref(null)
-const modInstallModal = ref(null)
-const incompatibilityWarning = ref(null)
 
 const options = ref(null)
 const installing = ref(false)
 const data = shallowRef(null)
 const versions = shallowRef([])
 const members = shallowRef([])
-const dependencies = shallowRef([])
 const categories = shallowRef([])
 const instance = ref(null)
+const instanceProjects = ref(null)
 
 const installed = ref(false)
 const installedVersion = ref(null)
 
-const offline = ref(await isOffline())
-
 async function fetchProjectData() {
-  ;[
-    data.value,
-    versions.value,
-    members.value,
-    dependencies.value,
-    categories.value,
-    instance.value,
-  ] = await Promise.all([
-    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project'),
-    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project'),
-    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project'),
-    useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project'),
-    get_categories().catch(handleError),
-    route.query.i ? getInstance(route.query.i, false).catch(handleError) : Promise.resolve(),
-  ])
+  const project = await get_project(route.params.id).catch(handleError)
 
-  installed.value =
-    instance.value?.path &&
-    (await check_installed(instance.value.path, data.value.id).catch(handleError))
+  data.value = project
+  ;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
+    await Promise.all([
+      get_version_many(project.versions).catch(handleError),
+      get_team(project.team).catch(handleError),
+      get_categories().catch(handleError),
+      route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),
+      route.query.i ? getInstanceProjects(route.query.i).catch(handleError) : Promise.resolve(),
+    ])
+
+  versions.value = versions.value.sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
+
+  if (instanceProjects.value) {
+    const installedFile = Object.values(instanceProjects.value).find(
+      (x) => x.metadata && x.metadata.project_id === data.value.id,
+    )
+    if (installedFile) {
+      installed.value = true
+      installedVersion.value = installedFile.metadata.version_id
+    }
+  }
   breadcrumbs.setName('Project', data.value.title)
-  installedVersion.value = instance.value
-    ? Object.values(instance.value.projects).find(
-        (p) => p?.metadata?.version?.project_id === data.value.id,
-      )?.metadata?.version?.id
-    : null
 }
 
-if (!offline.value) await fetchProjectData()
+await fetchProjectData()
 
 watch(
   () => route.params.id,
@@ -346,162 +317,22 @@ watch(
   },
 )
 
-dayjs.extend(relativeTime)
-
-const markInstalled = () => {
-  installed.value = true
-}
-
 async function install(version) {
   installing.value = true
-  let queuedVersionData
-  if (instance.value) {
-    instance.value = await getInstance(instance.value.path, false).catch(handleError)
-  }
-
-  if (installed.value) {
-    const old_project = Object.entries(instance.value.projects)
-      .map(([key, value]) => ({
-        key,
-        value,
-      }))
-      .find((p) => p.value.metadata?.version?.project_id === data.value.id)
-    if (!old_project) {
-      // Switching too fast, old project is not recognized as a Modrinth project yet
+  await installVersion(
+    data.value.id,
+    version,
+    instance.value ? instance.value.path : null,
+    'ProjectPage',
+    (version) => {
       installing.value = false
-      return
-    }
 
-    await remove_project(instance.value.path, old_project.key)
-  }
-
-  if (version) {
-    queuedVersionData = versions.value.find((v) => v.id === version)
-  } else {
-    if (data.value.project_type === 'modpack' || !instance.value) {
-      queuedVersionData = versions.value[0]
-    } else {
-      queuedVersionData = versions.value.find((v) =>
-        v.game_versions.includes(data.value.game_versions[0]),
-      )
-    }
-  }
-
-  if (data.value.project_type === 'modpack') {
-    const packs = Object.values(await list(true).catch(handleError))
-    if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === data.value.id)
-    ) {
-      await packInstall(
-        data.value.id,
-        queuedVersionData.id,
-        data.value.title,
-        data.value.icon_url,
-      ).catch(handleError)
-
-      mixpanel_track('PackInstall', {
-        id: data.value.id,
-        version_id: queuedVersionData.id,
-        title: data.value.title,
-        source: 'ProjectPage',
-      })
-    } else {
-      confirmModal.value.show(
-        data.value.id,
-        queuedVersionData.id,
-        data.value.title,
-        data.value.icon_url,
-      )
-    }
-  } else {
-    if (instance.value) {
-      if (!version) {
-        const gameVersion = instance.value.metadata.game_version
-        const loader = instance.value.metadata.loader
-        const selectedVersion = versions.value.find(
-          (v) =>
-            v.game_versions.includes(gameVersion) &&
-            (data.value.project_type === 'mod'
-              ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
-              : true),
-        )
-        if (!selectedVersion) {
-          incompatibilityWarning.value.show(
-            instance.value,
-            data.value.title,
-            versions.value,
-            markInstalled,
-            data.value.id,
-            data.value.project_type,
-          )
-          installing.value = false
-          return
-        } else {
-          queuedVersionData = selectedVersion
-          await installMod(instance.value.path, selectedVersion.id).catch(handleError)
-          await installVersionDependencies(instance.value, queuedVersionData)
-          installedVersion.value = selectedVersion.id
-          mixpanel_track('ProjectInstall', {
-            loader: instance.value.metadata.loader,
-            game_version: instance.value.metadata.game_version,
-            id: data.value.id,
-            project_type: data.value.project_type,
-            version_id: queuedVersionData.id,
-            title: data.value.title,
-            source: 'ProjectPage',
-          })
-        }
-      } else {
-        const gameVersion = instance.value.metadata.game_version
-        const loader = instance.value.metadata.loader
-        const compatible = versions.value.some(
-          (v) =>
-            v.game_versions.includes(gameVersion) &&
-            (data.value.project_type === 'mod'
-              ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
-              : true),
-        )
-        if (compatible) {
-          await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
-          await installVersionDependencies(instance.value, queuedVersionData)
-          installedVersion.value = queuedVersionData.id
-          mixpanel_track('ProjectInstall', {
-            loader: instance.value.metadata.loader,
-            game_version: instance.value.metadata.game_version,
-            id: data.value.id,
-            project_type: data.value.project_type,
-            version_id: queuedVersionData.id,
-            title: data.value.title,
-            source: 'ProjectPage',
-          })
-        } else {
-          incompatibilityWarning.value.show(
-            instance.value,
-            data.value.title,
-            [queuedVersionData],
-            markInstalled,
-            data.value.id,
-            data.value.project_type,
-          )
-          installing.value = false
-          return
-        }
+      if (instance.value && version) {
+        installed.value = true
+        installedVersion.value = version
       }
-      installed.value = true
-    } else {
-      modInstallModal.value.show(
-        data.value.id,
-        version ? [versions.value.find((v) => v.id === queuedVersionData.id)] : versions.value,
-        data.value.title,
-        data.value.project_type,
-      )
-    }
-  }
-
-  installing.value = false
+    },
+  )
 }
 
 const handleRightClick = (e) => {
