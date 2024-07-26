@@ -524,8 +524,14 @@ const [
   { data: searchProjects, refresh: updateSearchProjects },
   { data: notifications },
 ] = await Promise.all([
-  useAsyncData("projects", () => useBaseFetch("projects_random?count=40"), {
+  useAsyncData("projects", () => useBaseFetch("projects_random?count=60"), {
     transform: (result) => {
+      // TODO: remove once api always returns correct number of projects
+      for (let i = 0; i < 40 - result.length; i++) {
+        result.push(result[Math.round(Math.random() * result.length)]);
+      }
+      result = result.slice(0, 40);
+
       const val = Math.ceil(result.length / 3);
       return [result.slice(0, val), result.slice(val, val * 2), result.slice(val * 2, val * 3)];
     },
