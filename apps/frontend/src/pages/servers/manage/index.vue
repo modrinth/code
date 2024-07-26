@@ -10,7 +10,7 @@
           v-if="status === 'error'"
           type="button"
           alt="Try to load servers again"
-          class="flex items-center gap-2 text-sm font-bold"
+          class="flex items-center gap-2 bg-transparent text-sm font-bold"
           @click="() => refreshNuxtData('serversList')"
         >
           <UpdatedIcon />
@@ -41,7 +41,7 @@
           <div v-if="status === 'error'" class="flex h-full w-full items-center gap-6">
             <img
               alt=""
-              class="h-full w-full max-w-24 rounded-2xl object-cover"
+              class="h-full w-full max-w-24 rounded-2xl object-cover align-middle"
               height="256"
               src="https://media.tenor.com/scX-kVPwUn8AAAAC/this-is-fine.gif"
               width="256"
@@ -50,7 +50,7 @@
             />
             <div class="leading-[165%]">
               <h1 class="m-0 mb-2 text-2xl font-semibold">Unable to load servers</h1>
-              <p class="max-w-2xl">
+              <p class="m-0 max-w-2xl">
                 Your servers are safe, but could not be loaded due to a technical issue on our end.
                 Please try again later. If this issue persists, please contact
                 <a

@@ -1,0 +1,11 @@
+@font-face {
+    font-family: 'Monocraft';
+    src: url('/Monocraft.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+.monocraft-font {
+    font-family: Monocraft, monospace;
+}

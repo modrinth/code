@@ -94,7 +94,7 @@ const sendPowerAction = async (action: TPowerAction) => {
   app.$notify({
     group: "server",
     title: `${actionName}ing server`,
-    text: `Your server is now ${actionName}ing, this may take a few moments`,
+    text: `Your server is now ${actionName.toLow()}ing, this may take a few moments`,
     type: "success",
   });
   await usePyroFetch(auth.value.token, `servers/${serverId}/power`, 0, "POST", "application/json", {
@@ -143,7 +143,7 @@ const stats = ref<Stats>({
 
 const connectWebSocket = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  socket = new WebSocket(`ws://127.0.0.1:6527/v0/ws`);
+  socket = new WebSocket(`ws://103.114.160.194:6527/v0/ws`);
   await reauth();
 
   socket.onmessage = (event) => {

@@ -119,3 +119,9 @@ export interface Stats {
     ram: number[];
   }
 }
+
+export interface ServerBackup {
+  id: string;
+  name: string;
+  created_at: string;
+}
