@@ -487,6 +487,7 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode.collection,
     tags.value.projectViewModes,
   );
+  saveCosmetics();
 }
 
 let collection, refreshCollection, creator, projects, refreshProjects;
