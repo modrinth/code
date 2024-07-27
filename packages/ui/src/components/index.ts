@@ -2,6 +2,7 @@
 export { default as Avatar } from './base/Avatar.vue'
 export { default as Badge } from './base/Badge.vue'
 export { default as Button } from './base/Button.vue'
+export { default as ButtonStyled } from './base/ButtonStyled.vue'
 export { default as Card } from './base/Card.vue'
 export { default as Checkbox } from './base/Checkbox.vue'
 export { default as Chips } from './base/Chips.vue'
@@ -21,6 +22,7 @@ export { default as PopoutMenu } from './base/PopoutMenu.vue'
 export { default as ProjectCard } from './base/ProjectCard.vue'
 export { default as Promotion } from './base/Promotion.vue'
 export { default as Slider } from './base/Slider.vue'
+export { default as StatItem } from './base/StatItem.vue'
 export { default as Toggle } from './base/Toggle.vue'
 
 // Branding

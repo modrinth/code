@@ -1,5 +1,5 @@
 <template>
-  <span :class="'badge flex items-center gap-1 ' + color + ' type--' + type">
+  <span :class="'badge flex items-center gap-1 font-semibold text-secondary ' + color + ' type--' + type">
     <template v-if="color"> <span class="circle" /> {{ $capitalizeString(type) }}</template>
 
     <!-- User roles -->
@@ -8,10 +8,9 @@
     <template v-else-if="type === 'creator'"><CreatorIcon /> Creator</template>
 
     <!-- Project statuses -->
-    <template v-else-if="type === 'approved'"><ListIcon /> Listed</template>
+    <template v-else-if="type === 'approved'"><GlobeIcon /> Public</template>
     <template v-else-if="type === 'approved-general'"><CheckIcon /> Approved</template>
-    <template v-else-if="type === 'unlisted'"><EyeOffIcon /> Unlisted</template>
-    <template v-else-if="type === 'withheld'"><EyeOffIcon /> Withheld</template>
+    <template v-else-if="type === 'unlisted' || type ==='withheld'"><LinkIcon /> Unlisted</template>
     <template v-else-if="type === 'private'"><LockIcon /> Private</template>
     <template v-else-if="type === 'scheduled'"> <CalendarIcon /> Scheduled</template>
     <template v-else-if="type === 'draft'"><DraftIcon /> Draft</template>
@@ -35,11 +34,11 @@
 </template>
 
 <script setup>
+import { GlobeIcon, LinkIcon } from "@modrinth/assets"
+
 import ModrinthIcon from "~/assets/images/logo.svg?component";
 import ModeratorIcon from "~/assets/images/sidebar/admin.svg?component";
 import CreatorIcon from "~/assets/images/utils/box.svg?component";
-import ListIcon from "~/assets/images/utils/list.svg?component";
-import EyeOffIcon from "~/assets/images/utils/eye-off.svg?component";
 import DraftIcon from "~/assets/images/utils/file-text.svg?component";
 import CrossIcon from "~/assets/images/utils/x.svg?component";
 import ArchiveIcon from "~/assets/images/utils/archive.svg?component";
@@ -63,12 +62,6 @@ defineProps({
 
 <style lang="scss" scoped>
 .badge {
-  font-weight: bold;
-  width: fit-content;
-  --badge-color: var(--color-gray);
-  color: var(--badge-color);
-  white-space: nowrap;
-
   .circle {
     width: 0.5rem;
     height: 0.5rem;
@@ -108,7 +101,6 @@ defineProps({
   }
 
   &.type--creator,
-  &.type--approved,
   &.blue {
     --badge-color: var(--color-blue);
   }
@@ -119,8 +111,9 @@ defineProps({
   }
 
   &.type--private,
+  &.type--approved,
   &.gray {
-    --badge-color: var(--color-gray);
+    --badge-color: var(--color-secondary);
   }
 }
 </style>

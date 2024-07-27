@@ -917,9 +917,9 @@ tr.button-transparent {
 }
 
 .card-divider {
-  background-color: var(--color-divider);
+  background-color: var(--color-button-bg);
   border: none;
-  color: var(--color-divider);
+  color: var(--color-button-bg);
   height: 1px;
   margin: var(--spacing-card-bg) 0;
 }
@@ -1452,6 +1452,14 @@ svg.inline-svg {
 
     &[data-size="32"] {
       --_size: var(--icon-32);
+    }
+
+    &[data-size="96"] {
+      --_size: 96px;
+    }
+
+    &[data-size="128"] {
+      --_size: 128px;
     }
 
     &[data-shape="circle"] {

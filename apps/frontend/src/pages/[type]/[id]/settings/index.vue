@@ -423,7 +423,7 @@ const deleteIcon = async () => {
 
 svg {
   &.good {
-    color: var(--color-brand-green);
+    color: var(--color-green);
   }
 
   &.bad {

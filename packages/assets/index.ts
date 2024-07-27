@@ -32,6 +32,7 @@ import _AsteriskIcon from './icons/asterisk.svg?component'
 import _BellIcon from './icons/bell.svg?component'
 import _BellRingIcon from './icons/bell-ring.svg?component'
 import _BookIcon from './icons/book.svg?component'
+import _BookTextIcon from './icons/book-text.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
 import _BoxIcon from './icons/box.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
@@ -49,6 +50,7 @@ import _CoinsIcon from './icons/coins.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
+import _CrownIcon from './icons/crown.svg?component'
 import _CurrencyIcon from './icons/currency.svg?component'
 import _DashboardIcon from './icons/dashboard.svg?component'
 import _DownloadIcon from './icons/download.svg?component'
@@ -182,6 +184,7 @@ export const AsteriskIcon = _AsteriskIcon
 export const BellIcon = _BellIcon
 export const BellRingIcon = _BellRingIcon
 export const BookIcon = _BookIcon
+export const BookTextIcon = _BookTextIcon
 export const BookmarkIcon = _BookmarkIcon
 export const BoxIcon = _BoxIcon
 export const CalendarIcon = _CalendarIcon
@@ -199,6 +202,7 @@ export const CoinsIcon = _CoinsIcon
 export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
+export const CrownIcon = _CrownIcon
 export const CurrencyIcon = _CurrencyIcon
 export const DashboardIcon = _DashboardIcon
 export const DownloadIcon = _DownloadIcon

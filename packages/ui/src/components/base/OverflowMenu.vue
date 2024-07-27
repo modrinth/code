@@ -9,7 +9,7 @@
     <slot></slot>
     <template #menu>
       <template v-for="(option, index) in options">
-        <div v-if="option.divider" :key="`divider-${index}`" class="card-divider"></div>
+        <div v-if="option.divider" :key="`divider-${index}`" class="h-px mx-3 my-2 bg-button-bg"></div>
         <Button
           v-else
           :key="`option-${option.id}`"

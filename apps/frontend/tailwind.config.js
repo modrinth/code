@@ -25,6 +25,10 @@ module.exports = {
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",
+          orange: "var(--color-orange-bg)",
+          green: "var(--color-green-bg)",
+          blue: "var(--color-blue-bg)",
+          purple: "var(--color-purple-bg)",
           raised: "var(--color-raised-bg)",
         },
         divider: {
@@ -33,10 +37,14 @@ module.exports = {
         },
         brand: {
           DEFAULT: "var(--color-brand)",
-          green: "var(--color-brand-green)",
+          red: "var(--color-red)",
+          orange: "var(--color-orange)",
+          green: "var(--color-green)",
+          blue: "var(--color-blue)",
+          purple: "var(--color-purple)",
           highlight: "var(--color-brand-highlight)",
           shadow: "var(--color-brand-shadow)",
-          inverted: "var(--color-brand-inverted)",
+          inverted: "var(--color-accent-contrast)",
         },
         tabUnderlineHovered: "var(--tab-underline-hovered)",
         button: {

@@ -112,7 +112,7 @@
 
   .normal-page__content {
     max-width: calc(60rem - 0.75rem);
-    overflow-x: hidden;
+    //overflow-x: hidden;
   }
 }
 
@@ -149,6 +149,6 @@
   .normal-page__content {
     grid-area: content;
     max-width: calc(60rem - 0.75rem);
-    overflow-x: hidden;
+    //overflow-x: hidden;
   }
 }

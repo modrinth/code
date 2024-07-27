@@ -105,7 +105,7 @@ function updatePixelated() {
   }
 
   &.size-sm {
-    --size: 3rem;
+    --size: var(--_size, 3rem);
     box-shadow: var(--shadow-inset), var(--shadow-card);
     border-radius: var(--size-rounded-sm);
   }
