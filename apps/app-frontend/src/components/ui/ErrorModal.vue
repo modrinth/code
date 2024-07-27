@@ -223,4 +223,8 @@ async function loginMinecraft() {
   gap: var(--gap-md);
   padding: var(--gap-lg);
 }
+
+.markdown-body {
+  overflow: auto;
+}
 </style>
