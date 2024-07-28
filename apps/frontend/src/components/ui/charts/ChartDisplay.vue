@@ -1,15 +1,5 @@
 <template>
   <div>
-    <!-- <Modal header="Select date range" ref="dateRangeModal">
-      <div class="modal-body">
-        <div class="time-ranges">
-          <Button v-for="range in ranges" :key="range.getLabel([dayjs(), dayjs()])" @click="changeRangeModal(range)"
-            :class="`button-base ${selectedRange === range ? 'button-base__selected' : ''}`">
-            {{ range.getLabel([dayjs(), dayjs()]) }}
-          </Button>
-        </div>
-      </div>
-    </Modal> -->
     <div v-if="analytics.error.value" class="universal-card">
       <h2>
         <span class="label__title">Error</span>
@@ -95,9 +85,6 @@
               <Button v-tooltip="'Refresh the chart'" icon-only @click="resetCharts">
                 <UpdatedIcon />
               </Button>
-              <!-- <Button v-tooltip="'Select date range'" icon-only @click="openDateRangeModal">
-                <CalendarIcon />
-              </Button> -->
               <DropdownSelect
                 class="range-dropdown"
                 v-model="selectedRange"
@@ -308,9 +295,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button, Card, DropdownSelect, Modal } from "@modrinth/ui";
+import { Button, Card, DropdownSelect } from "@modrinth/ui";
 import { formatMoney, formatNumber, formatCategoryHeader } from "@modrinth/utils";
-import { UpdatedIcon, DownloadIcon, CalendarIcon } from "@modrinth/assets";
+import { UpdatedIcon, DownloadIcon } from "@modrinth/assets";
 import dayjs from "dayjs";
 import { computed } from "vue";
 
@@ -363,9 +350,6 @@ const selectedChart = computed({
   },
 });
 
-// Modal ref
-const dateRangeModal = ref();
-
 // Chart refs
 const downloadsChart = ref();
 const viewsChart = ref();
@@ -399,15 +383,6 @@ const resetCharts = () => {
   tinyDownloadChart.value?.resetChart();
   tinyViewChart.value?.resetChart();
   tinyRevenueChart.value?.resetChart();
-};
-
-const openDateRangeModal = () => {
-  dateRangeModal.value.show();
-};
-
-const changeRangeModal = (range: RangeObject) => {
-  selectedRange.value = range;
-  dateRangeModal.value.hide();
 };
 
 const isUsingProjectColors = computed({
