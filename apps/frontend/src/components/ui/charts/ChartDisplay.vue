@@ -103,7 +103,9 @@
                 v-model="selectedRange"
                 :options="ranges"
                 name="Time range"
-                :display-name="(o: RangeObject) => o.getLabel([startDate, endDate])"
+                :display-name="
+                  (o: RangeObject) => o?.getLabel([startDate, endDate]) ?? 'Loading...'
+                "
               />
             </div>
           </div>
@@ -430,29 +432,38 @@ const endDate = ref(dayjs().endOf("day"));
 const timeResolution = ref(30);
 
 onBeforeMount(() => {
-  // Load selected range from localStorage - cache.
+  // Load cached data and range from localStorage - cache.
   if (import.meta.client) {
     const rangeLabel = localStorage.getItem("analyticsSelectedRange");
     if (rangeLabel) {
       const range = props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === rangeLabel)!;
 
       if (range !== undefined) {
-        selectedRange.value = range;
+        internalRange.value = range;
+        const ranges = range.getDates(dayjs());
+        timeResolution.value = range.timeResolution;
+        startDate.value = ranges.startDate;
+        endDate.value = ranges.endDate;
       }
     }
   }
 });
 
 onMounted(() => {
+  if (internalRange.value === null) {
+    internalRange.value = props.ranges.find(
+      (r) => r.getLabel([dayjs(), dayjs()]) === "Previous 30 days",
+    )!;
+  }
+
   const ranges = selectedRange.value.getDates(dayjs());
   startDate.value = ranges.startDate;
   endDate.value = ranges.endDate;
   timeResolution.value = selectedRange.value.timeResolution;
 });
 
-const internalRange: Ref<RangeObject> = ref(
-  props.ranges.find((r) => r.getLabel([dayjs(), dayjs()]) === "This month")!,
-);
+const internalRange: Ref<RangeObject> = ref(null as unknown as RangeObject);
+
 const selectedRange = computed({
   get: () => {
     return internalRange.value;
@@ -468,7 +479,7 @@ const selectedRange = computed({
     if (import.meta.client) {
       localStorage.setItem(
         "analyticsSelectedRange",
-        internalRange.value.getLabel([dayjs(), dayjs()]),
+        internalRange.value?.getLabel([dayjs(), dayjs()]) ?? "Previous 30 days",
       );
     }
   },
@@ -485,7 +496,9 @@ const analytics = useFetchAllAnalytics(
 );
 
 const formattedCategorySubtitle = computed(() => {
-  return selectedRange.value.getLabel([dayjs(startDate.value), dayjs(endDate.value)]);
+  return (
+    selectedRange.value?.getLabel([dayjs(startDate.value), dayjs(endDate.value)]) ?? "Loading..."
+  );
 });
 
 const selectedDataSet = computed(() => {
@@ -606,7 +619,7 @@ const defaultRanges: RangeObject[] = [
       startDate: dayjs(currentDate).startOf("week").add(1, "hour"),
       endDate: currentDate,
     }),
-    timeResolution: 1440,
+    timeResolution: 360,
   },
   {
     getLabel: () => "Last week",
