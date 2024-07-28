@@ -44,7 +44,7 @@ interface Project {
   wiki_url: string;
   discord_url: string;
   donation_urls: DonationUrl[];
-  project_type: 'mod' | 'resourcepack' | 'map' | 'plugin'; // Adjust types as needed
+  project_type: 'mod' | 'resourcepack' | 'map' | 'plugin';
   downloads: number;
   icon_url: string;
   color: number;
@@ -83,6 +83,8 @@ export interface Server {
   loader_version: string | null;
   mc_version: string | null;
   mods: Mod[];
+  backup_quota: number;
+  used_backup_quota: number;
 }
 
 export interface WSAuth {

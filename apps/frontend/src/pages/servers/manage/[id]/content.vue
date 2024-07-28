@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
 import { EditIcon } from "@modrinth/assets";
-import { useServerStore } from "~~/stores/servers";
+import { useServerStore } from "~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const { formatMessage } = useVIntl();

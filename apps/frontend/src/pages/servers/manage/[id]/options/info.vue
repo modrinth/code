@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import CopyCode from "~/components/ui/CopyCode.vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
-import { useServerStore } from "~~/stores/servers";
+import { useServerStore } from "~/stores/servers";
 
 const { formatMessage } = useVIntl();
 const messages = defineMessages({

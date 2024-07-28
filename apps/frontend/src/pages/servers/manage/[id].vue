@@ -226,7 +226,7 @@ import {
   BoxIcon,
   LeftArrowIcon,
 } from "@modrinth/assets";
-import { useServerStore } from "~~/stores/servers";
+import { useServerStore } from "~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
 

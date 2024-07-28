@@ -148,41 +148,39 @@
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
               <div class="text-2xl font-extrabold text-white">
-                {{ backups.length || 0 }} Backups
+                {{ data.used_backup_quota }} Backups
               </div>
               <div class="text-contrast font-semibold">
-                {{ 15 - backupsData.length }} Slots avaliable
+                {{ data.backup_quota - data.used_backup_quota }} Slots avaliable
               </div>
             </div>
-            <Button color="primary" @click="showModel('createBackupModal')">
-              <PlusIcon /> Create Backup
-            </Button>
+            <Button color="primary" @click="showCreateModel()"> <PlusIcon /> Create Backup </Button>
           </div>
         </div>
 
         <div
           v-for="backup in backupsData"
-          :key="backup[0].id"
+          :key="backup.id"
           class="relative w-full rounded-2xl bg-bg-raised p-8"
         >
           <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
-                  <div class="text-2xl font-extrabold text-white">{{ backup[0].name }}</div>
+                  <div class="text-2xl font-extrabold text-white">{{ backup.name }}</div>
                   <div class="flex gap-2 font-bold text-brand">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
                 <div class="text-contrast flex gap-2 font-semibold">
-                  <CalendarIcon /> {{ backup[0].created_at }}
+                  <CalendarIcon /> {{ new Date(backup.created_at).toLocaleString() }}
                 </div>
               </div>
               <OverflowMenu
                 :options="[
-                  { id: 'rename', action: () => renameBackups() },
-                  { id: 'restore', action: () => restoreBackups() },
-                  { id: 'download', action: () => console.log('download') },
+                  { id: 'rename', action: () => renameBackupModal.show() },
+                  { id: 'restore', action: () => restoreBackupModal.show() },
+                  { id: 'download', action: () => initiateDownload(backup.id) },
                   { id: 'delete', action: () => deleteBackupModal.show(), color: 'red' },
                 ]"
                 direction="right"
@@ -215,7 +213,7 @@ import {
   TrashIcon,
   XIcon,
 } from "@modrinth/assets";
-import { useServerStore } from "~~/stores/servers";
+import { useServerStore } from "~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import { ref } from "vue";
 
@@ -231,6 +229,7 @@ const { data, status } = await useLazyAsyncData("backupsServerData", async () =>
   serverStore.getServerData(serverId),
 );
 
+// timestamp format 2024-07-26T05:49:19.121845
 const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
   "backupsData",
   async () => usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
@@ -244,16 +243,8 @@ const deleteBackupModal = ref<Modal | null>(null);
 const c_backupsName = ref();
 const r_backupsName = ref();
 
-const showModel = (modal: string) => {
-  if (modal === "createBackupModal") {
-    createBackupModal.value.show();
-  } else if (modal === "renameBackupModal") {
-    renameBackupModal.value.show();
-  } else if (modal === "restoreBackupModal") {
-    restoreBackupModal.value.show();
-  } else if (modal === "deleteBackupModal") {
-    deleteBackupModal.value.show();
-  }
+const showCreateModel = () => {
+  createBackupModal.value.show();
 };
 
 const createBackup = async () => {
@@ -270,7 +261,7 @@ const createBackup = async () => {
   );
 };
 
-const renameBackups = async (backupId: string) => {
+const renameBackup = async (backupId: string) => {
   const backupName = r_backupsName.value.value;
   await usePyroFetch(
     auth.value.token,
@@ -298,26 +289,18 @@ const restoreBackup = async (backupId: string) => {
   await restoreBackupModal.value?.hide();
 };
 
-const backups = [
-  {
-    name: "Backup #4",
-    daytime: "Today, 7:27 PM",
-    latest: true,
-  },
-  {
-    name: "Backup #3",
-    daytime: "Yesterday, 4:21 PM",
-    latest: false,
-  },
-  {
-    name: "Backup #2",
-    daytime: "Yesterday, 4:20 PM",
-    latest: false,
-  },
-  {
-    name: "Backup #1",
-    daytime: "2 weeks ago",
-    latest: false,
-  },
-];
+interface downloadUrl {
+  download_url: string;
+  experation_seconds: number;
+}
+
+const initiateDownload = async (backupId: string) => {
+  const downloadurl: downloadUrl = await usePyroFetch(
+    auth.value.token,
+    `servers/${serverId}/backups/${backupId}`,
+    0,
+    "GET",
+    "application/json",
+  );
+};
 </script>

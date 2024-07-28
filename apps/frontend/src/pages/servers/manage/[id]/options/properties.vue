@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div v-if="properties && status === 'success'">
+    <div v-if="error" class="alert alert-error">{{ error }}</div>
+    <div v-else-if="properties && status === 'success'">
       <section class="card">
         <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
         <div
@@ -68,9 +69,14 @@ const messages = defineMessages({
   },
 });
 
+const error = ref<string | null>(null);
+
 // "generator-settings": {},
 const { data: properties, status } = await useLazyAsyncData("serverProps", async () => {
   const data = await usePyroFetch<string>(auth.value.token, `servers/${serverId}/config/server`);
+  if (data.includes("Config file not found")) {
+    error.value = "Config file not found";
+  }
   return data;
 });
 
