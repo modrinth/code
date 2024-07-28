@@ -83,7 +83,7 @@
         v-for="process in currentProcesses"
         :key="process.pid"
         class="profile-button"
-        @click="selectedProcess(process)"
+        @click="selectProcess(process)"
       >
         <div class="text"><span class="circle running" /> {{ process.profile.name }}</div>
         <Button

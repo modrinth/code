@@ -37,13 +37,13 @@ import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
+import { invoke } from '@tauri-apps/api/tauri'
 
 const themeStore = useTheming()
 const urlModal = ref(null)
@@ -153,6 +153,8 @@ const installConfirmModal = ref()
 const incompatibilityWarningModal = ref()
 
 onMounted(() => {
+  invoke('show_window')
+
   notifications.setNotifs(notificationsWrapper.value)
 
   error.setErrorModal(errorModal.value)
@@ -221,7 +223,8 @@ command_listener(async (e) => {
 </script>
 
 <template>
-  <div v-if="failureText" class="failure dark-mode">
+  <SplashScreen v-if="true" />
+  <div v-else-if="failureText" class="failure dark-mode">
     <div class="appbar-failure dark-mode">
       <Button v-if="os != 'MacOS'" icon-only @click="TauriWindow.getCurrent().close()">
         <XIcon />
@@ -261,8 +264,6 @@ command_listener(async (e) => {
       </Card>
     </div>
   </div>
-  <SplashScreen v-else-if="isLoading" app-loading />
-  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
   <div v-else class="container">
     <div class="nav-container">
       <div class="nav-section">

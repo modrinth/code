@@ -22,6 +22,45 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
+// Should be call once Vue has mounted the app
+#[tracing::instrument(skip_all)]
+#[tauri::command]
+fn show_window(app: tauri::AppHandle) {
+    let win = app.get_window("main").unwrap();
+    win.show().unwrap();
+
+    #[cfg(not(target_os = "linux"))]
+    {
+        use window_shadows::set_shadow;
+        set_shadow(&win, true).unwrap();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        use macos::window_ext::WindowExt;
+        win.set_transparent_titlebar(true);
+        win.position_traffic_lights(9.0, 16.0);
+
+        macos::delegate::register_open_file(|filename| {
+            tauri::async_runtime::spawn(api::utils::handle_command(
+                filename,
+            ));
+        })
+            .unwrap();
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        use tauri::WindowEvent;
+        win.on_window_event(|e| {
+            use macos::window_ext::WindowExt;
+            if let WindowEvent::Resized(..) = e.event() {
+                let win = e.window();
+                win.position_traffic_lights(9.0, 16.0);
+            }
+        })
+    }
+}
+
 #[tauri::command]
 fn is_dev() -> bool {
     cfg!(debug_assertions)
@@ -89,43 +128,8 @@ fn main() {
                 tracing::error!("Error registering deep link handler: {}", e);
             }
 
-            let win = app.get_window("main").unwrap();
-            #[cfg(not(target_os = "linux"))]
-            {
-                use window_shadows::set_shadow;
-                set_shadow(&win, true).unwrap();
-            }
-            #[cfg(target_os = "macos")]
-            {
-                use macos::window_ext::WindowExt;
-                win.set_transparent_titlebar(true);
-                win.position_traffic_lights(9.0, 16.0);
-
-                macos::delegate::register_open_file(|filename| {
-                    tauri::async_runtime::spawn(api::utils::handle_command(
-                        filename,
-                    ));
-                })
-                .unwrap();
-            }
-
-            // Show app now that we are setup
-            win.show().unwrap();
-
             Ok(())
         });
-
-    #[cfg(target_os = "macos")]
-    {
-        use tauri::WindowEvent;
-        builder = builder.on_window_event(|e| {
-            use macos::window_ext::WindowExt;
-            if let WindowEvent::Resized(..) = e.event() {
-                let win = e.window();
-                win.position_traffic_lights(9.0, 16.0);
-            }
-        })
-    }
 
     let builder = builder
         .plugin(api::auth::init())
@@ -148,6 +152,7 @@ fn main() {
             toggle_decorations,
             api::auth::auth_login,
             api::mr_auth::modrinth_auth_login,
+            show_window,
         ]);
 
     builder
