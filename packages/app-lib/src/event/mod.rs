@@ -5,9 +5,6 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
-use crate::prelude::ProfilePathId;
-use crate::state::SafeProcesses;
-
 pub mod emit;
 
 // Global event state
@@ -140,15 +137,6 @@ impl Drop for LoadingBarId {
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
                 bars.remove(&loader_uuid);
             }
-            // complete calls state, and since a  LoadingBarId is created in state initialization, we only complete if its already initializaed
-            // to avoid an infinite loop.
-            if crate::State::initialized() {
-                let _ = SafeProcesses::complete(
-                    crate::state::ProcessType::LoadingBar,
-                    loader_uuid,
-                )
-                .await;
-            }
         });
     }
 }
@@ -162,28 +150,28 @@ pub enum LoadingBarType {
         version: u32,
     },
     PackFileDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         pack_name: String,
         icon: Option<String>,
         pack_version: String,
     },
     PackDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         pack_name: String,
         icon: Option<PathBuf>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
     MinecraftDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ProfileUpdate {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ZipExtract {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ConfigChange {
@@ -233,7 +221,7 @@ pub enum CommandPayload {
 
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
-    pub uuid: Uuid, // processes in state are going to be identified by UUIDs, as they might change to different processes
+    pub profile_path_id: String,
     pub pid: u32,
     pub event: ProcessPayloadType,
     pub message: String,
@@ -242,23 +230,18 @@ pub struct ProcessPayload {
 #[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
-    Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process
     Finished,
 }
 
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
-    pub uuid: Uuid,
-    pub profile_path_id: ProfilePathId,
-    pub path: PathBuf,
-    pub name: String,
+    pub profile_path_id: String,
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ProfilePayloadType {
     Created,
-    Added, // also triggered when Created
     Synced,
     Edited,
     Removed,

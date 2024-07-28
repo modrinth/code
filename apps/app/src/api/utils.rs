@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 use theseus::{
     handler,
     prelude::{CommandPayload, DirectoryInfo},
-    State,
 };
 
 use crate::api::Result;
@@ -16,11 +15,7 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             show_in_folder,
             show_launcher_logs_folder,
             progress_bars_list,
-            safety_check_safe_loading_bars,
-            get_opening_command,
-            await_sync,
-            is_offline,
-            refresh_offline
+            get_opening_command
         ])
         .build()
 }
@@ -52,12 +47,6 @@ pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
-}
-
-// Check if there are any safe loading bars running
-#[tauri::command]
-pub async fn safety_check_safe_loading_bars() -> Result<bool> {
-    Ok(theseus::safety::check_safe_loading_bars().await?)
 }
 
 // cfg only on mac os
@@ -101,19 +90,27 @@ pub fn show_in_folder(path: PathBuf) -> Result<()> {
         {
             use std::fs::metadata;
 
-            if path.to_string_lossy().to_string().contains(',') {
-                // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
-                let new_path = match metadata(&path)?.is_dir() {
-                    true => path,
-                    false => {
-                        let mut path2 = path.clone();
-                        path2.pop();
-                        path2
-                    }
-                };
-                Command::new("xdg-open").arg(&new_path).spawn()?;
-            } else {
+            let mut path = path;
+            let path_string = path.to_string_lossy().to_string();
+
+            if metadata(&path)?.is_dir() {
                 Command::new("xdg-open").arg(&path).spawn()?;
+            } else if path_string.contains(',') {
+                // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
+                path.pop();
+                Command::new("xdg-open").arg(&path).spawn()?;
+            } else {
+                Command::new("dbus-send")
+                    .args([
+                        "--session",
+                        "--dest=org.freedesktop.FileManager1",
+                        "--type=method_call",
+                        "/org/freedesktop/FileManager1",
+                        "org.freedesktop.FileManager1.ShowItems",
+                        format!("array:string:file://{}", path_string).as_str(),
+                        "string:\"\"",
+                    ])
+                    .spawn()?;
             }
         }
 
@@ -163,29 +160,4 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
-}
-
-// Waits for state to be synced
-#[tauri::command]
-pub async fn await_sync() -> Result<()> {
-    State::sync().await?;
-    tracing::debug!("State synced");
-    Ok(())
-}
-
-/// Check if theseus is currently in offline mode, without a refresh attempt
-#[tauri::command]
-pub async fn is_offline() -> Result<bool> {
-    let state = State::get().await?;
-    let offline = *state.offline.read().await;
-    Ok(offline)
-}
-
-/// Refreshes whether or not theseus is in offline mode, and returns the new value
-#[tauri::command]
-pub async fn refresh_offline() -> Result<bool> {
-    let state = State::get().await?;
-    state.refresh_offline().await?;
-    let offline = *state.offline.read().await;
-    Ok(offline)
 }

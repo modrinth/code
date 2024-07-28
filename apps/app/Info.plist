@@ -7,7 +7,7 @@
             <dict>
                 <key>CFBundleURLName</key>
                 <!-- Obviously needs to be replaced with your app's bundle identifier -->
-                <string>com.modrinth.theseus</string>
+                <string>ModrinthApp</string>
                 <key>CFBundleURLSchemes</key>
                 <array>
                     <!-- register the myapp:// and myscheme:// schemes -->
@@ -27,7 +27,7 @@
     			<string>Owner</string>
     			<key>LSItemContentTypes</key>
     			<array>
-    				<string>com.modrinth.theseus-type</string>
+    				<string>ModrinthApp-type</string>
     			</array>
     			<key>NSDocumentClass</key>
     			<string>NSDocument</string>
@@ -45,7 +45,7 @@
     			<key>UTTypeIcons</key>
     			<dict/>
     			<key>UTTypeIdentifier</key>
-    			<string>com.modrinth.theseus-type</string>
+    			<string>ModrinthApp-type</string>
     			<key>UTTypeTagSpecification</key>
     			<dict>
     				<key>public.filename-extension</key>

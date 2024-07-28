@@ -896,7 +896,7 @@ useSeoMeta({
     </div>
     <div class="logo-banner">
       <svg
-        v-if="$theme.active === 'light'"
+        v-if="$colorMode.value === 'light'"
         viewBox="0 0 865 512"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

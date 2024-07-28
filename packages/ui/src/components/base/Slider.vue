@@ -80,17 +80,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const currentValue = ref(Math.max(props.min, props.modelValue))
 
-const inputValueValid = (newValue: number) => {
-  if (newValue < props.min) {
-    currentValue.value = props.min
-  } else if (newValue > props.max) {
-    currentValue.value = props.max
-  } else if (!newValue) {
-    currentValue.value = props.min
-  } else {
-    currentValue.value = newValue - (props.forceStep ? newValue % props.step : 0)
-  }
+const inputValueValid = (inputValue: number) => {
+  let newValue = inputValue || props.min
 
+  if (props.forceStep) {
+    newValue -= newValue % props.step
+  }
+  newValue = Math.max(props.min, Math.min(newValue, props.max))
+
+  currentValue.value = newValue
   emit('update:modelValue', currentValue.value)
 }
 

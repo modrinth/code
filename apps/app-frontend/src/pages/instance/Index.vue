@@ -2,20 +2,10 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card" @contextmenu.prevent.stop="handleRightClick">
-        <Avatar
-          size="lg"
-          :src="
-            !instance.metadata.icon ||
-            (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
-              ? instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
-          "
-        />
+        <Avatar size="lg" :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null" />
         <div class="instance-info">
-          <h2 class="name">{{ instance.metadata.name }}</h2>
-          <span class="metadata">
-            {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
-          </span>
+          <h2 class="name">{{ instance.name }}</h2>
+          <span class="metadata"> {{ instance.loader }} {{ instance.game_version }} </span>
         </div>
         <span class="button-group">
           <Button v-if="instance.install_stage !== 'installed'" disabled class="instance-button">
@@ -26,7 +16,6 @@
             color="danger"
             class="instance-button"
             @click="stopInstance('InstancePage')"
-            @mouseover="checkProcess"
           >
             <StopCircleIcon />
             Stop
@@ -36,7 +25,6 @@
             color="primary"
             class="instance-button"
             @click="startInstance('InstancePage')"
-            @mouseover="checkProcess"
           >
             <PlayIcon />
             Play
@@ -135,22 +123,20 @@ import {
   CheckCircleIcon,
   UpdatedIcon,
 } from '@modrinth/assets'
-import { get, run } from '@/helpers/profile'
-import {
-  get_all_running_profile_paths,
-  get_uuids_by_profile_path,
-  kill_by_uuid,
-} from '@/helpers/process'
-import { offline_listener, process_listener, profile_listener } from '@/helpers/events'
+import { get, kill, run } from '@/helpers/profile'
+import { get_by_profile_path } from '@/helpers/process'
+import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
-import { isOffline, showProfileInFolder } from '@/helpers/utils.js'
+import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useFetch } from '@/helpers/fetch'
 import { handleSevereError } from '@/store/error.js'
+import { get_project, get_version_many } from '@/helpers/cache.js'
+import dayjs from 'dayjs'
 
 const route = useRoute()
 
@@ -161,72 +147,71 @@ const instance = ref(await get(route.params.id).catch(handleError))
 
 breadcrumbs.setName(
   'Instance',
-  instance.value.metadata.name.length > 40
-    ? instance.value.metadata.name.substring(0, 40) + '...'
-    : instance.value.metadata.name,
+  instance.value.name.length > 40
+    ? instance.value.name.substring(0, 40) + '...'
+    : instance.value.name,
 )
 
 breadcrumbs.setContext({
-  name: instance.value.metadata.name,
+  name: instance.value.name,
   link: route.path,
   query: route.query,
 })
 
-const offline = ref(await isOffline())
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
 
 const loadingBar = useLoading()
 
-const uuid = ref(null)
 const playing = ref(false)
 const loading = ref(false)
 const options = ref(null)
 
 const startInstance = async (context) => {
   loading.value = true
-  uuid.value = await run(route.params.id).catch(handleSevereError)
+  run(route.params.id).catch(handleSevereError)
   loading.value = false
   playing.value = true
 
   mixpanel_track('InstanceStart', {
-    loader: instance.value.metadata.loader,
-    game_version: instance.value.metadata.game_version,
+    loader: instance.value.loader,
+    game_version: instance.value.game_version,
     source: context,
   })
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths().catch(handleError)
-  if (runningPaths.includes(instance.value.path)) {
-    playing.value = true
-    return
-  }
+  const runningProcesses = await get_by_profile_path(route.params.id).catch(handleError)
 
-  playing.value = false
-  uuid.value = null
+  playing.value = runningProcesses.length > 0
 }
 
 // Get information on associated modrinth versions, if any
 const modrinthVersions = ref([])
-if (!(await isOffline()) && instance.value.metadata.linked_data?.project_id) {
-  modrinthVersions.value = await useFetch(
-    `https://api.modrinth.com/v2/project/${instance.value.metadata.linked_data.project_id}/version`,
-    'project',
-  )
+if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
+  const project = await get_project(instance.value.linked_data.project_id).catch(handleError)
+
+  if (project && project.versions) {
+    modrinthVersions.value = (await get_version_many(project.versions).catch(handleError)).sort(
+      (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+    )
+  }
 }
 
 await checkProcess()
 
 const stopInstance = async (context) => {
   playing.value = false
-  if (!uuid.value) {
-    const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
-    uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
-    uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
-  } else await kill_by_uuid(uuid.value).catch(handleError)
+  await kill(route.params.id).catch(handleError)
 
   mixpanel_track('InstanceStop', {
-    loader: instance.value.metadata.loader,
-    game_version: instance.value.metadata.game_version,
+    loader: instance.value.loader,
+    game_version: instance.value.game_version,
     source: context,
   })
 }
@@ -271,7 +256,7 @@ const handleOptionsClick = async (args) => {
       break
     case 'add_content':
       await router.push({
-        path: `/browse/${instance.value.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        path: `/browse/${instance.value.loader === 'vanilla' ? 'datapack' : 'mod'}`,
         query: { i: route.params.id },
       })
       break
@@ -302,17 +287,12 @@ const unlistenProfiles = await profile_listener(async (event) => {
 })
 
 const unlistenProcesses = await process_listener((e) => {
-  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
-})
-
-const unlistenOffline = await offline_listener((b) => {
-  offline.value = b
+  if (e.event === 'finished' && e.profile_path_id === route.params.id) playing.value = false
 })
 
 onUnmounted(() => {
   unlistenProcesses()
   unlistenProfiles()
-  unlistenOffline()
 })
 </script>
 

@@ -16,7 +16,7 @@ import { invoke } from '@tauri-apps/api/tauri'
     - icon is a path to an image file, which will be copied into the profile directory
 */
 
-export async function create(name, gameVersion, modloader, loaderVersion, icon, noWatch) {
+export async function create(name, gameVersion, modloader, loaderVersion, iconPath, skipInstall) {
   //Trim string name to avoid "Unable to find directory"
   name = name.trim()
   return await invoke('plugin:profile_create|profile_create', {
@@ -24,8 +24,8 @@ export async function create(name, gameVersion, modloader, loaderVersion, icon, 
     gameVersion,
     modloader,
     loaderVersion,
-    icon,
-    noWatch,
+    iconPath,
+    skipInstall,
   })
 }
 
@@ -41,8 +41,18 @@ export async function remove(path) {
 
 // Get a profile by path
 // Returns a Profile
-export async function get(path, clearProjects) {
-  return await invoke('plugin:profile|profile_get', { path, clearProjects })
+export async function get(path) {
+  return await invoke('plugin:profile|profile_get', { path })
+}
+
+export async function get_many(paths) {
+  return await invoke('plugin:profile|profile_get_many', { paths })
+}
+
+// Get a profile's projects
+// Returns a map of a path to profile file
+export async function get_projects(path) {
+  return await invoke('plugin:profile|profile_get_projects', { path })
 }
 
 // Get a profile's full fs path
@@ -65,8 +75,8 @@ export async function get_optimal_jre_key(path) {
 
 // Get a copy of the profile set
 // Returns hashmap of path -> Profile
-export async function list(clearProjects) {
-  return await invoke('plugin:profile|profile_list', { clearProjects })
+export async function list() {
+  return await invoke('plugin:profile|profile_list')
 }
 
 export async function check_installed(path, projectId) {
@@ -163,10 +173,8 @@ export async function run(path) {
   return await invoke('plugin:profile|profile_run', { path })
 }
 
-// Run Minecraft using a pathed profile
-// Waits for end
-export async function run_wait(path) {
-  return await invoke('plugin:profile|profile_run_wait', { path })
+export async function kill(path) {
+  return await invoke('plugin:profile|profile_kill', { path })
 }
 
 // Edits a profile

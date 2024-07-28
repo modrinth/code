@@ -5,17 +5,10 @@
  */
 import { invoke } from '@tauri-apps/api/tauri'
 
-export async function authenticate_begin_flow(provider) {
-  return await invoke('plugin:mr_auth|authenticate_begin_flow', { provider })
+export async function login(provider) {
+  return await invoke('modrinth_auth_login', { provider })
 }
 
-export async function authenticate_await_completion() {
-  return await invoke('plugin:mr_auth|authenticate_await_completion')
-}
-
-export async function cancel_flow() {
-  return await invoke('plugin:mr_auth|cancel_flow')
-}
 export async function login_pass(username, password, challenge) {
   return await invoke('plugin:mr_auth|login_pass', { username, password, challenge })
 }
@@ -32,10 +25,6 @@ export async function create_account(username, email, password, challenge, signU
     challenge,
     signUpNewsletter,
   })
-}
-
-export async function refresh() {
-  return await invoke('plugin:mr_auth|refresh')
 }
 
 export async function logout() {

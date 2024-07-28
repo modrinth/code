@@ -213,13 +213,7 @@ import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
 import { tauri } from '@tauri-apps/api'
-import {
-  get_game_versions,
-  get_fabric_versions,
-  get_forge_versions,
-  get_quilt_versions,
-  get_neoforge_versions,
-} from '@/helpers/metadata'
+import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 import { mixpanel_track } from '@/helpers/mixpanel'
@@ -304,10 +298,10 @@ const [
   all_game_versions,
   loaders,
 ] = await Promise.all([
-  get_fabric_versions().then(shallowRef).catch(handleError),
-  get_forge_versions().then(shallowRef).catch(handleError),
-  get_quilt_versions().then(shallowRef).catch(handleError),
-  get_neoforge_versions().then(shallowRef).catch(handleError),
+  get_loader_versions('fabric').then(shallowRef).catch(handleError),
+  get_loader_versions('forge').then(shallowRef).catch(handleError),
+  get_loader_versions('quilt').then(shallowRef).catch(handleError),
+  get_loader_versions('neo').then(shallowRef).catch(handleError),
   get_game_versions().then(shallowRef).catch(handleError),
   get_loaders()
     .then((value) =>

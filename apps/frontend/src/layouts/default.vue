@@ -62,7 +62,7 @@
                 :title="formatMessage(messages.changeTheme)"
                 @click="changeTheme"
               >
-                <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
+                <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
                 <SunIcon v-else aria-hidden="true" />
               </button>
               <div
@@ -242,7 +242,7 @@
               {{ formatMessage(commonMessages.settingsLabel) }}
             </NuxtLink>
             <button class="iconified-button" @click="changeTheme">
-              <MoonIcon v-if="$theme.active === 'light'" class="icon" />
+              <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
               <SunIcon v-else class="icon" />
               <span class="dropdown-item__text">
                 {{ formatMessage(messages.changeTheme) }}
@@ -403,7 +403,7 @@
           {{ formatMessage(messages.getModrinthApp) }}
         </nuxt-link>
         <button class="iconified-button raised-button" @click="changeTheme">
-          <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
+          <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
           {{ formatMessage(messages.changeTheme) }}
         </button>
@@ -449,6 +449,7 @@ import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
+import { DARK_THEMES } from "~/composables/theme.js";
 
 const { formatMessage } = useVIntl();
 
@@ -737,11 +738,18 @@ function toggleBrowseMenu() {
     isMobileMenuOpen.value = false;
   }
 }
-
-const { cycle: changeTheme } = useTheme();
+function changeTheme() {
+  updateTheme(
+    DARK_THEMES.includes(app.$colorMode.value)
+      ? "light"
+      : cosmetics.value.preferredDarkTheme ?? "dark",
+    true,
+  );
+}
 
 function hideStagingBanner() {
   cosmetics.value.hideStagingBanner = true;
+  saveCosmetics();
 }
 </script>
 

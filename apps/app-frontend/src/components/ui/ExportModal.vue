@@ -23,7 +23,7 @@ defineExpose({
 })
 
 const exportModal = ref(null)
-const nameInput = ref(props.instance.metadata.name)
+const nameInput = ref(props.instance.name)
 const exportDescription = ref('')
 const versionInput = ref('1.0.0')
 const files = ref([])
@@ -50,9 +50,9 @@ const initFiles = async () => {
         disabled:
           folder === 'profile.json' ||
           folder.startsWith('modrinth_logs') ||
-          folder.startsWith('.fabric') ||
-          folder.includes('.DS_Store'),
+          folder.startsWith('.fabric'),
       }))
+      .filter((pathData) => !pathData.path.includes('.DS_Store'))
       .forEach((pathData) => {
         const parent = pathData.path.split(sep).slice(0, -1).join(sep)
         if (parent !== '') {

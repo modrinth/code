@@ -1,6 +1,6 @@
 use super::io;
+use crate::state::JavaVersion;
 use futures::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -13,13 +13,6 @@ use winreg::{
     enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
     RegKey,
 };
-
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
-pub struct JavaVersion {
-    pub path: String,
-    pub version: String,
-    pub architecture: String,
-}
 
 // Entrypoint function (Windows)
 // Returns a Vec of unique JavaVersions from the PATH, Windows Registry Keys and common Java locations
@@ -190,14 +183,14 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 {
     Box::pin(async move {
         let state = State::get().await.map_err(|_| JREError::StateError)?;
 
         let mut jre_paths = HashSet::new();
-        let base_path = state.directories.java_versions_dir().await;
+        let base_path = state.directories.java_versions_dir();
 
         if base_path.is_dir() {
             if let Ok(dir) = std::fs::read_dir(base_path) {
@@ -262,7 +255,7 @@ pub async fn check_java_at_filepaths(
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
 // If no such path exists, or no such valid java at this path exists, returns None
 #[tracing::instrument]
-#[theseus_macros::debug_pin]
+
 pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
@@ -294,6 +287,7 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
         .arg("-cp")
         .arg(file_path.parent().unwrap())
         .arg("JavaInfo")
+        .env_remove("_JAVA_OPTIONS")
         .output()
         .ok()?;
 
@@ -317,12 +311,17 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Extract version info from it
     if let Some(arch) = java_arch {
         if let Some(version) = java_version {
-            let path = java.to_string_lossy().to_string();
-            return Some(JavaVersion {
-                path,
-                version: version.to_string(),
-                architecture: arch.to_string(),
-            });
+            if let Ok((_, major_version)) =
+                extract_java_majorminor_version(version)
+            {
+                let path = java.to_string_lossy().to_string();
+                return Some(JavaVersion {
+                    major_version,
+                    path,
+                    version: version.to_string(),
+                    architecture: arch.to_string(),
+                });
+            }
         }
     }
     None

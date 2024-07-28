@@ -11,8 +11,6 @@ use crate::{
         emit::{emit_loading, init_or_edit_loading},
         LoadingBarId,
     },
-    prelude::ProfilePathId,
-    state::Profiles,
     util::{
         fetch::{self, IoSemaphore},
         io,
@@ -105,10 +103,10 @@ pub async fn get_importable_instances(
 
 // Import an instance from a launcher type and base path
 // Note: this *deletes* the submitted empty profile
-#[theseus_macros::debug_pin]
+
 #[tracing::instrument]
 pub async fn import_instance(
-    profile_path: ProfilePathId, // This should be a blank profile
+    profile_path: &str, // This should be a blank profile
     launcher_type: ImportLauncherType,
     base_path: PathBuf,
     instance_folder: String,
@@ -117,31 +115,31 @@ pub async fn import_instance(
     let res = match launcher_type {
         ImportLauncherType::MultiMC | ImportLauncherType::PrismLauncher => {
             mmc::import_mmc(
-                base_path,            // path to base mmc folder
-                instance_folder,      // instance folder in mmc_base_path
-                profile_path.clone(), // path to profile
+                base_path,       // path to base mmc folder
+                instance_folder, // instance folder in mmc_base_path
+                profile_path,    // path to profile
             )
             .await
         }
         ImportLauncherType::ATLauncher => {
             atlauncher::import_atlauncher(
-                base_path,            // path to atlauncher folder
-                instance_folder,      // instance folder in atlauncher
-                profile_path.clone(), // path to profile
+                base_path,       // path to atlauncher folder
+                instance_folder, // instance folder in atlauncher
+                profile_path,    // path to profile
             )
             .await
         }
         ImportLauncherType::GDLauncher => {
             gdlauncher::import_gdlauncher(
                 base_path.join("instances").join(instance_folder), // path to gdlauncher folder
-                profile_path.clone(), // path to profile
+                profile_path, // path to profile
             )
             .await
         }
         ImportLauncherType::Curseforge => {
             curseforge::import_curseforge(
                 base_path.join("Instances").join(instance_folder), // path to curseforge folder
-                profile_path.clone(), // path to profile
+                profile_path, // path to profile
             )
             .await
         }
@@ -158,13 +156,10 @@ pub async fn import_instance(
         Ok(_) => {}
         Err(e) => {
             tracing::warn!("Import failed: {:?}", e);
-            let _ = crate::api::profile::remove(&profile_path).await;
+            let _ = crate::api::profile::remove(profile_path).await;
             return Err(e);
         }
     }
-
-    // Check existing managed packs for potential updates
-    tokio::task::spawn(Profiles::update_modrinth_versions());
 
     tracing::debug!("Completed import.");
     Ok(())
@@ -200,7 +195,7 @@ pub fn get_default_launcher_path(
 }
 
 /// Checks if this PathBuf is a valid instance for the given launcher type
-#[theseus_macros::debug_pin]
+
 #[tracing::instrument]
 pub async fn is_valid_importable_instance(
     instance_path: PathBuf,
@@ -224,7 +219,7 @@ pub async fn is_valid_importable_instance(
 }
 
 /// Caches an image file in the filesystem into the cache directory, and returns the path to the cached file.
-#[theseus_macros::debug_pin]
+
 #[tracing::instrument]
 pub async fn recache_icon(
     icon_path: PathBuf,
@@ -252,13 +247,14 @@ pub async fn recache_icon(
 }
 
 pub async fn copy_dotminecraft(
-    profile_path_id: ProfilePathId,
+    profile_path_id: &str,
     dotminecraft: PathBuf,
     io_semaphore: &IoSemaphore,
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<LoadingBarId> {
     // Get full path to profile
-    let profile_path = profile_path_id.get_full_path().await?;
+    let profile_path =
+        crate::api::profile::get_full_path(profile_path_id).await?;
 
     // Gets all subfiles recursively in src
     let subfiles = get_all_subfiles(&dotminecraft).await?;
@@ -298,7 +294,7 @@ pub async fn copy_dotminecraft(
 
 /// Recursively get a list of all subfiles in src
 /// uses async recursion
-#[theseus_macros::debug_pin]
+
 #[async_recursion::async_recursion]
 #[tracing::instrument]
 pub async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {
