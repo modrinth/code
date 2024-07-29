@@ -40,7 +40,6 @@ export function createDisplayNames(
       of(tag: string) {
         let attempt = 0;
 
-         
         lookupLoop: do {
           let lookup: string;
           switch (attempt) {
@@ -51,7 +50,6 @@ export function createDisplayNames(
               lookup = safeTagFor(tag);
               break;
             default:
-               
               break lookupLoop;
           }
 
