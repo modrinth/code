@@ -88,15 +88,12 @@
           :server_id="server.server_id"
           :name="server.name"
           :state="server.state"
-          :net="server.net"
-          :modpack="server.modpack"
           :game="server.game"
           :loader="server.loader"
           :loader_version="server.loader_version"
           :mc_version="server.mc_version"
-          :mods="server.mods"
-          :modpack_id="server.modpack_id"
           :project="server.project"
+          :mods="server.mods"
         />
       </div>
     </ul>

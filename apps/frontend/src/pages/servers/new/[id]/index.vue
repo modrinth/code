@@ -58,14 +58,14 @@ interface IntServer {
 const createServer = async () => {
   loading = true;
 
-  let path = "servers/create";
+  let path = "create";
   const version = 0;
   const body = {
     name: serverName.value,
     specs: {
       cpu: 4.0,
-      memory_mb: 8192,
-      swap_mb: 8192,
+      memory_mb: 4192,
+      swap_mb: 4192,
     },
     source: {
       modrinthid: pack.versions.slice(-1)[0],

@@ -71,24 +71,13 @@ import type { Server } from "~/types/servers";
 import { ChevronRightIcon, BoxIcon } from "@modrinth/assets";
 import LoaderIcon from "./LoaderIcon.vue";
 
-const props = withDefaults(defineProps<Server>(), {
-  server_id: "",
-  name: "",
-  state: "",
-  net: {
-    // @ts-ignore
-    ip: "",
-    port: 0,
-    domain: "",
-  },
-  modpack: "",
-  game: "",
-  loader: "",
-  loader_version: "",
-  mc_version: "",
-});
+const props = defineProps<Partial<Server>>();
 
-const pid: any = await toRaw(useBaseFetch(`version/${await props.modpack}`));
-const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
-const icon_url = project.icon_url;
+let icon_url: string | undefined = undefined;
+
+if (props.modpack) {
+  const pid: any = await toRaw(useBaseFetch(`version/${await props.modpack}`));
+  const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
+  icon_url = project.icon_url;
+}
 </script>
