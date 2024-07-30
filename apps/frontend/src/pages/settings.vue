@@ -47,6 +47,12 @@
               >
                 <MonitorSmartphoneIcon />
               </NavStackItem>
+              <NavStackItem
+                link="/settings/billing"
+                :label="formatMessage(commonSettingsMessages.billing)"
+              >
+                <CurrencyIcon />
+              </NavStackItem>
             </template>
             <template v-if="auth.user">
               <h3>Developer</h3>
@@ -81,6 +87,7 @@ import {
   ShieldIcon,
   KeyIcon,
   LanguagesIcon,
+  CurrencyIcon,
 } from "@modrinth/assets";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
