@@ -779,7 +779,7 @@ export default defineNuxtComponent({
         featured: false,
       };
       // For navigation from versions page / upload file prompt
-      if (process.client && history.state && history.state.newPrimaryFile) {
+      if (import.meta.client && history.state && history.state.newPrimaryFile) {
         replaceFile = history.state.newPrimaryFile;
 
         try {

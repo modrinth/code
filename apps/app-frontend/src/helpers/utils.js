@@ -1,11 +1,4 @@
-import {
-  add_project_from_version as installMod,
-  check_installed,
-  get_full_path,
-  get_mod_full_path,
-} from '@/helpers/profile'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/notifications.js'
+import { get_full_path, get_mod_full_path } from '@/helpers/profile'
 import { invoke } from '@tauri-apps/api/tauri'
 
 export async function isDev() {
@@ -54,55 +47,16 @@ export const releaseColor = (releaseType) => {
   }
 }
 
-export const installVersionDependencies = async (profile, version) => {
-  for (const dep of version.dependencies) {
-    if (dep.dependency_type !== 'required') continue
-    // disallow fabric api install on quilt
-    if (dep.project_id === 'P7dR8mSH' && profile.metadata.loader === 'quilt') continue
-    if (dep.version_id) {
-      if (
-        dep.project_id &&
-        (await check_installed(profile.path, dep.project_id).catch(handleError))
-      )
-        continue
-      await installMod(profile.path, dep.version_id)
-    } else {
-      if (
-        dep.project_id &&
-        (await check_installed(profile.path, dep.project_id).catch(handleError))
-      )
-        continue
-      const depVersions = await useFetch(
-        `https://api.modrinth.com/v2/project/${dep.project_id}/version`,
-        'dependency versions',
-      )
-      const latest = depVersions.find(
-        (v) =>
-          v.game_versions.includes(profile.metadata.game_version) &&
-          v.loaders.includes(profile.metadata.loader),
-      )
-      if (latest) {
-        await installMod(profile.path, latest.id).catch(handleError)
-      }
+export function debounce(fn, wait) {
+  let timer
+  return function (...args) {
+    if (timer) {
+      clearTimeout(timer) // clear any pre-existing timer
     }
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const context = this // get the current context
+    timer = setTimeout(() => {
+      fn.apply(context, args) // call the function if time expires
+    }, wait)
   }
-}
-
-export const openLink = (url) => {
-  window.__TAURI_INVOKE__('tauri', {
-    __tauriModule: 'Shell',
-    message: {
-      cmd: 'open',
-      path: url,
-    },
-  })
-}
-
-export const refreshOffline = async () => {
-  return await invoke('plugin:utils|refresh_offline', {})
-}
-
-// returns true/false
-export const isOffline = async () => {
-  return await invoke('plugin:utils|is_offline', {})
 }

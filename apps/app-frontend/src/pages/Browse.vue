@@ -10,6 +10,7 @@ import {
   NavRow,
   Card,
   SearchFilter,
+  Avatar,
 } from '@modrinth/ui'
 import { formatCategoryHeader, formatCategory } from '@modrinth/utils'
 import Multiselect from 'vue-multiselect'
@@ -17,29 +18,22 @@ import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
-import { Avatar } from '@modrinth/ui'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import ModInstallModal from '@/components/ui/ModInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
-import { useFetch } from '@/helpers/fetch.js'
-import { check_installed, get, get as getInstance } from '@/helpers/profile.js'
+import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { isOffline } from '@/helpers/utils'
-import { offline_listener } from '@/helpers/events'
-
+import { get_search_results } from '@/helpers/cache.js'
+import { debounce } from '@/helpers/utils.js'
 const router = useRouter()
 const route = useRoute()
 
-const offline = ref(await isOffline())
-const unlistenOffline = await offline_listener((b) => {
-  offline.value = b
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
 })
-
-const confirmModal = ref(null)
-const modInstallModal = ref(null)
-const incompatibilityWarningModal = ref(null)
+window.addEventListener('online', () => {
+  offline.value = false
+})
 
 const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setContext({ name: 'Browse', link: route.path, query: route.query })
@@ -65,6 +59,7 @@ const maxResults = ref(20)
 const currentPage = ref(1)
 const projectType = ref(route.params.projectType)
 const instanceContext = ref(null)
+const instanceProjects = ref(null)
 const ignoreInstanceLoaders = ref(false)
 const ignoreInstanceGameVersions = ref(false)
 
@@ -88,7 +83,10 @@ if (route.query.il) {
   ignoreInstanceLoaders.value = route.query.il === 'true'
 }
 if (route.query.i) {
-  instanceContext.value = await getInstance(route.query.i, true)
+  ;[instanceContext.value, instanceProjects.value] = await Promise.all([
+    getInstance(route.query.i).catch(handleError),
+    getInstanceProjects(route.query.i).catch(handleError),
+  ])
 }
 if (route.query.q) {
   query.value = route.query.q
@@ -144,18 +142,16 @@ if (route.query.ai) {
 }
 
 async function refreshSearch() {
-  const base = 'https://api.modrinth.com/v2/'
-
   const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
   if (query.value.length > 0) {
     params.push(`query=${query.value.replace(/ /g, '+')}`)
   }
   if (instanceContext.value) {
     if (!ignoreInstanceLoaders.value && projectType.value === 'mod') {
-      orFacets.value = [`categories:${encodeURIComponent(instanceContext.value.metadata.loader)}`]
+      orFacets.value = [`categories:${encodeURIComponent(instanceContext.value.loader)}`]
     }
     if (!ignoreInstanceGameVersions.value) {
-      selectedVersions.value = [instanceContext.value.metadata.game_version]
+      selectedVersions.value = [instanceContext.value.game_version]
     }
   }
   if (
@@ -224,13 +220,11 @@ async function refreshSearch() {
     }
 
     if (hideAlreadyInstalled.value) {
-      const installedMods = await get(instanceContext.value.path, false).then((x) =>
-        Object.values(x.projects)
-          .filter((x) => x.metadata.project)
-          .map((x) => x.metadata.project.id),
-      )
+      const installedMods = Object.values(instanceProjects.value)
+        .filter((x) => x.metadata)
+        .map((x) => x.metadata.project_id)
+
       installedMods.map((x) => [`project_id != ${x}`]).forEach((x) => formattedFacets.push(x))
-      console.log(`facets=${JSON.stringify(formattedFacets)}`)
     }
 
     params.push(`facets=${JSON.stringify(formattedFacets)}`)
@@ -246,24 +240,24 @@ async function refreshSearch() {
     }
   }
 
-  let val = `${base}${url}`
-
-  let rawResults = await useFetch(val, 'search results', offline.value)
+  let rawResults = await get_search_results(`?${url}`)
   if (!rawResults) {
     rawResults = {
-      hits: [],
-      total_hits: 0,
-      limit: 1,
+      result: {
+        hits: [],
+        total_hits: 0,
+        limit: 1,
+      },
     }
   }
   if (instanceContext.value) {
-    for (val of rawResults.hits) {
-      val.installed = await check_installed(instanceContext.value.path, val.project_id).then(
-        (x) => (val.installed = x),
+    for (const val of rawResults.result.hits) {
+      val.installed = Object.values(instanceProjects.value).some(
+        (x) => x.metadata && x.metadata.project_id === val.project_id,
       )
     }
   }
-  results.value = rawResults
+  results.value = rawResults.result
 }
 
 async function onSearchChange(newPageNumber) {
@@ -281,6 +275,8 @@ async function onSearchChange(newPageNumber) {
     breadcrumbs.setContext({ name: 'Browse', link: route.path, query: obj })
   }
 }
+
+const debouncedSearchChange = debounce(() => onSearchChange(1), 200)
 
 const searchWrapper = ref(null)
 async function onSearchChangeToTop(newPageNumber) {
@@ -488,6 +484,14 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   refreshSearch(),
 ])
 
+const filteredLoaders = computed(() => {
+  return loaders.value.filter((loader) => {
+    return projectType.value === 'mod' || projectType.value === 'modpack'
+      ? loader.supported_project_types[0] === 'mod'
+      : loader.supported_project_types[0] === projectType.value
+  })
+})
+
 const selectableProjectTypes = computed(() => {
   const values = [
     { label: 'Shaders', href: `/browse/shader` },
@@ -497,13 +501,13 @@ const selectableProjectTypes = computed(() => {
   if (instanceContext.value) {
     if (
       availableGameVersions.value.findIndex(
-        (x) => x.version === instanceContext.value.metadata.game_version,
+        (x) => x.version === instanceContext.value.game_version,
       ) <= availableGameVersions.value.findIndex((x) => x.version === '1.13')
     ) {
       values.unshift({ label: 'Data Packs', href: `/browse/datapack` })
     }
 
-    if (instanceContext.value.metadata.loader !== 'vanilla') {
+    if (instanceContext.value.loader !== 'vanilla') {
       values.unshift({ label: 'Mods', href: '/browse/mod' })
     }
   } else {
@@ -518,16 +522,8 @@ const selectableProjectTypes = computed(() => {
 const showVersions = computed(
   () => instanceContext.value === null || ignoreInstanceGameVersions.value,
 )
-const showLoaders = computed(
-  () =>
-    (projectType.value !== 'datapack' &&
-      projectType.value !== 'resourcepack' &&
-      projectType.value !== 'shader' &&
-      instanceContext.value === null) ||
-    ignoreInstanceLoaders.value,
-)
 
-onUnmounted(() => unlistenOffline())
+const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.value))
 </script>
 
 <template>
@@ -536,27 +532,19 @@ onUnmounted(() => unlistenOffline())
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
           <Avatar
-            :src="
-              !instanceContext.metadata.icon ||
-              (instanceContext.metadata.icon && instanceContext.metadata.icon.startsWith('http'))
-                ? instanceContext.metadata.icon
-                : convertFileSrc(instanceContext.metadata.icon)
-            "
-            :alt="instanceContext.metadata.name"
+            :src="instanceContext.icon_path ? convertFileSrc(instanceContext.icon_path) : null"
+            :alt="instanceContext.name"
             size="sm"
           />
           <div class="small-instance_info">
             <span class="title">{{
-              instanceContext.metadata.name.length > 20
-                ? instanceContext.metadata.name.substring(0, 20) + '...'
-                : instanceContext.metadata.name
+              instanceContext.name.length > 20
+                ? instanceContext.name.substring(0, 20) + '...'
+                : instanceContext.name
             }}</span>
             <span>
-              {{
-                instanceContext.metadata.loader.charAt(0).toUpperCase() +
-                instanceContext.metadata.loader.slice(1)
-              }}
-              {{ instanceContext.metadata.game_version }}
+              {{ instanceContext.loader.charAt(0).toUpperCase() + instanceContext.loader.slice(1) }}
+              {{ instanceContext.game_version }}
             </span>
           </div>
         </router-link>
@@ -596,17 +584,12 @@ onUnmounted(() => unlistenOffline())
         >
           <ClearIcon /> Clear filters
         </Button>
-        <div v-if="showLoaders" class="loaders">
+        <div
+          v-if="(isModProject && ignoreInstanceLoaders) || projectType === 'shader'"
+          class="loaders"
+        >
           <h2>Loaders</h2>
-          <div
-            v-for="loader in loaders.filter(
-              (l) =>
-                (projectType !== 'mod' && l.supported_project_types?.includes(projectType)) ||
-                (projectType === 'mod' &&
-                  ['fabric', 'forge', 'quilt', 'neoforge'].includes(l.name)),
-            )"
-            :key="loader"
-          >
+          <div v-for="loader in filteredLoaders" :key="loader">
             <SearchFilter
               :active-filters="orFacets"
               :icon="loader.icon"
@@ -656,7 +639,7 @@ onUnmounted(() => unlistenOffline())
             />
           </div>
         </div>
-        <div v-if="projectType !== 'datapack'" class="environment">
+        <div v-if="isModProject" class="environment">
           <h2>Environments</h2>
           <SearchFilter
             :active-filters="selectedEnvironments"
@@ -699,11 +682,12 @@ onUnmounted(() => unlistenOffline())
           <input
             v-model="query"
             autocomplete="off"
+            spellcheck="false"
             type="text"
             :placeholder="`Search ${projectType}s...`"
-            @input="onSearchChange(1)"
+            @input="debouncedSearchChange()"
           />
-          <Button @click="() => clearSearch()">
+          <Button class="r-btn" @click="() => clearSearch()">
             <XIcon />
           </Button>
         </div>
@@ -758,9 +742,6 @@ onUnmounted(() => unlistenOffline())
                 loader.supported_project_types?.includes(projectType),
             ),
           ]"
-          :confirm-modal="confirmModal"
-          :mod-install-modal="modInstallModal"
-          :incompatibility-warning-modal="incompatibilityWarningModal"
           :installed="result.installed"
         />
       </section>
@@ -774,9 +755,6 @@ onUnmounted(() => unlistenOffline())
       <br />
     </div>
   </div>
-  <InstallConfirmModal ref="confirmModal" />
-  <ModInstallModal ref="modInstallModal" />
-  <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 </template>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>

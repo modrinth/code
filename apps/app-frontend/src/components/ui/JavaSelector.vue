@@ -162,7 +162,6 @@ async function reinstallJava() {
   const path = await auto_install_java(props.version).catch(handleError)
   let result = await get_jre(path)
 
-  console.log('java result ' + result)
   if (!result) {
     result = {
       path: path,
@@ -205,6 +204,10 @@ async function reinstallJava() {
   align-items: center;
   gap: 0.5rem;
   margin: 0;
+
+  .btn {
+    width: max-content;
+  }
 }
 
 .test-success {

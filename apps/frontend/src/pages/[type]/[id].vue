@@ -1500,7 +1500,7 @@ const collapsedChecklist = ref(false);
 
 const showModerationChecklist = ref(false);
 const futureProjects = ref([]);
-if (process.client && history && history.state && history.state.showChecklist) {
+if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
   futureProjects.value = history.state.projects;
 }

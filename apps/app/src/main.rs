@@ -17,10 +17,8 @@ mod macos;
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
-    let s = State::get().await?;
-    State::update();
+    State::init().await?;
 
-    s.children.write().await.rescue_cache().await?;
     Ok(())
 }
 
@@ -56,7 +54,7 @@ struct Payload {
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
-    tauri_plugin_deep_link::prepare("com.modrinth.theseus");
+    tauri_plugin_deep_link::prepare("ModrinthApp");
 
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
@@ -133,6 +131,7 @@ fn main() {
             }
         })
     }
+
     let builder = builder
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
@@ -147,12 +146,14 @@ fn main() {
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())
+        .plugin(api::cache::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
             toggle_decorations,
             show_window,
             api::auth::auth_login,
+            api::mr_auth::modrinth_auth_login,
         ]);
 
     builder
