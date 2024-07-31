@@ -31,7 +31,7 @@
                   {{ formatMessage(channelMessages[`${version.version_type}Symbol`]) }}
                 </div>
                 <div class='hidden group-hover:!flex relative z-[1]'>
-                  <ButtonStyled circular>
+                  <ButtonStyled circular color='brand'>
                     <button v-tooltip='`Download`'>
                       <DownloadIcon />
                     </button>
