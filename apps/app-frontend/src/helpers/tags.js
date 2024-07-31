@@ -5,11 +5,6 @@
  */
 import { invoke } from '@tauri-apps/api/tauri'
 
-// Gets tag bundle of all tags
-export async function get_tag_bundle() {
-  return await invoke('plugin:tags|tags_get_tag_bundle')
-}
-
 // Gets cached category tags
 export async function get_categories() {
   return await invoke('plugin:tags|tags_get_categories')

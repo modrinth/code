@@ -152,7 +152,7 @@ export const analyticsSetToCSVString = (analytics) => {
   return [header, ...data].join(newline);
 };
 
-export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName, theme) => {
+export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName) => {
   if (!category || !projects) {
     return emptyAnalytics;
   }
@@ -219,9 +219,10 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         },
       ],
       colors: projectData.map((_, i) => {
+        const theme = useTheme();
         const project = chartData[i];
 
-        return intToRgba(project.color, project.id, theme);
+        return intToRgba(project.color, project.id, theme.value);
       }),
       defaultColors: projectData.map((_, i) => {
         const project = chartData[i];
@@ -281,10 +282,10 @@ const sortTimestamp = ([a], [b]) => a - b;
 const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 100) / 100];
 
 const processCountryAnalytics = (c, projects) => processAnalyticsByCountry(c, projects, sortCount);
-const processNumberAnalytics = (c, projects, theme) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads", theme);
-const processRevAnalytics = (c, projects, theme) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue", theme);
+const processNumberAnalytics = (c, projects) =>
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads");
+const processRevAnalytics = (c, projects) =>
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue");
 
 const useFetchAnalytics = (
   url,
@@ -327,12 +328,10 @@ export const useFetchAllAnalytics = (
     viewsByCountry: processCountryAnalytics(viewsByCountry.value, selectedProjects.value),
   }));
 
-  const theme = useTheme();
-
   const totalData = computed(() => ({
-    downloads: processNumberAnalytics(downloadData.value, projects.value, theme.active),
-    views: processNumberAnalytics(viewData.value, projects.value, theme.active),
-    revenue: processRevAnalytics(revenueData.value, projects.value, theme.active),
+    downloads: processNumberAnalytics(downloadData.value, projects.value),
+    views: processNumberAnalytics(viewData.value, projects.value),
+    revenue: processRevAnalytics(revenueData.value, projects.value),
   }));
 
   const fetchData = async (query) => {

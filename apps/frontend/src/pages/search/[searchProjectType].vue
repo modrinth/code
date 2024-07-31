@@ -763,6 +763,7 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode[projectType.value.id],
     tags.value.projectViewModes,
   );
+  saveCosmetics();
   setClosestMaxResults();
 }
 

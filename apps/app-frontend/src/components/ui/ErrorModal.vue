@@ -168,7 +168,7 @@ async function loginMinecraft() {
       </div>
       <div class="input-group push-right">
         <a :href="supportLink" class="btn" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-        <button class="btn" @clicdck="errorModal.hide()"><XIcon /> Close</button>
+        <button class="btn" @click="errorModal.hide()"><XIcon /> Close</button>
       </div>
     </div>
   </Modal>
@@ -222,5 +222,9 @@ async function loginMinecraft() {
   flex-direction: column;
   gap: var(--gap-md);
   padding: var(--gap-lg);
+}
+
+.markdown-body {
+  overflow: auto;
 }
 </style>

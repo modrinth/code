@@ -53,9 +53,6 @@ defineExpose({
   show: async (version, currentSelectedJava) => {
     chosenInstallOptions.value = await find_filtered_jres(version).catch(handleError)
 
-    console.log(chosenInstallOptions.value)
-    console.log(version)
-
     currentSelected.value = currentSelectedJava
     if (!currentSelected.value) {
       currentSelected.value = { path: '', version: '' }

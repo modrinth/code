@@ -2,7 +2,7 @@
 import { DropdownIcon, FolderOpenIcon, SearchIcon } from '@modrinth/assets'
 import { Button, OverflowMenu } from '@modrinth/ui'
 import { open } from '@tauri-apps/api/dialog'
-import { add_project_from_path, get } from '@/helpers/profile.js'
+import { add_project_from_path } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
 import { useRouter } from 'vue-router'
 
@@ -20,14 +20,13 @@ const handleAddContentFromFile = async () => {
   if (!newProject) return
 
   for (const project of newProject) {
-    await add_project_from_path(props.instance.path, project, 'mod').catch(handleError)
+    await add_project_from_path(props.instance.path, project).catch(handleError)
   }
-  props.instance.initProjects(await get(props.instance.path).catch(handleError))
 }
 
 const handleSearchContent = async () => {
   await router.push({
-    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    path: `/browse/${props.instance.loader === 'vanilla' ? 'datapack' : 'mod'}`,
     query: { i: props.instance.path },
   })
 }
