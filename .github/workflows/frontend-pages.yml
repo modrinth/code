@@ -21,7 +21,7 @@ jobs:
       - name: Purge cache
         if: github.ref == 'refs/heads/main'
         run: |
-          curl -X \
+          curl -X POST \
             -H "Authorization: ${{ secrets.CF_API_TOKEN }}" \
             -H "Content-Type: application/json" \
             --data '{"hosts": ["modrinth.com", "www.modrinth.com"]}' \
