@@ -17,7 +17,7 @@
         <div
           :class='`versions-grid-row w-full h-px bg-button-bg ${index === 0 ? `max-sm:!hidden` : ``}`'></div>
         <div class='versions-grid-row relative group'>
-          <nuxt-link class="absolute inset-[calc(-1rem-2px)_-2rem] before:content-[''] before:absolute before:inset-0  hover:before:backdrop-brightness-110" :to="`/${project.project_type}/${
+          <nuxt-link class="absolute inset-[calc(-1rem-2px)_-2rem] before:transition-all before:content-[''] before:absolute before:inset-0  hover:before:backdrop-brightness-110" :to="`/${project.project_type}/${
             project.slug ? project.slug : project.id
           }/version/${encodeURI(version.displayUrlEnding)}`"
           >
