@@ -199,7 +199,7 @@
           <div class="blob-demonstration gradient-border">
             <div class="launcher-view">
               <img
-                v-if="$colorMode.value === 'light'"
+                v-if="$theme.active === 'light'"
                 src="https://cdn.modrinth.com/landing-new/launcher-light.webp"
                 alt="launcher graphic"
                 class="minecraft-screen"
@@ -407,7 +407,7 @@
     </div>
     <div class="logo-banner">
       <svg
-        v-if="$colorMode.value === 'light'"
+        v-if="$theme.active === 'light'"
         viewBox="0 0 865 512"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
