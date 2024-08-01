@@ -344,10 +344,9 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Promotion } from "@modrinth/ui";
+import { Promotion, SearchFilter } from "@modrinth/ui";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import Pagination from "~/components/ui/Pagination.vue";
-import SearchFilter from "~/components/ui/search/SearchFilter.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 
