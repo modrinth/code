@@ -80,7 +80,6 @@ import EnvironmentIndicator from './EnvironmentIndicator.vue'
 </script>
 
 <script>
-
 dayjs.extend(relativeTime)
 export default defineComponent({
   props: {
@@ -200,7 +199,7 @@ export default defineComponent({
       const b = color & 0xff
       const g = (color & 0xff00) >>> 8
       const r = (color & 0xff0000) >>> 16
-      return `rgba(${  [r, g, b, 1].join(',')  })`
+      return `rgba(${[r, g, b, 1].join(',')})`
     },
     createdDate() {
       return dayjs(this.createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
@@ -301,7 +300,9 @@ export default defineComponent({
     img,
     svg {
       border-radius: var(--radius-lg);
-      box-shadow: -2px -2px 0 2px var(--color-raised-bg), 2px -2px 0 2px var(--color-raised-bg);
+      box-shadow:
+        -2px -2px 0 2px var(--color-raised-bg),
+        2px -2px 0 2px var(--color-raised-bg);
     }
   }
 

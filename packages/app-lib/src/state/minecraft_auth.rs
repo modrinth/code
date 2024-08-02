@@ -1,10 +1,11 @@
-use crate::data::DirectoryInfo;
-use crate::util::fetch::{read_json, write, IoSemaphore, REQWEST_CLIENT};
-use crate::{ErrorKind, State};
+use crate::util::fetch::REQWEST_CLIENT;
+use crate::ErrorKind;
 use base64::prelude::{BASE64_STANDARD, BASE64_URL_SAFE_NO_PAD};
 use base64::Engine;
 use byteorder::BigEndian;
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Duration, TimeZone, Utc};
+use dashmap::DashMap;
+use futures::TryStreamExt;
 use p256::ecdsa::signature::Signer;
 use p256::ecdsa::{Signature, SigningKey, VerifyingKey};
 use p256::pkcs8::{DecodePrivateKey, EncodePrivateKey, LineEnding};
@@ -73,17 +74,6 @@ pub enum MinecraftAuthenticationError {
     NoUserHash,
 }
 
-const AUTH_JSON: &str = "minecraft_auth.json";
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SaveDeviceToken {
-    pub id: String,
-    pub private_key: String,
-    pub x: String,
-    pub y: String,
-    pub token: DeviceToken,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MinecraftLoginFlow {
     pub verifier: String,
@@ -92,327 +82,119 @@ pub struct MinecraftLoginFlow {
     pub redirect_uri: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct MinecraftAuthStore {
-    pub users: HashMap<Uuid, Credentials>,
-    pub token: Option<SaveDeviceToken>,
-    pub default_user: Option<Uuid>,
-}
-
-impl MinecraftAuthStore {
-    #[tracing::instrument]
-    pub async fn init(
-        dirs: &DirectoryInfo,
-        io_semaphore: &IoSemaphore,
-    ) -> crate::Result<Self> {
-        let auth_path = dirs.caches_meta_dir().await.join(AUTH_JSON);
-        let store = read_json(&auth_path, io_semaphore).await.ok();
-
-        if let Some(store) = store {
-            Ok(store)
-        } else {
-            Ok(Self {
-                users: HashMap::new(),
-                token: None,
-                default_user: None,
-            })
-        }
-    }
-
-    #[tracing::instrument(skip(self))]
-    pub async fn save(&self) -> crate::Result<()> {
-        let state = State::get().await?;
-        let auth_path =
-            state.directories.caches_meta_dir().await.join(AUTH_JSON);
-
-        write(&auth_path, &serde_json::to_vec(&self)?, &state.io_semaphore)
+#[tracing::instrument]
+pub async fn login_begin(
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+) -> crate::Result<MinecraftLoginFlow> {
+    let (pair, current_date, valid_date) =
+        DeviceTokenPair::refresh_and_get_device_token(Utc::now(), false, exec)
             .await?;
 
-        Ok(())
-    }
+    let verifier = generate_oauth_challenge();
+    let mut hasher = sha2::Sha256::new();
+    hasher.update(&verifier);
+    let result = hasher.finalize();
+    let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
 
-    #[tracing::instrument(skip(self))]
-    async fn refresh_and_get_device_token(
-        &mut self,
-        current_date: DateTime<Utc>,
-        force_generate: bool,
-    ) -> crate::Result<(DeviceTokenKey, DeviceToken, DateTime<Utc>, bool)> {
-        macro_rules! generate_key {
-            ($self:ident, $generate_key:expr, $device_token:expr, $SaveDeviceToken:path) => {{
-                let key = generate_key()?;
-                let res = device_token(&key, current_date).await?;
-
-                self.token = Some(SaveDeviceToken {
-                    id: key.id.clone(),
-                    private_key: key
-                        .key
-                        .to_pkcs8_pem(LineEnding::default())
-                        .map_err(|err| {
-                            MinecraftAuthenticationError::PEMSerialize(err)
-                        })?
-                        .to_string(),
-                    x: key.x.clone(),
-                    y: key.y.clone(),
-                    token: res.value.clone(),
-                });
-                self.save().await?;
-
-                (key, res.value, res.date, true)
-            }};
-        }
-
-        let (key, token, date, valid_date) = if let Some(ref token) = self.token
-        {
-            if let Ok(private_key) =
-                SigningKey::from_pkcs8_pem(&token.private_key)
-            {
-                if token.token.not_after > Utc::now() && !force_generate {
-                    (
-                        DeviceTokenKey {
-                            id: token.id.clone(),
-                            key: private_key,
-                            x: token.x.clone(),
-                            y: token.y.clone(),
-                        },
-                        token.token.clone(),
-                        current_date,
+    match sisu_authenticate(
+        &pair.token.token,
+        &challenge,
+        &pair.key,
+        current_date,
+    )
+    .await
+    {
+        Ok((session_id, redirect_uri)) => Ok(MinecraftLoginFlow {
+            verifier,
+            challenge,
+            session_id,
+            redirect_uri: redirect_uri.value.msa_oauth_redirect,
+        }),
+        Err(err) => {
+            if !valid_date {
+                let (pair, current_date, _) =
+                    DeviceTokenPair::refresh_and_get_device_token(
+                        Utc::now(),
                         false,
-                    )
-                } else {
-                    let key = DeviceTokenKey {
-                        id: token.id.clone(),
-                        key: private_key,
-                        x: token.x.clone(),
-                        y: token.y.clone(),
-                    };
-
-                    let res = device_token(&key, current_date).await?;
-
-                    (key, res.value, res.date, true)
-                }
-            } else {
-                generate_key!(self, generate_key, device_token, SaveDeviceToken)
-            }
-        } else {
-            generate_key!(self, generate_key, device_token, SaveDeviceToken)
-        };
-
-        Ok((key, token, date, valid_date))
-    }
-
-    #[tracing::instrument(skip(self))]
-    pub async fn login_begin(&mut self) -> crate::Result<MinecraftLoginFlow> {
-        let (key, token, current_date, valid_date) =
-            self.refresh_and_get_device_token(Utc::now(), false).await?;
-
-        let verifier = generate_oauth_challenge();
-        let mut hasher = sha2::Sha256::new();
-        hasher.update(&verifier);
-        let result = hasher.finalize();
-        let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
-
-        match sisu_authenticate(&token.token, &challenge, &key, current_date)
-            .await
-        {
-            Ok((session_id, redirect_uri)) => Ok(MinecraftLoginFlow {
-                verifier,
-                challenge,
-                session_id,
-                redirect_uri: redirect_uri.value.msa_oauth_redirect,
-            }),
-            Err(err) => {
-                if !valid_date {
-                    let (key, token, current_date, _) = self
-                        .refresh_and_get_device_token(Utc::now(), false)
-                        .await?;
-
-                    let verifier = generate_oauth_challenge();
-                    let mut hasher = sha2::Sha256::new();
-                    hasher.update(&verifier);
-                    let result = hasher.finalize();
-                    let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
-
-                    let (session_id, redirect_uri) = sisu_authenticate(
-                        &token.token,
-                        &challenge,
-                        &key,
-                        current_date,
+                        exec,
                     )
                     .await?;
 
-                    Ok(MinecraftLoginFlow {
-                        verifier,
-                        challenge,
-                        session_id,
-                        redirect_uri: redirect_uri.value.msa_oauth_redirect,
-                    })
-                } else {
-                    Err(crate::ErrorKind::from(err).into())
-                }
+                let verifier = generate_oauth_challenge();
+                let mut hasher = sha2::Sha256::new();
+                hasher.update(&verifier);
+                let result = hasher.finalize();
+                let challenge = BASE64_URL_SAFE_NO_PAD.encode(result);
+
+                let (session_id, redirect_uri) = sisu_authenticate(
+                    &pair.token.token,
+                    &challenge,
+                    &pair.key,
+                    current_date,
+                )
+                .await?;
+
+                Ok(MinecraftLoginFlow {
+                    verifier,
+                    challenge,
+                    session_id,
+                    redirect_uri: redirect_uri.value.msa_oauth_redirect,
+                })
+            } else {
+                Err(crate::ErrorKind::from(err).into())
             }
         }
     }
+}
 
-    #[tracing::instrument(skip(self))]
-    pub async fn login_finish(
-        &mut self,
-        code: &str,
-        flow: MinecraftLoginFlow,
-    ) -> crate::Result<Credentials> {
-        let (key, token, _, _) =
-            self.refresh_and_get_device_token(Utc::now(), false).await?;
-
-        let oauth_token = oauth_token(code, &flow.verifier).await?;
-        let sisu_authorize = sisu_authorize(
-            Some(&flow.session_id),
-            &oauth_token.value.access_token,
-            &token.token,
-            &key,
-            oauth_token.date,
-        )
-        .await?;
-
-        let xbox_token = xsts_authorize(
-            sisu_authorize.value,
-            &token.token,
-            &key,
-            sisu_authorize.date,
-        )
-        .await?;
-        let minecraft_token = minecraft_token(xbox_token.value).await?;
-
-        minecraft_entitlements(&minecraft_token.access_token).await?;
-
-        let profile = minecraft_profile(&minecraft_token.access_token).await?;
-
-        let profile_id = profile.id.unwrap_or_default();
-
-        let credentials = Credentials {
-            id: profile_id,
-            username: profile.name,
-            access_token: minecraft_token.access_token,
-            refresh_token: oauth_token.value.refresh_token,
-            expires: oauth_token.date
-                + Duration::seconds(oauth_token.value.expires_in as i64),
-        };
-
-        self.users.insert(profile_id, credentials.clone());
-
-        if self.default_user.is_none() {
-            self.default_user = Some(profile_id);
-        }
-
-        self.save().await?;
-
-        Ok(credentials)
-    }
-
-    pub async fn refresh_token(
-        &mut self,
-        creds: &Credentials,
-    ) -> crate::Result<Option<Credentials>> {
-        let cred_id = creds.id;
-        let profile_name = creds.username.clone();
-
-        let oauth_token = oauth_refresh(&creds.refresh_token).await?;
-        let (key, token, current_date, _) = self
-            .refresh_and_get_device_token(oauth_token.date, false)
+#[tracing::instrument]
+pub async fn login_finish(
+    code: &str,
+    flow: MinecraftLoginFlow,
+    exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+) -> crate::Result<Credentials> {
+    let (pair, _, _) =
+        DeviceTokenPair::refresh_and_get_device_token(Utc::now(), false, exec)
             .await?;
 
-        let sisu_authorize = sisu_authorize(
-            None,
-            &oauth_token.value.access_token,
-            &token.token,
-            &key,
-            current_date,
-        )
-        .await?;
+    let oauth_token = oauth_token(code, &flow.verifier).await?;
+    let sisu_authorize = sisu_authorize(
+        Some(&flow.session_id),
+        &oauth_token.value.access_token,
+        &pair.token.token,
+        &pair.key,
+        oauth_token.date,
+    )
+    .await?;
 
-        let xbox_token = xsts_authorize(
-            sisu_authorize.value,
-            &token.token,
-            &key,
-            sisu_authorize.date,
-        )
-        .await?;
+    let xbox_token = xsts_authorize(
+        sisu_authorize.value,
+        &pair.token.token,
+        &pair.key,
+        sisu_authorize.date,
+    )
+    .await?;
+    let minecraft_token = minecraft_token(xbox_token.value).await?;
 
-        let minecraft_token = minecraft_token(xbox_token.value).await?;
+    minecraft_entitlements(&minecraft_token.access_token).await?;
 
-        let val = Credentials {
-            id: cred_id,
-            username: profile_name,
-            access_token: minecraft_token.access_token,
-            refresh_token: oauth_token.value.refresh_token,
-            expires: oauth_token.date
-                + Duration::seconds(oauth_token.value.expires_in as i64),
-        };
+    let profile = minecraft_profile(&minecraft_token.access_token).await?;
 
-        self.users.insert(val.id, val.clone());
-        self.save().await?;
+    let profile_id = profile.id.unwrap_or_default();
 
-        Ok(Some(val))
-    }
+    let credentials = Credentials {
+        id: profile_id,
+        username: profile.name,
+        access_token: minecraft_token.access_token,
+        refresh_token: oauth_token.value.refresh_token,
+        expires: oauth_token.date
+            + Duration::seconds(oauth_token.value.expires_in as i64),
+        active: true,
+    };
 
-    #[tracing::instrument(skip(self))]
-    pub async fn get_default_credential(
-        &mut self,
-    ) -> crate::Result<Option<Credentials>> {
-        let credentials = if let Some(default_user) = self.default_user {
-            if let Some(creds) = self.users.get(&default_user) {
-                Some(creds)
-            } else {
-                self.users.values().next()
-            }
-        } else {
-            self.users.values().next()
-        };
+    credentials.upsert(exec).await?;
 
-        if let Some(creds) = credentials {
-            if self.default_user != Some(creds.id) {
-                self.default_user = Some(creds.id);
-                self.save().await?;
-            }
-
-            if creds.expires < Utc::now() {
-                let old_credentials = creds.clone();
-
-                let res = self.refresh_token(&old_credentials).await;
-
-                match res {
-                    Ok(val) => Ok(val),
-                    Err(err) => {
-                        if let ErrorKind::MinecraftAuthenticationError(
-                            MinecraftAuthenticationError::Request {
-                                ref source,
-                                ..
-                            },
-                        ) = *err.raw
-                        {
-                            if source.is_connect() || source.is_timeout() {
-                                return Ok(Some(old_credentials));
-                            }
-                        }
-
-                        Err(err)
-                    }
-                }
-            } else {
-                Ok(Some(creds.clone()))
-            }
-        } else {
-            Ok(None)
-        }
-    }
-
-    #[tracing::instrument(skip(self))]
-    pub async fn remove(
-        &mut self,
-        id: Uuid,
-    ) -> crate::Result<Option<Credentials>> {
-        let val = self.users.remove(&id);
-        self.save().await?;
-        Ok(val)
-    }
+    Ok(credentials)
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -422,6 +204,343 @@ pub struct Credentials {
     pub access_token: String,
     pub refresh_token: String,
     pub expires: DateTime<Utc>,
+    pub active: bool,
+}
+
+impl Credentials {
+    pub async fn refresh(
+        &mut self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    ) -> crate::Result<()> {
+        let oauth_token = oauth_refresh(&self.refresh_token).await?;
+        let (pair, current_date, _) =
+            DeviceTokenPair::refresh_and_get_device_token(
+                oauth_token.date,
+                false,
+                exec,
+            )
+            .await?;
+
+        let sisu_authorize = sisu_authorize(
+            None,
+            &oauth_token.value.access_token,
+            &pair.token.token,
+            &pair.key,
+            current_date,
+        )
+        .await?;
+
+        let xbox_token = xsts_authorize(
+            sisu_authorize.value,
+            &pair.token.token,
+            &pair.key,
+            sisu_authorize.date,
+        )
+        .await?;
+
+        let minecraft_token = minecraft_token(xbox_token.value).await?;
+
+        self.access_token = minecraft_token.access_token;
+        self.refresh_token = oauth_token.value.refresh_token;
+        self.expires = oauth_token.date
+            + Duration::seconds(oauth_token.value.expires_in as i64);
+
+        self.upsert(exec).await?;
+
+        Ok(())
+    }
+
+    #[tracing::instrument]
+    pub async fn get_default_credential(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    ) -> crate::Result<Option<Credentials>> {
+        let credentials = Self::get_active(exec).await?;
+
+        if let Some(mut creds) = credentials {
+            if creds.expires < Utc::now() {
+                let res = creds.refresh(exec).await;
+
+                match res {
+                    Ok(_) => Ok(Some(creds)),
+                    Err(err) => {
+                        if let ErrorKind::MinecraftAuthenticationError(
+                            MinecraftAuthenticationError::Request {
+                                ref source,
+                                ..
+                            },
+                        ) = *err.raw
+                        {
+                            if source.is_connect() || source.is_timeout() {
+                                return Ok(Some(creds));
+                            }
+                        }
+
+                        Err(err)
+                    }
+                }
+            } else {
+                Ok(Some(creds))
+            }
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub async fn get_active(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        let res = sqlx::query!(
+            "
+            SELECT
+                uuid, active, username, access_token, refresh_token, expires
+            FROM minecraft_users
+            WHERE active = TRUE
+            "
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(res.map(|x| Self {
+            id: Uuid::parse_str(&x.uuid).unwrap_or_default(),
+            username: x.username,
+            access_token: x.access_token,
+            refresh_token: x.refresh_token,
+            expires: Utc
+                .timestamp_opt(x.expires, 0)
+                .single()
+                .unwrap_or_else(Utc::now),
+            active: x.active == 1,
+        }))
+    }
+
+    pub async fn get_all(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<DashMap<Uuid, Self>> {
+        let res = sqlx::query!(
+            "
+            SELECT
+                uuid, active, username, access_token, refresh_token, expires
+            FROM minecraft_users
+            "
+        )
+        .fetch(exec)
+        .try_fold(DashMap::new(), |acc, x| {
+            let uuid = Uuid::parse_str(&x.uuid).unwrap_or_default();
+
+            acc.insert(
+                uuid,
+                Self {
+                    id: uuid,
+                    username: x.username,
+                    access_token: x.access_token,
+                    refresh_token: x.refresh_token,
+                    expires: Utc
+                        .timestamp_opt(x.expires, 0)
+                        .single()
+                        .unwrap_or_else(Utc::now),
+                    active: x.active == 1,
+                },
+            );
+
+            async move { Ok(acc) }
+        })
+        .await?;
+
+        Ok(res)
+    }
+
+    pub async fn upsert(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    ) -> crate::Result<()> {
+        let expires = self.expires.timestamp();
+        let uuid = self.id.as_hyphenated().to_string();
+
+        if self.active {
+            sqlx::query!(
+                "
+                UPDATE minecraft_users
+                SET active = FALSE
+                ",
+            )
+            .execute(exec)
+            .await?;
+        }
+
+        sqlx::query!(
+            "
+            INSERT INTO minecraft_users (uuid, active, username, access_token, refresh_token, expires)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            ON CONFLICT (uuid) DO UPDATE SET
+                active = $2,
+                username = $3,
+                access_token = $4,
+                refresh_token = $5,
+                expires = $6
+            ",
+            uuid,
+            self.active,
+            self.username,
+            self.access_token,
+            self.refresh_token,
+            expires,
+        )
+            .execute(exec)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn remove(
+        uuid: Uuid,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let uuid = uuid.as_hyphenated().to_string();
+
+        sqlx::query!(
+            "
+            DELETE FROM minecraft_users WHERE uuid = $1
+            ",
+            uuid,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(())
+    }
+}
+
+pub struct DeviceTokenPair {
+    pub token: DeviceToken,
+    pub key: DeviceTokenKey,
+}
+
+impl DeviceTokenPair {
+    #[tracing::instrument(skip(exec))]
+    async fn refresh_and_get_device_token(
+        current_date: DateTime<Utc>,
+        force_generate: bool,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite> + Copy,
+    ) -> crate::Result<(Self, DateTime<Utc>, bool)> {
+        let pair = Self::get(exec).await?;
+
+        if let Some(mut pair) = pair {
+            if pair.token.not_after > Utc::now() && !force_generate {
+                Ok((pair, current_date, false))
+            } else {
+                let res = device_token(&pair.key, current_date).await?;
+
+                pair.token = res.value;
+                pair.upsert(exec).await?;
+
+                Ok((pair, res.date, true))
+            }
+        } else {
+            let key = generate_key()?;
+            let res = device_token(&key, current_date).await?;
+
+            let pair = Self {
+                key,
+                token: res.value,
+            };
+
+            pair.upsert(exec).await?;
+
+            Ok((pair, res.date, true))
+        }
+    }
+
+    async fn get(
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<Option<Self>> {
+        let res = sqlx::query!(
+            r#"
+            SELECT
+                uuid, private_key, x, y, issue_instant, not_after, token, json(display_claims) as "display_claims!: serde_json::Value"
+            FROM minecraft_device_tokens
+            "#
+        )
+            .fetch_optional(exec)
+            .await?;
+
+        if let Some(x) = res {
+            if let Ok(uuid) = Uuid::parse_str(&x.uuid) {
+                if let Ok(private_key) =
+                    SigningKey::from_pkcs8_pem(&x.private_key)
+                {
+                    return Ok(Some(Self {
+                        token: DeviceToken {
+                            issue_instant: Utc
+                                .timestamp_opt(x.issue_instant, 0)
+                                .single()
+                                .unwrap_or_else(Utc::now),
+                            not_after: Utc
+                                .timestamp_opt(x.not_after, 0)
+                                .single()
+                                .unwrap_or_else(Utc::now),
+                            token: x.token,
+                            display_claims: serde_json::from_value(
+                                x.display_claims,
+                            )
+                            .unwrap_or_default(),
+                        },
+                        key: DeviceTokenKey {
+                            id: uuid,
+                            key: private_key,
+                            x: x.x,
+                            y: x.y,
+                        },
+                    }));
+                }
+            }
+        }
+
+        Ok(None)
+    }
+
+    pub async fn upsert(
+        &self,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let uuid = self.key.id.as_hyphenated().to_string();
+        let issue_instant = self.token.issue_instant.timestamp();
+        let not_after = self.token.not_after.timestamp();
+        let key = self
+            .key
+            .key
+            .to_pkcs8_pem(LineEnding::default())
+            .map_err(MinecraftAuthenticationError::PEMSerialize)?
+            .to_string();
+        let display_claims = serde_json::to_string(&self.token.display_claims)?;
+
+        sqlx::query!(
+            "
+            INSERT INTO minecraft_device_tokens (id, uuid, private_key, x, y, issue_instant, not_after, token, display_claims)
+            VALUES (0, $1, $2, $3, $4, $5, $6, $7, $8)
+            ON CONFLICT (id) DO UPDATE SET
+                uuid = $1,
+                private_key = $2,
+                x = $3,
+                y = $4,
+                issue_instant = $5,
+                not_after = $6,
+                token = $7,
+                display_claims = jsonb($8)
+            ",
+            uuid,
+            key,
+            self.key.x,
+            self.key.y,
+            issue_instant,
+            not_after,
+            self.token.token,
+            display_claims,
+        )
+            .execute(exec)
+            .await?;
+
+        Ok(())
+    }
 }
 
 const MICROSOFT_CLIENT_ID: &str = "00000000402b5328";
@@ -455,7 +574,7 @@ pub async fn device_token(
         json!({
             "Properties": {
                 "AuthMethod": "ProofOfPossession",
-                "Id": format!("{{{}}}", key.id),
+                "Id": format!("{{{}}}", key.id.to_string().to_uppercase()),
                 "DeviceType": "Win32",
                 "Version": "10.16.0",
                 "ProofKey": {
@@ -905,7 +1024,7 @@ where
 }
 
 pub struct DeviceTokenKey {
-    pub id: String,
+    pub id: Uuid,
     pub key: SigningKey,
     pub x: String,
     pub y: String,
@@ -913,7 +1032,7 @@ pub struct DeviceTokenKey {
 
 #[tracing::instrument]
 fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
-    let id = Uuid::new_v4().to_string().to_uppercase();
+    let uuid = Uuid::new_v4();
 
     let signing_key = SigningKey::random(&mut OsRng);
     let public_key = VerifyingKey::from(&signing_key);
@@ -921,7 +1040,7 @@ fn generate_key() -> Result<DeviceTokenKey, MinecraftAuthenticationError> {
     let encoded_point = public_key.to_encoded_point(false);
 
     Ok(DeviceTokenKey {
-        id,
+        id: uuid,
         key: signing_key,
         x: BASE64_URL_SAFE_NO_PAD.encode(
             encoded_point.x().ok_or_else(|| {
@@ -1070,6 +1189,7 @@ fn get_date_header(headers: &HeaderMap) -> DateTime<Utc> {
 }
 
 #[tracing::instrument]
+#[allow(clippy::format_collect)]
 fn generate_oauth_challenge() -> String {
     let mut rng = rand::thread_rng();
 

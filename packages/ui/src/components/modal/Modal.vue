@@ -48,6 +48,12 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
+  },
 })
 
 const shown = ref(false)
@@ -61,6 +67,7 @@ function show() {
 }
 
 function hide() {
+  props.onHide()
   actuallyShown.value = false
   setTimeout(() => {
     shown.value = false

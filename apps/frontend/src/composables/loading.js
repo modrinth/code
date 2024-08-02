@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 export const useLoading = () => useState("loading", () => false);
 
 export const startLoading = () => {

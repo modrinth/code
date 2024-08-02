@@ -5,11 +5,10 @@ import { ref, watch, computed } from "vue";
 // note: build step can miss unix import for some reason, so
 // we have to import it like this
 
-const { unix } = dayjs;
+const { unix } = dayjs; // eslint-disable-line import/no-named-as-default-member
 
 export function useCountryNames(style = "long") {
   const formattingOptions = { type: "region", style };
-  // eslint-disable-next-line no-undef
   const { formats } = useVIntl();
   return function formatCountryName(code) {
     return formats.displayName(code, formattingOptions);
@@ -153,7 +152,7 @@ export const analyticsSetToCSVString = (analytics) => {
   return [header, ...data].join(newline);
 };
 
-export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName) => {
+export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, chartName, theme) => {
   if (!category || !projects) {
     return emptyAnalytics;
   }
@@ -220,11 +219,9 @@ export const processAnalytics = (category, projects, labelFn, sortFn, mapFn, cha
         },
       ],
       colors: projectData.map((_, i) => {
-        // eslint-disable-next-line no-undef
-        const theme = useTheme();
         const project = chartData[i];
 
-        return intToRgba(project.color, project.id, theme.value);
+        return intToRgba(project.color, project.id, theme);
       }),
       defaultColors: projectData.map((_, i) => {
         const project = chartData[i];
@@ -279,16 +276,15 @@ export const processAnalyticsByCountry = (category, projects, sortFn) => {
   };
 };
 
-// eslint-disable-next-line no-unused-vars
 const sortCount = ([_a, a], [_b, b]) => b - a;
 const sortTimestamp = ([a], [b]) => a - b;
 const roundValue = ([ts, value]) => [ts, Math.round(parseFloat(value) * 100) / 100];
 
 const processCountryAnalytics = (c, projects) => processAnalyticsByCountry(c, projects, sortCount);
-const processNumberAnalytics = (c, projects) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads");
-const processRevAnalytics = (c, projects) =>
-  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue");
+const processNumberAnalytics = (c, projects, theme) =>
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, null, "Downloads", theme);
+const processRevAnalytics = (c, projects, theme) =>
+  processAnalytics(c, projects, formatTimestamp, sortTimestamp, roundValue, "Revenue", theme);
 
 const useFetchAnalytics = (
   url,
@@ -296,7 +292,6 @@ const useFetchAnalytics = (
     apiVersion: 3,
   },
 ) => {
-  // eslint-disable-next-line no-undef
   return useBaseFetch(url, baseOptions);
 };
 
@@ -332,10 +327,12 @@ export const useFetchAllAnalytics = (
     viewsByCountry: processCountryAnalytics(viewsByCountry.value, selectedProjects.value),
   }));
 
+  const theme = useTheme();
+
   const totalData = computed(() => ({
-    downloads: processNumberAnalytics(downloadData.value, projects.value),
-    views: processNumberAnalytics(viewData.value, projects.value),
-    revenue: processRevAnalytics(revenueData.value, projects.value),
+    downloads: processNumberAnalytics(downloadData.value, projects.value, theme.active),
+    views: processNumberAnalytics(viewData.value, projects.value, theme.active),
+    revenue: processRevAnalytics(revenueData.value, projects.value, theme.active),
   }));
 
   const fetchData = async (query) => {

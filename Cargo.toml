@@ -2,21 +2,9 @@
 resolver = '2'
 members = [
   './packages/app-lib',
-  './packages/app-macros',
 	'./apps/app-playground',
-  './apps/app/src-tauri'
+  './apps/app'
 ]
-
-[profile.dev]
-opt-level = 0
-debug = true
-debug-assertions = true
-overflow-checks = true
-lto = false
-panic = 'unwind'
-incremental = true
-codegen-units = 256
-rpath = false
 
 # Optimize for speed and reduce size on release builds
 [profile.release]
@@ -25,3 +13,6 @@ codegen-units = 1 # Compile crates one after another so the compiler can optimiz
 lto = true # Enables link to optimizations
 opt-level = "s" # Optimize for binary size
 strip = true # Remove debug symbols
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3

@@ -23,7 +23,7 @@ Follow these steps to set up your development environment:
 
 ```bash
 pnpm install
-cargo tauri dev # `pnpm app:dev` is currently broken, contributions welcome!
+pnpm app:dev
 ```
 
 You should now have a development build of the app running with hot-reloading enabled. Any changes you make to the code will automatically refresh the app.

@@ -24,7 +24,7 @@ module.exports = {
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",
-          raised: "var(--color-bg-raised)",
+          raised: "var(--color-raised-bg)",
         },
         divider: {
           DEFAULT: "var(--color-divider)",
@@ -120,20 +120,10 @@ module.exports = {
           rawBg: "var(--landing-raw-bg)",
         },
       },
-      boxShadow: {
-        insetLg: "var(--shadow-inset-lg)",
-        inset: "var(--shadow-inset)",
-        insetSm: "var(--shadow-inset-sm)",
-        raisedLg: "var(--shadow-raised-lg)",
-        raised: "var(--shadow-raised)",
-        floating: "var(--shadow-floating)",
-        card: "var(--shadow-card)",
-        landing: {
-          blobShadow: "var(--landing-blob-shadow)",
-          cardShadow: "var(--landing-card-shadow)",
-        },
-      },
     },
   },
   plugins: [],
+  corePlugins: {
+    preflight: false,
+  },
 };

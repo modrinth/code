@@ -16,6 +16,8 @@ import ATLauncher from "~/assets/images/external/atlauncher.svg?component";
 import CurseForge from "~/assets/images/external/curseforge.svg?component";
 import Checkbox from "~/components/ui/Checkbox.vue";
 
+import { homePageProjects } from "~/generated/state.json";
+
 const os = ref(null);
 const macValue = ref(null);
 const downloadWindows = ref(null);
@@ -34,19 +36,17 @@ const macLinks = {
 
 let downloadLauncher;
 
-const [{ data: rows }, { data: launcherUpdates }] = await Promise.all([
-  useAsyncData("projects", () => useBaseFetch("projects_random?count=40"), {
-    transform: (homepageProjects) => {
-      const val = Math.ceil(homepageProjects.length / 6);
-      return [
-        homepageProjects.slice(0, val),
-        homepageProjects.slice(val, val * 2),
-        homepageProjects.slice(val * 2, val * 3),
-        homepageProjects.slice(val * 3, val * 4),
-        homepageProjects.slice(val * 4, val * 5),
-      ];
-    },
-  }),
+const newProjects = homePageProjects.slice(0, 40);
+const val = Math.ceil(newProjects.length / 6);
+const rows = ref([
+  newProjects.slice(0, val),
+  newProjects.slice(val, val * 2),
+  newProjects.slice(val * 2, val * 3),
+  newProjects.slice(val * 3, val * 4),
+  newProjects.slice(val * 4, val * 5),
+]);
+
+const [{ data: launcherUpdates }] = await Promise.all([
   await useAsyncData("launcherUpdates", () =>
     $fetch("https://launcher-files.modrinth.com/updates.json"),
   ),
@@ -896,7 +896,7 @@ useSeoMeta({
     </div>
     <div class="logo-banner">
       <svg
-        v-if="$colorMode.value === 'light'"
+        v-if="$theme.active === 'light'"
         viewBox="0 0 865 512"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

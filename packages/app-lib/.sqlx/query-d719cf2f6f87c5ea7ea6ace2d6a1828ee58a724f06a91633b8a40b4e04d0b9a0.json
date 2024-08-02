@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "\n            INSERT INTO minecraft_users (uuid, active, username, access_token, refresh_token, expires)\n            VALUES ($1, $2, $3, $4, $5, $6)\n            ON CONFLICT (uuid) DO UPDATE SET\n                active = $2,\n                username = $3,\n                access_token = $4,\n                refresh_token = $5,\n                expires = $6\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 6
+    },
+    "nullable": []
+  },
+  "hash": "d719cf2f6f87c5ea7ea6ace2d6a1828ee58a724f06a91633b8a40b4e04d0b9a0"
+}
