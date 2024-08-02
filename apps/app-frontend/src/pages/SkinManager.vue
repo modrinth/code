@@ -3,7 +3,7 @@
     <div class="iconified-input">
       <SearchIcon />
       <input v-model="search" type="text" placeholder="Search" class="search-input" />
-      <Button @click="() => (search = '')">
+      <Button class="r-btn" @click="() => (search = '')">
         <XIcon />
       </Button>
     </div>
@@ -65,7 +65,9 @@
       <ContextMenu ref="skinOptions" @option-clicked="handleOptionsClick">
         <template #use> <PlayIcon /> Use </template>
         <template v-if="Filters.sort === 'Custom'" #left> <ChevronLeftIcon /> Move Left </template>
-        <template v-if="Filters.sort === 'Custom'" #right> <ChevronRightIcon /> Move Right </template>
+        <template v-if="Filters.sort === 'Custom'" #right>
+          <ChevronRightIcon /> Move Right
+        </template>
         <template #edit> <EyeIcon /> Edit </template>
         <template #duplicate> <ClipboardCopyIcon /> Duplicate </template>
         <template #delete> <TrashIcon /> Delete </template>
@@ -277,7 +279,6 @@ import { handleError, useTheming } from '@/store/state.js'
 import { useNotifications } from '@/store/notifications.js'
 import { open } from '@tauri-apps/api/dialog'
 import { tauri } from '@tauri-apps/api'
-import { selectedAccount } from '@/helpers/auth'
 import dayjs from 'dayjs'
 import SkinSave from '@/components/ui/SkinSave.vue'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
@@ -288,6 +289,7 @@ import {
   loaded_skins,
   get_user_skin_data,
   get_launcher_names,
+  selectedAccount,
   set_skin,
   save_skin,
   import_skin,
@@ -719,16 +721,18 @@ const openskin = async () => {
 }
 
 const create_modal_render = async () => {
-    modalRender.value = new SkinViewer({
-      canvas: document.getElementById('new_render'),
-      width: 247.5,
-      height: 330,
-    })
-    modalRender.value.animation = new IdleAnimation()
-    modalRender.value.controls.enableZoom = false
+  modalRender.value = new SkinViewer({
+    canvas: document.getElementById('new_render'),
+    width: 247.5,
+    height: 330,
+  })
+  modalRender.value.animation = new IdleAnimation()
+  modalRender.value.controls.enableZoom = false
   modalRender.value.loadSkin(displaySkin.value, { model: convert_arms(selectedSkin.value.arms) })
   if (selectedSkin.value.cape !== 'no cape')
-    modalRender.value.loadCape(await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError))
+    modalRender.value.loadCape(
+      await get_cape_data(selectedSkin.value.cape, 'url').catch(handleError),
+    )
 }
 
 const create_render = async () => {

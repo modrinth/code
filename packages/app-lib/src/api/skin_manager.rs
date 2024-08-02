@@ -1,8 +1,8 @@
-use crate::data::DirectoryInfo;
 use crate::minecraft_auth;
 use crate::process::Settings;
 use crate::state::Credentials;
 use crate::util::fetch::{read_json, write, IoSemaphore};
+use crate::State;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use chrono::{DateTime, Utc};
 use futures::future;
@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::PathBuf;
 use tokio;
-use tokio::sync::{RwLock, Semaphore};
+use tokio::sync::Semaphore;
 use uuid::Uuid;
 
 // Get image size
@@ -218,10 +218,12 @@ pub async fn cache_new_user_skin(creds: Credentials) -> crate::Result<()> {
         Some(v) => v.to_vec(),
         None => Vec::new(),
     };
-    for (_, save) in &manager.saves {
-        if order.contains(&save.id) { continue };
+    for save in manager.saves.values() {
+        if order.contains(&save.id) {
+            continue;
+        };
         order.push(save.id)
-    };
+    }
     manager.order.insert(creds.id, order);
     save_to_manager(manager).await
 }
@@ -391,11 +393,10 @@ async fn import_json(
     path: PathBuf,
     installer: String,
 ) -> crate::Result<HashMap<String, MojangSkins>> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
+    let state = State::get().await?;
+    let settings = Settings::get(&state.pool).await?;
+    let io_semaphore =
+        IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
     let path = if installer == "Mojang" {
         path.join("launcher_custom_skins.json")
     } else {
@@ -499,16 +500,14 @@ async fn add_to_cache(
 }
 
 async fn save_to_cache(cache: Cache) -> crate::Result<bool> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
+    let state = State::get().await?;
+    let settings = Settings::get(&state.pool).await?;
+    let io_semaphore =
+        IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
     let path = crate::State::get()
         .await?
         .directories
-        .caches_meta_dir()
-        .await
+        .caches_dir()
         .join("skindata.json");
 
     Ok(write(&path, &serde_json::to_vec(&cache)?, &io_semaphore)
@@ -517,40 +516,35 @@ async fn save_to_cache(cache: Cache) -> crate::Result<bool> {
 }
 
 async fn get_cache() -> crate::Result<Cache> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
+    let state = State::get().await?;
+    let settings = Settings::get(&state.pool).await?;
+    let io_semaphore =
+        IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
     let path = crate::State::get()
         .await?
         .directories
-        .caches_meta_dir()
-        .await
+        .caches_dir()
         .join("skindata.json");
 
-    Ok(
-        match read_json::<Cache>(&path, &io_semaphore).await {
-            Ok(cache) => cache,
-            Err(_) => Cache {
-                capes: HashMap::new(),
-                users: HashMap::new(),
-                heads: HashMap::new(),
-                filters: Filters {
-                    sort: "Name".to_string(),
-                    filter: "Current user".to_string(),
-                },
+    Ok(match read_json::<Cache>(&path, &io_semaphore).await {
+        Ok(cache) => cache,
+        Err(_) => Cache {
+            capes: HashMap::new(),
+            users: HashMap::new(),
+            heads: HashMap::new(),
+            filters: Filters {
+                sort: "Name".to_string(),
+                filter: "Current user".to_string(),
             },
-        }
-    )
+        },
+    })
 }
 
 async fn save_to_manager(manager: SkinManager) -> crate::Result<()> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
+    let state = State::get().await?;
+    let settings = Settings::get(&state.pool).await?;
+    let io_semaphore =
+        IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
     let path = crate::State::get()
         .await?
         .directories
@@ -561,26 +555,23 @@ async fn save_to_manager(manager: SkinManager) -> crate::Result<()> {
 }
 
 async fn get_manager() -> crate::Result<SkinManager> {
-    let settings =
-        Settings::init(&DirectoryInfo::get_initial_settings_file()?).await?;
-    let io_semaphore: IoSemaphore = IoSemaphore(RwLock::new(Semaphore::new(
-        settings.max_concurrent_writes,
-    )));
+    let state = State::get().await?;
+    let settings = Settings::get(&state.pool).await?;
+    let io_semaphore =
+        IoSemaphore(Semaphore::new(settings.max_concurrent_writes));
     let path = crate::State::get()
         .await?
         .directories
         .settings_dir
         .join("skin_manager.json");
 
-    Ok(
-        match read_json::<SkinManager>(&path, &io_semaphore).await {
-            Ok(cache) => cache,
-            Err(_) => SkinManager {
-                saves: HashMap::new(),
-                order: HashMap::new(),
-            },
-        }
-    )
+    Ok(match read_json::<SkinManager>(&path, &io_semaphore).await {
+        Ok(cache) => cache,
+        Err(_) => SkinManager {
+            saves: HashMap::new(),
+            order: HashMap::new(),
+        },
+    })
 }
 
 #[derive(Serialize, Deserialize, Debug)]

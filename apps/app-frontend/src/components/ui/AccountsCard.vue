@@ -7,17 +7,17 @@
     :class="{ expanded: mode === 'expanded' }"
     @click="showCard = !showCard"
   >
-  <div class="overlap">
-    <AnimatedLogo v-if="!loaded_skins" class="loading" />
-    <Avatar
-      :size="mode === 'expanded' ? 'xs' : 'sm'"
-      :src="
-        selectedAccount
-          ? account_heads[selectedAccount.id]
-          : 'https://launcher-files.modrinth.com/assets/steve_head.png'
-      "
-    />
-  </div>
+    <div class="overlap">
+      <AnimatedLogo v-if="!loaded_skins" class="loading" />
+      <Avatar
+        :size="mode === 'expanded' ? 'xs' : 'sm'"
+        :src="
+          selectedAccount
+            ? account_heads[selectedAccount.id]
+            : 'https://launcher-files.modrinth.com/assets/steve_head.png'
+        "
+      />
+    </div>
   </div>
   <transition name="fade">
     <Card
@@ -71,13 +71,20 @@ import {
   set_default_user,
   login as login_flow,
   get_default_user,
-  selectedAccount,
 } from '@/helpers/auth'
 import { handleError } from '@/store/state.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
-import { cache_users_skins, cache_new_user_skin, account_heads, loaded_skins, get_heads, get_filters } from '@/helpers/skin_manager.js'
+import {
+  cache_users_skins,
+  cache_new_user_skin,
+  account_heads,
+  loaded_skins,
+  get_heads,
+  get_filters,
+  selectedAccount as skinManagerAccount,
+} from '@/helpers/skin_manager.js'
 
 defineProps({
   mode: {
@@ -100,18 +107,20 @@ defineExpose({
   refreshValues,
 })
 await refreshValues()
-selectedAccount.value = accounts.value.find(
-    (account) => account.id === defaultUser.value
-  )
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => defaultUser.value !== account.id),
 )
 
+const selectedAccount = computed(() => {
+  const account = accounts.value.find((account) => account.id === defaultUser.value)
+  skinManagerAccount.value = account
+  return account
+})
+
 async function setAccount(account) {
   defaultUser.value = account.id
   await set_default_user(account.id).catch(handleError)
-  selectedAccount.value = account
   emit('change')
 }
 
@@ -131,7 +140,7 @@ async function login() {
 const logout = async (id) => {
   await remove_user(id).catch(handleError)
   await refreshValues()
-  if (accounts.value.length > 0) {
+  if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
   } else {
@@ -329,8 +338,8 @@ onUnmounted(() => {
     padding: 0;
     width: 1rem;
     height: 1rem;
-    transform: scale(.6) translateX(-2rem) translateY(-0.3rem);
-}
+    transform: scale(0.6) translateX(-2rem) translateY(-0.3rem);
+  }
 }
 .overlap > * {
   grid-column-start: 1;

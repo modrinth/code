@@ -75,23 +75,22 @@ pub async fn users() -> crate::Result<Vec<Credentials>> {
 
 /// Refreshes a credential
 #[tracing::instrument]
-pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
+pub async fn refresh(uuid: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
-    let mut users = state.users.write().await;
-    let creds = users
-        .users
-        .get(&user)
+    let users = Credentials::get_all(&state.pool).await?;
+    let mut creds = users
+        .into_iter()
+        .map(|x| x.1)
+        .find(|c| c.id == uuid)
         .ok_or_else(|| {
             crate::ErrorKind::OtherError(format!(
-                "Tried to get nonexistent user with ID {user}"
+                "Tried to get nonexistent user with ID {uuid}"
             ))
             .as_error()
-        })?
-        .clone();
-    users.refresh_token(&creds).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to get nonexistent user with ID {user}"
-        ))
-        .as_error()
-    })
+        })?;
+    let res = creds.refresh(&state.pool).await;
+    match res {
+        Ok(_) => Ok(creds),
+        Err(e) => Err(e),
+    }
 }
