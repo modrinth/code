@@ -167,9 +167,6 @@ importers:
       semver:
         specifier: ^7.5.4
         version: 7.6.2
-      stripe:
-        specifier: ^16.5.0
-        version: 16.5.0
       vue-multiselect:
         specifier: 3.0.0-alpha.2
         version: 3.0.0-alpha.2
@@ -4843,10 +4840,6 @@ packages:
     peerDependencies:
       vue: ^3.0.0
 
-  qs@6.12.3:
-    resolution: {integrity: sha512-AWJm14H1vVaO/iNZ4/hO+HyaTehuy9nRqVdkTqlJt0HWvBiBIEXFmb4C0DGeYo3Xes9rrEW+TxHsaigCbN5ICQ==}
-    engines: {node: '>=0.6'}
-
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
@@ -5213,10 +5206,6 @@ packages:
 
   strip-literal@2.1.0:
     resolution: {integrity: sha512-Op+UycaUt/8FbN/Z2TWPBLge3jWrP3xj10f3fnYxf052bKuS3EKs1ZQcVGjnEMdsNVAM+plXRdmjrZ/KgG3Skw==}
-
-  stripe@16.5.0:
-    resolution: {integrity: sha512-5qY2Va8pmnqS/dcKsQKJnk9kkYCtS6hqjN7kktZEmdxVohZHvbT9pOWK8UUKRInTXYkCNl6x505tO5416KLPsQ==}
-    engines: {node: '>=12.*'}
 
   style-mod@4.1.2:
     resolution: {integrity: sha512-wnD1HyVqpJUI2+eKZ+eo1UwghftP6yuFheBqqe+bWCotBjC2K1YnteJILRMs3SM4V/0dLEW1SC27MWP5y+mwmw==}
@@ -11092,10 +11081,6 @@ snapshots:
     dependencies:
       vue: 3.4.31(typescript@5.5.3)
 
-  qs@6.12.3:
-    dependencies:
-      side-channel: 1.0.6
-
   queue-microtask@1.2.3: {}
 
   queue-tick@1.0.1: {}
@@ -11520,11 +11505,6 @@ snapshots:
     dependencies:
       js-tokens: 9.0.0
 
-  stripe@16.5.0:
-    dependencies:
-      '@types/node': 20.14.11
-      qs: 6.12.3
-
   style-mod@4.1.2: {}
 
   stylehacks@7.0.2(postcss@8.4.39):
@@ -11854,7 +11834,7 @@ snapshots:
 
   unimport@3.7.2:
     dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@3.29.4)
+      '@rollup/pluginutils': 5.1.0(rollup@4.18.0)
       acorn: 8.12.1
       escape-string-regexp: 5.0.0
       estree-walker: 3.0.3

@@ -176,6 +176,6 @@ export const commonSettingsMessages = defineMessages({
   },
   billing: {
     id: "settings.billing.title",
-    defaultMessage: "Billing",
+    defaultMessage: "Billing and subscriptions",
   },
 });
