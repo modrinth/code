@@ -1,7 +1,8 @@
 <template>
   <Checkbox
+    v-if="!threePhase"
     class="filter"
-    :model-value="isActive"
+    :model-value="isActive || isDisabled"
     :description="displayName"
     @update:model-value="toggle"
   >
@@ -13,11 +14,27 @@
       <span aria-hidden="true"> {{ props.displayName }}</span>
     </div>
   </Checkbox>
+  <ThreeStateCheckbox
+    v-else
+    class="filter"
+    :model-value="isActive ? 'POSITIVE' : isDisabled ? 'NEGATIVE' : 'NEUTRAL'"
+    :description="displayName"
+    @update:model-value="toggle"
+  >
+    <div class="filter-text">
+      <div v-if="props.icon" aria-hidden="true" class="icon" v-html="props.icon" />
+      <div v-else class="icon">
+        <slot />
+      </div>
+      <span aria-hidden="true"> {{ props.displayName }}</span>
+    </div>
+  </ThreeStateCheckbox>
 </template>
 
 <script setup>
 import { computed } from 'vue'
 import Checkbox from '../base/Checkbox.vue'
+import ThreeStateCheckbox from '../base/ThreeStateCheckbox.vue'
 
 const props = defineProps({
   facetName: {
@@ -38,9 +55,20 @@ const props = defineProps({
       return []
     },
   },
+  threePhase: {
+    type: Boolean,
+    default: false,
+  },
+  disabledFilters: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
 })
 
 const isActive = computed(() => props.activeFilters.includes(props.facetName))
+const isDisabled = computed(() => props.disabledFilters.includes(props.facetName))
 const emit = defineEmits(['toggle'])
 
 const toggle = () => {

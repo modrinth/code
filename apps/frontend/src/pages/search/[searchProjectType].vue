@@ -24,6 +24,7 @@
               selectedEnvironments.length === 0 &&
               selectedVersions.length === 0 &&
               facets.length === 0 &&
+              disabledFacets.length === 0 &&
               orFacets.length === 0
             "
             class="iconified-button"
@@ -61,6 +62,8 @@
                   )"
                   :key="category.name"
                   :active-filters="facets"
+                  :three-phase="true"
+                  :disabled-filters="disabledFacets"
                   :display-name="$formatCategory(category.name)"
                   :facet-name="`categories:'${encodeURIComponent(category.name)}'`"
                   :icon="category.icon"
@@ -372,6 +375,7 @@ const tags = useTags();
 const query = ref("");
 const facets = ref([]);
 const orFacets = ref([]);
+const disabledFacets = ref([]);
 const selectedVersions = ref([]);
 const onlyOpenSource = ref(false);
 const showSnapshots = ref(false);
@@ -407,6 +411,9 @@ if (route.query.q) {
 }
 if (route.query.f) {
   facets.value = getArrayOrString(route.query.f);
+}
+if (route.query.df) {
+  disabledFacets.value = getArrayOrString(route.query.df);
 }
 if (route.query.g) {
   orFacets.value = getArrayOrString(route.query.g);
@@ -474,6 +481,7 @@ const {
 
     if (
       facets.value.length > 0 ||
+      disabledFacets.value.length > 0 ||
       orFacets.value.length > 0 ||
       selectedVersions.value.length > 0 ||
       selectedEnvironments.value.length > 0 ||
@@ -482,6 +490,9 @@ const {
       let formattedFacets = [];
       for (const facet of facets.value) {
         formattedFacets.push([facet]);
+      }
+      for (const facet of disabledFacets.value) {
+        formattedFacets.push([facet.replace(":", "!=")]);
       }
 
       // loaders specifier
@@ -614,6 +625,10 @@ function getSearchUrl(offset, useObj) {
     queryItems.push(`g=${encodeURIComponent(orFacets.value)}`);
     obj.g = orFacets.value;
   }
+  if (disabledFacets.value.length > 0) {
+    queryItems.push(`df=${encodeURIComponent(disabledFacets.value)}`);
+    obj.df = disabledFacets.value;
+  }
   if (selectedVersions.value.length > 0) {
     queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`);
     obj.v = selectedVersions.value;
@@ -673,6 +688,9 @@ function clearFilters() {
   for (const facet of [...facets.value]) {
     toggleFacet(facet, true);
   }
+  for (const facet of [...disabledFacets.value]) {
+    toggleFacet(facet, true);
+  }
   for (const facet of [...orFacets.value]) {
     toggleOrFacet(facet, true);
   }
@@ -684,67 +702,33 @@ function clearFilters() {
 }
 
 function toggleFacet(elementName, doNotSendRequest = false) {
-  const index = facets.value.indexOf(elementName);
-
-  if (index !== -1) {
-    facets.value.splice(index, 1);
+  if (facets.value.includes(elementName)) {
+    toggleSearch(elementName, facets, true);
+    toggleSearch(elementName, disabledFacets, doNotSendRequest);
+  } else if (disabledFacets.value.includes(elementName)) {
+    toggleSearch(elementName, disabledFacets, doNotSendRequest);
   } else {
-    facets.value.push(elementName);
-  }
-
-  if (!doNotSendRequest) {
-    onSearchChange(1);
+    toggleSearch(elementName, facets, doNotSendRequest);
   }
 }
 
 function toggleOrFacet(elementName, doNotSendRequest) {
-  const index = orFacets.value.indexOf(elementName);
-  if (index !== -1) {
-    orFacets.value.splice(index, 1);
-  } else {
-    if (elementName === "categories:purpur") {
-      if (!orFacets.value.includes("categories:paper")) {
-        orFacets.value.push("categories:paper");
-      }
-      if (!orFacets.value.includes("categories:spigot")) {
-        orFacets.value.push("categories:spigot");
-      }
-      if (!orFacets.value.includes("categories:bukkit")) {
-        orFacets.value.push("categories:bukkit");
-      }
-    } else if (elementName === "categories:paper") {
-      if (!orFacets.value.includes("categories:spigot")) {
-        orFacets.value.push("categories:spigot");
-      }
-      if (!orFacets.value.includes("categories:bukkit")) {
-        orFacets.value.push("categories:bukkit");
-      }
-    } else if (elementName === "categories:spigot") {
-      if (!orFacets.value.includes("categories:bukkit")) {
-        orFacets.value.push("categories:bukkit");
-      }
-    } else if (elementName === "categories:waterfall") {
-      if (!orFacets.value.includes("categories:bungeecord")) {
-        orFacets.value.push("categories:bungeecord");
-      }
-    }
-    orFacets.value.push(elementName);
-  }
-
-  if (!doNotSendRequest) {
-    onSearchChange(1);
-  }
+  toggleSearch(elementName, orFacets, doNotSendRequest);
 }
 
 function toggleEnv(environment, sendRequest) {
-  const index = selectedEnvironments.value.indexOf(environment);
+  toggleSearch(environment, selectedEnvironments, sendRequest);
+}
+
+function toggleSearch(element, list, doNotSendRequest = false) {
+  const index = list.value.indexOf(element);
   if (index !== -1) {
-    selectedEnvironments.value.splice(index, 1);
+    list.value.splice(index, 1);
   } else {
-    selectedEnvironments.value.push(environment);
+    list.value.push(element);
   }
 
-  if (!sendRequest) {
+  if (!doNotSendRequest) {
     onSearchChange(1);
   }
 }
@@ -817,6 +801,7 @@ function setClosestMaxResults() {
 
   // Hide on mobile unless open
   display: none;
+
   &.open {
     display: block;
   }
