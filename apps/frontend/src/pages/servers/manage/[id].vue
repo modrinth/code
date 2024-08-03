@@ -17,7 +17,7 @@
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
           <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
             <LeftArrowIcon />
-            All Servers
+            All servers
           </NuxtLink>
         </div>
         <h1 class="m-0 text-4xl font-bold text-[var(--color-contrast)]">

@@ -5,7 +5,7 @@
         <div class="flex flex-col gap-4">
           <div class="experimental-styles-within flex flex-row items-center justify-between">
             <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-              Current Instance
+              Current instance
             </h2>
             <Button color="secondary">
               <EditIcon />

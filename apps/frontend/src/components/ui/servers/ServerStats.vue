@@ -13,7 +13,7 @@
           </h2>
           <ChevronRightIcon />
         </div>
-        <h3>CPU Usage</h3>
+        <h3>CPU usage</h3>
         <CPUIcon />
       </div>
       <ClientOnly>
@@ -46,7 +46,7 @@
           </h2>
           <ChevronRightIcon />
         </div>
-        <h3>Memory Usage</h3>
+        <h3>Memory usage</h3>
 
         <DBIcon />
       </div>
@@ -75,7 +75,7 @@
         <!-- make mb when not decimal -->
         <ChevronRightIcon />
       </div>
-      <h3>Storage Usage</h3>
+      <h3>Storage usage</h3>
 
       <div class="flex flex-col gap-2 pt-3">
         <div class="flex h-5 flex-row items-center gap-2 text-sm">
@@ -87,11 +87,11 @@
           class="flex h-5 flex-row items-center gap-2 text-sm"
         >
           <FileTextIcon />
-          <p>Server Properties</p>
+          <p>Server properties</p>
         </NuxtLink>
         <div class="flex h-5 flex-row items-center gap-2 text-sm">
           <FileTextIcon />
-          <p>Paper Configuration</p>
+          <p>Paper configuration</p>
         </div>
       </div>
     </div>

@@ -6,19 +6,19 @@
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
         <Button @click="sendPowerAction('start')" :disabled="isActioning" color="secondary">
           <UpdatedIcon />
-          Start Server
+          Start server
         </Button>
         <Button @click="sendPowerAction('restart')" :disabled="isActioning" color="secondary">
           <UpdatedIcon />
-          Restart Server
+          Restart server
         </Button>
         <Button @click="sendPowerAction('stop')" :disabled="isActioning" color="secondary">
           <UpdatedIcon />
-          Stop Server
+          Stop server
         </Button>
         <Button @click="sendPowerAction('kill')" :disabled="isActioning" color="secondary">
           <UpdatedIcon />
-          Kill Server
+          Kill server
         </Button>
       </div>
 

@@ -12,7 +12,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Create Backup</div>
+              <div class="text-2xl font-extrabold text-white">Create backup</div>
             </div>
             <button
               @click="createBackupModal.hide()"
@@ -35,7 +35,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="createBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="createBackup"> <PlusIcon /> Create Backup </Button>
+            <Button color="primary" @click="createBackup"> <PlusIcon /> Create backup </Button>
           </div>
         </div>
       </Modal>
@@ -50,7 +50,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Rename Backup</div>
+              <div class="text-2xl font-extrabold text-white">Rename backup</div>
             </div>
             <button
               @click="renameBackupModal.hide()"
@@ -70,7 +70,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="renameBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameBackupModal.hide()"> Rename Backup </Button>
+            <Button color="primary" @click="renameBackupModal.hide()"> Rename backup </Button>
           </div>
         </div>
       </Modal>
@@ -85,7 +85,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Restore Backup</div>
+              <div class="text-2xl font-extrabold text-white">Restore backup</div>
             </div>
             <button
               @click="restoreBackupModal.hide()"
@@ -104,7 +104,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="restoreBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="restoreBackupModal.hide()"> Restore Backup </Button>
+            <Button color="primary" @click="restoreBackupModal.hide()"> Restore backup </Button>
           </div>
         </div>
       </Modal>
@@ -119,7 +119,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Delete Backup</div>
+              <div class="text-2xl font-extrabold text-white">Delete backup</div>
             </div>
             <button
               @click="deleteBackupModal.hide()"
@@ -138,7 +138,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="deleteBackupModal.hide()"> Cancel </Button>
-            <Button color="danger" @click="deleteBackupModal.hide()"> Delete Backup </Button>
+            <Button color="danger" @click="deleteBackupModal.hide()"> Delete backup </Button>
           </div>
         </div>
       </Modal>
@@ -154,7 +154,7 @@
                 {{ data.backup_quota - data.used_backup_quota }} Slots avaliable
               </div>
             </div>
-            <Button color="primary" @click="showCreateModel()"> <PlusIcon /> Create Backup </Button>
+            <Button color="primary" @click="showCreateModel()"> <PlusIcon /> Create backup </Button>
           </div>
         </div>
 
