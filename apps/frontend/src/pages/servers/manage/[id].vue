@@ -42,8 +42,7 @@
               {{
                 data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
               }}
-              {{ data?.loader_version }}</span
-            >
+            </span>
           </div>
           <div class="h-6 w-0.5 bg-[#26252b]"></div>
           <div class="flex flex-row items-center gap-2">

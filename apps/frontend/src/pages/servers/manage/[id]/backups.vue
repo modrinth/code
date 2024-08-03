@@ -168,7 +168,10 @@
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
                   <div class="text-2xl font-extrabold text-white">{{ backup.name }}</div>
-                  <div class="flex gap-2 font-bold text-brand">
+                  <div
+                    class="flex gap-2 font-bold text-brand"
+                    v-if="latestBackup?.id === backup.id"
+                  >
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
@@ -184,8 +187,9 @@
                   { id: 'delete', action: () => deleteBackupModal.show(), color: 'red' },
                 ]"
                 direction="right"
+                class="bg-transparent"
               >
-                <MoreHorizontalIcon class="h-5 w-5" />
+                <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
                 <template #rename> <EditIcon /> Rename </template>
                 <template #restore> <ClipboardCopyIcon /> Restore </template>
                 <template #download> <DownloadIcon /> Download </template>
@@ -234,6 +238,8 @@ const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
   "backupsData",
   async () => usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
 );
+const latestBackup = backupsData.value?.reduce((a, b) => (a.created_at > b.created_at ? a : b));
+backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
 
 const createBackupModal = ref<Modal | null>(null);
 const renameBackupModal = ref<Modal | null>(null);
@@ -302,5 +308,9 @@ const initiateDownload = async (backupId: string) => {
     "GET",
     "application/json",
   );
+  const a = document.createElement("a");
+  a.href = downloadurl.download_url;
+  a.download = "backup.zip";
+  a.click();
 };
 </script>

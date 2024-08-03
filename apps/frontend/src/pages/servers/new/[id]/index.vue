@@ -58,7 +58,7 @@ interface IntServer {
 const createServer = async () => {
   loading = true;
 
-  let path = "create";
+  let path = "servers/create";
   const version = 0;
   const body = {
     name: serverName.value,
@@ -68,7 +68,8 @@ const createServer = async () => {
       swap_mb: 4192,
     },
     source: {
-      modrinthid: pack.versions.slice(-1)[0],
+      project_id: packId,
+      version_id: pack.versions.slice(-1)[0],
     },
     user_id: auth.value.user.id,
   };
