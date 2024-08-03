@@ -1,9 +1,19 @@
 <template>
-  <Modal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
-    <div class="p-4">
-      <div class="markdown-body" v-html="renderString(licenseText)" />
-    </div>
-  </Modal>
+  <NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
+    <template #title>
+      <Avatar
+          :src="project.icon_url"
+          :alt="project.title"
+          class="icon"
+          size='32px'
+          no-shadow
+      />
+      <span class='font-extrabold text-contrast text-lg'>
+        {{ project.license.name ? project.license.name : 'License' }}
+      </span>
+    </template>
+    <div class="markdown-body" v-html="renderString(licenseText)" />
+  </NewModal>
   <section class='normal-page__content'>
     <div
         v-if='project.body'
@@ -206,9 +216,7 @@
             <Avatar
                 :src='organization.icon_url'
                 :alt='organization.name'
-                class='icon'
-                data-size='32'
-                data-shape='square'
+                size='32px'
             />
             <div class='rows'>
                   <span>
@@ -228,9 +236,8 @@
           <Avatar
               :src='member.avatar_url'
               :alt='member.name'
-              class='icon'
-              data-size='32'
-              data-shape='circle'
+              size='32px'
+              circle
           />
           <div class='rows'>
                 <span class='flex items-center gap-1'>
@@ -255,20 +262,20 @@
             Licensed
             <a
                 v-if='project.license.url'
-                class='text-link'
+                class='text-link hover:underline'
                 :href='project.license.url'
                 :target='$external()'
                 rel='noopener nofollow ugc'
             >
               {{ licenseIdDisplay }}
-              <ExternalIcon aria-hidden='true' class='external-icon' />
+              <ExternalIcon aria-hidden='true' class='external-icon inline ml-1 mt-[-1px]' />
             </a>
             <span
                 v-else-if="
                     project.license.id === 'LicenseRef-All-Rights-Reserved' ||
                     !project.license.id.includes('LicenseRef')
                   "
-                class='text-link'
+                class='text-link hover:underline'
                 @click='getLicenseData()'
             >
                   {{ licenseIdDisplay }}
@@ -345,11 +352,11 @@ import {
   CodeIcon,
 } from '@modrinth/assets'
 
+import { NewModal, Avatar } from '@modrinth/ui'
+
 import { renderHighlightedString } from '~/helpers/highlight.js'
 import { getVersionsToDisplay } from '~/helpers/projects.js'
 import {formatCategory, renderString} from '@modrinth/utils'
-import Avatar from "~/components/ui/Avatar.vue";
-import Modal from "~/components/ui/Modal.vue";
 
 const props = defineProps({
   project: {

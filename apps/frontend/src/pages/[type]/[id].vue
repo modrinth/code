@@ -142,19 +142,30 @@
       />
     </div>
   </div>
-  <div v-else>
+  <div v-else class='experimental-styles-within'>
+    <NewModal ref='settingsModal'>
+      <template #title>
+        <Avatar
+          :src="project.icon_url"
+          :alt="project.title"
+          class="icon"
+          size='32px'
+        />
+        <span class='font-extrabold text-contrast text-lg'>
+          Settings
+        </span>
+      </template>
+    </NewModal>
     <CollectionCreateModal ref="modal_collection" :project-ids="[project.id]"/>
     <div class="new-page">
       <div class="normal-page__header relative my-4 flex flex-col gap-7">
         <div class="flex place-content-between gap-8">
-          <div class="experimental-styles-within flex flex-col gap-4">
+          <div class="flex flex-col gap-4">
             <div class="flex gap-4">
               <Avatar
-                  :src="project.icon_url"
-                  :alt="project.title"
-                  class="icon"
-                  data-size='96'
-                  data-shape='square'
+                :src="project.icon_url"
+                :alt="project.title"
+                size='96px'
               />
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-2">
@@ -282,11 +293,11 @@
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-                <nuxt-link
-                    :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+                <button
+                    @click='() => settingsModal.show()'
                 >
                   <SettingsIcon/>
-                </nuxt-link>
+                </button>
               </ButtonStyled>
               <ButtonStyled v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationChecklist"
                             size="large" circular>
@@ -352,14 +363,15 @@
               shown: project.gallery.length > 0 || !!currentMember,
             },
             {
-              label: formatMessage(messages.versionsTab),
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions`,
+              label: 'Versions (legacy)',
+              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions-legacy`,
               shown: versions.length > 0 || !!currentMember,
             },
             {
-              label: formatMessage(messages.versionsTab) + ' Next',
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions-next`,
+              label: formatMessage(messages.versionsTab),
+              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions`,
               shown: versions.length > 0 || !!currentMember,
+              subpages: [ `/${project.project_type}/${project.slug ? project.slug : project.id}/version/` ]
             },
             {
               label: formatMessage(messages.moderationTab),
@@ -408,7 +420,7 @@ import {
   EyeIcon,
 } from "@modrinth/assets";
 import {
-  ButtonStyled, Checkbox, OverflowMenu, PopoutMenu, StatItem
+  Avatar, NewModal, ButtonStyled, Checkbox, OverflowMenu, PopoutMenu, StatItem
 } from "@modrinth/ui";
 import {renderString, isRejected, isUnderReview, isStaff, formatCategory} from "@modrinth/utils";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
@@ -417,7 +429,6 @@ import HeartIcon from "~/assets/images/utils/heart.svg?component";
 import Badge from "~/components/ui/Badge.vue";
 import Modal from "~/components/ui/Modal.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
@@ -444,6 +455,8 @@ const user = await useUser();
 const tags = useTags();
 
 const {formatMessage} = useVIntl();
+
+const settingsModal = ref()
 
 const messages = defineMessages({
   downloadsStat: {

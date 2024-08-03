@@ -1,52 +1,54 @@
 <template>
-  <nav class="relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold">
+  <nav class="experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold">
     <NuxtLink
         v-for="(link, index) in filteredLinks"
         v-show="link.shown === undefined ? true : link.shown"
         :key="index"
         ref="linkElements"
         :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-        class="button-animation flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
-        :class="{ 'text-brand': activeIndex === index }"
+        class="button-animation flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full z-[1]"
+        :class="{ 'text-brand': activeIndex === index && !subpageSelected, 'text-contrast': activeIndex === index && subpageSelected }"
     >
       <component :is="link.icon" v-if="link.icon" class="size-5"/>
       <span>{{ link.label }}</span>
     </NuxtLink>
     <div
-        class="pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full bg-brand p-1 navtabs-transition"
+        :class="`pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 navtabs-transition ${subpageSelected ? 'bg-button-bg' : 'bg-brand-highlight'}`"
         :style="{
         left: sliderLeftPx,
         top: sliderTopPx,
         right: sliderRightPx,
         bottom: sliderBottomPx,
-        opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 0.25,
+        opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 1,
       }"
         aria-hidden="true"
     ></div>
   </nav>
 </template>
 
-<script setup>
+<script setup lang='ts'>
 const route = useNativeRoute();
 
-const props = defineProps({
-  links: {
-    default: () => [],
-    type: Array,
-  },
-  query: {
-    default: null,
-    type: String,
-  },
-});
+interface Tab {
+  label: string;
+  href: string;
+  shown?: boolean;
+  icon?: string;
+  subpages?: string[];
+}
+
+const props = defineProps<{
+  links: Tab[],
+  query?: string,
+}>()
 
 const sliderLeft = ref(4);
 const sliderTop = ref(4);
 const sliderRight = ref(4);
 const sliderBottom = ref(4);
-// const selectedElementWidth = ref(0);
 const activeIndex = ref(-1);
 const oldIndex = ref(-1);
+const subpageSelected = ref(false);
 
 const filteredLinks = computed(() =>
     props.links.filter((x) => (x.shown === undefined ? true : x.shown)),
@@ -58,9 +60,15 @@ const sliderBottomPx = computed(() => `${sliderBottom.value}px`);
 
 function pickLink() {
   let index = -1;
+  subpageSelected.value = false;
   for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
-    if (decodeURIComponent(route.path).includes(filteredLinks.value[i].href)) {
+    const link = filteredLinks.value[i]
+    if (decodeURIComponent(route.path) === link.href) {
       index = i;
+      break;
+    } else if (decodeURIComponent(route.path).includes(link.href) || (link.subpages && link.subpages.some((subpage) => decodeURIComponent(route.path).includes(subpage)))) {
+      index = i;
+      subpageSelected.value = true;
       break;
     }
   }
