@@ -36,12 +36,12 @@
             <RadioButtonIcon v-else class="radio" />
             {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
             <SunIcon
-              v-if="'light' === option"
+              v-if="theme.preferences.light === option"
               v-tooltip="formatMessage(colorTheme.preferredLight)"
               class="theme-icon"
             />
             <MoonIcon
-              v-else-if="(cosmetics.preferredDarkTheme ?? 'dark') === option"
+              v-else-if="theme.preferences.dark === option"
               v-tooltip="formatMessage(colorTheme.preferredDark)"
               class="theme-icon"
             />
@@ -224,12 +224,12 @@
 </template>
 
 <script setup lang="ts">
-import { CodeIcon, RadioButtonIcon, RadioButtonChecked, SunIcon, MoonIcon } from "@modrinth/assets";
+import { CodeIcon, MoonIcon, RadioButtonChecked, RadioButtonIcon, SunIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
-import { formatProjectType } from "~/plugins/shorthands.js";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import { DarkThemes, type Theme } from "~/plugins/theme.ts";
 import type { DisplayLocation } from "~/plugins/cosmetics";
+import { formatProjectType } from "~/plugins/shorthands.js";
+import { isDarkTheme, type Theme } from "~/plugins/theme/index.ts";
 
 useHead({
   title: "Display settings - Modrinth",
@@ -392,27 +392,36 @@ const tags = useTags();
 
 const theme = useTheme();
 
-// On the server the value of native theme can be 'unknown'. To ensure we're
-// hydrating correctly, we need to make sure we aren't using 'unknown' or
-// otherwise wait until we are mounted and supposedly hydrated at this point...
+// On the server the value of native theme can be 'unknown'. To hydrate
+// correctly, we need to make sure we aren't using 'unknown' and values between
+// server and client renders are in sync.
 
-const systemTheme = useMountedValue((mounted) => {
-  if (import.meta.server && theme.native !== "unknown") return theme.native;
+const serverSystemTheme = useState(() => {
+  const theme_ = theme.native;
+  if (theme_ === "unknown") return "light";
+  return theme_;
+});
 
-  return mounted ? theme.native : theme.active;
+const systemTheme = useMountedValue((mounted): Theme => {
+  const systemTheme_ = mounted ? theme.native : serverSystemTheme.value;
+  return systemTheme_ === "light" ? theme.preferences.light : theme.preferences.dark;
 });
 
 const themeOptions = computed(() => {
-  const options: Theme[] = ["system", "light", "dark", "oled"];
+  const options: ("system" | Theme)[] = ["system", "light", "dark", "oled"];
   if (flags.value.developerMode || theme.preferred === "retro") {
     options.push("retro");
   }
   return options;
 });
 
-function updateColorTheme(value: Theme) {
-  if (DarkThemes.includes(value)) {
-    cosmetics.value.preferredDarkTheme = value;
+function updateColorTheme(value: Theme | "system") {
+  if (value !== "system") {
+    if (isDarkTheme(value)) {
+      theme.preferences.dark = value;
+    } else {
+      theme.preferences.light = value;
+    }
   }
 
   theme.preferred = value;
