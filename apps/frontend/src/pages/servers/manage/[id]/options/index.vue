@@ -29,6 +29,7 @@ const { formatMessage } = useVIntl();
 const route = useNativeRoute();
 const serverId = route.params.id;
 
+const app = useNuxtApp();
 const auth = await useAuth();
 
 const messages = defineMessages({
@@ -57,8 +58,25 @@ const { data, status } = await useLazyAsyncData("Server", async () => {
 const newName = ref("");
 
 const updateServerName = async () => {
-  await usePyroFetch(auth.value.token, `servers/${serverId}/name`, 0, "POST", "application/json", {
-    name: newName.value,
-  });
+  try {
+    await usePyroFetch(
+      auth.value.token,
+      `servers/${serverId}/name`,
+      0,
+      "POST",
+      "application/json",
+      {
+        name: newName.value,
+      },
+    );
+  } catch (error) {
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "error",
+      title: "Could not update server name",
+      text: "Your server name could not be changed. Please try again later.",
+    });
+  }
 };
 </script>
