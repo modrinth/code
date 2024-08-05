@@ -4,8 +4,8 @@
       <section class="card">
         <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
         <div class="flex flex-col gap-2">
-          <p>Server ID: <CopyCode v-if="serverId" :text="serverId" /></p>
-          <p>Pack ID: <CopyCode v-if="data.modpack_id" :text="data.modpack_id" /></p>
+          <p class="m-0">Server ID: <CopyCode v-if="serverId" :text="serverId" /></p>
+          <p class="m-0">Pack ID: <CopyCode v-if="data.modpack_id" :text="data.modpack_id" /></p>
         </div>
       </section>
     </div>
