@@ -4,7 +4,7 @@
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-4 sm:px-6"
   >
     <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
-      <h1 class="text-contrast text-4xl font-bold">Servers</h1>
+      <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
         <button
           v-if="status === 'error'"
