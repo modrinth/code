@@ -228,10 +228,10 @@ const auth = await useAuth();
 
 import type { Server, ServerBackup } from "~/types/servers";
 
-await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("backupsServerData", async () =>
-  serverStore.getServerData(serverId),
-);
+const { data, status } = await useLazyAsyncData("backupsServerData", async () => {
+  await serverStore.fetchServerData(serverId);
+  return serverStore.getServerData(serverId);
+});
 
 // timestamp format 2024-07-26T05:49:19.121845
 const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
