@@ -147,6 +147,7 @@ import _CogIcon from './icons/cog.svg?component'
 import _CPUIcon from './icons/cpu.svg?component'
 import _DBIcon from './icons/db.svg?component'
 import _LoaderIcon from './icons/loader.svg?component'
+import _ImportIcon from './icons/import.svg?component'
 
 // Editor Icons
 import _BoldIcon from './icons/bold.svg?component'
@@ -315,3 +316,4 @@ export const CogIcon = _CogIcon
 export const CPUIcon = _CPUIcon
 export const DBIcon = _DBIcon
 export const LoaderIcon = _LoaderIcon
+export const ImportIcon = _ImportIcon

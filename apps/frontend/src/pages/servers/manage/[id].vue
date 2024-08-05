@@ -43,9 +43,7 @@
               :loader="data.loader"
             />
             <span class="text-sm font-semibold">
-              {{
-                data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
-              }}
+              {{ data && data.loader }}
             </span>
           </div>
           <div class="h-6 w-0.5 bg-[#26252b]"></div>
