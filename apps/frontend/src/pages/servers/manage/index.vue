@@ -74,7 +74,7 @@
       <p class="text-contrast">No servers found</p>
     </div>
 
-    <ul class="p-0" v-else>
+    <ul class="m-0 p-0" v-else>
       <div
         v-if="filteredData && filteredData.length === 0"
         class="flex h-full items-center justify-center"
@@ -120,7 +120,7 @@ useHead({
 
 const auth = await useAuth();
 
-const { data, status } = await useLazyAsyncData("serversList", async () => {
+const { data, status } = await useLazyAsyncData("ServerList", async () => {
   const response = await usePyroFetch<{
     servers: Server[];
   }>(auth.value.token, "servers");

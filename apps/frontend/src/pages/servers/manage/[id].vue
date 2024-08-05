@@ -242,7 +242,7 @@ definePageMeta({
 });
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("specificServer", async () =>
+const { data, status } = await useLazyAsyncData("ServerPage", async () =>
   serverStore.getServerData(serverId),
 );
 
