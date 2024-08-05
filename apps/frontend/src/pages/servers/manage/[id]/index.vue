@@ -88,17 +88,18 @@ type TPowerAction = "restart" | "start" | "stop" | "kill";
 
 const isActioning = ref(false);
 const sendPowerAction = async (action: TPowerAction) => {
+  console.log("Sending power action", action);
   isActioning.value = true;
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   // @ts-ignore
   app.$notify({
     group: "server",
     title: `${actionName}ing server`,
-    text: `Your server is now ${actionName.toLow()}ing, this may take a few moments`,
+    text: `Your server is now ${actionName}ing, this may take a few moments`,
     type: "success",
   });
   await usePyroFetch(auth.value.token, `servers/${serverId}/power`, 0, "POST", "application/json", {
-    action: action,
+    action: actionName,
   });
   isActioning.value = false;
 };
@@ -143,7 +144,7 @@ const stats = ref<Stats>({
 
 const connectWebSocket = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  socket = new WebSocket(`ws://103.114.160.194:6527/v0/ws`);
+  socket = new WebSocket(`ws://103.114.160.194:6443/v0/ws`);
   await reauth();
 
   socket.onmessage = (event) => {
