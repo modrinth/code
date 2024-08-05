@@ -1,24 +1,65 @@
 <template>
-  <div class="flex flex-col gap-6">
+  <div v-if="isConnected" data-pyro-server-manager-root class="flex flex-col gap-6">
     <UiServersServerStats :data="stats" />
     <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="experimental-styles-within flex flex-row items-center justify-between">
-        <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
-        <Button @click="sendPowerAction('start')" :disabled="isActioning" color="secondary">
-          <UpdatedIcon />
-          Start server
+        <div class="flex flex-row items-center gap-4">
+          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
+          <div
+            :class="`flex items-center gap-2 rounded-full px-2 py-1 ${stats.current.cpu_percent === null ? 'bg-red-400/10 text-red-500' : 'bg-green-400/10 text-green-500'}`"
+          >
+            <span class="text-sm font-semibold">
+              {{ stats.current.cpu_percent === null ? "Server Offline" : "Server Online" }}
+            </span>
+          </div>
+        </div>
+        <Button
+          v-if="stats.current.cpu_percent === null"
+          @click="sendPowerAction('start')"
+          color="secondary"
+          :disabled="isActioning"
+        >
+          <div v-if="isActioning" class="grid place-content-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="size-5 animate-spin"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+
+          <div class="contents" v-else>
+            <PlayIcon />
+            Start
+          </div>
         </Button>
-        <Button @click="sendPowerAction('restart')" :disabled="isActioning" color="secondary">
-          <UpdatedIcon />
-          Restart server
-        </Button>
-        <Button @click="sendPowerAction('stop')" :disabled="isActioning" color="secondary">
-          <UpdatedIcon />
-          Stop server
-        </Button>
-        <Button @click="sendPowerAction('kill')" :disabled="isActioning" color="secondary">
-          <UpdatedIcon />
-          Kill server
+
+        <Button v-else @click="sendPowerAction('restart')" color="secondary" :loading="isActioning">
+          <div v-if="isActioning" class="grid place-content-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="size-5 animate-spin"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+
+          <div class="contents" v-else>
+            <UpdatedIcon />
+            Restart
+          </div>
         </Button>
       </div>
 
@@ -40,26 +81,25 @@
       </div>
     </div>
   </div>
+  <div v-else class="flex h-full items-center justify-center">
+    <UiServersPyroLoading />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import { ExpandIcon, UpdatedIcon } from "@modrinth/assets";
+import { PlayIcon, UpdatedIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 import type { Stats, WSAuth, WSEvent } from "~/types/servers";
-import { useNotifications } from "@/composables/notifs";
 import { createVirtualScroller } from "vue-typed-virtual-list";
 import LogParser from "~/components/ui/servers/LogParser.vue";
 
 const VirtualScroller = createVirtualScroller<string>();
 
 const app = useNuxtApp();
-const notifications = useNotifications();
-const isFullScreen = ref(false);
 type VirtualListInstance = InstanceType<typeof VirtualScroller>;
 const scroller = ref<VirtualListInstance | null>(null);
 
-const config = useRuntimeConfig();
 const route = useNativeRoute();
 
 const serverId = route.params.id;
@@ -68,6 +108,8 @@ const auth = await useAuth();
 type TPowerAction = "restart" | "start" | "stop" | "kill";
 
 const isActioning = ref(false);
+const isConnected = ref(false);
+
 const sendPowerAction = async (action: TPowerAction) => {
   console.log("Sending power action", action);
   isActioning.value = true;
@@ -126,55 +168,66 @@ const stats = ref<Stats>({
 const connectWebSocket = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
   socket = new WebSocket(`ws://103.114.160.194:6443/v0/ws`);
-  await reauth();
 
-  socket.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.event === "log") {
-      consoleOutput.value.push(data.message);
-    } else if (data.event === "stats") {
-      stats.value = {
-        current: data,
-        past: stats.value.current,
-        graph: {
-          cpu: cpu_data.value,
-          ram: ram_data.value,
-        },
-      };
+  const waitForOpenConnection = () => {
+    return new Promise<void>((resolve, reject) => {
+      if (socket) {
+        socket.onopen = () => {
+          consoleOutput.value.push("Waiting for you to start your server!");
+          resolve();
+        };
 
-      cpu_data.value.push(Math.round(data.cpu_percent * 100) / 100);
-      if (cpu_data.value.length > 10) {
-        cpu_data.value.shift();
+        socket.onerror = (error) => {
+          consoleOutput.value.push(
+            `\nError: Failed to establish a websocket connection to the server, please try refreshing the page or contact support if the issue persists.`,
+          );
+          reject(error);
+        };
       }
+    });
+  };
 
-      ram_data.value.push(Math.floor((data.ram_usage_bytes / data.ram_total_bytes) * 100));
-      if (ram_data.value.length > 10) {
-        ram_data.value.shift();
+  try {
+    await waitForOpenConnection();
+    await reauth();
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.event === "log") {
+        consoleOutput.value.push(data.message);
+      } else if (data.event === "stats") {
+        isConnected.value = true;
+        stats.value = {
+          current: data,
+          past: stats.value.current,
+          graph: {
+            cpu: cpu_data.value,
+            ram: ram_data.value,
+          },
+        };
+
+        cpu_data.value.push(Math.round(data.cpu_percent * 100) / 100);
+        if (cpu_data.value.length > 10) {
+          cpu_data.value.shift();
+        }
+
+        ram_data.value.push(Math.floor((data.ram_usage_bytes / data.ram_total_bytes) * 100));
+        if (ram_data.value.length > 10) {
+          ram_data.value.shift();
+        }
+      } else if (data.event === "auth-expiring") {
+        reauth();
       }
-    } else if (data.event === "auth-expiring") {
-      reauth();
-    }
-  };
+    };
 
-  socket.onclose = () => {
-    consoleOutput.value.push("\nDisconnected from the server");
-  };
-
-  socket.onerror = (error) => {
-    console.log(error);
-    consoleOutput.value.push(
-      `\nError: Failed to establish a websocket connection to the server, please try refreshing the page or contact support if the issue persists.`,
-    );
-  };
+    socket.onclose = () => {
+      consoleOutput.value.push("\nWS died, oops");
+      isConnected.value = false;
+    };
+  } catch (error) {
+    console.error("ws failed:", error);
+  }
 };
-
-onMounted(() => {
-  setInterval(() => {
-    if (scroller.value) {
-      scroller.value.scrollTo(consoleOutput.value.length - 1);
-    }
-  }, 500);
-});
 
 onMounted(() => {
   connectWebSocket();
@@ -183,6 +236,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (socket) {
     socket.close();
+    socket = null;
   }
 });
 </script>
