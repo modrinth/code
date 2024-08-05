@@ -27,6 +27,7 @@
       >
         <div id="console" class="h-[300px] overflow-y-auto">
           <VirtualScroller
+            ref="scroller"
             :default-size="30"
             :items="consoleOutput"
             style="white-space: pre; word-wrap: break-word; width: 100%; line-height: 170%"
@@ -36,9 +37,6 @@
             </template>
           </VirtualScroller>
         </div>
-        <button color="secondary" class="absolute right-8 top-8" @click="toggleFullScreen">
-          <ExpandIcon />
-        </button>
       </div>
     </div>
   </div>
@@ -50,7 +48,6 @@ import { ExpandIcon, UpdatedIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 import type { Stats, WSAuth, WSEvent } from "~/types/servers";
 import { useNotifications } from "@/composables/notifs";
-import { defineComponent } from "vue";
 import { createVirtualScroller } from "vue-typed-virtual-list";
 import LogParser from "~/components/ui/servers/LogParser.vue";
 
@@ -59,30 +56,14 @@ const VirtualScroller = createVirtualScroller<string>();
 const app = useNuxtApp();
 const notifications = useNotifications();
 const isFullScreen = ref(false);
+type VirtualListInstance = InstanceType<typeof VirtualScroller>;
+const scroller = ref<VirtualListInstance | null>(null);
 
 const config = useRuntimeConfig();
 const route = useNativeRoute();
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const serverId = route.params.id;
 const auth = await useAuth();
-
-const toggleFullScreen = () => {
-  const consoleElement = document.querySelector(".console-container");
-  const conElement = document.getElementById("console");
-  if (!consoleElement || !conElement) return;
-
-  if (!document.fullscreenElement) {
-    consoleElement.requestFullscreen().then(() => {
-      isFullScreen.value = true;
-    });
-    conElement.style.height = "100%";
-  } else {
-    document.exitFullscreen().then(() => {
-      isFullScreen.value = false;
-    });
-    conElement.style.height = "300px";
-  }
-};
 
 type TPowerAction = "restart" | "start" | "stop" | "kill";
 
@@ -186,6 +167,14 @@ const connectWebSocket = async () => {
     );
   };
 };
+
+onMounted(() => {
+  setInterval(() => {
+    if (scroller.value) {
+      scroller.value.scrollTo(consoleOutput.value.length - 1);
+    }
+  }, 500);
+});
 
 onMounted(() => {
   connectWebSocket();
