@@ -233,12 +233,16 @@ const { data, status } = await useLazyAsyncData("backupsServerData", async () =>
   return serverStore.getServerData(serverId);
 });
 
-// timestamp format 2024-07-26T05:49:19.121845
 const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
   "backupsData",
   async () => usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
 );
-const latestBackup = backupsData.value?.reduce((a, b) => (a.created_at > b.created_at ? a : b));
+
+const latestBackup = backupsData.value?.reduce(
+  (a, b) => (a.created_at > b.created_at ? a : b),
+  backupsData.value[0] || null,
+);
+
 backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
 
 const createBackupModal = ref<Modal | null>(null);
