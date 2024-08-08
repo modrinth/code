@@ -143,7 +143,7 @@ const stats = ref<Stats>({
 
 const connectWebSocket = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  socket = new WebSocket(`ws://103.114.160.194:6527/v0/ws`);
+  socket = new WebSocket(`ws://127.0.0.1:6443/v0/ws`);
   await reauth();
 
   socket.onmessage = (event) => {
