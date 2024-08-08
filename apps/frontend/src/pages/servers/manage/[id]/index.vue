@@ -131,12 +131,16 @@ let socket: WebSocket | null = null;
 
 const reauth = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  socket?.send(
-    JSON.stringify({
-      event: "auth",
-      jwt: wsAuth.token,
-    }),
-  );
+  if (socket) {
+    if (socket.readyState === WebSocket.OPEN)
+      socket?.send(
+        JSON.stringify({
+          event: "auth",
+          jwt: wsAuth.token,
+        }),
+      );
+    else socket.onopen = () => socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
+  }
   return wsAuth;
 };
 

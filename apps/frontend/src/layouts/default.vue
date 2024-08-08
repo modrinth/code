@@ -715,19 +715,23 @@ function runAnalytics() {
   const config = useRuntimeConfig();
   const replacedUrl = config.public.apiBaseUrl.replace("v2/", "");
 
-  setTimeout(() => {
-    $fetch(`${replacedUrl}analytics/view`, {
-      method: "POST",
-      body: {
-        url: window.location.href,
-      },
-      headers: {
-        Authorization: auth.value.token,
-      },
-    })
-      .then(() => {})
-      .catch(() => {});
-  });
+  try {
+    setTimeout(() => {
+      $fetch(`${replacedUrl}analytics/view`, {
+        method: "POST",
+        body: {
+          url: window.location.href,
+        },
+        headers: {
+          Authorization: auth.value.token,
+        },
+      })
+        .then(() => {})
+        .catch(() => {});
+    });
+  } catch (e) {
+    console.error(`Sending analytics failed (CORS error? If so, ignore)`, e);
+  }
 }
 function toggleMobileMenu() {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
