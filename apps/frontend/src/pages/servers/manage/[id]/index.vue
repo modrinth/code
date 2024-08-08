@@ -169,7 +169,7 @@ const connectWebSocket = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
   socket = new WebSocket(`ws://127.0.0.1:6527/v0/ws`);
   await reauth();
-
+  try {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.event === "log") {
