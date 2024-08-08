@@ -1,4 +1,4 @@
-import TOML from "@ltd/j-toml";
+import { parse as parseTOML } from "@ltd/j-toml";
 import JSZip from "jszip";
 import yaml from "js-yaml";
 import { satisfies } from "semver";
@@ -95,9 +95,37 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
     .map((it) => it.version);
 
   const inferFunctions = {
-    // Forge 1.13+ and NeoForge
+    // NeoForge
+    "META-INF/neoforge.mods.toml": (file) => {
+      const metadata = parseTOML(file, { joiner: "\n" });
+      if (!metadata.mods || metadata.mods.length === 0) {
+        return {};
+      }
+
+      const mcDependency = Object.values(metadata.dependencies)
+        .flat()
+        .find((dependency) => dependency.modId === "minecraft");
+      if (!mcDependency) {
+        return {};
+      }
+
+      const gameVersions = getGameVersionsMatchingMavenRange(
+        mcDependency.versionRange,
+        simplifiedGameVersions,
+      );
+      const versionNum = metadata.mods[0].version;
+
+      return {
+        name: `${project.title} ${versionNum}`,
+        version_number: versionNum,
+        loaders: ["neoforge"],
+        version_type: versionType(versionNum),
+        game_versions: gameVersions,
+      };
+    },
+    // Forge 1.13+
     "META-INF/mods.toml": async (file, zip) => {
-      const metadata = TOML.parse(file, { joiner: "\n" }); // eslint-disable-line import/no-named-as-default-member
+      const metadata = parseTOML(file, { joiner: "\n" });
 
       if (metadata.mods && metadata.mods.length > 0) {
         let versionNum = metadata.mods[0].version;
@@ -130,31 +158,11 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           );
         }
 
-        const hasNeoForge =
-          Object.values(metadata.dependencies)
-            .flat()
-            .filter((dependency) => dependency.modId === "neoforge").length > 0;
-
-        const hasForge =
-          Object.values(metadata.dependencies)
-            .flat()
-            .filter((dependency) => dependency.modId === "forge").length > 0;
-
-        // Checks if game version is below 1.20.2 as NeoForge full split and id change was in 1.20.2
-        const below1202 = getGameVersionsMatchingSemverRange("<=1.20.1", simplifiedGameVersions);
-
-        const isOlderThan1202 = below1202.some((r) => gameVersions.includes(r));
-
-        const loaders = [];
-
-        if (hasNeoForge) loaders.push("neoforge");
-        if (hasForge || isOlderThan1202) loaders.push("forge");
-
         return {
           name: `${project.title} ${versionNum}`,
           version_number: versionNum,
           version_type: versionType(versionNum),
-          loaders,
+          loaders: ["forge"],
           game_versions: gameVersions,
         };
       } else {

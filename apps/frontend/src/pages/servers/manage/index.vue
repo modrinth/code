@@ -4,7 +4,7 @@
     class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-4 sm:px-6"
   >
     <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
-      <h1 class="text-contrast text-4xl font-bold">Servers</h1>
+      <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
       <div class="flex w-full flex-row items-center justify-end gap-4">
         <button
           v-if="status === 'error'"
@@ -74,7 +74,7 @@
       <p class="text-contrast">No servers found</p>
     </div>
 
-    <ul v-else>
+    <ul class="m-0 p-0" v-else>
       <div
         v-if="filteredData && filteredData.length === 0"
         class="flex h-full items-center justify-center"
@@ -120,7 +120,7 @@ useHead({
 
 const auth = await useAuth();
 
-const { data, status } = await useLazyAsyncData("serversList", async () => {
+const { data, status } = await useLazyAsyncData("ServerList", async () => {
   const response = await usePyroFetch<{
     servers: Server[];
   }>(auth.value.token, "servers");

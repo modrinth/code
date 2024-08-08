@@ -1,7 +1,7 @@
 <template>
   <div>
     <svg
-      v-if="loader === 'fabric'"
+      v-if="loader === 'Fabric'"
       xmlns="http://www.w3.org/2000/svg"
       xml:space="preserve"
       fill-rule="evenodd"
@@ -10,9 +10,7 @@
       clip-rule="evenodd"
       viewBox="0 0 24 24"
     >
-      n
       <path fill="none" d="M0 0h24v24H0z" />
-      n
       <path
         fill="none"
         stroke="currentColor"
@@ -22,7 +20,7 @@
       />
     </svg>
     <svg
-      v-else-if="loader === 'quilt'"
+      v-else-if="loader === 'Quilt'"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       xml:space="preserve"
       fill-rule="evenodd"
@@ -66,7 +64,7 @@
       ></path>
     </svg>
     <svg
-      v-else-if="loader === 'forge'"
+      v-else-if="loader === 'Forge'"
       ml:space="preserve"
       fill-rule="evenodd"
       stroke-linecap="round"
@@ -76,7 +74,6 @@
       viewBox="0 0 24 24"
     >
       <path fill="none" d="M0 0h24v24H0z"></path>
-      n
       <path
         fill="none"
         stroke="currentColor"
@@ -85,7 +82,7 @@
       ></path>
     </svg>
     <svg
-      v-else-if="loader === 'neoforge'"
+      v-else-if="loader === 'Neoforge'"
       enable-background="new 0 0 24 24"
       version="1.1"
       viewBox="0 0 24 24"
@@ -117,7 +114,7 @@
       </g>
     </svg>
     <svg
-      v-else-if="loader === 'paper'"
+      v-else-if="loader === 'Paper'"
       xml:space="preserve"
       fill-rule="evenodd"
       stroke-linecap="round"
@@ -132,7 +129,7 @@
       <path fill="currentColor" d="m12 18-4-2 10-9-6 11Z" />
     </svg>
     <svg
-      v-else-if="loader === 'spigot'"
+      v-else-if="loader === 'Spigot'"
       viewBox="0 0 332 284"
       style="
         fill-rule: evenodd;
@@ -149,7 +146,7 @@
       />
     </svg>
     <svg
-      v-else-if="loader === 'bukkit'"
+      v-else-if="loader === 'Bukkit'"
       viewBox="0 0 292 319"
       style="fill-rule: evenodd; clip-rule: evenodd; stroke-linecap: round; stroke-linejoin: round"
       stroke="currentColor"

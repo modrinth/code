@@ -37,11 +37,13 @@
           </div>
           <div class="h-6 w-0.5 bg-[#26252b]"></div>
           <div class="flex flex-row items-center gap-2">
-            <LoaderIcon v-if="data.loader" :loader="data.loader" />
+            <LoaderIcon
+              class="grid place-content-center"
+              v-if="data.loader"
+              :loader="data.loader"
+            />
             <span class="text-sm font-semibold">
-              {{
-                data && data.loader && data.loader.charAt(0).toUpperCase() + data.loader.slice(1)
-              }}
+              {{ data && data.loader }}
             </span>
           </div>
           <div class="h-6 w-0.5 bg-[#26252b]"></div>
@@ -238,7 +240,7 @@ definePageMeta({
 });
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("specificServer", async () =>
+const { data, status } = await useLazyAsyncData("ServerPage", async () =>
   serverStore.getServerData(serverId),
 );
 
