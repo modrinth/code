@@ -102,19 +102,25 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
         return {};
       }
 
-      const mcDependency = Object.values(metadata.dependencies)
+      const neoForgeDependency = Object.values(metadata.dependencies)
         .flat()
-        .find((dependency) => dependency.modId === "minecraft");
-      if (!mcDependency) {
+        .find((dependency) => dependency.modId === "neoforge");
+      if (!neoForgeDependency) {
         return {};
       }
 
+      // https://docs.neoforged.net/docs/gettingstarted/versioning/#neoforge
+      const mcVersionRange = neoForgeDependency.versionRange
+        .replace("-beta", "")
+        .replace(/(\d+)(?:\.(\d+))?(?:\.(\d+)?)?/g, (_match, major, minor) => {
+          return `1.${major}${minor ? "." + minor : ""}`;
+        });
       const gameVersions = getGameVersionsMatchingMavenRange(
-        mcDependency.versionRange,
+        mcVersionRange,
         simplifiedGameVersions,
       );
-      const versionNum = metadata.mods[0].version;
 
+      const versionNum = metadata.mods[0].version;
       return {
         name: `${project.title} ${versionNum}`,
         version_number: versionNum,
