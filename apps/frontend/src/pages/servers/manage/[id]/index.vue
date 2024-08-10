@@ -1,7 +1,12 @@
 <template>
   <div v-if="isConnected" data-pyro-server-manager-root class="flex flex-col gap-6">
-    <UiServersServerStats :data="stats" />
-    <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
+    <transition name="fade-slide">
+      <UiServersServerStats :data="stats" v-if="!fullScreen" />
+    </transition>
+    <div
+      class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8 transition-[height] duration-500 ease-in-out"
+      :style="consoleStyle"
+    >
       <div class="experimental-styles-within flex flex-row items-center justify-between">
         <div class="flex flex-row items-center gap-4">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
@@ -64,9 +69,9 @@
       </div>
 
       <div
-        class="monocraft-font console-container relative mt-4 h-full w-full overflow-hidden rounded-xl bg-black p-6 text-sm"
+        class="monocraft-font console relative h-full w-full overflow-hidden rounded-xl bg-black p-6 text-sm"
       >
-        <div id="console" class="h-[300px] overflow-y-auto">
+        <div class="h-full overflow-y-auto">
           <VirtualScroller
             ref="scroller"
             :default-size="30"
@@ -78,6 +83,12 @@
             </template>
           </VirtualScroller>
         </div>
+        <button
+          class="absolute right-8 top-8 bg-transparent transition-transform duration-300 hover:scale-110"
+          @click="toggleFullScreen"
+        >
+          <ExpandIcon />
+        </button>
       </div>
     </div>
   </div>
@@ -91,13 +102,34 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from "vue";
-import { PlayIcon, UpdatedIcon } from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
+import { PlayIcon, UpdatedIcon, ExpandIcon } from "@modrinth/assets";
+import { Button, Modal } from "@modrinth/ui";
 import type { Stats, WSAuth, WSEvent } from "~/types/servers";
 import { createVirtualScroller } from "vue-typed-virtual-list";
 import LogParser from "~/components/ui/servers/LogParser.vue";
 import PyroError from "~/components/ui/servers/PyroError.vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
+
+const fullScreen = ref(false);
+const consoleStyle = ref({ height: "400px", marginTop: "0px" });
+
+const toggleFullScreen = () => {
+  fullScreen.value = !fullScreen.value;
+
+  if (fullScreen.value) {
+    consoleStyle.value.height = "70vh";
+    setTimeout(() => {
+      let mt = 254;
+      const interval = setInterval(() => {
+        mt -= 10;
+        consoleStyle.value.marginTop = `${mt}px`;
+        if (mt <= 0 || !fullScreen) clearInterval(interval);
+      }, 10);
+    }, 500);
+  } else {
+    consoleStyle.value.height = "400px";
+  }
+};
 
 const VirtualScroller = createVirtualScroller<string>();
 
@@ -228,3 +260,23 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
+<style scoped>
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.console {
+  transition:
+    height 0.5s ease,
+    margin-top 0.5s ease;
+}
+</style>
