@@ -132,7 +132,7 @@ const searchInput = ref("");
 const fuse = computed(
   () =>
     new Fuse(data.value || [], {
-      keys: ["loader"],
+      keys: ["name", "loader", "mc_version", "project.title", "mods.name"],
       includeScore: true,
       threshold: 0.4,
     }),

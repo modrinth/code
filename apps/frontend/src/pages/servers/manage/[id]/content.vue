@@ -31,10 +31,10 @@
                   </div>
                 </div>
                 <div class="flex flex-col gap-1">
-                  <button class="rounded-xl border-2 border-[#424956] bg-bg p-2 px-4">
+                  <button class="rounded-xl border-2 border-solid border-[#424956] bg-bg p-2 px-4">
                     <EditIcon />
                   </button>
-                  <button class="rounded-xl border-2 border-[#424956] bg-bg p-2 px-4">
+                  <button class="rounded-xl border-2 border-solid border-[#424956] bg-bg p-2 px-4">
                     <ImportIcon />
                   </button>
                 </div>
@@ -102,6 +102,11 @@
         </div>
       </div>
     </div>
+    <PyroError
+      v-else-if="status === 'error'"
+      title="Error Accessing Server"
+      message="Dont worry, your server is safe. We just can't connect to it right now."
+    />
     <PyroLoading v-else />
   </div>
 </template>

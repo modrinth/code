@@ -47,6 +47,11 @@
       </section>
     </div>
     <PyroLoading v-else-if="status === 'pending'" />
+    <PyroError
+      v-else-if="status === 'error'"
+      title="Failed to load"
+      message="Failed to load server properties"
+    />
   </div>
 </template>
 
@@ -54,6 +59,7 @@
 import { ref, watch } from "vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
+import PyroError from "~/components/ui/servers/PyroError.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -71,9 +77,11 @@ const messages = defineMessages({
 
 const error = ref<string | null>(null);
 
-// "generator-settings": {},
 const { data: properties, status } = await useLazyAsyncData("serverProps", async () => {
-  const data = await usePyroFetch<string>(auth.value.token, `servers/${serverId}/config/server`);
+  const data = await usePyroFetch<string>(
+    auth.value.token,
+    `servers/${serverId}/config/ServerProperties`,
+  );
   if (data.includes("Config file not found")) {
     error.value = "Config file not found";
   }

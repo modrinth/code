@@ -16,9 +16,9 @@
             </div>
             <button
               @click="createBackupModal.hide()"
-              class="text-contrast rounded-full bg-[#ffffff10] p-2"
+              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
             >
-              <XIcon class="h-5 w-5" />
+              <XIcon class="h-4 w-4" />
             </button>
           </div>
           <div class="mb-3 mt-3">
@@ -54,9 +54,9 @@
             </div>
             <button
               @click="renameBackupModal.hide()"
-              class="text-contrast rounded-full bg-[#ffffff10] p-2"
+              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
             >
-              <XIcon class="h-5 w-5" />
+              <XIcon class="h-4 w-4" />
             </button>
           </div>
           <div class="mt-2 flex flex-col gap-2">
@@ -89,9 +89,9 @@
             </div>
             <button
               @click="restoreBackupModal.hide()"
-              class="text-contrast rounded-full bg-[#ffffff10] p-2"
+              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
             >
-              <XIcon class="h-5 w-5" />
+              <XIcon class="h-4 w-4" />
             </button>
           </div>
           <div class="flex flex-col gap-4">
@@ -109,7 +109,9 @@
         </div>
       </Modal>
       <Modal header="" ref="deleteBackupModal">
-        <div class="flex flex-col gap-4 rounded-2xl border-2 border-[#FF496E] bg-[#270B11] p-6">
+        <div
+          class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11] p-6"
+        >
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-4">
               <UiAvatar
@@ -123,9 +125,9 @@
             </div>
             <button
               @click="deleteBackupModal.hide()"
-              class="text-contrast rounded-full bg-[#ffffff10] p-2"
+              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
             >
-              <XIcon class="h-5 w-5" />
+              <XIcon class="h-4 w-4" />
             </button>
           </div>
           <div class="flex flex-col gap-4">
@@ -159,7 +161,7 @@
         </div>
 
         <div
-          v-for="backup in backupsData"
+          v-for="(backup, index) in backupsData"
           :key="backup.id"
           class="relative w-full rounded-2xl bg-bg-raised p-8"
         >
@@ -168,10 +170,7 @@
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
                   <div class="text-2xl font-extrabold text-white">{{ backup.name }}</div>
-                  <div
-                    class="flex gap-2 font-bold text-brand"
-                    v-if="latestBackup?.id === backup.id"
-                  >
+                  <div class="flex gap-2 font-bold text-brand" v-if="index == 0">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
@@ -201,6 +200,11 @@
       </div>
     </div>
     <PyroLoading v-else-if="status === 'pending' || backupsStatus === 'pending'" />
+    <PyroError
+      v-else-if="status === 'error' || backupsStatus === 'error'"
+      title="Could not load backups"
+      message="Your backups could not be displayed due to a technical issue on our end. Please try again later."
+    />
   </div>
 </template>
 
@@ -219,7 +223,8 @@ import {
 } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
-import { ref } from "vue";
+import PyroError from "~/components/ui/servers/PyroError.vue";
+import { ref, reactive } from "vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -227,6 +232,8 @@ const serverStore = useServerStore();
 const auth = await useAuth();
 
 import type { Server, ServerBackup } from "~/types/servers";
+
+const backupError = ref<string | null>(null);
 
 const { data, status } = await useLazyAsyncData("backupsServerData", async () => {
   await serverStore.fetchServerData(serverId);
@@ -236,11 +243,6 @@ const { data, status } = await useLazyAsyncData("backupsServerData", async () =>
 const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
   "backupsData",
   async () => usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
-);
-
-const latestBackup = backupsData.value?.reduce(
-  (a, b) => (a.created_at > b.created_at ? a : b),
-  backupsData.value[0] || null,
 );
 
 backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
@@ -253,48 +255,76 @@ const deleteBackupModal = ref<Modal | null>(null);
 const c_backupsName = ref();
 const r_backupsName = ref();
 
+const backupsState = reactive({
+  loading: false,
+});
+
 const showCreateModel = () => {
   createBackupModal.value.show();
 };
 
 const createBackup = async () => {
+  backupsState.loading = true;
   const backupName = c_backupsName.value.value;
-  await usePyroFetch(
-    auth.value.token,
-    `servers/${serverId}/backups`,
-    0,
-    "POST",
-    "application/json",
-    {
-      name: backupName,
-    },
-  );
+  try {
+    await usePyroFetch(
+      auth.value.token,
+      `servers/${serverId}/backups`,
+      0,
+      "POST",
+      "application/json",
+      {
+        name: backupName,
+      },
+    );
+
+    await serverStore.fetchServerData(serverId);
+    await refreshNuxtData("backupsData");
+    backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
+    createBackupModal.value.hide();
+  } catch (error) {
+    backupError.value = error as string;
+  } finally {
+    backupsState.loading = false;
+  }
 };
 
 const renameBackup = async (backupId: string) => {
   const backupName = r_backupsName.value.value;
-  await usePyroFetch(
-    auth.value.token,
-    `servers/${serverId}/backups/${backupId}`,
-    0,
-    "PUT",
-    "application/json",
-    {
-      name: backupName,
-    },
-  );
+  try {
+    await usePyroFetch(
+      auth.value.token,
+      `servers/${serverId}/backups/${backupId}`,
+      0,
+      "PUT",
+      "application/json",
+      {
+        name: backupName,
+      },
+    );
+
+    await renameBackupModal.value?.hide();
+  } catch (error) {
+    backupError.value = error as string;
+  }
 
   await renameBackupModal.value?.hide();
 };
 
 const restoreBackup = async (backupId: string) => {
-  await usePyroFetch(
-    auth.value.token,
-    `servers/${serverId}/backups/${backupId}/restore`,
-    0,
-    "POST",
-    "application/json",
-  );
+  try {
+    await usePyroFetch(
+      auth.value.token,
+      `servers/${serverId}/backups/${backupId}/restore`,
+      0,
+      "POST",
+      "application/json",
+    );
+
+    await restoreBackupModal.value?.hide();
+  } catch (error) {
+    backupError.value = error as string;
+  }
 
   await restoreBackupModal.value?.hide();
 };

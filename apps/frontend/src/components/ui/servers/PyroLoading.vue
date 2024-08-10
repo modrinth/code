@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen w-full items-center justify-center">
+  <div class="flex h-[70vh] w-full items-center justify-center">
     <PyroIcon class="pyro-logo-animation size-32 opacity-10" />
   </div>
 </template>

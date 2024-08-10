@@ -82,7 +82,7 @@
       />
 
       <div class="flex flex-row gap-2">
-        <Button transparent @click="copyText(data.net.ip)">
+        <Button transparent @click="copyText(data.net.ip + ':' + data.net.port)">
           <CopyIcon />
 
           Copy IP
@@ -162,57 +162,11 @@
     </div>
   </div>
 
-  <div
+  <PyroError
     v-else-if="status === 'error'"
-    class="relative -mt-12 flex h-screen min-h-[400px] w-full flex-1 items-center justify-center"
-  >
-    <div
-      class="bg-loading-animation absolute inset-0 -mt-8"
-      style="
-        background: linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64)),
-          linear-gradient(180deg, rgba(131, 66, 66, 0.275) 0%, rgba(202, 14, 14, 0.9) 97.29%);
-      "
-    ></div>
-    <div
-      class="bg-loading-animation pointer-events-none absolute inset-0 mx-auto flex h-full w-full max-w-7xl select-none items-center justify-center"
-    >
-      <img
-        src="~/assets/images/games/bg-mock.png"
-        alt="Background"
-        class="absolute inset-0 mt-12 h-full w-full object-fill"
-      />
-    </div>
-    <div
-      class="pyro-logo-animation relative flex flex-col items-center gap-4 rounded-2xl border-2 border-[#FF496E] bg-[#270B11] p-8"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="size-8 text-[#FF496E]"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-        />
-      </svg>
-      <h1
-        class="m-0 inline-flex items-center gap-2 text-4xl font-bold text-[var(--color-contrast)]"
-      >
-        Server not found
-      </h1>
-      <p class="max-w-sm text-center leading-relaxed text-secondary">
-        The server you are looking for does not exist or you do not have permission to view it.
-      </p>
-      <Button color="primary" @click="$router.push('/servers/manage')">
-        <LeftArrowIcon />
-        Back to Servers
-      </Button>
-    </div>
-  </div>
+    title="Server not found"
+    message="The server you are looking for does not exist or you do not have permission to view it."
+  />
 </template>
 
 <script setup lang="ts">
@@ -229,6 +183,7 @@ import {
 } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
+import PyroError from "~/components/ui/servers/PyroError.vue";
 import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
 
 const route = useNativeRoute();

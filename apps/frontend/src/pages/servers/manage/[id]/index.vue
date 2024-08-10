@@ -81,9 +81,12 @@
       </div>
     </div>
   </div>
-  <div v-else class="flex h-full items-center justify-center">
-    <UiServersPyroLoading />
-  </div>
+  <PyroLoading v-else-if="!isConnected" />
+  <PyroError
+    v-else
+    title="Error Accessing Server"
+    message="Dont worry, your server is safe. We just can't connect to it right now."
+  />
 </template>
 
 <script setup lang="ts">
@@ -93,6 +96,8 @@ import { Button } from "@modrinth/ui";
 import type { Stats, WSAuth, WSEvent } from "~/types/servers";
 import { createVirtualScroller } from "vue-typed-virtual-list";
 import LogParser from "~/components/ui/servers/LogParser.vue";
+import PyroError from "~/components/ui/servers/PyroError.vue";
+import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const VirtualScroller = createVirtualScroller<string>();
 
