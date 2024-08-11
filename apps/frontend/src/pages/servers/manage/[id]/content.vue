@@ -22,12 +22,12 @@
                 decoding="async"
               />
               <div class="flex w-full justify-between">
-                <div class="flex flex-col">
+                <div v-if="data" class="flex flex-col">
                   <h1 class="m-0 text-xl font-bold text-[var(--color-contrast)]">
-                    {{ data.project.title }}
+                    {{ data.project?.title ?? "" }}
                   </h1>
                   <div class="text-sm">
-                    {{ data.project.description }}
+                    {{ data.project?.description ?? "" }}
                   </div>
                 </div>
                 <div class="flex flex-col gap-1">
@@ -102,7 +102,7 @@
         </div>
       </div>
     </div>
-    <PyroError
+    <UiServersPyroError
       v-else-if="status === 'error'"
       title="Error Accessing Server"
       message="Dont worry, your server is safe. We just can't connect to it right now."
