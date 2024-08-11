@@ -68,6 +68,7 @@
       "env": ["BASE_URL", "BROWSER_BASE_URL", "RATE_LIMIT_IGNORE_KEY", "SITE_URL", "FLAG_OVERRIDES"]
     },
     "@modrinth/frontend#dev": {
+      "dependsOn": ["^build", "^intl:extract"],
       "cache": false,
       "persistent": true,
       "env": ["BASE_URL", "BROWSER_BASE_URL", "RATE_LIMIT_IGNORE_KEY", "SITE_URL", "FLAG_OVERRIDES"]
@@ -119,6 +120,23 @@
     },
     "@modrinth/assets#fix": {
       "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/i18n
+    "@modrinth/i18n#clean": {
+      "inputs": ["dist"],
+      "outputs": ["dist"]
+    },
+    "@modrinth/i18n#build": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"],
+      "outputs": ["dist"]
+    },
+    "@modrinth/i18n#intl:extract": {
+      "inputs": ["src/**/*.ts"],
+      "outputs": ["dist/files/en-US/index.json"]
+    },
+    "@modrinth/i18n#build:full": {
+      "dependsOn": ["build", "intl:extract"]
     },
 
     // @modrinth/ui

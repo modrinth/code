@@ -1,0 +1,37 @@
+{
+  "name": "@modrinth/i18n",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "del-cli dist",
+    "build": "unbuild",
+    "intl:extract": "formatjs extract \"src/**/*.ts\" --out-file dist/files/en-US/index.json --format crowdin --preserve-whitespace"
+  },
+  "devDependencies": {
+    "@formatjs/cli": "^6.2.12",
+    "@formatjs/icu-messageformat-parser": "^2.7.8",
+    "glob": "^10.2.7",
+    "typescript": "^5.2.2",
+    "unbuild": "^2.0.0",
+    "unimport": "^3.10.0",
+    "unplugin-macros": "^0.13.1",
+    "del-cli": "^5.1.0"
+  },
+  "dependencies": {
+    "@formatjs/intl-localematcher": "^0.5.4",
+    "@vintl/nuxt": "^1.9.2",
+    "@vintl/vintl": "^4.4.1"
+  }
+}

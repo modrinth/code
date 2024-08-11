@@ -5,8 +5,8 @@ import { resolve, basename, relative } from "pathe";
 import { defineNuxtConfig } from "nuxt/config";
 import { $fetch } from "ofetch";
 import { globIterate } from "glob";
-import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { consola } from "consola";
+import { createLocaleResolver } from "@modrinth/i18n/utils";
 
 const STAGING_API_URL = "https://staging-api.modrinth.com/v2/";
 
@@ -108,6 +108,9 @@ export default defineNuxtConfig({
         },
       }),
     ],
+    optimizeDeps: {
+      exclude: ["@modrinth/i18n"],
+    },
   },
   hooks: {
     async "build:before"() {
@@ -211,53 +214,51 @@ export default defineNuxtConfig({
 
       const isProduction = getDomain() === "https://modrinth.com";
 
-      const resolveCompactNumberDataImport = await (async () => {
-        const compactNumberLocales: string[] = [];
-
+      const resolveCompactNumberDataImport = await createLocaleResolver(async ({ addFile }) => {
         for await (const localeFile of globIterate(
           "node_modules/@vintl/compact-number/dist/locale-data/*.mjs",
           { ignore: "**/*.data.mjs" },
         )) {
           const tag = basename(localeFile, ".mjs");
-          compactNumberLocales.push(tag);
+          addFile(tag, { from: `@vintl/compact-number/locale-data/${tag}` });
         }
+      });
 
-        function resolveImport(tag: string) {
-          const matchedTag = matchLocale([tag], compactNumberLocales, "en-x-placeholder");
-          return matchedTag === "en-x-placeholder"
-            ? undefined
-            : `@vintl/compact-number/locale-data/${matchedTag}`;
-        }
-
-        return resolveImport;
-      })();
-
-      const resolveOmorphiaLocaleImport = await (async () => {
-        const omorphiaLocales: string[] = [];
-        const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
-
+      const resolveOmorphiaLocaleImport = await createLocaleResolver(async ({ addFile }) => {
         for await (const localeDir of globIterate("node_modules/omorphia/locales/*", {
           posix: true,
         })) {
           const tag = basename(localeDir);
-          omorphiaLocales.push(tag);
-
-          const localeFiles: { from: string; format?: string }[] = [];
-
-          omorphiaLocaleSets.set(tag, { files: localeFiles });
 
           for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
-            localeFiles.push({
-              from: pathToFileURL(localeFile).toString(),
-              format: "default",
-            });
+            const localeFileName = basename(localeFile);
+
+            if (localeFileName === "index.json") {
+              addFile(tag, { from: pathToFileURL(localeFile).toString(), format: "default" });
+            } else {
+              console.warn(`Ignoring handling of unknown file ${localeFile}`);
+            }
           }
         }
+      });
 
-        return function resolveLocaleImport(tag: string) {
-          return omorphiaLocaleSets.get(matchLocale([tag], omorphiaLocales, "en-x-placeholder"));
-        };
-      })();
+      const resolveCommonMessagesImport = await createLocaleResolver(async ({ addFile }) => {
+        for await (const localeDir of globIterate("node_modules/@modrinth/i18n/dist/files/*", {
+          posix: true,
+        })) {
+          const tag = basename(localeDir);
+
+          for await (const localeFile of globIterate(`${localeDir}/*.json`, { posix: true })) {
+            const localeFileName = basename(localeFile);
+
+            if (localeFileName === "index.json") {
+              addFile(tag, { from: pathToFileURL(localeFile).toString(), format: "crowdin" });
+            } else {
+              console.warn(`Ignoring handling of unknown file ${localeFile}`);
+            }
+          }
+        }
+      });
 
       for await (const localeDir of globIterate("src/locales/*/", { posix: true })) {
         const tag = basename(localeDir);
@@ -301,12 +302,14 @@ export default defineNuxtConfig({
           localeFiles.push(...omorphiaLocaleData.files);
         }
 
+        const commonLocaleData = resolveCommonMessagesImport(tag);
+        if (commonLocaleData != null) {
+          localeFiles.push(...commonLocaleData.files);
+        }
+
         const cnDataImport = resolveCompactNumberDataImport(tag);
         if (cnDataImport != null) {
-          (locale.additionalImports ??= []).push({
-            from: cnDataImport,
-            resolve: false,
-          });
+          (locale.additionalImports ??= []).push(...cnDataImport.imports);
         }
       }
     },

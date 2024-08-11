@@ -35,6 +35,7 @@
     "@formatjs/intl-localematcher": "^0.5.4",
     "@ltd/j-toml": "^1.38.0",
     "@modrinth/assets": "workspace:*",
+    "@modrinth/i18n": "workspace:*",
     "@modrinth/ui": "workspace:*",
     "@modrinth/utils": "workspace:*",
     "@vintl/vintl": "^4.4.1",
