@@ -56,35 +56,11 @@
     </div>
 
     <div class="flex flex-row items-center justify-between">
-      <UiNavTabs
-        :links="[
-          {
-            icon: HomeIcon,
-            label: 'Overview',
-            href: `/servers/manage/${serverId}`,
-          },
-          {
-            icon: CubeIcon,
-            label: 'Content',
-            href: `/servers/manage/${serverId}/content`,
-          },
-          {
-            icon: CloudIcon,
-            label: 'Backups',
-            href: `/servers/manage/${serverId}/backups`,
-          },
-          {
-            icon: CogIcon,
-            label: 'Options',
-            href: `/servers/manage/${serverId}/options`,
-          },
-        ]"
-      />
+      <UiNavTabs :links="navLinks" />
 
       <div class="flex flex-row gap-2">
         <Button transparent @click="copyText(data.net.ip + ':' + data.net.port)">
           <CopyIcon />
-
           Copy IP
         </Button>
         <a
@@ -136,6 +112,13 @@ import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+
+const navLinks = [
+  { icon: HomeIcon, label: "Overview", href: `/servers/manage/${serverId}` },
+  { icon: CubeIcon, label: "Content", href: `/servers/manage/${serverId}/content` },
+  { icon: CloudIcon, label: "Backups", href: `/servers/manage/${serverId}/backups` },
+  { icon: CogIcon, label: "Options", href: `/servers/manage/${serverId}/options` },
+];
 
 definePageMeta({
   middleware: "auth",
