@@ -70,7 +70,10 @@
       </div>
     </div>
 
-    <div v-else-if="!data || data.length === 0" class="flex h-full items-center justify-center">
+    <div
+      v-else-if="!data || data.length === 0"
+      class="flex h-full min-h-[128px] items-center justify-center"
+    >
       <p class="text-contrast">No servers found</p>
     </div>
 
