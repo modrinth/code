@@ -1,11 +1,26 @@
 <template>
-  <div class="flex h-[70vh] w-full items-center justify-center">
+  <div class="flex h-[70vh] w-full flex-col items-center justify-center">
     <PyroIcon class="pyro-logo-animation size-32 opacity-10" />
+    <p
+      class="text-sm transition"
+      :class="{ 'opacity-0': !showLoading, 'animate-pulse opacity-100': showLoading }"
+    >
+      Loading...
+    </p>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from "vue";
 import { PyroIcon } from "@modrinth/assets";
+
+const showLoading = ref(false);
+
+onMounted(() => {
+  setTimeout(() => {
+    showLoading.value = true;
+  }, 5000);
+});
 </script>
 
 <style>
