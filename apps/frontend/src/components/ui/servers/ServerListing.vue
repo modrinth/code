@@ -8,7 +8,7 @@
     data-pyro-server-listing
     :data-pyro-server-listing-id="server_id"
   >
-    <UiAvatar no-shadow size="md" alt="Server Icon" />
+    <UiAvatar :src="iconUrl" no-shadow size="md" alt="Server Icon" />
     <div class="ml-8 flex flex-col gap-3">
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold">{{ name }}</h2>
@@ -34,8 +34,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import type { Server } from "~/types/servers";
+import { computed, toRaw } from "vue";
+import type { Project, Server } from "~/types/servers";
 import type { StatusState } from "./ServerInstallStatusPill.vue";
 import { ChevronRightIcon } from "@modrinth/assets";
 
@@ -49,4 +49,17 @@ const status = computed(() => ({
 const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
+
+const { data: iconData } = await useAsyncData(`server-icon-${props.server_id}`, async () => {
+  if (props.modpack) {
+    const versionData: any = await toRaw(useBaseFetch(`version/${props.modpack}`));
+    if (versionData && versionData.project_id) {
+      const projectData: Project = await toRaw(useBaseFetch(`project/${versionData.project_id}`)) as Project;
+      return projectData.icon_url;
+    }
+  }
+  return null;
+});
+
+const iconUrl = computed(() => iconData.value || undefined);
 </script>

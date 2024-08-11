@@ -95,8 +95,7 @@
           :loader="server.loader"
           :loader_version="server.loader_version"
           :mc_version="server.mc_version"
-          :project="server.project"
-          :mods="server.mods"
+          :modpack="server.modpack"
         />
       </div>
     </ul>

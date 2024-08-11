@@ -28,7 +28,7 @@ interface GalleryItem {
   ordering: number;
 }
 
-interface Project {
+export interface Project {
   slug: string;
   title: string;
   description: string;
@@ -76,7 +76,6 @@ export interface Server {
     domain: string;
   };
   modpack: string | null;
-  modpack_id: string | null;
   project: Project | null;
   game: string;
   loader: string | null;
