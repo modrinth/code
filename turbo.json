@@ -1,30 +1,148 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build": {
+    // @modrinth/app
+    "@modrinth/app#build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".nuxt/**", "dist/**", ".output/**", "target/**"],
-      "env": [
-        "NODE_ENV",
-        "SITE_URL",
-        "BASE_URL",
-        "FLAG_OVERRIDES",
-        "BROWSER_BASE_URL",
-        "RATE_LIMIT_IGNORE_KEY",
-        "VERCEL_*",
-        "CF_PAGES_*",
-        "HEROKU_APP_NAME"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!LICENSE"],
+      "outputs": ["target"]
     },
-    "lint": {},
-    "dev": {
+    "@modrinth/app#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "@modrinth/app#test": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!LICENSE"]
+    },
+    "@modrinth/app#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/app#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/app-frontend
+    "@modrinth/app-frontend#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!LICENSE"],
+      "outputs": ["dist"],
+      "env": ["BASE_URL", "BROWSER_BASE_URL"]
+    },
+    "@modrinth/app-frontend#dev": {
       "cache": false,
       "persistent": true,
-      "env": [
-        "*"
-      ]
+      "env": ["BASE_URL", "BROWSER_BASE_URL"]
     },
-    "test": {}
-  }
+    "@modrinth/app-frontend#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/app-frontend#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/app-playground
+    "@modrinth/app-playground#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!LICENSE"],
+      "outputs": ["target"]
+    },
+    "@modrinth/app-playground#dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "@modrinth/app-playground#test": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!LICENSE"]
+    },
+    "@modrinth/app-playground#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/app-playground#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/frontend
+    "@modrinth/frontend#build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "!*.md", "!LICENSE", "!src/generated"],
+      "outputs": [".nuxt", ".output", "src/generated"],
+      "env": ["BASE_URL", "BROWSER_BASE_URL", "RATE_LIMIT_IGNORE_KEY", "SITE_URL", "FLAG_OVERRIDES"]
+    },
+    "@modrinth/frontend#dev": {
+      "cache": false,
+      "persistent": true,
+      "env": ["BASE_URL", "BROWSER_BASE_URL", "RATE_LIMIT_IGNORE_KEY", "SITE_URL", "FLAG_OVERRIDES"]
+    },
+    "@modrinth/frontend#preview": {
+      "dependsOn": ["build"],
+      "inputs": [".output"]
+    },
+    "@modrinth/frontend#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/frontend#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/frontend#intl:extract": {
+      "inputs": [
+        "src/**/*.vue",
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "src/**/*.js",
+        "src/**/*.jsx",
+        "src/**/*.mts",
+        "src/**/*.cts",
+        "src/**/*.mjs",
+        "src/**/*.cjs",
+        "!src/**/*.d.ts"
+      ],
+      "outputs": ["src/locales/en-US/index.json"]
+    },
+
+    // @modrinth/app-lib
+    "@modrinth/app-lib#build": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!LICENSE"],
+      "outputs": ["target"]
+    },
+    "@modrinth/app-lib#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/app-lib#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/app-lib#test": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/assets
+    "@modrinth/assets#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/assets#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/ui
+    "@modrinth/ui#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/ui#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    // @modrinth/utils
+    "@modrinth/utils#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+    "@modrinth/utils#fix": {
+      "inputs": ["$TURBO_DEFAULT$", "!LICENSE"]
+    },
+
+    "build": {},
+    "dev": {},
+    "test": {},
+    "lint": {},
+    "fix": {},
+    "intl:extract": {}
+  },
+  "globalEnv": ["NODE_ENV", "TAURI_*", "VERCEL_*", "HEROKU_*", "CF_PAGES_*"]
 }
