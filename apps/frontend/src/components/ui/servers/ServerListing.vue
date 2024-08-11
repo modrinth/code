@@ -4,6 +4,7 @@
     :href="state !== 'Installing' ? `/servers/manage/${server_id}` : undefined"
     class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
+    :data-pyro-server-listing-id="server_id"
   >
     <UiAvatar no-shadow size="md" :src="icon_url" alt="Server Icon" />
     <div class="ml-8 flex flex-col gap-3">
