@@ -1,6 +1,7 @@
 <template>
-  <NuxtLink
-    :href="`/servers/manage/${server_id}`"
+  <component
+    :is="state === 'Installing' ? 'div' : 'NuxtLink'"
+    :href="state !== 'Installing' ? `/servers/manage/${server_id}` : undefined"
     class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
   >
@@ -9,7 +10,7 @@
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold">{{ name }}</h2>
         <UiServersServerInstallStatusPill v-if="state" :state="state as StatusState" />
-        <ChevronRightIcon />
+        <ChevronRightIcon v-if="state !== 'Installing'" />
       </div>
 
       <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
@@ -22,7 +23,7 @@
         <UiServersServerModLabel v-if="mods?.length ?? 0 > 0" :mods="mods" />
       </div>
     </div>
-  </NuxtLink>
+  </component>
 </template>
 
 <script setup lang="ts">
