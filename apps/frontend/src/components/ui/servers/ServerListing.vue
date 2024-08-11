@@ -1,7 +1,9 @@
 <template>
-  <component
-    :is="state === 'Installing' ? 'div' : 'NuxtLink'"
-    :href="state !== 'Installing' ? `/servers/manage/${server_id}` : undefined"
+  <NuxtLink
+    :to="`/servers/manage/${server_id}`"
+    :aria-disabled="state === 'Installing'"
+    :tabindex="state === 'Installing' ? -1 : 0"
+    :class="state === 'Installing' ? 'pointer-events-none cursor-not-allowed' : ''"
     class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
     :data-pyro-server-listing-id="server_id"
@@ -24,7 +26,7 @@
         <UiServersServerModLabel v-if="mods?.length ?? 0 > 0" :mods="mods" />
       </div>
     </div>
-  </component>
+  </NuxtLink>
 </template>
 
 <script setup lang="ts">
