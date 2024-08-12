@@ -24,28 +24,17 @@
           {{ data?.name }}
         </h1>
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
-          <div class="flex flex-row items-center gap-2">
-            <img
-              src="~/assets/images/games/minecraft.png"
-              alt="Minecraft Java Edition"
-              class="size-5"
-            />
-            <span class="text-sm font-semibold">
-              {{ data && data.game.charAt(0).toUpperCase() + data.game.slice(1) }}
-              {{ data?.mc_version }}
-            </span>
-          </div>
-          <div class="h-6 w-0.5 bg-[#26252b]"></div>
-          <div class="flex flex-row items-center gap-2">
-            <LoaderIcon
-              class="grid place-content-center"
-              v-if="data.loader"
-              :loader="data.loader"
-            />
-            <span class="text-sm font-semibold">
-              {{ data && data.loader }}
-            </span>
-          </div>
+          <UiServersServerGameLabel
+            v-if="showGameLabel"
+            :game="data.game!"
+            :mcVersion="data.mc_version ?? ''"
+          />
+          <UiServersServerLoaderLabel
+            v-if="showLoaderLabel"
+            :loader="data.loader!"
+            :loaderVersion="data.loader_version ?? ''"
+          />
+          <UiServersServerModLabel v-if="showModLabel" :mods="data.mods" />
         </div>
       </div>
     </div>
@@ -98,6 +87,10 @@ import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+
+const showGameLabel = computed(() => !!data.value?.game);
+const showLoaderLabel = computed(() => !!data.value?.loader);
+const showModLabel = computed(() => (data.value?.mods?.length ?? 0) > 0);
 
 const navLinks = [
   { icon: HomeIcon, label: "Overview", href: `/servers/manage/${serverId}` },
