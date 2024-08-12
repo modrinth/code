@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full">
+  <div aria-hidden="true" class="pointer-events-none h-full w-full select-none">
     <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
         <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"></div>
