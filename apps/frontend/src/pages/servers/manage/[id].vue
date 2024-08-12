@@ -1,5 +1,5 @@
 <template>
-  <!--  && data.state === 'running' -->
+  <UiServersPyroLoading class="h-screen" v-if="status === 'pending'" />
   <div
     v-if="data && status === 'success'"
     data-pyro-server-manager-root
@@ -61,21 +61,22 @@
     <UiServersPoweredByPyro />
   </div>
 
-  <PyroError
-    v-else-if="status === 'error'"
-    title="Server not found"
-    message="The server you are looking for does not exist or you do not have permission to view it."
-  />
+  <PyroError v-else-if="status === 'error'" :title="errorTitle" :message="errorMessage" />
 </template>
 
 <script setup lang="ts">
+import { ref, computed } from "vue";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import PyroError from "~/components/ui/servers/PyroError.vue";
+import { PyroFetchError } from "~/composables/pyroFetch";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+
+const errorTitle = ref("Error");
+const errorMessage = ref("An unexpected error occurred.");
 
 const showGameLabel = computed(() => !!data.value?.game);
 const showLoaderLabel = computed(() => !!data.value?.loader);
@@ -92,8 +93,36 @@ definePageMeta({
   middleware: "auth",
 });
 
-await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("ServerPage", async () =>
-  serverStore.getServerData(serverId),
+const { data, status } = await useLazyAsyncData(
+  "ServerPage",
+  async () => {
+    try {
+      await serverStore.fetchServerData(serverId);
+      return serverStore.getServerData(serverId);
+    } catch (error) {
+      if (error instanceof PyroFetchError) {
+        switch (error.statusCode) {
+          case 401:
+            errorTitle.value = "Server Not Found";
+            errorMessage.value = "The server you are looking for does not exist.";
+            break;
+          case 404:
+            errorTitle.value = "Server Not Found";
+            errorMessage.value = "The server you are looking for does not exist.";
+            break;
+          default:
+            errorTitle.value = "Error";
+            errorMessage.value = `An error occurred: ${error.message}`;
+        }
+      } else {
+        errorTitle.value = "Unexpected Error";
+        errorMessage.value = "An unexpected error occurred while fetching server data.";
+      }
+      throw error;
+    }
+  },
+  {
+    server: false,
+  },
 );
 </script>
