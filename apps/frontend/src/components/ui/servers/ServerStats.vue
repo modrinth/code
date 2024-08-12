@@ -3,18 +3,17 @@
     <div
       v-for="(metric, index) in metrics"
       :key="index"
-      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
     >
-      <div class="p-8">
-        <div class="flex flex-row items-center gap-2">
-          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-            {{ metric.value }}
-          </h2>
-          <ChevronRightIcon />
-        </div>
-        <h3>{{ metric.title }}</h3>
-        <component class="absolute right-8 top-8" :is="metric.icon" />
+      <div class="flex flex-row items-center gap-2">
+        <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
+          {{ metric.value }}
+        </h2>
+        <ChevronRightIcon />
       </div>
+      <h3>{{ metric.title }}</h3>
+
+      <component class="absolute right-8 top-8" :is="metric.icon" />
       <ClientOnly>
         <VueApexCharts
           ref="chart"
@@ -22,7 +21,7 @@
           height="150"
           :options="chartOptions"
           :series="[{ name: 'Chart', data: metric.data }]"
-          class="chart absolute bottom-0 w-full"
+          class="chart absolute bottom-0 left-0 right-0 w-full"
         />
       </ClientOnly>
     </div>
