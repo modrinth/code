@@ -10,16 +10,21 @@
       @scroll="handleScroll"
     >
       <div data-pyro-terminal-virtual-height-watcher :style="{ height: `${totalHeight}px` }">
-        <div
-          data-pyro-terminal-virtual-offsetter
+        <ul
+          class="m-0 list-none p-0"
+          data-pyro-terminal-virtual-list
           :style="{ transform: `translateY(${offsetY}px)` }"
         >
           <template v-for="(item, index) in visibleItems" :key="index">
-            <div class="relative w-full" :data-pyro-terminal-recycle-tracker="index" ref="itemRefs">
+            <li
+              class="relative w-full list-none"
+              :data-pyro-terminal-recycle-tracker="index"
+              ref="itemRefs"
+            >
               <LogParser :log="item" />
-            </div>
+            </li>
           </template>
-        </div>
+        </ul>
       </div>
     </div>
     <button
