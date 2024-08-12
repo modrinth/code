@@ -4,18 +4,16 @@
       <section class="card">
         <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
         <div class="flex flex-col gap-2">
-          <p class="m-0">Server ID: <CopyCode v-if="serverId" :text="serverId" /></p>
-          <p class="m-0">Pack ID: <CopyCode v-if="data.modpack" :text="data.modpack" /></p>
+          <p class="m-0">Server ID: <UiCopyCode v-if="serverId" :text="serverId" /></p>
+          <p class="m-0">Pack ID: <UiCopyCode v-if="data.modpack" :text="data.modpack" /></p>
         </div>
       </section>
     </div>
-    <PyroLoading v-else-if="status === 'pending'" />
+    <UiServersPyroLoading v-else-if="status === 'pending'" />
   </div>
 </template>
 
 <script setup lang="ts">
-import CopyCode from "~/components/ui/CopyCode.vue";
-import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import { useServerStore } from "~/stores/servers";
 
 const { formatMessage } = useVIntl();
