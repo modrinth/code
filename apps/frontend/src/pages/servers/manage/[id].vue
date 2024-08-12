@@ -46,11 +46,6 @@
               {{ data && data.loader }}
             </span>
           </div>
-          <div class="h-6 w-0.5 bg-[#26252b]"></div>
-          <div class="flex flex-row items-center gap-2">
-            <BoxIcon />
-            <span class="text-sm font-semibold">{{ data?.mods.length }} mods</span>
-          </div>
         </div>
       </div>
     </div>
