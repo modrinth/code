@@ -1079,9 +1079,9 @@ import {
   EyeIcon,
   CheckIcon,
   XIcon,
+  SendIcon,
 } from "@modrinth/assets";
 import { Checkbox, Promotion, OverflowMenu, PopoutMenu } from "@modrinth/ui";
-import { SendIcon } from "@modrinth/assets";
 import { renderString, isRejected, isUnderReview, isStaff } from "@modrinth/utils";
 import CrownIcon from "~/assets/images/utils/crown.svg?component";
 import CalendarIcon from "~/assets/images/utils/calendar.svg?component";

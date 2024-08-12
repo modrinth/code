@@ -20,9 +20,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import type { Server } from "~/types/servers";
-import { ref } from "vue";
 
 const { formatMessage } = useVIntl();
 

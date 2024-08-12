@@ -77,14 +77,14 @@
       <p class="text-contrast">No servers found</p>
     </div>
 
-    <ul class="m-0 p-0" v-else>
+    <ul v-else class="m-0 p-0">
       <div
         v-if="filteredData && filteredData.length === 0"
         class="flex h-full items-center justify-center"
       >
         <p class="text-contrast">No servers found</p>
       </div>
-      <div class="flex flex-col gap-4" v-else>
+      <div v-else class="flex flex-col gap-4">
         <ServerListing
           v-for="server in filteredData"
           :key="server.server_id"

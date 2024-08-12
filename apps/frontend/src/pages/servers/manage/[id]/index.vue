@@ -1,7 +1,7 @@
 <template>
   <div v-if="isConnected" data-pyro-server-manager-root class="flex flex-col gap-6">
     <transition name="fade-slide">
-      <UiServersServerStats :data="stats" v-if="!fullScreen" />
+      <UiServersServerStats v-if="!fullScreen" :data="stats" />
     </transition>
     <div
       class="relative flex w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8 transition-[height] duration-500 ease-in-out"

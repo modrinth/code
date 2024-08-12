@@ -353,7 +353,7 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@vintl/nuxt", "@nuxtjs/turnstile", '@pinia/nuxt',],
+  modules: ["@vintl/nuxt", "@nuxtjs/turnstile", "@pinia/nuxt"],
   vintl: {
     defaultLocale: "en-US",
     locales: [
@@ -403,7 +403,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  css: ["~/assets/styles/tailwind.css", '~/assets/styles/fonts.css'],
+  css: ["~/assets/styles/tailwind.css", "~/assets/styles/fonts.css"],
   postcss: {
     plugins: {
       tailwindcss: {},

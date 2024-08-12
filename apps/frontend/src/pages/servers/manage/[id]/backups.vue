@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="data && backupsData && status === 'success' && backupsStatus === 'success'">
-      <Modal header="" ref="createBackupModal">
+      <Modal ref="createBackupModal" header="">
         <div class="flex flex-col gap-4 p-6">
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -15,8 +15,8 @@
               <div class="text-2xl font-extrabold text-white">Create backup</div>
             </div>
             <button
-              @click="createBackupModal.hide()"
               class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              @click="createBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
             </button>
@@ -39,7 +39,7 @@
           </div>
         </div>
       </Modal>
-      <Modal header="" ref="renameBackupModal">
+      <Modal ref="renameBackupModal" header="">
         <div class="flex flex-col gap-4 p-6">
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -53,8 +53,8 @@
               <div class="text-2xl font-extrabold text-white">Rename backup</div>
             </div>
             <button
-              @click="renameBackupModal.hide()"
               class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              @click="renameBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
             </button>
@@ -74,7 +74,7 @@
           </div>
         </div>
       </Modal>
-      <Modal header="" ref="restoreBackupModal">
+      <Modal ref="restoreBackupModal" header="">
         <div class="flex flex-col gap-4 p-6">
           <div class="flex items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -88,8 +88,8 @@
               <div class="text-2xl font-extrabold text-white">Restore backup</div>
             </div>
             <button
-              @click="restoreBackupModal.hide()"
               class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              @click="restoreBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
             </button>
@@ -108,7 +108,7 @@
           </div>
         </div>
       </Modal>
-      <Modal header="" ref="deleteBackupModal">
+      <Modal ref="deleteBackupModal" header="">
         <div
           class="flex flex-col gap-4 rounded-2xl border-2 border-solid border-[#FF496E] bg-[#270B11] p-6"
         >
@@ -124,8 +124,8 @@
               <div class="text-2xl font-extrabold text-white">Delete backup</div>
             </div>
             <button
-              @click="deleteBackupModal.hide()"
               class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              @click="deleteBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
             </button>
@@ -170,7 +170,7 @@
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
                   <div class="text-2xl font-extrabold text-white">{{ backup.name }}</div>
-                  <div class="flex gap-2 font-bold text-brand" v-if="index == 0">
+                  <div v-if="index == 0" class="flex gap-2 font-bold text-brand">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
@@ -221,17 +221,17 @@ import {
   TrashIcon,
   XIcon,
 } from "@modrinth/assets";
+import { ref, reactive } from "vue";
 import { useServerStore } from "~/stores/servers";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import PyroError from "~/components/ui/servers/PyroError.vue";
-import { ref, reactive } from "vue";
+
+import type { ServerBackup } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 const auth = await useAuth();
-
-import type { Server, ServerBackup } from "~/types/servers";
 
 const backupError = ref<string | null>(null);
 
@@ -242,7 +242,7 @@ const { data, status } = await useLazyAsyncData("backupsServerData", async () =>
 
 const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
   "backupsData",
-  async () => usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
+  async () => await usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
 );
 
 backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));

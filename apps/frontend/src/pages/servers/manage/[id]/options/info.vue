@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { useServerStore } from "~/stores/servers";
+import { useServerStore } from "~/stores/servers.ts";
 
 const { formatMessage } = useVIntl();
 const messages = defineMessages({
@@ -29,7 +29,8 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("infoServerData", async () =>
-  serverStore.getServerData(serverId),
+const { data, status } = await useLazyAsyncData(
+  "infoServerData",
+  async () => await serverStore.getServerData(serverId),
 );
 </script>

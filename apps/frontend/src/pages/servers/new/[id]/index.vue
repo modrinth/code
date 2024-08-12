@@ -78,7 +78,7 @@ const createServer = async () => {
   const config = useRuntimeConfig();
 
   const timeout = 10000;
-  let retryAmount = 3;
+  const retryAmount = 3;
 
   let base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
 

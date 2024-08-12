@@ -13,7 +13,7 @@
           <ChevronRightIcon />
         </div>
         <h3>{{ metric.title }}</h3>
-        <component :is="metric.icon" />
+        <component class="absolute right-8 top-8" :is="metric.icon" />
       </div>
       <ClientOnly>
         <VueApexCharts

@@ -22,9 +22,9 @@
           <div v-else-if="typeof property === 'number'">
             <input
               :id="index as unknown as string"
+              v-model.number="liveProperties[index]"
               type="number"
               class="w-full rounded border p-2"
-              v-model.number="liveProperties[index]"
             />
           </div>
           <div v-else-if="typeof property === 'object'">
@@ -94,7 +94,7 @@ watch(
   liveProperties,
   (newProperties) => {
     changedPropertiesState.value = {};
-    let changed = [];
+    const changed = [];
     for (const key in newProperties) {
       // @ts-ignore https://typescript.tv/errors/#ts7053
       if (newProperties[key] !== properties.value[key]) {

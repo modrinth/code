@@ -24,7 +24,7 @@ export async function usePyroFetch<T>(
 ): Promise<T> {
   const config = useRuntimeConfig();
   const timeout = 10000;
-  let retryAmount = 3;
+  const retryAmount = 3;
 
   if (!authToken) {
     throw new PyroFetchError("Cannot pyrofetch without auth", 10000);

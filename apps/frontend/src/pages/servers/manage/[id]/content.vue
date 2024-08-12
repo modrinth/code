@@ -112,10 +112,9 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
 import { EditIcon, ImportIcon, BoxIcon, SearchIcon, FileIcon } from "@modrinth/assets";
 import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
-import { useServerStore } from "~/stores/servers";
+import { useServerStore } from "~/stores/servers.ts";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const { formatMessage } = useVIntl();
@@ -125,10 +124,12 @@ const serverStore = useServerStore();
 const auth = await useAuth();
 
 await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData("contentServerData", async () =>
-  serverStore.getServerData(serverId),
+const { data, status } = await useLazyAsyncData(
+  "contentServerData",
+  async () => await serverStore.getServerData(serverId),
 );
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { data: mods, status: modsStatus } = await useLazyAsyncData("serverProps", async () => {
   await usePyroFetch<string>(auth.value.token, `servers/${serverId}/mods`);
 });
