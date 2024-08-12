@@ -1,20 +1,19 @@
 <template>
   <div data-pyro-server-stats class="flex flex-row items-center gap-6">
-    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised">
+    <div
+      v-for="(metric, index) in metrics"
+      :key="index"
+      class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
+    >
       <div class="p-8">
         <div class="flex flex-row items-center gap-2">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-            {{
-              lerp(
-                Math.round(data.current.cpu_percent * 100) / 100,
-                Math.round(data.past.cpu_percent * 100) / 100,
-              ).toFixed(2)
-            }}%
+            {{ metric.value }}
           </h2>
           <ChevronRightIcon />
         </div>
-        <h3>CPU usage</h3>
-        <CPUIcon />
+        <h3>{{ metric.title }}</h3>
+        <component :is="metric.icon" />
       </div>
       <ClientOnly>
         <VueApexCharts
@@ -22,46 +21,7 @@
           type="area"
           height="150"
           :options="chartOptions"
-          :series="[
-            {
-              name: 'Chart',
-              data: data.graph.cpu,
-            },
-          ]"
-          class="chart absolute bottom-0 w-full"
-        />
-      </ClientOnly>
-    </div>
-
-    <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised">
-      <div class="p-8">
-        <div class="flex flex-row items-center gap-2">
-          <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-            {{
-              lerp(
-                Math.floor((data.current.ram_usage_bytes / data.current.ram_total_bytes) * 100),
-                Math.floor((data.past.ram_usage_bytes / data.past.ram_total_bytes) * 100),
-              )
-            }}%
-          </h2>
-          <ChevronRightIcon />
-        </div>
-        <h3>Memory usage</h3>
-
-        <DBIcon />
-      </div>
-      <ClientOnly>
-        <VueApexCharts
-          ref="chart"
-          type="area"
-          height="150"
-          :options="chartOptions"
-          :series="[
-            {
-              name: 'Chart',
-              data: data.graph.ram,
-            },
-          ]"
+          :series="[{ name: 'Chart', data: metric.data }]"
           class="chart absolute bottom-0 w-full"
         />
       </ClientOnly>
@@ -72,7 +32,6 @@
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
           {{ (Math.round((data.current.storage_total_bytes / 1e9) * 100) / 100).toFixed(2) }} GB
         </h2>
-        <!-- make mb when not decimal -->
         <ChevronRightIcon />
       </div>
       <h3>Storage usage</h3>
@@ -99,8 +58,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, computed, onUnmounted } from "vue";
 import type { Stats } from "~/types/servers";
-
 import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
@@ -108,7 +67,7 @@ const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
 const route = useNativeRoute();
 const serverId = route.params.id;
 
-defineProps({
+const props = defineProps({
   data: {
     type: Object as PropType<Stats>,
     required: true,
@@ -116,8 +75,43 @@ defineProps({
 });
 
 const lerp = (a: number, b: number) => {
-  // fix this :)
-  return a;
+  return a + (b - a) * 0.5;
+};
+
+const metrics = ref([
+  {
+    title: "CPU usage",
+    value: "0%",
+    icon: CPUIcon,
+    data: [] as number[],
+  },
+  {
+    title: "Memory usage",
+    value: "0%",
+    icon: DBIcon,
+    data: [] as number[],
+  },
+]);
+
+const updateMetrics = () => {
+  metrics.value = metrics.value.map((metric, index) => {
+    const currentValue =
+      index === 0
+        ? props.data.current.cpu_percent
+        : (props.data.current.ram_usage_bytes / props.data.current.ram_total_bytes) * 100;
+    const pastValue =
+      index === 0
+        ? props.data.past.cpu_percent
+        : (props.data.past.ram_usage_bytes / props.data.past.ram_total_bytes) * 100;
+
+    const newValue = lerp(currentValue, pastValue);
+
+    return {
+      ...metric,
+      value: `${newValue.toFixed(2)}%`,
+      data: [...metric.data.slice(-10), newValue], // Keep only the last 10 data points
+    };
+  });
 };
 
 const chartOptions = ref({
@@ -126,27 +120,16 @@ const chartOptions = ref({
     fontFamily:
       "Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
     foreColor: "var(--color-base)",
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-      autoScaleYaxis: false,
-    },
-    sparkline: {
-      enabled: true,
-    },
+    toolbar: { show: false },
+    zoom: { enabled: false },
+    sparkline: { enabled: true },
     animations: {
       enabled: true,
-      easing: "easeinout",
-      dynamicAnimation: {
-        speed: 1000,
-      },
+      easing: "linear",
+      dynamicAnimation: { speed: 1000 },
     },
   },
-  stroke: {
-    curve: "smooth",
-  },
+  stroke: { curve: "smooth" },
   fill: {
     colors: ["var(--color-brand)"],
     type: "gradient",
@@ -163,48 +146,37 @@ const chartOptions = ref({
       colorStops: [],
     },
   },
-  grid: {
-    show: false,
-  },
-  legend: {
-    show: false,
-  },
+  grid: { show: false },
+  legend: { show: false },
   colors: ["var(--color-brand)"],
-  dataLabels: {
-    enabled: false,
-  },
+  dataLabels: { enabled: false },
   xaxis: {
-    categories: ["1", "2", "3", "4", "5", "6", "7 ", "8", "9", "10"],
-    labels: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-    tooltip: {
-      enabled: false,
-    },
+    type: "numeric",
+    lines: { show: false },
+    axisBorder: { show: false },
+    labels: { show: false },
   },
   yaxis: {
-    labels: {
-      show: false,
-    },
-    axisBorder: {
-      show: false,
-    },
-    axisTicks: {
-      show: false,
-    },
-    tooltip: {
-      enabled: false,
-    },
-    tickAmount: 10,
     min: 0,
     max: 100,
-    stepSize: 5,
+    tickAmount: 5,
+    labels: { show: false },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
   },
-  tooltip: {
-    enabled: false,
-  },
+  tooltip: { enabled: false },
+});
+
+let interval: number;
+
+onMounted(() => {
+  updateMetrics();
+  interval = window.setInterval(updateMetrics, 1000);
+});
+
+onUnmounted(() => {
+  if (interval) {
+    clearInterval(interval);
+  }
 });
 </script>
