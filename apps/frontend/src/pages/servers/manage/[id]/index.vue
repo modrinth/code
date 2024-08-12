@@ -10,180 +10,43 @@
       <div class="experimental-styles-within flex flex-row items-center justify-between">
         <div class="flex flex-row items-center gap-4">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
-          <div
-            :class="`flex items-center gap-2 rounded-full px-2 py-1 ${stats.current.cpu_percent === null ? 'bg-red-400/10 text-red-500' : 'bg-green-400/10 text-green-500'}`"
-          >
-            <span class="text-sm font-semibold">
-              {{ stats.current.cpu_percent === null ? "Server Offline" : "Server Online" }}
-            </span>
-          </div>
+          <UiServersPanelServerStatus :is-online="isServerOnline" />
         </div>
-        <Button
-          v-if="stats.current.cpu_percent === null"
-          @click="sendPowerAction('start')"
-          color="secondary"
-          :disabled="isActioning"
-        >
-          <div v-if="isActioning" class="grid place-content-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              class="size-5 animate-spin"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-
-          <div class="contents" v-else>
-            <PlayIcon />
-            Start
-          </div>
-        </Button>
-
-        <Button v-else @click="sendPowerAction('restart')" color="secondary" :loading="isActioning">
-          <div v-if="isActioning" class="grid place-content-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              class="size-5 animate-spin"
-            >
-              <path
-                fill-rule="evenodd"
-                d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H3.989a.75.75 0 0 0-.75.75v4.242a.75.75 0 0 0 1.5 0v-2.43l.31.31a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.243a.75.75 0 0 0 .53-.219Z"
-                clip-rule="evenodd"
-              />
-            </svg>
-          </div>
-
-          <div class="contents" v-else>
-            <UpdatedIcon />
-            Restart
-          </div>
-        </Button>
+        <UiServersPanelServerActionButton
+          :is-online="isServerOnline"
+          :is-actioning="isActioning"
+          @action="sendPowerAction"
+        />
       </div>
 
-      <div
-        class="monocraft-font console relative h-full w-full overflow-hidden rounded-xl bg-black p-6 text-sm"
-      >
-        <div class="h-full overflow-y-auto">
-          <VirtualScroller
-            ref="scroller"
-            :default-size="30"
-            :items="consoleOutput"
-            style="white-space: pre; word-wrap: break-word; width: 100%; line-height: 170%"
-          >
-            <template #item="{ index, offset, ref }">
-              <LogParser v-if="ref" :log="ref" />
-            </template>
-          </VirtualScroller>
-        </div>
-        <button
-          class="absolute right-8 top-8 bg-transparent transition-transform duration-300 hover:scale-110"
-          @click="toggleFullScreen"
-        >
-          <ExpandIcon />
-        </button>
-      </div>
+      <UiServersPanelTerminal
+        :console-output="consoleOutput"
+        :full-screen="fullScreen"
+        @toggle-full-screen="toggleFullScreen"
+      />
     </div>
   </div>
   <PyroLoading v-else-if="!isConnected" />
   <PyroError
     v-else
     title="Error Accessing Server"
-    message="Dont worry, your server is safe. We just can't connect to it right now."
+    message="Don't worry, your server is safe. We just can't connect to it right now."
   />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
-import { PlayIcon, UpdatedIcon, ExpandIcon } from "@modrinth/assets";
-import { Button, Modal } from "@modrinth/ui";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import type { Stats, WSAuth, WSEvent } from "~/types/servers";
-import { createVirtualScroller } from "vue-typed-virtual-list";
-import LogParser from "~/components/ui/servers/LogParser.vue";
 import PyroError from "~/components/ui/servers/PyroError.vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
-
-const toggleFullScreen = () => {
-  fullScreen.value = !fullScreen.value;
-
-  if (fullScreen.value) {
-    consoleStyle.value.height = "70vh";
-    setTimeout(() => {
-      let mt = 254;
-      const interval = setInterval(() => {
-        mt -= 10;
-        consoleStyle.value.marginTop = `${mt}px`;
-        if (mt <= 0 || !fullScreen) clearInterval(interval);
-      }, 10);
-    }, 500);
-  } else {
-    consoleStyle.value.height = "400px";
-  }
-};
-
-const VirtualScroller = createVirtualScroller<string>();
-
-const app = useNuxtApp();
-type VirtualListInstance = InstanceType<typeof VirtualScroller>;
-const scroller = ref<VirtualListInstance | null>(null);
-
-const route = useNativeRoute();
-
-const serverId = route.params.id;
-const auth = await useAuth();
-
-type TPowerAction = "restart" | "start" | "stop" | "kill";
-
 const isActioning = ref(false);
 const isConnected = ref(false);
-
-const sendPowerAction = async (action: TPowerAction) => {
-  console.log("Sending power action", action);
-  isActioning.value = true;
-  const actionName = action.charAt(0).toUpperCase() + action.slice(1);
-  // @ts-ignore
-  app.$notify({
-    group: "server",
-    title: `${actionName}ing server`,
-    text: `Your server is now ${actionName}ing, this may take a few moments`,
-    type: "success",
-  });
-  await usePyroFetch(auth.value.token, `servers/${serverId}/power`, 0, "POST", "application/json", {
-    action: actionName,
-  });
-  isActioning.value = false;
-};
-
-let socket: WebSocket | null = null;
-
-const reauth = async () => {
-  const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  if (socket) {
-    if (socket.readyState === WebSocket.OPEN)
-      socket?.send(
-        JSON.stringify({
-          event: "auth",
-          jwt: wsAuth.token,
-        }),
-      );
-    else socket.onopen = () => socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
-  }
-  return wsAuth;
-};
-
 const consoleOutput = ref<string[]>([]);
-const cpu_data = ref<number[]>([]);
-const ram_data = ref<number[]>([]);
+const cpuData = ref<number[]>([]);
+const ramData = ref<number[]>([]);
 
 const stats = ref<Stats>({
   current: {
@@ -206,59 +69,137 @@ const stats = ref<Stats>({
   },
 });
 
-const connectWebSocket = async () => {
-  const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  socket = new WebSocket(`ws://127.0.0.1:6527/v0/ws`);
-  await reauth();
-  try {
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.event === "log") {
-        consoleOutput.value.push(data.message);
-      } else if (data.event === "stats") {
-        isConnected.value = true;
-        stats.value = {
-          current: data,
-          past: stats.value.current,
-          graph: {
-            cpu: cpu_data.value,
-            ram: ram_data.value,
-          },
-        };
+const isServerOnline = computed(() => stats.value.current.cpu_percent !== null);
 
-        cpu_data.value.push(Math.round(data.cpu_percent * 100) / 100);
-        if (cpu_data.value.length > 10) {
-          cpu_data.value.shift();
-        }
+const app = useNuxtApp();
+const route = useRoute();
+const auth = await useAuth();
+const serverId = route.params.id as string;
 
-        ram_data.value.push(Math.floor((data.ram_usage_bytes / data.ram_total_bytes) * 100));
-        if (ram_data.value.length > 10) {
-          ram_data.value.shift();
-        }
-      } else if (data.event === "auth-expiring") {
-        reauth();
-      }
-    };
+let socket: WebSocket | null = null;
 
-    socket.onclose = () => {
-      consoleOutput.value.push("\nWS died, oops");
-      isConnected.value = false;
-    };
-  } catch (error) {
-    console.error("ws failed:", error);
+const toggleFullScreen = () => {
+  fullScreen.value = !fullScreen.value;
+  if (fullScreen.value) {
+    consoleStyle.value.height = "70vh";
+    animateMarginTop();
+  } else {
+    consoleStyle.value.height = "400px";
+    consoleStyle.value.marginTop = "0px";
   }
 };
 
-onMounted(() => {
-  connectWebSocket();
-});
+const animateMarginTop = () => {
+  setTimeout(() => {
+    let mt = 254;
+    const interval = setInterval(() => {
+      mt -= 10;
+      consoleStyle.value.marginTop = `${mt}px`;
+      if (mt <= 0 || !fullScreen.value) clearInterval(interval);
+    }, 10);
+  }, 500);
+};
 
-onBeforeUnmount(() => {
-  if (socket) {
-    socket.close();
-    socket = null;
+const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
+  isActioning.value = true;
+  const actionName = action.charAt(0).toUpperCase() + action.slice(1);
+  // @ts-ignore
+  app.$notify({
+    group: "server",
+    title: `${actionName}ing server`,
+    text: `Your server is now ${actionName}ing, this may take a few moments`,
+    type: "success",
+  });
+
+  try {
+    await usePyroFetch(
+      auth.value.token,
+      `servers/${serverId}/power`,
+      0,
+      "POST",
+      "application/json",
+      {
+        action: actionName,
+      },
+    );
+  } catch (error) {
+    console.error(`Error ${actionName}ing server:`, error);
+    // @ts-ignore
+    app.$notify({
+      group: "server",
+      title: `Error ${actionName}ing server`,
+      text: "An error occurred while attempting to perform the action.",
+      type: "error",
+    });
+  } finally {
+    isActioning.value = false;
   }
-});
+};
+
+const connectWebSocket = async () => {
+  const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
+  socket = new WebSocket(`ws://127.0.0.1:6632/v0/ws`);
+
+  socket.onopen = () => {
+    socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
+  };
+
+  socket.onmessage = (event) => handleWebSocketMessage(JSON.parse(event.data));
+
+  socket.onclose = () => {
+    consoleOutput.value.push("\nWS connection closed");
+    isConnected.value = false;
+  };
+
+  socket.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    isConnected.value = false;
+  };
+};
+
+const handleWebSocketMessage = (data: WSEvent) => {
+  switch (data.event) {
+    case "log":
+      consoleOutput.value.push(data.message);
+      break;
+    case "stats":
+      // FIX PLS
+      updateStats(data as any);
+      break;
+    case "auth-expiring":
+      reauth();
+      break;
+  }
+};
+
+const updateStats = (data: Stats["current"]) => {
+  isConnected.value = true;
+  stats.value = {
+    current: data,
+    past: stats.value.current,
+    graph: {
+      cpu: updateDataArray(cpuData.value, Math.round(data.cpu_percent * 100) / 100),
+      ram: updateDataArray(
+        ramData.value,
+        Math.floor((data.ram_usage_bytes / data.ram_total_bytes) * 100),
+      ),
+    },
+  };
+};
+
+const updateDataArray = (arr: number[], newValue: number) => {
+  arr.push(newValue);
+  if (arr.length > 10) arr.shift();
+  return [...arr];
+};
+
+const reauth = async () => {
+  const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
+  socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
+};
+
+onMounted(connectWebSocket);
+onBeforeUnmount(() => socket?.close());
 </script>
 
 <style scoped>
