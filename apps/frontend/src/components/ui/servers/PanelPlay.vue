@@ -24,7 +24,7 @@ export default defineComponent({
       required: true,
     },
     port: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
