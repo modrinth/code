@@ -1,12 +1,11 @@
 <template>
   <div class="flex flex-row items-center gap-4">
-    <div
-      v-if="loader && loaderVersion"
-      class="experimental-styles-within h-6 w-0.5 bg-button-border"
-    ></div>
-    <div v-if="loader && loaderVersion" class="flex flex-row items-center gap-2">
+    <div v-if="loader" class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
+    <div v-if="loader" class="flex flex-row items-center gap-2">
       <UiServersLoaderIcon v-if="loader" :loader="loader" />
-      <span class="text-sm font-semibold capitalize"> {{ loader }} {{ loaderVersion }} </span>
+      <span class="text-sm font-semibold capitalize">
+        {{ loader }} <span v-if="loaderVersion">{{ loaderVersion }}</span>
+      </span>
     </div>
   </div>
 </template>
