@@ -131,10 +131,17 @@ const updateClientHeight = () => {
   }
 };
 
+const scrollToBottom = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+  }
+};
+
 onMounted(() => {
   updateClientHeight();
   updateItemHeights();
   window.addEventListener("resize", updateClientHeight);
+  scrollToBottom();
 });
 
 onUnmounted(() => {
@@ -151,9 +158,7 @@ watch(
 
     nextTick(() => {
       updateItemHeights();
-      if (scrollContainer.value) {
-        scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
-      }
+      scrollToBottom();
     });
   },
   { deep: true },
