@@ -58,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, markRaw } from "vue";
 import type { Stats } from "~/types/servers";
 import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 
@@ -82,13 +82,13 @@ const metrics = ref([
   {
     title: "CPU usage",
     value: "0%",
-    icon: CPUIcon,
+    icon: markRaw(CPUIcon),
     data: [] as number[],
   },
   {
     title: "Memory usage",
     value: "0%",
-    icon: DBIcon,
+    icon: markRaw(DBIcon),
     data: [] as number[],
   },
 ]);
@@ -109,7 +109,7 @@ const updateMetrics = () => {
     return {
       ...metric,
       value: `${newValue.toFixed(2)}%`,
-      data: [...metric.data.slice(-10), newValue], // Keep only the last 10 data points
+      data: [...metric.data.slice(-10), newValue],
     };
   });
 };
