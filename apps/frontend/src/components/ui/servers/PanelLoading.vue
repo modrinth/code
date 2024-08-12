@@ -7,8 +7,8 @@
       <div class="h-[144px] w-[144px] animate-pulse rounded-2xl bg-bg-raised"></div>
       <div class="flex flex-col gap-4">
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
-          <a href="/servers/manage" class="breadcrumb goto-link flex w-fit items-center"
-            ><svg
+          <a href="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+            <svg
               xmlns="http://www.w3.org/2000/svg"
               width="14.414"
               height="12.162"
