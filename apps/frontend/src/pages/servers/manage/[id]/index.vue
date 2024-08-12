@@ -159,6 +159,9 @@ const connectWebSocket = async () => {
 
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
+    case "auth":
+      isConnected.value = true;
+      break;
     case "log":
       consoleOutput.value.push(data.message);
       break;
