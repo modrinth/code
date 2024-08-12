@@ -59,17 +59,8 @@
       <UiNavTabs :links="navLinks" />
 
       <div class="flex flex-row gap-2">
-        <Button transparent @click="copyText(data.net.ip + ':' + data.net.port)">
-          <CopyIcon />
-          Copy IP
-        </Button>
-        <a
-          class="btn btn-primary"
-          :href="'modrinth://servers/' + data.server_id + '/' + data.net.ip + ':' + data.net.port"
-        >
-          <PlayIcon />
-          Play
-        </a>
+        <UiServersPanelCopyIP :ip="data.net.ip" :port="data.net.port" />
+        <UiServersPanelPlay :serverId="data.server_id" :ip="data.net.ip" :port="data.net.port" />
       </div>
     </div>
 
