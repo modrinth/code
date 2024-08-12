@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex flex-row items-center gap-4">
     <div v-if="loader && loaderVersion" class="h-6 w-0.5 bg-button-border"></div>
     <div v-if="loader && loaderVersion" class="flex flex-row items-center gap-2">
       <UiServersLoaderIcon v-if="loader" :loader="loader" />
