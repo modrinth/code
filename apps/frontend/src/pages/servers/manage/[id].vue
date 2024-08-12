@@ -107,8 +107,4 @@ await serverStore.fetchServerData(serverId);
 const { data, status } = await useLazyAsyncData("ServerPage", async () =>
   serverStore.getServerData(serverId),
 );
-
-const copyText = (ip: string) => {
-  navigator.clipboard.writeText(ip);
-};
 </script>
