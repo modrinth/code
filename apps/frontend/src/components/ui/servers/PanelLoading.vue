@@ -1,10 +1,10 @@
 <template>
   <div
     aria-hidden="true"
-    class="experimental-styles-within pointer-events-none mx-auto flex min-h-screen w-full max-w-[1280px] animate-pulse select-none flex-col gap-6 px-4 sm:px-6"
+    class="experimental-styles-within pointer-events-none mx-auto flex min-h-screen w-full max-w-[1280px] select-none flex-col gap-6 px-4 sm:px-6"
   >
     <div class="flex flex-row items-center gap-6 pt-4">
-      <div class="h-[144px] w-[144px] rounded-2xl bg-bg-raised"></div>
+      <div class="h-[144px] w-[144px] animate-pulse rounded-2xl bg-bg-raised"></div>
       <div class="flex flex-col gap-4">
         <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
           <a href="/servers/manage" class="breadcrumb goto-link flex w-fit items-center"
@@ -25,18 +25,18 @@
             All servers
           </a>
         </div>
-        <span class="h-10 w-[200px] rounded-full bg-bg-raised"></span>
+        <span class="h-10 w-[200px] animate-pulse rounded-full bg-bg-raised"></span>
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
             <img
               src="/_nuxt/assets/images/games/minecraft.png"
               alt="Minecraft Logo"
               class="size-5"
-            /><span class="text-sm font-semibold">Minecraft </span>
+            /><span class="text-sm font-semibold">Minecraft</span>
           </div>
           <div class="flex flex-row items-center gap-4">
             <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
-            <div class="flex flex-row items-center gap-2">
+            <div class="flex animate-pulse flex-row items-center gap-2">
               <div class="h-4 w-4 rounded-full bg-bg-raised"></div>
               <span class="h-4 w-[100px] rounded-full bg-bg-raised"></span>
             </div>
