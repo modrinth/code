@@ -54,7 +54,9 @@ const { data: iconData } = await useAsyncData(`server-icon-${props.server_id}`, 
   if (props.modpack) {
     const versionData: any = await toRaw(useBaseFetch(`version/${props.modpack}`));
     if (versionData && versionData.project_id) {
-      const projectData: Project = await toRaw(useBaseFetch(`project/${versionData.project_id}`)) as Project;
+      const projectData: Project = (await toRaw(
+        useBaseFetch(`project/${versionData.project_id}`),
+      )) as Project;
       return projectData.icon_url;
     }
   }

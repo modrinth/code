@@ -33,23 +33,23 @@ export interface Project {
   title: string;
   description: string;
   categories: string[];
-  client_side: 'required' | 'optional';
-  server_side: 'required' | 'optional';
+  client_side: "required" | "optional";
+  server_side: "required" | "optional";
   body: string;
-  status: 'approved' | 'pending' | 'rejected';
-  requested_status: 'approved' | 'pending' | 'rejected';
+  status: "approved" | "pending" | "rejected";
+  requested_status: "approved" | "pending" | "rejected";
   additional_categories: string[];
   issues_url: string;
   source_url: string;
   wiki_url: string;
   discord_url: string;
   donation_urls: DonationUrl[];
-  project_type: 'mod' | 'resourcepack' | 'map' | 'plugin';
+  project_type: "mod" | "resourcepack" | "map" | "plugin";
   downloads: number;
   icon_url: string;
   color: number;
   thread_id: string;
-  monetization_status: 'monetized' | 'non-monetized';
+  monetization_status: "monetized" | "non-monetized";
   id: string;
   team: string;
   body_url: string | null;
@@ -107,18 +107,18 @@ export interface Stats {
     ram_total_bytes: number;
     storage_usage_bytes: number;
     storage_total_bytes: number;
-  },
+  };
   past: {
     cpu_percent: number;
     ram_usage_bytes: number;
     ram_total_bytes: number;
     storage_usage_bytes: number;
     storage_total_bytes: number;
-  },
+  };
   graph: {
     cpu: number[];
     ram: number[];
-  }
+  };
 }
 
 export interface ServerBackup {
