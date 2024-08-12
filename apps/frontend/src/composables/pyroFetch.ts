@@ -1,7 +1,18 @@
-// 0 pre-launch
+import { $fetch, FetchError } from "ofetch";
+
 type TAPIVersion = 0;
 type TAccept = "application/json" | "TODO";
 type TMethod = "GET" | "PATCH" | "POST" | "PUT" | "DELETE";
+
+export class PyroFetchError extends Error {
+  constructor(
+    message: string,
+    public statusCode?: number,
+  ) {
+    super(message);
+    this.name = "PyroFetchError";
+  }
+}
 
 export async function usePyroFetch<T>(
   authToken: string,
@@ -16,24 +27,20 @@ export async function usePyroFetch<T>(
   let retryAmount = 3;
 
   if (!authToken) {
-    throw new Error("Cannot pyrofetch without auth (10000)");
+    throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
   }
 
   let base = import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl;
 
   if (!base) {
-    throw new Error(
-      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables (10001)",
+    throw new PyroFetchError(
+      "Cannot pyrofetch without base url. Make sure to set a PYRO_BASE_URL in environment variables",
+      10001,
     );
   }
 
-  if (base.endsWith("/")) {
-    base = base.slice(0, -1);
-  }
-
-  if (path.startsWith("/")) {
-    path = path.slice(1);
-  }
+  base = base.endsWith("/") ? base.slice(0, -1) : base;
+  path = path.startsWith("/") ? path.slice(1) : path;
 
   const fullUrl: string = `${base}/modrinth/v${version}/${path}`;
 
@@ -54,15 +61,39 @@ export async function usePyroFetch<T>(
     retry: retryAmount,
   };
 
-  if ((method === "POST" || method === "PUT" || method === "PATCH" || method == "DELETE") && body) {
+  if (
+    (method === "POST" || method === "PUT" || method === "PATCH" || method === "DELETE") &&
+    body
+  ) {
     request.headers["Content-Type"] = "application/json";
     request.body = JSON.stringify(body);
     request.retry = 0;
   }
 
-  // Known issue when wrapping $fetch
-  // https://github.com/unjs/nitro/issues/470
-  // https://github.com/nuxt/nuxt/issues/18570
-  // @ts-ignore No known fix.
-  return await $fetch(fullUrl, request);
+  try {
+    // @ts-ignore No known fix for the known issue when wrapping $fetch
+    const response = await $fetch(fullUrl, request);
+    return response as T;
+  } catch (error) {
+    if (error instanceof FetchError) {
+      switch (error.response?.status) {
+        case 400:
+          throw new PyroFetchError("[PYRO] Bad Request", 400);
+        case 401:
+          throw new PyroFetchError("[PYRO] Unauthorized", 401);
+        case 403:
+          throw new PyroFetchError("[PYRO] Forbidden", 403);
+        case 404:
+          throw new PyroFetchError("[PYRO] Not Found", 404);
+        case 500:
+          throw new PyroFetchError("[PYRO] Internal Server Error", 500);
+        default:
+          throw new PyroFetchError(
+            `HTTP Error: ${error.response?.status} ${error.response?.statusText}`,
+            error.response?.status,
+          );
+      }
+    }
+    throw new PyroFetchError("[PYRO] An unexpected error occurred during the fetch operation.");
+  }
 }
