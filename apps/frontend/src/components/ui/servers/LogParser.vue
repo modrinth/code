@@ -1,5 +1,5 @@
 <template>
-  <div v-html="parsedLog"></div>
+  <div class="px-6 text-white hover:bg-[#323232]" v-html="parsedLog"></div>
 </template>
 
 <script lang="ts">
