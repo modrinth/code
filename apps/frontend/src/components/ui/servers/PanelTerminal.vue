@@ -28,10 +28,10 @@
       </div>
     </div>
     <button
-      class="absolute right-8 top-8 bg-transparent transition-transform duration-300 hover:scale-110"
+      class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-[#242424] transition-transform duration-300 hover:scale-110"
       @click="$emit('toggle-full-screen')"
     >
-      <ExpandIcon />
+      <ExpandIcon class="flex !size-6" />
     </button>
   </div>
 </template>
