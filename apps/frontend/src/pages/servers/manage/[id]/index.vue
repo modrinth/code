@@ -26,8 +26,8 @@
       />
     </div>
   </div>
-  <PyroLoading v-else-if="!isConnected" />
-  <PyroError
+  <UiServersPanelOverviewLoading v-else-if="!isConnected" />
+  <UiServersPyroError
     v-else
     title="Error Accessing Server"
     message="Don't worry, your server is safe. We just can't connect to it right now."
@@ -37,8 +37,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import type { Stats, WSAuth, WSEvent } from "~/types/servers";
-import PyroError from "~/components/ui/servers/PyroError.vue";
-import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
