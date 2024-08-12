@@ -50,7 +50,7 @@ const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
 
-const { data: iconData } = await useAsyncData(`server-icon-${props.server_id}`, async () => {
+const { data: iconData } = await useLazyAsyncData(`server-icon-${props.server_id}`, async () => {
   if (props.modpack) {
     const versionData: any = await toRaw(useBaseFetch(`version/${props.modpack}`));
     if (versionData && versionData.project_id) {
