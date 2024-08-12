@@ -159,7 +159,7 @@ const connectWebSocket = async () => {
 
 const handleWebSocketMessage = (data: WSEvent) => {
   switch (data.event) {
-    case "auth":
+    case "auth-ok":
       isConnected.value = true;
       break;
     case "log":
