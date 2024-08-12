@@ -21,6 +21,8 @@ module.exports = {
         dark: "var(--color-text-dark)",
         inverted: "var(--color-text-inverted)",
         heading: "var(--color-heading)",
+        red: "var(--color-red)",
+        orange: "var(--color-orange)",
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",

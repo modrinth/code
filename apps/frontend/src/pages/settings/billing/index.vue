@@ -3,9 +3,31 @@
     <h2>{{ formatMessage(messages.subscriptionTitle) }}</h2>
     <p>{{ formatMessage(messages.subscriptionDescription) }}</p>
     <div class="universal-card recessed">
-      <div class="flex justify-between">
+      <ConfirmModal
+        ref="modal_cancel"
+        :title="formatMessage(cancelModalMessages.title)"
+        :description="formatMessage(cancelModalMessages.description)"
+        :proceed-label="formatMessage(cancelModalMessages.action)"
+        @proceed="cancelSubscription(cancelSubscriptionId)"
+      />
+      <div class="flex flex-wrap justify-between gap-4">
         <div class="flex flex-col gap-4">
-          <span v-if="midasSubscription">You're currently subscribed to:</span>
+          <template v-if="midasSubscription">
+            <span v-if="midasSubscription.status === 'active'">
+              You're currently subscribed to:
+            </span>
+            <span v-else-if="midasSubscription.status === 'payment-processing'" class="text-orange">
+              Your payment is being processed. Perks will activate once payment is complete.
+            </span>
+            <span v-else-if="midasSubscription.status === 'cancelled'">
+              You've cancelled your subscription. <br />
+              You will retain your perks until the end of the current billing cycle.
+            </span>
+            <span v-else-if="midasSubscription.status === 'payment-failed'" class="text-red">
+              Your subscription payment failed. Please update your payment method.
+            </span>
+          </template>
+
           <span v-else>Become a subscriber to Modrinth Plus!</span>
           <ModrinthPlusIcon class="h-8 w-min" />
           <div class="flex flex-col gap-2">
@@ -24,8 +46,8 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col justify-between text-right">
-          <div class="flex flex-col gap-1">
+        <div class="flex w-full flex-wrap justify-between gap-4 xl:w-auto xl:flex-col">
+          <div class="flex flex-col gap-1 xl:ml-auto xl:text-right">
             <span class="text-2xl font-bold text-dark">
               <template v-if="midasSubscription">
                 {{
@@ -41,12 +63,21 @@
                 {{ formatPrice(price.prices.intervals.monthly, currency) }} / month
               </template>
             </span>
-            <span v-if="midasSubscription" class="text-sm text-secondary">
-              Since {{ $dayjs(midasSubscription.created).format("MMMM D, YYYY") }}
-            </span>
-            <span v-if="midasSubscription" class="text-sm text-secondary">
-              Renews {{ $dayjs(midasSubscription.expires).format("MMMM D, YYYY") }}
-            </span>
+            <template v-if="midasSubscription">
+              <span class="text-sm text-secondary">
+                Since {{ $dayjs(midasSubscription.created).format("MMMM D, YYYY") }}
+              </span>
+              <span v-if="midasSubscription.status === 'active'" class="text-sm text-secondary">
+                Renews {{ $dayjs(midasSubscription.expires).format("MMMM D, YYYY") }}
+              </span>
+              <span
+                v-else-if="midasSubscription.status === 'cancelled'"
+                class="text-sm text-secondary"
+              >
+                Expires {{ $dayjs(midasSubscription.expires).format("MMMM D, YYYY") }}
+              </span>
+            </template>
+
             <span v-else class="text-sm text-secondary">
               Or {{ formatPrice(price.prices.intervals.yearly, currency) }} / year (save
               {{
@@ -54,7 +85,47 @@
               }}%)!
             </span>
           </div>
-          <button v-if="midasSubscription" class="btn ml-auto"><XIcon /> Cancel</button>
+          <div
+            v-if="midasSubscription && midasSubscription.status === 'payment-failed'"
+            class="ml-auto flex flex-row-reverse items-center gap-2"
+          >
+            <button
+              v-if="midasSubscription && midasSubscription.status === 'payment-failed'"
+              class="btn btn-large btn-primary"
+              @click="
+                purchaseModalStep = 0;
+                $refs.purchaseModal.show();
+              "
+            >
+              <UpdatedIcon />
+              Update method
+            </button>
+            <OverflowMenu
+              class="btn icon-only transparent"
+              :options="[
+                {
+                  id: 'cancel',
+                  action: () => {
+                    cancelSubscriptionId = midasSubscription.id;
+                    $refs.modal_cancel.show();
+                  },
+                },
+              ]"
+            >
+              <MoreVerticalIcon />
+              <template #cancel><XIcon /> Cancel</template>
+            </OverflowMenu>
+          </div>
+          <button
+            v-else-if="midasSubscription && midasSubscription.status !== 'cancelled'"
+            class="btn ml-auto"
+            @click="
+              cancelSubscriptionId = midasSubscription.id;
+              $refs.modal_cancel.show();
+            "
+          >
+            <XIcon /> Cancel
+          </button>
           <button
             v-else
             class="btn btn-purple btn-large ml-auto"
@@ -236,10 +307,10 @@
                   }}
                 </template>
 
-                <span v-if="props.option.type === 'cashapp'">
+                <span v-if="props.option.type === 'cashapp' && props.option.cashapp.cashtag">
                   ({{ props.option.cashapp.cashtag }})
                 </span>
-                <span v-else-if="props.option.type === 'paypal'">
+                <span v-else-if="props.option.type === 'paypal' && props.option.paypal.payer_email">
                   ({{ props.option.paypal.payer_email }})
                 </span>
               </div>
@@ -358,6 +429,9 @@
       <div class="header__title">
         <h2 class="text-2xl">{{ formatMessage(messages.paymentMethodTitle) }}</h2>
       </div>
+      <nuxt-link class="btn" to="/settings/billing/charges">
+        <HistoryIcon /> {{ formatMessage(messages.paymentMethodHistory) }}
+      </nuxt-link>
       <button class="btn" @click="addPaymentMethod">
         <PlusIcon /> {{ formatMessage(messages.paymentMethodAdd) }}
       </button>
@@ -479,8 +553,14 @@ import {
   RadioButtonChecked,
   InfoIcon,
   ChevronRightIcon,
+  UpdatedIcon,
+  HistoryIcon,
 } from "@modrinth/assets";
 import { products } from "~/generated/state.json";
+
+definePageMeta({
+  middleware: "auth",
+});
 
 const data = useNuxtApp();
 
@@ -502,6 +582,22 @@ const deleteModalMessages = defineMessages({
   },
 });
 
+const cancelModalMessages = defineMessages({
+  title: {
+    id: "settings.billing.modal.cancel.title",
+    defaultMessage: "Are you sure you want to cancel your subscription?",
+  },
+  description: {
+    id: "settings.billing.modal.cancel.description",
+    defaultMessage:
+      "This will cancel your subscription. You will retain your perks until the end of the current billing cycle.",
+  },
+  action: {
+    id: "settings.billing.modal.cancel.action",
+    defaultMessage: "Cancel subscription",
+  },
+});
+
 const messages = defineMessages({
   subscriptionTitle: {
     id: "settings.billing.subscription.title",
@@ -518,6 +614,10 @@ const messages = defineMessages({
   paymentMethodNone: {
     id: "settings.billing.payment_method.none",
     defaultMessage: "You have not added any payment methods.",
+  },
+  paymentMethodHistory: {
+    id: "settings.billing.payment_method.action.history",
+    defaultMessage: "View past charges",
   },
   paymentMethodAdd: {
     id: "settings.billing.payment_method.action.add",
@@ -607,7 +707,7 @@ const [
 ]);
 
 async function refresh() {
-  await Promise.all([refreshPaymentMethods(), refreshCustomer()]);
+  await Promise.all([refreshPaymentMethods(), refreshCustomer(), refreshSubscriptions()]);
 }
 
 const midasProduct = ref(products.find((x) => x.metadata.type === "midas"));
@@ -629,7 +729,7 @@ if (route.query.priceId && route.query.plan && route.query.redirect_status) {
     interval: route.query.plan,
     created: Date.now(),
     expires: route.query.plan === "yearly" ? Date.now() + 31536000000 : Date.now() + 2629746000,
-    status: route.query.redirect_status === "success" ? "active" : "payment_failed",
+    status: route.query.redirect_status === "success" ? "active" : "payment-failed",
   });
 }
 
@@ -739,11 +839,31 @@ async function removePaymentMethod(index) {
   stopLoading();
 }
 
+const cancelSubscriptionId = ref();
+async function cancelSubscription(id) {
+  startLoading();
+  try {
+    await useBaseFetch(`billing/subscription/${id}`, {
+      internal: true,
+      method: "DELETE",
+    });
+    await refresh();
+  } catch (err) {
+    data.$notify({
+      group: "main",
+      title: "An error occurred",
+      text: err.data ? err.data.description : err,
+      type: "error",
+    });
+  }
+  stopLoading();
+}
+
 const purchaseModal = ref();
 const purchaseModalStep = ref(0);
 
 const selectedPlan = ref("yearly");
-const currency = ref("JPY");
+const currency = ref("USD");
 
 const price = ref(midasProduct.value.prices.find((x) => x.currency_code === currency.value));
 
