@@ -69,20 +69,15 @@
 </template>
 
 <script setup lang="ts">
-import { Button } from "@modrinth/ui";
 import {
   HomeIcon,
   CubeIcon,
   CloudIcon,
   CogIcon,
-  CopyIcon,
-  PlayIcon,
-  BoxIcon,
   LeftArrowIcon,
 } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import PyroError from "~/components/ui/servers/PyroError.vue";
-import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
