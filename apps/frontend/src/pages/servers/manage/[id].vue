@@ -55,13 +55,7 @@
         </div>
 
         <div data-pyro-mount class="h-full w-full">
-          <NuxtPage
-            :route="route"
-            :transition="{
-              name: 'page',
-              mode: 'out-in',
-            }"
-          />
+          <NuxtPage :route="route" />
         </div>
 
         <UiServersPoweredByPyro />
