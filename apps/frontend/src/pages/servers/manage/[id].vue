@@ -69,13 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  HomeIcon,
-  CubeIcon,
-  CloudIcon,
-  CogIcon,
-  LeftArrowIcon,
-} from "@modrinth/assets";
+import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import PyroError from "~/components/ui/servers/PyroError.vue";
 
