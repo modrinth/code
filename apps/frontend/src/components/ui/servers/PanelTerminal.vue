@@ -53,7 +53,7 @@ const emit = defineEmits<{
 const scrollContainer = ref<HTMLElement | null>(null);
 const itemRefs = ref<HTMLElement[]>([]);
 const itemHeights = ref<number[]>([]);
-const averageItemHeight = ref(30);
+const averageItemHeight = ref(28);
 const bufferSize = 5;
 
 const scrollTop = ref(0);
