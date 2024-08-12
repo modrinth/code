@@ -1,36 +1,89 @@
 import { defineStore } from "pinia";
 import type { Server } from "~/types/servers";
 
-// Define the store using Pinia
+interface ServerState {
+  serverData: Record<string, Server>;
+  error: Error | null;
+}
+
 export const useServerStore = defineStore("servers", {
-  state: () => ({
-    serverData: {} as Record<string, Server>,
+  state: (): ServerState => ({
+    serverData: {},
+    error: null,
   }),
+
   actions: {
     async fetchServerData(serverId: string) {
-      const auth = await useAuth();
-      let data = await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
+      try {
+        const auth = await useAuth();
+        const data = await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
 
-      // Fetch additional project information
-      if (data.modpack) {
-        const pid: any = await toRaw(useBaseFetch(`version/${await data.modpack}`));
-        const project: any = await toRaw(useBaseFetch(`project/${pid.project_id}`));
-        // Update server data
-        data.modpack = pid.id;
-        // @ts-ignore
-        data.modpack_id = pid.id;
-        data.project = project;
+        if (!data) {
+          throw new Error("Failed to fetch server data");
+        }
+
+        if (data.modpack) {
+          const pid = await this.fetchModpackVersion(data.modpack);
+          // @ts-ignore
+          const project = await this.fetchProject(pid.project_id);
+
+          // @ts-ignore
+          data.modpack = pid.id;
+          // @ts-ignore
+          data.modpack_id = pid.id;
+          // @ts-ignore
+          data.project = project;
+        }
+
+        this.serverData[serverId] = data;
+        this.error = null;
+      } catch (error) {
+        console.error("Error fetching server data:", error);
+        this.error = error instanceof Error ? error : new Error("An unknown error occurred");
+
+        throw this.error;
       }
-      this.serverData[serverId] = data;
     },
+
+    async fetchModpackVersion(modpackId: string) {
+      try {
+        return await toRaw(useBaseFetch(`version/${modpackId}`));
+      } catch (error) {
+        console.error("Error fetching modpack version:", error);
+        throw error;
+      }
+    },
+
+    async fetchProject(projectId: string) {
+      try {
+        return await toRaw(useBaseFetch(`project/${projectId}`));
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        throw error;
+      }
+    },
+
     updateServerData(serverId: string, data: Partial<Server>) {
+      if (!this.serverData[serverId]) {
+        console.warn(`Attempting to update non-existent server data for server ID: ${serverId}`);
+        return;
+      }
       this.serverData[serverId] = {
         ...this.serverData[serverId],
         ...data,
       };
     },
+
+    clearError() {
+      this.error = null;
+    },
   },
+
   getters: {
-    getServerData: (state) => (serverId: string) => state.serverData[serverId],
+    getServerData:
+      (state) =>
+      (serverId: string): Server | undefined =>
+        state.serverData[serverId],
+    hasError: (state): boolean => state.error !== null,
   },
 });
