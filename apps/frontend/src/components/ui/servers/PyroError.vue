@@ -65,7 +65,6 @@
 <script setup lang="ts">
 import { Button } from "@modrinth/ui";
 import { LeftArrowIcon } from "@modrinth/assets";
-import { defineProps } from "vue";
 
 const props = defineProps({
   title: {

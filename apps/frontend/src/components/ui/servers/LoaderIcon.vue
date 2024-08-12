@@ -164,7 +164,7 @@
 
 <script setup lang="ts">
 import { LoaderIcon } from "@modrinth/assets";
-import { defineProps } from "vue";
+
 const props = defineProps({
   loader: String,
 });
