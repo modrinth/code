@@ -18,7 +18,7 @@ export const useServerStore = defineStore("servers", {
         // Update server data
         data.modpack = pid.id;
         // @ts-ignore
-        data.modpack_id = pid.project_id;
+        data.modpack_id = pid.id;
         data.project = project;
       }
       this.serverData[serverId] = data;
