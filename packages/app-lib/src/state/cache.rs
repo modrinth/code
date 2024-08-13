@@ -829,23 +829,30 @@ impl CachedEntry {
     ) -> crate::Result<Vec<(Self, bool)>> {
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
-                let mut results = fetch_json::<Vec<_>>(
-                    Method::GET,
-                    &*format!(
-                        "{}{}?ids={}",
-                        $api_url,
-                        $url_suffix,
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
-                    &fetch_semaphore,
-                    pool,
-                )
-                .await?
-                .into_iter()
-                .map($cache_variant)
-                .collect::<Vec<_>>();
+                let keys = keys.into_iter().collect::<Vec<_>>();
+                let mut results = vec![];
+
+                for keys in keys.chunks(100) {
+                    let mut result = fetch_json::<Vec<_>>(
+                        Method::GET,
+                        &*format!(
+                            "{}{}?ids={}",
+                            $api_url,
+                            $url_suffix,
+                            serde_json::to_string(&keys)?
+                        ),
+                        None,
+                        None,
+                        &fetch_semaphore,
+                        pool,
+                    )
+                    .await?
+                    .into_iter()
+                    .map($cache_variant)
+                    .collect::<Vec<_>>();
+
+                    results.append(&mut result);
+                }
 
                 let mut values = vec![];
                 let visited_keys = DashSet::new();
