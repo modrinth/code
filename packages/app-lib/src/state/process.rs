@@ -162,11 +162,9 @@ impl Process {
 
         loop {
             if let Some(t) = self.try_wait().await? {
-                println!("Minecraft Child exited with status {} pid: {}", t, self.pid);
                 mc_exit_status = t;
                 break;
             }
-            println!("Still running Minecraft Child pid: {}", self.pid);
             // sleep for 10ms
             tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
 
@@ -188,7 +186,7 @@ impl Process {
             ProcessPayloadType::Finished,
             "Exited process",
         )
-            .await?;
+        .await?;
 
         // Now fully complete- update playtime one last time
         update_playtime(&mut last_updated_playtime, &self.profile_path, true)
