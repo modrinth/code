@@ -32,7 +32,7 @@ If you discover a security vulnerability within our codebase, please follow our 
 
 ## Support
 
-If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.gg/modrinth).
+If you need help with the Modrinth web interface or app, please visit our [support page](https://support.modrinth.com). For general inquiries, you can also join our [Discord server](https://discord.modrinth.com).
 
 ## License
 
