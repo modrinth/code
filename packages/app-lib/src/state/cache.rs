@@ -505,7 +505,8 @@ impl CacheValue {
     }
 }
 
-#[derive(PartialEq, Eq, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum CacheBehaviour {
     /// Serve expired data. If fetch fails / launcher is offline, errors are ignored
     /// and expired data is served
@@ -1378,6 +1379,25 @@ impl CachedEntry {
                 expires = excluded.expires
             ",
             items,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn purge_cache_types(
+        cache_types: &[CacheValueType],
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let cache_types = serde_json::to_string(&cache_types)?;
+
+        sqlx::query!(
+            "
+            DELETE FROM cache
+            WHERE data_type IN (SELECT value FROM json_each($1))
+            ",
+            cache_types,
         )
         .execute(exec)
         .await?;

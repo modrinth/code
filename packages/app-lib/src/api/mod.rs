@@ -14,11 +14,11 @@ pub mod tags;
 
 pub mod data {
     pub use crate::state::{
-        Credentials, Dependency, DirectoryInfo, Hooks, JavaVersion, LinkedData,
-        MemorySettings, ModLoader, ModrinthCredentials,
-        ModrinthCredentialsResult, Organization, Process, ProfileFile, Project,
-        ProjectType, SearchResult, SearchResults, Settings, TeamMember, Theme,
-        User, Version, WindowSize,
+        CacheBehaviour, CacheValueType, Credentials, Dependency, DirectoryInfo,
+        Hooks, JavaVersion, LinkedData, MemorySettings, ModLoader,
+        ModrinthCredentials, ModrinthCredentialsResult, Organization, Process,
+        ProfileFile, Project, ProjectType, SearchResult, SearchResults,
+        Settings, TeamMember, Theme, User, Version, WindowSize,
     };
 }
 

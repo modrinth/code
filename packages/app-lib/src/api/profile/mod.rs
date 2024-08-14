@@ -71,12 +71,13 @@ pub async fn get_many(paths: &[&str]) -> crate::Result<Vec<Profile>> {
 #[tracing::instrument]
 pub async fn get_projects(
     path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<DashMap<String, ProfileFile>> {
     let state = State::get().await?;
 
     if let Some(profile) = get(path).await? {
         let files = profile
-            .get_projects(None, &state.pool, &state.api_semaphore)
+            .get_projects(cache_behaviour, &state.pool, &state.api_semaphore)
             .await?;
 
         Ok(files)
