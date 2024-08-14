@@ -280,7 +280,7 @@ const installed = ref(false)
 const installedVersion = ref(null)
 
 async function fetchProjectData() {
-  const project = await get_project(route.params.id).catch(handleError)
+  const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
 
   data.value = project
   ;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
