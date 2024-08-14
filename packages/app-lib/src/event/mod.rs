@@ -145,7 +145,11 @@ impl Drop for LoadingBarId {
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
 pub enum LoadingBarType {
-    StateInit,
+    LegacyDataMigration,
+    DirectoryMove {
+        old: PathBuf,
+        new: PathBuf,
+    },
     JavaDownload {
         version: u32,
     },

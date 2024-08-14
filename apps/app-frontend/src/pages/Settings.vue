@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, UpdatedIcon } from '@modrinth/assets'
 import { Card, Slider, DropdownSelect, Toggle, Modal, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
-import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
+import { get, set } from '@/helpers/settings'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
@@ -155,7 +155,8 @@ async function findLauncherDir() {
       <label for="theme">
         <span class="label__title">App directory</span>
         <span class="label__description">
-          The directory where the launcher stores all of its files.
+          The directory where the launcher stores all of its files. Changes will be applied after
+          restarting the launcher.
         </span>
       </label>
       <div class="app-directory">

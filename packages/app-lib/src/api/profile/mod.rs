@@ -617,7 +617,7 @@ fn pack_get_relative_path(
 pub async fn run(path: &str) -> crate::Result<Process> {
     let state = State::get().await?;
 
-    let default_account = Credentials::get_active(&state.pool)
+    let default_account = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 

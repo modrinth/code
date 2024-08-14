@@ -112,18 +112,20 @@ pub(crate) async fn watch_profile(
 ) -> crate::Result<()> {
     let profile_path = dirs.profiles_dir().join(profile_path);
 
-    for folder in ProjectType::iterator()
-        .map(|x| x.get_folder())
-        .chain(["crash-reports"])
-    {
-        let path = profile_path.join(folder);
+    if profile_path.exists() && profile_path.is_dir() {
+        for folder in ProjectType::iterator()
+            .map(|x| x.get_folder())
+            .chain(["crash-reports"])
+        {
+            let path = profile_path.join(folder);
 
-        if !path.exists() {
-            crate::util::io::create_dir_all(&path).await?;
+            if !path.exists() {
+                crate::util::io::create_dir_all(&path).await?;
+            }
+
+            let mut watcher = watcher.write().await;
+            watcher.watcher().watch(&path, RecursiveMode::Recursive)?;
         }
-
-        let mut watcher = watcher.write().await;
-        watcher.watcher().watch(&path, RecursiveMode::Recursive)?;
     }
 
     Ok(())

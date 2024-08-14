@@ -16,8 +16,12 @@ mod macos;
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
-    theseus::EventState::init(app).await?;
+    theseus::EventState::init(app.clone()).await?;
     State::init().await?;
+
+    let state = State::get().await?;
+    app.asset_protocol_scope()
+        .allow_directory(state.directories.caches_dir(), true)?;
 
     Ok(())
 }
@@ -28,37 +32,6 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
     win.show().unwrap();
-
-    #[cfg(not(target_os = "linux"))]
-    {
-        use window_shadows::set_shadow;
-        set_shadow(&win, true).unwrap();
-    }
-    #[cfg(target_os = "macos")]
-    {
-        use macos::window_ext::WindowExt;
-        win.set_transparent_titlebar(true);
-        win.position_traffic_lights(9.0, 16.0);
-
-        macos::delegate::register_open_file(|filename| {
-            tauri::async_runtime::spawn(api::utils::handle_command(
-                filename,
-            ));
-        })
-            .unwrap();
-    }
-
-    #[cfg(target_os = "macos")]
-    {
-        use tauri::WindowEvent;
-        win.on_window_event(|e| {
-            use macos::window_ext::WindowExt;
-            if let WindowEvent::Resized(..) = e.event() {
-                let win = e.window();
-                win.position_traffic_lights(9.0, 16.0);
-            }
-        })
-    }
 }
 
 #[tauri::command]
@@ -128,8 +101,45 @@ fn main() {
                 tracing::error!("Error registering deep link handler: {}", e);
             }
 
+            if let Some(window) = app.get_window("main") {
+                // Hide window to prevent white flash on startup
+                window.hide().unwrap();
+
+                #[cfg(not(target_os = "linux"))]
+                {
+                    use window_shadows::set_shadow;
+                    set_shadow(&window, true).unwrap();
+                }
+
+                #[cfg(target_os = "macos")]
+                {
+                    use macos::window_ext::WindowExt;
+                    window.set_transparent_titlebar(true);
+                    window.position_traffic_lights(9.0, 16.0);
+
+                    macos::delegate::register_open_file(|filename| {
+                        tauri::async_runtime::spawn(
+                            api::utils::handle_command(filename),
+                        );
+                    })
+                    .unwrap();
+                }
+            }
+
             Ok(())
         });
+
+    #[cfg(target_os = "macos")]
+    {
+        use tauri::WindowEvent;
+        builder = builder.on_window_event(|e| {
+            use macos::window_ext::WindowExt;
+            if let WindowEvent::Resized(..) = e.event() {
+                let win = e.window();
+                win.position_traffic_lights(9.0, 16.0);
+            }
+        })
+    }
 
     let builder = builder
         .plugin(api::auth::init())

@@ -1,6 +1,17 @@
 <template>
   <div v-if="!hidden" class="splash-screen dark" :class="{ 'fade-out': doneLoading }">
-    <div class="app-logo-wrapper" data-tauri-drag-region>
+    <div v-if="os !== 'MacOS'" class="app-buttons">
+      <button class="btn icon-only transparent" icon-only @click="() => appWindow.minimize()">
+        <MinimizeIcon />
+      </button>
+      <button class="btn icon-only transparent" @click="() => appWindow.toggleMaximize()">
+        <MaximizeIcon />
+      </button>
+      <button class="btn icon-only transparent" @click="handleClose">
+        <XIcon />
+      </button>
+    </div>
+    <div class="app-logo-wrapper">
       <svg
         class="app-logo"
         viewBox="0 0 1215 175"
@@ -62,46 +73,96 @@
         </g>
       </svg>
       <ProgressBar class="loading-bar" :progress="loadingProgress" />
+      <span v-if="message">{{ message }}</span>
     </div>
     <div class="gradient-bg"></div>
     <div class="cube-bg"></div>
+    <div class="base-bg"></div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
+import { appWindow } from '@tauri-apps/api/window'
+import { XIcon } from '@modrinth/assets'
+import { MaximizeIcon, MinimizeIcon } from '@/assets/icons/index.js'
+import { window as TauriWindow } from '@tauri-apps/api'
+import { TauriEvent } from '@tauri-apps/api/event'
+import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import { getOS } from '@/helpers/utils.js'
+import { useLoading } from '@/store/loading.js'
 
 const doneLoading = ref(false)
 const loadingProgress = ref(0)
 const hidden = ref(false)
+const message = ref()
 
-defineExpose({
-  finishLoading() {
-    doneLoading.value = true
+const loading = useLoading()
 
-    setTimeout(() => {
-      hidden.value = true
-    }, 150)
-  },
+watch(loading, (newValue) => {
+  if (!newValue.barEnabled) {
+    if (loading.loading) {
+      loadingProgress.value = 0
+      fakeLoadingIncrease()
+    } else {
+      loadingProgress.value = 100
+      doneLoading.value = true
+
+      setTimeout(() => {
+        hidden.value = true
+        loading.setEnabled(true)
+      }, 250)
+    }
+  }
 })
 
-loading_listener(async (e) => {
-  if (e.event_type === 'state_init') {
-    loadingProgress.value = 100 * (e.fraction ?? 1)
+function fakeLoadingIncrease() {
+  if (loadingProgress.value < 95) {
+    setTimeout(() => {
+      loadingProgress.value += 1
+      fakeLoadingIncrease()
+    }, 5)
   }
+}
+
+const os = ref('')
+getOS().then((x) => (os.value = x))
+
+loading_listener(async (e) => {
+  if (e.event.type === 'directory_move') {
+    loadingProgress.value = 100 * (e.fraction ?? 1)
+    message.value = 'Updating app directory...'
+  }
+})
+
+const handleClose = async () => {
+  await saveWindowState(StateFlags.ALL)
+  await TauriWindow.getCurrent().close()
+}
+
+TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+  await handleClose()
 })
 </script>
 
 <style scoped lang="scss">
 .splash-screen {
-  transition: opacity 0.1s ease-in-out;
+  transition: opacity 0.25s ease-in-out;
   opacity: 1;
 
   &.fade-out {
     opacity: 0;
   }
+}
+
+.app-buttons {
+  position: absolute;
+  right: 0;
+  z-index: 5;
+  background: var(--color-button-bg);
+  display: flex;
 }
 
 .app-logo-wrapper {
@@ -116,7 +177,7 @@ loading_listener(async (e) => {
 
   gap: 1rem;
 
-  z-index: 100;
+  z-index: 4;
 }
 
 .app-logo {
@@ -134,7 +195,7 @@ loading_listener(async (e) => {
   width: 100vw;
   background: linear-gradient(180deg, rgba(66, 131, 92, 0.275) 0%, rgba(17, 35, 43, 0.5) 97.29%),
     linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64));
-  z-index: 99;
+  z-index: 3;
 }
 
 .cube-bg {
@@ -150,6 +211,16 @@ loading_listener(async (e) => {
   background: #16181c url('@/assets/loading/cube.png') center no-repeat;
   background-size: contain;
 
-  z-index: 98;
+  z-index: 2;
+}
+
+.base-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  z-index: 1;
 }
 </style>

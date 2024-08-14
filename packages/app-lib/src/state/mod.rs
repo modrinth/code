@@ -1,8 +1,4 @@
 //! Theseus state management system
-use crate::event::emit::{emit_loading, init_loading_unsafe};
-
-use crate::event::LoadingBarType;
-
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
 use tokio::sync::{OnceCell, Semaphore};
@@ -35,7 +31,7 @@ pub use self::minecraft_auth::*;
 mod cache;
 pub use self::cache::*;
 
-mod db;
+pub mod db;
 pub mod fs_watcher;
 mod mr_auth;
 
@@ -72,7 +68,18 @@ impl State {
             .get_or_try_init(Self::initialize_state)
             .await?;
 
-        Process::garbage_collect(&state.pool).await?;
+        tokio::task::spawn(async move {
+            let res = tokio::try_join!(
+                state.discord_rpc.clear_to_default(true),
+                Process::garbage_collect(&state.pool)
+            );
+
+            if let Err(e) = res {
+                tracing::error!(
+                    "Error running garbage collection and discord RPC: {e}"
+                );
+            }
+        });
 
         Ok(())
     }
@@ -94,13 +101,6 @@ impl State {
 
     #[tracing::instrument]
     async fn initialize_state() -> crate::Result<Arc<Self>> {
-        let loading_bar = init_loading_unsafe(
-            LoadingBarType::StateInit,
-            100.0,
-            "Initializing launcher",
-        )
-        .await?;
-
         let pool = db::connect().await?;
 
         legacy_converter::migrate_legacy_data(&pool).await?;
@@ -120,22 +120,12 @@ impl State {
             &io_semaphore,
         )
         .await?;
-
         let directories = DirectoryInfo::init(settings.custom_dir).await?;
 
-        emit_loading(&loading_bar, 10.0, None).await?;
-
-        let discord_rpc = DiscordGuard::init().await?;
-        if settings.discord_rpc {
-            // Add default Idling to discord rich presence
-            // Force add to avoid recursion
-            let _ = discord_rpc.force_set_activity("Idling...", true).await;
-        }
+        let discord_rpc = DiscordGuard::init()?;
 
         let file_watcher = fs_watcher::init_watcher().await?;
         fs_watcher::watch_profiles_init(&file_watcher, &directories).await?;
-
-        emit_loading(&loading_bar, 10.0, None).await?;
 
         Ok(Arc::new(Self {
             directories,

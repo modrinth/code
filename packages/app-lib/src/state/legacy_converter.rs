@@ -1,4 +1,3 @@
-use crate::data::DirectoryInfo;
 use crate::jre::check_jre;
 use crate::prelude::ModLoader;
 use crate::state;
@@ -33,18 +32,6 @@ where
         return Ok(());
     };
     let old_launcher_root_str = old_launcher_root.to_string_lossy().to_string();
-
-    let new_launcher_root = DirectoryInfo::get_initial_settings_dir().ok_or(
-        crate::ErrorKind::FSError(
-            "Could not find valid config dir".to_string(),
-        ),
-    )?;
-    let new_launcher_root_str = new_launcher_root
-        .to_string_lossy()
-        .to_string()
-        .trim_end_matches('/')
-        .trim_end_matches('\\')
-        .to_string();
 
     let io_semaphore = IoSemaphore(Semaphore::new(10));
     let settings_path = old_launcher_root.join("settings.json");
@@ -95,13 +82,9 @@ where
         settings.prev_custom_dir = Some(old_launcher_root_str.clone());
 
         for (_, legacy_version) in legacy_settings.java_globals.0 {
-            if let Ok(Some(mut java_version)) =
+            if let Ok(Some(java_version)) =
                 check_jre(PathBuf::from(legacy_version.path)).await
             {
-                java_version.path = java_version
-                    .path
-                    .replace(&old_launcher_root_str, &new_launcher_root_str);
-
                 java_version.upsert(exec).await?;
             }
         }
@@ -206,12 +189,7 @@ where
                                 }
                             },
                             name: profile.metadata.name,
-                            icon_path: profile.metadata.icon.map(|x| {
-                                x.replace(
-                                    &old_launcher_root_str,
-                                    &new_launcher_root_str,
-                                )
-                            }),
+                            icon_path: profile.metadata.icon,
                             game_version: profile.metadata.game_version,
                             loader: match profile.metadata.loader {
                                 LegacyModLoader::Vanilla => ModLoader::Vanilla,
@@ -254,12 +232,7 @@ where
                                 .metadata
                                 .recent_time_played,
                             java_path: profile.java.as_ref().and_then(|x| {
-                                x.override_version.clone().map(|x| {
-                                    x.path.replace(
-                                        &old_launcher_root_str,
-                                        &new_launcher_root_str,
-                                    )
-                                })
+                                x.override_version.clone().map(|x| x.path)
                             }),
                             extra_launch_args: profile
                                 .java

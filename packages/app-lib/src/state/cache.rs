@@ -654,11 +654,6 @@ impl CachedEntry {
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<Self>> {
-        use std::time::Instant;
-        let now = Instant::now();
-
-        println!("start {type_:?} keys: {keys:?}");
-
         if keys.is_empty() {
             return Ok(Vec::new());
         }
@@ -743,13 +738,6 @@ impl CachedEntry {
             }
         }
 
-        let time = now.elapsed();
-        println!(
-            "query {type_:?} keys: {remaining_keys:?}, elapsed: {:.2?}",
-            time
-        );
-        let now = Instant::now();
-
         if !remaining_keys.is_empty() {
             let res = Self::fetch_many(
                 type_,
@@ -786,9 +774,6 @@ impl CachedEntry {
                 }
             }
         }
-
-        let time = now.elapsed();
-        println!("FETCH {type_:?} DONE, elapsed: {:.2?}", time);
 
         if !expired_keys.is_empty()
             && (cache_behaviour == CacheBehaviour::StaleWhileRevalidate
@@ -1064,8 +1049,6 @@ impl CachedEntry {
                             false,
                         ));
 
-                        println!("found hash {hash} {version_id} {project_id}");
-
                         vals.push((
                             CacheValue::File(CachedFile {
                                 hash,
@@ -1307,7 +1290,6 @@ impl CachedEntry {
                                 false,
                             ));
 
-                            println!("found update {hash} {game_version} {loader} {version_id}");
                             vals.push((
                                 CacheValue::FileUpdate(CachedFileUpdate {
                                     hash: hash.clone(),

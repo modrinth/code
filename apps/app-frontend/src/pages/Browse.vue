@@ -233,14 +233,14 @@ async function refreshSearch() {
   if (currentPage.value !== 1) {
     params.push(`offset=${offset}`)
   }
-  let url = 'search'
+  let url = ''
   if (params.length > 0) {
     for (let i = 0; i < params.length; i++) {
       url += i === 0 ? `?${params[i]}` : `&${params[i]}`
     }
   }
 
-  let rawResults = await get_search_results(`?${url}`)
+  let rawResults = await get_search_results(`${url}`)
   if (!rawResults) {
     rawResults = {
       result: {
@@ -585,7 +585,10 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
           <ClearIcon /> Clear filters
         </Button>
         <div
-          v-if="(isModProject && ignoreInstanceLoaders) || projectType === 'shader'"
+          v-if="
+            (isModProject && (ignoreInstanceLoaders || !instanceContext)) ||
+            projectType === 'shader'
+          "
           class="loaders"
         >
           <h2>Loaders</h2>

@@ -536,7 +536,7 @@ const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
 
-watch(searchFilter, () => (currentPage.value = 1))
+watch([searchFilter, selectedProjectType], () => (currentPage.value = 1))
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
