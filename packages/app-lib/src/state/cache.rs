@@ -56,7 +56,7 @@ impl CacheValueType {
         }
     }
 
-    pub fn from_str(val: &str) -> CacheValueType {
+    pub fn from_string(val: &str) -> CacheValueType {
         match val {
             "project" => CacheValueType::Project,
             "version" => CacheValueType::Version,
@@ -731,7 +731,7 @@ impl CachedEntry {
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,
-                        type_: CacheValueType::from_str(&row.data_type),
+                        type_: CacheValueType::from_string(&row.data_type),
                         data: Some(data),
                         expires: row.expires,
                     });

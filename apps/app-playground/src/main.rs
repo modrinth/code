@@ -89,7 +89,7 @@ async fn main() -> theseus::Result<()> {
     .await?;
     install_zipped_mrpack(pack, profile_path.to_string()).await?;
 
-    let projects = profile::get_projects(&profile_path).await?;
+    let projects = profile::get_projects(&profile_path, None).await?;
 
     for (path, file) in projects {
         println!(

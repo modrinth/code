@@ -268,7 +268,7 @@ impl DirectoryInfo {
                     return Err(crate::ErrorKind::DirectoryMoveError(format!("Cannot move directory to {}: directory is not writeable", move_dir.display())).into());
                 }
 
-                const MOVE_DIRS: &[&'static str] = &[
+                const MOVE_DIRS: &[&str] = &[
                     CACHES_FOLDER_NAME,
                     LAUNCHER_LOGS_FOLDER_NAME,
                     PROFILES_FOLDER_NAME,
@@ -505,7 +505,7 @@ impl DirectoryInfo {
             settings.custom_dir = Some(new_dir);
         }
 
-        settings.prev_custom_dir = settings.custom_dir.clone();
+        settings.prev_custom_dir.clone_from(&settings.custom_dir);
         if settings.custom_dir.is_none() {
             settings.custom_dir = Some(app_dir.to_string_lossy().to_string());
         }
