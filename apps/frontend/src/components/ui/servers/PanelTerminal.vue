@@ -170,5 +170,7 @@ watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
 <style scoped>
 .monocraft-font {
   font-family: "Monocraft", monospace;
+  font-size: 18px;
+  line-height: 1.5em;
 }
 </style>
