@@ -9,6 +9,7 @@ use std::collections::HashMap;
 use std::fmt::Display;
 use std::hash::Hash;
 use std::path::{Path, PathBuf};
+use tokio::sync::mpsc;
 
 // 1 day
 const DEFAULT_ID: &str = "0";
@@ -830,28 +831,43 @@ impl CachedEntry {
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
                 let keys = keys.into_iter().collect::<Vec<_>>();
-                let mut results = vec![];
+
+                let (tx, mut rx) = mpsc::channel(32);
 
                 for keys in keys.chunks(100) {
-                    let mut result = fetch_json::<Vec<_>>(
-                        Method::GET,
-                        &*format!(
-                            "{}{}?ids={}",
-                            $api_url,
-                            $url_suffix,
-                            serde_json::to_string(&keys)?
-                        ),
-                        None,
-                        None,
-                        &fetch_semaphore,
-                        pool,
-                    )
-                    .await?
-                    .into_iter()
-                    .map($cache_variant)
-                    .collect::<Vec<_>>();
+                    let json = serde_json::to_string(&keys)?;
 
-                    results.append(&mut result);
+                    let tx = tx.clone();
+                    tokio::task::spawn(async move {
+                        let state = crate::state::State::get().await?;
+
+                        let result = fetch_json::<Vec<_>>(
+                            Method::GET,
+                            &*format!(
+                                "{}{}?ids={}",
+                                $api_url, $url_suffix, json
+                            ),
+                            None,
+                            None,
+                            &state.fetch_semaphore,
+                            &state.pool,
+                        )
+                        .await?
+                        .into_iter()
+                        .map($cache_variant)
+                        .collect::<Vec<_>>();
+
+                        tx.send(result).await.unwrap();
+
+                        Ok::<(), crate::Error>(())
+                    });
+                }
+
+                let mut results = vec![];
+
+                drop(tx);
+                while let Some(mut message) = rx.recv().await {
+                    results.append(&mut message);
                 }
 
                 let mut values = vec![];
