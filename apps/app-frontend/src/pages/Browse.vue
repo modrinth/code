@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, readonly, shallowRef, watch, onUnmounted } from 'vue'
+import { computed, nextTick, ref, readonly, shallowRef, watch } from 'vue'
 import { ClearIcon, SearchIcon, ClientIcon, ServerIcon, XIcon } from '@modrinth/assets'
 import {
   Pagination,
@@ -19,7 +19,6 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { get_search_results } from '@/helpers/cache.js'
@@ -724,7 +723,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
         class="pagination-before"
         @switch-page="onSearchChange"
       />
-      <SplashScreen v-if="loading" />
+      <section v-if="loading" class="offline">Loading...</section>
       <section v-else-if="offline && results.total_hits === 0" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
       </section>

@@ -221,9 +221,19 @@ impl DirectoryInfo {
 
                 #[cfg(windows)]
                 {
-                    use std::os::windows::fs::MetadataExt;
-                    Ok(old_dir.metadata()?.volume_serial_number()
-                        == new_dir.metadata()?.volume_serial_number())
+                    let old_dir = crate::util::io::canonicalize(old_dir)?;
+                    let new_dir = crate::util::io::canonicalize(new_dir)?;
+
+                    let old_component = old_dir.components().next();
+                    let new_component = new_dir.components().next();
+
+                    match (old_component, new_component) {
+                        (
+                            Some(std::path::Component::Prefix(old)),
+                            Some(std::path::Component::Prefix(new)),
+                        ) => Ok(old.as_os_str() == new.as_os_str()),
+                        _ => Ok(false),
+                    }
                 }
             }
 
