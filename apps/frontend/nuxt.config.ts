@@ -453,6 +453,7 @@ function getDomain() {
       return "https://modrinth.com";
     }
   } else {
-    return "http://localhost:3000";
+    const port = process.env.PORT || 3000;
+    return `http://localhost:${port}`;
   }
 }
