@@ -241,7 +241,7 @@ function retryDirectoryChange() {
       </div>
       <div class="input-group push-right">
         <a :href="supportLink" class="btn" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-        <button v-if="closable" class="btn" @clicdck="errorModal.hide()"><XIcon /> Close</button>
+        <button v-if="closable" class="btn" @click="errorModal.hide()"><XIcon /> Close</button>
       </div>
     </div>
   </Modal>
@@ -296,5 +296,9 @@ function retryDirectoryChange() {
   flex-direction: column;
   gap: var(--gap-md);
   padding: var(--gap-lg);
+}
+
+.markdown-body {
+  overflow: auto;
 }
 </style>
