@@ -162,9 +162,11 @@ impl Process {
 
         loop {
             if let Some(t) = self.try_wait().await? {
+                println!("Minecraft Child exited with status {} pid: {}", t, self.pid);
                 mc_exit_status = t;
                 break;
             }
+            println!("Still running Minecraft Child pid: {}", self.pid);
             // sleep for 10ms
             tokio::time::sleep(tokio::time::Duration::from_millis(50)).await;
 
@@ -176,6 +178,17 @@ impl Process {
             )
             .await;
         }
+
+        let state = crate::State::get().await?;
+        Self::remove(self.pid as u32, &state.pool).await?;
+
+        emit_process(
+            &self.profile_path,
+            self.pid as u32,
+            ProcessPayloadType::Finished,
+            "Exited process",
+        )
+            .await?;
 
         // Now fully complete- update playtime one last time
         update_playtime(&mut last_updated_playtime, &self.profile_path, true)
@@ -197,10 +210,7 @@ impl Process {
             }
         });
 
-        let state = crate::State::get().await?;
         let _ = state.discord_rpc.clear_to_default(true).await;
-
-        Self::remove(self.pid as u32, &state.pool).await?;
 
         // If in tauri, window should show itself again after process exists if it was hidden
         #[cfg(feature = "tauri")]
@@ -226,14 +236,6 @@ impl Process {
                 }
             }
         }
-
-        emit_process(
-            &self.profile_path,
-            self.pid as u32,
-            ProcessPayloadType::Finished,
-            "Exited process",
-        )
-        .await?;
 
         Ok(mc_exit_status)
     }
