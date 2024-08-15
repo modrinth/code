@@ -7,7 +7,7 @@ import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { handleError } from '@/store/notifications.js'
 import dayjs from 'dayjs'
-import { get_search_results } from '@/helpers/cache.js'
+import { useFeaturedProjects } from '@/store/featuredProjects.js'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -51,36 +51,26 @@ const getInstances = async () => {
   filter.value = filters.join(' AND ')
 }
 
-const getFeaturedModpacks = async () => {
-  const response = await get_search_results(
-    `?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
-  )
-
-  if (response) {
-    featuredModpacks.value = response.result.hits
-  } else {
-    featuredModpacks.value = []
-  }
-}
-const getFeaturedMods = async () => {
-  const response = await get_search_results('?facets=[["project_type:mod"]]&limit=10&index=follows')
-
-  if (response) {
-    featuredMods.value = response.result.hits
-  } else {
-    featuredModpacks.value = []
-  }
-}
-
 await getInstances()
 
-await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+let featuredProjects = useFeaturedProjects()
+
+async function updateFeaturedProjects() {
+  let [modpacks, mods] = await Promise.all([
+    await featuredProjects.getFeaturedModpack(filter),
+    await featuredProjects.getFeaturedMods(),
+  ])
+  featuredModpacks.value = modpacks
+  featuredMods.value = mods
+}
+
+await updateFeaturedProjects()
 
 const unlistenProfile = await profile_listener(async (e) => {
   await getInstances()
 
   if (e.event === 'added' || e.event === 'created' || e.event === 'removed') {
-    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+    await updateFeaturedProjects()
   }
 })
 
