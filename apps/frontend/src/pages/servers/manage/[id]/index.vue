@@ -10,10 +10,10 @@
       <div class="experimental-styles-within flex flex-row items-center justify-between">
         <div class="flex flex-row items-center gap-4">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
-          <UiServersPanelServerStatus :is-online="isServerOnline" />
+          <UiServersPanelServerStatus :state="serverPowerState" />
         </div>
         <UiServersPanelServerActionButton
-          :is-online="isServerOnline"
+          :is-online="serverPowerState === 'running'"
           :is-actioning="isActioning"
           @action="sendPowerAction"
         />
@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-import type { Stats, WSAuth, WSEvent } from "~/types/servers";
+import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
 
 const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
@@ -45,6 +45,7 @@ const isConnected = ref(false);
 const consoleOutput = ref<string[]>([]);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
+const serverPowerState = ref<ServerState>("stopped");
 
 const stats = ref<Stats>({
   current: {
@@ -66,8 +67,6 @@ const stats = ref<Stats>({
     ram: [],
   },
 });
-
-const isServerOnline = computed(() => stats.value.current.cpu_percent !== null);
 
 const app = useNuxtApp();
 const route = useRoute();
@@ -105,7 +104,7 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
   app.$notify({
     group: "server",
     title: `${actionName}ing server`,
-    text: `Your server is now ${actionName}ing, this may take a few moments`,
+    text: `Your server is now ${actionName.toLocaleLowerCase()}ing, this may take a few moments`,
     type: "success",
   });
 
@@ -161,13 +160,19 @@ const handleWebSocketMessage = (data: WSEvent) => {
       consoleOutput.value.push(data.message);
       break;
     case "stats":
-      // FIX PLS
       updateStats(data as any);
       break;
     case "auth-expiring":
       reauth();
       break;
+    case "power-state":
+      updatePowerState(data.state);
+      break;
   }
+};
+
+const updatePowerState = (state: ServerState) => {
+  serverPowerState.value = state;
 };
 
 const updateStats = (data: Stats["current"]) => {
