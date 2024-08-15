@@ -141,7 +141,7 @@ onMounted(() => {
   updateClientHeight();
   updateItemHeights();
   window.addEventListener("resize", updateClientHeight);
-  scrollToBottom();
+  // scrollToBottom();
 });
 
 onUnmounted(() => {
