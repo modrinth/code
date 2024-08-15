@@ -91,9 +91,12 @@ export interface WSAuth {
   token: string;
 }
 
+export type ServerState = "running" | "stopped" | "crashed";
+
 export interface WSEvent {
   event: string;
   message: string;
+  state: ServerState;
 }
 
 export interface Servers {
