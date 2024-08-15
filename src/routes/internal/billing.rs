@@ -670,6 +670,20 @@ pub async fn initiate_payment(
             ..Default::default()
         };
 
+        let mut metadata = HashMap::new();
+        metadata.insert("modrinth_user_id".to_string(), to_base62(user.id.0));
+        metadata.insert(
+            "modrinth_price_id".to_string(),
+            to_base62(price_item.id.0 as u64),
+        );
+        if let Some(interval) = payment_request.interval {
+            metadata.insert(
+                "modrinth_subscription_interval".to_string(),
+                interval.as_str().to_string(),
+            );
+        }
+        update_payment_intent.metadata = Some(metadata);
+
         if let PaymentRequestType::PaymentMethod { .. } = payment_request.type_ {
             update_payment_intent.payment_method = Some(payment_method.id.clone());
         }
@@ -897,6 +911,7 @@ pub async fn stripe_webhook(
                             user_subscription.expires += duration;
                             user_subscription.status = SubscriptionStatus::Active;
                             user_subscription.interval = interval;
+                            user_subscription.price_id = metadata.product_price.id;
                             user_subscription.upsert(&mut transaction).await?;
                         } else {
                             user_subscription_item::UserSubscriptionItem {
@@ -952,6 +967,7 @@ pub async fn stripe_webhook(
                         if let Some(mut user_subscription) = metadata.user_subscription {
                             user_subscription.status = SubscriptionStatus::PaymentProcessing;
                             user_subscription.interval = interval;
+                            user_subscription.price_id = metadata.product_price.id;
                             user_subscription.upsert(&mut transaction).await?;
                         } else {
                             user_subscription_item::UserSubscriptionItem {
@@ -988,6 +1004,8 @@ pub async fn stripe_webhook(
                                 if let Some(mut user_subscription) = metadata.user_subscription {
                                     user_subscription.last_charge = Some(Utc::now());
                                     user_subscription.status = SubscriptionStatus::PaymentFailed;
+                                    user_subscription.price_id = metadata.product_price.id;
+                                    user_subscription.interval = interval;
                                     user_subscription.upsert(&mut transaction).await?;
                                 } else {
                                     user_subscription_item::UserSubscriptionItem {
