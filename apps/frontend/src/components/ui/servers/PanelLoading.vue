@@ -29,7 +29,7 @@
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
             <img
-              src="/_nuxt/assets/images/games/minecraft.png"
+              src="~/assets/images/games/minecraft.png"
               alt="Minecraft Logo"
               class="size-5"
             /><span class="text-sm font-semibold">Minecraft</span>
