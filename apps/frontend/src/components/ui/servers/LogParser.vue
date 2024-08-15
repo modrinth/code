@@ -1,5 +1,5 @@
 <template>
-  <div class="whitespace-nowrap px-6 py-1 text-white hover:bg-[#323232]" v-html="parsedLog"></div>
+  <div class="parsed-log whitespace-nowrap px-6 py-1" v-html="parsedLog"></div>
 </template>
 
 <script lang="ts">
@@ -54,3 +54,17 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+html.light-mode .parsed-log:hover {
+  background-color: #ccc;
+}
+
+html.dark-mode .parsed-log:hover {
+  background-color: #333;
+}
+
+html.oled-mode .parsed-log:hover {
+  background-color: #333;
+}
+</style>

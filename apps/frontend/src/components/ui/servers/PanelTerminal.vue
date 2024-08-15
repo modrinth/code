@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-terminal-holy-shit
-    class="monocraft-font console relative h-full w-full overflow-hidden rounded-xl bg-black text-sm"
+    class="monocraft-font console relative h-full w-full overflow-hidden rounded-xl text-sm"
   >
     <div
       data-pyro-terminal-root
@@ -172,5 +172,17 @@ watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
   font-family: "Monocraft", monospace;
   font-size: 18px;
   line-height: 1.5em;
+}
+
+html.light-mode .console {
+  background: var(--color-bg);
+}
+
+html.dark-mode .console {
+  background: black;
+}
+
+html.oled-mode .console {
+  background: black;
 }
 </style>
