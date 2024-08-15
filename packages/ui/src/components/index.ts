@@ -48,3 +48,6 @@ export { default as NavStack } from './nav/NavStack.vue'
 export { default as Categories } from './search/Categories.vue'
 export { default as SearchDropdown } from './search/SearchDropdown.vue'
 export { default as SearchFilter } from './search/SearchFilter.vue'
+
+// Billing
+export { default as PurchaseModal } from './billing/PurchaseModal.vue'

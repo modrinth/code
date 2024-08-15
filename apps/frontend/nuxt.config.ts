@@ -77,6 +77,13 @@ export default defineNuxtConfig({
           title: "Modrinth mods",
         },
       ],
+      script: [
+        {
+          src: "https://js.stripe.com/v3/",
+          defer: true,
+          async: true,
+        },
+      ],
     },
   },
   vite: {
@@ -177,7 +184,7 @@ export default defineNuxtConfig({
         $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
         $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
         // TODO: dehardcode
-        $fetch(`http://127.0.0.1:8000/_internal/billing/products`, headers),
+        $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
       ]);
 
       state.categories = categories;
