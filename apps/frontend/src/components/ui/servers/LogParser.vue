@@ -1,5 +1,5 @@
 <template>
-  <div class="px-6 py-1 text-white hover:bg-[#323232]" v-html="parsedLog"></div>
+  <div class="whitespace-nowrap px-6 py-1 text-white hover:bg-[#323232]" v-html="parsedLog"></div>
 </template>
 
 <script lang="ts">
