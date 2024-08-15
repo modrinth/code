@@ -8,11 +8,11 @@ export const useFeaturedProjects = defineStore('featuredProjects', {
   }),
   actions: {
     async getFeaturedModpack(filter) {
-      if (this.modpacks !== undefined && this.modpacks.length !== 0) {
+      if (this.modpacks?.length) {
         return this.modpacks
       }
 
-      let offset = Math.floor(Math.random() * 100)
+      const offset = Math.floor(Math.random() * 100)
 
       const response = await get_search_results(
         `?facets=[["project_type:modpack"]]&limit=10&filters=${filter.value}&offset=${offset}`,
@@ -27,11 +27,11 @@ export const useFeaturedProjects = defineStore('featuredProjects', {
       return this.modpacks
     },
     async getFeaturedMods() {
-      if (this.mods !== undefined && this.mods.length !== 0) {
+      if (this.mods?.length) {
         return this.mods
       }
 
-      let offset = Math.floor(Math.random() * 100)
+      const offset = Math.floor(Math.random() * 100)
 
       const response = await get_search_results(
         `?facets=[["project_type:mod"]]&limit=10&offset=${offset}`,
