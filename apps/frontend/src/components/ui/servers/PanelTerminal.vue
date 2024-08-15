@@ -31,7 +31,22 @@
       class="absolute right-4 top-4 grid size-12 place-content-center rounded-lg bg-[#242424] transition-transform duration-300 hover:scale-110"
       @click="$emit('toggle-full-screen')"
     >
-      <ExpandIcon class="flex !size-6" />
+      <ExpandIcon v-if="!props.fullScreen" class="flex !size-6" />
+      <svg
+        v-else
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        class="size-6"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M9 9V4.5M9 9H4.5M9 9 3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5 5.25 5.25"
+        />
+      </svg>
     </button>
   </div>
 </template>
