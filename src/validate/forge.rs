@@ -1,5 +1,5 @@
 use crate::validate::{filter_out_packs, SupportedGameVersions, ValidationError, ValidationResult};
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::DateTime;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -16,10 +16,7 @@ impl super::Validator for ForgeValidator {
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 1.13, the first forge version which uses the new TOML system
-        SupportedGameVersions::PastDate(DateTime::<Utc>::from_naive_utc_and_offset(
-            NaiveDateTime::from_timestamp_opt(1540122067, 0).unwrap(),
-            Utc,
-        ))
+        SupportedGameVersions::PastDate(DateTime::from_timestamp(1540122067, 0).unwrap())
     }
 
     fn validate(
@@ -55,14 +52,8 @@ impl super::Validator for LegacyForgeValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Times between versions 1.5.2 to 1.12.2, which all use the legacy way of defining mods
         SupportedGameVersions::Range(
-            DateTime::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(0, 0).unwrap(),
-                Utc,
-            ),
-            DateTime::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(1540122066, 0).unwrap(),
-                Utc,
-            ),
+            DateTime::from_timestamp(0, 0).unwrap(),
+            DateTime::from_timestamp(1540122066, 0).unwrap(),
         )
     }
 

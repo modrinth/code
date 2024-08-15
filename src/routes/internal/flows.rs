@@ -30,6 +30,7 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
+use std::str::FromStr;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use validator::Validate;
@@ -217,6 +218,7 @@ impl TempUser {
                     None
                 },
                 venmo_handle: None,
+                stripe_customer_id: None,
                 totp_secret: None,
                 username,
                 name: self.name,
@@ -680,7 +682,6 @@ impl AuthProvider {
                     pub id: String,
                     pub email: String,
                     pub name: Option<String>,
-                    pub bio: Option<String>,
                     pub picture: Option<String>,
                 }
 
@@ -1523,6 +1524,7 @@ pub async fn create_account_with_password(
         paypal_country: None,
         paypal_email: None,
         venmo_handle: None,
+        stripe_customer_id: None,
         totp_secret: None,
         username: new_account.username.clone(),
         name: Some(new_account.username),
@@ -2157,6 +2159,7 @@ pub async fn set_email(
     redis: Data<RedisPool>,
     email: web::Json<SetEmail>,
     session_queue: Data<AuthQueue>,
+    stripe_client: Data<stripe::Client>,
 ) -> Result<HttpResponse, ApiError> {
     email
         .0
@@ -2195,6 +2198,22 @@ pub async fn set_email(
             "If you did not make this change, please contact us immediately through our support channels on Discord or via email (support@modrinth.com).",
             None,
         )?;
+    }
+
+    if let Some(customer_id) = user
+        .stripe_customer_id
+        .as_ref()
+        .and_then(|x| stripe::CustomerId::from_str(x).ok())
+    {
+        stripe::Customer::update(
+            &stripe_client,
+            &customer_id,
+            stripe::UpdateCustomer {
+                email: Some(&email.email),
+                ..Default::default()
+            },
+        )
+        .await?;
     }
 
     let flow = Flow::ConfirmEmail {

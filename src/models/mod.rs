@@ -3,6 +3,7 @@ pub mod v2;
 pub mod v3;
 
 pub use v3::analytics;
+pub use v3::billing;
 pub use v3::collections;
 pub use v3::ids;
 pub use v3::images;

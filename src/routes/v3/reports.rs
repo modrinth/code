@@ -260,11 +260,8 @@ pub async fn reports(
             ",
             count.count as i64
         )
-        .fetch_many(&**pool)
-        .try_filter_map(|e| async {
-            Ok(e.right()
-                .map(|m| crate::database::models::ids::ReportId(m.id)))
-        })
+        .fetch(&**pool)
+        .map_ok(|m| crate::database::models::ids::ReportId(m.id))
         .try_collect::<Vec<crate::database::models::ids::ReportId>>()
         .await?
     } else {
@@ -278,11 +275,8 @@ pub async fn reports(
             user.id.0 as i64,
             count.count as i64
         )
-        .fetch_many(&**pool)
-        .try_filter_map(|e| async {
-            Ok(e.right()
-                .map(|m| crate::database::models::ids::ReportId(m.id)))
-        })
+        .fetch(&**pool)
+        .map_ok(|m| crate::database::models::ids::ReportId(m.id))
         .try_collect::<Vec<crate::database::models::ids::ReportId>>()
         .await?
     };

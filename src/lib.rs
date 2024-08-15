@@ -58,6 +58,7 @@ pub struct LabrinthConfig {
     pub active_sockets: web::Data<RwLock<ActiveSockets>>,
     pub automated_moderation_queue: web::Data<AutomatedModerationQueue>,
     pub rate_limiter: KeyedRateLimiter,
+    pub stripe_client: stripe::Client,
 }
 
 pub fn app_setup(
@@ -75,14 +76,16 @@ pub fn app_setup(
 
     let automated_moderation_queue = web::Data::new(AutomatedModerationQueue::default());
 
-    let automated_moderation_queue_ref = automated_moderation_queue.clone();
-    let pool_ref = pool.clone();
-    let redis_pool_ref = redis_pool.clone();
-    actix_rt::spawn(async move {
-        automated_moderation_queue_ref
-            .task(pool_ref, redis_pool_ref)
-            .await;
-    });
+    {
+        let automated_moderation_queue_ref = automated_moderation_queue.clone();
+        let pool_ref = pool.clone();
+        let redis_pool_ref = redis_pool.clone();
+        actix_rt::spawn(async move {
+            automated_moderation_queue_ref
+                .task(pool_ref, redis_pool_ref)
+                .await;
+        });
+    }
 
     let mut scheduler = scheduler::Scheduler::new();
 
@@ -257,6 +260,17 @@ pub fn app_setup(
         });
     }
 
+    let stripe_client = stripe::Client::new(dotenvy::var("STRIPE_API_KEY").unwrap());
+    {
+        let pool_ref = pool.clone();
+        let redis_ref = redis_pool.clone();
+        let stripe_client_ref = stripe_client.clone();
+
+        actix_rt::spawn(async move {
+            routes::internal::billing::task(stripe_client_ref, pool_ref, redis_ref).await;
+        });
+    }
+
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),
     };
@@ -279,6 +293,7 @@ pub fn app_setup(
         active_sockets,
         automated_moderation_queue,
         rate_limiter: limiter,
+        stripe_client,
     }
 }
 
@@ -311,6 +326,7 @@ pub fn app_config(cfg: &mut web::ServiceConfig, labrinth_config: LabrinthConfig)
     .app_data(web::Data::new(labrinth_config.maxmind.clone()))
     .app_data(labrinth_config.active_sockets.clone())
     .app_data(labrinth_config.automated_moderation_queue.clone())
+    .app_data(web::Data::new(labrinth_config.stripe_client.clone()))
     .configure(routes::v2::config)
     .configure(routes::v3::config)
     .configure(routes::internal::config)
@@ -416,6 +432,7 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("SITE_VERIFY_EMAIL_PATH");
     failed |= check_var::<String>("SITE_RESET_PASSWORD_PATH");
+    failed |= check_var::<String>("SITE_BILLING_PATH");
 
     failed |= check_var::<String>("BEEHIIV_PUBLICATION_ID");
     failed |= check_var::<String>("BEEHIIV_API_KEY");
@@ -437,6 +454,9 @@ pub fn check_env_vars() -> bool {
     failed |= check_var::<u64>("PAYOUTS_BUDGET");
 
     failed |= check_var::<String>("FLAME_ANVIL_URL");
+
+    failed |= check_var::<String>("STRIPE_API_KEY");
+    failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
 
     failed
 }

@@ -1,5 +1,3 @@
-use thiserror::Error;
-
 pub use super::collections::CollectionId;
 pub use super::images::ImageId;
 pub use super::notifications::NotificationId;
@@ -15,6 +13,9 @@ pub use super::teams::TeamId;
 pub use super::threads::ThreadId;
 pub use super::threads::ThreadMessageId;
 pub use super::users::UserId;
+pub use crate::models::billing::UserSubscriptionId;
+pub use crate::models::v3::billing::{ProductId, ProductPriceId};
+use thiserror::Error;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
 /// long when encoded as base62.
@@ -133,6 +134,9 @@ base62_id_impl!(OAuthClientId, OAuthClientId);
 base62_id_impl!(OAuthRedirectUriId, OAuthRedirectUriId);
 base62_id_impl!(OAuthClientAuthorizationId, OAuthClientAuthorizationId);
 base62_id_impl!(PayoutId, PayoutId);
+base62_id_impl!(ProductId, ProductId);
+base62_id_impl!(ProductPriceId, ProductPriceId);
+base62_id_impl!(UserSubscriptionId, UserSubscriptionId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

@@ -232,6 +232,30 @@ generate_ids!(
     PayoutId
 );
 
+generate_ids!(
+    pub generate_product_id,
+    ProductId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM products WHERE id=$1)",
+    ProductId
+);
+
+generate_ids!(
+    pub generate_product_price_id,
+    ProductPriceId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM products_prices WHERE id=$1)",
+    ProductPriceId
+);
+
+generate_ids!(
+    pub generate_user_subscription_id,
+    UserSubscriptionId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM users_subscriptions WHERE id=$1)",
+    UserSubscriptionId
+);
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Hash, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
@@ -350,6 +374,17 @@ pub struct OAuthAccessTokenId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[sqlx(transparent)]
 pub struct PayoutId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct ProductId(pub i64);
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct ProductPriceId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[sqlx(transparent)]
+pub struct UserSubscriptionId(pub i64);
 
 use crate::models::ids;
 
@@ -502,5 +537,37 @@ impl From<ids::PayoutId> for PayoutId {
 impl From<PayoutId> for ids::PayoutId {
     fn from(id: PayoutId) -> Self {
         ids::PayoutId(id.0 as u64)
+    }
+}
+
+impl From<ids::ProductId> for ProductId {
+    fn from(id: ids::ProductId) -> Self {
+        ProductId(id.0 as i64)
+    }
+}
+impl From<ProductId> for ids::ProductId {
+    fn from(id: ProductId) -> Self {
+        ids::ProductId(id.0 as u64)
+    }
+}
+impl From<ids::ProductPriceId> for ProductPriceId {
+    fn from(id: ids::ProductPriceId) -> Self {
+        ProductPriceId(id.0 as i64)
+    }
+}
+impl From<ProductPriceId> for ids::ProductPriceId {
+    fn from(id: ProductPriceId) -> Self {
+        ids::ProductPriceId(id.0 as u64)
+    }
+}
+
+impl From<ids::UserSubscriptionId> for UserSubscriptionId {
+    fn from(id: ids::UserSubscriptionId) -> Self {
+        UserSubscriptionId(id.0 as i64)
+    }
+}
+impl From<UserSubscriptionId> for ids::UserSubscriptionId {
+    fn from(id: UserSubscriptionId) -> Self {
+        ids::UserSubscriptionId(id.0 as u64)
     }
 }

@@ -17,7 +17,7 @@ actix-multipart = "0.6.1"
 actix-cors = "0.7.0"
 actix-ws = "0.2.5"
 actix-files = "0.6.5"
-actix-web-prom = "0.7.0"
+actix-web-prom = { version = "0.8.0", features = ["process"]}
 governor = "0.6.3"
 
 tokio = { version = "1.35.1", features = ["sync"] }
@@ -110,11 +110,15 @@ lettre = "0.11.3"
 derive-new = "0.6.0"
 rust_iso3166 = "0.1.11"
 
-jemallocator = {version = "0.3.2", optional = true}
+jemallocator = {version = "0.5.4", optional = true}
+
+async-stripe = { version = "0.37.3", features = ["runtime-tokio-hyper-rustls"] }
+rusty-money = "0.4.1"
+json-patch = "*"
 
 [dev-dependencies]
 actix-http = "3.4.0"
-json-patch = "*"
+
 [profile.dev]
 opt-level = 0                # Minimal optimization, speeds up compilation
 lto = false                  # Disables Link Time Optimization

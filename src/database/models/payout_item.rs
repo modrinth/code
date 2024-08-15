@@ -74,19 +74,17 @@ impl Payout {
             ",
             &payout_ids.into_iter().map(|x| x.0).collect::<Vec<_>>()
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|r| Payout {
-                id: PayoutId(r.id),
-                user_id: UserId(r.user_id),
-                created: r.created,
-                status: PayoutStatus::from_string(&r.status),
-                amount: r.amount,
-                method: r.method.map(|x| PayoutMethodType::from_string(&x)),
-                method_address: r.method_address,
-                platform_id: r.platform_id,
-                fee: r.fee,
-            }))
+        .fetch(exec)
+        .map_ok(|r| Payout {
+            id: PayoutId(r.id),
+            user_id: UserId(r.user_id),
+            created: r.created,
+            status: PayoutStatus::from_string(&r.status),
+            amount: r.amount,
+            method: r.method.map(|x| PayoutMethodType::from_string(&x)),
+            method_address: r.method_address,
+            platform_id: r.platform_id,
+            fee: r.fee,
         })
         .try_collect::<Vec<Payout>>()
         .await?;

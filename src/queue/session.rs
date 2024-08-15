@@ -98,11 +98,8 @@ impl AuthQueue {
                 WHERE refresh_expires <= NOW()
                 "
             )
-            .fetch_many(&mut *transaction)
-            .try_filter_map(|e| async {
-                Ok(e.right()
-                    .map(|x| (SessionId(x.id), x.session, UserId(x.user_id))))
-            })
+            .fetch(&mut *transaction)
+            .map_ok(|x| (SessionId(x.id), x.session, UserId(x.user_id)))
             .try_collect::<Vec<(SessionId, String, UserId)>>()
             .await?;
 

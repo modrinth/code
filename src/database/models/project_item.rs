@@ -358,8 +358,8 @@ impl Project {
                 ",
                 id as ProjectId,
             )
-            .fetch_many(&mut **transaction)
-            .try_filter_map(|e| async { Ok(e.right().map(|x| ThreadId(x.id))) })
+            .fetch(&mut **transaction)
+            .map_ok(|x| ThreadId(x.id))
             .try_collect::<Vec<_>>()
             .await?;
 
@@ -443,8 +443,8 @@ impl Project {
                 ",
                 project.inner.team_id as TeamId,
             )
-            .fetch_many(&mut **transaction)
-            .try_filter_map(|e| async { Ok(e.right().map(|x| UserId(x.user_id))) })
+            .fetch(&mut **transaction)
+            .map_ok(|x| UserId(x.user_id))
             .try_collect::<Vec<_>>()
             .await?;
 
@@ -874,19 +874,17 @@ impl Project {
             ",
             id as ProjectId
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|x| {
-                (
-                    x.dependency_id.map(VersionId),
-                    if x.mod_id == Some(0) {
-                        None
-                    } else {
-                        x.mod_id.map(ProjectId)
-                    },
-                    x.mod_dependency_id.map(ProjectId),
-                )
-            }))
+        .fetch(exec)
+        .map_ok(|x| {
+            (
+                x.dependency_id.map(VersionId),
+                if x.mod_id == Some(0) {
+                    None
+                } else {
+                    x.mod_id.map(ProjectId)
+                },
+                x.mod_dependency_id.map(ProjectId),
+            )
         })
         .try_collect::<Dependencies>()
         .await?;

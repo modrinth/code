@@ -6,9 +6,9 @@ use crate::models::pats::Scopes;
 use crate::models::users::{Role, User, UserId, UserPayoutData};
 use crate::queue::session::AuthQueue;
 use crate::routes::internal::session::get_session_metadata;
+use actix_web::http::header::{HeaderValue, AUTHORIZATION};
 use actix_web::HttpRequest;
 use chrono::Utc;
-use reqwest::header::{HeaderValue, AUTHORIZATION};
 
 pub async fn get_user_from_headers<'a, E>(
     req: &HttpRequest,
@@ -69,6 +69,7 @@ where
             venmo_handle: db_user.venmo_handle,
             balance: db_user.balance,
         }),
+        stripe_customer_id: db_user.stripe_customer_id,
     };
 
     if let Some(required_scopes) = required_scopes {

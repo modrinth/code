@@ -18,7 +18,7 @@ jobs:
 
       # Start Docker Compose
       - name: Start Docker Compose
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Install cargo tarpaulin
         uses: taiki-e/install-action@cargo-tarpaulin

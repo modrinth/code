@@ -144,9 +144,8 @@ impl Thread {
             ",
             &thread_ids_parsed
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|x| Thread {
+        .fetch(exec)
+            .map_ok(|x| Thread {
                 id: ThreadId(x.id),
                 project_id: x.mod_id.map(ProjectId),
                 report_id: x.report_id.map(ReportId),
@@ -161,8 +160,7 @@ impl Thread {
                     messages
                 },
                 members: x.members.unwrap_or_default().into_iter().map(UserId).collect(),
-            }))
-        })
+            })
         .try_collect::<Vec<Thread>>()
         .await?;
 
@@ -236,17 +234,14 @@ impl ThreadMessage {
             ",
             &message_ids_parsed
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|x| ThreadMessage {
-                id: ThreadMessageId(x.id),
-                thread_id: ThreadId(x.thread_id),
-                author_id: x.author_id.map(UserId),
-                body: serde_json::from_value(x.body)
-                    .unwrap_or(MessageBody::Deleted { private: false }),
-                created: x.created,
-                hide_identity: x.hide_identity,
-            }))
+        .fetch(exec)
+        .map_ok(|x| ThreadMessage {
+            id: ThreadMessageId(x.id),
+            thread_id: ThreadId(x.thread_id),
+            author_id: x.author_id.map(UserId),
+            body: serde_json::from_value(x.body).unwrap_or(MessageBody::Deleted { private: false }),
+            created: x.created,
+            hide_identity: x.hide_identity,
         })
         .try_collect::<Vec<ThreadMessage>>()
         .await?;

@@ -135,24 +135,22 @@ impl Image {
             report_id.map(|x| x.0),
 
         )
-        .fetch_many(&mut **transaction)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|row| {
-                let id = ImageId(row.id);
+        .fetch(&mut **transaction)
+        .map_ok(|row| {
+            let id = ImageId(row.id);
 
-                Image {
-                    id,
-                    url: row.url,
-                    size: row.size as u64,
-                    created: row.created,
-                    owner_id: UserId(row.owner_id),
-                    context: row.context,
-                    project_id: row.mod_id.map(ProjectId),
-                    version_id: row.version_id.map(VersionId),
-                    thread_message_id: row.thread_message_id.map(ThreadMessageId),
-                    report_id: row.report_id.map(ReportId),
-                }
-            }))
+            Image {
+                id,
+                url: row.url,
+                size: row.size as u64,
+                created: row.created,
+                owner_id: UserId(row.owner_id),
+                context: row.context,
+                project_id: row.mod_id.map(ProjectId),
+                version_id: row.version_id.map(VersionId),
+                thread_message_id: row.thread_message_id.map(ThreadMessageId),
+                report_id: row.report_id.map(ReportId),
+            }
         })
         .try_collect::<Vec<Image>>()
         .await

@@ -14,7 +14,6 @@ pub const DELETED_USER: UserId = UserId(127155982985829);
 bitflags::bitflags! {
     #[derive(Copy, Clone, Debug)]
     pub struct Badges: u64 {
-        // 1 << 0 unused - ignore + replace with something later
         const MIDAS = 1 << 0;
         const EARLY_MODPACK_ADOPTER = 1 << 1;
         const EARLY_RESPACK_ADOPTER = 1 << 2;
@@ -53,6 +52,7 @@ pub struct User {
     pub has_password: Option<bool>,
     pub has_totp: Option<bool>,
     pub payout_data: Option<UserPayoutData>,
+    pub stripe_customer_id: Option<String>,
 
     // DEPRECATED. Always returns None
     pub github_id: Option<u64>,
@@ -86,6 +86,7 @@ impl From<DBUser> for User {
             has_password: None,
             has_totp: None,
             github_id: None,
+            stripe_customer_id: None,
         }
     }
 }

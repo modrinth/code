@@ -98,8 +98,8 @@ pub async fn random_projects_get(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_many(&**pool)
-    .try_filter_map(|e| async { Ok(e.right().map(|m| db_ids::ProjectId(m.id))) })
+    .fetch(&**pool)
+    .map_ok(|m| db_ids::ProjectId(m.id))
     .try_collect::<Vec<_>>()
     .await?;
 
@@ -430,8 +430,8 @@ pub async fn project_edit(
                         ",
                         project_item.inner.team_id as db_ids::TeamId
                     )
-                    .fetch_many(&mut *transaction)
-                    .try_filter_map(|e| async { Ok(e.right().map(|c| db_models::UserId(c.id))) })
+                    .fetch(&mut *transaction)
+                    .map_ok(|c| db_models::UserId(c.id))
                     .try_collect::<Vec<_>>()
                     .await?;
 

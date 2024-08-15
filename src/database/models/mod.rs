@@ -14,12 +14,14 @@ pub mod oauth_token_item;
 pub mod organization_item;
 pub mod pat_item;
 pub mod payout_item;
+pub mod product_item;
 pub mod project_item;
 pub mod report_item;
 pub mod session_item;
 pub mod team_item;
 pub mod thread_item;
 pub mod user_item;
+pub mod user_subscription_item;
 pub mod version_item;
 
 pub use collection_item::Collection;

@@ -1,5 +1,5 @@
 use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::DateTime;
 use std::io::Cursor;
 use zip::ZipArchive;
 
@@ -16,10 +16,7 @@ impl super::Validator for PackValidator {
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 13w24a which replaced texture packs with resource packs
-        SupportedGameVersions::PastDate(DateTime::from_naive_utc_and_offset(
-            NaiveDateTime::from_timestamp_opt(1371137542, 0).unwrap(),
-            Utc,
-        ))
+        SupportedGameVersions::PastDate(DateTime::from_timestamp(1371137542, 0).unwrap())
     }
 
     fn validate(
@@ -50,14 +47,8 @@ impl super::Validator for TexturePackValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // a1.2.2a to 13w23b
         SupportedGameVersions::Range(
-            DateTime::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(1289339999, 0).unwrap(),
-                Utc,
-            ),
-            DateTime::from_naive_utc_and_offset(
-                NaiveDateTime::from_timestamp_opt(1370651522, 0).unwrap(),
-                Utc,
-            ),
+            DateTime::from_timestamp(1289339999, 0).unwrap(),
+            DateTime::from_timestamp(1370651522, 0).unwrap(),
         )
     }
 

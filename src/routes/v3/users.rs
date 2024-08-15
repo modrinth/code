@@ -610,11 +610,8 @@ pub async fn user_follows(
             ",
             id as crate::database::models::ids::UserId,
         )
-        .fetch_many(&**pool)
-        .try_filter_map(|e| async {
-            Ok(e.right()
-                .map(|m| crate::database::models::ProjectId(m.mod_id)))
-        })
+        .fetch(&**pool)
+        .map_ok(|m| crate::database::models::ProjectId(m.mod_id))
         .try_collect::<Vec<crate::database::models::ProjectId>>()
         .await?;
 

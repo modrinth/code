@@ -49,10 +49,8 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
         .map(|x| x.to_string())
         .collect::<Vec<String>>(),
     )
-        .fetch_many(pool)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|m| {
-
+        .fetch(pool)
+        .map_ok(|m| {
             PartialProject {
                 id: ProjectId(m.id),
                 name: m.name,
@@ -65,7 +63,7 @@ pub async fn index_local(pool: &PgPool) -> Result<Vec<UploadSearchProject>, Inde
                 slug: m.slug,
                 color: m.color,
                 license: m.license,
-            }}))
+            }
         })
         .try_collect::<Vec<PartialProject>>()
         .await?;

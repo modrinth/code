@@ -5,7 +5,6 @@ use crate::routes::ApiError;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use sqlx::PgPool;
-use std::usize;
 
 #[derive(Serialize)]
 struct DiscordEmbed {

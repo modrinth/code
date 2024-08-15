@@ -110,35 +110,33 @@ impl Notification {
             ",
             &notification_ids_parsed
         )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|row| {
-                    let id = NotificationId(row.id);
+            .fetch(exec)
+            .map_ok(|row| {
+                let id = NotificationId(row.id);
 
-                    Notification {
-                        id,
-                        user_id: UserId(row.user_id),
-                        read: row.read,
-                        created: row.created,
-                        body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
-                            if let Some(name) = row.name {
-                                NotificationBody::LegacyMarkdown {
-                                    notification_type: row.notification_type,
-                                    name,
-                                    text: row.text.unwrap_or_default(),
-                                    link: row.link.unwrap_or_default(),
-                                    actions: serde_json::from_value(
-                                        row.actions.unwrap_or_default(),
-                                    )
-                                        .ok()
-                                        .unwrap_or_default(),
-                                }
-                            } else {
-                                NotificationBody::Unknown
+                Notification {
+                    id,
+                    user_id: UserId(row.user_id),
+                    read: row.read,
+                    created: row.created,
+                    body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
+                        if let Some(name) = row.name {
+                            NotificationBody::LegacyMarkdown {
+                                notification_type: row.notification_type,
+                                name,
+                                text: row.text.unwrap_or_default(),
+                                link: row.link.unwrap_or_default(),
+                                actions: serde_json::from_value(
+                                    row.actions.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default(),
                             }
-                        }),
-                    }
-                }))
+                        } else {
+                            NotificationBody::Unknown
+                        }
+                    }),
+                }
             })
             .try_collect::<Vec<Notification>>()
             .await
@@ -173,35 +171,33 @@ impl Notification {
             ",
             user_id as UserId
         )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|row| {
-                    let id = NotificationId(row.id);
+            .fetch(exec)
+            .map_ok(|row| {
+                let id = NotificationId(row.id);
 
-                    Notification {
-                        id,
-                        user_id: UserId(row.user_id),
-                        read: row.read,
-                        created: row.created,
-                        body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
-                            if let Some(name) = row.name {
-                                NotificationBody::LegacyMarkdown {
-                                    notification_type: row.notification_type,
-                                    name,
-                                    text: row.text.unwrap_or_default(),
-                                    link: row.link.unwrap_or_default(),
-                                    actions: serde_json::from_value(
-                                        row.actions.unwrap_or_default(),
-                                    )
-                                        .ok()
-                                        .unwrap_or_default(),
-                                }
-                            } else {
-                                NotificationBody::Unknown
+                Notification {
+                    id,
+                    user_id: UserId(row.user_id),
+                    read: row.read,
+                    created: row.created,
+                    body: row.body.clone().and_then(|x| serde_json::from_value(x).ok()).unwrap_or_else(|| {
+                        if let Some(name) = row.name {
+                            NotificationBody::LegacyMarkdown {
+                                notification_type: row.notification_type,
+                                name,
+                                text: row.text.unwrap_or_default(),
+                                link: row.link.unwrap_or_default(),
+                                actions: serde_json::from_value(
+                                    row.actions.unwrap_or_default(),
+                                )
+                                    .ok()
+                                    .unwrap_or_default(),
                             }
-                        }),
-                    }
-                }))
+                        } else {
+                            NotificationBody::Unknown
+                        }
+                    }),
+                }
             })
             .try_collect::<Vec<Notification>>()
             .await?;
@@ -242,8 +238,8 @@ impl Notification {
             ",
             &notification_ids_parsed
         )
-        .fetch_many(&mut **transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|x| UserId(x.user_id))) })
+        .fetch(&mut **transaction)
+        .map_ok(|x| UserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;
 
@@ -285,8 +281,8 @@ impl Notification {
             ",
             &notification_ids_parsed
         )
-        .fetch_many(&mut **transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|x| UserId(x.user_id))) })
+        .fetch(&mut **transaction)
+        .map_ok(|x| UserId(x.user_id))
         .try_collect::<Vec<_>>()
         .await?;
 

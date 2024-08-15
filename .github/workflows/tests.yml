@@ -26,7 +26,7 @@ jobs:
       
       # Start Docker Compose
       - name: Start Docker Compose
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - uses: actions-rs/toolchain@v1
         name: Install toolchain

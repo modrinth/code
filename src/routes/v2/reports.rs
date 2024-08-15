@@ -1,6 +1,5 @@
 use crate::database::redis::RedisPool;
-use crate::models::ids::ImageId;
-use crate::models::reports::{ItemType, Report};
+use crate::models::reports::Report;
 use crate::models::v2::reports::LegacyReport;
 use crate::queue::session::AuthQueue;
 use crate::routes::{v2_reroute, v3, ApiError};
@@ -16,18 +15,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(report_edit);
     cfg.service(report_delete);
     cfg.service(report_get);
-}
-
-#[derive(Deserialize, Validate)]
-pub struct CreateReport {
-    pub report_type: String,
-    pub item_id: String,
-    pub item_type: ItemType,
-    pub body: String,
-    // Associations to uploaded images
-    #[validate(length(max = 10))]
-    #[serde(default)]
-    pub uploaded_images: Vec<ImageId>,
 }
 
 #[post("report")]

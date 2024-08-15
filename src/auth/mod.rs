@@ -3,6 +3,7 @@ pub mod email;
 pub mod oauth;
 pub mod templates;
 pub mod validate;
+pub use crate::auth::email::send_email;
 pub use checks::{
     filter_enlisted_projects_ids, filter_enlisted_version_ids, filter_visible_collections,
     filter_visible_project_ids, filter_visible_projects,

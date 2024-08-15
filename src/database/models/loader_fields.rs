@@ -60,15 +60,13 @@ impl Game {
             SELECT id, slug, name, icon_url, banner_url FROM games
             ",
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|x| Game {
-                id: GameId(x.id),
-                slug: x.slug,
-                name: x.name,
-                icon_url: x.icon_url,
-                banner_url: x.banner_url,
-            }))
+        .fetch(exec)
+        .map_ok(|x| Game {
+            id: GameId(x.id),
+            slug: x.slug,
+            name: x.name,
+            icon_url: x.icon_url,
+            banner_url: x.banner_url,
         })
         .try_collect::<Vec<Game>>()
         .await?;
@@ -151,24 +149,21 @@ impl Loader {
             GROUP BY l.id;
             ",
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|x| Loader {
-                id: LoaderId(x.id),
-                loader: x.loader,
-                icon: x.icon,
-                supported_project_types: x
-                    .project_types
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|x| x.to_string())
-                    .collect(),
-                supported_games: x
-                    .games
-                    .unwrap_or_default(),
-                metadata: x.metadata
-
-            }))
+        .fetch(exec)
+        .map_ok(|x| Loader {
+            id: LoaderId(x.id),
+            loader: x.loader,
+            icon: x.icon,
+            supported_project_types: x
+                .project_types
+                .unwrap_or_default()
+                .iter()
+                .map(|x| x.to_string())
+                .collect(),
+            supported_games: x
+                .games
+                .unwrap_or_default(),
+            metadata: x.metadata
         })
         .try_collect::<Vec<_>>()
         .await?;
@@ -451,21 +446,22 @@ impl LoaderField {
             FROM loader_fields lf
             ",
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().and_then(|r| {
-                Some(LoaderField {
-                    id: LoaderFieldId(r.id),
-                    field_type: LoaderFieldType::build(&r.field_type, r.enum_type)?,
-                    field: r.field,
-                    optional: r.optional,
-                    min_val: r.min_val,
-                    max_val: r.max_val,
-                })
-            }))
+        .fetch(exec)
+        .map_ok(|r| {
+            Some(LoaderField {
+                id: LoaderFieldId(r.id),
+                field_type: LoaderFieldType::build(&r.field_type, r.enum_type)?,
+                field: r.field,
+                optional: r.optional,
+                min_val: r.min_val,
+                max_val: r.max_val,
+            })
         })
-        .try_collect::<Vec<LoaderField>>()
-        .await?;
+        .try_collect::<Vec<Option<LoaderField>>>()
+        .await?
+            .into_iter()
+            .flatten()
+            .collect();
 
         redis
             .set_serialized_to_json(LOADER_FIELDS_NAMESPACE_ALL, "", &result, None)

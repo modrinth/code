@@ -12,7 +12,7 @@ use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use hex::ToHex;
 use hmac::{Hmac, Mac, NewMac};
-use hyper::Method;
+use reqwest::Method;
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use serde_json::json;

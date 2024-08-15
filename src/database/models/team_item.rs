@@ -300,34 +300,24 @@ impl TeamMember {
             &team_ids_parsed,
             user_id as UserId
         )
-        .fetch_many(executor)
-        .try_filter_map(|e| async {
-            if let Some(m) = e.right() {
-                Ok(Some(Ok(TeamMember {
-                    id: TeamMemberId(m.id),
-                    team_id: TeamId(m.team_id),
-                    user_id,
-                    role: m.role,
-                    is_owner: m.is_owner,
-                    permissions: ProjectPermissions::from_bits(m.permissions as u64)
-                        .unwrap_or_default(),
-                    organization_permissions: m
-                        .organization_permissions
-                        .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
-                    accepted: m.accepted,
-                    payouts_split: m.payouts_split,
-                    ordering: m.ordering,
-                })))
-            } else {
-                Ok(None)
-            }
+        .fetch(executor)
+        .map_ok(|m| TeamMember {
+            id: TeamMemberId(m.id),
+            team_id: TeamId(m.team_id),
+            user_id,
+            role: m.role,
+            is_owner: m.is_owner,
+            permissions: ProjectPermissions::from_bits(m.permissions as u64)
+                .unwrap_or_default(),
+            organization_permissions: m
+                .organization_permissions
+                .map(|p| OrganizationPermissions::from_bits(p as u64).unwrap_or_default()),
+            accepted: m.accepted,
+            payouts_split: m.payouts_split,
+            ordering: m.ordering,
         })
-        .try_collect::<Vec<Result<TeamMember, super::DatabaseError>>>()
+        .try_collect::<Vec<TeamMember>>()
         .await?;
-
-        let team_members = team_members
-            .into_iter()
-            .collect::<Result<Vec<TeamMember>, super::DatabaseError>>()?;
 
         Ok(team_members)
     }

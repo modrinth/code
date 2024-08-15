@@ -55,8 +55,8 @@ pub async fn get_projects(
         ProjectStatus::Processing.as_str(),
         count.count as i64
     )
-    .fetch_many(&**pool)
-    .try_filter_map(|e| async { Ok(e.right().map(|m| database::models::ProjectId(m.id))) })
+    .fetch(&**pool)
+    .map_ok(|m| database::models::ProjectId(m.id))
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 

@@ -18,7 +18,6 @@ pub struct Pepper {
     pub pepper: String,
 }
 
-#[cfg(not(tarpaulin_include))]
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();

@@ -86,20 +86,18 @@ impl Report {
             ",
             &report_ids_parsed
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|x| QueryReport {
-                id: ReportId(x.id),
-                report_type: x.name,
-                project_id: x.mod_id.map(ProjectId),
-                version_id: x.version_id.map(VersionId),
-                user_id: x.user_id.map(UserId),
-                body: x.body,
-                reporter: UserId(x.reporter),
-                created: x.created,
-                closed: x.closed,
-                thread_id: ThreadId(x.thread_id)
-            }))
+        .fetch(exec)
+        .map_ok(|x| QueryReport {
+            id: ReportId(x.id),
+            report_type: x.name,
+            project_id: x.mod_id.map(ProjectId),
+            version_id: x.version_id.map(VersionId),
+            user_id: x.user_id.map(UserId),
+            body: x.body,
+            reporter: UserId(x.reporter),
+            created: x.created,
+            closed: x.closed,
+            thread_id: ThreadId(x.thread_id)
         })
         .try_collect::<Vec<QueryReport>>()
         .await?;

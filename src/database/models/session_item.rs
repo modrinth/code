@@ -220,8 +220,8 @@ impl Session {
                 ",
             user_id.0,
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|x| SessionId(x.id))) })
+        .fetch(exec)
+        .map_ok(|x| SessionId(x.id))
         .try_collect::<Vec<SessionId>>()
         .await?;
 

@@ -167,8 +167,8 @@ impl PersonalAccessToken {
             ",
             user_id.0,
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|x| PatId(x.id))) })
+        .fetch(exec)
+        .map_ok(|x| PatId(x.id))
         .try_collect::<Vec<PatId>>()
         .await?;
 
