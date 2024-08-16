@@ -39,6 +39,16 @@ export const initAuth = async (oldToken = null) => {
     authCookie.value = route.query.code;
   }
 
+  if (route.fullPath.includes("new_account=true") && route.path !== "/auth/welcome") {
+    const redirect = route.path.startsWith("/auth/") ? null : route.fullPath;
+
+    await navigateTo(
+      `/auth/welcome?authToken=${route.query.code}${
+        redirect ? `&redirect=${encodeURIComponent(redirect)}` : ""
+      }`,
+    );
+  }
+
   if (authCookie.value) {
     auth.token = authCookie.value;
 
