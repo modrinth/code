@@ -61,7 +61,7 @@
         <UiServersPoweredByPyro />
       </div>
 
-      <PyroError v-else-if="error" :title="errorTitle" :message="errorMessage" />
+      <UiServersPyroError v-else-if="error" :title="errorTitle" :message="errorMessage" />
     </div>
   </ClientOnly>
 </template>
@@ -71,7 +71,6 @@ import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
-import PyroError from "~/components/ui/servers/PyroError.vue";
 import { PyroFetchError } from "~/composables/pyroFetch";
 import type { Server } from "~/types/servers";
 
