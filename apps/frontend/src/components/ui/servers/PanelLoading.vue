@@ -46,9 +46,7 @@
       <nav
         class="relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold"
       >
-        <div
-          class="router-link-active router-link-exact-active button-animation flex flex-row items-center gap-2 px-4 py-2 text-brand focus:rounded-full"
-        >
+        <div class="button-animation flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -62,8 +60,9 @@
             class="size-5"
           >
             <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <path d="M9 22V12h6v10"></path></svg
-          ><span>Overview</span>
+            <path d="M9 22V12h6v10"></path>
+          </svg>
+          <span>Overview</span>
         </div>
         <div class="button-animation flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full">
           <svg
@@ -74,8 +73,9 @@
           >
             <path
               d="M10.362 1.093a.75.75 0 0 0-.724 0L2.523 5.018 10 9.143l7.477-4.125zM18 6.443l-7.25 4v8.25l6.862-3.786A.75.75 0 0 0 18 14.25zm-8.75 12.25v-8.25l-7.25-4v7.807a.75.75 0 0 0 .388.657z"
-            ></path></svg
-          ><span>Content</span>
+            ></path>
+          </svg>
+          <span>Content</span>
         </div>
         <div class="button-animation flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full">
           <svg
@@ -105,11 +105,6 @@
           </svg>
           <span>Options</span>
         </div>
-        <div
-          class="pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full bg-brand p-1 transition-all"
-          aria-hidden="true"
-          style="left: 4px; top: 4px; width: 125px; opacity: 0.25"
-        ></div>
       </nav>
       <div class="flex flex-row gap-2">
         <div class="btn btn-transparent">
