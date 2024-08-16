@@ -1,6 +1,6 @@
-const { resolve } = require("node:path");
+const { resolve } = require('node:path')
 
-const project = resolve(process.cwd(), "tsconfig.json");
+const project = resolve(process.cwd(), 'tsconfig.json')
 
 module.exports = {
   extends: [
@@ -15,20 +15,21 @@ module.exports = {
     'turbo',
   ],
   parserOptions: {
-    sourceType: "module",
+    sourceType: 'module',
   },
   settings: {
-    "import/resolver": {
+    'import/resolver': {
       typescript: {
         project,
       },
     },
   },
-  "ignorePatterns": [".nuxt/**", ".output/**", "node_modules", "dist/**"],
+  ignorePatterns: ['.nuxt/**', '.output/**', 'node_modules', 'dist/**'],
   rules: {
     'no-console': 'off',
     'vue/no-v-html': 'off',
     'vue/multi-word-component-names': 'off',
+    'vue/no-multiple-template-root': 'off',
     'import/extensions': ['error', 'always', { ignorePackages: true }],
   },
-};
+}
