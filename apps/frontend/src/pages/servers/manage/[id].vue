@@ -41,7 +41,7 @@
           </div>
         </div>
 
-        <div class="flex flex-row items-center justify-between">
+        <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
           <UiNavTabs :links="navLinks" />
 
           <div class="flex flex-row gap-2">
@@ -68,7 +68,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import { storeToRefs } from 'pinia';
+import { storeToRefs } from "pinia";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import PyroError from "~/components/ui/servers/PyroError.vue";
