@@ -118,6 +118,7 @@ import _ShieldIcon from './icons/shield.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscendingIcon from './icons/sort-asc.svg?component'
 import _SortDescendingIcon from './icons/sort-desc.svg?component'
+import _SparklesIcon from './icons/sparkles.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _SunIcon from './icons/sun.svg?component'
@@ -307,3 +308,4 @@ export const Heading1Icon = _Heading1Icon
 export const Heading2Icon = _Heading2Icon
 export const Heading3Icon = _Heading3Icon
 export const CardIcon = _CardIcon
+export const SparklesIcon = _SparklesIcon

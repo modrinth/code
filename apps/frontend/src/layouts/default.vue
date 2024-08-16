@@ -20,6 +20,7 @@
     </div>
     <div
       v-if="
+        user &&
         user.subscriptions &&
         user.subscriptions.some((x) => x.status === 'payment-failed') &&
         route.path !== '/settings/billing'
@@ -468,7 +469,12 @@ const { formatMessage } = useVIntl();
 
 const app = useNuxtApp();
 const auth = await useAuth();
-const user = await useUser();
+const user = ref();
+
+if (import.meta.client) {
+  user.value = await useUser();
+}
+
 const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
 const tags = useTags();

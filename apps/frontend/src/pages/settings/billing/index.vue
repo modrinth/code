@@ -95,7 +95,7 @@
           >
             <button
               v-if="midasSubscription && midasSubscription.status === 'payment-failed'"
-              class="btn btn-large btn-primary"
+              class="iconified-button raised-button"
               @click="
                 purchaseModalStep = 0;
                 $refs.purchaseModal.show();
@@ -122,7 +122,7 @@
           </div>
           <button
             v-else-if="midasSubscription && midasSubscription.status !== 'cancelled'"
-            class="btn ml-auto"
+            class="iconified-button raised-button !ml-auto"
             @click="
               cancelSubscriptionId = midasSubscription.id;
               $refs.modal_cancel.show();
@@ -496,13 +496,22 @@ const price = computed(() =>
 const route = useRoute();
 const router = useRouter();
 if (route.query.priceId && route.query.plan && route.query.redirect_status) {
+  let status;
+  if (route.query.redirect_status === "succeeded") {
+    status = "active";
+  } else if (route.query.redirect_status === "processing") {
+    status = "payment-processing";
+  } else {
+    status = "payment-failed";
+  }
+
   subscriptions.value.push({
     id: "temp",
     price_id: route.query.priceId,
     interval: route.query.plan,
     created: Date.now(),
     expires: route.query.plan === "yearly" ? Date.now() + 31536000000 : Date.now() + 2629746000,
-    status: route.query.redirect_status === "success" ? "active" : "payment-failed",
+    status,
   });
 
   await router.replace({ query: {} });

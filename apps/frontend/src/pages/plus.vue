@@ -24,15 +24,14 @@
   />
   <div class="main-hero">
     <div class="flex max-w-screen-lg flex-col items-center gap-4 text-center">
-      <ModrinthPlusIcon class="h-8 w-max" />
-      <h1 class="hidden">Modrinth Plus</h1>
+      <ModrinthPlusIcon class="text-contrast h-8 w-max" />
       <h1 class="m-0 text-[4rem]">Support creators and go ad-free</h1>
       <p class="m-0 mb-4 text-[18px] leading-relaxed">
         Subscribe to Modrinth Plus to go ad-free, support Modrinth's development, and get an
         exclusive profile badge! Half your subscription goes directly to Modrinth creators. Cancel
         anytime.
       </p>
-      <p class="m-0 text-[2rem] font-bold text-purple">
+      <p class="text-purple m-0 text-[2rem] font-bold">
         {{ formatPrice(vintl.locale, price.prices.intervals.monthly, price.currency_code) }}/mo
       </p>
       <p class="m-0 mb-4 text-secondary">
@@ -40,8 +39,16 @@
         {{ calculateSavings(price.prices.intervals.monthly, price.prices.intervals.yearly) }}% with
         annual billing!
       </p>
-      <button v-if="auth.user" class="btn btn-purple btn-large" @click="purchaseModal.show()">
-        Subscribe
+      <button
+        v-if="auth.user"
+        class="btn btn-purple btn-large"
+        :disabled="auth.user && isPermission(auth.user.badges, 1 << 0)"
+        @click="purchaseModal.show()"
+      >
+        <template v-if="isPermission(auth.user.badges, 1 << 0)">
+          You are already subscribed!
+        </template>
+        <template v-else> Subscribe </template>
       </button>
       <nuxt-link
         v-else
@@ -52,9 +59,34 @@
       </nuxt-link>
     </div>
   </div>
+  <div class="perks-hero">
+    <h2>What you get with Modrinth Plus!</h2>
+    <div class="mt-8 grid max-w-screen-lg gap-8 lg:grid-cols-3">
+      <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
+        <HeartIcon class="text-purple h-8 w-8" />
+        <span class="text-lg font-bold">Support Modrinth creators</span>
+        <span class="leading-5 text-secondary">
+          50% of your subscription goes directly to Modrinth creators.
+        </span>
+      </div>
+      <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
+        <SparklesIcon class="text-purple h-8 w-8" />
+        <span class="text-lg font-bold">Remove all ads</span>
+        <span class="leading-5 text-secondary">
+          Never see an advertisement again on the Modrinth app or the website.
+        </span>
+      </div>
+      <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
+        <StarIcon class="text-purple h-8 w-8" />
+        <span class="text-lg font-bold">Profile badge</span>
+        <span class="leading-5 text-secondary">Get an exclusive badge on your user page.</span>
+      </div>
+    </div>
+    <span class="mt-4 text-secondary">...and much more coming soon!</span>
+  </div>
 </template>
 <script setup>
-import { ModrinthPlusIcon } from "@modrinth/assets";
+import { ModrinthPlusIcon, HeartIcon, SparklesIcon, StarIcon } from "@modrinth/assets";
 import { PurchaseModal } from "@modrinth/ui";
 import { calculateSavings, formatPrice, getCurrency } from "@modrinth/utils";
 import { products } from "~/generated/state.json";
@@ -101,18 +133,21 @@ onMounted(() => {
 </script>
 <style lang="scss" scoped>
 .main-hero {
-  background-color: #000;
+  background: linear-gradient(360deg, rgba(199, 138, 255, 0.2) 10.92%, var(--color-bg) 100%),
+    var(--color-accent-contrast);
   margin-top: -4rem;
-  padding: 11.25rem 1rem 12rem;
+  padding: 11.25rem 1rem 8rem;
 
   display: flex;
-  justify-content: center;
   align-items: center;
-  text-align: center;
   flex-direction: column;
+}
 
-  svg {
-    color: var(--color-contrast);
-  }
+.perks-hero {
+  background-color: var(--color-accent-contrast);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 4rem 1rem;
 }
 </style>

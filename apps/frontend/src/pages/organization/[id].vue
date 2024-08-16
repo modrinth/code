@@ -129,7 +129,7 @@
     </div>
     <div v-if="!routeHasSettings" class="normal-page__content">
       <ModalCreation ref="modal_creation" :organization-id="organization.id" />
-      <Promotion :external="false" query-param="" />
+      <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
       <div v-if="isInvited" class="universal-card information invited">
         <h2>Invitation to join {{ organization.name }}</h2>
         <p>You have been invited to join {{ organization.name }}.</p>
