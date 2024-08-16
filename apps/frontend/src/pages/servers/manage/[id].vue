@@ -3,17 +3,17 @@
     <div class="contents">
       <UiServersPanelLoading v-if="isLoading" class="h-screen" />
       <div
-        v-else-if="data"
+        v-else-if="serverData"
         data-pyro-server-manager-root
         class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
       >
         <div class="flex flex-row items-center gap-6 pt-4">
           <UiAvatar
-            v-if="data.project"
+            v-if="serverData.project"
             no-shadow
             size="lg"
             alt="Server Icon"
-            :src="data.project.icon_url"
+            :src="serverData.project.icon_url"
           />
           <div class="flex flex-col gap-4">
             <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
@@ -23,20 +23,20 @@
               </NuxtLink>
             </div>
             <h1 class="m-0 text-4xl font-bold text-[var(--color-contrast)]">
-              {{ data.name }}
+              {{ serverData.name }}
             </h1>
             <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
               <UiServersServerGameLabel
                 v-if="showGameLabel"
-                :game="data.game!"
-                :mc-version="data.mc_version ?? ''"
+                :game="serverData.game!"
+                :mc-version="serverData.mc_version ?? ''"
               />
               <UiServersServerLoaderLabel
                 v-if="showLoaderLabel"
-                :loader="data.loader!"
-                :loader-version="data.loader_version ?? ''"
+                :loader="serverData.loader!"
+                :loader-version="serverData.loader_version ?? ''"
               />
-              <UiServersServerModLabel v-if="showModLabel" :mods="data.mods" />
+              <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
             </div>
           </div>
         </div>
@@ -45,11 +45,11 @@
           <UiNavTabs :links="navLinks" />
 
           <div class="flex flex-row gap-2">
-            <UiServersPanelCopyIP :ip="data.net.ip" :port="data.net.port" />
+            <UiServersPanelCopyIP :ip="serverData.net.ip" :port="serverData.net.port" />
             <UiServersPanelPlay
-              :server-id="data.server_id"
-              :ip="data.net.ip"
-              :port="data.net.port"
+              :server-id="serverData.server_id"
+              :ip="serverData.net.ip"
+              :port="serverData.net.port"
             />
           </div>
         </div>
@@ -68,25 +68,29 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import { storeToRefs } from 'pinia';
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
-import { useServerStore } from "~/stores/servers.ts";
+import { useServerStore } from "~/stores/servers";
 import PyroError from "~/components/ui/servers/PyroError.vue";
-import { PyroFetchError } from "~/composables/pyroFetch.ts";
+import { PyroFetchError } from "~/composables/pyroFetch";
 import type { Server } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
+const { serverData: storeServerData } = storeToRefs(serverStore);
+
 const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const isLoading = ref(true);
 const error = ref<Error | null>(null);
-const data = ref<Server | null>(null);
 
-const showGameLabel = computed(() => !!data.value?.game);
-const showLoaderLabel = computed(() => !!data.value?.loader);
-const showModLabel = computed(() => (data.value?.mods?.length ?? 0) > 0);
+const serverData = computed(() => storeServerData.value[serverId] || null);
+
+const showGameLabel = computed(() => !!serverData.value?.game);
+const showLoaderLabel = computed(() => !!serverData.value?.loader);
+const showModLabel = computed(() => (serverData.value?.mods?.length ?? 0) > 0);
 
 const navLinks = [
   { icon: HomeIcon, label: "Overview", href: `/servers/manage/${serverId}` },
@@ -103,7 +107,6 @@ onMounted(async () => {
   try {
     isLoading.value = true;
     await serverStore.fetchServerData(serverId);
-    data.value = serverStore.getServerData(serverId) || null;
   } catch (err) {
     error.value = err as Error;
     if (err instanceof PyroFetchError) {
