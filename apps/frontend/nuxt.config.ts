@@ -316,10 +316,18 @@ export default defineNuxtConfig({
     apiBaseUrl: process.env.BASE_URL ?? globalThis.BASE_URL ?? getApiUrl(),
     // @ts-ignore
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY ?? globalThis.RATE_LIMIT_IGNORE_KEY,
-    pyroBaseUrl: process.env.PYRO_BASE_URL,
+    pyroBaseUrl:
+      // @ts-ignore
+      process.env.PYRO_BASE_URL ?? globalThis.PYRO_BASE_URL ?? isProduction()
+        ? "https://archon.pyro.host"
+        : "http://127.0.0.1:3001",
     public: {
       apiBaseUrl: getApiUrl(),
-      pyroBaseUrl: process.env.PYRO_BASE_URL,
+      pyroBaseUrl:
+        // @ts-ignore
+        process.env.PYRO_BASE_URL ?? globalThis.PYRO_BASE_URL ?? isProduction()
+          ? "https://archon.pyro.host"
+          : "http://127.0.0.1:3001",
       siteUrl: getDomain(),
       production: isProduction(),
       featureFlagOverrides: getFeatureFlagOverrides(),
