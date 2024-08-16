@@ -1,5 +1,5 @@
 <template>
-  <div data-pyro-server-stats class="flex flex-row items-center gap-6">
+  <div data-pyro-server-stats class="flex flex-col items-center gap-6 md:flex-row">
     <div
       v-for="(metric, index) in metrics"
       :key="index"
