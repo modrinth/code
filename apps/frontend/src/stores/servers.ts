@@ -29,8 +29,10 @@ export const useServerStore = defineStore("servers", {
 
           // @ts-ignore
           data.modpack = pid.id;
+
           // @ts-ignore
           data.modpack_id = pid.id;
+
           // @ts-ignore
           data.project = project;
         }
@@ -76,6 +78,34 @@ export const useServerStore = defineStore("servers", {
 
     clearError() {
       this.error = null;
+    },
+
+    async updateServerName(serverId: string, newName: string) {
+      try {
+        const auth = await useAuth();
+        await usePyroFetch(
+          auth.value.token,
+          `servers/${serverId}/name`,
+          0,
+          "POST",
+          "application/json",
+          { name: newName },
+        );
+
+        if (this.serverData[serverId]) {
+          this.serverData[serverId] = {
+            ...this.serverData[serverId],
+            name: newName,
+          };
+        } else {
+          console.warn(
+            `Attempting to update name for non-existent server data. Server ID: ${serverId}`,
+          );
+        }
+      } catch (error) {
+        console.error("Error updating server name:", error);
+        throw error;
+      }
     },
   },
 
