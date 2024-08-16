@@ -39,7 +39,7 @@ pub struct Settings {
 
 impl Settings {
     pub async fn get(
-        exec: impl sqlx::Executor<'_, Database=sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<Self> {
         let res = sqlx::query!(
             "
@@ -104,7 +104,7 @@ impl Settings {
 
     pub async fn update(
         &self,
-        exec: impl sqlx::Executor<'_, Database=sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let max_concurrent_writes = self.max_concurrent_writes as i32;
         let max_concurrent_downloads = self.max_concurrent_downloads as i32;
@@ -180,8 +180,8 @@ impl Settings {
             self.library_filter,
             self.library_group,
         )
-            .execute(exec)
-            .await?;
+        .execute(exec)
+        .await?;
 
         Ok(())
     }
