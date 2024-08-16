@@ -160,7 +160,7 @@ const handleWebSocketMessage = (data: WSEvent) => {
       consoleOutput.value.push(data.message);
       break;
     case "stats":
-      updateStats(data as any);
+      updateStats(data as unknown as Stats["current"]);
       break;
     case "auth-expiring":
       reauth();
