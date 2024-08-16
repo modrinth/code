@@ -9,6 +9,8 @@
 import { defineComponent } from "vue";
 import { CopyIcon } from "@modrinth/assets";
 
+const app = useNuxtApp();
+
 export default defineComponent({
   name: "CopyIPButton",
   components: {
@@ -28,6 +30,14 @@ export default defineComponent({
     const copyText = () => {
       const text = `${props.ip}:${props.port}`;
       navigator.clipboard.writeText(text);
+
+      // @ts-ignore
+      app.$notify({
+        group: "server",
+        title: `Copied IP`,
+        text: `Your server's IP has been copied to your clipboard`,
+        type: "success",
+      });
     };
 
     return { copyText };
