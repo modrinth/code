@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { Server } from "~/types/servers";
+import type { Project, Server } from "~/types/servers";
 
 interface ServerState {
   serverData: Record<string, Server>;
@@ -23,18 +23,12 @@ export const useServerStore = defineStore("servers", {
         }
 
         if (data.modpack) {
-          const pid = await this.fetchModpackVersion(data.modpack);
+          const pid: Project = await this.fetchModpackVersion(data.modpack);
           // @ts-ignore
           const project = await this.fetchProject(pid.project_id);
 
-          // @ts-ignore
-          data.modpack = pid.id;
-
-          // @ts-ignore
           data.modpack_id = pid.id;
-
-          // @ts-ignore
-          data.project = project;
+          data.project = project as Project | null;
         }
 
         this.serverData[serverId] = data;
@@ -47,9 +41,10 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
-    async fetchModpackVersion(modpackId: string) {
+    async fetchModpackVersion(modpackId: string): Promise<Project> {
       try {
-        return await toRaw(useBaseFetch(`version/${modpackId}`));
+        const result = await toRaw(useBaseFetch(`version/${modpackId}`));
+        return result as Project;
       } catch (error) {
         console.error("Error fetching modpack version:", error);
         throw error;
