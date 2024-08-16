@@ -1,18 +1,17 @@
 <script setup>
-import { ref, watch } from 'vue'
-import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, UpdatedIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, Modal, Button } from '@modrinth/ui'
+import { ref } from 'vue'
+import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon } from '@modrinth/assets'
+import { Card, Slider, DropdownSelect, Toggle, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
-import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
 import { get_user } from '@/helpers/cache.js'
+import { useSettings } from '@/composables/useSettings.js'
 
 const pageOptions = ['Home', 'Library']
 
@@ -20,64 +19,13 @@ const themeStore = useTheming()
 
 const version = await getVersion()
 
-const accessSettings = async () => {
-  const settings = await get()
-
-  settings.launchArgs = settings.extra_launch_args.join(' ')
-  settings.envVars = settings.custom_env_vars.map((x) => x.join('=')).join(' ')
-
-  return settings
-}
-
-const fetchSettings = await accessSettings().catch(handleError)
-
-const settings = ref(fetchSettings)
+const settings = await useSettings()
 // const settingsDir = ref(settings.value.loaded_config_dir)
 
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
-watch(
-  settings,
-  async (oldSettings, newSettings) => {
-    if (oldSettings.loaded_config_dir !== newSettings.loaded_config_dir) {
-      return
-    }
-
-    const setSettings = JSON.parse(JSON.stringify(newSettings))
-
-    if (setSettings.telemetry) {
-      mixpanel_opt_out_tracking()
-    } else {
-      mixpanel_opt_in_tracking()
-    }
-
-    setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
-    setSettings.custom_env_vars = setSettings.envVars
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((x) => x.split('=').filter(Boolean))
-
-    if (!setSettings.hooks.pre_launch) {
-      setSettings.hooks.pre_launch = null
-    }
-    if (!setSettings.hooks.wrapper) {
-      setSettings.hooks.wrapper = null
-    }
-    if (!setSettings.hooks.post_exit) {
-      setSettings.hooks.post_exit = null
-    }
-
-    if (!setSettings.custom_dir) {
-      setSettings.custom_dir = null
-    }
-
-    await set(setSettings)
-  },
-  { deep: true },
-)
-
 const javaVersions = ref(await get_java_versions().catch(handleError))
+
 async function updateJavaVersion(version) {
   if (version?.path === '') {
     version.path = undefined

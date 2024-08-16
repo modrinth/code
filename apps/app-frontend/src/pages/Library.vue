@@ -11,6 +11,7 @@ import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
 import { get, set } from '@/helpers/settings.js'
+import { useSettings } from '@/composables/useSettings.js'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -34,18 +35,9 @@ onUnmounted(() => {
   unlistenProfile()
 })
 
-const fetchSettings = await get()
-const settings = ref(fetchSettings)
+const settings = await useSettings()
 
-watch(
-  settings,
-  async (oldSettings, newSettings) => {
-    const setSettings = JSON.parse(JSON.stringify(newSettings))
-
-    await set(setSettings)
-  },
-  { deep: true },
-)
+console.log('settings', settings)
 </script>
 
 <template>
