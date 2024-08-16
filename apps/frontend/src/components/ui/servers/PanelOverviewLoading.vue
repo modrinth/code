@@ -23,7 +23,7 @@
             </div>
             <ChevronRightIcon />
           </div>
-          <h3>RAM usage</h3>
+          <h3>Memory usage</h3>
           <DBIcon class="absolute right-8 top-8" />
         </div>
         <div
