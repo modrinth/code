@@ -29,7 +29,7 @@
     <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
       <div class="flex flex-row items-center gap-2">
         <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">
-          {{ (Math.round((data.current.storage_total_bytes / 1e9) * 100) / 100).toFixed(2) }} GB
+          {{ formatBytes(data.current.storage_total_bytes / 10) }}
         </h2>
         <ChevronRightIcon />
       </div>
@@ -75,6 +75,20 @@ const props = defineProps({
 
 const lerp = (a: number, b: number) => {
   return a + (b - a) * 0.5;
+};
+
+// I told you it would go into prod
+const formatBytes = (bytes: number) => {
+  const units = ["Bytes", "KB", "MB", "GB", "TB"];
+  let value = bytes;
+  let unitIndex = 0;
+
+  while (value >= 1024 && unitIndex < units.length - 2) {
+    value /= 1024;
+    unitIndex++;
+  }
+
+  return `${Math.round(value * 100) / 100} ${units[unitIndex]}`;
 };
 
 const metrics = ref([
