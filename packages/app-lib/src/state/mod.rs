@@ -57,6 +57,9 @@ pub struct State {
     /// Discord RPC
     pub discord_rpc: DiscordGuard,
 
+    /// Process manager
+    pub process_manager: ProcessManager,
+
     pub(crate) pool: SqlitePool,
 
     pub(crate) file_watcher: FileWatcher,
@@ -69,15 +72,10 @@ impl State {
             .await?;
 
         tokio::task::spawn(async move {
-            let res = tokio::try_join!(
-                state.discord_rpc.clear_to_default(true),
-                Process::garbage_collect(&state.pool)
-            );
+            let res = state.discord_rpc.clear_to_default(true).await;
 
             if let Err(e) = res {
-                tracing::error!(
-                    "Error running garbage collection and discord RPC: {e}"
-                );
+                tracing::error!("Error running discord RPC: {e}");
             }
         });
 
@@ -133,6 +131,7 @@ impl State {
             io_semaphore,
             api_semaphore,
             discord_rpc,
+            process_manager: ProcessManager::new(),
             pool,
             file_watcher,
         }))

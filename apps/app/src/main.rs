@@ -32,6 +32,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
     win.show().unwrap();
+    win.set_focus().unwrap();
 }
 
 #[tauri::command]

@@ -250,7 +250,7 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
 #[allow(unused_variables)]
 pub async fn emit_process(
     profile_path: &str,
-    pid: u32,
+    uuid: Uuid,
     event: ProcessPayloadType,
     message: &str,
 ) -> crate::Result<()> {
@@ -263,7 +263,7 @@ pub async fn emit_process(
                 "process",
                 ProcessPayload {
                     profile_path_id: profile_path.to_string(),
-                    pid,
+                    uuid,
                     event,
                     message: message.to_string(),
                 },

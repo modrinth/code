@@ -1,16 +1,17 @@
 //! Theseus process management interface
 
-use crate::state::Process;
+use crate::state::ProcessMetadata;
 pub use crate::{
     state::{Hooks, MemorySettings, Profile, Settings, WindowSize},
     State,
 };
+use uuid::Uuid;
 
 // Gets the Profile paths of each *running* stored process in the state
 #[tracing::instrument]
-pub async fn get_all() -> crate::Result<Vec<Process>> {
+pub async fn get_all() -> crate::Result<Vec<ProcessMetadata>> {
     let state = State::get().await?;
-    let processes = Process::get_all(&state.pool).await?;
+    let processes = state.process_manager.get_all();
     Ok(processes)
 }
 
@@ -18,39 +19,31 @@ pub async fn get_all() -> crate::Result<Vec<Process>> {
 #[tracing::instrument]
 pub async fn get_by_profile_path(
     profile_path: &str,
-) -> crate::Result<Vec<Process>> {
+) -> crate::Result<Vec<ProcessMetadata>> {
     let state = State::get().await?;
-    let processes =
-        Process::get_from_profile(profile_path, &state.pool).await?;
+    let processes = state
+        .process_manager
+        .get_all()
+        .into_iter()
+        .filter(|x| x.profile_path == profile_path)
+        .collect();
     Ok(processes)
 }
 
 // Kill a child process stored in the state by UUID, as a string
 #[tracing::instrument]
-pub async fn kill(pid: i32) -> crate::Result<()> {
+pub async fn kill(uuid: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-    let process = Process::get(pid, &state.pool).await?;
+    state.process_manager.kill(uuid).await?;
 
-    if let Some(process) = process {
-        process.kill().await?;
-
-        Ok(())
-    } else {
-        Ok(())
-    }
+    Ok(())
 }
 
 // Wait for a child process stored in the state by UUID
 #[tracing::instrument]
-pub async fn wait_for(pid: i32) -> crate::Result<()> {
+pub async fn wait_for(uuid: Uuid) -> crate::Result<()> {
     let state = State::get().await?;
-    let process = Process::get(pid, &state.pool).await?;
+    state.process_manager.wait_for(uuid).await?;
 
-    if let Some(process) = process {
-        process.wait_for().await?;
-
-        Ok(())
-    } else {
-        Ok(())
-    }
+    Ok(())
 }

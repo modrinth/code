@@ -3,7 +3,9 @@ use crate::data::ModLoader;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::launcher::io::IOError;
-use crate::state::{Credentials, JavaVersion, Process, ProfileInstallStage};
+use crate::state::{
+    Credentials, JavaVersion, ProcessMetadata, ProfileInstallStage,
+};
 use crate::util::io;
 use crate::{
     process,
@@ -410,7 +412,7 @@ pub async fn launch_minecraft(
     credentials: &Credentials,
     post_exit_hook: Option<String>,
     profile: &Profile,
-) -> crate::Result<Process> {
+) -> crate::Result<ProcessMetadata> {
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::Installing
     {
@@ -508,7 +510,7 @@ pub async fn launch_minecraft(
     if let Some(process) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Profile {} is already running at path: {}",
-            profile.path, process.pid
+            profile.path, process.uuid
         ))
         .as_error());
     }
@@ -646,11 +648,8 @@ pub async fn launch_minecraft(
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
-    Process::insert_new_process(
-        &profile.path,
-        command,
-        post_exit_hook,
-        &state.pool,
-    )
-    .await
+    state
+        .process_manager
+        .insert_new_process(&profile.path, command, post_exit_hook)
+        .await
 }

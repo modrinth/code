@@ -8,7 +8,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Credentials, JavaVersion, Process,
+    CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
     ProfileFile, ProjectType, SideType,
 };
 
@@ -615,7 +615,7 @@ fn pack_get_relative_path(
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
-pub async fn run(path: &str) -> crate::Result<Process> {
+pub async fn run(path: &str) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
     let default_account = Credentials::get_default_credential(&state.pool)
@@ -632,7 +632,7 @@ pub async fn run(path: &str) -> crate::Result<Process> {
 pub async fn run_credentials(
     path: &str,
     credentials: &Credentials,
-) -> crate::Result<Process> {
+) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
     let profile = get(path).await?.ok_or_else(|| {
@@ -716,10 +716,11 @@ pub async fn run_credentials(
 }
 
 pub async fn kill(path: &str) -> crate::Result<()> {
+    let state = State::get().await?;
     let processes = crate::api::process::get_by_profile_path(path).await?;
 
     for process in processes {
-        process.kill().await?;
+        state.process_manager.kill(process.uuid).await?;
     }
 
     Ok(())

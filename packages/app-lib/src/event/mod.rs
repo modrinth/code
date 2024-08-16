@@ -226,7 +226,7 @@ pub enum CommandPayload {
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
     pub profile_path_id: String,
-    pub pid: u32,
+    pub uuid: Uuid,
     pub event: ProcessPayloadType,
     pub message: String,
 }

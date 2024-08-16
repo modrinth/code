@@ -6,7 +6,7 @@ use discord_rich_presence::{
 };
 use tokio::sync::RwLock;
 
-use crate::state::{Process, Profile};
+use crate::state::Profile;
 use crate::State;
 
 pub struct DiscordGuard {
@@ -167,7 +167,7 @@ impl DiscordGuard {
             return self.clear_activity(true).await;
         }
 
-        let running_profiles = Process::get_all(&state.pool).await?;
+        let running_profiles = state.process_manager.get_all();
         if let Some(existing_child) = running_profiles.first() {
             let prof =
                 Profile::get(&existing_child.profile_path, &state.pool).await?;

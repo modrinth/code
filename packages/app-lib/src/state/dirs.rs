@@ -270,7 +270,6 @@ impl DirectoryInfo {
 
                 const MOVE_DIRS: &[&str] = &[
                     CACHES_FOLDER_NAME,
-                    LAUNCHER_LOGS_FOLDER_NAME,
                     PROFILES_FOLDER_NAME,
                     METADATA_FOLDER_NAME,
                 ];
