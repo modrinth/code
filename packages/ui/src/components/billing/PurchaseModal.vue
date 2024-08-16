@@ -34,7 +34,7 @@
         Review
       </span>
     </div>
-    <div v-if="purchaseModalStep === 0" class="sm:w-[600px]">
+    <div v-if="purchaseModalStep === 0" class="md:w-[600px]">
       <div>
         <p class="my-2 text-lg font-bold">Choose billing interval</p>
         <div class="flex flex-col gap-4">
@@ -84,16 +84,16 @@
     <template v-if="purchaseModalStep === 1">
       <div
         v-show="loadingPaymentMethodModal !== 2"
-        class="flex min-h-[16rem] items-center justify-center sm:w-[600px]"
+        class="flex min-h-[16rem] items-center justify-center md:w-[600px]"
       >
         <AnimatedLogo class="w-[80px]" />
       </div>
-      <div v-show="loadingPaymentMethodModal === 2" class="min-h-[16rem] p-1 sm:w-[600px]">
+      <div v-show="loadingPaymentMethodModal === 2" class="min-h-[16rem] p-1 md:w-[600px]">
         <div id="address-element"></div>
         <div id="payment-element" class="mt-4"></div>
       </div>
     </template>
-    <div v-if="purchaseModalStep === 2" class="sm:w-[650px]">
+    <div v-if="purchaseModalStep === 2" class="md:w-[650px]">
       <div>
         <div class="r-4 rounded-xl bg-bg p-4">
           <p class="my-2 text-lg font-bold text-primary">Purchase details</p>

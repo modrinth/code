@@ -187,7 +187,7 @@
           {{ formatMessage(messages.paymentMethodTitle) }}
         </span>
       </template>
-      <div class="min-h-[16rem] sm:w-[600px]">
+      <div class="min-h-[16rem] md:w-[600px]">
         <div
           v-show="loadingPaymentMethodModal !== 2"
           class="flex min-h-[16rem] items-center justify-center"
