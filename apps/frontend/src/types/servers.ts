@@ -92,16 +92,17 @@ export interface WSAuth {
 }
 
 export type ServerState = "running" | "stopped" | "crashed";
+export type WebsocketEventType =
+  | "log"
+  | "auth"
+  | "stats"
+  | "power-state"
+  | "auth-expiring"
+  | "auth-incorrect"
+  | (string & {});
 
 export interface WSEvent {
-  event:
-    | "log"
-    | "auth"
-    | "stats"
-    | "power-state"
-    | "auth-expiring"
-    | "auth-incorrect"
-    | (string & {});
+  event: WebsocketEventType;
   message: string;
   state: ServerState;
 }
