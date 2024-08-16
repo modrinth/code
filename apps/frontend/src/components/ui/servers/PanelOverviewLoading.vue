@@ -2,13 +2,19 @@
   <div aria-hidden="true" class="pointer-events-none h-full w-full select-none">
     <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
-        <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"></div>
-        <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"></div>
-        <div class="relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"></div>
+        <div
+          class="fade-in-up relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
+        ></div>
+        <div
+          class="fade-in-up relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
+        ></div>
+        <div
+          class="fade-in-up relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
+        ></div>
       </div>
 
       <div
-        class="relative flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8"
+        class="fade-in-up relative flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl bg-bg-raised p-8"
       >
         <div class="experimental-styles-within flex flex-row items-center justify-between">
           <div class="flex flex-row items-center gap-4">
@@ -43,3 +49,36 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-in-up {
+  animation: fade-in-up 600ms
+    linear(
+      0,
+      0.006,
+      0.025 2.8%,
+      0.101 6.1%,
+      0.539 18.9%,
+      0.721 25.3%,
+      0.849 31.5%,
+      0.937 38.1%,
+      0.968 41.8%,
+      0.991 45.7%,
+      1.006 50.1%,
+      1.015 55%,
+      1.017 63.9%,
+      1.001
+    );
+}
+</style>
