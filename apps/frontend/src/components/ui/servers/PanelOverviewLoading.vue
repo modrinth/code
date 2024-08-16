@@ -3,14 +3,54 @@
     <div class="flex flex-col gap-6">
       <div class="flex flex-row items-center gap-6">
         <div
-          class="fade-in-up relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
-        ></div>
+          class="fade-in-up relative max-h-[230px] min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <div class="flex flex-row items-center gap-2">
+              <div class="h-9 w-[84px] rounded-full bg-[var(--color-text-secondary)]"></div>
+            </div>
+            <ChevronRightIcon />
+          </div>
+          <h3>CPU usage</h3>
+          <CPUIcon class="absolute right-8 top-8" />
+        </div>
         <div
-          class="fade-in-up relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
-        ></div>
+          class="fade-in-up relative max-h-[230px] min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <div class="flex flex-row items-center gap-2">
+              <div class="h-9 w-[84px] rounded-full bg-[var(--color-text-secondary)]"></div>
+            </div>
+            <ChevronRightIcon />
+          </div>
+          <h3>RAM usage</h3>
+          <DBIcon class="absolute right-8 top-8" />
+        </div>
         <div
-          class="fade-in-up relative min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised"
-        ></div>
+          class="fade-in-up relative max-h-[230px] min-h-[230px] w-full overflow-hidden rounded-2xl bg-bg-raised p-8"
+        >
+          <div class="flex flex-row items-center gap-2">
+            <div class="flex flex-row items-center gap-2">
+              <div class="h-9 w-[84px] rounded-full bg-[var(--color-text-secondary)]"></div>
+            </div>
+            <ChevronRightIcon />
+          </div>
+          <h3>Storage usage</h3>
+          <div class="flex flex-col gap-4 pt-4">
+            <div class="flex animate-pulse flex-row items-center gap-2">
+              <div class="h-4 w-4 rounded-full bg-[var(--color-text-secondary)]"></div>
+              <span class="h-4 w-[100px] rounded-full bg-[var(--color-text-secondary)]"></span>
+            </div>
+            <div class="flex animate-pulse flex-row items-center gap-2">
+              <div class="h-4 w-4 rounded-full bg-[var(--color-text-secondary)]"></div>
+              <span class="h-4 w-[100px] rounded-full bg-[var(--color-text-secondary)]"></span>
+            </div>
+            <div class="flex animate-pulse flex-row items-center gap-2">
+              <div class="h-4 w-4 rounded-full bg-[var(--color-text-secondary)]"></div>
+              <span class="h-4 w-[100px] rounded-full bg-[var(--color-text-secondary)]"></span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -18,7 +58,7 @@
       >
         <div class="experimental-styles-within flex flex-row items-center justify-between">
           <div class="flex flex-row items-center gap-4">
-            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
+            <h2 class="m-0 text-3xl font-extrabold text-[var(--color-text-secondary)]">Console</h2>
             <div class="flex items-center gap-2 rounded-full bg-button-border px-2 py-1 opacity-0">
               <span class="text-sm font-semibold">Offline</span>
             </div>
@@ -49,6 +89,10 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+</script>
 
 <style scoped>
 @keyframes fade-in-up {
