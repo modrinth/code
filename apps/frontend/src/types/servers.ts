@@ -76,6 +76,7 @@ export interface Server {
     domain: string;
   };
   modpack: string | null;
+  modpack_id: string | null;
   project: Project | null;
   game: string;
   loader: string | null;
