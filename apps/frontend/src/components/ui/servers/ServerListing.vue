@@ -11,7 +11,7 @@
     <UiAvatar :src="iconUrl" no-shadow size="md" alt="Server Icon" />
     <div class="ml-8 flex flex-col gap-3">
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
-        <h2 class="m-0 text-xl font-bold">{{ name }}</h2>
+        <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
         <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
         <ChevronRightIcon v-if="!status.isInstalling" />
       </div>
