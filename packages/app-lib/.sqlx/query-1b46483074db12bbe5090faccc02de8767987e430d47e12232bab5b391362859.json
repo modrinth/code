@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated\n            FROM settings\n            ",
+  "query": "\n            SELECT\n                max_concurrent_writes, max_concurrent_downloads,\n                theme, default_page, collapsed_navigation, advanced_rendering, native_decorations,\n                discord_rpc, developer_mode, telemetry,\n                onboarded,\n                json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,\n                mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,\n                hook_pre_launch, hook_wrapper, hook_post_exit,\n                custom_dir, prev_custom_dir, migrated,\n                library_sort, library_filter, library_group\n            FROM settings\n            ",
   "describe": {
     "columns": [
       {
@@ -122,6 +122,21 @@
         "name": "migrated",
         "ordinal": 23,
         "type_info": "Int64"
+      },
+      {
+        "name": "library_sort",
+        "ordinal": 24,
+        "type_info": "Text"
+      },
+      {
+        "name": "library_filter",
+        "ordinal": 25,
+        "type_info": "Text"
+      },
+      {
+        "name": "library_group",
+        "ordinal": 26,
+        "type_info": "Text"
       }
     ],
     "parameters": {
@@ -151,8 +166,11 @@
       true,
       true,
       true,
+      false,
+      false,
+      false,
       false
     ]
   },
-  "hash": "03d1aeddf7788320530c447a82342aecdb4099ce183dd9106c4bcc47604cb080"
+  "hash": "1b46483074db12bbe5090faccc02de8767987e430d47e12232bab5b391362859"
 }

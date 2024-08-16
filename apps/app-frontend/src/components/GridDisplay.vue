@@ -121,9 +121,9 @@ const handleOptionsClick = async (args) => {
 }
 
 const search = ref('')
-const group = ref('Category')
-const filters = ref('All profiles')
-const sortBy = ref('Name')
+const group = defineModel('group')
+const filters = defineModel('filters')
+const sortBy = defineModel('sortBy')
 
 const filteredResults = computed(() => {
   let instances = props.instances.filter((instance) => {

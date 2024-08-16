@@ -31,11 +31,15 @@ pub struct Settings {
     pub custom_dir: Option<String>,
     pub prev_custom_dir: Option<String>,
     pub migrated: bool,
+
+    pub library_sort: String,
+    pub library_filter: String,
+    pub library_group: String,
 }
 
 impl Settings {
     pub async fn get(
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database=sqlx::Sqlite>,
     ) -> crate::Result<Self> {
         let res = sqlx::query!(
             "
@@ -47,7 +51,8 @@ impl Settings {
                 json(extra_launch_args) extra_launch_args, json(custom_env_vars) custom_env_vars,
                 mc_memory_max, mc_force_fullscreen, mc_game_resolution_x, mc_game_resolution_y, hide_on_process_start,
                 hook_pre_launch, hook_wrapper, hook_post_exit,
-                custom_dir, prev_custom_dir, migrated
+                custom_dir, prev_custom_dir, migrated,
+                library_sort, library_filter, library_group
             FROM settings
             "
         )
@@ -91,12 +96,15 @@ impl Settings {
             custom_dir: res.custom_dir,
             prev_custom_dir: res.prev_custom_dir,
             migrated: res.migrated == 1,
+            library_sort: res.library_sort,
+            library_filter: res.library_filter,
+            library_group: res.library_group,
         })
     }
 
     pub async fn update(
         &self,
-        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+        exec: impl sqlx::Executor<'_, Database=sqlx::Sqlite>,
     ) -> crate::Result<()> {
         let max_concurrent_writes = self.max_concurrent_writes as i32;
         let max_concurrent_downloads = self.max_concurrent_downloads as i32;
@@ -138,7 +146,11 @@ impl Settings {
 
                 custom_dir = $22,
                 prev_custom_dir = $23,
-                migrated = $24
+                migrated = $24,
+
+                library_sort = $25,
+                library_filter = $26,
+                library_group = $27
             ",
             max_concurrent_writes,
             max_concurrent_downloads,
@@ -163,10 +175,13 @@ impl Settings {
             self.hooks.post_exit,
             self.custom_dir,
             self.prev_custom_dir,
-            self.migrated
+            self.migrated,
+            self.library_sort,
+            self.library_filter,
+            self.library_group,
         )
-        .execute(exec)
-        .await?;
+            .execute(exec)
+            .await?;
 
         Ok(())
     }

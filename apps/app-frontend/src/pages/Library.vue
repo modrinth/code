@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref, shallowRef } from 'vue'
+import { onUnmounted, ref, shallowRef, watch } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
@@ -10,6 +10,7 @@ import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
+import { get, set } from '@/helpers/settings.js'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
@@ -32,10 +33,30 @@ const unlistenProfile = await profile_listener(async () => {
 onUnmounted(() => {
   unlistenProfile()
 })
+
+const fetchSettings = await get()
+const settings = ref(fetchSettings)
+
+watch(
+  settings,
+  async (oldSettings, newSettings) => {
+    const setSettings = JSON.parse(JSON.stringify(newSettings))
+
+    await set(setSettings)
+  },
+  { deep: true },
+)
 </script>
 
 <template>
-  <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
+  <GridDisplay
+    v-if="instances.length > 0"
+    label="Instances"
+    :instances="instances"
+    v-model:group="settings.library_group"
+    v-model:filters="settings.library_filter"
+    v-model:sortBy="settings.library_sort"
+  />
   <div v-else class="no-instance">
     <div class="icon">
       <NewInstanceImage />
