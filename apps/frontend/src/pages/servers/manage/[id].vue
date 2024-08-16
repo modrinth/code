@@ -72,7 +72,6 @@ import { storeToRefs } from "pinia";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers";
 import { PyroFetchError } from "~/composables/pyroFetch";
-import type { Server } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
