@@ -1,74 +1,85 @@
 <template>
   <div>
-    <div v-if="data && status === 'success'">
+    <div v-if="serverData && !isLoading">
       <section class="card">
-        <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
+        <h2 class="text-3xl font-bold">{{ $t(messages.title) }}</h2>
         <label for="username-field">
-          <span class="label__title">{{ formatMessage(messages.servernameTitle) }}</span>
-          <span class="label__description">{{
-            formatMessage(messages.servernameDescription)
-          }}</span>
+          <span class="label__title">{{ $t(messages.servernameTitle) }}</span>
+          <span class="label__description">
+            {{ $t(messages.servernameDescription) }}
+          </span>
         </label>
-        <input v-model="newName" :placeholder="data.name" />
-        <button type="submit" class="btn btn-primary" @click="() => updateServerName()">
-          Save
+        <input v-model="newName" :placeholder="serverData.name" @keyup.enter="updateServerName" />
+        <button
+          type="submit"
+          class="btn btn-primary"
+          @click="updateServerName"
+          :disabled="isUpdating"
+        >
+          {{ isUpdating ? "Saving..." : "Save" }}
         </button>
       </section>
     </div>
-    <PyroLoading v-else-if="status === 'pending'" />
+    <PyroLoading v-else />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import type { Server } from "~/types/servers";
 
-const { formatMessage } = useVIntl();
-
-const route = useNativeRoute();
-const serverId = route.params.id;
-
 const app = useNuxtApp();
-const auth = await useAuth();
+const route = useRoute();
+const serverId = route.params.id as string;
 
-const messages = defineMessages({
-  title: {
-    id: "server.options.general.title",
-    defaultMessage: "General",
-  },
-  description: {
-    id: "server.options.general.description",
-    defaultMessage: "Your server settings.",
-  },
-  servernameTitle: {
-    id: "server.options.general.servername.title",
-    defaultMessage: "Server Name",
-  },
-  servernameDescription: {
-    id: "server.options.general.servername.description",
-    defaultMessage: "A name to help identify your server.",
-  },
-});
+const serverStore = useServerStore();
 
-const { data, status } = await useLazyAsyncData("Server", async () => {
-  return await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
-});
+const messages = {
+  title: "General",
+  description: "Settings that affect your server globally.",
+  servernameTitle: "Server Name",
+  servernameDescription: "Change the name of your server as it appears on Modrinth",
+};
 
 const newName = ref("");
+const isLoading = ref(true);
+const isUpdating = ref(false);
+const serverData = ref<Server | null>(null);
+
+const fetchServerData = async () => {
+  try {
+    isLoading.value = true;
+    await serverStore.fetchServerData(serverId);
+    serverData.value = serverStore.getServerData(serverId) ?? null;
+  } catch (error) {
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "error",
+      title: "Failed to fetch server data",
+      text: "Please try again later.",
+    });
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 const updateServerName = async () => {
+  if (!newName.value.trim()) return;
+
   try {
-    await usePyroFetch(
-      auth.value.token,
-      `servers/${serverId}/name`,
-      0,
-      "POST",
-      "application/json",
-      {
-        name: newName.value,
-      },
-    );
+    isUpdating.value = true;
+    await serverStore.updateServerName(serverId, newName.value);
+    await fetchServerData();
+    newName.value = "";
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "success",
+      title: "Server name updated",
+      text: "Your server name has been successfully changed.",
+    });
   } catch (error) {
     // @ts-ignore
     app.$notify({
@@ -77,6 +88,10 @@ const updateServerName = async () => {
       title: "Could not update server name",
       text: "Your server name could not be changed. Please try again later.",
     });
+  } finally {
+    isUpdating.value = false;
   }
 };
+
+onMounted(fetchServerData);
 </script>
