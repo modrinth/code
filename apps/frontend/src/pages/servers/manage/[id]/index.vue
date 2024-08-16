@@ -1,5 +1,9 @@
 <template>
-  <div v-if="isConnected" data-pyro-server-manager-root class="flex flex-col gap-6">
+  <div
+    v-if="isConnected && !isWSAuthIncorrect"
+    data-pyro-server-manager-root
+    class="flex flex-col gap-6"
+  >
     <transition name="fade-slide">
       <UiServersServerStats v-if="!fullScreen" :data="stats" />
     </transition>
@@ -26,11 +30,16 @@
       />
     </div>
   </div>
-  <UiServersPanelOverviewLoading v-else-if="!isConnected" />
+  <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWSAuthIncorrect" />
+  <UiServersPyroError
+    v-if="isWSAuthIncorrect"
+    title="WebSocket authentication failed"
+    message="Indicative of a server misconfiguration. Please report this to support."
+  />
   <UiServersPyroError
     v-else
-    title="Error Accessing Server"
-    message="Don't worry, your server is safe. We just can't connect to it right now."
+    title="An error occurred"
+    message="Something went wrong while attempting to connect to your server. Your data is safe, and we're working to resolve the issue."
   />
 </template>
 
@@ -42,6 +51,7 @@ const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
 const isActioning = ref(false);
 const isConnected = ref(false);
+const isWSAuthIncorrect = ref(false);
 const consoleOutput = ref<string[]>([]);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
@@ -167,6 +177,9 @@ const handleWebSocketMessage = (data: WSEvent) => {
       break;
     case "power-state":
       updatePowerState(data.state);
+      break;
+    case "auth-incorrect":
+      isWSAuthIncorrect.value = true;
       break;
   }
 };
