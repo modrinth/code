@@ -25,14 +25,12 @@
             All servers
           </a>
         </div>
-        <span class="h-10 w-[200px] animate-pulse rounded-full bg-bg-raised"></span>
+        <span class="h-[2.6rem] w-[200px] animate-pulse rounded-full bg-bg-raised"></span>
         <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
           <div class="flex flex-row items-center gap-2">
-            <img
-              src="~/assets/images/games/minecraft.png"
-              alt="Minecraft Logo"
-              class="size-5"
-            /><span class="text-sm font-semibold">Minecraft</span>
+            <img src="~/assets/images/games/minecraft.png" alt="Minecraft Logo" class="size-5" />
+            <span class="text-sm font-semibold">Minecraft</span>
+            <span class="h-4 w-[40px] rounded-full bg-bg-raised"></span>
           </div>
           <div class="flex flex-row items-center gap-4">
             <div class="experimental-styles-within h-6 w-0.5 bg-button-border"></div>
