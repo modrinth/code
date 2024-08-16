@@ -2,6 +2,7 @@
   <div>
     <svg
       v-if="loader === 'Fabric'"
+      class="size-6"
       xmlns="http://www.w3.org/2000/svg"
       xml:space="preserve"
       fill-rule="evenodd"
@@ -21,6 +22,7 @@
     </svg>
     <svg
       v-else-if="loader === 'Quilt'"
+      class="size-6"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       xml:space="preserve"
       fill-rule="evenodd"
@@ -65,6 +67,7 @@
     </svg>
     <svg
       v-else-if="loader === 'Forge'"
+      class="size-6"
       ml:space="preserve"
       fill-rule="evenodd"
       stroke-linecap="round"
@@ -83,6 +86,7 @@
     </svg>
     <svg
       v-else-if="loader === 'Neoforge'"
+      class="size-6"
       enable-background="new 0 0 24 24"
       version="1.1"
       viewBox="0 0 24 24"
@@ -115,6 +119,7 @@
     </svg>
     <svg
       v-else-if="loader === 'Paper'"
+      class="size-6"
       xml:space="preserve"
       fill-rule="evenodd"
       stroke-linecap="round"
@@ -147,6 +152,7 @@
     </svg>
     <svg
       v-else-if="loader === 'Bukkit'"
+      class="size-6"
       viewBox="0 0 292 319"
       style="fill-rule: evenodd; clip-rule: evenodd; stroke-linecap: round; stroke-linejoin: round"
       stroke="currentColor"
