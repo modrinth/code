@@ -94,7 +94,14 @@ export interface WSAuth {
 export type ServerState = "running" | "stopped" | "crashed";
 
 export interface WSEvent {
-  event: string;
+  event:
+    | "log"
+    | "auth"
+    | "stats"
+    | "power-state"
+    | "auth-expiring"
+    | "auth-incorrect"
+    | (string & {});
   message: string;
   state: ServerState;
 }
