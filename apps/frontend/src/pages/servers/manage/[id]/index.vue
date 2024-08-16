@@ -32,7 +32,7 @@
   </div>
   <UiServersPanelOverviewLoading v-else-if="!isConnected && !isWSAuthIncorrect" />
   <UiServersPyroError
-    v-if="isWSAuthIncorrect"
+    v-else-if="isWSAuthIncorrect"
     title="WebSocket authentication failed"
     message="Indicative of a server misconfiguration. Please report this to support."
   />
