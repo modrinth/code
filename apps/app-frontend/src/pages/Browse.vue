@@ -585,7 +585,10 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
           <ClearIcon /> Clear filters
         </Button>
         <div
-          v-if="(isModProject && ignoreInstanceLoaders) || projectType === 'shader'"
+          v-if="
+            (isModProject && (ignoreInstanceLoaders || !instanceContext)) ||
+            projectType === 'shader'
+          "
           class="loaders"
         >
           <h2>Loaders</h2>
