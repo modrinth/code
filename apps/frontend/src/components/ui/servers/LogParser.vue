@@ -1,5 +1,5 @@
 <template>
-  <div class="parsed-log whitespace-nowrap px-6 py-1" v-html="parsedLog"></div>
+  <div class="parsed-log w-fit whitespace-nowrap px-6 py-1" v-html="parsedLog"></div>
 </template>
 
 <script lang="ts">
