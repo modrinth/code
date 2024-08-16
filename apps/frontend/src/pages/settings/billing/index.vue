@@ -97,8 +97,10 @@
               v-if="midasSubscription && midasSubscription.status === 'payment-failed'"
               class="iconified-button raised-button"
               @click="
-                purchaseModalStep = 0;
-                $refs.purchaseModal.show();
+                () => {
+                  purchaseModalStep = 0;
+                  $refs.purchaseModal.show();
+                }
               "
             >
               <UpdatedIcon />
@@ -124,8 +126,10 @@
             v-else-if="midasSubscription && midasSubscription.status !== 'cancelled'"
             class="iconified-button raised-button !ml-auto"
             @click="
-              cancelSubscriptionId = midasSubscription.id;
-              $refs.modal_cancel.show();
+              () => {
+                cancelSubscriptionId = midasSubscription.id;
+                $refs.modal_cancel.show();
+              }
             "
           >
             <XIcon /> Cancel
@@ -134,8 +138,10 @@
             v-else
             class="btn btn-purple btn-large ml-auto"
             @click="
-              purchaseModalStep = 0;
-              $refs.purchaseModal.show();
+              () => {
+                purchaseModalStep = 0;
+                $refs.purchaseModal.show();
+              }
             "
           >
             <RightArrowIcon />
@@ -177,7 +183,7 @@
     />
     <NewModal ref="addPaymentMethodModal">
       <template #title>
-        <span class="text-lg font-extrabold text-contrast">
+        <span class="text-contrast text-lg font-extrabold">
           {{ formatMessage(messages.paymentMethodTitle) }}
         </span>
       </template>
@@ -233,7 +239,7 @@
           <PayPalIcon v-else-if="method.type === 'paypal'" class="h-8 w-8" />
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
-              <div class="font-bold text-contrast">
+              <div class="text-contrast font-bold">
                 <template v-if="method.type === 'card'">
                   {{
                     formatMessage(messages.paymentMethodCardDisplay, {

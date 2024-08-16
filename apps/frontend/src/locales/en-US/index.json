@@ -368,6 +368,12 @@
   "layout.banner.staging.title": {
     "message": "You’re viewing Modrinth’s staging environment."
   },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Update billing info"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Your subscription failed to renew. Please update your payment method to prevent losing access."
+  },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
   },
@@ -788,6 +794,93 @@
   "settings.authorized-apps.title": {
     "message": "Authorized apps"
   },
+  "settings.billing.modal.cancel.action": {
+    "message": "Cancel subscription"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "This will cancel your subscription. You will retain your perks until the end of the current billing cycle."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Are you sure you want to cancel your subscription?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Remove this payment method"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "This will remove this payment method forever (like really forever)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Are you sure you want to remove this payment method?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Add payment method"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "View past charges"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Make primary"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} ending in {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Expires {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "You have not added any payment methods."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primary"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Payment methods"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Unknown payment method"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Manage your Modrinth subscriptions."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Subscriptions"
+  },
+  "settings.billing.title": {
+    "message": "Billing and subscriptions"
+  },
   "settings.display.banner.developer-mode.button": {
     "message": "Deactivate developer mode"
   },
@@ -826,6 +919,9 @@
   },
   "settings.display.project-list-layouts.user": {
     "message": "User profile pages"
+  },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Collection"
   },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."

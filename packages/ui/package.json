@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "fix": "eslint . --fix && prettier --write .",
-    "intl:extract": "formatjs extract \"lib/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"lib/**/*.d.ts\" --out-file locales/en-US/index.json --preserve-whitespace"
+    "intl:extract": "formatjs extract \"src/**/*.{vue,ts,tsx,js,jsx,mts,cts,mjs,cjs}\" --ignore \"src/**/*.d.ts\" --out-file src/locales/en-US/index.json --preserve-whitespace"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.2.12",
