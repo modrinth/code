@@ -31,6 +31,8 @@ import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
+import { save_filters } from '@/helpers/skin_manager.js'
+import { SkinManagerIcon } from '@/assets/icons/index.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
@@ -126,6 +128,7 @@ initialize_state()
   })
 
 const handleClose = async () => {
+  await save_filters()
   await TauriWindow.getCurrent().close()
 }
 
@@ -253,6 +256,14 @@ async function handleCommand(e) {
           </RouterLink>
           <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
+          </RouterLink>
+          <RouterLink
+            v-if="!offline"
+            v-tooltip="'Skin Manager'"
+            to="/SkinManager"
+            class="btn icon-only collapsed-button"
+          >
+            <SkinManagerIcon />
           </RouterLink>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
