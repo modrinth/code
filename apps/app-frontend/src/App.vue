@@ -1,16 +1,8 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
-import {
-  HomeIcon,
-  SearchIcon,
-  LibraryIcon,
-  PlusIcon,
-  SettingsIcon,
-  FileIcon,
-  XIcon,
-} from '@modrinth/assets'
-import { Button, Notifications, Card } from '@modrinth/ui'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, XIcon } from '@modrinth/assets'
+import { Button, Notifications } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
@@ -21,11 +13,11 @@ import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ErrorModal from '@/components/ui/ErrorModal.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
-import { offline_listener, command_listener, warning_listener } from '@/helpers/events.js'
-import { MinimizeIcon, MaximizeIcon, ChatIcon } from '@/assets/icons'
+import { command_listener, warning_listener } from '@/helpers/events.js'
+import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/api/os'
 import { appWindow } from '@tauri-apps/api/window'
-import { isDev, getOS, isOffline, showLauncherLogsFolder } from '@/helpers/utils.js'
+import { isDev, getOS } from '@/helpers/utils.js'
 import {
   mixpanel_track,
   mixpanel_init,
@@ -36,129 +28,105 @@ import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
 import { getVersion } from '@tauri-apps/api/app'
 import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
-import { await_sync, check_safe_loading_bars_complete } from './helpers/state'
-import { confirm } from '@tauri-apps/api/dialog'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
-import OnboardingScreen from '@/components/ui/tutorial/OnboardingScreen.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
+import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
+import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
+import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
+import { useInstall } from '@/store/install.js'
+import { invoke } from '@tauri-apps/api/tauri'
+import { get_opening_command, initialize_state } from '@/helpers/state'
 
 const themeStore = useTheming()
-const urlModal = ref(null)
-const isLoading = ref(true)
 
-const offline = ref(false)
+const urlModal = ref(null)
+
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
+})
+
 const showOnboarding = ref(false)
 const nativeDecorations = ref(false)
 
-const onboardingVideo = ref()
-
-const failureText = ref(null)
 const os = ref('')
 
-defineExpose({
-  initialize: async () => {
-    isLoading.value = false
-    const {
-      native_decorations,
-      theme,
-      opt_out_analytics,
-      collapsed_navigation,
-      advanced_rendering,
-      fully_onboarded,
-    } = await get()
-    // video should play if the user is not on linux, and has not onboarded
-    os.value = await getOS()
-    const dev = await isDev()
-    const version = await getVersion()
-    showOnboarding.value = !fully_onboarded
+const stateInitialized = ref(false)
 
-    nativeDecorations.value = native_decorations
-    if (os.value !== 'MacOS') appWindow.setDecorations(native_decorations)
+async function setupApp() {
+  stateInitialized.value = true
+  const {
+    native_decorations,
+    theme,
+    telemetry,
+    collapsed_navigation,
+    advanced_rendering,
+    onboarded,
+    default_page,
+  } = await get()
 
-    themeStore.setThemeState(theme)
-    themeStore.collapsedNavigation = collapsed_navigation
-    themeStore.advancedRendering = advanced_rendering
+  if (default_page && default_page !== 'Home') {
+    await router.push({ name: default_page })
+  }
 
-    mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
-    if (opt_out_analytics) {
-      mixpanel_opt_out_tracking()
-    }
-    mixpanel_track('Launched', { version, dev, fully_onboarded })
+  os.value = await getOS()
+  const dev = await isDev()
+  const version = await getVersion()
+  showOnboarding.value = !onboarded
 
-    if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
+  nativeDecorations.value = native_decorations
+  if (os.value !== 'MacOS') await appWindow.setDecorations(native_decorations)
 
-    if ((await type()) === 'Darwin') {
-      document.getElementsByTagName('html')[0].classList.add('mac')
-    } else {
-      document.getElementsByTagName('html')[0].classList.add('windows')
-    }
+  themeStore.setThemeState(theme)
+  themeStore.collapsedNavigation = collapsed_navigation
+  themeStore.advancedRendering = advanced_rendering
 
-    offline.value = await isOffline()
-    await offline_listener((b) => {
-      offline.value = b
-    })
+  mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+  if (!telemetry) {
+    mixpanel_opt_out_tracking()
+  }
+  mixpanel_track('Launched', { version, dev, onboarded })
 
-    await warning_listener((e) =>
-      notificationsWrapper.value.addNotification({
-        title: 'Warning',
-        text: e.message,
-        type: 'warn',
-      }),
-    )
+  if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
-    if (showOnboarding.value) {
-      onboardingVideo.value.play()
-    }
-  },
-  failure: async (e) => {
-    isLoading.value = false
-    failureText.value = e
-    os.value = await getOS()
-  },
-})
+  if ((await type()) === 'Darwin') {
+    document.getElementsByTagName('html')[0].classList.add('mac')
+  } else {
+    document.getElementsByTagName('html')[0].classList.add('windows')
+  }
 
-const confirmClose = async () => {
-  const confirmed = await confirm(
-    'An action is currently in progress. Are you sure you want to exit?',
-    {
-      title: 'Modrinth',
-      type: 'warning',
-    },
+  await warning_listener((e) =>
+    notificationsWrapper.value.addNotification({
+      title: 'Warning',
+      text: e.message,
+      type: 'warn',
+    }),
   )
-  return confirmed
+
+  get_opening_command().then(handleCommand)
 }
+
+const stateFailed = ref(false)
+initialize_state()
+  .then(() => {
+    setupApp().catch((err) => {
+      stateFailed.value = true
+      console.error(err)
+      error.showError(err, false, 'state_init')
+    })
+  })
+  .catch((err) => {
+    stateFailed.value = true
+    console.error('Failed to initialize app', err)
+    error.showError(err, false, 'state_init')
+  })
 
 const handleClose = async () => {
-  if (failureText.value != null) {
-    await TauriWindow.getCurrent().close()
-    return
-  }
-  // State should respond immeiately if it's safe to close
-  // If not, code is deadlocked or worse, so wait 2 seconds and then ask the user to confirm closing
-  // (Exception: if the user is changing config directory, which takes control of the state, and it's taking a significant amount of time for some reason)
-  const isSafe = await Promise.race([
-    check_safe_loading_bars_complete(),
-    new Promise((r) => setTimeout(r, 2000)),
-  ])
-  if (!isSafe) {
-    const response = await confirmClose()
-    if (!response) {
-      return
-    }
-  }
-  await await_sync()
   await TauriWindow.getCurrent().close()
-}
-
-const openSupport = async () => {
-  window.__TAURI_INVOKE__('tauri', {
-    __tauriModule: 'Shell',
-    message: {
-      cmd: 'open',
-      path: 'https://discord.gg/modrinth',
-    },
-  })
 }
 
 TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
@@ -175,19 +143,29 @@ const route = useRoute()
 const isOnBrowse = computed(() => route.path.startsWith('/browse'))
 
 const loading = useLoading()
+loading.setEnabled(false)
 
 const notifications = useNotifications()
 const notificationsWrapper = ref()
 
-watch(notificationsWrapper, () => {
-  notifications.setNotifs(notificationsWrapper.value)
-})
-
 const error = useError()
 const errorModal = ref()
 
-watch(errorModal, () => {
+const install = useInstall()
+const modInstallModal = ref()
+const installConfirmModal = ref()
+const incompatibilityWarningModal = ref()
+
+onMounted(() => {
+  invoke('show_window')
+
+  notifications.setNotifs(notificationsWrapper.value)
+
   error.setErrorModal(errorModal.value)
+
+  install.setIncompatibilityWarningModal(incompatibilityWarningModal)
+  install.setInstallConfirmModal(installConfirmModal)
+  install.setModInstallModal(modInstallModal)
 })
 
 document.querySelector('body').addEventListener('click', function (e) {
@@ -232,7 +210,10 @@ document.querySelector('body').addEventListener('auxclick', function (e) {
 
 const accounts = ref(null)
 
-command_listener(async (e) => {
+command_listener(handleCommand)
+async function handleCommand(e) {
+  if (!e) return
+
   if (e.event === 'RunMRPack') {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
@@ -245,53 +226,12 @@ command_listener(async (e) => {
     // Other commands are URL-based (deep linking)
     urlModal.value.show(e)
   }
-})
+}
 </script>
 
 <template>
-  <div v-if="failureText" class="failure dark-mode">
-    <div class="appbar-failure dark-mode">
-      <Button v-if="os != 'MacOS'" icon-only @click="TauriWindow.getCurrent().close()">
-        <XIcon />
-      </Button>
-    </div>
-    <div class="error-view dark-mode">
-      <Card class="error-text">
-        <div class="label">
-          <h3>
-            <span class="label__title size-card-header">Failed to initialize</span>
-          </h3>
-        </div>
-        <div class="error-div">
-          Modrinth App failed to load correctly. This may be because of a corrupted file, or because
-          the app is missing crucial files.
-        </div>
-        <div class="error-div">You may be able to fix it one of the following ways:</div>
-        <ul class="error-div">
-          <li>Ennsuring you are connected to the internet, then try restarting the app.</li>
-          <li>Redownloading the app.</li>
-        </ul>
-        <div class="error-div">
-          If it still does not work, you can seek support using the link below. You should provide
-          the following error, as well as any recent launcher logs in the folder below.
-        </div>
-        <div class="error-div">The following error was provided:</div>
-
-        <Card class="error-message">
-          {{ failureText.message }}
-        </Card>
-
-        <div class="button-row push-right">
-          <Button @click="showLauncherLogsFolder"><FileIcon />Open launcher logs</Button>
-
-          <Button @click="openSupport"><ChatIcon />Get support</Button>
-        </div>
-      </Card>
-    </div>
-  </div>
-  <SplashScreen v-else-if="isLoading" app-loading />
-  <OnboardingScreen v-else-if="showOnboarding" :finish="() => (showOnboarding = false)" />
-  <div v-else class="container">
+  <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
+  <div v-if="stateInitialized" class="container">
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
@@ -385,6 +325,9 @@ command_listener(async (e) => {
   <URLConfirmModal ref="urlModal" />
   <Notifications ref="notificationsWrapper" />
   <ErrorModal ref="errorModal" />
+  <ModInstallModal ref="modInstallModal" />
+  <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
+  <InstallConfirmModal ref="installConfirmModal" />
 </template>
 
 <style lang="scss" scoped>
@@ -474,53 +417,6 @@ command_listener(async (e) => {
   }
 }
 
-.failure {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background-color: var(--color-bg);
-
-  .appbar-failure {
-    display: flex; /* Change to flex to align items horizontally */
-    justify-content: flex-end; /* Align items to the right */
-    height: 3.25rem;
-    //no select
-    user-select: none;
-    -webkit-user-select: none;
-  }
-
-  .error-view {
-    display: flex; /* Change to flex to align items horizontally */
-    justify-content: center;
-    width: 100%;
-    background-color: var(--color-bg);
-
-    color: var(--color-base);
-
-    .card {
-      background-color: var(--color-raised-bg);
-    }
-
-    .error-text {
-      display: flex;
-      max-width: 60%;
-      gap: 0.25rem;
-      flex-direction: column;
-
-      .error-div {
-        // spaced out
-        margin: 0.5rem;
-      }
-
-      .error-message {
-        margin: 0.5rem;
-        background-color: var(--color-button-bg);
-      }
-    }
-  }
-}
-
 .nav-container {
   display: flex;
   flex-direction: column;
@@ -584,55 +480,6 @@ command_listener(async (e) => {
   }
 }
 
-.instance-list {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  width: 70%;
-  margin: 0.4rem;
-
-  p:nth-child(1) {
-    font-size: 0.6rem;
-  }
-
-  & > p {
-    color: var(--color-base);
-    margin: 0.8rem 0;
-    font-size: 0.7rem;
-    line-height: 0.8125rem;
-    font-weight: 500;
-    text-transform: uppercase;
-  }
-}
-
-.user-section {
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  height: 4.375rem;
-
-  section {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    text-align: left;
-    margin-left: 0.5rem;
-  }
-
-  .username {
-    margin-bottom: 0.3rem;
-    font-weight: 400;
-    line-height: 1.25rem;
-    color: var(--color-contrast);
-  }
-
-  a {
-    font-weight: 400;
-    color: var(--color-secondary);
-  }
-}
-
 .nav-section {
   display: flex;
   flex-direction: column;
@@ -643,14 +490,6 @@ command_listener(async (e) => {
   gap: 1rem;
 }
 
-.video {
-  margin-top: 2.25rem;
-  width: 100vw;
-  height: calc(100vh - 2.25rem);
-  object-fit: cover;
-  border-radius: var(--radius-md);
-}
-
 .button-row {
   display: flex;
   flex-direction: row;
@@ -659,6 +498,36 @@ command_listener(async (e) => {
 
   .transparent {
     padding: var(--gap-sm) 0;
+  }
+}
+</style>
+<style>
+.mac {
+  .nav-container {
+    padding-top: calc(var(--gap-md) + 1.75rem);
+  }
+
+  .account-card,
+  .card-section {
+    top: calc(var(--gap-md) + 1.75rem);
+  }
+}
+
+.windows {
+  .fake-appbar {
+    height: 2.5rem !important;
+  }
+
+  .window-controls {
+    display: flex !important;
+  }
+
+  .info-card {
+    right: 8rem;
+  }
+
+  .profile-card {
+    right: 8rem;
   }
 }
 </style>

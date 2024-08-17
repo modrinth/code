@@ -3,6 +3,7 @@
 // Branding
 import _ModrinthIcon from './branding/logo.svg?component'
 import _FourOhFourNotFound from './branding/404.svg?component'
+import _ModrinthPlusIcon from './branding/modrinth-plus.svg?component'
 
 // External Icons
 import _SSODiscordIcon from './external/sso/discord.svg?component'
@@ -36,6 +37,7 @@ import _BookTextIcon from './icons/book-text.svg?component'
 import _BookmarkIcon from './icons/bookmark.svg?component'
 import _BoxIcon from './icons/box.svg?component'
 import _CalendarIcon from './icons/calendar.svg?component'
+import _CardIcon from './icons/card.svg?component'
 import _ChartIcon from './icons/chart.svg?component'
 import _CheckIcon from './icons/check.svg?component'
 import _CheckCheckIcon from './icons/check-check.svg?component'
@@ -102,6 +104,7 @@ import _PlayIcon from './icons/play.svg?component'
 import _PlusIcon from './icons/plus.svg?component'
 import _RadioButtonIcon from './icons/radio-button.svg?component'
 import _RadioButtonChecked from './icons/radio-button-checked.svg?component'
+import _ReceiptTextIcon from './icons/receipt-text.svg?component'
 import _ReplyIcon from './icons/reply.svg?component'
 import _ReportIcon from './icons/report.svg?component'
 import _RightArrowIcon from './icons/right-arrow.svg?component'
@@ -117,6 +120,7 @@ import _ShieldIcon from './icons/shield.svg?component'
 import _SlashIcon from './icons/slash.svg?component'
 import _SortAscendingIcon from './icons/sort-asc.svg?component'
 import _SortDescendingIcon from './icons/sort-desc.svg?component'
+import _SparklesIcon from './icons/sparkles.svg?component'
 import _StarIcon from './icons/star.svg?component'
 import _StopCircleIcon from './icons/stop-circle.svg?component'
 import _SunIcon from './icons/sun.svg?component'
@@ -159,6 +163,7 @@ import './omorphia.scss'
 
 export const ModrinthIcon = _ModrinthIcon
 export const FourOhFourNotFound = _FourOhFourNotFound
+export const ModrinthPlusIcon = _ModrinthPlusIcon
 export const SSODiscordIcon = _SSODiscordIcon
 export const SSOGitHubIcon = _SSOGitHubIcon
 export const SSOGitLabIcon = _SSOGitLabIcon
@@ -255,6 +260,7 @@ export const PlayIcon = _PlayIcon
 export const PlusIcon = _PlusIcon
 export const RadioButtonIcon = _RadioButtonIcon
 export const RadioButtonChecked = _RadioButtonChecked
+export const ReceiptTextIcon = _ReceiptTextIcon
 export const ReplyIcon = _ReplyIcon
 export const ReportIcon = _ReportIcon
 export const RightArrowIcon = _RightArrowIcon
@@ -305,3 +311,5 @@ export const TextQuoteIcon = _TextQuoteIcon
 export const Heading1Icon = _Heading1Icon
 export const Heading2Icon = _Heading2Icon
 export const Heading3Icon = _Heading3Icon
+export const CardIcon = _CardIcon
+export const SparklesIcon = _SparklesIcon

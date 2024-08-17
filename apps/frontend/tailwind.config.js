@@ -22,6 +22,10 @@ module.exports = {
         dark: "var(--color-text-dark)",
         inverted: "var(--color-text-inverted)",
         heading: "var(--color-heading)",
+        red: "var(--color-red)",
+        orange: "var(--color-orange)",
+        purple: "var(--color-purple)",
+        contrast: "var(--color-contrast)",
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",
@@ -132,4 +136,7 @@ module.exports = {
     },
   },
   plugins: [],
+  corePlugins: {
+    preflight: false,
+  },
 };

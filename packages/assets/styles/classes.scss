@@ -437,7 +437,6 @@ a,
 
   display: flex;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
   width: fit-content;
   height: fit-content;
@@ -900,6 +899,7 @@ a,
   img {
     max-width: 100%;
     height: auto;
+    display: inline-block;
   }
 
   html:not(.dark-mode, .oled-mode) & img[src$='#gh-dark-mode-only'] {

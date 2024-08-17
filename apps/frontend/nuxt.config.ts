@@ -77,6 +77,13 @@ export default defineNuxtConfig({
           title: "Modrinth mods",
         },
       ],
+      script: [
+        {
+          src: "https://js.stripe.com/v3/",
+          defer: true,
+          async: true,
+        },
+      ],
     },
   },
   vite: {
@@ -122,6 +129,10 @@ export default defineNuxtConfig({
         gameVersions?: any[];
         donationPlatforms?: any[];
         reportTypes?: any[];
+        homePageProjects?: any[];
+        homePageSearch?: any[];
+        homePageNotifs?: any[];
+        products?: any[];
       } = {};
 
       try {
@@ -153,21 +164,38 @@ export default defineNuxtConfig({
         },
       };
 
-      const [categories, loaders, gameVersions, donationPlatforms, reportTypes] = await Promise.all(
-        [
-          $fetch(`${API_URL}tag/category`, headers),
-          $fetch(`${API_URL}tag/loader`, headers),
-          $fetch(`${API_URL}tag/game_version`, headers),
-          $fetch(`${API_URL}tag/donation_platform`, headers),
-          $fetch(`${API_URL}tag/report_type`, headers),
-        ],
-      );
+      const [
+        categories,
+        loaders,
+        gameVersions,
+        donationPlatforms,
+        reportTypes,
+        homePageProjects,
+        homePageSearch,
+        homePageNotifs,
+        products,
+      ] = await Promise.all([
+        $fetch(`${API_URL}tag/category`, headers),
+        $fetch(`${API_URL}tag/loader`, headers),
+        $fetch(`${API_URL}tag/game_version`, headers),
+        $fetch(`${API_URL}tag/donation_platform`, headers),
+        $fetch(`${API_URL}tag/report_type`, headers),
+        $fetch(`${API_URL}projects_random?count=60`, headers),
+        $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
+        $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
+        // TODO: dehardcode
+        $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
+      ]);
 
       state.categories = categories;
       state.loaders = loaders;
       state.gameVersions = gameVersions;
       state.donationPlatforms = donationPlatforms;
       state.reportTypes = reportTypes;
+      state.homePageProjects = homePageProjects;
+      state.homePageSearch = homePageSearch;
+      state.homePageNotifs = homePageNotifs;
+      state.products = products;
 
       await fs.writeFile("./src/generated/state.json", JSON.stringify(state));
 
@@ -220,7 +248,7 @@ export default defineNuxtConfig({
         const omorphiaLocales: string[] = [];
         const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
 
-        for await (const localeDir of globIterate("node_modules/omorphia/locales/*", {
+        for await (const localeDir of globIterate("node_modules/@modrinth/ui/src/locales/*", {
           posix: true,
         })) {
           const tag = basename(localeDir);
@@ -390,6 +418,14 @@ export default defineNuxtConfig({
     plugins: {
       tailwindcss: {},
       autoprefixer: {},
+    },
+  },
+  routeRules: {
+    "/**": {
+      headers: {
+        "Accept-CH": "Sec-CH-Prefers-Color-Scheme",
+        "Critical-CH": "Sec-CH-Prefers-Color-Scheme",
+      },
     },
   },
   compatibilityDate: "2024-07-03",

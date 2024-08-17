@@ -187,8 +187,8 @@ const props = defineProps({
 })
 
 const filterVersions = ref([])
-const filterLoader = ref(props.instance ? [props.instance?.metadata?.loader] : [])
-const filterGameVersions = ref(props.instance ? [props.instance?.metadata?.game_version] : [])
+const filterLoader = ref(props.instance ? [props.instance?.loader] : [])
+const filterGameVersions = ref(props.instance ? [props.instance?.game_version] : [])
 
 const currentPage = ref(1)
 

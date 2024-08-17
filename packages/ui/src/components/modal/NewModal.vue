@@ -17,8 +17,8 @@
     <div class="modal-container" :class="{ shown: visible }">
       <div class="modal-body flex flex-col bg-bg-raised rounded-2xl p-6">
         <div class="flex items-center pb-6 border-b-[1px] border-button-bg">
-          <div class='flex flex-grow items-center gap-3'>
-            <slot name='title' />
+          <div class="flex flex-grow items-center gap-3">
+            <slot name="title" />
           </div>
           <ButtonStyled v-if="closable" circular>
             <button @click="hide">
@@ -26,10 +26,8 @@
             </button>
           </ButtonStyled>
         </div>
-        <div class='overflow-y-auto pt-6'>
-          <slot>
-            You just lost the game.
-          </slot>
+        <div class="overflow-y-auto">
+          <slot> You just lost the game.</slot>
         </div>
       </div>
     </div>
@@ -137,6 +135,7 @@ defineExpose({
 
   &.shown {
     visibility: visible;
+
     .modal-body {
       opacity: 1;
       visibility: visible;

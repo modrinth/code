@@ -1,18 +1,30 @@
 //! Authentication flow interface
+use crate::event::emit::{emit_loading, init_loading};
+use crate::state::JavaVersion;
+use crate::util::fetch::{fetch_advanced, fetch_json};
+use dashmap::DashMap;
 use reqwest::Method;
 use serde::Deserialize;
 use std::path::PathBuf;
 
-use crate::event::emit::{emit_loading, init_loading};
-use crate::state::CredentialsStore;
-use crate::util::fetch::{fetch_advanced, fetch_json};
-
 use crate::util::io;
 use crate::util::jre::extract_java_majorminor_version;
 use crate::{
-    util::jre::{self, JavaVersion},
+    util::jre::{self},
     LoadingBarType, State,
 };
+
+pub async fn get_java_versions() -> crate::Result<DashMap<u32, JavaVersion>> {
+    let state = State::get().await?;
+
+    JavaVersion::get_all(&state.pool).await
+}
+
+pub async fn set_java_version(java_version: JavaVersion) -> crate::Result<()> {
+    let state = State::get().await?;
+    java_version.upsert(&state.pool).await?;
+    Ok(())
+}
 
 // Searches for jres on the system given a java version (ex: 1.8, 1.17, 1.18)
 // Allow higher allows for versions higher than the given version to be returned ('at least')
@@ -38,7 +50,6 @@ pub async fn find_filtered_jres(
     })
 }
 
-#[theseus_macros::debug_pin]
 pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
@@ -67,7 +78,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 None,
                 None,
                 &state.fetch_semaphore,
-                &CredentialsStore(None),
+                &state.pool,
             ).await?;
     emit_loading(&loading_bar, 10.0, Some("Downloading java version")).await?;
 
@@ -80,11 +91,11 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             None,
             Some((&loading_bar, 80.0)),
             &state.fetch_semaphore,
-            &CredentialsStore(None),
+            &state.pool,
         )
         .await?;
 
-        let path = state.directories.java_versions_dir().await;
+        let path = state.directories.java_versions_dir();
 
         let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
             .map_err(|_| {

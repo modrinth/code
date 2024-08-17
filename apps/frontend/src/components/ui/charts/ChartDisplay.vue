@@ -162,7 +162,7 @@
                     <div
                       :style="{
                         '--color-brand': isUsingProjectColors
-                          ? intToRgba(project.color, project.id, theme ?? undefined)
+                          ? intToRgba(project.color, project.id, theme.active ?? undefined)
                           : getDefaultColor(project.id),
                       }"
                       class="legend__item__color"

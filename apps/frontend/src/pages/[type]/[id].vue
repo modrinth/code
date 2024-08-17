@@ -3,8 +3,8 @@
     <div class="normal-page__sidebar">
       <aside class="universal-card">
         <Breadcrumbs
-            current-title="Settings"
-            :link-stack="[
+          current-title="Settings"
+          :link-stack="[
             {
               href: organization
                 ? `/organization/${organization.slug}/settings/projects`
@@ -20,162 +20,151 @@
         />
         <div class="settings-header">
           <Avatar
-              :src="project.icon_url"
-              :alt="project.title"
-              size="sm"
-              class="settings-header__icon"
+            :src="project.icon_url"
+            :alt="project.title"
+            size="sm"
+            class="settings-header__icon"
           />
           <div class="settings-header__text">
             <h1 class="wrap-as-needed">
               {{ project.title }}
             </h1>
-            <Badge :type="project.status"/>
+            <Badge :type="project.status" />
           </div>
         </div>
         <h2>Project settings</h2>
         <NavStack>
           <NavStackItem
-              :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-              label="General"
+            :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+            label="General"
           >
-            <SettingsIcon/>
+            <SettingsIcon />
           </NavStackItem>
           <NavStackItem
-              :link="`/${project.project_type}/${
+            :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/tags`"
-              label="Tags"
+            label="Tags"
           >
-            <CategoriesIcon/>
+            <CategoriesIcon />
           </NavStackItem>
           <NavStackItem
-              :link="`/${project.project_type}/${
+            :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/description`"
-              label="Description"
+            label="Description"
           >
-            <DescriptionIcon/>
+            <DescriptionIcon />
           </NavStackItem>
           <NavStackItem
-              :link="`/${project.project_type}/${
+            :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/license`"
-              label="License"
+            label="License"
           >
-            <CopyrightIcon/>
+            <CopyrightIcon />
           </NavStackItem>
           <NavStackItem
-              :link="`/${project.project_type}/${
+            :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/links`"
-              label="Links"
+            label="Links"
           >
-            <LinksIcon/>
+            <LinksIcon />
           </NavStackItem>
           <NavStackItem
-              :link="`/${project.project_type}/${
+            :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/members`"
-              label="Members"
+            label="Members"
           >
-            <UsersIcon/>
+            <UsersIcon />
           </NavStackItem>
           <h3>View</h3>
           <NavStackItem
-              :link="`/${project.project_type}/${
+            :link="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/settings/analytics`"
-              label="Analytics"
-              chevron
+            label="Analytics"
+            chevron
           >
-            <ChartIcon/>
+            <ChartIcon />
           </NavStackItem>
           <h3>Upload</h3>
           <NavStackItem
-              :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
-              label="Gallery"
-              chevron
+            :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
+            label="Gallery"
+            chevron
           >
-            <GalleryIcon/>
+            <GalleryIcon />
           </NavStackItem>
           <NavStackItem
-              :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-              label="Versions"
-              chevron
+            :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
+            label="Versions"
+            chevron
           >
-            <VersionIcon/>
+            <VersionIcon />
           </NavStackItem>
         </NavStack>
       </aside>
     </div>
     <div class="normal-page__content">
       <ProjectMemberHeader
-          v-if="currentMember"
-          :project="project"
-          :versions="versions"
-          :current-member="currentMember"
-          :is-settings="route.name.startsWith('type-id-settings')"
-          :route-name="route.name"
-          :set-processing="setProcessing"
-          :collapsed="collapsedChecklist"
-          :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-          :all-members="allMembers"
-          :update-members="updateMembers"
-          :auth="auth"
-          :tags="tags"
+        v-if="currentMember"
+        :project="project"
+        :versions="versions"
+        :current-member="currentMember"
+        :is-settings="route.name.startsWith('type-id-settings')"
+        :route-name="route.name"
+        :set-processing="setProcessing"
+        :collapsed="collapsedChecklist"
+        :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+        :all-members="allMembers"
+        :update-members="updateMembers"
+        :auth="auth"
+        :tags="tags"
       />
       <NuxtPage
-          v-model:project="project"
-          v-model:versions="versions"
-          v-model:featured-versions="featuredVersions"
-          v-model:members="members"
-          v-model:all-members="allMembers"
-          v-model:dependencies="dependencies"
-          v-model:organization="organization"
-          :current-member="currentMember"
-          :patch-project="patchProject"
-          :patch-icon="patchIcon"
-          :reset-project="resetProject"
-          :reset-organization="resetOrganization"
-          :reset-members="resetMembers"
-          :route="route"
+        v-model:project="project"
+        v-model:versions="versions"
+        v-model:featured-versions="featuredVersions"
+        v-model:members="members"
+        v-model:all-members="allMembers"
+        v-model:dependencies="dependencies"
+        v-model:organization="organization"
+        :current-member="currentMember"
+        :patch-project="patchProject"
+        :patch-icon="patchIcon"
+        :reset-project="resetProject"
+        :reset-organization="resetOrganization"
+        :reset-members="resetMembers"
+        :route="route"
       />
     </div>
   </div>
-  <div v-else class='experimental-styles-within'>
-    <NewModal ref='settingsModal'>
+  <div v-else class="experimental-styles-within">
+    <NewModal ref="settingsModal">
       <template #title>
-        <Avatar
-          :src="project.icon_url"
-          :alt="project.title"
-          class="icon"
-          size='32px'
-        />
-        <span class='font-extrabold text-contrast text-lg'>
-          Settings
-        </span>
+        <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
+        <span class="text-contrast text-lg font-extrabold"> Settings </span>
       </template>
     </NewModal>
-    <CollectionCreateModal ref="modal_collection" :project-ids="[project.id]"/>
+    <CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
     <div class="new-page">
       <div class="normal-page__header relative my-4 flex flex-col gap-7">
         <div class="flex place-content-between gap-8">
           <div class="flex flex-col gap-4">
             <div class="flex gap-4">
-              <Avatar
-                :src="project.icon_url"
-                :alt="project.title"
-                size='96px'
-              />
+              <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-2">
-                  <h1 class="text-2xl leading-none font-extrabold m-0 text-contrast">
+                  <h1 class="text-contrast m-0 text-2xl font-extrabold leading-none">
                     {{ project.title }}
                   </h1>
                   <Badge
-                      v-if="auth.user && currentMember"
-                      :type="project.status"
-                      class="status-badge"
+                    v-if="auth.user && currentMember"
+                    :type="project.status"
+                    class="status-badge"
                   />
                 </div>
                 <p class="font-semibold">
@@ -183,9 +172,9 @@
                 </p>
                 <div class="tag-list mt-auto">
                   <div
-                      v-for="(category, index) in project.categories"
-                      :key="index"
-                      class="tag-list__item"
+                    v-for="(category, index) in project.categories"
+                    :key="index"
+                    class="tag-list__item"
                   >
                     {{ formatCategory(category) }}
                   </div>
@@ -193,88 +182,91 @@
               </div>
             </div>
             <div class="divide-y-1 flex gap-4">
-              <StatItem :label="formatMessage(messages.downloadsStat, { count: project.downloads })"
-                        :value="$formatNumber(project.downloads)">
-                <DownloadIcon/>
+              <StatItem
+                :label="formatMessage(messages.downloadsStat, { count: project.downloads })"
+                :value="$formatNumber(project.downloads)"
+              >
+                <DownloadIcon />
               </StatItem>
-              <div class="border-base border-[1px] border-button-bg"/>
-              <StatItem :label="formatMessage(messages.followersStat, { count: project.followers })"
-                        :value="$formatNumber(project.followers)">
-                <HeartIcon/>
+              <div class="border-base border-[1px] border-button-bg" />
+              <StatItem
+                :label="formatMessage(messages.followersStat, { count: project.followers })"
+                :value="$formatNumber(project.followers)"
+              >
+                <HeartIcon />
               </StatItem>
             </div>
             <ProjectMemberHeader
-                v-if="currentMember"
-                :project="project"
-                :versions="versions"
-                :current-member="currentMember"
-                :is-settings="route.name.startsWith('type-id-settings')"
-                :route-name="route.name"
-                :set-processing="setProcessing"
-                :collapsed="collapsedChecklist"
-                :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-                :all-members="allMembers"
-                :update-members="updateMembers"
-                :auth="auth"
-                :tags="tags"
+              v-if="currentMember"
+              :project="project"
+              :versions="versions"
+              :current-member="currentMember"
+              :is-settings="route.name.startsWith('type-id-settings')"
+              :route-name="route.name"
+              :set-processing="setProcessing"
+              :collapsed="collapsedChecklist"
+              :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+              :all-members="allMembers"
+              :update-members="updateMembers"
+              :auth="auth"
+              :tags="tags"
             />
             <MessageBanner v-if="project.status === 'archived'" message-type="warning">
-              {{ project.title }} has been archived. {{ project.title }} will not receive any further
-              updates unless the author decides to unarchive the project.
+              {{ project.title }} has been archived. {{ project.title }} will not receive any
+              further updates unless the author decides to unarchive the project.
             </MessageBanner>
             <MessageBanner v-if="project.project_type === 'modpack'" message-type="information">
               To install {{ project.title }}, download
               <nuxt-link to="/app">the Modrinth App</nuxt-link>
-              . For instructions with other launchers,
-              please see
-              <a href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/" :target="$external()"
-              >our documentation</a
+              . For instructions with other launchers, please see
+              <a
+                href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
+                :target="$external()"
+                >our documentation</a
               >.
             </MessageBanner>
             <div class="flex gap-2">
               <ButtonStyled size="large" color="brand">
                 <button>
-                  <DownloadIcon/>
+                  <DownloadIcon />
                   Download
                 </button>
               </ButtonStyled>
-              <ButtonStyled size="large" circular :color="following ? 'red' : 'standard'" color-fill="none" hover-color-fill="background">
+              <ButtonStyled
+                size="large"
+                circular
+                :color="following ? 'red' : 'standard'"
+                color-fill="none"
+                hover-color-fill="background"
+              >
                 <button
-                    v-if="auth.user"
-                    v-tooltip="following ? `Unfollow` : `Follow`"
-                    @click="userFollowProject(project)"
+                  v-if="auth.user"
+                  v-tooltip="following ? `Unfollow` : `Follow`"
+                  @click="userFollowProject(project)"
                 >
-                  <HeartIcon
-                      :fill="following ? 'currentColor' : 'none'"
-                      aria-hidden="true"
-                  />
+                  <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
                 </button>
                 <nuxt-link v-else to="/auth/sign-in">
-                  <HeartIcon aria-hidden="true"/>
+                  <HeartIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled size="large" circular>
-                <PopoutMenu
-                    v-if="auth.user"
-                    direction="right"
-                    position="bottom"
-                    from="top-right"
-                >
-                  <BookmarkIcon aria-hidden="true"/>
+                <PopoutMenu v-if="auth.user" direction="right" position="bottom" from="top-right">
+                  <BookmarkIcon aria-hidden="true" />
                   <template #menu>
                     <input
-                        v-model="displayCollectionsSearch"
-                        type="text"
-                        placeholder="Search collections..."
-                        class="search-input menu-search"
+                      v-model="displayCollectionsSearch"
+                      type="text"
+                      placeholder="Search collections..."
+                      class="search-input menu-search"
                     />
                     <div v-if="collections.length > 0" class="collections-list">
                       <Checkbox
-                          v-for="option in collections"
-                          :key="option.id"
-                          :model-value="option.projects.includes(project.id)"
-                          class="popout-checkbox"
-                          @update:model-value="() => onUserCollectProject(option, project.id)"
+                        v-for="option in collections"
+                        :key="option.id"
+                        :model-value="option.projects.includes(project.id)"
+                        class="popout-checkbox"
+                        @update:model-value="() => onUserCollectProject(option, project.id)"
                       >
                         {{ option.name }}
                       </Checkbox>
@@ -283,51 +275,51 @@
                       <p class="popout-text">No collections found.</p>
                     </div>
                     <button class="btn collection-button" @click="$refs.modal_collection.show()">
-                      <PlusIcon/>
+                      <PlusIcon />
                       Create new collection
                     </button>
                   </template>
                 </PopoutMenu>
                 <nuxt-link v-else to="/auth/sign-in">
-                  <BookmarkIcon aria-hidden="true"/>
+                  <BookmarkIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-                <button
-                    @click='() => settingsModal.show()'
-                >
-                  <SettingsIcon/>
+                <button @click="() => settingsModal.show()">
+                  <SettingsIcon />
                 </button>
               </ButtonStyled>
-              <ButtonStyled v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationChecklist"
-                            size="large" circular>
-                <button
-                    @click="showModerationChecklist = true"
-                >
-                  <EyeIcon/>
+              <ButtonStyled
+v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationChecklist"
+                "
+                size="large"
+                circular
+              >
+                <button @click="showModerationChecklist = true">
+                  <EyeIcon />
                 </button>
               </ButtonStyled>
               <ButtonStyled size="large" circular type="transparent">
                 <OverflowMenu
-                    :options="[
-                  {
-                    id: 'report',
-                    action: () =>
-                      auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
-                    color: 'red',
-                    hoverOnly: true,
-                  },
-                  { id: 'copy-id', action: () => copyId() },
-                ]"
-                    direction="right"
+                  :options="[
+                    {
+                      id: 'report',
+                      action: () =>
+                        auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+                      color: 'red',
+                      hoverOnly: true,
+                    },
+                    { id: 'copy-id', action: () => copyId() },
+                  ]"
+                  direction="right"
                 >
-                  <MoreVerticalIcon/>
+                  <MoreVerticalIcon />
                   <template #report>
-                    <ReportIcon/>
+                    <ReportIcon />
                     Report
                   </template>
                   <template #copy-id>
-                    <ClipboardCopyIcon/>
+                    <ClipboardCopyIcon />
                     Copy ID
                   </template>
                 </OverflowMenu>
@@ -336,23 +328,23 @@
           </div>
           <div class="max-h-[13.125rem] w-[26.375rem] max-w-[26.375rem]">
             <nuxt-link
-                v-if="featuredGalleryImage"
-                :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
+              v-if="featuredGalleryImage"
+              :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
             >
               <img
-                  :src="featuredGalleryImage.url"
-                  :alt="
+                :src="featuredGalleryImage.url"
+                :alt="
                   featuredGalleryImage.description
                     ? featuredGalleryImage.description
                     : featuredGalleryImage.title
                 "
-                  class="h-full min-w-[26.375rem] rounded-2xl border-4 border-solid border-button-bg object-cover"
+                class="h-full min-w-[26.375rem] rounded-2xl border-4 border-solid border-button-bg object-cover"
               />
             </nuxt-link>
           </div>
         </div>
         <NavTabs
-            :links="[
+          :links="[
             {
               label: formatMessage(messages.aboutTab),
               href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
@@ -371,7 +363,9 @@
               label: formatMessage(messages.versionsTab),
               href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions`,
               shown: versions.length > 0 || !!currentMember,
-              subpages: [ `/${project.project_type}/${project.slug ? project.slug : project.id}/version/` ]
+              subpages: [
+                `/${project.project_type}/${project.slug ? project.slug : project.id}/version/`,
+              ],
             },
             {
               label: formatMessage(messages.moderationTab),
@@ -386,25 +380,25 @@
         />
       </div>
       <NuxtPage
-          v-model:project="project"
-          v-model:versions="versions"
-          v-model:featured-versions="featuredVersions"
-          v-model:members="members"
-          v-model:all-members="allMembers"
-          v-model:dependencies="dependencies"
-          v-model:organization="organization"
-          :current-member="currentMember"
-          :reset-project="resetProject"
-          :reset-organization="resetOrganization"
-          :reset-members="resetMembers"
-          :route="route"
+        v-model:project="project"
+        v-model:versions="versions"
+        v-model:featured-versions="featuredVersions"
+        v-model:members="members"
+        v-model:all-members="allMembers"
+        v-model:dependencies="dependencies"
+        v-model:organization="organization"
+        :current-member="currentMember"
+        :reset-project="resetProject"
+        :reset-organization="resetOrganization"
+        :reset-members="resetMembers"
+        :route="route"
       />
     </div>
     <ModerationChecklist
-        v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
-        :project="project"
-        :future-projects="futureProjects"
-        :reset-project="resetProject"
+      v-if="auth.user && tags.staffRoles.includes(auth.user.role) && showModerationChecklist"
+      :project="project"
+      :future-projects="futureProjects"
+      :reset-project="resetProject"
     />
   </div>
 </template>
@@ -420,9 +414,15 @@ import {
   EyeIcon,
 } from "@modrinth/assets";
 import {
-  Avatar, NewModal, ButtonStyled, Checkbox, OverflowMenu, PopoutMenu, StatItem
+  Avatar,
+  NewModal,
+  ButtonStyled,
+  Checkbox,
+  OverflowMenu,
+  PopoutMenu,
+  StatItem,
 } from "@modrinth/ui";
-import {renderString, isRejected, isUnderReview, isStaff, formatCategory} from "@modrinth/utils";
+import { renderString, isRejected, isUnderReview, isStaff, formatCategory } from "@modrinth/utils";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";
 import ReportIcon from "~/assets/images/utils/report.svg?component";
 import HeartIcon from "~/assets/images/utils/heart.svg?component";
@@ -441,9 +441,9 @@ import LinksIcon from "~/assets/images/utils/link.svg?component";
 import CopyrightIcon from "~/assets/images/utils/copyright.svg?component";
 import GalleryIcon from "~/assets/images/utils/image.svg?component";
 import VersionIcon from "~/assets/images/utils/version.svg?component";
-import {reportProject} from "~/utils/report-helpers.ts";
+import { reportProject } from "~/utils/report-helpers.ts";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
-import {userCollectProject} from "~/composables/user.js";
+import { userCollectProject } from "~/composables/user.js";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
 
@@ -451,12 +451,16 @@ const data = useNuxtApp();
 const route = useNativeRoute();
 
 const auth = await useAuth();
-const user = await useUser();
+const user = ref();
+if (import.meta.client) {
+  user.value = await useUser();
+}
+
 const tags = useTags();
 
-const {formatMessage} = useVIntl();
+const { formatMessage } = useVIntl();
 
-const settingsModal = ref()
+const settingsModal = ref();
 
 const messages = defineMessages({
   downloadsStat: {
@@ -487,19 +491,19 @@ const messages = defineMessages({
 
 const displayCollectionsSearch = ref("");
 const collections = computed(() =>
-    user.value && user.value.collections
-        ? user.value.collections.filter((x) =>
-            x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
-        )
-        : [],
+  user.value && user.value.collections
+    ? user.value.collections.filter((x) =>
+        x.name.toLowerCase().includes(displayCollectionsSearch.value.toLowerCase()),
+      )
+    : [],
 );
 
 if (
-    !route.params.id ||
-    !(
-        tags.value.projectTypes.find((x) => x.id === route.params.type) ||
-        route.params.type === "project"
-    )
+  !route.params.id ||
+  !(
+    tags.value.projectTypes.find((x) => x.id === route.params.type) ||
+    route.params.type === "project"
+  )
 ) {
   throw createError({
     fatal: true,
@@ -509,31 +513,31 @@ if (
 }
 
 let project,
-    resetProject,
-    allMembers,
-    resetMembers,
-    dependencies,
-    featuredVersions,
-    versions,
-    organization,
-    resetOrganization;
+  resetProject,
+  allMembers,
+  resetMembers,
+  dependencies,
+  featuredVersions,
+  versions,
+  organization,
+  resetOrganization;
 try {
   [
-    {data: project, refresh: resetProject},
-    {data: allMembers, refresh: resetMembers},
-    {data: dependencies},
-    {data: featuredVersions},
-    {data: versions},
-    {data: organization, refresh: resetOrganization},
+    { data: project, refresh: resetProject },
+    { data: allMembers, refresh: resetMembers },
+    { data: dependencies },
+    { data: featuredVersions },
+    { data: versions },
+    { data: organization, refresh: resetOrganization },
   ] = await Promise.all([
     useAsyncData(`project/${route.params.id}`, () => useBaseFetch(`project/${route.params.id}`), {
       transform: (project) => {
         if (project) {
           project.actualProjectType = JSON.parse(JSON.stringify(project.project_type));
           project.project_type = data.$getProjectTypeForUrl(
-              project.project_type,
-              project.loaders,
-              tags.value,
+            project.project_type,
+            project.loaders,
+            tags.value,
           );
         }
 
@@ -541,30 +545,30 @@ try {
       },
     }),
     useAsyncData(
-        `project/${route.params.id}/members`,
-        () => useBaseFetch(`project/${route.params.id}/members`, {apiVersion: 3}),
-        {
-          transform: (members) => {
-            members.forEach((it, index) => {
-              members[index].avatar_url = it.user.avatar_url;
-              members[index].name = it.user.username;
-            });
+      `project/${route.params.id}/members`,
+      () => useBaseFetch(`project/${route.params.id}/members`, { apiVersion: 3 }),
+      {
+        transform: (members) => {
+          members.forEach((it, index) => {
+            members[index].avatar_url = it.user.avatar_url;
+            members[index].name = it.user.username;
+          });
 
-            return members;
-          },
+          return members;
         },
+      },
     ),
     useAsyncData(`project/${route.params.id}/dependencies`, () =>
-        useBaseFetch(`project/${route.params.id}/dependencies`),
+      useBaseFetch(`project/${route.params.id}/dependencies`),
     ),
     useAsyncData(`project/${route.params.id}/version?featured=true`, () =>
-        useBaseFetch(`project/${route.params.id}/version?featured=true`),
+      useBaseFetch(`project/${route.params.id}/version?featured=true`),
     ),
     useAsyncData(`project/${route.params.id}/version`, () =>
-        useBaseFetch(`project/${route.params.id}/version`),
+      useBaseFetch(`project/${route.params.id}/version`),
     ),
     useAsyncData(`project/${route.params.id}/organization`, () =>
-        useBaseFetch(`project/${route.params.id}/organization`, {apiVersion: 3}),
+      useBaseFetch(`project/${route.params.id}/organization`, { apiVersion: 3 }),
     ),
   ]);
 
@@ -592,10 +596,10 @@ if (project.value.project_type !== route.params.type || route.params.id !== proj
   path = path.filter((x) => x);
 
   await navigateTo(
-      `/${project.value.project_type}/${project.value.slug}${
-          path.length > 0 ? `/${path.join("/")}` : ""
-      }`,
-      {redirectCode: 301, replace: true},
+    `/${project.value.project_type}/${project.value.slug}${
+      path.length > 0 ? `/${path.join("/")}` : ""
+    }`,
+    { redirectCode: 301, replace: true },
   );
 }
 
@@ -604,11 +608,11 @@ if (project.value.project_type !== route.params.type || route.params.id !== proj
 const members = computed(() => {
   const acceptedMembers = allMembers.value.filter((x) => x.accepted);
   const owner = acceptedMembers.find((x) =>
-      organization.value
-          ? organization.value.members.some(
-              (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
-          )
-          : x.is_owner,
+    organization.value
+      ? organization.value.members.some(
+          (orgMember) => orgMember.user.id === x.user.id && orgMember.is_owner,
+        )
+      : x.is_owner,
   );
 
   const rest = acceptedMembers.filter((x) => !owner || x.user.id !== owner.user.id) || [];
@@ -667,19 +671,19 @@ featuredVersions.value.sort((a, b) => {
 const featuredGalleryImage = computed(() => project.value.gallery.find((img) => img.featured));
 
 const projectTypeDisplay = computed(() =>
-    data.$formatProjectType(
-        data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
-    ),
+  data.$formatProjectType(
+    data.$getProjectTypeForDisplay(project.value.project_type, project.value.loaders),
+  ),
 );
 
-const following = computed(() => user.value.follows.find((x) => x.id === project.value.id))
+const following = computed(() => user.value.follows.find((x) => x.id === project.value.id));
 
 const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`);
 const description = computed(
-    () =>
-        `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
-            project.value.title
-        } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
+  () =>
+    `${project.value.description} - Download the Minecraft ${projectTypeDisplay.value} ${
+      project.value.title
+    } by ${members.value.find((x) => x.is_owner)?.user?.username || "a Creator"} on Modrinth`,
 );
 
 if (!route.name.startsWith("type-id-settings")) {
@@ -690,9 +694,9 @@ if (!route.name.startsWith("type-id-settings")) {
     ogDescription: () => project.value.description,
     ogImage: () => project.value.icon_url ?? "https://cdn.modrinth.com/placeholder.png",
     robots: () =>
-        project.value.status === "approved" || project.value.status === "archived"
-            ? "all"
-            : "noindex",
+      project.value.status === "approved" || project.value.status === "archived"
+        ? "all"
+        : "noindex",
   });
 }
 
@@ -751,7 +755,7 @@ async function patchProject(resData, quiet = false) {
         text: "Your project has been updated.",
         type: "success",
       });
-      window.scrollTo({top: 0, behavior: "smooth"});
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   } catch (err) {
     data.$notify({
@@ -760,7 +764,7 @@ async function patchProject(resData, quiet = false) {
       text: err.data.description,
       type: "error",
     });
-    window.scrollTo({top: 0, behavior: "smooth"});
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   stopLoading();
@@ -774,13 +778,13 @@ async function patchIcon(icon) {
 
   try {
     await useBaseFetch(
-        `project/${project.value.id}/icon?ext=${
-            icon.type.split("/")[icon.type.split("/").length - 1]
-        }`,
-        {
-          method: "PATCH",
-          body: icon,
-        },
+      `project/${project.value.id}/icon?ext=${
+        icon.type.split("/")[icon.type.split("/").length - 1]
+      }`,
+      {
+        method: "PATCH",
+        body: icon,
+      },
     );
     await resetProject();
     result = true;
@@ -798,7 +802,7 @@ async function patchIcon(icon) {
       type: "error",
     });
 
-    window.scrollTo({top: 0, behavior: "smooth"});
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   stopLoading();
@@ -807,18 +811,18 @@ async function patchIcon(icon) {
 
 async function updateMembers() {
   allMembers.value = await useAsyncData(
-      `project/${route.params.id}/members`,
-      () => useBaseFetch(`project/${route.params.id}/members`),
-      {
-        transform: (members) => {
-          members.forEach((it, index) => {
-            members[index].avatar_url = it.user.avatar_url;
-            members[index].name = it.user.username;
-          });
+    `project/${route.params.id}/members`,
+    () => useBaseFetch(`project/${route.params.id}/members`),
+    {
+      transform: (members) => {
+        members.forEach((it, index) => {
+          members[index].avatar_url = it.user.avatar_url;
+          members[index].name = it.user.username;
+        });
 
-          return members;
-        },
+        return members;
       },
+    },
   );
 }
 

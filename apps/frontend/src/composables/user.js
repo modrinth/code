@@ -12,20 +12,27 @@ export const initUser = async () => {
   const auth = (await useAuth()).value;
 
   const user = {
-    notifications: [],
+    collections: [],
     follows: [],
+    subscriptions: [],
     lastUpdated: 0,
   };
 
   if (auth.user && auth.user.id) {
     try {
-      const [follows, collections] = await Promise.all([
-        useBaseFetch(`user/${auth.user.id}/follows`),
-        useBaseFetch(`user/${auth.user.id}/collections`, { apiVersion: 3 }),
+      const headers = {
+        Authorization: auth.token,
+      };
+
+      const [follows, collections, subscriptions] = await Promise.all([
+        useBaseFetch(`user/${auth.user.id}/follows`, { headers }, true),
+        useBaseFetch(`user/${auth.user.id}/collections`, { apiVersion: 3, headers }, true),
+        useBaseFetch(`billing/subscriptions`, { internal: true, headers }, true),
       ]);
 
       user.collections = collections;
       user.follows = follows;
+      user.subscriptions = subscriptions;
       user.lastUpdated = Date.now();
     } catch (err) {
       console.error(err);
@@ -167,6 +174,5 @@ export const logout = async () => {
 
   await useAuth("none");
   useCookie("auth-token").value = null;
-  await navigateTo("/");
   stopLoading();
 };

@@ -37,7 +37,6 @@ export { default as CompactChart } from './chart/CompactChart.vue'
 export { default as NewModal } from './modal/NewModal.vue'
 export { default as Modal } from './modal/Modal.vue'
 export { default as ConfirmModal } from './modal/ConfirmModal.vue'
-export { default as ReportModal } from './modal/ReportModal.vue'
 export { default as ShareModal } from './modal/ShareModal.vue'
 
 // Navigation
@@ -50,3 +49,6 @@ export { default as NavStack } from './nav/NavStack.vue'
 export { default as Categories } from './search/Categories.vue'
 export { default as SearchDropdown } from './search/SearchDropdown.vue'
 export { default as SearchFilter } from './search/SearchFilter.vue'
+
+// Billing
+export { default as PurchaseModal } from './billing/PurchaseModal.vue'
