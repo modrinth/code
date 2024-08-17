@@ -7,6 +7,7 @@ on:
 
 jobs:
   run-docker:
+    if: github.repository_owner == 'modrinth'
     runs-on: ubuntu-latest
 
     steps:

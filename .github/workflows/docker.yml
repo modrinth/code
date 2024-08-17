@@ -9,6 +9,7 @@ on:
   pull_request:
 jobs:
   docker:
+    if: github.repository_owner == 'modrinth'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

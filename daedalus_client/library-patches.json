@@ -2863,7 +2863,8 @@
   {
     "_comment": "Replace glfw from 3.3.1 with version from 3.3.2 to prevent stack smashing",
     "match": [
-      "org.lwjgl:lwjgl-glfw-natives-linux:3.3.1"
+      "org.lwjgl:lwjgl-glfw-natives-linux:3.3.1",
+      "org.lwjgl:lwjgl-glfw:3.3.1:natives-linux"
     ],
     "override": {
       "downloads": {
