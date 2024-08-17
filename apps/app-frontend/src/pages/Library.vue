@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref, shallowRef, watch } from 'vue'
+import { onUnmounted, ref, shallowRef } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
@@ -10,7 +10,6 @@ import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
-import { get, set } from '@/helpers/settings.js'
 import { useSettings } from '@/composables/useSettings.js'
 
 const route = useRoute()
