@@ -1,36 +1,30 @@
 <template>
   <NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
     <template #title>
-      <Avatar
-          :src="project.icon_url"
-          :alt="project.title"
-          class="icon"
-          size='32px'
-          no-shadow
-      />
-      <span class='font-extrabold text-contrast text-lg'>
-        {{ project.license.name ? project.license.name : 'License' }}
+      <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
+      <span class="text-lg font-extrabold text-contrast">
+        {{ project.license.name ? project.license.name : "License" }}
       </span>
     </template>
     <div class="markdown-body" v-html="renderString(licenseText)" />
   </NewModal>
-  <section class='normal-page__content'>
+  <section class="normal-page__content">
     <div
-        v-if='project.body'
-        class='markdown-body card'
-        v-html="renderHighlightedString(project.body || '')"
+      v-if="project.body"
+      class="markdown-body card"
+      v-html="renderHighlightedString(project.body || '')"
     />
   </section>
-  <div class='normal-page__sidebar'>
-    <div v-if='versions.length > 0' class='card flex-card experimental-styles-within'>
+  <div class="normal-page__sidebar">
+    <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
       <h2>{{ formatMessage(compatibilityMessages.title) }}</h2>
       <section>
         <h3>{{ formatMessage(compatibilityMessages.minecraftJava) }}</h3>
-        <div class='tag-list'>
+        <div class="tag-list">
           <div
-              v-for='version in getVersionsToDisplay(project)'
-              :key='`version-tag-${version}`'
-              class='tag-list__item'
+            v-for="version in getVersionsToDisplay(project)"
+            :key="`version-tag-${version}`"
+            class="tag-list__item"
           >
             {{ version }}
           </div>
@@ -38,78 +32,76 @@
       </section>
       <section>
         <h3>{{ formatMessage(compatibilityMessages.platforms) }}</h3>
-        <div class='tag-list'>
+        <div class="tag-list">
           <div
-              v-for='platform in project.loaders'
-              :key='`platform-tag-${platform}`'
-              :class='`tag-list__item`'
-              :style='`--_color: var(--color-platform-${platform})`'
+            v-for="platform in project.loaders"
+            :key="`platform-tag-${platform}`"
+            :class="`tag-list__item`"
+            :style="`--_color: var(--color-platform-${platform})`"
           >
-            <svg v-html='tags.loaders.find((x) => x.name === platform).icon'></svg>
+            <svg v-html="tags.loaders.find((x) => x.name === platform).icon"></svg>
             {{ formatCategory(platform) }}
           </div>
         </div>
       </section>
       <section>
         <h3>{{ formatMessage(compatibilityMessages.environments) }}</h3>
-        <div class='status-list'>
-          <div class='status-list__item status-list__item--color-green'>
+        <div class="status-list">
+          <div class="status-list__item status-list__item--color-green">
             <CheckIcon />
             Singleplayer
           </div>
           <div
-              v-if="
-                  project.client_side !== 'unsupported' && project.server_side !== 'unsupported'
-                "
-              class='status-list__item status-list__item--color-green'
+            v-if="project.client_side !== 'unsupported' && project.server_side !== 'unsupported'"
+            class="status-list__item status-list__item--color-green"
           >
             <CheckIcon />
             Client and server
           </div>
           <div
-              v-if="project.client_side === 'required' && project.server_side === 'unsupported'"
-              class='status-list__item status-list__item--color-green'
+            v-if="project.client_side === 'required' && project.server_side === 'unsupported'"
+            class="status-list__item status-list__item--color-green"
           >
             <CheckIcon />
             Client
           </div>
           <div
-              v-if="project.server_side === 'required' && project.client_side === 'unsupported'"
-              class='status-list__item status-list__item--color-green'
+            v-if="project.server_side === 'required' && project.client_side === 'unsupported'"
+            class="status-list__item status-list__item--color-green"
           >
             <CheckIcon />
             Server
           </div>
           <div
-              v-if="
-                  project.client_side === 'optional' ||
-                  (project.client_side === 'required' && project.server_side === 'optional')
-                "
-              class='status-list__item status-list__item--color-orange'
+            v-if="
+              project.client_side === 'optional' ||
+              (project.client_side === 'required' && project.server_side === 'optional')
+            "
+            class="status-list__item status-list__item--color-orange"
           >
             <CheckIcon />
             Client <span>(Limited functionality)</span>
           </div>
           <div
-              v-if="
-                  project.server_side === 'optional' ||
-                  (project.server_side === 'required' && project.client_side === 'optional')
-                "
-              class='status-list__item status-list__item--color-orange'
+            v-if="
+              project.server_side === 'optional' ||
+              (project.server_side === 'required' && project.client_side === 'optional')
+            "
+            class="status-list__item status-list__item--color-orange"
           >
             <CheckIcon />
             Server <span>(Limited functionality)</span>
           </div>
           <div
-              v-if="project.client_side === 'unsupported'"
-              class='status-list__item status-list__item--color-red'
+            v-if="project.client_side === 'unsupported'"
+            class="status-list__item status-list__item--color-red"
           >
             <XIcon />
             Client
           </div>
           <div
-              v-if="project.server_side === 'unsupported'"
-              class='status-list__item status-list__item--color-red'
+            v-if="project.server_side === 'unsupported'"
+            class="status-list__item status-list__item--color-red"
           >
             <XIcon />
             Server
@@ -118,207 +110,200 @@
       </section>
     </div>
     <div
-        v-if='
-            project.issues_url ||
-            project.source_url ||
-            project.wiki_url ||
-            project.discord_url ||
-            project.donation_urls.length > 0
-          '
-        class='card flex-card experimental-styles-within'
+      v-if="
+        project.issues_url ||
+        project.source_url ||
+        project.wiki_url ||
+        project.discord_url ||
+        project.donation_urls.length > 0
+      "
+      class="card flex-card experimental-styles-within"
     >
       <h2>{{ formatMessage(linksMessages.title) }}</h2>
-      <div class='links-list'>
+      <div class="links-list">
         <a
-            v-if='project.issues_url'
-            :href='project.issues_url'
-            :target='$external()'
-            rel='noopener nofollow ugc'
+          v-if="project.issues_url"
+          :href="project.issues_url"
+          :target="$external()"
+          rel="noopener nofollow ugc"
         >
-          <IssuesIcon aria-hidden='true' />
+          <IssuesIcon aria-hidden="true" />
           {{ formatMessage(linksMessages.issues) }}
-          <ExternalIcon aria-hidden='true' class='external-icon' />
+          <ExternalIcon aria-hidden="true" class="external-icon" />
         </a>
         <a
-            v-if='project.source_url'
-            :href='project.source_url'
-            :target='$external()'
-            rel='noopener nofollow ugc'
+          v-if="project.source_url"
+          :href="project.source_url"
+          :target="$external()"
+          rel="noopener nofollow ugc"
         >
-          <CodeIcon aria-hidden='true' />
+          <CodeIcon aria-hidden="true" />
           {{ formatMessage(linksMessages.source) }}
-          <ExternalIcon aria-hidden='true' class='external-icon' />
+          <ExternalIcon aria-hidden="true" class="external-icon" />
         </a>
         <a
-            v-if='project.wiki_url'
-            :href='project.wiki_url'
-            :target='$external()'
-            rel='noopener nofollow ugc'
+          v-if="project.wiki_url"
+          :href="project.wiki_url"
+          :target="$external()"
+          rel="noopener nofollow ugc"
         >
-          <WikiIcon aria-hidden='true' />
+          <WikiIcon aria-hidden="true" />
           {{ formatMessage(linksMessages.wiki) }}
-          <ExternalIcon aria-hidden='true' class='external-icon' />
+          <ExternalIcon aria-hidden="true" class="external-icon" />
         </a>
         <a
-            v-if='project.discord_url'
-            :href='project.discord_url'
-            :target='$external()'
-            rel='noopener nofollow ugc'
+          v-if="project.discord_url"
+          :href="project.discord_url"
+          :target="$external()"
+          rel="noopener nofollow ugc"
         >
-          <DiscordIcon class='shrink' aria-hidden='true' />
+          <DiscordIcon class="shrink" aria-hidden="true" />
           {{ formatMessage(linksMessages.discord) }}
-          <ExternalIcon aria-hidden='true' class='external-icon' />
+          <ExternalIcon aria-hidden="true" class="external-icon" />
         </a>
         <hr
-            v-if='
-                (project.issues_url ||
-                  project.source_url ||
-                  project.wiki_url ||
-                  project.discord_url) &&
-                project.donation_urls.length > 0
-              '
+          v-if="
+            (project.issues_url || project.source_url || project.wiki_url || project.discord_url) &&
+            project.donation_urls.length > 0
+          "
         />
         <a
-            v-for='(donation, index) in project.donation_urls'
-            :key='index'
-            :href='donation.url'
-            :target='$external()'
-            rel='noopener nofollow ugc'
+          v-for="(donation, index) in project.donation_urls"
+          :key="index"
+          :href="donation.url"
+          :target="$external()"
+          rel="noopener nofollow ugc"
         >
-          <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden='true' />
-          <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden='true' />
-          <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden='true' />
-          <PayPalIcon v-else-if="donation.id === 'paypal'" aria-hidden='true' />
-          <OpenCollectiveIcon
-              v-else-if="donation.id === 'open-collective'"
-              aria-hidden='true'
-          />
+          <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
+          <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
+          <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
+          <PayPalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
+          <OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true" />
           <HeartIcon v-else-if="donation.id === 'github'" />
           <UnknownIcon v-else />
           <span v-if="donation.id === 'bmac'">{{ formatMessage(linksMessages.donateBmac) }}</span>
-          <span v-else-if="donation.id === 'patreon'">{{ formatMessage(linksMessages.donatePatreon) }}</span>
-          <span v-else-if="donation.id === 'paypal'">{{ formatMessage(linksMessages.donatePayPal) }}</span>
-          <span v-else-if="donation.id === 'ko-fi'">{{ formatMessage(linksMessages.donateKoFi) }}</span>
-          <span v-else-if="donation.id === 'github'">{{ formatMessage(linksMessages.donateGithub) }}</span>
+          <span v-else-if="donation.id === 'patreon'">{{
+            formatMessage(linksMessages.donatePatreon)
+          }}</span>
+          <span v-else-if="donation.id === 'paypal'">{{
+            formatMessage(linksMessages.donatePayPal)
+          }}</span>
+          <span v-else-if="donation.id === 'ko-fi'">{{
+            formatMessage(linksMessages.donateKoFi)
+          }}</span>
+          <span v-else-if="donation.id === 'github'">{{
+            formatMessage(linksMessages.donateGithub)
+          }}</span>
           <span v-else>{{ formatMessage(linksMessages.donateGeneric) }}</span>
-          <ExternalIcon aria-hidden='true' class='external-icon' />
+          <ExternalIcon aria-hidden="true" class="external-icon" />
         </a>
       </div>
     </div>
-    <div class='card flex-card experimental-styles-within'>
+    <div class="card flex-card experimental-styles-within">
       <h2>{{ formatMessage(creatorsMessages.title) }}</h2>
-      <div class='details-list'>
-        <template v-if='organization'>
+      <div class="details-list">
+        <template v-if="organization">
           <nuxt-link
-              class='details-list__item details-list__item--type-large'
-              :to='`/organization/${organization.slug}`'
+            class="details-list__item details-list__item--type-large"
+            :to="`/organization/${organization.slug}`"
           >
-            <Avatar
-                :src='organization.icon_url'
-                :alt='organization.name'
-                size='32px'
-            />
-            <div class='rows'>
-                  <span>
-                    {{ organization.name }}
-                  </span>
-              <span class='details-list__item__text--style-secondary'>Organization</span>
+            <Avatar :src="organization.icon_url" :alt="organization.name" size="32px" />
+            <div class="rows">
+              <span>
+                {{ organization.name }}
+              </span>
+              <span class="details-list__item__text--style-secondary">Organization</span>
             </div>
           </nuxt-link>
           <hr />
         </template>
         <nuxt-link
-            v-for='member in members'
-            :key='`member-${member.id}`'
-            class='details-list__item details-list__item--type-large'
-            :to="'/user/' + member.user.username"
+          v-for="member in members"
+          :key="`member-${member.id}`"
+          class="details-list__item details-list__item--type-large"
+          :to="'/user/' + member.user.username"
         >
-          <Avatar
-              :src='member.avatar_url'
-              :alt='member.name'
-              size='32px'
-              circle
-          />
-          <div class='rows'>
-                <span class='flex items-center gap-1'>
-                  {{ member.name }}
-                  <CrownIcon
-                      v-if='member.is_owner'
-                      v-tooltip="formatMessage(creatorsMessages.owner)"
-                      class='text-brand-orange'
-                  />
-                </span>
-            <span class='details-list__item__text--style-secondary'>{{ member.role }}</span>
+          <Avatar :src="member.avatar_url" :alt="member.name" size="32px" circle />
+          <div class="rows">
+            <span class="flex items-center gap-1">
+              {{ member.name }}
+              <CrownIcon
+                v-if="member.is_owner"
+                v-tooltip="formatMessage(creatorsMessages.owner)"
+                class="text-brand-orange"
+              />
+            </span>
+            <span class="details-list__item__text--style-secondary">{{ member.role }}</span>
           </div>
         </nuxt-link>
       </div>
     </div>
-    <div class='card flex-card experimental-styles-within'>
+    <div class="card flex-card experimental-styles-within">
       <h2>{{ formatMessage(detailsMessages.title) }}</h2>
-      <div class='details-list'>
-        <div class='details-list__item'>
-          <BookTextIcon aria-hidden='true' />
+      <div class="details-list">
+        <div class="details-list__item">
+          <BookTextIcon aria-hidden="true" />
           <div>
             Licensed
             <a
-                v-if='project.license.url'
-                class='text-link hover:underline'
-                :href='project.license.url'
-                :target='$external()'
-                rel='noopener nofollow ugc'
+              v-if="project.license.url"
+              class="text-link hover:underline"
+              :href="project.license.url"
+              :target="$external()"
+              rel="noopener nofollow ugc"
             >
               {{ licenseIdDisplay }}
-              <ExternalIcon aria-hidden='true' class='external-icon inline ml-1 mt-[-1px]' />
+              <ExternalIcon aria-hidden="true" class="external-icon ml-1 mt-[-1px] inline" />
             </a>
             <span
-                v-else-if="
-                    project.license.id === 'LicenseRef-All-Rights-Reserved' ||
-                    !project.license.id.includes('LicenseRef')
-                  "
-                class='text-link hover:underline'
-                @click='getLicenseData()'
+              v-else-if="
+                project.license.id === 'LicenseRef-All-Rights-Reserved' ||
+                !project.license.id.includes('LicenseRef')
+              "
+              class="text-link hover:underline"
+              @click="getLicenseData()"
             >
-                  {{ licenseIdDisplay }}
-                </span>
+              {{ licenseIdDisplay }}
+            </span>
             <span v-else>{{ licenseIdDisplay }}</span>
           </div>
         </div>
         <div
-            v-if='project.approved'
-            v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
-            class='details-list__item'
+          v-if="project.approved"
+          v-tooltip="$dayjs(project.approved).format('MMMM D, YYYY [at] h:mm A')"
+          class="details-list__item"
         >
-          <CalendarIcon aria-hidden='true' />
+          <CalendarIcon aria-hidden="true" />
           <div>
             {{ formatMessage(detailsMessages.published, { date: publishedDate }) }}
           </div>
         </div>
         <div
-            v-else
-            v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
-            class='details-list__item'
+          v-else
+          v-tooltip="$dayjs(project.published).format('MMMM D, YYYY [at] h:mm A')"
+          class="details-list__item"
         >
-          <CalendarIcon aria-hidden='true' />
+          <CalendarIcon aria-hidden="true" />
           <div>
             {{ formatMessage(detailsMessages.created, { date: createdDate }) }}
           </div>
         </div>
         <div
-            v-if="project.status === 'processing' && project.queued"
-            v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
-            class='details-list__item'
+          v-if="project.status === 'processing' && project.queued"
+          v-tooltip="$dayjs(project.queued).format('MMMM D, YYYY [at] h:mm A')"
+          class="details-list__item"
         >
-          <ScaleIcon aria-hidden='true' />
+          <ScaleIcon aria-hidden="true" />
           <div>
             {{ formatMessage(detailsMessages.submitted, { date: submittedDate }) }}
           </div>
         </div>
         <div
-            v-if='versions.length > 0 && project.updated'
-            v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
-            class='details-list__item'
+          v-if="versions.length > 0 && project.updated"
+          v-tooltip="$dayjs(project.updated).format('MMMM D, YYYY [at] h:mm A')"
+          class="details-list__item"
         >
-          <VersionIcon aria-hidden='true' />
+          <VersionIcon aria-hidden="true" />
           <div>
             {{ formatMessage(detailsMessages.updated, { date: updatedDate }) }}
           </div>
@@ -326,7 +311,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script setup>
@@ -350,42 +334,42 @@ import {
   VersionIcon,
   ExternalIcon,
   CodeIcon,
-} from '@modrinth/assets'
+} from "@modrinth/assets";
 
-import { NewModal, Avatar } from '@modrinth/ui'
+import { NewModal, Avatar } from "@modrinth/ui";
 
-import { renderHighlightedString } from '~/helpers/highlight.js'
-import { getVersionsToDisplay } from '~/helpers/projects.js'
-import {formatCategory, renderString} from '@modrinth/utils'
+import { formatCategory, renderString } from "@modrinth/utils";
+import { renderHighlightedString } from "~/helpers/highlight.js";
+import { getVersionsToDisplay } from "~/helpers/projects.js";
 
 const props = defineProps({
   project: {
     type: Object,
     default() {
-      return {}
-    }
+      return {};
+    },
   },
   versions: {
     type: Array,
     default() {
-      return {}
-    }
+      return {};
+    },
   },
   members: {
     type: Array,
     default() {
-      return {}
-    }
+      return {};
+    },
   },
   organization: {
     type: Object,
     default() {
-      return {}
-    }
+      return {};
+    },
   },
-})
+});
 
-const tags = useTags()
+const tags = useTags();
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
@@ -493,10 +477,18 @@ const detailsMessages = defineMessages({
 const modalLicense = ref(null);
 const licenseText = ref("");
 
-const createdDate = computed(() => props.project.published ? formatRelativeTime(props.project.published) : 'unknown');
-const submittedDate = computed(() => props.project.queued ? formatRelativeTime(props.project.queued) : 'unknown');
-const publishedDate = computed(() => props.project.approved ? formatRelativeTime(props.project.approved) : 'unknown');
-const updatedDate = computed(() => props.project.updated ? formatRelativeTime(props.project.updated) : 'unknown');
+const createdDate = computed(() =>
+  props.project.published ? formatRelativeTime(props.project.published) : "unknown",
+);
+const submittedDate = computed(() =>
+  props.project.queued ? formatRelativeTime(props.project.queued) : "unknown",
+);
+const publishedDate = computed(() =>
+  props.project.approved ? formatRelativeTime(props.project.approved) : "unknown",
+);
+const updatedDate = computed(() =>
+  props.project.updated ? formatRelativeTime(props.project.updated) : "unknown",
+);
 
 const licenseIdDisplay = computed(() => {
   const id = props.project.license.id;
@@ -512,12 +504,12 @@ const licenseIdDisplay = computed(() => {
 
 async function getLicenseData() {
   try {
-    const text = await useBaseFetch(`tag/license/${props.project.license.id}`)
-    licenseText.value = text.body || 'License text could not be retrieved.'
+    const text = await useBaseFetch(`tag/license/${props.project.license.id}`);
+    licenseText.value = text.body || "License text could not be retrieved.";
   } catch {
-    licenseText.value = 'License text could not be retrieved.'
+    licenseText.value = "License text could not be retrieved.";
   }
 
-  modalLicense.value.show()
+  modalLicense.value.show();
 }
 </script>

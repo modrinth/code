@@ -1,10 +1,10 @@
 <template>
   <div v-if="count > 1" class="flex items-center gap-1">
-    <ButtonStyled v-if="page > 1" circular type='transparent'>
+    <ButtonStyled v-if="page > 1" circular type="transparent">
       <a
-          aria-label="Previous Page"
-          :href="linkFunction(page - 1)"
-          @click.prevent="switchPage(page - 1)"
+        aria-label="Previous Page"
+        :href="linkFunction(page - 1)"
+        @click.prevent="switchPage(page - 1)"
       >
         <ChevronLeftIcon />
       </a>
@@ -21,22 +21,23 @@
       <div v-if="item === '-'">
         <GapIcon />
       </div>
-      <ButtonStyled v-else circular :color="page === item ? 'brand' : 'standard'" :type="page === item ? 'standard' : 'transparent'">
-        <a
-            :href="linkFunction(item)"
-            @click.prevent="page !== item ? switchPage(item) : null"
-        >
+      <ButtonStyled
+        v-else
+        circular
+        :color="page === item ? 'brand' : 'standard'"
+        :type="page === item ? 'standard' : 'transparent'"
+      >
+        <a :href="linkFunction(item)" @click.prevent="page !== item ? switchPage(item) : null">
           {{ item }}
         </a>
       </ButtonStyled>
     </div>
 
-
-    <ButtonStyled v-if="page !== pages[pages.length - 1]" circular type='transparent'>
+    <ButtonStyled v-if="page !== pages[pages.length - 1]" circular type="transparent">
       <a
-          aria-label="Next Page"
-          :href="linkFunction(page + 1)"
-          @click.prevent="switchPage(page + 1)"
+        aria-label="Next Page"
+        :href="linkFunction(page + 1)"
+        @click.prevent="switchPage(page + 1)"
       >
         <ChevronRightIcon />
       </a>
@@ -69,32 +70,31 @@ const props = withDefaults(
 const pages = computed(() => {
   let pages: ('-' | number)[] = []
 
-
   const first = 1
   const last = props.count
   const current = props.page
   const prev = current - 1
   const next = current + 1
-  const gap = '-';
+  const gap = '-'
 
   if (prev > first) {
-    pages.push(first);
+    pages.push(first)
   }
   if (prev > first + 1) {
     pages.push(gap)
   }
   if (prev >= first) {
-    pages.push(prev);
+    pages.push(prev)
   }
-  pages.push(current);
+  pages.push(current)
   if (next <= last) {
-    pages.push(next);
+    pages.push(next)
   }
   if (next < last - 1) {
     pages.push(gap)
   }
   if (next < last) {
-    pages.push(last);
+    pages.push(last)
   }
 
   return pages
