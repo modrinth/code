@@ -77,6 +77,13 @@ export default defineNuxtConfig({
           title: "Modrinth mods",
         },
       ],
+      script: [
+        {
+          src: "https://js.stripe.com/v3/",
+          defer: true,
+          async: true,
+        },
+      ],
     },
   },
   vite: {
@@ -125,6 +132,7 @@ export default defineNuxtConfig({
         homePageProjects?: any[];
         homePageSearch?: any[];
         homePageNotifs?: any[];
+        products?: any[];
       } = {};
 
       try {
@@ -165,6 +173,7 @@ export default defineNuxtConfig({
         homePageProjects,
         homePageSearch,
         homePageNotifs,
+        products,
       ] = await Promise.all([
         $fetch(`${API_URL}tag/category`, headers),
         $fetch(`${API_URL}tag/loader`, headers),
@@ -174,6 +183,8 @@ export default defineNuxtConfig({
         $fetch(`${API_URL}projects_random?count=60`, headers),
         $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
         $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
+        // TODO: dehardcode
+        $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
       ]);
 
       state.categories = categories;
@@ -184,6 +195,7 @@ export default defineNuxtConfig({
       state.homePageProjects = homePageProjects;
       state.homePageSearch = homePageSearch;
       state.homePageNotifs = homePageNotifs;
+      state.products = products;
 
       await fs.writeFile("./src/generated/state.json", JSON.stringify(state));
 
@@ -236,7 +248,7 @@ export default defineNuxtConfig({
         const omorphiaLocales: string[] = [];
         const omorphiaLocaleSets = new Map<string, { files: { from: string }[] }>();
 
-        for await (const localeDir of globIterate("node_modules/omorphia/locales/*", {
+        for await (const localeDir of globIterate("node_modules/@modrinth/ui/src/locales/*", {
           posix: true,
         })) {
           const tag = basename(localeDir);

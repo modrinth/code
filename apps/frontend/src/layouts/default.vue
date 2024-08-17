@@ -20,6 +20,21 @@
     </div>
     <div
       v-if="
+        user &&
+        user.subscriptions &&
+        user.subscriptions.some((x) => x.status === 'payment-failed') &&
+        route.path !== '/settings/billing'
+      "
+      class="email-nag"
+    >
+      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
+      <nuxt-link class="btn" to="/settings/billing">
+        <SettingsIcon />
+        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
+      </nuxt-link>
+    </div>
+    <div
+      v-if="
         config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
         !cosmetics.hideStagingBanner
       "
@@ -454,6 +469,12 @@ const { formatMessage } = useVIntl();
 
 const app = useNuxtApp();
 const auth = await useAuth();
+const user = ref();
+
+if (import.meta.client) {
+  user.value = await useUser();
+}
+
 const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
 const tags = useTags();
@@ -481,6 +502,18 @@ const addEmailBannerMessages = defineMessages({
   action: {
     id: "layout.banner.add-email.button",
     defaultMessage: "Visit account settings",
+  },
+});
+
+const subscriptionPaymentFailedBannerMessages = defineMessages({
+  title: {
+    id: "layout.banner.subscription-payment-failed.title",
+    defaultMessage:
+      "Your subscription failed to renew. Please update your payment method to prevent losing access.",
+  },
+  action: {
+    id: "layout.banner.subscription-payment-failed.button",
+    defaultMessage: "Update billing info",
   },
 });
 

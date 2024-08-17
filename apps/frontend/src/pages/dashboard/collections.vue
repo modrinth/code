@@ -32,7 +32,7 @@
               <BoxIcon />
               {{
                 formatMessage(messages.projectsCountLabel, {
-                  count: formatCompactNumber(user.follows.length),
+                  count: formatCompactNumber(user ? user.follows.length : 0),
                 })
               }}
             </div>
@@ -127,8 +127,8 @@ useHead({
   title: () => `${formatMessage(messages.collectionsLongTitle)} - Modrinth`,
 });
 
-const user = await useUser();
 const auth = await useAuth();
+const user = await useUser();
 
 if (import.meta.client) {
   await initUserFollows();
