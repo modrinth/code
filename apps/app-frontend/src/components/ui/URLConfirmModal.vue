@@ -16,11 +16,16 @@ const installing = ref(false)
 defineExpose({
   async show(event) {
     if (event.event === 'InstallVersion') {
-      version.value = await get_version(event.id).catch(handleError)
-      project.value = await get_project(version.value.project_id).catch(handleError)
+      version.value = await get_version(event.id, 'must_revalidate').catch(handleError)
+      project.value = await get_project(version.value.project_id, 'must_revalidate').catch(
+        handleError,
+      )
     } else {
-      project.value = await get_project(event.id).catch(handleError)
-      version.value = await get_version(project.value.versions[0]).catch(handleError)
+      project.value = await get_project(event.id, 'must_revalidate').catch(handleError)
+      version.value = await get_version(
+        project.value.versions[project.value.versions.length - 1],
+        'must_revalidate',
+      ).catch(handleError)
     }
     categories.value = (await get_categories().catch(handleError)).filter(
       (cat) => project.value.categories.includes(cat.name) && cat.project_type === 'mod',

@@ -5,7 +5,8 @@ use theseus::{
 };
 
 use crate::api::Result;
-use std::{env, path::PathBuf, process::Command};
+use dashmap::DashMap;
+use std::path::PathBuf;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -44,7 +45,7 @@ pub enum OS {
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
 pub async fn progress_bars_list(
-) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
+) -> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
 }
@@ -71,72 +72,20 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(path: PathBuf) -> Result<()> {
-    {
-        #[cfg(target_os = "windows")]
-        {
-            if path.is_dir() {
-                Command::new("explorer")
-                    .args([&path]) // The comma after select is not a typo
-                    .spawn()?;
-            } else {
-                Command::new("explorer")
-                    .args(["/select,", &path.to_string_lossy()]) // The comma after select is not a typo
-                    .spawn()?;
-            }
-        }
+pub fn show_in_folder(path: PathBuf) {
+    let res = opener::reveal(path);
 
-        #[cfg(target_os = "linux")]
-        {
-            use std::fs::metadata;
-
-            let mut path = path;
-            let path_string = path.to_string_lossy().to_string();
-
-            if metadata(&path)?.is_dir() {
-                Command::new("xdg-open").arg(&path).spawn()?;
-            } else if path_string.contains(',') {
-                // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
-                path.pop();
-                Command::new("xdg-open").arg(&path).spawn()?;
-            } else {
-                Command::new("dbus-send")
-                    .args([
-                        "--session",
-                        "--dest=org.freedesktop.FileManager1",
-                        "--type=method_call",
-                        "/org/freedesktop/FileManager1",
-                        "org.freedesktop.FileManager1.ShowItems",
-                        format!("array:string:file://{}", path_string).as_str(),
-                        "string:\"\"",
-                    ])
-                    .spawn()?;
-            }
-        }
-
-        #[cfg(target_os = "macos")]
-        {
-            if path.is_dir() {
-                Command::new("open").args([&path]).spawn()?;
-            } else {
-                Command::new("open")
-                    .args(["-R", &path.as_os_str().to_string_lossy()])
-                    .spawn()?;
-            }
-        }
-
-        Ok::<(), theseus::Error>(())
-    }?;
-
-    Ok(())
+    if let Err(e) = res {
+        tracing::error!("Failed to open folder: {}", e);
+    }
 }
 
 #[tauri::command]
-pub fn show_launcher_logs_folder() -> Result<()> {
+pub fn show_launcher_logs_folder() {
     let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
     // failure to get folder just opens filesystem
     // (ie: if in debug mode only and launcher_logs never created)
-    show_in_folder(path)
+    show_in_folder(path);
 }
 
 // Get opening command
@@ -144,9 +93,28 @@ pub fn show_launcher_logs_folder() -> Result<()> {
 // This should be called once and only when the app is done booting up and ready to receive a command
 // Returns a Command struct- see events.js
 #[tauri::command]
+#[cfg(target_os = "macos")]
+pub async fn get_opening_command(
+    state: tauri::State<'_, crate::macos::deep_link::InitialPayload>,
+) -> Result<Option<CommandPayload>> {
+    let payload = state.payload.lock().await;
+
+    return if let Some(payload) = payload.as_ref() {
+        tracing::info!("opening command {payload}");
+
+        Ok(Some(handler::parse_command(payload).await?))
+    } else {
+        Ok(None)
+    };
+}
+
+#[tauri::command]
+#[cfg(not(target_os = "macos"))]
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
     // Tauri is not CLI, we use arguments as path to file to call
-    let cmd_arg = env::args_os().nth(1);
+    let cmd_arg = std::env::args_os().nth(1);
+
+    tracing::info!("opening command {cmd_arg:?}");
 
     let cmd_arg = cmd_arg.map(|path| path.to_string_lossy().to_string());
     if let Some(cmd) = cmd_arg {

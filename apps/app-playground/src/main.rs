@@ -89,7 +89,7 @@ async fn main() -> theseus::Result<()> {
     .await?;
     install_zipped_mrpack(pack, profile_path.to_string()).await?;
 
-    let projects = profile::get_projects(&profile_path).await?;
+    let projects = profile::get_projects(&profile_path, None).await?;
 
     for (path, file) in projects {
         println!(
@@ -102,13 +102,13 @@ async fn main() -> theseus::Result<()> {
     // Run a profile, running minecraft and store the RwLock to the process
     let process = profile::run(&profile_path).await?;
 
-    println!("Minecraft PID: {}", process.pid);
+    println!("Minecraft UUID: {}", process.uuid);
 
     println!("All running process UUID {:?}", process::get_all().await?);
 
     // hold the lock to the process until it ends
     println!("Waiting for process to end...");
-    process.wait_for().await?;
+    process::wait_for(process.uuid).await?;
 
     Ok(())
 }

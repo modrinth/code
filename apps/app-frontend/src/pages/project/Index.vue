@@ -280,12 +280,12 @@ const installed = ref(false)
 const installedVersion = ref(null)
 
 async function fetchProjectData() {
-  const project = await get_project(route.params.id).catch(handleError)
+  const project = await get_project(route.params.id, 'must_revalidate').catch(handleError)
 
   data.value = project
   ;[versions.value, members.value, categories.value, instance.value, instanceProjects.value] =
     await Promise.all([
-      get_version_many(project.versions).catch(handleError),
+      get_version_many(project.versions, 'must_revalidate').catch(handleError),
       get_team(project.team).catch(handleError),
       get_categories().catch(handleError),
       route.query.i ? getInstance(route.query.i).catch(handleError) : Promise.resolve(),

@@ -26,12 +26,20 @@
       </div>
     </div>
     <Button
+      v-tooltip="'Refresh projects'"
+      icon-only
+      :disabled="refreshingProjects"
+      @click="refreshProjects"
+    >
+      <UpdatedIcon />
+    </Button>
+    <Button
       v-if="canUpdatePack"
       :disabled="installing"
       color="secondary"
       @click="modpackVersionModal.show()"
     >
-      <UpdatedIcon />
+      <DownloadIcon />
       {{ installing ? 'Updating' : 'Update modpack' }}
     </Button>
     <Button v-else-if="!isPackLocked" @click="exportModal.show()">
@@ -39,7 +47,7 @@
       Export modpack
     </Button>
     <Button v-if="!isPackLocked && projects.some((m) => m.outdated)" @click="updateAll">
-      <UpdatedIcon />
+      <DownloadIcon />
       Update all
     </Button>
     <AddContentButton v-if="!isPackLocked" :instance="instance" />
@@ -347,6 +355,7 @@ import {
   EyeIcon,
   EyeOffIcon,
   CodeIcon,
+  DownloadIcon,
 } from '@modrinth/assets'
 import {
   Pagination,
@@ -438,10 +447,10 @@ const exportModal = ref(null)
 const projects = ref([])
 const selectionMap = ref(new Map())
 
-const initProjects = async () => {
+const initProjects = async (cacheBehaviour) => {
   const newProjects = []
 
-  const profileProjects = await get_projects(props.instance.path)
+  const profileProjects = await get_projects(props.instance.path, cacheBehaviour)
   const fetchProjects = []
   const fetchVersions = []
 
@@ -536,7 +545,7 @@ const ascending = ref(true)
 const sortColumn = ref('Name')
 const currentPage = ref(1)
 
-watch(searchFilter, () => (currentPage.value = 1))
+watch([searchFilter, selectedProjectType], () => (currentPage.value = 1))
 
 const selected = computed(() =>
   Array.from(selectionMap.value)
@@ -846,17 +855,24 @@ watch(selectAll, () => {
   }
 })
 
+const switchPage = (page) => {
+  currentPage.value = page
+}
+
+const refreshingProjects = ref(false)
+async function refreshProjects() {
+  refreshingProjects.value = true
+  await initProjects('bypass')
+  refreshingProjects.value = false
+}
+
 const unlisten = await listen('tauri://file-drop', async (event) => {
   for (const file of event.payload) {
     if (file.endsWith('.mrpack')) continue
     await add_project_from_path(props.instance.path, file).catch(handleError)
   }
-  initProjects(await get(props.instance.path).catch(handleError))
+  await initProjects()
 })
-
-const switchPage = (page) => {
-  currentPage.value = page
-}
 
 onUnmounted(() => {
   unlisten()

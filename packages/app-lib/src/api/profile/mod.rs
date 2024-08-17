@@ -8,7 +8,7 @@ use crate::pack::install_from::{
     EnvType, PackDependency, PackFile, PackFileHash, PackFormat,
 };
 use crate::state::{
-    CacheBehaviour, CachedEntry, Credentials, JavaVersion, Process,
+    CacheBehaviour, CachedEntry, Credentials, JavaVersion, ProcessMetadata,
     ProfileFile, ProjectType, SideType,
 };
 
@@ -71,12 +71,13 @@ pub async fn get_many(paths: &[&str]) -> crate::Result<Vec<Profile>> {
 #[tracing::instrument]
 pub async fn get_projects(
     path: &str,
+    cache_behaviour: Option<CacheBehaviour>,
 ) -> crate::Result<DashMap<String, ProfileFile>> {
     let state = State::get().await?;
 
     if let Some(profile) = get(path).await? {
         let files = profile
-            .get_projects(None, &state.pool, &state.api_semaphore)
+            .get_projects(cache_behaviour, &state.pool, &state.api_semaphore)
             .await?;
 
         Ok(files)
@@ -614,10 +615,10 @@ fn pack_get_relative_path(
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
-pub async fn run(path: &str) -> crate::Result<Process> {
+pub async fn run(path: &str) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
 
-    let default_account = Credentials::get_active(&state.pool)
+    let default_account = Credentials::get_default_credential(&state.pool)
         .await?
         .ok_or_else(|| crate::ErrorKind::NoCredentialsError.as_error())?;
 
@@ -631,7 +632,7 @@ pub async fn run(path: &str) -> crate::Result<Process> {
 pub async fn run_credentials(
     path: &str,
     credentials: &Credentials,
-) -> crate::Result<Process> {
+) -> crate::Result<ProcessMetadata> {
     let state = State::get().await?;
     let settings = Settings::get(&state.pool).await?;
     let profile = get(path).await?.ok_or_else(|| {
@@ -652,7 +653,7 @@ pub async fn run_credentials(
         if let Some(command) = cmd.next() {
             let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
-                .args(&cmd.collect::<Vec<&str>>())
+                .args(cmd.collect::<Vec<&str>>())
                 .current_dir(&full_path)
                 .spawn()
                 .map_err(|e| IOError::with_path(e, &full_path))?
@@ -715,10 +716,11 @@ pub async fn run_credentials(
 }
 
 pub async fn kill(path: &str) -> crate::Result<()> {
+    let state = State::get().await?;
     let processes = crate::api::process::get_by_profile_path(path).await?;
 
     for process in processes {
-        process.kill().await?;
+        state.process_manager.kill(process.uuid).await?;
     }
 
     Ok(())
@@ -920,5 +922,8 @@ pub async fn add_all_recursive_folder_paths(
 }
 
 pub fn sanitize_profile_name(input: &str) -> String {
-    input.replace(['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>'], "_")
+    input.replace(
+        ['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>', '!'],
+        "_",
+    )
 }
