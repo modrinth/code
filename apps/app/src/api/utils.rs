@@ -108,6 +108,7 @@ pub async fn get_opening_command(
     };
 }
 
+#[tauri::command]
 #[cfg(not(target_os = "macos"))]
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
     // Tauri is not CLI, we use arguments as path to file to call
