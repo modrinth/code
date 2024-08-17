@@ -59,5 +59,5 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 
 #[tauri::command]
 pub async fn purge_cache_types(cache_types: Vec<CacheValueType>) -> Result<()> {
-    Ok(theseus::cache::purge_cache_types(&*cache_types).await?)
+    Ok(theseus::cache::purge_cache_types(&cache_types).await?)
 }

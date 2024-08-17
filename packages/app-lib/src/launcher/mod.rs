@@ -514,12 +514,18 @@ pub async fn launch_minecraft(
         ))
         .as_error());
     }
+
+    let natives_dir = state.directories.version_natives_dir(&version_jar);
+    if !natives_dir.exists() {
+        io::create_dir_all(&natives_dir).await?;
+    }
+
     command
         .args(
             args::get_jvm_arguments(
                 args.get(&d::minecraft::ArgumentType::Jvm)
                     .map(|x| x.as_slice()),
-                &state.directories.version_natives_dir(&version_jar),
+                &natives_dir,
                 &state.directories.libraries_dir(),
                 &args::get_class_paths(
                     &state.directories.libraries_dir(),
