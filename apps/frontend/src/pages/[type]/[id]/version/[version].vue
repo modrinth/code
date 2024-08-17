@@ -1,6 +1,6 @@
 <template>
   <div v-if="version" class="version-page">
-    <ModalConfirm
+    <ConfirmModal
       v-if="currentMember"
       ref="modal_confirm"
       title="Are you sure you want to delete this version?"
@@ -37,17 +37,24 @@
           open-direction="top"
         />
         <div class="button-group">
-          <button class="iconified-button" @click="$refs.modal_package_mod.hide()">
-            <CrossIcon />
-            Cancel
-          </button>
-          <button class="iconified-button brand-button" @click="createDataPackVersion">
-            <RightArrowIcon />
-            Begin packaging data pack
-          </button>
+          <ButtonStyled>
+            <button @click="$refs.modal_package_mod.hide()">
+              <CrossIcon />
+              Cancel
+            </button>
+          </ButtonStyled>
+          <ButtonStyled color="brand">
+            <button @click="createDataPackVersion">
+              <RightArrowIcon />
+              Begin packaging data pack
+            </button>
+          </ButtonStyled>
         </div>
       </div>
     </Modal>
+    <NuxtLink :to="getPreviousLink()">
+      <ChevronRightIcon />
+    </NuxtLink>
     <div class="version-page__title universal-card">
       <Breadcrumbs
         :current-title="version.name"
@@ -94,96 +101,102 @@
         </ul>
       </div>
       <div v-if="isCreating" class="input-group">
-        <button
-          class="iconified-button brand-button"
-          :disabled="shouldPreventActions"
-          @click="createVersion"
-        >
-          <PlusIcon aria-hidden="true" />
-          Create
-        </button>
-        <nuxt-link
-          v-if="auth.user"
-          :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
-          class="iconified-button"
-        >
-          <CrossIcon aria-hidden="true" />
-          Cancel
-        </nuxt-link>
+        <ButtonStyled color="brand">
+          <button :disabled="shouldPreventActions" @click="createVersion">
+            <PlusIcon aria-hidden="true" />
+            Create
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <nuxt-link
+            v-if="auth.user"
+            :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
+          >
+            <CrossIcon aria-hidden="true" />
+            Cancel
+          </nuxt-link>
+        </ButtonStyled>
       </div>
       <div v-else-if="isEditing" class="input-group">
-        <button
-          class="iconified-button brand-button"
-          :disabled="shouldPreventActions"
-          @click="saveEditedVersion"
-        >
-          <SaveIcon aria-hidden="true" />
-          Save
-        </button>
-        <button class="iconified-button" @click="version.featured = !version.featured">
-          <StarIcon aria-hidden="true" />
-          <template v-if="!version.featured"> Feature version</template>
-          <template v-else> Unfeature version</template>
-        </button>
-        <nuxt-link
-          v-if="currentMember"
-          class="action iconified-button"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/version/${encodeURI(version.displayUrlEnding)}`"
-        >
-          <CrossIcon aria-hidden="true" />
-          Discard changes
-        </nuxt-link>
+        <ButtonStyled color="brand">
+          <button :disabled="shouldPreventActions" @click="saveEditedVersion">
+            <SaveIcon aria-hidden="true" />
+            Save
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="version.featured = !version.featured">
+            <StarIcon aria-hidden="true" />
+            <template v-if="!version.featured"> Feature version</template>
+            <template v-else> Unfeature version</template>
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <nuxt-link
+            v-if="currentMember"
+            class="action"
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/version/${encodeURI(version.displayUrlEnding)}`"
+          >
+            <CrossIcon aria-hidden="true" />
+            Discard changes
+          </nuxt-link>
+        </ButtonStyled>
       </div>
       <div v-else class="input-group">
-        <a
-          v-if="primaryFile"
-          v-tooltip="primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'"
-          :href="primaryFile.url"
-          class="iconified-button brand-button"
-          :aria-label="`Download ${primaryFile.filename}`"
-        >
-          <DownloadIcon aria-hidden="true" />
-          Download
-        </a>
-        <nuxt-link v-if="!auth.user" class="iconified-button" to="/auth/sign-in">
-          <ReportIcon aria-hidden="true" />
-          Report
-        </nuxt-link>
-        <button v-else class="iconified-button" @click="() => reportVersion(version.id)">
-          <ReportIcon aria-hidden="true" />
-          Report
-        </button>
-        <nuxt-link
-          v-if="currentMember"
-          class="action iconified-button"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/version/${encodeURI(version.displayUrlEnding)}/edit`"
-        >
-          <EditIcon aria-hidden="true" />
-          Edit
-        </nuxt-link>
-        <button
-          v-if="
-            currentMember &&
-            version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))
-          "
-          class="iconified-button"
-          @click="$refs.modal_package_mod.show()"
-        >
-          <BoxIcon aria-hidden="true" />
-          Package as mod
-        </button>
-        <button
-          v-if="currentMember"
-          class="iconified-button danger-button"
-          @click="$refs.modal_confirm.show()"
-        >
-          <TrashIcon aria-hidden="true" />
-          Delete
-        </button>
+        <ButtonStyled v-if="primaryFile" color="brand">
+          <a
+            v-tooltip="primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'"
+            :href="primaryFile.url"
+            @click="emit('onDownload')"
+          >
+            <DownloadIcon aria-hidden="true" />
+            Download
+          </a>
+        </ButtonStyled>
+        <ButtonStyled v-if="!auth.user">
+          <nuxt-link to="/auth/sign-in">
+            <ReportIcon aria-hidden="true" />
+            Report
+          </nuxt-link>
+        </ButtonStyled>
+        <ButtonStyled v-else>
+          <button @click="() => reportVersion(version.id)">
+            <ReportIcon aria-hidden="true" />
+            Report
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <nuxt-link
+            v-if="currentMember"
+            class="action"
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/version/${encodeURI(version.displayUrlEnding)}/edit`"
+          >
+            <EditIcon aria-hidden="true" />
+            Edit
+          </nuxt-link>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button
+            v-if="
+              currentMember &&
+              version.loaders.some((x) => tags.loaderData.dataPackLoaders.includes(x))
+            "
+            @click="$refs.modal_package_mod.show()"
+          >
+            <BoxIcon aria-hidden="true" />
+            Package as mod
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button v-if="currentMember" @click="$refs.modal_confirm.show()">
+            <TrashIcon aria-hidden="true" />
+            Delete
+          </button>
+        </ButtonStyled>
       </div>
     </div>
     <div class="version-page__changelog universal-card">
@@ -242,14 +255,12 @@
             {{ dependency.dependency_type }}
           </span>
         </div>
-        <button
-          v-if="isEditing && project.project_type !== 'modpack'"
-          class="iconified-button"
-          @click="version.dependencies.splice(index, 1)"
-        >
-          <TrashIcon />
-          Remove
-        </button>
+        <ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
+          <button @click="version.dependencies.splice(index, 1)">
+            <TrashIcon />
+            Remove
+          </button>
+        </ButtonStyled>
       </div>
       <div
         v-for="(dependency, index) in deps.filter((x) => x.file_name)"
@@ -297,13 +308,12 @@
           />
         </div>
         <div class="input-group">
-          <button
-            class="iconified-button brand-button"
-            @click="addDependency(dependencyAddMode, newDependencyId, newDependencyType)"
-          >
-            <PlusIcon />
-            Add dependency
-          </button>
+          <ButtonStyled color="brand">
+            <button @click="addDependency(dependencyAddMode, newDependencyId, newDependencyType)">
+              <PlusIcon />
+              Add dependency
+            </button>
+          </ButtonStyled>
         </div>
       </div>
     </div>
@@ -371,31 +381,32 @@
           :show-labels="false"
           :allow-empty="false"
         />
-        <button
-          v-if="isEditing"
-          :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
-          class="iconified-button raised-button"
-          @click="
-            () => {
-              deleteFiles.push(file.hashes.sha1);
-              version.files.splice(index, 1);
-              oldFileTypes.splice(index, 1);
-            }
-          "
-        >
-          <TrashIcon />
-          Remove
-        </button>
-        <a
-          v-else
-          :href="file.url"
-          class="iconified-button raised-button"
-          :title="`Download ${file.filename}`"
-          tabindex="0"
-        >
-          <DownloadIcon />
-          Download
-        </a>
+        <ButtonStyled v-if="isEditing">
+          <button
+            :disabled="primaryFile.hashes.sha1 === file.hashes.sha1"
+            @click="
+              () => {
+                deleteFiles.push(file.hashes.sha1);
+                version.files.splice(index, 1);
+                oldFileTypes.splice(index, 1);
+              }
+            "
+          >
+            <TrashIcon />
+            Remove
+          </button>
+        </ButtonStyled>
+        <ButtonStyled v-else>
+          <a
+            :href="file.url"
+            class="raised-button"
+            :title="`Download ${file.filename}`"
+            tabindex="0"
+          >
+            <DownloadIcon />
+            Download
+          </a>
+        </ButtonStyled>
       </div>
       <template v-if="isEditing">
         <div v-for="(file, index) in newFiles" :key="index" class="file">
@@ -417,18 +428,20 @@
             :show-labels="false"
             :allow-empty="false"
           />
-          <button
-            class="iconified-button raised-button"
-            @click="
-              () => {
-                newFiles.splice(index, 1);
-                newFileTypes.splice(index, 1);
-              }
-            "
-          >
-            <TrashIcon />
-            Remove
-          </button>
+          <ButtonStyled>
+            <button
+              class="raised-button"
+              @click="
+                () => {
+                  newFiles.splice(index, 1);
+                  newFileTypes.splice(index, 1);
+                }
+              "
+            >
+              <TrashIcon />
+              Remove
+            </button>
+          </ButtonStyled>
         </div>
         <div class="additional-files">
           <h4>Upload additional files</h4>
@@ -612,7 +625,7 @@
   </div>
 </template>
 <script>
-import { MarkdownEditor } from "@modrinth/ui";
+import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
 import { Multiselect } from "vue-multiselect";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
@@ -626,7 +639,6 @@ import Badge from "~/components/ui/Badge.vue";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import CopyCode from "~/components/ui/CopyCode.vue";
 import Categories from "~/components/ui/search/Categories.vue";
-import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import Chips from "~/components/ui/Chips.vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import FileInput from "~/components/ui/FileInput.vue";
@@ -675,10 +687,11 @@ export default defineNuxtComponent({
     Badge,
     Breadcrumbs,
     CopyCode,
-    ModalConfirm,
     Multiselect,
     BoxIcon,
     RightArrowIcon,
+    ConfirmModal,
+    ButtonStyled,
   },
   props: {
     project: {
@@ -942,10 +955,7 @@ export default defineNuxtComponent({
     },
     getPreviousLink() {
       if (this.$router.options.history.state.back) {
-        if (
-          this.$router.options.history.state.back.includes("/changelog") ||
-          this.$router.options.history.state.back.includes("/versions")
-        ) {
+        if (this.$router.options.history.state.back.includes("/versions")) {
           return this.$router.options.history.state.back;
         }
       }
@@ -955,9 +965,9 @@ export default defineNuxtComponent({
     },
     getPreviousLabel() {
       return this.$router.options.history.state.back &&
-        this.$router.options.history.state.back.endsWith("/changelog")
-        ? "Changelog"
-        : "Versions";
+        this.$router.options.history.state.back.endsWith("/versions")
+        ? "Back to versions"
+        : "All versions";
     },
     acceptFileFromProjectType,
     renderHighlightedString,
@@ -1480,8 +1490,9 @@ export default defineNuxtComponent({
         min-width: 235px;
       }
 
-      .iconified-button {
+      .raised-button {
         margin-left: auto;
+        background-color: var(--color-raised-bg);
       }
 
       &:not(:nth-child(2)) {

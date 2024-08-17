@@ -1416,6 +1416,10 @@ svg.inline-svg {
       width: var(--icon-16);
       height: var(--icon-16);
     }
+
+    > svg:first-child {
+      flex-shrink: 0;
+    }
   }
 
   .links-list {

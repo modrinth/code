@@ -12,7 +12,7 @@
         {{ project.license.name ? project.license.name : 'License' }}
       </span>
     </template>
-    <div class="markdown-body" v-html="renderString(licenseText)" />
+    <div class="markdown-body" v-html="renderString(licenseText).isEmpty ? 'Loading license text...' : renderString(licenseText)" />
   </NewModal>
   <section class='normal-page__content'>
     <div
@@ -194,7 +194,7 @@
               aria-hidden='true'
           />
           <HeartIcon v-else-if="donation.id === 'github'" />
-          <UnknownIcon v-else />
+          <CurrencyIcon v-else />
           <span v-if="donation.id === 'bmac'">{{ formatMessage(linksMessages.donateBmac) }}</span>
           <span v-else-if="donation.id === 'patreon'">{{ formatMessage(linksMessages.donatePatreon) }}</span>
           <span v-else-if="donation.id === 'paypal'">{{ formatMessage(linksMessages.donatePayPal) }}</span>
@@ -276,7 +276,7 @@
                     !project.license.id.includes('LicenseRef')
                   "
                 class='text-link hover:underline'
-                @click='getLicenseData()'
+                @click='(event) => getLicenseData(event)'
             >
                   {{ licenseIdDisplay }}
                 </span>
@@ -344,7 +344,7 @@ import {
   PayPalIcon,
   CrownIcon,
   BuyMeACoffeeIcon,
-  UnknownIcon,
+  CurrencyIcon,
   PatreonIcon,
   HeartIcon,
   VersionIcon,
@@ -510,14 +510,14 @@ const licenseIdDisplay = computed(() => {
   }
 });
 
-async function getLicenseData() {
+async function getLicenseData(event) {
+  modalLicense.value.show(event)
+
   try {
     const text = await useBaseFetch(`tag/license/${props.project.license.id}`)
     licenseText.value = text.body || 'License text could not be retrieved.'
   } catch {
     licenseText.value = 'License text could not be retrieved.'
   }
-
-  modalLicense.value.show()
 }
 </script>

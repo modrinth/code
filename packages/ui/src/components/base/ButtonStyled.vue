@@ -9,6 +9,7 @@ const props = withDefaults(
       type?: 'standard' | 'outlined' | 'transparent',
       colorFill?: 'auto' | 'background' | 'text' | 'none',
       hoverColorFill?: 'auto' | 'background' | 'text' | 'none',
+      allowNonButton?: boolean,
     }>(),
     {
       color: 'standard',
@@ -16,7 +17,8 @@ const props = withDefaults(
       circular: false,
       type: 'standard',
       colorFill: 'auto',
-      hoverColorFill: 'auto'
+      hoverColorFill: 'auto',
+      allowNonButton: false,
     }
 )
 
@@ -139,26 +141,40 @@ const colorVariables = computed(() => {
 </script>
 
 <template>
-  <div class="btn-wrapper" :class="{'outline': type === 'outlined'}" :style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`">
+  <div class="btn-wrapper" :class="{'outline': type === 'outlined', 'allow-non-button': allowNonButton}" :style="`${colorVariables}--_height:${height};--_width:${width};--_radius: ${radius};--_padding-x:${paddingX};--_padding-y:${paddingY};--_gap:${gap};--_font-weight:${fontWeight};--_icon-size:${iconSize};`">
     <slot />
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .btn-wrapper {
   display: contents;
 }
 
+.btn-wrapper.allow-non-button :slotted(> *:first-child),
 /* Searches up to 4 children deep for valid button */
-.btn-wrapper :slotted(:is(button, a):first-child),
+.btn-wrapper :slotted(> :is(button, a):first-child),
 .btn-wrapper :slotted(*) > :is(button, a):first-child,
 .btn-wrapper :slotted(*) > *:first-child > :is(button, a):first-child,
 .btn-wrapper :slotted(*) > *:first-child > *:first-child > :is(button, a):first-child {
-  @apply flex flex-row items-center justify-center border-solid border-2 border-transparent active:scale-95 hover:brightness-125 focus-visible:brightness-125 bg-[--_bg] text-[--_text] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
+  @apply flex flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
   transition: scale 0.125s ease-in-out, background-color 0.25s ease-in-out;
+
+  &[disabled], &[disabled="true"], &.disabled, &.looks-disabled {
+    @apply opacity-50;
+  }
+
+  &[disabled], &[disabled="true"], &.disabled {
+    @apply cursor-not-allowed;
+  }
+
+  &:not([disabled]):not([disabled="true"]):not(.disabled) {
+    @apply active:scale-95 hover:brightness-125 focus-visible:brightness-125 hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
+  }
 }
 
-.btn-wrapper.outline :slotted(:is(button, a):first-child),
+.btn-wrapper.outline.allow-non-button :slotted(*:first-child),
+.btn-wrapper.outline :slotted(> :is(button, a):first-child),
 .btn-wrapper.outline :slotted(*) > :is(button, a):first-child,
 .btn-wrapper.outline :slotted(*) > *:first-child > :is(button, a):first-child,
 .btn-wrapper.outline :slotted(*) > *:first-child > *:first-child > :is(button, a):first-child {
@@ -166,7 +182,8 @@ const colorVariables = computed(() => {
 }
 
 /*noinspection CssUnresolvedCustomProperty*/
-.btn-wrapper :slotted(:is(button, a):first-child) > svg:first-child,
+.btn-wrapper.allow-non-button :slotted(> *:first-child) > svg:first-child,
+.btn-wrapper :slotted(> :is(button, a):first-child) > svg:first-child,
 .btn-wrapper :slotted(*) > :is(button, a):first-child  > svg:first-child,
 .btn-wrapper :slotted(*) > *:first-child > :is(button, a):first-child  > svg:first-child,
 .btn-wrapper :slotted(*) > *:first-child > *:first-child > :is(button, a):first-child > svg:first-child {
