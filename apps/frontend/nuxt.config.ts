@@ -184,7 +184,8 @@ export default defineNuxtConfig({
         $fetch(`${API_URL}search?limit=3&query=leave&index=relevance`, headers),
         $fetch(`${API_URL}search?limit=3&query=&index=updated`, headers),
         // TODO: dehardcode
-        $fetch(`${API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
+        $fetch(`${STAGING_API_URL.replace("/v2/", "/_internal/")}billing/products`, headers),
+        // SET TO API_URL WHEN MERGING WITH UPSTREAM
       ]);
 
       state.categories = categories;
