@@ -89,16 +89,64 @@ fn main() {
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
-            // Register deep link handler, allowing reading of modrinth:// links
-            if let Err(e) = tauri_plugin_deep_link::register(
+            #[cfg(target_os = "macos")]
+            let res = {
+                use macos::deep_link::InitialPayload;
+                let mtx = std::sync::Arc::new(tokio::sync::Mutex::new(None));
+
+                app.manage(InitialPayload {
+                    payload: mtx.clone(),
+                });
+
+                let mtx_copy = mtx.clone();
+                macos::delegate::register_open_file(move |filename| {
+                    let mtx_copy = mtx_copy.clone();
+
+                    tauri::async_runtime::spawn(async move {
+                        tracing::info!("Handling file open {request}");
+
+                        let mut payload = mtx_copy.lock().await;
+                        if payload.is_none() {
+                            *payload = Some(filename.clone());
+                        }
+
+                        let _ = api::utils::handle_command(filename).await;
+                    });
+                })
+                .unwrap();
+
+                let mtx_copy = mtx.clone();
+                tauri_plugin_deep_link::register(
+                    "modrinth",
+                    move |request: String| {
+                        let mtx_copy = mtx_copy.clone();
+
+                        tauri::async_runtime::spawn(async move {
+                            tracing::info!("Handling deep link {request}");
+
+                            let mut payload = mtx_copy.lock().await;
+                            if payload.is_none() {
+                                *payload = Some(request.clone());
+                            }
+
+                            let _ = api::utils::handle_command(request).await;
+                        });
+                    },
+                )
+            };
+
+            #[cfg(not(target_os = "macos"))]
+            let res = tauri_plugin_deep_link::register(
                 "modrinth",
                 |request: String| {
+                    tracing::info!("Handling deep link {request}");
                     tauri::async_runtime::spawn(api::utils::handle_command(
                         request,
                     ));
                 },
-            ) {
-                // Allow it to fail- see https://github.com/FabianLars/tauri-plugin-deep-link/issues/19
+            );
+
+            if let Err(e) = res {
                 tracing::error!("Error registering deep link handler: {}", e);
             }
 
@@ -117,13 +165,6 @@ fn main() {
                     use macos::window_ext::WindowExt;
                     window.set_transparent_titlebar(true);
                     window.position_traffic_lights(9.0, 16.0);
-
-                    macos::delegate::register_open_file(|filename| {
-                        tauri::async_runtime::spawn(
-                            api::utils::handle_command(filename),
-                        );
-                    })
-                    .unwrap();
                 }
             }
 

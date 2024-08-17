@@ -5,7 +5,8 @@ use theseus::{
 };
 
 use crate::api::Result;
-use std::{env, path::PathBuf};
+use dashmap::DashMap;
+use std::path::PathBuf;
 
 pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new("utils")
@@ -44,7 +45,7 @@ pub enum OS {
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
 pub async fn progress_bars_list(
-) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
+) -> Result<DashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;
     Ok(res)
 }
@@ -92,9 +93,27 @@ pub fn show_launcher_logs_folder() {
 // This should be called once and only when the app is done booting up and ready to receive a command
 // Returns a Command struct- see events.js
 #[tauri::command]
+#[cfg(target_os = "macos")]
+pub async fn get_opening_command(
+    state: tauri::State<'_, crate::macos::deep_link::InitialPayload>,
+) -> Result<Option<CommandPayload>> {
+    let payload = state.payload.lock().await;
+
+    return if let Some(payload) = payload.as_ref() {
+        tracing::info!("opening command {payload}");
+
+        Ok(Some(handler::parse_command(payload).await?))
+    } else {
+        Ok(None)
+    };
+}
+
+#[cfg(not(target_os = "macos"))]
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
     // Tauri is not CLI, we use arguments as path to file to call
     let cmd_arg = env::args_os().nth(1);
+
+    tracing::info!("opening command {cmd_arg:?}");
 
     let cmd_arg = cmd_arg.map(|path| path.to_string_lossy().to_string());
     if let Some(cmd) = cmd_arg {

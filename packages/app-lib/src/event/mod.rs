@@ -1,8 +1,8 @@
 //! Theseus state management system
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 use tokio::sync::OnceCell;
-use tokio::sync::RwLock;
 use uuid::Uuid;
 
 pub mod emit;
@@ -14,7 +14,7 @@ pub struct EventState {
     /// Tauri app
     #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
-    pub loading_bars: RwLock<HashMap<Uuid, LoadingBar>>,
+    pub loading_bars: DashMap<Uuid, LoadingBar>,
 }
 
 impl EventState {
@@ -24,7 +24,7 @@ impl EventState {
             .get_or_try_init(|| async {
                 Ok(Arc::new(Self {
                     app,
-                    loading_bars: RwLock::new(HashMap::new()),
+                    loading_bars: DashMap::new(),
                 }))
             })
             .await
@@ -36,7 +36,7 @@ impl EventState {
         EVENT_STATE
             .get_or_try_init(|| async {
                 Ok(Arc::new(Self {
-                    loading_bars: RwLock::new(HashMap::new()),
+                    loading_bars: DashMap::new(),
                 }))
             })
             .await
@@ -55,17 +55,10 @@ impl EventState {
     }
 
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
-    pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
+    pub async fn list_progress_bars() -> crate::Result<DashMap<Uuid, LoadingBar>>
     {
         let value = Self::get().await?;
-        let read = value.loading_bars.read().await;
-
-        let mut display_list: HashMap<Uuid, LoadingBar> = HashMap::new();
-        for (uuid, loading_bar) in read.iter() {
-            display_list.insert(*uuid, loading_bar.clone());
-        }
-
-        Ok(display_list)
+        Ok(value.loading_bars.clone())
     }
 
     #[cfg(feature = "tauri")]
@@ -100,10 +93,10 @@ impl Drop for LoadingBarId {
         let loader_uuid = self.0;
         tokio::spawn(async move {
             if let Ok(event_state) = EventState::get().await {
-                let mut bars = event_state.loading_bars.write().await;
-
                 #[cfg(any(feature = "tauri", feature = "cli"))]
-                if let Some(bar) = bars.remove(&loader_uuid) {
+                if let Some((_, bar)) =
+                    event_state.loading_bars.remove(&loader_uuid)
+                {
                     #[cfg(feature = "tauri")]
                     {
                         let loader_uuid = bar.loading_bar_uuid;
@@ -135,7 +128,7 @@ impl Drop for LoadingBarId {
                 }
 
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
-                bars.remove(&loader_uuid);
+                event_state.loading_bars.remove(&loader_uuid);
             }
         });
     }
