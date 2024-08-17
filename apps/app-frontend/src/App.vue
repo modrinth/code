@@ -45,11 +45,9 @@ const urlModal = ref(null)
 const offline = ref(!navigator.onLine)
 window.addEventListener('offline', () => {
   offline.value = true
-  console.log('offline')
 })
 window.addEventListener('online', () => {
   offline.value = false
-  console.log('online')
 })
 
 const showOnboarding = ref(false)
@@ -112,14 +110,17 @@ async function setupApp() {
   get_opening_command().then(handleCommand)
 }
 
+const stateFailed = ref(false)
 initialize_state()
   .then(() => {
     setupApp().catch((err) => {
+      stateFailed.value = true
       console.error(err)
       error.showError(err, false, 'state_init')
     })
   })
   .catch((err) => {
+    stateFailed.value = true
     console.error('Failed to initialize app', err)
     error.showError(err, false, 'state_init')
   })
@@ -229,7 +230,7 @@ async function handleCommand(e) {
 </script>
 
 <template>
-  <SplashScreen ref="splashScreen" data-tauri-drag-region />
+  <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
   <div v-if="stateInitialized" class="container">
     <div class="nav-container">
       <div class="nav-section">

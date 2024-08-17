@@ -295,7 +295,7 @@ impl DirectoryInfo {
                     }
 
                     for entry_path in
-                        crate::pack::import::get_all_subfiles(source, true)
+                        crate::pack::import::get_all_subfiles(source, false)
                             .await?
                     {
                         let relative_path = entry_path.strip_prefix(source)?;
