@@ -174,9 +174,13 @@ const options = ref(null)
 
 const startInstance = async (context) => {
   loading.value = true
-  run(route.params.id).catch(handleSevereError)
+  try {
+    await run(route.params.id)
+    playing.value = true
+  } catch (err) {
+    handleSevereError(err)
+  }
   loading.value = false
-  playing.value = true
 
   mixpanel_track('InstanceStart', {
     loader: instance.value.loader,
@@ -194,13 +198,19 @@ const checkProcess = async () => {
 // Get information on associated modrinth versions, if any
 const modrinthVersions = ref([])
 if (!offline.value && instance.value.linked_data && instance.value.linked_data.project_id) {
-  const project = await get_project(instance.value.linked_data.project_id).catch(handleError)
-
-  if (project && project.versions) {
-    modrinthVersions.value = (await get_version_many(project.versions).catch(handleError)).sort(
-      (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-    )
-  }
+  get_project(instance.value.linked_data.project_id, 'must_revalidate')
+    .catch(handleError)
+    .then((project) => {
+      if (project && project.versions) {
+        get_version_many(project.versions, 'must_revalidate')
+          .catch(handleError)
+          .then((versions) => {
+            modrinthVersions.value = versions.sort(
+              (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
+            )
+          })
+      }
+    })
 }
 
 await checkProcess()

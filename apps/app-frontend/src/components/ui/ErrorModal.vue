@@ -1,5 +1,5 @@
 <script setup>
-import { XIcon, IssuesIcon, LogInIcon } from '@modrinth/assets'
+import { XIcon, IssuesIcon, LogInIcon, UpdatedIcon } from '@modrinth/assets'
 import { Modal } from '@modrinth/ui'
 import { ChatIcon } from '@/assets/icons'
 import { ref } from 'vue'
@@ -7,9 +7,11 @@ import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { handleSevereError } from '@/store/error.js'
+import { cancel_directory_change } from '@/helpers/settings.js'
 
 const errorModal = ref()
 const error = ref()
+const closable = ref(true)
 
 const title = ref('An error occurred')
 const errorType = ref('unknown')
@@ -17,7 +19,9 @@ const supportLink = ref('https://support.modrinth.com')
 const metadata = ref({})
 
 defineExpose({
-  async show(errorVal) {
+  async show(errorVal, canClose = true, source = null) {
+    closable.value = canClose
+
     if (errorVal.message && errorVal.message.includes('Minecraft authentication error:')) {
       title.value = 'Unable to sign in to Minecraft'
       errorType.value = 'minecraft_auth'
@@ -36,6 +40,22 @@ defineExpose({
     } else if (errorVal.message && errorVal.message.includes('User is not logged in')) {
       title.value = 'Sign in to Minecraft'
       errorType.value = 'minecraft_sign_in'
+      supportLink.value = 'https://support.modrinth.com'
+    } else if (errorVal.message && errorVal.message.includes('Move directory error:')) {
+      title.value = 'Could not change app directory'
+      errorType.value = 'directory_move'
+      supportLink.value = 'https://support.modrinth.com'
+
+      if (errorVal.message.includes('directory is not writeable')) {
+        metadata.value.readOnly = true
+      }
+
+      if (errorVal.message.includes('Not enough space')) {
+        metadata.value.notEnoughSpace = true
+      }
+    } else if (source === 'state_init') {
+      title.value = 'Error initializing Modrinth App'
+      errorType.value = 'state_init'
       supportLink.value = 'https://support.modrinth.com'
     } else {
       title.value = 'An error occurred'
@@ -67,10 +87,23 @@ async function loginMinecraft() {
     handleSevereError(err)
   }
 }
+
+async function cancelDirectoryChange() {
+  try {
+    await cancel_directory_change()
+    window.location.reload()
+  } catch (err) {
+    handleError(err)
+  }
+}
+
+function retryDirectoryChange() {
+  window.location.reload()
+}
 </script>
 
 <template>
-  <Modal ref="errorModal" :header="title">
+  <Modal ref="errorModal" :header="title" :closable="closable">
     <div class="modal-body">
       <div class="markdown-body">
         <template v-if="errorType === 'minecraft_auth'">
@@ -125,30 +158,40 @@ async function loginMinecraft() {
               <LogInIcon /> Try signing in again
             </button>
           </div>
-          <hr />
-          <p>
-            If nothing is working and you need help, visit
-            <a :href="supportLink">our support page</a>
-            and start a chat using the widget in the bottom right and we will be more than happy to
-            assist! Make sure to provide the following debug information to the agent:
-          </p>
-          <details>
-            <summary>Debug information</summary>
-            {{ error.message ?? error }}
-          </details>
+        </template>
+        <template v-if="errorType === 'directory_move'">
+          <template v-if="metadata.readOnly">
+            <h3>Change directory permissions</h3>
+            <p>
+              It looks like the Modrinth App is unable to write to the directory you selected.
+              Please adjust the permissions of the directory and try again or cancel the directory
+              change.
+            </p>
+          </template>
+          <template v-else-if="metadata.notEnoughSpace">
+            <h3>Not enough space</h3>
+            <p>
+              It looks like there is not enough space on the disk containing the dirctory you
+              selected Please free up some space and try again or cancel the directory change.
+            </p>
+          </template>
+          <template v-else>
+            <p>
+              The Modrinth App is unable to migrate to the new directory you selected. Please
+              contact support for help or cancel the directory change.
+            </p>
+          </template>
+
+          <div class="cta-button">
+            <button class="btn" @click="retryDirectoryChange">
+              <UpdatedIcon /> Retry directory change
+            </button>
+            <button class="btn btn-danger" @click="cancelDirectoryChange">
+              <XIcon /> Cancel directory change
+            </button>
+          </div>
         </template>
         <div v-else-if="errorType === 'minecraft_sign_in'">
-          <div class="warning-banner">
-            <div class="warning-banner__title">
-              <IssuesIcon />
-              <span>Installed the app before April 23rd, 2024?</span>
-            </div>
-            <div class="warning-banner__description">
-              Modrinth has updated our sign-in workflow to allow for better stability, security, and
-              performance. You must sign in again so your credentials can be upgraded to this new
-              flow.
-            </div>
-          </div>
           <p>
             To play this instance, you must sign in through Microsoft below. If you don't have a
             Minecraft account, you can purchase the game on the
@@ -162,13 +205,43 @@ async function loginMinecraft() {
             </button>
           </div>
         </div>
+        <template v-else-if="errorType === 'state_init'">
+          <p>
+            Modrinth App failed to load correctly. This may be because of a corrupted file, or
+            because the app is missing crucial files.
+          </p>
+          <p>You may be able to fix it through one of the following ways:</p>
+          <ul>
+            <li>Ennsuring you are connected to the internet, then try restarting the app.</li>
+            <li>Redownloading the app.</li>
+          </ul>
+        </template>
         <template v-else>
           {{ error.message ?? error }}
+        </template>
+        <template
+          v-if="
+            errorType === 'directory_move' ||
+            errorType === 'minecraft_auth' ||
+            errorType === 'state_init'
+          "
+        >
+          <hr />
+          <p>
+            If nothing is working and you need help, visit
+            <a :href="supportLink">our support page</a>
+            and start a chat using the widget in the bottom right and we will be more than happy to
+            assist! Make sure to provide the following debug information to the agent:
+          </p>
+          <details>
+            <summary>Debug information</summary>
+            {{ error.message ?? error }}
+          </details>
         </template>
       </div>
       <div class="input-group push-right">
         <a :href="supportLink" class="btn" @click="errorModal.hide()"><ChatIcon /> Get support</a>
-        <button class="btn" @click="errorModal.hide()"><XIcon /> Close</button>
+        <button v-if="closable" class="btn" @click="errorModal.hide()"><XIcon /> Close</button>
       </div>
     </div>
   </Modal>
@@ -191,6 +264,7 @@ async function loginMinecraft() {
   align-items: center;
   justify-content: center;
   padding: 0.5rem;
+  gap: 0.5rem;
 }
 
 .warning-banner {

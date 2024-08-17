@@ -51,8 +51,8 @@ export async function get_many(paths) {
 
 // Get a profile's projects
 // Returns a map of a path to profile file
-export async function get_projects(path) {
-  return await invoke('plugin:profile|profile_get_projects', { path })
+export async function get_projects(path, cacheBehaviour) {
+  return await invoke('plugin:profile|profile_get_projects', { path, cacheBehaviour })
 }
 
 // Get a profile's full fs path

@@ -66,7 +66,7 @@ pub async fn init_loading_unsafe(
     let event_state = crate::EventState::get().await?;
     let key = LoadingBarId(Uuid::new_v4());
 
-    event_state.loading_bars.write().await.insert(
+    event_state.loading_bars.insert(
         key.0,
         LoadingBar {
             loading_bar_uuid: key.0,
@@ -121,7 +121,7 @@ pub async fn edit_loading(
 ) -> crate::Result<()> {
     let event_state = crate::EventState::get().await?;
 
-    if let Some(bar) = event_state.loading_bars.write().await.get_mut(&id.0) {
+    if let Some(mut bar) = event_state.loading_bars.get_mut(&id.0) {
         bar.bar_type = bar_type;
         bar.total = total;
         bar.message = title.to_string();
@@ -152,8 +152,7 @@ pub async fn emit_loading(
 ) -> crate::Result<()> {
     let event_state = crate::EventState::get().await?;
 
-    let mut loading_bar = event_state.loading_bars.write().await;
-    let loading_bar = match loading_bar.get_mut(&key.0) {
+    let mut loading_bar = match event_state.loading_bars.get_mut(&key.0) {
         Some(f) => f,
         None => {
             return Err(EventError::NoLoadingBar(key.0).into());
@@ -250,7 +249,7 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
 #[allow(unused_variables)]
 pub async fn emit_process(
     profile_path: &str,
-    pid: u32,
+    uuid: Uuid,
     event: ProcessPayloadType,
     message: &str,
 ) -> crate::Result<()> {
@@ -263,7 +262,7 @@ pub async fn emit_process(
                 "process",
                 ProcessPayload {
                     profile_path_id: profile_path.to_string(),
-                    pid,
+                    uuid,
                     event,
                     message: message.to_string(),
                 },

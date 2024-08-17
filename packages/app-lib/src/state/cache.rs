@@ -3,6 +3,7 @@ use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::collections::HashMap;
@@ -56,7 +57,7 @@ impl CacheValueType {
         }
     }
 
-    pub fn from_str(val: &str) -> CacheValueType {
+    pub fn from_string(val: &str) -> CacheValueType {
         match val {
             "project" => CacheValueType::Project,
             "version" => CacheValueType::Version,
@@ -412,7 +413,7 @@ pub struct GameVersion {
 }
 
 impl CacheValue {
-    fn get_entry(self) -> CachedEntry {
+    pub fn get_entry(self) -> CachedEntry {
         CachedEntry {
             id: self.get_key(),
             alias: self.get_alias(),
@@ -422,7 +423,7 @@ impl CacheValue {
         }
     }
 
-    fn get_type(&self) -> CacheValueType {
+    pub fn get_type(&self) -> CacheValueType {
         match self {
             CacheValue::Project(_) => CacheValueType::Project,
             CacheValue::Version(_) => CacheValueType::Version,
@@ -505,7 +506,8 @@ impl CacheValue {
     }
 }
 
-#[derive(PartialEq, Eq, Debug, Copy, Clone)]
+#[derive(Deserialize, Serialize, PartialEq, Eq, Debug, Copy, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum CacheBehaviour {
     /// Serve expired data. If fetch fails / launcher is offline, errors are ignored
     /// and expired data is served
@@ -529,9 +531,9 @@ pub struct CachedEntry {
     id: String,
     alias: Option<String>,
     #[serde(rename = "data_type")]
-    type_: CacheValueType,
+    pub type_: CacheValueType,
     data: Option<CacheValue>,
-    expires: i64,
+    pub expires: i64,
 }
 
 macro_rules! impl_cache_methods {
@@ -654,11 +656,6 @@ impl CachedEntry {
         pool: &SqlitePool,
         fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Vec<Self>> {
-        use std::time::Instant;
-        let now = Instant::now();
-
-        println!("start {type_:?} keys: {keys:?}");
-
         if keys.is_empty() {
             return Ok(Vec::new());
         }
@@ -735,20 +732,13 @@ impl CachedEntry {
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,
-                        type_: CacheValueType::from_str(&row.data_type),
+                        type_: CacheValueType::from_string(&row.data_type),
                         data: Some(data),
                         expires: row.expires,
                     });
                 }
             }
         }
-
-        let time = now.elapsed();
-        println!(
-            "query {type_:?} keys: {remaining_keys:?}, elapsed: {:.2?}",
-            time
-        );
-        let now = Instant::now();
 
         if !remaining_keys.is_empty() {
             let res = Self::fetch_many(
@@ -787,9 +777,6 @@ impl CachedEntry {
             }
         }
 
-        let time = now.elapsed();
-        println!("FETCH {type_:?} DONE, elapsed: {:.2?}", time);
-
         if !expired_keys.is_empty()
             && (cache_behaviour == CacheBehaviour::StaleWhileRevalidate
                 || cache_behaviour
@@ -827,20 +814,50 @@ impl CachedEntry {
         fetch_semaphore: &FetchSemaphore,
         pool: &SqlitePool,
     ) -> crate::Result<Vec<(Self, bool)>> {
+        async fn fetch_many_batched<T: DeserializeOwned>(
+            method: Method,
+            api_url: &str,
+            url: &str,
+            keys: &DashSet<impl Display + Eq + Hash + Serialize>,
+            fetch_semaphore: &FetchSemaphore,
+            pool: &SqlitePool,
+        ) -> crate::Result<Vec<T>> {
+            const MAX_REQUEST_SIZE: usize = 1000;
+
+            let urls = keys
+                .iter()
+                .collect::<Vec<_>>()
+                .chunks(MAX_REQUEST_SIZE)
+                .map(|chunk| {
+                    serde_json::to_string(&chunk)
+                        .map(|keys| format!("{api_url}{url}{keys}"))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            let res = futures::future::try_join_all(urls.iter().map(|url| {
+                fetch_json::<Vec<_>>(
+                    method.clone(),
+                    url,
+                    None,
+                    None,
+                    fetch_semaphore,
+                    pool,
+                )
+            }))
+            .await?;
+
+            Ok(res.into_iter().flatten().collect())
+        }
+
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
-                let mut results = fetch_json::<Vec<_>>(
+                let mut results = fetch_many_batched(
                     Method::GET,
-                    &*format!(
-                        "{}{}?ids={}",
-                        $api_url,
-                        $url_suffix,
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
+                    $api_url,
+                    &format!("{}?ids=", $url_suffix),
+                    &keys,
                     &fetch_semaphore,
-                    pool,
+                    &pool,
                 )
                 .await?
                 .into_iter()
@@ -938,14 +955,11 @@ impl CachedEntry {
                 )
             }
             CacheValueType::Team => {
-                let mut teams = fetch_json::<Vec<Vec<TeamMember>>>(
+                let mut teams = fetch_many_batched::<Vec<TeamMember>>(
                     Method::GET,
-                    &format!(
-                        "{MODRINTH_API_URL_V3}teams?ids={}",
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
+                    MODRINTH_API_URL_V3,
+                    "teams?ids=",
+                    &keys,
                     fetch_semaphore,
                     pool,
                 )
@@ -980,14 +994,11 @@ impl CachedEntry {
                 values
             }
             CacheValueType::Organization => {
-                let mut orgs = fetch_json::<Vec<Organization>>(
+                let mut orgs = fetch_many_batched::<Organization>(
                     Method::GET,
-                    &format!(
-                        "{MODRINTH_API_URL_V3}organizations?ids={}",
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
+                    MODRINTH_API_URL_V3,
+                    "organizations?ids=",
+                    &keys,
                     fetch_semaphore,
                     pool,
                 )
@@ -1063,8 +1074,6 @@ impl CachedEntry {
                             CacheValue::Version(version).get_entry(),
                             false,
                         ));
-
-                        println!("found hash {hash} {version_id} {project_id}");
 
                         vals.push((
                             CacheValue::File(CachedFile {
@@ -1307,7 +1316,6 @@ impl CachedEntry {
                                 false,
                             ));
 
-                            println!("found update {hash} {game_version} {loader} {version_id}");
                             vals.push((
                                 CacheValue::FileUpdate(CachedFileUpdate {
                                     hash: hash.clone(),
@@ -1372,7 +1380,7 @@ impl CachedEntry {
         })
     }
 
-    async fn upsert_many(
+    pub(crate) async fn upsert_many(
         items: &[Self],
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
@@ -1396,6 +1404,25 @@ impl CachedEntry {
                 expires = excluded.expires
             ",
             items,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(())
+    }
+
+    pub async fn purge_cache_types(
+        cache_types: &[CacheValueType],
+        exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
+    ) -> crate::Result<()> {
+        let cache_types = serde_json::to_string(&cache_types)?;
+
+        sqlx::query!(
+            "
+            DELETE FROM cache
+            WHERE data_type IN (SELECT value FROM json_each($1))
+            ",
+            cache_types,
         )
         .execute(exec)
         .await?;

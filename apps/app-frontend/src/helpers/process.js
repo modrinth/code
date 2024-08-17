@@ -18,6 +18,6 @@ export async function get_all() {
 }
 
 /// Kills a process by UUID
-export async function kill(pid) {
-  return await invoke('plugin:process|process_kill', { pid })
+export async function kill(uuid) {
+  return await invoke('plugin:process|process_kill', { uuid })
 }

@@ -6,7 +6,7 @@ use discord_rich_presence::{
 };
 use tokio::sync::RwLock;
 
-use crate::state::{Process, Profile};
+use crate::state::Profile;
 use crate::State;
 
 pub struct DiscordGuard {
@@ -17,8 +17,8 @@ pub struct DiscordGuard {
 impl DiscordGuard {
     /// Initialize discord IPC client, and attempt to connect to it
     /// If it fails, it will still return a DiscordGuard, but the client will be unconnected
-    pub async fn init() -> crate::Result<DiscordGuard> {
-        let mut dipc =
+    pub fn init() -> crate::Result<DiscordGuard> {
+        let dipc =
             DiscordIpcClient::new("1123683254248148992").map_err(|e| {
                 crate::ErrorKind::OtherError(format!(
                     "Could not create Discord client {}",
@@ -26,15 +26,10 @@ impl DiscordGuard {
                 ))
             })?;
 
-        let res = dipc.connect(); // Do not need to connect to Discord to use app
-        let connected = if res.is_ok() {
-            Arc::new(AtomicBool::new(true))
-        } else {
-            Arc::new(AtomicBool::new(false))
-        };
-
-        let client = Arc::new(RwLock::new(dipc));
-        Ok(DiscordGuard { client, connected })
+        Ok(DiscordGuard {
+            client: Arc::new(RwLock::new(dipc)),
+            connected: Arc::new(AtomicBool::new(false)),
+        })
     }
 
     /// If the client failed connecting during init(), this will check for connection and attempt to reconnect
@@ -172,7 +167,7 @@ impl DiscordGuard {
             return self.clear_activity(true).await;
         }
 
-        let running_profiles = Process::get_all(&state.pool).await?;
+        let running_profiles = state.process_manager.get_all();
         if let Some(existing_child) = running_profiles.first() {
             let prof =
                 Profile::get(&existing_child.profile_path, &state.pool).await?;
