@@ -372,7 +372,6 @@ import { formatProjectType } from '@modrinth/utils'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import {
   add_project_from_path,
-  get,
   get_projects,
   remove_project,
   toggle_disable_project,

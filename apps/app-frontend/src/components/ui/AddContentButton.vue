@@ -40,11 +40,11 @@ const handleSearchContent = async () => {
       :options="[
         {
           id: 'search',
-          action: () => handleSearchContent,
+          action: handleSearchContent,
         },
         {
           id: 'from_file',
-          action: () => handleAddContentFromFile,
+          action: handleAddContentFromFile,
         },
       ]"
       class="btn btn-primary btn-dropdown-animation icon-only"
