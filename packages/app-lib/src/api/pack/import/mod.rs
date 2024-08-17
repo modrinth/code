@@ -104,7 +104,7 @@ pub async fn get_importable_instances(
 // Import an instance from a launcher type and base path
 // Note: this *deletes* the submitted empty profile
 
-#[tracing::instrument]
+// #[tracing::instrument]
 pub async fn import_instance(
     profile_path: &str, // This should be a blank profile
     launcher_type: ImportLauncherType,

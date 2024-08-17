@@ -3,6 +3,7 @@ use crate::util::fetch::{fetch_json, sha1_async, FetchSemaphore};
 use chrono::{DateTime, Utc};
 use dashmap::DashSet;
 use reqwest::Method;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::collections::HashMap;
@@ -813,20 +814,50 @@ impl CachedEntry {
         fetch_semaphore: &FetchSemaphore,
         pool: &SqlitePool,
     ) -> crate::Result<Vec<(Self, bool)>> {
+        async fn fetch_many_batched<T: DeserializeOwned>(
+            method: Method,
+            api_url: &str,
+            url: &str,
+            keys: &DashSet<impl Display + Eq + Hash + Serialize>,
+            fetch_semaphore: &FetchSemaphore,
+            pool: &SqlitePool,
+        ) -> crate::Result<Vec<T>> {
+            const MAX_REQUEST_SIZE: usize = 1000;
+
+            let urls = keys
+                .iter()
+                .collect::<Vec<_>>()
+                .chunks(MAX_REQUEST_SIZE)
+                .map(|chunk| {
+                    serde_json::to_string(&chunk)
+                        .map(|keys| format!("{api_url}{url}{keys}"))
+                })
+                .collect::<Result<Vec<_>, _>>()?;
+
+            let res = futures::future::try_join_all(urls.iter().map(|url| {
+                fetch_json::<Vec<_>>(
+                    method.clone(),
+                    url,
+                    None,
+                    None,
+                    fetch_semaphore,
+                    pool,
+                )
+            }))
+            .await?;
+
+            Ok(res.into_iter().flatten().collect())
+        }
+
         macro_rules! fetch_original_values {
             ($type:ident, $api_url:expr, $url_suffix:expr, $cache_variant:path) => {{
-                let mut results = fetch_json::<Vec<_>>(
+                let mut results = fetch_many_batched(
                     Method::GET,
-                    &*format!(
-                        "{}{}?ids={}",
-                        $api_url,
-                        $url_suffix,
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
+                    $api_url,
+                    &format!("{}?ids=", $url_suffix),
+                    &keys,
                     &fetch_semaphore,
-                    pool,
+                    &pool,
                 )
                 .await?
                 .into_iter()
@@ -924,14 +955,11 @@ impl CachedEntry {
                 )
             }
             CacheValueType::Team => {
-                let mut teams = fetch_json::<Vec<Vec<TeamMember>>>(
+                let mut teams = fetch_many_batched::<Vec<TeamMember>>(
                     Method::GET,
-                    &format!(
-                        "{MODRINTH_API_URL_V3}teams?ids={}",
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
+                    MODRINTH_API_URL_V3,
+                    "teams?ids=",
+                    &keys,
                     fetch_semaphore,
                     pool,
                 )
@@ -966,14 +994,11 @@ impl CachedEntry {
                 values
             }
             CacheValueType::Organization => {
-                let mut orgs = fetch_json::<Vec<Organization>>(
+                let mut orgs = fetch_many_batched::<Organization>(
                     Method::GET,
-                    &format!(
-                        "{MODRINTH_API_URL_V3}organizations?ids={}",
-                        serde_json::to_string(&keys)?
-                    ),
-                    None,
-                    None,
+                    MODRINTH_API_URL_V3,
+                    "organizations?ids=",
+                    &keys,
                     fetch_semaphore,
                     pool,
                 )

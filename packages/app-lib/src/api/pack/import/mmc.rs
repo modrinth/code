@@ -174,8 +174,7 @@ async fn load_instance_cfg(file_path: &Path) -> crate::Result<MMCInstance> {
     }
 }
 
-#[tracing::instrument]
-
+// #[tracing::instrument]
 pub async fn import_mmc(
     mmc_base_path: PathBuf,  // path to base mmc folder
     instance_folder: String, // instance folder in mmc_base_path
