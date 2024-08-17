@@ -6,19 +6,20 @@ macro_rules! impl_cache_methods {
         $(
             paste::paste! {
                 #[tauri::command]
-                pub async fn [<get_ $variant:snake>](id: &str) -> Result<Option<$type>>
+                pub async fn [<get_ $variant:snake>](id: &str, cache_behaviour: Option<CacheBehaviour>) -> Result<Option<$type>>
                 {
-                    Ok(theseus::cache::[<get_ $variant:snake>](id).await?)
+                    Ok(theseus::cache::[<get_ $variant:snake>](id, cache_behaviour).await?)
                 }
 
                 #[tauri::command]
                 pub async fn [<get_ $variant:snake _many>](
                     ids: Vec<String>,
+                    cache_behaviour: Option<CacheBehaviour>,
                 ) -> Result<Vec<$type>>
                 {
                     let ids = ids.iter().map(|x| &**x).collect::<Vec<&str>>();
                     let entries =
-                        theseus::cache::[<get_ $variant:snake _many>](&*ids).await?;
+                        theseus::cache::[<get_ $variant:snake _many>](&*ids, cache_behaviour).await?;
 
                     Ok(entries)
                 }
@@ -51,6 +52,12 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
             get_organization_many,
             get_search_results,
             get_search_results_many,
+            purge_cache_types,
         ])
         .build()
+}
+
+#[tauri::command]
+pub async fn purge_cache_types(cache_types: Vec<CacheValueType>) -> Result<()> {
+    Ok(theseus::cache::purge_cache_types(&cache_types).await?)
 }

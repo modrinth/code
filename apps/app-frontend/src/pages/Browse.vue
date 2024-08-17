@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, readonly, shallowRef, watch, onUnmounted } from 'vue'
+import { computed, nextTick, ref, readonly, shallowRef, watch } from 'vue'
 import { ClearIcon, SearchIcon, ClientIcon, ServerIcon, XIcon } from '@modrinth/assets'
 import {
   Pagination,
@@ -19,7 +19,6 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { get_search_results } from '@/helpers/cache.js'
@@ -233,14 +232,14 @@ async function refreshSearch() {
   if (currentPage.value !== 1) {
     params.push(`offset=${offset}`)
   }
-  let url = 'search'
+  let url = ''
   if (params.length > 0) {
     for (let i = 0; i < params.length; i++) {
       url += i === 0 ? `?${params[i]}` : `&${params[i]}`
     }
   }
 
-  let rawResults = await get_search_results(`?${url}`)
+  let rawResults = await get_search_results(`${url}`)
   if (!rawResults) {
     rawResults = {
       result: {
@@ -585,7 +584,10 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
           <ClearIcon /> Clear filters
         </Button>
         <div
-          v-if="(isModProject && ignoreInstanceLoaders) || projectType === 'shader'"
+          v-if="
+            (isModProject && (ignoreInstanceLoaders || !instanceContext)) ||
+            projectType === 'shader'
+          "
           class="loaders"
         >
           <h2>Loaders</h2>
@@ -721,7 +723,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
         class="pagination-before"
         @switch-page="onSearchChange"
       />
-      <SplashScreen v-if="loading" />
+      <section v-if="loading" class="offline">Loading...</section>
       <section v-else-if="offline && results.total_hits === 0" class="offline">
         You are currently offline. Connect to the internet to browse Modrinth!
       </section>

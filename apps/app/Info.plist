@@ -27,7 +27,7 @@
     			<string>Owner</string>
     			<key>LSItemContentTypes</key>
     			<array>
-    				<string>ModrinthApp-type</string>
+    				<string>com.modrinth.theseus-type</string>
     			</array>
     			<key>NSDocumentClass</key>
     			<string>NSDocument</string>
@@ -45,7 +45,7 @@
     			<key>UTTypeIcons</key>
     			<dict/>
     			<key>UTTypeIdentifier</key>
-    			<string>ModrinthApp-type</string>
+    			<string>com.modrinth.theseus-type</string>
     			<key>UTTypeTagSpecification</key>
     			<dict>
     				<key>public.filename-extension</key>

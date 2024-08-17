@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
-import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, Button } from '@modrinth/ui'
+import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
+import { Card, Slider, DropdownSelect, Toggle, ConfirmModal, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
@@ -10,8 +10,8 @@ import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vu
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
-import { get_user } from '@/helpers/cache.js'
 import { useSettings } from '@/composables/useSettings.js'
+import { get_user, purge_cache_types } from '@/helpers/cache.js'
 
 const pageOptions = ['Home', 'Library']
 
@@ -20,7 +20,6 @@ const themeStore = useTheming()
 const version = await getVersion()
 
 const settings = await useSettings()
-// const settingsDir = ref(settings.value.loaded_config_dir)
 
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
@@ -72,6 +71,25 @@ async function findLauncherDir() {
     settings.value.custom_dir = newDir
   }
 }
+
+async function purgeCache() {
+  await purge_cache_types([
+    'project',
+    'version',
+    'user',
+    'team',
+    'organization',
+    'loader_manifest',
+    'minecraft_manifest',
+    'categories',
+    'report_types',
+    'loaders',
+    'game_versions',
+    'donation_platforms',
+    'file_update',
+    'search_results',
+  ]).catch(handleError)
+}
 </script>
 
 <template>
@@ -84,26 +102,50 @@ async function findLauncherDir() {
       </div>
       <ModrinthLoginScreen ref="loginScreenModal" :callback="signInAfter" />
       <div class="adjacent-input">
-        <label for="theme">
+        <label for="sign-in">
           <span class="label__title">Manage account</span>
           <span v-if="credentials" class="label__description">
             You are currently logged in as {{ credentials.user.username }}.
           </span>
           <span v-else> Sign in to your Modrinth account. </span>
         </label>
-        <button v-if="credentials" class="btn" @click="logOut">
+        <button v-if="credentials" id="sign-in" class="btn" @click="logOut">
           <LogOutIcon />
           Sign out
         </button>
-        <button v-else class="btn" @click="$refs.loginScreenModal.show()">
+        <button v-else id="sign-in" class="btn" @click="$refs.loginScreenModal.show()">
           <LogInIcon />
           Sign in
         </button>
       </div>
-      <label for="theme">
+      <ConfirmModal
+        ref="purgeCacheConfirmModal"
+        title="Are you sure you want to purge the cache?"
+        description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
+        :has-to-type="false"
+        proceed-label="Purge cache"
+        :noblur="!themeStore.advancedRendering"
+        @proceed="purgeCache"
+      />
+      <div class="adjacent-input">
+        <label for="purge-cache">
+          <span class="label__title">App cache</span>
+          <span class="label__description">
+            The Modrinth app stores a cache of data to speed up loading. This can be purged to force
+            the app to reload data. <br />
+            This may slow down the app temporarily.
+          </span>
+        </label>
+        <button id="purge-cache" class="btn" @click="$refs.purgeCacheConfirmModal.show()">
+          <TrashIcon />
+          Purge cache
+        </button>
+      </div>
+      <label for="appDir">
         <span class="label__title">App directory</span>
         <span class="label__description">
-          The directory where the launcher stores all of its files.
+          The directory where the launcher stores all of its files. Changes will be applied after
+          restarting the launcher.
         </span>
       </label>
       <div class="app-directory">

@@ -42,7 +42,7 @@ export const useInstall = defineStore('installStore', {
 })
 
 export const install = async (projectId, versionId, instancePath, source, callback = () => {}) => {
-  const project = await get_project(projectId).catch(handleError)
+  const project = await get_project(projectId, 'must_revalidate').catch(handleError)
 
   if (project.project_type === 'modpack') {
     const version = versionId ?? project.versions[project.versions.length - 1]
@@ -68,7 +68,7 @@ export const install = async (projectId, versionId, instancePath, source, callba
       const [instance, instanceProjects, versions] = await Promise.all([
         await get(instancePath).catch(handleError),
         await get_projects(instancePath).catch(handleError),
-        await get_version_many(project.versions),
+        await get_version_many(project.versions, 'must_revalidate'),
       ])
 
       const projectVersions = versions.sort(
@@ -165,11 +165,11 @@ export const installVersionDependencies = async (profile, version) => {
       )
         continue
 
-      const depProject = await get_project(dep.project_id).catch(handleError)
+      const depProject = await get_project(dep.project_id, 'must_revalidate').catch(handleError)
 
-      const depVersions = (await get_version_many(depProject.versions).catch(handleError)).sort(
-        (a, b) => dayjs(b.date_published) - dayjs(a.date_published),
-      )
+      const depVersions = (
+        await get_version_many(depProject.versions, 'must_revalidate').catch(handleError)
+      ).sort((a, b) => dayjs(b.date_published) - dayjs(a.date_published))
 
       const latest = depVersions.find(
         (v) => v.game_versions.includes(profile.game_version) && v.loaders.includes(profile.loader),

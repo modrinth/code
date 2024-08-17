@@ -81,9 +81,9 @@
     >
       <Button
         v-for="process in currentProcesses"
-        :key="process.pid"
+        :key="process.uuid"
         class="profile-button"
-        @click="selectedProcess(process)"
+        @click="selectProcess(process)"
       >
         <div class="text"><span class="circle running" /> {{ process.profile.name }}</div>
         <Button
@@ -162,8 +162,7 @@ const unlistenProcess = await process_listener(async () => {
 
 const stop = async (process) => {
   try {
-    console.log(process.pid)
-    await killProcess(process.pid).catch(handleError)
+    await killProcess(process.uuid).catch(handleError)
 
     mixpanel_track('InstanceStop', {
       loader: process.profile.loader,

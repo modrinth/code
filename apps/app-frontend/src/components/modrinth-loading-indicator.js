@@ -40,10 +40,12 @@ export default defineComponent({
     const loading = useLoading()
 
     watch(loading, (newValue) => {
-      if (newValue.loading) {
-        indicator.start()
-      } else {
-        indicator.finish()
+      if (newValue.barEnabled) {
+        if (newValue.loading) {
+          indicator.start()
+        } else {
+          indicator.finish()
+        }
       }
     })
 
