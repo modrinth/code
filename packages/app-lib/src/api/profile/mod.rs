@@ -653,7 +653,7 @@ pub async fn run_credentials(
         if let Some(command) = cmd.next() {
             let full_path = get_full_path(&profile.path).await?;
             let result = Command::new(command)
-                .args(&cmd.collect::<Vec<&str>>())
+                .args(cmd.collect::<Vec<&str>>())
                 .current_dir(&full_path)
                 .spawn()
                 .map_err(|e| IOError::with_path(e, &full_path))?
@@ -922,5 +922,8 @@ pub async fn add_all_recursive_folder_paths(
 }
 
 pub fn sanitize_profile_name(input: &str) -> String {
-    input.replace(['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>'], "_")
+    input.replace(
+        ['/', '\\', '?', '*', ':', '\'', '\"', '|', '<', '>', '!'],
+        "_",
+    )
 }

@@ -11,7 +11,7 @@
         <XIcon />
       </button>
     </div>
-    <div class="app-logo-wrapper">
+    <div class="app-logo-wrapper" data-tauri-drag-region>
       <svg
         class="app-logo"
         viewBox="0 0 1215 175"
@@ -75,7 +75,7 @@
       <ProgressBar class="loading-bar" :progress="loadingProgress" />
       <span v-if="message">{{ message }}</span>
     </div>
-    <div class="gradient-bg"></div>
+    <div class="gradient-bg" data-tauri-drag-region></div>
     <div class="cube-bg"></div>
     <div class="base-bg"></div>
   </div>
@@ -160,8 +160,7 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
 .app-buttons {
   position: absolute;
   right: 0;
-  z-index: 5;
-  background: var(--color-button-bg);
+  z-index: 9999;
   display: flex;
 }
 
@@ -177,7 +176,7 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
 
   gap: 1rem;
 
-  z-index: 4;
+  z-index: 9998;
 }
 
 .app-logo {
@@ -195,7 +194,7 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   width: 100vw;
   background: linear-gradient(180deg, rgba(66, 131, 92, 0.275) 0%, rgba(17, 35, 43, 0.5) 97.29%),
     linear-gradient(0deg, rgba(22, 24, 28, 0.64), rgba(22, 24, 28, 0.64));
-  z-index: 3;
+  z-index: 9997;
 }
 
 .cube-bg {
@@ -211,7 +210,7 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   background: #16181c url('@/assets/loading/cube.png') center no-repeat;
   background-size: contain;
 
-  z-index: 2;
+  z-index: 9996;
 }
 
 .base-bg {
@@ -221,6 +220,6 @@ TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   width: 100%;
   height: 100%;
   background: var(--color-bg);
-  z-index: 1;
+  z-index: 9995;
 }
 </style>

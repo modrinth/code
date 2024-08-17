@@ -412,7 +412,7 @@ pub struct GameVersion {
 }
 
 impl CacheValue {
-    fn get_entry(self) -> CachedEntry {
+    pub fn get_entry(self) -> CachedEntry {
         CachedEntry {
             id: self.get_key(),
             alias: self.get_alias(),
@@ -422,7 +422,7 @@ impl CacheValue {
         }
     }
 
-    fn get_type(&self) -> CacheValueType {
+    pub fn get_type(&self) -> CacheValueType {
         match self {
             CacheValue::Project(_) => CacheValueType::Project,
             CacheValue::Version(_) => CacheValueType::Version,
@@ -530,9 +530,9 @@ pub struct CachedEntry {
     id: String,
     alias: Option<String>,
     #[serde(rename = "data_type")]
-    type_: CacheValueType,
+    pub type_: CacheValueType,
     data: Option<CacheValue>,
-    expires: i64,
+    pub expires: i64,
 }
 
 macro_rules! impl_cache_methods {
@@ -1355,7 +1355,7 @@ impl CachedEntry {
         })
     }
 
-    async fn upsert_many(
+    pub(crate) async fn upsert_many(
         items: &[Self],
         exec: impl sqlx::Executor<'_, Database = sqlx::Sqlite>,
     ) -> crate::Result<()> {
