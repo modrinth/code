@@ -59,21 +59,22 @@
       </div>
     </div>
     <div class="log-text">
-      <VirtualScroller
+      <RecycleScroller
+        v-slot="{ item }"
         ref="logContainer"
         class="scroller"
-        :default-size="20"
         :items="displayProcessedLogs"
+        direction="vertical"
+        :item-size="20"
+        key-field="id"
       >
-        <template #item="{ ref }">
-          <div class="user no-wrap">
-            <span :style="{ color: ref.prefixColor, 'font-weight': ref.weight }">{{
-              ref.prefix
-            }}</span>
-            <span :style="{ color: ref.textColor }">{{ ref.text }}</span>
-          </div>
-        </template>
-      </VirtualScroller>
+        <div class="user no-wrap">
+          <span :style="{ color: item.prefixColor, 'font-weight': item.weight }">{{
+            item.prefix
+          }}</span>
+          <span :style="{ color: item.textColor }">{{ item.text }}</span>
+        </div>
+      </RecycleScroller>
     </div>
     <ShareModal
       ref="shareModal"
@@ -104,12 +105,11 @@ import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
-import { createVirtualScroller } from 'vue-typed-virtual-list'
+import { RecycleScroller } from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)
-
-const VirtualScroller = createVirtualScroller()
 
 const route = useRoute()
 
@@ -412,20 +412,15 @@ function handleUserScroll() {
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveStdLog()
-    const logContainerElement = logContainer.value.$el
-    const scroll =
-      logContainerElement.scrollHeight -
-      logContainerElement.scrollTop -
-      logContainerElement.clientHeight
-    // const scroll = logContainer.value.$el.scrollHeight - logContainer.value.$el.scrollTop - logContainer.value.$el.clientHeight
+    const scroll = logContainer.value.getScroll()
 
     // Allow resetting of userScrolled if the user scrolls to the bottom
     if (selectedLogIndex.value === 0) {
-      if (scroll <= 10) userScrolled.value = false
+      if (scroll.end >= logContainer.value.$el.scrollHeight - 10) userScrolled.value = false
       if (!userScrolled.value) {
         await nextTick()
         isAutoScrolling.value = true
-        logContainer.value.scrollTo(displayProcessedLogs.value.length - 1)
+        logContainer.value.scrollToItem(displayProcessedLogs.value.length - 1)
         setTimeout(() => (isAutoScrolling.value = false), 50)
       }
     }
