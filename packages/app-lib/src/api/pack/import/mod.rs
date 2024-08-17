@@ -257,7 +257,7 @@ pub async fn copy_dotminecraft(
         crate::api::profile::get_full_path(profile_path_id).await?;
 
     // Gets all subfiles recursively in src
-    let subfiles = get_all_subfiles(&dotminecraft).await?;
+    let subfiles = get_all_subfiles(&dotminecraft, true).await?;
     let total_subfiles = subfiles.len() as u64;
 
     let loading_bar = init_or_edit_loading(
@@ -297,20 +297,33 @@ pub async fn copy_dotminecraft(
 
 #[async_recursion::async_recursion]
 #[tracing::instrument]
-pub async fn get_all_subfiles(src: &Path) -> crate::Result<Vec<PathBuf>> {
+pub async fn get_all_subfiles(
+    src: &Path,
+    include_empty_dirs: bool,
+) -> crate::Result<Vec<PathBuf>> {
     if !src.is_dir() {
         return Ok(vec![src.to_path_buf()]);
     }
 
     let mut files = Vec::new();
     let mut dir = io::read_dir(&src).await?;
+
+    let mut has_files = false;
     while let Some(child) = dir
         .next_entry()
         .await
         .map_err(|e| IOError::with_path(e, src))?
     {
+        has_files = true;
         let src_child = child.path();
-        files.append(&mut get_all_subfiles(&src_child).await?);
+        files.append(
+            &mut get_all_subfiles(&src_child, include_empty_dirs).await?,
+        );
     }
+
+    if !has_files && include_empty_dirs {
+        files.push(src.to_path_buf());
+    }
+
     Ok(files)
 }

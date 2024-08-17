@@ -295,11 +295,13 @@ impl DirectoryInfo {
                     }
 
                     for entry_path in
-                        crate::pack::import::get_all_subfiles(source).await?
+                        crate::pack::import::get_all_subfiles(source, true)
+                            .await?
                     {
                         let relative_path = entry_path.strip_prefix(source)?;
                         let new_path = destination.join(relative_path);
-                        let path_size = entry_path.metadata()?.len();
+                        let path_size =
+                            entry_path.metadata().map(|x| x.len()).unwrap_or(0);
 
                         *total_size += path_size;
 
