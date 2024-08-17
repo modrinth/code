@@ -103,7 +103,7 @@ fn main() {
                     let mtx_copy = mtx_copy.clone();
 
                     tauri::async_runtime::spawn(async move {
-                        tracing::info!("Handling file open {request}");
+                        tracing::info!("Handling file open {filename}");
 
                         let mut payload = mtx_copy.lock().await;
                         if payload.is_none() {

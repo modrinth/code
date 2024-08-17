@@ -111,7 +111,7 @@ pub async fn get_opening_command(
 #[cfg(not(target_os = "macos"))]
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
     // Tauri is not CLI, we use arguments as path to file to call
-    let cmd_arg = env::args_os().nth(1);
+    let cmd_arg = std::env::args_os().nth(1);
 
     tracing::info!("opening command {cmd_arg:?}");
 
