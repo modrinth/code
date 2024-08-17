@@ -160,7 +160,7 @@ pub fn insert_mirrored_artifact(
     entire_url: bool,
     mirror_artifacts: &DashMap<String, MirrorArtifact>,
 ) -> Result<()> {
-    let mut val = mirror_artifacts
+    let val = mirror_artifacts
         .entry(get_path_from_artifact(artifact)?)
         .or_insert(MirrorArtifact {
             sha1,

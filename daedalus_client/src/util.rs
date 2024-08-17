@@ -159,7 +159,7 @@ pub async fn download_file(
     const RETRIES: u32 = 10;
     for attempt in 1..=(RETRIES + 1) {
         let result = REQWEST_CLIENT
-            .get(&url.replace("http://", "https://"))
+            .get(url.replace("http://", "https://"))
             .send()
             .await
             .and_then(|x| x.error_for_status());

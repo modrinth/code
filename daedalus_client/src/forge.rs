@@ -1,5 +1,5 @@
 use crate::util::{
-    download_file, fetch_json, fetch_xml, format_url, sha1_async,
+    download_file, fetch_json, fetch_xml, format_url,
 };
 use crate::{insert_mirrored_artifact, Error, MirrorArtifact, UploadFile};
 use chrono::{DateTime, Utc};
@@ -403,9 +403,10 @@ async fn fetch(
                         .map(|mut lib| {
                             // For all libraries besides the forge lib extracted, we mirror them from maven servers
                             // unless the URL is empty/null or available on Minecraft's servers
-                            if let Some(url) = lib.url {
-                                if lib.name != install_profile.install.path
-                                    && !url.is_empty()
+                            if let Some(ref url) = lib.url {
+                                if lib.name == install_profile.install.path {
+                                    lib.url = Some(format_url("maven/"));
+                                } else if !url.is_empty()
                                     && !url.contains(
                                         "https://libraries.minecraft.net/",
                                     )
@@ -414,7 +415,7 @@ async fn fetch(
                                         &lib.name,
                                         None,
                                         vec![
-                                            url,
+                                            url.clone(),
                                             "https://maven.creeperhost.net/"
                                                 .to_string(),
                                             maven_url.to_string(),
@@ -422,10 +423,10 @@ async fn fetch(
                                         false,
                                         mirror_artifacts,
                                     )?;
+
+                                    lib.url = Some(format_url("maven/"));
                                 }
                             }
-
-                            lib.url = Some(format_url("maven/"));
 
                             Ok(lib)
                         })
@@ -442,7 +443,7 @@ async fn fetch(
                     // pub profile: String,
                     // pub version: String,
                     // pub json: String,
-                    pub path: Option<String>,
+                    // pub path: Option<String>,
                     // pub minecraft: String,
                     pub data: HashMap<String, daedalus::modded::SidedDataEntry>,
                     pub libraries: Vec<daedalus::minecraft::Library>,
