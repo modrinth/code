@@ -771,10 +771,11 @@ pub async fn initiate_payment(
         intent.metadata = Some(metadata);
         intent.automatic_payment_methods = Some(CreatePaymentIntentAutomaticPaymentMethods {
             allow_redirects: None,
-            enabled: true,
+            enabled: false,
         });
         intent.receipt_email = user.email.as_deref();
         intent.setup_future_usage = Some(PaymentIntentSetupFutureUsage::OffSession);
+        intent.payment_method_types = Some(vec!["card".to_string(), "cashapp".to_string()]);
 
         if let PaymentRequestType::PaymentMethod { .. } = payment_request.type_ {
             intent.payment_method = Some(payment_method.id.clone());
@@ -1007,22 +1008,12 @@ pub async fn stripe_webhook(
                                     user_subscription.price_id = metadata.product_price.id;
                                     user_subscription.interval = interval;
                                     user_subscription.upsert(&mut transaction).await?;
-                                } else {
-                                    user_subscription_item::UserSubscriptionItem {
-                                        id: subscription_id,
-                                        user_id: metadata.user.id,
-                                        price_id: metadata.product_price.id,
-                                        interval,
-                                        created: Utc::now(),
-                                        expires: Utc::now(),
-                                        last_charge: Some(Utc::now()),
-                                        status: SubscriptionStatus::PaymentFailed,
-                                    }
-                                    .upsert(&mut transaction)
-                                    .await?;
-                                }
 
-                                intervals.get(&interval).copied()
+                                    intervals.get(&interval).copied()
+                                } else {
+                                    // We don't create a new subscription for a failed payment, so we return None here so no email is sent
+                                    None
+                                }
                             } else {
                                 None
                             }
