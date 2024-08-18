@@ -186,7 +186,7 @@
     />
     <NewModal ref="addPaymentMethodModal">
       <template #title>
-        <span class="text-contrast text-lg font-extrabold">
+        <span class="text-lg font-extrabold text-contrast">
           {{ formatMessage(messages.paymentMethodTitle) }}
         </span>
       </template>
@@ -242,7 +242,7 @@
           <PayPalIcon v-else-if="method.type === 'paypal'" class="h-8 w-8" />
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
-              <div class="text-contrast font-bold">
+              <div class="font-bold text-contrast">
                 <template v-if="method.type === 'card'">
                   {{
                     formatMessage(messages.paymentMethodCardDisplay, {
