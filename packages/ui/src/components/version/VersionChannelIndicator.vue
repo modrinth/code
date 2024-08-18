@@ -1,4 +1,4 @@
-<script setup lang='ts'>
+<script setup lang="ts">
 import { useVIntl, defineMessages } from '@vintl/vintl'
 import { computed } from 'vue'
 
@@ -6,35 +6,35 @@ const { formatMessage } = useVIntl()
 
 const props = withDefaults(
   defineProps<{
-    channel: 'release' | 'beta' | 'alpha',
+    channel: 'release' | 'beta' | 'alpha'
     large?: boolean
   }>(),
   {
-    large: false
-  }
+    large: false,
+  },
 )
 
 const messages = defineMessages({
   releaseSymbol: {
     id: 'project.versions.channel.release.symbol',
-    defaultMessage: 'R'
+    defaultMessage: 'R',
   },
   betaSymbol: {
     id: 'project.versions.channel.beta.symbol',
-    defaultMessage: 'B'
+    defaultMessage: 'B',
   },
   alphaSymbol: {
     id: 'project.versions.channel.alpha.symbol',
-    defaultMessage: 'A'
-  }
+    defaultMessage: 'A',
+  },
 })
-
 </script>
 
 <template>
   <div
-      :style='`--_size: ${size};`'
-      :class="`flex ${ large ? 'text-lg w-[2.625rem] h-[2.625rem]' : 'text-sm w-9 h-9'} font-bold justify-center items-center rounded-full ${channel === 'release' ? 'bg-bg-green text-brand-green' : channel === 'beta' ? 'bg-bg-orange text-brand-orange' : 'bg-bg-red text-brand-red'}`">
+    :style="`--_size: ${size};`"
+    :class="`flex ${large ? 'text-lg w-[2.625rem] h-[2.625rem]' : 'text-sm w-9 h-9'} font-bold justify-center items-center rounded-full ${channel === 'release' ? 'bg-bg-green text-brand-green' : channel === 'beta' ? 'bg-bg-orange text-brand-orange' : 'bg-bg-red text-brand-red'}`"
+  >
     {{ channel ? formatMessage(messages[`${channel}Symbol`]) : '?' }}
   </div>
 </template>

@@ -1,8 +1,8 @@
 <template>
   <NewModal ref="modal" :noblur="noblur" danger>
     <template #title>
-      <slot name='title'>
-        <span class='font-extrabold text-contrast text-lg'>{{ title }}</span>
+      <slot name="title">
+        <span class="font-extrabold text-contrast text-lg">{{ title }}</span>
       </slot>
     </template>
     <div>
