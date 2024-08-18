@@ -34,7 +34,10 @@
             <span class="font-bold">Benefits</span>
             <div class="flex items-center gap-2">
               <CheckCircleIcon class="h-5 w-5 text-brand" />
-              <span>Ad-free browsing on modrinth.com and Modrinth App</span>
+              <span>
+                Ad-free browsing on modrinth.com
+                <!--and Modrinth App-->
+              </span>
             </div>
             <div class="flex items-center gap-2">
               <CheckCircleIcon class="h-5 w-5 text-brand" />
@@ -163,7 +166,7 @@
       ref="purchaseModal"
       :product="midasProduct"
       :country="country"
-      publishable-key="pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b"
+      :publishable-key="config.public.stripePublishableKey"
       :send-billing-request="
         async (body) =>
           await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
@@ -183,7 +186,7 @@
     />
     <NewModal ref="addPaymentMethodModal">
       <template #title>
-        <span class="text-lg font-extrabold text-contrast">
+        <span class="text-contrast text-lg font-extrabold">
           {{ formatMessage(messages.paymentMethodTitle) }}
         </span>
       </template>
@@ -239,7 +242,7 @@
           <PayPalIcon v-else-if="method.type === 'paypal'" class="h-8 w-8" />
           <div class="flex flex-col">
             <div class="flex items-center gap-2">
-              <div class="font-bold text-contrast">
+              <div class="text-contrast font-bold">
                 <template v-if="method.type === 'card'">
                   {{
                     formatMessage(messages.paymentMethodCardDisplay, {
@@ -457,9 +460,7 @@ let elements = null;
 function loadStripe() {
   try {
     if (!stripe) {
-      stripe = Stripe(
-        "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b",
-      );
+      stripe = Stripe(props.publishableKey);
     }
   } catch {}
 }
