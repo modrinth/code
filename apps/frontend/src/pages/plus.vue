@@ -3,7 +3,7 @@
     ref="purchaseModal"
     :product="midasProduct"
     :country="country"
-    publishable-key="pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b"
+    :publishable-key="config.public.stripePublishableKey"
     :send-billing-request="
       async (body) =>
         await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
@@ -73,7 +73,9 @@
         <SparklesIcon class="h-8 w-8 text-purple" />
         <span class="text-lg font-bold">Remove all ads</span>
         <span class="leading-5 text-secondary">
-          Never see an advertisement again on the Modrinth app or the website.
+          Never see an advertisement again on
+          <!--the Modrinth app or-->
+          the website.
         </span>
       </div>
       <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">

@@ -6,6 +6,7 @@
     <template v-else-if="type === 'admin'"> <ModrinthIcon /> Modrinth Team</template>
     <template v-else-if="type === 'moderator'"> <ModeratorIcon /> Moderator</template>
     <template v-else-if="type === 'creator'"><CreatorIcon /> Creator</template>
+    <template v-else-if="type === 'plus'"><PlusIcon /> Modrinth Plus</template>
 
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'"><GlobeIcon /> Public</template>
@@ -37,6 +38,7 @@
 import { GlobeIcon, LinkIcon } from "@modrinth/assets"
 
 import ModrinthIcon from "~/assets/images/logo.svg?component";
+import PlusIcon from "~/assets/images/utils/plus.svg?component";
 import ModeratorIcon from "~/assets/images/sidebar/admin.svg?component";
 import CreatorIcon from "~/assets/images/utils/box.svg?component";
 import DraftIcon from "~/assets/images/utils/file-text.svg?component";
@@ -106,6 +108,7 @@ defineProps({
   }
 
   &.type--unlisted,
+  &.type--plus,
   &.purple {
     --badge-color: var(--color-purple);
   }
