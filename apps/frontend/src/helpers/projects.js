@@ -82,7 +82,7 @@ export const REJECTED_PROJECT_STATUSES = ["rejected", "withheld"];
 export const UNDER_REVIEW_PROJECT_STATUSES = ["processing"];
 export const DRAFT_PROJECT_STATUSES = ["draft"];
 
-export function getVersionsToDisplay(project, overrideTags) {
+export function getVersionsToDisplay(project) {
   return formatVersionsForDisplay(project.game_versions.slice());
 }
 

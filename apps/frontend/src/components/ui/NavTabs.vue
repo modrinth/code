@@ -1,32 +1,37 @@
 <template>
-  <nav class="experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold">
+  <nav
+    class="experimental-styles-within relative flex w-fit overflow-clip rounded-full bg-bg-raised p-1 text-sm font-bold"
+  >
     <NuxtLink
-        v-for="(link, index) in filteredLinks"
-        v-show="link.shown === undefined ? true : link.shown"
-        :key="index"
-        ref="linkElements"
-        :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
-        class="button-animation flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full z-[1]"
-        :class="{ 'text-brand': activeIndex === index && !subpageSelected, 'text-contrast': activeIndex === index && subpageSelected }"
+      v-for="(link, index) in filteredLinks"
+      v-show="link.shown === undefined ? true : link.shown"
+      :key="index"
+      ref="linkElements"
+      :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
+      class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
+      :class="{
+        'text-brand': activeIndex === index && !subpageSelected,
+        'text-contrast': activeIndex === index && subpageSelected,
+      }"
     >
-      <component :is="link.icon" v-if="link.icon" class="size-5"/>
+      <component :is="link.icon" v-if="link.icon" class="size-5" />
       <span>{{ link.label }}</span>
     </NuxtLink>
     <div
-        :class="`pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 navtabs-transition ${subpageSelected ? 'bg-button-bg' : 'bg-brand-highlight'}`"
-        :style="{
+      :class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${subpageSelected ? 'bg-button-bg' : 'bg-brand-highlight'}`"
+      :style="{
         left: sliderLeftPx,
         top: sliderTopPx,
         right: sliderRightPx,
         bottom: sliderBottomPx,
         opacity: sliderLeft === 4 && sliderLeft === sliderRight ? 0 : activeIndex === -1 ? 0 : 1,
       }"
-        aria-hidden="true"
+      aria-hidden="true"
     ></div>
   </nav>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
 const route = useNativeRoute();
 
 interface Tab {
@@ -38,9 +43,9 @@ interface Tab {
 }
 
 const props = defineProps<{
-  links: Tab[],
-  query?: string,
-}>()
+  links: Tab[];
+  query?: string;
+}>();
 
 const sliderLeft = ref(4);
 const sliderTop = ref(4);
@@ -51,7 +56,7 @@ const oldIndex = ref(-1);
 const subpageSelected = ref(false);
 
 const filteredLinks = computed(() =>
-    props.links.filter((x) => (x.shown === undefined ? true : x.shown)),
+  props.links.filter((x) => (x.shown === undefined ? true : x.shown)),
 );
 const sliderLeftPx = computed(() => `${sliderLeft.value}px`);
 const sliderTopPx = computed(() => `${sliderTop.value}px`);
@@ -62,11 +67,15 @@ function pickLink() {
   let index = -1;
   subpageSelected.value = false;
   for (let i = filteredLinks.value.length - 1; i >= 0; i--) {
-    const link = filteredLinks.value[i]
+    const link = filteredLinks.value[i];
     if (decodeURIComponent(route.path) === link.href) {
       index = i;
       break;
-    } else if (decodeURIComponent(route.path).includes(link.href) || (link.subpages && link.subpages.some((subpage) => decodeURIComponent(route.path).includes(subpage)))) {
+    } else if (
+      decodeURIComponent(route.path).includes(link.href) ||
+      (link.subpages &&
+        link.subpages.some((subpage) => decodeURIComponent(route.path).includes(subpage)))
+    ) {
       index = i;
       subpageSelected.value = true;
       break;
@@ -93,7 +102,7 @@ function startAnimation() {
     top: el.offsetTop,
     right: el.offsetParent.offsetWidth - el.offsetLeft - el.offsetWidth,
     bottom: el.offsetParent.offsetHeight - el.offsetTop - el.offsetHeight,
-  }
+  };
 
   if (sliderLeft.value === 4 && sliderRight.value === 4) {
     sliderLeft.value = newValues.left;
@@ -107,24 +116,24 @@ function startAnimation() {
       sliderLeft.value = newValues.left;
       setTimeout(() => {
         sliderRight.value = newValues.right;
-      }, delay)
+      }, delay);
     } else {
       sliderRight.value = newValues.right;
       setTimeout(() => {
         sliderLeft.value = newValues.left;
-      }, delay)
+      }, delay);
     }
 
     if (newValues.top < sliderTop.value) {
       sliderTop.value = newValues.top;
       setTimeout(() => {
         sliderBottom.value = newValues.bottom;
-      }, delay)
+      }, delay);
     } else {
       sliderBottom.value = newValues.bottom;
       setTimeout(() => {
         sliderTop.value = newValues.top;
-      }, delay)
+      }, delay);
     }
   }
 }
@@ -143,7 +152,8 @@ watch(route, () => pickLink());
 <style scoped>
 .navtabs-transition {
   /* Delay on opacity is to hide any jankiness as the page loads */
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0s, opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
-
+  transition:
+    all 150ms cubic-bezier(0.4, 0, 0.2, 1) 0s,
+    opacity 250ms cubic-bezier(0.5, 0, 0.2, 1) 50ms;
 }
 </style>

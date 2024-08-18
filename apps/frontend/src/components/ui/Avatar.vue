@@ -1,9 +1,17 @@
 <template>
-  <OmorphiaAvatar :src='src' :alt='alt' :size='size' :circle='circle' :no-shadow='noShadow' :loading='loading' :raised='raised' />
+  <OmorphiaAvatar
+    :src="src"
+    :alt="alt"
+    :size="size"
+    :circle="circle"
+    :no-shadow="noShadow"
+    :loading="loading"
+    :raised="raised"
+  />
 </template>
 
 <script setup>
-import { Avatar as OmorphiaAvatar } from '@modrinth/ui'
+import { Avatar as OmorphiaAvatar } from "@modrinth/ui";
 
 const props = defineProps({
   src: {

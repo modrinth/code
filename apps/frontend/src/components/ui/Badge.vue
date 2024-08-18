@@ -1,5 +1,9 @@
 <template>
-  <span :class="'badge flex items-center gap-1 font-semibold text-secondary ' + color + ' type--' + type">
+  <span
+    :class="
+      'badge flex items-center gap-1 font-semibold text-secondary ' + color + ' type--' + type
+    "
+  >
     <template v-if="color"> <span class="circle" /> {{ $capitalizeString(type) }}</template>
 
     <!-- User roles -->
@@ -11,7 +15,9 @@
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'"><GlobeIcon /> Public</template>
     <template v-else-if="type === 'approved-general'"><CheckIcon /> Approved</template>
-    <template v-else-if="type === 'unlisted' || type ==='withheld'"><LinkIcon /> Unlisted</template>
+    <template v-else-if="type === 'unlisted' || type === 'withheld'"
+      ><LinkIcon /> Unlisted</template
+    >
     <template v-else-if="type === 'private'"><LockIcon /> Private</template>
     <template v-else-if="type === 'scheduled'"> <CalendarIcon /> Scheduled</template>
     <template v-else-if="type === 'draft'"><DraftIcon /> Draft</template>
@@ -35,7 +41,7 @@
 </template>
 
 <script setup>
-import { GlobeIcon, LinkIcon } from "@modrinth/assets"
+import { GlobeIcon, LinkIcon } from "@modrinth/assets";
 
 import ModrinthIcon from "~/assets/images/logo.svg?component";
 import PlusIcon from "~/assets/images/utils/plus.svg?component";

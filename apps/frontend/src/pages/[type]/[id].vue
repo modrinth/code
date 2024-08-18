@@ -228,9 +228,7 @@
               <template #title>
                 <GameIcon />
                 {{
-                  currentGameVersion
-                    ? `Game version: ${currentGameVersion}`
-                    : "Select game versions"
+                  currentGameVersion ? `Game version: ${currentGameVersion}` : "Select game version"
                 }}
               </template>
               <div class="iconified-input mb-2 flex w-full">
@@ -688,7 +686,6 @@ import {
 } from "@modrinth/assets";
 import {
   Avatar,
-  Button,
   ButtonStyled,
   Checkbox,
   NewModal,
@@ -1021,7 +1018,10 @@ const projectTypeDisplay = computed(() =>
   ),
 );
 
-const following = computed(() => user.value.follows.find((x) => x.id === project.value.id));
+const following = computed(
+  () =>
+    user.value && user.value.follows && user.value.follows.find((x) => x.id === project.value.id),
+);
 
 const title = computed(() => `${project.value.title} - Minecraft ${projectTypeDisplay.value}`);
 const description = computed(

@@ -34,7 +34,11 @@
     <div>
       <h2 class="text-lg font-extrabold text-contrast">Files</h2>
       <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div v-for="file in version.files" class="flex gap-2 rounded-2xl bg-bg-raised p-4">
+        <div
+          v-for="(file, index) in version.files"
+          :key="index"
+          class="flex gap-2 rounded-2xl bg-bg-raised p-4"
+        >
           <div
             :class="`flex h-9 w-9 items-center justify-center rounded-full ${file.primary ? 'bg-brand-highlight text-brand' : 'bg-button-bg text-secondary'}`"
           >
@@ -123,11 +127,11 @@ const version = computed(() => {
   return version;
 });
 
-const data = useNuxtApp();
+// const data = useNuxtApp();
 const route = useNativeRoute();
 
-const auth = await useAuth();
-const tags = useTags();
+// const auth = await useAuth();
+// const tags = useTags();
 
 const versionsListLink = computed(() => {
   if (router.options.history.state.back) {

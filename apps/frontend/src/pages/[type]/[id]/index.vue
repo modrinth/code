@@ -2,7 +2,7 @@
   <NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
     <template #title>
       <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
-      <span class="text-contrast text-lg font-extrabold">
+      <span class="text-lg font-extrabold text-contrast">
         {{ project.license.name ? project.license.name : "License" }}
       </span>
     </template>
@@ -220,7 +220,7 @@
               <span class="details-list__item__text--style-secondary">Organization</span>
             </div>
           </nuxt-link>
-          <hr />
+          <hr v-if="members.length > 0" />
         </template>
         <nuxt-link
           v-for="member in members"

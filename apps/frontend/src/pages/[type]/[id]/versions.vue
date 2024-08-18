@@ -5,34 +5,34 @@
     >
       <div class="versions-grid-row">
         <div class="w-9 max-sm:hidden"></div>
-        <div class="text-contrast text-sm font-bold max-sm:hidden">Name</div>
+        <div class="text-sm font-bold text-contrast max-sm:hidden">Name</div>
         <div
-          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Game version
         </div>
         <div
-          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Platforms
         </div>
         <div
-          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Published
         </div>
         <div
-          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Downloads
         </div>
-        <div class="text-contrast text-sm font-bold max-sm:hidden xl:collapse xl:hidden">
+        <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">
           Compatibility
         </div>
-        <div class="text-contrast text-sm font-bold max-sm:hidden xl:collapse xl:hidden">Stats</div>
+        <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">Stats</div>
         <div class="w-9 max-sm:hidden"></div>
       </div>
-      <template v-for="(version, index) in versionsPage">
+      <template v-for="(version, index) in versionsPage" :key="index">
         <div
           :class="`versions-grid-row h-px w-full bg-button-bg ${index === 0 ? `max-sm:!hidden` : ``}`"
         ></div>
@@ -62,7 +62,7 @@
                 </div>
               </div>
               <div class="pointer-events-none relative z-[1] flex flex-col justify-center">
-                <div class="text-contrast font-bold">{{ version.version_number }}</div>
+                <div class="font-bold text-contrast">{{ version.version_number }}</div>
                 <div class="text-xs font-medium">{{ version.name }}</div>
               </div>
             </div>
@@ -71,12 +71,12 @@
                 <div class="flex items-center">
                   <div class="tag-list">
                     <div
-                      v-for="version in formatVersionsForDisplay(version.game_versions)"
-                      :key="`version-tag-${version}`"
-                      v-tooltip="`Add filter for ${version}`"
+                      v-for="gameVersion in formatVersionsForDisplay(version.game_versions)"
+                      :key="`version-tag-${gameVersion}`"
+                      v-tooltip="`Add filter for ${gameVersion}`"
                       class="tag-list__item z-[1] cursor-pointer hover:underline"
                     >
-                      {{ version }}
+                      {{ gameVersion }}
                     </div>
                   </div>
                 </div>
@@ -189,11 +189,11 @@
           </div>
           <div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
             <div
-              v-for="(file, index) in version.files"
-              :key="`platform-tag-${file}`"
-              :class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || index === 0 ? 'text-contrast bg-brand-highlight' : 'text-primary'}`"
+              v-for="(file, fileIdx) in version.files"
+              :key="`platform-tag-${fileIdx}`"
+              :class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || fileIdx === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
             >
-              <StarIcon v-if="file.primary || index === 0" class="shrink-0" />
+              <StarIcon v-if="file.primary || fileIdx === 0" class="shrink-0" />
               {{ file.filename }} - {{ formatBytes(file.size) }}
             </div>
           </div>
@@ -247,7 +247,7 @@ const props = defineProps({
 });
 
 const tags = useTags();
-const { formatMessage } = useVIntl();
+// const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
 const emits = defineEmits(["onDownload"]);
@@ -257,7 +257,7 @@ const versionsPage = computed(() =>
   props.versions.slice((currentPage.value - 1) * 20, currentPage.value * 20),
 );
 
-const messages = defineMessages({});
+// const messages = defineMessages({});
 
 const showFiles = ref(false);
 

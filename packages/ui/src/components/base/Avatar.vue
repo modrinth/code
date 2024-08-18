@@ -18,6 +18,7 @@
   <svg
     v-else
     class="`experimental-styles-within avatar"
+    :style="`--_size: ${cssSize}`"
     :class="{
       circle: circle,
       'no-shadow': noShadow,
