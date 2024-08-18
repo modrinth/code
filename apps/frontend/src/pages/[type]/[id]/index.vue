@@ -2,11 +2,16 @@
   <NewModal ref="modalLicense" :header="project.license.name ? project.license.name : 'License'">
     <template #title>
       <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" no-shadow />
-      <span class="text-lg font-extrabold text-contrast">
+      <span class="text-contrast text-lg font-extrabold">
         {{ project.license.name ? project.license.name : "License" }}
       </span>
     </template>
-    <div class="markdown-body" v-html="renderString(licenseText)" />
+    <div
+      class="markdown-body"
+      v-html="
+        renderString(licenseText).isEmpty ? 'Loading license text...' : renderString(licenseText)
+      "
+    />
   </NewModal>
   <section class="normal-page__content">
     <div
@@ -180,7 +185,7 @@
           <PayPalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
           <OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true" />
           <HeartIcon v-else-if="donation.id === 'github'" />
-          <UnknownIcon v-else />
+          <CurrencyIcon v-else />
           <span v-if="donation.id === 'bmac'">{{ formatMessage(linksMessages.donateBmac) }}</span>
           <span v-else-if="donation.id === 'patreon'">{{
             formatMessage(linksMessages.donatePatreon)
@@ -261,7 +266,7 @@
                 !project.license.id.includes('LicenseRef')
               "
               class="text-link hover:underline"
-              @click="getLicenseData()"
+              @click="(event) => getLicenseData(event)"
             >
               {{ licenseIdDisplay }}
             </span>
@@ -328,7 +333,7 @@ import {
   PayPalIcon,
   CrownIcon,
   BuyMeACoffeeIcon,
-  UnknownIcon,
+  CurrencyIcon,
   PatreonIcon,
   HeartIcon,
   VersionIcon,
@@ -502,14 +507,14 @@ const licenseIdDisplay = computed(() => {
   }
 });
 
-async function getLicenseData() {
+async function getLicenseData(event) {
+  modalLicense.value.show(event);
+
   try {
     const text = await useBaseFetch(`tag/license/${props.project.license.id}`);
     licenseText.value = text.body || "License text could not be retrieved.";
   } catch {
     licenseText.value = "License text could not be retrieved.";
   }
-
-  modalLicense.value.show();
 }
 </script>

@@ -4,8 +4,8 @@
     <Pagination
       :page="currentPage"
       :count="Math.ceil(filteredVersions.length / 20)"
-      class="pagination-before"
       :link-function="(page) => `?page=${page}`"
+      class="mb-2 flex justify-end"
       @switch-page="switchPage"
     />
     <div class="card changelog-wrapper">
@@ -60,17 +60,18 @@
     <Pagination
       :page="currentPage"
       :count="Math.ceil(filteredVersions.length / 20)"
-      class="pagination-before"
+      class="mb-2 flex justify-end"
       :link-function="(page) => `?page=${page}`"
       @switch-page="switchPage"
     />
   </div>
 </template>
 <script setup>
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
+import { Pagination } from "@modrinth/ui";
+import { DownloadIcon } from "@modrinth/assets";
+
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
-import Pagination from "~/components/ui/Pagination.vue";
 
 const props = defineProps({
   project: {
@@ -249,5 +250,9 @@ function switchPage(page) {
       }
     }
   }
+}
+
+.brand-button {
+  color: var(--color-accent-contrast);
 }
 </style>

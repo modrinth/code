@@ -146,7 +146,257 @@
     <NewModal ref="settingsModal">
       <template #title>
         <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
-        <span class="text-contrast text-lg font-extrabold"> Settings </span>
+        <span class="text-lg font-extrabold text-contrast"> Settings </span>
+      </template>
+    </NewModal>
+    <div class="over-the-top-download-animation" :class="{ shown: !overTheTopDownloadAnimation }">
+      <div>
+        <div
+          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-brand bg-brand-highlight opacity-40"
+        ></div>
+        <div
+          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-brand bg-brand-highlight opacity-60"
+        ></div>
+        <div
+          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-brand bg-brand-highlight"
+        >
+          <DownloadIcon class="h-20 w-20 text-contrast" />
+        </div>
+      </div>
+    </div>
+    <NewModal ref="downloadModal">
+      <template #title>
+        <Avatar :src="project.icon_url" :alt="project.title" class="icon" size="32px" />
+        <div class="truncate text-lg font-extrabold text-contrast">
+          Download {{ project.title }}
+        </div>
+      </template>
+      <template #default>
+        <div class="mx-auto flex w-[30rem] max-w-[40rem] flex-col gap-4">
+          <div class="mx-auto flex w-fit flex-col">
+            <ButtonStyled color="brand">
+              <a
+                class="w-fit"
+                :href="`modrinth://mod/${project.slug}`"
+                @click="() => installWithApp()"
+              >
+                <ModrinthIcon />
+                Install with Modrinth App
+                <ExternalIcon />
+              </a>
+            </ButtonStyled>
+            <Accordion ref="getModrinthAppAccordion">
+              <nuxt-link class="mt-2 flex justify-center text-brand-blue hover:underline" to="/app">
+                Don't have Modrinth App?
+              </nuxt-link>
+            </Accordion>
+          </div>
+
+          <div class="flex items-center gap-4 px-4">
+            <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+            <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>
+            <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+          </div>
+          <div class="mx-auto flex w-fit flex-col gap-2">
+            <ButtonStyled v-if="project.game_versions.length === 1" allow-non-button>
+              <div class="disabled">
+                <GameIcon />
+                {{
+                  currentGameVersion
+                    ? `Game version: ${currentGameVersion}`
+                    : "Error: no game versions found"
+                }}
+                <InfoIcon
+                  v-tooltip="`${project.title} is only available for ${currentGameVersion}`"
+                  class="ml-auto size-5"
+                />
+              </div>
+            </ButtonStyled>
+            <Accordion
+              v-else
+              ref="gameVersionAccordion"
+              class="accordion-with-bg"
+              @on-open="
+                () => {
+                  gameVersionFilterInput.focus();
+                  if (platformAccordion) {
+                    platformAccordion.close();
+                  }
+                }
+              "
+            >
+              <template #title>
+                <GameIcon />
+                {{
+                  currentGameVersion
+                    ? `Game version: ${currentGameVersion}`
+                    : "Select game versions"
+                }}
+              </template>
+              <div class="iconified-input mb-2 flex w-full">
+                <label for="game-versions-filtering" hidden>Search game versions...</label>
+                <SearchIcon />
+                <input
+                  id="game-versions-filtering"
+                  ref="gameVersionFilterInput"
+                  v-model="versionFilter"
+                  type="search"
+                  autocomplete="off"
+                  placeholder="Search game versions..."
+                />
+              </div>
+              <ScrollablePanel
+                :class="project.game_versions.length > 4 ? 'h-[20rem]' : 'h-[10rem]'"
+              >
+                <ButtonStyled
+                  v-for="version in project.game_versions
+                    .filter(
+                      (x) =>
+                        (versionFilter && x.includes(versionFilter)) ||
+                        (!versionFilter &&
+                          (showAllVersions || (!x.includes('w') && !x.includes('-')))),
+                    )
+                    .slice()
+                    .reverse()"
+                  :key="version"
+                  :color="currentGameVersion === version ? 'brand' : 'standard'"
+                >
+                  <button
+                    v-tooltip="
+                      !possibleGameVersions.includes(version)
+                        ? `${project.title} does not support ${version} for ${formatCategory(currentPlatform)}`
+                        : null
+                    "
+                    :class="{
+                      'looks-disabled !text-brand-red': !possibleGameVersions.includes(version),
+                    }"
+                    @click="
+                      () => {
+                        userSelectedGameVersion = version;
+                        gameVersionAccordion.close();
+                        if (!currentPlatform && platformAccordion) {
+                          platformAccordion.open();
+                        }
+                      }
+                    "
+                  >
+                    {{ version }}
+                    <CheckIcon v-if="userSelectedGameVersion === version" />
+                  </button>
+                </ButtonStyled>
+              </ScrollablePanel>
+              <Checkbox
+                v-model="showAllVersions"
+                class="mx-1"
+                :label="`Show all versions`"
+                :disabled="!!versionFilter"
+              />
+            </Accordion>
+            <ButtonStyled
+              v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
+              allow-non-button
+            >
+              <div class="disabled">
+                <WrenchIcon />
+                {{
+                  currentPlatform
+                    ? `Platform: ${formatCategory(currentPlatform)}`
+                    : "Error: no platforms found"
+                }}
+                <InfoIcon
+                  v-tooltip="
+                    `${project.title} is only available for ${formatCategory(currentPlatform)}`
+                  "
+                  class="ml-auto size-5"
+                />
+              </div>
+            </ButtonStyled>
+            <Accordion
+              v-else-if="project.project_type !== 'resourcepack'"
+              ref="platformAccordion"
+              class="accordion-with-bg"
+              @on-open="
+                () => {
+                  if (gameVersionAccordion) {
+                    gameVersionAccordion.close();
+                  }
+                }
+              "
+            >
+              <template #title>
+                <WrenchIcon />
+                {{
+                  currentPlatform
+                    ? `Platform: ${formatCategory(currentPlatform)}`
+                    : "Select platform"
+                }}
+              </template>
+              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[20rem]' : 'h-[10rem]'">
+                <ButtonStyled
+                  v-for="platform in project.loaders.slice().reverse()"
+                  :key="platform"
+                  :color="currentPlatform === platform ? 'brand' : 'standard'"
+                >
+                  <button
+                    v-tooltip="
+                      !possiblePlatforms.includes(platform)
+                        ? `${project.title} does not support ${formatCategory(platform)} for ${currentGameVersion}`
+                        : null
+                    "
+                    :class="{
+                      'looks-disabled !text-brand-red': !possiblePlatforms.includes(platform),
+                    }"
+                    @click="
+                      () => {
+                        userSelectedPlatform = platform;
+
+                        platformAccordion.close();
+                        if (!currentGameVersion && gameVersionAccordion) {
+                          gameVersionAccordion.open();
+                        }
+                      }
+                    "
+                  >
+                    {{ formatCategory(platform) }}
+                    <CheckIcon v-if="userSelectedPlatform === platform" />
+                  </button>
+                </ButtonStyled>
+              </ScrollablePanel>
+            </Accordion>
+          </div>
+
+          <AutomaticAccordion div class="flex flex-col gap-2">
+            <VersionSummary
+              v-if="filteredRelease"
+              :version="filteredRelease"
+              @on-download="onDownload"
+              @on-navigate="downloadModal.hide"
+            />
+            <VersionSummary
+              v-if="filteredBeta"
+              :version="filteredBeta"
+              @on-download="onDownload"
+              @on-navigate="downloadModal.hide"
+            />
+            <VersionSummary
+              v-if="filteredAlpha"
+              :version="filteredAlpha"
+              @on-download="onDownload"
+              @on-navigate="downloadModal.hide"
+            />
+            <p
+              v-if="
+                currentPlatform &&
+                currentGameVersion &&
+                !filteredRelease &&
+                !filteredBeta &&
+                !filteredAlpha
+              "
+            >
+              No versions available for {{ currentGameVersion }} and {{ currentPlatform }}.
+            </p>
+          </AutomaticAccordion>
+        </div>
       </template>
     </NewModal>
     <CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
@@ -158,7 +408,7 @@
               <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-2">
-                  <h1 class="text-contrast m-0 text-2xl font-extrabold leading-none">
+                  <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
                     {{ project.title }}
                   </h1>
                   <Badge
@@ -226,7 +476,11 @@
               >.
             </MessageBanner>
             <div class="flex gap-2">
-              <ButtonStyled size="large" color="brand">
+              <ButtonStyled
+                size="large"
+                :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+                @click="(event) => downloadModal.show(event)"
+              >
                 <button>
                   <DownloadIcon />
                   Download
@@ -285,12 +539,15 @@
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-                <button @click="() => settingsModal.show()">
+                <nuxt-link
+                  :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+                >
                   <SettingsIcon />
-                </button>
+                </nuxt-link>
               </ButtonStyled>
               <ButtonStyled
-v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationChecklist"
+                v-if="
+                  auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationChecklist
                 "
                 size="large"
                 circular
@@ -355,9 +612,9 @@ v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationCh
               shown: project.gallery.length > 0 || !!currentMember,
             },
             {
-              label: 'Versions (legacy)',
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions-legacy`,
-              shown: versions.length > 0 || !!currentMember,
+              label: 'Changelog',
+              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/changelog`,
+              shown: versions.length > 0,
             },
             {
               label: formatMessage(messages.versionsTab),
@@ -392,6 +649,7 @@ v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationCh
         :reset-organization="resetOrganization"
         :reset-members="resetMembers"
         :route="route"
+        @on-download="triggerDownloadAnimation"
       />
     </div>
     <ModerationChecklist
@@ -404,48 +662,58 @@ v-if="auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationCh
 </template>
 <script setup>
 import {
+  AlignLeftIcon as DescriptionIcon,
   BookmarkIcon,
-  ClipboardCopyIcon,
-  PlusIcon,
   ChartIcon,
   CheckIcon,
-  XIcon,
-  MoreVerticalIcon,
+  ClipboardCopyIcon,
+  CopyrightIcon,
+  DownloadIcon,
+  ExternalIcon,
   EyeIcon,
+  GameIcon,
+  HeartIcon,
+  ImageIcon as GalleryIcon,
+  InfoIcon,
+  LinkIcon as LinksIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  ReportIcon,
+  SearchIcon,
+  SettingsIcon,
+  TagsIcon as CategoriesIcon,
+  UsersIcon,
+  VersionIcon,
+  WrenchIcon,
 } from "@modrinth/assets";
 import {
   Avatar,
-  NewModal,
+  Button,
   ButtonStyled,
   Checkbox,
+  NewModal,
   OverflowMenu,
   PopoutMenu,
+  ScrollablePanel,
   StatItem,
 } from "@modrinth/ui";
-import { renderString, isRejected, isUnderReview, isStaff, formatCategory } from "@modrinth/utils";
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
-import ReportIcon from "~/assets/images/utils/report.svg?component";
-import HeartIcon from "~/assets/images/utils/heart.svg?component";
+import { formatCategory, isRejected, isStaff, isUnderReview } from "@modrinth/utils";
+import dayjs from "dayjs";
 import Badge from "~/components/ui/Badge.vue";
-import Modal from "~/components/ui/Modal.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import ProjectMemberHeader from "~/components/ui/ProjectMemberHeader.vue";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import SettingsIcon from "~/assets/images/utils/settings.svg?component";
-import UsersIcon from "~/assets/images/utils/users.svg?component";
-import CategoriesIcon from "~/assets/images/utils/tags.svg?component";
-import DescriptionIcon from "~/assets/images/utils/align-left.svg?component";
-import LinksIcon from "~/assets/images/utils/link.svg?component";
-import CopyrightIcon from "~/assets/images/utils/copyright.svg?component";
-import GalleryIcon from "~/assets/images/utils/image.svg?component";
-import VersionIcon from "~/assets/images/utils/version.svg?component";
 import { reportProject } from "~/utils/report-helpers.ts";
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import { userCollectProject } from "~/composables/user.js";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import ModerationChecklist from "~/components/ui/ModerationChecklist.vue";
+import Accordion from "~/components/ui/Accordion.vue";
+import ModrinthIcon from "~/assets/images/utils/modrinth.svg?component";
+import VersionSummary from "~/components/ui/VersionSummary.vue";
+import AutomaticAccordion from "~/components/ui/AutomaticAccordion.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
@@ -461,6 +729,83 @@ const tags = useTags();
 const { formatMessage } = useVIntl();
 
 const settingsModal = ref();
+const downloadModal = ref();
+const overTheTopDownloadAnimation = ref();
+
+const userSelectedGameVersion = ref(null);
+const userSelectedPlatform = ref(null);
+const showAllVersions = ref(false);
+
+const gameVersionFilterInput = ref();
+
+const versionFilter = ref("");
+
+const currentGameVersion = computed(() => {
+  return (
+    userSelectedGameVersion.value ||
+    (project.value.game_versions.length === 1 && project.value.game_versions[0])
+  );
+});
+
+const possibleGameVersions = computed(() => {
+  return versions.value
+    .filter((x) => !currentPlatform.value || x.loaders.includes(currentPlatform.value))
+    .flatMap((x) => x.game_versions);
+});
+
+const possiblePlatforms = computed(() => {
+  return versions.value
+    .filter((x) => !currentGameVersion.value || x.game_versions.includes(currentGameVersion.value))
+    .flatMap((x) => x.loaders);
+});
+
+const currentPlatform = computed(() => {
+  return (
+    userSelectedPlatform.value || (project.value.loaders.length === 1 && project.value.loaders[0])
+  );
+});
+
+function installWithApp() {
+  setTimeout(() => {
+    getModrinthAppAccordion.value.open();
+  }, 1500);
+}
+
+const gameVersionAccordion = ref();
+const platformAccordion = ref();
+const getModrinthAppAccordion = ref();
+
+const filteredVersions = computed(() => {
+  return versions.value.filter(
+    (x) =>
+      x.game_versions.includes(currentGameVersion.value) &&
+      x.loaders.includes(currentPlatform.value),
+  );
+});
+
+const filteredRelease = computed(() => {
+  return filteredVersions.value.find((x) => x.version_type === "release");
+});
+
+const filteredBeta = computed(() => {
+  return filteredVersions.value.find(
+    (x) =>
+      x.version_type === "beta" &&
+      (!filteredRelease.value ||
+        dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))),
+  );
+});
+
+const filteredAlpha = computed(() => {
+  return filteredVersions.value.find(
+    (x) =>
+      x.version_type === "alpha" &&
+      (!filteredRelease.value ||
+        dayjs(x.date_published).isAfter(dayjs(filteredRelease.value.date_published))) &&
+      (!filteredBeta.value ||
+        dayjs(x.date_published).isAfter(dayjs(filteredBeta.value.date_published))),
+  );
+});
 
 const messages = defineMessages({
   downloadsStat: {
@@ -838,6 +1183,25 @@ if (import.meta.client && history && history.state && history.state.showChecklis
   showModerationChecklist.value = true;
   futureProjects.value = history.state.projects;
 }
+
+function closeDownloadModal(event) {
+  downloadModal.value.hide(event);
+  userSelectedPlatform.value = null;
+  userSelectedGameVersion.value = null;
+  showAllVersions.value = false;
+}
+
+function triggerDownloadAnimation() {
+  overTheTopDownloadAnimation.value = true;
+  setTimeout(() => (overTheTopDownloadAnimation.value = false), 500);
+}
+
+function onDownload(event) {
+  triggerDownloadAnimation();
+  setTimeout(() => {
+    closeDownloadModal(event);
+  }, 400);
+}
 </script>
 <style lang="scss" scoped>
 .normal-page__header {
@@ -907,5 +1271,58 @@ if (import.meta.client && history && history.state && history.state.showChecklis
 
 .normal-page__info:empty {
   display: none;
+}
+
+:deep(.accordion-with-bg) {
+  @apply rounded-2xl bg-bg p-2;
+  --scrollable-pane-bg: var(--color-bg);
+}
+
+.over-the-top-download-animation {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  scale: 0.5;
+  transition: all 0.5s ease-out;
+  opacity: 1;
+
+  &.shown {
+    scale: 0.8;
+    opacity: 0;
+
+    .animation-ring-1 {
+      width: 25rem;
+      height: 25rem;
+    }
+    .animation-ring-2 {
+      width: 50rem;
+      height: 50rem;
+    }
+    .animation-ring-3 {
+      width: 100rem;
+      height: 100rem;
+    }
+  }
+
+  > div {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+
+    > * {
+      position: absolute;
+      scale: 1;
+      transition: all 0.2s ease-out;
+      width: 20rem;
+      height: 20rem;
+    }
+  }
 }
 </style>

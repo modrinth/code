@@ -5,31 +5,31 @@
     >
       <div class="versions-grid-row">
         <div class="w-9 max-sm:hidden"></div>
-        <div class="text-sm font-bold text-contrast max-sm:hidden">Name</div>
+        <div class="text-contrast text-sm font-bold max-sm:hidden">Name</div>
         <div
-          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Game version
         </div>
         <div
-          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Platforms
         </div>
         <div
-          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Published
         </div>
         <div
-          class="text-sm font-bold text-contrast max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
+          class="text-contrast text-sm font-bold max-sm:hidden sm:max-xl:collapse sm:max-xl:hidden"
         >
           Downloads
         </div>
-        <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">
+        <div class="text-contrast text-sm font-bold max-sm:hidden xl:collapse xl:hidden">
           Compatibility
         </div>
-        <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">Stats</div>
+        <div class="text-contrast text-sm font-bold max-sm:hidden xl:collapse xl:hidden">Stats</div>
         <div class="w-9 max-sm:hidden"></div>
       </div>
       <template v-for="(version, index) in versionsPage">
@@ -42,26 +42,27 @@
             :to="`/${project.project_type}/${
               project.slug ? project.slug : project.id
             }/version/${encodeURI(version.displayUrlEnding)}`"
-          >
-          </nuxt-link>
+          ></nuxt-link>
           <div class="flex flex-col justify-center gap-2 sm:contents">
             <div class="flex flex-row items-center gap-2 sm:contents">
               <div class="self-center">
-                <div
-                  :class="`pointer-events-none relative z-[1] flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold group-hover:hidden ${version.version_type === 'release' ? 'bg-bg-green text-brand-green' : version.version_type === 'beta' ? 'bg-bg-orange text-brand-orange' : 'bg-bg-red text-brand-red'}`"
-                >
-                  {{ formatMessage(channelMessages[`${version.version_type}Symbol`]) }}
+                <div class="pointer-events-none relative z-[1] group-hover:hidden">
+                  <VersionChannelIndicator :channel="version.version_type" />
                 </div>
                 <div class="relative z-[1] hidden group-hover:!flex">
                   <ButtonStyled circular color="brand">
-                    <button v-tooltip="`Download`">
+                    <a
+                      v-tooltip="`Download`"
+                      :href="getPrimaryFile(version).url"
+                      @click="emits('onDownload')"
+                    >
                       <DownloadIcon />
-                    </button>
+                    </a>
                   </ButtonStyled>
                 </div>
               </div>
               <div class="pointer-events-none relative z-[1] flex flex-col justify-center">
-                <div class="font-bold text-contrast">{{ version.version_number }}</div>
+                <div class="text-contrast font-bold">{{ version.version_number }}</div>
                 <div class="text-xs font-medium">{{ version.name }}</div>
               </div>
             </div>
@@ -113,7 +114,7 @@
             </div>
           </div>
           <div class="flex items-start justify-end gap-1 sm:items-center">
-            <ButtonStyled circular type="transparent">
+            <ButtonStyled v-if="false" circular type="transparent">
               <OverflowMenu
                 class="group-hover:!bg-button-bg"
                 :options="[
@@ -190,7 +191,7 @@
             <div
               v-for="(file, index) in version.files"
               :key="`platform-tag-${file}`"
-              :class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || index === 0 ? 'bg-brand-highlight text-contrast' : 'text-primary'}`"
+              :class="`flex items-center gap-1 text-wrap rounded-full bg-button-bg px-2 py-0.5 text-xs font-medium ${file.primary || index === 0 ? 'text-contrast bg-brand-highlight' : 'text-primary'}`"
             >
               <StarIcon v-if="file.primary || index === 0" class="shrink-0" />
               {{ file.filename }} - {{ formatBytes(file.size) }}
@@ -225,8 +226,8 @@ import {
   ReportIcon,
 } from "@modrinth/assets";
 import { formatBytes, formatCategory } from "@modrinth/utils";
-import { ButtonStyled, OverflowMenu, Pagination } from "@modrinth/ui";
-import { formatVersionsForDisplay, getVersionsToDisplay } from "~/helpers/projects.js";
+import { ButtonStyled, OverflowMenu, Pagination, VersionChannelIndicator } from "@modrinth/ui";
+import { formatVersionsForDisplay } from "~/helpers/projects.js";
 
 const formatCompactNumber = useCompactNumber();
 
@@ -249,64 +250,14 @@ const tags = useTags();
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
+const emits = defineEmits(["onDownload"]);
+
 const currentPage = ref(1);
 const versionsPage = computed(() =>
   props.versions.slice((currentPage.value - 1) * 20, currentPage.value * 20),
 );
 
-const messages = defineMessages({
-  versionName: {
-    id: "project.versions.channel.release.label",
-    defaultMessage: "Release",
-  },
-  releaseSymbol: {
-    id: "project.versions.channel.release.symbol",
-    defaultMessage: "R",
-  },
-  beta: {
-    id: "project.versions.channel.beta.label",
-    defaultMessage: "Beta",
-  },
-  betaSymbol: {
-    id: "project.versions.channel.beta.symbol",
-    defaultMessage: "B",
-  },
-  alpha: {
-    id: "project.versions.channel.alpha.label",
-    defaultMessage: "Alpha",
-  },
-  alphaSymbol: {
-    id: "project.versions.channel.alpha.symbol",
-    defaultMessage: "A",
-  },
-});
-
-const channelMessages = defineMessages({
-  release: {
-    id: "project.versions.channel.release.label",
-    defaultMessage: "Release",
-  },
-  releaseSymbol: {
-    id: "project.versions.channel.release.symbol",
-    defaultMessage: "R",
-  },
-  beta: {
-    id: "project.versions.channel.beta.label",
-    defaultMessage: "Beta",
-  },
-  betaSymbol: {
-    id: "project.versions.channel.beta.symbol",
-    defaultMessage: "B",
-  },
-  alpha: {
-    id: "project.versions.channel.alpha.label",
-    defaultMessage: "Alpha",
-  },
-  alphaSymbol: {
-    id: "project.versions.channel.alpha.symbol",
-    defaultMessage: "A",
-  },
-});
+const messages = defineMessages({});
 
 const showFiles = ref(false);
 
@@ -319,6 +270,10 @@ function switchPage(page) {
       p: currentPage.value !== 1 ? currentPage.value : undefined,
     },
   });
+}
+
+function getPrimaryFile(version) {
+  return version.files.find((x) => x.primary) || version.files[0];
 }
 </script>
 <style scoped>

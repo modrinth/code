@@ -68,6 +68,7 @@ import _FilterIcon from './icons/filter.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GapIcon from './icons/gap.svg?component'
+import _GameIcon from './icons/game.svg?component'
 import _GitHubIcon from './icons/github.svg?component'
 import _GlobeIcon from './icons/globe.svg?component'
 import _GridIcon from './icons/grid.svg?component'
@@ -142,6 +143,7 @@ import _UserXIcon from './icons/user-x.svg?component'
 import _UsersIcon from './icons/users.svg?component'
 import _VersionIcon from './icons/version.svg?component'
 import _WikiIcon from './icons/wiki.svg?component'
+import _WrenchIcon from './icons/wrench.svg?component'
 import _XIcon from './icons/x.svg?component'
 import _XCircleIcon from './icons/x-circle.svg?component'
 import _ZoomInIcon from './icons/zoom-in.svg?component'
@@ -224,6 +226,7 @@ export const FilterIcon = _FilterIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const GapIcon = _GapIcon
+export const GameIcon = _GameIcon
 export const GitHubIcon = _GitHubIcon
 export const GlobeIcon = _GlobeIcon
 export const GridIcon = _GridIcon
@@ -297,6 +300,7 @@ export const UserXIcon = _UserXIcon
 export const UsersIcon = _UsersIcon
 export const VersionIcon = _VersionIcon
 export const WikiIcon = _WikiIcon
+export const WrenchIcon = _WrenchIcon
 export const XIcon = _XIcon
 export const XCircleIcon = _XCircleIcon
 export const ZoomInIcon = _ZoomInIcon
