@@ -149,16 +149,19 @@
         <span class="text-lg font-extrabold text-contrast"> Settings </span>
       </template>
     </NewModal>
-    <div class="over-the-top-download-animation" :class="{ shown: !overTheTopDownloadAnimation }">
+    <div
+      class="over-the-top-download-animation"
+      :class="{ 'animation-hidden': !overTheTopDownloadAnimation }"
+    >
       <div>
         <div
-          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-brand bg-brand-highlight opacity-40"
+          class="animation-ring-3 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-40"
         ></div>
         <div
-          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-brand bg-brand-highlight opacity-60"
+          class="animation-ring-2 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight opacity-60"
         ></div>
         <div
-          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-brand bg-brand-highlight"
+          class="animation-ring-1 flex items-center justify-center rounded-full border-4 border-solid border-brand bg-brand-highlight"
         >
           <DownloadIcon class="h-20 w-20 text-contrast" />
         </div>
@@ -1290,7 +1293,7 @@ function onDownload(event) {
   transition: all 0.5s ease-out;
   opacity: 1;
 
-  &.shown {
+  &.animation-hidden {
     scale: 0.8;
     opacity: 0;
 
