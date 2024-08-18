@@ -350,6 +350,11 @@ export default defineNuxtConfig({
         "unknown",
 
       turnstile: { siteKey: "0x4AAAAAAAW3guHM6Eunbgwu" },
+
+      stripePublishableKey:
+        process.env.RATE_LIMIT_IGNORE_KEY ||
+        globalThis.STRIPE_PUBLISHABLE_KEY ||
+        "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b",
     },
   },
   typescript: {
