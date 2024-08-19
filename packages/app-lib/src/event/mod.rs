@@ -2,7 +2,7 @@
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
-use tauri::{Emitter, Manager};
+use tauri::Emitter;
 use tokio::sync::OnceCell;
 use uuid::Uuid;
 
@@ -104,7 +104,6 @@ impl Drop for LoadingBarId {
                         let event = bar.bar_type.clone();
                         let fraction = bar.current / bar.total;
 
-                        use tauri::Manager;
                         let _ = event_state.app.emit(
                             "loading",
                             LoadingPayload {

@@ -228,7 +228,6 @@ fn main() {
             initialize_state,
             is_dev,
             toggle_decorations,
-            api::auth::auth_login,
             api::mr_auth::modrinth_auth_login,
             show_window,
         ]);

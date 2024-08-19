@@ -1,16 +1,20 @@
 use tauri_build::InlinedPlugin;
 
 fn main() {
+    // ToDo: Cleanup this & reduce boilerplate.
+    //  Waiting for tauri-build 2.0.0-rc.4 https://github.com/tauri-apps/tauri/pull/10685
+
+    // ToDo: Cleanup commands for other plugins than auth, import
     tauri_build::try_build(
         tauri_build::Attributes::new()
             .codegen(tauri_build::CodegenContext::new())
             .plugin(
                 "auth",
-                InlinedPlugin::new().commands(&["auth_get_default_user", "auth_set_default_user", "auth_remove_user", "auth_users", "auth_get_user"]),
+                InlinedPlugin::new().commands(&["login", "get_default_user", "set_default_user", "remove_user", "get_users"]),
             )
             .plugin(
                 "import",
-                InlinedPlugin::new().commands(&["import_get_importable_instances", "import_import_instance", "import_is_valid_importable_instance", "import_get_default_launcher_path"]),
+                InlinedPlugin::new().commands(&["get_importable_instances", "import_instance", "is_valid_importable_instance", "get_default_launcher_path"]),
             )
             .plugin(
                 "jre",

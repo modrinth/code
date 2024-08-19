@@ -9,8 +9,6 @@ use tauri::Emitter;
 use crate::event::{
     LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
 };
-#[cfg(feature = "tauri")]
-use tauri::Manager;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
