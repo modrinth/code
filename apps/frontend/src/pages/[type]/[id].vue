@@ -1144,7 +1144,7 @@ const config = useRuntimeConfig();
 const auth = await useAuth();
 const user = ref();
 if (import.meta.client) {
-  user.value = await useUser();
+  user.value = (await useUser()).value;
 }
 
 const cosmetics = useCosmetics();

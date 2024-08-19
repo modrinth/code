@@ -40,6 +40,7 @@
           </div>
           <div class="sidebar__item">
             <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
+            <Badge v-else-if="isPermission(user.badges, 1 << 0)" type="plus" />
             <Badge v-else-if="projects.length > 0" type="creator" />
           </div>
           <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
