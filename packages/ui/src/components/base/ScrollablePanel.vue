@@ -98,15 +98,29 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
   gap: 0.5rem;
   height: 100%;
   width: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   position: relative;
+
   ::-webkit-scrollbar {
     transition: all;
   }
-  &:not(:hover)::-webkit-scrollbar {
-    //width: 0px;
-    //background: transparent; /* make scrollbar transparent */
+
+  &::-webkit-scrollbar {
+    width: var(--gap-md);
+    border: 3px solid var(--color-bg);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-bg);
+    border: 3px solid var(--color-bg);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-raised-bg);
+    border-radius: var(--radius-lg);
+    padding: 4px;
+    border: 3px solid var(--color-bg);
   }
 }
 </style>

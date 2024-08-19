@@ -65,6 +65,7 @@ import _EyeOffIcon from './icons/eye-off.svg?component'
 import _FileIcon from './icons/file.svg?component'
 import _FileTextIcon from './icons/file-text.svg?component'
 import _FilterIcon from './icons/filter.svg?component'
+import _FilterXIcon from './icons/filter-x.svg?component'
 import _FolderOpenIcon from './icons/folder-open.svg?component'
 import _FolderSearchIcon from './icons/folder-search.svg?component'
 import _GapIcon from './icons/gap.svg?component'
@@ -223,6 +224,7 @@ export const EyeOffIcon = _EyeOffIcon
 export const FileIcon = _FileIcon
 export const FileTextIcon = _FileTextIcon
 export const FilterIcon = _FilterIcon
+export const FilterXIcon = _FilterXIcon
 export const FolderOpenIcon = _FolderOpenIcon
 export const FolderSearchIcon = _FolderSearchIcon
 export const GapIcon = _GapIcon

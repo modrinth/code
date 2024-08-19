@@ -1,6 +1,25 @@
 <template>
   <section class="normal-page__content experimental-styles-within overflow-visible">
     <div
+      v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
+      class="card flex items-center gap-4"
+    >
+      <FileInput
+        :max-size="524288000"
+        :accept="acceptFileFromProjectType(project.project_type)"
+        prompt="Upload a version"
+        class="btn btn-primary"
+        @change="handleFiles"
+      >
+        <UploadIcon />
+      </FileInput>
+      <span class="flex items-center gap-2">
+        <InfoIcon /> Click to choose a file or drag one onto this page
+      </span>
+      <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
+    </div>
+    <div
+      v-if="versions.length > 0"
       class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content] supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content]"
     >
       <div class="versions-grid-row">
@@ -32,7 +51,10 @@
         <div class="text-sm font-bold text-contrast max-sm:hidden xl:collapse xl:hidden">Stats</div>
         <div class="w-9 max-sm:hidden"></div>
       </div>
-      <template v-for="(version, index) in versionsPage" :key="index">
+      <template
+        v-for="(version, index) in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
+        :key="index"
+      >
         <div
           :class="`versions-grid-row h-px w-full bg-button-bg ${index === 0 ? `max-sm:!hidden` : ``}`"
         ></div>
@@ -75,6 +97,7 @@
                       :key="`version-tag-${gameVersion}`"
                       v-tooltip="`Add filter for ${gameVersion}`"
                       class="tag-list__item z-[1] cursor-pointer hover:underline"
+                      @click="versionFilters.toggleFilters('gameVersion', version.game_versions)"
                     >
                       {{ gameVersion }}
                     </div>
@@ -88,6 +111,7 @@
                       v-tooltip="`Add filter for ${platform}`"
                       :class="`tag-list__item z-[1] cursor-pointer hover:underline`"
                       :style="`--_color: var(--color-platform-${platform})`"
+                      @click="versionFilters.toggleFilter('platform', platform)"
                     >
                       <svg v-html="tags.loaders.find((x) => x.name === platform).icon"></svg>
                       {{ formatCategory(platform) }}
@@ -203,13 +227,19 @@
     <div class="my-3 flex justify-end">
       <Pagination
         :page="currentPage"
-        :count="Math.ceil(versions.length / 20)"
+        :count="Math.ceil(filteredVersions.length / 20)"
         :link-function="(page) => `?page=${currentPage}`"
         @switch-page="switchPage"
       />
     </div>
   </section>
-  <div class="normal-page__sidebar"></div>
+  <div class="normal-page__sidebar">
+    <VersionFilterControl
+      ref="versionFilters"
+      :versions="props.versions"
+      @switch-page="switchPage"
+    />
+  </div>
 </template>
 
 <script setup>
@@ -224,10 +254,21 @@ import {
   ShareIcon,
   EditIcon,
   ReportIcon,
+  UploadIcon,
+  InfoIcon,
 } from "@modrinth/assets";
 import { formatBytes, formatCategory } from "@modrinth/utils";
-import { ButtonStyled, OverflowMenu, Pagination, VersionChannelIndicator } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  OverflowMenu,
+  Pagination,
+  VersionChannelIndicator,
+  FileInput,
+} from "@modrinth/ui";
 import { formatVersionsForDisplay } from "~/helpers/projects.js";
+import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
+import DropArea from "~/components/ui/DropArea.vue";
+import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 
 const formatCompactNumber = useCompactNumber();
 
@@ -244,20 +285,23 @@ const props = defineProps({
       return [];
     },
   },
+  currentMember: {
+    type: Object,
+    default() {
+      return null;
+    },
+  },
 });
 
 const tags = useTags();
-// const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();
 
 const emits = defineEmits(["onDownload"]);
 
-const currentPage = ref(1);
-const versionsPage = computed(() =>
-  props.versions.slice((currentPage.value - 1) * 20, currentPage.value * 20),
-);
+const route = useNativeRoute();
+const router = useNativeRouter();
 
-// const messages = defineMessages({});
+const currentPage = ref(route.query.page ?? 1);
 
 const showFiles = ref(false);
 
@@ -267,13 +311,46 @@ function switchPage(page) {
   router.replace({
     query: {
       ...route.query,
-      p: currentPage.value !== 1 ? currentPage.value : undefined,
+      page: currentPage.value !== 1 ? currentPage.value : undefined,
     },
   });
 }
 
 function getPrimaryFile(version) {
   return version.files.find((x) => x.primary) || version.files[0];
+}
+
+const versionFilters = ref(null);
+const filteredVersions = computed(() => {
+  const selectedGameVersions = getArrayOrString(route.query.gameVersion) ?? [];
+  const selectedLoaders = getArrayOrString(route.query.platform) ?? [];
+  const selectedVersionTypes = getArrayOrString(route.query.type) ?? [];
+
+  return props.versions.filter(
+    (projectVersion) =>
+      (selectedGameVersions.length === 0 ||
+        selectedGameVersions.some((gameVersion) =>
+          projectVersion.game_versions.includes(gameVersion),
+        )) &&
+      (selectedLoaders.length === 0 ||
+        selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (selectedVersionTypes.length === 0 ||
+        selectedVersionTypes.includes(projectVersion.version_type)),
+  );
+});
+
+async function handleFiles(files) {
+  await router.push({
+    name: "type-id-version-version",
+    params: {
+      type: props.project.project_type,
+      id: props.project.slug ? props.project.slug : props.project.id,
+      version: "create",
+    },
+    state: {
+      newPrimaryFile: files[0],
+    },
+  });
 }
 </script>
 <style scoped>

@@ -1,7 +1,7 @@
 <template>
   <div>
-    <ButtonStyled v-if="!!slots.title">
-      <button class="w-full" @click="() => (isOpen ? close() : open())">
+    <ButtonStyled v-if="!!slots.title" :type="type">
+      <button class="!w-full" @click="() => (isOpen ? close() : open())">
         <slot name="title" /><DropdownIcon
           class="ml-auto size-5 transition-transform duration-300"
           :class="{ 'rotate-180': isOpen }"
@@ -22,7 +22,18 @@
 import { DropdownIcon } from "@modrinth/assets";
 import { ButtonStyled } from "@modrinth/ui";
 
-const isOpen = ref(false);
+const props = withDefaults(
+  defineProps<{
+    openByDefault?: boolean;
+    type?: "standard" | "outlined" | "transparent";
+  }>(),
+  {
+    type: "standard",
+    openByDefault: false,
+  },
+);
+
+const isOpen = ref(props.openByDefault);
 const emit = defineEmits(["onOpen", "onClose"]);
 
 const slots = useSlots();

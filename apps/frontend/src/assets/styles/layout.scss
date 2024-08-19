@@ -130,11 +130,13 @@
     / 100%;
 
   @media screen and (min-width: 1024px) {
-    grid-template:
-      "header header" auto
-      "content sidebar" auto
-      "content dummy" 1fr
-      / 1fr 20rem;
+    &.sidebar {
+      grid-template:
+        "header header" auto
+        "content sidebar" auto
+        "content dummy" 1fr
+        / 1fr 20rem;
+    }
 
     .normal-page__sidebar {
       min-width: 20rem;

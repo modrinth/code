@@ -2,7 +2,7 @@
   <div v-if="user" class="experimental-styles-within">
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
-    <div class="new-page">
+    <div class="new-page sidebar">
       <div class="normal-page__header pt-4">
         <div class="mb-4 flex gap-4" :class="{ 'items-center': !user.bio }">
           <Avatar
@@ -39,37 +39,36 @@
             <HeartIcon />
             Follow
           </button>
-          <ButtonStyled size="large" circular type="transparent">
-            <OverflowMenu
-              :options="
-                [
-                  { id: 'edit', action: () => navigateTo('/settings/profile') },
-                  {
-                    id: 'report',
-                    action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
-                    color: 'red',
-                    hoverOnly: true,
-                  },
-                  { id: 'copy-id', action: () => copyId() },
-                ].slice(auth.user && auth.user.id === user.id ? 0 : 1, 3)
-              "
-              direction="right"
-            >
-              <MoreVerticalIcon />
-              <template #edit>
-                <EditIcon />
-                {{ formatMessage(commonMessages.editButton) }}
-              </template>
-              <template #report>
-                <ReportIcon />
-                {{ formatMessage(commonMessages.reportButton) }}
-              </template>
-              <template #copy-id>
-                <ClipboardCopyIcon />
-                {{ formatMessage(commonMessages.copyIdButton) }}
-              </template>
-            </OverflowMenu>
-          </ButtonStyled>
+          <OverflowMenu
+            class="btn btn-large transparent !rounded-full !p-3"
+            :options="
+              [
+                { id: 'edit', action: () => navigateTo('/settings/profile') },
+                {
+                  id: 'report',
+                  action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
+                  color: 'red',
+                  hoverOnly: true,
+                },
+                { id: 'copy-id', action: () => copyId() },
+              ].slice(auth.user && auth.user.id === user.id ? 0 : 1, 3)
+            "
+            direction="right"
+          >
+            <MoreVerticalIcon />
+            <template #edit>
+              <EditIcon />
+              {{ formatMessage(commonMessages.editButton) }}
+            </template>
+            <template #report>
+              <ReportIcon />
+              {{ formatMessage(commonMessages.reportButton) }}
+            </template>
+            <template #copy-id>
+              <ClipboardCopyIcon />
+              {{ formatMessage(commonMessages.copyIdButton) }}
+            </template>
+          </OverflowMenu>
         </div>
         <div class="mb-4 flex items-center justify-between">
           <NavTabs
@@ -311,7 +310,7 @@ import {
   ClipboardCopyIcon,
   MoreVerticalIcon,
 } from "@modrinth/assets";
-import { ButtonStyled, OverflowMenu, Badge } from "@modrinth/ui";
+import { OverflowMenu, Badge } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";

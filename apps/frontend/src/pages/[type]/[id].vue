@@ -246,9 +246,7 @@
                   placeholder="Search game versions..."
                 />
               </div>
-              <ScrollablePanel
-                :class="project.game_versions.length > 4 ? 'h-[20rem]' : 'h-[10rem]'"
-              >
+              <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[20rem]' : ''">
                 <ButtonStyled
                   v-for="version in project.game_versions
                     .filter(
@@ -332,7 +330,7 @@
                     : "Select platform"
                 }}
               </template>
-              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[20rem]' : 'h-[10rem]'">
+              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[20rem]' : ''">
                 <ButtonStyled
                   v-for="platform in project.loaders.slice().reverse()"
                   :key="platform"
@@ -401,9 +399,12 @@
       </template>
     </NewModal>
     <CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
-    <div class="new-page">
-      <div class="normal-page__header relative my-4 flex flex-col gap-7">
-        <div class="flex place-content-between gap-8">
+    <div
+      class="new-page"
+      :class="{ sidebar: !route.name.endsWith('gallery') && !route.name.endsWith('moderation') }"
+    >
+      <div class="normal-page__header relative my-4">
+        <div class="mb-4 flex flex-wrap place-content-between gap-8">
           <div class="flex flex-col gap-4">
             <div class="flex gap-4">
               <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
@@ -447,36 +448,7 @@
                 <HeartIcon />
               </StatItem>
             </div>
-            <ProjectMemberHeader
-              v-if="currentMember"
-              :project="project"
-              :versions="versions"
-              :current-member="currentMember"
-              :is-settings="route.name.startsWith('type-id-settings')"
-              :route-name="route.name"
-              :set-processing="setProcessing"
-              :collapsed="collapsedChecklist"
-              :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-              :all-members="allMembers"
-              :update-members="updateMembers"
-              :auth="auth"
-              :tags="tags"
-            />
-            <MessageBanner v-if="project.status === 'archived'" message-type="warning">
-              {{ project.title }} has been archived. {{ project.title }} will not receive any
-              further updates unless the author decides to unarchive the project.
-            </MessageBanner>
-            <MessageBanner v-if="project.project_type === 'modpack'" message-type="information">
-              To install {{ project.title }}, download
-              <nuxt-link to="/app">the Modrinth App</nuxt-link>
-              . For instructions with other launchers, please see
-              <a
-                href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
-                :target="$external()"
-                >our documentation</a
-              >.
-            </MessageBanner>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
               <ButtonStyled
                 size="large"
                 :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
@@ -557,34 +529,33 @@
                   <EyeIcon />
                 </button>
               </ButtonStyled>
-              <ButtonStyled size="large" circular type="transparent">
-                <OverflowMenu
-                  :options="[
-                    {
-                      id: 'report',
-                      action: () =>
-                        auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
-                      color: 'red',
-                      hoverOnly: true,
-                    },
-                    { id: 'copy-id', action: () => copyId() },
-                  ]"
-                  direction="right"
-                >
-                  <MoreVerticalIcon />
-                  <template #report>
-                    <ReportIcon />
-                    Report
-                  </template>
-                  <template #copy-id>
-                    <ClipboardCopyIcon />
-                    Copy ID
-                  </template>
-                </OverflowMenu>
-              </ButtonStyled>
+              <OverflowMenu
+                class="btn btn-large transparent !rounded-full !p-3"
+                :options="[
+                  {
+                    id: 'report',
+                    action: () =>
+                      auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+                    color: 'red',
+                    hoverOnly: true,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+                direction="right"
+              >
+                <MoreVerticalIcon />
+                <template #report>
+                  <ReportIcon />
+                  Report
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon />
+                  Copy ID
+                </template>
+              </OverflowMenu>
             </div>
           </div>
-          <div class="max-h-[13.125rem] w-[26.375rem] max-w-[26.375rem]">
+          <div class="sm:max-h-[13.125rem] sm:w-[26.375rem] sm:max-w-[26.375rem]">
             <nuxt-link
               v-if="featuredGalleryImage"
               :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
@@ -596,11 +567,30 @@
                     ? featuredGalleryImage.description
                     : featuredGalleryImage.title
                 "
-                class="h-full min-w-[26.375rem] rounded-2xl border-4 border-solid border-button-bg object-cover"
+                class="w-full rounded-2xl border-4 border-solid border-button-bg object-cover sm:h-full sm:min-w-[26.375rem]"
               />
             </nuxt-link>
           </div>
         </div>
+        <ProjectMemberHeader
+          v-if="currentMember"
+          :project="project"
+          :versions="versions"
+          :current-member="currentMember"
+          :is-settings="route.name.startsWith('type-id-settings')"
+          :route-name="route.name"
+          :set-processing="setProcessing"
+          :collapsed="collapsedChecklist"
+          :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+          :all-members="allMembers"
+          :update-members="updateMembers"
+          :auth="auth"
+          :tags="tags"
+        />
+        <MessageBanner v-if="project.status === 'archived'" message-type="warning" class="mb-4">
+          {{ project.title }} has been archived. {{ project.title }} will not receive any further
+          updates unless the author decides to unarchive the project.
+        </MessageBanner>
         <NavTabs
           :links="[
             {
@@ -635,6 +625,7 @@
                 (isRejected(project) || isUnderReview(project) || isStaff(auth.user)),
             },
           ]"
+          class="mt-2"
         />
       </div>
       <NuxtPage
