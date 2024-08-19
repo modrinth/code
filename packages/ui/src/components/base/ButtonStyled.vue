@@ -205,12 +205,7 @@ const colorVariables = computed(() => {
 .btn-wrapper :slotted(> :is(button, a):first-child) > svg:first-child,
 .btn-wrapper :slotted(*) > :is(button, a):first-child > svg:first-child,
 .btn-wrapper :slotted(*) > *:first-child > :is(button, a):first-child > svg:first-child,
-.btn-wrapper
-  :slotted(*)
-  > *:first-child
-  > *:first-child
-  > :is(button, a):first-child
-  > svg:first-child {
+.btn-wrapper :slotted(*) > *:first-child > *:first-child > :is(button, a):first-child > svg:first-child {
   min-width: var(--_icon-size, 1rem);
   min-height: var(--_icon-size, 1rem);
 }

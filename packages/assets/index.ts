@@ -49,6 +49,7 @@ import _ClientIcon from './icons/client.svg?component'
 import _ClipboardCopyIcon from './icons/clipboard-copy.svg?component'
 import _CodeIcon from './icons/code.svg?component'
 import _CoinsIcon from './icons/coins.svg?component'
+import _CompassIcon from './icons/compass.svg?component'
 import _ContractIcon from './icons/contract.svg?component'
 import _CopyIcon from './icons/copy.svg?component'
 import _CopyrightIcon from './icons/copyright.svg?component'
@@ -100,6 +101,7 @@ import _MicrophoneIcon from './icons/microphone.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
+import _NewspaperIcon from './icons/newspaper.svg?component'
 import _OmorphiaIcon from './icons/omorphia.svg?component'
 import _PaintBrushIcon from './icons/paintbrush.svg?component'
 import _PlayIcon from './icons/play.svg?component'
@@ -207,6 +209,7 @@ export const ClientIcon = _ClientIcon
 export const ClipboardCopyIcon = _ClipboardCopyIcon
 export const CodeIcon = _CodeIcon
 export const CoinsIcon = _CoinsIcon
+export const CompassIcon = _CompassIcon
 export const ContractIcon = _ContractIcon
 export const CopyIcon = _CopyIcon
 export const CopyrightIcon = _CopyrightIcon
@@ -259,6 +262,7 @@ export const MicrophoneIcon = _MicrophoneIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon
+export const NewspaperIcon = _NewspaperIcon
 export const OmorphiaIcon = _OmorphiaIcon
 export const PaintBrushIcon = _PaintBrushIcon
 export const PlayIcon = _PlayIcon
