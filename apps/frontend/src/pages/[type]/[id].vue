@@ -201,8 +201,8 @@
             <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
           </div>
           <div class="mx-auto flex w-fit flex-col gap-2">
-            <ButtonStyled v-if="project.game_versions.length === 1" allow-non-button>
-              <div class="disabled">
+            <ButtonStyled v-if="project.game_versions.length === 1">
+              <div class="disabled button-like">
                 <GameIcon />
                 {{
                   currentGameVersion
@@ -293,9 +293,8 @@
             </Accordion>
             <ButtonStyled
               v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
-              allow-non-button
             >
-              <div class="disabled">
+              <div class="disabled button-like">
                 <WrenchIcon />
                 {{
                   currentPlatform
