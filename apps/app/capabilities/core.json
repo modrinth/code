@@ -23,6 +23,7 @@
     "core:window:allow-hide",
     "core:window:allow-close",
     "core:window:allow-set-decorations",
-    "core:window:allow-start-dragging"
+    "core:window:allow-start-dragging",
+    "core:webview:allow-set-webview-zoom"
   ]
 }
