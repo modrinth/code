@@ -7,7 +7,7 @@
       <h1 class="my-0 truncate text-nowrap text-base font-extrabold leading-none text-contrast">
         {{ version.version_number }}
       </h1>
-      <p class="truncate text-nowrap text-xs font-semibold text-secondary">
+      <p class="m-0 truncate text-nowrap text-xs font-semibold text-secondary">
         {{ version.name }}
       </p>
     </div>
