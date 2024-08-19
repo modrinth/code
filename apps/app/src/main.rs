@@ -4,8 +4,8 @@
 )]
 
 use native_dialog::{MessageDialog, MessageType};
-use tauri::{Manager, PhysicalSize};
 use tauri_plugin_window_state::{StateFlags, WindowExt};
+use tauri::{Emitter, EventTarget, Listener, Manager};
 use theseus::prelude::*;
 
 mod api;
@@ -32,7 +32,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 fn show_window(app: tauri::AppHandle) {
-    let win = app.get_window("main").unwrap();
+    let win = app.get_webview_window("main").unwrap();
     if let Err(e) = win.show() {
         MessageDialog::new()
             .set_type(MessageType::Error)
@@ -84,8 +84,6 @@ struct Payload {
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
-    tauri_plugin_deep_link::prepare("ModrinthApp");
-
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
             ERROR > WARN > INFO > DEBUG > TRACE
@@ -106,8 +104,20 @@ fn main() {
 
     let mut builder = tauri::Builder::default();
     builder = builder
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
-            app.emit_all("single-instance", Payload { args: argv, cwd })
+            app.emit_to(
+                EventTarget::any(),
+                "single-instance",
+                Payload { args: argv, cwd },
+            )
+            .unwrap();
+        }))
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            app.emit("single-instance", Payload { args: argv, cwd })
                 .unwrap();
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
@@ -139,41 +149,34 @@ fn main() {
                 .unwrap();
 
                 let mtx_copy = mtx.clone();
-                tauri_plugin_deep_link::register(
-                    "modrinth",
-                    move |request: String| {
-                        let mtx_copy = mtx_copy.clone();
+                app.listen("deep-link://new-url", |url| {
+                    let request = url.payload().to_owned();
+                    let mtx_copy = mtx_copy.clone();
 
-                        tauri::async_runtime::spawn(async move {
-                            tracing::info!("Handling deep link {request}");
+                    tauri::async_runtime::spawn(async move {
+                        tracing::info!("Handling deep link {request}");
 
-                            let mut payload = mtx_copy.lock().await;
-                            if payload.is_none() {
-                                *payload = Some(request.clone());
-                            }
+                        let mut payload = mtx_copy.lock().await;
+                        if payload.is_none() {
+                            *payload = Some(request.clone());
+                        }
 
-                            let _ = api::utils::handle_command(request).await;
-                        });
-                    },
-                )
+                        let _ = api::utils::handle_command(request).await;
+                    });
+                });
             };
 
             #[cfg(not(target_os = "macos"))]
-            let res = tauri_plugin_deep_link::register(
-                "modrinth",
-                |request: String| {
-                    tracing::info!("Handling deep link {request}");
-                    tauri::async_runtime::spawn(api::utils::handle_command(
-                        request,
-                    ));
-                },
-            );
+            app.listen("deep-link://new-url", |url| {
+                let payload = url.payload().to_owned();
+                tracing::info!("Handling deep link {payload}");
+                tauri::async_runtime::spawn(api::utils::handle_command(
+                    payload,
+                ));
+                dbg!(url);
+            });
 
-            if let Err(e) = res {
-                tracing::error!("Error registering deep link handler: {}", e);
-            }
-
-            if let Some(window) = app.get_window("main") {
+            if let Some(window) = app.get_webview_window("main") {
                 // Hide window to prevent white flash on startup
                 let _ = window.hide();
 

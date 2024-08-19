@@ -15,8 +15,7 @@ import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
-import { type } from '@tauri-apps/api/os'
-import { appWindow } from '@tauri-apps/api/window'
+import { type } from '@tauri-apps/plugin-os'
 import { isDev, getOS } from '@/helpers/utils.js'
 import {
   mixpanel_track,
@@ -24,9 +23,9 @@ import {
   mixpanel_opt_out_tracking,
   mixpanel_is_loaded,
 } from '@/helpers/mixpanel'
-import { saveWindowState, StateFlags } from 'tauri-plugin-window-state-api'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { getCurrentWindow } from '@tauri-apps/api/window';
 import { getVersion } from '@tauri-apps/api/app'
-import { window as TauriWindow } from '@tauri-apps/api'
 import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { install_from_file } from './helpers/pack'
@@ -35,7 +34,7 @@ import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
-import { invoke } from '@tauri-apps/api/tauri'
+import { invoke } from '@tauri-apps/api/core'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 
 const themeStore = useTheming()
@@ -79,7 +78,7 @@ async function setupApp() {
   showOnboarding.value = !onboarded
 
   nativeDecorations.value = native_decorations
-  if (os.value !== 'MacOS') await appWindow.setDecorations(native_decorations)
+  if (os.value !== 'MacOS') await getCurrentWindow().setDecorations(native_decorations)
 
   themeStore.setThemeState(theme)
   themeStore.collapsedNavigation = collapsed_navigation
@@ -127,10 +126,10 @@ initialize_state()
 
 const handleClose = async () => {
   await saveWindowState(StateFlags.ALL)
-  await TauriWindow.getCurrent().close()
+  await getCurrentWindow().close()
 }
 
-TauriWindow.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
+getCurrentWindow().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
   await handleClose()
 })
 
@@ -288,10 +287,10 @@ async function handleCommand(e) {
           </section>
         </div>
         <section v-if="!nativeDecorations" class="window-controls">
-          <Button class="titlebar-button" icon-only @click="() => appWindow.minimize()">
+          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
             <MinimizeIcon />
           </Button>
-          <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
+          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().toggleMaximize()">
             <MaximizeIcon />
           </Button>
           <Button class="titlebar-button close" icon-only @click="handleClose">

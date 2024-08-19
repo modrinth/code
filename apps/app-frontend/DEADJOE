@@ -1,0 +1,21 @@
+
+*** These modified files were found in JOE when it aborted on Mon Aug 19 11:35:46 2024
+*** JOE was aborted by UNIX signal 1
+
+*** File '(Unnamed)'
+/home/norbi/.config/ngrok/ngrok.yml
+start.sh
+eula.txt
+Main.java
+MANIFEST.MF
+MANIFEST.MF
+MANIFEST.MF
+src/org/quiltmc/loader/impl/launch/knot/KnotClient.java
+docker-compose.yml
+/home/norbi/Development/Modrinth/code/apps/app-frontend/src/App.vue
+
+*** File '* Startup Log *'
+Processing '/etc/joe/joerc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/joerc

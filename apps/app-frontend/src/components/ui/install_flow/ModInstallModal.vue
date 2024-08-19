@@ -16,13 +16,13 @@ import {
   list,
   create,
 } from '@/helpers/profile'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { installVersionDependencies } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
 import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
-import { tauri } from '@tauri-apps/api'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
 const themeStore = useTheming()
 const router = useRouter()
@@ -153,7 +153,7 @@ const upload_icon = async () => {
   })
 
   if (!icon.value) return
-  display_icon.value = tauri.convertFileSrc(icon.value)
+  display_icon.value = convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {

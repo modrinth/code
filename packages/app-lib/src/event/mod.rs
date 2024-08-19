@@ -2,6 +2,7 @@
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
+use tauri::{Emitter, Manager};
 use tokio::sync::OnceCell;
 use uuid::Uuid;
 
@@ -62,10 +63,10 @@ impl EventState {
     }
 
     #[cfg(feature = "tauri")]
-    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
+    pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>> {
         use tauri::Manager;
         let value = Self::get().await?;
-        Ok(value.app.get_window("main"))
+        Ok(value.app.get_webview_window("main"))
     }
 }
 
@@ -104,7 +105,7 @@ impl Drop for LoadingBarId {
                         let fraction = bar.current / bar.total;
 
                         use tauri::Manager;
-                        let _ = event_state.app.emit_all(
+                        let _ = event_state.app.emit(
                             "loading",
                             LoadingPayload {
                                 fraction: None,
