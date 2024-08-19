@@ -1,5 +1,5 @@
 <template>
-  <div class="card flex-card">
+  <div class="card flex-card experimental-styles-within">
     <span class="text-lg font-bold text-contrast">Filter</span>
     <div class="flex items-center gap-2">
       <div class="iconified-input w-full">
@@ -35,41 +35,38 @@
         </template>
       </template>
 
-      <div>
-        <ScrollablePanel :class="{ 'h-[18rem]': value.length > 4 }">
-          <div class="mr-2 flex flex-col gap-1">
-            <ButtonStyled
-              v-for="filter in value"
-              :key="filter"
-              :type="selectedFilters[key]?.includes(filter) ? 'standard' : 'transparent'"
+      <ScrollablePanel :class="{ 'h-[18rem]': value.length >= 8 }">
+        <div class="mr-2 flex flex-col gap-1">
+          <ButtonStyled
+            v-for="filter in value"
+            :key="filter"
+            :type="selectedFilters[key]?.includes(filter) ? 'standard' : 'transparent'"
+          >
+            <button
+              class="!mr-2 flex !w-full items-center !justify-normal !gap-2 !p-2 !py-1 !pl-8"
+              @click="toggleFilter(key, filter)"
             >
-              <button
-                class="!mr-2 flex !w-full items-center !justify-normal !gap-2 !p-2 !py-1 !pl-8"
-                @click="toggleFilter(key, filter)"
-              >
-                <span v-if="filter === 'release'" class="h-2 w-2 rounded-full bg-brand" />
-                <span v-else-if="filter === 'beta'" class="h-2 w-2 rounded-full bg-orange" />
-                <span v-else-if="filter === 'alpha'" class="h-2 w-2 rounded-full bg-red" />
-                <span class="text-sm text-secondary">{{ $capitalizeString(filter) }}</span>
-              </button>
-            </ButtonStyled>
-          </div>
-        </ScrollablePanel>
-        <Checkbox
-          v-if="key === 'gameVersion'"
-          v-model="showSnapshots"
-          class="mx-1 ml-4"
-          :label="`Show all versions`"
-        />
-      </div>
+              <span v-if="filter === 'release'" class="h-2 w-2 rounded-full bg-brand" />
+              <span v-else-if="filter === 'beta'" class="h-2 w-2 rounded-full bg-orange" />
+              <span v-else-if="filter === 'alpha'" class="h-2 w-2 rounded-full bg-red" />
+              <span class="text-sm text-secondary">{{ $formatCategory(filter) }}</span>
+            </button>
+          </ButtonStyled>
+        </div>
+      </ScrollablePanel>
+      <Checkbox
+        v-if="key === 'gameVersion'"
+        v-model="showSnapshots"
+        class="mx-1 ml-4"
+        :label="`Show all versions`"
+      />
     </Accordion>
   </div>
 </template>
 
 <script setup>
 import { FilterXIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled, ScrollablePanel } from "@modrinth/ui";
-import Checkbox from "~/components/ui/Checkbox.vue";
+import { ButtonStyled, ScrollablePanel, Checkbox } from "@modrinth/ui";
 import Accordion from "~/components/ui/Accordion.vue";
 
 const props = defineProps({
@@ -127,7 +124,7 @@ const filters = computed(() => {
       ? value.filter((x) => x.toLowerCase().includes(queryFilter.value.toLowerCase()))
       : value;
 
-    if (filters.length > 1) {
+    if (filters.length > 0) {
       filteredObj[key] = filters;
     }
   }

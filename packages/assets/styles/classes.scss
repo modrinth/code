@@ -1090,7 +1090,8 @@ select {
     box-shadow: var(--shadow-inset-sm);
     border: none;
     cursor: pointer;
-    padding-left: 0.5rem;
+    padding-left: 7px;
+    padding-top: 10px;
     font-size: 1rem;
 
     transition: background-color 0.1s ease-in-out;

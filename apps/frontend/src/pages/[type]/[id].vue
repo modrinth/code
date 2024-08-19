@@ -403,12 +403,12 @@
       :class="{ sidebar: !route.name.endsWith('gallery') && !route.name.endsWith('moderation') }"
     >
       <div class="normal-page__header relative my-4">
-        <div class="mb-4 flex flex-wrap place-content-between gap-8">
+        <div class="mb-4 flex flex-wrap place-content-between gap-8 lg:flex-nowrap">
           <div class="flex flex-col gap-4">
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
               <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
               <div class="flex flex-col gap-1">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2">
                   <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
                     {{ project.title }}
                   </h1>
@@ -432,7 +432,7 @@
                 </div>
               </div>
             </div>
-            <div class="divide-y-1 flex gap-4">
+            <div class="divide-y-1 flex flex-wrap gap-4">
               <StatItem
                 :label="formatMessage(messages.downloadsStat, { count: project.downloads })"
                 :value="$formatNumber(project.downloads)"
@@ -447,10 +447,23 @@
                 <HeartIcon />
               </StatItem>
             </div>
+            <div class="block sm:hidden">
+              <ButtonStyled
+                size="large"
+                :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+                @click="(event) => downloadModal.show(event)"
+              >
+                <button>
+                  <DownloadIcon />
+                  Download
+                </button>
+              </ButtonStyled>
+            </div>
             <div class="flex flex-wrap gap-2">
               <ButtonStyled
                 size="large"
                 :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+                class="!hidden sm:!flex"
                 @click="(event) => downloadModal.show(event)"
               >
                 <button>
@@ -524,7 +537,7 @@
                 size="large"
                 circular
               >
-                <button @click="showModerationChecklist = true">
+                <button class="!hidden sm:!flex" @click="showModerationChecklist = true">
                   <EyeIcon />
                 </button>
               </ButtonStyled>
@@ -554,9 +567,11 @@
               </OverflowMenu>
             </div>
           </div>
-          <div class="sm:max-h-[13.125rem] sm:w-[26.375rem] sm:max-w-[26.375rem]">
+          <div
+            v-if="featuredGalleryImage"
+            class="sm:max-h-[13.125rem] sm:w-[26.375rem] sm:max-w-[26.375rem]"
+          >
             <nuxt-link
-              v-if="featuredGalleryImage"
               :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
             >
               <img
@@ -590,42 +605,10 @@
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
-        <NavTabs
-          :links="[
-            {
-              label: formatMessage(messages.aboutTab),
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
-            },
-            {
-              label: formatMessage(messages.galleryTab),
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`,
-              shown: project.gallery.length > 0 || !!currentMember,
-            },
-            {
-              label: 'Changelog',
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/changelog`,
-              shown: versions.length > 0,
-            },
-            {
-              label: formatMessage(messages.versionsTab),
-              href: `/${project.project_type}/${project.slug ? project.slug : project.id}/versions`,
-              shown: versions.length > 0 || !!currentMember,
-              subpages: [
-                `/${project.project_type}/${project.slug ? project.slug : project.id}/version/`,
-              ],
-            },
-            {
-              label: formatMessage(messages.moderationTab),
-              href: `/${project.project_type}/${
-                project.slug ? project.slug : project.id
-              }/moderation`,
-              shown:
-                !!currentMember &&
-                (isRejected(project) || isUnderReview(project) || isStaff(auth.user)),
-            },
-          ]"
-          class="mt-2"
-        />
+        <NavTabs :links="navLinks" class="mt-2 !hidden sm:!flex" />
+        <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
+          <NavRow :links="navLinks" />
+        </nav>
       </div>
       <NuxtPage
         v-model:project="project"
@@ -690,6 +673,7 @@ import {
 import { formatCategory, isRejected, isStaff, isUnderReview } from "@modrinth/utils";
 import dayjs from "dayjs";
 import Badge from "~/components/ui/Badge.vue";
+import NavRow from "~/components/ui/NavRow.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
@@ -1195,6 +1179,40 @@ function onDownload(event) {
     closeDownloadModal(event);
   }, 400);
 }
+
+const navLinks = computed(() => {
+  const projectUrl = `/${project.value.project_type}/${project.value.slug ? project.value.slug : project.value.id}`;
+
+  return [
+    {
+      label: formatMessage(messages.aboutTab),
+      href: projectUrl,
+    },
+    {
+      label: formatMessage(messages.galleryTab),
+      href: `${projectUrl}/gallery`,
+      shown: project.value.gallery.length > 0 || !!currentMember,
+    },
+    {
+      label: "Changelog",
+      href: `${projectUrl}/changelog`,
+      shown: versions.value.length > 0,
+    },
+    {
+      label: formatMessage(messages.versionsTab),
+      href: `${projectUrl}/versions`,
+      shown: versions.value.length > 0 || !!currentMember.value,
+      subpages: [`${projectUrl}/version/`],
+    },
+    {
+      label: formatMessage(messages.moderationTab),
+      href: `${projectUrl}/moderation`,
+      shown:
+        !!currentMember.value &&
+        (isRejected(project.value) || isUnderReview(project.value) || isStaff(auth.value.user)),
+    },
+  ];
+});
 </script>
 <style lang="scss" scoped>
 .normal-page__header {

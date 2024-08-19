@@ -71,20 +71,10 @@
           </OverflowMenu>
         </div>
         <div class="mb-4 flex items-center justify-between">
-          <NavTabs
-            :links="[
-              {
-                label: formatMessage(commonMessages.allProjectType),
-                href: `/user/${user.username}`,
-              },
-              ...projectTypes.map((x) => {
-                return {
-                  label: formatMessage(getProjectTypeMessage(x, true)),
-                  href: `/user/${user.username}/${x}s`,
-                };
-              }),
-            ]"
-          />
+          <NavTabs :links="navLinks" class="mt-2 !hidden sm:!flex" />
+          <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
+            <NavRow :links="navLinks" />
+          </nav>
         </div>
       </div>
       <div class="normal-page__content">
@@ -312,6 +302,7 @@ import {
 } from "@modrinth/assets";
 import { OverflowMenu, Badge } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
+import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
 
@@ -564,6 +555,19 @@ const badges = computed(() => {
 async function copyId() {
   await navigator.clipboard.writeText(project.value.id);
 }
+
+const navLinks = computed(() => [
+  {
+    label: formatMessage(commonMessages.allProjectType),
+    href: `/user/${user.value.username}`,
+  },
+  ...projectTypes.value.map((x) => {
+    return {
+      label: formatMessage(getProjectTypeMessage(x, true)),
+      href: `/user/${user.value.username}/${x}s`,
+    };
+  }),
+]);
 </script>
 <script>
 export default defineNuxtComponent({

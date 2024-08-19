@@ -6,7 +6,7 @@
       v-for="(link, index) in filteredLinks"
       v-show="link.shown === undefined ? true : link.shown"
       :key="index"
-      ref="linkElements"
+      ref="tabLinkElements"
       :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
       class="button-animation z-[1] flex flex-row items-center gap-2 px-4 py-2 focus:rounded-full"
       :class="{
@@ -92,10 +92,12 @@ function pickLink() {
   }
 }
 
-const linkElements = ref();
+const tabLinkElements = ref();
 
 function startAnimation() {
-  const el = linkElements.value[activeIndex.value].$el;
+  const el = tabLinkElements.value[activeIndex.value].$el;
+
+  if (!el || !el.offsetParent) return;
 
   const newValues = {
     left: el.offsetLeft,

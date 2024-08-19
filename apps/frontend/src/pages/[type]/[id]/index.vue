@@ -441,6 +441,10 @@ const linksMessages = defineMessages({
     id: "project.about.links.donate.kofi",
     defaultMessage: "Donate on Ko-fi",
   },
+  donateGithub: {
+    id: "project.about.links.donate.github",
+    defaultMessage: "Sponsor on GitHub",
+  },
 });
 const creatorsMessages = defineMessages({
   title: {
