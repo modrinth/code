@@ -405,7 +405,7 @@
       <div class="normal-page__header relative my-4">
         <div class="mb-4 flex flex-wrap place-content-between gap-8 lg:flex-nowrap">
           <div class="flex flex-col gap-4">
-            <div class="flex flex-wrap gap-4">
+            <div class="flex flex-wrap gap-4 sm:flex-nowrap">
               <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
               <div class="flex flex-col gap-1">
                 <div class="flex flex-wrap items-center gap-2">
