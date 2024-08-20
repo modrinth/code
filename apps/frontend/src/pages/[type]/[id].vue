@@ -1184,7 +1184,7 @@ const navLinks = computed(() => {
     {
       label: formatMessage(messages.galleryTab),
       href: `${projectUrl}/gallery`,
-      shown: project.value.gallery.length > 0 || !!currentMember,
+      shown: project.value.gallery.length > 0 || !!currentMember.value,
     },
     {
       label: "Changelog",
