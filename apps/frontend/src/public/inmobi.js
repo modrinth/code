@@ -1,5 +1,6 @@
 (function () {
-  var host = window.location.hostname;
+  var host = "modrinth.com";
+  // var host = window.location.hostname;
   var element = document.createElement("script");
   var firstScript = document.getElementsByTagName("script")[0];
   var url = "https://cmp.inmobi.com".concat(

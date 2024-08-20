@@ -88,7 +88,6 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
       <div class="card search-controls">
         <div class="search-filter-container">
           <button

@@ -109,6 +109,8 @@
           </div>
         </div>
 
+        <AdPlaceholder />
+
         <div class="creator-list universal-card">
           <div class="title-and-link">
             <h3>Members</h3>
@@ -129,7 +131,6 @@
     </div>
     <div v-if="!routeHasSettings" class="normal-page__content">
       <ModalCreation ref="modal_creation" :organization-id="organization.id" />
-      <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
       <div v-if="isInvited" class="universal-card information invited">
         <h2>Invitation to join {{ organization.name }}</h2>
         <p>You have been invited to join {{ organization.name }}.</p>
@@ -228,13 +229,14 @@ import {
   CheckIcon,
   XIcon,
 } from "@modrinth/assets";
-import { Avatar, Breadcrumbs, Promotion } from "@modrinth/ui";
+import { Avatar, Breadcrumbs } from "@modrinth/ui";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 import OrganizationIcon from "~/assets/images/utils/organization.svg?component";
 import DownloadIcon from "~/assets/images/utils/download.svg?component";

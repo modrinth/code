@@ -1,5 +1,8 @@
 <template>
-  <div class="relative mb-3 flex rounded-2xl">
+  <div
+    v-if="!auth.user || isPermission(auth.user.badges, 1 << 0)"
+    class="relative mb-3 flex rounded-2xl"
+  >
     <div class="flex min-h-[250px] min-w-[300px] flex-col gap-4 rounded-2xl bg-bg-raised p-6">
       <p class="m-0 text-xl font-bold text-contrast">90% of ad revenue goes to creators</p>
       <nuxt-link to="/plus" class="mt-auto flex items-center gap-1 text-purple hover:underline">
@@ -40,6 +43,8 @@ useHead({
   ],
 });
 
+const auth = await useAuth();
+
 onMounted(() => {
   window.tude = window.tude || { cmd: [] };
   tude.cmd.push(function () {
@@ -56,5 +61,32 @@ onMounted(() => {
 iframe[id^="google_ads_iframe"] {
   color-scheme: normal;
   background: transparent;
+}
+
+#qc-cmp2-ui {
+  background: var(--color-raised-bg);
+  border-radius: var(--radius-lg);
+}
+
+#qc-cmp2-ui button[mode="primary"] {
+  background: var(--color-brand);
+  color: var(--color-accent-contrast);
+  border-radius: var(--radius-lg);
+}
+
+#qc-cmp2-ui button[mode="secondary"] {
+  background: var(--color-button-bg);
+  color: var(--color-base);
+  border-radius: var(--radius-lg);
+}
+
+#qc-cmp2-ui h2 {
+  color: var(--color-contrast);
+  font-size: 1.5rem;
+}
+
+#qc-cmp2-ui p {
+  font-family: var(--font-standard);
+  font-size: 1rem;
 }
 </style>
