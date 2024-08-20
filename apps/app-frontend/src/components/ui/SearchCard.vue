@@ -69,12 +69,7 @@ import { formatNumber, formatCategory } from '@modrinth/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
-import { install as packInstall } from '@/helpers/pack.js'
-import { installVersionDependencies } from '@/helpers/utils.js'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { install as installVersion } from '@/store/install.js'
 dayjs.extend(relativeTime)
 
 const props = defineProps({
@@ -91,18 +86,6 @@ const props = defineProps({
     required: true,
   },
   instance: {
-    type: Object,
-    default: null,
-  },
-  confirmModal: {
-    type: Object,
-    default: null,
-  },
-  modInstallModal: {
-    type: Object,
-    default: null,
-  },
-  incompatibilityWarningModal: {
     type: Object,
     default: null,
   },
@@ -123,93 +106,19 @@ const installed = ref(props.installed)
 
 async function install() {
   installing.value = true
-  const versions = await useFetch(
-    `https://api.modrinth.com/v2/project/${props.project.project_id}/version`,
-    'project versions',
-  )
-  let queuedVersionData
-
-  if (!props.instance) {
-    queuedVersionData = versions[0]
-  } else {
-    queuedVersionData = versions.find(
-      (v) =>
-        v.game_versions.includes(props.instance.metadata.game_version) &&
-        (props.project.project_type !== 'mod' ||
-          v.loaders.includes(props.instance.metadata.loader)),
-    )
-  }
-
-  if (props.project.project_type === 'modpack') {
-    const packs = Object.values(await list().catch(handleError))
-    if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === props.project.project_id)
-    ) {
-      await packInstall(
-        props.project.project_id,
-        queuedVersionData.id,
-        props.project.title,
-        props.project.icon_url,
-      ).catch(handleError)
-
-      mixpanel_track('PackInstall', {
-        id: props.project.project_id,
-        version_id: queuedVersionData.id,
-        title: props.project.title,
-        source: 'SearchCard',
-      })
-    } else {
-      props.confirmModal.show(
-        props.project.project_id,
-        queuedVersionData.id,
-        props.project.title,
-        props.project.icon_url,
-      )
-    }
-  } else {
-    if (props.instance) {
-      if (!queuedVersionData) {
-        props.incompatibilityWarningModal.show(
-          props.instance,
-          props.project.title,
-          versions,
-          () => (installed.value = true),
-          props.project.project_id,
-          props.project.project_type,
-        )
-        installing.value = false
-        return
-      } else {
-        await installMod(props.instance.path, queuedVersionData.id).catch(handleError)
-        await installVersionDependencies(props.instance, queuedVersionData)
-
-        mixpanel_track('ProjectInstall', {
-          loader: props.instance.metadata.loader,
-          game_version: props.instance.metadata.game_version,
-          id: props.project.project_id,
-          project_type: props.project.project_type,
-          version_id: queuedVersionData.id,
-          title: props.project.title,
-          source: 'SearchCard',
-        })
-      }
-    } else {
-      props.modInstallModal.show(
-        props.project.project_id,
-        versions,
-        props.project.title,
-        props.project.project_type,
-      )
+  await installVersion(
+    props.project.project_id,
+    null,
+    props.instance ? props.instance.path : null,
+    'SearchCard',
+    (version) => {
       installing.value = false
-      return
-    }
-    if (props.instance) installed.value = true
-  }
 
-  installing.value = false
+      if (props.instance && version) {
+        installed.value = true
+      }
+    },
+  )
 }
 </script>
 

@@ -249,7 +249,7 @@
         </div>
       </div>
       <div class="normal-page__content">
-        <Promotion :external="false" query-param="" />
+        <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
 
         <nav class="navigation-card">
           <NavRow
@@ -487,7 +487,6 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode.collection,
     tags.value.projectViewModes,
   );
-  saveCosmetics();
 }
 
 let collection, refreshCollection, creator, projects, refreshProjects;

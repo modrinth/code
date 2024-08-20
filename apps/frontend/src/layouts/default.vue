@@ -20,6 +20,21 @@
     </div>
     <div
       v-if="
+        user &&
+        user.subscriptions &&
+        user.subscriptions.some((x) => x.status === 'payment-failed') &&
+        route.path !== '/settings/billing'
+      "
+      class="email-nag"
+    >
+      <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
+      <nuxt-link class="btn" to="/settings/billing">
+        <SettingsIcon />
+        {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
+      </nuxt-link>
+    </div>
+    <div
+      v-if="
         config.public.apiBaseUrl.startsWith('https://staging-api.modrinth.com') &&
         !cosmetics.hideStagingBanner
       "
@@ -62,7 +77,7 @@
                 :title="formatMessage(messages.changeTheme)"
                 @click="changeTheme"
               >
-                <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
+                <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
                 <SunIcon v-else aria-hidden="true" />
               </button>
               <div
@@ -242,7 +257,7 @@
               {{ formatMessage(commonMessages.settingsLabel) }}
             </NuxtLink>
             <button class="iconified-button" @click="changeTheme">
-              <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
+              <MoonIcon v-if="$theme.active === 'light'" class="icon" />
               <SunIcon v-else class="icon" />
               <span class="dropdown-item__text">
                 {{ formatMessage(messages.changeTheme) }}
@@ -403,7 +418,7 @@
           {{ formatMessage(messages.getModrinthApp) }}
         </nuxt-link>
         <button class="iconified-button raised-button" @click="changeTheme">
-          <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
+          <MoonIcon v-if="$theme.active === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
           {{ formatMessage(messages.changeTheme) }}
         </button>
@@ -449,12 +464,17 @@ import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import { getProjectTypeMessage } from "~/utils/i18n-project-type.ts";
 import { commonMessages } from "~/utils/common-messages.ts";
-import { DARK_THEMES } from "~/composables/theme.js";
 
 const { formatMessage } = useVIntl();
 
 const app = useNuxtApp();
 const auth = await useAuth();
+const user = ref();
+
+if (import.meta.client) {
+  user.value = (await useUser()).value;
+}
+
 const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
 const tags = useTags();
@@ -482,6 +502,18 @@ const addEmailBannerMessages = defineMessages({
   action: {
     id: "layout.banner.add-email.button",
     defaultMessage: "Visit account settings",
+  },
+});
+
+const subscriptionPaymentFailedBannerMessages = defineMessages({
+  title: {
+    id: "layout.banner.subscription-payment-failed.title",
+    defaultMessage:
+      "Your subscription failed to renew. Please update your payment method to prevent losing access.",
+  },
+  action: {
+    id: "layout.banner.subscription-payment-failed.button",
+    defaultMessage: "Update billing info",
   },
 });
 
@@ -654,7 +686,7 @@ const navRoutes = computed(() => [
 ]);
 
 onMounted(() => {
-  if (window && process.client) {
+  if (window && import.meta.client) {
     window.history.scrollRestoration = "auto";
   }
 
@@ -667,7 +699,7 @@ watch(
     isMobileMenuOpen.value = false;
     isBrowseMenuOpen.value = false;
 
-    if (process.client) {
+    if (import.meta.client) {
       document.body.style.overflowY = "scroll";
       document.body.setAttribute("tabindex", "-1");
       document.body.removeAttribute("tabindex");
@@ -738,18 +770,11 @@ function toggleBrowseMenu() {
     isMobileMenuOpen.value = false;
   }
 }
-function changeTheme() {
-  updateTheme(
-    DARK_THEMES.includes(app.$colorMode.value)
-      ? "light"
-      : cosmetics.value.preferredDarkTheme ?? "dark",
-    true,
-  );
-}
+
+const { cycle: changeTheme } = useTheme();
 
 function hideStagingBanner() {
   cosmetics.value.hideStagingBanner = true;
-  saveCosmetics();
 }
 </script>
 

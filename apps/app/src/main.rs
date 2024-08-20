@@ -16,12 +16,23 @@ mod macos;
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
-    theseus::EventState::init(app).await?;
-    let s = State::get().await?;
-    State::update();
+    theseus::EventState::init(app.clone()).await?;
+    State::init().await?;
 
-    s.children.write().await.rescue_cache().await?;
+    let state = State::get().await?;
+    app.asset_protocol_scope()
+        .allow_directory(state.directories.caches_dir(), true)?;
+
     Ok(())
+}
+
+// Should be call once Vue has mounted the app
+#[tracing::instrument(skip_all)]
+#[tauri::command]
+fn show_window(app: tauri::AppHandle) {
+    let win = app.get_window("main").unwrap();
+    win.show().unwrap();
+    win.set_focus().unwrap();
 }
 
 #[tauri::command]
@@ -50,7 +61,7 @@ struct Payload {
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
-    tauri_plugin_deep_link::prepare("com.modrinth.theseus");
+    tauri_plugin_deep_link::prepare("ModrinthApp");
 
     /*
         tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
@@ -78,41 +89,84 @@ fn main() {
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
-            // Register deep link handler, allowing reading of modrinth:// links
-            if let Err(e) = tauri_plugin_deep_link::register(
+            #[cfg(target_os = "macos")]
+            let res = {
+                use macos::deep_link::InitialPayload;
+                let mtx = std::sync::Arc::new(tokio::sync::Mutex::new(None));
+
+                app.manage(InitialPayload {
+                    payload: mtx.clone(),
+                });
+
+                let mtx_copy = mtx.clone();
+                macos::delegate::register_open_file(move |filename| {
+                    let mtx_copy = mtx_copy.clone();
+
+                    tauri::async_runtime::spawn(async move {
+                        tracing::info!("Handling file open {filename}");
+
+                        let mut payload = mtx_copy.lock().await;
+                        if payload.is_none() {
+                            *payload = Some(filename.clone());
+                        }
+
+                        let _ = api::utils::handle_command(filename).await;
+                    });
+                })
+                .unwrap();
+
+                let mtx_copy = mtx.clone();
+                tauri_plugin_deep_link::register(
+                    "modrinth",
+                    move |request: String| {
+                        let mtx_copy = mtx_copy.clone();
+
+                        tauri::async_runtime::spawn(async move {
+                            tracing::info!("Handling deep link {request}");
+
+                            let mut payload = mtx_copy.lock().await;
+                            if payload.is_none() {
+                                *payload = Some(request.clone());
+                            }
+
+                            let _ = api::utils::handle_command(request).await;
+                        });
+                    },
+                )
+            };
+
+            #[cfg(not(target_os = "macos"))]
+            let res = tauri_plugin_deep_link::register(
                 "modrinth",
                 |request: String| {
+                    tracing::info!("Handling deep link {request}");
                     tauri::async_runtime::spawn(api::utils::handle_command(
                         request,
                     ));
                 },
-            ) {
-                // Allow it to fail- see https://github.com/FabianLars/tauri-plugin-deep-link/issues/19
+            );
+
+            if let Err(e) = res {
                 tracing::error!("Error registering deep link handler: {}", e);
             }
 
-            let win = app.get_window("main").unwrap();
-            #[cfg(not(target_os = "linux"))]
-            {
-                use window_shadows::set_shadow;
-                set_shadow(&win, true).unwrap();
-            }
-            #[cfg(target_os = "macos")]
-            {
-                use macos::window_ext::WindowExt;
-                win.set_transparent_titlebar(true);
-                win.position_traffic_lights(9.0, 16.0);
+            if let Some(window) = app.get_window("main") {
+                // Hide window to prevent white flash on startup
+                window.hide().unwrap();
 
-                macos::delegate::register_open_file(|filename| {
-                    tauri::async_runtime::spawn(api::utils::handle_command(
-                        filename,
-                    ));
-                })
-                .unwrap();
-            }
+                #[cfg(not(target_os = "linux"))]
+                {
+                    use window_shadows::set_shadow;
+                    set_shadow(&window, true).unwrap();
+                }
 
-            // Show app now that we are setup
-            win.show().unwrap();
+                #[cfg(target_os = "macos")]
+                {
+                    use macos::window_ext::WindowExt;
+                    window.set_transparent_titlebar(true);
+                    window.position_traffic_lights(9.0, 16.0);
+                }
+            }
 
             Ok(())
         });
@@ -128,6 +182,7 @@ fn main() {
             }
         })
     }
+
     let builder = builder
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
@@ -142,11 +197,14 @@ fn main() {
         .plugin(api::settings::init())
         .plugin(api::tags::init())
         .plugin(api::utils::init())
+        .plugin(api::cache::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
             toggle_decorations,
             api::auth::auth_login,
+            api::mr_auth::modrinth_auth_login,
+            show_window,
         ]);
 
     builder

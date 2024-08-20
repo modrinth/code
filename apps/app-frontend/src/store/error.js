@@ -8,8 +8,8 @@ export const useError = defineStore('errorsStore', {
     setErrorModal(ref) {
       this.errorModal = ref
     },
-    showError(error) {
-      this.errorModal.show(error)
+    showError(error, closable = true, source = null) {
+      this.errorModal.show(error, closable, source)
     },
   },
 })

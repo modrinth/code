@@ -27,13 +27,13 @@
         <multiselect
           id="package-mod-loaders"
           v-model="packageLoaders"
-          :options="['fabric', 'forge', 'quilt']"
+          :options="['fabric', 'forge', 'quilt', 'neoforge']"
           :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
           :multiple="true"
           :searchable="false"
           :show-no-results="false"
           :show-labels="false"
-          placeholder="Choose loaders.."
+          placeholder="Choose loaders..."
           open-direction="top"
         />
         <div class="button-group">
@@ -779,7 +779,7 @@ export default defineNuxtComponent({
         featured: false,
       };
       // For navigation from versions page / upload file prompt
-      if (process.client && history.state && history.state.newPrimaryFile) {
+      if (import.meta.client && history.state && history.state.newPrimaryFile) {
         replaceFile = history.state.newPrimaryFile;
 
         try {
@@ -901,7 +901,7 @@ export default defineNuxtComponent({
 
       newFileTypes: [],
 
-      packageLoaders: ["forge", "fabric", "quilt"],
+      packageLoaders: ["forge", "fabric", "quilt", "neoforge"],
 
       showKnownErrors: false,
       shouldPreventActions: false,

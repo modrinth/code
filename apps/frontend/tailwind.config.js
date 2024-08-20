@@ -21,6 +21,10 @@ module.exports = {
         dark: "var(--color-text-dark)",
         inverted: "var(--color-text-inverted)",
         heading: "var(--color-heading)",
+        red: "var(--color-red)",
+        orange: "var(--color-orange)",
+        purple: "var(--color-purple)",
+        contrast: "var(--color-contrast)",
         bg: {
           DEFAULT: "var(--color-bg)",
           red: "var(--color-red-bg)",
@@ -120,20 +124,10 @@ module.exports = {
           rawBg: "var(--landing-raw-bg)",
         },
       },
-      boxShadow: {
-        insetLg: "var(--shadow-inset-lg)",
-        inset: "var(--shadow-inset)",
-        insetSm: "var(--shadow-inset-sm)",
-        raisedLg: "var(--shadow-raised-lg)",
-        raised: "var(--shadow-raised)",
-        floating: "var(--shadow-floating)",
-        card: "var(--shadow-card)",
-        landing: {
-          blobShadow: "var(--landing-blob-shadow)",
-          cardShadow: "var(--landing-card-shadow)",
-        },
-      },
     },
   },
   plugins: [],
+  corePlugins: {
+    preflight: false,
+  },
 };

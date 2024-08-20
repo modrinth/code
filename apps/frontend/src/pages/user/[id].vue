@@ -40,6 +40,7 @@
           </div>
           <div class="sidebar__item">
             <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
+            <Badge v-else-if="isPermission(user.badges, 1 << 0)" type="plus" />
             <Badge v-else-if="projects.length > 0" type="creator" />
           </div>
           <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
@@ -121,7 +122,7 @@
         </div>
       </div>
       <div class="normal-page__content">
-        <Promotion :external="false" query-param="" />
+        <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
         <nav class="navigation-card">
           <NavRow
             :links="[
@@ -489,7 +490,6 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode.user,
     tags.value.projectViewModes,
   );
-  saveCosmetics();
 }
 </script>
 <script>

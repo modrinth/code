@@ -216,7 +216,7 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <Promotion :external="false" query-param="" />
+      <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
       <div class="card search-controls">
         <div class="search-filter-container">
           <button
@@ -369,6 +369,7 @@ const route = useNativeRoute();
 
 const cosmetics = useCosmetics();
 const tags = useTags();
+const auth = await useAuth();
 
 const query = ref("");
 const facets = ref([]);
@@ -465,7 +466,7 @@ const {
 } = useLazyFetch(
   () => {
     const config = useRuntimeConfig();
-    const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl;
+    const base = import.meta.server ? config.apiBaseUrl : config.public.apiBaseUrl;
 
     const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`];
 
@@ -589,7 +590,7 @@ function onSearchChange(newPageNumber) {
 
   refreshSearch();
 
-  if (process.client) {
+  if (import.meta.client) {
     const obj = getSearchUrl((currentPage.value - 1) * maxResults.value, true);
     router.replace({ path: route.path, query: obj });
   }
@@ -751,7 +752,7 @@ function toggleEnv(environment, sendRequest) {
 }
 
 function onSearchChangeToTop(newPageNumber) {
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -763,7 +764,6 @@ function cycleSearchDisplayMode() {
     cosmetics.value.searchDisplayMode[projectType.value.id],
     tags.value.projectViewModes,
   );
-  saveCosmetics();
   setClosestMaxResults();
 }
 

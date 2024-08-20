@@ -2,7 +2,6 @@
 resolver = '2'
 members = [
   './packages/app-lib',
-  './packages/app-macros',
 	'./apps/app-playground',
   './apps/app'
 ]
@@ -14,3 +13,6 @@ codegen-units = 1 # Compile crates one after another so the compiler can optimiz
 lto = true # Enables link to optimizations
 opt-level = "s" # Optimize for binary size
 strip = true # Remove debug symbols
+
+[profile.dev.package.sqlx-macros]
+opt-level = 3

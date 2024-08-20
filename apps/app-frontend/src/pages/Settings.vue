@@ -1,10 +1,10 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, UpdatedIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, Modal, Button } from '@modrinth/ui'
+import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
+import { Card, Slider, DropdownSelect, Toggle, ConfirmModal, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
-import { is_dir_writeable, change_config_dir, get, set } from '@/helpers/settings'
-import { get_max_memory } from '@/helpers/jre'
+import { get, set } from '@/helpers/settings'
+import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
@@ -12,6 +12,7 @@ import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/m
 import { open } from '@tauri-apps/api/dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
+import { get_user, purge_cache_types } from '@/helpers/cache.js'
 
 const pageOptions = ['Home', 'Library']
 
@@ -22,8 +23,8 @@ const version = await getVersion()
 const accessSettings = async () => {
   const settings = await get()
 
-  settings.javaArgs = settings.custom_java_args.join(' ')
-  settings.envArgs = settings.custom_env_args.map((x) => x.join('=')).join(' ')
+  settings.launchArgs = settings.extra_launch_args.join(' ')
+  settings.envVars = settings.custom_env_vars.map((x) => x.join('=')).join(' ')
 
   return settings
 }
@@ -31,7 +32,7 @@ const accessSettings = async () => {
 const fetchSettings = await accessSettings().catch(handleError)
 
 const settings = ref(fetchSettings)
-const settingsDir = ref(settings.value.loaded_config_dir)
+
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
 watch(
@@ -43,26 +44,14 @@ watch(
 
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
-    if (setSettings.opt_out_analytics) {
+    if (setSettings.telemetry) {
       mixpanel_opt_out_tracking()
     } else {
       mixpanel_opt_in_tracking()
     }
 
-    for (const [key, value] of Object.entries(setSettings.java_globals)) {
-      if (value?.path === '') {
-        value.path = undefined
-      }
-
-      if (value?.path) {
-        value.path = value.path.replace('java.exe', 'javaw.exe')
-      }
-
-      console.log(`${key}: ${value}`)
-    }
-
-    setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
-    setSettings.custom_env_args = setSettings.envArgs
+    setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
+    setSettings.custom_env_vars = setSettings.envVars
       .trim()
       .split(/\s+/)
       .filter(Boolean)
@@ -78,22 +67,49 @@ watch(
       setSettings.hooks.post_exit = null
     }
 
+    if (!setSettings.custom_dir) {
+      setSettings.custom_dir = null
+    }
+
     await set(setSettings)
   },
   { deep: true },
 )
 
-const credentials = ref(await getCreds().catch(handleError))
+const javaVersions = ref(await get_java_versions().catch(handleError))
+async function updateJavaVersion(version) {
+  if (version?.path === '') {
+    version.path = undefined
+  }
+
+  if (version?.path) {
+    version.path = version.path.replace('java.exe', 'javaw.exe')
+  }
+
+  await set_java_version(version).catch(handleError)
+}
+
+async function fetchCredentials() {
+  const creds = await getCreds().catch(handleError)
+  console.log(creds)
+  if (creds && creds.user_id) {
+    creds.user = await get_user(creds.user_id).catch(handleError)
+  }
+  credentials.value = creds
+}
+
+const credentials = ref()
+await fetchCredentials()
+
 const loginScreenModal = ref()
 
 async function logOut() {
   await logout().catch(handleError)
-  credentials.value = await getCreds().catch(handleError)
+  await fetchCredentials()
 }
 
 async function signInAfter() {
-  loginScreenModal.value.hide()
-  credentials.value = await getCreds().catch(handleError)
+  await fetchCredentials()
 }
 
 async function findLauncherDir() {
@@ -103,23 +119,28 @@ async function findLauncherDir() {
     title: 'Select a new app directory',
   })
 
-  const writeable = await is_dir_writeable(newDir)
-
-  if (!writeable) {
-    handleError('The selected directory does not have proper permissions for write access.')
-    return
-  }
-
   if (newDir) {
-    settingsDir.value = newDir
-    await refreshDir()
+    settings.value.custom_dir = newDir
   }
 }
 
-async function refreshDir() {
-  await change_config_dir(settingsDir.value).catch(handleError)
-  settings.value = await accessSettings().catch(handleError)
-  settingsDir.value = settings.value.loaded_config_dir
+async function purgeCache() {
+  await purge_cache_types([
+    'project',
+    'version',
+    'user',
+    'team',
+    'organization',
+    'loader_manifest',
+    'minecraft_manifest',
+    'categories',
+    'report_types',
+    'loaders',
+    'game_versions',
+    'donation_platforms',
+    'file_update',
+    'search_results',
+  ]).catch(handleError)
 }
 </script>
 
@@ -131,48 +152,62 @@ async function refreshDir() {
           <span class="label__title size-card-header">General settings</span>
         </h3>
       </div>
-      <Modal
-        ref="loginScreenModal"
-        class="login-screen-modal"
-        :noblur="!themeStore.advancedRendering"
-      >
-        <ModrinthLoginScreen :modal="true" :prev-page="signInAfter" :next-page="signInAfter" />
-      </Modal>
+      <ModrinthLoginScreen ref="loginScreenModal" :callback="signInAfter" />
       <div class="adjacent-input">
-        <label for="theme">
+        <label for="sign-in">
           <span class="label__title">Manage account</span>
           <span v-if="credentials" class="label__description">
             You are currently logged in as {{ credentials.user.username }}.
           </span>
           <span v-else> Sign in to your Modrinth account. </span>
         </label>
-        <button v-if="credentials" class="btn" @click="logOut">
+        <button v-if="credentials" id="sign-in" class="btn" @click="logOut">
           <LogOutIcon />
           Sign out
         </button>
-        <button v-else class="btn" @click="$refs.loginScreenModal.show()">
+        <button v-else id="sign-in" class="btn" @click="$refs.loginScreenModal.show()">
           <LogInIcon />
           Sign in
         </button>
       </div>
-      <label for="theme">
+      <ConfirmModal
+        ref="purgeCacheConfirmModal"
+        title="Are you sure you want to purge the cache?"
+        description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
+        :has-to-type="false"
+        proceed-label="Purge cache"
+        :noblur="!themeStore.advancedRendering"
+        @proceed="purgeCache"
+      />
+      <div class="adjacent-input">
+        <label for="purge-cache">
+          <span class="label__title">App cache</span>
+          <span class="label__description">
+            The Modrinth app stores a cache of data to speed up loading. This can be purged to force
+            the app to reload data. <br />
+            This may slow down the app temporarily.
+          </span>
+        </label>
+        <button id="purge-cache" class="btn" @click="$refs.purgeCacheConfirmModal.show()">
+          <TrashIcon />
+          Purge cache
+        </button>
+      </div>
+      <label for="appDir">
         <span class="label__title">App directory</span>
         <span class="label__description">
-          The directory where the launcher stores all of its files.
+          The directory where the launcher stores all of its files. Changes will be applied after
+          restarting the launcher.
         </span>
       </label>
       <div class="app-directory">
         <div class="iconified-input">
           <BoxIcon />
-          <input id="appDir" v-model="settingsDir" type="text" class="input" />
-          <Button @click="findLauncherDir">
+          <input id="appDir" v-model="settings.custom_dir" type="text" class="input" />
+          <Button class="r-btn" @click="findLauncherDir">
             <FolderSearchIcon />
           </Button>
         </div>
-        <Button large @click="refreshDir">
-          <UpdatedIcon />
-          Refresh
-        </Button>
       </div>
     </Card>
     <Card>
@@ -230,11 +265,11 @@ async function refreshDir() {
         </label>
         <Toggle
           id="minimize-launcher"
-          :model-value="settings.hide_on_process"
-          :checked="settings.hide_on_process"
+          :model-value="settings.hide_on_process_start"
+          :checked="settings.hide_on_process_start"
           @update:model-value="
             (e) => {
-              settings.hide_on_process = e
+              settings.hide_on_process_start = e
             }
           "
         />
@@ -285,10 +320,11 @@ async function refreshDir() {
       <div class="adjacent-input">
         <label for="max-downloads">
           <span class="label__title">Maximum concurrent downloads</span>
-          <span class="label__description"
-            >The maximum amount of files the launcher can download at the same time. Set this to a
-            lower value if you have a poor internet connection.</span
-          >
+          <span class="label__description">
+            The maximum amount of files the launcher can download at the same time. Set this to a
+            lower value if you have a poor internet connection. (app restart required to take
+            effect)
+          </span>
         </label>
         <Slider
           id="max-downloads"
@@ -302,10 +338,11 @@ async function refreshDir() {
       <div class="adjacent-input">
         <label for="max-writes">
           <span class="label__title">Maximum concurrent writes</span>
-          <span class="label__description"
-            >The maximum amount of files the launcher can write to the disk at once. Set this to a
-            lower value if you are frequently getting I/O errors.</span
-          >
+          <span class="label__description">
+            The maximum amount of files the launcher can write to the disk at once. Set this to a
+            lower value if you are frequently getting I/O errors. (app restart required to take
+            effect)
+          </span>
         </label>
         <Slider
           id="max-writes"
@@ -324,37 +361,38 @@ async function refreshDir() {
       </div>
       <div class="adjacent-input">
         <label for="opt-out-analytics">
-          <span class="label__title">Disable analytics</span>
+          <span class="label__title">Telemetry</span>
           <span class="label__description">
             Modrinth collects anonymized analytics and usage data to improve our user experience and
-            customize your experience. By enabling this option, you opt out and your data will no
+            customize your experience. By disabling this option, you opt out and your data will no
             longer be collected.
           </span>
         </label>
         <Toggle
           id="opt-out-analytics"
-          :model-value="settings.opt_out_analytics"
-          :checked="settings.opt_out_analytics"
+          :model-value="settings.telemetry"
+          :checked="settings.telemetry"
           @update:model-value="
             (e) => {
-              settings.opt_out_analytics = e
+              settings.telemetry = e
             }
           "
         />
       </div>
       <div class="adjacent-input">
         <label for="disable-discord-rpc">
-          <span class="label__title">Disable Discord RPC</span>
+          <span class="label__title">Discord RPC</span>
           <span class="label__description">
-            Disables the Discord Rich Presence integration. 'Modrinth' will no longer show up as a
-            game or app you are using on your Discord profile. This does not disable any
-            instance-specific Discord Rich Presence integrations, such as those added by mods.
+            Manages the Discord Rich Presence integration. Disabling this will cause 'Modrinth' to
+            no longer show up as a game or app you are using on your Discord profile. This does not
+            disable any instance-specific Discord Rich Presence integrations, such as those added by
+            mods. (app restart required to take effect)
           </span>
         </label>
         <Toggle
           id="disable-discord-rpc"
-          v-model="settings.disable_discord_rpc"
-          :checked="settings.disable_discord_rpc"
+          v-model="settings.discord_rpc"
+          :checked="settings.discord_rpc"
         />
       </div>
     </Card>
@@ -364,25 +402,24 @@ async function refreshDir() {
           <span class="label__title size-card-header">Java settings</span>
         </h3>
       </div>
-      <label for="java-21">
-        <span class="label__title">Java 21 location</span>
-      </label>
-      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_21" :version="21" />
-      <label for="java-17">
-        <span class="label__title">Java 17 location</span>
-      </label>
-      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_17" :version="17" />
-      <label for="java-8">
-        <span class="label__title">Java 8 location</span>
-      </label>
-      <JavaSelector id="java-8" v-model="settings.java_globals.JAVA_8" :version="8" />
+      <template v-for="version in [21, 17, 8]">
+        <label :for="'java-' + version">
+          <span class="label__title">Java {{ version }} location</span>
+        </label>
+        <JavaSelector
+          :id="'java-selector-' + version"
+          v-model="javaVersions[version]"
+          :version="version"
+          @update:model-value="updateJavaVersion"
+        />
+      </template>
       <hr class="card-divider" />
       <label for="java-args">
         <span class="label__title">Java arguments</span>
       </label>
       <input
         id="java-args"
-        v-model="settings.javaArgs"
+        v-model="settings.launchArgs"
         autocomplete="off"
         type="text"
         class="installation-input"
@@ -393,7 +430,7 @@ async function refreshDir() {
       </label>
       <input
         id="env-vars"
-        v-model="settings.envArgs"
+        v-model="settings.envVars"
         autocomplete="off"
         type="text"
         class="installation-input"
@@ -526,7 +563,7 @@ async function refreshDir() {
       <div>
         <label>
           <span class="label__title">App version</span>
-          <span class="label__description">Theseus v{{ version }} </span>
+          <span class="label__description">Modrinth App v{{ version }} </span>
         </label>
       </div>
     </Card>
@@ -549,18 +586,6 @@ async function refreshDir() {
 
 .card-divider {
   margin: 1rem 0;
-}
-
-:deep {
-  .login-screen-modal {
-    .modal-container .modal-body {
-      width: auto;
-
-      .content {
-        background: none;
-      }
-    }
-  }
 }
 
 .app-directory {

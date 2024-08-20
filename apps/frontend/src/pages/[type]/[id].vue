@@ -272,7 +272,7 @@
               <hr class="card-divider" />
             </div>
             <div class="input-group">
-              <template v-if="auth.user">
+              <template v-if="auth.user && user && user.follows">
                 <button
                   v-if="!user.follows.find((x) => x.id === project.id)"
                   class="btn"
@@ -486,7 +486,12 @@
             >our documentation</a
           >.
         </MessageBanner>
-        <Promotion v-if="tags.approvedStatuses.includes(project.status)" />
+        <Promotion
+          v-if="
+            tags.approvedStatuses.includes(project.status) &&
+            (!auth.user || !isPermission(auth.user.badges, 1 << 0))
+          "
+        />
         <div class="navigation-card">
           <NavRow
             :links="[
@@ -1128,7 +1133,11 @@ const route = useNativeRoute();
 const config = useRuntimeConfig();
 
 const auth = await useAuth();
-const user = await useUser();
+const user = ref();
+if (import.meta.client) {
+  user.value = (await useUser()).value;
+}
+
 const cosmetics = useCosmetics();
 const tags = useTags();
 const flags = useFeatureFlags();
@@ -1500,7 +1509,7 @@ const collapsedChecklist = ref(false);
 
 const showModerationChecklist = ref(false);
 const futureProjects = ref([]);
-if (process.client && history && history.state && history.state.showChecklist) {
+if (import.meta.client && history && history.state && history.state.showChecklist) {
   showModerationChecklist.value = true;
   futureProjects.value = history.state.projects;
 }

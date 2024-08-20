@@ -21,7 +21,8 @@ export async function install(projectId, versionId, packTitle, iconUrl) {
     profile_creator.gameVersion,
     profile_creator.modloader,
     profile_creator.loaderVersion,
-    profile_creator.icon,
+    null,
+    true,
   )
 
   return await invoke('plugin:pack|pack_install', { location, profile })
@@ -39,7 +40,8 @@ export async function install_from_file(path) {
     profile_creator.gameVersion,
     profile_creator.modloader,
     profile_creator.loaderVersion,
-    profile_creator.icon,
+    null,
+    true,
   )
   return await invoke('plugin:pack|pack_install', { location, profile })
 }

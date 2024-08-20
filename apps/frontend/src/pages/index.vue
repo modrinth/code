@@ -199,7 +199,7 @@
           <div class="blob-demonstration gradient-border">
             <div class="launcher-view">
               <img
-                v-if="$colorMode.value === 'light'"
+                v-if="$theme.active === 'light'"
                 src="https://cdn.modrinth.com/landing-new/launcher-light.webp"
                 alt="launcher graphic"
                 class="minecraft-screen"
@@ -407,7 +407,7 @@
     </div>
     <div class="logo-banner">
       <svg
-        v-if="$colorMode.value === 'light'"
+        v-if="$theme.active === 'light'"
         viewBox="0 0 865 512"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -513,34 +513,32 @@ import ATLauncherLogo from "~/assets/images/external/atlauncher.svg?component";
 import Avatar from "~/components/ui/Avatar.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 
-const searchQuery = ref("better");
+import { homePageProjects, homePageSearch, homePageNotifs } from "~/generated/state.json";
+
+const searchQuery = ref("leave");
 const sortType = ref("relevance");
 
 const auth = await useAuth();
 const tags = useTags();
 
-const [
-  { data: rows },
-  { data: searchProjects, refresh: updateSearchProjects },
-  { data: notifications },
-] = await Promise.all([
-  useAsyncData("projects", () => useBaseFetch("projects_random?count=40"), {
-    transform: (result) => {
-      const val = Math.ceil(result.length / 3);
-      return [result.slice(0, val), result.slice(val, val * 2), result.slice(val * 2, val * 3)];
-    },
-  }),
-  useAsyncData(
-    "demoSearchProjects",
-    () => useBaseFetch(`search?limit=3&query=${searchQuery.value}&index=${sortType.value}`),
-    {
-      transform: (result) => result.hits,
-    },
-  ),
-  useAsyncData("updatedProjects", () => useBaseFetch(`search?limit=3&query=&index=updated`), {
-    transform: (result) => result.hits,
-  }),
+const newProjects = homePageProjects.slice(0, 40);
+const val = Math.ceil(newProjects.length / 3);
+const rows = ref([
+  newProjects.slice(0, val),
+  newProjects.slice(val, val * 2),
+  newProjects.slice(val * 2, val * 3),
 ]);
+
+const notifications = ref(homePageNotifs.hits ?? []);
+const searchProjects = ref(homePageSearch.hits ?? []);
+
+async function updateSearchProjects() {
+  const res = await useBaseFetch(
+    `search?limit=3&query=${searchQuery.value}&index=${sortType.value}`,
+  );
+
+  searchProjects.value = res.hits ?? [];
+}
 </script>
 
 <style lang="scss" scoped>

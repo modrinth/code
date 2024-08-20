@@ -195,12 +195,12 @@ const filterLoader = ref([])
 const filterGameVersions = ref([])
 
 if (props.instance) {
-  let loader = props.instance.metadata?.loader
+  let loader = props.instance?.loader
   if (possibleLoaders.value.includes(loader)) {
     filterLoader.value.push(loader)
   }
 
-  let gameVersion = props.instance.metadata?.game_version
+  let gameVersion = props.instance?.game_version
   if (possibleGameVersions.value.includes(gameVersion)) {
     filterGameVersions.value.push(gameVersion)
   }

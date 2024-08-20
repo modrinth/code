@@ -69,44 +69,15 @@ input {
   }
 }
 
-.mac {
-  .nav-container {
-    padding-top: calc(var(--gap-md) + 1.75rem);
-  }
-
-  .account-card,
-  .card-section {
-    top: calc(var(--gap-md) + 1.75rem);
-  }
-}
-
-.windows {
-  .fake-appbar {
-    height: 2.5rem !important;
-  }
-
-  .window-controls {
-    display: flex !important;
-  }
-
-  .info-card {
-    right: 8rem;
-  }
-
-  .profile-card {
-    right: 8rem;
-  }
-}
-
 * {
   scrollbar-width: auto;
-  scrollbar-color: var(--color-button-bg) var(--color-bg);
+  scrollbar-color: var(--color-scrollbar) var(--color-bg);
 }
 
 /* Chrome, Edge, and Safari */
 *::-webkit-scrollbar {
   width: var(--gap-md);
-  border: 3px solid var(--color-bg);
+  border: 3px solid var(--color-scrollbar);
 }
 
 *::-webkit-scrollbar-track {
@@ -115,7 +86,7 @@ input {
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--color-button-bg);
+  background-color: var(--color-scrollbar);
   border-radius: var(--radius-lg);
   border: 3px solid var(--color-bg);
 }
@@ -135,3 +106,5 @@ img {
   -moz-user-select: none;
   -ms-user-select: none;
 }
+
+@import '@modrinth/assets/omorphia.scss';
