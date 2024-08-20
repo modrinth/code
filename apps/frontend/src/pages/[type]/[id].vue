@@ -404,7 +404,7 @@
     >
       <div class="normal-page__header relative my-4">
         <div
-          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 xl:grid-cols-[1fr_auto]"
+          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
         >
           <div class="flex gap-4">
             <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
