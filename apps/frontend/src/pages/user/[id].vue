@@ -5,7 +5,7 @@
     <div class="new-page sidebar">
       <div class="normal-page__header pt-4">
         <div
-          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
+          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 xl:grid-cols-[1fr_auto]"
         >
           <div class="flex gap-4">
             <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
@@ -178,7 +178,10 @@
           <span v-if="auth.user && auth.user.id === user.id" class="preserve-lines text">
             <IntlFormatted :message-id="messages.profileNoCollectionsAuthLabel">
               <template #create-link="{ children }">
-                <a class="link" @click.prevent="$refs.modal_collection_creation.show()">
+                <a
+                  class="link"
+                  @click.prevent="(event) => $refs.modal_collection_creation.show(event)"
+                >
                   <component :is="() => children" />
                 </a>
               </template>

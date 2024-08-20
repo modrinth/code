@@ -404,7 +404,7 @@
     >
       <div class="normal-page__header relative my-4">
         <div
-          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
+          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 xl:grid-cols-[1fr_auto]"
         >
           <div class="flex gap-4">
             <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
@@ -424,7 +424,7 @@
               </p>
               <div class="mt-auto flex flex-wrap gap-4">
                 <div
-                  class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4"
+                  class="flex items-center gap-3 border-0 border-r border-solid border-button-bg pr-4"
                 >
                   <DownloadIcon class="h-6 w-6 text-secondary" />
                   <span class="font-semibold">
@@ -432,14 +432,14 @@
                   </span>
                 </div>
                 <div
-                  class="flex items-center gap-2 border-0 border-solid border-button-bg pr-4 md:border-r"
+                  class="flex items-center gap-3 border-0 border-solid border-button-bg pr-4 md:border-r"
                 >
                   <HeartIcon class="h-6 w-6 text-secondary" />
                   <span class="font-semibold">
                     {{ $formatNumber(project.followers) }}
                   </span>
                 </div>
-                <div class="hidden items-center gap-2 md:flex">
+                <div class="hidden items-center gap-3 md:flex">
                   <TagsIcon class="h-6 w-6 text-secondary" />
                   <div class="flex flex-wrap gap-2">
                     <div
@@ -524,7 +524,10 @@
                     <div v-else class="menu-text">
                       <p class="popout-text">No collections found.</p>
                     </div>
-                    <button class="btn collection-button" @click="$refs.modal_collection.show()">
+                    <button
+                      class="btn collection-button"
+                      @click="(event) => $refs.modal_collection.show(event)"
+                    >
                       <PlusIcon />
                       Create new collection
                     </button>
@@ -662,7 +665,6 @@ import {
   CopyrightIcon,
   DownloadIcon,
   ExternalIcon,
-  BoxIcon,
   EyeIcon,
   GameIcon,
   HeartIcon,

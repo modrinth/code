@@ -72,10 +72,10 @@
                   <VersionChannelIndicator :channel="version.version_type" />
                 </div>
               </div>
-              <div class="pointer-events-none relative z-[1] flex flex-col justify-center">
-                <div class="font-bold text-contrast group-hover:underline">
-                  {{ version.version_number }}
-                </div>
+              <div
+                class="pointer-events-none relative z-[1] flex flex-col justify-center group-hover:underline"
+              >
+                <div class="font-bold text-contrast">{{ version.version_number }}</div>
                 <div class="text-xs font-medium">{{ version.name }}</div>
               </div>
             </div>

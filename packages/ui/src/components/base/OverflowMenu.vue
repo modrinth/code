@@ -23,8 +23,8 @@
           transparent
           :action="
             option.action
-              ? () => {
-                  option.action()
+              ? (event) => {
+                  option.action(event)
                   if (!option.remainOnClick) {
                     close()
                   }
