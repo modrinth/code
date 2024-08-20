@@ -85,7 +85,7 @@
 import { ref, watch } from 'vue'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { loading_listener } from '@/helpers/events.js'
-import { getCurrentWindow } from '@tauri-apps/api/window';
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { XIcon } from '@modrinth/assets'
 import { MaximizeIcon, MinimizeIcon } from '@/assets/icons/index.js'
 import { TauriEvent } from '@tauri-apps/api/event'

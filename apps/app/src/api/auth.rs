@@ -19,7 +19,9 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 /// Authenticate a user with Hydra - part 1
 /// This begins the authentication flow quasi-synchronously, returning a URL to visit (that the user will sign in at)
 #[tauri::command]
-pub async fn login<R: Runtime>(app: tauri::AppHandle<R>) -> Result<Option<Credentials>> {
+pub async fn login<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<Option<Credentials>> {
     let flow = minecraft_auth::begin_login().await?;
 
     let start = Utc::now();

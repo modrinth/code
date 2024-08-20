@@ -5,7 +5,7 @@
 
 use native_dialog::{MessageDialog, MessageType};
 use tauri_plugin_window_state::{StateFlags, WindowExt};
-use tauri::{Emitter, EventTarget, Listener, Manager};
+use tauri::{Listener, Manager};
 use theseus::prelude::*;
 
 mod api;
@@ -73,12 +73,6 @@ async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
         )))
     })?;
     Ok(())
-}
-
-#[derive(Clone, serde::Serialize)]
-struct Payload {
-    args: Vec<String>,
-    cwd: String,
 }
 
 // if Tauri app is called with arguments, then those arguments will be treated as commands

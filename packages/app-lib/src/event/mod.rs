@@ -64,7 +64,8 @@ impl EventState {
     }
 
     #[cfg(feature = "tauri")]
-    pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>> {
+    pub async fn get_main_window() -> crate::Result<Option<tauri::WebviewWindow>>
+    {
         use tauri::Manager;
         let value = Self::get().await?;
         Ok(value.app.get_webview_window("main"))

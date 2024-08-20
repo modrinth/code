@@ -24,12 +24,13 @@ import {
   mixpanel_is_loaded,
 } from '@/helpers/mixpanel'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
-import { getCurrentWindow } from '@tauri-apps/api/window';
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
 import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
+import { useCheckDisableMouseover } from '@/composables/macCssFix.js'
 import ModInstallModal from '@/components/ui/install_flow/ModInstallModal.vue'
 import IncompatibilityWarningModal from '@/components/ui/install_flow/IncompatibilityWarningModal.vue'
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
@@ -55,6 +56,10 @@ const nativeDecorations = ref(false)
 const os = ref('')
 
 const stateInitialized = ref(false)
+
+onMounted(async () => {
+  await useCheckDisableMouseover()
+})
 
 async function setupApp() {
   stateInitialized.value = true
@@ -290,7 +295,11 @@ async function handleCommand(e) {
           <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().minimize()">
             <MinimizeIcon />
           </Button>
-          <Button class="titlebar-button" icon-only @click="() => getCurrentWindow().toggleMaximize()">
+          <Button
+            class="titlebar-button"
+            icon-only
+            @click="() => getCurrentWindow().toggleMaximize()"
+          >
             <MaximizeIcon />
           </Button>
           <Button class="titlebar-button close" icon-only @click="handleClose">

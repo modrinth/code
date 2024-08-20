@@ -3,13 +3,13 @@ use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
 };
-use futures::prelude::*;
-#[cfg(feature = "tauri")]
-use tauri::Emitter;
 #[cfg(feature = "tauri")]
 use crate::event::{
     LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
 };
+use futures::prelude::*;
+#[cfg(feature = "tauri")]
+use tauri::Emitter;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
