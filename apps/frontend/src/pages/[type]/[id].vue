@@ -501,7 +501,7 @@
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled size="large" circular>
-                <PopoutMenu v-if="auth.user" direction="right" position="bottom" from="top-right">
+                <PopoutMenu v-if="auth.user" from="top-right">
                   <BookmarkIcon aria-hidden="true" />
                   <template #menu>
                     <input

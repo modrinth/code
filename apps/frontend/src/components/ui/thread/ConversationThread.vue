@@ -154,8 +154,6 @@
                 </button>
                 <OverflowMenu
                   class="btn btn-danger btn-dropdown-animation icon-only"
-                  position="top"
-                  direction="left"
                   :options="
                     replyBody
                       ? [
