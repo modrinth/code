@@ -246,7 +246,7 @@
                   placeholder="Search game versions..."
                 />
               </div>
-              <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[20rem]' : ''">
+              <ScrollablePanel :class="project.game_versions.length > 4 ? 'h-[15rem]' : ''">
                 <ButtonStyled
                   v-for="version in project.game_versions
                     .filter(
@@ -329,7 +329,7 @@
                     : "Select platform"
                 }}
               </template>
-              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[20rem]' : ''">
+              <ScrollablePanel :class="project.loaders.length > 4 ? 'h-[15rem]' : ''">
                 <ButtonStyled
                   v-for="platform in project.loaders.slice().reverse()"
                   :key="platform"
