@@ -369,6 +369,7 @@ pub struct User {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
+    #[serde(default)]
     pub badges: u32,
 }
 
