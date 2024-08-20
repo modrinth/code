@@ -6,7 +6,6 @@ import {
   Checkbox,
   Button,
   DropdownSelect,
-  Promotion,
   NavRow,
   Card,
   SearchFilter,
@@ -23,6 +22,8 @@ import { get as getInstance, get_projects as getInstanceProjects } from '@/helpe
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
+import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
+
 const router = useRouter()
 const route = useRoute()
 
@@ -674,7 +675,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
       </Card>
     </aside>
     <div class="search">
-      <Promotion class="promotion" :external="false" query-param="?r=launcher" />
+      <PromotionWrapper />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
       </Card>

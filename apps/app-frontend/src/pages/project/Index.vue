@@ -163,7 +163,7 @@
       </Card>
     </div>
     <div v-if="data" class="content-container">
-      <Promotion :external="false" query-param="?r=launcher" />
+      <PromotionWrapper />
       <Card class="tabs">
         <NavRow
           v-if="data.gallery.length > 0"
@@ -261,6 +261,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { install as installVersion } from '@/store/install.js'
 import { get_project, get_project_many, get_team, get_version_many } from '@/helpers/cache.js'
+import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 
 dayjs.extend(relativeTime)
 

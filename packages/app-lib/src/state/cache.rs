@@ -369,6 +369,7 @@ pub struct User {
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
+    pub badges: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
