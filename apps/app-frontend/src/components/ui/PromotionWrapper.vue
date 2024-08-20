@@ -9,9 +9,7 @@ const showAd = ref(true)
 
 const creds = await getCreds().catch(handleError)
 if (creds && creds.user_id) {
-  console.log(creds)
   const user = await get_user(creds.user_id).catch(handleError)
-  console.log(user)
 
   const MIDAS_BITFLAG = 1 << 0
   if (user && (user.badges & MIDAS_BITFLAG) === MIDAS_BITFLAG) {
