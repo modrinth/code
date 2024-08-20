@@ -58,6 +58,7 @@
     />
   </div>
   <div class="normal-page__sidebar">
+    <AdPlaceholder />
     <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
   </div>
 </template>
@@ -67,6 +68,7 @@ import { DownloadIcon } from "@modrinth/assets";
 
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const props = defineProps({
   project: {

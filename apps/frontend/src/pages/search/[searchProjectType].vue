@@ -10,6 +10,7 @@
       }"
       aria-label="Filters"
     >
+      <AdPlaceholder />
       <section class="card flex-card" :class="{ 'sidebar-menu_open': sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
@@ -224,6 +225,7 @@ import GridIcon from "~/assets/images/utils/grid.svg?component";
 import ListIcon from "~/assets/images/utils/list.svg?component";
 import ImageIcon from "~/assets/images/utils/image.svg?component";
 import Accordion from "~/components/ui/Accordion.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const sidebarMenuOpen = ref(false);
 const showAllLoaders = ref(false);

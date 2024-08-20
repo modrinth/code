@@ -68,22 +68,13 @@
           <div class="flex flex-col justify-center gap-2 sm:contents">
             <div class="flex flex-row items-center gap-2 sm:contents">
               <div class="self-center">
-                <div class="pointer-events-none relative z-[1] group-hover:hidden">
+                <div class="pointer-events-none relative z-[1]">
                   <VersionChannelIndicator :channel="version.version_type" />
                 </div>
-                <div class="relative z-[1] hidden group-hover:!flex">
-                  <ButtonStyled circular color="brand">
-                    <a
-                      v-tooltip="`Download`"
-                      :href="getPrimaryFile(version).url"
-                      @click="emits('onDownload')"
-                    >
-                      <DownloadIcon />
-                    </a>
-                  </ButtonStyled>
-                </div>
               </div>
-              <div class="pointer-events-none relative z-[1] flex flex-col justify-center">
+              <div
+                class="pointer-events-none relative z-[1] flex flex-col justify-center group-hover:underline"
+              >
                 <div class="font-bold text-contrast">{{ version.version_number }}</div>
                 <div class="text-xs font-medium">{{ version.name }}</div>
               </div>
@@ -95,7 +86,7 @@
                     <div
                       v-for="gameVersion in formatVersionsForDisplay(version.game_versions)"
                       :key="`version-tag-${gameVersion}`"
-                      v-tooltip="`Add filter for ${gameVersion}`"
+                      v-tooltip="`Toggle filter for ${gameVersion}`"
                       class="tag-list__item z-[1] cursor-pointer hover:underline"
                       @click="versionFilters.toggleFilters('gameVersion', version.game_versions)"
                     >
@@ -108,7 +99,7 @@
                     <div
                       v-for="platform in version.loaders"
                       :key="`platform-tag-${platform}`"
-                      v-tooltip="`Add filter for ${platform}`"
+                      v-tooltip="`Toggle filter for ${platform}`"
                       :class="`tag-list__item z-[1] cursor-pointer hover:underline`"
                       :style="`--_color: var(--color-platform-${platform})`"
                       @click="versionFilters.toggleFilter('platform', platform)"
@@ -138,7 +129,17 @@
             </div>
           </div>
           <div class="flex items-start justify-end gap-1 sm:items-center">
-            <ButtonStyled v-if="false" circular type="transparent">
+            <ButtonStyled circular type="transparent">
+              <a
+                v-tooltip="`Download`"
+                :href="getPrimaryFile(version).url"
+                class="z-[1] group-hover:!bg-brand group-hover:!text-brand-inverted"
+                @click="emits('onDownload')"
+              >
+                <DownloadIcon />
+              </a>
+            </ButtonStyled>
+            <ButtonStyled circular type="transparent">
               <OverflowMenu
                 class="group-hover:!bg-button-bg"
                 :options="[
@@ -146,36 +147,53 @@
                     id: 'download',
                     color: 'primary',
                     hoverFilled: true,
-                    action: () => {},
+                    link: getPrimaryFile(version).url,
+                    action: () => {
+                      emits('onDownload');
+                    },
                   },
                   {
                     id: 'new-tab',
                     action: () => {},
+                    link: `/${project.project_type}/${
+                      project.slug ? project.slug : project.id
+                    }/version/${encodeURI(version.displayUrlEnding)}`,
+                    external: true,
                   },
                   {
                     id: 'copy-link',
-                    action: () => {},
+                    action: () =>
+                      copyToClipboard(
+                        `https://modrinth.com/${project.project_type}/${
+                          project.slug ? project.slug : project.id
+                        }/version/${encodeURI(version.displayUrlEnding)}`,
+                      ),
                   },
                   {
                     id: 'share',
                     action: () => {},
+                    shown: false,
                   },
                   {
                     id: 'report',
                     color: 'red',
                     hoverFilled: true,
-                    action: () => {},
+                    action: () => reportVersion(version.id),
                   },
-                  { divider: true },
+                  { divider: true, shown: currentMember },
                   {
                     id: 'edit',
-                    action: () => {},
+                    link: `/${project.project_type}/${
+                      project.slug ? project.slug : project.id
+                    }/version/${encodeURI(version.displayUrlEnding)}/edit`,
+                    shown: currentMember,
                   },
                   {
                     id: 'delete',
                     color: 'red',
                     hoverFilled: true,
                     action: () => {},
+                    shown: currentMember && false,
                   },
                 ]"
               >
@@ -234,6 +252,7 @@
     </div>
   </section>
   <div class="normal-page__sidebar">
+    <AdPlaceholder />
     <VersionFilterControl
       ref="versionFilters"
       :versions="props.versions"
@@ -243,6 +262,14 @@
 </template>
 
 <script setup>
+import {
+  ShareModal,
+  ButtonStyled,
+  OverflowMenu,
+  Pagination,
+  VersionChannelIndicator,
+  FileInput,
+} from "@modrinth/ui";
 import {
   StarIcon,
   CalendarIcon,
@@ -258,17 +285,11 @@ import {
   InfoIcon,
 } from "@modrinth/assets";
 import { formatBytes, formatCategory } from "@modrinth/utils";
-import {
-  ButtonStyled,
-  OverflowMenu,
-  Pagination,
-  VersionChannelIndicator,
-  FileInput,
-} from "@modrinth/ui";
 import { formatVersionsForDisplay } from "~/helpers/projects.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const formatCompactNumber = useCompactNumber();
 
@@ -351,6 +372,10 @@ async function handleFiles(files) {
       newPrimaryFile: files[0],
     },
   });
+}
+
+async function copyToClipboard(text) {
+  await navigator.clipboard.writeText(text);
 }
 </script>
 <style scoped>

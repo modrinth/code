@@ -541,20 +541,36 @@
                   <SettingsIcon />
                 </nuxt-link>
               </ButtonStyled>
-              <ButtonStyled
-                v-if="
-                  auth.user && tags.staffRoles.includes(auth.user.role) && !showModerationChecklist
-                "
-                size="large"
-                circular
-              >
-                <button class="!hidden sm:!flex" @click="showModerationChecklist = true">
-                  <EyeIcon />
-                </button>
-              </ButtonStyled>
               <ButtonStyled size="large" circular type="transparent">
                 <OverflowMenu
                   :options="[
+                    {
+                      id: 'analytics',
+                      link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
+                      hoverOnly: true,
+                      shown: auth.user && !!currentMember,
+                    },
+                    {
+                      divider: true,
+                      shown: auth.user && !!currentMember,
+                    },
+                    {
+                      id: 'moderation-checklist',
+                      action: () => (showModerationChecklist = true),
+                      color: 'orange',
+                      hoverOnly: true,
+                      shown:
+                        auth.user &&
+                        tags.staffRoles.includes(auth.user.role) &&
+                        !showModerationChecklist,
+                    },
+                    {
+                      divider: true,
+                      shown:
+                        auth.user &&
+                        tags.staffRoles.includes(auth.user.role) &&
+                        !showModerationChecklist,
+                    },
                     {
                       id: 'report',
                       action: () =>
@@ -566,6 +582,14 @@
                   ]"
                 >
                   <MoreVerticalIcon />
+                  <template #analytics>
+                    <ChartIcon />
+                    Analytics
+                  </template>
+                  <template #moderation-checklist>
+                    <ScaleIcon />
+                    Review project
+                  </template>
                   <template #report>
                     <ReportIcon />
                     Report
@@ -629,6 +653,7 @@
 </template>
 <script setup>
 import {
+  ScaleIcon,
   AlignLeftIcon as DescriptionIcon,
   BookmarkIcon,
   ChartIcon,

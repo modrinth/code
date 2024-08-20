@@ -80,14 +80,14 @@
       "sidebar content" auto
       "info content" auto
       "dummy content" 1fr
-      / 20rem 1fr;
+      / 18.75rem 1fr;
 
     &.alt-layout {
       grid-template:
         "content sidebar" auto
         "content info" auto
         "content dummy" 1fr
-        / 1fr 20rem;
+        / 1fr 18.75rem;
     }
 
     &.no-sidebar {
@@ -106,12 +106,12 @@
   }
 
   .normal-page__sidebar {
-    min-width: 20rem;
-    width: 20rem;
+    min-width: 18.75rem;
+    width: 18.75rem;
   }
 
   .normal-page__content {
-    max-width: calc(60rem - 0.75rem);
+    max-width: calc(80rem - 18.75rem - 0.75rem);
     //overflow-x: hidden;
   }
 }
@@ -135,12 +135,12 @@
         "header header" auto
         "content sidebar" auto
         "content dummy" 1fr
-        / 1fr 20rem;
+        / 1fr 18.75rem;
     }
 
     .normal-page__sidebar {
-      min-width: 20rem;
-      width: 20rem;
+      min-width: 18.75rem;
+      width: 18.75rem;
     }
   }
 
@@ -150,7 +150,7 @@
 
   .normal-page__content {
     grid-area: content;
-    max-width: calc(60rem - 0.75rem);
+    max-width: calc(80rem - 18.75rem - 0.75rem);
     //overflow-x: hidden;
   }
 }

@@ -21,6 +21,7 @@
     />
   </section>
   <div class="normal-page__sidebar">
+    <AdPlaceholder />
     <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
       <h2>{{ formatMessage(compatibilityMessages.title) }}</h2>
       <section>
@@ -346,6 +347,7 @@ import { NewModal, Avatar } from "@modrinth/ui";
 import { formatCategory, renderString } from "@modrinth/utils";
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import { getVersionsToDisplay } from "~/helpers/projects.js";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const props = defineProps({
   project: {

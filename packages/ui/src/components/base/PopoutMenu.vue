@@ -105,12 +105,14 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
   window.addEventListener('resize', updateDirection)
+  window.addEventListener('scroll', updateDirection)
   updateDirection()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
   window.removeEventListener('resize', updateDirection)
+  window.removeEventListener('scroll', updateDirection)
 })
 </script>
 

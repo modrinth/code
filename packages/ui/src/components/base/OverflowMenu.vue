@@ -8,7 +8,7 @@
   >
     <slot></slot>
     <template #menu>
-      <template v-for="(option, index) in options">
+      <template v-for="(option, index) in options.filter((x) => x.shown ?? true)">
         <div
           v-if="option.divider"
           :key="`divider-${index}`"
@@ -49,29 +49,47 @@
   </PopoutMenu>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
-defineProps({
-  options: {
-    type: Array,
-    required: true,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  position: {
-    type: String,
-    default: 'auto',
-  },
-  direction: {
-    type: String,
-    default: 'auto',
-  },
-})
+interface BaseOption {
+  shown?: boolean;
+}
+
+interface Divider extends BaseOption {
+  divider?: boolean;
+}
+
+interface Item extends BaseOption {
+  id: string;
+  action?: () => void;
+  link?: string;
+  external?: boolean;
+  color?: 'primary' | 'danger' | 'secondary' | 'highlight' | 'red' | 'orange' | 'green' | 'blue' | 'purple';
+  hoverFilled?: boolean;
+  hoverFilledOnly?: boolean;
+  remainOnClick?: boolean;
+}
+
+type Option = Divider | Item;
+
+const props = withDefaults(
+  defineProps<
+    {
+      options: Option[],
+      disabled?: boolean,
+      position?: string,
+      direction?: string,
+    }
+  >(), {
+    options: () => [],
+    disabled: false,
+    position: 'auto',
+    direction: 'auto',
+});
+
 defineOptions({
   inheritAttrs: false,
 })

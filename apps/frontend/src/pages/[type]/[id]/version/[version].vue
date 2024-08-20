@@ -467,6 +467,7 @@
     </div>
   </div>
   <div class="normal-page__sidebar version-page__metadata">
+    <AdPlaceholder />
     <div class="universal-card full-width-inputs">
       <h3>Metadata</h3>
       <div>
@@ -658,6 +659,7 @@ import RightArrowIcon from "~/assets/images/utils/right-arrow.svg?component";
 import Modal from "~/components/ui/Modal.vue";
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 export default defineNuxtComponent({
   components: {
     MarkdownEditor,
@@ -689,6 +691,7 @@ export default defineNuxtComponent({
     RightArrowIcon,
     ConfirmModal,
     ButtonStyled,
+    AdPlaceholder,
   },
   props: {
     project: {
