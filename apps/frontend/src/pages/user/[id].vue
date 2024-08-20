@@ -188,6 +188,7 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
+        <AdPlaceholder />
         <div class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileDetails) }}</h2>
           <div class="flex items-center gap-2">
@@ -320,6 +321,7 @@ import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
