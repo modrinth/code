@@ -47,7 +47,6 @@
                       { id: 'copy-id', action: () => copyId() },
                     ].slice(auth.user && auth.user.id === user.id ? 0 : 1, 3)
                   "
-                  direction="right"
                 >
                   <MoreVerticalIcon />
                   <template #edit>
