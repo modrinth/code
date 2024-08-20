@@ -1253,13 +1253,13 @@ function hideStagingBanner() {
   }
 }
 
-@media (any-hover: none) and (max-width: 600px) {
+@media (any-hover: none) and (max-width: 640px) {
   .desktop-only {
     display: none;
   }
 }
 
-@media (any-hover: none) and (max-width: 600px) {
+@media (any-hover: none) and (max-width: 640px) {
   .mobile-navigation {
     display: flex;
   }
