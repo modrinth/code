@@ -2,6 +2,7 @@
 use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
 use std::{path::PathBuf, sync::Arc};
+#[cfg(feature = "tauri")]
 use tauri::Emitter;
 use tokio::sync::OnceCell;
 use uuid::Uuid;

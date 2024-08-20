@@ -4,6 +4,7 @@ use crate::event::{
     ProfilePayloadType,
 };
 use futures::prelude::*;
+#[cfg(feature = "tauri")]
 use tauri::Emitter;
 #[cfg(feature = "tauri")]
 use crate::event::{

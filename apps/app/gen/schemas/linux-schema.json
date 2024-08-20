@@ -300,44 +300,10 @@
     "Identifier": {
       "oneOf": [
         {
+          "description": "auth:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "auth:default"
-          ]
-        },
-        {
-          "description": "auth:allow-auth-get-default-user -> Enables the auth_get_default_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:allow-auth-get-default-user"
-          ]
-        },
-        {
-          "description": "auth:allow-auth-get-user -> Enables the auth_get_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:allow-auth-get-user"
-          ]
-        },
-        {
-          "description": "auth:allow-auth-remove-user -> Enables the auth_remove_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:allow-auth-remove-user"
-          ]
-        },
-        {
-          "description": "auth:allow-auth-set-default-user -> Enables the auth_set_default_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:allow-auth-set-default-user"
-          ]
-        },
-        {
-          "description": "auth:allow-auth-users -> Enables the auth_users command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:allow-auth-users"
           ]
         },
         {
@@ -376,41 +342,6 @@
           ]
         },
         {
-          "description": "auth:deny-auth-get-default-user -> Denies the auth_get_default_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:deny-auth-get-default-user"
-          ]
-        },
-        {
-          "description": "auth:deny-auth-get-user -> Denies the auth_get_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:deny-auth-get-user"
-          ]
-        },
-        {
-          "description": "auth:deny-auth-remove-user -> Denies the auth_remove_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:deny-auth-remove-user"
-          ]
-        },
-        {
-          "description": "auth:deny-auth-set-default-user -> Denies the auth_set_default_user command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:deny-auth-set-default-user"
-          ]
-        },
-        {
-          "description": "auth:deny-auth-users -> Denies the auth_users command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "auth:deny-auth-users"
-          ]
-        },
-        {
           "description": "auth:deny-get-default-user -> Denies the get_default_user command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -446,6 +377,7 @@
           ]
         },
         {
+          "description": "cache:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "cache:default"
@@ -2741,6 +2673,7 @@
           ]
         },
         {
+          "description": "import:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "import:default"
@@ -2761,38 +2694,10 @@
           ]
         },
         {
-          "description": "import:allow-import-get-default-launcher-path -> Enables the import_get_default_launcher_path command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:allow-import-get-default-launcher-path"
-          ]
-        },
-        {
-          "description": "import:allow-import-get-importable-instances -> Enables the import_get_importable_instances command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:allow-import-get-importable-instances"
-          ]
-        },
-        {
-          "description": "import:allow-import-import-instance -> Enables the import_import_instance command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:allow-import-import-instance"
-          ]
-        },
-        {
           "description": "import:allow-import-instance -> Enables the import_instance command without any pre-configured scope.",
           "type": "string",
           "enum": [
             "import:allow-import-instance"
-          ]
-        },
-        {
-          "description": "import:allow-import-is-valid-importable-instance -> Enables the import_is_valid_importable_instance command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:allow-import-is-valid-importable-instance"
           ]
         },
         {
@@ -2817,38 +2722,10 @@
           ]
         },
         {
-          "description": "import:deny-import-get-default-launcher-path -> Denies the import_get_default_launcher_path command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:deny-import-get-default-launcher-path"
-          ]
-        },
-        {
-          "description": "import:deny-import-get-importable-instances -> Denies the import_get_importable_instances command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:deny-import-get-importable-instances"
-          ]
-        },
-        {
-          "description": "import:deny-import-import-instance -> Denies the import_import_instance command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:deny-import-import-instance"
-          ]
-        },
-        {
           "description": "import:deny-import-instance -> Denies the import_instance command without any pre-configured scope.",
           "type": "string",
           "enum": [
             "import:deny-import-instance"
-          ]
-        },
-        {
-          "description": "import:deny-import-is-valid-importable-instance -> Denies the import_is_valid_importable_instance command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "import:deny-import-is-valid-importable-instance"
           ]
         },
         {
@@ -2859,9 +2736,17 @@
           ]
         },
         {
+          "description": "jre:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "jre:default"
+          ]
+        },
+        {
+          "description": "jre:allow-get-java-versions -> Enables the get_java_versions command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "jre:allow-get-java-versions"
           ]
         },
         {
@@ -2900,6 +2785,13 @@
           ]
         },
         {
+          "description": "jre:deny-get-java-versions -> Denies the get_java_versions command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "jre:deny-get-java-versions"
+          ]
+        },
+        {
           "description": "jre:deny-jre-auto-install-java -> Denies the jre_auto_install_java command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -2935,6 +2827,7 @@
           ]
         },
         {
+          "description": "logs:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "logs:default"
@@ -3025,6 +2918,7 @@
           ]
         },
         {
+          "description": "metadata:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "metadata:default"
@@ -3059,6 +2953,7 @@
           ]
         },
         {
+          "description": "mr-auth:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "mr-auth:default"
@@ -3310,6 +3205,7 @@
           ]
         },
         {
+          "description": "pack:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "pack:default"
@@ -3344,6 +3240,7 @@
           ]
         },
         {
+          "description": "process:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "process:default"
@@ -3406,6 +3303,7 @@
           ]
         },
         {
+          "description": "profile:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "profile:default"
@@ -3510,6 +3408,13 @@
           ]
         },
         {
+          "description": "profile:allow-profile-kill -> Enables the profile_kill command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "profile:allow-profile-kill"
+          ]
+        },
+        {
           "description": "profile:allow-profile-list -> Enables the profile_list command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3549,20 +3454,6 @@
           "type": "string",
           "enum": [
             "profile:allow-profile-run-credentials"
-          ]
-        },
-        {
-          "description": "profile:allow-profile-run-wait -> Enables the profile_run_wait command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "profile:allow-profile-run-wait"
-          ]
-        },
-        {
-          "description": "profile:allow-profile-run-wait-credentials -> Enables the profile_run_wait_credentials command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "profile:allow-profile-run-wait-credentials"
           ]
         },
         {
@@ -3692,6 +3583,13 @@
           ]
         },
         {
+          "description": "profile:deny-profile-kill -> Denies the profile_kill command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "profile:deny-profile-kill"
+          ]
+        },
+        {
           "description": "profile:deny-profile-list -> Denies the profile_list command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3734,20 +3632,6 @@
           ]
         },
         {
-          "description": "profile:deny-profile-run-wait -> Denies the profile_run_wait command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "profile:deny-profile-run-wait"
-          ]
-        },
-        {
-          "description": "profile:deny-profile-run-wait-credentials -> Denies the profile_run_wait_credentials command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "profile:deny-profile-run-wait-credentials"
-          ]
-        },
-        {
           "description": "profile:deny-profile-toggle-disable-project -> Denies the profile_toggle_disable_project command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3776,6 +3660,7 @@
           ]
         },
         {
+          "description": "profile-create:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "profile-create:default"
@@ -3810,6 +3695,7 @@
           ]
         },
         {
+          "description": "settings:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "settings:default"
@@ -3949,6 +3835,7 @@
           ]
         },
         {
+          "description": "tags:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "tags:default"
@@ -4039,6 +3926,7 @@
           ]
         },
         {
+          "description": "utils:default -> Default plugin permissions.",
           "type": "string",
           "enum": [
             "utils:default"

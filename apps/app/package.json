@@ -8,7 +8,7 @@
     "fix": "cargo fmt && cargo clippy --fix"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.0.0-rc.4"
+    "@tauri-apps/cli": "2.0.0-rc.5"
   },
   "dependencies": {
     "@modrinth/app-frontend": "workspace:*",
