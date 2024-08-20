@@ -598,7 +598,7 @@
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
-        <NavTabs :links="navLinks" class="mt-2 !hidden sm:!flex" />
+        <NavTabs :links="navLinks" class="mt-4 !hidden sm:!flex" />
         <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
           <NavRow :links="navLinks" />
         </nav>

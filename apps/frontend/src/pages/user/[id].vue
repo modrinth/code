@@ -4,74 +4,71 @@
     <CollectionCreateModal ref="modal_collection_creation" />
     <div class="new-page sidebar">
       <div class="normal-page__header pt-4">
-        <div class="mb-4 flex gap-4" :class="{ 'items-center': !user.bio }">
-          <Avatar
-            :src="user.avatar_url"
-            size="6rem"
-            circle
-            :alt="user.username"
-            class="sm:!h-32 sm:!min-h-32 sm:!w-32 sm:!min-w-32"
-          />
-          <div class="flex flex-col gap-2">
-            <div class="flex flex-wrap items-center gap-2">
-              <h1 class="m-0 text-2xl text-contrast sm:text-4xl">
-                {{ user.username }}
-              </h1>
-
-              <Badge v-if="tags.staffRoles.includes(user.role)" :type="user.role" />
-              <Badge v-else-if="isPermission(user.badges, 1 << 0)" type="plus" />
-              <Badge v-else-if="projects.length > 0" type="creator" />
+        <div
+          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 xl:grid-cols-[1fr_auto]"
+        >
+          <div class="flex gap-4">
+            <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
+            <div class="flex flex-col gap-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
+                  {{ user.username }}
+                </h1>
+              </div>
+              <p class="m-0 line-clamp-2 max-w-[40rem]">
+                {{ user.bio }}
+              </p>
             </div>
-
-            <span v-if="user.bio"> {{ user.bio }}</span>
+          </div>
+          <div class="flex flex-col justify-center gap-4">
+            <div class="flex flex-wrap gap-2">
+              <ButtonStyled size="large">
+                <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/dashboard/projects">
+                  <SettingsIcon />
+                  {{ formatMessage(messages.profileManageProjectsButton) }}
+                </NuxtLink>
+              </ButtonStyled>
+              <ButtonStyled size="large" circular type="transparent">
+                <OverflowMenu
+                  :options="
+                    [
+                      {
+                        id: 'edit',
+                        action: () => navigateTo('/settings/profile'),
+                        color: 'red',
+                        hoverOnly: true,
+                      },
+                      {
+                        id: 'report',
+                        action: () => reportUser(user.id),
+                        color: 'red',
+                        hoverOnly: true,
+                      },
+                      { id: 'copy-id', action: () => copyId() },
+                    ].slice(auth.user && auth.user.id === user.id ? 0 : 1, 3)
+                  "
+                  direction="right"
+                >
+                  <MoreVerticalIcon />
+                  <template #edit>
+                    <EditIcon />
+                    {{ formatMessage(commonMessages.editButton) }}
+                  </template>
+                  <template #report>
+                    <ReportIcon />
+                    {{ formatMessage(commonMessages.reportButton) }}
+                  </template>
+                  <template #copy-id>
+                    <ClipboardCopyIcon />
+                    {{ formatMessage(commonMessages.copyIdButton) }}
+                  </template>
+                </OverflowMenu>
+              </ButtonStyled>
+            </div>
           </div>
         </div>
-        <div class="mb-4 flex items-center gap-2">
-          <NuxtLink
-            v-if="auth.user && auth.user.id === user.id"
-            class="btn btn-large"
-            to="/dashboard/projects"
-          >
-            <SettingsIcon />
-            {{ formatMessage(messages.profileManageProjectsButton) }}
-          </NuxtLink>
-          <button v-else v-tooltip="'Coming soon!'" class="btn btn-large" disabled>
-            <HeartIcon />
-            Follow
-          </button>
-          <OverflowMenu
-            class="btn btn-large transparent !rounded-full !p-3"
-            :options="
-              [
-                { id: 'edit', action: () => navigateTo('/settings/profile') },
-                {
-                  id: 'report',
-                  action: () => (auth.user ? reportUser(user.id) : navigateTo('/auth/sign-in')),
-                  color: 'red',
-                  hoverOnly: true,
-                },
-                { id: 'copy-id', action: () => copyId() },
-              ].slice(auth.user && auth.user.id === user.id ? 0 : 1, 3)
-            "
-            direction="right"
-          >
-            <MoreVerticalIcon />
-            <template #edit>
-              <EditIcon />
-              {{ formatMessage(commonMessages.editButton) }}
-            </template>
-            <template #report>
-              <ReportIcon />
-              {{ formatMessage(commonMessages.reportButton) }}
-            </template>
-            <template #copy-id>
-              <ClipboardCopyIcon />
-              {{ formatMessage(commonMessages.copyIdButton) }}
-            </template>
-          </OverflowMenu>
-        </div>
-        <div class="mb-4 flex items-center justify-between">
-          <NavTabs :links="navLinks" class="mt-2 !hidden sm:!flex" />
+        <div class="my-4 flex items-center justify-between">
+          <NavTabs :links="navLinks" class="!hidden sm:!flex" />
           <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
             <NavRow :links="navLinks" />
           </nav>
@@ -299,12 +296,16 @@ import {
   SettingsIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
+  BookmarkIcon,
+  TagsIcon,
+  PlusIcon,
+  EyeIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, Badge } from "@modrinth/ui";
+import { OverflowMenu, Badge, Checkbox, ButtonStyled, PopoutMenu } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { reportUser } from "~/utils/report-helpers.ts";
+import { reportProject, reportUser } from "~/utils/report-helpers.ts";
 
 import StaffBadge from "~/assets/images/badges/staff.svg?component";
 import ModBadge from "~/assets/images/badges/mod.svg?component";
@@ -644,5 +645,9 @@ export default defineNuxtComponent({
       }
     }
   }
+}
+
+.normal-page__header {
+  grid-area: header;
 }
 </style>
