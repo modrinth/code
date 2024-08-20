@@ -64,7 +64,6 @@
       >
         <ButtonStyled type="transparent">
           <OverflowMenu
-            v-if="auth.user"
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             :options="[
               {
@@ -192,6 +191,12 @@
           <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
           <template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
         </OverflowMenu>
+        <ButtonStyled v-else color="brand">
+          <nuxt-link to="/auth/sign-in">
+            <LogInIcon aria-hidden="true" />
+            Sign in
+          </nuxt-link>
+        </ButtonStyled>
       </div>
     </header>
     <header class="mobile-navigation mobile-only">
