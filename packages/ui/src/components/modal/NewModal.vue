@@ -18,13 +18,17 @@
       class="modal-overlay"
       @click="() => (closable ? hide() : {})"
     />
-    <div class="modal-container" :class="{ shown: visible }">
-      <div class="modal-body flex flex-col bg-bg-raised rounded-2xl p-6">
+    <div class="modal-container experimental-styles-within" :class="{ shown: visible }">
+      <div class="modal-body flex flex-col bg-bg-raised rounded-2xl">
         <div
-          class="grid grid-cols-[auto_min-content] items-center gap-12 pb-6 border-b-[1px] border-button-bg max-w-full"
+          class="grid grid-cols-[auto_min-content] items-center gap-12 p-6 border-solid border-0 border-b-[1px] border-button-bg max-w-full"
         >
           <div class="flex text-wrap break-words items-center gap-3 min-w-0">
-            <slot name="title" />
+            <slot name="title">
+              <span v-if="header" class="text-lg font-extrabold text-contrast">
+                {{ header }}
+              </span>
+            </slot>
           </div>
           <ButtonStyled v-if="closable" circular>
             <button @click="hide">
@@ -32,7 +36,7 @@
             </button>
           </ButtonStyled>
         </div>
-        <div class="overflow-y-auto">
+        <div class="overflow-y-auto p-6">
           <slot> You just lost the game.</slot>
         </div>
       </div>
@@ -53,6 +57,7 @@ const props = withDefaults(
     danger?: boolean
     closeOnEsc?: boolean
     warnOnClose?: boolean
+    header?: string
   }>(),
   {
     type: true,
@@ -138,8 +143,8 @@ function handleKeyDown(event: KeyboardEvent) {
   transform: translate(
       calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
       calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
-    )
-    scaleX(0.8) scaleY(0.5);
+  )
+  scaleX(0.8) scaleY(0.5);
   border-radius: 180px;
   filter: blur(5px);
 
@@ -178,8 +183,8 @@ function handleKeyDown(event: KeyboardEvent) {
   visibility: hidden;
   pointer-events: none;
   transform: translate(
-    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 16),
-    calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 16)
+      calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 16),
+      calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 16)
   );
   transition: all 0.2s ease-out;
 

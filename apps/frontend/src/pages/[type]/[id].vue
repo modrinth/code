@@ -46,7 +46,7 @@
             }/settings/tags`"
             label="Tags"
           >
-            <CategoriesIcon />
+            <TagsIcon />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${
@@ -403,74 +403,85 @@
       :class="{ sidebar: !route.name.endsWith('gallery') && !route.name.endsWith('moderation') }"
     >
       <div class="normal-page__header relative my-4">
-        <div class="mb-4 flex flex-wrap place-content-between gap-8 lg:flex-nowrap">
-          <div class="flex flex-col gap-4">
-            <div class="flex flex-wrap gap-4 sm:flex-nowrap">
-              <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
-              <div class="flex flex-col gap-1">
-                <div class="flex flex-wrap items-center gap-2">
-                  <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
-                    {{ project.title }}
-                  </h1>
-                  <Badge
-                    v-if="auth.user && currentMember"
-                    :type="project.status"
-                    class="status-badge"
-                  />
+        <div
+          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 xl:grid-cols-[1fr_auto]"
+        >
+          <div class="flex gap-4">
+            <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
+            <div class="flex flex-col gap-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
+                  {{ project.title }}
+                </h1>
+                <Badge
+                  v-if="auth.user && currentMember"
+                  :type="project.status"
+                  class="status-badge"
+                />
+              </div>
+              <p class="m-0 line-clamp-2 max-w-[40rem]">
+                {{ project.description }}
+              </p>
+              <div class="mt-auto flex flex-wrap gap-4">
+                <div
+                  class="flex items-center gap-3 border-0 border-r border-solid border-button-bg pr-4"
+                >
+                  <DownloadIcon class="h-6 w-6 text-secondary" />
+                  <span class="font-semibold">
+                    {{ $formatNumber(project.downloads) }}
+                  </span>
                 </div>
-                <p class="font-semibold">
-                  {{ project.description }}
-                </p>
-                <div class="tag-list mt-auto">
-                  <div
-                    v-for="(category, index) in project.categories"
-                    :key="index"
-                    class="tag-list__item"
-                  >
-                    {{ formatCategory(category) }}
+                <div
+                  class="flex items-center gap-3 border-0 border-solid border-button-bg pr-4 md:border-r"
+                >
+                  <HeartIcon class="h-6 w-6 text-secondary" />
+                  <span class="font-semibold">
+                    {{ $formatNumber(project.followers) }}
+                  </span>
+                </div>
+                <div class="hidden items-center gap-3 md:flex">
+                  <TagsIcon class="h-6 w-6 text-secondary" />
+                  <div class="flex flex-wrap gap-2">
+                    <div
+                      v-for="(category, index) in project.categories"
+                      :key="index"
+                      class="tag-list__item"
+                    >
+                      {{ formatCategory(category) }}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="divide-y-1 flex flex-wrap gap-4">
-              <StatItem
-                :label="formatMessage(messages.downloadsStat, { count: project.downloads })"
-                :value="$formatNumber(project.downloads)"
-              >
-                <DownloadIcon />
-              </StatItem>
-              <div class="border-base border-[1px] border-button-bg" />
-              <StatItem
-                :label="formatMessage(messages.followersStat, { count: project.followers })"
-                :value="$formatNumber(project.followers)"
-              >
-                <HeartIcon />
-              </StatItem>
-            </div>
-            <div class="block sm:hidden">
-              <ButtonStyled
-                size="large"
-                :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
-                @click="(event) => downloadModal.show(event)"
-              >
-                <button>
-                  <DownloadIcon />
-                  Download
-                </button>
-              </ButtonStyled>
-            </div>
+          </div>
+          <div class="flex flex-col justify-center gap-4">
             <div class="flex flex-wrap gap-2">
-              <ButtonStyled
-                size="large"
-                :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
-                class="!hidden sm:!flex"
-                @click="(event) => downloadModal.show(event)"
-              >
-                <button>
-                  <DownloadIcon />
-                  Download
-                </button>
-              </ButtonStyled>
+              <div class="hidden sm:contents">
+                <ButtonStyled
+                  size="large"
+                  :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+                >
+                  <button @click="(event) => downloadModal.show(event)">
+                    <DownloadIcon aria-hidden="true" />
+                    Download
+                  </button>
+                </ButtonStyled>
+              </div>
+              <div class="contents sm:hidden">
+                <ButtonStyled
+                  size="large"
+                  circular
+                  :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+                >
+                  <button
+                    aria-label="Download"
+                    class="flex sm:hidden"
+                    @click="(event) => downloadModal.show(event)"
+                  >
+                    <DownloadIcon aria-hidden="true" />
+                  </button>
+                </ButtonStyled>
+              </div>
               <ButtonStyled
                 size="large"
                 circular
@@ -541,49 +552,31 @@
                   <EyeIcon />
                 </button>
               </ButtonStyled>
-              <OverflowMenu
-                class="btn btn-large transparent !rounded-full !p-3"
-                :options="[
-                  {
-                    id: 'report',
-                    action: () =>
-                      auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
-                    color: 'red',
-                    hoverOnly: true,
-                  },
-                  { id: 'copy-id', action: () => copyId() },
-                ]"
-                direction="right"
-              >
-                <MoreVerticalIcon />
-                <template #report>
-                  <ReportIcon />
-                  Report
-                </template>
-                <template #copy-id>
-                  <ClipboardCopyIcon />
-                  Copy ID
-                </template>
-              </OverflowMenu>
+              <ButtonStyled size="large" circular type="transparent">
+                <OverflowMenu
+                  :options="[
+                    {
+                      id: 'report',
+                      action: () =>
+                        auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+                      color: 'red',
+                      hoverOnly: true,
+                    },
+                    { id: 'copy-id', action: () => copyId() },
+                  ]"
+                >
+                  <MoreVerticalIcon />
+                  <template #report>
+                    <ReportIcon />
+                    Report
+                  </template>
+                  <template #copy-id>
+                    <ClipboardCopyIcon />
+                    Copy ID
+                  </template>
+                </OverflowMenu>
+              </ButtonStyled>
             </div>
-          </div>
-          <div
-            v-if="featuredGalleryImage"
-            class="sm:max-h-[13.125rem] sm:w-[26.375rem] sm:max-w-[26.375rem]"
-          >
-            <nuxt-link
-              :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
-            >
-              <img
-                :src="featuredGalleryImage.url"
-                :alt="
-                  featuredGalleryImage.description
-                    ? featuredGalleryImage.description
-                    : featuredGalleryImage.title
-                "
-                class="w-full rounded-2xl border-4 border-solid border-button-bg object-cover sm:h-full sm:min-w-[26.375rem]"
-              />
-            </nuxt-link>
           </div>
         </div>
         <ProjectMemberHeader
@@ -655,7 +648,7 @@ import {
   ReportIcon,
   SearchIcon,
   SettingsIcon,
-  TagsIcon as CategoriesIcon,
+  TagsIcon,
   UsersIcon,
   VersionIcon,
   WrenchIcon,

@@ -65,11 +65,11 @@ defineProps({
   },
   position: {
     type: String,
-    default: 'bottom',
+    default: 'auto',
   },
   direction: {
     type: String,
-    default: 'left',
+    default: 'auto',
   },
 })
 defineOptions({

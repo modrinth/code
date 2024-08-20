@@ -11,7 +11,7 @@
     </button>
     <div
       class="popup-menu"
-      :class="`position-${position}-${direction} ${dropdownVisible ? 'visible' : ''}`"
+      :class="`position-${computedPosition}-${computedDirection} ${dropdownVisible ? 'visible' : ''}`"
     >
       <slot name="menu"> </slot>
     </div>
@@ -28,11 +28,11 @@ const props = defineProps({
   },
   position: {
     type: String,
-    default: 'bottom',
+    default: 'auto',
   },
   direction: {
     type: String,
-    default: 'left',
+    default: 'auto',
   },
 })
 defineOptions({
@@ -42,6 +42,31 @@ defineOptions({
 const dropdownVisible = ref(false)
 const dropdown = ref(null)
 const dropdownButton = ref(null)
+const computedPosition = ref('bottom')
+const computedDirection = ref('left')
+
+function updateDirection() {
+  if (props.direction === 'auto') {
+    if (dropdownButton.value) {
+      const x = dropdownButton.value.getBoundingClientRect().left
+      computedDirection.value = x < window.innerWidth / 2 ? 'right' : 'left'
+    } else {
+      computedDirection.value = 'left'
+    }
+  } else {
+    computedDirection.value = props.direction
+  }
+  if (props.position === 'auto') {
+    if (dropdownButton.value) {
+      const y = dropdownButton.value.getBoundingClientRect().top
+      computedPosition.value = y < window.innerHeight / 2 ? 'bottom' : 'top'
+    } else {
+      computedPosition.value = 'bottom'
+    }
+  } else {
+    computedPosition.value = props.position
+  }
+}
 
 const toggleDropdown = () => {
   if (!props.disabled) {
@@ -79,10 +104,13 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
+  window.addEventListener('resize', updateDirection)
+  updateDirection()
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('resize', updateDirection)
 })
 </script>
 
