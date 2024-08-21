@@ -11,7 +11,7 @@
           <XIcon />
         </Button>
       </div>
-      <Button color="primary" @click="$refs.modal_creation.show()">
+      <Button color="primary" @click="(event) => $refs.modal_creation.show(event)">
         <PlusIcon /> {{ formatMessage(messages.createNewButton) }}
       </Button>
     </div>

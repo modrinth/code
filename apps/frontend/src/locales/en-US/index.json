@@ -369,7 +369,7 @@
     "message": "For security purposes, please enter your email on Modrinth."
   },
   "layout.banner.staging.description": {
-    "message": "The staging environment is running on a copy of the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
+    "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
   },
   "layout.banner.staging.title": {
     "message": "You’re viewing Modrinth’s staging environment."
@@ -483,7 +483,7 @@
     "message": "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}"
   },
   "profile.stats.projects": {
-    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> project}}"
+    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
   },
   "profile.stats.projects-followers": {
     "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"

@@ -404,7 +404,7 @@
     >
       <div class="normal-page__header relative my-4">
         <div
-          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 xl:grid-cols-[1fr_auto]"
+          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
         >
           <div class="flex gap-4">
             <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
@@ -524,7 +524,10 @@
                     <div v-else class="menu-text">
                       <p class="popout-text">No collections found.</p>
                     </div>
-                    <button class="btn collection-button" @click="$refs.modal_collection.show()">
+                    <button
+                      class="btn collection-button"
+                      @click="(event) => $refs.modal_collection.show(event)"
+                    >
                       <PlusIcon />
                       Create new collection
                     </button>
@@ -622,10 +625,9 @@
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
           updates unless the author decides to unarchive the project.
         </MessageBanner>
-        <NavTabs :links="navLinks" class="mt-4 !hidden sm:!flex" />
-        <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
-          <NavRow :links="navLinks" />
-        </nav>
+        <div class="overflow-x-auto">
+          <NavTabs :links="navLinks" class="mt-4" />
+        </div>
       </div>
       <NuxtPage
         v-model:project="project"
@@ -662,7 +664,6 @@ import {
   CopyrightIcon,
   DownloadIcon,
   ExternalIcon,
-  EyeIcon,
   GameIcon,
   HeartIcon,
   ImageIcon as GalleryIcon,
@@ -686,7 +687,6 @@ import {
   OverflowMenu,
   PopoutMenu,
   ScrollablePanel,
-  StatItem,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview } from "@modrinth/utils";
 import dayjs from "dayjs";

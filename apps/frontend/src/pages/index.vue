@@ -1276,7 +1276,7 @@ async function updateSearchProjects() {
       font-size: 1.625rem;
     }
 
-    margin-top: -4rem;
+    margin-top: -5rem;
     padding: 11.25rem 1rem 12rem;
   }
 

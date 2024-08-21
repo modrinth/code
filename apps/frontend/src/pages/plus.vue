@@ -143,7 +143,7 @@ onMounted(() => {
 .main-hero {
   background: linear-gradient(360deg, rgba(199, 138, 255, 0.2) 10.92%, var(--color-bg) 100%),
     var(--color-accent-contrast);
-  margin-top: -4rem;
+  margin-top: -5rem;
   padding: 11.25rem 1rem 8rem;
 
   display: flex;

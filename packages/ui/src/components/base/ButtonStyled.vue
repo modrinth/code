@@ -206,5 +206,30 @@ const colorVariables = computed(() => {
   min-height: var(--_icon-size, 1rem);
 }
 
+.joined-buttons {
+  display: flex;
+  gap: 1px;
+
+  > .btn-wrapper:not(:first-child) {
+    :slotted(:is(button, a, .button-like):first-child),
+    :slotted(*) > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > *:first-child > :is(button, a, .button-like):first-child {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  > :not(:last-child) {
+    :slotted(:is(button, a, .button-like):first-child),
+    :slotted(*) > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > *:first-child > :is(button, a, .button-like):first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}
+
 /* guys, I know this is nuts, I know */
 </style>
