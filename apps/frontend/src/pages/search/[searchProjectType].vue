@@ -255,7 +255,7 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Promotion, Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
+import { Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
 import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon } from "@modrinth/assets";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
@@ -281,7 +281,6 @@ const route = useNativeRoute();
 
 const cosmetics = useCosmetics();
 const tags = useTags();
-const auth = await useAuth();
 
 const query = ref("");
 const facets = ref([]);
