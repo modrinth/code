@@ -16,7 +16,7 @@
 import { ChevronRightIcon } from "@modrinth/assets";
 </script>
 <style lang="scss" scoped>
-@media (max-width: 324px) {
+@media (max-width: 1024px) {
   .ad-parent {
     display: none;
   }

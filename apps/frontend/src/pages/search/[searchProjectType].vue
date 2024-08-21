@@ -6,12 +6,11 @@
     <aside
       :class="{
         'normal-page__sidebar': true,
-        open: sidebarMenuOpen,
       }"
       aria-label="Filters"
     >
       <AdPlaceholder />
-      <section class="card flex-card" :class="{ 'sidebar-menu_open': sidebarMenuOpen }">
+      <section class="card flex-card" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
             <label class="hidden" for="search">Search</label>
@@ -763,12 +762,6 @@ function toggleFilter(filter, doNotSendRequest) {
 
   // Always show on desktop
   @media screen and (min-width: 1024px) {
-    display: block;
-  }
-
-  // Hide on mobile unless open
-  display: none;
-  &.open {
     display: block;
   }
 }
