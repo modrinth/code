@@ -5,7 +5,7 @@
     <div class="new-page sidebar">
       <div class="normal-page__header pt-4">
         <div
-          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
+          class="mb-4 grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
         >
           <div class="flex gap-4">
             <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
@@ -71,7 +71,7 @@
             </div>
           </div>
         </div>
-        <div class="my-4 flex items-center justify-between">
+        <div v-if="navLinks.length > 2" class="mb-4 flex items-center justify-between">
           <NavTabs :links="navLinks" class="!hidden sm:!flex" />
           <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
             <NavRow :links="navLinks" />
