@@ -101,7 +101,17 @@ onUnmounted(() => unlisten())
       />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>
-        <p class="description">
+        <p
+          v-if="
+            props.instance.install_stage === 'installing' ||
+            props.instance.install_stage === 'not_installed' ||
+            props.instance.install_stage === 'pack_installing'
+          "
+          class="description"
+        >
+          Installing...
+        </p>
+        <p v-else class="description">
           {{ props.instance.loader }}
           {{ props.instance.game_version }}
         </p>

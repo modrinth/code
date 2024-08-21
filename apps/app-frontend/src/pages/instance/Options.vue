@@ -894,7 +894,8 @@ const isChanged = computed(() => {
   return (
     loader.value !== props.instance.loader ||
     gameVersion.value !== props.instance.game_version ||
-    selectableLoaderVersions.value[loaderVersionIndex.value].id !== props.instance.loader_version
+    (loaderVersionIndex.value >= 0 &&
+      selectableLoaderVersions.value[loaderVersionIndex.value].id !== props.instance.loader_version)
   )
 })
 
@@ -910,6 +911,8 @@ async function saveGvLoaderEdits() {
 
   if (loader.value !== 'vanilla') {
     editProfile.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value].id
+  } else {
+    loaderVersionIndex.value = -1
   }
   await edit(props.instance.path, editProfile).catch(handleError)
   await repairProfile(false)

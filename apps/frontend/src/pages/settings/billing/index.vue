@@ -34,10 +34,7 @@
             <span class="font-bold">Benefits</span>
             <div class="flex items-center gap-2">
               <CheckCircleIcon class="h-5 w-5 text-brand" />
-              <span>
-                Ad-free browsing on modrinth.com
-                <!--and Modrinth App-->
-              </span>
+              <span> Ad-free browsing on modrinth.com and Modrinth App </span>
             </div>
             <div class="flex items-center gap-2">
               <CheckCircleIcon class="h-5 w-5 text-brand" />
