@@ -175,30 +175,35 @@
         </div>
       </template>
       <template #default>
-        <div class="mx-auto flex w-[30rem] max-w-[40rem] flex-col gap-4">
-          <div class="mx-auto flex w-fit flex-col">
-            <ButtonStyled color="brand">
-              <a
-                class="w-fit"
-                :href="`modrinth://mod/${project.slug}`"
-                @click="() => installWithApp()"
-              >
-                <ModrinthIcon />
-                Install with Modrinth App
-                <ExternalIcon />
-              </a>
-            </ButtonStyled>
-            <Accordion ref="getModrinthAppAccordion">
-              <nuxt-link class="mt-2 flex justify-center text-brand-blue hover:underline" to="/app">
-                Don't have Modrinth App?
-              </nuxt-link>
-            </Accordion>
-          </div>
+        <div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
+          <div class="modrinth-app-section contents">
+            <div class="mx-auto flex w-fit flex-col">
+              <ButtonStyled color="brand">
+                <a
+                  class="w-fit"
+                  :href="`modrinth://mod/${project.slug}`"
+                  @click="() => installWithApp()"
+                >
+                  <ModrinthIcon />
+                  Install with Modrinth App
+                  <ExternalIcon />
+                </a>
+              </ButtonStyled>
+              <Accordion ref="getModrinthAppAccordion">
+                <nuxt-link
+                  class="mt-2 flex justify-center text-brand-blue hover:underline"
+                  to="/app"
+                >
+                  Don't have Modrinth App?
+                </nuxt-link>
+              </Accordion>
+            </div>
 
-          <div class="flex items-center gap-4 px-4">
-            <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
-            <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>
-            <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+            <div class="flex items-center gap-4 px-4">
+              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+              <span class="flex-shrink-0 text-sm font-semibold text-secondary"> or </span>
+              <div class="flex h-[2px] w-full rounded-2xl bg-button-bg"></div>
+            </div>
           </div>
           <div class="mx-auto flex w-fit flex-col gap-2">
             <ButtonStyled v-if="project.game_versions.length === 1">
@@ -1350,6 +1355,12 @@ const navLinks = computed(() => {
       width: 20rem;
       height: 20rem;
     }
+  }
+}
+
+@media (hover: none) and (max-width: 767px) {
+  .modrinth-app-section {
+    display: none;
   }
 }
 </style>
