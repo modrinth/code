@@ -24,7 +24,7 @@
     <AdPlaceholder
       v-if="
         (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(props.project.status)
+        tags.approvedStatuses.includes(project.status)
       "
     />
     <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
