@@ -1,4 +1,6 @@
+/*eslint-env node*/
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: [
     './src/components/**/*.{js,vue,ts}',
