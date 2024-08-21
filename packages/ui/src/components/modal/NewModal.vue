@@ -140,11 +140,11 @@ function handleKeyDown(event: KeyboardEvent) {
   opacity: 0;
   transition: all 0.2s ease-out;
   background: linear-gradient(to bottom, rgba(29, 48, 43, 0.52) 0%, rgba(14, 21, 26, 0.95) 100%);
-  transform: translate(
-      calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
-      calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
-    )
-    scaleX(0.8) scaleY(0.5);
+  //transform: translate(
+  //    calc((-50vw + var(--_mouse-x, 50vw) * 1px) / 2),
+  //    calc((-50vh + var(--_mouse-y, 50vh) * 1px) / 2)
+  //  )
+  //  scaleX(0.8) scaleY(0.5);
   border-radius: 180px;
   filter: blur(5px);
 
