@@ -110,6 +110,11 @@ iframe[id^="google_ads_iframe"] {
   font-family: var(--font-standard);
 }
 
+#qc-cmp2-ui .qc-cmp2-toggle[aria-checked="true"] {
+  background-color: var(--color-brand);
+  border: 1px solid var(--color-brand);
+}
+
 @media (max-width: 1024px) {
   .ad-parent {
     display: none;
