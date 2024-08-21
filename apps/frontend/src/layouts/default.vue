@@ -137,7 +137,11 @@
           <ButtonStyled type="transparent">
             <NuxtLink to="/app"> <DownloadIcon /> Get Modrinth App </NuxtLink>
           </ButtonStyled>
-          <ButtonStyled type="transparent" color="purple">
+          <ButtonStyled
+            v-if="!auth.user || isPermission(auth.badges, 1 << 0)"
+            type="transparent"
+            color="purple"
+          >
             <NuxtLink to="/plus"> <ArrowBigUpDashIcon /> Upgrade to Modrinth+ </NuxtLink>
           </ButtonStyled>
         </div>
