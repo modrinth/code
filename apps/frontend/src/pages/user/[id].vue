@@ -71,11 +71,8 @@
             </div>
           </div>
         </div>
-        <div v-if="navLinks.length > 2" class="mb-4 flex items-center justify-between">
-          <NavTabs :links="navLinks" class="!hidden sm:!flex" />
-          <nav class="navigation-card !mb-0 !mt-2 sm:!hidden">
-            <NavRow :links="navLinks" />
-          </nav>
+        <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
+          <NavTabs :links="navLinks" />
         </div>
       </div>
       <div class="normal-page__content">

@@ -15,7 +15,7 @@
       }"
     >
       <component :is="link.icon" v-if="link.icon" class="size-5" />
-      <span>{{ link.label }}</span>
+      <span class="text-nowrap">{{ link.label }}</span>
     </NuxtLink>
     <div
       :class="`navtabs-transition pointer-events-none absolute h-[calc(100%-0.5rem)] overflow-hidden rounded-full p-1 ${subpageSelected ? 'bg-button-bg' : 'bg-brand-highlight'}`"
