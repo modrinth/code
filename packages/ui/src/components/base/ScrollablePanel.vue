@@ -22,8 +22,9 @@ const props = withDefaults(
     noMaxHeight?: boolean
   }>(),
   {
-  noMaxHeight: false,
-})
+    noMaxHeight: false,
+  },
+)
 
 const scrollableAtTop = ref(true)
 const scrollableAtBottom = ref(false)

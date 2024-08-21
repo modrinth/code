@@ -55,40 +55,49 @@ import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
 interface BaseOption {
-  shown?: boolean;
+  shown?: boolean
 }
 
 interface Divider extends BaseOption {
-  divider?: boolean;
+  divider?: boolean
 }
 
 interface Item extends BaseOption {
-  id: string;
-  action?: () => void;
-  link?: string;
-  external?: boolean;
-  color?: 'primary' | 'danger' | 'secondary' | 'highlight' | 'red' | 'orange' | 'green' | 'blue' | 'purple';
-  hoverFilled?: boolean;
-  hoverFilledOnly?: boolean;
-  remainOnClick?: boolean;
+  id: string
+  action?: () => void
+  link?: string
+  external?: boolean
+  color?:
+    | 'primary'
+    | 'danger'
+    | 'secondary'
+    | 'highlight'
+    | 'red'
+    | 'orange'
+    | 'green'
+    | 'blue'
+    | 'purple'
+  hoverFilled?: boolean
+  hoverFilledOnly?: boolean
+  remainOnClick?: boolean
 }
 
-type Option = Divider | Item;
+type Option = Divider | Item
 
 const props = withDefaults(
-  defineProps<
-    {
-      options: Option[],
-      disabled?: boolean,
-      position?: string,
-      direction?: string,
-    }
-  >(), {
+  defineProps<{
+    options: Option[]
+    disabled?: boolean
+    position?: string
+    direction?: string
+  }>(),
+  {
     options: () => [],
     disabled: false,
     position: 'auto',
     direction: 'auto',
-});
+  },
+)
 
 defineOptions({
   inheritAttrs: false,
