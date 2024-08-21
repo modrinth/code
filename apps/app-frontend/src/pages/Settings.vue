@@ -91,7 +91,6 @@ async function updateJavaVersion(version) {
 
 async function fetchCredentials() {
   const creds = await getCreds().catch(handleError)
-  console.log(creds)
   if (creds && creds.user_id) {
     creds.user = await get_user(creds.user_id).catch(handleError)
   }

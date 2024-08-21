@@ -63,7 +63,7 @@
       </Card>
     </div>
     <div class="content">
-      <Promotion :external="false" query-param="?r=launcher" />
+      <PromotionWrapper />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
@@ -104,7 +104,7 @@
   </ContextMenu>
 </template>
 <script setup>
-import { Button, Avatar, Card, Promotion } from '@modrinth/ui'
+import { Button, Avatar, Card } from '@modrinth/ui'
 import {
   BoxIcon,
   SettingsIcon,
@@ -137,6 +137,7 @@ import { useFetch } from '@/helpers/fetch'
 import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
+import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 
 const route = useRoute()
 
