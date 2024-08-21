@@ -425,6 +425,13 @@ html {
   --color-blue: rgb(9, 159, 239);
   --color-purple: rgb(139, 129, 230);
   --color-gray: #718096;
+
+  --color-red-highlight: rgba(232, 32, 13, 0.25);
+  --color-orange-highlight: rgba(232, 141, 13, 0.25);
+  --color-green-highlight: rgba(60, 219, 54, 0.25);
+  --color-blue-highlight: rgba(9, 159, 239, 0.25);
+  --color-purple-highlight: rgba(139, 129, 230, 0.25);
+  --color-gray-highlight: rgba(113, 128, 150, 0.25);
 }
 
 body {

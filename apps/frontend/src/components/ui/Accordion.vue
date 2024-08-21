@@ -50,6 +50,7 @@ function close() {
 defineExpose({
   open,
   close,
+  isOpen,
 });
 
 defineOptions({

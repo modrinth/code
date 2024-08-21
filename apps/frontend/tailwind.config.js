@@ -34,6 +34,14 @@ module.exports = {
           purple: "var(--color-purple-bg)",
           raised: "var(--color-raised-bg)",
         },
+        highlight: {
+          DEFAULT: "var(--color-brand-highlight)",
+          red: "var(--color-red-highlight)",
+          orange: "var(--color-orange-highlight)",
+          green: "var(--color-green-highlight)",
+          blue: "var(--color-blue-highlight)",
+          purple: "var(--color-purple-highlight)",
+        },
         divider: {
           DEFAULT: "var(--color-divider)",
           dark: "var(--color-divider-dark)",

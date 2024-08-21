@@ -10,7 +10,7 @@
       aria-label="Filters"
     >
       <AdPlaceholder />
-      <section class="card flex-card" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
+      <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
             <label class="hidden" for="search">Search</label>
@@ -34,56 +34,97 @@
                 orFacets.length === 0
               )
             "
+            v-tooltip="`Reset all filters`"
             class="btn icon-only"
             @click="clearFilters"
           >
             <FilterXIcon />
           </button>
         </div>
-        <Accordion
-          v-for="(categories, header) in filters"
+        <div
+          v-for="(categories, header, index) in filters"
           :key="header"
-          :open-by-default="true"
-          type="transparent"
+          :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"
         >
-          <template #title>
+          <button
+            class="flex !w-full bg-transparent px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"
+            @click="
+              () => {
+                filterAccordions[index].isOpen
+                  ? filterAccordions[index].close()
+                  : filterAccordions[index].open();
+              }
+            "
+          >
             <template v-if="header === 'gameVersion'"> Game versions </template>
             <template v-else>
               {{ $formatCategoryHeader(header) }}
             </template>
-          </template>
-          <ScrollablePanel :class="{ 'h-[18rem]': categories.length >= 8 }">
-            <div class="mr-2 flex flex-col gap-1">
-              <ButtonStyled
-                v-for="category in categories"
-                :key="category.name"
-                :type="filterSelected(category) ? 'standard' : 'transparent'"
-              >
-                <button
-                  class="!mr-2 flex !w-full !justify-normal !gap-2 !p-2 !py-1 !pl-8"
-                  @click="toggleFilter(category)"
-                >
-                  <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />
-                  <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />
-                  <div v-if="category.icon" class="h-4" v-html="category.icon" />
-                  <span class="text-sm text-secondary">{{ $formatCategory(category.name) }}</span>
-                </button>
-              </ButtonStyled>
-            </div>
-          </ScrollablePanel>
-          <Checkbox
-            v-if="header === 'gameVersion'"
-            v-model="showSnapshots"
-            class="mx-1 ml-4"
-            :label="`Show all versions`"
-          />
-          <Checkbox
-            v-if="header === 'loaders' && projectType.id === 'mod'"
-            v-model="showAllLoaders"
-            class="mx-1 ml-4"
-            :label="`Show all loaders`"
-          />
-        </Accordion>
+            <DropdownIcon
+              class="ml-auto h-5 w-5 transition-transform"
+              :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"
+            />
+          </button>
+          <Accordion ref="filterAccordions" :open-by-default="true">
+            <ScrollablePanel
+              :class="{ 'h-[18rem]': categories.length >= 8 && header === 'gameVersion' }"
+            >
+              <div class="mr-1 flex flex-col gap-1">
+                <div v-for="category in categories" :key="category.name" class="group flex gap-1">
+                  <button
+                    :class="`flex !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${filterSelected(category) ? 'bg-brand-highlight text-contrast hover:brightness-125' : negativeFilterSelected(category) ? 'bg-highlight-red text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"
+                    @click="
+                      negativeFilterSelected(category)
+                        ? toggleNegativeFilter(category)
+                        : toggleFilter(category)
+                    "
+                  >
+                    <ClientIcon v-if="category.name === 'client'" class="h-4 w-4" />
+                    <ServerIcon v-else-if="category.name === 'server'" class="h-4 w-4" />
+                    <div v-if="category.icon" class="h-4" v-html="category.icon" />
+                    <span class="truncate text-sm">{{ $formatCategory(category.name) }}</span>
+                    <BanIcon
+                      v-if="negativeFilterSelected(category)"
+                      :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${negativeFilterSelected(category) ? '' : 'opacity-0'}`"
+                      aria-hidden="true"
+                    />
+                    <CheckIcon
+                      v-else
+                      :class="`ml-auto h-4 w-4 shrink-0 transition-opacity group-hover:opacity-100 ${filterSelected(category) ? '' : 'opacity-0'}`"
+                      aria-hidden="true"
+                    />
+                  </button>
+                  <button
+                    v-if="
+                      (category.type === 'or' || category.type === 'normal') &&
+                      !negativeFilterSelected(category)
+                    "
+                    v-tooltip="negativeFilterSelected(category) ? 'Include' : 'Exclude'"
+                    class="hidden items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:flex"
+                    @click="toggleNegativeFilter(category)"
+                  >
+                    <BanIcon
+                      class="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100"
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
+              </div>
+            </ScrollablePanel>
+            <Checkbox
+              v-if="header === 'gameVersion'"
+              v-model="showSnapshots"
+              class="mx-2"
+              :label="`Show all versions`"
+            />
+            <Checkbox
+              v-if="header === 'loaders' && projectType.id === 'mod'"
+              v-model="showAllLoaders"
+              class="mx-2"
+              :label="`Show all loaders`"
+            />
+          </Accordion>
+        </div>
       </section>
     </aside>
     <section class="normal-page__content">
@@ -210,8 +251,8 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Promotion, Pagination, ScrollablePanel, ButtonStyled, Checkbox } from "@modrinth/ui";
-import { FilterXIcon } from "@modrinth/assets";
+import { Promotion, Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
+import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon } from "@modrinth/assets";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 
@@ -229,6 +270,8 @@ import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 const sidebarMenuOpen = ref(false);
 const showAllLoaders = ref(false);
 
+const filterAccordions = ref([]);
+
 const data = useNuxtApp();
 const route = useNativeRoute();
 
@@ -239,6 +282,7 @@ const auth = await useAuth();
 const query = ref("");
 const facets = ref([]);
 const orFacets = ref([]);
+const negativeFacets = ref([]);
 const selectedVersions = ref([]);
 const onlyOpenSource = ref(false);
 const showSnapshots = ref(false);
@@ -277,6 +321,9 @@ if (route.query.f) {
 }
 if (route.query.g) {
   orFacets.value = getArrayOrString(route.query.g);
+}
+if (route.query.nf) {
+  negativeFacets.value = getArrayOrString(route.query.nf);
 }
 if (route.query.v) {
   selectedVersions.value = getArrayOrString(route.query.v);
@@ -342,6 +389,7 @@ const {
     if (
       facets.value.length > 0 ||
       orFacets.value.length > 0 ||
+      negativeFacets.value.length > 0 ||
       selectedVersions.value.length > 0 ||
       selectedEnvironments.value.length > 0 ||
       projectType.value
@@ -349,6 +397,10 @@ const {
       let formattedFacets = [];
       for (const facet of facets.value) {
         formattedFacets.push([facet]);
+      }
+
+      for (const facet of negativeFacets.value) {
+        formattedFacets.push([facet.replace(":", "!=")]);
       }
 
       // loaders specifier
@@ -481,6 +533,10 @@ function getSearchUrl(offset, useObj) {
     queryItems.push(`g=${encodeURIComponent(orFacets.value)}`);
     obj.g = orFacets.value;
   }
+  if (negativeFacets.value.length > 0) {
+    queryItems.push(`nf=${encodeURIComponent(negativeFacets.value)}`);
+    obj.nf = negativeFacets.value;
+  }
   if (selectedVersions.value.length > 0) {
     queryItems.push(`v=${encodeURIComponent(selectedVersions.value)}`);
     obj.v = selectedVersions.value;
@@ -579,21 +635,33 @@ const filters = computed(() => {
   const filters = {};
 
   if (projectType.value.id !== "resourcepack" && projectType.value.id !== "datapack") {
-    const loaders = tags.value.loaders.filter((x) => {
-      if (projectType.value.id === "mod" && !showAllLoaders.value) {
-        return (
-          tags.value.loaderData.modLoaders.includes(x.name) &&
-          !tags.value.loaderData.hiddenModLoaders.includes(x.name)
-        );
-      } else if (projectType.value.id === "mod" && showAllLoaders.value) {
-        return tags.value.loaderData.modLoaders.includes(x.name);
-      } else if (projectType.value.id === "plugin") {
-        return tags.value.loaderData.pluginLoaders.includes(x.name);
-      } else if (projectType.value.id === "datapack") {
-        return tags.value.loaderData.dataPackLoaders.includes(x.name);
-      } else {
-        return x.supported_project_types.includes(projectType.value.actual);
-      }
+    const loaders = tags.value.loaders
+      .filter((x) => {
+        if (projectType.value.id === "mod" && !showAllLoaders.value) {
+          return (
+            tags.value.loaderData.modLoaders.includes(x.name) &&
+            !tags.value.loaderData.hiddenModLoaders.includes(x.name)
+          );
+        } else if (projectType.value.id === "mod" && showAllLoaders.value) {
+          return tags.value.loaderData.modLoaders.includes(x.name);
+        } else if (projectType.value.id === "plugin") {
+          return tags.value.loaderData.pluginLoaders.includes(x.name);
+        } else if (projectType.value.id === "datapack") {
+          return tags.value.loaderData.dataPackLoaders.includes(x.name);
+        } else {
+          return x.supported_project_types.includes(projectType.value.actual);
+        }
+      })
+      .slice();
+
+    loaders.sort((a, b) => {
+      const isAHidden = tags.value.loaderData.hiddenModLoaders.includes(a.name);
+      const isBHidden = tags.value.loaderData.hiddenModLoaders.includes(b.name);
+
+      // Sort hidden mod loaders (true) after visible ones (false)
+      if (isAHidden && !isBHidden) return 1;
+      if (!isAHidden && isBHidden) return -1;
+      return 0; // No sorting if both are hidden or both are visible
     });
 
     if (loaders.length > 0) {
@@ -678,8 +746,44 @@ function filterSelected(filter) {
   }
 }
 
+function negativeFilterSelected(filter) {
+  if (filter.type === "or" || filter.type === "normal") {
+    return negativeFacets.value.includes(filter.facet);
+  }
+}
+
+function toggleNegativeFilter(filter) {
+  const elementName = filter.facet;
+
+  if (filterSelected(filter)) {
+    if (filter.type === "or") {
+      const index = orFacets.value.indexOf(elementName);
+      orFacets.value.splice(index, 1);
+    } else if (filter.type === "normal") {
+      const index = facets.value.indexOf(elementName);
+      facets.value.splice(index, 1);
+    }
+  }
+
+  if (filter.type === "or" || filter.type === "normal") {
+    const index = negativeFacets.value.indexOf(elementName);
+    if (index !== -1) {
+      negativeFacets.value.splice(index, 1);
+    } else {
+      negativeFacets.value.push(elementName);
+    }
+  }
+
+  onSearchChange(1);
+}
+
 function toggleFilter(filter, doNotSendRequest) {
   const elementName = filter.facet;
+
+  if (negativeFilterSelected(filter)) {
+    const index = negativeFacets.value.indexOf(elementName);
+    negativeFacets.value.splice(index, 1);
+  }
 
   if (filter.type === "or") {
     const index = orFacets.value.indexOf(elementName);

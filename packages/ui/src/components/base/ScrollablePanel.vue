@@ -1,10 +1,10 @@
 <template>
-  <div class="scrollable-pane-wrapper">
+  <div class="scrollable-pane-wrapper" :class="{ 'max-height': !props.noMaxHeight }">
     <div
       class="wrapper-wrapper"
       :class="{
-        'top-fade': !scrollableAtTop,
-        'bottom-fade': !scrollableAtBottom,
+        'top-fade': !scrollableAtTop && !props.noMaxHeight,
+        'bottom-fade': !scrollableAtBottom && !props.noMaxHeight,
       }"
     >
       <div ref="scrollablePane" class="scrollable-pane" @scroll="onScroll">
@@ -14,8 +14,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+
+const props = withDefaults(
+  defineProps<{
+    noMaxHeight?: boolean
+  }>(),
+  {
+  noMaxHeight: false,
+})
 
 const scrollableAtTop = ref(true)
 const scrollableAtBottom = ref(false)
@@ -51,8 +59,11 @@ function onScroll({ target: { scrollTop, offsetHeight, scrollHeight } }) {
 .scrollable-pane-wrapper {
   display: flex;
   flex-direction: column;
-  max-height: 19rem;
   position: relative;
+
+  &.max-height {
+    max-height: 19rem;
+  }
 }
 .wrapper-wrapper {
   flex-grow: 1;

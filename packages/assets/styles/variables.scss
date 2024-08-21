@@ -40,8 +40,15 @@ html {
   --color-purple: #8e32f3;
   --color-gray: #595b61;
 
+  --color-red-highlight: rgba(203, 34, 69, 0.25);
+  --color-orange-highlight: rgba(224, 131, 37, 0.25);
+  --color-green-highlight: rgba(0, 175, 92, 0.25);
+  --color-blue-highlight: rgba(31, 104, 192, 0.25);
+  --color-purple-highlight: rgba(142, 50, 243, 0.25);
+  --color-gray-highlight: rgba(89, 91, 97, 0.25);
+
   --color-brand: var(--color-green);
-  --color-brand-highlight: rgba(0, 175, 92, 0.25);
+  --color-brand-highlight: var(--color-green-highlight);
   --color-brand-shadow: rgba(0, 175, 92, 0.7);
 
   --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 91%, 0.1);
@@ -82,6 +89,13 @@ html {
   --color-blue: #4f9cff;
   --color-purple: #c78aff;
   --color-gray: #9fa4b3;
+
+  --color-red-highlight: rgba(255, 73, 110, 0.25);
+  --color-orange-highlight: rgba(255, 163, 71, 0.25);
+  --color-green-highlight: rgba(27, 217, 106, 0.25);
+  --color-blue-highlight: rgba(79, 156, 255, 0.25);
+  --color-purple-highlight: rgba(199, 138, 255, 0.25);
+  --color-gray-highlight: rgba(159, 164, 179, 0.25);
 
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(27, 217, 106, 0.25);
