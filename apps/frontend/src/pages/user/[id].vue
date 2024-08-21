@@ -348,7 +348,7 @@ const messages = defineMessages({
   profileProjectsStats: {
     id: "profile.stats.projects",
     defaultMessage:
-      "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> project}}",
+      "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}",
   },
   profileDownloadsStats: {
     id: "profile.stats.downloads",
