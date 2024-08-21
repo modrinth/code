@@ -145,7 +145,7 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
 
 const connectWebSocket = async () => {
   const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
-  socket = new WebSocket(`ws://127.0.0.1:6632/v0/ws`);
+  socket = new WebSocket(`ws://127.0.0.1:8889/v0/ws`);
 
   socket.onopen = () => {
     socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
