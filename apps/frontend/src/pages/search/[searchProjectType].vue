@@ -68,6 +68,7 @@
           <Accordion ref="filterAccordions" :open-by-default="true">
             <ScrollablePanel
               :class="{ 'h-[18rem]': categories.length >= 8 && header === 'gameVersion' }"
+              :no-max-height="header !== 'gameVersion'"
             >
               <div class="mr-1 flex flex-col gap-1">
                 <div v-for="category in categories" :key="category.name" class="group flex gap-1">
