@@ -1,12 +1,9 @@
 //! Theseus state management system
+use dashmap::DashMap;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 use tokio::sync::OnceCell;
-use tokio::sync::RwLock;
 use uuid::Uuid;
-
-use crate::prelude::ProfilePathId;
-use crate::state::SafeProcesses;
 
 pub mod emit;
 
@@ -17,7 +14,7 @@ pub struct EventState {
     /// Tauri app
     #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
-    pub loading_bars: RwLock<HashMap<Uuid, LoadingBar>>,
+    pub loading_bars: DashMap<Uuid, LoadingBar>,
 }
 
 impl EventState {
@@ -27,7 +24,7 @@ impl EventState {
             .get_or_try_init(|| async {
                 Ok(Arc::new(Self {
                     app,
-                    loading_bars: RwLock::new(HashMap::new()),
+                    loading_bars: DashMap::new(),
                 }))
             })
             .await
@@ -39,7 +36,7 @@ impl EventState {
         EVENT_STATE
             .get_or_try_init(|| async {
                 Ok(Arc::new(Self {
-                    loading_bars: RwLock::new(HashMap::new()),
+                    loading_bars: DashMap::new(),
                 }))
             })
             .await
@@ -58,17 +55,10 @@ impl EventState {
     }
 
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
-    pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
+    pub async fn list_progress_bars() -> crate::Result<DashMap<Uuid, LoadingBar>>
     {
         let value = Self::get().await?;
-        let read = value.loading_bars.read().await;
-
-        let mut display_list: HashMap<Uuid, LoadingBar> = HashMap::new();
-        for (uuid, loading_bar) in read.iter() {
-            display_list.insert(*uuid, loading_bar.clone());
-        }
-
-        Ok(display_list)
+        Ok(value.loading_bars.clone())
     }
 
     #[cfg(feature = "tauri")]
@@ -103,10 +93,10 @@ impl Drop for LoadingBarId {
         let loader_uuid = self.0;
         tokio::spawn(async move {
             if let Ok(event_state) = EventState::get().await {
-                let mut bars = event_state.loading_bars.write().await;
-
                 #[cfg(any(feature = "tauri", feature = "cli"))]
-                if let Some(bar) = bars.remove(&loader_uuid) {
+                if let Some((_, bar)) =
+                    event_state.loading_bars.remove(&loader_uuid)
+                {
                     #[cfg(feature = "tauri")]
                     {
                         let loader_uuid = bar.loading_bar_uuid;
@@ -138,16 +128,7 @@ impl Drop for LoadingBarId {
                 }
 
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
-                bars.remove(&loader_uuid);
-            }
-            // complete calls state, and since a  LoadingBarId is created in state initialization, we only complete if its already initializaed
-            // to avoid an infinite loop.
-            if crate::State::initialized() {
-                let _ = SafeProcesses::complete(
-                    crate::state::ProcessType::LoadingBar,
-                    loader_uuid,
-                )
-                .await;
+                event_state.loading_bars.remove(&loader_uuid);
             }
         });
     }
@@ -157,33 +138,37 @@ impl Drop for LoadingBarId {
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
 pub enum LoadingBarType {
-    StateInit,
+    LegacyDataMigration,
+    DirectoryMove {
+        old: PathBuf,
+        new: PathBuf,
+    },
     JavaDownload {
         version: u32,
     },
     PackFileDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         pack_name: String,
         icon: Option<String>,
         pack_version: String,
     },
     PackDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         pack_name: String,
         icon: Option<PathBuf>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
     MinecraftDownload {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ProfileUpdate {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ZipExtract {
-        profile_path: PathBuf,
+        profile_path: String,
         profile_name: String,
     },
     ConfigChange {
@@ -233,8 +218,8 @@ pub enum CommandPayload {
 
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
-    pub uuid: Uuid, // processes in state are going to be identified by UUIDs, as they might change to different processes
-    pub pid: u32,
+    pub profile_path_id: String,
+    pub uuid: Uuid,
     pub event: ProcessPayloadType,
     pub message: String,
 }
@@ -242,23 +227,18 @@ pub struct ProcessPayload {
 #[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
-    Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process
     Finished,
 }
 
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
-    pub uuid: Uuid,
-    pub profile_path_id: ProfilePathId,
-    pub path: PathBuf,
-    pub name: String,
+    pub profile_path_id: String,
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum ProfilePayloadType {
     Created,
-    Added, // also triggered when Created
     Synced,
     Edited,
     Removed,

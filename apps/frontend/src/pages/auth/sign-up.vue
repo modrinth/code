@@ -110,7 +110,7 @@
         ref="turnstile"
         v-model="token"
         class="turnstile"
-        :options="{ theme: $colorMode.value === 'light' ? 'light' : 'dark' }"
+        :options="{ theme: $theme.active === 'light' ? 'light' : 'dark' }"
       />
 
       <button
@@ -204,14 +204,6 @@ const auth = await useAuth();
 const route = useNativeRoute();
 
 const redirectTarget = route.query.redirect;
-
-if (route.fullPath.includes("new_account=true")) {
-  await navigateTo(
-    `/auth/welcome?authToken=${route.query.code}${
-      route.query.redirect ? `&redirect=${encodeURIComponent(route.query.redirect)}` : ""
-    }`,
-  );
-}
 
 if (auth.value.user) {
   await navigateTo("/dashboard");

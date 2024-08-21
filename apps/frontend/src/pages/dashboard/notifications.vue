@@ -151,7 +151,7 @@ async function readAll() {
 
 function changePage(newPage) {
   page.value = newPage;
-  if (process.client) {
+  if (import.meta.client) {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 }

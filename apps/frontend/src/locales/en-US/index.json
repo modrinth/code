@@ -173,11 +173,17 @@
   "button.continue": {
     "message": "Continue"
   },
+  "button.copy-id": {
+    "message": "Copy ID"
+  },
   "button.create-a-project": {
     "message": "Create a project"
   },
   "button.edit": {
     "message": "Edit"
+  },
+  "button.report": {
+    "message": "Report"
   },
   "button.save": {
     "message": "Save"
@@ -363,10 +369,16 @@
     "message": "For security purposes, please enter your email on Modrinth."
   },
   "layout.banner.staging.description": {
-    "message": "The staging environment is running on a copy of the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
+    "message": "The staging environment is completely separate from the production Modrinth database. This is used for testing and debugging purposes, and may be running in-development versions of the Modrinth backend or frontend newer than the production instance."
   },
   "layout.banner.staging.title": {
     "message": "You’re viewing Modrinth’s staging environment."
+  },
+  "layout.banner.subscription-payment-failed.button": {
+    "message": "Update billing info"
+  },
+  "layout.banner.subscription-payment-failed.title": {
+    "message": "Your subscription failed to renew. Please update your payment method to prevent losing access."
   },
   "layout.banner.verify-email.action": {
     "message": "Re-send verification email"
@@ -434,14 +446,17 @@
   "profile.button.manage-projects": {
     "message": "Manage projects"
   },
-  "profile.button.report": {
-    "message": "Report"
-  },
   "profile.error.not-found": {
     "message": "User not found"
   },
   "profile.joined-at": {
-    "message": "Joined {ago}"
+    "message": "Joined <date>{ago}</date>"
+  },
+  "profile.label.badges": {
+    "message": "Badges"
+  },
+  "profile.label.details": {
+    "message": "Details"
   },
   "profile.label.no-collections": {
     "message": "This user has no collections!"
@@ -465,10 +480,13 @@
     "message": "{bio} - Download {username}'s projects on Modrinth"
   },
   "profile.stats.downloads": {
-    "message": "{count, plural, one {<stat>{count}</stat> download} other {<stat>{count}</stat> downloads}}"
+    "message": "{count, plural, one {<stat>{count}</stat> project download} other {<stat>{count}</stat> project downloads}}"
+  },
+  "profile.stats.projects": {
+    "message": "{count, plural, one {<stat>{count}</stat> project} other {<stat>{count}</stat> projects}}"
   },
   "profile.stats.projects-followers": {
-    "message": "{count, plural, one {<stat>{count}</stat> follower} other {<stat>{count}</stat> followers}} of projects"
+    "message": "{count, plural, one {<stat>{count}</stat> project follower} other {<stat>{count}</stat> project followers}}"
   },
   "profile.user-id": {
     "message": "User ID: {id}"
@@ -523,6 +541,99 @@
   },
   "project-type.shader.singular": {
     "message": "Shader"
+  },
+  "project.about.compatibility.environments": {
+    "message": "Supported environments"
+  },
+  "project.about.compatibility.game.minecraftJava": {
+    "message": "Minecraft: Java Edition"
+  },
+  "project.about.compatibility.platforms": {
+    "message": "Platforms"
+  },
+  "project.about.compatibility.title": {
+    "message": "Compatibility"
+  },
+  "project.about.creators.owner": {
+    "message": "Project owner"
+  },
+  "project.about.creators.title": {
+    "message": "Creators"
+  },
+  "project.about.details.created": {
+    "message": "Created {date}"
+  },
+  "project.about.details.licensed": {
+    "message": "Licensed {license}"
+  },
+  "project.about.details.published": {
+    "message": "Published {date}"
+  },
+  "project.about.details.submitted": {
+    "message": "Submitted {date}"
+  },
+  "project.about.details.title": {
+    "message": "Details"
+  },
+  "project.about.details.updated": {
+    "message": "Updated {date}"
+  },
+  "project.about.links.discord": {
+    "message": "Join Discord server"
+  },
+  "project.about.links.donate.bmac": {
+    "message": "Buy Me a Coffee"
+  },
+  "project.about.links.donate.generic": {
+    "message": "Donate"
+  },
+  "project.about.links.donate.github": {
+    "message": "Sponsor on GitHub"
+  },
+  "project.about.links.donate.kofi": {
+    "message": "Donate on Ko-fi"
+  },
+  "project.about.links.donate.patreon": {
+    "message": "Donate on Patreon"
+  },
+  "project.about.links.donate.paypal": {
+    "message": "Donate on PayPal"
+  },
+  "project.about.links.issues": {
+    "message": "Report issues"
+  },
+  "project.about.links.source": {
+    "message": "View source"
+  },
+  "project.about.links.title": {
+    "message": "Links"
+  },
+  "project.about.links.wiki": {
+    "message": "Visit wiki"
+  },
+  "project.about.title": {
+    "message": "About"
+  },
+  "project.gallery.title": {
+    "message": "Gallery"
+  },
+  "project.moderation.title": {
+    "message": "Moderation"
+  },
+  "project.stats.downloads-label": {
+    "message": "download{count, plural, one {} other {s}}"
+  },
+  "project.stats.followers-label": {
+    "message": "follower{count, plural, one {} other {s}}"
+  },
+  "project.version.all-versions": {
+    "message": "All versions"
+  },
+  "project.version.back-to-versions": {
+    "message": "Back to versions"
+  },
+  "project.versions.title": {
+    "message": "Versions"
   },
   "revenue.transfers.total": {
     "message": "You have withdrawn {amount} in total."
@@ -788,6 +899,93 @@
   "settings.authorized-apps.title": {
     "message": "Authorized apps"
   },
+  "settings.billing.modal.cancel.action": {
+    "message": "Cancel subscription"
+  },
+  "settings.billing.modal.cancel.description": {
+    "message": "This will cancel your subscription. You will retain your perks until the end of the current billing cycle."
+  },
+  "settings.billing.modal.cancel.title": {
+    "message": "Are you sure you want to cancel your subscription?"
+  },
+  "settings.billing.modal.delete.action": {
+    "message": "Remove this payment method"
+  },
+  "settings.billing.modal.delete.description": {
+    "message": "This will remove this payment method forever (like really forever)."
+  },
+  "settings.billing.modal.delete.title": {
+    "message": "Are you sure you want to remove this payment method?"
+  },
+  "settings.billing.payment_method.action.add": {
+    "message": "Add payment method"
+  },
+  "settings.billing.payment_method.action.history": {
+    "message": "View past charges"
+  },
+  "settings.billing.payment_method.action.primary": {
+    "message": "Make primary"
+  },
+  "settings.billing.payment_method.card_display": {
+    "message": "{card_brand} ending in {last_four}"
+  },
+  "settings.billing.payment_method.card_expiry": {
+    "message": "Expires {month}/{year}"
+  },
+  "settings.billing.payment_method.none": {
+    "message": "You have not added any payment methods."
+  },
+  "settings.billing.payment_method.primary": {
+    "message": "Primary"
+  },
+  "settings.billing.payment_method.title": {
+    "message": "Payment methods"
+  },
+  "settings.billing.payment_method_type.amazon_pay": {
+    "message": "Amazon Pay"
+  },
+  "settings.billing.payment_method_type.amex": {
+    "message": "American Express"
+  },
+  "settings.billing.payment_method_type.cashapp": {
+    "message": "Cash App"
+  },
+  "settings.billing.payment_method_type.diners": {
+    "message": "Diners Club"
+  },
+  "settings.billing.payment_method_type.discover": {
+    "message": "Discover"
+  },
+  "settings.billing.payment_method_type.eftpos": {
+    "message": "EFTPOS"
+  },
+  "settings.billing.payment_method_type.jcb": {
+    "message": "JCB"
+  },
+  "settings.billing.payment_method_type.mastercard": {
+    "message": "MasterCard"
+  },
+  "settings.billing.payment_method_type.paypal": {
+    "message": "PayPal"
+  },
+  "settings.billing.payment_method_type.unionpay": {
+    "message": "UnionPay"
+  },
+  "settings.billing.payment_method_type.unknown": {
+    "message": "Unknown payment method"
+  },
+  "settings.billing.payment_method_type.visa": {
+    "message": "Visa"
+  },
+  "settings.billing.subscription.description": {
+    "message": "Manage your Modrinth subscriptions."
+  },
+  "settings.billing.subscription.title": {
+    "message": "Subscriptions"
+  },
+  "settings.billing.title": {
+    "message": "Billing and subscriptions"
+  },
   "settings.display.banner.developer-mode.button": {
     "message": "Deactivate developer mode"
   },
@@ -827,6 +1025,12 @@
   "settings.display.project-list-layouts.user": {
     "message": "User profile pages"
   },
+  "settings.display.project-list.layouts.collection": {
+    "message": "Collection"
+  },
+  "settings.display.sidebar.Left-aligned-search-sidebar.title": {
+    "message": "Left-aligned search sidebar"
+  },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
   },
@@ -845,17 +1049,14 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Hide Modrinth App promotions"
   },
-  "settings.display.sidebar.right-aligned-project-sidebar.description": {
-    "message": "Aligns the project details sidebar to the right of the page's content."
+  "settings.display.sidebar.left-aligned-project-sidebar.description": {
+    "message": "Aligns the project details sidebar to the left of the page's content."
   },
-  "settings.display.sidebar.right-aligned-project-sidebar.title": {
-    "message": "Right-aligned project sidebar"
+  "settings.display.sidebar.left-aligned-project-sidebar.title": {
+    "message": "Left-aligned project sidebar"
   },
-  "settings.display.sidebar.right-aligned-search-sidebar.description": {
-    "message": "Aligns the search filters sidebar to the right of the search results."
-  },
-  "settings.display.sidebar.right-aligned-search-sidebar.title": {
-    "message": "Right-aligned search sidebar"
+  "settings.display.sidebar.left-aligned-search-sidebar.description": {
+    "message": "Aligns the search filters sidebar to the left of the search results."
   },
   "settings.display.theme.dark": {
     "message": "Dark"

@@ -292,7 +292,7 @@ role-moderator {
 }
 
 .role-admin {
-  color: var(--color-brand-green);
+  color: var(--color-green);
 }
 
 .reporter-icon {

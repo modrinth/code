@@ -45,11 +45,3 @@ export async function remove_user(user) {
 export async function users() {
   return await invoke('plugin:auth|auth_users')
 }
-
-// Get a user by UUID
-// Prefer to use refresh() instead of this because it will refresh the credentials
-// user is UUID
-// Returns Credentials (of user)
-export async function get_user(user) {
-  return await invoke('plugin:auth|auth_get_user', { user })
-}

@@ -21,7 +21,7 @@
           v-for="option in themeOptions"
           :key="option"
           class="preview-radio button-base"
-          :class="{ selected: theme.preference === option }"
+          :class="{ selected: theme.preferred === option }"
           @click="() => updateColorTheme(option)"
         >
           <div class="preview" :class="`${option === 'system' ? systemTheme : option}-mode`">
@@ -32,16 +32,16 @@
             </div>
           </div>
           <div class="label">
-            <RadioButtonChecked v-if="theme.preference === option" class="radio" />
+            <RadioButtonChecked v-if="theme.preferred === option" class="radio" />
             <RadioButtonIcon v-else class="radio" />
             {{ colorTheme[option] ? formatMessage(colorTheme[option]) : option }}
             <SunIcon
-              v-if="'light' === option"
+              v-if="theme.preferences.light === option"
               v-tooltip="formatMessage(colorTheme.preferredLight)"
               class="theme-icon"
             />
             <MoonIcon
-              v-else-if="(cosmetics.preferredDarkTheme ?? 'dark') === option"
+              v-else-if="theme.preferences.dark === option"
               v-tooltip="formatMessage(colorTheme.preferredDark)"
               class="theme-icon"
             />
@@ -153,7 +153,6 @@
           v-model="cosmetics.advancedRendering"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
@@ -170,10 +169,9 @@
           v-model="cosmetics.externalLinksNewTab"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
-      <div class="adjacent-input small">
+      <div v-if="false" class="adjacent-input small">
         <label for="modrinth-app-promos">
           <span class="label__title">
             {{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
@@ -187,16 +185,15 @@
           v-model="cosmetics.hideModrinthAppPromos"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
         <label for="search-layout-toggle">
           <span class="label__title">
-            {{ formatMessage(toggleFeatures.rightAlignedSearchSidebarTitle) }}
+            {{ formatMessage(toggleFeatures.leftAlignedSearchSidebarTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(toggleFeatures.rightAlignedSearchSidebarDescription) }}
+            {{ formatMessage(toggleFeatures.leftAlignedSearchSidebarDescription) }}
           </span>
         </label>
         <input
@@ -204,16 +201,15 @@
           v-model="cosmetics.searchLayout"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
       <div class="adjacent-input small">
         <label for="project-layout-toggle">
           <span class="label__title">
-            {{ formatMessage(toggleFeatures.rightAlignedProjectSidebarTitle) }}
+            {{ formatMessage(toggleFeatures.leftAlignedProjectSidebarTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(toggleFeatures.rightAlignedProjectSidebarDescription) }}
+            {{ formatMessage(toggleFeatures.leftAlignedProjectSidebarDescription) }}
           </span>
         </label>
         <input
@@ -221,19 +217,19 @@
           v-model="cosmetics.projectLayout"
           class="switch stylized-toggle"
           type="checkbox"
-          @change="saveCosmetics"
         />
       </div>
     </section>
   </div>
 </template>
 
-<script setup>
-import { CodeIcon, RadioButtonIcon, RadioButtonChecked, SunIcon, MoonIcon } from "@modrinth/assets";
+<script setup lang="ts">
+import { CodeIcon, MoonIcon, RadioButtonChecked, RadioButtonIcon, SunIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
-import { formatProjectType } from "~/plugins/shorthands.js";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import { DARK_THEMES } from "~/composables/theme.js";
+import type { DisplayLocation } from "~/plugins/cosmetics";
+import { formatProjectType } from "~/plugins/shorthands.js";
+import { isDarkTheme, type Theme } from "~/plugins/theme/index.ts";
 
 useHead({
   title: "Display settings - Modrinth",
@@ -330,6 +326,10 @@ const projectListLayouts = defineMessages({
     id: "settings.display.project-list-layouts.user",
     defaultMessage: "User profile pages",
   },
+  collection: {
+    id: "settings.display.project-list.layouts.collection",
+    defaultMessage: "Collection",
+  },
 });
 
 const toggleFeatures = defineMessages({
@@ -368,21 +368,21 @@ const toggleFeatures = defineMessages({
     defaultMessage:
       'Hides the "Get Modrinth App" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer.',
   },
-  rightAlignedSearchSidebarTitle: {
-    id: "settings.display.sidebar.right-aligned-search-sidebar.title",
-    defaultMessage: "Right-aligned search sidebar",
+  leftAlignedSearchSidebarTitle: {
+    id: "settings.display.sidebar.Left-aligned-search-sidebar.title",
+    defaultMessage: "Left-aligned search sidebar",
   },
-  rightAlignedSearchSidebarDescription: {
-    id: "settings.display.sidebar.right-aligned-search-sidebar.description",
-    defaultMessage: "Aligns the search filters sidebar to the right of the search results.",
+  leftAlignedSearchSidebarDescription: {
+    id: "settings.display.sidebar.left-aligned-search-sidebar.description",
+    defaultMessage: "Aligns the search filters sidebar to the left of the search results.",
   },
-  rightAlignedProjectSidebarTitle: {
-    id: "settings.display.sidebar.right-aligned-project-sidebar.title",
-    defaultMessage: "Right-aligned project sidebar",
+  leftAlignedProjectSidebarTitle: {
+    id: "settings.display.sidebar.left-aligned-project-sidebar.title",
+    defaultMessage: "Left-aligned project sidebar",
   },
-  rightAlignedProjectSidebarDescription: {
-    id: "settings.display.sidebar.right-aligned-project-sidebar.description",
-    defaultMessage: "Aligns the project details sidebar to the right of the page's content.",
+  leftAlignedProjectSidebarDescription: {
+    id: "settings.display.sidebar.left-aligned-project-sidebar.description",
+    defaultMessage: "Aligns the project details sidebar to the left of the page's content.",
   },
 });
 
@@ -390,45 +390,41 @@ const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
 const tags = useTags();
 
-const systemTheme = ref("light");
-
 const theme = useTheme();
 
+// On the server the value of native theme can be 'unknown'. To hydrate
+// correctly, we need to make sure we aren't using 'unknown' and values between
+// server and client renders are in sync.
+
+const serverSystemTheme = useState(() => {
+  const theme_ = theme.native;
+  if (theme_ === "unknown") return "light";
+  return theme_;
+});
+
+const systemTheme = useMountedValue((mounted): Theme => {
+  const systemTheme_ = mounted ? theme.native : serverSystemTheme.value;
+  return systemTheme_ === "light" ? theme.preferences.light : theme.preferences.dark;
+});
+
 const themeOptions = computed(() => {
-  const options = ["system", "light", "dark", "oled"];
-  if (flags.value.developerMode || theme.value.preference === "retro") {
+  const options: ("system" | Theme)[] = ["system", "light", "dark", "oled"];
+  if (flags.value.developerMode || theme.preferred === "retro") {
     options.push("retro");
   }
   return options;
 });
 
-onMounted(() => {
-  updateSystemTheme();
-  window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", (event) => {
-    setSystemTheme(event.matches);
-  });
-});
-
-function updateSystemTheme() {
-  const query = window.matchMedia("(prefers-color-scheme: light)");
-  setSystemTheme(query.matches);
-}
-
-function setSystemTheme(light) {
-  if (light) {
-    systemTheme.value = "light";
-  } else {
-    systemTheme.value = cosmetics.value.preferredDarkTheme ?? "dark";
+function updateColorTheme(value: Theme | "system") {
+  if (value !== "system") {
+    if (isDarkTheme(value)) {
+      theme.preferences.dark = value;
+    } else {
+      theme.preferences.light = value;
+    }
   }
-}
 
-function updateColorTheme(value) {
-  if (DARK_THEMES.includes(value)) {
-    cosmetics.value.preferredDarkTheme = value;
-    saveCosmetics();
-    updateSystemTheme();
-  }
-  updateTheme(value, true);
+  theme.preferred = value;
 }
 
 function disableDeveloperMode() {
@@ -445,16 +441,18 @@ function disableDeveloperMode() {
 const listTypes = computed(() => {
   const types = tags.value.projectTypes.map((type) => {
     return {
-      id: type.id,
+      id: type.id as DisplayLocation,
       name: formatProjectType(type.id) + "s",
       display: "the " + formatProjectType(type.id).toLowerCase() + "s search page",
     };
   });
+
   types.push({
-    id: "user",
+    id: "user" as DisplayLocation,
     name: "User profiles",
     display: "user pages",
   });
+
   return types;
 });
 </script>

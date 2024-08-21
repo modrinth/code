@@ -4,34 +4,33 @@ import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { offline_listener, profile_listener } from '@/helpers/events.js'
+import { profile_listener } from '@/helpers/events.js'
 import { handleError } from '@/store/notifications.js'
 import { Button } from '@modrinth/ui'
 import { PlusIcon } from '@modrinth/assets'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { NewInstanceImage } from '@/assets/icons'
-import { isOffline } from '@/helpers/utils'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
-const profiles = await list(true).catch(handleError)
-const instances = shallowRef(Object.values(profiles))
+const instances = shallowRef(await list().catch(handleError))
 
-const offline = ref(await isOffline())
-const unlistenOffline = await offline_listener((b) => {
-  offline.value = b
+const offline = ref(!navigator.onLine)
+window.addEventListener('offline', () => {
+  offline.value = true
+})
+window.addEventListener('online', () => {
+  offline.value = false
 })
 
 const unlistenProfile = await profile_listener(async () => {
-  const profiles = await list(true).catch(handleError)
-  instances.value = Object.values(profiles)
+  instances.value = await list().catch(handleError)
 })
 onUnmounted(() => {
   unlistenProfile()
-  unlistenOffline()
 })
 </script>
 
