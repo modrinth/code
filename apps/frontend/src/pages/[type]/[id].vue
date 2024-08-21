@@ -665,7 +665,6 @@ import {
   CopyrightIcon,
   DownloadIcon,
   ExternalIcon,
-  EyeIcon,
   GameIcon,
   HeartIcon,
   ImageIcon as GalleryIcon,
@@ -689,7 +688,6 @@ import {
   OverflowMenu,
   PopoutMenu,
   ScrollablePanel,
-  StatItem,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview } from "@modrinth/utils";
 import dayjs from "dayjs";
