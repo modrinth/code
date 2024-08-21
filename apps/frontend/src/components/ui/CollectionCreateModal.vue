@@ -37,13 +37,13 @@
       <div class="flex gap-2">
         <ButtonStyled color="brand">
           <button @click="create">
-            <PlusIcon />
+            <PlusIcon aria-hidden="true" />
             Create collection
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button @click="modal.hide()">
-            <XIcon />
+            <XIcon aria-hidden="true" />
             Cancel
           </button>
         </ButtonStyled>

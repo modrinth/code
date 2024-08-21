@@ -36,7 +36,7 @@
           </div>
         </div>
       </section>
-      <section>
+      <section v-if="project.project_type !== 'resourcepack'">
         <h3>{{ formatMessage(compatibilityMessages.platforms) }}</h3>
         <div class="tag-list">
           <div
@@ -50,67 +50,50 @@
           </div>
         </div>
       </section>
-      <section>
+      <section
+        v-if="
+          (project.actualProjectType === 'mod' || project.project_type === 'modpack') &&
+          !(project.client_side === 'unsupported' && project.server_side === 'unsupported') &&
+          !(project.client_side === 'unknown' && project.server_side === 'unknown')
+        "
+      >
         <h3>{{ formatMessage(compatibilityMessages.environments) }}</h3>
         <div class="status-list">
-          <div class="status-list__item status-list__item--color-green">
-            <CheckIcon />
+          <div
+            v-if="
+              (project.client_side === 'required' && project.server_side !== 'required') ||
+              (project.client_side === 'optional' && project.server_side === 'optional')
+            "
+            class="status-list__item"
+          >
+            <ClientIcon aria-hidden="true" />
+            Client only
+          </div>
+          <div
+            v-if="
+              (project.server_side === 'required' && project.client_side !== 'unsupported') ||
+              (project.client_side === 'optional' && project.server_side === 'optional')
+            "
+            class="status-list__item"
+          >
+            <ServerIcon aria-hidden="true" />
+            Server only
+          </div>
+          <div class="status-list__item">
+            <UserIcon aria-hidden="true" />
             Singleplayer
-          </div>
-          <div
-            v-if="project.client_side !== 'unsupported' && project.server_side !== 'unsupported'"
-            class="status-list__item status-list__item--color-green"
-          >
-            <CheckIcon />
-            Client and server
-          </div>
-          <div
-            v-if="project.client_side === 'required' && project.server_side === 'unsupported'"
-            class="status-list__item status-list__item--color-green"
-          >
-            <CheckIcon />
-            Client
-          </div>
-          <div
-            v-if="project.server_side === 'required' && project.client_side === 'unsupported'"
-            class="status-list__item status-list__item--color-green"
-          >
-            <CheckIcon />
-            Server
           </div>
           <div
             v-if="
               project.client_side === 'optional' ||
-              (project.client_side === 'required' && project.server_side === 'optional')
-            "
-            class="status-list__item status-list__item--color-orange"
-          >
-            <CheckIcon />
-            Client <span class="text-sm">(Limited functionality)</span>
-          </div>
-          <div
-            v-if="
+              (project.client_side === 'required' && project.server_side === 'optional') ||
               project.server_side === 'optional' ||
               (project.server_side === 'required' && project.client_side === 'optional')
             "
-            class="status-list__item status-list__item--color-orange"
+            class="status-list__item"
           >
-            <CheckIcon />
-            Server <span class="text-sm">(Limited functionality)</span>
-          </div>
-          <div
-            v-if="project.client_side === 'unsupported'"
-            class="status-list__item status-list__item--color-red"
-          >
-            <XIcon />
-            Client
-          </div>
-          <div
-            v-if="project.server_side === 'unsupported'"
-            class="status-list__item status-list__item--color-red"
-          >
-            <XIcon />
-            Server
+            <MonitorSmartphoneIcon aria-hidden="true" />
+            Client and server <span class="text-sm">(optional)</span>
           </div>
         </div>
       </section>
@@ -321,8 +304,6 @@
 
 <script setup>
 import {
-  CheckIcon,
-  XIcon,
   CalendarIcon,
   IssuesIcon,
   WikiIcon,
@@ -340,6 +321,10 @@ import {
   VersionIcon,
   ExternalIcon,
   CodeIcon,
+  UserIcon,
+  ServerIcon,
+  ClientIcon,
+  MonitorSmartphoneIcon,
 } from "@modrinth/assets";
 
 import { NewModal, Avatar } from "@modrinth/ui";
@@ -395,7 +380,7 @@ const compatibilityMessages = defineMessages({
   },
   environments: {
     id: "project.about.compatibility.environments",
-    defaultMessage: "Environments",
+    defaultMessage: "Supported environments",
   },
 });
 const linksMessages = defineMessages({

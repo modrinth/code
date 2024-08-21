@@ -38,7 +38,7 @@
             :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
             label="General"
           >
-            <SettingsIcon />
+            <SettingsIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${
@@ -46,7 +46,7 @@
             }/settings/tags`"
             label="Tags"
           >
-            <TagsIcon />
+            <TagsIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${
@@ -54,7 +54,7 @@
             }/settings/description`"
             label="Description"
           >
-            <DescriptionIcon />
+            <DescriptionIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${
@@ -62,7 +62,7 @@
             }/settings/license`"
             label="License"
           >
-            <CopyrightIcon />
+            <CopyrightIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${
@@ -70,7 +70,7 @@
             }/settings/links`"
             label="Links"
           >
-            <LinksIcon />
+            <LinksIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${
@@ -78,7 +78,7 @@
             }/settings/members`"
             label="Members"
           >
-            <UsersIcon />
+            <UsersIcon aria-hidden="true" />
           </NavStackItem>
           <h3>View</h3>
           <NavStackItem
@@ -88,7 +88,7 @@
             label="Analytics"
             chevron
           >
-            <ChartIcon />
+            <ChartIcon aria-hidden="true" />
           </NavStackItem>
           <h3>Upload</h3>
           <NavStackItem
@@ -96,14 +96,14 @@
             label="Gallery"
             chevron
           >
-            <GalleryIcon />
+            <GalleryIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
             label="Versions"
             chevron
           >
-            <VersionIcon />
+            <VersionIcon aria-hidden="true" />
           </NavStackItem>
         </NavStack>
       </aside>
@@ -184,9 +184,9 @@
                   :href="`modrinth://mod/${project.slug}`"
                   @click="() => installWithApp()"
                 >
-                  <ModrinthIcon />
+                  <ModrinthIcon aria-hidden="true" />
                   Install with Modrinth App
-                  <ExternalIcon />
+                  <ExternalIcon aria-hidden="true" />
                 </a>
               </ButtonStyled>
               <Accordion ref="getModrinthAppAccordion">
@@ -208,7 +208,7 @@
           <div class="mx-auto flex w-fit flex-col gap-2">
             <ButtonStyled v-if="project.game_versions.length === 1">
               <div class="disabled button-like">
-                <GameIcon />
+                <GameIcon aria-hidden="true" />
                 {{
                   currentGameVersion
                     ? `Game version: ${currentGameVersion}`
@@ -234,14 +234,14 @@
               "
             >
               <template #title>
-                <GameIcon />
+                <GameIcon aria-hidden="true" />
                 {{
                   currentGameVersion ? `Game version: ${currentGameVersion}` : "Select game version"
                 }}
               </template>
               <div class="iconified-input mb-2 flex w-full">
                 <label for="game-versions-filtering" hidden>Search game versions...</label>
-                <SearchIcon />
+                <SearchIcon aria-hidden="true" />
                 <input
                   id="game-versions-filtering"
                   ref="gameVersionFilterInput"
@@ -300,7 +300,7 @@
               v-if="project.loaders.length === 1 && project.project_type !== 'resourcepack'"
             >
               <div class="disabled button-like">
-                <WrenchIcon />
+                <WrenchIcon aria-hidden="true" />
                 {{
                   currentPlatform
                     ? `Platform: ${formatCategory(currentPlatform)}`
@@ -327,7 +327,7 @@
               "
             >
               <template #title>
-                <WrenchIcon />
+                <WrenchIcon aria-hidden="true" />
                 {{
                   currentPlatform
                     ? `Platform: ${formatCategory(currentPlatform)}`
@@ -536,7 +536,7 @@
                       class="btn collection-button"
                       @click="(event) => $refs.modal_collection.show(event)"
                     >
-                      <PlusIcon />
+                      <PlusIcon aria-hidden="true" />
                       Create new collection
                     </button>
                   </template>
@@ -549,7 +549,7 @@
                 <nuxt-link
                   :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
                 >
-                  <SettingsIcon />
+                  <SettingsIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled size="large" circular type="transparent">
@@ -591,22 +591,23 @@
                     },
                     { id: 'copy-id', action: () => copyId() },
                   ]"
+                  aria-label="More options"
                 >
-                  <MoreVerticalIcon />
+                  <MoreVerticalIcon aria-hidden="true" />
                   <template #analytics>
-                    <ChartIcon />
+                    <ChartIcon aria-hidden="true" />
                     Analytics
                   </template>
                   <template #moderation-checklist>
-                    <ScaleIcon />
+                    <ScaleIcon aria-hidden="true" />
                     Review project
                   </template>
                   <template #report>
-                    <ReportIcon />
+                    <ReportIcon aria-hidden="true" />
                     Report
                   </template>
                   <template #copy-id>
-                    <ClipboardCopyIcon />
+                    <ClipboardCopyIcon aria-hidden="true" />
                     Copy ID
                   </template>
                 </OverflowMenu>

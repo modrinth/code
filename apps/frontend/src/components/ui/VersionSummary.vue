@@ -13,16 +13,17 @@
     </div>
     <ButtonStyled color="brand">
       <a :href="downloadUrl" class="min-w-0" @click="emit('onDownload')">
-        <DownloadIcon /> Download
+        <DownloadIcon aria-hidden="true" /> Download
       </a>
     </ButtonStyled>
     <ButtonStyled circular>
       <nuxt-link
         :to="`/project/${props.version.project_id}/version/${props.version.id}`"
         class="min-w-0"
+        aria-label="Open project page"
         @click="emit('onNavigate')"
       >
-        <ExternalIcon />
+        <ExternalIcon aria-hidden="true" />
       </nuxt-link>
     </ButtonStyled>
   </div>

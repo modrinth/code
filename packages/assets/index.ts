@@ -103,6 +103,7 @@ import _LogOutIcon from './icons/log-out.svg?component'
 import _MailIcon from './icons/mail.svg?component'
 import _MessageIcon from './icons/message.svg?component'
 import _MicrophoneIcon from './icons/microphone.svg?component'
+import _MonitorSmartphoneIcon from './icons/monitor-smartphone.svg?component'
 import _MoonIcon from './icons/moon.svg?component'
 import _MoreHorizontalIcon from './icons/more-horizontal.svg?component'
 import _MoreVerticalIcon from './icons/more-vertical.svg?component'
@@ -272,6 +273,7 @@ export const LogOutIcon = _LogOutIcon
 export const MailIcon = _MailIcon
 export const MessageIcon = _MessageIcon
 export const MicrophoneIcon = _MicrophoneIcon
+export const MonitorSmartphoneIcon = _MonitorSmartphoneIcon
 export const MoonIcon = _MoonIcon
 export const MoreHorizontalIcon = _MoreHorizontalIcon
 export const MoreVerticalIcon = _MoreVerticalIcon

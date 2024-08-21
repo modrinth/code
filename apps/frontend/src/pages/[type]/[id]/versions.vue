@@ -9,12 +9,13 @@
         :accept="acceptFileFromProjectType(project.project_type)"
         prompt="Upload a version"
         class="btn btn-primary"
+        aria-label="Upload a version"
         @change="handleFiles"
       >
-        <UploadIcon />
+        <UploadIcon aria-hidden="true" />
       </FileInput>
       <span class="flex items-center gap-2">
-        <InfoIcon /> Click to choose a file or drag one onto this page
+        <InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
     </div>
@@ -134,9 +135,10 @@
                 v-tooltip="`Download`"
                 :href="getPrimaryFile(version).url"
                 class="z-[1] group-hover:!bg-brand group-hover:!text-brand-inverted"
+                aria-label="Download"
                 @click="emits('onDownload')"
               >
-                <DownloadIcon />
+                <DownloadIcon aria-hidden="true" />
               </a>
             </ButtonStyled>
             <ButtonStyled circular type="transparent">
@@ -196,34 +198,35 @@
                     shown: currentMember && false,
                   },
                 ]"
+                aria-label="More options"
               >
-                <MoreVerticalIcon />
+                <MoreVerticalIcon aria-hidden="true" />
                 <template #download>
-                  <DownloadIcon />
+                  <DownloadIcon aria-hidden="true" />
                   Download
                 </template>
                 <template #new-tab>
-                  <ExternalIcon />
+                  <ExternalIcon aria-hidden="true" />
                   Open in new tab
                 </template>
                 <template #copy-link>
-                  <LinkIcon />
+                  <LinkIcon aria-hidden="true" />
                   Copy link
                 </template>
                 <template #share>
-                  <ShareIcon />
+                  <ShareIcon aria-hidden="true" />
                   Share
                 </template>
                 <template #report>
-                  <ReportIcon />
+                  <ReportIcon aria-hidden="true" />
                   Report
                 </template>
                 <template #edit>
-                  <EditIcon />
+                  <EditIcon aria-hidden="true" />
                   Edit
                 </template>
                 <template #delete>
-                  <TrashIcon />
+                  <TrashIcon aria-hidden="true" />
                   Delete
                 </template>
               </OverflowMenu>

@@ -16,14 +16,14 @@
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
         <Button color="primary" :disabled="offline || !logs[selectedLogIndex]" @click="share">
-          <ShareIcon />
+          <ShareIcon aria-hidden="true" />
           Share
         </Button>
         <Button
           v-if="logs[selectedLogIndex] && logs[selectedLogIndex].live === true"
           @click="clearLiveLog()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Clear
         </Button>
 
@@ -33,7 +33,7 @@
           color="danger"
           @click="deleteLog()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Delete
         </Button>
       </div>

@@ -33,10 +33,11 @@
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="choose-image iconified-button"
             prompt="Upload icon"
+            aria-label="Upload icon"
             :disabled="!hasPermission"
             @change="showPreviewImage"
           >
-            <UploadIcon />
+            <UploadIcon aria-hidden="true" />
           </FileInput>
           <button
             v-if="!deletedIcon && (previewImage || project.icon_url)"
@@ -44,7 +45,7 @@
             :disabled="!hasPermission"
             @click="markIconForDeletion"
           >
-            <TrashIcon />
+            <TrashIcon aria-hidden="true" />
             Remove icon
           </button>
         </div>
@@ -211,7 +212,7 @@
           :disabled="!hasChanges"
           @click="saveChanges()"
         >
-          <SaveIcon />
+          <SaveIcon aria-hidden="true" />
           Save changes
         </button>
       </div>
@@ -233,7 +234,7 @@
         :disabled="!hasDeletePermission"
         @click="$refs.modal_confirm.show()"
       >
-        <TrashIcon />
+        <TrashIcon aria-hidden="true" />
         Delete project
       </button>
     </section>
