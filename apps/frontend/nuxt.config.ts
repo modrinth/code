@@ -435,9 +435,6 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2024-07-03",
   telemetry: false,
-  devServer: {
-    host: "ads-local.modrinth.com",
-  },
 });
 
 function getApiUrl() {
