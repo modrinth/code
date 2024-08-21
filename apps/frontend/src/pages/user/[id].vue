@@ -298,19 +298,13 @@ import {
   XIcon,
   CalendarIcon,
   DownloadIcon,
-  SettingsIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
-  BookmarkIcon,
-  TagsIcon,
-  PlusIcon,
-  EyeIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, Badge, Checkbox, ButtonStyled, PopoutMenu } from "@modrinth/ui";
+import { OverflowMenu, ButtonStyled } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
-import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
-import { reportProject, reportUser } from "~/utils/report-helpers.ts";
+import { reportUser } from "~/utils/report-helpers.ts";
 
 import StaffBadge from "~/assets/images/badges/staff.svg?component";
 import ModBadge from "~/assets/images/badges/mod.svg?component";

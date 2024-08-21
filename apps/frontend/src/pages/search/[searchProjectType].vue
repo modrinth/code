@@ -1,5 +1,8 @@
 <template>
-  <div class="new-page sidebar experimental-styles-within">
+  <div
+    class="new-page sidebar experimental-styles-within"
+    :class="{ 'alt-layout': cosmetics.searchLayout }"
+  >
     <Head>
       <Title>Search {{ projectType.display }}s - Modrinth</Title>
     </Head>
@@ -31,7 +34,8 @@
                 selectedEnvironments.length === 0 &&
                 selectedVersions.length === 0 &&
                 facets.length === 0 &&
-                orFacets.length === 0
+                orFacets.length === 0 &&
+                negativeFacets.length === 0
               )
             "
             v-tooltip="`Reset all filters`"
@@ -579,6 +583,7 @@ function getSearchUrl(offset, useObj) {
 function clearFilters() {
   facets.value = [];
   orFacets.value = [];
+  negativeFacets.value = [];
   onlyOpenSource.value = false;
   selectedVersions.value = [];
   selectedEnvironments.value = [];

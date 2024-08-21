@@ -86,7 +86,7 @@
             class="status-list__item status-list__item--color-orange"
           >
             <CheckIcon />
-            Client <span>(Limited functionality)</span>
+            Client <span class="text-sm">(Limited functionality)</span>
           </div>
           <div
             v-if="
@@ -96,7 +96,7 @@
             class="status-list__item status-list__item--color-orange"
           >
             <CheckIcon />
-            Server <span>(Limited functionality)</span>
+            Server <span class="text-sm">(Limited functionality)</span>
           </div>
           <div
             v-if="project.client_side === 'unsupported'"

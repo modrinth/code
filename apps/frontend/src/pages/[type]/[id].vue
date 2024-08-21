@@ -400,7 +400,10 @@
     <CollectionCreateModal ref="modal_collection" :project-ids="[project.id]" />
     <div
       class="new-page"
-      :class="{ sidebar: !route.name.endsWith('gallery') && !route.name.endsWith('moderation') }"
+      :class="{
+        sidebar: !route.name.endsWith('gallery') && !route.name.endsWith('moderation'),
+        'alt-layout': cosmetics.projectLayout,
+      }"
     >
       <div class="normal-page__header relative my-4">
         <div
@@ -496,7 +499,7 @@
                 >
                   <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
                 </button>
-                <nuxt-link v-else to="/auth/sign-in">
+                <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in">
                   <HeartIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>
@@ -533,7 +536,7 @@
                     </button>
                   </template>
                 </PopoutMenu>
-                <nuxt-link v-else to="/auth/sign-in">
+                <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in">
                   <BookmarkIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>
@@ -691,7 +694,6 @@ import {
 import { formatCategory, isRejected, isStaff, isUnderReview } from "@modrinth/utils";
 import dayjs from "dayjs";
 import Badge from "~/components/ui/Badge.vue";
-import NavRow from "~/components/ui/NavRow.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
@@ -711,12 +713,10 @@ const data = useNuxtApp();
 const route = useNativeRoute();
 
 const auth = await useAuth();
-const user = ref();
-if (import.meta.client) {
-  user.value = await useUser();
-}
+const user = await useUser();
 
 const tags = useTags();
+const cosmetics = useCosmetics();
 
 const { formatMessage } = useVIntl();
 
@@ -1004,8 +1004,6 @@ featuredVersions.value.sort((a, b) => {
   const gameVersions = tags.value.gameVersions.map((e) => e.version);
   return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest);
 });
-
-const featuredGalleryImage = computed(() => project.value.gallery.find((img) => img.featured));
 
 const projectTypeDisplay = computed(() =>
   data.$formatProjectType(

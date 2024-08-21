@@ -136,6 +136,14 @@
         "content sidebar" auto
         "content dummy" 1fr
         / 1fr 18.75rem;
+
+      &.alt-layout {
+        grid-template:
+          "header header" auto
+          "sidebar content" auto
+          "dummy content" 1fr
+          / 18.75rem 1fr;
+      }
     }
 
     .normal-page__sidebar {

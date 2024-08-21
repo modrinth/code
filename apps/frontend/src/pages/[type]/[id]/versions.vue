@@ -263,7 +263,6 @@
 
 <script setup>
 import {
-  ShareModal,
   ButtonStyled,
   OverflowMenu,
   Pagination,

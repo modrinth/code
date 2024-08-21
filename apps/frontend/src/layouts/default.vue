@@ -466,7 +466,6 @@ import {
   SearchIcon,
   BellIcon,
   SettingsIcon,
-  ScaleIcon,
   HomeIcon,
   MoonIcon,
   SunIcon,
@@ -499,15 +498,10 @@ const { formatMessage } = useVIntl();
 
 const app = useNuxtApp();
 const auth = await useAuth();
-const user = ref();
-
-if (import.meta.client) {
-  user.value = await useUser();
-}
+const user = await useUser();
 
 const cosmetics = useCosmetics();
 const flags = useFeatureFlags();
-const tags = useTags();
 
 const config = useRuntimeConfig();
 const route = useNativeRoute();
@@ -685,7 +679,6 @@ useSeoMeta({
 
 const developerModeCounter = ref(0);
 
-const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 const isBrowseMenuOpen = ref(false);
 const navRoutes = computed(() => [

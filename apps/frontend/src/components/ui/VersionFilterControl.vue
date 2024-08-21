@@ -22,51 +22,63 @@
         <FilterXIcon />
       </button>
     </div>
-    <Accordion
-      v-for="(value, key) in filters"
+    <div
+      v-for="(value, key, index) in filters"
       :key="key"
-      :open-by-default="true"
-      type="transparent"
+      :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"
     >
-      <template #title>
+      <button
+        class="flex !w-full bg-transparent px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"
+        @click="
+          () => {
+            filterAccordions[index].isOpen
+              ? filterAccordions[index].close()
+              : filterAccordions[index].open();
+          }
+        "
+      >
         <template v-if="key === 'gameVersion'"> Game versions </template>
         <template v-else>
           {{ $capitalizeString(key) }}
         </template>
-      </template>
-
-      <ScrollablePanel :class="{ 'h-[18rem]': value.length >= 8 }">
-        <div class="mr-2 flex flex-col gap-1">
-          <ButtonStyled
-            v-for="filter in value"
-            :key="filter"
-            :type="selectedFilters[key]?.includes(filter) ? 'standard' : 'transparent'"
-          >
-            <button
-              class="!mr-2 flex !w-full items-center !justify-normal !gap-2 !p-2 !py-1 !pl-8"
-              @click="toggleFilter(key, filter)"
-            >
-              <span v-if="filter === 'release'" class="h-2 w-2 rounded-full bg-brand" />
-              <span v-else-if="filter === 'beta'" class="h-2 w-2 rounded-full bg-orange" />
-              <span v-else-if="filter === 'alpha'" class="h-2 w-2 rounded-full bg-red" />
-              <span class="text-sm text-secondary">{{ $formatCategory(filter) }}</span>
-            </button>
-          </ButtonStyled>
-        </div>
-      </ScrollablePanel>
-      <Checkbox
-        v-if="key === 'gameVersion'"
-        v-model="showSnapshots"
-        class="mx-1 ml-4"
-        :label="`Show all versions`"
-      />
-    </Accordion>
+        <DropdownIcon
+          class="ml-auto h-5 w-5 transition-transform"
+          :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"
+        />
+      </button>
+      <Accordion ref="filterAccordions" :open-by-default="true">
+        <ScrollablePanel
+          :class="{ 'h-[18rem]': value.length >= 8 && key === 'gameVersion' }"
+          :no-max-height="key !== 'gameVersion'"
+        >
+          <div class="mr-1 flex flex-col gap-1">
+            <div v-for="filter in value" :key="filter" class="group flex gap-1">
+              <button
+                :class="`flex !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${selectedFilters[key]?.includes(filter) ? 'bg-brand-highlight text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"
+                @click="toggleFilter(key, filter)"
+              >
+                <span v-if="filter === 'release'" class="h-2 w-2 rounded-full bg-brand" />
+                <span v-else-if="filter === 'beta'" class="h-2 w-2 rounded-full bg-orange" />
+                <span v-else-if="filter === 'alpha'" class="h-2 w-2 rounded-full bg-red" />
+                <span class="truncate text-sm">{{ $formatCategory(filter) }}</span>
+              </button>
+            </div>
+          </div>
+        </ScrollablePanel>
+        <Checkbox
+          v-if="key === 'gameVersion'"
+          v-model="showSnapshots"
+          class="mx-2"
+          :label="`Show all versions`"
+        />
+      </Accordion>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { FilterXIcon, SearchIcon } from "@modrinth/assets";
-import { ButtonStyled, ScrollablePanel, Checkbox } from "@modrinth/ui";
+import { DropdownIcon, FilterXIcon, SearchIcon } from "@modrinth/assets";
+import { ScrollablePanel, Checkbox } from "@modrinth/ui";
 import Accordion from "~/components/ui/Accordion.vue";
 
 const props = defineProps({
@@ -83,6 +95,8 @@ const route = useNativeRoute();
 const router = useNativeRouter();
 
 const tags = useTags();
+
+const filterAccordions = ref([]);
 
 const queryFilter = ref("");
 const showSnapshots = ref(false);
