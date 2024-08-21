@@ -12,7 +12,7 @@
       }"
       aria-label="Filters"
     >
-      <AdPlaceholder />
+      <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
       <section class="card gap-1" :class="{ 'max-lg:!hidden': !sidebarMenuOpen }">
         <div class="flex items-center gap-2">
           <div class="iconified-input w-full">
@@ -134,7 +134,6 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
       <div class="card search-controls">
         <div class="search-filter-container">
           <button
@@ -257,7 +256,7 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Promotion, Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
+import { Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
 import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon } from "@modrinth/assets";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
