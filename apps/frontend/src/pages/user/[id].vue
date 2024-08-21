@@ -30,7 +30,7 @@
             <div class="flex flex-wrap gap-2">
               <ButtonStyled size="large">
                 <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
-                  <EditIcon />
+                  <EditIcon aria-hidden="true" />
                   {{ formatMessage(commonMessages.editButton) }}
                 </NuxtLink>
               </ButtonStyled>
@@ -52,18 +52,19 @@
                     },
                     { id: 'copy-id', action: () => copyId() },
                   ]"
+                  aria-label="More options"
                 >
-                  <MoreVerticalIcon />
+                  <MoreVerticalIcon aria-hidden="true" />
                   <template #manage-projects>
-                    <BoxIcon />
+                    <BoxIcon aria-hidden="true" />
                     {{ formatMessage(messages.profileManageProjectsButton) }}
                   </template>
                   <template #report>
-                    <ReportIcon />
+                    <ReportIcon aria-hidden="true" />
                     {{ formatMessage(commonMessages.reportButton) }}
                   </template>
                   <template #copy-id>
-                    <ClipboardCopyIcon />
+                    <ClipboardCopyIcon aria-hidden="true" />
                     {{ formatMessage(commonMessages.copyIdButton) }}
                   </template>
                 </OverflowMenu>
@@ -141,7 +142,7 @@
               <div class="details">
                 <h2 class="title">{{ collection.name }}</h2>
                 <div class="stats">
-                  <LibraryIcon />
+                  <LibraryIcon aria-hidden="true" />
                   Collection
                 </div>
               </div>

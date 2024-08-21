@@ -13,7 +13,7 @@
       <template v-else>
         <span>{{ formatMessage(addEmailBannerMessages.title) }}</span>
         <nuxt-link class="btn" to="/settings/account">
-          <SettingsIcon />
+          <SettingsIcon aria-hidden="true" />
           {{ formatMessage(addEmailBannerMessages.action) }}
         </nuxt-link>
       </template>
@@ -29,7 +29,7 @@
     >
       <span>{{ formatMessage(subscriptionPaymentFailedBannerMessages.title) }}</span>
       <nuxt-link class="btn" to="/settings/billing">
-        <SettingsIcon />
+        <SettingsIcon aria-hidden="true" />
         {{ formatMessage(subscriptionPaymentFailedBannerMessages.action) }}
       </nuxt-link>
     </div>
@@ -41,14 +41,16 @@
       class="site-banner site-banner--warning"
     >
       <div class="site-banner__title">
-        <IssuesIcon />
+        <IssuesIcon aria-hidden="true" />
         <span>{{ formatMessage(stagingBannerMessages.title) }}</span>
       </div>
       <div class="site-banner__description">
         {{ formatMessage(stagingBannerMessages.description) }}
       </div>
       <div class="site-banner__actions">
-        <Button transparent icon-only :action="hideStagingBanner"><XIcon /></Button>
+        <Button transparent icon-only :action="hideStagingBanner" aria-label="Close banner"
+          ><XIcon aria-hidden="true"
+        /></Button>
       </div>
     </div>
     <header
@@ -92,13 +94,16 @@
               },
             ]"
           >
-            <CompassIcon /> Browse <DropdownIcon class="h-5 w-5 text-secondary" />
-            <template #mods> <BoxIcon /> Mods </template>
-            <template #resourcepacks> <PaintBrushIcon /> Resource Packs </template>
-            <template #datapacks> <BracesIcon /> Data Packs </template>
-            <template #plugins> <ServerIcon /> Plugins </template>
-            <template #shaders> <GlassesIcon /> Shaders </template>
-            <template #modpacks> <PackageOpenIcon /> Modpacks </template>
+            <CompassIcon aria-hidden="true" /> Browse
+            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
+            <template #resourcepacks>
+              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+            </template>
+            <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
+            <template #plugins> <ServerIcon aria-hidden="true" /> Plugins </template>
+            <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
+            <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
           </OverflowMenu>
         </ButtonStyled>
         <div class="contents lg:hidden">
@@ -123,26 +128,33 @@
                 },
               ]"
             >
-              <HamburgerIcon /> More <DropdownIcon class="h-5 w-5 text-secondary" />
-              <template #servers> <ServerIcon /> Host a server </template>
-              <template #app> <DownloadIcon /> Get Modrinth App </template>
-              <template #plus> <ArrowBigUpDashIcon /> Upgrade to Modrinth+ </template>
+              <HamburgerIcon aria-hidden="true" /> More
+              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+              <template #servers> <ServerIcon aria-hidden="true" /> Host a server </template>
+              <template #app> <DownloadIcon aria-hidden="true" /> Get Modrinth App </template>
+              <template #plus>
+                <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
+              </template>
             </OverflowMenu>
           </ButtonStyled>
         </div>
         <div class="hidden lg:contents">
           <ButtonStyled v-if="false" type="transparent">
-            <a href="https://bisecthosting.com/modrinth"> <ServerIcon /> Host a server </a>
+            <a href="https://bisecthosting.com/modrinth">
+              <ServerIcon aria-hidden="true" /> Host a server
+            </a>
           </ButtonStyled>
           <ButtonStyled type="transparent">
-            <NuxtLink to="/app"> <DownloadIcon /> Get Modrinth App </NuxtLink>
+            <NuxtLink to="/app"> <DownloadIcon aria-hidden="true" /> Get Modrinth App </NuxtLink>
           </ButtonStyled>
           <ButtonStyled
             v-if="!auth.user || isPermission(auth.badges, 1 << 0)"
             type="transparent"
             color="purple"
           >
-            <NuxtLink to="/plus"> <ArrowBigUpDashIcon /> Upgrade to Modrinth+ </NuxtLink>
+            <NuxtLink to="/plus">
+              <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
+            </NuxtLink>
           </ButtonStyled>
         </div>
       </div>
@@ -153,6 +165,7 @@
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             position="bottom"
             direction="left"
+            aria-label="Create new..."
             :options="[
               {
                 id: 'new-project',
@@ -169,11 +182,16 @@
               },
             ]"
           >
-            <PlusIcon /> <DropdownIcon class="h-5 w-5 text-secondary" />
-            <template #new-project> <BoxIcon /> New project </template>
+            <PlusIcon aria-hidden="true" />
+            <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+            <template #new-project> <BoxIcon aria-hidden="true" /> New project </template>
             <!-- <template #import-project> <BoxImportIcon /> Import project </template>-->
-            <template #new-collection> <CollectionIcon /> New collection </template>
-            <template #new-organization> <OrganizationIcon /> New organization </template>
+            <template #new-collection>
+              <CollectionIcon aria-hidden="true" /> New collection
+            </template>
+            <template #new-organization>
+              <OrganizationIcon aria-hidden="true" /> New organization
+            </template>
           </OverflowMenu>
         </ButtonStyled>
         <OverflowMenu
@@ -246,7 +264,7 @@
             </div>
           </NuxtLink>
           <nuxt-link v-else class="iconified-button brand-button" to="/auth/sign-in">
-            <LogInIcon /> {{ formatMessage(commonMessages.signInButton) }}
+            <LogInIcon aria-hidden="true" /> {{ formatMessage(commonMessages.signInButton) }}
           </nuxt-link>
         </div>
         <div class="links">
@@ -290,20 +308,26 @@
         </div>
       </div>
       <div class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen || isMobileMenuOpen }">
-        <NuxtLink to="/" class="tab button-animation" :title="formatMessage(navMenuMessages.home)">
-          <HomeIcon />
+        <NuxtLink
+          to="/"
+          class="tab button-animation"
+          :title="formatMessage(navMenuMessages.home)"
+          aria-label="Home"
+        >
+          <HomeIcon aria-hidden="true" />
         </NuxtLink>
         <button
           class="tab button-animation"
           :class="{ 'router-link-exact-active': isBrowseMenuOpen }"
           :title="formatMessage(navMenuMessages.search)"
+          aria-label="Search"
           @click="toggleBrowseMenu()"
         >
           <template v-if="auth.user">
-            <SearchIcon />
+            <SearchIcon aria-hidden="true" />
           </template>
           <template v-else>
-            <SearchIcon class="smaller" />
+            <SearchIcon aria-hidden="true" class="smaller" />
             {{ formatMessage(navMenuMessages.search) }}
           </template>
         </button>
@@ -311,6 +335,7 @@
           <NuxtLink
             to="/dashboard/notifications"
             class="tab button-animation"
+            aria-label="Notifications"
             :class="{
               'no-active': isMobileMenuOpen || isBrowseMenuOpen,
             }"
@@ -322,24 +347,26 @@
               }
             "
           >
-            <NotificationIcon />
+            <NotificationIcon aria-hidden="true" />
           </NuxtLink>
           <NuxtLink
             to="/dashboard"
             class="tab button-animation"
+            aria-label="Dashboard"
             :title="formatMessage(commonMessages.dashboardLabel)"
           >
-            <ChartIcon />
+            <ChartIcon aria-hidden="true" />
           </NuxtLink>
         </template>
         <button
           class="tab button-animation"
           :title="formatMessage(messages.toggleMenu)"
+          :aria-label="isMobileMenuOpen ? 'Close menu' : 'Open menu'"
           @click="toggleMobileMenu()"
         >
           <template v-if="!auth.user">
-            <HamburgerIcon v-if="!isMobileMenuOpen" />
-            <CrossIcon v-else />
+            <HamburgerIcon v-if="!isMobileMenuOpen" aria-hidden="true" />
+            <CrossIcon v-else aria-hidden="true" />
           </template>
           <template v-else>
             <Avatar

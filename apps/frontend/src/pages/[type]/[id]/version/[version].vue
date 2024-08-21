@@ -39,13 +39,13 @@
         <div class="button-group">
           <ButtonStyled>
             <button @click="$refs.modal_package_mod.hide()">
-              <CrossIcon />
+              <CrossIcon aria-hidden="true" />
               Cancel
             </button>
           </ButtonStyled>
           <ButtonStyled color="brand">
             <button @click="createDataPackVersion">
-              <RightArrowIcon />
+              <RightArrowIcon aria-hidden="true" />
               Begin packaging data pack
             </button>
           </ButtonStyled>
@@ -254,7 +254,7 @@
         </div>
         <ButtonStyled v-if="isEditing && project.project_type !== 'modpack'">
           <button @click="version.dependencies.splice(index, 1)">
-            <TrashIcon />
+            <TrashIcon aria-hidden="true" />
             Remove
           </button>
         </ButtonStyled>
@@ -307,7 +307,7 @@
         <div class="input-group">
           <ButtonStyled color="brand">
             <button @click="addDependency(dependencyAddMode, newDependencyId, newDependencyType)">
-              <PlusIcon />
+              <PlusIcon aria-hidden="true" />
               Add dependency
             </button>
           </ButtonStyled>
@@ -317,7 +317,7 @@
     <div class="version-page__files universal-card">
       <h3>Files</h3>
       <div v-if="isEditing && replaceFile" class="file primary">
-        <FileIcon />
+        <FileIcon aria-hidden="true" />
         <span class="filename">
           <strong>{{ replaceFile.name }}</strong>
           <span class="file-size">({{ $formatBytes(replaceFile.size) }})</span>
@@ -325,12 +325,13 @@
         <FileInput
           class="iconified-button raised-button"
           prompt="Replace"
+          aria-label="Replace"
           :accept="acceptFileFromProjectType(project.project_type)"
           :max-size="524288000"
           should-always-reset
           @change="(x) => (replaceFile = x[0])"
         >
-          <TransferIcon />
+          <TransferIcon aria-hidden="true" />
         </FileInput>
       </div>
       <div
@@ -341,7 +342,7 @@
           primary: primaryFile.hashes.sha1 === file.hashes.sha1,
         }"
       >
-        <FileIcon />
+        <FileIcon aria-hidden="true" />
         <span class="filename">
           <strong>{{ file.filename }}</strong>
           <span class="file-size">({{ $formatBytes(file.size) }})</span>
@@ -389,7 +390,7 @@
               }
             "
           >
-            <TrashIcon />
+            <TrashIcon aria-hidden="true" />
             Remove
           </button>
         </ButtonStyled>
@@ -400,14 +401,14 @@
             :title="`Download ${file.filename}`"
             tabindex="0"
           >
-            <DownloadIcon />
+            <DownloadIcon aria-hidden="true" />
             Download
           </a>
         </ButtonStyled>
       </div>
       <template v-if="isEditing">
         <div v-for="(file, index) in newFiles" :key="index" class="file">
-          <FileIcon />
+          <FileIcon aria-hidden="true" />
           <span class="filename">
             <strong>{{ file.name }}</strong>
             <span class="file-size">({{ $formatBytes(file.size) }})</span>
@@ -435,7 +436,7 @@
                 }
               "
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               Remove
             </button>
           </ButtonStyled>
@@ -448,6 +449,7 @@
           <span v-else>Used for files such as sources or Javadocs.</span>
           <FileInput
             prompt="Drag and drop to upload or click to select"
+            aria-label="Upload additional file"
             multiple
             long-style
             :accept="acceptFileFromProjectType(project.project_type)"
@@ -460,7 +462,7 @@
                 })
             "
           >
-            <UploadIcon />
+            <UploadIcon aria-hidden="true" />
           </FileInput>
         </div>
       </template>

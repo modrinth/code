@@ -40,9 +40,10 @@
             "
             v-tooltip="`Reset all filters`"
             class="btn icon-only"
+            aria-label="Reset all filters"
             @click="clearFilters"
           >
-            <FilterXIcon />
+            <FilterXIcon aria-hidden="true" />
           </button>
         </div>
         <div

@@ -68,13 +68,13 @@
       <div class="flex gap-2">
         <ButtonStyled color="brand">
           <button @click="createProject">
-            <PlusIcon />
+            <PlusIcon aria-hidden="true" />
             Create project
           </button>
         </ButtonStyled>
         <ButtonStyled>
           <button @click="cancel">
-            <XIcon />
+            <XIcon aria-hidden="true" />
             Cancel
           </button>
         </ButtonStyled>

@@ -23,15 +23,15 @@
       </h2>
       <div class="button-group">
         <ButtonStyled color="brand" size="large">
-          <nuxt-link to="/mods"> <CompassIcon /> Discover mods </nuxt-link>
+          <nuxt-link to="/mods"> <CompassIcon aria-hidden="true" /> Discover mods </nuxt-link>
         </ButtonStyled>
         <ButtonStyled size="large" type="outlined">
           <nuxt-link v-if="!auth.user" to="/auth/sign-up" rel="noopener nofollow">
-            <LogInIcon />
+            <LogInIcon aria-hidden="true" />
             Sign up
           </nuxt-link>
           <nuxt-link v-else to="/dashboard/projects">
-            <DashboardIcon />
+            <DashboardIcon aria-hidden="true" />
             Go to dashboard
           </nuxt-link>
         </ButtonStyled>
@@ -175,7 +175,7 @@
                       {{ notification.versions[notification.versions.length - 1] }}
                     </p>
                     <div class="date">
-                      <CalendarIcon />
+                      <CalendarIcon aria-hidden="true" />
                       <span>
                         Received
                         {{ fromNow(notification.date_modified) }}
@@ -217,19 +217,21 @@
                   href="https://prismlauncher.org/"
                   class="graphic gradient-border"
                   title="Prism Launcher"
+                  aria-label="Prism Launcher"
                 >
-                  <PrismLauncherLogo />
+                  <PrismLauncherLogo aria-hidden="true" />
                 </a>
-                <nuxt-link to="/app" class="graphic gradient-border">
-                  <ModrinthIcon />
+                <nuxt-link to="/app" class="graphic gradient-border" aria-label="Modrinth App">
+                  <ModrinthIcon aria-hidden="true" />
                 </nuxt-link>
                 <a
                   rel="noopener"
                   href="https://atlauncher.com/"
                   class="graphic gradient-border"
                   title="ATLauncher"
+                  aria-label="ATLauncher"
                 >
-                  <ATLauncherLogo />
+                  <ATLauncherLogo aria-hidden="true" />
                 </a>
               </div>
             </div>

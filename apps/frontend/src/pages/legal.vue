@@ -5,32 +5,32 @@
         <h1>Legal</h1>
         <NavStack>
           <NavStackItem link="/legal/terms" label="Terms of Use">
-            <HeartHandshakeIcon />
+            <HeartHandshakeIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/legal/rules" label="Content Rules">
-            <ScaleIcon />
+            <ScaleIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/legal/copyright" label="Copyright Policy">
-            <CopyrightIcon />
+            <CopyrightIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/legal/security" label="Security Notice">
-            <ShieldIcon />
+            <ShieldIcon aria-hidden="true" />
           </NavStackItem>
 
           <h3>Privacy</h3>
           <NavStackItem link="/legal/privacy" label="Privacy Policy">
-            <LockIcon />
+            <LockIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/legal/ccpa" label="California Privacy Notice">
-            <InfoIcon />
+            <InfoIcon aria-hidden="true" />
           </NavStackItem>
 
           <h3>Rewards Program</h3>
           <NavStackItem link="/legal/cmp" label="Rewards Program Terms">
-            <CurrencyIcon />
+            <CurrencyIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/legal/cmp-info" label="Rewards Program Info">
-            <InfoIcon />
+            <InfoIcon aria-hidden="true" />
           </NavStackItem>
         </NavStack>
       </aside>

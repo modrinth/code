@@ -31,8 +31,8 @@
             </slot>
           </div>
           <ButtonStyled v-if="closable" circular>
-            <button @click="hide">
-              <XIcon />
+            <button @click="hide" aria-label="Close">
+              <XIcon aria-hidden="true" />
             </button>
           </ButtonStyled>
         </div>

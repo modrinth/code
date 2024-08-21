@@ -44,7 +44,7 @@
         to="/settings/billing"
         class="btn btn-purple btn-large"
       >
-        <SettingsIcon />
+        <SettingsIcon aria-hidden="true" />
         Manage subscription
       </nuxt-link>
       <button v-else-if="auth.user" class="btn btn-purple btn-large" @click="purchaseModal.show()">
