@@ -191,7 +191,7 @@ const isChildOfDropdown = (element) => {
 <style lang="scss" scoped>
 .animated-dropdown {
   width: 20rem;
-  min-height: 40px;
+  height: 40px;
   position: relative;
   display: inline-block;
 
@@ -266,6 +266,10 @@ const isChildOfDropdown = (element) => {
       padding: var(--gap-md);
       cursor: pointer;
       user-select: none;
+
+      > label {
+        cursor: pointer;
+      }
 
       &:hover {
         filter: brightness(0.85);

@@ -24,7 +24,7 @@
               </Button>
             </template>
             <template v-else-if="canEdit && isEditing === true">
-              <PopoutMenu class="btn" position="bottom" direction="right">
+              <PopoutMenu class="btn">
                 <EditIcon /> {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">

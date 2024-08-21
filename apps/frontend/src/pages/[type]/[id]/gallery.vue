@@ -794,4 +794,8 @@ export default defineNuxtComponent({
     }
   }
 }
+
+.brand-button {
+  color: var(--color-accent-contrast);
+}
 </style>

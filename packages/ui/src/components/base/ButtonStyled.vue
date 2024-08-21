@@ -156,41 +156,96 @@ const colorVariables = computed(() => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .btn-wrapper {
   display: contents;
 }
 
 /* Searches up to 4 children deep for valid button */
-.btn-wrapper :slotted(:is(button, a):first-child),
-.btn-wrapper :slotted(*) > :is(button, a):first-child,
-.btn-wrapper :slotted(*) > *:first-child > :is(button, a):first-child,
-.btn-wrapper :slotted(*) > *:first-child > *:first-child > :is(button, a):first-child {
-  @apply flex flex-row items-center justify-center border-solid border-2 border-transparent active:scale-95 hover:brightness-125 focus-visible:brightness-125 bg-[--_bg] text-[--_text] hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
-  transition:
-    scale 0.125s ease-in-out,
-    background-color 0.25s ease-in-out;
-}
-
-.btn-wrapper.outline :slotted(:is(button, a):first-child),
-.btn-wrapper.outline :slotted(*) > :is(button, a):first-child,
-.btn-wrapper.outline :slotted(*) > *:first-child > :is(button, a):first-child,
-.btn-wrapper.outline :slotted(*) > *:first-child > *:first-child > :is(button, a):first-child {
-  @apply border-current;
-}
-
-/*noinspection CssUnresolvedCustomProperty*/
-.btn-wrapper :slotted(:is(button, a):first-child) > svg:first-child,
-.btn-wrapper :slotted(*) > :is(button, a):first-child > svg:first-child,
-.btn-wrapper :slotted(*) > *:first-child > :is(button, a):first-child > svg:first-child,
+.btn-wrapper :slotted(:is(button, a, .button-like):first-child),
+.btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child,
+.btn-wrapper :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
 .btn-wrapper
   :slotted(*)
   > *:first-child
   > *:first-child
-  > :is(button, a):first-child
+  > :is(button, a, .button-like):first-child {
+  @apply flex flex-row items-center justify-center border-solid border-2 border-transparent bg-[--_bg] text-[--_text] h-[--_height] min-w-[--_width] rounded-[--_radius] px-[--_padding-x] py-[--_padding-y] gap-[--_gap] font-[--_font-weight];
+  transition:
+    scale 0.125s ease-in-out,
+    background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out;
+
+  &[disabled],
+  &[disabled='true'],
+  &.disabled,
+  &.looks-disabled {
+    @apply opacity-50;
+  }
+
+  &[disabled],
+  &[disabled='true'],
+  &.disabled {
+    @apply cursor-not-allowed;
+  }
+
+  &:not([disabled]):not([disabled='true']):not(.disabled) {
+    @apply active:scale-95 hover:brightness-125 focus-visible:brightness-125 hover:bg-[--_hover-bg] hover:text-[--_hover-text] focus-visible:bg-[--_hover-bg] focus-visible:text-[--_hover-text];
+  }
+}
+
+.btn-wrapper.outline :slotted(:is(button, a, .button-like):first-child),
+.btn-wrapper.outline :slotted(*) > :is(button, a, .button-like):first-child,
+.btn-wrapper.outline :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
+.btn-wrapper.outline
+  :slotted(*)
+  > *:first-child
+  > *:first-child
+  > :is(button, a, .button-like):first-child {
+  @apply border-current;
+}
+
+/*noinspection CssUnresolvedCustomProperty*/
+.btn-wrapper :slotted(:is(button, a, .button-like):first-child) > svg:first-child,
+.btn-wrapper :slotted(*) > :is(button, a, .button-like):first-child > svg:first-child,
+.btn-wrapper
+  :slotted(*)
+  > *:first-child
+  > :is(button, a, .button-like):first-child
+  > svg:first-child,
+.btn-wrapper
+  :slotted(*)
+  > *:first-child
+  > *:first-child
+  > :is(button, a, .button-like):first-child
   > svg:first-child {
   min-width: var(--_icon-size, 1rem);
   min-height: var(--_icon-size, 1rem);
+}
+
+.joined-buttons {
+  display: flex;
+  gap: 1px;
+
+  > .btn-wrapper:not(:first-child) {
+    :slotted(:is(button, a, .button-like):first-child),
+    :slotted(*) > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > *:first-child > :is(button, a, .button-like):first-child {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  > :not(:last-child) {
+    :slotted(:is(button, a, .button-like):first-child),
+    :slotted(*) > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > :is(button, a, .button-like):first-child,
+    :slotted(*) > *:first-child > *:first-child > :is(button, a, .button-like):first-child {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
 }
 
 /* guys, I know this is nuts, I know */

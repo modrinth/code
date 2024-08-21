@@ -8,8 +8,12 @@
   >
     <slot></slot>
     <template #menu>
-      <template v-for="(option, index) in options">
-        <div v-if="option.divider" :key="`divider-${index}`" class="card-divider"></div>
+      <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
+        <div
+          v-if="option.divider"
+          :key="`divider-${index}`"
+          class="h-px mx-3 my-2 bg-button-bg"
+        ></div>
         <Button
           v-else
           :key="`option-${option.id}`"
@@ -19,8 +23,8 @@
           transparent
           :action="
             option.action
-              ? () => {
-                  option.action()
+              ? (event) => {
+                  option.action(event)
                   if (!option.remainOnClick) {
                     close()
                   }
@@ -45,29 +49,56 @@
   </PopoutMenu>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import Button from './Button.vue'
 import PopoutMenu from './PopoutMenu.vue'
 
-defineProps({
-  options: {
-    type: Array,
-    required: true,
+interface BaseOption {
+  shown?: boolean
+}
+
+interface Divider extends BaseOption {
+  divider?: boolean
+}
+
+interface Item extends BaseOption {
+  id: string
+  action?: () => void
+  link?: string
+  external?: boolean
+  color?:
+    | 'primary'
+    | 'danger'
+    | 'secondary'
+    | 'highlight'
+    | 'red'
+    | 'orange'
+    | 'green'
+    | 'blue'
+    | 'purple'
+  hoverFilled?: boolean
+  hoverFilledOnly?: boolean
+  remainOnClick?: boolean
+}
+
+type Option = Divider | Item
+
+const props = withDefaults(
+  defineProps<{
+    options: Option[]
+    disabled?: boolean
+    position?: string
+    direction?: string
+  }>(),
+  {
+    options: () => [],
+    disabled: false,
+    position: 'auto',
+    direction: 'auto',
   },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  position: {
-    type: String,
-    default: 'bottom',
-  },
-  direction: {
-    type: String,
-    default: 'left',
-  },
-})
+)
+
 defineOptions({
   inheritAttrs: false,
 })

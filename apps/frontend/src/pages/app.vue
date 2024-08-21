@@ -1000,7 +1000,7 @@ useSeoMeta({
     center 4rem;
   background-size: cover;
   padding: 6rem 1rem 12rem 1rem;
-  margin-top: -4rem;
+  margin-top: -5rem;
   display: flex;
   justify-content: center;
   align-items: center;

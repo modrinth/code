@@ -76,8 +76,8 @@ if (error.value) {
   });
 }
 
-const openCreateOrgModal = () => {
-  createOrgModal.value?.show();
+const openCreateOrgModal = (event) => {
+  createOrgModal.value?.show(event);
 };
 </script>
 

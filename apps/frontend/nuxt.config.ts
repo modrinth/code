@@ -434,6 +434,7 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: "2024-07-03",
+  telemetry: false,
 });
 
 function getApiUrl() {

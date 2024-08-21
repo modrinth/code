@@ -21,7 +21,9 @@ export { default as Pagination } from './base/Pagination.vue'
 export { default as PopoutMenu } from './base/PopoutMenu.vue'
 export { default as ProjectCard } from './base/ProjectCard.vue'
 export { default as Promotion } from './base/Promotion.vue'
+export { default as ScrollablePanel } from './base/ScrollablePanel.vue'
 export { default as Slider } from './base/Slider.vue'
+export { default as StatItem } from './base/StatItem.vue'
 export { default as Toggle } from './base/Toggle.vue'
 
 // Branding
@@ -51,3 +53,6 @@ export { default as SearchFilter } from './search/SearchFilter.vue'
 
 // Billing
 export { default as PurchaseModal } from './billing/PurchaseModal.vue'
+
+// Version
+export { default as VersionChannelIndicator } from './version/VersionChannelIndicator.vue'
