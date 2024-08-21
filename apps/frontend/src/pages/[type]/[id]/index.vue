@@ -24,7 +24,7 @@
     <AdPlaceholder
       v-if="
         (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(props.project.status)
+        tags.approvedStatuses.includes(project.status)
       "
     />
     <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
@@ -72,24 +72,31 @@
             class="status-list__item"
           >
             <ClientIcon aria-hidden="true" />
-            Client only
+            Client-side
           </div>
           <div
             v-if="
-              (project.server_side === 'required' && project.client_side !== 'unsupported') ||
+              (project.server_side === 'required' && project.client_side !== 'required') ||
               (project.client_side === 'optional' && project.server_side === 'optional')
             "
             class="status-list__item"
           >
             <ServerIcon aria-hidden="true" />
-            Server only
+            Server-side
           </div>
-          <div class="status-list__item">
+          <div v-if="false" class="status-list__item">
             <UserIcon aria-hidden="true" />
             Singleplayer
           </div>
           <div
-            v-if="
+            v-if="project.client_side === 'required' && project.server_side === 'required'"
+            class="status-list__item"
+          >
+            <MonitorSmartphoneIcon aria-hidden="true" />
+            Client and server
+          </div>
+          <div
+            v-else-if="
               project.client_side === 'optional' ||
               (project.client_side === 'required' && project.server_side === 'optional') ||
               project.server_side === 'optional' ||

@@ -61,7 +61,7 @@
     <AdPlaceholder
       v-if="
         (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(props.project.status)
+        tags.approvedStatuses.includes(project.status)
       "
     />
     <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />

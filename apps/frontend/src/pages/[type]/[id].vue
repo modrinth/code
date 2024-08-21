@@ -176,7 +176,13 @@
       </template>
       <template #default>
         <div class="mx-auto flex max-w-[40rem] flex-col gap-4 md:w-[30rem]">
-          <div class="modrinth-app-section contents">
+          <div
+            v-if="
+              project.project_type !== 'plugin' ||
+              project.loaders.some((x) => !tags.loaderData.allPluginLoaders.includes(x))
+            "
+            class="modrinth-app-section contents"
+          >
             <div class="mx-auto flex w-fit flex-col">
               <ButtonStyled color="brand">
                 <a
@@ -509,8 +515,15 @@
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled size="large" circular>
-                <PopoutMenu v-if="auth.user" from="top-right">
-                  <BookmarkIcon aria-hidden="true" />
+                <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right">
+                  <BookmarkIcon
+                    aria-hidden="true"
+                    :fill="
+                      collections.some((x) => x.projects.includes(project.id))
+                        ? 'currentColor'
+                        : 'none'
+                    "
+                  />
                   <template #menu>
                     <input
                       v-model="displayCollectionsSearch"
@@ -520,7 +533,9 @@
                     />
                     <div v-if="collections.length > 0" class="collections-list">
                       <Checkbox
-                        v-for="option in collections"
+                        v-for="option in collections
+                          .slice()
+                          .sort((a, b) => a.name.localeCompare(b.name))"
                         :key="option.id"
                         :model-value="option.projects.includes(project.id)"
                         class="popout-checkbox"

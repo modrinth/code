@@ -563,12 +563,15 @@ const navLinks = computed(() => [
     label: formatMessage(commonMessages.allProjectType),
     href: `/user/${user.value.username}`,
   },
-  ...projectTypes.value.map((x) => {
-    return {
-      label: formatMessage(getProjectTypeMessage(x, true)),
-      href: `/user/${user.value.username}/${x}s`,
-    };
-  }),
+  ...projectTypes.value
+    .map((x) => {
+      return {
+        label: formatMessage(getProjectTypeMessage(x, true)),
+        href: `/user/${user.value.username}/${x}s`,
+      };
+    })
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label)),
 ]);
 </script>
 <script>
