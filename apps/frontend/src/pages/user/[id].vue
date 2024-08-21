@@ -9,49 +9,48 @@
         >
           <div class="flex gap-4">
             <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-2">
               <div class="flex flex-wrap items-center gap-2">
                 <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
                   {{ user.username }}
                 </h1>
               </div>
               <p class="m-0 line-clamp-2 max-w-[40rem]">
-                {{ user.bio }}
+                {{ user.bio ?? projects.length === 0 ? "A Modrinth user." : "A Modrinth creator." }}
               </p>
             </div>
           </div>
           <div class="flex flex-col justify-center gap-4">
             <div class="flex flex-wrap gap-2">
               <ButtonStyled size="large">
-                <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/dashboard/projects">
-                  <SettingsIcon />
-                  {{ formatMessage(messages.profileManageProjectsButton) }}
+                <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
+                  <EditIcon />
+                  {{ formatMessage(commonMessages.editButton) }}
                 </NuxtLink>
               </ButtonStyled>
               <ButtonStyled size="large" circular type="transparent">
                 <OverflowMenu
-                  :options="
-                    [
-                      {
-                        id: 'edit',
-                        action: () => navigateTo('/settings/profile'),
-                        color: 'red',
-                        hoverOnly: true,
-                      },
-                      {
-                        id: 'report',
-                        action: () => reportUser(user.id),
-                        color: 'red',
-                        hoverOnly: true,
-                      },
-                      { id: 'copy-id', action: () => copyId() },
-                    ].slice(auth.user && auth.user.id === user.id ? 0 : 1, 3)
-                  "
+                  :options="[
+                    {
+                      id: 'manage-projects',
+                      action: () => navigateTo('/dashboard/projects'),
+                      hoverOnly: true,
+                      shown: auth.user && auth.user.id === user.id,
+                    },
+                    { divider: true, shown: auth.user && auth.user.id === user.id },
+                    {
+                      id: 'report',
+                      action: () => reportUser(user.id),
+                      color: 'red',
+                      hoverOnly: true,
+                    },
+                    { id: 'copy-id', action: () => copyId() },
+                  ]"
                 >
                   <MoreVerticalIcon />
-                  <template #edit>
-                    <EditIcon />
-                    {{ formatMessage(commonMessages.editButton) }}
+                  <template #manage-projects>
+                    <BoxIcon />
+                    {{ formatMessage(messages.profileManageProjectsButton) }}
                   </template>
                   <template #report>
                     <ReportIcon />
@@ -191,6 +190,7 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
+        <AdPlaceholder />
         <div class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileDetails) }}</h2>
           <div class="flex items-center gap-2">
@@ -323,6 +323,7 @@ import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const data = useNuxtApp();
 const route = useNativeRoute();
