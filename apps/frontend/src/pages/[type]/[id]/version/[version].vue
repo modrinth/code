@@ -630,7 +630,14 @@
   </div>
 </template>
 <script>
-import { ButtonStyled, ConfirmModal, MarkdownEditor } from "@modrinth/ui";
+import {
+  ButtonStyled,
+  ConfirmModal,
+  MarkdownEditor,
+  Chips,
+  FileInput,
+  Checkbox,
+} from "@modrinth/ui";
 import { Multiselect } from "vue-multiselect";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
 import { inferVersionInfo } from "~/helpers/infer.js";
@@ -641,9 +648,6 @@ import { useImageUpload } from "~/composables/image-upload.ts";
 
 import Breadcrumbs from "~/components/ui/Breadcrumbs.vue";
 import Categories from "~/components/ui/search/Categories.vue";
-import Chips from "~/components/ui/Chips.vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
-import FileInput from "~/components/ui/FileInput.vue";
 
 import FileIcon from "~/assets/images/utils/file.svg?component";
 import TrashIcon from "~/assets/images/utils/trash.svg?component";
@@ -664,6 +668,7 @@ import Modal from "~/components/ui/Modal.vue";
 import ChevronRightIcon from "~/assets/images/utils/chevron-right.svg?component";
 
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
+
 export default defineNuxtComponent({
   components: {
     MarkdownEditor,

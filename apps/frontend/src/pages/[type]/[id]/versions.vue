@@ -276,6 +276,7 @@ import {
   Pagination,
   VersionChannelIndicator,
   FileInput,
+  DropArea,
 } from "@modrinth/ui";
 import {
   StarIcon,
@@ -293,14 +294,7 @@ import {
 } from "@modrinth/assets";
 import { formatBytes, formatCategory } from "@modrinth/utils";
 import { formatVersionsForDisplay } from "~/helpers/projects.js";
-import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
-import DropArea from "~/components/ui/DropArea.vue";
-import { Badge, FileInput, DropArea } from "@modrinth/ui";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
-import UploadIcon from "~/assets/images/utils/upload.svg?component";
-import InfoIcon from "~/assets/images/utils/info.svg?component";
-import Pagination from "~/components/ui/Pagination.vue";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 
 const props = defineProps({
@@ -327,6 +321,7 @@ const props = defineProps({
 const auth = await useAuth();
 const tags = useTags();
 const formatRelativeTime = useRelativeTime();
+const formatCompactNumber = useCompactNumber();
 
 const emits = defineEmits(["onDownload"]);
 

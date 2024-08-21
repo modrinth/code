@@ -1,5 +1,9 @@
 <template>
-  <span :class="'version-badge ' + color + ' type--' + type">
+  <span
+    :class="
+      'badge flex items-center gap-1 font-semibold text-secondary ' + color + ' type--' + type
+    "
+  >
     <template v-if="color"> <span class="circle" /> {{ capitalizeString(type) }}</template>
 
     <!-- User roles -->
@@ -15,16 +19,13 @@
 
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'">
-      <ListIcon aria-hidden="true" /> {{ formatMessage(messages.listedLabel) }}
+      <GlobeIcon aria-hidden="true" /> formatMessage(messages.publicLabel)
     </template>
     <template v-else-if="type === 'approved-general'">
       <CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
     </template>
-    <template v-else-if="type === 'unlisted'">
-      <EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
-    </template>
-    <template v-else-if="type === 'withheld'">
-      <EyeOffIcon aria-hidden="true" /> {{ formatMessage(messages.withheldLabel) }}
+    <template v-else-if="type === 'unlisted' || type === 'withheld'">
+      <LinkIcon aria-hidden="true" /> {{ formatMessage(messages.unlistedLabel) }}
     </template>
     <template v-else-if="type === 'private'">
       <LockIcon aria-hidden="true" /> {{ formatMessage(messages.privateLabel) }}
@@ -79,8 +80,6 @@ import {
   ModrinthIcon,
   ScaleIcon,
   BoxIcon,
-  ListIcon,
-  EyeOffIcon,
   FileTextIcon,
   XIcon,
   ArchiveIcon,
@@ -88,6 +87,8 @@ import {
   CheckIcon,
   LockIcon,
   CalendarIcon,
+  GlobeIcon,
+  LinkIcon,
 } from '@modrinth/assets'
 import { capitalizeString } from '@modrinth/utils'
 import { useVIntl, defineMessages } from '@vintl/vintl'
@@ -121,9 +122,9 @@ const messages = defineMessages({
     id: 'omorphia.component.badge.label.failed',
     defaultMessage: 'Failed',
   },
-  listedLabel: {
-    id: 'omorphia.component.badge.label.listed',
-    defaultMessage: 'Listed',
+  publicLabel: {
+    id: 'omorphia.component.badge.label.public',
+    defaultMessage: 'Public',
   },
   moderatorLabel: {
     id: 'omorphia.component.badge.label.moderator',
@@ -242,8 +243,9 @@ defineProps({
   }
 
   &.type--private,
+  &.type--approved,
   &.gray {
-    --badge-color: var(--color-gray);
+    --badge-color: var(--color-secondary);
   }
 
   &::first-letter {

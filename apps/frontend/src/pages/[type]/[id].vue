@@ -696,10 +696,10 @@ import {
   OverflowMenu,
   PopoutMenu,
   ScrollablePanel,
+  Badge,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview } from "@modrinth/utils";
 import dayjs from "dayjs";
-import Badge from "~/components/ui/Badge.vue";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
