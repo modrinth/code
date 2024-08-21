@@ -148,7 +148,7 @@
             <NuxtLink to="/app"> <DownloadIcon aria-hidden="true" /> Get Modrinth App </NuxtLink>
           </ButtonStyled>
           <ButtonStyled
-            v-if="!auth.user || isPermission(auth.badges, 1 << 0)"
+            v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)"
             type="transparent"
             color="purple"
           >

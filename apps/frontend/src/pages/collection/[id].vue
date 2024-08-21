@@ -248,7 +248,7 @@
             </div>
           </template>
         </div>
-        <AdPlaceholder />
+        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
       </div>
       <div class="normal-page__content">
         <nav class="navigation-card">

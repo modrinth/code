@@ -469,7 +469,12 @@
     </div>
   </div>
   <div class="normal-page__sidebar version-page__metadata">
-    <AdPlaceholder />
+    <AdPlaceholder
+      v-if="
+        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
+        tags.approvedStatuses.includes(props.project.status)
+      "
+    />
     <div class="universal-card full-width-inputs">
       <h3>Metadata</h3>
       <div>

@@ -255,7 +255,12 @@
     </div>
   </section>
   <div class="normal-page__sidebar">
-    <AdPlaceholder />
+    <AdPlaceholder
+      v-if="
+        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
+        tags.approvedStatuses.includes(props.project.status)
+      "
+    />
     <VersionFilterControl
       ref="versionFilters"
       :versions="props.versions"
@@ -316,6 +321,7 @@ const props = defineProps({
   },
 });
 
+const auth = await useAuth();
 const tags = useTags();
 const formatRelativeTime = useRelativeTime();
 
