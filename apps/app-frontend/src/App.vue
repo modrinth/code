@@ -383,6 +383,8 @@ async function handleCommand(e) {
   --appbar-height: 3.25rem;
   --sidebar-width: 4.5rem;
 
+  max-width: unset !important;
+
   height: 100vh;
   display: flex;
   flex-direction: row;

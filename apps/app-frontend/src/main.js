@@ -7,6 +7,8 @@ import 'floating-vue/dist/style.css'
 import loadCssMixin from './mixins/macCssFix.js'
 import { createPlugin } from '@vintl/vintl/plugin'
 
+import './../src/assets/stylesheets/tailwind.css'
+
 const VIntlPlugin = createPlugin({
   controllerOpts: {
     defaultLocale: 'en-US',

@@ -903,7 +903,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
   }
 
   .search {
-    margin: 0 1rem 0.5rem 20.5rem;
+    margin: 1rem 1rem 0.5rem 20.5rem;
     width: calc(100% - 20.5rem);
 
     .offline {
