@@ -454,15 +454,18 @@ async fn parse_skin_data(response: Value, id: Uuid) -> crate::Result<Parsed> {
         .bytes()
         .await?;
     let encoded_img = STANDARD.encode(&img);
+    let img = image::load_from_memory(&img)?;
 
-    let crop =
-        image::imageops::crop_imm(&image::load_from_memory(&img)?, 8, 8, 8, 8)
-            .to_image();
+    let mut head = image::imageops::crop_imm(&img, 8, 8, 8, 8).to_image();
+    let hat = image::imageops::crop_imm(&img, 40, 8, 8, 8).to_image();
+    image::imageops::overlay(&mut head, &hat, 0, 0);
+
     let mut buf: Vec<u8> = vec![];
-    let _ = crop.write_to(
+    // img is stored as jpg to convert transparency into black pixels
+    head.write_to(
         &mut Cursor::new(&mut buf),
         image::ImageOutputFormat::Jpeg(100),
-    );
+    )?;
     let encoded_head = STANDARD.encode(&buf);
 
     let skin_data: SkinCache = SkinCache {
