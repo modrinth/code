@@ -44,7 +44,7 @@
         to="/settings/billing"
         class="btn btn-purple btn-large"
       >
-        <SettingsIcon />
+        <SettingsIcon aria-hidden="true" />
         Manage subscription
       </nuxt-link>
       <button v-else-if="auth.user" class="btn btn-purple btn-large" @click="purchaseModal.show()">
@@ -73,9 +73,7 @@
         <SparklesIcon class="h-8 w-8 text-purple" />
         <span class="text-lg font-bold">Remove all ads</span>
         <span class="leading-5 text-secondary">
-          Never see an advertisement again on
-          <!--the Modrinth app or-->
-          the website.
+          Never see an advertisement again on the Modrinth app or the website.
         </span>
       </div>
       <div class="flex flex-col gap-4 rounded-xl bg-bg-raised p-4">
@@ -143,7 +141,7 @@ onMounted(() => {
 .main-hero {
   background: linear-gradient(360deg, rgba(199, 138, 255, 0.2) 10.92%, var(--color-bg) 100%),
     var(--color-accent-contrast);
-  margin-top: -4rem;
+  margin-top: -5rem;
   padding: 11.25rem 1rem 8rem;
 
   display: flex;

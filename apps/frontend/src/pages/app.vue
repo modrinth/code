@@ -210,7 +210,7 @@ useSeoMeta({
           <div class="search-bar">
             <h4>Installed mods</h4>
             <div class="mini-input">
-              <SearchIcon />
+              <SearchIcon aria-hidden="true" />
               <div class="search">Search mods</div>
             </div>
           </div>
@@ -1000,7 +1000,7 @@ useSeoMeta({
     center 4rem;
   background-size: cover;
   padding: 6rem 1rem 12rem 1rem;
-  margin-top: -4rem;
+  margin-top: -5rem;
   display: flex;
   justify-content: center;
   align-items: center;

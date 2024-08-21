@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use tauri::Manager;
+use tauri::{Manager, PhysicalSize};
 use theseus::prelude::*;
 
 mod api;
@@ -33,6 +33,14 @@ fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
     win.show().unwrap();
     win.set_focus().unwrap();
+
+    // fix issue where window shows as extremely small
+    if let Ok(size) = win.inner_size() {
+        let width = if size.width < 1100 { 1280 } else { size.width };
+        let height = if size.height < 700 { 800 } else { size.height };
+
+        win.set_size(PhysicalSize::new(width, height)).unwrap();
+    }
 }
 
 #[tauri::command]

@@ -273,6 +273,7 @@ where
                                             bio: x.user.bio,
                                             created: x.user.created,
                                             role: x.user.role,
+                                            badges: 0,
                                         };
 
                                         cached_entries.push(CacheValue::User(

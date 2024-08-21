@@ -1,92 +1,85 @@
 <template>
-  <div
-    v-if="
-      loaderFilters.length > 1 || gameVersionFilters.length > 1 || versionTypeFilters.length > 1
-    "
-    class="card search-controls"
-  >
-    <Multiselect
-      v-if="loaderFilters.length > 1"
-      v-model="selectedLoaders"
-      :options="loaderFilters"
-      :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-      :multiple="true"
-      :searchable="false"
-      :show-no-results="false"
-      :close-on-select="true"
-      :clear-search-on-select="false"
-      :show-labels="false"
-      :allow-empty="true"
-      placeholder="Filter loader..."
-      @update:model-value="updateQuery"
-    />
-    <Multiselect
-      v-if="gameVersionFilters.length > 1"
-      v-model="selectedGameVersions"
-      :options="
-        includeSnapshots
-          ? gameVersionFilters.map((x) => x.version)
-          : gameVersionFilters.filter((it) => it.version_type === 'release').map((x) => x.version)
-      "
-      :multiple="true"
-      :searchable="true"
-      :show-no-results="false"
-      :close-on-select="false"
-      :show-labels="false"
-      :hide-selected="true"
-      :selectable="() => selectedGameVersions.length <= 6"
-      placeholder="Filter versions..."
-      @update:model-value="updateQuery"
-    />
-    <Multiselect
-      v-if="versionTypeFilters.length > 1"
-      v-model="selectedVersionTypes"
-      :options="versionTypeFilters"
-      :custom-label="(x) => $capitalizeString(x)"
-      :multiple="true"
-      :searchable="false"
-      :show-no-results="false"
-      :close-on-select="true"
-      :clear-search-on-select="false"
-      :show-labels="false"
-      :allow-empty="true"
-      placeholder="Filter channels..."
-      @update:model-value="updateQuery"
-    />
-    <Checkbox
-      v-if="
-        gameVersionFilters.length > 1 &&
-        gameVersionFilters.some((v) => v.version_type !== 'release')
-      "
-      v-model="includeSnapshots"
-      label="Show all versions"
-      description="Show all versions"
-      :border="false"
-      @update:model-value="updateQuery"
-    />
-    <button
-      title="Clear filters"
-      :disabled="selectedLoaders.length === 0 && selectedGameVersions.length === 0"
-      class="iconified-button"
-      @click="
-        () => {
-          selectedLoaders = [];
-          selectedGameVersions = [];
-          selectedVersionTypes = [];
-          updateQuery();
-        }
-      "
+  <div class="card flex-card experimental-styles-within">
+    <span class="text-lg font-bold text-contrast">Filter</span>
+    <div class="flex items-center gap-2">
+      <div class="iconified-input w-full">
+        <label class="hidden" for="search">Search</label>
+        <SearchIcon aria-hidden="true" />
+        <input
+          id="search"
+          v-model="queryFilter"
+          name="search"
+          type="search"
+          placeholder="Search filters..."
+          autocomplete="off"
+        />
+      </div>
+      <button
+        v-if="Object.keys(selectedFilters).length !== 0"
+        class="btn icon-only"
+        @click="clearFilters"
+      >
+        <FilterXIcon />
+      </button>
+    </div>
+    <div
+      v-for="(value, key, index) in filters"
+      :key="key"
+      :class="`border-0 border-b border-solid border-button-bg py-2 last:border-b-0`"
     >
-      <ClearIcon />
-      Clear filters
-    </button>
+      <button
+        class="flex !w-full bg-transparent px-0 py-2 font-extrabold text-contrast transition-all active:scale-[0.98]"
+        @click="
+          () => {
+            filterAccordions[index].isOpen
+              ? filterAccordions[index].close()
+              : filterAccordions[index].open();
+          }
+        "
+      >
+        <template v-if="key === 'gameVersion'"> Game versions </template>
+        <template v-else>
+          {{ $capitalizeString(key) }}
+        </template>
+        <DropdownIcon
+          class="ml-auto h-5 w-5 transition-transform"
+          :class="{ 'rotate-180': filterAccordions[index]?.isOpen }"
+        />
+      </button>
+      <Accordion ref="filterAccordions" :open-by-default="true">
+        <ScrollablePanel
+          :class="{ 'h-[18rem]': value.length >= 8 && key === 'gameVersion' }"
+          :no-max-height="key !== 'gameVersion'"
+        >
+          <div class="mr-1 flex flex-col gap-1">
+            <div v-for="filter in value" :key="filter" class="group flex gap-1">
+              <button
+                :class="`flex !w-full items-center gap-2 truncate rounded-xl px-2 py-1 text-sm font-semibold transition-all active:scale-[0.98] ${selectedFilters[key]?.includes(filter) ? 'bg-brand-highlight text-contrast hover:brightness-125' : 'bg-transparent text-secondary hover:bg-button-bg'}`"
+                @click="toggleFilter(key, filter)"
+              >
+                <span v-if="filter === 'release'" class="h-2 w-2 rounded-full bg-brand" />
+                <span v-else-if="filter === 'beta'" class="h-2 w-2 rounded-full bg-orange" />
+                <span v-else-if="filter === 'alpha'" class="h-2 w-2 rounded-full bg-red" />
+                <span class="truncate text-sm">{{ $formatCategory(filter) }}</span>
+              </button>
+            </div>
+          </div>
+        </ScrollablePanel>
+        <Checkbox
+          v-if="key === 'gameVersion'"
+          v-model="showSnapshots"
+          class="mx-2"
+          :label="`Show all versions`"
+        />
+      </Accordion>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { Multiselect } from "vue-multiselect";
-import Checkbox from "~/components/ui/Checkbox.vue";
-import ClearIcon from "~/assets/images/utils/clear.svg?component";
+import { DropdownIcon, FilterXIcon, SearchIcon } from "@modrinth/assets";
+import { ScrollablePanel, Checkbox } from "@modrinth/ui";
+import Accordion from "~/components/ui/Accordion.vue";
 
 const props = defineProps({
   versions: {
@@ -98,64 +91,137 @@ const props = defineProps({
 });
 const emit = defineEmits(["switch-page"]);
 
-const router = useNativeRouter();
 const route = useNativeRoute();
+const router = useNativeRouter();
 
 const tags = useTags();
 
-const tempLoaders = new Set();
-let tempVersions = new Set();
-const tempReleaseChannels = new Set();
+const filterAccordions = ref([]);
 
-for (const version of props.versions) {
-  for (const loader of version.loaders) {
-    tempLoaders.add(loader);
+const queryFilter = ref("");
+const showSnapshots = ref(false);
+const filters = computed(() => {
+  const filters = {};
+
+  const tempLoaders = new Set();
+  const tempVersions = new Set();
+  const tempReleaseChannels = new Set();
+
+  for (const version of props.versions) {
+    for (const loader of version.loaders) {
+      tempLoaders.add(loader);
+    }
+    for (const gameVersion of version.game_versions) {
+      tempVersions.add(gameVersion);
+    }
+    tempReleaseChannels.add(version.version_type);
   }
-  for (const gameVersion of version.game_versions) {
-    tempVersions.add(gameVersion);
+
+  if (tempReleaseChannels.size > 0) {
+    filters.type = Array.from(tempReleaseChannels);
   }
-  tempReleaseChannels.add(version.version_type);
+  if (tempVersions.size > 0) {
+    const gameVersions = tags.value.gameVersions.filter((x) => tempVersions.has(x.version));
+
+    filters.gameVersion = gameVersions
+      .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
+      .map((x) => x.version);
+  }
+  if (tempLoaders.size > 0) {
+    filters.platform = Array.from(tempLoaders);
+  }
+
+  const filteredObj = {};
+
+  for (const [key, value] of Object.entries(filters)) {
+    const filters = queryFilter.value
+      ? value.filter((x) => x.toLowerCase().includes(queryFilter.value.toLowerCase()))
+      : value;
+
+    if (filters.length > 0) {
+      filteredObj[key] = filters;
+    }
+  }
+
+  return filteredObj;
+});
+
+const selectedFilters = ref({});
+
+if (route.query.type) {
+  selectedFilters.value.type = getArrayOrString(route.query.type);
+}
+if (route.query.gameVersion) {
+  selectedFilters.value.gameVersion = getArrayOrString(route.query.gameVersion);
+}
+if (route.query.platform) {
+  selectedFilters.value.platform = getArrayOrString(route.query.platform);
 }
 
-tempVersions = Array.from(tempVersions);
+async function toggleFilters(type, filters) {
+  for (const filter of filters) {
+    await toggleFilter(type, filter);
+  }
 
-const loaderFilters = shallowRef(Array.from(tempLoaders));
-const gameVersionFilters = shallowRef(
-  tags.value.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version)),
-);
-const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels));
-const includeSnapshots = ref(route.query.s === "true");
-
-const selectedGameVersions = shallowRef(getArrayOrString(route.query.g) ?? []);
-const selectedLoaders = shallowRef(getArrayOrString(route.query.l) ?? []);
-const selectedVersionTypes = shallowRef(getArrayOrString(route.query.c) ?? []);
-
-async function updateQuery() {
   await router.replace({
     query: {
       ...route.query,
-      l: selectedLoaders.value.length === 0 ? undefined : selectedLoaders.value,
-      g: selectedGameVersions.value.length === 0 ? undefined : selectedGameVersions.value,
-      c: selectedVersionTypes.value.length === 0 ? undefined : selectedVersionTypes.value,
-      s: includeSnapshots.value ? true : undefined,
+      type: selectedFilters.value.type,
+      gameVersion: selectedFilters.value.gameVersion,
+      platform: selectedFilters.value.platform,
     },
   });
+
   emit("switch-page", 1);
 }
-</script>
 
-<style lang="scss" scoped>
-.search-controls {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-card-md);
-  align-items: center;
-  flex-wrap: wrap;
-  .multiselect {
-    flex: 1;
+async function toggleFilter(type, filter, skipRouter) {
+  if (!selectedFilters.value[type]) {
+    selectedFilters.value[type] = [];
   }
-  .checkbox-outer {
-    min-width: fit-content;
+
+  const index = selectedFilters.value[type].indexOf(filter);
+  if (index !== -1) {
+    selectedFilters.value[type].splice(index, 1);
+  } else {
+    selectedFilters.value[type].push(filter);
+  }
+
+  if (selectedFilters.value[type].length === 0) {
+    delete selectedFilters.value[type];
+  }
+
+  if (!skipRouter) {
+    await router.replace({
+      query: {
+        ...route.query,
+        type: selectedFilters.value.type,
+        gameVersion: selectedFilters.value.gameVersion,
+        platform: selectedFilters.value.platform,
+      },
+    });
+
+    emit("switch-page", 1);
   }
 }
-</style>
+
+async function clearFilters() {
+  selectedFilters.value = {};
+
+  await router.replace({
+    query: {
+      ...route.query,
+      type: undefined,
+      gameVersion: undefined,
+      platform: undefined,
+    },
+  });
+
+  emit("switch-page", 1);
+}
+
+defineExpose({
+  toggleFilter,
+  toggleFilters,
+});
+</script>

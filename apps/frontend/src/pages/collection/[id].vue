@@ -15,17 +15,17 @@
           <div class="card__overlay input-group">
             <template v-if="canEdit && isEditing === false">
               <Button @click="isEditing = true">
-                <EditIcon />
+                <EditIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.editButton) }}
               </Button>
               <Button id="delete-collection" @click="() => $refs.deleteModal.show()">
-                <TrashIcon />
+                <TrashIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.deleteLabel) }}
               </Button>
             </template>
             <template v-else-if="canEdit && isEditing === true">
-              <PopoutMenu class="btn" position="bottom" direction="right">
-                <EditIcon /> {{ formatMessage(messages.editIconButton) }}
+              <PopoutMenu class="btn">
+                <EditIcon aria-hidden="true" /> {{ formatMessage(messages.editIconButton) }}
                 <template #menu>
                   <span class="icon-edit-menu">
                     <FileInput
@@ -35,10 +35,11 @@
                       accept="image/png,image/jpeg,image/gif,image/webp"
                       class="btn btn-transparent upload"
                       style="white-space: nowrap"
-                      prompt=""
+                      prompt="Upload icon"
+                      aria-label="Upload icon"
                       @change="showPreviewImage"
                     >
-                      <UploadIcon />
+                      <UploadIcon aria-hidden="true" />
                       {{ formatMessage(messages.uploadIconButton) }}
                     </FileInput>
                     <Button
@@ -52,7 +53,7 @@
                         }
                       "
                     >
-                      <TrashIcon />
+                      <TrashIcon aria-hidden="true" />
                       {{ formatMessage(messages.deleteIconButton) }}
                     </Button>
                   </span>
@@ -103,11 +104,11 @@
             </div>
             <div class="push-right input-group">
               <Button @click="isEditing = false">
-                <XIcon />
+                <XIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.cancelButton) }}
               </Button>
               <Button color="primary" @click="saveChanges()">
-                <SaveIcon />
+                <SaveIcon aria-hidden="true" />
                 {{ formatMessage(commonMessages.saveButton) }}
               </Button>
             </div>
@@ -122,7 +123,7 @@
 
               <div>
                 <span class="collection-label">
-                  <BoxIcon /> {{ formatMessage(messages.collectionLabel) }}
+                  <BoxIcon aria-hidden="true" /> {{ formatMessage(messages.collectionLabel) }}
                 </span>
               </div>
 
@@ -187,7 +188,7 @@
                   "
                   class="date"
                 >
-                  <CalendarIcon />
+                  <CalendarIcon aria-hidden="true" />
                   <label>
                     {{
                       formatMessage(messages.createdAtLabel, {
@@ -208,7 +209,7 @@
                   "
                   class="date"
                 >
-                  <UpdatedIcon />
+                  <UpdatedIcon aria-hidden="true" />
                   <label>
                     {{
                       formatMessage(messages.updatedAtLabel, {
@@ -331,7 +332,7 @@
                 }
               "
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               {{ formatMessage(messages.removeProjectButton) }}
             </button>
             <button
@@ -339,7 +340,7 @@
               class="iconified-button"
               @click="unfollowProject(project)"
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               {{ formatMessage(messages.unfollowProjectButton) }}
             </button>
           </ProjectCard>

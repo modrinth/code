@@ -1,18 +1,16 @@
 <template>
   <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD">
-    <a
-      :href="`https://bisecthosting.com/modrinth${queryParam}`"
-      rel="noopener nofollow sponsored"
-      :target="target"
-    ></a>
+    <a href="https://modrinth.com/plus" rel="noopener nofollow sponsored" :target="target"></a>
     <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-0">
       <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-1">
         <div class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-2">
-          <BisectIcon class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-3" />
+          <ModrinthPlusIcon class="GBBNWLJVGRHFLYVGSZKSSKNTHFYXHMBD-3" />
           <span>
-            <span> Host your Minecraft server on </span>
-            <strong>BisectHosting</strong>
-            <span> - get 25% off your first month with code <strong>MODRINTH</strong>. </span>
+            <span>
+              90% of ad revenue goes to creators. Go ad-free while supporting creators with
+            </span>
+            <strong>Modrinth Plus.</strong>
+            <span> Subscribe today!</span>
           </span>
         </div>
       </div>
@@ -25,16 +23,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { BisectIcon } from '@modrinth/assets'
+import { ModrinthPlusIcon } from '@modrinth/assets'
 
 const props = withDefaults(
   defineProps<{
     external: boolean
-    queryParam: string
   }>(),
   {
     external: true,
-    queryParam: '',
   },
 )
 

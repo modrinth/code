@@ -1,241 +1,215 @@
 <template>
-  <Modal ref="modal" header="Create a project">
-    <div class="modal-creation universal-labels">
-      <div class="markdown-body">
-        <p>New projects are created as drafts and can be found under your profile page.</p>
-      </div>
-      <label for="name">
-        <span class="label__title">Name<span class="required">*</span></span>
-      </label>
-      <input
-        id="name"
-        v-model="name"
-        type="text"
-        maxlength="64"
-        placeholder="Enter project name..."
-        autocomplete="off"
-        @input="updatedName()"
-      />
-      <label for="slug">
-        <span class="label__title">URL<span class="required">*</span></span>
-      </label>
-      <div class="text-input-wrapper">
-        <div class="text-input-wrapper__before">https://modrinth.com/project/</div>
+  <NewModal ref="modal" header="Creating a project">
+    <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
+        <label for="name">
+          <span class="text-lg font-semibold text-contrast">
+            Name
+            <span class="text-brand-red">*</span>
+          </span>
+        </label>
         <input
-          id="slug"
-          v-model="slug"
+          id="name"
+          v-model="name"
           type="text"
           maxlength="64"
+          placeholder="Enter project name..."
           autocomplete="off"
-          @input="manualSlug = true"
+          @input="updatedName()"
         />
       </div>
-      <label for="visibility">
-        <span class="label__title">Visibility<span class="required">*</span></span>
-        <span class="label__description">
-          The visibility of your project after it has been approved.
-        </span>
-      </label>
-      <multiselect
-        id="visibility"
-        v-model="visibility"
-        :options="visibilities"
-        track-by="actual"
-        label="display"
-        :multiple="false"
-        :searchable="false"
-        :show-no-results="false"
-        :show-labels="false"
-        placeholder="Choose visibility.."
-        open-direction="bottom"
-      />
-      <label for="additional-information">
-        <span class="label__title">Summary<span class="required">*</span></span>
-        <span class="label__description"
-          >This appears in search and on the sidebar of your project's page.</span
-        >
-      </label>
-      <div class="textarea-wrapper">
-        <textarea id="additional-information" v-model="description" maxlength="256" />
+      <div class="flex flex-col gap-2">
+        <label for="slug">
+          <span class="text-lg font-semibold text-contrast">
+            URL
+            <span class="text-brand-red">*</span>
+          </span>
+        </label>
+        <div class="text-input-wrapper">
+          <div class="text-input-wrapper__before">https://modrinth.com/project/</div>
+          <input
+            id="slug"
+            v-model="slug"
+            type="text"
+            maxlength="64"
+            autocomplete="off"
+            @input="manualSlug = true"
+          />
+        </div>
       </div>
-      <div class="push-right input-group">
-        <button class="iconified-button" @click="cancel">
-          <CrossIcon />
-          Cancel
-        </button>
-        <button class="iconified-button brand-button" @click="createProject">
-          <CheckIcon />
-          Continue
-        </button>
+      <div class="flex flex-col gap-2">
+        <label for="visibility" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast">
+            Visibility
+            <span class="text-brand-red">*</span>
+          </span>
+          <span> The visibility of your project after it has been approved. </span>
+        </label>
+        <DropdownSelect
+          id="visibility"
+          v-model="visibility"
+          :options="visibilities"
+          :display-name="(x) => x.display"
+          name="Visibility"
+        />
+      </div>
+      <div class="flex flex-col gap-2">
+        <label for="additional-information" class="flex flex-col gap-1">
+          <span class="text-lg font-semibold text-contrast">
+            Summary
+            <span class="text-brand-red">*</span>
+          </span>
+          <span> A sentence or two that describes your project. </span>
+        </label>
+        <div class="textarea-wrapper">
+          <textarea id="additional-information" v-model="description" maxlength="256" />
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <ButtonStyled color="brand">
+          <button @click="createProject">
+            <PlusIcon aria-hidden="true" />
+            Create project
+          </button>
+        </ButtonStyled>
+        <ButtonStyled>
+          <button @click="cancel">
+            <XIcon aria-hidden="true" />
+            Cancel
+          </button>
+        </ButtonStyled>
       </div>
     </div>
-  </Modal>
+  </NewModal>
 </template>
 
-<script>
-import { Multiselect } from "vue-multiselect";
-import CrossIcon from "~/assets/images/utils/x.svg?component";
-import CheckIcon from "~/assets/images/utils/right-arrow.svg?component";
-import Modal from "~/components/ui/Modal.vue";
+<script setup>
+import { NewModal, ButtonStyled, DropdownSelect } from "@modrinth/ui";
+import { XIcon, PlusIcon } from "@modrinth/assets";
 
-export default {
-  components: {
-    CrossIcon,
-    CheckIcon,
-    Modal,
-    Multiselect,
+const router = useRouter();
+const app = useNuxtApp();
+
+const props = defineProps({
+  organizationId: {
+    type: String,
+    required: false,
+    default: null,
   },
-  props: {
-    organizationId: {
-      type: String,
-      required: false,
-      default: null,
-    },
+});
+
+const modal = ref();
+
+const name = ref("");
+const slug = ref("");
+const description = ref("");
+const manualSlug = ref(false);
+const visibilities = ref([
+  {
+    actual: "approved",
+    display: "Public",
   },
-  setup() {
-    const tags = useTags();
-
-    return { tags };
+  {
+    actual: "unlisted",
+    display: "Unlisted",
   },
-  data() {
-    return {
-      name: "",
-      slug: "",
-      description: "",
-      manualSlug: false,
-      visibilities: [
-        {
-          actual: "approved",
-          display: "Public",
-        },
-        {
-          actual: "private",
-          display: "Private",
-        },
-        {
-          actual: "unlisted",
-          display: "Unlisted",
-        },
-      ],
-      visibility: {
-        actual: "approved",
-        display: "Public",
-      },
-    };
+  {
+    actual: "private",
+    display: "Private",
   },
-  methods: {
-    cancel() {
-      this.$refs.modal.hide();
-    },
-    async createProject() {
-      startLoading();
+]);
+const visibility = ref({
+  actual: "approved",
+  display: "Public",
+});
 
-      const formData = new FormData();
-
-      const auth = await useAuth();
-
-      const projectData = {
-        title: this.name.trim(),
-        project_type: "mod",
-        slug: this.slug,
-        description: this.description.trim(),
-        body: "",
-        requested_status: this.visibility.actual,
-        initial_versions: [],
-        team_members: [
-          {
-            user_id: auth.value.user.id,
-            name: auth.value.user.username,
-            role: "Owner",
-          },
-        ],
-        categories: [],
-        client_side: "required",
-        server_side: "required",
-        license_id: "LicenseRef-Unknown",
-        is_draft: true,
-      };
-
-      if (this.organizationId) {
-        projectData.organization_id = this.organizationId;
-      }
-
-      formData.append("data", JSON.stringify(projectData));
-
-      try {
-        await useBaseFetch("project", {
-          method: "POST",
-          body: formData,
-          headers: {
-            "Content-Disposition": formData,
-          },
-        });
-
-        this.$refs.modal.hide();
-        await this.$router.push({
-          name: "type-id",
-          params: {
-            type: "project",
-            id: this.slug,
-          },
-        });
-      } catch (err) {
-        this.$notify({
-          group: "main",
-          title: "An error occurred",
-          text: err.data.description,
-          type: "error",
-        });
-      }
-      stopLoading();
-    },
-    show() {
-      this.projectType = this.tags.projectTypes[0].display;
-      this.name = "";
-      this.slug = "";
-      this.description = "";
-      this.manualSlug = false;
-      this.$refs.modal.show();
-    },
-    updatedName() {
-      if (!this.manualSlug) {
-        this.slug = this.name
-          .trim()
-          .toLowerCase()
-          .replaceAll(" ", "-")
-          .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, "")
-          .replaceAll(/--+/gm, "-");
-      }
-    },
-  },
+const cancel = () => {
+  modal.value.hide();
 };
-</script>
 
-<style scoped lang="scss">
-.modal-creation {
-  padding: var(--spacing-card-bg);
-  display: flex;
-  flex-direction: column;
+async function createProject() {
+  startLoading();
 
-  .markdown-body {
-    margin-bottom: 0.5rem;
+  const formData = new FormData();
+
+  const auth = await useAuth();
+
+  const projectData = {
+    title: name.value.trim(),
+    project_type: "mod",
+    slug: slug.value,
+    description: description.value.trim(),
+    body: "",
+    requested_status: visibility.value.actual,
+    initial_versions: [],
+    team_members: [
+      {
+        user_id: auth.value.user.id,
+        name: auth.value.user.username,
+        role: "Owner",
+      },
+    ],
+    categories: [],
+    client_side: "required",
+    server_side: "required",
+    license_id: "LicenseRef-Unknown",
+    is_draft: true,
+  };
+
+  if (props.organizationId) {
+    projectData.organization_id = props.organizationId;
   }
 
-  input {
-    width: 20rem;
-    max-width: 100%;
-  }
+  formData.append("data", JSON.stringify(projectData));
 
-  .text-input-wrapper {
-    width: 100%;
-  }
+  try {
+    await useBaseFetch("project", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "Content-Disposition": formData,
+      },
+    });
 
-  textarea {
-    min-height: 5rem;
+    modal.value.hide();
+    await router.push({
+      name: "type-id",
+      params: {
+        type: "project",
+        id: slug.value,
+      },
+    });
+  } catch (err) {
+    app.$notify({
+      group: "main",
+      title: "An error occurred",
+      text: err.data.description,
+      type: "error",
+    });
   }
+  stopLoading();
+}
 
-  .input-group {
-    margin-top: var(--spacing-card-md);
+function show(event) {
+  name.value = "";
+  slug.value = "";
+  description.value = "";
+  manualSlug.value = false;
+  modal.value.show(event);
+}
+
+defineExpose({
+  show,
+});
+
+function updatedName() {
+  if (!manualSlug.value) {
+    slug.value = name.value
+      .trim()
+      .toLowerCase()
+      .replaceAll(" ", "-")
+      .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, "")
+      .replaceAll(/--+/gm, "-");
   }
 }
-</style>
+</script>

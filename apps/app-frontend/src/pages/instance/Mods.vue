@@ -213,9 +213,9 @@
             class="mod-content"
           >
             <Avatar :src="mod.icon" />
-            <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
+            <div class="mod-text">
               <div class="title">{{ mod.name }}</div>
-              <span class="no-wrap">by {{ mod.author }}</span>
+              <span v-if="mod.author" class="no-wrap">by {{ mod.author }}</span>
             </div>
           </router-link>
           <div v-else class="mod-content">
@@ -476,41 +476,54 @@ const initProjects = async (cacheBehaviour) => {
     if (file.metadata) {
       const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
       const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
-      const org = project.organization
-        ? modrinthOrganizations.find((x) => x.id === project.organization)
-        : null
 
-      const team = modrinthTeams.find((x) => x[0].team_id === project.team)
+      if (project && version) {
+        const org = project.organization
+          ? modrinthOrganizations.find((x) => x.id === project.organization)
+          : null
 
-      let owner = org ? org.name : team.find((x) => x.is_owner).user.username
+        const team = modrinthTeams.find((x) => x[0].team_id === project.team)
 
-      newProjects.push({
-        path,
-        name: project.title,
-        slug: project.slug,
-        author: owner,
-        version: version.version_number,
-        file_name: file.file_name,
-        icon: project.icon_url,
-        disabled: file.file_name.endsWith('.disabled'),
-        updateVersion: file.update_version_id,
-        outdated: !!file.update_version_id,
-        project_type: project.project_type,
-        id: project.id,
-      })
-    } else {
-      newProjects.push({
-        path,
-        name: file.file_name.replace('.disabled', ''),
-        author: '',
-        version: null,
-        file_name: file.file_name,
-        icon: null,
-        disabled: file.file_name.endsWith('.disabled'),
-        outdated: false,
-        project_type: file.project_type,
-      })
+        let owner
+
+        if (org) {
+          owner = org.name
+        } else if (team) {
+          owner = team.find((x) => x.is_owner).user.username
+        } else {
+          owner = null
+        }
+
+        newProjects.push({
+          path,
+          name: project.title,
+          slug: project.slug,
+          author: owner,
+          version: version.version_number,
+          file_name: file.file_name,
+          icon: project.icon_url,
+          disabled: file.file_name.endsWith('.disabled'),
+          updateVersion: file.update_version_id,
+          outdated: !!file.update_version_id,
+          project_type: project.project_type,
+          id: project.id,
+        })
+      }
+
+      continue
     }
+
+    newProjects.push({
+      path,
+      name: file.file_name.replace('.disabled', ''),
+      author: '',
+      version: null,
+      file_name: file.file_name,
+      icon: null,
+      disabled: file.file_name.endsWith('.disabled'),
+      outdated: false,
+      project_type: file.project_type,
+    })
   }
 
   projects.value = newProjects

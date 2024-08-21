@@ -15,6 +15,10 @@ export const commonMessages = defineMessages({
     id: "button.continue",
     defaultMessage: "Continue",
   },
+  copyIdButton: {
+    id: "button.copy-id",
+    defaultMessage: "Copy ID",
+  },
   changesSavedLabel: {
     id: "label.changes-saved",
     defaultMessage: "Changes saved",
@@ -90,6 +94,10 @@ export const commonMessages = defineMessages({
   rejectedLabel: {
     id: "label.rejected",
     defaultMessage: "Rejected",
+  },
+  reportButton: {
+    id: "button.report",
+    defaultMessage: "Report",
   },
   passwordLabel: {
     id: "label.password",

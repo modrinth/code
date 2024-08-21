@@ -1,13 +1,5 @@
 <template>
   <div class="content">
-    <VersionFilterControl :versions="props.versions" />
-    <Pagination
-      :page="currentPage"
-      :count="Math.ceil(filteredVersions.length / 20)"
-      class="pagination-before"
-      :link-function="(page) => `?page=${page}`"
-      @switch-page="switchPage"
-    />
     <div class="card changelog-wrapper">
       <div
         v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
@@ -60,17 +52,23 @@
     <Pagination
       :page="currentPage"
       :count="Math.ceil(filteredVersions.length / 20)"
-      class="pagination-before"
+      class="mb-2 flex justify-end"
       :link-function="(page) => `?page=${page}`"
       @switch-page="switchPage"
     />
   </div>
+  <div class="normal-page__sidebar">
+    <AdPlaceholder />
+    <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
+  </div>
 </template>
 <script setup>
-import DownloadIcon from "~/assets/images/utils/download.svg?component";
+import { Pagination } from "@modrinth/ui";
+import { DownloadIcon } from "@modrinth/assets";
+
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
-import Pagination from "~/components/ui/Pagination.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const props = defineProps({
   project: {
@@ -106,11 +104,11 @@ useSeoMeta({
 const router = useNativeRouter();
 const route = useNativeRoute();
 
-const currentPage = ref(Number(route.query.p ?? 1));
+const currentPage = ref(Number(route.query.page ?? 1));
 const filteredVersions = computed(() => {
-  const selectedGameVersions = getArrayOrString(route.query.g) ?? [];
-  const selectedLoaders = getArrayOrString(route.query.l) ?? [];
-  const selectedVersionTypes = getArrayOrString(route.query.c) ?? [];
+  const selectedGameVersions = getArrayOrString(route.query.gameVersion) ?? [];
+  const selectedLoaders = getArrayOrString(route.query.platform) ?? [];
+  const selectedVersionTypes = getArrayOrString(route.query.type) ?? [];
 
   return props.versions.filter(
     (projectVersion) =>
@@ -131,7 +129,7 @@ function switchPage(page) {
   router.replace({
     query: {
       ...route.query,
-      p: currentPage.value !== 1 ? currentPage.value : undefined,
+      page: currentPage.value !== 1 ? currentPage.value : undefined,
     },
   });
 }
@@ -249,5 +247,9 @@ function switchPage(page) {
       }
     }
   }
+}
+
+.brand-button {
+  color: var(--color-accent-contrast);
 }
 </style>

@@ -4,7 +4,7 @@
       v-for="(link, index) in filteredLinks"
       v-show="link.shown === undefined ? true : link.shown"
       :key="index"
-      ref="linkElements"
+      ref="rowLinkElements"
       :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
       class="nav-link button-animation"
     >
@@ -66,10 +66,12 @@ function pickLink() {
   }
 }
 
-const linkElements = ref();
+const rowLinkElements = ref();
 
 function startAnimation() {
-  const el = linkElements.value[activeIndex.value].$el;
+  const el = rowLinkElements.value[activeIndex.value].$el;
+
+  if (!el || !el.offsetParent) return;
 
   sliderPositionX.value = el.offsetLeft;
   sliderPositionY.value = el.offsetTop + el.offsetHeight;
