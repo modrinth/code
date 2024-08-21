@@ -248,10 +248,9 @@
             </div>
           </template>
         </div>
+        <AdPlaceholder />
       </div>
       <div class="normal-page__content">
-        <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
-
         <nav class="navigation-card">
           <NavRow
             :links="[
@@ -380,7 +379,7 @@ import {
   LibraryIcon,
   BoxIcon,
 } from "@modrinth/assets";
-import { PopoutMenu, FileInput, DropdownSelect, Promotion, Avatar, Button } from "@modrinth/ui";
+import { PopoutMenu, FileInput, DropdownSelect, Avatar, Button } from "@modrinth/ui";
 
 import WorldIcon from "assets/images/utils/world.svg";
 import UpToDate from "assets/images/illustrations/up_to_date.svg";
@@ -388,6 +387,7 @@ import { addNotification } from "~/composables/notifs.js";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
 import NavRow from "~/components/ui/NavRow.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
+import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;

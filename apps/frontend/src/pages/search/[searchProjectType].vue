@@ -134,7 +134,6 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <Promotion v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" :external="false" />
       <div class="card search-controls">
         <div class="search-filter-container">
           <button
@@ -257,7 +256,7 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Promotion, Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
+import { Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
 import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon } from "@modrinth/assets";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
@@ -283,7 +282,6 @@ const route = useNativeRoute();
 
 const cosmetics = useCosmetics();
 const tags = useTags();
-const auth = await useAuth();
 
 const query = ref("");
 const facets = ref([]);
