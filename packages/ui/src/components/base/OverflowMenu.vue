@@ -8,7 +8,7 @@
   >
     <slot></slot>
     <template #menu>
-      <template v-for="(option, index) in options.filter((x) => x.shown ?? true)">
+      <template v-for="(option, index) in options.filter((x) => x.shown === undefined || x.shown)">
         <div
           v-if="option.divider"
           :key="`divider-${index}`"
