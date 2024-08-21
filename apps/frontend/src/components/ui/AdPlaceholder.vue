@@ -101,9 +101,11 @@ iframe[id^="google_ads_iframe"] {
 }
 
 #qc-cmp2-ui div,
-li,
-strong,
-p {
+#qc-cmp2-ui li,
+#qc-cmp2-ui strong,
+#qc-cmp2-ui p,
+#qc-cmp2-ui .qc-cmp2-list-item-title,
+#qc-cmp2-ui .qc-cmp2-expandable-info {
   color: var(--color-base);
   font-family: var(--font-standard);
 }
