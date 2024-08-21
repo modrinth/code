@@ -58,7 +58,12 @@
     />
   </div>
   <div class="normal-page__sidebar">
-    <AdPlaceholder />
+    <AdPlaceholder
+      v-if="
+        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
+        tags.approvedStatuses.includes(props.project.status)
+      "
+    />
     <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
   </div>
 </template>
@@ -90,6 +95,9 @@ const props = defineProps({
     },
   },
 });
+
+const auth = await useAuth();
+const tags = useTags();
 
 const title = `${props.project.title} - Changelog`;
 const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`;

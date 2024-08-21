@@ -21,7 +21,12 @@
     />
   </section>
   <div class="normal-page__sidebar">
-    <AdPlaceholder />
+    <AdPlaceholder
+      v-if="
+        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
+        tags.approvedStatuses.includes(props.project.status)
+      "
+    />
     <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
       <h2>{{ formatMessage(compatibilityMessages.title) }}</h2>
       <section>
@@ -361,6 +366,7 @@ const props = defineProps({
   },
 });
 
+const auth = await useAuth();
 const tags = useTags();
 const { formatMessage } = useVIntl();
 const formatRelativeTime = useRelativeTime();

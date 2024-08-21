@@ -109,7 +109,7 @@
           </div>
         </div>
 
-        <AdPlaceholder />
+        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
 
         <div class="creator-list universal-card">
           <div class="title-and-link">
