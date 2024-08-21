@@ -515,8 +515,15 @@
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled size="large" circular>
-                <PopoutMenu v-if="auth.user" from="top-right">
-                  <BookmarkIcon aria-hidden="true" />
+                <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right">
+                  <BookmarkIcon
+                    aria-hidden="true"
+                    :fill="
+                      collections.some((x) => x.projects.includes(project.id))
+                        ? 'currentColor'
+                        : 'none'
+                    "
+                  />
                   <template #menu>
                     <input
                       v-model="displayCollectionsSearch"
@@ -526,7 +533,9 @@
                     />
                     <div v-if="collections.length > 0" class="collections-list">
                       <Checkbox
-                        v-for="option in collections"
+                        v-for="option in collections
+                          .slice()
+                          .sort((a, b) => a.name.localeCompare(b.name))"
                         :key="option.id"
                         :model-value="option.projects.includes(project.id)"
                         class="popout-checkbox"
