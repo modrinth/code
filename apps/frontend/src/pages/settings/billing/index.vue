@@ -344,6 +344,16 @@ definePageMeta({
   middleware: "auth",
 });
 
+useHead({
+  script: [
+    {
+      src: "https://js.stripe.com/v3/",
+      defer: true,
+      async: true,
+    },
+  ],
+});
+
 const data = useNuxtApp();
 const config = useRuntimeConfig();
 
