@@ -241,15 +241,16 @@ pub async fn install_minecraft(
             profile.loader,
             Some("stable"),
         )
-            .await?;
+        .await?;
 
         let loader_version_id = loader_version.clone();
         crate::api::profile::edit(&profile.path, |prof| {
-            prof.loader_version = loader_version_id.clone().map(|x| x.id.clone());
+            prof.loader_version =
+                loader_version_id.clone().map(|x| x.id.clone());
 
             async { Ok(()) }
         })
-            .await?;
+        .await?;
     }
 
     let version_jar =
@@ -478,7 +479,7 @@ pub async fn launch_minecraft(
             "No loader version selected for {}",
             profile.loader.as_str()
         ))
-            .into());
+        .into());
     }
 
     let version_jar =
