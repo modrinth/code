@@ -11,7 +11,7 @@
           type="button"
           alt="Try to load servers again"
           class="flex items-center gap-2 bg-transparent text-sm font-bold"
-          @click="() => refreshNuxtData('serversList')"
+          @click="() => refreshNuxtData('ServerList')"
         >
           <UpdatedIcon />
           Retry
