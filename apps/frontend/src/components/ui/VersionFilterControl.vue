@@ -223,5 +223,8 @@ async function clearFilters() {
 defineExpose({
   toggleFilter,
   toggleFilters,
+  filters,
+  selectedFilters,
+  clearFilters,
 });
 </script>

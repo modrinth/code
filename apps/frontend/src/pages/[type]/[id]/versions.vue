@@ -19,6 +19,91 @@
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
     </div>
+    <div v-if="versionFilters" class="mb-3 flex flex-wrap items-center gap-1">
+      <ButtonStyled v-for="(value, key) in versionFilters.filters" :key="key">
+        <OverflowMenu
+          :options="
+            value.map((x) => ({
+              id: x,
+              action: () => versionFilters.toggleFilter(key, x),
+              color:
+                x === 'release'
+                  ? 'green'
+                  : x === 'beta'
+                    ? 'orange'
+                    : x === 'alpha'
+                      ? 'red'
+                      : 'default',
+              remainOnClick: true,
+            }))
+          "
+          class="ml-auto"
+        >
+          <RadioButtonIcon v-if="key === 'type'" class="h-5 w-5 text-secondary" />
+          <GameIcon v-else-if="key === 'gameVersion'" class="h-5 w-5 text-secondary" />
+          <WrenchIcon v-else-if="key === 'platform'" class="h-5 w-5 text-secondary" />
+          Filter by {{ key === "gameVersion" ? "game version" : key }}
+          <DropdownIcon class="h-5 w-5 text-secondary" />
+          <template v-for="filter in value" :key="filter" #[filter]>
+            {{ formatCategory(filter) }}
+            <CheckIcon
+              class="ml-auto text-secondary transition-opacity duration-100"
+              :class="{
+                'opacity-0': !(key === 'gameVersion'
+                  ? selectedGameVersions.includes(filter)
+                  : key === 'platform'
+                    ? selectedPlatforms.includes(filter)
+                    : key === 'type'
+                      ? selectedVersionChannels.includes(filter)
+                      : false),
+              }"
+            />
+          </template>
+        </OverflowMenu>
+      </ButtonStyled>
+    </div>
+    <div class="mb-3 flex flex-wrap items-center gap-1 empty:hidden">
+      <button
+        v-if="
+          selectedVersionChannels.length + selectedGameVersions.length + selectedPlatforms.length >
+          2
+        "
+        class="tag-list__item text-contrast"
+        @click="versionFilters.clearFilters"
+      >
+        <XCircleIcon />
+        Clear all filters
+      </button>
+      <button
+        v-for="channel in selectedVersionChannels"
+        :key="`remove-filter-${channel}`"
+        class="tag-list__item"
+        :style="`--_color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'});--_bg-color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'}-highlight)`"
+        @click="versionFilters.toggleFilter('type', channel)"
+      >
+        <XIcon />
+        {{ channel.slice(0, 1).toUpperCase() + channel.slice(1) }}
+      </button>
+      <button
+        v-for="version in selectedGameVersions"
+        :key="`remove-filter-${version}`"
+        class="tag-list__item"
+        @click="versionFilters.toggleFilter('gameVersion', version)"
+      >
+        <XIcon />
+        {{ version }}
+      </button>
+      <button
+        v-for="platform in selectedPlatforms"
+        :key="`remove-filter-${platform}`"
+        class="tag-list__item"
+        :style="`--_color: var(--color-platform-${platform})`"
+        @click="versionFilters.toggleFilter('platform', platform)"
+      >
+        <XIcon />
+        {{ formatCategory(platform) }}
+      </button>
+    </div>
     <div
       v-if="versions.length > 0"
       class="flex flex-col gap-4 rounded-2xl bg-bg-raised px-6 pb-8 pt-4 supports-[grid-template-columns:subgrid]:grid supports-[grid-template-columns:subgrid]:grid-cols-[1fr_min-content] sm:px-8 supports-[grid-template-columns:subgrid]:sm:grid-cols-[min-content_auto_auto_auto_min-content] supports-[grid-template-columns:subgrid]:xl:grid-cols-[min-content_auto_auto_auto_auto_auto_min-content]"
@@ -69,8 +154,12 @@
           <div class="flex flex-col justify-center gap-2 sm:contents">
             <div class="flex flex-row items-center gap-2 sm:contents">
               <div class="self-center">
-                <div class="pointer-events-none relative z-[1]">
-                  <VersionChannelIndicator :channel="version.version_type" />
+                <div class="relative z-[1] cursor-pointer">
+                  <VersionChannelIndicator
+                    v-tooltip="`Toggle filter for ${version.version_type}`"
+                    :channel="version.version_type"
+                    @click="versionFilters.toggleFilter('type', version.version_type)"
+                  />
                 </div>
               </div>
               <div
@@ -264,11 +353,13 @@
         tags.approvedStatuses.includes(project.status)
       "
     />
-    <VersionFilterControl
-      ref="versionFilters"
-      :versions="props.versions"
-      @switch-page="switchPage"
-    />
+    <div class="hidden">
+      <VersionFilterControl
+        ref="versionFilters"
+        :versions="props.versions"
+        @switch-page="switchPage"
+      />
+    </div>
   </div>
 </template>
 
@@ -281,6 +372,13 @@ import {
   FileInput,
 } from "@modrinth/ui";
 import {
+  GameIcon,
+  WrenchIcon,
+  XCircleIcon,
+  RadioButtonIcon,
+  CheckIcon,
+  DropdownIcon,
+  XIcon,
   StarIcon,
   CalendarIcon,
   DownloadIcon,
@@ -351,22 +449,30 @@ function getPrimaryFile(version) {
   return version.files.find((x) => x.primary) || version.files[0];
 }
 
+const selectedGameVersions = computed(() => {
+  return getArrayOrString(route.query.gameVersion) ?? [];
+});
+
+const selectedPlatforms = computed(() => {
+  return getArrayOrString(route.query.platform) ?? [];
+});
+
+const selectedVersionChannels = computed(() => {
+  return getArrayOrString(route.query.type) ?? [];
+});
+
 const versionFilters = ref(null);
 const filteredVersions = computed(() => {
-  const selectedGameVersions = getArrayOrString(route.query.gameVersion) ?? [];
-  const selectedLoaders = getArrayOrString(route.query.platform) ?? [];
-  const selectedVersionTypes = getArrayOrString(route.query.type) ?? [];
-
   return props.versions.filter(
     (projectVersion) =>
-      (selectedGameVersions.length === 0 ||
-        selectedGameVersions.some((gameVersion) =>
+      (selectedGameVersions.value.length === 0 ||
+        selectedGameVersions.value.some((gameVersion) =>
           projectVersion.game_versions.includes(gameVersion),
         )) &&
-      (selectedLoaders.length === 0 ||
-        selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
-      (selectedVersionTypes.length === 0 ||
-        selectedVersionTypes.includes(projectVersion.version_type)),
+      (selectedPlatforms.value.length === 0 ||
+        selectedPlatforms.value.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (selectedVersionChannels.value.length === 0 ||
+        selectedVersionChannels.value.includes(projectVersion.version_type)),
   );
 });
 
