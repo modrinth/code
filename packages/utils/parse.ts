@@ -14,7 +14,7 @@ export const configuredXss = new FilterXSS({
     kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
-    img: [...(whiteList.img || []), 'usemap', 'style'],
+    img: [...(whiteList.img || []), 'usemap', 'style', 'align'],
     map: ['name'],
     area: [...(whiteList.a || []), 'coords'],
     a: [...(whiteList.a || []), 'rel'],
@@ -22,6 +22,8 @@ export const configuredXss = new FilterXSS({
     th: [...(whiteList.th || []), 'style'],
     picture: [],
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
+    p: [...xss.whiteList.p, 'align'],
+    div: [...xss.whiteList.p, 'align'],
   },
   css: {
     whiteList: {
