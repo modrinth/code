@@ -179,7 +179,7 @@ const startInstance = async (context) => {
     await run(route.params.id)
     playing.value = true
   } catch (err) {
-    handleSevereError(err)
+    handleSevereError(err, { profilePath: route.params.id })
   }
   loading.value = false
 
