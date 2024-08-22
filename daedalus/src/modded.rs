@@ -98,6 +98,27 @@ pub fn merge_partial_version(
 ) -> VersionInfo {
     let merge_id = merge.id.clone();
 
+    let mut libraries = vec![];
+
+    // We skip duplicate libraries that exist already in the partial version
+    for mut lib in merge.libraries {
+        let lib_artifact = lib.name.rsplit_once(':').map(|x| x.0);
+
+        if let Some(lib_artifact) = lib_artifact {
+            if !partial.libraries.iter().any(|x| {
+                let target_artifact = x.name.rsplit_once(':').map(|x| x.0);
+
+                target_artifact == Some(lib_artifact) && x.include_in_classpath
+            }) {
+                libraries.push(lib);
+            } else {
+                lib.include_in_classpath = false;
+            }
+        } else {
+            libraries.push(lib);
+        }
+    }
+
     VersionInfo {
         arguments: if let Some(partial_args) = partial.arguments {
             if let Some(merge_args) = merge.arguments {
@@ -133,10 +154,8 @@ pub fn merge_partial_version(
         downloads: merge.downloads,
         id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
         java_version: merge.java_version,
-        libraries: partial
-            .libraries
-            .into_iter()
-            .chain(merge.libraries)
+        libraries: libraries.into_iter()
+            .chain(partial.libraries)
             .map(|mut x| {
                 x.name = x.name.replace(DUMMY_REPLACE_STRING, &merge_id);
 

@@ -47,6 +47,7 @@ pub async fn fetch_quilt(
     .await
 }
 
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip(semaphore, upload_files, mirror_artifacts))]
 async fn fetch(
     format_version: usize,
