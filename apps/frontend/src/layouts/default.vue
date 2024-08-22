@@ -64,81 +64,101 @@
       <div
         class="col-span-2 row-start-2 flex flex-wrap justify-center gap-1 sm:col-span-1 sm:row-start-auto"
       >
+        <div class="hidden xl:contents">
+          <ButtonStyled type="transparent">
+            <nuxt-link to="/mods" class="temp-nav-buttons"> Mods </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <nuxt-link to="/resourcepacks" class="temp-nav-buttons"> Resource Packs </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <nuxt-link to="/datapacks" class="temp-nav-buttons"> Data Packs </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <nuxt-link to="/modpacks" class="temp-nav-buttons"> Modpacks </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <nuxt-link to="/shaders" class="temp-nav-buttons"> Shaders </nuxt-link>
+          </ButtonStyled>
+          <ButtonStyled type="transparent">
+            <nuxt-link to="/plugins" class="temp-nav-buttons"> Plugins </nuxt-link>
+          </ButtonStyled>
+        </div>
+        <div class="contents xl:hidden">
+          <ButtonStyled type="transparent">
+            <OverflowMenu
+              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
+              :options="[
+                {
+                  id: 'mods',
+                  link: '/mods',
+                },
+                {
+                  id: 'resourcepacks',
+                  link: '/resourcepacks',
+                },
+                {
+                  id: 'datapacks',
+                  link: '/datapacks',
+                },
+                {
+                  id: 'plugins',
+                  link: '/plugins',
+                },
+                {
+                  id: 'shaders',
+                  link: '/shaders',
+                },
+                {
+                  id: 'modpacks',
+                  link: '/modpacks',
+                },
+              ]"
+            >
+              <CompassIcon aria-hidden="true" /> Browse
+              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
+              <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
+              <template #resourcepacks>
+                <PaintBrushIcon aria-hidden="true" /> Resource Packs
+              </template>
+              <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
+              <template #plugins> <ServerIcon aria-hidden="true" /> Plugins </template>
+              <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
+              <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
+            </OverflowMenu>
+          </ButtonStyled>
+        </div>
         <ButtonStyled type="transparent">
           <OverflowMenu
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             :options="[
               {
-                id: 'mods',
-                link: '/mods',
+                id: 'servers',
+                link: 'https://bisecthosting.com/modrinth',
+                shown: false,
               },
               {
-                id: 'resourcepacks',
-                link: '/resourcepacks',
+                id: 'app',
+                link: '/app',
               },
               {
-                id: 'datapacks',
-                link: '/datapacks',
-              },
-              {
-                id: 'plugins',
-                link: '/plugins',
-              },
-              {
-                id: 'shaders',
-                link: '/shaders',
-              },
-              {
-                id: 'modpacks',
-                link: '/modpacks',
+                id: 'plus',
+                color: 'purple',
+                link: '/plus',
+                shown: !auth.user || !isPermission(auth.user.badges, 1 << 0),
               },
             ]"
           >
-            <CompassIcon aria-hidden="true" /> Browse
+            <HamburgerIcon aria-hidden="true" /> More
             <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-            <template #mods> <BoxIcon aria-hidden="true" /> Mods </template>
-            <template #resourcepacks>
-              <PaintBrushIcon aria-hidden="true" /> Resource Packs
+            <template #servers> <ServerIcon aria-hidden="true" /> Host a server </template>
+            <template #app> <DownloadIcon aria-hidden="true" /> Get Modrinth App </template>
+            <template #plus>
+              <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
             </template>
-            <template #datapacks> <BracesIcon aria-hidden="true" /> Data Packs </template>
-            <template #plugins> <ServerIcon aria-hidden="true" /> Plugins </template>
-            <template #shaders> <GlassesIcon aria-hidden="true" /> Shaders </template>
-            <template #modpacks> <PackageOpenIcon aria-hidden="true" /> Modpacks </template>
           </OverflowMenu>
         </ButtonStyled>
-        <div class="contents lg:hidden">
-          <ButtonStyled type="transparent">
-            <OverflowMenu
-              v-if="auth.user"
-              class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
-              :options="[
-                {
-                  id: 'servers',
-                  link: 'https://bisecthosting.com/modrinth',
-                  shown: false,
-                },
-                {
-                  id: 'app',
-                  link: '/app',
-                },
-                {
-                  id: 'plus',
-                  color: 'purple',
-                  link: '/plus',
-                },
-              ]"
-            >
-              <HamburgerIcon aria-hidden="true" /> More
-              <DropdownIcon aria-hidden="true" class="h-5 w-5 text-secondary" />
-              <template #servers> <ServerIcon aria-hidden="true" /> Host a server </template>
-              <template #app> <DownloadIcon aria-hidden="true" /> Get Modrinth App </template>
-              <template #plus>
-                <ArrowBigUpDashIcon aria-hidden="true" /> Upgrade to Modrinth+
-              </template>
-            </OverflowMenu>
-          </ButtonStyled>
-        </div>
-        <div class="hidden lg:contents">
+        <div v-if="false" class="hidden lg:contents">
           <ButtonStyled v-if="false" type="transparent">
             <a href="https://bisecthosting.com/modrinth">
               <ServerIcon aria-hidden="true" /> Host a server
@@ -1300,6 +1320,11 @@ function hideStagingBanner() {
   main {
     padding-top: 0.75rem;
   }
+}
+
+.temp-nav-buttons.router-link-exact-active {
+  color: var(--color-contrast) !important;
+  background-color: var(--color-brand-highlight) !important;
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>

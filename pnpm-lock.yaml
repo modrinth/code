@@ -93,18 +93,27 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^5.0.4
         version: 5.0.5(vite@5.3.3(@types/node@20.14.11)(sass@1.77.6)(terser@5.31.3))(vue@3.4.31(typescript@5.5.3))
+      autoprefixer:
+        specifier: ^10.4.19
+        version: 10.4.19(postcss@8.4.39)
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
       eslint-config-custom:
         specifier: workspace:*
         version: link:../../packages/eslint-config-custom
+      postcss:
+        specifier: ^8.4.39
+        version: 8.4.39
       prettier:
         specifier: ^3.2.5
         version: 3.3.2
       sass:
         specifier: ^1.74.1
         version: 1.77.6
+      tailwindcss:
+        specifier: ^3.4.4
+        version: 3.4.4
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig

@@ -44,6 +44,8 @@
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+
 const pixelated = ref(false)
 const img = ref(null)
 

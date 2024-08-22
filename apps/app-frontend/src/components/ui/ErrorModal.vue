@@ -1,5 +1,5 @@
 <script setup>
-import { XIcon, IssuesIcon, LogInIcon, UpdatedIcon } from '@modrinth/assets'
+import { XIcon, HammerIcon, LogInIcon, UpdatedIcon } from '@modrinth/assets'
 import { Modal } from '@modrinth/ui'
 import { ChatIcon } from '@/assets/icons'
 import { ref } from 'vue'
@@ -8,6 +8,7 @@ import { handleError } from '@/store/notifications.js'
 import mixpanel from 'mixpanel-browser'
 import { handleSevereError } from '@/store/error.js'
 import { cancel_directory_change } from '@/helpers/settings.js'
+import { install } from '@/helpers/profile.js'
 
 const errorModal = ref()
 const error = ref()
@@ -19,7 +20,7 @@ const supportLink = ref('https://support.modrinth.com')
 const metadata = ref({})
 
 defineExpose({
-  async show(errorVal, canClose = true, source = null) {
+  async show(errorVal, context, canClose = true, source = null) {
     closable.value = canClose
 
     if (errorVal.message && errorVal.message.includes('Minecraft authentication error:')) {
@@ -53,6 +54,11 @@ defineExpose({
       if (errorVal.message.includes('Not enough space')) {
         metadata.value.notEnoughSpace = true
       }
+    } else if (errorVal.message && errorVal.message.includes('No loader version selected for')) {
+      title.value = 'No loader selected'
+      errorType.value = 'no_loader_version'
+      supportLink.value = 'https://support.modrinth.com'
+      metadata.value.profilePath = context.profilePath
     } else if (source === 'state_init') {
       title.value = 'Error initializing Modrinth App'
       errorType.value = 'state_init'
@@ -99,6 +105,18 @@ async function cancelDirectoryChange() {
 
 function retryDirectoryChange() {
   window.location.reload()
+}
+
+const loadingRepair = ref(false)
+async function repairInstance() {
+  loadingRepair.value = true
+  try {
+    await install(metadata.value.profilePath, false)
+    errorModal.value.hide()
+  } catch (err) {
+    handleSevereError(err)
+  }
+  loadingRepair.value = false
 }
 </script>
 
@@ -216,6 +234,15 @@ function retryDirectoryChange() {
             <li>Redownloading the app.</li>
           </ul>
         </template>
+        <template v-else-if="errorType === 'no_loader_version'">
+          <p>The Modrinth App failed to find the loader version for this instance.</p>
+          <p>To resolve this, you need to repair the instance. Click the button below to do so.</p>
+          <div class="cta-button">
+            <button class="btn btn-primary" :disabled="loadingRepair" @click="repairInstance">
+              <HammerIcon /> Repair instance
+            </button>
+          </div>
+        </template>
         <template v-else>
           {{ error.message ?? error }}
         </template>
@@ -223,7 +250,8 @@ function retryDirectoryChange() {
           v-if="
             errorType === 'directory_move' ||
             errorType === 'minecraft_auth' ||
-            errorType === 'state_init'
+            errorType === 'state_init' ||
+            errorType === 'no_loader_version'
           "
         >
           <hr />
