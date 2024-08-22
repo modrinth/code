@@ -116,13 +116,13 @@ initialize_state()
     setupApp().catch((err) => {
       stateFailed.value = true
       console.error(err)
-      error.showError(err, false, 'state_init')
+      error.showError(err, null, false, 'state_init')
     })
   })
   .catch((err) => {
     stateFailed.value = true
     console.error('Failed to initialize app', err)
-    error.showError(err, false, 'state_init')
+    error.showError(err, null, false, 'state_init')
   })
 
 const handleClose = async () => {
