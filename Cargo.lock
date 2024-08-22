@@ -5072,7 +5072,7 @@ dependencies = [
 
 [[package]]
 name = "theseus"
-version = "0.0.0"
+version = "0.8.2"
 dependencies = [
  "async-recursion",
  "async-tungstenite",
@@ -5124,7 +5124,7 @@ dependencies = [
 
 [[package]]
 name = "theseus_gui"
-version = "0.0.0"
+version = "0.8.2"
 dependencies = [
  "chrono",
  "cocoa 0.25.0",
