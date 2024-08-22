@@ -122,7 +122,9 @@ const handleProjectClick = (event, passedInstance) => {
 const handleOptionsClick = async (args) => {
   switch (args.option) {
     case 'play':
-      await run(args.item.path).catch(handleSevereError)
+      await run(args.item.path).catch((err) =>
+        handleSevereError(err, { profilePath: args.item.path }),
+      )
       mixpanel_track('InstanceStart', {
         loader: args.item.loader,
         game_version: args.item.game_version,
