@@ -60,7 +60,7 @@
   <div class="normal-page__sidebar">
     <AdPlaceholder
       v-if="
-        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
+        (!auth.user || !isPermission(auth.user.badges, 1 << 0) || featueshowAdsWithPlus) &&
         tags.approvedStatuses.includes(project.status)
       "
     />

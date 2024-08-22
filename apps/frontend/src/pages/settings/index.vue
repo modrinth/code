@@ -190,10 +190,10 @@
       <div class="adjacent-input small">
         <label for="search-layout-toggle">
           <span class="label__title">
-            {{ formatMessage(toggleFeatures.leftAlignedSearchSidebarTitle) }}
+            {{ formatMessage(toggleFeatures.rightAlignedSearchSidebarTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(toggleFeatures.leftAlignedSearchSidebarDescription) }}
+            {{ formatMessage(toggleFeatures.rightAlignedSearchSidebarDescription) }}
           </span>
         </label>
         <input
@@ -206,10 +206,10 @@
       <div class="adjacent-input small">
         <label for="project-layout-toggle">
           <span class="label__title">
-            {{ formatMessage(toggleFeatures.leftAlignedProjectSidebarTitle) }}
+            {{ formatMessage(toggleFeatures.rightAlignedContentSidebarTitle) }}
           </span>
           <span class="label__description">
-            {{ formatMessage(toggleFeatures.leftAlignedProjectSidebarDescription) }}
+            {{ formatMessage(toggleFeatures.rightAlignedContentSidebarDescription) }}
           </span>
         </label>
         <input
@@ -368,21 +368,21 @@ const toggleFeatures = defineMessages({
     defaultMessage:
       'Hides the "Get Modrinth App" buttons from primary navigation. The Modrinth App page can still be found on the landing page or in the footer.',
   },
-  leftAlignedSearchSidebarTitle: {
-    id: "settings.display.sidebar.Left-aligned-search-sidebar.title",
-    defaultMessage: "Left-aligned search sidebar",
+  rightAlignedSearchSidebarTitle: {
+    id: "settings.display.sidebar.right-aligned-search-sidebar.title",
+    defaultMessage: "Right-aligned sidebar on search pages",
   },
-  leftAlignedSearchSidebarDescription: {
-    id: "settings.display.sidebar.left-aligned-search-sidebar.description",
-    defaultMessage: "Aligns the search filters sidebar to the left of the search results.",
+  rightAlignedSearchSidebarDescription: {
+    id: "settings.display.sidebar.right-aligned-search-sidebar.description",
+    defaultMessage: "Aligns the search filters sidebar to the right of the search results.",
   },
-  leftAlignedProjectSidebarTitle: {
-    id: "settings.display.sidebar.left-aligned-project-sidebar.title",
-    defaultMessage: "Left-aligned project sidebar",
+  rightAlignedContentSidebarTitle: {
+    id: "settings.display.sidebar.right-aligned-content-sidebar.title",
+    defaultMessage: "Right-aligned sidebar on content pages",
   },
-  leftAlignedProjectSidebarDescription: {
-    id: "settings.display.sidebar.left-aligned-project-sidebar.description",
-    defaultMessage: "Aligns the project details sidebar to the left of the page's content.",
+  rightAlignedContentSidebarDescription: {
+    id: "settings.display.sidebar.right-aligned-content-sidebar.description",
+    defaultMessage: "Aligns the sidebar to the right of the content page's content.",
   },
 });
 

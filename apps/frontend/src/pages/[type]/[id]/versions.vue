@@ -232,7 +232,10 @@
               </OverflowMenu>
             </ButtonStyled>
           </div>
-          <div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
+          <div
+            v-if="flags.showVersionFilesInTable"
+            class="tag-list pointer-events-none relative z-[1] col-span-full"
+          >
             <div
               v-for="(file, fileIdx) in version.files"
               :key="`platform-tag-${fileIdx}`"
@@ -323,6 +326,7 @@ const props = defineProps({
 
 const auth = await useAuth();
 const tags = useTags();
+const flags = useFeatureFlags();
 const formatRelativeTime = useRelativeTime();
 
 const emits = defineEmits(["onDownload"]);
@@ -331,8 +335,6 @@ const route = useNativeRoute();
 const router = useNativeRouter();
 
 const currentPage = ref(route.query.page ?? 1);
-
-const showFiles = ref(false);
 
 function switchPage(page) {
   currentPage.value = page;
