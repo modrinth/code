@@ -15,7 +15,7 @@
               <div class="text-2xl font-extrabold text-white">Create backup</div>
             </div>
             <button
-              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
               @click="createBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
@@ -53,7 +53,7 @@
               <div class="text-2xl font-extrabold text-white">Rename backup</div>
             </div>
             <button
-              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
               @click="renameBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
@@ -70,7 +70,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="renameBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameBackupModal.hide()"> Rename backup </Button>
+            <Button color="primary" @click="renameBackup"> Rename backup </Button>
           </div>
         </div>
       </Modal>
@@ -88,7 +88,7 @@
               <div class="text-2xl font-extrabold text-white">Restore backup</div>
             </div>
             <button
-              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
               @click="restoreBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
@@ -97,14 +97,14 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
               <div class="text-2xl font-extrabold text-white">Backup #4</div>
-              <div class="text-contrast flex gap-2 font-semibold">
+              <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon /> Today, 7:27 PM
               </div>
             </div>
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="restoreBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="restoreBackupModal.hide()"> Restore backup </Button>
+            <Button color="primary" @click="restoreBackup"> Restore backup </Button>
           </div>
         </div>
       </Modal>
@@ -124,7 +124,7 @@
               <div class="text-2xl font-extrabold text-white">Delete backup</div>
             </div>
             <button
-              class="text-contrast h-8 w-8 rounded-full bg-[#ffffff10] p-2"
+              class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
               @click="deleteBackupModal.hide()"
             >
               <XIcon class="h-4 w-4" />
@@ -133,7 +133,7 @@
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
               <div class="text-2xl font-extrabold text-white">Backup #4</div>
-              <div class="text-contrast flex gap-2 font-semibold">
+              <div class="flex gap-2 font-semibold text-contrast">
                 <CalendarIcon /> Today, 7:27 PM
               </div>
             </div>
@@ -152,7 +152,7 @@
               <div class="text-2xl font-extrabold text-white">
                 {{ data.used_backup_quota }} Backups
               </div>
-              <div class="text-contrast font-semibold">
+              <div class="font-semibold text-contrast">
                 {{ data.backup_quota - data.used_backup_quota }} Slots avaliable
               </div>
             </div>
@@ -174,7 +174,7 @@
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>
-                <div class="text-contrast flex gap-2 font-semibold">
+                <div class="flex gap-2 font-semibold text-contrast">
                   <CalendarIcon /> {{ new Date(backup.created_at).toLocaleString() }}
                 </div>
               </div>
@@ -294,9 +294,9 @@ const renameBackup = async (backupId: string) => {
   try {
     await usePyroFetch(
       auth.value.token,
-      `servers/${serverId}/backups/${backupId}`,
+      `servers/${serverId}/backups/${backupId}/rename`,
       0,
-      "PUT",
+      "POST",
       "application/json",
       {
         name: backupName,
