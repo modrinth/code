@@ -22,6 +22,7 @@
     <div v-if="versionFilters" class="mb-3 flex flex-wrap items-center gap-1">
       <ButtonStyled v-for="(value, key) in versionFilters.filters" :key="key">
         <OverflowMenu
+          v-if="value.length > 1"
           :options="
             value.map((x) => ({
               id: x,
