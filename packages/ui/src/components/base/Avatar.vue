@@ -101,12 +101,8 @@ function updatePixelated() {
 
 <style lang="scss" scoped>
 .avatar {
+  @apply min-w-[--_size] min-h-[--_size] w-[--_size] h-[--_size];
   --_size: 2rem;
-
-  min-width: var(--_size);
-  min-height: var(--_size);
-  width: var(--_size);
-  height: var(--_size);
 
   border: 1px solid var(--color-button-border);
   background-color: var(--color-button-bg);
