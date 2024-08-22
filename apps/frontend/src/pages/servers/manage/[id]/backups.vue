@@ -70,7 +70,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="renameBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="renameBackup"> Rename backup </Button>
+            <Button color="primary" @click="renameBackup(currentBackup)"> Rename backup </Button>
           </div>
         </div>
       </Modal>
@@ -104,7 +104,7 @@
           </div>
           <div class="mb-4 mt-4 flex justify-end gap-4">
             <Button transparent @click="restoreBackupModal.hide()"> Cancel </Button>
-            <Button color="primary" @click="restoreBackup"> Restore backup </Button>
+            <Button color="primary" @click="restoreBackup(currentBackup)"> Restore backup </Button>
           </div>
         </div>
       </Modal>
@@ -180,10 +180,29 @@
               </div>
               <OverflowMenu
                 :options="[
-                  { id: 'rename', action: () => renameBackupModal.show() },
-                  { id: 'restore', action: () => restoreBackupModal.show() },
+                  {
+                    id: 'rename',
+                    action: () => {
+                      renameBackupModal.show();
+                      currentBackup = backup.id;
+                    },
+                  },
+                  {
+                    id: 'restore',
+                    action: () => {
+                      restoreBackupModal.show();
+                      currentBackup = backup.id;
+                    },
+                  },
                   { id: 'download', action: () => initiateDownload(backup.id) },
-                  { id: 'delete', action: () => deleteBackupModal.show(), color: 'red' },
+                  {
+                    id: 'delete',
+                    action: () => {
+                      deleteBackupModal.show();
+                      currentBackup = backup.id;
+                    },
+                    color: 'red',
+                  },
                 ]"
                 direction="right"
                 class="bg-transparent"
@@ -254,6 +273,8 @@ const deleteBackupModal = ref<Modal | null>(null);
 
 const c_backupsName = ref();
 const r_backupsName = ref();
+
+const currentBackup = ref("");
 
 const backupsState = reactive({
   loading: false,
