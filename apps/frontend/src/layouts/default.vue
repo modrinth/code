@@ -130,7 +130,6 @@
         </div>
         <ButtonStyled type="transparent">
           <OverflowMenu
-            v-if="auth.user"
             class="btn-dropdown-animation flex items-center gap-1 rounded-xl bg-transparent px-2 py-1"
             :options="[
               {
@@ -146,6 +145,7 @@
                 id: 'plus',
                 color: 'purple',
                 link: '/plus',
+                shown: !auth.user || !isPermission(auth.user.badges, 1 << 0),
               },
             ]"
           >
