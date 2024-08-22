@@ -1,6 +1,6 @@
 [package]
 name = "theseus_gui"
-version = "0.0.0"
+version = "0.8.2"
 description = "A Tauri App"
 authors = ["you"]
 license = ""
@@ -19,7 +19,7 @@ theseus = { path = "../../packages/app-lib", features = ["tauri"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 
-tauri = { version = "1.7.1", features = [ "updater", "app-all", "devtools", "dialog", "dialog-confirm", "dialog-open", "macos-private-api", "os-all", "protocol-asset", "shell-open", "window-close", "window-create", "window-hide", "window-maximize", "window-minimize", "window-set-decorations", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
+tauri = { version = "1.7.1", features = [ "app-all", "devtools", "dialog", "dialog-confirm", "dialog-open", "macos-private-api", "os-all", "protocol-asset", "shell-open", "window-close", "window-create", "window-hide", "window-maximize", "window-minimize", "window-set-decorations", "window-show", "window-start-dragging", "window-unmaximize", "window-unminimize"] }
 tauri-plugin-single-instance = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v1" }
 tauri-plugin-deep-link = "0.1.2"
@@ -28,7 +28,7 @@ tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"
 tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
-daedalus = "0.2.2"
+daedalus = "0.2.3"
 chrono = "0.4.26"
 
 dirs = "5.0.1"
