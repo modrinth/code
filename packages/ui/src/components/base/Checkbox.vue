@@ -32,9 +32,9 @@ const emit = defineEmits<{
 
 const props = withDefaults(
   defineProps<{
-    label: string
+    label?: string
     disabled?: boolean
-    description: string
+    description?: string
     modelValue: boolean
     clickEvent?: () => void
     collapsingToggleStyle?: boolean

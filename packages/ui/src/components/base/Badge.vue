@@ -19,7 +19,7 @@
 
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'">
-      <GlobeIcon aria-hidden="true" /> formatMessage(messages.publicLabel)
+      <GlobeIcon aria-hidden="true" /> {{ formatMessage(messages.publicLabel) }}
     </template>
     <template v-else-if="type === 'approved-general'">
       <CheckIcon aria-hidden="true" /> {{ formatMessage(messages.approvedLabel) }}
