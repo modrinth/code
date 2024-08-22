@@ -190,14 +190,13 @@
 }
 
 .universal-body {
-  *:not(.markdown-body) {
-    @extend .universal-labels;
+  @extend .universal-labels;
 
-    .multiselect {
-      width: 15rem;
-    }
+  .multiselect {
+    width: 15rem;
+  }
 
-    > :where(
+  > :where(
       input + *,
       .input-group + *,
       .textarea-wrapper + *,
@@ -205,116 +204,119 @@
       .resizable-textarea-wrapper + *,
       .input-div + *
     ) {
-      &:not(:empty) {
-        margin-block-start: var(--spacing-card-md);
-      }
+    &:not(:empty) {
+      margin-block-start: var(--spacing-card-md);
     }
+  }
 
-    :where(button, .button, .iconified-button) {
-      width: fit-content;
+  :where(button, .button, .iconified-button) {
+    width: fit-content;
+  }
+
+  .input-group {
+    input {
+      width: auto;
+      flex-basis: 0;
     }
+  }
 
+  :where(input) {
+    box-sizing: border-box;
+    max-height: 40px;
+
+    &:not(.stylized-toggle) {
+      max-width: 100%;
+    }
+  }
+
+  :where(.adjacent-input, &.adjacent-input) {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-card-sm);
+    margin-bottom: calc(var(--spacing-card-sm) + var(--spacing-card-md));
+
+    .iconified-button,
     .input-group {
-      input {
-        width: auto;
-        flex-basis: 0;
-      }
+      flex-shrink: 0;
     }
 
-    :where(input) {
-      box-sizing: border-box;
-      max-height: 40px;
-
-      &:not(.stylized-toggle) {
-        max-width: 100%;
-      }
-    }
-
-    :where(.adjacent-input, &.adjacent-input) {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: var(--spacing-card-sm);
-      margin-bottom: calc(var(--spacing-card-sm) + var(--spacing-card-md));
-
-      .iconified-button,
-      .input-group {
-        flex-shrink: 0;
-      }
-
-      input {
-        flex-shrink: 1;
-      }
-
-      > :first-child {
-        flex-shrink: 2;
-        flex-grow: 1;
-        flex-basis: min-content;
-      }
-
-      label,
-      .label {
-        .label__title {
-          margin-block: 0;
-        }
-
-        .label__description {
-          margin-block-end: 0;
-        }
-
-        .label__description:not(:first-child) {
-          margin-top: var(--spacing-card-sm);
-        }
-      }
-
-      @media screen and (max-width: 750px) {
-        &:not(&.small) {
-          flex-direction: column;
-          align-items: flex-start;
-
-          .stylized-toggle {
-            flex-basis: 0;
-          }
-        }
-      }
-    }
-
-    h1 {
-      display: flex;
-      align-items: center;
+    input {
+      flex-shrink: 1;
     }
 
     > :first-child {
-      :first-child {
-        margin-block-start: 0;
+      flex-shrink: 2;
+      flex-grow: 1;
+      flex-basis: min-content;
+    }
+
+    label,
+    .label {
+      .label__title {
+        margin-block: 0;
       }
 
+      .label__description {
+        margin-block-end: 0;
+      }
+
+      .label__description:not(:first-child) {
+        margin-top: var(--spacing-card-sm);
+      }
+    }
+
+    @media screen and (max-width: 750px) {
+      &:not(&.small) {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .stylized-toggle {
+          flex-basis: 0;
+        }
+      }
+    }
+  }
+
+  h1 {
+    display: flex;
+    align-items: center;
+  }
+
+  .markdown-body h1 {
+    display: block;
+  }
+
+  > :first-child {
+    :first-child {
       margin-block-start: 0;
     }
 
-    > :last-child {
-      margin-block-end: 0;
+    margin-block-start: 0;
+  }
+
+  > :last-child {
+    margin-block-end: 0;
+  }
+
+  :where(.header__row) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-card-sm);
+
+    * {
+      flex-shrink: 0;
     }
 
-    :where(.header__row) {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: var(--spacing-card-sm);
+    .header__title {
+      margin: 0;
+      flex-grow: 1;
+    }
 
-      * {
-        flex-shrink: 0;
-      }
-
-      .header__title {
-        margin: 0;
-        flex-grow: 1;
-      }
-
-      &:not(:last-child) {
-        margin-bottom: var(--spacing-card-md);
-      }
+    &:not(:last-child) {
+      margin-bottom: var(--spacing-card-md);
     }
   }
 }
