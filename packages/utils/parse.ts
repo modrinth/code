@@ -22,8 +22,8 @@ export const configuredXss = new FilterXSS({
     th: [...(whiteList.th || []), 'style'],
     picture: [],
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
-    p: [...xss.whiteList.p, 'align'],
-    div: [...xss.whiteList.p, 'align'],
+    p: [...(whiteList.p || []), 'align'],
+    div: [...(whiteList.p || []), 'align'],
   },
   css: {
     whiteList: {
