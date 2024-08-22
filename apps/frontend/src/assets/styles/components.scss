@@ -190,7 +190,7 @@
 }
 
 .universal-body {
-  :not(.markdown-body) {
+  *:not(.markdown-body) {
     @extend .universal-labels;
 
     .multiselect {
