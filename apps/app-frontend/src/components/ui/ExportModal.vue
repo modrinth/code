@@ -73,6 +73,38 @@ const initFiles = async () => {
     },
     value,
   ])
+
+  // Process subfolders
+  for (const [parent, children] of newFolders.entries()) {
+    const parentPath = parent.split(sep).slice(0, -1).join(sep)
+    if (parentPath !== '') {
+      if (newFolders.has(parentPath)) {
+        newFolders.get(parentPath).push({
+          name: parent.split(sep).pop(),
+          path: parent,
+          children,
+          showingMore: false,
+        })
+      } else {
+        newFolders.set(parentPath, [
+          {
+            name: parent.split(sep).pop(),
+            path: parent,
+            children,
+            showingMore: false,
+          },
+        ])
+      }
+    }
+  }
+
+  folders.value = [...newFolders.entries()].map(([name, value]) => [
+    {
+      name,
+      showingMore: false,
+    },
+    value,
+  ])
 }
 
 await initFiles()
