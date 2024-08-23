@@ -126,6 +126,7 @@ initialize_state()
   })
 
 const handleClose = async () => {
+  await saveWindowState(StateFlags.ALL)
   await TauriWindow.getCurrent().close()
 }
 
@@ -293,16 +294,7 @@ async function handleCommand(e) {
           <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
             <MaximizeIcon />
           </Button>
-          <Button
-            class="titlebar-button close"
-            icon-only
-            @click="
-              () => {
-                saveWindowState(StateFlags.ALL)
-                handleClose()
-              }
-            "
-          >
+          <Button class="titlebar-button close" icon-only @click="handleClose">
             <XIcon />
           </Button>
         </section>
