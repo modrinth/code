@@ -39,7 +39,7 @@ fn show_window(app: tauri::AppHandle) {
             .set_title("Initialization error")
             .set_text(&format!(
                 "Cannot display application window due to an error:\n{}",
-                e.to_string()
+                e
             ))
             .show_alert()
             .unwrap();
@@ -258,6 +258,6 @@ fn main() {
             .show_alert()
             .unwrap();
 
-        Err(e).expect("error while running tauri application")
+        panic!("{1}: {:?}", e, "error while running tauri application")
     }
 }
