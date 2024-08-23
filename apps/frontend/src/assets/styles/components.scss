@@ -284,6 +284,10 @@
     align-items: center;
   }
 
+  .markdown-body h1 {
+    display: block;
+  }
+
   > :first-child {
     :first-child {
       margin-block-start: 0;

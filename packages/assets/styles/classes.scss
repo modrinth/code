@@ -833,6 +833,7 @@ a,
 // MARKDOWN
 
 .markdown-body {
+  overflow-y: auto;
   h1:first-child {
     margin-top: 0;
   }
@@ -856,6 +857,10 @@ a,
     line-height: 1.5;
   }
 
+  h1 {
+    display: block;
+  }
+  
   h1,
   h2 {
     padding: 10px 0 5px;
