@@ -257,7 +257,7 @@ pub async fn copy_dotminecraft(
         crate::api::profile::get_full_path(profile_path_id).await?;
 
     // Gets all subfiles recursively in src
-    let subfiles = get_all_subfiles(&dotminecraft, true).await?;
+    let subfiles = get_all_subfiles(&dotminecraft, false).await?;
     let total_subfiles = subfiles.len() as u64;
 
     let loading_bar = init_or_edit_loading(

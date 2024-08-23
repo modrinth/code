@@ -50,7 +50,7 @@ pub fn parse_rules(
 
 // if anything is disallowed, it should NOT be included
 // if anything is not disallowed, it shouldn't factor in final result
-// if anything is not allowed, it shouldn't factor in final result
+// if anything is not allowed, it should NOT be included
 // if anything is allowed, it should be included
 #[tracing::instrument]
 pub fn parse_rule(
@@ -85,7 +85,7 @@ pub fn parse_rule(
             if res {
                 Some(true)
             } else {
-                None
+                Some(false)
             }
         }
         RuleAction::Disallow => {
