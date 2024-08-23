@@ -108,6 +108,16 @@ useSeoMeta({
   ogDescription: description,
 });
 
+useHead({
+  script: [
+    {
+      src: "https://js.stripe.com/v3/",
+      defer: true,
+      async: true,
+    },
+  ],
+});
+
 const vintl = useVIntl();
 
 const data = useNuxtApp();
