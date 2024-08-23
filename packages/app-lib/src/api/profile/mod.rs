@@ -515,7 +515,9 @@ pub async fn export_mrpack(
         let relative_path = pack_get_relative_path(&profile_base_path, &path)?;
 
         if packfile.files.iter().any(|f| f.path == relative_path)
-            || !included_candidates_set.contains(&relative_path)
+            || !included_candidates_set
+                .iter()
+                .any(|x| relative_path.starts_with(&**x))
         {
             continue;
         }
