@@ -25,10 +25,13 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    subdomain: {
+      type: String,
+    },
   },
   setup(props) {
     const copyText = () => {
-      const text = `${props.ip}:${props.port}`;
+      const text = props.subdomain ? `${props.subdomain}` : `${props.ip}:${props.port}`;
       navigator.clipboard.writeText(text);
 
       // @ts-ignore

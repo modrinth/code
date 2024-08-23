@@ -1,49 +1,52 @@
 <template>
   <div>
-    <div v-if="error" class="alert alert-error">{{ error }}</div>
-    <div v-else-if="properties && status === 'success'">
+    <div v-if="properties && status === 'success'">
       <section class="card">
-        <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
-        <div
-          v-for="(property, index) in liveProperties"
-          :key="index"
-          class="mb-4 flex justify-between gap-4"
-        >
-          <label :for="index as unknown as string" class="block text-lg font-semibold">{{
-            index
-              .toString()
-              .split("-")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-          }}</label>
-          <div v-if="typeof property === 'boolean'">
-            <Checkbox id="property.id" :model-value="property" />
-          </div>
-          <div v-else-if="typeof property === 'number'">
-            <input
-              :id="index as unknown as string"
-              v-model.number="liveProperties[index]"
-              type="number"
-              class="w-full rounded border p-2"
-            />
-          </div>
-          <div v-else-if="typeof property === 'object'">
-            <textarea
-              :id="index as unknown as string"
-              :value="JSON.stringify(property, null, 2)"
-              class="w-full rounded border p-2"
-            ></textarea>
-          </div>
-          <div v-else>
-            <input
-              :id="index as unknown as string"
-              :value="property"
-              type="text"
-              class="w-full rounded border p-2"
-            />
+        <div class="flex flex-col gap-6">
+          <h2 class="text-3xl font-bold">General</h2>
+          <div class="h-[2px] w-full bg-divider"></div>
+          <div v-for="(property, index) in liveProperties" :key="index">
+            <div class="mb-4 flex justify-between">
+              <label :for="index as unknown as string" class="block text-lg font-semibold">{{
+                index
+                  .toString()
+                  .split("-")
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(" ")
+              }}</label>
+              <div v-if="typeof property === 'boolean'">
+                <Checkbox id="property.id" :model-value="property" />
+              </div>
+              <div v-else-if="typeof property === 'number'">
+                <input
+                  :id="index as unknown as string"
+                  v-model.number="liveProperties[index]"
+                  type="number"
+                  class="w-full rounded border p-2"
+                />
+              </div>
+              <div v-else-if="typeof property === 'object'">
+                <textarea
+                  :id="index as unknown as string"
+                  :value="JSON.stringify(property, null, 2)"
+                  class="w-full rounded border p-2"
+                ></textarea>
+              </div>
+              <div v-else>
+                <input
+                  :id="index as unknown as string"
+                  :value="property"
+                  type="text"
+                  class="w-full rounded border p-2"
+                />
+              </div>
+            </div>
+            <div class="h-[2px] w-full bg-divider"></div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary" @click="() => saveProperties()">Save</button>
+        <button type="submit" class="btn btn-primary mt-4" @click="() => saveProperties()">
+          Save
+        </button>
       </section>
     </div>
     <PyroLoading v-else-if="status === 'pending'" />
@@ -67,24 +70,11 @@ const auth = await useAuth();
 
 const changedPropertiesState = ref({});
 
-const { formatMessage } = useVIntl();
-const messages = defineMessages({
-  title: {
-    id: "server.options.props.title",
-    defaultMessage: "Server Properties",
-  },
-});
-
-const error = ref<string | null>(null);
-
-const { data: properties, status } = await useLazyAsyncData("serverProps", async () => {
+const { data: properties, status } = await useAsyncData("serverProps", async () => {
   const data = await usePyroFetch<string>(
     auth.value.token,
     `servers/${serverId}/config/ServerProperties`,
   );
-  if (data.includes("Config file not found")) {
-    error.value = "Config file not found";
-  }
   return data;
 });
 

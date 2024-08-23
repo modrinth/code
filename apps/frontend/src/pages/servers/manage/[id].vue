@@ -45,7 +45,11 @@
           <UiNavTabs :links="navLinks" />
 
           <div class="flex flex-row gap-2">
-            <UiServersPanelCopyIP :ip="serverData.net.ip" :port="serverData.net.port" />
+            <UiServersPanelCopyIP
+              :ip="serverData.net.ip"
+              :port="serverData.net.port"
+              :subdomain="serverData.net.domain"
+            />
             <UiServersPanelPlay
               :server-id="serverData.server_id"
               :ip="serverData.net.ip"

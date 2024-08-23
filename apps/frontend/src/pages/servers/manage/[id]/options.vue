@@ -6,6 +6,12 @@
           <NavStackItem :link="`/servers/manage/${serverId}/options`" label="General">
             <CogIcon />
           </NavStackItem>
+          <NavStackItem :link="`/servers/manage/${serverId}/options/args`" label="Launch Arguments">
+            <TextQuoteIcon />
+          </NavStackItem>
+          <NavStackItem :link="`/servers/manage/${serverId}/options/network`" label="Network">
+            <VersionIcon />
+          </NavStackItem>
           <NavStackItem :link="`/servers/manage/${serverId}/options/properties`" label="Properties">
             <ListIcon />
           </NavStackItem>
@@ -22,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { CogIcon, FileIcon, ListIcon } from "@modrinth/assets";
+import { CogIcon, FileIcon, ListIcon, TextQuoteIcon, VersionIcon } from "@modrinth/assets";
 import NavStack from "~/components/ui/NavStack.vue";
 import NavStackItem from "~/components/ui/NavStackItem.vue";
 

@@ -2,10 +2,9 @@
   <div>
     <div v-if="data && status === 'success'">
       <section class="card">
-        <h2 class="text-3xl font-bold">{{ formatMessage(messages.title) }}</h2>
-        <div class="flex flex-col gap-4">
-          <p class="m-0">Server ID: <UiCopyCode v-if="serverId" :text="serverId" /></p>
-          <p class="m-0">Pack ID: <UiCopyCode v-if="data.modpack" :text="data.modpack" /></p>
+        <div class="flex flex-col gap-6">
+          <h2 class="text-3xl font-bold">Launch Arguments</h2>
+          <div class="h-[2px] w-full bg-divider"></div>
         </div>
       </section>
     </div>
@@ -16,17 +15,27 @@
 <script setup lang="ts">
 import { useServerStore } from "~/stores/servers.ts";
 
-const { formatMessage } = useVIntl();
-const messages = defineMessages({
-  title: {
-    id: "server.options.info.title",
-    defaultMessage: "Info",
-  },
-});
-
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+const isUpdating = ref(false);
+const temdata = ref("");
+
+const updateServerArgs = async () => {
+  try {
+    isUpdating.value = true;
+  } catch (error) {
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "error",
+      title: "Failed to update server arguments",
+      text: "Please try again later.",
+    });
+  } finally {
+    isUpdating.value = false;
+  }
+};
 
 await serverStore.fetchServerData(serverId);
 const { data, status } = await useLazyAsyncData(
