@@ -36,6 +36,7 @@ import IncompatibilityWarningModal from '@/components/ui/install_flow/Incompatib
 import InstallConfirmModal from '@/components/ui/install_flow/InstallConfirmModal.vue'
 import { useInstall } from '@/store/install.js'
 import { invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 
 const themeStore = useTheming()
@@ -184,13 +185,7 @@ document.querySelector('body').addEventListener('click', function (e) {
         !target.href.startsWith('http://localhost') &&
         !target.href.startsWith('https://tauri.localhost')
       ) {
-        window.__TAURI_INVOKE__('tauri', {
-          __tauriModule: 'Shell',
-          message: {
-            cmd: 'open',
-            path: target.href,
-          },
-        })
+        open(target.href)
       }
       e.preventDefault()
       break

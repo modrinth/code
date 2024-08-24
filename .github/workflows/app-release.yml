@@ -25,7 +25,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Rust setup (mac)
         if: startsWith(matrix.platform, 'macos')
@@ -49,7 +49,7 @@ jobs:
             ${{ runner.os }}-rust-target-
 
       - name: Use Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -66,7 +66,7 @@ jobs:
           echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
 
       - name: Setup pnpm cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -114,14 +114,14 @@ jobs:
           tauriScript: pnpm --filter=@modrinth/app run tauri
 
       - name: upload ${{ matrix.platform }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: startsWith(matrix.platform, 'macos')
         with:
           name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os_mac.outputs.artifactPaths), '\n') }}"
 
       - name: upload ${{ matrix.platform }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: "!startsWith(matrix.platform, 'macos')"
         with:
           name: ${{ matrix.platform }}

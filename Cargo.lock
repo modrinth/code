@@ -4927,9 +4927,9 @@ dependencies = [
 
 [[package]]
 name = "tao"
-version = "0.29.0"
+version = "0.29.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6775bcf3c1da33f848ede9cff5883ed1e45a29f66533ce42ad06c93ae514ed59"
+checksum = "d3a97abbc7d6cfd0720da3e06fcb1cf2ac87cbfdb5bbbce103a1279a211c4d81"
 dependencies = [
  "bitflags 2.6.0",
  "cocoa 0.26.0",
@@ -4983,9 +4983,9 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 
 [[package]]
 name = "tauri"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "089bfbc9893d4129d73190496982c4d1ac0b02a9a7460a85d49c748e473c2f2e"
+checksum = "997e79de4c7a13b494a02c8104aa146a5d871ce83e5943e522bc5f8f35c8dab8"
 dependencies = [
  "anyhow",
  "bytes",
@@ -5033,9 +5033,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-build"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7abd4a3003014ed609030cb670ab666991bb794f4a927935f0a7ae0404f65d8"
+checksum = "032b966611a9324c2185fb9039ccfb938dbe00ec96fa1fe1596c9a1a98a6c87b"
 dependencies = [
  "anyhow",
  "cargo_toml",
@@ -5057,9 +5057,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-codegen"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "175a0cc0f11d4278123144daa571bb72be333376b8f4ca52ce6b9504e43caafc"
+checksum = "0f4138f3ee5fafa703c4504da58b6b94693655d0ddff8daf1e831b6dc04f4125"
 dependencies = [
  "base64 0.22.1",
  "brotli",
@@ -5084,9 +5084,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-macros"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfa65710d73b174d152a3bd48ab6e9e994ea32cd052473c223325ea10ca229b4"
+checksum = "a5995206394cd30411fc5c8ae195e498357f63e11ed960ea32b53512dcb2a5a5"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -5098,9 +5098,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin"
-version = "2.0.0-rc.3"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec01af01098a286d3e430c1fa947bfd77bc8011ecb209438af4444b02d82b29e"
+checksum = "4658d4bfb0e9c8abc8fa9d3e45b4e5fcbfe1be850316d96cefa6a1d4ffc215be"
 dependencies = [
  "anyhow",
  "glob",
@@ -5190,9 +5190,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-plugin-shell"
-version = "2.0.0-rc.1"
+version = "2.0.0-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2133e5c6fe2ae0263ff5920feed477d3b1413f89033f537966831b0cb6f61f8e"
+checksum = "46315cccdbc7686bfb9f17e4aab757e5bb50118bc42e52784cae3917c59ac4d7"
 dependencies = [
  "encoding_rs",
  "log",
@@ -5226,9 +5226,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-runtime"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef9dcd87245b84eb27724de1108c0a1a19e826dae36a2f86c9efe94963b3cc3c"
+checksum = "7c0830152f7e56a6c43080ced8f1c30a785a237ca3cfaa559ddf52d4be633275"
 dependencies = [
  "dpi",
  "gtk",
@@ -5245,9 +5245,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-runtime-wry"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02a73e75d1d0204f69efff29ade79299623eb140e0266856c68b880dad632457"
+checksum = "6f185bd051f52bece7ef2b197e1f285dab57e3891faa8eacc991459792b077c1"
 dependencies = [
  "cocoa 0.26.0",
  "gtk",
@@ -5269,9 +5269,9 @@ dependencies = [
 
 [[package]]
 name = "tauri-utils"
-version = "2.0.0-rc.4"
+version = "2.0.0-rc.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62e4c7855f6d4270361dd55edd92ccaa91e17c4d08aae30b1fedeb8a155b8b3c"
+checksum = "f04e02a821a99d544d93b44870799aaf75c8c0dda1853baf064261da3070b892"
 dependencies = [
  "brotli",
  "cargo_metadata",
@@ -5419,7 +5419,6 @@ dependencies = [
  "tracing-error",
  "url",
  "uuid 1.10.0",
- "window-shadows",
 ]
 
 [[package]]
@@ -6328,18 +6327,6 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
-
-[[package]]
-name = "window-shadows"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67ff424735b1ac21293b0492b069394b0a189c8a463fb015a16dea7c2e221c08"
-dependencies = [
- "cocoa 0.25.0",
- "objc",
- "raw-window-handle 0.5.2",
- "windows-sys 0.48.0",
-]
 
 [[package]]
 name = "window-vibrancy"

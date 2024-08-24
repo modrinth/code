@@ -164,32 +164,33 @@ fn main() {
 
                 #[cfg(not(target_os = "linux"))]
                 {
-                    use window_shadows::set_shadow;
-                    set_shadow(&window, true).unwrap();
+                    window.set_shadow(true).unwrap();
                 }
+
 
                 #[cfg(target_os = "macos")]
                 {
-                    use macos::window_ext::WindowExt;
-                    window.set_transparent_titlebar(true);
-                    window.position_traffic_lights(9.0, 16.0);
+                    use tauri::TitleBarStyle;
+                    window = window.set_title_bar_style(TitleBarStyle::Transparent);
+                    // ToDo: I don't think there is a nice way to do it in v2
+                    // window.position_traffic_lights(9.0, 16.0);
                 }
             }
 
             Ok(())
         });
 
-    #[cfg(target_os = "macos")]
-    {
-        use tauri::WindowEvent;
-        builder = builder.on_window_event(|e| {
-            use macos::window_ext::WindowExt;
-            if let WindowEvent::Resized(..) = e.event() {
-                let win = e.window();
-                win.position_traffic_lights(9.0, 16.0);
-            }
-        })
-    }
+    // #[cfg(target_os = "macos")]
+    // {
+    //     use tauri::WindowEvent;
+    //     builder = builder.on_window_event(|e| {
+    //         use macos::window_ext::WindowExt;
+    //         if let WindowEvent::Resized(..) = e.event() {
+    //             let win = e.window();
+    //             win.position_traffic_lights(9.0, 16.0);
+    //         }
+    //     })
+    // }
 
     let builder = builder
         .plugin(api::auth::init())
