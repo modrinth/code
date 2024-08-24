@@ -145,6 +145,7 @@
                 id: 'plus',
                 color: 'purple',
                 link: '/plus',
+                shown: !auth.user || !isPermission(auth.user.badges, 1 << 0),
               },
             ]"
           >

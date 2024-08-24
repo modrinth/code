@@ -40,7 +40,9 @@ const checkProcess = async () => {
 const play = async (e, context) => {
   e?.stopPropagation()
   modLoading.value = true
-  await run(props.instance.path).catch(handleSevereError)
+  await run(props.instance.path).catch((err) =>
+    handleSevereError(err, { profilePath: props.instance.path }),
+  )
   modLoading.value = false
 
   mixpanel_track('InstancePlay', {

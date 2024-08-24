@@ -519,16 +519,17 @@
                 <button
                   v-if="auth.user"
                   v-tooltip="following ? `Unfollow` : `Follow`"
+                  :aria-label="following ? `Unfollow` : `Follow`"
                   @click="userFollowProject(project)"
                 >
                   <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
                 </button>
-                <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in">
+                <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
                   <HeartIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>
               <ButtonStyled size="large" circular>
-                <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right">
+                <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right" aria-label="Save">
                   <BookmarkIcon
                     aria-hidden="true"
                     :fill="
@@ -569,7 +570,7 @@
                     </button>
                   </template>
                 </PopoutMenu>
-                <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in">
+                <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
                   <BookmarkIcon aria-hidden="true" />
                 </nuxt-link>
               </ButtonStyled>

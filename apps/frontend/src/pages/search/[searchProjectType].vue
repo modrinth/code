@@ -108,13 +108,10 @@
                       !negativeFilterSelected(category)
                     "
                     v-tooltip="negativeFilterSelected(category) ? 'Include' : 'Exclude'"
-                    class="hidden items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:flex"
+                    class="flex items-center justify-center gap-2 rounded-xl bg-transparent px-2 py-1 text-sm font-semibold text-secondary opacity-0 transition-all hover:bg-button-bg hover:text-red active:scale-[0.96] group-hover:opacity-100"
                     @click="toggleNegativeFilter(category)"
                   >
-                    <BanIcon
-                      class="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100"
-                      aria-hidden="true"
-                    />
+                    <BanIcon class="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>

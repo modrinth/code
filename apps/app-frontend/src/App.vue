@@ -116,16 +116,17 @@ initialize_state()
     setupApp().catch((err) => {
       stateFailed.value = true
       console.error(err)
-      error.showError(err, false, 'state_init')
+      error.showError(err, null, false, 'state_init')
     })
   })
   .catch((err) => {
     stateFailed.value = true
     console.error('Failed to initialize app', err)
-    error.showError(err, false, 'state_init')
+    error.showError(err, null, false, 'state_init')
   })
 
 const handleClose = async () => {
+  await saveWindowState(StateFlags.ALL)
   await TauriWindow.getCurrent().close()
 }
 
@@ -231,7 +232,7 @@ async function handleCommand(e) {
 
 <template>
   <SplashScreen v-if="!stateFailed" ref="splashScreen" data-tauri-drag-region />
-  <div v-if="stateInitialized" class="container">
+  <div v-if="stateInitialized" class="app-container">
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
@@ -293,16 +294,7 @@ async function handleCommand(e) {
           <Button class="titlebar-button" icon-only @click="() => appWindow.toggleMaximize()">
             <MaximizeIcon />
           </Button>
-          <Button
-            class="titlebar-button close"
-            icon-only
-            @click="
-              () => {
-                saveWindowState(StateFlags.ALL)
-                handleClose()
-              }
-            "
-          >
+          <Button class="titlebar-button close" icon-only @click="handleClose">
             <XIcon />
           </Button>
         </section>
@@ -379,7 +371,7 @@ async function handleCommand(e) {
   }
 }
 
-.container {
+.app-container {
   --appbar-height: 3.25rem;
   --sidebar-width: 4.5rem;
 

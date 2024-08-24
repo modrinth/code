@@ -675,7 +675,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
       </Card>
     </aside>
     <div class="search">
-      <PromotionWrapper />
+      <PromotionWrapper class="mt-4" />
       <Card class="project-type-container">
         <NavRow :links="selectableProjectTypes" />
       </Card>
