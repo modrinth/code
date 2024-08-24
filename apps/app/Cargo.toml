@@ -22,6 +22,7 @@ tauri-plugin-deep-link = "2.0.0-rc"
 tauri-plugin-os = "2.0.0-rc"
 tauri-plugin-shell = "2.0.0-rc"
 tauri-plugin-dialog = "2.0.0-rc"
+tauri-plugin-updater = "2.0.0-rc.1"
 
 tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"
