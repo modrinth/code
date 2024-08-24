@@ -302,7 +302,7 @@ import {
   ClipboardCopyIcon,
   MoreVerticalIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, ButtonStyled } from "@modrinth/ui";
+import { OverflowMenu, ButtonStyled, Avatar } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
@@ -319,7 +319,6 @@ import EditIcon from "~/assets/images/utils/edit.svg?component";
 import HeartIcon from "~/assets/images/utils/heart.svg?component";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
-import Avatar from "~/components/ui/Avatar.vue";
 import CollectionCreateModal from "~/components/ui/CollectionCreateModal.vue";
 import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 

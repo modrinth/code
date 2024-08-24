@@ -244,10 +244,9 @@
 <script setup>
 import { Multiselect } from "vue-multiselect";
 
+import { Avatar } from "@modrinth/ui";
 import { formatProjectStatus } from "@modrinth/utils";
-import Avatar from "~/components/ui/Avatar.vue";
 import ModalConfirm from "~/components/ui/ModalConfirm.vue";
-import FileInput from "~/components/ui/FileInput.vue";
 
 import UploadIcon from "~/assets/images/utils/upload.svg?component";
 import SaveIcon from "~/assets/images/utils/save.svg?component";
