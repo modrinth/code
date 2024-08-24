@@ -5,7 +5,7 @@
 
 use native_dialog::{MessageDialog, MessageType};
 use tauri_plugin_window_state::{StateFlags, WindowExt};
-use tauri::{Listener, Manager};
+use tauri::{Listener, Manager, PhysicalSize};
 use theseus::prelude::*;
 
 mod api;

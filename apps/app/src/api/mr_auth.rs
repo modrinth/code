@@ -5,7 +5,7 @@ use tauri::{Manager, UserAttentionType};
 use theseus::prelude::*;
 
 pub fn init<R: tauri::Runtime>() -> TauriPlugin<R> {
-    tauri::plugin::Builder::new("mr_auth")
+    tauri::plugin::Builder::new("mr-auth")
         .invoke_handler(tauri::generate_handler![
             login_pass,
             login_2fa,

@@ -19,7 +19,7 @@ import { invoke } from '@tauri-apps/api/core'
 export async function create(name, gameVersion, modloader, loaderVersion, iconPath, skipInstall) {
   //Trim string name to avoid "Unable to find directory"
   name = name.trim()
-  return await invoke('plugin:profile_create|profile_create', {
+  return await invoke('plugin:profile-create|profile_create', {
     name,
     gameVersion,
     modloader,
@@ -31,7 +31,7 @@ export async function create(name, gameVersion, modloader, loaderVersion, iconPa
 
 // duplicate a profile
 export async function duplicate(path) {
-  return await invoke('plugin:profile_create|profile_duplicate', { path })
+  return await invoke('plugin:profile-create|profile_duplicate', { path })
 }
 
 // Remove a profile
