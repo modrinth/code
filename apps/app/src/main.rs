@@ -4,8 +4,8 @@
 )]
 
 use native_dialog::{MessageDialog, MessageType};
-use tauri_plugin_window_state::{StateFlags, WindowExt};
 use tauri::{Listener, Manager, PhysicalSize};
+use tauri_plugin_window_state::{StateFlags, WindowExt};
 use theseus::prelude::*;
 
 mod api;
@@ -168,12 +168,11 @@ fn main() {
                     window.set_shadow(true).unwrap();
                 }
 
-
                 #[cfg(target_os = "macos")]
                 {
                     use tauri::TitleBarStyle;
-                    window = window.set_title_bar_style(TitleBarStyle::Transparent);
-                    // ToDo: I don't think there is a nice way to do it in v2
+                    window.set_title_bar_style(TitleBarStyle::Transparent);
+                    // TODO: I don't think there is a nice way to do it in v2
                     // window.position_traffic_lights(9.0, 16.0);
                 }
             }

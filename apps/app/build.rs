@@ -1,9 +1,10 @@
 use tauri_build::{DefaultPermissionRule, InlinedPlugin};
 
 fn main() {
-    // ToDo: Cleanup this & reduce boilerplate.
-
-    // ToDo: Cleanup commands for other plugins than auth, import
+    // Sadly, there is no better way to do it right now
+    // You could try parsing source code here and detecting #[tauri::command]
+    // But I think it's not worth it
+    // https://github.com/tauri-apps/tauri/issues/10075
     tauri_build::try_build(
         tauri_build::Attributes::new()
             .codegen(tauri_build::CodegenContext::new())
@@ -12,10 +13,32 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "login",
+                        "remove_user",
                         "get_default_user",
                         "set_default_user",
-                        "remove_user",
                         "get_users",
+                    ])
+                    .default_permission(
+                        DefaultPermissionRule::AllowAllCommands,
+                    ),
+            )
+            .plugin(
+                "cache",
+                InlinedPlugin::new()
+                    .commands(&[
+                        "get_project",
+                        "get_project_many",
+                        "get_version",
+                        "get_version_many",
+                        "get_user",
+                        "get_user_many",
+                        "get_team",
+                        "get_team_many",
+                        "get_organization",
+                        "get_organization_many",
+                        "get_search_results",
+                        "get_search_results_many",
+                        "purge_cache_types",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -38,12 +61,13 @@ fn main() {
                 "jre",
                 InlinedPlugin::new()
                     .commands(&[
+                        "get_java_versions",
+                        "set_java_versions",
                         "jre_find_filtered_jres",
                         "jre_get_jre",
                         "jre_test_jre",
                         "jre_auto_install_java",
                         "jre_get_max_memory",
-                        "get_java_versions",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -79,13 +103,9 @@ fn main() {
                 "mr-auth",
                 InlinedPlugin::new()
                     .commands(&[
-                        "authenticate_begin_flow",
-                        "authenticate_await_completion",
-                        "cancel_flow",
                         "login_pass",
                         "login_2fa",
                         "create_account",
-                        "refresh",
                         "logout",
                         "get",
                     ])
@@ -120,6 +140,8 @@ fn main() {
                     .commands(&[
                         "profile_remove",
                         "profile_get",
+                        "profile_get_many",
+                        "profile_get_projects",
                         "profile_get_optimal_jre_key",
                         "profile_get_full_path",
                         "profile_get_mod_full_path",
@@ -141,8 +163,6 @@ fn main() {
                         "profile_edit_icon",
                         "profile_export_mrpack",
                         "profile_get_pack_export_candidates",
-                        "profile_get_many",
-                        "profile_get_projects",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -162,8 +182,7 @@ fn main() {
                     .commands(&[
                         "settings_get",
                         "settings_set",
-                        "settings_change_config_dir",
-                        "settings_is_dir_writeable",
+                        "cancel_directory_change",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -178,7 +197,6 @@ fn main() {
                         "tags_get_loaders",
                         "tags_get_game_versions",
                         "tags_get_donation_platforms",
-                        "tags_get_tag_bundle",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
@@ -190,36 +208,11 @@ fn main() {
                     .commands(&[
                         "get_os",
                         "should_disable_mouseover",
-                        "show_in_folder",
+                        "highlight_in_folder",
+                        "open_path",
                         "show_launcher_logs_folder",
                         "progress_bars_list",
-                        "safety_check_safe_loading_bars",
                         "get_opening_command",
-                        "await_sync",
-                        "is_offline",
-                        "refresh_offline",
-                    ])
-                    .default_permission(
-                        DefaultPermissionRule::AllowAllCommands,
-                    ),
-            )
-            .plugin(
-                "cache",
-                InlinedPlugin::new()
-                    .commands(&[
-                        "get_project",
-                        "get_project_many",
-                        "get_version",
-                        "get_version_many",
-                        "get_user",
-                        "get_user_many",
-                        "get_team",
-                        "get_team_many",
-                        "get_organization",
-                        "get_organization_many",
-                        "get_search_results",
-                        "get_search_results_many",
-                        "purge_cache_bytes",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,

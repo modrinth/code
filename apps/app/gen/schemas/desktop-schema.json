@@ -468,10 +468,10 @@
           ]
         },
         {
-          "description": "cache:allow-purge-cache-bytes -> Enables the purge_cache_bytes command without any pre-configured scope.",
+          "description": "cache:allow-purge-cache-types -> Enables the purge_cache_types command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "cache:allow-purge-cache-bytes"
+            "cache:allow-purge-cache-types"
           ]
         },
         {
@@ -559,10 +559,10 @@
           ]
         },
         {
-          "description": "cache:deny-purge-cache-bytes -> Denies the purge_cache_bytes command without any pre-configured scope.",
+          "description": "cache:deny-purge-cache-types -> Denies the purge_cache_types command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "cache:deny-purge-cache-bytes"
+            "cache:deny-purge-cache-types"
           ]
         },
         {
@@ -2785,6 +2785,13 @@
           ]
         },
         {
+          "description": "jre:allow-set-java-versions -> Enables the set_java_versions command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "jre:allow-set-java-versions"
+          ]
+        },
+        {
           "description": "jre:deny-get-java-versions -> Denies the get_java_versions command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -2824,6 +2831,13 @@
           "type": "string",
           "enum": [
             "jre:deny-jre-test-jre"
+          ]
+        },
+        {
+          "description": "jre:deny-set-java-versions -> Denies the set_java_versions command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "jre:deny-set-java-versions"
           ]
         },
         {
@@ -2960,27 +2974,6 @@
           ]
         },
         {
-          "description": "mr-auth:allow-authenticate-await-completion -> Enables the authenticate_await_completion command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:allow-authenticate-await-completion"
-          ]
-        },
-        {
-          "description": "mr-auth:allow-authenticate-begin-flow -> Enables the authenticate_begin_flow command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:allow-authenticate-begin-flow"
-          ]
-        },
-        {
-          "description": "mr-auth:allow-cancel-flow -> Enables the cancel_flow command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:allow-cancel-flow"
-          ]
-        },
-        {
           "description": "mr-auth:allow-create-account -> Enables the create_account command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3016,34 +3009,6 @@
           ]
         },
         {
-          "description": "mr-auth:allow-refresh -> Enables the refresh command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:allow-refresh"
-          ]
-        },
-        {
-          "description": "mr-auth:deny-authenticate-await-completion -> Denies the authenticate_await_completion command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:deny-authenticate-await-completion"
-          ]
-        },
-        {
-          "description": "mr-auth:deny-authenticate-begin-flow -> Denies the authenticate_begin_flow command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:deny-authenticate-begin-flow"
-          ]
-        },
-        {
-          "description": "mr-auth:deny-cancel-flow -> Denies the cancel_flow command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:deny-cancel-flow"
-          ]
-        },
-        {
           "description": "mr-auth:deny-create-account -> Denies the create_account command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3076,13 +3041,6 @@
           "type": "string",
           "enum": [
             "mr-auth:deny-logout"
-          ]
-        },
-        {
-          "description": "mr-auth:deny-refresh -> Denies the refresh command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "mr-auth:deny-refresh"
           ]
         },
         {
@@ -3702,10 +3660,10 @@
           ]
         },
         {
-          "description": "settings:allow-settings-change-config-dir -> Enables the settings_change_config_dir command without any pre-configured scope.",
+          "description": "settings:allow-cancel-directory-change -> Enables the cancel_directory_change command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "settings:allow-settings-change-config-dir"
+            "settings:allow-cancel-directory-change"
           ]
         },
         {
@@ -3716,13 +3674,6 @@
           ]
         },
         {
-          "description": "settings:allow-settings-is-dir-writeable -> Enables the settings_is_dir_writeable command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "settings:allow-settings-is-dir-writeable"
-          ]
-        },
-        {
           "description": "settings:allow-settings-set -> Enables the settings_set command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3730,10 +3681,10 @@
           ]
         },
         {
-          "description": "settings:deny-settings-change-config-dir -> Denies the settings_change_config_dir command without any pre-configured scope.",
+          "description": "settings:deny-cancel-directory-change -> Denies the cancel_directory_change command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "settings:deny-settings-change-config-dir"
+            "settings:deny-cancel-directory-change"
           ]
         },
         {
@@ -3741,13 +3692,6 @@
           "type": "string",
           "enum": [
             "settings:deny-settings-get"
-          ]
-        },
-        {
-          "description": "settings:deny-settings-is-dir-writeable -> Denies the settings_is_dir_writeable command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "settings:deny-settings-is-dir-writeable"
           ]
         },
         {
@@ -3877,13 +3821,6 @@
           ]
         },
         {
-          "description": "tags:allow-tags-get-tag-bundle -> Enables the tags_get_tag_bundle command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "tags:allow-tags-get-tag-bundle"
-          ]
-        },
-        {
           "description": "tags:deny-tags-get-categories -> Denies the tags_get_categories command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -3916,13 +3853,6 @@
           "type": "string",
           "enum": [
             "tags:deny-tags-get-report-types"
-          ]
-        },
-        {
-          "description": "tags:deny-tags-get-tag-bundle -> Denies the tags_get_tag_bundle command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "tags:deny-tags-get-tag-bundle"
           ]
         },
         {
@@ -3996,13 +3926,6 @@
           ]
         },
         {
-          "description": "utils:allow-await-sync -> Enables the await_sync command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:allow-await-sync"
-          ]
-        },
-        {
           "description": "utils:allow-get-opening-command -> Enables the get_opening_command command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -4017,10 +3940,17 @@
           ]
         },
         {
-          "description": "utils:allow-is-offline -> Enables the is_offline command without any pre-configured scope.",
+          "description": "utils:allow-highlight-in-folder -> Enables the highlight_in_folder command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "utils:allow-is-offline"
+            "utils:allow-highlight-in-folder"
+          ]
+        },
+        {
+          "description": "utils:allow-open-path -> Enables the open_path command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "utils:allow-open-path"
           ]
         },
         {
@@ -4031,20 +3961,6 @@
           ]
         },
         {
-          "description": "utils:allow-refresh-offline -> Enables the refresh_offline command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:allow-refresh-offline"
-          ]
-        },
-        {
-          "description": "utils:allow-safety-check-safe-loading-bars -> Enables the safety_check_safe_loading_bars command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:allow-safety-check-safe-loading-bars"
-          ]
-        },
-        {
           "description": "utils:allow-should-disable-mouseover -> Enables the should_disable_mouseover command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -4052,24 +3968,10 @@
           ]
         },
         {
-          "description": "utils:allow-show-in-folder -> Enables the show_in_folder command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:allow-show-in-folder"
-          ]
-        },
-        {
           "description": "utils:allow-show-launcher-logs-folder -> Enables the show_launcher_logs_folder command without any pre-configured scope.",
           "type": "string",
           "enum": [
             "utils:allow-show-launcher-logs-folder"
-          ]
-        },
-        {
-          "description": "utils:deny-await-sync -> Denies the await_sync command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:deny-await-sync"
           ]
         },
         {
@@ -4087,10 +3989,17 @@
           ]
         },
         {
-          "description": "utils:deny-is-offline -> Denies the is_offline command without any pre-configured scope.",
+          "description": "utils:deny-highlight-in-folder -> Denies the highlight_in_folder command without any pre-configured scope.",
           "type": "string",
           "enum": [
-            "utils:deny-is-offline"
+            "utils:deny-highlight-in-folder"
+          ]
+        },
+        {
+          "description": "utils:deny-open-path -> Denies the open_path command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "utils:deny-open-path"
           ]
         },
         {
@@ -4101,31 +4010,10 @@
           ]
         },
         {
-          "description": "utils:deny-refresh-offline -> Denies the refresh_offline command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:deny-refresh-offline"
-          ]
-        },
-        {
-          "description": "utils:deny-safety-check-safe-loading-bars -> Denies the safety_check_safe_loading_bars command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:deny-safety-check-safe-loading-bars"
-          ]
-        },
-        {
           "description": "utils:deny-should-disable-mouseover -> Denies the should_disable_mouseover command without any pre-configured scope.",
           "type": "string",
           "enum": [
             "utils:deny-should-disable-mouseover"
-          ]
-        },
-        {
-          "description": "utils:deny-show-in-folder -> Denies the show_in_folder command without any pre-configured scope.",
-          "type": "string",
-          "enum": [
-            "utils:deny-show-in-folder"
           ]
         },
         {

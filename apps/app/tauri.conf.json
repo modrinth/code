@@ -11,7 +11,7 @@
     "copyright": "",
     "targets": "all",
     "externalBin": [],
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": "v1Compatible",
     "icon": [
       "icons/128x128.png",
       "icons/128x128@2x.png",
