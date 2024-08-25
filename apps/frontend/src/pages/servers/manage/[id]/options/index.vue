@@ -37,11 +37,6 @@
 import { ref, onMounted } from "vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import type { Server } from "~/types/servers";
-import { EditIcon } from "@modrinth/assets";
-import { Button, SearchDropdown } from "@modrinth/ui";
-import { useFetch } from "#app";
-import type { subtle } from "node:crypto";
-import Checkbox from "~/components/ui/Checkbox.vue";
 
 const app = useNuxtApp();
 const route = useRoute();
@@ -53,15 +48,12 @@ const newName = ref("");
 const isLoading = ref(true);
 const isUpdating = ref(false);
 const serverData = ref<Server | null>(null);
-const versions = ref<any>([]);
-const version = ref<string | null>(serverData.value?.project?.versions[0] ?? null);
 
 const fetchServerData = async () => {
   try {
     isLoading.value = true;
     await serverStore.fetchServerData(serverId);
     serverData.value = serverStore.getServerData(serverId) ?? null;
-    versions.value = await useBaseFetch(`project/${serverData.value?.project?.id}/version`);
   } catch (error) {
     // @ts-ignore
     app.$notify({

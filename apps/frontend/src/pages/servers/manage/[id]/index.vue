@@ -47,6 +47,8 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
 
+const serverStore = useServerStore();
+
 const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
 const isActioning = ref(false);
@@ -119,16 +121,7 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
   });
 
   try {
-    await usePyroFetch(
-      auth.value.token,
-      `servers/${serverId}/power`,
-      0,
-      "POST",
-      "application/json",
-      {
-        action: actionName,
-      },
-    );
+    serverStore.sendPowerAction(serverId, actionName);
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error);
     // @ts-ignore
@@ -144,7 +137,7 @@ const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") =>
 };
 
 const connectWebSocket = async () => {
-  const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
+  const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
   socket = new WebSocket(`ws://127.0.0.1:8889/v0/ws`);
 
   socket.onopen = () => {
@@ -210,7 +203,7 @@ const updateDataArray = (arr: number[], newValue: number) => {
 };
 
 const reauth = async () => {
-  const wsAuth = await usePyroFetch<WSAuth>(auth.value.token, `servers/${serverId}/ws`);
+  const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
   socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
 };
 

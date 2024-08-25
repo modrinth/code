@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="data && backupsData && status === 'success' && backupsStatus === 'success'">
+    <div v-if="data && status === 'success'">
       <Modal ref="createBackupModal" header="">
         <div class="flex flex-col gap-4 p-6">
           <div class="flex items-center justify-between gap-4">
@@ -161,7 +161,7 @@
         </div>
 
         <div
-          v-for="(backup, index) in backupsData"
+          v-for="(backup, index) in data.backups"
           :key="backup.id"
           class="relative w-full rounded-2xl bg-bg-raised p-8"
         >
@@ -254,17 +254,10 @@ const auth = await useAuth();
 
 const backupError = ref<string | null>(null);
 
-const { data, status } = await useLazyAsyncData("backupsServerData", async () => {
+const { data, status } = await useLazyAsyncData("backupsData", async () => {
   await serverStore.fetchServerData(serverId);
   return serverStore.getServerData(serverId);
 });
-
-const { data: backupsData, status: backupsStatus } = await useLazyAsyncData(
-  "backupsData",
-  async () => await usePyroFetch<ServerBackup[]>(auth.value.token, `servers/${serverId}/backups`),
-);
-
-backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
 
 const createBackupModal = ref<Modal | null>(null);
 const renameBackupModal = ref<Modal | null>(null);
@@ -288,20 +281,9 @@ const createBackup = async () => {
   backupsState.loading = true;
   const backupName = c_backupsName.value.value;
   try {
-    await usePyroFetch(
-      auth.value.token,
-      `servers/${serverId}/backups`,
-      0,
-      "POST",
-      "application/json",
-      {
-        name: backupName,
-      },
-    );
+    serverStore.createBackup(serverId, backupName);
 
-    await serverStore.fetchServerData(serverId);
     await refreshNuxtData("backupsData");
-    backupsData.value?.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
     createBackupModal.value.hide();
   } catch (error) {
     backupError.value = error as string;
@@ -313,19 +295,10 @@ const createBackup = async () => {
 const renameBackup = async (backupId: string) => {
   const backupName = r_backupsName.value.value;
   try {
-    await usePyroFetch(
-      auth.value.token,
-      `servers/${serverId}/backups/${backupId}/rename`,
-      0,
-      "POST",
-      "application/json",
-      {
-        name: backupName,
-      },
-    );
+    await serverStore.renameBackup(serverId, backupId, backupName);
 
     await refreshNuxtData("backupsData");
-    await renameBackupModal.value?.hide();
+    renameBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;
   }
@@ -335,13 +308,7 @@ const renameBackup = async (backupId: string) => {
 
 const restoreBackup = async (backupId: string) => {
   try {
-    await usePyroFetch(
-      auth.value.token,
-      `servers/${serverId}/backups/${backupId}/restore`,
-      0,
-      "POST",
-      "application/json",
-    );
+    await serverStore.restoreBackup(serverId, backupId);
 
     await restoreBackupModal.value?.hide();
   } catch (error) {
@@ -351,19 +318,21 @@ const restoreBackup = async (backupId: string) => {
   await restoreBackupModal.value?.hide();
 };
 
-interface downloadUrl {
-  download_url: string;
-  experation_seconds: number;
-}
+const deleteBackup = async (backupId: string) => {
+  try {
+    await serverStore.deleteBackup(serverId, backupId);
+
+    await refreshNuxtData("backupsData");
+    await deleteBackupModal.value?.hide();
+  } catch (error) {
+    backupError.value = error as string;
+  }
+
+  await deleteBackupModal.value?.hide();
+};
 
 const initiateDownload = async (backupId: string) => {
-  const downloadurl: downloadUrl = await usePyroFetch(
-    auth.value.token,
-    `servers/${serverId}/backups/${backupId}`,
-    0,
-    "GET",
-    "application/json",
-  );
+  const downloadurl: any = await serverStore.downloadBackup(serverId, backupId);
   const a = document.createElement("a");
   a.href = downloadurl.download_url;
   a.download = "backup.zip";

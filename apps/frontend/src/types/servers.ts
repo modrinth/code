@@ -78,6 +78,7 @@ export interface Server {
   modpack: string | null;
   modpack_id: string | null;
   project: Project | null;
+  backups: ServerBackup[];
   game: string;
   loader: string | null;
   loader_version: string | null;

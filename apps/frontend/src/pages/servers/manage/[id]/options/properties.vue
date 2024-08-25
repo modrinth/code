@@ -67,14 +67,13 @@ import PyroError from "~/components/ui/servers/PyroError.vue";
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const auth = await useAuth();
+const serverStore = useServerStore();
 
 const changedPropertiesState = ref({});
 
 const { data: properties, status } = await useAsyncData("serverProps", async () => {
-  const data = await usePyroFetch<string>(
-    auth.value.token,
-    `servers/${serverId}/config/ServerProperties`,
-  );
+  const data = await serverStore.fetchConfigFile(serverId, "ServerProperties");
+
   return data;
 });
 
@@ -101,14 +100,7 @@ watch(
 );
 
 const saveProperties = async () => {
-  await usePyroFetch(
-    auth.value.token,
-    `servers/${serverId}/config/server`,
-    0,
-    "PUT",
-    "application/json",
-    changedPropertiesState.value,
-  );
+  serverStore.saveConfigFile(serverId, "ServerProperties", changedPropertiesState.value);
   refreshNuxtData("serverProps");
 };
 </script>
