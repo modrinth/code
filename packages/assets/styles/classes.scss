@@ -1208,7 +1208,7 @@ select {
   line-height: 1;
 }
 
-.markdown-alert .markdown-alert-title .octicon {
+.markdown-alert .markdown-alert-title > svg {
   margin-right: 0.5rem;
   display: inline-block;
   overflow: visible !important;

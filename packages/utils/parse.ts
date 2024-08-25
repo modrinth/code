@@ -23,9 +23,9 @@ export const configuredXss = new FilterXSS({
     th: [...(whiteList.th || []), 'style'],
     picture: [],
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
-    p: [...(whiteList.p || []), 'align', 'class'],
-    div: [...(whiteList.p || []), 'align', 'class'],
-    svg: ['class', 'viewBox', 'version', 'width', 'height', 'aria-hidden'],
+    p: [...(whiteList.p || []), 'align'],
+    div: [...(whiteList.p || []), 'align'],
+    svg: ['aria-hidden'],
     path: ['d'],
   },
   css: {
@@ -77,6 +77,28 @@ export const configuredXss = new FilterXSS({
         }
       }
       return `${name}="${escapeAttrValue(allowedClasses.join(' '))}"`
+    }
+
+    // For markdown callouts
+    if (name === 'class' && ['div', 'p'].includes(tag)) {
+      const classWhitelist = [
+        'markdown-alert',
+        'markdown-alert-note',
+        'markdown-alert-tip',
+        'markdown-alert-warning',
+        'markdown-alert-important',
+        'markdown-alert-caution',
+        'markdown-alert-title',
+      ]
+
+      const allowed: string[] = []
+      for (const className of value.split(/\s/g)) {
+        if (classWhitelist.includes(className)) {
+          allowed.push(className)
+        }
+      }
+
+      return `${name}="${escapeAttrValue(allowed.join(' '))}"`
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
