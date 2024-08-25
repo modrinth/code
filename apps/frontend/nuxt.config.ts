@@ -77,13 +77,6 @@ export default defineNuxtConfig({
           title: "Modrinth mods",
         },
       ],
-      script: [
-        {
-          src: "https://js.stripe.com/v3/",
-          defer: true,
-          async: true,
-        },
-      ],
     },
   },
   vite: {

@@ -3,7 +3,9 @@
     windows_subsystem = "windows"
 )]
 
+use native_dialog::{MessageDialog, MessageType};
 use tauri::{Manager, PhysicalSize};
+use tauri_plugin_window_state::{StateFlags, WindowExt};
 use theseus::prelude::*;
 
 mod api;
@@ -31,15 +33,28 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 #[tauri::command]
 fn show_window(app: tauri::AppHandle) {
     let win = app.get_window("main").unwrap();
-    win.show().unwrap();
-    win.set_focus().unwrap();
+    if let Err(e) = win.show() {
+        MessageDialog::new()
+            .set_type(MessageType::Error)
+            .set_title("Initialization error")
+            .set_text(&format!(
+                "Cannot display application window due to an error:\n{}",
+                e
+            ))
+            .show_alert()
+            .unwrap();
+        panic!("cannot display application window")
+    } else {
+        let _ = win.restore_state(StateFlags::all());
+        let _ = win.set_focus();
 
-    // fix issue where window shows as extremely small
-    if let Ok(size) = win.inner_size() {
-        let width = if size.width < 1100 { 1280 } else { size.width };
-        let height = if size.height < 700 { 800 } else { size.height };
+        // fix issue where window shows as extremely small
+        if let Ok(size) = win.inner_size() {
+            let width = if size.width < 1100 { 1280 } else { size.width };
+            let height = if size.height < 700 { 800 } else { size.height };
 
-        win.set_size(PhysicalSize::new(width, height)).unwrap();
+            let _ = win.set_size(PhysicalSize::new(width, height));
+        }
     }
 }
 
@@ -160,7 +175,7 @@ fn main() {
 
             if let Some(window) = app.get_window("main") {
                 // Hide window to prevent white flash on startup
-                window.hide().unwrap();
+                let _ = window.hide();
 
                 #[cfg(not(target_os = "linux"))]
                 {
@@ -215,7 +230,34 @@ fn main() {
             show_window,
         ]);
 
-    builder
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+    if let Err(e) = builder.run(tauri::generate_context!()) {
+        #[cfg(target_os = "windows")]
+        {
+            // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
+            if format!("{:?}", e)
+                .contains("Runtime(CreateWebview(WebView2Error(WindowsError")
+            {
+                MessageDialog::new()
+                    .set_type(MessageType::Error)
+                    .set_title("Initialization error")
+                    .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://docs.modrinth.com/faq/app/webview2")
+                    .show_alert()
+                    .unwrap();
+
+                panic!("webview2 initialization failed")
+            }
+        }
+
+        MessageDialog::new()
+            .set_type(MessageType::Error)
+            .set_title("Initialization error")
+            .set_text(&format!(
+                "Cannot initialize application due to an error:\n{:?}",
+                e
+            ))
+            .show_alert()
+            .unwrap();
+
+        panic!("{1}: {:?}", e, "error while running tauri application")
+    }
 }
