@@ -23,6 +23,7 @@
     "dayjs": "^1.11.10",
     "highlight.js": "^11.9.0",
     "markdown-it": "^14.1.0",
+    "markdown-it-github-alerts": "^0.3.0",
     "xss": "^1.0.14"
   }
 }

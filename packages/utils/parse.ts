@@ -1,4 +1,5 @@
 import MarkdownIt from 'markdown-it'
+import MarkdownItGitHubAlerts from 'markdown-it-github-alerts'
 import { escapeAttrValue, FilterXSS, safeAttrValue, whiteList } from 'xss'
 
 export const configuredXss = new FilterXSS({
@@ -22,8 +23,10 @@ export const configuredXss = new FilterXSS({
     th: [...(whiteList.th || []), 'style'],
     picture: [],
     source: ['media', 'sizes', 'src', 'srcset', 'type'],
-    p: [...(whiteList.p || []), 'align'],
-    div: [...(whiteList.p || []), 'align'],
+    p: [...(whiteList.p || []), 'align', 'class'],
+    div: [...(whiteList.p || []), 'align', 'class'],
+    svg: ['class', 'viewBox', 'version', 'width', 'height', 'aria-hidden'],
+    path: ['d'],
   },
   css: {
     whiteList: {
@@ -128,6 +131,8 @@ export const md = (options = {}) => {
     breaks: false,
     ...options,
   })
+
+  md.use(MarkdownItGitHubAlerts)
 
   const defaultLinkOpenRenderer =
     md.renderer.rules.link_open ||
