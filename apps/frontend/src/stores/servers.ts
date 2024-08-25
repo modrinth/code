@@ -275,7 +275,7 @@ export const useServerStore = defineStore("servers", {
           0,
           "PUT",
           "application/json",
-          { data },
+          data,
         );
       } catch (error) {
         console.error("Error saving config file:", error);
@@ -286,7 +286,12 @@ export const useServerStore = defineStore("servers", {
     async checkSubdomainAvailability(subdomain: string) {
       try {
         const auth = await useAuth();
-        return await usePyroFetch(auth.value.token, `servers/subdomain/${subdomain}`, 0, "GET");
+        return await usePyroFetch(
+          auth.value.token,
+          `subdomains/${subdomain}/isavailable`,
+          0,
+          "GET",
+        );
       } catch (error) {
         console.error("Error checking subdomain availability:", error);
         throw error;
@@ -298,7 +303,7 @@ export const useServerStore = defineStore("servers", {
         const auth = await useAuth();
         await usePyroFetch(
           auth.value.token,
-          `servers/${serverId}/subdomain`,
+          `servers/${serverId}/subdomains`,
           0,
           "POST",
           "application/json",

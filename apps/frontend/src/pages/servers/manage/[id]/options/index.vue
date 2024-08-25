@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="serverData && !isLoading">
+    <div v-if="data && status == 'success'">
       <section class="card">
         <div class="flex flex-col gap-6">
           <h2 class="text-3xl font-bold">General</h2>
@@ -10,19 +10,14 @@
               <span class="text-lg font-bold text-white">Server Name</span>
               <span> Change the name of your server as it appears on Modrinth </span>
             </label>
-            <input
-              v-model="newName"
-              :placeholder="serverData.name"
-              @keyup.enter="updateServerName"
-              class="h-[50%] w-[40%]"
-            />
+            <input v-model="serverName" @keyup.enter="updateServerName" class="h-[50%] w-[40%]" />
           </div>
           <div class="h-[2px] w-full bg-divider"></div>
           <button
             type="submit"
             class="btn btn-primary"
             @click="updateServerName"
-            :disabled="isUpdating"
+            :disabled="isUpdating || !hasUnsavedChanges"
           >
             {{ isUpdating ? "Saving..." : "Save" }}
           </button>
@@ -44,57 +39,39 @@ const serverId = route.params.id as string;
 
 const serverStore = useServerStore();
 
-const newName = ref("");
-const isLoading = ref(true);
 const isUpdating = ref(false);
-const serverData = ref<Server | null>(null);
+const { data, status } = await useAsyncData(
+  "data",
+  async () => await serverStore.getServerData(serverId),
+);
 
-const fetchServerData = async () => {
-  try {
-    isLoading.value = true;
-    await serverStore.fetchServerData(serverId);
-    serverData.value = serverStore.getServerData(serverId) ?? null;
-  } catch (error) {
-    // @ts-ignore
-    app.$notify({
-      group: "serverOptions",
-      type: "error",
-      title: "Failed to fetch server data",
-      text: "Please try again later.",
-    });
-  } finally {
-    isLoading.value = false;
-  }
-};
+const serverName = ref(data.value?.name || "");
 
-const updateServerName = async () => {
-  if (!newName.value.trim()) return;
+const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
 
+const updateServerData = async () => {
   try {
     isUpdating.value = true;
-    await serverStore.updateServerName(serverId, newName.value);
+    await serverStore.updateServerName(serverId, serverName.value);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await fetchServerData();
-    newName.value = "";
+    await refreshNuxtData("backupsData");
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
       type: "success",
-      title: "Server name updated",
-      text: "Your server name has been successfully changed.",
+      title: "Server settings updated",
+      text: "Your server settings were successfully changed.",
     });
   } catch (error) {
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
       type: "error",
-      title: "Could not update server name",
-      text: "Your server name could not be changed. Please try again later.",
+      title: "Failed to update server settings",
+      text: "An error occurred while attempting to update your server settings.",
     });
   } finally {
     isUpdating.value = false;
   }
 };
-
-onMounted(fetchServerData);
 </script>

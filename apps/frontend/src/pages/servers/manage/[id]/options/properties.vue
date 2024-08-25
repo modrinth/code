@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="properties && status === 'success'">
+    <div v-if="data && status === 'success'">
       <section class="card">
         <div class="flex flex-col gap-6">
           <h2 class="text-3xl font-bold">General</h2>
@@ -15,7 +15,7 @@
                   .join(" ")
               }}</label>
               <div v-if="typeof property === 'boolean'">
-                <Checkbox id="property.id" :model-value="property" />
+                <Checkbox id="property.id" v-model="liveProperties[index]" />
               </div>
               <div v-else-if="typeof property === 'number'">
                 <input
@@ -44,8 +44,13 @@
             <div class="h-[2px] w-full bg-divider"></div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-4" @click="() => saveProperties()">
-          Save
+        <button
+          type="submit"
+          class="btn btn-primary mt-4"
+          @click="() => saveProperties()"
+          :disabled="isUpdating || !hasUnsavedChanges"
+        >
+          {{ isUpdating ? "Saving..." : "Save" }}
         </button>
       </section>
     </div>
@@ -69,15 +74,18 @@ const serverId = route.params.id as string;
 const auth = await useAuth();
 const serverStore = useServerStore();
 
+const isUpdating = ref(false);
+
 const changedPropertiesState = ref({});
 
-const { data: properties, status } = await useAsyncData("serverProps", async () => {
-  const data = await serverStore.fetchConfigFile(serverId, "ServerProperties");
+const { data, status } = await useAsyncData(
+  "data",
+  async () => await serverStore.fetchConfigFile(serverId, "ServerProperties"),
+);
 
-  return data;
-});
+const liveProperties = ref(JSON.parse(JSON.stringify(data.value)));
 
-const liveProperties = ref(JSON.parse(JSON.stringify(properties.value)));
+const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
 
 watch(
   liveProperties,
@@ -86,7 +94,7 @@ watch(
     const changed = [];
     for (const key in newProperties) {
       // @ts-ignore https://typescript.tv/errors/#ts7053
-      if (newProperties[key] !== properties.value[key]) {
+      if (newProperties[key] !== data.value[key]) {
         changed.push(key);
       }
     }
@@ -100,7 +108,28 @@ watch(
 );
 
 const saveProperties = async () => {
-  serverStore.saveConfigFile(serverId, "ServerProperties", changedPropertiesState.value);
-  refreshNuxtData("serverProps");
+  try {
+    isUpdating.value = true;
+    await serverStore.saveConfigFile(serverId, "ServerProperties", changedPropertiesState.value);
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await refreshNuxtData("data");
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "success",
+      title: "Server settings updated",
+      text: "Your server settings were successfully changed.",
+    });
+  } catch (error) {
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "error",
+      title: "Failed to update server settings",
+      text: "An error occurred while attempting to update your server settings.",
+    });
+  } finally {
+    isUpdating.value = false;
+  }
 };
 </script>

@@ -12,15 +12,20 @@
             </label>
             <div class="flex items-center gap-2">
               <input
-                v-if="subdomain"
-                v-model="subdomain"
-                :placeholder="subdomain"
+                v-model="serverSubdomain"
+                @keyup.enter="updateServerData"
                 class="h-[50%] w-[63%]"
               />
               .{{ data.net.domain.split(".").slice(1).join(".") }}
             </div>
           </div>
-          <button type="submit" class="btn btn-primary" @click="" :disabled="isUpdating">
+          <div class="h-[2px] w-full bg-divider"></div>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            @click=""
+            :disabled="isUpdating || !hasUnsavedChanges"
+          >
             {{ isUpdating ? "Saving..." : "Save" }}
           </button>
         </div>
@@ -38,12 +43,54 @@ const serverId = route.params.id as string;
 const serverStore = useServerStore();
 
 const isUpdating = ref(false);
-
-await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData(
-  "infoServerData",
+const { data, status } = await useAsyncData(
+  "data",
   async () => await serverStore.getServerData(serverId),
 );
 
-const subdomain = ref<string>(data?.value?.net?.domain.split(".")[0] ?? "");
+const serverSubdomain = ref(data?.value?.net?.domain.split(".")[0] ?? "");
+
+const hasUnsavedChanges = computed(
+  () => serverSubdomain.value !== data?.value?.net?.domain.split(".")[0],
+);
+
+const updateServerData = async () => {
+  try {
+    isUpdating.value = true;
+    const available = (await serverStore.checkSubdomainAvailability(serverSubdomain.value)) as {
+      available: boolean;
+    };
+    if (!available.available) {
+      // @ts-ignore
+      app.$notify({
+        group: "serverOptions",
+        type: "error",
+        title: "Subdomain is taken",
+        text: "The subdomain you entered is already in use.",
+      });
+    } else {
+      await serverStore.changeSubdomain(serverId, serverSubdomain.value);
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await refreshNuxtData("backupsData");
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "success",
+      title: "Server settings updated",
+      text: "Your server settings were successfully changed.",
+    });
+  } catch (error) {
+    // @ts-ignore
+    app.$notify({
+      group: "serverOptions",
+      type: "error",
+      title: "Failed to update server settings",
+      text: "An error occurred while attempting to update your server settings.",
+    });
+  } finally {
+    isUpdating.value = false;
+  }
+};
 </script>
