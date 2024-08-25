@@ -324,6 +324,7 @@ const renameBackup = async (backupId: string) => {
       },
     );
 
+    await refreshNuxtData("backupsData");
     await renameBackupModal.value?.hide();
   } catch (error) {
     backupError.value = error as string;
