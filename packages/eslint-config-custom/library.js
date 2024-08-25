@@ -12,9 +12,6 @@ module.exports = {
     'plugin:import/typescript',
     'turbo',
   ],
-  parserOptions: {
-    // project,
-  },
   globals: {
     React: true,
     JSX: true,
