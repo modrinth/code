@@ -1,7 +1,7 @@
 <template>
   <div
     class="new-page sidebar experimental-styles-within"
-    :class="{ 'alt-layout': !cosmetics.searchLayout }"
+    :class="{ 'alt-layout': !cosmetics.rightSearchLayout }"
   >
     <Head>
       <Title>Search {{ projectType.display }}s - Modrinth</Title>
@@ -204,6 +204,14 @@
           </button>
         </div>
       </div>
+      <pagination
+        v-if="false"
+        :page="currentPage"
+        :count="pageCount"
+        :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
+        class="mb-3 justify-end"
+        @switch-page="onSearchChangeToTop"
+      />
       <LogoAnimated v-if="searchLoading && !noLoad" />
       <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
         <p>No results found for your query!</p>

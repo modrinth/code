@@ -198,7 +198,7 @@
         </label>
         <input
           id="search-layout-toggle"
-          v-model="cosmetics.searchLayout"
+          v-model="cosmetics.rightSearchLayout"
           class="switch stylized-toggle"
           type="checkbox"
         />
@@ -214,7 +214,7 @@
         </label>
         <input
           id="project-layout-toggle"
-          v-model="cosmetics.projectLayout"
+          v-model="cosmetics.rightContentLayout"
           class="switch stylized-toggle"
           type="checkbox"
         />

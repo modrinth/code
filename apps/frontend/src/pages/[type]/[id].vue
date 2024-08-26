@@ -426,7 +426,7 @@
     <div
       class="new-page sidebar"
       :class="{
-        'alt-layout': !cosmetics.projectLayout,
+        'alt-layout': !cosmetics.rightContentLayout,
       }"
     >
       <div class="normal-page__header relative my-4">
