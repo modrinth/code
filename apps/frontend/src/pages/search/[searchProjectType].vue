@@ -263,9 +263,8 @@
 </template>
 <script setup>
 import { Multiselect } from "vue-multiselect";
-import { Pagination, ScrollablePanel, Checkbox, ManySelect } from "@modrinth/ui";
+import { Pagination, ScrollablePanel, Checkbox } from "@modrinth/ui";
 import { BanIcon, DropdownIcon, CheckIcon, FilterXIcon } from "@modrinth/assets";
-import { formatCategory } from "@modrinth/utils";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import LogoAnimated from "~/components/brand/LogoAnimated.vue";
 

@@ -335,7 +335,6 @@ const props = defineProps({
   },
 });
 
-const auth = await useAuth();
 const tags = useTags();
 const flags = useFeatureFlags();
 const formatRelativeTime = useRelativeTime();

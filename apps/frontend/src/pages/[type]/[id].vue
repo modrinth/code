@@ -1311,9 +1311,9 @@ const messages = defineMessages({
     id: "project.stats.followers-label",
     defaultMessage: "follower{count, plural, one {} other {s}}",
   },
-  aboutTab: {
-    id: "project.about.title",
-    defaultMessage: "About",
+  descriptionTab: {
+    id: "project.description.title",
+    defaultMessage: "Description",
   },
   galleryTab: {
     id: "project.gallery.title",
@@ -1704,7 +1704,7 @@ const navLinks = computed(() => {
 
   return [
     {
-      label: formatMessage(messages.aboutTab),
+      label: formatMessage(messages.descriptionTab),
       href: projectUrl,
     },
     {

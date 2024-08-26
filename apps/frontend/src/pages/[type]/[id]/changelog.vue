@@ -74,7 +74,6 @@ import { DownloadIcon } from "@modrinth/assets";
 
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const props = defineProps({
   project: {
@@ -96,9 +95,6 @@ const props = defineProps({
     },
   },
 });
-
-const auth = await useAuth();
-const tags = useTags();
 
 const title = `${props.project.title} - Changelog`;
 const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`;
