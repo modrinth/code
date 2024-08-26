@@ -415,7 +415,8 @@
                 !filteredAlpha
               "
             >
-              No versions available for {{ currentGameVersion }} and {{ currentPlatform }}.
+              No versions available for {{ currentGameVersion }} and
+              {{ formatCategory(currentPlatform) }}.
             </p>
           </AutomaticAccordion>
         </div>
