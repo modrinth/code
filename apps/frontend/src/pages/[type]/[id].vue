@@ -451,7 +451,7 @@
               </p>
               <div class="mt-auto flex flex-wrap gap-4">
                 <div
-                  class="flex items-center gap-3 border-0 border-r border-solid border-button-bg pr-4"
+                  class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4"
                 >
                   <DownloadIcon class="h-6 w-6 text-secondary" />
                   <span class="font-semibold">
@@ -459,14 +459,14 @@
                   </span>
                 </div>
                 <div
-                  class="flex items-center gap-3 border-0 border-solid border-button-bg pr-4 md:border-r"
+                  class="flex items-center gap-2 border-0 border-solid border-button-bg pr-4 md:border-r"
                 >
                   <HeartIcon class="h-6 w-6 text-secondary" />
                   <span class="font-semibold">
                     {{ $formatNumber(project.followers) }}
                   </span>
                 </div>
-                <div class="hidden items-center gap-3 md:flex">
+                <div class="hidden items-center gap-2 md:flex">
                   <TagsIcon class="h-6 w-6 text-secondary" />
                   <div class="flex flex-wrap gap-2">
                     <div
@@ -665,12 +665,6 @@
         </MessageBanner>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder
-          v-if="
-            (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
-            tags.approvedStatuses.includes(project.status)
-          "
-        />
         <div v-if="versions.length > 0" class="card flex-card experimental-styles-within">
           <h2>{{ formatMessage(compatibilityMessages.title) }}</h2>
           <section>
@@ -754,6 +748,12 @@
             </div>
           </section>
         </div>
+        <AdPlaceholder
+          v-if="
+            (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
+            tags.approvedStatuses.includes(project.status)
+          "
+        />
         <div
           v-if="
             project.issues_url ||

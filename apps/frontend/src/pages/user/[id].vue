@@ -194,9 +194,6 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
         <div class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileDetails) }}</h2>
           <div class="flex items-center gap-2">
@@ -260,6 +257,9 @@
             </div>
           </div>
         </div>
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
         <div v-if="organizations.length > 0" class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">

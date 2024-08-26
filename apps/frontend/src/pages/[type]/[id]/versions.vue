@@ -1,5 +1,5 @@
 <template>
-  <section class="normal-page__content experimental-styles-within overflow-visible">
+  <section class="experimental-styles-within overflow-visible">
     <div
       v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
       class="card flex items-center gap-4"
@@ -19,91 +19,19 @@
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
     </div>
-    <div v-if="versionFilters" class="mb-3 flex flex-wrap items-center gap-1">
-      <ButtonStyled v-for="(value, key) in versionFilters.filters" :key="key">
-        <OverflowMenu
-          v-if="value.length > 1"
-          :options="
-            value.map((x) => ({
-              id: x,
-              action: () => versionFilters.toggleFilter(key, x),
-              color:
-                x === 'release'
-                  ? 'green'
-                  : x === 'beta'
-                    ? 'orange'
-                    : x === 'alpha'
-                      ? 'red'
-                      : 'default',
-              remainOnClick: true,
-            }))
-          "
-          class="ml-auto"
-        >
-          <RadioButtonIcon v-if="key === 'type'" class="h-5 w-5 text-secondary" />
-          <GameIcon v-else-if="key === 'gameVersion'" class="h-5 w-5 text-secondary" />
-          <WrenchIcon v-else-if="key === 'platform'" class="h-5 w-5 text-secondary" />
-          Filter by {{ key === "gameVersion" ? "game version" : key }}
-          <DropdownIcon class="h-5 w-5 text-secondary" />
-          <template v-for="filter in value" :key="filter" #[filter]>
-            {{ formatCategory(filter) }}
-            <CheckIcon
-              class="ml-auto text-secondary transition-opacity duration-100"
-              :class="{
-                'opacity-0': !(key === 'gameVersion'
-                  ? selectedGameVersions.includes(filter)
-                  : key === 'platform'
-                    ? selectedPlatforms.includes(filter)
-                    : key === 'type'
-                      ? selectedVersionChannels.includes(filter)
-                      : false),
-              }"
-            />
-          </template>
-        </OverflowMenu>
-      </ButtonStyled>
-    </div>
-    <div class="mb-3 flex flex-wrap items-center gap-1 empty:hidden">
-      <button
-        v-if="
-          selectedVersionChannels.length + selectedGameVersions.length + selectedPlatforms.length >
-          2
-        "
-        class="tag-list__item text-contrast"
-        @click="versionFilters.clearFilters"
-      >
-        <XCircleIcon />
-        Clear all filters
-      </button>
-      <button
-        v-for="channel in selectedVersionChannels"
-        :key="`remove-filter-${channel}`"
-        class="tag-list__item"
-        :style="`--_color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'});--_bg-color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'}-highlight)`"
-        @click="versionFilters.toggleFilter('type', channel)"
-      >
-        <XIcon />
-        {{ channel.slice(0, 1).toUpperCase() + channel.slice(1) }}
-      </button>
-      <button
-        v-for="version in selectedGameVersions"
-        :key="`remove-filter-${version}`"
-        class="tag-list__item"
-        @click="versionFilters.toggleFilter('gameVersion', version)"
-      >
-        <XIcon />
-        {{ version }}
-      </button>
-      <button
-        v-for="platform in selectedPlatforms"
-        :key="`remove-filter-${platform}`"
-        class="tag-list__item"
-        :style="`--_color: var(--color-platform-${platform})`"
-        @click="versionFilters.toggleFilter('platform', platform)"
-      >
-        <XIcon />
-        {{ formatCategory(platform) }}
-      </button>
+    <div class="mb-3 flex flex-wrap gap-2">
+      <VersionFilterControl
+        ref="versionFilters"
+        :versions="props.versions"
+        @switch-page="switchPage"
+      />
+      <Pagination
+        :page="currentPage"
+        class="ml-auto"
+        :count="Math.ceil(filteredVersions.length / 20)"
+        :link-function="(page) => `?page=${currentPage}`"
+        @switch-page="switchPage"
+      />
     </div>
     <div
       v-if="versions.length > 0"
@@ -159,7 +87,7 @@
                   <VersionChannelIndicator
                     v-tooltip="`Toggle filter for ${version.version_type}`"
                     :channel="version.version_type"
-                    @click="versionFilters.toggleFilter('type', version.version_type)"
+                    @click="versionFilters.toggleFilter('channel', version.version_type)"
                   />
                 </div>
               </div>
@@ -347,21 +275,6 @@
       />
     </div>
   </section>
-  <div class="normal-page__sidebar">
-    <AdPlaceholder
-      v-if="
-        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(project.status)
-      "
-    />
-    <div class="hidden">
-      <VersionFilterControl
-        ref="versionFilters"
-        :versions="props.versions"
-        @switch-page="switchPage"
-      />
-    </div>
-  </div>
 </template>
 
 <script setup>
@@ -451,15 +364,15 @@ function getPrimaryFile(version) {
 }
 
 const selectedGameVersions = computed(() => {
-  return getArrayOrString(route.query.gameVersion) ?? [];
+  return getArrayOrString(route.query.g) ?? [];
 });
 
 const selectedPlatforms = computed(() => {
-  return getArrayOrString(route.query.platform) ?? [];
+  return getArrayOrString(route.query.l) ?? [];
 });
 
 const selectedVersionChannels = computed(() => {
-  return getArrayOrString(route.query.type) ?? [];
+  return getArrayOrString(route.query.c) ?? [];
 });
 
 const versionFilters = ref(null);
