@@ -13,8 +13,8 @@ export type DisplayLocation =
   | "collection";
 
 export interface Cosmetics {
-  searchLayout: boolean;
-  projectLayout: boolean;
+  rightSearchLayout: boolean;
+  leftContentLayout: boolean;
   advancedRendering: boolean;
   externalLinksNewTab: boolean;
   notUsingBlockers: boolean;
@@ -34,8 +34,8 @@ export default defineNuxtPlugin({
       httpOnly: false,
       path: "/",
       default: () => ({
-        searchLayout: false,
-        projectLayout: false,
+        rightSearchLayout: false,
+        leftContentLayout: false,
         advancedRendering: true,
         externalLinksNewTab: true,
         notUsingBlockers: false,
