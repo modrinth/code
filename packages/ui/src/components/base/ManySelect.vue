@@ -25,25 +25,29 @@
           <Button
             v-for="(option, index) in filteredOptions"
             :key="`option-${index}`"
-            transparent
+            :transparent="!manyValues.includes(option)"
             :action="() => toggleOption(option)"
             class="!w-full"
+            :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
             <slot name="option" :option="option">{{ displayName(option) }}</slot>
-            <CheckIcon class="h-5 w-5 text-secondary ml-auto transition-opacity" :class="{ 'opacity-0': !manyValues.includes(option) }" />
+            <CheckIcon class="h-5 w-5 text-contrast ml-auto transition-opacity" :class="{ 'opacity-0': !manyValues.includes(option) }" />
           </Button>
         </ScrollablePanel>
-        <Button
-          v-else
-          v-for="(option, index) in options.filter((x) => !searchQuery || displayName(x).toLowerCase().includes(searchQuery.toLowerCase()))"
-          :key="`option-${index}`"
-          transparent
-          :action="() => toggleOption(option)"
-          class="!w-full"
-        >
-          <slot name="option" :option="option">{{ displayName(option) }}</slot>
-          <CheckIcon class="h-5 w-5 text-secondary ml-auto transition-opacity" :class="{ 'opacity-0': !manyValues.includes(option) }" />
-        </Button>
+        <div
+          v-else class="flex flex-col gap-1">
+          <Button
+            v-for="(option, index) in filteredOptions"
+            :key="`option-${index}`"
+            :transparent="!manyValues.includes(option)"
+            :action="() => toggleOption(option)"
+            class="!w-full"
+            :color="manyValues.includes(option) ? 'secondary' : 'default'"
+          >
+            <slot name="option" :option="option">{{ displayName(option) }}</slot>
+            <CheckIcon class="h-5 w-5 text-contrast ml-auto transition-opacity" :class="{ 'opacity-0': !manyValues.includes(option) }" />
+          </Button>
+        </div>
         <slot name="footer" />
       </template>
     </PopoutMenu>

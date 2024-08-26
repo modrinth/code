@@ -32,15 +32,7 @@
         <FilterIcon class="h-5 w-5 text-secondary" />
         Channels
         <template #option="{ option }">
-          <span
-            :class="{
-              'text-red': option === 'alpha',
-              'text-orange': option === 'beta',
-              'text-green': option === 'release',
-            }"
-          >
-            {{ option === "release" ? "Release" : option === "beta" ? "Beta" : "Alpha" }}
-          </span>
+          {{ option === "release" ? "Release" : option === "beta" ? "Beta" : "Alpha" }}
         </template>
       </ManySelect>
     </div>
