@@ -27,7 +27,7 @@
       />
       <Pagination
         :page="currentPage"
-        class="ml-auto"
+        class="ml-auto mt-auto"
         :count="Math.ceil(filteredVersions.length / 20)"
         :link-function="(page) => `?page=${currentPage}`"
         @switch-page="switchPage"
