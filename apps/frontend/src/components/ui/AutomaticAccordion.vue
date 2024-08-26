@@ -31,10 +31,7 @@ onMounted(() => {
   mutationObserver.value = new MutationObserver(updateContent);
 
   mutationObserver.value.observe(slotContainer.value, {
-    attributes: true,
     childList: true,
-    characterData: true,
-    subtree: true,
   });
 
   updateContent();
