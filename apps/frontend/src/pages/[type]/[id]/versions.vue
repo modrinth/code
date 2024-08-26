@@ -133,7 +133,13 @@
                 class="flex flex-col justify-center gap-1 max-sm:flex-row max-sm:justify-start max-sm:gap-3 xl:contents"
               >
                 <div
-                  class="pointer-events-none z-[1] flex items-center gap-1 text-nowrap font-medium xl:self-center"
+                  v-tooltip="
+                    formatMessage(commonMessages.dateAtTimeTooltip, {
+                      date: new Date(version.date_published),
+                      time: new Date(version.date_published),
+                    })
+                  "
+                  class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
                 >
                   <CalendarIcon class="xl:hidden" />
                   {{ formatRelativeTime(version.date_published) }}
@@ -286,13 +292,6 @@ import {
   FileInput,
 } from "@modrinth/ui";
 import {
-  GameIcon,
-  WrenchIcon,
-  XCircleIcon,
-  RadioButtonIcon,
-  CheckIcon,
-  DropdownIcon,
-  XIcon,
   StarIcon,
   CalendarIcon,
   DownloadIcon,
@@ -311,9 +310,9 @@ import { formatVersionsForDisplay } from "~/helpers/projects.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const formatCompactNumber = useCompactNumber();
+const { formatMessage } = useVIntl();
 
 const props = defineProps({
   project: {
