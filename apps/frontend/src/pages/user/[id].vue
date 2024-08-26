@@ -2,7 +2,7 @@
   <div v-if="user" class="experimental-styles-within">
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
-    <div class="new-page sidebar" :class="{ 'alt-layout': !cosmetics.rightContentLayout }">
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
       <div class="normal-page__header pt-4">
         <div
           class="mb-4 grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"

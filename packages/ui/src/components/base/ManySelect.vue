@@ -8,7 +8,6 @@
       :direction="direction"
       @open="() => {
         searchQuery = ''
-        searchInput.focus()
     }"
     >
       <slot />

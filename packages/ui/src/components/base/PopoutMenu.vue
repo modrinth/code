@@ -1,11 +1,5 @@
 <template>
-  <div
-    ref="dropdown"
-    class="popup-container"
-    tabindex="-1"
-    :aria-expanded="dropdownVisible"
-    @focusout="test"
-  >
+  <div ref="dropdown" class="popup-container" tabindex="-1" :aria-expanded="dropdownVisible">
     <button
       v-bind="$attrs"
       ref="dropdownButton"
@@ -138,16 +132,6 @@ onBeforeUnmount(() => {
 
 function handleKeyDown(event) {
   if (event.key === 'Escape') {
-    hide()
-  }
-}
-
-function test() {
-  if (
-    dropdown.value &&
-    dropdownVisible.value &&
-    !dropdown.value.matches(':focus-within:not(:focus)')
-  ) {
     hide()
   }
 }

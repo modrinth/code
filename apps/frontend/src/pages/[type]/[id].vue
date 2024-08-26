@@ -246,7 +246,6 @@
               class="accordion-with-bg"
               @on-open="
                 () => {
-                  gameVersionFilterInput.focus();
                   if (platformAccordion) {
                     platformAccordion.close();
                   }
@@ -426,7 +425,7 @@
     <div
       class="new-page sidebar"
       :class="{
-        'alt-layout': !cosmetics.rightContentLayout,
+        'alt-layout': cosmetics.leftContentLayout,
       }"
     >
       <div class="normal-page__header relative my-4">

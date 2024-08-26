@@ -14,7 +14,7 @@ export type DisplayLocation =
 
 export interface Cosmetics {
   rightSearchLayout: boolean;
-  rightContentLayout: boolean;
+  leftContentLayout: boolean;
   advancedRendering: boolean;
   externalLinksNewTab: boolean;
   notUsingBlockers: boolean;
@@ -35,7 +35,7 @@ export default defineNuxtPlugin({
       path: "/",
       default: () => ({
         rightSearchLayout: false,
-        rightContentLayout: false,
+        leftContentLayout: false,
         advancedRendering: true,
         externalLinksNewTab: true,
         notUsingBlockers: false,
