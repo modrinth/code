@@ -11,7 +11,7 @@
       {
         "name": "active",
         "ordinal": 1,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "session_id",
@@ -21,7 +21,7 @@
       {
         "name": "expires",
         "ordinal": 3,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {

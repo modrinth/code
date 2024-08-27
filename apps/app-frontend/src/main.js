@@ -4,7 +4,6 @@ import App from '@/App.vue'
 import { createPinia } from 'pinia'
 import FloatingVue from 'floating-vue'
 import 'floating-vue/dist/style.css'
-import loadCssMixin from './mixins/macCssFix.js'
 import { createPlugin } from '@vintl/vintl/plugin'
 
 const VIntlPlugin = createPlugin({
@@ -30,7 +29,6 @@ let app = createApp(App)
 app.use(router)
 app.use(pinia)
 app.use(FloatingVue)
-app.mixin(loadCssMixin)
 app.use(VIntlPlugin)
 
 app.mount('#app')
