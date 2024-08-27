@@ -93,16 +93,21 @@ fn main() {
     tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
     let mut builder = tauri::Builder::default();
+
+    #[cfg(feature = "updater")]
+    {
+        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+    }
+
     builder = builder
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|app| {
             #[cfg(target_os = "macos")]
-            let res = {
+            {
                 use macos::deep_link::InitialPayload;
                 let mtx = std::sync::Arc::new(tokio::sync::Mutex::new(None));
 
@@ -174,7 +179,8 @@ fn main() {
             show_window,
         ]);
 
-    #[cfg(target_os = "macos")] {
+    #[cfg(target_os = "macos")]
+    {
         builder = builder.plugin(macos::window_ext::init());
     }
 
@@ -184,7 +190,7 @@ fn main() {
         Ok(app) => {
             #[allow(unused_variables)]
             app.run(|app, event| {
-                #[cfg(any(target_os = "macos"))]
+                #[cfg(target_os = "macos")]
                 if let tauri::RunEvent::Opened { urls } = event {
                     tracing::info!("Handling webview open {urls:?}");
 
@@ -210,14 +216,14 @@ fn main() {
                     }
                 }
             });
-        },
+        }
         Err(e) => {
             #[cfg(target_os = "windows")]
             {
                 // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
-                if format!("{:?}", e)
-                    .contains("Runtime(CreateWebview(WebView2Error(WindowsError")
-                {
+                if format!("{:?}", e).contains(
+                    "Runtime(CreateWebview(WebView2Error(WindowsError",
+                ) {
                     MessageDialog::new()
                         .set_type(MessageType::Error)
                         .set_title("Initialization error")

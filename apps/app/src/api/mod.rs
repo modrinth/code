@@ -39,10 +39,6 @@ pub enum TheseusSerializableError {
 
     #[error("Tauri error: {0}")]
     Tauri(#[from] tauri::Error),
-
-    #[cfg(target_os = "macos")]
-    #[error("Callback error: {0}")]
-    Callback(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -90,14 +86,6 @@ macro_rules! impl_serialize {
 }
 
 // Use the macro to implement Serialize for TheseusSerializableError
-#[cfg(target_os = "macos")]
-impl_serialize! {
-    IO,
-    Tauri,
-    Callback
-}
-
-#[cfg(not(target_os = "macos"))]
 impl_serialize! {
     IO,
     Tauri,
