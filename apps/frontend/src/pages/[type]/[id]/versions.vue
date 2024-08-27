@@ -1,5 +1,5 @@
 <template>
-  <section class="normal-page__content experimental-styles-within overflow-visible">
+  <section class="experimental-styles-within overflow-visible">
     <div
       v-if="currentMember && isPermission(currentMember?.permissions, 1 << 0)"
       class="card flex items-center gap-4"
@@ -18,6 +18,20 @@
         <InfoIcon aria-hidden="true" /> Click to choose a file or drag one onto this page
       </span>
       <DropArea :accept="acceptFileFromProjectType(project.project_type)" @change="handleFiles" />
+    </div>
+    <div class="mb-3 flex flex-wrap gap-2">
+      <VersionFilterControl
+        ref="versionFilters"
+        :versions="props.versions"
+        @switch-page="switchPage"
+      />
+      <Pagination
+        :page="currentPage"
+        class="ml-auto mt-auto"
+        :count="Math.ceil(filteredVersions.length / 20)"
+        :link-function="(page) => `?page=${currentPage}`"
+        @switch-page="switchPage"
+      />
     </div>
     <div
       v-if="versions.length > 0"
@@ -69,8 +83,12 @@
           <div class="flex flex-col justify-center gap-2 sm:contents">
             <div class="flex flex-row items-center gap-2 sm:contents">
               <div class="self-center">
-                <div class="pointer-events-none relative z-[1]">
-                  <VersionChannelIndicator :channel="version.version_type" />
+                <div class="relative z-[1] cursor-pointer">
+                  <VersionChannelIndicator
+                    v-tooltip="`Toggle filter for ${version.version_type}`"
+                    :channel="version.version_type"
+                    @click="versionFilters.toggleFilter('channel', version.version_type)"
+                  />
                 </div>
               </div>
               <div
@@ -115,7 +133,13 @@
                 class="flex flex-col justify-center gap-1 max-sm:flex-row max-sm:justify-start max-sm:gap-3 xl:contents"
               >
                 <div
-                  class="pointer-events-none z-[1] flex items-center gap-1 text-nowrap font-medium xl:self-center"
+                  v-tooltip="
+                    formatMessage(commonMessages.dateAtTimeTooltip, {
+                      date: new Date(version.date_published),
+                      time: new Date(version.date_published),
+                    })
+                  "
+                  class="z-[1] flex cursor-help items-center gap-1 text-nowrap font-medium xl:self-center"
                 >
                   <CalendarIcon class="xl:hidden" />
                   {{ formatRelativeTime(version.date_published) }}
@@ -232,7 +256,10 @@
               </OverflowMenu>
             </ButtonStyled>
           </div>
-          <div v-if="showFiles" class="tag-list pointer-events-none relative z-[1] col-span-full">
+          <div
+            v-if="flags.showVersionFilesInTable"
+            class="tag-list pointer-events-none relative z-[1] col-span-full"
+          >
             <div
               v-for="(file, fileIdx) in version.files"
               :key="`platform-tag-${fileIdx}`"
@@ -254,19 +281,6 @@
       />
     </div>
   </section>
-  <div class="normal-page__sidebar">
-    <AdPlaceholder
-      v-if="
-        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(project.status)
-      "
-    />
-    <VersionFilterControl
-      ref="versionFilters"
-      :versions="props.versions"
-      @switch-page="switchPage"
-    />
-  </div>
 </template>
 
 <script setup>
@@ -296,9 +310,9 @@ import { formatVersionsForDisplay } from "~/helpers/projects.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
 import DropArea from "~/components/ui/DropArea.vue";
 import { acceptFileFromProjectType } from "~/helpers/fileUtils.js";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const formatCompactNumber = useCompactNumber();
+const { formatMessage } = useVIntl();
 
 const props = defineProps({
   project: {
@@ -321,8 +335,8 @@ const props = defineProps({
   },
 });
 
-const auth = await useAuth();
 const tags = useTags();
+const flags = useFeatureFlags();
 const formatRelativeTime = useRelativeTime();
 
 const emits = defineEmits(["onDownload"]);
@@ -331,8 +345,6 @@ const route = useNativeRoute();
 const router = useNativeRouter();
 
 const currentPage = ref(route.query.page ?? 1);
-
-const showFiles = ref(false);
 
 function switchPage(page) {
   currentPage.value = page;
@@ -349,22 +361,30 @@ function getPrimaryFile(version) {
   return version.files.find((x) => x.primary) || version.files[0];
 }
 
+const selectedGameVersions = computed(() => {
+  return getArrayOrString(route.query.g) ?? [];
+});
+
+const selectedPlatforms = computed(() => {
+  return getArrayOrString(route.query.l) ?? [];
+});
+
+const selectedVersionChannels = computed(() => {
+  return getArrayOrString(route.query.c) ?? [];
+});
+
 const versionFilters = ref(null);
 const filteredVersions = computed(() => {
-  const selectedGameVersions = getArrayOrString(route.query.gameVersion) ?? [];
-  const selectedLoaders = getArrayOrString(route.query.platform) ?? [];
-  const selectedVersionTypes = getArrayOrString(route.query.type) ?? [];
-
   return props.versions.filter(
     (projectVersion) =>
-      (selectedGameVersions.length === 0 ||
-        selectedGameVersions.some((gameVersion) =>
+      (selectedGameVersions.value.length === 0 ||
+        selectedGameVersions.value.some((gameVersion) =>
           projectVersion.game_versions.includes(gameVersion),
         )) &&
-      (selectedLoaders.length === 0 ||
-        selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
-      (selectedVersionTypes.length === 0 ||
-        selectedVersionTypes.includes(projectVersion.version_type)),
+      (selectedPlatforms.value.length === 0 ||
+        selectedPlatforms.value.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (selectedVersionChannels.value.length === 0 ||
+        selectedVersionChannels.value.includes(projectVersion.version_type)),
   );
 });
 

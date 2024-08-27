@@ -2,7 +2,7 @@
   <div v-if="user" class="experimental-styles-within">
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
-    <div class="new-page sidebar">
+    <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
       <div class="normal-page__header pt-4">
         <div
           class="mb-4 grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
@@ -72,11 +72,11 @@
             </div>
           </div>
         </div>
+      </div>
+      <div class="normal-page__content">
         <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
           <NavTabs :links="navLinks" />
         </div>
-      </div>
-      <div class="normal-page__content">
         <div v-if="projects.length > 0">
           <div
             v-if="route.params.projectType !== 'collections'"
@@ -194,7 +194,6 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
-        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
         <div class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileDetails) }}</h2>
           <div class="flex items-center gap-2">
@@ -258,6 +257,9 @@
             </div>
           </div>
         </div>
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
         <div v-if="organizations.length > 0" class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
@@ -328,6 +330,7 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
+const flags = useFeatureFlags();
 
 const vintl = useVIntl();
 const { formatMessage } = vintl;

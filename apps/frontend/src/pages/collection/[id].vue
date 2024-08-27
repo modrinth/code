@@ -248,7 +248,9 @@
             </div>
           </template>
         </div>
-        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
       </div>
       <div class="normal-page__content">
         <nav class="navigation-card">
@@ -480,6 +482,7 @@ const route = useNativeRoute();
 const auth = await useAuth();
 const cosmetics = useCosmetics();
 const tags = useTags();
+const flags = useFeatureFlags();
 
 const isEditing = ref(false);
 

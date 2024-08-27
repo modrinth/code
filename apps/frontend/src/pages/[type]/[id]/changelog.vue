@@ -1,5 +1,15 @@
 <template>
   <div class="content">
+    <div class="mb-3 flex">
+      <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
+      <Pagination
+        :page="currentPage"
+        :count="Math.ceil(filteredVersions.length / 20)"
+        class="ml-auto mt-auto"
+        :link-function="(page) => `?page=${page}`"
+        @switch-page="switchPage"
+      />
+    </div>
     <div class="card changelog-wrapper">
       <div
         v-for="version in filteredVersions.slice((currentPage - 1) * 20, currentPage * 20)"
@@ -57,15 +67,6 @@
       @switch-page="switchPage"
     />
   </div>
-  <div class="normal-page__sidebar">
-    <AdPlaceholder
-      v-if="
-        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
-        tags.approvedStatuses.includes(project.status)
-      "
-    />
-    <VersionFilterControl :versions="props.versions" @switch-page="switchPage" />
-  </div>
 </template>
 <script setup>
 import { Pagination } from "@modrinth/ui";
@@ -73,7 +74,6 @@ import { DownloadIcon } from "@modrinth/assets";
 
 import { renderHighlightedString } from "~/helpers/highlight.js";
 import VersionFilterControl from "~/components/ui/VersionFilterControl.vue";
-import AdPlaceholder from "~/components/ui/AdPlaceholder.vue";
 
 const props = defineProps({
   project: {
@@ -96,9 +96,6 @@ const props = defineProps({
   },
 });
 
-const auth = await useAuth();
-const tags = useTags();
-
 const title = `${props.project.title} - Changelog`;
 const description = `View the changelog of ${props.project.title}'s ${props.versions.length} versions.`;
 
@@ -114,9 +111,9 @@ const route = useNativeRoute();
 
 const currentPage = ref(Number(route.query.page ?? 1));
 const filteredVersions = computed(() => {
-  const selectedGameVersions = getArrayOrString(route.query.gameVersion) ?? [];
-  const selectedLoaders = getArrayOrString(route.query.platform) ?? [];
-  const selectedVersionTypes = getArrayOrString(route.query.type) ?? [];
+  const selectedGameVersions = getArrayOrString(route.query.g) ?? [];
+  const selectedLoaders = getArrayOrString(route.query.l) ?? [];
+  const selectedVersionTypes = getArrayOrString(route.query.c) ?? [];
 
   return props.versions.filter(
     (projectVersion) =>
