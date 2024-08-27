@@ -611,8 +611,8 @@
   "project.about.links.wiki": {
     "message": "Visit wiki"
   },
-  "project.about.title": {
-    "message": "About"
+  "project.description.title": {
+    "message": "Description"
   },
   "project.gallery.title": {
     "message": "Gallery"
@@ -1028,9 +1028,6 @@
   "settings.display.project-list.layouts.collection": {
     "message": "Collection"
   },
-  "settings.display.sidebar.Left-aligned-search-sidebar.title": {
-    "message": "Left-aligned search sidebar"
-  },
   "settings.display.sidebar.advanced-rendering.description": {
     "message": "Enables advanced rendering such as blur effects that may cause performance issues without hardware-accelerated rendering."
   },
@@ -1049,14 +1046,17 @@
   "settings.display.sidebar.hide-app-promos.title": {
     "message": "Hide Modrinth App promotions"
   },
-  "settings.display.sidebar.left-aligned-project-sidebar.description": {
-    "message": "Aligns the project details sidebar to the left of the page's content."
+  "settings.display.sidebar.left-aligned-content-sidebar.title": {
+    "message": "Left-aligned sidebar on content pages"
   },
-  "settings.display.sidebar.left-aligned-project-sidebar.title": {
-    "message": "Left-aligned project sidebar"
+  "settings.display.sidebar.right-aligned-content-sidebar.description": {
+    "message": "Aligns the sidebar to the left of the page's content."
   },
-  "settings.display.sidebar.left-aligned-search-sidebar.description": {
-    "message": "Aligns the search filters sidebar to the left of the search results."
+  "settings.display.sidebar.right-aligned-filters-sidebar.description": {
+    "message": "Aligns the filters sidebar to the right of the search results."
+  },
+  "settings.display.sidebar.right-aligned-filters-sidebar.title": {
+    "message": "Right-aligned filters sidebar on search pages"
   },
   "settings.display.theme.dark": {
     "message": "Dark"

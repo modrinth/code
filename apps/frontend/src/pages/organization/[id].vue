@@ -109,7 +109,9 @@
           </div>
         </div>
 
-        <AdPlaceholder v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0)" />
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
 
         <div class="creator-list universal-card">
           <div class="title-and-link">
@@ -253,6 +255,7 @@ const user = await useUser();
 const cosmetics = useCosmetics();
 const route = useNativeRoute();
 const tags = useTags();
+const flags = useFeatureFlags();
 
 let orgId = useRouteId();
 
