@@ -101,6 +101,7 @@ jobs:
         with:
           args: "--target universal-apple-darwin --config ./apps/app/tauri-release.conf.json"
           working-directory: ./apps/app
+          tauriScript: pnpm --filter=@modrinth/app run tauri
 
       - name: build app
         uses: tauri-apps/tauri-action@v0
@@ -113,6 +114,7 @@ jobs:
         with:
           args: "--config ./apps/app/tauri-release.conf.json"
           working-directory: ./apps/app
+          tauriScript: pnpm --filter=@modrinth/app run tauri
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4
