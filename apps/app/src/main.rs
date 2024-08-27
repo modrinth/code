@@ -51,6 +51,8 @@ fn show_window(app: tauri::AppHandle) {
             .show_alert()
             .unwrap();
         panic!("cannot display application window")
+    } else {
+        let _ = win.set_focus();
     }
 }
 
@@ -104,7 +106,11 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_window_state::Builder::default().build())
+        .plugin(
+            tauri_plugin_window_state::Builder::default()
+                .with_filename("app-window-state.json")
+                .build(),
+        )
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {
