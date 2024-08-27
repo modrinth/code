@@ -217,7 +217,7 @@ where
                                     let file_name = format!(
                                         "{}/{}",
                                         profile.path,
-                                        path.replace("\\", "/")
+                                        path.replace('\\', "/")
                                             .replace(".disabled", "")
                                     );
 

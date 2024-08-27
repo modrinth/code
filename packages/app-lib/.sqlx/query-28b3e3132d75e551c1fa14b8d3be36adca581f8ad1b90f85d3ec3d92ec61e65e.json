@@ -26,7 +26,7 @@
       {
         "name": "expires",
         "ordinal": 4,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {
