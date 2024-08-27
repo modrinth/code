@@ -4,8 +4,7 @@
 )]
 
 use native_dialog::{MessageDialog, MessageType};
-use tauri::{Listener, Manager, PhysicalSize};
-use tauri_plugin_window_state::{StateFlags, WindowExt};
+use tauri::{Listener, Manager};
 use theseus::prelude::*;
 
 mod api;
@@ -152,7 +151,7 @@ fn main() {
             Ok(())
         });
 
-    let mut builder = builder
+    let builder = builder
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
         .plugin(api::import::init())

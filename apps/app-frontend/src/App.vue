@@ -132,13 +132,8 @@ initialize_state()
   })
 
 const handleClose = async () => {
-  await saveWindowState(StateFlags.ALL)
   await getCurrentWindow().close()
 }
-
-getCurrentWindow().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-  await handleClose()
-})
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {

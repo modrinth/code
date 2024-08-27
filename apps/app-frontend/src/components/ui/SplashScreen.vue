@@ -137,13 +137,8 @@ loading_listener(async (e) => {
 })
 
 const handleClose = async () => {
-  await saveWindowState(StateFlags.ALL)
   await getCurrentWindow().close()
 }
-
-getCurrentWindow().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, async () => {
-  await handleClose()
-})
 </script>
 
 <style scoped lang="scss">
