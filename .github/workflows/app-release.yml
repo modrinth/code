@@ -98,9 +98,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          args: "--target universal-apple-darwin --config ./apps/app/tauri-release.conf.json"
+          args: "--target universal-apple-darwin"
           tauriScript: pnpm --filter=@modrinth/app run tauri
-          working-directory: ./apps/app
 
       - name: build app
         uses: tauri-apps/tauri-action@v0
@@ -112,8 +111,6 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tauriScript: pnpm --filter=@modrinth/app run tauri
-          args: "--config ./apps/app/tauri-release.conf.json"
-          working-directory: ./apps/app
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4

@@ -51,6 +51,10 @@
         "schemes": ["modrinth"]
       },
       "mobile": []
+    },
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIwMzM5QkE0M0FCOERBMzkKUldRNTJyZzZwSnN6SUdPRGdZREtUUGxMblZqeG9OVHYxRUlRTzJBc2U3MUNJaDMvZDQ1UytZZmYK",
+      "endpoints": ["https://launcher-files.modrinth.com/updates.json"]
     }
   },
   "app": {

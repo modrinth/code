@@ -151,7 +151,7 @@ fn main() {
             Ok(())
         });
 
-    let mut builder = builder
+    builder = builder
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
         .plugin(api::import::init())

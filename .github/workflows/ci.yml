@@ -62,6 +62,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
 
       - name: Lint
         run: pnpm lint
