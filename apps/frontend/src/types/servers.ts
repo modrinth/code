@@ -66,6 +66,12 @@ export interface Project {
   gallery: GalleryItem[];
 }
 
+export interface ServerBackup {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
 export interface Server {
   server_id: string;
   name: string;
@@ -132,10 +138,4 @@ export interface Stats {
     cpu: number[];
     ram: number[];
   };
-}
-
-export interface ServerBackup {
-  id: string;
-  name: string;
-  created_at: string;
 }
