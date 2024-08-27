@@ -6,6 +6,7 @@ on:
     tags:
       - 'v*'
     paths:
+      - .giuthub/workflows/app-release.yml
       - 'apps/app/**'
       - 'apps/app-frontend/**'
       - 'packages/app-lib/**'
@@ -99,7 +100,6 @@ jobs:
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           args: "--target universal-apple-darwin --config tauri-release.conf.json"
-          working-directory: ./apps/app
           tauriScript: pnpm --filter=@modrinth/app run tauri
 
       - name: build app
@@ -113,7 +113,6 @@ jobs:
         with:
           tauriScript: pnpm --filter=@modrinth/app run tauri
           args: "--config tauri-release.conf.json"
-          working-directory: ./apps/app
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4
