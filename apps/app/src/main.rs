@@ -14,6 +14,14 @@ mod error;
 #[cfg(target_os = "macos")]
 mod macos;
 
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate cocoa;
+
+#[cfg(target_os = "macos")]
+#[macro_use]
+extern crate objc;
+
 // Should be called in launcher initialization
 #[tracing::instrument(skip_all)]
 #[tauri::command]
@@ -44,17 +52,6 @@ fn show_window(app: tauri::AppHandle) {
             .show_alert()
             .unwrap();
         panic!("cannot display application window")
-    } else {
-        let _ = win.restore_state(StateFlags::all());
-        let _ = win.set_focus();
-
-        // fix issue where window shows as extremely small
-        if let Ok(size) = win.inner_size() {
-            let width = if size.width < 1100 { 1280 } else { size.width };
-            let height = if size.height < 700 { 800 } else { size.height };
-
-            let _ = win.set_size(PhysicalSize::new(width, height));
-        }
     }
 }
 
@@ -115,31 +112,14 @@ fn main() {
                 });
 
                 let mtx_copy = mtx.clone();
-                macos::delegate::register_open_file(move |filename| {
-                    let mtx_copy = mtx_copy.clone();
-
-                    tauri::async_runtime::spawn(async move {
-                        tracing::info!("Handling file open {filename}");
-
-                        let mut payload = mtx_copy.lock().await;
-                        if payload.is_none() {
-                            *payload = Some(filename.clone());
-                        }
-
-                        let _ = api::utils::handle_command(filename).await;
-                    });
-                })
-                .unwrap();
-
-                let mtx_copy = mtx.clone();
-                app.listen("deep-link://new-url", |url| {
+                app.listen("deep-link://new-url", move |url| {
+                    let mtx_copy_copy = mtx_copy.clone();
                     let request = url.payload().to_owned();
-                    let mtx_copy = mtx_copy.clone();
 
                     tauri::async_runtime::spawn(async move {
                         tracing::info!("Handling deep link {request}");
 
-                        let mut payload = mtx_copy.lock().await;
+                        let mut payload = mtx_copy_copy.lock().await;
                         if payload.is_none() {
                             *payload = Some(request.clone());
                         }
@@ -159,7 +139,7 @@ fn main() {
                 dbg!(url);
             });
 
-            if let Some(window) = app.get_webview_window("main") {
+            if let Some(window) = app.get_window("main") {
                 // Hide window to prevent white flash on startup
                 let _ = window.hide();
 
@@ -167,32 +147,12 @@ fn main() {
                 {
                     window.set_shadow(true).unwrap();
                 }
-
-                #[cfg(target_os = "macos")]
-                {
-                    use tauri::TitleBarStyle;
-                    window.set_title_bar_style(TitleBarStyle::Transparent);
-                    // TODO: I don't think there is a nice way to do it in v2
-                    // window.position_traffic_lights(9.0, 16.0);
-                }
             }
 
             Ok(())
         });
 
-    // #[cfg(target_os = "macos")]
-    // {
-    //     use tauri::WindowEvent;
-    //     builder = builder.on_window_event(|e| {
-    //         use macos::window_ext::WindowExt;
-    //         if let WindowEvent::Resized(..) = e.event() {
-    //             let win = e.window();
-    //             win.position_traffic_lights(9.0, 16.0);
-    //         }
-    //     })
-    // }
-
-    let builder = builder
+    let mut builder = builder
         .plugin(api::auth::init())
         .plugin(api::mr_auth::init())
         .plugin(api::import::init())
@@ -215,34 +175,72 @@ fn main() {
             show_window,
         ]);
 
-    if let Err(e) = builder.run(tauri::generate_context!()) {
-        #[cfg(target_os = "windows")]
-        {
-            // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
-            if format!("{:?}", e)
-                .contains("Runtime(CreateWebview(WebView2Error(WindowsError")
+    #[cfg(target_os = "macos")] {
+        builder = builder.plugin(macos::window_ext::init());
+    }
+
+    let app = builder.build(tauri::generate_context!());
+
+    match app {
+        Ok(app) => {
+            #[allow(unused_variables)]
+            app.run(|app, event| {
+                #[cfg(any(target_os = "macos"))]
+                if let tauri::RunEvent::Opened { urls } = event {
+                    tracing::info!("Handling webview open {urls:?}");
+
+                    let file = urls
+                        .into_iter()
+                        .filter_map(|url| url.to_file_path().ok())
+                        .next();
+
+                    if let Some(file) = file {
+                        use macos::deep_link::InitialPayload;
+                        let initial_payload = app.state::<InitialPayload>();
+                        let request = file.to_string_lossy().to_string();
+
+                        let mtx_copy = initial_payload.payload.clone();
+                        tauri::async_runtime::spawn(async move {
+                            let mut payload = mtx_copy.lock().await;
+                            if payload.is_none() {
+                                *payload = Some(request.clone());
+                            }
+
+                            let _ = api::utils::handle_command(request).await;
+                        });
+                    }
+                }
+            });
+        },
+        Err(e) => {
+            #[cfg(target_os = "windows")]
             {
-                MessageDialog::new()
-                    .set_type(MessageType::Error)
-                    .set_title("Initialization error")
-                    .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://docs.modrinth.com/faq/app/webview2")
-                    .show_alert()
-                    .unwrap();
+                // tauri doesn't expose runtime errors, so matching a string representation seems like the only solution
+                if format!("{:?}", e)
+                    .contains("Runtime(CreateWebview(WebView2Error(WindowsError")
+                {
+                    MessageDialog::new()
+                        .set_type(MessageType::Error)
+                        .set_title("Initialization error")
+                        .set_text("Your Microsoft Edge WebView2 installation is corrupt.\n\nMicrosoft Edge WebView2 is required to run Modrinth App.\n\nLearn how to repair it at https://docs.modrinth.com/faq/app/webview2")
+                        .show_alert()
+                        .unwrap();
 
-                panic!("webview2 initialization failed")
+                    panic!("webview2 initialization failed")
+                }
             }
+
+            MessageDialog::new()
+                .set_type(MessageType::Error)
+                .set_title("Initialization error")
+                .set_text(&format!(
+                    "Cannot initialize application due to an error:\n{:?}",
+                    e
+                ))
+                .show_alert()
+                .unwrap();
+
+            panic!("{1}: {:?}", e, "error while running tauri application")
         }
-
-        MessageDialog::new()
-            .set_type(MessageType::Error)
-            .set_title("Initialization error")
-            .set_text(&format!(
-                "Cannot initialize application due to an error:\n{:?}",
-                e
-            ))
-            .show_alert()
-            .unwrap();
-
-        panic!("{1}: {:?}", e, "error while running tauri application")
     }
 }

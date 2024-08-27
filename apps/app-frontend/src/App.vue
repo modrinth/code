@@ -98,7 +98,8 @@ async function setupApp() {
 
   if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
-  if ((await type()) === 'Darwin') {
+  const osType = await type()
+  if (osType === 'macos') {
     document.getElementsByTagName('html')[0].classList.add('mac')
   } else {
     document.getElementsByTagName('html')[0].classList.add('windows')
