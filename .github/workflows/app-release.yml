@@ -120,6 +120,7 @@ jobs:
             target/release/bundle/*/*.AppImage.tar.gz
             target/release/bundle/*/*.AppImage.tar.gz.sig
             target/release/bundle/*/*.deb
+            target/release/bundle/*/*.rpm
             
             target/release/bundle/*/*.msi
             target/release/bundle/*/*.msi.zip
