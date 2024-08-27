@@ -3,75 +3,67 @@
     <ModalCreation ref="modal_creation" />
     <CollectionCreateModal ref="modal_collection_creation" />
     <div class="new-page sidebar" :class="{ 'alt-layout': cosmetics.leftContentLayout }">
-      <div class="normal-page__header pt-4">
-        <div
-          class="mb-4 grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
-        >
-          <div class="flex gap-4">
+      <div class="normal-page__header py-4">
+        <ContentPageHeader>
+          <template #icon>
             <Avatar :src="user.avatar_url" :alt="user.username" size="96px" circle />
-            <div class="flex flex-col gap-2">
-              <div class="flex flex-wrap items-center gap-2">
-                <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
-                  {{ user.username }}
-                </h1>
-              </div>
-              <p class="m-0 line-clamp-2 max-w-[40rem]">
-                {{
-                  user.bio
-                    ? user.bio
-                    : projects.length === 0
-                      ? "A Modrinth user."
-                      : "A Modrinth creator."
-                }}
-              </p>
-            </div>
-          </div>
-          <div class="flex flex-col justify-center gap-4">
-            <div class="flex flex-wrap gap-2">
-              <ButtonStyled size="large">
-                <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
-                  <EditIcon aria-hidden="true" />
-                  {{ formatMessage(commonMessages.editButton) }}
-                </NuxtLink>
-              </ButtonStyled>
-              <ButtonStyled size="large" circular type="transparent">
-                <OverflowMenu
-                  :options="[
-                    {
-                      id: 'manage-projects',
-                      action: () => navigateTo('/dashboard/projects'),
-                      hoverOnly: true,
-                      shown: auth.user && auth.user.id === user.id,
-                    },
-                    { divider: true, shown: auth.user && auth.user.id === user.id },
-                    {
-                      id: 'report',
-                      action: () => reportUser(user.id),
-                      color: 'red',
-                      hoverOnly: true,
-                    },
-                    { id: 'copy-id', action: () => copyId() },
-                  ]"
-                  aria-label="More options"
-                >
-                  <MoreVerticalIcon aria-hidden="true" />
-                  <template #manage-projects>
-                    <BoxIcon aria-hidden="true" />
-                    {{ formatMessage(messages.profileManageProjectsButton) }}
-                  </template>
-                  <template #report>
-                    <ReportIcon aria-hidden="true" />
-                    {{ formatMessage(commonMessages.reportButton) }}
-                  </template>
-                  <template #copy-id>
-                    <ClipboardCopyIcon aria-hidden="true" />
-                    {{ formatMessage(commonMessages.copyIdButton) }}
-                  </template>
-                </OverflowMenu>
-              </ButtonStyled>
-            </div>
-          </div>
-        </div>
+          </template>
+          <template #title>
+            {{ user.username }}
+          </template>
+          <template #summary>
+            {{
+              user.bio
+                ? user.bio
+                : projects.length === 0
+                  ? "A Modrinth user."
+                  : "A Modrinth creator."
+            }}
+          </template>
+          <template #actions>
+            <ButtonStyled size="large">
+              <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
+                <EditIcon aria-hidden="true" />
+                {{ formatMessage(commonMessages.editButton) }}
+              </NuxtLink>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular type="transparent">
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'manage-projects',
+                    action: () => navigateTo('/dashboard/projects'),
+                    hoverOnly: true,
+                    shown: auth.user && auth.user.id === user.id,
+                  },
+                  { divider: true, shown: auth.user && auth.user.id === user.id },
+                  {
+                    id: 'report',
+                    action: () => reportUser(user.id),
+                    color: 'red',
+                    hoverOnly: true,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+                aria-label="More options"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #manage-projects>
+                  <BoxIcon aria-hidden="true" />
+                  {{ formatMessage(messages.profileManageProjectsButton) }}
+                </template>
+                <template #report>
+                  <ReportIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.reportButton) }}
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  {{ formatMessage(commonMessages.copyIdButton) }}
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ContentPageHeader>
       </div>
       <div class="normal-page__content">
         <div v-if="navLinks.length > 2" class="mb-4 max-w-full overflow-x-auto">
@@ -304,7 +296,7 @@ import {
   ClipboardCopyIcon,
   MoreVerticalIcon,
 } from "@modrinth/assets";
-import { OverflowMenu, ButtonStyled } from "@modrinth/ui";
+import { OverflowMenu, ButtonStyled, ContentPageHeader } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
 import ProjectCard from "~/components/ui/ProjectCard.vue";
 import { reportUser } from "~/utils/report-helpers.ts";
@@ -652,9 +644,5 @@ export default defineNuxtComponent({
       }
     }
   }
-}
-
-.normal-page__header {
-  grid-area: header;
 }
 </style>

@@ -430,220 +430,208 @@
       }"
     >
       <div class="normal-page__header relative my-4">
-        <div
-          class="grid grid-cols-1 gap-x-8 gap-y-6 border-0 border-b border-solid border-button-bg pb-6 lg:grid-cols-[1fr_auto]"
-        >
-          <div class="flex gap-4">
+        <ContentPageHeader>
+          <template #icon>
             <Avatar :src="project.icon_url" :alt="project.title" size="96px" />
-            <div class="flex flex-col gap-1">
-              <div class="flex flex-wrap items-center gap-2">
-                <h1 class="m-0 text-2xl font-extrabold leading-none text-contrast">
-                  {{ project.title }}
-                </h1>
-                <Badge
-                  v-if="auth.user && currentMember"
-                  :type="project.status"
-                  class="status-badge"
-                />
-              </div>
-              <p class="m-0 line-clamp-2 max-w-[40rem]">
-                {{ project.description }}
-              </p>
-              <div class="mt-auto flex flex-wrap gap-4">
+          </template>
+          <template #title>
+            {{ project.title }}
+          </template>
+          <template #title-suffix>
+            <Badge v-if="auth.user && currentMember" :type="project.status" class="status-badge" />
+          </template>
+          <template #summary>
+            {{ project.description }}
+          </template>
+          <template #stats>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <DownloadIcon class="h-6 w-6 text-secondary" />
+              {{ $formatNumber(project.downloads) }}
+            </div>
+            <div
+              class="flex items-center gap-2 border-0 border-solid border-button-bg pr-4 md:border-r"
+            >
+              <HeartIcon class="h-6 w-6 text-secondary" />
+              <span class="font-semibold">
+                {{ $formatNumber(project.followers) }}
+              </span>
+            </div>
+            <div class="hidden items-center gap-2 md:flex">
+              <TagsIcon class="h-6 w-6 text-secondary" />
+              <div class="flex flex-wrap gap-2">
                 <div
-                  class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4"
+                  v-for="(category, index) in project.categories"
+                  :key="index"
+                  class="tag-list__item"
                 >
-                  <DownloadIcon class="h-6 w-6 text-secondary" />
-                  <span class="font-semibold">
-                    {{ $formatNumber(project.downloads) }}
-                  </span>
-                </div>
-                <div
-                  class="flex items-center gap-2 border-0 border-solid border-button-bg pr-4 md:border-r"
-                >
-                  <HeartIcon class="h-6 w-6 text-secondary" />
-                  <span class="font-semibold">
-                    {{ $formatNumber(project.followers) }}
-                  </span>
-                </div>
-                <div class="hidden items-center gap-2 md:flex">
-                  <TagsIcon class="h-6 w-6 text-secondary" />
-                  <div class="flex flex-wrap gap-2">
-                    <div
-                      v-for="(category, index) in project.categories"
-                      :key="index"
-                      class="tag-list__item"
-                    >
-                      {{ formatCategory(category) }}
-                    </div>
-                  </div>
+                  {{ formatCategory(category) }}
                 </div>
               </div>
             </div>
-          </div>
-          <div class="flex flex-col justify-center gap-4">
-            <div class="flex flex-wrap gap-2">
-              <div class="hidden sm:contents">
-                <ButtonStyled
-                  size="large"
-                  :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
-                >
-                  <button @click="(event) => downloadModal.show(event)">
-                    <DownloadIcon aria-hidden="true" />
-                    Download
-                  </button>
-                </ButtonStyled>
-              </div>
-              <div class="contents sm:hidden">
-                <ButtonStyled
-                  size="large"
-                  circular
-                  :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
-                >
-                  <button
-                    aria-label="Download"
-                    class="flex sm:hidden"
-                    @click="(event) => downloadModal.show(event)"
-                  >
-                    <DownloadIcon aria-hidden="true" />
-                  </button>
-                </ButtonStyled>
-              </div>
+          </template>
+          <template #actions>
+            <div class="hidden sm:contents">
+              <ButtonStyled
+                size="large"
+                :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
+              >
+                <button @click="(event) => downloadModal.show(event)">
+                  <DownloadIcon aria-hidden="true" />
+                  Download
+                </button>
+              </ButtonStyled>
+            </div>
+            <div class="contents sm:hidden">
               <ButtonStyled
                 size="large"
                 circular
-                :color="following ? 'red' : 'standard'"
-                color-fill="none"
-                hover-color-fill="background"
+                :color="route.name === 'type-id-version-version' ? `standard` : `brand`"
               >
                 <button
-                  v-if="auth.user"
-                  v-tooltip="following ? `Unfollow` : `Follow`"
-                  :aria-label="following ? `Unfollow` : `Follow`"
-                  @click="userFollowProject(project)"
+                  aria-label="Download"
+                  class="flex sm:hidden"
+                  @click="(event) => downloadModal.show(event)"
                 >
-                  <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+                  <DownloadIcon aria-hidden="true" />
                 </button>
-                <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
-                  <HeartIcon aria-hidden="true" />
-                </nuxt-link>
-              </ButtonStyled>
-              <ButtonStyled size="large" circular>
-                <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right" aria-label="Save">
-                  <BookmarkIcon
-                    aria-hidden="true"
-                    :fill="
-                      collections.some((x) => x.projects.includes(project.id))
-                        ? 'currentColor'
-                        : 'none'
-                    "
-                  />
-                  <template #menu>
-                    <input
-                      v-model="displayCollectionsSearch"
-                      type="text"
-                      placeholder="Search collections..."
-                      class="search-input menu-search"
-                    />
-                    <div v-if="collections.length > 0" class="collections-list">
-                      <Checkbox
-                        v-for="option in collections
-                          .slice()
-                          .sort((a, b) => a.name.localeCompare(b.name))"
-                        :key="option.id"
-                        :model-value="option.projects.includes(project.id)"
-                        class="popout-checkbox"
-                        @update:model-value="() => onUserCollectProject(option, project.id)"
-                      >
-                        {{ option.name }}
-                      </Checkbox>
-                    </div>
-                    <div v-else class="menu-text">
-                      <p class="popout-text">No collections found.</p>
-                    </div>
-                    <button
-                      class="btn collection-button"
-                      @click="(event) => $refs.modal_collection.show(event)"
-                    >
-                      <PlusIcon aria-hidden="true" />
-                      Create new collection
-                    </button>
-                  </template>
-                </PopoutMenu>
-                <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
-                  <BookmarkIcon aria-hidden="true" />
-                </nuxt-link>
-              </ButtonStyled>
-              <ButtonStyled v-if="auth.user && currentMember" size="large" circular>
-                <nuxt-link
-                  :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-                >
-                  <SettingsIcon aria-hidden="true" />
-                </nuxt-link>
-              </ButtonStyled>
-              <ButtonStyled size="large" circular type="transparent">
-                <OverflowMenu
-                  :options="[
-                    {
-                      id: 'analytics',
-                      link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
-                      hoverOnly: true,
-                      shown: auth.user && !!currentMember,
-                    },
-                    {
-                      divider: true,
-                      shown: auth.user && !!currentMember,
-                    },
-                    {
-                      id: 'moderation-checklist',
-                      action: () => (showModerationChecklist = true),
-                      color: 'orange',
-                      hoverOnly: true,
-                      shown:
-                        auth.user &&
-                        tags.staffRoles.includes(auth.user.role) &&
-                        !showModerationChecklist,
-                    },
-                    {
-                      divider: true,
-                      shown:
-                        auth.user &&
-                        tags.staffRoles.includes(auth.user.role) &&
-                        !showModerationChecklist,
-                    },
-                    {
-                      id: 'report',
-                      action: () =>
-                        auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
-                      color: 'red',
-                      hoverOnly: true,
-                    },
-                    { id: 'copy-id', action: () => copyId() },
-                  ]"
-                  aria-label="More options"
-                >
-                  <MoreVerticalIcon aria-hidden="true" />
-                  <template #analytics>
-                    <ChartIcon aria-hidden="true" />
-                    Analytics
-                  </template>
-                  <template #moderation-checklist>
-                    <ScaleIcon aria-hidden="true" />
-                    Review project
-                  </template>
-                  <template #report>
-                    <ReportIcon aria-hidden="true" />
-                    Report
-                  </template>
-                  <template #copy-id>
-                    <ClipboardCopyIcon aria-hidden="true" />
-                    Copy ID
-                  </template>
-                </OverflowMenu>
               </ButtonStyled>
             </div>
-          </div>
-        </div>
+            <ButtonStyled
+              size="large"
+              circular
+              :color="following ? 'red' : 'standard'"
+              color-fill="none"
+              hover-color-fill="background"
+            >
+              <button
+                v-if="auth.user"
+                v-tooltip="following ? `Unfollow` : `Follow`"
+                :aria-label="following ? `Unfollow` : `Follow`"
+                @click="userFollowProject(project)"
+              >
+                <HeartIcon :fill="following ? 'currentColor' : 'none'" aria-hidden="true" />
+              </button>
+              <nuxt-link v-else v-tooltip="'Follow'" to="/auth/sign-in" aria-label="Follow">
+                <HeartIcon aria-hidden="true" />
+              </nuxt-link>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular>
+              <PopoutMenu v-if="auth.user" v-tooltip="'Save'" from="top-right" aria-label="Save">
+                <BookmarkIcon
+                  aria-hidden="true"
+                  :fill="
+                    collections.some((x) => x.projects.includes(project.id))
+                      ? 'currentColor'
+                      : 'none'
+                  "
+                />
+                <template #menu>
+                  <input
+                    v-model="displayCollectionsSearch"
+                    type="text"
+                    placeholder="Search collections..."
+                    class="search-input menu-search"
+                  />
+                  <div v-if="collections.length > 0" class="collections-list">
+                    <Checkbox
+                      v-for="option in collections
+                        .slice()
+                        .sort((a, b) => a.name.localeCompare(b.name))"
+                      :key="option.id"
+                      :model-value="option.projects.includes(project.id)"
+                      class="popout-checkbox"
+                      @update:model-value="() => onUserCollectProject(option, project.id)"
+                    >
+                      {{ option.name }}
+                    </Checkbox>
+                  </div>
+                  <div v-else class="menu-text">
+                    <p class="popout-text">No collections found.</p>
+                  </div>
+                  <button
+                    class="btn collection-button"
+                    @click="(event) => $refs.modal_collection.show(event)"
+                  >
+                    <PlusIcon aria-hidden="true" />
+                    Create new collection
+                  </button>
+                </template>
+              </PopoutMenu>
+              <nuxt-link v-else v-tooltip="'Save'" to="/auth/sign-in" aria-label="Save">
+                <BookmarkIcon aria-hidden="true" />
+              </nuxt-link>
+            </ButtonStyled>
+            <ButtonStyled v-if="auth.user && currentMember" size="large" circular>
+              <nuxt-link
+                :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+              >
+                <SettingsIcon aria-hidden="true" />
+              </nuxt-link>
+            </ButtonStyled>
+            <ButtonStyled size="large" circular type="transparent">
+              <OverflowMenu
+                :options="[
+                  {
+                    id: 'analytics',
+                    link: `/${project.project_type}/${project.slug ? project.slug : project.id}/settings/analytics`,
+                    hoverOnly: true,
+                    shown: auth.user && !!currentMember,
+                  },
+                  {
+                    divider: true,
+                    shown: auth.user && !!currentMember,
+                  },
+                  {
+                    id: 'moderation-checklist',
+                    action: () => (showModerationChecklist = true),
+                    color: 'orange',
+                    hoverOnly: true,
+                    shown:
+                      auth.user &&
+                      tags.staffRoles.includes(auth.user.role) &&
+                      !showModerationChecklist,
+                  },
+                  {
+                    divider: true,
+                    shown:
+                      auth.user &&
+                      tags.staffRoles.includes(auth.user.role) &&
+                      !showModerationChecklist,
+                  },
+                  {
+                    id: 'report',
+                    action: () =>
+                      auth.user ? reportProject(project.id) : navigateTo('/auth/sign-in'),
+                    color: 'red',
+                    hoverOnly: true,
+                  },
+                  { id: 'copy-id', action: () => copyId() },
+                ]"
+                aria-label="More options"
+              >
+                <MoreVerticalIcon aria-hidden="true" />
+                <template #analytics>
+                  <ChartIcon aria-hidden="true" />
+                  Analytics
+                </template>
+                <template #moderation-checklist>
+                  <ScaleIcon aria-hidden="true" />
+                  Review project
+                </template>
+                <template #report>
+                  <ReportIcon aria-hidden="true" />
+                  Report
+                </template>
+                <template #copy-id>
+                  <ClipboardCopyIcon aria-hidden="true" />
+                  Copy ID
+                </template>
+              </OverflowMenu>
+            </ButtonStyled>
+          </template>
+        </ContentPageHeader>
         <ProjectMemberHeader
           v-if="currentMember"
           :project="project"
@@ -1044,6 +1032,7 @@ import {
   OverflowMenu,
   PopoutMenu,
   ScrollablePanel,
+  ContentPageHeader,
 } from "@modrinth/ui";
 import { formatCategory, isRejected, isStaff, isUnderReview, renderString } from "@modrinth/utils";
 import dayjs from "dayjs";
@@ -1734,10 +1723,6 @@ const navLinks = computed(() => {
 });
 </script>
 <style lang="scss" scoped>
-.normal-page__header {
-  grid-area: header;
-}
-
 .settings-header {
   display: flex;
   flex-direction: row;
