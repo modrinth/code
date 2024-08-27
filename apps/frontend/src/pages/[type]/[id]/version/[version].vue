@@ -471,7 +471,7 @@
   <div class="normal-page__sidebar version-page__metadata">
     <AdPlaceholder
       v-if="
-        (!auth.user || !isPermission(auth.user.badges, 1 << 0)) &&
+        (!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus) &&
         tags.approvedStatuses.includes(project.status)
       "
     />
@@ -749,6 +749,7 @@ export default defineNuxtComponent({
 
     const auth = await useAuth();
     const tags = useTags();
+    const flags = useFeatureFlags();
 
     const path = route.name.split("-");
     const mode = path[path.length - 1];
@@ -896,6 +897,7 @@ export default defineNuxtComponent({
     return {
       auth,
       tags,
+      flags,
       fileTypes: ref(fileTypes),
       oldFileTypes: ref(oldFileTypes),
       isCreating: ref(isCreating),

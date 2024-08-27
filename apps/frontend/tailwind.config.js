@@ -24,6 +24,8 @@ module.exports = {
         heading: "var(--color-heading)",
         red: "var(--color-red)",
         orange: "var(--color-orange)",
+        green: "var(--color-green)",
+        blue: "var(--color-blue)",
         purple: "var(--color-purple)",
         bg: {
           DEFAULT: "var(--color-bg)",
