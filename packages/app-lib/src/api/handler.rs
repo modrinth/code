@@ -40,12 +40,11 @@ pub async fn handle_url(sublink: &str) -> crate::Result<CommandPayload> {
 pub async fn parse_command(
     command_string: &str,
 ) -> crate::Result<CommandPayload> {
-    tracing::info!("Parsing command: {}", &command_string);
+    tracing::debug!("Parsing command: {}", &command_string);
 
     // modrinth://some-command
     // This occurs when following a web redirect link
     if let Some(sublink) = command_string.strip_prefix("modrinth://") {
-        tracing::info!("Sublink: {sublink}");
         Ok(handle_url(sublink).await?)
     } else {
         // We assume anything else is a filepath to an .mrpack file
