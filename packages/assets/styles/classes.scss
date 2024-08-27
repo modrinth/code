@@ -1191,6 +1191,7 @@ select {
   margin-bottom: 16px;
   color: inherit;
   border-left: 0.25em solid #888;
+  border-radius: 0.25rem;
 }
 
 .markdown-alert > :first-child {
@@ -1213,7 +1214,8 @@ select {
   display: inline-block;
   overflow: visible !important;
   vertical-align: text-bottom;
-  fill: currentColor;
+  height: 1.2em;
+  width: 1.2em;
 }
 
 .markdown-alert.markdown-alert-note {
