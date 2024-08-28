@@ -114,27 +114,29 @@ fn main() {
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {
-                use macos::deep_link::InitialPayload;
-                let mtx = std::sync::Arc::new(tokio::sync::Mutex::new(None));
+                let payload = macos::deep_link::get_or_init_payload(app);
 
-                app.manage(InitialPayload {
-                    payload: mtx.clone(),
-                });
-
-                let mtx_copy = mtx.clone();
+                let mtx_copy = payload.payload.clone();
                 app.listen("deep-link://new-url", move |url| {
                     let mtx_copy_copy = mtx_copy.clone();
                     let request = url.payload().to_owned();
 
+                    let actual_request =
+                        serde_json::from_str::<Vec<String>>(&request)
+                            .ok()
+                            .map(|mut x| x.remove(0))
+                            .unwrap_or(request);
+
                     tauri::async_runtime::spawn(async move {
-                        tracing::info!("Handling deep link {request}");
+                        tracing::info!("Handling deep link {actual_request}");
 
                         let mut payload = mtx_copy_copy.lock().await;
                         if payload.is_none() {
-                            *payload = Some(request.clone());
+                            *payload = Some(actual_request.clone());
                         }
 
-                        let _ = api::utils::handle_command(request).await;
+                        let _ =
+                            api::utils::handle_command(actual_request).await;
                     });
                 });
             };
@@ -206,11 +208,11 @@ fn main() {
                         .next();
 
                     if let Some(file) = file {
-                        use macos::deep_link::InitialPayload;
-                        let initial_payload = app.state::<InitialPayload>();
-                        let request = file.to_string_lossy().to_string();
+                        let payload =
+                            macos::deep_link::get_or_init_payload(app);
 
-                        let mtx_copy = initial_payload.payload.clone();
+                        let mtx_copy = payload.payload.clone();
+                        let request = file.to_string_lossy().to_string();
                         tauri::async_runtime::spawn(async move {
                             let mut payload = mtx_copy.lock().await;
                             if payload.is_none() {
