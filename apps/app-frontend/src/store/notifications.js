@@ -23,7 +23,3 @@ export const handleError = (err) => {
   })
   console.error(err)
 }
-
-export const handleMixpanelError = (err) => {
-  console.error(err)
-}

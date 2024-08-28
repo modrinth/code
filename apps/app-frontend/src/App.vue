@@ -17,16 +17,9 @@ import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/plugin-os'
 import { isDev, getOS } from '@/helpers/utils.js'
-import {
-  mixpanel_track,
-  mixpanel_init,
-  mixpanel_opt_out_tracking,
-  mixpanel_is_loaded,
-} from '@/helpers/mixpanel'
-import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
-import { TauriEvent } from '@tauri-apps/api/event'
 import URLConfirmModal from '@/components/ui/URLConfirmModal.vue'
 import { install_from_file } from './helpers/pack'
 import { useError } from '@/store/error.js'
@@ -90,11 +83,12 @@ async function setupApp() {
   themeStore.collapsedNavigation = collapsed_navigation
   themeStore.advancedRendering = advanced_rendering
 
-  mixpanel_init('014c7d6a336d0efaefe3aca91063748d', { debug: dev, persistence: 'localStorage' })
+  initAnalytics()
   if (!telemetry) {
-    mixpanel_opt_out_tracking()
+    optOutAnalytics()
   }
-  mixpanel_track('Launched', { version, dev, onboarded })
+  if (dev) debugAnalytics()
+  trackEvent('Launched', { version, dev, onboarded })
 
   if (!dev) document.addEventListener('contextmenu', (event) => event.preventDefault())
 
@@ -137,9 +131,7 @@ const handleClose = async () => {
 
 const router = useRouter()
 router.afterEach((to, from, failure) => {
-  if (mixpanel_is_loaded()) {
-    mixpanel_track('PageView', { path: to.path, fromPath: from.path, failed: failure })
-  }
+  trackEvent('PageView', { path: to.path, fromPath: from.path, failed: failure })
 })
 const route = useRoute()
 const isOnBrowse = computed(() => route.path.startsWith('/browse'))
@@ -214,7 +206,7 @@ async function handleCommand(e) {
     // RunMRPack should directly install a local mrpack given a path
     if (e.path.endsWith('.mrpack')) {
       await install_from_file(e.path).catch(handleError)
-      mixpanel_track('InstanceCreate', {
+      trackEvent('InstanceCreate', {
         source: 'CreationModalFileDrop',
       })
     }
