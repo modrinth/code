@@ -4,7 +4,7 @@ import { Button, Checkbox, Modal } from '@modrinth/ui'
 import { PackageIcon, VersionIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { export_profile_mrpack, get_pack_export_candidates } from '@/helpers/profile.js'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { handleError } from '@/store/notifications.js'
 import { useTheming } from '@/store/theme'
 

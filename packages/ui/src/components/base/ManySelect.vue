@@ -6,9 +6,11 @@
       :disabled="disabled"
       :position="position"
       :direction="direction"
-      @open="() => {
-        searchQuery = ''
-    }"
+      @open="
+        () => {
+          searchQuery = ''
+        }
+      "
     >
       <slot />
       <DropdownIcon class="h-5 w-5 text-secondary" />
@@ -16,12 +18,20 @@
         <div class="iconified-input mb-2 w-full" v-if="search">
           <label for="search-input" hidden>Search...</label>
           <SearchIcon aria-hidden="true" />
-          <input id="search-input" v-model="searchQuery" placeholder="Search..." type="text" ref="searchInput" @keydown.enter="() => {
-            toggleOption(filteredOptions[0])
-          }" />
+          <input
+            id="search-input"
+            v-model="searchQuery"
+            placeholder="Search..."
+            type="text"
+            ref="searchInput"
+            @keydown.enter="
+              () => {
+                toggleOption(filteredOptions[0])
+              }
+            "
+          />
         </div>
-        <ScrollablePanel
-          v-if="search" class="h-[17rem]">
+        <ScrollablePanel v-if="search" class="h-[17rem]">
           <Button
             v-for="(option, index) in filteredOptions"
             :key="`option-${index}`"
@@ -31,11 +41,13 @@
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
             <slot name="option" :option="option">{{ displayName(option) }}</slot>
-            <CheckIcon class="h-5 w-5 text-contrast ml-auto transition-opacity" :class="{ 'opacity-0': !manyValues.includes(option) }" />
+            <CheckIcon
+              class="h-5 w-5 text-contrast ml-auto transition-opacity"
+              :class="{ 'opacity-0': !manyValues.includes(option) }"
+            />
           </Button>
         </ScrollablePanel>
-        <div
-          v-else class="flex flex-col gap-1">
+        <div v-else class="flex flex-col gap-1">
           <Button
             v-for="(option, index) in filteredOptions"
             :key="`option-${index}`"
@@ -45,7 +57,10 @@
             :color="manyValues.includes(option) ? 'secondary' : 'default'"
           >
             <slot name="option" :option="option">{{ displayName(option) }}</slot>
-            <CheckIcon class="h-5 w-5 text-contrast ml-auto transition-opacity" :class="{ 'opacity-0': !manyValues.includes(option) }" />
+            <CheckIcon
+              class="h-5 w-5 text-contrast ml-auto transition-opacity"
+              :class="{ 'opacity-0': !manyValues.includes(option) }"
+            />
           </Button>
         </div>
         <slot name="footer" />
@@ -63,12 +78,12 @@ type Option = string | number | object
 
 const props = withDefaults(
   defineProps<{
-    modelValue: Option[],
+    modelValue: Option[]
     options: Option[]
     disabled?: boolean
     position?: string
-    direction?: string,
-    displayName?: (option: Option) => string,
+    direction?: string
+    displayName?: (option: Option) => string
     search?: boolean
   }>(),
   {
@@ -80,9 +95,9 @@ const props = withDefaults(
   },
 )
 
-const emit = defineEmits(['update:modelValue', 'change']);
+const emit = defineEmits(['update:modelValue', 'change'])
 const selectedValues = ref(props.modelValue || [])
-const searchInput = ref();
+const searchInput = ref()
 
 const searchQuery = ref('')
 
@@ -98,7 +113,11 @@ const manyValues = computed({
 })
 
 const filteredOptions = computed(() => {
-  return props.options.filter((x) => !searchQuery.value || props.displayName(x).toLowerCase().includes(searchQuery.value.toLowerCase()))
+  return props.options.filter(
+    (x) =>
+      !searchQuery.value ||
+      props.displayName(x).toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
 })
 
 defineOptions({
@@ -112,5 +131,4 @@ function toggleOption(id: Option) {
     manyValues.value = [...manyValues.value, id]
   }
 }
-
 </script>

@@ -3,18 +3,20 @@ import { DropdownIcon } from '@modrinth/assets'
 import { reactive } from 'vue'
 import Button from './Button.vue'
 
-const props = withDefaults(
-  defineProps<{
-    collapsible: boolean
-    defaultCollapsed: boolean
-    noAutoBody: boolean
-  }>(),
-  {
-    collapsible: false,
-    defaultCollapsed: false,
-    noAutoBody: false,
+const props = defineProps({
+  collapsible: {
+    type: Boolean,
+    default: false,
   },
-)
+  defaultCollapsed: {
+    type: Boolean,
+    default: false,
+  },
+  noAutoBody: {
+    type: Boolean,
+    default: false,
+  },
+})
 
 const state = reactive({
   collapsed: props.defaultCollapsed,
