@@ -11,7 +11,7 @@
       {
         "name": "active",
         "ordinal": 1,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "username",
@@ -31,7 +31,7 @@
       {
         "name": "expires",
         "ordinal": 5,
-        "type_info": "Int64"
+        "type_info": "Integer"
       }
     ],
     "parameters": {
