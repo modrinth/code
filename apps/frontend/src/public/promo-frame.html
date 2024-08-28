@@ -11,16 +11,39 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+      cursor: pointer;
+    }
+
+    .ads-container {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #plus-link {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
     }
 
     #modrinth-rail-1 {
       border-radius: 1rem;
-      overflow: hidden;
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      z-index: 2;
     }
   </style>
 </head>
 <body>
-<div id="modrinth-rail-1" />
+<div class="ads-container">
+  <a id="plus-link" href="https://modrinth.com/plus"></a>
+  <div id="modrinth-rail-1" />
+</div>
 <script>
   window.tude = window.tude || { cmd: [] };
   tude.cmd.push(function () {
@@ -32,27 +55,19 @@
     ]);
   });
 
-  document.querySelector('body').addEventListener('click', function (e) {
-    let target = e.target
-    while (target != null) {
-      if (target.matches('a')) {
-        e.preventDefault()
-        if (target.href) {
-          window.__TAURI_INTERNALS__.invoke("plugin:shell|open", {
-            path: target.href
-          })
-        }
-        break
+  window.addEventListener(
+    'message',
+    (event) => {
+      if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
+        window.__TAURI_INTERNALS__.invoke('plugin:shell|open', {
+          path: event.data.modrinthOpenUrl,
+        })
       }
-      target = target.parentElement
-    }
-  })
+    },
+    false,
+  )
 
-  window.open = (url) => {
-    window.__TAURI_INTERNALS__.invoke("plugin:shell|open", {
-      path: url
-    })
-  }
+  document.addEventListener('contextmenu', event => event.preventDefault());
 </script>
 </body>
 </html>

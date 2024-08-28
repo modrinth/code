@@ -54,12 +54,21 @@ function updateAdPosition() {
   if (adsWrapper.value) {
     const rect = adsWrapper.value.getBoundingClientRect()
 
-    init_ads_window(
-      rect.left + window.scrollX,
-      rect.top + window.scrollY,
-      rect.right - rect.left,
-      rect.bottom - rect.top,
-    )
+    let y = rect.top + window.scrollY
+    let height = rect.bottom - rect.top
+
+    // Prevent ad from overlaying the app bar
+    if (y <= 52) {
+      y = 52
+      height = rect.bottom - 52
+
+      if (height < 0) {
+        height = 0
+        y = -1000
+      }
+    }
+
+    init_ads_window(rect.left + window.scrollX, y, rect.right - rect.left, height)
   }
 }
 
@@ -83,7 +92,7 @@ onUnmounted(() => {
   <div
     v-if="showAd"
     ref="adsWrapper"
-    class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised"
+    class="ad-parent relative mb-3 flex w-full justify-center rounded-2xl bg-bg-raised cursor-pointer"
   >
     <div class="flex max-h-[250px] min-h-[250px] min-w-[300px] max-w-[300px] flex-col gap-4 p-6">
       <p class="m-0 text-2xl font-bold text-contrast">90% of ad revenue goes to creators</p>

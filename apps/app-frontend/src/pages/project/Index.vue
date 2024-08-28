@@ -310,11 +310,13 @@ async function fetchProjectData() {
 
 await fetchProjectData()
 
+const promo = ref(null)
 watch(
   () => route.params.id,
   async () => {
     if (route.params.id && route.path.startsWith('/project')) {
       await fetchProjectData()
+      promo.value.scroll()
     }
   },
 )

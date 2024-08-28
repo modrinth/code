@@ -10,6 +10,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .build()
 }
 
+const LINK_SCRIPT: &str = include_str!("ads-init.js");
+
 #[tauri::command]
 pub async fn init_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
@@ -27,10 +29,10 @@ pub async fn init_ads_window<R: Runtime>(
         window.add_child(
             tauri::webview::WebviewBuilder::new(
                 "ads-window",
-                WebviewUrl::External("https://aditude-test.modrinth.com/promo-frame.html".parse().unwrap()),
+                WebviewUrl::External("https://modrinth.com/wrapper/app-ads".parse().unwrap()),
             )
+                .initialization_script(LINK_SCRIPT)
                 .user_agent("ModrinthApp Ads Webview")
-                .accept_first_mouse(true)
                 .zoom_hotkeys_enabled(false)
                 .transparent(true),
             LogicalPosition::new(x, y),

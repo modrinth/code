@@ -3,7 +3,7 @@
   "description": "",
   "local": false,
   "remote": {
-    "urls": ["https://*.modrinth.com/*"]
+    "urls": ["https://modrinth.com/wrapper/app-ads", "http://localhost:3000/*"]
   },
   "webviews": [
     "ads-window"
