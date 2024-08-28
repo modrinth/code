@@ -20,6 +20,27 @@
                   : "A Modrinth creator."
             }}
           </template>
+          <template #stats>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <BoxIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(projects?.length || 0) }}
+              projects
+            </div>
+            <div
+              class="flex items-center gap-2 border-0 border-r border-solid border-button-bg pr-4 font-semibold"
+            >
+              <DownloadIcon class="h-6 w-6 text-secondary" />
+              {{ formatCompactNumber(sumDownloads) }}
+              downloads
+            </div>
+            <div class="flex items-center gap-2 font-semibold">
+              <CalendarIcon class="h-6 w-6 text-secondary" />
+              Joined
+              {{ formatRelativeTime(user.created) }}
+            </div>
+          </template>
           <template #actions>
             <ButtonStyled size="large">
               <NuxtLink v-if="auth.user && auth.user.id === user.id" to="/settings/profile">
@@ -186,72 +207,6 @@
         </div>
       </div>
       <div class="normal-page__sidebar">
-        <div class="card flex-card">
-          <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileDetails) }}</h2>
-          <div class="flex items-center gap-2">
-            <BoxIcon aria-hidden="true" class="stroke-[3] text-secondary" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileProjectsStats"
-                :values="{ count: formatCompactNumber(projects.length) }"
-              >
-                <template #stat="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <DownloadIcon aria-hidden="true" class="stroke-[3] text-secondary" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileDownloadsStats"
-                :values="{ count: formatCompactNumber(sumDownloads) }"
-              >
-                <template #stat="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <HeartIcon aria-hidden="true" class="text-secondary *:stroke-[3]" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileProjectsFollowersStats"
-                :values="{ count: formatCompactNumber(sumFollows) }"
-              >
-                <template #stat="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => normalizeChildren(children)" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <CalendarIcon aria-hidden="true" class="text-secondary *:stroke-[3]" />
-            <div class="text-secondary">
-              <IntlFormatted
-                :message-id="messages.profileJoinedAt"
-                :values="{ ago: formatRelativeTime(user.created) }"
-              >
-                <template #date="{ children }">
-                  <span class="font-bold text-primary">
-                    <component :is="() => children" />
-                  </span>
-                </template>
-              </IntlFormatted>
-            </div>
-          </div>
-        </div>
-        <AdPlaceholder
-          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
-        />
         <div v-if="organizations.length > 0" class="card flex-card">
           <h2 class="text-lg text-contrast">{{ formatMessage(messages.profileOrganizations) }}</h2>
           <div class="flex flex-wrap gap-2">
@@ -280,6 +235,9 @@
             </div>
           </div>
         </div>
+        <AdPlaceholder
+          v-if="!auth.user || !isPermission(auth.user.badges, 1 << 0) || flags.showAdsWithPlus"
+        />
       </div>
     </div>
   </div>
@@ -295,6 +253,7 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
+  UsersIcon,
 } from "@modrinth/assets";
 import { OverflowMenu, ButtonStyled, ContentPageHeader } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
