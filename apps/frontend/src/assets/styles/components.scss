@@ -625,17 +625,17 @@ tr.button-transparent {
 
 .danger-button {
   --background-color: var(--color-red);
-  --text-color: var(--color-brand-inverted);
+  --text-color: var(--color-accent-contrast);
 }
 
 .moderation-button {
   --background-color: var(--color-orange);
-  --text-color: var(--color-brand-inverted);
+  --text-color: var(--color-accent-contrast);
 }
 
 .brand-button {
   --background-color: var(--color-brand);
-  --text-color: var(--color-brand-inverted);
+  --text-color: var(--color-accent-contrast);
 }
 
 .alt-brand-button {
@@ -715,7 +715,7 @@ tr.button-transparent {
 
     &:after {
       transform: translatex(20px);
-      background: var(--color-brand-inverted);
+      background: var(--color-accent-contrast);
     }
   }
 

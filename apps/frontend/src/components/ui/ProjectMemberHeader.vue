@@ -496,7 +496,7 @@ const submitForReview = async () => {
 
       &.done {
         --background-color: var(--color-green);
-        --content-color: var(--color-brand-inverted);
+        --content-color: var(--color-accent-contrast);
       }
     }
   }

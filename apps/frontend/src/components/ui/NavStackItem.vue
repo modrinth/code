@@ -99,8 +99,8 @@ export default {
     border-radius: 0.25rem;
 
     .nav-content {
-      color: var(--color-button-text-active);
-      background-color: var(--color-button-bg);
+      color: var(--color-contrast);
+      background-color: var(--color-brand-highlight);
       box-shadow: none;
     }
   }

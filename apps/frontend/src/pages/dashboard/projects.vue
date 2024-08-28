@@ -646,7 +646,7 @@ export default defineNuxtComponent({
 
 .label-button[data-active="true"] {
   --background-color: var(--color-red);
-  --text-color: var(--color-brand-inverted);
+  --text-color: var(--color-accent-contrast);
 }
 
 .links-modal {

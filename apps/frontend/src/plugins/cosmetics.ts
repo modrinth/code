@@ -1,6 +1,7 @@
 import type { DarkTheme } from "./theme/index.ts";
 
 export type DisplayMode = "list" | "gallery" | "grid";
+export type AccentColor = "green" | "purple";
 
 export type DisplayLocation =
   | "mod"
@@ -22,6 +23,7 @@ export interface Cosmetics {
   preferredDarkTheme: DarkTheme;
   searchDisplayMode: Record<DisplayLocation, DisplayMode>;
   hideStagingBanner: boolean;
+  accentColor: AccentColor;
 }
 
 export default defineNuxtPlugin({
@@ -40,6 +42,7 @@ export default defineNuxtPlugin({
         externalLinksNewTab: true,
         notUsingBlockers: false,
         hideModrinthAppPromos: false,
+        accentColor: "green",
         preferredDarkTheme: "dark",
         searchDisplayMode: {
           mod: "list",

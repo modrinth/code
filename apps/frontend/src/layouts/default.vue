@@ -1,5 +1,13 @@
 <template>
-  <div ref="main_page" class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
+  <div
+    ref="main_page"
+    class="layout"
+    :class="{
+      'expanded-mobile-nav': isBrowseMenuOpen,
+      'purple-mode':
+        cosmetics.accentColor === 'purple' && auth.user && isPermission(auth.user.badges, 1 << 0),
+    }"
+  >
     <div
       v-if="auth.user && !auth.user.email_verified && route.path !== '/auth/verify-email'"
       class="email-nag"

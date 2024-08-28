@@ -119,7 +119,7 @@ export default {
   }
 
   svg {
-    color: var(--color-brand-inverted);
+    color: var(--color-accent-contrast);
     stroke-width: 0.2rem;
     height: 0.8rem;
     width: 0.8rem;

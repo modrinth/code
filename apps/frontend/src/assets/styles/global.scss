@@ -51,9 +51,6 @@ html {
   --color-text-inverted: initial !important;
   --color-bg-inverted: initial !important;
 
-  --color-brand: var(--color-green) !important;
-  --color-brand-inverted: initial !important;
-
   --tab-underline-hovered: initial !important;
 
   --color-button-text: initial !important;
@@ -184,6 +181,8 @@ html {
   --color-green-bg: rgba(0, 175, 92, 0.1);
   --color-blue-bg: rgba(31, 104, 192, 0.1);
   --color-purple-bg: rgba(142, 50, 243, 0.1);
+  --color-purple-highlight: rgba(142, 50, 243, 0.25);
+  --color-purple-shadow: rgba(142, 50, 243, 0.7);
 
   --color-warning-bg: hsl(355, 70%, 88%);
   --color-warning-text: hsl(342, 70%, 35%);
@@ -280,6 +279,8 @@ html {
   --color-green-bg: rgba(27, 217, 106, 0.2);
   --color-blue-bg: rgba(79, 156, 255, 0.2);
   --color-purple-bg: rgba(199, 138, 255, 0.2);
+  --color-purple-highlight: rgba(177, 101, 255, 0.25);
+  --color-purple-shadow: rgba(191, 114, 255, 0.7);
 
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(27, 217, 106, 0.25);
@@ -391,6 +392,11 @@ html {
 }
 
 .oled-mode {
+  .experimental-styles-within,
+  &.experimental-styles-within {
+    --color-button-bg: #222329;
+  }
+
   --color-bg: #000000;
   --color-raised-bg: #101013;
 
@@ -405,6 +411,11 @@ html {
 }
 
 .retro-mode {
+  .experimental-styles-within,
+  &.experimental-styles-within {
+    --color-button-bg: #3a3b38;
+  }
+
   --color-bg: #191917;
   --color-raised-bg: #1d1e1b;
   --color-button-bg: #3a3b38;
@@ -426,12 +437,25 @@ html {
   --color-purple: rgb(139, 129, 230);
   --color-gray: #718096;
 
-  --color-red-highlight: rgba(232, 32, 13, 0.25);
-  --color-orange-highlight: rgba(232, 141, 13, 0.25);
-  --color-green-highlight: rgba(60, 219, 54, 0.25);
-  --color-blue-highlight: rgba(9, 159, 239, 0.25);
+  --color-red-bg: rgba(232, 32, 13, 0.1);
+  --color-orange-bg: rgba(232, 141, 13, 0.1);
+  --color-green-bg: rgba(60, 219, 54, 0.1);
+  --color-blue-bg: rgba(9, 159, 239, 0.1);
+  --color-purple-bg: rgba(139, 129, 230, 0.1);
   --color-purple-highlight: rgba(139, 129, 230, 0.25);
-  --color-gray-highlight: rgba(113, 128, 150, 0.25);
+  --color-purple-shadow: rgba(139, 129, 230, 0.7);
+}
+
+.green-mode {
+  --color-brand: var(--color-green);
+  --color-brand-highlight: var(--color-green-highlight);
+  --color-brand-shadow: var(--color-green-shadow);
+}
+
+.purple-mode {
+  --color-brand: var(--color-purple);
+  --color-brand-highlight: var(--color-purple-highlight);
+  --color-brand-shadow: var(--color-purple-shadow);
 }
 
 body {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="experimental-styles-within flex flex-col gap-6">
     <MessageBanner v-if="flags.developerMode" message-type="warning" class="developer-message">
       <CodeIcon class="inline-flex" />
       <IntlFormatted :message-id="developerModeBanner.description">
@@ -13,14 +13,18 @@
         {{ formatMessage(developerModeBanner.deactivate) }}
       </Button>
     </MessageBanner>
-    <section class="universal-card">
-      <h2 class="text-2xl">{{ formatMessage(colorTheme.title) }}</h2>
-      <p>{{ formatMessage(colorTheme.description) }}</p>
-      <div class="theme-options mt-4">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <h2 class="m-0 text-2xl font-extrabold text-contrast">
+          {{ formatMessage(colorTheme.title) }}
+        </h2>
+        <p class="m-0">{{ formatMessage(colorTheme.description) }}</p>
+      </div>
+      <section class="theme-options">
         <button
           v-for="option in themeOptions"
           :key="option"
-          class="preview-radio button-base"
+          class="preview-radio transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
           :class="{ selected: theme.preferred === option }"
           @click="() => updateColorTheme(option)"
         >
@@ -47,187 +51,153 @@
             />
           </div>
         </button>
+      </section>
+    </div>
+    <div v-if="auth.user && isPermission(auth.user.badges, 1 << 0)" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <h2 class="m-0 flex items-center gap-2 text-2xl font-extrabold text-contrast">
+          {{ formatMessage(accentColor.title) }}
+          <span
+            class="flex items-center justify-center gap-1 rounded-full bg-bg-purple px-2 py-0.5 text-sm font-bold text-purple"
+          >
+            <ModrinthIcon class="h-4 w-auto" />
+            Modrinth+
+          </span>
+        </h2>
+        <p class="m-0">{{ formatMessage(accentColor.description) }}</p>
       </div>
-    </section>
-    <section class="universal-card">
-      <h2 class="text-2xl">{{ formatMessage(projectListLayouts.title) }}</h2>
-      <p class="mb-4">{{ formatMessage(projectListLayouts.description) }}</p>
-      <div class="project-lists">
-        <div v-for="projectType in listTypes" :key="projectType.id + '-project-list-layouts'">
+      <section class="theme-options">
+        <button
+          v-for="option in accentOptions"
+          :key="option"
+          class="preview-radio transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
+          :class="{
+            selected:
+              cosmetics.accentColor === option || (!cosmetics.accentColor && option === 'green'),
+          }"
+          @click="() => (cosmetics.accentColor = option)"
+        >
+          <div class="preview" :class="`${option}-mode`">
+            <TextLogo class="h-8 w-auto text-contrast" />
+          </div>
           <div class="label">
-            <div class="label__title">
-              {{
-                projectListLayouts[projectType.id]
-                  ? formatMessage(projectListLayouts[projectType.id])
-                  : projectType.id
-              }}
-            </div>
+            <RadioButtonChecked
+              v-if="
+                cosmetics.accentColor === option || (!cosmetics.accentColor && option === 'green')
+              "
+              class="radio"
+            />
+            <RadioButtonIcon v-else class="radio" />
+            {{ accentColor[option] ? formatMessage(accentColor[option]) : option }}
           </div>
-          <div class="project-list-layouts">
-            <button
-              class="preview-radio button-base"
-              :class="{ selected: cosmetics.searchDisplayMode[projectType.id] === 'list' }"
-              @click="() => (cosmetics.searchDisplayMode[projectType.id] = 'list')"
-            >
-              <div class="preview">
-                <div class="layout-list-mode">
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                </div>
-              </div>
-              <div class="label">
-                <RadioButtonChecked
-                  v-if="cosmetics.searchDisplayMode[projectType.id] === 'list'"
-                  class="radio"
-                />
-                <RadioButtonIcon v-else class="radio" />
-                Rows
-              </div>
-            </button>
-            <button
-              class="preview-radio button-base"
-              :class="{ selected: cosmetics.searchDisplayMode[projectType.id] === 'grid' }"
-              @click="() => (cosmetics.searchDisplayMode[projectType.id] = 'grid')"
-            >
-              <div class="preview">
-                <div class="layout-grid-mode">
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                </div>
-              </div>
-              <div class="label">
-                <RadioButtonChecked
-                  v-if="cosmetics.searchDisplayMode[projectType.id] === 'grid'"
-                  class="radio"
-                />
-                <RadioButtonIcon v-else class="radio" />
-                Grid
-              </div>
-            </button>
-            <button
-              class="preview-radio button-base"
-              :class="{ selected: cosmetics.searchDisplayMode[projectType.id] === 'gallery' }"
-              @click="() => (cosmetics.searchDisplayMode[projectType.id] = 'gallery')"
-            >
-              <div class="preview">
-                <div class="layout-gallery-mode">
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                  <div class="example-card card"></div>
-                </div>
-              </div>
-              <div class="label">
-                <RadioButtonChecked
-                  v-if="cosmetics.searchDisplayMode[projectType.id] === 'gallery'"
-                  class="radio"
-                />
-                <RadioButtonIcon v-else class="radio" />
-                Gallery
-              </div>
-            </button>
-          </div>
-        </div>
+        </button>
+      </section>
+    </div>
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <h2 class="m-0 text-2xl font-extrabold text-contrast">
+          {{ formatMessage(toggleFeatures.title) }}
+        </h2>
+        <p class="m-0">{{ formatMessage(toggleFeatures.description) }}</p>
       </div>
-    </section>
-    <section class="universal-card">
-      <h2 class="text-2xl">{{ formatMessage(toggleFeatures.title) }}</h2>
-      <p class="mb-4">{{ formatMessage(toggleFeatures.description) }}</p>
-      <div class="adjacent-input small">
-        <label for="advanced-rendering">
-          <span class="label__title">
-            {{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
-          </span>
-          <span class="label__description">
-            {{ formatMessage(toggleFeatures.advancedRenderingDescription) }}
-          </span>
-        </label>
+      <label
+        class="!m-0 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-1 rounded-2xl border-2 border-solid border-bg-raised px-6 py-4 transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
+        :class="{ 'bg-bg-raised': cosmetics.advancedRendering }"
+      >
+        <span class="col-start-1 font-extrabold text-contrast">
+          {{ formatMessage(toggleFeatures.advancedRenderingTitle) }}
+        </span>
+        <span class="col-start-1">{{
+          formatMessage(toggleFeatures.advancedRenderingDescription)
+        }}</span>
         <input
           id="advanced-rendering"
           v-model="cosmetics.advancedRendering"
-          class="switch stylized-toggle"
+          class="switch stylized-toggle col-start-2 row-span-2 row-start-1"
           type="checkbox"
         />
-      </div>
-      <div class="adjacent-input small">
-        <label for="external-links-new-tab">
-          <span class="label__title">
-            {{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
-          </span>
-          <span class="label__description">
-            {{ formatMessage(toggleFeatures.externalLinksNewTabDescription) }}
-          </span>
-        </label>
+      </label>
+      <label
+        class="!m-0 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-1 rounded-2xl border-2 border-solid border-bg-raised px-6 py-4 transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
+        :class="{ 'bg-bg-raised': cosmetics.externalLinksNewTab }"
+      >
+        <span class="col-start-1 font-extrabold text-contrast">
+          {{ formatMessage(toggleFeatures.externalLinksNewTabTitle) }}
+        </span>
+        <span class="col-start-1">{{
+          formatMessage(toggleFeatures.externalLinksNewTabDescription)
+        }}</span>
         <input
-          id="external-links-new-tab"
           v-model="cosmetics.externalLinksNewTab"
-          class="switch stylized-toggle"
+          class="switch stylized-toggle col-start-2 row-span-2 row-start-1"
           type="checkbox"
         />
-      </div>
-      <div v-if="false" class="adjacent-input small">
-        <label for="modrinth-app-promos">
-          <span class="label__title">
-            {{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
-          </span>
-          <span class="label__description">
-            {{ formatMessage(toggleFeatures.hideModrinthAppPromosDescription) }}
-          </span>
-        </label>
+      </label>
+      <label
+        v-if="false"
+        class="!m-0 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-1 rounded-2xl border-2 border-solid border-bg-raised px-6 py-4 transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
+        :class="{ 'bg-bg-raised': cosmetics.hideModrinthAppPromos }"
+      >
+        <span class="col-start-1 font-extrabold text-contrast">
+          {{ formatMessage(toggleFeatures.hideModrinthAppPromosTitle) }}
+        </span>
+        <span class="col-start-1">{{
+          formatMessage(toggleFeatures.hideModrinthAppPromosDescription)
+        }}</span>
         <input
-          id="modrinth-app-promos"
           v-model="cosmetics.hideModrinthAppPromos"
-          class="switch stylized-toggle"
+          class="switch stylized-toggle col-start-2 row-span-2 row-start-1"
           type="checkbox"
         />
-      </div>
-      <div class="adjacent-input small">
-        <label for="search-layout-toggle">
-          <span class="label__title">
-            {{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarTitle) }}
-          </span>
-          <span class="label__description">
-            {{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription) }}
-          </span>
-        </label>
+      </label>
+      <label
+        class="!m-0 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-1 rounded-2xl border-2 border-solid border-bg-raised px-6 py-4 transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
+        :class="{ 'bg-bg-raised': cosmetics.rightSearchLayout }"
+      >
+        <span class="col-start-1 font-extrabold text-contrast">
+          {{ formatMessage(toggleFeatures.rightAlignedFiltersSidebarTitle) }}
+        </span>
+        <span class="col-start-1">{{
+          formatMessage(toggleFeatures.rightAlignedFiltersSidebarDescription)
+        }}</span>
         <input
-          id="search-layout-toggle"
           v-model="cosmetics.rightSearchLayout"
-          class="switch stylized-toggle"
+          class="switch stylized-toggle col-start-2 row-span-2 row-start-1"
           type="checkbox"
         />
-      </div>
-      <div class="adjacent-input small">
-        <label for="project-layout-toggle">
-          <span class="label__title">
-            {{ formatMessage(toggleFeatures.leftAlignedContentSidebarTitle) }}
-          </span>
-          <span class="label__description">
-            {{ formatMessage(toggleFeatures.leftAlignedContentSidebarDescription) }}
-          </span>
-        </label>
+      </label>
+      <label
+        class="!m-0 grid cursor-pointer grid-cols-[1fr_auto] items-center gap-1 rounded-2xl border-2 border-solid border-bg-raised px-6 py-4 transition-transform hover:brightness-110 active:scale-[0.99] active:brightness-125"
+        :class="{ 'bg-bg-raised': cosmetics.leftContentLayout }"
+      >
+        <span class="col-start-1 font-extrabold text-contrast">
+          {{ formatMessage(toggleFeatures.leftAlignedContentSidebarTitle) }}
+        </span>
+        <span class="col-start-1">{{
+          formatMessage(toggleFeatures.leftAlignedContentSidebarDescription)
+        }}</span>
         <input
-          id="project-layout-toggle"
           v-model="cosmetics.leftContentLayout"
-          class="switch stylized-toggle"
+          class="switch stylized-toggle col-start-2 row-span-2 row-start-1"
           type="checkbox"
         />
-      </div>
-    </section>
+      </label>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { CodeIcon, MoonIcon, RadioButtonChecked, RadioButtonIcon, SunIcon } from "@modrinth/assets";
-import { Button } from "@modrinth/ui";
+import {
+  ModrinthIcon,
+  CodeIcon,
+  MoonIcon,
+  RadioButtonChecked,
+  RadioButtonIcon,
+  SunIcon,
+} from "@modrinth/assets";
+import { TextLogo, Button } from "@modrinth/ui";
 import MessageBanner from "~/components/ui/MessageBanner.vue";
-import type { DisplayLocation } from "~/plugins/cosmetics";
+import type { AccentColor, DisplayLocation } from "~/plugins/cosmetics";
 import { formatProjectType } from "~/plugins/shorthands.js";
 import { isDarkTheme, type Theme } from "~/plugins/theme/index.ts";
 
@@ -236,6 +206,7 @@ useHead({
 });
 
 const { formatMessage } = useVIntl();
+const auth = await useAuth();
 
 const developerModeBanner = defineMessages({
   description: {
@@ -285,6 +256,26 @@ const colorTheme = defineMessages({
   preferredDark: {
     id: "settings.display.theme.preferred-dark-theme",
     defaultMessage: "Preferred dark theme",
+  },
+});
+
+const accentColor = defineMessages({
+  title: {
+    id: "settings.display.accent.title",
+    defaultMessage: "Accent color",
+  },
+  description: {
+    id: "settings.display.accent.description",
+    defaultMessage:
+      "Thank you for supporting Modrinth! You can choose to make the Modrinth accent color purple if you'd like.",
+  },
+  green: {
+    id: "settings.display.accent.green",
+    defaultMessage: "Modrinth Green",
+  },
+  purple: {
+    id: "settings.display.accent.purple",
+    defaultMessage: "Plus Purple",
   },
 });
 
@@ -415,6 +406,10 @@ const themeOptions = computed(() => {
   return options;
 });
 
+const accentOptions = computed(() => {
+  return ["green", "purple"] as AccentColor[];
+});
+
 function updateColorTheme(value: Theme | "system") {
   if (value !== "system") {
     if (isDarkTheme(value)) {
@@ -462,7 +457,7 @@ const listTypes = computed(() => {
   border-radius: var(--radius-md);
   padding: 0;
   overflow: hidden;
-  border: 1px solid var(--color-divider);
+  border: 1px solid var(--color-button-bg);
   background-color: var(--color-button-bg);
   color: var(--color-base);
   display: flex;
@@ -471,6 +466,8 @@ const listTypes = computed(() => {
 
   &.selected {
     color: var(--color-contrast);
+    background-color: var(--color-brand-highlight);
+    border-color: var(--color-brand-highlight);
 
     .label {
       .radio {

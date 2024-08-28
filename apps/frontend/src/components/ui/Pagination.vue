@@ -135,7 +135,7 @@ a {
 
   &.page-number.current {
     background: var(--color-brand);
-    color: var(--color-brand-inverted);
+    color: var(--color-accent-contrast);
     cursor: default;
     outline: 2px solid transparent;
   }
