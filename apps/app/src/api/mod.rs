@@ -16,8 +16,8 @@ pub mod settings;
 pub mod tags;
 pub mod utils;
 
-pub mod cache;
 pub mod ads;
+pub mod cache;
 
 pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
 
