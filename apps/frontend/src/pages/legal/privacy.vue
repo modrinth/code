@@ -109,7 +109,7 @@
     <p>This data is used to deliver statistics.</p>
 
     <h3>Usage data</h3>
-    <p>When you interact with the Modrinth App or the Website, we collect through MixPanel:</p>
+    <p>When you interact with the Modrinth App or the Website, we collect through PostHog:</p>
     <ul>
       <li>Your IP address</li>
       <li>Your anonymized user ID</li>
@@ -150,9 +150,10 @@
         <a href="https://www.cloudflare.com/en-gb/gdpr/introduction/"> Cloudflare </a>
       </li>
       <li><a href="https://sentry.io/trust/privacy/">Sentry</a></li>
-      <li><a href="https://mixpanel.com/legal/privacy-policy">MixPanel</a></li>
+      <li><a href="https://posthog.com/privacy">PostHog</a></li>
       <li><a href="https://www.beehiiv.com/privacy">BeeHiiv</a></li>
       <li><a href="https://www.paypal.com/us/legalhub/privacy-full">PayPal</a></li>
+      <li><a href="https://stripe.com/privacy">Stripe</a></li>
     </ul>
     <p>
       Data that we specifically collect isn't shared with any other third party. We do not sell any

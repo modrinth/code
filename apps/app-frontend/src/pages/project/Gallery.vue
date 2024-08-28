@@ -93,7 +93,7 @@ import {
 } from '@modrinth/assets'
 import { Button, Card } from '@modrinth/ui'
 import { ref } from 'vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 
 const props = defineProps({
   project: {
@@ -112,7 +112,7 @@ const nextImage = () => {
     expandedGalleryIndex.value = 0
   }
   expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
-  mixpanel_track('GalleryImageNext', {
+  trackEvent('GalleryImageNext', {
     project_id: props.project.id,
     url: expandedGalleryItem.value.url,
   })
@@ -124,7 +124,7 @@ const previousImage = () => {
     expandedGalleryIndex.value = props.project.gallery.length - 1
   }
   expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
-  mixpanel_track('GalleryImagePrevious', {
+  trackEvent('GalleryImagePrevious', {
     project_id: props.project.id,
     url: expandedGalleryItem.value,
   })
@@ -135,7 +135,7 @@ const expandImage = (item, index) => {
   expandedGalleryIndex.value = index
   zoomedIn.value = false
 
-  mixpanel_track('GalleryImageExpand', {
+  trackEvent('GalleryImageExpand', {
     project_id: props.project.id,
     url: item.url,
   })

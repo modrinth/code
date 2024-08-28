@@ -61,7 +61,7 @@ import { formatCategory } from '@modrinth/utils'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { ref } from 'vue'
 import { handleError, useTheming } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 
 const themeStore = useTheming()
 
@@ -87,7 +87,7 @@ defineExpose({
 
     incompatibleModal.value.show()
 
-    mixpanel_track('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
+    trackEvent('ProjectInstallStart', { source: 'ProjectIncompatibilityWarningModal' })
   },
 })
 
@@ -98,7 +98,7 @@ const install = async () => {
   onInstall.value(selectedVersion.value.id)
   incompatibleModal.value.hide()
 
-  mixpanel_track('ProjectInstall', {
+  trackEvent('ProjectInstall', {
     loader: instance.value.loader,
     game_version: instance.value.game_version,
     id: project.value,

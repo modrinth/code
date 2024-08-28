@@ -23,7 +23,7 @@ import { duplicate, kill, remove, run } from '@/helpers/profile.js'
 import { useRouter } from 'vue-router'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import { useTheming } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { handleSevereError } from '@/store/error.js'
 import { install as installVersion } from '@/store/install.js'
 
@@ -125,14 +125,14 @@ const handleOptionsClick = async (args) => {
       await run(args.item.path).catch((err) =>
         handleSevereError(err, { profilePath: args.item.path }),
       )
-      mixpanel_track('InstanceStart', {
+      trackEvent('InstanceStart', {
         loader: args.item.loader,
         game_version: args.item.game_version,
       })
       break
     case 'stop':
       await kill(args.item.path).catch(handleError)
-      mixpanel_track('InstanceStop', {
+      trackEvent('InstanceStop', {
         loader: args.item.loader,
         game_version: args.item.game_version,
       })

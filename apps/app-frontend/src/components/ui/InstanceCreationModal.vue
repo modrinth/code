@@ -216,7 +216,7 @@ import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
@@ -264,13 +264,13 @@ defineExpose({
       hide()
       if (event.payload && event.payload.length > 0 && event.payload[0].endsWith('.mrpack')) {
         await install_from_file(event.payload[0]).catch(handleError)
-        mixpanel_track('InstanceCreate', {
+        trackEvent('InstanceCreate', {
           source: 'CreationModalFileDrop',
         })
       }
     })
 
-    mixpanel_track('InstanceCreateStart', { source: 'CreationModal' })
+    trackEvent('InstanceCreateStart', { source: 'CreationModal' })
   },
 })
 
@@ -360,7 +360,7 @@ const create_instance = async () => {
     icon.value,
   ).catch(handleError)
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     profile_name: profile_name.value,
     game_version: game_version.value,
     loader: loader.value,
@@ -419,7 +419,7 @@ const openFile = async () => {
   hide()
   await install_from_file(newProject).catch(handleError)
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     source: 'CreationModalFileOpen',
   })
 }

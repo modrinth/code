@@ -3,7 +3,7 @@ import { XIcon, DownloadIcon } from '@modrinth/assets'
 import { Button, Modal } from '@modrinth/ui'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { useTheming } from '@/store/theme.js'
 import { handleError } from '@/store/state.js'
 
@@ -25,7 +25,7 @@ defineExpose({
 
     onInstall.value = callback
 
-    mixpanel_track('PackInstallStart')
+    trackEvent('PackInstallStart')
   },
 })
 
@@ -39,7 +39,7 @@ async function install() {
     project.value.title,
     project.value.icon_url,
   ).catch(handleError)
-  mixpanel_track('PackInstall', {
+  trackEvent('PackInstall', {
     id: project.value.id,
     version_id: versionId.value,
     title: project.value.title,

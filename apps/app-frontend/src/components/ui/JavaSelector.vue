@@ -65,8 +65,8 @@ import { auto_install_java, find_filtered_jres, get_jre, test_jre } from '@/help
 import { ref } from 'vue'
 import { open } from '@tauri-apps/plugin-dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { handleError } from '@/store/state.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const props = defineProps({
   version: {
@@ -113,7 +113,7 @@ async function testJava() {
   )
   testingJava.value = false
 
-  mixpanel_track('JavaTest', {
+  trackEvent('JavaTest', {
     path: props.modelValue ? props.modelValue.path : '',
     success: testingJavaSuccess.value,
   })
@@ -136,7 +136,7 @@ async function handleJavaFileInput() {
       }
     }
 
-    mixpanel_track('JavaManualSelect', {
+    trackEvent('JavaManualSelect', {
       path: filePath,
       version: props.version,
     })
@@ -170,7 +170,7 @@ async function reinstallJava() {
     }
   }
 
-  mixpanel_track('JavaReInstall', {
+  trackEvent('JavaReInstall', {
     path: path,
     version: props.version,
   })

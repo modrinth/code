@@ -70,7 +70,7 @@ import {
   get_default_user,
 } from '@/helpers/auth'
 import { handleError } from '@/store/state.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { process_listener } from '@/helpers/events'
 import { handleSevereError } from '@/store/error.js'
 
@@ -118,7 +118,7 @@ async function login() {
     await refreshValues()
   }
 
-  mixpanel_track('AccountLogIn')
+  trackEvent('AccountLogIn')
 }
 
 const logout = async (id) => {
@@ -130,7 +130,7 @@ const logout = async (id) => {
   } else {
     emit('change')
   }
-  mixpanel_track('AccountLogOut')
+  trackEvent('AccountLogOut')
 }
 
 let showCard = ref(false)
