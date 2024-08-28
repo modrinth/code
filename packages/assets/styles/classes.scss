@@ -1190,16 +1190,15 @@ select {
   padding: 0.5rem 1rem;
   margin-bottom: 16px;
   color: inherit;
+  position: relative;
 
   &::after {
     position: absolute;
-    display: block;
+    top: 0;
+    left: 0;
+    bottom: 0;
     content: '';
-    background-color: red;
     width: 0.25em;
-    height: 15%;
-    left: 1.5rem;
-    transform: translateY(-90%);
     border-radius: var(--radius-xl);
   }
 
