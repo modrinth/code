@@ -8,7 +8,7 @@ import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/j
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import { mixpanel_opt_out_tracking, mixpanel_opt_in_tracking } from '@/helpers/mixpanel'
+import { optOutAnalytics, optInAnalytics } from '@/helpers/analytics'
 import { open } from '@tauri-apps/plugin-dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
@@ -45,9 +45,9 @@ watch(
     const setSettings = JSON.parse(JSON.stringify(newSettings))
 
     if (setSettings.telemetry) {
-      mixpanel_opt_out_tracking()
+      optInAnalytics()
     } else {
-      mixpanel_opt_in_tracking()
+      optOutAnalytics()
     }
 
     setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
