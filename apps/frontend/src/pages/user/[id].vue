@@ -253,7 +253,6 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
   MoreVerticalIcon,
-  UsersIcon,
 } from "@modrinth/assets";
 import { OverflowMenu, ButtonStyled, ContentPageHeader } from "@modrinth/ui";
 import NavTabs from "~/components/ui/NavTabs.vue";
@@ -269,7 +268,6 @@ import EarlyAdopterBadge from "~/assets/images/badges/early-adopter.svg?componen
 import ReportIcon from "~/assets/images/utils/report.svg?component";
 import UpToDate from "~/assets/images/illustrations/up_to_date.svg?component";
 import EditIcon from "~/assets/images/utils/edit.svg?component";
-import HeartIcon from "~/assets/images/utils/heart.svg?component";
 import WorldIcon from "~/assets/images/utils/world.svg?component";
 import ModalCreation from "~/components/ui/ModalCreation.vue";
 import Avatar from "~/components/ui/Avatar.vue";
@@ -452,15 +450,6 @@ const sumDownloads = computed(() => {
 
   for (const project of projects.value) {
     sum += project.downloads;
-  }
-
-  return sum;
-});
-const sumFollows = computed(() => {
-  let sum = 0;
-
-  for (const project of projects.value) {
-    sum += project.followers;
   }
 
   return sum;
