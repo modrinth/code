@@ -689,13 +689,13 @@
             "
           >
             <h3>{{ formatMessage(compatibilityMessages.environments) }}</h3>
-            <div class="status-list">
+            <div class="tag-list">
               <div
                 v-if="
                   (project.client_side === 'required' && project.server_side !== 'required') ||
                   (project.client_side === 'optional' && project.server_side === 'optional')
                 "
-                class="status-list__item"
+                class="tag-list__item"
               >
                 <ClientIcon aria-hidden="true" />
                 Client-side
@@ -705,33 +705,28 @@
                   (project.server_side === 'required' && project.client_side !== 'required') ||
                   (project.client_side === 'optional' && project.server_side === 'optional')
                 "
-                class="status-list__item"
+                class="tag-list__item"
               >
                 <ServerIcon aria-hidden="true" />
                 Server-side
               </div>
-              <div v-if="false" class="status-list__item">
+              <div v-if="false" class="tag-list__item">
                 <UserIcon aria-hidden="true" />
                 Singleplayer
               </div>
               <div
-                v-if="project.client_side === 'required' && project.server_side === 'required'"
-                class="status-list__item"
+                v-if="
+                  project.project_type !== 'datapack' &&
+                  ((project.client_side === 'required' && project.server_side === 'required') ||
+                    project.client_side === 'optional' ||
+                    (project.client_side === 'required' && project.server_side === 'optional') ||
+                    project.server_side === 'optional' ||
+                    (project.server_side === 'required' && project.client_side === 'optional'))
+                "
+                class="tag-list__item"
               >
                 <MonitorSmartphoneIcon aria-hidden="true" />
                 Client and server
-              </div>
-              <div
-                v-else-if="
-                  project.client_side === 'optional' ||
-                  (project.client_side === 'required' && project.server_side === 'optional') ||
-                  project.server_side === 'optional' ||
-                  (project.server_side === 'required' && project.client_side === 'optional')
-                "
-                class="status-list__item"
-              >
-                <MonitorSmartphoneIcon aria-hidden="true" />
-                Client and server <span class="text-sm">(optional)</span>
               </div>
             </div>
           </section>
