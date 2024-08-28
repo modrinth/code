@@ -1190,7 +1190,18 @@ select {
   padding: 0.5rem 1rem;
   margin-bottom: 16px;
   color: inherit;
-  border-left: 0.25em solid #888;
+
+  &::after {
+    position: absolute;
+    display: block;
+    content: '';
+    background-color: red;
+    width: 0.25em;
+    height: 15%;
+    left: 1.5rem;
+    transform: translateY(-90%);
+    border-radius: var(--radius-xl);
+  }
 
   :first-child {
     margin-top: 0;
@@ -1217,42 +1228,52 @@ select {
   }
 
   &.markdown-alert-note {
-    border-left-color: var(--color-blue);
-
     & .markdown-alert-title {
       color: var(--color-blue);
+    }
+
+    &::after {
+      background-color: var(--color-blue);
     }
   }
 
   &.markdown-alert-tip {
-    border-left-color: var(--color-green);
-
     & .markdown-alert-title {
       color: var(--color-green);
+    }
+
+    &::after {
+      background-color: var(--color-green);
     }
   }
 
   &.markdown-alert-important {
-    border-left-color: var(--color-purple);
-
     & .markdown-alert-title {
       color: var(--color-purple);
+    }
+
+    &::after {
+      background-color: var(--color-purple);
     }
   }
 
   &.markdown-alert-warning {
-    border-left-color: var(--color-orange);
-
     & .markdown-alert-title {
       color: var(--color-orange);
+    }
+
+    &::after {
+      background-color: var(--color-orange);
     }
   }
 
   &.markdown-alert-caution {
-    border-left-color: var(--color-red);
-
     & .markdown-alert-title {
       color: var(--color-red);
+    }
+
+    &::after {
+      background-color: var(--color-red);
     }
   }
 }
