@@ -4,6 +4,7 @@
     class="experimental-styles-within new-page sidebar"
     :class="{ 'alt-layout': cosmetics.leftContentLayout || routeHasSettings }"
   >
+    <ModalCreation ref="modal_creation" :organization-id="organization.id" />
     <template v-if="routeHasSettings">
       <div class="normal-page__sidebar">
         <div class="universal-card">
@@ -171,7 +172,6 @@
         </div>
       </div>
       <div class="normal-page__content">
-        <ModalCreation ref="modal_creation" :organization-id="organization.id" />
         <div v-if="isInvited" class="universal-card information invited">
           <h2>Invitation to join {{ organization.name }}</h2>
           <p>You have been invited to join {{ organization.name }}.</p>
