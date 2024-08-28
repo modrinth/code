@@ -1191,69 +1191,68 @@ select {
   margin-bottom: 16px;
   color: inherit;
   border-left: 0.25em solid #888;
-  border-radius: 0.25rem;
-}
 
-.markdown-alert > :first-child {
-  margin-top: 0;
-}
+  :first-child {
+    margin-top: 0;
+  }
 
-.markdown-alert > :last-child {
-  margin-bottom: 0;
-}
+  :last-child {
+    margin-bottom: 0;
+  }
 
-.markdown-alert .markdown-alert-title {
-  display: flex;
-  font-weight: 500;
-  align-items: center;
-  line-height: 1;
-}
+  & .markdown-alert-title {
+    display: flex;
+    font-weight: 500;
+    align-items: center;
+    line-height: 1;
+  }
 
-.markdown-alert .markdown-alert-title > svg {
-  margin-right: 0.5rem;
-  display: inline-block;
-  overflow: visible !important;
-  vertical-align: text-bottom;
-  height: 1.2em;
-  width: 1.2em;
-}
+  & .markdown-alert-title > svg {
+    margin-right: 0.5rem;
+    display: inline-block;
+    overflow: visible !important;
+    vertical-align: text-bottom;
+    height: 1.2em;
+    width: 1.2em;
+  }
 
-.markdown-alert.markdown-alert-note {
-  border-left-color: var(--color-blue);
-}
+  &.markdown-alert-note {
+    border-left-color: var(--color-blue);
 
-.markdown-alert.markdown-alert-note .markdown-alert-title {
-  color: var(--color-blue);
-}
+    & .markdown-alert-title {
+      color: var(--color-blue);
+    }
+  }
 
-.markdown-alert.markdown-alert-important {
-  border-left-color: var(--color-purple);
-}
+  &.markdown-alert-tip {
+    border-left-color: var(--color-green);
 
-.markdown-alert.markdown-alert-important .markdown-alert-title {
-  color: var(--color-purple);
-}
+    & .markdown-alert-title {
+      color: var(--color-green);
+    }
+  }
 
-.markdown-alert.markdown-alert-warning {
-  border-left-color: var(--color-orange);
-}
+  &.markdown-alert-important {
+    border-left-color: var(--color-purple);
 
-.markdown-alert.markdown-alert-warning .markdown-alert-title {
-  color: var(--color-orange);
-}
+    & .markdown-alert-title {
+      color: var(--color-purple);
+    }
+  }
 
-.markdown-alert.markdown-alert-tip {
-  border-left-color: var(--color-green);
-}
+  &.markdown-alert-warning {
+    border-left-color: var(--color-orange);
 
-.markdown-alert.markdown-alert-tip .markdown-alert-title {
-  color: var(--color-green);
-}
+    & .markdown-alert-title {
+      color: var(--color-orange);
+    }
+  }
 
-.markdown-alert.markdown-alert-caution {
-  border-left-color: var(--color-red);
-}
+  &.markdown-alert-caution {
+    border-left-color: var(--color-red);
 
-.markdown-alert.markdown-alert-caution .markdown-alert-title {
-  color: var(--color-red);
+    & .markdown-alert-title {
+      color: var(--color-red);
+    }
+  }
 }
