@@ -379,7 +379,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { listen } from '@tauri-apps/api/event'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
@@ -682,7 +682,7 @@ const updateAll = async () => {
     projects.value[project].updating = false
   }
 
-  mixpanel_track('InstanceUpdateAll', {
+  trackEvent('InstanceUpdateAll', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     count: setProjects.length,
@@ -708,7 +708,7 @@ const updateProject = async (mod) => {
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
 
-  mixpanel_track('InstanceProjectUpdate', {
+  trackEvent('InstanceProjectUpdate', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     id: mod.id,
@@ -735,7 +735,7 @@ const toggleDisableMod = async (mod) => {
     .then((newPath) => {
       mod.path = newPath
       mod.disabled = !mod.disabled
-      mixpanel_track('InstanceProjectDisable', {
+      trackEvent('InstanceProjectDisable', {
         loader: props.instance.loader,
         game_version: props.instance.game_version,
         id: mod.id,
@@ -756,7 +756,7 @@ const removeMod = async (mod) => {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
-  mixpanel_track('InstanceProjectRemove', {
+  trackEvent('InstanceProjectRemove', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     id: mod.id,

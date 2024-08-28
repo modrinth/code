@@ -40,8 +40,8 @@ import { Modal, Button } from '@modrinth/ui'
 import { ref } from 'vue'
 import { find_filtered_jres } from '@/helpers/jre.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const themeStore = useTheming()
 
@@ -67,7 +67,7 @@ const emit = defineEmits(['submit'])
 function setJavaInstall(javaInstall) {
   emit('submit', javaInstall)
   detectJavaModal.value.hide()
-  mixpanel_track('JavaAutoDetect', {
+  trackEvent('JavaAutoDetect', {
     path: javaInstall.path,
     version: javaInstall.version,
   })
