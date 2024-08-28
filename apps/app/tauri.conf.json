@@ -70,10 +70,10 @@
         "resizable": true,
         "title": "Modrinth App",
         "width": 1280,
-        "minHeight": 700,
+        "minHeight": 750,
         "minWidth": 1100,
         "visible": false,
-        "zoomHotkeysEnabled": true,
+        "zoomHotkeysEnabled": false,
         "decorations": false
       }
     ],
@@ -86,7 +86,7 @@
         ],
         "enable": true
       },
-      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://*.cloudflare.com https://api.mclo.gs; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost; script-src https://*.cloudflare.com 'self'; frame-src https://*.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'; style-src unsafe-inline 'self'"
+      "csp": "default-src 'self'; connect-src ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://*.cloudflare.com https://api.mclo.gs https://cmp.inmobi.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost; script-src https://cmp.inmobi.com https://*.cloudflare.com 'self'; frame-src https://*.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'; style-src unsafe-inline 'self'"
     }
   }
 }

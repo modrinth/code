@@ -1,8 +1,8 @@
 <template>
   <div class="instance-container">
-    <div class="side-cards">
+    <div class="side-cards pb-4" @scroll="$refs.promo.scroll()">
       <Card class="instance-card" @contextmenu.prevent.stop="handleRightClick">
-        <Avatar size="lg" :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null" />
+        <Avatar size="md" :src="instance.icon_path ? convertFileSrc(instance.icon_path) : null" />
         <div class="instance-info">
           <h2 class="name">{{ instance.name }}</h2>
           <span class="metadata"> {{ instance.loader }} {{ instance.game_version }} </span>
@@ -61,9 +61,9 @@
           </RouterLink>
         </div>
       </Card>
+      <PromotionWrapper ref="promo" class="mt-4" />
     </div>
     <div class="content">
-      <PromotionWrapper />
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
@@ -311,7 +311,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 17rem;
 }
 
 Button {
@@ -325,12 +324,13 @@ Button {
 }
 
 .side-cards {
-  position: absolute;
+  position: fixed;
+  width: 300px;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  min-height: calc(100% - 3.25rem);
-  max-height: calc(100% - 3.25rem);
+
+  min-height: calc(100vh - 3.25rem);
+  max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -374,10 +374,7 @@ Button {
   overflow: auto;
   gap: 1rem;
   min-height: 100%;
-}
-
-.content {
-  margin-left: 19rem;
+  padding: 1rem;
 }
 
 .instance-info {
@@ -451,10 +448,10 @@ Button {
 }
 
 .content {
-  width: 100%;
+  margin: 0 1rem 0.5rem 20rem;
+  width: calc(100% - 20rem);
   display: flex;
   flex-direction: column;
-  padding: 1rem 1rem 0 0;
   overflow: auto;
 }
 
