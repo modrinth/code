@@ -18,4 +18,4 @@ strip = true # Remove debug symbols
 opt-level = 3
 
 [patch.crates-io]
-wry = { git = "https://github.com/modrinth/wry", rev = "fc4eac7" }
+wry = { git = "https://github.com/modrinth/wry", rev = "23b0ee4" }

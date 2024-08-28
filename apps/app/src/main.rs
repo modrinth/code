@@ -96,7 +96,7 @@ fn main() {
 
     let mut builder = tauri::Builder::default();
 
-    #[cfg(feature = "updater")]
+    // #[cfg(feature = "updater")]
     {
         builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
     }

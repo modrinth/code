@@ -6882,6 +6882,7 @@ dependencies = [
 [[package]]
 name = "wry"
 version = "0.42.0"
+source = "git+https://github.com/modrinth/wry?rev=23b0ee4#23b0ee4ea1c1956db7edefac8e4fd710f548c85d"
 dependencies = [
  "base64 0.22.1",
  "block",
