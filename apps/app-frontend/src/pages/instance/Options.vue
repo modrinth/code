@@ -541,15 +541,15 @@ import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { open } from '@tauri-apps/api/dialog'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-dialog'
 import { get_loader_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
+import { trackEvent } from '@/helpers/analytics'
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -590,7 +590,7 @@ const availableGroups = ref([
 async function resetIcon() {
   icon.value = null
   await edit_icon(props.instance.path, null).catch(handleError)
-  mixpanel_track('InstanceRemoveIcon')
+  trackEvent('InstanceRemoveIcon')
 }
 
 async function setIcon() {
@@ -609,7 +609,7 @@ async function setIcon() {
   icon.value = value
   await edit_icon(props.instance.path, icon.value).catch(handleError)
 
-  mixpanel_track('InstanceSetIcon')
+  trackEvent('InstanceSetIcon')
 }
 
 const globalSettings = await get().catch(handleError)
@@ -754,7 +754,7 @@ const repairing = ref(false)
 
 async function duplicateProfile() {
   await duplicate(props.instance.path).catch(handleError)
-  mixpanel_track('InstanceDuplicate', {
+  trackEvent('InstanceDuplicate', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -765,7 +765,7 @@ async function repairProfile(force) {
   await install(props.instance.path, force).catch(handleError)
   repairing.value = false
 
-  mixpanel_track('InstanceRepair', {
+  trackEvent('InstanceRepair', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -796,7 +796,7 @@ async function repairModpack() {
   await update_repair_modrinth(props.instance.path).catch(handleError)
   inProgress.value = false
 
-  mixpanel_track('InstanceRepair', {
+  trackEvent('InstanceRepair', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })
@@ -808,7 +808,7 @@ async function removeProfile() {
   await remove(props.instance.path).catch(handleError)
   removing.value = false
 
-  mixpanel_track('InstanceRemove', {
+  trackEvent('InstanceRemove', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
   })

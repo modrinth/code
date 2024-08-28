@@ -16,13 +16,13 @@ import {
   list,
   create,
 } from '@/helpers/profile'
-import { open } from '@tauri-apps/api/dialog'
+import { open } from '@tauri-apps/plugin-dialog'
 import { installVersionDependencies } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
 import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
-import { tauri } from '@tauri-apps/api'
+import { convertFileSrc } from '@tauri-apps/api/core'
+import { trackEvent } from '@/helpers/analytics'
 
 const themeStore = useTheming()
 const router = useRouter()
@@ -88,7 +88,7 @@ defineExpose({
 
     installModal.value.show()
 
-    mixpanel_track('ProjectInstallStart', { source: 'ProjectInstallModal' })
+    trackEvent('ProjectInstallStart', { source: 'ProjectInstallModal' })
   },
 })
 
@@ -115,7 +115,7 @@ async function install(instance) {
   instance.installedMod = true
   instance.installing = false
 
-  mixpanel_track('ProjectInstall', {
+  trackEvent('ProjectInstall', {
     loader: instance.loader,
     game_version: instance.game_version,
     id: project.value.id,
@@ -137,7 +137,7 @@ const toggleCreation = () => {
   loader.value = null
 
   if (showCreation.value) {
-    mixpanel_track('InstanceCreateStart', { source: 'ProjectInstallModal' })
+    trackEvent('InstanceCreateStart', { source: 'ProjectInstallModal' })
   }
 }
 
@@ -153,7 +153,7 @@ const upload_icon = async () => {
   })
 
   if (!icon.value) return
-  display_icon.value = tauri.convertFileSrc(icon.value)
+  display_icon.value = convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {
@@ -186,7 +186,7 @@ const createInstance = async () => {
   const instance = await get(id, true)
   await installVersionDependencies(instance, versions.value[0])
 
-  mixpanel_track('InstanceCreate', {
+  trackEvent('InstanceCreate', {
     profile_name: name.value,
     game_version: versions.value[0].game_versions[0],
     loader: loader,
@@ -195,7 +195,7 @@ const createInstance = async () => {
     source: 'ProjectInstallModal',
   })
 
-  mixpanel_track('ProjectInstall', {
+  trackEvent('ProjectInstall', {
     loader: loader,
     game_version: versions.value[0].game_versions[0],
     id: project.value,

@@ -131,9 +131,8 @@ import { ref, onUnmounted } from 'vue'
 import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showProfileInFolder } from '@/helpers/utils.js'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
-import { mixpanel_track } from '@/helpers/mixpanel'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { useFetch } from '@/helpers/fetch'
+import { trackEvent } from '@/helpers/analytics'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { handleSevereError } from '@/store/error.js'
 import { get_project, get_version_many } from '@/helpers/cache.js'
 import dayjs from 'dayjs'
@@ -183,7 +182,7 @@ const startInstance = async (context) => {
   }
   loading.value = false
 
-  mixpanel_track('InstanceStart', {
+  trackEvent('InstanceStart', {
     loader: instance.value.loader,
     game_version: instance.value.game_version,
     source: context,
@@ -220,7 +219,7 @@ const stopInstance = async (context) => {
   playing.value = false
   await kill(route.params.id).catch(handleError)
 
-  mixpanel_track('InstanceStop', {
+  trackEvent('InstanceStop', {
     loader: instance.value.loader,
     game_version: instance.value.game_version,
     source: context,

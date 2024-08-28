@@ -6,7 +6,7 @@
       {
         "name": "major_version",
         "ordinal": 0,
-        "type_info": "Int64"
+        "type_info": "Integer"
       },
       {
         "name": "full_version",

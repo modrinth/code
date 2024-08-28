@@ -5,10 +5,10 @@ import { ChatIcon } from '@/assets/icons'
 import { ref } from 'vue'
 import { login as login_flow, set_default_user } from '@/helpers/auth.js'
 import { handleError } from '@/store/notifications.js'
-import mixpanel from 'mixpanel-browser'
 import { handleSevereError } from '@/store/error.js'
 import { cancel_directory_change } from '@/helpers/settings.js'
 import { install } from '@/helpers/profile.js'
+import { trackEvent } from '@/helpers/analytics'
 
 const errorModal = ref()
 const error = ref()
@@ -85,7 +85,7 @@ async function loginMinecraft() {
       await set_default_user(loggedIn.id).catch(handleError)
     }
 
-    await mixpanel.track('AccountLogIn')
+    await trackEvent('AccountLogIn', { source: 'ErrorModal' })
     loadingMinecraft.value = false
     errorModal.value.hide()
   } catch (err) {

@@ -3,14 +3,13 @@ use crate::event::{
     CommandPayload, EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
 };
-use futures::prelude::*;
-
 #[cfg(feature = "tauri")]
 use crate::event::{
     LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
 };
+use futures::prelude::*;
 #[cfg(feature = "tauri")]
-use tauri::Manager;
+use tauri::Emitter;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
@@ -187,7 +186,7 @@ pub async fn emit_loading(
         #[cfg(feature = "tauri")]
         event_state
             .app
-            .emit_all(
+            .emit(
                 "loading",
                 LoadingPayload {
                     fraction: opt_display_frac,
@@ -215,7 +214,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
         let event_state = crate::EventState::get().await?;
         event_state
             .app
-            .emit_all(
+            .emit(
                 "warning",
                 WarningPayload {
                     message: message.to_string(),
@@ -239,7 +238,7 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
         let event_state = crate::EventState::get().await?;
         event_state
             .app
-            .emit_all("command", command)
+            .emit("command", command)
             .map_err(EventError::from)?;
     }
     Ok(())
@@ -258,7 +257,7 @@ pub async fn emit_process(
         let event_state = crate::EventState::get().await?;
         event_state
             .app
-            .emit_all(
+            .emit(
                 "process",
                 ProcessPayload {
                     profile_path_id: profile_path.to_string(),
@@ -283,7 +282,7 @@ pub async fn emit_profile(
         let event_state = crate::EventState::get().await?;
         event_state
             .app
-            .emit_all(
+            .emit(
                 "profile",
                 ProfilePayload {
                     profile_path_id: profile_path_id.to_string(),
