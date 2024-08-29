@@ -21,27 +21,26 @@ pub async fn init_ads_window<R: Runtime>(
     height: f32,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
-        webview.set_position(LogicalPosition::new(x, y)).unwrap();
-        webview.set_size(LogicalSize::new(width, height)).unwrap();
+        let _ = webview.set_position(LogicalPosition::new(x, y));
+        let _ = webview.set_size(LogicalSize::new(width, height));
     } else {
-        let window = app.get_window("main").unwrap();
-
-        window
-            .add_child(
-                tauri::webview::WebviewBuilder::new(
-                    "ads-window",
-                    WebviewUrl::External(
-                        "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
-                    ),
-                )
-                .initialization_script(LINK_SCRIPT)
-                .user_agent("ModrinthApp Ads Webview")
-                .zoom_hotkeys_enabled(false)
-                .transparent(true),
-                LogicalPosition::new(x, y),
-                LogicalSize::new(width, height),
-            )
-            .unwrap();
+        if let Some(window) = app.get_window("main") {
+            let _ = window
+                .add_child(
+                    tauri::webview::WebviewBuilder::new(
+                        "ads-window",
+                        WebviewUrl::External(
+                            "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
+                        ),
+                    )
+                        .initialization_script(LINK_SCRIPT)
+                        .user_agent("ModrinthApp Ads Webview")
+                        .zoom_hotkeys_enabled(false)
+                        .transparent(true),
+                    LogicalPosition::new(x, y),
+                    LogicalSize::new(width, height),
+                );
+        }
     }
 
     Ok(())
@@ -52,9 +51,8 @@ pub async fn hide_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
-        webview
-            .set_position(LogicalPosition::new(-1000, -1000))
-            .unwrap();
+        let _ = webview
+            .set_position(LogicalPosition::new(-1000, -1000));
     }
 
     Ok(())
