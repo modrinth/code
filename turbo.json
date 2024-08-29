@@ -15,9 +15,7 @@
         "VERCEL_*",
         "CF_PAGES_*",
         "HEROKU_APP_NAME",
-        "STRIPE_PUBLISHABLE_KEY",
-        "TAURI_SIGNING_PRIVATE_KEY",
-        "TAURI_SIGNING_PRIVATE_KEY_PASSWORD"
+        "STRIPE_PUBLISHABLE_KEY"
       ]
     },
     "lint": {},
