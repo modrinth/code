@@ -104,7 +104,7 @@ const createServer = async () => {
       Accept: "application/json",
       "ngrok-skip-browser-warning": "true",
       "X-Pinggy-No-Screen": "true",
-      "X-Master-Key": "SpJYC6JsrqhqyrDBWxPWOPU63KFHuwcf",
+      "X-Master-Key": "IytvaAQD3BgancASUHKjlUn3dXG4Gz6c8v2bIHrO2uytV4kqLujCt292FqEXWXb1",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "*",
       "User-Agent": "Pyro/1.0 (https://pyro.host)",
