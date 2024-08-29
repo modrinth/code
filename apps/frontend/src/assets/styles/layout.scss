@@ -62,6 +62,10 @@
   .normal-page__content {
     grid-area: content;
   }
+
+  .normal-page__header {
+    grid-area: header;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -160,5 +164,9 @@
     grid-area: content;
     max-width: calc(80rem - 18.75rem - 0.75rem);
     //overflow-x: hidden;
+  }
+
+  .normal-page__header {
+    grid-area: header;
   }
 }

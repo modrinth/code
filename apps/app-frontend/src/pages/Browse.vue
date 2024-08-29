@@ -528,7 +528,8 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
 
 <template>
   <div ref="searchWrapper" class="search-container">
-    <aside class="filter-panel">
+    <aside class="filter-panel" @scroll="$refs.promo.scroll()">
+      <PromotionWrapper ref="promo" />
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
           <Avatar
@@ -675,8 +676,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
       </Card>
     </aside>
     <div class="search">
-      <PromotionWrapper class="mt-4" />
-      <Card class="project-type-container">
+      <Card class="project-type-container mt-4">
         <NavRow :links="selectableProjectTypes" />
       </Card>
       <Card class="search-panel-container">
@@ -878,7 +878,6 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
 
   .filter-panel {
     position: fixed;
-    width: 20rem;
     padding: 1rem 0.5rem 1rem 1rem;
     display: flex;
     flex-direction: column;
@@ -903,8 +902,8 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
   }
 
   .search {
-    margin: 0 1rem 0.5rem 20.5rem;
-    width: calc(100% - 20.5rem);
+    margin: 0 1rem 0.5rem calc(300px + 2.5rem);
+    width: calc(100% - calc(300px + 2.5rem));
 
     .offline {
       margin: 1rem;
