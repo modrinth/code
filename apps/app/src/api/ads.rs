@@ -33,13 +33,15 @@ pub async fn init_ads_window<R: Runtime>(
                     tauri::webview::WebviewBuilder::new(
                         "ads-window",
                         WebviewUrl::External(
-                            "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
+                            "https://modrinth.com/wrapper/app-ads"
+                                .parse()
+                                .unwrap(),
                         ),
                     )
-                        .initialization_script(LINK_SCRIPT)
-                        .user_agent("ModrinthApp Ads Webview")
-                        .zoom_hotkeys_enabled(false)
-                        .transparent(true),
+                    .initialization_script(LINK_SCRIPT)
+                    .user_agent("ModrinthApp Ads Webview")
+                    .zoom_hotkeys_enabled(false)
+                    .transparent(true),
                     LogicalPosition::new(x, y),
                     LogicalSize::new(width, height),
                 );
