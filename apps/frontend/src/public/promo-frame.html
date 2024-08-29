@@ -70,7 +70,7 @@
         false,
       );
 
-      window.addEventListener("wheel", (event) => {
+      window.addEventListener("mousewheel", (event) => {
         if (window.__TAURI_INTERNALS__) {
           window.__TAURI_INTERNALS__.invoke("plugin:ads|scroll_ads_window", {
             scroll: event.deltaY,
