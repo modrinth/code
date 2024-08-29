@@ -92,7 +92,7 @@
         "font-src": [
           "https://cdn-raw.modrinth.com/fonts/inter/"
         ],
-        "img-src": "'unsafe-inline''self' asset: http://asset.localhost blob: data:",
+        "img-src": "'unsafe-inline' 'self' asset: http://asset.localhost blob: data:",
         "style-src": "'unsafe-inline' 'self'",
         "script-src": "https://cmp.inmobi.com https://*.cloudflare.com 'self'",
         "frame-src": "https://*.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://discord.com 'self'"
