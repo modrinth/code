@@ -173,7 +173,8 @@ document.querySelector('body').addEventListener('click', function (e) {
         ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
         !target.classList.contains('router-link-active') &&
         !target.href.startsWith('http://localhost') &&
-        !target.href.startsWith('https://tauri.localhost')
+        !target.href.startsWith('https://tauri.localhost') &&
+        !target.href.startsWith('http://tauri.localhost')
       ) {
         open(target.href)
       }
