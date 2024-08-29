@@ -12,6 +12,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 const LINK_SCRIPT: &str = include_str!("ads-init.js");
 
+// TODO: make ads work on linux
+
 #[tauri::command]
 pub async fn init_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
@@ -20,13 +22,14 @@ pub async fn init_ads_window<R: Runtime>(
     width: f32,
     height: f32,
 ) -> crate::api::Result<()> {
-    if let Some(webview) = app.webviews().get("ads-window") {
-        let _ = webview.set_position(LogicalPosition::new(x, y));
-        let _ = webview.set_size(LogicalSize::new(width, height));
-    } else {
-        if let Some(window) = app.get_window("main") {
-            let _ = window
-                .add_child(
+    #[cfg(not(target_os = "linux"))]
+    {
+        if let Some(webview) = app.webviews().get("ads-window") {
+            let _ = webview.set_position(LogicalPosition::new(x, y));
+            let _ = webview.set_size(LogicalSize::new(width, height));
+        } else {
+            if let Some(window) = app.get_window("main") {
+                let _ = window.add_child(
                     tauri::webview::WebviewBuilder::new(
                         "ads-window",
                         WebviewUrl::External(
@@ -40,6 +43,7 @@ pub async fn init_ads_window<R: Runtime>(
                     LogicalPosition::new(x, y),
                     LogicalSize::new(width, height),
                 );
+            }
         }
     }
 
@@ -50,9 +54,11 @@ pub async fn init_ads_window<R: Runtime>(
 pub async fn hide_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<()> {
-    if let Some(webview) = app.webviews().get("ads-window") {
-        let _ = webview
-            .set_position(LogicalPosition::new(-1000, -1000));
+    #[cfg(not(target_os = "linux"))]
+    {
+        if let Some(webview) = app.webviews().get("ads-window") {
+            let _ = webview.set_position(LogicalPosition::new(-1000, -1000));
+        }
     }
 
     Ok(())
