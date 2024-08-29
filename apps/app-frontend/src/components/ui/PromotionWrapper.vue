@@ -1,10 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { get as getCreds } from '@/helpers/mr_auth.js'
 import { handleError } from '@/store/notifications.js'
 import { get_user } from '@/helpers/cache.js'
 import { ChevronRightIcon } from '@modrinth/assets'
 import { init_ads_window } from '@/helpers/ads.js'
+import { listen } from '@tauri-apps/api/event'
 
 const showAd = ref(true)
 
@@ -72,6 +73,13 @@ function updateAdPosition() {
   }
 }
 
+const unlisten = await listen('ads-scroll', (event) => {
+  if (adsWrapper.value) {
+    adsWrapper.value.parentNode.scrollTop += event.payload.scroll
+    updateAdPosition()
+  }
+})
+
 onUnmounted(() => {
   if (resizeObserver) {
     resizeObserver.disconnect()
@@ -85,6 +93,8 @@ onUnmounted(() => {
   if (scrollHandler) {
     window.removeEventListener('scroll', scrollHandler)
   }
+
+  unlisten()
 })
 </script>
 

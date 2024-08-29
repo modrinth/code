@@ -321,6 +321,13 @@
           ]
         },
         {
+          "description": "ads:allow-scroll-ads-window -> Enables the scroll_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-scroll-ads-window"
+          ]
+        },
+        {
           "description": "ads:deny-hide-ads-window -> Denies the hide_ads_window command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -332,6 +339,13 @@
           "type": "string",
           "enum": [
             "ads:deny-init-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-scroll-ads-window -> Denies the scroll_ads_window command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-scroll-ads-window"
           ]
         },
         {

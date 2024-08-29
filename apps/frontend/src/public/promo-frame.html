@@ -44,7 +44,7 @@
   </head>
   <body>
     <div class="ads-container">
-      <a id="plus-link" href="https://modrinth.com/plus"></a>
+      <a id="plus-link" href="https://modrinth.com/plus" target="_blank"></a>
       <div id="modrinth-rail-1" />
     </div>
     <script>
@@ -69,6 +69,24 @@
         },
         false,
       );
+
+      window.addEventListener("wheel", (event) => {
+        if (window.__TAURI_INTERNALS__) {
+          window.__TAURI_INTERNALS__.invoke("plugin:ads|scroll_ads_window", {
+            scroll: event.deltaY,
+          });
+        }
+      });
+
+      document.getElementById("plus-link").addEventListener("click", (event) => {
+        event.preventDefault();
+
+        if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
+          window.__TAURI_INTERNALS__.invoke("plugin:shell|open", {
+            path: this.href,
+          });
+        }
+      });
 
       document.addEventListener("contextmenu", (event) => event.preventDefault());
     </script>

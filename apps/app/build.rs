@@ -221,7 +221,11 @@ fn main() {
             .plugin(
                 "ads",
                 InlinedPlugin::new()
-                    .commands(&["init_ads_window", "hide_ads_window"])
+                    .commands(&[
+                        "init_ads_window",
+                        "hide_ads_window",
+                        "scroll_ads_window",
+                    ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
                     ),
