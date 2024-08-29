@@ -36,9 +36,7 @@ pub async fn init_ads_window<R: Runtime>(
                 tauri::webview::WebviewBuilder::new(
                     "ads-window",
                     WebviewUrl::External(
-                        "https://modrinth.com/wrapper/app-ads"
-                            .parse()
-                            .unwrap(),
+                        "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
                     ),
                 )
                 .initialization_script(LINK_SCRIPT)
