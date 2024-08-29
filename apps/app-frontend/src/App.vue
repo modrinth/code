@@ -31,6 +31,7 @@ import { useInstall } from '@/store/install.js'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
+import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 
 const themeStore = useTheming()
 
@@ -126,6 +127,7 @@ initialize_state()
   })
 
 const handleClose = async () => {
+  await saveWindowState(StateFlags.ALL)
   await getCurrentWindow().close()
 }
 

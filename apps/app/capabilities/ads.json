@@ -1,0 +1,15 @@
+{
+  "identifier": "ads",
+  "description": "",
+  "local": false,
+  "remote": {
+    "urls": ["https://modrinth.com/*", "http://localhost:3000/*"]
+  },
+  "webviews": [
+    "ads-window"
+  ],
+  "permissions": [
+    "shell:allow-open",
+    "ads:default"
+  ]
+}

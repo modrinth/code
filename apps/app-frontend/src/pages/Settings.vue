@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
 import { Card, Slider, DropdownSelect, Toggle, ConfirmModal, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
@@ -13,6 +13,11 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
 import { get_user, purge_cache_types } from '@/helpers/cache.js'
+import { hide_ads_window } from '@/helpers/ads.js'
+
+onMounted(() => {
+  hide_ads_window()
+})
 
 const pageOptions = ['Home', 'Library']
 

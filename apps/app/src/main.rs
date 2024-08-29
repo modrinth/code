@@ -31,6 +31,8 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     let state = State::get().await?;
     app.asset_protocol_scope()
         .allow_directory(state.directories.caches_dir(), true)?;
+    app.asset_protocol_scope()
+        .allow_directory(state.directories.caches_dir().join("icons"), true)?;
 
     Ok(())
 }
@@ -39,7 +41,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 #[tracing::instrument(skip_all)]
 #[tauri::command]
 fn show_window(app: tauri::AppHandle) {
-    let win = app.get_webview_window("main").unwrap();
+    let win = app.get_window("main").unwrap();
     if let Err(e) = win.show() {
         MessageDialog::new()
             .set_type(MessageType::Error)
@@ -179,6 +181,7 @@ fn main() {
         .plugin(api::tags::init())
         .plugin(api::utils::init())
         .plugin(api::cache::init())
+        .plugin(api::ads::init())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             is_dev,
