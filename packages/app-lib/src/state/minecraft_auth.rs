@@ -178,19 +178,16 @@ pub async fn login_finish(
 
     minecraft_entitlements(&minecraft_token.access_token).await?;
 
-    let profile = minecraft_profile(&minecraft_token.access_token).await?;
-
-    let profile_id = profile.id.unwrap_or_default();
-
-    let credentials = Credentials {
-        id: profile_id,
-        username: profile.name,
+    let mut credentials = Credentials {
+        id: Uuid::default(),
+        username: String::default(),
         access_token: minecraft_token.access_token,
         refresh_token: oauth_token.value.refresh_token,
         expires: oauth_token.date
             + Duration::seconds(oauth_token.value.expires_in as i64),
         active: true,
     };
+    credentials.get_profile().await?;
 
     credentials.upsert(exec).await?;
 
@@ -245,7 +242,18 @@ impl Credentials {
         self.expires = oauth_token.date
             + Duration::seconds(oauth_token.value.expires_in as i64);
 
+        self.get_profile().await?;
+
         self.upsert(exec).await?;
+
+        Ok(())
+    }
+
+    async fn get_profile(&mut self) -> crate::Result<()> {
+        let profile = minecraft_profile(&self.access_token).await?;
+
+        self.id = profile.id.unwrap_or_default();
+        self.username = profile.name;
 
         Ok(())
     }
