@@ -127,17 +127,17 @@ async function handleJavaFileInput() {
   let filePath = await open()
 
   if (filePath) {
-    let result = await get_jre(filePath)
+    let result = await get_jre(filePath.path)
     if (!result) {
       result = {
-        path: filePath,
+        path: filePath.path,
         version: props.version.toString(),
         architecture: 'x86',
       }
     }
 
     trackEvent('JavaManualSelect', {
-      path: filePath,
+      path: filePath.path,
       version: props.version,
     })
 

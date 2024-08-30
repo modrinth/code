@@ -76,7 +76,7 @@
         </div>
       </RecycleScroller>
     </div>
-    <ShareModal
+    <ShareModalWrapper
       ref="shareModal"
       header="Share Log"
       share-title="Instance Log"
@@ -89,7 +89,7 @@
 
 <script setup>
 import { CheckIcon, ClipboardCopyIcon, ShareIcon, TrashIcon } from '@modrinth/assets'
-import { Button, Card, ShareModal, Checkbox, DropdownSelect } from '@modrinth/ui'
+import { Button, Card, Checkbox, DropdownSelect } from '@modrinth/ui'
 import {
   delete_logs_by_filename,
   get_logs,
@@ -107,6 +107,7 @@ import { handleError } from '@/store/notifications.js'
 import { ofetch } from 'ofetch'
 import { RecycleScroller } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 dayjs.extend(isToday)
 dayjs.extend(isYesterday)

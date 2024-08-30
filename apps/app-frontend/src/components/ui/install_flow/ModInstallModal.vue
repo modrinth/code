@@ -7,7 +7,7 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from '@modrinth/assets'
-import { Avatar, Modal, Button, Card } from '@modrinth/ui'
+import { Avatar, Button, Card } from '@modrinth/ui'
 import { computed, ref } from 'vue'
 import {
   add_project_from_version as installMod,
@@ -19,12 +19,11 @@ import {
 import { open } from '@tauri-apps/plugin-dialog'
 import { installVersionDependencies } from '@/store/install.js'
 import { handleError } from '@/store/notifications.js'
-import { useTheming } from '@/store/theme.js'
 import { useRouter } from 'vue-router'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
-const themeStore = useTheming()
 const router = useRouter()
 
 const versions = ref()
@@ -142,7 +141,7 @@ const toggleCreation = () => {
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -151,6 +150,7 @@ const upload_icon = async () => {
       },
     ],
   })
+  icon.value = res ? res.path : null
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)
@@ -213,12 +213,7 @@ const createInstance = async () => {
 </script>
 
 <template>
-  <Modal
-    ref="installModal"
-    header="Install project to instance"
-    :noblur="!themeStore.advancedRendering"
-    :on-hide="onInstall"
-  >
+  <ModalWrapper ref="installModal" header="Install project to instance" :on-hide="onInstall">
     <div class="modal-body">
       <input
         v-model="searchFilter"
@@ -304,7 +299,7 @@ const createInstance = async () => {
         <Button @click="installModal.hide()">Cancel</Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <style scoped lang="scss">

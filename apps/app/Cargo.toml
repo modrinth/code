@@ -1,6 +1,6 @@
 [package]
 name = "theseus_gui"
-version = "0.8.4"
+version = "0.8.5"
 description = "The Modrinth App is a desktop application for managing your Minecraft mods"
 license = "GPL-3.0-only"
 repository = "https://github.com/modrinth/code/apps/app/"
@@ -22,7 +22,8 @@ tauri-plugin-deep-link = "2.0.0-rc"
 tauri-plugin-os = "2.0.0-rc"
 tauri-plugin-shell = "2.0.0-rc"
 tauri-plugin-dialog = "2.0.0-rc"
-tauri-plugin-updater = { version = "2.0.0-rc.1", optional = true }
+tauri-plugin-updater = { version = "2.0.0-rc" }
+tauri-plugin-single-instance = { version = "2.0.0-rc" }
 
 tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"
@@ -67,4 +68,4 @@ default = ["custom-protocol"]
 # this feature is used for production builds where `devPath` points to the filesystem
 # DO NOT remove this
 custom-protocol = ["tauri/custom-protocol"]
-updater = ["dep:tauri-plugin-updater"]
+updater = []

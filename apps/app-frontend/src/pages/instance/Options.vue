@@ -1,18 +1,13 @@
 <template>
-  <ConfirmModal
+  <ConfirmModalWrapper
     ref="modal_confirm"
     title="Are you sure you want to delete this instance?"
     description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
     :has-to-type="false"
     proceed-label="Delete"
-    :noblur="!themeStore.advancedRendering"
     @proceed="removeProfile"
   />
-  <Modal
-    ref="modalConfirmUnlock"
-    header="Are you sure you want to unlock this instance?"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="modalConfirmUnlock" header="Are you sure you want to unlock this instance?">
     <div class="modal-delete">
       <div
         class="markdown-body"
@@ -31,13 +26,9 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 
-  <Modal
-    ref="modalConfirmUnpair"
-    header="Are you sure you want to unpair this instance?"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="modalConfirmUnpair" header="Are you sure you want to unpair this instance?">
     <div class="modal-delete">
       <div
         class="markdown-body"
@@ -56,13 +47,9 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 
-  <Modal
-    ref="changeVersionsModal"
-    header="Change instance versions"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="changeVersionsModal" header="Change instance versions">
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -106,7 +93,7 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
   <section class="card">
     <div class="label">
       <h3>
@@ -511,18 +498,7 @@ import {
   DownloadIcon,
   ClipboardCopyIcon,
 } from '@modrinth/assets'
-import {
-  Button,
-  Toggle,
-  ConfirmModal,
-  Card,
-  Slider,
-  Checkbox,
-  Avatar,
-  Modal,
-  Chips,
-  DropdownSelect,
-} from '@modrinth/ui'
+import { Button, Toggle, Card, Slider, Checkbox, Avatar, Chips, DropdownSelect } from '@modrinth/ui'
 import { SwapIcon } from '@/assets/icons'
 
 import { Multiselect } from 'vue-multiselect'
@@ -546,10 +522,11 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { get_loader_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 import { handleError } from '@/store/notifications.js'
-import { useTheming } from '@/store/theme.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -569,8 +546,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const themeStore = useTheming()
 
 const title = ref(props.instance.name)
 const icon = ref(props.instance.icon_path)
@@ -606,7 +581,7 @@ async function setIcon() {
 
   if (!value) return
 
-  icon.value = value
+  icon.value = value.path
   await edit_icon(props.instance.path, icon.value).catch(handleError)
 
   trackEvent('InstanceSetIcon')

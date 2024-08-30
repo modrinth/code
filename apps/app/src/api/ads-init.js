@@ -1,16 +1,19 @@
-document.addEventListener('click', function (e) {
-  let target = e.target
-  while (target != null) {
-    if (target.matches('a')) {
-      e.preventDefault()
-      if (target.href) {
-        window.top.postMessage({ modrinthOpenUrl: target.href }, 'https://modrinth.com')
+if (!window.modrinthClickListener) {
+  window.modrinthClickListener = true
+  document.addEventListener('click', function (e) {
+    let target = e.target
+    while (target != null) {
+      if (target.matches('a')) {
+        e.preventDefault()
+        if (target.href) {
+          window.top.postMessage({ modrinthOpenUrl: target.href }, 'https://modrinth.com')
+        }
+        break
       }
-      break
+      target = target.parentElement
     }
-    target = target.parentElement
-  }
-})
+  })
+}
 
 window.open = (url, target, features) => {
   window.top.postMessage({ modrinthOpenUrl: url }, 'https://modrinth.com')
