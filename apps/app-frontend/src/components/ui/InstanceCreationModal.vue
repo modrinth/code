@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" header="Create instance" :noblur="!themeStore.advancedRendering">
+  <ModalWrapper ref="modal" header="Create instance">
     <div class="modal-header">
       <Chips v-model="creationType" :items="['custom', 'from file', 'import from launcher']" />
     </div>
@@ -193,10 +193,11 @@
         />
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 </template>
 
 <script setup>
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 import {
   PlusIcon,
   UploadIcon,
@@ -207,7 +208,7 @@ import {
   FolderSearchIcon,
   UpdatedIcon,
 } from '@modrinth/assets'
-import { Avatar, Button, Chips, Modal, Checkbox } from '@modrinth/ui'
+import { Avatar, Button, Chips, Checkbox } from '@modrinth/ui'
 import { computed, onUnmounted, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
@@ -217,7 +218,6 @@ import { get_game_versions, get_loader_versions } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 import { trackEvent } from '@/helpers/analytics'
-import { useTheming } from '@/store/state.js'
 import { listen } from '@tauri-apps/api/event'
 import { install_from_file } from '@/helpers/pack.js'
 import {
@@ -226,8 +226,6 @@ import {
   import_instance,
 } from '@/helpers/import.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
-
-const themeStore = useTheming()
 
 const profile_name = ref('')
 const game_version = ref('')

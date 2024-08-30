@@ -32,6 +32,8 @@ import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-shell'
 import { get_opening_command, initialize_state } from '@/helpers/state'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
+import { renderString } from '@modrinth/utils'
+import { useFetch } from '@/helpers/fetch.js'
 
 const themeStore = useTheming()
 
@@ -51,6 +53,8 @@ const nativeDecorations = ref(false)
 const os = ref('')
 
 const stateInitialized = ref(false)
+
+const criticalErrorMessage = ref()
 
 onMounted(async () => {
   await useCheckDisableMouseover()
@@ -107,6 +111,16 @@ async function setupApp() {
       type: 'warn',
     }),
   )
+
+  useFetch(
+    `https://api.modrinth.com/appCriticalAnnouncement.json?version=${version}`,
+    'criticalAnnouncements',
+    true,
+  ).then((res) => {
+    if (res.header && res.body) {
+      criticalErrorMessage.value = res
+    }
+  })
 
   get_opening_command().then(handleCommand)
 }
@@ -266,6 +280,10 @@ async function handleCommand(e) {
       </div>
     </div>
     <div class="view">
+      <div v-if="criticalErrorMessage" class="critical-error-banner" data-tauri-drag-region>
+        <h1>{{ criticalErrorMessage.header }}</h1>
+        <div class="markdown-body" v-html="renderString(criticalErrorMessage.body ?? '')"></div>
+      </div>
       <div class="appbar-row">
         <div data-tauri-drag-region class="appbar">
           <section class="navigation-controls">
@@ -377,6 +395,16 @@ async function handleCommand(e) {
   .view {
     width: calc(100% - var(--sidebar-width));
     background-color: var(--color-raised-bg);
+
+    .critical-error-banner {
+      margin-top: -1.25rem;
+      padding: 1rem;
+      background-color: rgba(203, 34, 69, 0.1);
+      border-left: 2px solid var(--color-red);
+      border-bottom: 2px solid var(--color-red);
+      border-right: 2px solid var(--color-red);
+      border-radius: 1rem;
+    }
 
     .appbar {
       display: flex;

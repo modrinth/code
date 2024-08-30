@@ -191,7 +191,7 @@ pub async fn generate_pack_from_version_id(
     let state = State::get().await?;
 
     let loading_bar = if let Some(bar) = initialized_loading_bar {
-        emit_loading(&bar, 0.0, Some("Downloading pack file")).await?;
+        emit_loading(&bar, 0.0, Some("Downloading pack file"))?;
         bar
     } else {
         init_loading(
@@ -207,7 +207,7 @@ pub async fn generate_pack_from_version_id(
         .await?
     };
 
-    emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
+    emit_loading(&loading_bar, 0.0, Some("Fetching version"))?;
     let version = CachedEntry::get_version(
         &version_id,
         None,
@@ -220,7 +220,7 @@ pub async fn generate_pack_from_version_id(
             "Invalid version ID specified!".to_string(),
         )
     })?;
-    emit_loading(&loading_bar, 10.0, None).await?;
+    emit_loading(&loading_bar, 10.0, None)?;
 
     let (url, hash) =
         if let Some(file) = version.files.iter().find(|x| x.primary) {
@@ -248,7 +248,7 @@ pub async fn generate_pack_from_version_id(
         &state.pool,
     )
     .await?;
-    emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
+    emit_loading(&loading_bar, 0.0, Some("Fetching project metadata"))?;
 
     let project = CachedEntry::get_project(
         &version.project_id,
@@ -263,7 +263,7 @@ pub async fn generate_pack_from_version_id(
         )
     })?;
 
-    emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
+    emit_loading(&loading_bar, 10.0, Some("Retrieving icon"))?;
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
         let icon_bytes =
@@ -287,7 +287,7 @@ pub async fn generate_pack_from_version_id(
     } else {
         None
     };
-    emit_loading(&loading_bar, 10.0, None).await?;
+    emit_loading(&loading_bar, 10.0, None)?;
 
     Ok(CreatePack {
         file,

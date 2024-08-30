@@ -284,7 +284,7 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Modal ref="deleteWarning" header="Are you sure?">
+  <ModalWrapper ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -302,8 +302,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <Modal ref="deleteDisabledWarning" header="Are you sure?">
+  </ModalWrapper>
+  <ModalWrapper ref="deleteDisabledWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -325,7 +325,7 @@
         </Button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
   <ShareModal
     ref="shareModal"
     share-title="Sharing modpack content"
@@ -361,7 +361,6 @@ import {
   Pagination,
   DropdownSelect,
   ShareModal,
-  Modal,
   Checkbox,
   AnimatedLogo,
   Avatar,
@@ -393,6 +392,7 @@ import {
   get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const props = defineProps({
   instance: {

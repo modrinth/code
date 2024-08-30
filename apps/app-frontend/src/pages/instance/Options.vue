@@ -8,11 +8,7 @@
     :noblur="!themeStore.advancedRendering"
     @proceed="removeProfile"
   />
-  <Modal
-    ref="modalConfirmUnlock"
-    header="Are you sure you want to unlock this instance?"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="modalConfirmUnlock" header="Are you sure you want to unlock this instance?">
     <div class="modal-delete">
       <div
         class="markdown-body"
@@ -31,13 +27,9 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 
-  <Modal
-    ref="modalConfirmUnpair"
-    header="Are you sure you want to unpair this instance?"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="modalConfirmUnpair" header="Are you sure you want to unpair this instance?">
     <div class="modal-delete">
       <div
         class="markdown-body"
@@ -56,13 +48,9 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
 
-  <Modal
-    ref="changeVersionsModal"
-    header="Change instance versions"
-    :noblur="!themeStore.advancedRendering"
-  >
+  <ModalWrapper ref="changeVersionsModal" header="Change instance versions">
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -106,7 +94,7 @@
         </button>
       </div>
     </div>
-  </Modal>
+  </ModalWrapper>
   <section class="card">
     <div class="label">
       <h3>
@@ -519,7 +507,6 @@ import {
   Slider,
   Checkbox,
   Avatar,
-  Modal,
   Chips,
   DropdownSelect,
 } from '@modrinth/ui'
@@ -550,6 +537,7 @@ import { useTheming } from '@/store/theme.js'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import ModpackVersionModal from '@/components/ui/ModpackVersionModal.vue'
 import { trackEvent } from '@/helpers/analytics'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
 
 const breadcrumbs = useBreadcrumbs()
 

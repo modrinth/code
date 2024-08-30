@@ -225,6 +225,7 @@ fn main() {
                         "init_ads_window",
                         "hide_ads_window",
                         "scroll_ads_window",
+                        "show_ads_window",
                     ])
                     .default_permission(
                         DefaultPermissionRule::AllowAllCommands,
