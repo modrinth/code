@@ -45,15 +45,8 @@ impl EventState {
             .cloned()
     }
 
-    #[cfg(feature = "tauri")]
     pub fn get() -> crate::Result<Arc<Self>> {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
-    }
-
-    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
-    #[cfg(not(feature = "tauri"))]
-    pub async fn get() -> crate::Result<Arc<Self>> {
-        Self::init().await
     }
 
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
