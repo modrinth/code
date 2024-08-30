@@ -5,8 +5,10 @@
   "build": {
     "features": ["updater"]
   },
-  "security": {
-    "capabilities": ["ads", "core", "plugins", "updater"]
+  "app": {
+    "security": {
+      "capabilities": ["ads", "core", "plugins", "updater"]
+    }
   },
   "plugins": {
     "updater": {
