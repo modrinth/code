@@ -6,7 +6,6 @@
     "main"
   ],
   "permissions": [
-    "updater:default",
-    "process:default"
+    "updater:default"
   ]
 }

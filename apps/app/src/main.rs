@@ -135,6 +135,11 @@ async fn toggle_decorations(b: bool, window: tauri::Window) -> api::Result<()> {
     Ok(())
 }
 
+#[tauri::command]
+fn restart_app(app: tauri::AppHandle) {
+    app.restart();
+}
+
 // if Tauri app is called with arguments, then those arguments will be treated as commands
 // ie: deep links or filepaths for .mrpacks
 fn main() {
@@ -160,12 +165,15 @@ fn main() {
 
     #[cfg(feature = "updater")]
     {
-        builder = builder
-            .plugin(tauri_plugin_updater::Builder::new().build())
-            .plugin(tauri_plugin_process::init());
+        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
     }
 
     builder = builder
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            if let Some(win) = app.get_window("main") {
+                let _ = win.set_focus();
+            }
+        }))
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_deep_link::init())
@@ -250,6 +258,7 @@ fn main() {
             toggle_decorations,
             api::mr_auth::modrinth_auth_login,
             show_window,
+            restart_app,
         ]);
 
     #[cfg(target_os = "macos")]

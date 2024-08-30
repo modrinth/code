@@ -141,7 +141,7 @@ const toggleCreation = () => {
 }
 
 const upload_icon = async () => {
-  icon.value = await open({
+  const res = await open({
     multiple: false,
     filters: [
       {
@@ -150,6 +150,7 @@ const upload_icon = async () => {
       },
     ],
   })
+  icon.value = res ? res.path : null
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)

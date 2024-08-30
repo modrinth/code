@@ -23,7 +23,7 @@ tauri-plugin-os = "2.0.0-rc"
 tauri-plugin-shell = "2.0.0-rc"
 tauri-plugin-dialog = "2.0.0-rc"
 tauri-plugin-updater = { version = "2.0.0-rc" }
-tauri-plugin-process = { version = "2.0.0-rc" }
+tauri-plugin-single-instance = { version = "2.0.0-rc" }
 
 tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"

@@ -34,24 +34,24 @@ onMounted(() => {
   if (showAd.value) {
     updateAdPosition(true)
 
-    resizeObserver = new ResizeObserver(updateAdPosition)
+    resizeObserver = new ResizeObserver(() => updateAdPosition())
     resizeObserver.observe(adsWrapper.value)
 
-    intersectionObserver = new IntersectionObserver(updateAdPosition)
+    intersectionObserver = new IntersectionObserver(() => updateAdPosition())
     intersectionObserver.observe(adsWrapper.value)
 
-    mutationObserver = new MutationObserver(updateAdPosition)
+    mutationObserver = new MutationObserver(() => updateAdPosition())
     mutationObserver.observe(adsWrapper.value, { attributes: true, childList: true, subtree: true })
 
     // Add scroll event listener
     scrollHandler = () => {
-      requestAnimationFrame(updateAdPosition)
+      requestAnimationFrame(() => updateAdPosition())
     }
     window.addEventListener('scroll', scrollHandler, { passive: true })
   }
 })
 
-function updateAdPosition(override = false) {
+function updateAdPosition(overrideShown = false) {
   if (adsWrapper.value) {
     const rect = adsWrapper.value.getBoundingClientRect()
 
@@ -69,7 +69,7 @@ function updateAdPosition(override = false) {
       }
     }
 
-    init_ads_window(rect.left + window.scrollX, y, rect.right - rect.left, height, override)
+    init_ads_window(rect.left + window.scrollX, y, rect.right - rect.left, height, overrideShown)
   }
 }
 

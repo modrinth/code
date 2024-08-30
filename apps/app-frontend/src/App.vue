@@ -24,7 +24,7 @@ import { handleError, useNotifications } from '@/store/notifications.js'
 import { command_listener, warning_listener } from '@/helpers/events.js'
 import { MinimizeIcon, MaximizeIcon } from '@/assets/icons'
 import { type } from '@tauri-apps/plugin-os'
-import { isDev, getOS } from '@/helpers/utils.js'
+import { isDev, getOS, restartApp } from '@/helpers/utils.js'
 import { initAnalytics, debugAnalytics, optOutAnalytics, trackEvent } from '@/helpers/analytics'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { getVersion } from '@tauri-apps/api/app'
@@ -43,7 +43,6 @@ import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
 import { check } from '@tauri-apps/plugin-updater'
-import { relaunch } from '@tauri-apps/plugin-process'
 
 const themeStore = useTheming()
 
@@ -246,7 +245,8 @@ async function handleCommand(e) {
 
 const updateAvailable = ref(false)
 async function checkUpdates() {
-  const update = await check().catch(() => {})
+  const update = await check()
+  console.log(update)
   updateAvailable.value = !!update
 
   setTimeout(
@@ -293,7 +293,7 @@ async function checkUpdates() {
           v-if="updateAvailable"
           v-tooltip="'Install update'"
           class="btn btn-outline btn-primary icon-only collapsed-button"
-          @click="relaunch()"
+          @click="restartApp()"
         >
           <DownloadIcon />
         </button>

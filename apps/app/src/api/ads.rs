@@ -33,9 +33,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 const LINK_SCRIPT: &str = include_str!("ads-init.js");
 
-// TODO: make ads work on linux
-
 #[tauri::command]
+#[cfg(not(target_os = "linux"))]
 pub async fn init_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
     x: f32,
@@ -44,65 +43,64 @@ pub async fn init_ads_window<R: Runtime>(
     height: f32,
     override_shown: bool,
 ) -> crate::api::Result<()> {
-    #[cfg(not(target_os = "linux"))]
-    {
-        let state = app.state::<RwLock<AdsState>>();
-        let mut state = state.write().await;
-        state.size = Some(LogicalSize::new(width, height));
-        state.position = Some(LogicalPosition::new(x, y));
+    let state = app.state::<RwLock<AdsState>>();
+    let mut state = state.write().await;
+    state.size = Some(LogicalSize::new(width, height));
+    state.position = Some(LogicalPosition::new(x, y));
 
-        if override_shown {
-            state.shown = true;
+    if override_shown {
+        state.shown = true;
+    }
+
+    if let Some(webview) = app.webviews().get("ads-window") {
+        if state.shown {
+            let _ = webview.set_position(LogicalPosition::new(x, y));
+            let _ = webview.set_size(LogicalSize::new(width, height));
         }
-
-        if let Some(webview) = app.webviews().get("ads-window") {
+    } else if let Some(window) = app.get_window("main") {
+        let _ = window.add_child(
+            tauri::webview::WebviewBuilder::new(
+                "ads-window",
+                WebviewUrl::External(
+                    "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
+                ),
+            )
+            .initialization_script(LINK_SCRIPT)
+            .user_agent("ModrinthApp Ads Webview")
+            .zoom_hotkeys_enabled(false)
+            .transparent(true),
             if state.shown {
-                let _ = webview.set_position(LogicalPosition::new(x, y));
-                let _ = webview.set_size(LogicalSize::new(width, height));
-            }
-        } else if let Some(window) = app.get_window("main") {
-            let _ = window.add_child(
-                tauri::webview::WebviewBuilder::new(
-                    "ads-window",
-                    WebviewUrl::External(
-                        "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
-                    ),
-                )
-                .initialization_script(LINK_SCRIPT)
-                .user_agent("ModrinthApp Ads Webview")
-                .zoom_hotkeys_enabled(false)
-                .transparent(false),
-                if state.shown {
-                    LogicalPosition::new(x, y)
-                } else {
-                    LogicalPosition::new(-1000.0, -1000.0)
-                },
-                LogicalSize::new(width, height),
-            );
-        }
+                LogicalPosition::new(x, y)
+            } else {
+                LogicalPosition::new(-1000.0, -1000.0)
+            },
+            LogicalSize::new(width, height),
+        );
     }
 
     Ok(())
 }
 
+// TODO: make ads work on linux
+#[tauri::command]
+#[cfg(target_os = "linux")]
+pub async fn init_ads_window() {}
+
 #[tauri::command]
 pub async fn show_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
 ) -> crate::api::Result<()> {
-    #[cfg(not(target_os = "linux"))]
-    {
-        if let Some(webview) = app.webviews().get("ads-window") {
-            let state = app.state::<RwLock<AdsState>>();
-            let mut state = state.write().await;
+    if let Some(webview) = app.webviews().get("ads-window") {
+        let state = app.state::<RwLock<AdsState>>();
+        let mut state = state.write().await;
 
-            state.shown = true;
-            if let Some(size) = state.size {
-                let _ = webview.set_size(size);
-            }
+        state.shown = true;
+        if let Some(size) = state.size {
+            let _ = webview.set_size(size);
+        }
 
-            if let Some(position) = state.position {
-                let _ = webview.set_position(position);
-            }
+        if let Some(position) = state.position {
+            let _ = webview.set_position(position);
         }
     }
 
