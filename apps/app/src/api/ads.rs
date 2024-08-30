@@ -1,8 +1,6 @@
 use serde::Serialize;
 use tauri::plugin::TauriPlugin;
-use tauri::{
-    Emitter, LogicalPosition, LogicalSize, Manager, Runtime, WebviewUrl,
-};
+use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
 use tokio::sync::RwLock;
 
 pub struct AdsState {
@@ -31,8 +29,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
         .build()
 }
 
-const LINK_SCRIPT: &str = include_str!("ads-init.js");
-
 #[tauri::command]
 #[cfg(not(target_os = "linux"))]
 pub async fn init_ads_window<R: Runtime>(
@@ -43,6 +39,9 @@ pub async fn init_ads_window<R: Runtime>(
     height: f32,
     override_shown: bool,
 ) -> crate::api::Result<()> {
+    use tauri::WebviewUrl;
+    const LINK_SCRIPT: &str = include_str!("ads-init.js");
+
     let state = app.state::<RwLock<AdsState>>();
     let mut state = state.write().await;
     state.size = Some(LogicalSize::new(width, height));
