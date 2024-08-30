@@ -42,20 +42,21 @@ pub async fn init_ads_window<R: Runtime>(
     y: f32,
     width: f32,
     height: f32,
+    override_shown: bool,
 ) -> crate::api::Result<()> {
     #[cfg(not(target_os = "linux"))]
     {
         let state = app.state::<RwLock<AdsState>>();
-        let shown;
-        {
-            let mut state = state.write().await;
-            state.size = Some(LogicalSize::new(width, height));
-            state.position = Some(LogicalPosition::new(x, y));
-            shown = state.shown;
+        let mut state = state.write().await;
+        state.size = Some(LogicalSize::new(width, height));
+        state.position = Some(LogicalPosition::new(x, y));
+
+        if override_shown {
+            state.shown = true;
         }
 
         if let Some(webview) = app.webviews().get("ads-window") {
-            if shown {
+            if state.shown {
                 let _ = webview.set_position(LogicalPosition::new(x, y));
                 let _ = webview.set_size(LogicalSize::new(width, height));
             }
@@ -70,8 +71,8 @@ pub async fn init_ads_window<R: Runtime>(
                 .initialization_script(LINK_SCRIPT)
                 .user_agent("ModrinthApp Ads Webview")
                 .zoom_hotkeys_enabled(false)
-                .transparent(true),
-                if shown {
+                .transparent(false),
+                if state.shown {
                     LogicalPosition::new(x, y)
                 } else {
                     LogicalPosition::new(-1000.0, -1000.0)

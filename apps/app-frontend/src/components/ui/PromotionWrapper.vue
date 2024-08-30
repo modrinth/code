@@ -32,7 +32,7 @@ let intersectionObserver
 let mutationObserver
 onMounted(() => {
   if (showAd.value) {
-    updateAdPosition()
+    updateAdPosition(true)
 
     resizeObserver = new ResizeObserver(updateAdPosition)
     resizeObserver.observe(adsWrapper.value)
@@ -51,7 +51,7 @@ onMounted(() => {
   }
 })
 
-function updateAdPosition() {
+function updateAdPosition(override = false) {
   if (adsWrapper.value) {
     const rect = adsWrapper.value.getBoundingClientRect()
 
@@ -69,7 +69,7 @@ function updateAdPosition() {
       }
     }
 
-    init_ads_window(rect.left + window.scrollX, y, rect.right - rect.left, height)
+    init_ads_window(rect.left + window.scrollX, y, rect.right - rect.left, height, override)
   }
 }
 
