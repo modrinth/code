@@ -169,7 +169,15 @@ fn main() {
     }
 
     builder = builder
-        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+        .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
+            if let Some(payload) = args.get(1) {
+                tracing::info!("Handling deep link from arg {payload}");
+                let payload = payload.clone();
+                tauri::async_runtime::spawn(api::utils::handle_command(
+                    payload,
+                ));
+            }
+
             if let Some(win) = app.get_window("main") {
                 let _ = win.set_focus();
             }
