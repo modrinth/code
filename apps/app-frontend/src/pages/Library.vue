@@ -13,7 +13,7 @@ import { NewInstanceImage } from '@/assets/icons'
 import { hide_ads_window } from '@/helpers/ads.js'
 
 onMounted(() => {
-  hide_ads_window()
+  hide_ads_window(true)
 })
 
 const route = useRoute()

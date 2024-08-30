@@ -8,6 +8,6 @@ export async function show_ads_window() {
   return await invoke('plugin:ads|show_ads_window')
 }
 
-export async function hide_ads_window() {
-  return await invoke('plugin:ads|hide_ads_window')
+export async function hide_ads_window(reset) {
+  return await invoke('plugin:ads|hide_ads_window', { reset })
 }

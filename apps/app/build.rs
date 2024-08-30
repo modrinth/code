@@ -62,7 +62,7 @@ fn main() {
                 InlinedPlugin::new()
                     .commands(&[
                         "get_java_versions",
-                        "set_java_versions",
+                        "set_java_version",
                         "jre_find_filtered_jres",
                         "jre_get_jre",
                         "jre_test_jre",

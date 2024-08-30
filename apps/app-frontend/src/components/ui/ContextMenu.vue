@@ -71,9 +71,11 @@ const isLinkedData = (item) => {
 }
 
 const hideContextMenu = () => {
+  if (shown.value) {
+    show_ads_window()
+  }
   shown.value = false
   emit('menu-closed')
-  show_ads_window()
 }
 
 const optionClicked = (option) => {

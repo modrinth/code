@@ -86,6 +86,7 @@
         ],
         "enable": true
       },
+      "capabilities": ["ads", "core", "plugins"],
       "csp": {
         "default-src": "'self' customprotocol: asset:",
         "connect-src": "ipc: http://ipc.localhost https://modrinth.com https://*.modrinth.com https://*.posthog.com https://*.sentry.io https://*.cloudflare.com https://api.mclo.gs https://cmp.inmobi.com",

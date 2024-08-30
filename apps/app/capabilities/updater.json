@@ -1,0 +1,12 @@
+{
+  "identifier": "updater",
+  "description": "",
+  "local": true,
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "updater:default",
+    "process:default"
+  ]
+}

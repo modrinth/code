@@ -6,6 +6,7 @@ use tauri::{
 use tokio::sync::RwLock;
 
 pub struct AdsState {
+    pub shown: bool,
     pub size: Option<LogicalSize<f32>>,
     pub position: Option<LogicalPosition<f32>>,
 }
@@ -14,6 +15,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
     tauri::plugin::Builder::<R>::new("ads")
         .setup(|app, _api| {
             app.manage(RwLock::new(AdsState {
+                shown: true,
                 size: None,
                 position: None,
             }));
@@ -43,16 +45,20 @@ pub async fn init_ads_window<R: Runtime>(
 ) -> crate::api::Result<()> {
     #[cfg(not(target_os = "linux"))]
     {
-        let mut state = app.state::<RwLock<AdsState>>();
+        let state = app.state::<RwLock<AdsState>>();
+        let shown;
         {
             let mut state = state.write().await;
             state.size = Some(LogicalSize::new(width, height));
             state.position = Some(LogicalPosition::new(x, y));
+            shown = state.shown;
         }
 
         if let Some(webview) = app.webviews().get("ads-window") {
-            let _ = webview.set_position(LogicalPosition::new(x, y));
-            let _ = webview.set_size(LogicalSize::new(width, height));
+            if shown {
+                let _ = webview.set_position(LogicalPosition::new(x, y));
+                let _ = webview.set_size(LogicalSize::new(width, height));
+            }
         } else if let Some(window) = app.get_window("main") {
             let _ = window.add_child(
                 tauri::webview::WebviewBuilder::new(
@@ -65,7 +71,11 @@ pub async fn init_ads_window<R: Runtime>(
                 .user_agent("ModrinthApp Ads Webview")
                 .zoom_hotkeys_enabled(false)
                 .transparent(true),
-                LogicalPosition::new(x, y),
+                if shown {
+                    LogicalPosition::new(x, y)
+                } else {
+                    LogicalPosition::new(-1000.0, -1000.0)
+                },
                 LogicalSize::new(width, height),
             );
         }
@@ -82,8 +92,9 @@ pub async fn show_ads_window<R: Runtime>(
     {
         if let Some(webview) = app.webviews().get("ads-window") {
             let state = app.state::<RwLock<AdsState>>();
-            let state = state.read().await;
+            let mut state = state.write().await;
 
+            state.shown = true;
             if let Some(size) = state.size {
                 let _ = webview.set_size(size);
             }
@@ -97,12 +108,21 @@ pub async fn show_ads_window<R: Runtime>(
     Ok(())
 }
 
-
 #[tauri::command]
 pub async fn hide_ads_window<R: Runtime>(
     app: tauri::AppHandle<R>,
+    reset: Option<bool>,
 ) -> crate::api::Result<()> {
     if let Some(webview) = app.webviews().get("ads-window") {
+        let state = app.state::<RwLock<AdsState>>();
+        let mut state = state.write().await;
+        state.shown = false;
+
+        if reset.unwrap_or(false) {
+            state.size = None;
+            state.position = None;
+        }
+
         let _ = webview.set_position(LogicalPosition::new(-1000, -1000));
     }
 

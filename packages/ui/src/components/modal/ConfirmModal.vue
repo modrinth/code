@@ -1,5 +1,5 @@
 <template>
-  <NewModal ref="modal" :noblur="noblur" danger>
+  <NewModal ref="modal" :noblur="noblur" danger :on-hide="onHide">
     <template #title>
       <slot name="title">
         <span class="font-extrabold text-contrast text-lg">{{ title }}</span>
@@ -75,6 +75,12 @@ const props = defineProps({
   noblur: {
     type: Boolean,
     default: false,
+  },
+  onHide: {
+    type: Function,
+    default() {
+      return () => {}
+    },
   },
 })
 

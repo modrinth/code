@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue'
 import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, ConfirmModal, Button } from '@modrinth/ui'
+import { Card, Slider, DropdownSelect, Toggle, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
@@ -14,6 +14,7 @@ import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
 import { get_user, purge_cache_types } from '@/helpers/cache.js'
 import { hide_ads_window } from '@/helpers/ads.js'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 onMounted(() => {
   hide_ads_window()
@@ -174,13 +175,12 @@ async function purgeCache() {
           Sign in
         </button>
       </div>
-      <ConfirmModal
+      <ConfirmModalWrapper
         ref="purgeCacheConfirmModal"
         title="Are you sure you want to purge the cache?"
         description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
         :has-to-type="false"
         proceed-label="Purge cache"
-        :noblur="!themeStore.advancedRendering"
         @proceed="purgeCache"
       />
       <div class="adjacent-input">

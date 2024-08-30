@@ -1,7 +1,15 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { RouterView, RouterLink, useRouter, useRoute } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, XIcon } from '@modrinth/assets'
+import {
+  HomeIcon,
+  SearchIcon,
+  LibraryIcon,
+  PlusIcon,
+  SettingsIcon,
+  XIcon,
+  DownloadIcon,
+} from '@modrinth/assets'
 import { Button, Notifications } from '@modrinth/ui'
 import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
@@ -34,6 +42,8 @@ import { get_opening_command, initialize_state } from '@/helpers/state'
 import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { renderString } from '@modrinth/utils'
 import { useFetch } from '@/helpers/fetch.js'
+import { check } from '@tauri-apps/plugin-updater'
+import { relaunch } from '@tauri-apps/plugin-process'
 
 const themeStore = useTheming()
 
@@ -117,12 +127,13 @@ async function setupApp() {
     'criticalAnnouncements',
     true,
   ).then((res) => {
-    if (res.header && res.body) {
+    if (res && res.header && res.body) {
       criticalErrorMessage.value = res
     }
   })
 
   get_opening_command().then(handleCommand)
+  checkUpdates()
 }
 
 const stateFailed = ref(false)
@@ -232,6 +243,19 @@ async function handleCommand(e) {
     urlModal.value.show(e)
   }
 }
+
+const updateAvailable = ref(false)
+async function checkUpdates() {
+  const update = await check().catch(() => {})
+  updateAvailable.value = !!update
+
+  setTimeout(
+    () => {
+      checkUpdates()
+    },
+    5 * 1000 * 60,
+  )
+}
 </script>
 
 <template>
@@ -265,6 +289,14 @@ async function handleCommand(e) {
         </div>
       </div>
       <div class="settings pages-list">
+        <button
+          v-if="updateAvailable"
+          v-tooltip="'Install update'"
+          class="btn btn-outline btn-primary icon-only collapsed-button"
+          @click="relaunch()"
+        >
+          <DownloadIcon />
+        </button>
         <Button
           v-tooltip="'Create profile'"
           class="sleek-primary collapsed-button"

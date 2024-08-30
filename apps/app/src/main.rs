@@ -31,9 +31,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     {
         use tauri_plugin_updater::UpdaterExt;
 
-        let updater = app
-            .updater_builder()
-            .build()?;
+        let updater = app.updater_builder().build()?;
 
         let update_fut = updater.check();
 
@@ -44,7 +42,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
             1.0,
             "Checking for updates...",
         )
-            .await?;
+        .await?;
 
         let update = update_fut.await;
 
@@ -60,18 +58,26 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
                 1.0,
                 "Updating Modrinth App...",
             )
-                .await?;
+            .await?;
 
             // 100 MiB
             const DEFAULT_CONTENT_LENGTH: u64 = 1024 * 1024 * 100;
 
-            update.download_and_install(|chunk_length, content_length| {
-                let _ = theseus::emit_loading(
-                    &loader_bar_id,
-                    (chunk_length as f64) / (content_length.unwrap_or(DEFAULT_CONTENT_LENGTH) as f64),
-                    None,
-                );
-            }, || {}).await?;
+            update
+                .download_and_install(
+                    |chunk_length, content_length| {
+                        let _ = theseus::emit_loading(
+                            &loader_bar_id,
+                            (chunk_length as f64)
+                                / (content_length
+                                    .unwrap_or(DEFAULT_CONTENT_LENGTH)
+                                    as f64),
+                            None,
+                        );
+                    },
+                    || {},
+                )
+                .await?;
 
             app.restart();
         }
@@ -154,7 +160,9 @@ fn main() {
 
     #[cfg(feature = "updater")]
     {
-        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+        builder = builder
+            .plugin(tauri_plugin_updater::Builder::new().build())
+            .plugin(tauri_plugin_process::init());
     }
 
     builder = builder

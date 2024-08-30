@@ -11,7 +11,7 @@ import { get_search_results } from '@/helpers/cache.js'
 import { hide_ads_window } from '@/helpers/ads.js'
 
 onMounted(() => {
-  hide_ads_window()
+  hide_ads_window(true)
 })
 
 const featuredModpacks = ref({})

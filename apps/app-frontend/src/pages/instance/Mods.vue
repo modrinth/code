@@ -326,7 +326,7 @@
       </div>
     </div>
   </ModalWrapper>
-  <ShareModal
+  <ShareModalWrapper
     ref="shareModal"
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
@@ -360,7 +360,6 @@ import {
 import {
   Pagination,
   DropdownSelect,
-  ShareModal,
   Checkbox,
   AnimatedLogo,
   Avatar,
@@ -393,6 +392,7 @@ import {
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
 import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 const props = defineProps({
   instance: {
@@ -784,6 +784,7 @@ const deleteDisabled = async () => {
 }
 
 const shareNames = async () => {
+  console.log(functionValues.value)
   await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 

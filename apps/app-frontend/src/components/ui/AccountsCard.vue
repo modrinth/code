@@ -151,7 +151,10 @@ const handleClickOutside = (event) => {
 
 function toggleMenu(override = true) {
   if (showCard.value || !override) {
-    show_ads_window()
+    if (showCard.value) {
+      show_ads_window()
+    }
+
     showCard.value = false
   } else {
     hide_ads_window()
