@@ -48,7 +48,7 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.8.4",
+  "version": "0.0.0",
   "identifier": "ModrinthApp",
   "plugins": {
     "deep-link": {
