@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue'
 import { get, set } from '@/helpers/settings.js'
-import { mixpanel_opt_in_tracking, mixpanel_opt_out_tracking } from '@/helpers/mixpanel.js'
+import { optOutAnalytics, optInAnalytics } from '@/helpers/analytics'
 import { handleError } from '@/store/state'
 
 export async function useSettings() {
@@ -21,9 +21,9 @@ export async function useSettings() {
       const setSettings = JSON.parse(JSON.stringify(newSettings))
 
       if (setSettings.telemetry) {
-        mixpanel_opt_out_tracking()
+        optOutAnalytics()
       } else {
-        mixpanel_opt_in_tracking()
+        optInAnalytics()
       }
 
       setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)

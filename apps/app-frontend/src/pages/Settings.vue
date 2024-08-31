@@ -7,7 +7,6 @@ import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/j
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import { optOutAnalytics, optInAnalytics } from '@/helpers/analytics'
 import { open } from '@tauri-apps/plugin-dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
@@ -29,47 +28,6 @@ const version = await getVersion()
 const settings = await useSettings()
 
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
-
-watch(
-  settings,
-  async (oldSettings, newSettings) => {
-    if (oldSettings.loaded_config_dir !== newSettings.loaded_config_dir) {
-      return
-    }
-
-    const setSettings = JSON.parse(JSON.stringify(newSettings))
-
-    if (setSettings.telemetry) {
-      optInAnalytics()
-    } else {
-      optOutAnalytics()
-    }
-
-    setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
-    setSettings.custom_env_vars = setSettings.envVars
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((x) => x.split('=').filter(Boolean))
-
-    if (!setSettings.hooks.pre_launch) {
-      setSettings.hooks.pre_launch = null
-    }
-    if (!setSettings.hooks.wrapper) {
-      setSettings.hooks.wrapper = null
-    }
-    if (!setSettings.hooks.post_exit) {
-      setSettings.hooks.post_exit = null
-    }
-
-    if (!setSettings.custom_dir) {
-      setSettings.custom_dir = null
-    }
-
-    await set(setSettings)
-  },
-  { deep: true },
-)
 
 const javaVersions = ref(await get_java_versions().catch(handleError))
 
