@@ -130,9 +130,16 @@ const os = ref('')
 getOS().then((x) => (os.value = x))
 
 loading_listener(async (e) => {
+  console.log(e)
   if (e.event.type === 'directory_move') {
     loadingProgress.value = 100 * (e.fraction ?? 1)
     message.value = 'Updating app directory...'
+  } else if (e.event.type === 'launcher_update') {
+    loadingProgress.value = 100 * (e.fraction ?? 1)
+    message.value = 'Updating Modrinth App...'
+  } else if (e.event.type === 'checking_for_updates') {
+    loadingProgress.value = 100 * (e.fraction ?? 1)
+    message.value = 'Checking for updates...'
   }
 })
 

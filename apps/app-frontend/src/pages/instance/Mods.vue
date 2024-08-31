@@ -284,7 +284,7 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Modal ref="deleteWarning" header="Are you sure?">
+  <ModalWrapper ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -302,8 +302,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <Modal ref="deleteDisabledWarning" header="Are you sure?">
+  </ModalWrapper>
+  <ModalWrapper ref="deleteDisabledWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -325,8 +325,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <ShareModal
+  </ModalWrapper>
+  <ShareModalWrapper
     ref="shareModal"
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
@@ -360,8 +360,6 @@ import {
 import {
   Pagination,
   DropdownSelect,
-  ShareModal,
-  Modal,
   Checkbox,
   AnimatedLogo,
   Avatar,
@@ -393,6 +391,8 @@ import {
   get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 const props = defineProps({
   instance: {
@@ -784,6 +784,7 @@ const deleteDisabled = async () => {
 }
 
 const shareNames = async () => {
+  console.log(functionValues.value)
   await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 

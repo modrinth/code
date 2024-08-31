@@ -44,7 +44,24 @@ jobs:
       - name: Setup rust cache
         uses: actions/cache@v4
         with:
-          path: target/**
+          path: |
+            target/**
+            !target/*/release/bundle/*/*.dmg
+            !target/*/release/bundle/*/*.app.tar.gz
+            !target/*/release/bundle/*/*.app.tar.gz.sig
+            !target/release/bundle/*/*.dmg
+            !target/release/bundle/*/*.app.tar.gz
+            !target/release/bundle/*/*.app.tar.gz.sig
+
+            !target/release/bundle/*/*.AppImage
+            !target/release/bundle/*/*.AppImage.tar.gz
+            !target/release/bundle/*/*.AppImage.tar.gz.sig
+            !target/release/bundle/*/*.deb
+            !target/release/bundle/*/*.rpm
+
+            !target/release/bundle/*/*.msi
+            !target/release/bundle/*/*.msi.zip
+            !target/release/bundle/*/*.msi.zip.sig
           key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-target-
@@ -124,7 +141,7 @@ jobs:
             target/release/bundle/*/*.AppImage.tar.gz.sig
             target/release/bundle/*/*.deb
             target/release/bundle/*/*.rpm
-            
+
             target/release/bundle/*/*.msi
             target/release/bundle/*/*.msi.zip
             target/release/bundle/*/*.msi.zip.sig

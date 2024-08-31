@@ -119,7 +119,7 @@ pub(crate) async fn watch_profile(
         {
             let path = profile_path.join(folder);
 
-            if !path.exists() {
+            if !path.exists() && !path.is_symlink() {
                 crate::util::io::create_dir_all(&path).await?;
             }
 

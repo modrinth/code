@@ -78,16 +78,6 @@
         }
       });
 
-      document.getElementById("plus-link").addEventListener("click", (event) => {
-        event.preventDefault();
-
-        if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
-          window.__TAURI_INTERNALS__.invoke("plugin:shell|open", {
-            path: this.href,
-          });
-        }
-      });
-
       document.addEventListener("contextmenu", (event) => event.preventDefault());
     </script>
   </body>

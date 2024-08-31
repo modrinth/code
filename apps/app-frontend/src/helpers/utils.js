@@ -33,6 +33,10 @@ export async function highlightModInProfile(profilePath, projectPath) {
   return await highlightInFolder(fullPath)
 }
 
+export async function restartApp() {
+  return await invoke('restart_app')
+}
+
 export const releaseColor = (releaseType) => {
   switch (releaseType) {
     case 'release':

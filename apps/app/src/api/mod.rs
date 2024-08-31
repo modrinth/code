@@ -40,6 +40,10 @@ pub enum TheseusSerializableError {
 
     #[error("Tauri error: {0}")]
     Tauri(#[from] tauri::Error),
+
+    #[cfg(feature = "updater")]
+    #[error("Tauri updater error: {0}")]
+    TauriUpdater(#[from] tauri_plugin_updater::Error),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -87,7 +91,15 @@ macro_rules! impl_serialize {
 }
 
 // Use the macro to implement Serialize for TheseusSerializableError
+#[cfg(not(feature = "updater"))]
 impl_serialize! {
     IO,
     Tauri,
+}
+
+#[cfg(feature = "updater")]
+impl_serialize! {
+    IO,
+    Tauri,
+    TauriUpdater,
 }

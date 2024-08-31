@@ -884,6 +884,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
     height: fit-content;
     min-height: calc(100vh - 3.25rem);
     max-height: calc(100vh - 3.25rem);
+    width: 20rem;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -902,8 +903,8 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
   }
 
   .search {
-    margin: 0 1rem 0.5rem calc(300px + 2.5rem);
-    width: calc(100% - calc(300px + 2.5rem));
+    margin: 0 1rem 0.5rem calc(20rem + 1rem);
+    width: calc(100% - calc(20rem + 1rem));
 
     .offline {
       margin: 1rem;

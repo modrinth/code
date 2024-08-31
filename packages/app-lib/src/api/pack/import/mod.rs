@@ -287,7 +287,7 @@ pub async fn copy_dotminecraft(
 
         fetch::copy(&src_child, &dst_child, io_semaphore).await?;
 
-        emit_loading(&loading_bar, 1.0, None).await?;
+        emit_loading(&loading_bar, 1.0, None)?;
     }
     Ok(loading_bar)
 }
