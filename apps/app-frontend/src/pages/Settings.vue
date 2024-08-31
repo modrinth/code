@@ -1,17 +1,24 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { LogOutIcon, LogInIcon, BoxIcon, FolderSearchIcon, TrashIcon } from '@modrinth/assets'
-import { Card, Slider, DropdownSelect, Toggle, ConfirmModal, Button } from '@modrinth/ui'
+import { Card, Slider, DropdownSelect, Toggle, Button } from '@modrinth/ui'
 import { handleError, useTheming } from '@/store/state'
 import { get_java_versions, get_max_memory, set_java_version } from '@/helpers/jre'
 import { get as getCreds, logout } from '@/helpers/mr_auth.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import ModrinthLoginScreen from '@/components/ui/tutorial/ModrinthLoginScreen.vue'
-import { open } from '@tauri-apps/api/dialog'
+import { optOutAnalytics, optInAnalytics } from '@/helpers/analytics'
+import { open } from '@tauri-apps/plugin-dialog'
 import { getOS } from '@/helpers/utils.js'
 import { getVersion } from '@tauri-apps/api/app'
 import { useSettings } from '@/composables/useSettings.js'
 import { get_user, purge_cache_types } from '@/helpers/cache.js'
+import { hide_ads_window } from '@/helpers/ads.js'
+import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
+
+onMounted(() => {
+  hide_ads_window()
+})
 
 const pageOptions = ['Home', 'Library']
 
@@ -22,6 +29,47 @@ const version = await getVersion()
 const settings = await useSettings()
 
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
+
+watch(
+  settings,
+  async (oldSettings, newSettings) => {
+    if (oldSettings.loaded_config_dir !== newSettings.loaded_config_dir) {
+      return
+    }
+
+    const setSettings = JSON.parse(JSON.stringify(newSettings))
+
+    if (setSettings.telemetry) {
+      optInAnalytics()
+    } else {
+      optOutAnalytics()
+    }
+
+    setSettings.extra_launch_args = setSettings.launchArgs.trim().split(/\s+/).filter(Boolean)
+    setSettings.custom_env_vars = setSettings.envVars
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((x) => x.split('=').filter(Boolean))
+
+    if (!setSettings.hooks.pre_launch) {
+      setSettings.hooks.pre_launch = null
+    }
+    if (!setSettings.hooks.wrapper) {
+      setSettings.hooks.wrapper = null
+    }
+    if (!setSettings.hooks.post_exit) {
+      setSettings.hooks.post_exit = null
+    }
+
+    if (!setSettings.custom_dir) {
+      setSettings.custom_dir = null
+    }
+
+    await set(setSettings)
+  },
+  { deep: true },
+)
 
 const javaVersions = ref(await get_java_versions().catch(handleError))
 
@@ -39,7 +87,6 @@ async function updateJavaVersion(version) {
 
 async function fetchCredentials() {
   const creds = await getCreds().catch(handleError)
-  console.log(creds)
   if (creds && creds.user_id) {
     creds.user = await get_user(creds.user_id).catch(handleError)
   }
@@ -118,13 +165,12 @@ async function purgeCache() {
           Sign in
         </button>
       </div>
-      <ConfirmModal
+      <ConfirmModalWrapper
         ref="purgeCacheConfirmModal"
         title="Are you sure you want to purge the cache?"
         description="If you proceed, your entire cache will be purged. This may slow down the app temporarily."
         :has-to-type="false"
         proceed-label="Purge cache"
-        :noblur="!themeStore.advancedRendering"
         @proceed="purgeCache"
       />
       <div class="adjacent-input">

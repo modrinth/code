@@ -213,9 +213,9 @@
             class="mod-content"
           >
             <Avatar :src="mod.icon" />
-            <div v-tooltip="`${mod.name} by ${mod.author}`" class="mod-text">
+            <div class="mod-text">
               <div class="title">{{ mod.name }}</div>
-              <span class="no-wrap">by {{ mod.author }}</span>
+              <span v-if="mod.author" class="no-wrap">by {{ mod.author }}</span>
             </div>
           </router-link>
           <div v-else class="mod-content">
@@ -284,7 +284,7 @@
     :link-function="(page) => `?page=${page}`"
     @switch-page="switchPage"
   />
-  <Modal ref="deleteWarning" header="Are you sure?">
+  <ModalWrapper ref="deleteWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -302,8 +302,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <Modal ref="deleteDisabledWarning" header="Are you sure?">
+  </ModalWrapper>
+  <ModalWrapper ref="deleteDisabledWarning" header="Are you sure?">
     <div class="modal-body">
       <div class="markdown-body">
         <p>
@@ -325,8 +325,8 @@
         </Button>
       </div>
     </div>
-  </Modal>
-  <ShareModal
+  </ModalWrapper>
+  <ShareModalWrapper
     ref="shareModal"
     share-title="Sharing modpack content"
     share-text="Check out the projects I'm using in my modpack!"
@@ -360,8 +360,6 @@ import {
 import {
   Pagination,
   DropdownSelect,
-  ShareModal,
-  Modal,
   Checkbox,
   AnimatedLogo,
   Avatar,
@@ -372,7 +370,6 @@ import { formatProjectType } from '@modrinth/utils'
 import { computed, onUnmounted, ref, watch } from 'vue'
 import {
   add_project_from_path,
-  get,
   get_projects,
   remove_project,
   toggle_disable_project,
@@ -380,7 +377,7 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import { mixpanel_track } from '@/helpers/mixpanel'
+import { trackEvent } from '@/helpers/analytics'
 import { listen } from '@tauri-apps/api/event'
 import { highlightModInProfile } from '@/helpers/utils.js'
 import { MenuIcon, ToggleIcon, TextInputIcon, AddProjectImage, PackageIcon } from '@/assets/icons'
@@ -394,6 +391,8 @@ import {
   get_version_many,
 } from '@/helpers/cache.js'
 import { profile_listener } from '@/helpers/events.js'
+import ModalWrapper from '@/components/ui/modal/ModalWrapper.vue'
+import ShareModalWrapper from '@/components/ui/modal/ShareModalWrapper.vue'
 
 const props = defineProps({
   instance: {
@@ -477,41 +476,54 @@ const initProjects = async (cacheBehaviour) => {
     if (file.metadata) {
       const project = modrinthProjects.find((x) => file.metadata.project_id === x.id)
       const version = modrinthVersions.find((x) => file.metadata.version_id === x.id)
-      const org = project.organization
-        ? modrinthOrganizations.find((x) => x.id === project.organization)
-        : null
 
-      const team = modrinthTeams.find((x) => x[0].team_id === project.team)
+      if (project && version) {
+        const org = project.organization
+          ? modrinthOrganizations.find((x) => x.id === project.organization)
+          : null
 
-      let owner = org ? org.name : team.find((x) => x.is_owner).user.username
+        const team = modrinthTeams.find((x) => x[0].team_id === project.team)
 
-      newProjects.push({
-        path,
-        name: project.title,
-        slug: project.slug,
-        author: owner,
-        version: version.version_number,
-        file_name: file.file_name,
-        icon: project.icon_url,
-        disabled: file.file_name.endsWith('.disabled'),
-        updateVersion: file.update_version_id,
-        outdated: !!file.update_version_id,
-        project_type: project.project_type,
-        id: project.id,
-      })
-    } else {
-      newProjects.push({
-        path,
-        name: file.file_name.replace('.disabled', ''),
-        author: '',
-        version: null,
-        file_name: file.file_name,
-        icon: null,
-        disabled: file.file_name.endsWith('.disabled'),
-        outdated: false,
-        project_type: file.project_type,
-      })
+        let owner
+
+        if (org) {
+          owner = org.name
+        } else if (team) {
+          owner = team.find((x) => x.is_owner).user.username
+        } else {
+          owner = null
+        }
+
+        newProjects.push({
+          path,
+          name: project.title,
+          slug: project.slug,
+          author: owner,
+          version: version.version_number,
+          file_name: file.file_name,
+          icon: project.icon_url,
+          disabled: file.file_name.endsWith('.disabled'),
+          updateVersion: file.update_version_id,
+          outdated: !!file.update_version_id,
+          project_type: project.project_type,
+          id: project.id,
+        })
+      }
+
+      continue
     }
+
+    newProjects.push({
+      path,
+      name: file.file_name.replace('.disabled', ''),
+      author: '',
+      version: null,
+      file_name: file.file_name,
+      icon: null,
+      disabled: file.file_name.endsWith('.disabled'),
+      outdated: false,
+      project_type: file.project_type,
+    })
   }
 
   projects.value = newProjects
@@ -670,7 +682,7 @@ const updateAll = async () => {
     projects.value[project].updating = false
   }
 
-  mixpanel_track('InstanceUpdateAll', {
+  trackEvent('InstanceUpdateAll', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     count: setProjects.length,
@@ -696,7 +708,7 @@ const updateProject = async (mod) => {
   mod.version = mod.updateVersion.version_number
   mod.updateVersion = null
 
-  mixpanel_track('InstanceProjectUpdate', {
+  trackEvent('InstanceProjectUpdate', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     id: mod.id,
@@ -723,7 +735,7 @@ const toggleDisableMod = async (mod) => {
     .then((newPath) => {
       mod.path = newPath
       mod.disabled = !mod.disabled
-      mixpanel_track('InstanceProjectDisable', {
+      trackEvent('InstanceProjectDisable', {
         loader: props.instance.loader,
         game_version: props.instance.game_version,
         id: mod.id,
@@ -744,7 +756,7 @@ const removeMod = async (mod) => {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 
-  mixpanel_track('InstanceProjectRemove', {
+  trackEvent('InstanceProjectRemove', {
     loader: props.instance.loader,
     game_version: props.instance.game_version,
     id: mod.id,
@@ -772,6 +784,7 @@ const deleteDisabled = async () => {
 }
 
 const shareNames = async () => {
+  console.log(functionValues.value)
   await shareModal.value.show(functionValues.value.map((x) => x.name).join('\n'))
 }
 

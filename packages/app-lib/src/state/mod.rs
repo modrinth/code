@@ -72,7 +72,11 @@ impl State {
             .await?;
 
         tokio::task::spawn(async move {
-            let res = state.discord_rpc.clear_to_default(true).await;
+            let res = tokio::try_join!(
+                state.discord_rpc.clear_to_default(true),
+                Profile::refresh_all(),
+                ModrinthCredentials::refresh_all(),
+            );
 
             if let Err(e) = res {
                 tracing::error!("Error running discord RPC: {e}");

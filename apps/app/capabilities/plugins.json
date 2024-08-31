@@ -1,0 +1,41 @@
+{
+  "identifier": "plugins",
+  "description": "",
+  "local": true,
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "dialog:allow-open",
+    "dialog:allow-confirm",
+    "shell:allow-open",
+    "os:allow-platform",
+    "os:allow-version",
+    "os:allow-os-type",
+    "os:allow-family",
+    "os:allow-arch",
+    "os:allow-exe-extension",
+    "os:allow-locale",
+    "os:allow-hostname",
+    "deep-link:default",
+    "window-state:default",
+    "window-state:allow-restore-state",
+    "window-state:allow-save-window-state",
+
+    "auth:default",
+    "import:default",
+    "jre:default",
+    "logs:default",
+    "metadata:default",
+    "mr-auth:default",
+    "profile-create:default",
+    "pack:default",
+    "process:default",
+    "profile:default",
+    "cache:default",
+    "settings:default",
+    "tags:default",
+    "utils:default",
+    "ads:default"
+  ]
+}

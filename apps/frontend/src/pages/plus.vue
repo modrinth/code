@@ -3,7 +3,7 @@
     ref="purchaseModal"
     :product="midasProduct"
     :country="country"
-    publishable-key="pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b"
+    :publishable-key="config.public.stripePublishableKey"
     :send-billing-request="
       async (body) =>
         await useBaseFetch('billing/payment', { internal: true, method: 'POST', body })
@@ -44,7 +44,7 @@
         to="/settings/billing"
         class="btn btn-purple btn-large"
       >
-        <SettingsIcon />
+        <SettingsIcon aria-hidden="true" />
         Manage subscription
       </nuxt-link>
       <button v-else-if="auth.user" class="btn btn-purple btn-large" @click="purchaseModal.show()">
@@ -108,6 +108,16 @@ useSeoMeta({
   ogDescription: description,
 });
 
+useHead({
+  script: [
+    {
+      src: "https://js.stripe.com/v3/",
+      defer: true,
+      async: true,
+    },
+  ],
+});
+
 const vintl = useVIntl();
 
 const data = useNuxtApp();
@@ -141,7 +151,7 @@ onMounted(() => {
 .main-hero {
   background: linear-gradient(360deg, rgba(199, 138, 255, 0.2) 10.92%, var(--color-bg) 100%),
     var(--color-accent-contrast);
-  margin-top: -4rem;
+  margin-top: -5rem;
   padding: 11.25rem 1rem 8rem;
 
   display: flex;

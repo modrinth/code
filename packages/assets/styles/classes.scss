@@ -476,6 +476,11 @@ a,
     }
   }
 
+  &.btn-large-round {
+    padding: 0.75rem;
+    border-radius: 50%;
+  }
+
   &.btn-dropdown-animation {
     svg:last-child {
       transition: transform 0.125s ease-in-out;
@@ -851,6 +856,10 @@ a,
     line-height: 1.5;
   }
 
+  h1 {
+    display: block;
+  }
+
   h1,
   h2 {
     padding: 10px 0 5px;
@@ -877,7 +886,7 @@ a,
 
   a {
     cursor: pointer;
-    color: var(--color-link);
+    color: var(--color-blue);
 
     &:focus-visible,
     &:hover {
@@ -1085,7 +1094,8 @@ select {
     box-shadow: var(--shadow-inset-sm);
     border: none;
     cursor: pointer;
-    padding-left: 0.5rem;
+    padding-left: 7px;
+    padding-top: 10px;
     font-size: 1rem;
 
     transition: background-color 0.1s ease-in-out;

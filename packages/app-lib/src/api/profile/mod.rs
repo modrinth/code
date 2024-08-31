@@ -510,12 +510,14 @@ pub async fn export_mrpack(
     // Iterate over every file in the folder
     // Every file that is NOT in the config file is added to the zip, in overrides
     for path in path_list {
-        emit_loading(&loading_bar, 1.0, None).await?;
+        emit_loading(&loading_bar, 1.0, None)?;
 
         let relative_path = pack_get_relative_path(&profile_base_path, &path)?;
 
         if packfile.files.iter().any(|f| f.path == relative_path)
-            || !included_candidates_set.contains(&relative_path)
+            || !included_candidates_set
+                .iter()
+                .any(|x| relative_path.starts_with(&**x))
         {
             continue;
         }

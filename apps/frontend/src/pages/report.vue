@@ -82,7 +82,7 @@
             :disabled="submitLoading || !canSubmit"
             @click="submitReport"
           >
-            <SaveIcon />
+            <SaveIcon aria-hidden="true" />
             Submit
           </Button>
         </div>

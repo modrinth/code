@@ -13,7 +13,8 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
         .invoke_handler(tauri::generate_handler![
             get_os,
             should_disable_mouseover,
-            show_in_folder,
+            highlight_in_folder,
+            open_path,
             show_launcher_logs_folder,
             progress_bars_list,
             get_opening_command
@@ -72,11 +73,20 @@ pub async fn should_disable_mouseover() -> bool {
 }
 
 #[tauri::command]
-pub fn show_in_folder(path: PathBuf) {
+pub fn highlight_in_folder(path: PathBuf) {
     let res = opener::reveal(path);
 
     if let Err(e) = res {
-        tracing::error!("Failed to open folder: {}", e);
+        tracing::error!("Failed to highlight file in folder: {}", e);
+    }
+}
+
+#[tauri::command]
+pub fn open_path(path: PathBuf) {
+    let res = opener::open(path);
+
+    if let Err(e) = res {
+        tracing::error!("Failed to open path: {}", e);
     }
 }
 
@@ -85,7 +95,7 @@ pub fn show_launcher_logs_folder() {
     let path = DirectoryInfo::launcher_logs_dir().unwrap_or_default();
     // failure to get folder just opens filesystem
     // (ie: if in debug mode only and launcher_logs never created)
-    show_in_folder(path);
+    open_path(path);
 }
 
 // Get opening command
@@ -127,5 +137,6 @@ pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
 // helper function called when redirected by a weblink (ie: modrith://do-something) or when redirected by a .mrpack file (in which case its a filepath)
 // We hijack the deep link library (which also contains functionality for instance-checking)
 pub async fn handle_command(command: String) -> Result<()> {
+    tracing::info!("handle command: {command}");
     Ok(theseus::handler::parse_and_emit_command(&command).await?)
 }

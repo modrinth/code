@@ -203,7 +203,7 @@ pub async fn install_zipped_mrpack_files(
         )
         .await?;
 
-        emit_loading(&loading_bar, 0.0, Some("Extracting overrides")).await?;
+        emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))?;
 
         let mut total_len = 0;
 
@@ -270,8 +270,7 @@ pub async fn install_zipped_mrpack_files(
                         "Extracting override {}/{}",
                         index, total_len
                     )),
-                )
-                .await?;
+                )?;
             }
         }
 

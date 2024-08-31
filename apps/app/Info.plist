@@ -6,63 +6,17 @@
         <array>
             <dict>
                 <key>CFBundleURLName</key>
-                <!-- Obviously needs to be replaced with your app's bundle identifier -->
                 <string>ModrinthApp</string>
                 <key>CFBundleURLSchemes</key>
                 <array>
-                    <!-- register the myapp:// and myscheme:// schemes -->
                     <string>modrinth</string>
+                    <string>modrinthscheme</string>
                 </array>
             </dict>
         </array>
-        <!-- Declare file types your app can open -->
-        <key>CFBundleDocumentTypes</key>
-    	<array>
-    		<dict>
-    			<key>CFBundleTypeName</key>
-    			<string>Modrinth type</string>
-    			<key>CFBundleTypeRole</key>
-    			<string>Editor</string>
-    			<key>LSHandlerRank</key>
-    			<string>Owner</string>
-    			<key>LSItemContentTypes</key>
-    			<array>
-    				<string>com.modrinth.theseus-type</string>
-    			</array>
-    			<key>NSDocumentClass</key>
-    			<string>NSDocument</string>
-    		</dict>
-    	</array>
-    	<key>UTImportedTypeDeclarations</key>
-    	<array>
-    		<dict>
-    			<key>UTTypeConformsTo</key>
-    			<array>
-    				<string>public.data</string>
-    			</array>
-    			<key>UTTypeDescription</key>
-    			<string>Modrinth File</string>
-    			<key>UTTypeIcons</key>
-    			<dict/>
-    			<key>UTTypeIdentifier</key>
-    			<string>com.modrinth.theseus-type</string>
-    			<key>UTTypeTagSpecification</key>
-    			<dict>
-    				<key>public.filename-extension</key>
-    				<array>
-    					<string>mrpack</string>
-    				</array>
-    				<key>public.mime-type</key>
-    				<array>
-    					<string>application/x-mrpack</string>
-    				</array>
-    			</dict>
-    		</dict>
-    	</array>
-		<key>NSCameraUsageDescription</key>
-		<string>A Minecraft mod wants to access your camera.</string>
-		<key>NSMicrophoneUsageDescription</key>
-		<string>A Minecraft mod wants to access your microphone.</string>
-
+        <key>NSCameraUsageDescription</key>
+        <string>A Minecraft mod wants to access your camera.</string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>A Minecraft mod wants to access your microphone.</string>
     </dict>
 </plist>

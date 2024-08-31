@@ -1,161 +1,220 @@
 <template>
-  <div
-    v-if="
-      loaderFilters.length > 1 || gameVersionFilters.length > 1 || versionTypeFilters.length > 1
-    "
-    class="card search-controls"
-  >
-    <Multiselect
-      v-if="loaderFilters.length > 1"
-      v-model="selectedLoaders"
-      :options="loaderFilters"
-      :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-      :multiple="true"
-      :searchable="false"
-      :show-no-results="false"
-      :close-on-select="true"
-      :clear-search-on-select="false"
-      :show-labels="false"
-      :allow-empty="true"
-      placeholder="Filter loader..."
-      @update:model-value="updateQuery"
-    />
-    <Multiselect
-      v-if="gameVersionFilters.length > 1"
-      v-model="selectedGameVersions"
-      :options="
-        includeSnapshots
-          ? gameVersionFilters.map((x) => x.version)
-          : gameVersionFilters.filter((it) => it.version_type === 'release').map((x) => x.version)
-      "
-      :multiple="true"
-      :searchable="true"
-      :show-no-results="false"
-      :close-on-select="false"
-      :show-labels="false"
-      :hide-selected="true"
-      :selectable="() => selectedGameVersions.length <= 6"
-      placeholder="Filter versions..."
-      @update:model-value="updateQuery"
-    />
-    <Multiselect
-      v-if="versionTypeFilters.length > 1"
-      v-model="selectedVersionTypes"
-      :options="versionTypeFilters"
-      :custom-label="(x) => $capitalizeString(x)"
-      :multiple="true"
-      :searchable="false"
-      :show-no-results="false"
-      :close-on-select="true"
-      :clear-search-on-select="false"
-      :show-labels="false"
-      :allow-empty="true"
-      placeholder="Filter channels..."
-      @update:model-value="updateQuery"
-    />
-    <Checkbox
-      v-if="
-        gameVersionFilters.length > 1 &&
-        gameVersionFilters.some((v) => v.version_type !== 'release')
-      "
-      v-model="includeSnapshots"
-      label="Show all versions"
-      description="Show all versions"
-      :border="false"
-      @update:model-value="updateQuery"
-    />
-    <button
-      title="Clear filters"
-      :disabled="selectedLoaders.length === 0 && selectedGameVersions.length === 0"
-      class="iconified-button"
-      @click="
-        () => {
-          selectedLoaders = [];
-          selectedGameVersions = [];
-          selectedVersionTypes = [];
-          updateQuery();
-        }
-      "
-    >
-      <ClearIcon />
-      Clear filters
-    </button>
+  <div class="experimental-styles-within flex flex-col gap-3">
+    <div class="flex flex-wrap items-center gap-2">
+      <ManySelect
+        v-model="selectedPlatforms"
+        :options="filterOptions.platform"
+        @change="updateFilters"
+      >
+        <FilterIcon class="h-5 w-5 text-secondary" />
+        Platform
+        <template #option="{ option }">
+          {{ formatCategory(option) }}
+        </template>
+      </ManySelect>
+      <ManySelect
+        v-model="selectedGameVersions"
+        :options="filterOptions.gameVersion"
+        search
+        @change="updateFilters"
+      >
+        <FilterIcon class="h-5 w-5 text-secondary" />
+        Game versions
+        <template #footer>
+          <Checkbox v-model="showSnapshots" class="mx-1" :label="`Show all versions`" />
+        </template>
+      </ManySelect>
+      <ManySelect
+        v-model="selectedChannels"
+        :options="filterOptions.channel"
+        @change="updateFilters"
+      >
+        <FilterIcon class="h-5 w-5 text-secondary" />
+        Channels
+        <template #option="{ option }">
+          {{ option === "release" ? "Release" : option === "beta" ? "Beta" : "Alpha" }}
+        </template>
+      </ManySelect>
+    </div>
+    <div class="flex flex-wrap items-center gap-1 empty:hidden">
+      <button
+        v-if="selectedChannels.length + selectedGameVersions.length + selectedPlatforms.length > 1"
+        class="tag-list__item text-contrast transition-transform active:scale-[0.95]"
+        @click="clearFilters"
+      >
+        <XCircleIcon />
+        Clear all filters
+      </button>
+      <button
+        v-for="channel in selectedChannels"
+        :key="`remove-filter-${channel}`"
+        class="tag-list__item transition-transform active:scale-[0.95]"
+        :style="`--_color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'});--_bg-color: var(--color-${channel === 'alpha' ? 'red' : channel === 'beta' ? 'orange' : 'green'}-highlight)`"
+        @click="toggleFilter('channel', channel)"
+      >
+        <XIcon />
+        {{ channel.slice(0, 1).toUpperCase() + channel.slice(1) }}
+      </button>
+      <button
+        v-for="version in selectedGameVersions"
+        :key="`remove-filter-${version}`"
+        class="tag-list__item transition-transform active:scale-[0.95]"
+        @click="toggleFilter('gameVersion', version)"
+      >
+        <XIcon />
+        {{ version }}
+      </button>
+      <button
+        v-for="platform in selectedPlatforms"
+        :key="`remove-filter-${platform}`"
+        class="tag-list__item transition-transform active:scale-[0.95]"
+        :style="`--_color: var(--color-platform-${platform})`"
+        @click="toggleFilter('platform', platform)"
+      >
+        <XIcon />
+        {{ formatCategory(platform) }}
+      </button>
+    </div>
   </div>
 </template>
 
-<script setup>
-import { Multiselect } from "vue-multiselect";
-import Checkbox from "~/components/ui/Checkbox.vue";
-import ClearIcon from "~/assets/images/utils/clear.svg?component";
+<script setup lang="ts">
+import { FilterIcon, XCircleIcon, XIcon } from "@modrinth/assets";
+import { ManySelect, Checkbox } from "@modrinth/ui";
+import { formatCategory } from "@modrinth/utils";
+import type { ModrinthVersion } from "@modrinth/utils";
 
-const props = defineProps({
-  versions: {
-    type: Array,
-    default() {
-      return [];
-    },
-  },
-});
+const props = defineProps<{ versions: ModrinthVersion[] }>();
+
 const emit = defineEmits(["switch-page"]);
 
-const router = useNativeRouter();
+const allChannels = ref(["release", "beta", "alpha"]);
+
 const route = useNativeRoute();
+const router = useNativeRouter();
 
 const tags = useTags();
 
-const tempLoaders = new Set();
-let tempVersions = new Set();
-const tempReleaseChannels = new Set();
+const showSnapshots = ref(false);
 
-for (const version of props.versions) {
-  for (const loader of version.loaders) {
-    tempLoaders.add(loader);
+type FilterType = "channel" | "gameVersion" | "platform";
+type Filter = string;
+
+const filterOptions = computed(() => {
+  const filters: Record<FilterType, Filter[]> = {
+    channel: [],
+    gameVersion: [],
+    platform: [],
+  };
+
+  const platformSet = new Set();
+  const gameVersionSet = new Set();
+  const channelSet = new Set();
+
+  for (const version of props.versions) {
+    for (const loader of version.loaders) {
+      platformSet.add(loader);
+    }
+    for (const gameVersion of version.game_versions) {
+      gameVersionSet.add(gameVersion);
+    }
+    channelSet.add(version.version_type);
   }
-  for (const gameVersion of version.game_versions) {
-    tempVersions.add(gameVersion);
+
+  if (channelSet.size > 0) {
+    filters.channel = Array.from(channelSet) as Filter[];
+    filters.channel.sort((a, b) => allChannels.value.indexOf(a) - allChannels.value.indexOf(b));
   }
-  tempReleaseChannels.add(version.version_type);
-}
+  if (gameVersionSet.size > 0) {
+    const gameVersions = tags.value.gameVersions.filter((x) => gameVersionSet.has(x.version));
 
-tempVersions = Array.from(tempVersions);
+    filters.gameVersion = gameVersions
+      .filter((x) => (showSnapshots.value ? true : x.version_type === "release"))
+      .map((x) => x.version);
+  }
+  if (platformSet.size > 0) {
+    filters.platform = Array.from(platformSet) as Filter[];
+  }
 
-const loaderFilters = shallowRef(Array.from(tempLoaders));
-const gameVersionFilters = shallowRef(
-  tags.value.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version)),
-);
-const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels));
-const includeSnapshots = ref(route.query.s === "true");
+  return filters;
+});
 
-const selectedGameVersions = shallowRef(getArrayOrString(route.query.g) ?? []);
-const selectedLoaders = shallowRef(getArrayOrString(route.query.l) ?? []);
-const selectedVersionTypes = shallowRef(getArrayOrString(route.query.c) ?? []);
+const selectedChannels = ref<string[]>([]);
+const selectedGameVersions = ref<string[]>([]);
+const selectedPlatforms = ref<string[]>([]);
 
-async function updateQuery() {
+selectedChannels.value = route.query.c ? getArrayOrString(route.query.c) : [];
+selectedGameVersions.value = route.query.g ? getArrayOrString(route.query.g) : [];
+selectedPlatforms.value = route.query.l ? getArrayOrString(route.query.l) : [];
+
+async function toggleFilters(type: FilterType, filters: Filter[]) {
+  for (const filter of filters) {
+    await toggleFilter(type, filter);
+  }
+
   await router.replace({
     query: {
       ...route.query,
-      l: selectedLoaders.value.length === 0 ? undefined : selectedLoaders.value,
-      g: selectedGameVersions.value.length === 0 ? undefined : selectedGameVersions.value,
-      c: selectedVersionTypes.value.length === 0 ? undefined : selectedVersionTypes.value,
-      s: includeSnapshots.value ? true : undefined,
+      c: selectedChannels.value,
+      g: selectedGameVersions.value,
+      l: selectedPlatforms.value,
     },
   });
+
   emit("switch-page", 1);
 }
-</script>
 
-<style lang="scss" scoped>
-.search-controls {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-card-md);
-  align-items: center;
-  flex-wrap: wrap;
-  .multiselect {
-    flex: 1;
+async function toggleFilter(type: FilterType, filter: Filter, skipRouter = false) {
+  if (type === "channel") {
+    selectedChannels.value = selectedChannels.value.includes(filter)
+      ? selectedChannels.value.filter((x) => x !== filter)
+      : [...selectedChannels.value, filter];
+  } else if (type === "gameVersion") {
+    selectedGameVersions.value = selectedGameVersions.value.includes(filter)
+      ? selectedGameVersions.value.filter((x) => x !== filter)
+      : [...selectedGameVersions.value, filter];
+  } else if (type === "platform") {
+    selectedPlatforms.value = selectedPlatforms.value.includes(filter)
+      ? selectedPlatforms.value.filter((x) => x !== filter)
+      : [...selectedPlatforms.value, filter];
   }
-  .checkbox-outer {
-    min-width: fit-content;
+  if (!skipRouter) {
+    await updateFilters();
   }
 }
-</style>
+
+async function updateFilters() {
+  await router.replace({
+    query: {
+      ...route.query,
+      c: selectedChannels.value,
+      g: selectedGameVersions.value,
+      l: selectedPlatforms.value,
+    },
+  });
+
+  emit("switch-page", 1);
+}
+
+async function clearFilters() {
+  selectedChannels.value = [];
+  selectedGameVersions.value = [];
+  selectedPlatforms.value = [];
+
+  await router.replace({
+    query: {
+      ...route.query,
+      c: undefined,
+      g: undefined,
+      l: undefined,
+    },
+  });
+
+  emit("switch-page", 1);
+}
+
+defineExpose({
+  toggleFilter,
+  toggleFilters,
+});
+</script>

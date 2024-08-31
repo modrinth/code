@@ -5,33 +5,33 @@
         <h1>Dashboard</h1>
         <NavStack>
           <NavStackItem link="/dashboard" label="Overview">
-            <DashboardIcon />
+            <DashboardIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/notifications" label="Notifications">
-            <NotificationsIcon />
+            <NotificationsIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/reports" label="Active reports">
-            <ReportIcon />
+            <ReportIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/analytics" label="Analytics">
-            <ChartIcon />
+            <ChartIcon aria-hidden="true" />
           </NavStackItem>
 
           <h3>Manage</h3>
           <NavStackItem v-if="true" link="/dashboard/projects" label="Projects">
-            <ListIcon />
+            <ListIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem v-if="true" link="/dashboard/organizations" label="Organizations">
-            <OrganizationIcon />
+            <OrganizationIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem
             link="/dashboard/collections"
             :label="formatMessage(commonMessages.collectionsLabel)"
           >
-            <LibraryIcon />
+            <LibraryIcon aria-hidden="true" />
           </NavStackItem>
           <NavStackItem link="/dashboard/revenue" label="Revenue">
-            <CurrencyIcon />
+            <CurrencyIcon aria-hidden="true" />
           </NavStackItem>
         </NavStack>
       </aside>

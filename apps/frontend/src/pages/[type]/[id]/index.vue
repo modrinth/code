@@ -1,23 +1,40 @@
 <template>
-  <div
-    v-if="project.body"
-    class="markdown-body card"
-    v-html="renderHighlightedString(project.body || '')"
-  />
+  <section class="normal-page__content">
+    <div
+      v-if="project.body"
+      class="markdown-body card"
+      v-html="renderHighlightedString(project.body || '')"
+    />
+  </section>
 </template>
 
-<script>
+<script setup>
 import { renderHighlightedString } from "~/helpers/highlight.js";
 
-export default defineNuxtComponent({
-  props: {
-    project: {
-      type: Object,
-      default() {
-        return {};
-      },
+defineProps({
+  project: {
+    type: Object,
+    default() {
+      return {};
     },
   },
-  methods: { renderHighlightedString },
+  versions: {
+    type: Array,
+    default() {
+      return {};
+    },
+  },
+  members: {
+    type: Array,
+    default() {
+      return {};
+    },
+  },
+  organization: {
+    type: Object,
+    default() {
+      return {};
+    },
+  },
 });
 </script>

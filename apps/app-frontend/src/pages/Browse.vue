@@ -6,7 +6,6 @@ import {
   Checkbox,
   Button,
   DropdownSelect,
-  Promotion,
   NavRow,
   Card,
   SearchFilter,
@@ -20,9 +19,11 @@ import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import { get as getInstance, get_projects as getInstanceProjects } from '@/helpers/profile.js'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { convertFileSrc } from '@tauri-apps/api/core'
 import { get_search_results } from '@/helpers/cache.js'
 import { debounce } from '@/helpers/utils.js'
+import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
+
 const router = useRouter()
 const route = useRoute()
 
@@ -527,7 +528,8 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
 
 <template>
   <div ref="searchWrapper" class="search-container">
-    <aside class="filter-panel">
+    <aside class="filter-panel" @scroll="$refs.promo.scroll()">
+      <PromotionWrapper ref="promo" />
       <Card v-if="instanceContext" class="small-instance">
         <router-link :to="`/instance/${encodeURIComponent(instanceContext.path)}`" class="instance">
           <Avatar
@@ -674,8 +676,7 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
       </Card>
     </aside>
     <div class="search">
-      <Promotion class="promotion" :external="false" query-param="?r=launcher" />
-      <Card class="project-type-container">
+      <Card class="project-type-container mt-4">
         <NavRow :links="selectableProjectTypes" />
       </Card>
       <Card class="search-panel-container">
@@ -877,13 +878,13 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
 
   .filter-panel {
     position: fixed;
-    width: 20rem;
     padding: 1rem 0.5rem 1rem 1rem;
     display: flex;
     flex-direction: column;
     height: fit-content;
     min-height: calc(100vh - 3.25rem);
     max-height: calc(100vh - 3.25rem);
+    width: 20rem;
     overflow-y: auto;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -902,8 +903,8 @@ const isModProject = computed(() => ['modpack', 'mod'].includes(projectType.valu
   }
 
   .search {
-    margin: 0 1rem 0.5rem 20.5rem;
-    width: calc(100% - 20.5rem);
+    margin: 0 1rem 0.5rem calc(20rem + 1rem);
+    width: calc(100% - calc(20rem + 1rem));
 
     .offline {
       margin: 1rem;

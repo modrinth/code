@@ -28,7 +28,7 @@
         <p>All permission checks complete!</p>
         <div class="input-group modpack-buttons">
           <button class="btn" @click="modPackIndex -= 1">
-            <LeftArrowIcon />
+            <LeftArrowIcon aria-hidden="true" />
             Previous
           </button>
         </div>
@@ -142,7 +142,7 @@
         </div>
         <div class="input-group modpack-buttons">
           <button class="btn" :disabled="modPackIndex <= 0" @click="modPackIndex -= 1">
-            <LeftArrowIcon />
+            <LeftArrowIcon aria-hidden="true" />
             Previous
           </button>
           <button
@@ -150,7 +150,7 @@
             :disabled="!modPackData[modPackIndex].status"
             @click="modPackIndex += 1"
           >
-            <RightArrowIcon />
+            <RightArrowIcon aria-hidden="true" />
             Next project
           </button>
         </div>
@@ -273,20 +273,20 @@
       </div>
     </div>
     <div class="input-group modpack-buttons">
-      <button v-if="!done" class="btn skip-btn" @click="goToNextProject">
-        <ExitIcon />
+      <button v-if="!done" class="btn skip-btn" aria-label="Skip" @click="goToNextProject">
+        <ExitIcon aria-hidden="true" />
         <template v-if="futureProjects.length > 0">Skip</template>
         <template v-else>Exit</template>
       </button>
       <button v-if="currentStepIndex > 0" class="btn" @click="previousPage() && !done">
-        <LeftArrowIcon /> Previous
+        <LeftArrowIcon aria-hidden="true" /> Previous
       </button>
       <button
         v-if="currentStepIndex < steps.length - 1 && !done"
         class="btn btn-primary"
         @click="nextPage()"
       >
-        <RightArrowIcon /> Next
+        <RightArrowIcon aria-hidden="true" /> Next
       </button>
       <button
         v-else-if="!generatedMessage"
@@ -294,20 +294,18 @@
         :disabled="loadingMessage"
         @click="generateMessage"
       >
-        <UpdatedIcon /> Generate message
+        <UpdatedIcon aria-hidden="true" /> Generate message
       </button>
       <template v-if="generatedMessage && !done">
         <button class="btn btn-green" @click="sendMessage(project.requested_status ?? 'approved')">
-          <CheckIcon /> Approve
+          <CheckIcon aria-hidden="true" /> Approve
         </button>
         <div class="joined-buttons">
           <button class="btn btn-danger" @click="sendMessage('rejected')">
-            <CrossIcon /> Reject
+            <CrossIcon aria-hidden="true" /> Reject
           </button>
           <OverflowMenu
             class="btn btn-danger btn-dropdown-animation icon-only"
-            position="top"
-            direction="left"
             :options="[
               {
                 id: 'withhold',
@@ -318,7 +316,7 @@
             ]"
           >
             <DropdownIcon style="rotate: 180deg" />
-            <template #withhold> <EyeOffIcon /> Withhold </template>
+            <template #withhold> <EyeOffIcon aria-hidden="true" /> Withhold </template>
           </OverflowMenu>
         </div>
       </template>

@@ -14,17 +14,20 @@
         "RATE_LIMIT_IGNORE_KEY",
         "VERCEL_*",
         "CF_PAGES_*",
-        "HEROKU_APP_NAME"
+        "HEROKU_APP_NAME",
+        "STRIPE_PUBLISHABLE_KEY"
       ]
     },
     "lint": {},
     "dev": {
       "cache": false,
       "persistent": true,
-      "env": [
-        "*"
-      ]
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "env": ["DISPLAY", "WEBKIT_DISABLE_DMABUF_RENDERER"]
     },
-    "test": {}
+    "test": {},
+    "fix": {
+      "cache": false
+    }
   }
 }

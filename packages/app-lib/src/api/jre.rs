@@ -68,7 +68,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
         pub name: PathBuf,
     }
 
-    emit_loading(&loading_bar, 0.0, Some("Fetching java version")).await?;
+    emit_loading(&loading_bar, 0.0, Some("Fetching java version"))?;
     let packages = fetch_json::<Vec<Package>>(
                 Method::GET,
                 &format!(
@@ -80,7 +80,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 &state.fetch_semaphore,
                 &state.pool,
             ).await?;
-    emit_loading(&loading_bar, 10.0, Some("Downloading java version")).await?;
+    emit_loading(&loading_bar, 10.0, Some("Downloading java version"))?;
 
     if let Some(download) = packages.first() {
         let file = fetch_advanced(
@@ -115,13 +115,13 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             }
         }
 
-        emit_loading(&loading_bar, 0.0, Some("Extracting java")).await?;
+        emit_loading(&loading_bar, 0.0, Some("Extracting java"))?;
         archive.extract(&path).map_err(|_| {
             crate::Error::from(crate::ErrorKind::InputError(
                 "Failed to extract java zip".to_string(),
             ))
         })?;
-        emit_loading(&loading_bar, 10.0, Some("Done extracting java")).await?;
+        emit_loading(&loading_bar, 10.0, Some("Done extracting java"))?;
         let mut base_path = path.join(
             download
                 .name

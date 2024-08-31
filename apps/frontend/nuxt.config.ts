@@ -77,13 +77,6 @@ export default defineNuxtConfig({
           title: "Modrinth mods",
         },
       ],
-      script: [
-        {
-          src: "https://js.stripe.com/v3/",
-          defer: true,
-          async: true,
-        },
-      ],
     },
   },
   vite: {
@@ -350,6 +343,11 @@ export default defineNuxtConfig({
         "unknown",
 
       turnstile: { siteKey: "0x4AAAAAAAW3guHM6Eunbgwu" },
+
+      stripePublishableKey:
+        process.env.STRIPE_PUBLISHABLE_KEY ||
+        globalThis.STRIPE_PUBLISHABLE_KEY ||
+        "pk_test_51JbFxJJygY5LJFfKV50mnXzz3YLvBVe2Gd1jn7ljWAkaBlRz3VQdxN9mXcPSrFbSqxwAb0svte9yhnsmm7qHfcWn00R611Ce7b",
     },
   },
   typescript: {
@@ -429,6 +427,7 @@ export default defineNuxtConfig({
     },
   },
   compatibilityDate: "2024-07-03",
+  telemetry: false,
 });
 
 function getApiUrl() {
