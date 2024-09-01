@@ -9,7 +9,7 @@ use crate::event::{
 };
 use futures::prelude::*;
 #[cfg(feature = "tauri")]
-use tauri::Emitter;
+use tauri::{Emitter, Manager};
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
@@ -228,7 +228,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 
 // emit_command(CommandPayload::Something { something })
 // ie: installing a pack, opening an .mrpack, etc
-// Generally used for url deep links and file opens that we we want to handle in the frontend
+// Generally used for url deep links and file opens that we want to handle in the frontend
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
@@ -240,6 +240,10 @@ pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
             .app
             .emit("command", command)
             .map_err(EventError::from)?;
+
+        if let Some(window) = event_state.app.get_window("main") {
+            let _ = window.set_focus();
+        }
     }
     Ok(())
 }
