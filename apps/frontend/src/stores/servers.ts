@@ -40,7 +40,7 @@ export const useServerStore = defineStore("servers", {
 
     async listServers() {
       try {
-        return await usePyroFetch<Server[]>("servers");
+        return await usePyroFetch<{ servers: Server[] }>("servers");
       } catch (error) {
         console.error("Error listing servers:", error);
         throw error;
