@@ -567,6 +567,7 @@
               :show-labels="false"
               :limit="6"
               :hide-selected="true"
+              :custom-label="(version) => version"
               placeholder="Choose versions..."
             />
             <Checkbox
