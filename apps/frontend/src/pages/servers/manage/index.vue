@@ -65,37 +65,39 @@
             </div>
           </div>
 
-          <div v-else class="min-h-[128px]"></div>
+          <div v-else-if="status === 'pending'" class="min-h-[128px]"></div>
         </Transition>
       </div>
     </div>
 
     <div
-      v-else-if="!servers || servers.length === 0"
+      v-else-if="serverList.length === 0"
       class="flex h-full min-h-[128px] items-center justify-center"
     >
-      <p class="text-contrast">No servers found</p>
+      <p class="text-contrast">You don't have any servers yet.</p>
     </div>
 
     <template v-else>
-      <ul v-if="filteredData && filteredData.length > 0" class="m-0 p-0">
-        <div class="flex flex-col gap-4">
-          <ServerListing
-            v-for="server in filteredData"
-            :key="server.server_id"
-            :server_id="server.server_id"
-            :name="server.name"
-            :state="server.state"
-            :game="server.game"
-            :loader="server.loader"
-            :loader_version="server.loader_version"
-            :mc_version="server.mc_version"
-            :modpack="server.modpack"
-          />
-        </div>
-      </ul>
+      <div v-if="filteredData.length > 0">
+        <ul class="m-0 p-0">
+          <div class="flex flex-col gap-4">
+            <ServerListing
+              v-for="server in filteredData"
+              :key="server.server_id"
+              :server_id="server.server_id"
+              :name="server.name"
+              :state="server.state"
+              :game="server.game"
+              :loader="server.loader"
+              :loader_version="server.loader_version"
+              :mc_version="server.mc_version"
+              :modpack="server.modpack"
+            />
+          </div>
+        </ul>
+      </div>
       <div v-else class="flex h-full items-center justify-center">
-        <p class="text-contrast">No servers found</p>
+        <p class="text-contrast">No servers found (after filtering)</p>
       </div>
     </template>
 
@@ -108,6 +110,7 @@ import { ref, computed } from "vue";
 import Fuse from "fuse.js";
 import { SearchIcon, UpdatedIcon } from "@modrinth/assets";
 import ServerListing from "~/components/ui/servers/ServerListing.vue";
+import type { Server } from "~/types/servers";
 
 definePageMeta({
   middleware: "auth",
@@ -120,28 +123,36 @@ useHead({
 const auth = await useAuth();
 const serverStore = useServerStore();
 
-const { data: servers, status } = await useLazyAsyncData("ServerList", async () => {
-  if (auth.value) {
-    return await serverStore.listServers();
-  }
-  return [];
-});
+interface ServerResponse {
+  servers: Server[];
+}
+
+const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
+  "ServerList",
+  async () => {
+    if (auth.value) {
+      return await serverStore.listServers();
+    }
+    return { servers: [] };
+  },
+);
+
+const serverList = computed(() => serverResponse.value?.servers || []);
 
 const searchInput = ref("");
 
 const fuse = computed(() => {
-  if (!servers.value || servers.value.length === 0) return null;
-  return new Fuse(servers.value, {
-    keys: ["name", "loader", "mc_version", "project.title", "mods.name"],
+  if (serverList.value.length === 0) return null;
+  return new Fuse(serverList.value, {
+    keys: ["name", "loader", "mc_version", "game", "state"],
     includeScore: true,
     threshold: 0.4,
   });
 });
 
 const filteredData = computed(() => {
-  if (!servers.value || servers.value.length === 0) return [];
   if (!searchInput.value.trim()) {
-    return servers.value;
+    return serverList.value;
   }
   return fuse.value ? fuse.value.search(searchInput.value).map((result) => result.item) : [];
 });
