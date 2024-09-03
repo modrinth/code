@@ -71,34 +71,33 @@
     </div>
 
     <div
-      v-else-if="!data || data.length === 0"
+      v-else-if="!servers || servers.length === 0"
       class="flex h-full min-h-[128px] items-center justify-center"
     >
       <p class="text-contrast">No servers found</p>
     </div>
 
-    <ul v-else class="m-0 p-0">
-      <div
-        v-if="filteredData && filteredData.length === 0"
-        class="flex h-full items-center justify-center"
-      >
+    <template v-else>
+      <ul v-if="filteredData && filteredData.length > 0" class="m-0 p-0">
+        <div class="flex flex-col gap-4">
+          <ServerListing
+            v-for="server in filteredData"
+            :key="server.server_id"
+            :server_id="server.server_id"
+            :name="server.name"
+            :state="server.state"
+            :game="server.game"
+            :loader="server.loader"
+            :loader_version="server.loader_version"
+            :mc_version="server.mc_version"
+            :modpack="server.modpack"
+          />
+        </div>
+      </ul>
+      <div v-else class="flex h-full items-center justify-center">
         <p class="text-contrast">No servers found</p>
       </div>
-      <div v-else class="flex flex-col gap-4">
-        <ServerListing
-          v-for="server in filteredData"
-          :key="server.server_id"
-          :server_id="server.server_id"
-          :name="server.name"
-          :state="server.state"
-          :game="server.game"
-          :loader="server.loader"
-          :loader_version="server.loader_version"
-          :mc_version="server.mc_version"
-          :modpack="server.modpack"
-        />
-      </div>
-    </ul>
+    </template>
 
     <UiServersPoweredByPyro />
   </div>
@@ -121,29 +120,30 @@ useHead({
 const auth = await useAuth();
 const serverStore = useServerStore();
 
-const { data, status } = await useLazyAsyncData("ServerList", async () => {
+const { data: servers, status } = await useLazyAsyncData("ServerList", async () => {
   if (auth.value) {
     return await serverStore.listServers();
   }
+  return [];
 });
 
 const searchInput = ref("");
 
-const fuse = computed(
-  () =>
-    new Fuse(data.value || [], {
-      keys: ["name", "loader", "mc_version", "project.title", "mods.name"],
-      includeScore: true,
-      threshold: 0.4,
-    }),
-);
+const fuse = computed(() => {
+  if (!servers.value || servers.value.length === 0) return null;
+  return new Fuse(servers.value, {
+    keys: ["name", "loader", "mc_version", "project.title", "mods.name"],
+    includeScore: true,
+    threshold: 0.4,
+  });
+});
 
 const filteredData = computed(() => {
+  if (!servers.value || servers.value.length === 0) return [];
   if (!searchInput.value.trim()) {
-    return data.value;
+    return servers.value;
   }
-
-  return fuse.value.search(searchInput.value).map((result) => result.item);
+  return fuse.value ? fuse.value.search(searchInput.value).map((result) => result.item) : [];
 });
 </script>
 
