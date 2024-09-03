@@ -9,7 +9,7 @@
         <button
           v-if="status === 'error'"
           type="button"
-          alt="Try to load servers again"
+          alt="Reload servers"
           class="flex items-center gap-2 bg-transparent text-sm font-bold"
           @click="() => refreshNuxtData('ServerList')"
         >
