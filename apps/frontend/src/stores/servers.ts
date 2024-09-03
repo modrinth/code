@@ -15,12 +15,7 @@ export const useServerStore = defineStore("servers", {
   actions: {
     async fetchServerData(serverId: string) {
       try {
-        const auth = await useAuth();
-        const data = await usePyroFetch<Server>(auth.value.token, `servers/${serverId}`);
-
-        if (!data) {
-          throw new Error("Failed to fetch server data");
-        }
+        const data = await usePyroFetch<Server>(`servers/${serverId}`);
 
         if (data.modpack) {
           const pid: Project = await this.fetchModpackVersion(data.modpack);
@@ -39,15 +34,13 @@ export const useServerStore = defineStore("servers", {
       } catch (error) {
         console.error("Error fetching server data:", error);
         this.error = error instanceof Error ? error : new Error("An unknown error occurred");
-
         throw this.error;
       }
     },
 
     async fetchModpackVersion(modpackId: string): Promise<Project> {
       try {
-        const result = await toRaw(useBaseFetch(`version/${modpackId}`));
-        return result as Project;
+        return await toRaw(usePyroFetch<Project>(`version/${modpackId}`));
       } catch (error) {
         console.error("Error fetching modpack version:", error);
         throw error;
@@ -56,7 +49,7 @@ export const useServerStore = defineStore("servers", {
 
     async fetchProject(projectId: string) {
       try {
-        return await toRaw(useBaseFetch(`project/${projectId}`));
+        return await toRaw(usePyroFetch(`project/${projectId}`));
       } catch (error) {
         console.error("Error fetching project:", error);
         throw error;
@@ -65,19 +58,8 @@ export const useServerStore = defineStore("servers", {
 
     async fetchServerBackups(serverId: string) {
       try {
-        const auth = await useAuth();
-        const result = await usePyroFetch<ServerBackup[]>(
-          auth.value.token,
-          `servers/${serverId}/backups`,
-        );
-
-        if (!result) {
-          throw new Error("Failed to fetch server backups");
-        }
-
-        result.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
-
-        return result;
+        const result = await usePyroFetch<ServerBackup[]>(`servers/${serverId}/backups`);
+        return result.sort((a, b) => (a.created_at > b.created_at ? -1 : 1));
       } catch (error) {
         console.error("Error fetching server backups:", error);
         throw error;
@@ -97,14 +79,7 @@ export const useServerStore = defineStore("servers", {
 
     async requestWebsocket(serverId: string) {
       try {
-        const auth = await useAuth();
-        const result = await usePyroFetch(auth.value.token, `servers/${serverId}/ws`, 0, "GET");
-
-        if (!result) {
-          throw new Error("Failed to request websocket");
-        }
-
-        return result;
+        return await usePyroFetch(`servers/${serverId}/ws`);
       } catch (error) {
         console.error("Error requesting websocket:", error);
         throw error;
@@ -113,15 +88,10 @@ export const useServerStore = defineStore("servers", {
 
     async sendPowerAction(serverId: string, action: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/power`,
-          0,
-          "POST",
-          "application/json",
-          { action },
-        );
+        await usePyroFetch(`servers/${serverId}/power`, {
+          method: "POST",
+          body: { action },
+        });
       } catch (error) {
         console.error("Error changing power state:", error);
         throw error;
@@ -130,15 +100,10 @@ export const useServerStore = defineStore("servers", {
 
     async updateServerName(serverId: string, newName: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/name`,
-          0,
-          "POST",
-          "application/json",
-          { name: newName },
-        );
+        await usePyroFetch(`servers/${serverId}/name`, {
+          method: "POST",
+          body: { name: newName },
+        });
 
         if (this.serverData[serverId]) {
           this.serverData[serverId] = {
@@ -158,15 +123,10 @@ export const useServerStore = defineStore("servers", {
 
     async createBackup(serverId: string, backupName: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/backups`,
-          0,
-          "POST",
-          "application/json",
-          { name: backupName },
-        );
+        await usePyroFetch(`servers/${serverId}/backups`, {
+          method: "POST",
+          body: { name: backupName },
+        });
       } catch (error) {
         console.error("Error creating backup:", error);
         throw error;
@@ -175,15 +135,10 @@ export const useServerStore = defineStore("servers", {
 
     async renameBackup(serverId: string, backupId: string, newName: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/backups/${backupId}`,
-          0,
-          "POST",
-          "application/json",
-          { name: newName },
-        );
+        await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+          method: "POST",
+          body: { name: newName },
+        });
       } catch (error) {
         console.error("Error renaming backup:", error);
         throw error;
@@ -192,13 +147,9 @@ export const useServerStore = defineStore("servers", {
 
     async deleteBackup(serverId: string, backupId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/backups/${backupId}`,
-          0,
-          "DELETE",
-        );
+        await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+          method: "DELETE",
+        });
       } catch (error) {
         console.error("Error deleting backup:", error);
         throw error;
@@ -207,8 +158,9 @@ export const useServerStore = defineStore("servers", {
 
     async restoreBackup(serverId: string, backupId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(auth.value.token, `servers/${serverId}/backups/${backupId}`, 0, "POST");
+        await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+          method: "POST",
+        });
       } catch (error) {
         console.error("Error restoring backup:", error);
         throw error;
@@ -217,14 +169,7 @@ export const useServerStore = defineStore("servers", {
 
     async downloadBackup(serverId: string, backupId: string) {
       try {
-        const auth = await useAuth();
-        return await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/backups/${backupId}`,
-          0,
-          "GET",
-          "application/json",
-        );
+        return await usePyroFetch(`servers/${serverId}/backups/${backupId}`);
       } catch (error) {
         console.error("Error downloading backup:", error);
         throw error;
@@ -233,8 +178,7 @@ export const useServerStore = defineStore("servers", {
 
     async initiateWorldDownload(serverId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(auth.value.token, `servers/${serverId}/world`, 0, "GET");
+        await usePyroFetch(`servers/${serverId}/world`);
       } catch (error) {
         console.error("Error initiating world download:", error);
         throw error;
@@ -243,8 +187,7 @@ export const useServerStore = defineStore("servers", {
 
     async getWorldDownloadURL(serverId: string) {
       try {
-        const auth = await useAuth();
-        return await usePyroFetch(auth.value.token, `servers/${serverId}/download`, 0, "GET");
+        return await usePyroFetch(`servers/${serverId}/download`);
       } catch (error) {
         console.error("Error getting world download URL:", error);
         throw error;
@@ -253,13 +196,7 @@ export const useServerStore = defineStore("servers", {
 
     async fetchConfigFile(serverId: string, fileName: string) {
       try {
-        const auth = await useAuth();
-        return await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/config/${fileName}`,
-          0,
-          "GET",
-        );
+        return await usePyroFetch(`servers/${serverId}/config/${fileName}`);
       } catch (error) {
         console.error("Error fetching config file:", error);
         throw error;
@@ -268,15 +205,10 @@ export const useServerStore = defineStore("servers", {
 
     async saveConfigFile(serverId: string, fileName: string, data: any) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/config/${fileName}`,
-          0,
-          "PUT",
-          "application/json",
-          data,
-        );
+        await usePyroFetch(`servers/${serverId}/config/${fileName}`, {
+          method: "PUT",
+          body: data,
+        });
       } catch (error) {
         console.error("Error saving config file:", error);
         throw error;
@@ -285,13 +217,7 @@ export const useServerStore = defineStore("servers", {
 
     async checkSubdomainAvailability(subdomain: string) {
       try {
-        const auth = await useAuth();
-        return await usePyroFetch(
-          auth.value.token,
-          `subdomains/${subdomain}/isavailable`,
-          0,
-          "GET",
-        );
+        return await usePyroFetch(`subdomains/${subdomain}/isavailable`);
       } catch (error) {
         console.error("Error checking subdomain availability:", error);
         throw error;
@@ -300,15 +226,10 @@ export const useServerStore = defineStore("servers", {
 
     async changeSubdomain(serverId: string, subdomain: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/subdomains`,
-          0,
-          "POST",
-          "application/json",
-          { subdomain },
-        );
+        await usePyroFetch(`servers/${serverId}/subdomains`, {
+          method: "POST",
+          body: { subdomain },
+        });
       } catch (error) {
         console.error("Error changing subdomain:", error);
         throw error;
@@ -317,15 +238,10 @@ export const useServerStore = defineStore("servers", {
 
     async installMod(serverId: string, projectId: string, versionId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/mods`,
-          0,
-          "POST",
-          "application/json",
-          { rinth_ids: { project_id: projectId, version_id: versionId } },
-        );
+        await usePyroFetch(`servers/${serverId}/mods`, {
+          method: "POST",
+          body: { rinth_ids: { project_id: projectId, version_id: versionId } },
+        });
       } catch (error) {
         console.error("Error installing mod:", error);
         throw error;
@@ -334,8 +250,9 @@ export const useServerStore = defineStore("servers", {
 
     async removeMod(serverId: string, modId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(auth.value.token, `servers/${serverId}/mods/${modId}`, 0, "DELETE");
+        await usePyroFetch(`servers/${serverId}/mods/${modId}`, {
+          method: "DELETE",
+        });
       } catch (error) {
         console.error("Error removing mod:", error);
         throw error;
@@ -344,15 +261,10 @@ export const useServerStore = defineStore("servers", {
 
     async reinstallMod(serverId: string, modId: string, versionId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/mods/${modId}`,
-          0,
-          "POST",
-          "application/json",
-          { version_id: modId },
-        );
+        await usePyroFetch(`servers/${serverId}/mods/${modId}`, {
+          method: "POST",
+          body: { version_id: versionId },
+        });
       } catch (error) {
         console.error("Error reinstalling mod:", error);
         throw error;
@@ -361,15 +273,10 @@ export const useServerStore = defineStore("servers", {
 
     async reinstallServer(serverId: string, projectId: string, versionId: string) {
       try {
-        const auth = await useAuth();
-        await usePyroFetch(
-          auth.value.token,
-          `servers/${serverId}/reinstall`,
-          0,
-          "POST",
-          "application/json",
-          { project_id: projectId, version_id: versionId },
-        );
+        await usePyroFetch(`servers/${serverId}/reinstall`, {
+          method: "POST",
+          body: { project_id: projectId, version_id: versionId },
+        });
       } catch (error) {
         console.error("Error reinstalling server:", error);
         throw error;
