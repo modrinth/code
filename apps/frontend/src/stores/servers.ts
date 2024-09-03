@@ -38,6 +38,15 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
+    async listServers() {
+      try {
+        return await usePyroFetch<Server[]>("servers");
+      } catch (error) {
+        console.error("Error listing servers:", error);
+        throw error;
+      }
+    },
+
     async fetchModpackVersion(modpackId: string): Promise<Project> {
       try {
         return await toRaw(usePyroFetch<Project>(`version/${modpackId}`));
