@@ -110,8 +110,6 @@ import Fuse from "fuse.js";
 import { SearchIcon, UpdatedIcon } from "@modrinth/assets";
 import ServerListing from "~/components/ui/servers/ServerListing.vue";
 
-import type { Server } from "~/types/servers";
-
 definePageMeta({
   middleware: "auth",
 });
@@ -121,12 +119,12 @@ useHead({
 });
 
 const auth = await useAuth();
+const serverStore = useServerStore();
 
 const { data, status } = await useLazyAsyncData("ServerList", async () => {
-  const response = await usePyroFetch<{
-    servers: Server[];
-  }>(auth.value.token, "servers");
-  return response.servers;
+  if (auth.value) {
+    return await serverStore.listServers();
+  }
 });
 
 const searchInput = ref("");
