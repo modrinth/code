@@ -4,7 +4,7 @@ import { $fetch, FetchError } from "ofetch";
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: Record<string, any>;
-  accept?: "application/json" | "TODO";
+  accept?: "application/json";
   version?: number;
 }
 
