@@ -46,14 +46,14 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
   const headers: any = {
     Accept: accept,
     Authorization: `Bearer ${authToken}`,
-    "ngrok-skip-browser-warning": "true",
-    "X-Pinggy-No-Screen": "true",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "*",
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
-    Vary: "Accept",
+    Vary: "Accept, Origin",
   };
+
+  if (import.meta.client) {
+    headers.Origin = window.location.origin;
+  }
 
   if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && body) {
     headers["Content-Type"] = "application/json";
