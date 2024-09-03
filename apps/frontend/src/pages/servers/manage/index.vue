@@ -55,11 +55,11 @@
                 Please try again later. If this issue persists, please contact
                 <a
                   class="text-[var(--color-link)]"
-                  href="https://discord.modrinth.com/"
+                  href="https://support.modrinth.com/"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  support on Discord.
+                  Modrinth support.
                 </a>
               </p>
             </div>

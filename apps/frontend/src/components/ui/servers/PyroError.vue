@@ -44,15 +44,7 @@
         {{ message }}
       </div>
       <div class="max-w-md text-center leading-relaxed text-secondary">
-        If this issue persists, contact
-        <a
-          class="text-[var(--color-link)]"
-          href="https://discord.modrinth.com/"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          support on Discord.
-        </a>
+        If this issue persists, contact Modrinth support.
       </div>
       <Button @click="$router.push('/servers/manage')">
         <LeftArrowIcon />
