@@ -25,12 +25,18 @@
     </svg>
     Installing
   </div>
+  <div
+    v-if="state === 'Failed'"
+    class="flex w-fit flex-row items-center rounded-full bg-red px-2 py-0.5 text-sm font-bold text-white"
+  >
+    Server Failed to Install
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue";
 
-export type StatusState = "Installing";
+export type StatusState = "Installing" | "Failed";
 
 export default defineComponent({
   name: "StatusIndicator",
