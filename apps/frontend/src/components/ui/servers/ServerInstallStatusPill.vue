@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="state === 'Installing'"
-    class="flex w-fit flex-row items-center rounded-full bg-red px-2 py-0.5 text-sm font-bold text-white"
+    class="flex w-fit flex-row items-center rounded-full bg-orange px-2 py-0.5 text-sm font-bold text-black"
   >
     <svg
-      class="mr-2 h-3 w-3 animate-spin text-white"
+      class="mr-2 h-3 w-3 animate-spin"
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
@@ -29,7 +29,7 @@
     v-if="state === 'Failed'"
     class="flex w-fit flex-row items-center rounded-full bg-red px-2 py-0.5 text-sm font-bold text-white"
   >
-    Server Failed to Install
+    Failed to Install
   </div>
 </template>
 
