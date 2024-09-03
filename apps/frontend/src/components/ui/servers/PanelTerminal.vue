@@ -21,7 +21,7 @@
               class="relative w-full list-none"
               :data-pyro-terminal-recycle-tracker="index"
             >
-              <LogParser :log="item" />
+              <UiServersLogParser :log="item" />
             </li>
           </template>
         </ul>
@@ -54,8 +54,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { ExpandIcon } from "@modrinth/assets";
-// eslint-disable-next-line import/no-unresolved
-import LogParser from "~/components/ui/servers/LogParser.vue";
 
 const props = defineProps<{
   consoleOutput: string[];
