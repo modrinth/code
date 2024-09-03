@@ -1,9 +1,9 @@
 <template>
   <NuxtLink
     :to="`/servers/manage/${server_id}`"
-    :aria-disabled="status.isInstalling"
-    :tabindex="status.isInstalling ? -1 : 0"
-    :class="status.isInstalling ? 'pointer-events-none cursor-not-allowed' : ''"
+    :aria-disabled="status.isInstalling || status.isFailed"
+    :tabindex="status.isInstalling || status.isFailed ? -1 : 0"
+    :class="status.isInstalling || status.isFailed ? 'pointer-events-none cursor-not-allowed' : ''"
     class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
     :data-pyro-server-listing-id="server_id"
@@ -13,7 +13,7 @@
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
         <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
-        <ChevronRightIcon v-if="!status.isInstalling" />
+        <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
       </div>
 
       <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
@@ -43,6 +43,7 @@ const props = defineProps<Partial<Server>>();
 
 const status = computed(() => ({
   state: props.state as StatusState | undefined,
+  isFailed: props.state === "Failed",
   isInstalling: props.state === "Installing",
 }));
 
