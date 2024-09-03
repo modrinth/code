@@ -79,21 +79,19 @@
 
     <template v-else>
       <div v-if="filteredData.length > 0">
-        <ul class="m-0 p-0">
-          <div class="flex flex-col gap-4">
-            <ServerListing
-              v-for="server in filteredData"
-              :key="server.server_id"
-              :server_id="server.server_id"
-              :name="server.name"
-              :state="server.state"
-              :game="server.game"
-              :loader="server.loader"
-              :loader_version="server.loader_version"
-              :mc_version="server.mc_version"
-              :modpack="server.modpack"
-            />
-          </div>
+        <ul class="m-0 flex flex-col gap-4 p-0">
+          <ServerListing
+            v-for="server in filteredData"
+            :key="server.server_id"
+            :server_id="server.server_id"
+            :name="server.name"
+            :state="server.state"
+            :game="server.game"
+            :loader="server.loader"
+            :loader_version="server.loader_version"
+            :mc_version="server.mc_version"
+            :modpack="server.modpack"
+          />
         </ul>
       </div>
       <div v-else class="flex h-full items-center justify-center">
