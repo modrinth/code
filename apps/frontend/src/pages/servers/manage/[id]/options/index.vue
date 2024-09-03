@@ -10,13 +10,13 @@
               <span class="text-lg font-bold text-white">Server Name</span>
               <span> Change the name of your server as it appears on Modrinth </span>
             </label>
-            <input v-model="serverName" @keyup.enter="updateServerName" class="h-[50%] w-[40%]" />
+            <input v-model="serverName" @keyup.enter="updateServerNameReq" class="h-[50%] w-[40%]" />
           </div>
           <div class="h-[2px] w-full bg-divider"></div>
           <button
             type="submit"
             class="btn btn-primary"
-            @click="updateServerName"
+            @click="updateServerNameReq"
             :disabled="isUpdating || !hasUnsavedChanges"
           >
             {{ isUpdating ? "Saving..." : "Save" }}
@@ -49,7 +49,7 @@ const serverName = ref(data.value?.name || "");
 
 const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
 
-const updateServerData = async () => {
+const updateServerNameReq = async () => {
   try {
     isUpdating.value = true;
     await serverStore.updateServerName(serverId, serverName.value);
