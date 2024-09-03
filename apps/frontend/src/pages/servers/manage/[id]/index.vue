@@ -137,7 +137,7 @@ const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
 
 const connectWebSocket = async () => {
   const wsAuth = (await serverStore.requestWebsocket(serverId)) as WSAuth;
-  socket = new WebSocket(`ws://127.0.0.1:8889/v0/ws`);
+  socket = new WebSocket("wss://" + wsAuth.url);
 
   socket.onopen = () => {
     socket?.send(JSON.stringify({ event: "auth", jwt: wsAuth.token }));
