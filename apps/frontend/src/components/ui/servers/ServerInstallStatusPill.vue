@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="state === 'Installing'"
-    class="flex w-fit flex-row items-center rounded-full bg-red-500 px-2 py-0.5 text-sm font-bold text-white"
+    class="flex w-fit flex-row items-center rounded-full bg-red px-2 py-0.5 text-sm font-bold text-white"
   >
     <svg
       class="mr-2 h-3 w-3 animate-spin text-white"
