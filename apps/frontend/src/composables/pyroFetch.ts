@@ -52,7 +52,9 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
   };
 
   if (import.meta.client) {
-    headers.Origin = window.location.origin;
+    if (typeof window !== "undefined") {
+      headers.Origin = window.location.origin;
+    }
   }
 
   if (["POST", "PUT", "PATCH", "DELETE"].includes(method) && body) {
