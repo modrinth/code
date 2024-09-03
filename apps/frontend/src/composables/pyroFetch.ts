@@ -3,7 +3,7 @@ import { $fetch, FetchError } from "ofetch";
 interface PyroFetchOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: Record<string, any>;
-  accept?: "application/json";
+  accept?: "application/json" | (string & {});
   version?: number;
 }
 
