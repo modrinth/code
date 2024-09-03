@@ -74,9 +74,7 @@
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
-// eslint-disable-next-line import/no-unresolved
 import { useServerStore } from "~/stores/servers.ts";
-// eslint-disable-next-line import/no-unresolved
 import { PyroFetchError } from "~/composables/pyroFetch.ts";
 
 const route = useNativeRoute();
