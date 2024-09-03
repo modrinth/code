@@ -115,7 +115,6 @@ useHead({
   title: "Servers - Modrinth",
 });
 
-const auth = await useAuth();
 const serverStore = useServerStore();
 
 interface ServerResponse {
@@ -125,10 +124,7 @@ interface ServerResponse {
 const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
   "ServerList",
   async () => {
-    if (auth.value) {
-      return await serverStore.listServers();
-    }
-    return { servers: [] };
+    return await serverStore.listServers();
   },
 );
 
