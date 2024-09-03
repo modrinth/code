@@ -307,7 +307,7 @@ export const useServerStore = defineStore("servers", {
           0,
           "POST",
           "application/json",
-          { subdomain: subdomain },
+          { subdomain },
         );
       } catch (error) {
         console.error("Error changing subdomain:", error);
