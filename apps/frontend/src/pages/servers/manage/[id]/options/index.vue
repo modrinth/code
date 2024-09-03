@@ -29,9 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
-import type { Server } from "~/types/servers";
 
 const app = useNuxtApp();
 const route = useRoute();

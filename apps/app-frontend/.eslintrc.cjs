@@ -1,6 +1,5 @@
 module.exports = {
   root: true,
-  baseUrl: './',
   extends: ['../../packages/eslint-config-custom/vue.js'],
   env: {
     browser: true,

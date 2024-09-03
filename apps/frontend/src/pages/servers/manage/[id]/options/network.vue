@@ -13,8 +13,8 @@
             <div class="flex items-center gap-2">
               <input
                 v-model="serverSubdomain"
-                @keyup.enter="updateServerData"
                 class="h-[50%] w-[63%]"
+                @keyup.enter="updateServerData"
               />
               .{{ data.net.domain.split(".").slice(1).join(".") }}
             </div>

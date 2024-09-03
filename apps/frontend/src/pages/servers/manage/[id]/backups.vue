@@ -241,11 +241,11 @@ import {
   XIcon,
 } from "@modrinth/assets";
 import { ref, reactive } from "vue";
-import { useServerStore } from "~/stores/servers";
+import { useServerStore } from "~/stores/servers.ts";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import PyroError from "~/components/ui/servers/PyroError.vue";
 
-import type { ServerBackup } from "~/types/servers";
+import type { ServerBackup } from "~/types/servers.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
