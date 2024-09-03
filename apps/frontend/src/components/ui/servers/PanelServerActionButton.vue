@@ -1,5 +1,5 @@
 <template>
-  <Button @click="handleAction" color="secondary" :disabled="isActioning">
+  <Button color="secondary" :disabled="isActioning" @click="handleAction">
     <div v-if="isActioning" class="grid place-content-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -15,7 +15,7 @@
       </svg>
     </div>
 
-    <div class="contents" v-else>
+    <div v-else class="contents">
       <component :is="isOnline ? UpdatedIcon : PlayIcon" />
       {{ isOnline ? "Restart" : "Start" }}
     </div>

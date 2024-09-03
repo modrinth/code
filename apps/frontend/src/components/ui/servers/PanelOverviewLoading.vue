@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import { ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
 </script>
 
 <style scoped>

@@ -79,7 +79,7 @@
 
     <template v-else>
       <ul v-if="filteredData.length > 0" class="m-0 flex flex-col gap-4 p-0">
-        <ServerListing
+        <UiServersServerListing
           v-for="server in filteredData"
           :key="server.server_id"
           :server_id="server.server_id"
@@ -105,7 +105,6 @@
 import { ref, computed } from "vue";
 import Fuse from "fuse.js";
 import { SearchIcon, UpdatedIcon } from "@modrinth/assets";
-import ServerListing from "~/components/ui/servers/ServerListing.vue";
 import type { Server } from "~/types/servers";
 
 definePageMeta({

@@ -171,7 +171,10 @@
 <script setup lang="ts">
 import { LoaderIcon } from "@modrinth/assets";
 
-const props = defineProps({
-  loader: String,
+defineProps({
+  loader: {
+    type: String,
+    default: "",
+  },
 });
 </script>

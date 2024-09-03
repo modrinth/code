@@ -10,27 +10,30 @@
               <span class="text-lg font-bold text-white">Server Name</span>
               <span> Change the name of your server as it appears on Modrinth </span>
             </label>
-            <input v-model="serverName" @keyup.enter="updateServerNameReq" class="h-[50%] w-[40%]" />
+            <input
+              v-model="serverName"
+              class="h-[50%] w-[40%]"
+              @keyup.enter="updateServerNameReq"
+            />
           </div>
           <div class="h-[2px] w-full bg-divider"></div>
           <button
             type="submit"
             class="btn btn-primary"
-            @click="updateServerNameReq"
             :disabled="isUpdating || !hasUnsavedChanges"
+            @click="updateServerNameReq"
           >
             {{ isUpdating ? "Saving..." : "Save" }}
           </button>
         </div>
       </section>
     </div>
-    <PyroLoading v-else />
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 
 const app = useNuxtApp();
 const route = useRoute();

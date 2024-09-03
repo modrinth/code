@@ -20,12 +20,12 @@
         <UiServersServerGameLabel
           v-if="showGameLabel"
           :game="game!"
-          :mcVersion="mc_version ?? ''"
+          :mc-version="mc_version ?? ''"
         />
         <UiServersServerLoaderLabel
           v-if="showLoaderLabel"
           :loader="loader!"
-          :loaderVersion="loader_version ?? ''"
+          :loader-version="loader_version ?? ''"
         />
         <UiServersServerModLabel v-if="showModLabel" :mods="mods" />
       </div>
@@ -35,9 +35,9 @@
 
 <script setup lang="ts">
 import { computed, toRaw } from "vue";
-import type { Project, Server } from "~/types/servers";
-import type { StatusState } from "./ServerInstallStatusPill.vue";
 import { ChevronRightIcon } from "@modrinth/assets";
+import type { StatusState } from "./ServerInstallStatusPill.vue";
+import type { Project, Server } from "~/types/servers";
 
 const props = defineProps<Partial<Server>>();
 

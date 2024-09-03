@@ -26,6 +26,7 @@ export default defineComponent({
       required: true,
     },
     subdomain: {
+      default: null,
       type: String,
     },
   },

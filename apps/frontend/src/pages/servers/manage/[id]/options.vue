@@ -2,23 +2,29 @@
   <div class="flex gap-4">
     <div class="normal-page__sidebar">
       <aside class="universal-card">
-        <NavStack>
-          <NavStackItem :link="`/servers/manage/${serverId}/options`" label="General">
+        <UiNavStack>
+          <UiNavStackItem :link="`/servers/manage/${serverId}/options`" label="General">
             <CogIcon />
-          </NavStackItem>
-          <NavStackItem :link="`/servers/manage/${serverId}/options/args`" label="Launch Arguments">
+          </UiNavStackItem>
+          <UiNavStackItem
+            :link="`/servers/manage/${serverId}/options/args`"
+            label="Launch Arguments"
+          >
             <TextQuoteIcon />
-          </NavStackItem>
-          <NavStackItem :link="`/servers/manage/${serverId}/options/network`" label="Network">
+          </UiNavStackItem>
+          <UiNavStackItem :link="`/servers/manage/${serverId}/options/network`" label="Network">
             <VersionIcon />
-          </NavStackItem>
-          <NavStackItem :link="`/servers/manage/${serverId}/options/properties`" label="Properties">
+          </UiNavStackItem>
+          <UiNavStackItem
+            :link="`/servers/manage/${serverId}/options/properties`"
+            label="Properties"
+          >
             <ListIcon />
-          </NavStackItem>
-          <NavStackItem :link="`/servers/manage/${serverId}/options/info`" label="Info">
+          </UiNavStackItem>
+          <UiNavStackItem :link="`/servers/manage/${serverId}/options/info`" label="Info">
             <FileIcon />
-          </NavStackItem>
-        </NavStack>
+          </UiNavStackItem>
+        </UiNavStack>
       </aside>
     </div>
     <div class="w-full">
@@ -29,8 +35,6 @@
 
 <script setup lang="ts">
 import { CogIcon, FileIcon, ListIcon, TextQuoteIcon, VersionIcon } from "@modrinth/assets";
-import NavStack from "~/components/ui/NavStack.vue";
-import NavStackItem from "~/components/ui/NavStackItem.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id;

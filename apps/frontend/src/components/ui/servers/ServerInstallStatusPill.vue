@@ -40,7 +40,7 @@ import { XIcon } from "@modrinth/assets";
 
 export type StatusState = "Installing" | "Failed";
 
-const props = defineProps<{
+defineProps<{
   state: StatusState;
 }>();
 </script>

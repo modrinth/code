@@ -82,7 +82,6 @@ const stats = ref<Stats>({
 
 const app = useNuxtApp();
 const route = useRoute();
-const auth = await useAuth();
 const serverId = route.params.id as string;
 
 let socket: WebSocket | null = null;
@@ -109,7 +108,7 @@ const animateMarginTop = () => {
   }, 500);
 };
 
-const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
+const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
   isActioning.value = true;
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   // @ts-ignore

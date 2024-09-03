@@ -41,7 +41,7 @@ export default defineComponent({
       newline: false,
       escapeXML: false,
       stream: false,
-      colors: colors,
+      colors,
     });
 
     const parsedLog = computed(() => {

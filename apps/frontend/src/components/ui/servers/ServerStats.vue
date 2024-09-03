@@ -13,7 +13,7 @@
       </div>
       <h3>{{ metric.title }}</h3>
 
-      <component class="absolute right-8 top-8" :is="metric.icon" />
+      <component :is="metric.icon" class="absolute right-8 top-8" />
       <ClientOnly>
         <VueApexCharts
           ref="chart"
@@ -58,8 +58,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, markRaw } from "vue";
-import type { Stats } from "~/types/servers";
 import { FileTextIcon, FolderOpenIcon, ChevronRightIcon, CPUIcon, DBIcon } from "@modrinth/assets";
+import type { Stats } from "~/types/servers";
 
 const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
 

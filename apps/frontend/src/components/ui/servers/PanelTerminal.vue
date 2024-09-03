@@ -4,8 +4,8 @@
     class="monocraft-font console relative h-full w-full overflow-hidden rounded-xl text-sm"
   >
     <div
-      data-pyro-terminal-root
       ref="scrollContainer"
+      data-pyro-terminal-root
       class="h-full w-full overflow-x-auto overflow-y-auto py-6"
       @scroll="handleScroll"
     >
@@ -17,9 +17,9 @@
         >
           <template v-for="(item, index) in visibleItems" :key="index">
             <li
+              ref="itemRefs"
               class="relative w-full list-none"
               :data-pyro-terminal-recycle-tracker="index"
-              ref="itemRefs"
             >
               <LogParser :log="item" />
             </li>
@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { ExpandIcon } from "@modrinth/assets";
+// eslint-disable-next-line import/no-unresolved
 import LogParser from "~/components/ui/servers/LogParser.vue";
 
 const props = defineProps<{
@@ -61,7 +62,7 @@ const props = defineProps<{
   fullScreen: boolean;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: "toggle-full-screen"): void;
 }>();
 

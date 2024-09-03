@@ -58,7 +58,7 @@
 import { Button } from "@modrinth/ui";
 import { LeftArrowIcon } from "@modrinth/assets";
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     required: true,
