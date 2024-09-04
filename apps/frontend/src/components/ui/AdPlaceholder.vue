@@ -13,7 +13,7 @@
     <div
       class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl bg-bg-raised"
     >
-      <div id="project-rail" />
+      <div data-ad="project-rail" />
     </div>
   </div>
 </template>
