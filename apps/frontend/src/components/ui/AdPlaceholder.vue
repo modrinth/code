@@ -13,7 +13,7 @@
     <div
       class="absolute top-0 flex items-center justify-center overflow-hidden rounded-2xl bg-bg-raised"
     >
-      <div id="modrinth-rail-1" />
+      <div id="project-rail" />
     </div>
   </div>
 </template>
@@ -23,7 +23,9 @@ import { ChevronRightIcon } from "@modrinth/assets";
 useHead({
   script: [
     {
-      src: "https://dn0qt3r0xannq.cloudfront.net/modrinth-7JfmkEIXEp/modrinth-longform/prebid-load.js",
+      type: "module",
+      src: "//js.rev.iq",
+      "data-domain": "modrinth.com",
       async: true,
     },
     {
@@ -31,25 +33,6 @@ useHead({
       async: true,
     },
   ],
-  link: [
-    {
-      rel: "preload",
-      as: "script",
-      href: "https://www.googletagservices.com/tag/js/gpt.js",
-    },
-  ],
-});
-
-onMounted(() => {
-  window.tude = window.tude || { cmd: [] };
-  tude.cmd.push(function () {
-    tude.refreshAdsViaDivMappings([
-      {
-        divId: "modrinth-rail-1",
-        baseDivId: "pb-slot-square-2",
-      },
-    ]);
-  });
 });
 </script>
 <style>
