@@ -124,7 +124,8 @@ interface ServerResponse {
 const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
   "ServerList",
   async () => {
-    return await serverStore.listServers();
+    const response = await serverStore.listServers();
+    return response || { servers: [] };
   },
 );
 
