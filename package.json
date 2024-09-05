@@ -6,6 +6,7 @@
     "web:dev": "turbo run dev --filter=@modrinth/frontend",
     "web:build": "turbo run build --filter=@modrinth/frontend",
     "app:dev": "turbo run dev --filter=@modrinth/app",
+    "docs:dev": "turbo run dev --filter=@modrinth/docs",
     "app:build": "turbo run build --filter=@modrinth/app",
     "pages:build": "NITRO_PRESET=cloudflare-pages pnpm --filter frontend run build",
     "build": "turbo run build --continue",
