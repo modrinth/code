@@ -54,7 +54,7 @@
       </div>
     </div>
     <header
-      class="experimental-styles-within desktop-only relative z-[5] mx-auto my-4 grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 sm:grid-cols-[auto_1fr_auto]"
+      class="experimental-styles-within desktop-only relative z-[5] mx-auto grid max-w-[1280px] grid-cols-[1fr_auto] items-center gap-2 px-3 py-4 sm:grid-cols-[auto_1fr_auto]"
     >
       <div>
         <NuxtLink to="/" aria-label="Modrinth home page">
