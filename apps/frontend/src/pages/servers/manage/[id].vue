@@ -9,11 +9,10 @@
       >
         <div class="flex flex-row items-center gap-6 pt-4">
           <UiAvatar
-            v-if="serverData.project"
             no-shadow
             size="lg"
             alt="Server Icon"
-            :src="serverData.project.icon_url"
+            :src="serverData?.project?.icon_url ?? undefined"
           />
           <div class="flex flex-col gap-4">
             <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
