@@ -124,8 +124,12 @@ interface ServerResponse {
 const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
   "ServerList",
   async () => {
-    const response = await serverStore.listServers();
-    return response;
+    try {
+      const response = await serverStore.listServers();
+      return response;
+    } catch (error) {
+      throw new PyroFetchError("Unable to load servers");
+    }
   },
 );
 
