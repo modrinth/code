@@ -125,7 +125,7 @@ const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
   "ServerList",
   async () => {
     const response = await serverStore.listServers();
-    return response || { servers: [] };
+    return response;
   },
 );
 

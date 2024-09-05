@@ -71,7 +71,9 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     return response;
   } catch (error) {
     if (error instanceof FetchError) {
-      const statusCode = error.response?.status;
+      console.log(error);
+      const statusCode = error.response?.status ?? "unknown";
+      const statusText = error.response?.statusText ?? "unknown error";
       const errorMessages: { [key: number]: string } = {
         400: "Bad Request",
         401: "Unauthorized",
@@ -80,10 +82,13 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
         500: "Internal Server Error",
       };
       const message =
-        statusCode !== undefined
+        typeof statusCode === "number" && statusCode in errorMessages
           ? errorMessages[statusCode]
-          : `HTTP Error: ${statusCode} ${error.response?.statusText}`;
-      throw new PyroFetchError(`[PYRO] ${message}`, statusCode);
+          : `HTTP Error: ${statusCode !== "unknown" ? statusCode : "unknown status code"} ${statusText !== "unknown error" ? statusText : "unknown status text"}`;
+      throw new PyroFetchError(
+        `[PYRO] ${message}`,
+        typeof statusCode === "number" ? statusCode : undefined,
+      );
     }
     throw new PyroFetchError("[PYRO] An unexpected error occurred during the fetch operation.");
   }
