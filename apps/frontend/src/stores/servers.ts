@@ -49,7 +49,8 @@ export const useServerStore = defineStore("servers", {
 
     async fetchModpackVersion(modpackId: string): Promise<Project> {
       try {
-        return await toRaw(usePyroFetch<Project>(`version/${modpackId}`));
+        const result = await toRaw(useBaseFetch(`version/${modpackId}`));
+        return result as Project;
       } catch (error) {
         console.error("Error fetching modpack version:", error);
         throw error;
@@ -58,7 +59,7 @@ export const useServerStore = defineStore("servers", {
 
     async fetchProject(projectId: string) {
       try {
-        return await toRaw(usePyroFetch(`project/${projectId}`));
+        return await toRaw(useBaseFetch(`project/${projectId}`));
       } catch (error) {
         console.error("Error fetching project:", error);
         throw error;
