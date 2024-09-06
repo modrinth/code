@@ -87,7 +87,24 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from "vue";
 import { ButtonStyled } from "@modrinth/ui";
+
+onMounted(() => {
+  document.body.style.background = "var(--color-accent-contrast)";
+  const layoutDiv = document.querySelector(".layout") as HTMLElement;
+  if (layoutDiv) {
+    layoutDiv.style.background = "var(--color-accent-contrast)";
+  }
+});
+
+onUnmounted(() => {
+  document.body.style.background = "";
+  const layoutDiv = document.querySelector(".layout") as HTMLElement;
+  if (layoutDiv) {
+    layoutDiv.style.background = "";
+  }
+});
 </script>
 
 <style scoped>
