@@ -717,7 +717,7 @@ const updateProject = async (mod) => {
   })
 }
 
-let locks = {}
+const locks = {}
 
 const toggleDisableMod = async (mod) => {
   // Use mod's id as the key for the lock. If mod doesn't have a unique id, replace `mod.id` with some unique property.
@@ -725,7 +725,7 @@ const toggleDisableMod = async (mod) => {
     locks[mod.id] = ref(null)
   }
 
-  let lock = locks[mod.id]
+  const lock = locks[mod.id]
 
   while (lock.value) {
     await lock.value

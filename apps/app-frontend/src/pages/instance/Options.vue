@@ -880,7 +880,7 @@ const editing = ref(false)
 async function saveGvLoaderEdits() {
   editing.value = true
 
-  let editProfile = editProfileObject.value
+  const editProfile = editProfileObject.value
   editProfile.loader = loader.value
   editProfile.game_version = gameVersion.value
 
