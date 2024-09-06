@@ -75,9 +75,12 @@
           class="relative m-0 max-w-lg text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
           Integrated with the Modrinth App. Choose from thousands of modpacks or create your own.
-          Invite your friends when you’re ready to play. Ready in seconds.
+          Invite your friends when you’re ready to play. It’s that easy.
         </h2>
-        <img src="~/assets/images/games/app-hero.png" alt="" class="w-[800px]" />
+        <ButtonStyled color="brand" size="large">
+          <nuxt-link class="w-fit" to="/mods"> Get Started </nuxt-link>
+        </ButtonStyled>
+        <img src="~/assets/images/games/app-servers-hero.png" alt="" class="w-full" />
       </div>
     </section>
   </div>
