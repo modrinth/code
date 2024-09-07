@@ -196,8 +196,8 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Experience the fastest, most reliable hosting</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              DDoS protection built-in. 99.999% uptime guarantee. The most powerful hardware.
-              Powered by Pyro's custom-built software.
+              DDoS protection built-in. 99.999% uptime. SSDs. Ryzen 9s. Powered by Pyro's custom
+              software that keeps your server running smoothly.
             </h3>
           </div>
         </div>
@@ -240,8 +240,8 @@
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
             <h2 class="m-0 text-lg font-bold">Backups included</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Never lose your progress. Backup your server up to 15 times. Restore from any backup
-              with a single click.
+              Backup your server up to 15 times and store them forever. Restore your progress at any
+              time with a single click. Just like a time machine.
             </h3>
             <div class="flex flex-row items-center gap-8">
               <div
@@ -267,6 +267,7 @@
             </div>
           </div>
         </div>
+        <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12"></div>
       </div>
     </section>
   </div>
@@ -275,6 +276,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { ButtonStyled } from "@modrinth/ui";
+
+const title = "Modrinth Servers";
+const description =
+  "Start your own Minecraft server directly in the Modrinth app. Play your favorite mods, plugins, and datapacks — without the hassle of setup.";
+
+useSeoMeta({
+  title,
+  description,
+  ogTitle: title,
+  ogDescription: description,
+});
 
 const words = ["friends", "medieval-masters", "create-server", "mega-smp", "spookypack"];
 const currentWordIndex = ref(0);
