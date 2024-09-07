@@ -1,5 +1,5 @@
 <template>
-  <div class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
+  <div data-pyro class="servers-hero relative -mt-48 h-full min-h-screen py-48 md:-mt-20 md:py-32">
     <img
       src="~/assets/images/games/maze.png"
       alt=""
@@ -222,8 +222,8 @@
         <h2
           class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Included with every server is a suite of features designed to make your hosting experience
-          one only Modrinth can provide.
+          Included with every server is a suite of features designed to provide a hosting experience
+          that only Modrinth can offer.
         </h2>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
@@ -245,7 +245,7 @@
             <h2 class="m-0 text-lg font-bold">Backups included</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Backup your server up to 15 times and store them forever. Restore your progress at any
-              time with a single click. Just like a time machine.
+              time with a single click. It's like a time machine.
             </h3>
             <div class="flex flex-row items-center gap-8">
               <div
@@ -271,7 +271,30 @@
             </div>
           </div>
         </div>
-        <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12"></div>
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Store as many mods, plugins, and worlds as you want. No limits on storage space.
+            </h3>
+          </div>
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <h2 class="m-0 text-lg font-bold">24/7 support</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Modrinth support is available around the clock to help you with your server. Reach out
+              to us at any time.
+            </h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+    >
+      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
+        <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl"></h1>
       </div>
     </section>
   </div>
