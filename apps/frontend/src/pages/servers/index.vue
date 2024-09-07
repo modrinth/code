@@ -25,6 +25,11 @@
           plugins, and datapacks — without the hassle of setup.
         </h2>
         <div class="relative flex w-fit flex-row gap-8">
+          <!--
+            Open modal, choose plan
+            Mount stripe
+            On success, create server and redirect user to management page
+          -->
           <ButtonStyled color="brand" size="large">
             <nuxt-link class="w-fit" to="/mods"> Start your server </nuxt-link>
           </ButtonStyled>
@@ -66,8 +71,9 @@
       </div>
     </section>
 
-    <section class="relative mx-auto mt-24 flex max-w-7xl flex-col px-3 pt-24">
-      <div class="flex w-full flex-col gap-8">
+    <section class="section-hero relative mt-24 flex flex-col px-3 pt-24 md:mt-48 md:pt-48">
+      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
@@ -82,12 +88,12 @@
           Integrated with Modrinth App. Choose from thousands of modpacks or create your own from
           your profiles. Invite your friends when you're ready to play.
         </h2>
-        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <img
-            src="~/assets/images/games/excitement.png"
-            alt=""
-            class="absolute right-8 top-24 hidden max-w-[360px] lg:block"
-          />
+        <img
+          src="~/assets/images/games/excitement.png"
+          alt=""
+          class="absolute right-8 top-0 hidden max-w-[360px] lg:block"
+        />
+        <div class="relative grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -165,24 +171,42 @@
               <path d="M10 8h.01" />
               <path d="M14 8h.01" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">Use an interface like no other</h2>
+            <h2 class="m-0 text-lg font-bold">Manage it all on Modrinth</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
               Keep track of your server's stats, and content on the website and in the Modrinth app.
               It's never been easier to manage your server.
             </h3>
           </div>
 
-          <div class="flex flex-col gap-4 rounded-xl bg-bg p-12 text-left">
-            <svg></svg>
-            <h2 class="m-0 text-lg font-bold"></h2>
-            <h3 class="m-0 text-base font-normal text-secondary"></h3>
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-8 text-brand"
+            >
+              <polygon points="13 19 22 12 13 5 13 19" />
+              <polygon points="2 19 11 12 2 5 2 19" />
+            </svg>
+            <h2 class="m-0 text-lg font-bold">Experience the fastest, most reliable hosting</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              DDoS protection built-in. 99.999% uptime guarantee. The most powerful hardware.
+              Powered by Pyro's custom-built software.
+            </h3>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="relative mx-auto mt-24 flex max-w-7xl flex-col px-3 pt-24">
-      <div class="flex w-full flex-col gap-8">
+    <section class="section-hero relative mt-24 flex flex-col px-3 pt-24 md:mt-48 md:pt-48">
+      <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
+      <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
@@ -192,10 +216,10 @@
           All the features you need
         </h1>
         <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+          class="relative m-0 max-w-xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Modrinth Servers come with unlimited storage, a custom subdomain, all the backups you
-          need, uncapped player slots and more, all included in your plan.
+          Included with every server is a suite of features designed to make your hosting experience
+          one only Modrinth can provide.
         </h2>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
@@ -213,6 +237,35 @@
               >.modrinth.gg
             </div>
           </div>
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <h2 class="m-0 text-lg font-bold">Backups included</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Never lose your progress. Backup your server up to 15 times. Restore from any backup
+              with a single click.
+            </h3>
+            <div class="flex flex-row items-center gap-8">
+              <div
+                class="flex w-fit flex-row items-center gap-4 rounded-full bg-brand py-1 pl-4 pr-6 text-[var(--color-accent-contrast)]"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="size-8"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                <p class="text-sm font-bold">Successfully backed up!</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -223,7 +276,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { ButtonStyled } from "@modrinth/ui";
 
-const words = ["friends", "medieval-masters", "create-server", "bananaramas", "fluffles"];
+const words = ["friends", "medieval-masters", "create-server", "mega-smp", "spookypack"];
 const currentWordIndex = ref(0);
 const currentText = ref("");
 const isDeleting = ref(false);
@@ -278,5 +331,17 @@ onUnmounted(() => {
     var(--color-brand-highlight) 0%,
     var(--color-accent-contrast) 100%
   );
+}
+
+.section-hero {
+  background: radial-gradient(
+    65% 50% at 50% -10%,
+    var(--color-brand-highlight) 0%,
+    var(--color-accent-contrast) 100%
+  );
+}
+
+.faded-brand-line {
+  background: linear-gradient(to right, var(--color-brand-highlight), transparent);
 }
 </style>
