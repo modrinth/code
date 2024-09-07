@@ -226,6 +226,11 @@
           Included with every server is a suite of features designed to provide a hosting experience
           that only Modrinth can offer.
         </h2>
+        <img
+          src="~/assets/images/games/waving.png"
+          alt=""
+          class="absolute right-8 top-32 hidden max-w-[580px] lg:block"
+        />
         <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
           <div class="grid w-full grid-cols-1 gap-8">
             <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
@@ -248,12 +253,11 @@
               <h2 class="m-0 text-lg font-bold">Custom subdomain</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
                 Share your server with a custom
-                <span class="text-contrast">modrinth.gg</span> subdomain. Don't fumble with IP
-                addresses and ports. Just share your link.
+                <span class="text-contrast">modrinth.gg</span> subdomain.
               </h3>
               <div
                 aria-hidden="true"
-                class="ooh-shiny absolute -right-8 -top-8 flex items-center justify-center rounded-full bg-bg-raised p-4"
+                class="ooh-shiny absolute right-4 top-4 flex items-center justify-center rounded-full bg-bg-raised p-4"
               >
                 <span class="font-bold text-contrast">{{ currentText }}</span
                 >.modrinth.gg
@@ -278,23 +282,22 @@
               </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
-                Backup your server up to 15 times and store them forever. Restore your progress at
-                any time with a single click. It's like a time machine.
+                Backup your server up to 15 times and keep your data stored forever.
               </h3>
             </div>
           </div>
           <div
-            class="relative flex flex-col gap-4 overflow-hidden rounded-xl bg-highlight p-6 text-left md:p-12"
+            class="relative flex flex-col gap-4 overflow-hidden rounded-xl bg-highlight p-6 text-left backdrop-blur-xl md:p-12"
           >
             <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
             <h3 class="m-0 text-base font-normal">
-              Store as many mods, plugins, and worlds as you want.
+              Store as many mods, plugins, and worlds as you need.
             </h3>
 
             <img
               src="~/assets/images/games/content-hero.png"
               alt=""
-              class="absolute -bottom-8 -right-[15%] max-w-2xl rounded-xl bg-brand p-4"
+              class="absolute -bottom-16 -right-[15%] max-w-2xl rounded-xl bg-brand p-4"
             />
             <div
               class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
