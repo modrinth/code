@@ -27,6 +27,7 @@
         <div class="relative flex w-fit flex-row gap-8">
           <!--
             Open modal, choose plan
+            Choose modpack (redirect to search page) - or choose a loader (forge/fabric/vanilla) with no mods
             Mount stripe
             On success, create server and redirect user to management page
           -->
@@ -210,7 +211,7 @@
       class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
     >
       <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
-      <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
+      <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
@@ -235,7 +236,7 @@
             </h3>
             <div
               aria-hidden="true"
-              class="ooh-shiny flex items-center justify-center rounded-full bg-bg-raised p-4"
+              class="ooh-shiny absolute -right-8 -top-8 flex items-center justify-center rounded-full bg-bg-raised p-4"
             >
               <span class="font-bold text-contrast">{{ currentText }}</span
               >.modrinth.gg
@@ -247,42 +248,21 @@
               Backup your server up to 15 times and store them forever. Restore your progress at any
               time with a single click. It's like a time machine.
             </h3>
-            <div class="flex flex-row items-center gap-8">
-              <div
-                class="mx-auto flex w-fit flex-row items-center gap-4 rounded-full bg-brand py-1 pl-4 pr-6 text-[var(--color-accent-contrast)]"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="size-8"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
-                <p class="text-sm font-bold">Successfully backed up!</p>
-              </div>
-            </div>
           </div>
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
             <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Store as many mods, plugins, and worlds as you want. No limits on storage space.
+              Store as many mods, plugins, and worlds as you want. No limits on your server's
+              storage.
             </h3>
           </div>
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
-            <h2 class="m-0 text-lg font-bold">24/7 support</h2>
+            <h2 class="m-0 text-lg font-bold">Around-the-clock support</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth support is available around the clock to help you with your server. Reach out
-              to us at any time.
+              Modrinth support is available to help you with your server. Reach out to us at any
+              time for setup help, troubleshooting, or questions.
             </h3>
           </div>
         </div>
@@ -294,7 +274,21 @@
     >
       <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col items-center gap-8 text-center">
-        <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl"></h1>
+        <h1 class="relative m-0 text-4xl leading-[120%] md:text-7xl">
+          Start your server on Modrinth
+        </h1>
+        <h2
+          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+        >
+          Plans start at ___. Cancel at any time.
+        </h2>
+
+        <div class="relative flex w-full flex-col items-center gap-8">
+          <ButtonStyled color="brand" size="large">
+            <nuxt-link class="w-fit" to="/mods"> Start your server </nuxt-link>
+          </ButtonStyled>
+          <UiServersPoweredByPyro class="!mt-0" />
+        </div>
       </div>
     </section>
   </div>
