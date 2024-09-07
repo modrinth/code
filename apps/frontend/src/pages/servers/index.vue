@@ -283,13 +283,19 @@
               </h3>
             </div>
           </div>
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+          <div
+            class="relative flex flex-col gap-4 overflow-hidden rounded-xl bg-highlight p-6 text-left md:p-12"
+          >
             <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
+            <h3 class="m-0 text-base font-normal">
               Store as many mods, plugins, and worlds as you want.
             </h3>
 
-            <img src="~/assets/images/games/content-hero.png" alt="" class="w-full rounded-xl" />
+            <img
+              src="~/assets/images/games/content-hero.png"
+              alt=""
+              class="absolute -bottom-8 -right-[15%] max-w-2xl rounded-xl bg-brand p-4"
+            />
             <div
               class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
             >
