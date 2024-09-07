@@ -229,6 +229,22 @@
         <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
           <div class="grid w-full grid-cols-1 gap-8">
             <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="size-8 text-brand"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                <path d="M2 12h20" />
+              </svg>
               <h2 class="m-0 text-lg font-bold">Custom subdomain</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
                 Share your server with a custom
@@ -244,6 +260,22 @@
               </div>
             </div>
             <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="size-8 text-brand"
+              >
+                <path d="M12 13v8" />
+                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+                <path d="m8 17 4-4 4 4" />
+              </svg>
               <h2 class="m-0 text-lg font-bold">Backups included</h2>
               <h3 class="m-0 text-base font-normal text-secondary">
                 Backup your server up to 15 times and store them forever. Restore your progress at
