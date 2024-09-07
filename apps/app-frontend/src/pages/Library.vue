@@ -40,8 +40,6 @@ onUnmounted(() => {
 })
 
 const settings = await useSettings()
-
-console.log('settings', settings)
 </script>
 
 <template>
