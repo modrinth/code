@@ -226,44 +226,43 @@
           Included with every server is a suite of features designed to provide a hosting experience
           that only Modrinth can offer.
         </h2>
-        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
-            <h2 class="m-0 text-lg font-bold">Custom subdomain</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
-              Share your server with a custom
-              <span class="text-contrast">modrinth.gg</span> subdomain. Don't fumble with IP
-              addresses and ports. Just share your link.
-            </h3>
-            <div
-              aria-hidden="true"
-              class="ooh-shiny absolute -right-8 -top-8 flex items-center justify-center rounded-full bg-bg-raised p-4"
-            >
-              <span class="font-bold text-contrast">{{ currentText }}</span
-              >.modrinth.gg
+        <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
+          <div class="grid w-full grid-cols-1 gap-8">
+            <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+              <h2 class="m-0 text-lg font-bold">Custom subdomain</h2>
+              <h3 class="m-0 text-base font-normal text-secondary">
+                Share your server with a custom
+                <span class="text-contrast">modrinth.gg</span> subdomain. Don't fumble with IP
+                addresses and ports. Just share your link.
+              </h3>
+              <div
+                aria-hidden="true"
+                class="ooh-shiny absolute -right-8 -top-8 flex items-center justify-center rounded-full bg-bg-raised p-4"
+              >
+                <span class="font-bold text-contrast">{{ currentText }}</span
+                >.modrinth.gg
+              </div>
+            </div>
+            <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+              <h2 class="m-0 text-lg font-bold">Backups included</h2>
+              <h3 class="m-0 text-base font-normal text-secondary">
+                Backup your server up to 15 times and store them forever. Restore your progress at
+                any time with a single click. It's like a time machine.
+              </h3>
             </div>
           </div>
           <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
-            <h2 class="m-0 text-lg font-bold">Backups included</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
-              Backup your server up to 15 times and store them forever. Restore your progress at any
-              time with a single click. It's like a time machine.
-            </h3>
-          </div>
-        </div>
-        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
             <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Store as many mods, plugins, and worlds as you want. No limits on your server's
-              storage.
+              Store as many mods, plugins, and worlds as you want.
             </h3>
-          </div>
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
-            <h2 class="m-0 text-lg font-bold">Around-the-clock support</h2>
-            <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth support is available to help you with your server. Reach out to us at any
-              time for setup help, troubleshooting, or questions.
-            </h3>
+
+            <img src="~/assets/images/games/content-hero.png" alt="" class="w-full rounded-xl" />
+            <div
+              class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
+            >
+              8.49 GB of 10 GB used
+            </div>
           </div>
         </div>
       </div>
@@ -280,7 +279,7 @@
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Plans start at ___. Cancel at any time.
+          Plans start at ___. Cancel anytime.
         </h2>
 
         <div class="relative flex w-full flex-col items-center gap-8">
