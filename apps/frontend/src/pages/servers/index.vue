@@ -245,7 +245,7 @@
             </h3>
             <div class="flex flex-row items-center gap-8">
               <div
-                class="flex w-fit flex-row items-center gap-4 rounded-full bg-brand py-1 pl-4 pr-6 text-[var(--color-accent-contrast)]"
+                class="mx-auto flex w-fit flex-row items-center gap-4 rounded-full bg-brand py-1 pl-4 pr-6 text-[var(--color-accent-contrast)]"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
