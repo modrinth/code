@@ -51,7 +51,6 @@ where
     let user = User {
         id: UserId::from(db_user.id),
         username: db_user.username,
-        name: db_user.name,
         email: db_user.email,
         email_verified: Some(db_user.email_verified),
         avatar_url: db_user.avatar_url,

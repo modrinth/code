@@ -163,7 +163,6 @@ pub async fn user_edit(
         info,
         web::Json(v3::users::EditUser {
             username: new_user.username,
-            name: new_user.name,
             bio: new_user.bio,
             role: new_user.role,
             badges: new_user.badges,

@@ -35,7 +35,7 @@ impl From<crate::models::v3::users::User> for LegacyUser {
         Self {
             id: data.id,
             username: data.username,
-            name: data.name,
+            name: None,
             email: data.email,
             email_verified: data.email_verified,
             avatar_url: data.avatar_url,

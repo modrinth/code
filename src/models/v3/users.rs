@@ -39,7 +39,6 @@ impl Default for Badges {
 pub struct User {
     pub id: UserId,
     pub username: String,
-    pub name: Option<String>,
     pub avatar_url: Option<String>,
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
@@ -73,7 +72,6 @@ impl From<DBUser> for User {
         Self {
             id: data.id.into(),
             username: data.username,
-            name: data.name,
             email: None,
             email_verified: None,
             avatar_url: data.avatar_url,

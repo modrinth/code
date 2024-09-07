@@ -4,11 +4,11 @@
 -- Inserts 5 dummy users for testing, with slight differences
 -- 'Friend' and 'enemy' function like 'user', but we can use them to simulate 'other' users that may or may not be able to access certain things
 -- IDs 1-5, 1-5
-INSERT INTO users (id, username, name, email, role) VALUES (1, 'Admin', 'Administrator Test', 'admin@modrinth.com', 'admin');
-INSERT INTO users (id, username, name, email, role) VALUES (2, 'Moderator', 'Moderator Test', 'moderator@modrinth.com', 'moderator');
-INSERT INTO users (id, username, name, email, role) VALUES (3, 'User', 'User Test', 'user@modrinth.com', 'developer');
-INSERT INTO users (id, username, name, email, role) VALUES (4, 'Friend', 'Friend Test', 'friend@modrinth.com', 'developer');
-INSERT INTO users (id, username, name, email, role) VALUES (5, 'Enemy', 'Enemy Test', 'enemy@modrinth.com', 'developer');
+INSERT INTO users (id, username, email, role) VALUES (1, 'Admin', 'admin@modrinth.com', 'admin');
+INSERT INTO users (id, username, email, role) VALUES (2, 'Moderator', 'moderator@modrinth.com', 'moderator');
+INSERT INTO users (id, username, email, role) VALUES (3, 'User', 'user@modrinth.com', 'developer');
+INSERT INTO users (id, username, email, role) VALUES (4, 'Friend', 'friend@modrinth.com', 'developer');
+INSERT INTO users (id, username, email, role) VALUES (5, 'Enemy', 'enemy@modrinth.com', 'developer');
 
 -- Full PATs for each user, with different scopes
 -- These are not legal PATs, as they contain all scopes- they mimic permissions of a logged in user

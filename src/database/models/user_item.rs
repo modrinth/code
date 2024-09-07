@@ -37,7 +37,6 @@ pub struct User {
     pub totp_secret: Option<String>,
 
     pub username: String,
-    pub name: Option<String>,
     pub email: Option<String>,
     pub email_verified: bool,
     pub avatar_url: Option<String>,
@@ -57,7 +56,7 @@ impl User {
         sqlx::query!(
             "
             INSERT INTO users (
-                id, username, name, email,
+                id, username, email,
                 avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
@@ -67,12 +66,11 @@ impl User {
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19, $20
+                $14, $15, $16, $17, $18, $19
             )
             ",
             self.id as UserId,
             &self.username,
-            self.name.as_ref(),
             self.email.as_ref(),
             self.avatar_url.as_ref(),
             self.bio.as_ref(),
@@ -166,7 +164,7 @@ impl User {
 
                 let users = sqlx::query!(
                     "
-                    SELECT id, name, email,
+                    SELECT id, email,
                         avatar_url, username, bio,
                         created, role, badges,
                         balance,
@@ -189,7 +187,6 @@ impl User {
                             google_id: u.google_id,
                             steam_id: u.steam_id,
                             microsoft_id: u.microsoft_id,
-                            name: u.name,
                             email: u.email,
                             email_verified: u.email_verified,
                             avatar_url: u.avatar_url,

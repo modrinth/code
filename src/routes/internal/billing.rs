@@ -999,7 +999,7 @@ pub async fn stripe_webhook(
                     let price = match metadata.product_price.prices {
                         Price::OneTime { price } => Some(price),
                         Price::Recurring { intervals } => {
-                            if let Some((subscription_id, interval)) =
+                            if let Some((_subscription_id, interval)) =
                                 metadata.user_subscription_data
                             {
                                 if let Some(mut user_subscription) = metadata.user_subscription {

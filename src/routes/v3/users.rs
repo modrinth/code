@@ -274,13 +274,6 @@ pub struct EditUser {
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 64), regex = "RE_URL_SAFE")]
-    pub name: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
     #[validate(length(max = 160))]
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
@@ -343,20 +336,6 @@ pub async fn user_edit(
                         "Username {username} is taken!"
                     )));
                 }
-            }
-
-            if let Some(name) = &new_user.name {
-                sqlx::query!(
-                    "
-                    UPDATE users
-                    SET name = $1
-                    WHERE (id = $2)
-                    ",
-                    name.as_deref(),
-                    id as crate::database::models::ids::UserId,
-                )
-                .execute(&mut *transaction)
-                .await?;
             }
 
             if let Some(bio) = &new_user.bio {
