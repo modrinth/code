@@ -261,7 +261,7 @@
             <div
               class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
             >
-              8.49 GB of 10 GB used
+              8.49 GB used
             </div>
           </div>
         </div>
