@@ -236,7 +236,7 @@ export const useServerStore = defineStore("servers", {
 
     async changeSubdomain(serverId: string, subdomain: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/subdomains`, {
+        await usePyroFetch(`servers/${serverId}/subdomain`, {
           method: "POST",
           body: { subdomain },
         });

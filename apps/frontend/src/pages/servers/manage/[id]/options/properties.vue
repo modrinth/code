@@ -1,65 +1,67 @@
 <template>
-  <div>
-    <div v-if="data && status === 'success'">
-      <section class="card">
-        <div class="flex flex-col gap-6">
-          <h2 class="text-3xl font-bold">General</h2>
-          <div class="h-[2px] w-full bg-divider"></div>
-          <div v-for="(property, index) in liveProperties" :key="index">
-            <div class="mb-4 flex justify-between">
-              <label :for="index as unknown as string" class="block text-lg font-semibold">{{
-                index
-                  .toString()
-                  .split("-")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")
-              }}</label>
-              <div v-if="typeof property === 'boolean'">
-                <Checkbox id="property.id" v-model="liveProperties[index]" />
-              </div>
-              <div v-else-if="typeof property === 'number'">
-                <input
-                  :id="index as unknown as string"
-                  v-model.number="liveProperties[index]"
-                  type="number"
-                  class="w-full rounded border p-2"
-                />
-              </div>
-              <div v-else-if="typeof property === 'object'">
-                <textarea
-                  :id="index as unknown as string"
-                  :value="JSON.stringify(property, null, 2)"
-                  class="w-full rounded border p-2"
-                ></textarea>
-              </div>
-              <div v-else>
-                <input
-                  :id="index as unknown as string"
-                  :value="property"
-                  type="text"
-                  class="w-full rounded border p-2"
-                />
-              </div>
-            </div>
-            <div class="h-[2px] w-full bg-divider"></div>
+  <div class="h-full w-full">
+    <div
+      class="flex h-full w-full flex-col justify-between gap-6 p-8"
+      v-if="data && status == 'success'"
+    >
+      <h2 class="text-3xl font-bold">server.properties</h2>
+      <div v-for="(property, index) in liveProperties" :key="index">
+        <div class="mb-4 flex justify-between">
+          <label :for="index as unknown as string" class="block text-lg font-semibold">{{
+            index
+              .toString()
+              .split("-")
+              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" ")
+          }}</label>
+          <div v-if="typeof property === 'boolean'">
+            <Checkbox id="property.id" v-model="liveProperties[index]" />
+          </div>
+          <div v-else-if="typeof property === 'number'">
+            <input
+              :id="index as unknown as string"
+              v-model.number="liveProperties[index]"
+              type="number"
+              class="w-full rounded border p-2"
+            />
+          </div>
+          <div v-else-if="typeof property === 'object'">
+            <textarea
+              :id="index as unknown as string"
+              :value="JSON.stringify(property, null, 2)"
+              class="w-full rounded border p-2"
+            ></textarea>
+          </div>
+          <div v-else>
+            <input
+              :id="index as unknown as string"
+              :value="property"
+              type="text"
+              class="w-full rounded border p-2"
+            />
           </div>
         </div>
-        <button
-          type="submit"
-          class="btn btn-primary mt-4"
-          @click="() => saveProperties()"
-          :disabled="isUpdating || !hasUnsavedChanges"
-        >
-          {{ isUpdating ? "Saving..." : "Save" }}
-        </button>
-      </section>
+        <div class="h-[2px] w-full bg-divider"></div>
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary mt-4"
+        @click="() => saveProperties()"
+        :disabled="isUpdating || !hasUnsavedChanges"
+      >
+        {{ isUpdating ? "Saving..." : "Save" }}
+      </button>
     </div>
-    <PyroLoading v-else-if="status === 'pending'" />
-    <PyroError
-      v-else-if="status === 'error'"
-      title="Failed to load"
-      message="Failed to load server properties"
-    />
+    <div v-else-if="status === 'error'" class="mt-12 flex w-full items-center justify-center">
+      <div class="flex flex-col items-center gap-4">
+        <h2 class="text-3xl font-bold">Config not available</h2>
+        <div class="text-center text-lg">
+          We couldent find a config, make sure you have started your server at least once. <br />
+          If this issue persists, please contact support.
+        </div>
+      </div>
+    </div>
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 
@@ -67,7 +69,6 @@
 import { ref, watch } from "vue";
 import Checkbox from "~/components/ui/Checkbox.vue";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
-import PyroError from "~/components/ui/servers/PyroError.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -82,6 +83,8 @@ const { data, status } = await useAsyncData(
   "data",
   async () => await serverStore.fetchConfigFile(serverId, "ServerProperties"),
 );
+
+console.log(data);
 
 const liveProperties = ref(JSON.parse(JSON.stringify(data.value)));
 

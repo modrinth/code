@@ -1,32 +1,27 @@
 <template>
-  <div>
-    <div v-if="data && status == 'success'">
-      <section class="card">
-        <div class="flex flex-col gap-6">
-          <h2 class="text-3xl font-bold">General</h2>
-          <div class="h-[2px] w-full bg-divider"></div>
-          <div class="ml-1 flex flex-col gap-4">
-            <label for="username-field" class="flex flex-col gap-2">
-              <span class="text-lg font-bold text-white">Server Name</span>
-              <span> Change the name of your server as it appears on Modrinth </span>
-            </label>
-            <input
-              v-model="serverName"
-              class="h-[50%] w-[40%]"
-              @keyup.enter="updateServerNameReq"
-            />
-          </div>
-          <div class="h-[2px] w-full bg-divider"></div>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            :disabled="isUpdating || !hasUnsavedChanges"
-            @click="updateServerNameReq"
-          >
-            {{ isUpdating ? "Saving..." : "Save" }}
-          </button>
+  <div class="h-full w-full">
+    <div
+      class="flex h-full w-full flex-col justify-between gap-6 p-8"
+      v-if="data && status == 'success'"
+    >
+      <h2 class="text-3xl font-bold">General</h2>
+      <div class="flex h-full flex-col gap-2">
+        <div class="card flex flex-col gap-4">
+          <label for="username-field" class="flex flex-col gap-2">
+            <span class="text-lg font-bold text-white">Server name</span>
+            <span> Change the name of your server as it appears on Modrinth </span>
+          </label>
+          <input v-model="serverName" class="h-[50%] w-[40%]" @keyup.enter="updateServerNameReq" />
         </div>
-      </section>
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        :disabled="isUpdating || !hasUnsavedChanges"
+        @click="updateServerNameReq"
+      >
+        {{ isUpdating ? "Saving..." : "Save" }}
+      </button>
     </div>
     <UiServersPyroLoading v-else />
   </div>

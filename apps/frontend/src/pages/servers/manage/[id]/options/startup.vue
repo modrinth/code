@@ -1,14 +1,15 @@
 <template>
-  <div>
-    <div v-if="data && status === 'success'">
-      <section class="card">
-        <div class="flex flex-col gap-6">
-          <h2 class="text-3xl font-bold">Launch Arguments</h2>
-          <div class="h-[2px] w-full bg-divider"></div>
-        </div>
-      </section>
+  <div class="h-full w-full">
+    <div
+      class="flex h-full w-full flex-col justify-between gap-6 p-8"
+      v-if="data && status == 'success'"
+    >
+      <h2 class="text-3xl font-bold">Startup</h2>
+      <button type="submit" class="btn btn-primary" :disabled="isUpdating" @click="">
+        {{ isUpdating ? "Saving..." : "Save" }}
+      </button>
     </div>
-    <UiServersPyroLoading v-else-if="status === 'pending'" />
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 

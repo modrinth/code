@@ -43,8 +43,6 @@ let loading = false;
 const packId = route.params.id;
 const serverName = ref("");
 
-const pack: any = await toRaw(useBaseFetch(`project/${packId}`));
-
 const updateServerName = (event: Event) => {
   serverName.value = (event.target as HTMLInputElement).value;
 };
@@ -55,8 +53,15 @@ interface IntServer {
   port: number;
 }
 
+const loaders = ["Forge", "Fabric", "Liteloader", "Optifine", "Modloader", "Modpack"];
+
 const createServer = async () => {
   loading = true;
+
+  // check if packid is in loader
+  const loader = loaders.includes(packId);
+
+  const pack: any = loader ? null : await toRaw(useBaseFetch(`project/${packId}`));
 
   let path = "servers/create";
   const version = 0;
@@ -67,10 +72,15 @@ const createServer = async () => {
       memory_mb: 4192,
       swap_mb: 4192,
     },
-    source: {
-      project_id: packId,
-      version_id: pack.versions.slice(-1)[0],
-    },
+    source: loader
+      ? {
+          loader: packId,
+          version: "1.20.1-47.3.7",
+        }
+      : {
+          project_id: packId,
+          version_id: pack.versions.slice(-1)[0],
+        },
     user_id: auth.value.user.id,
   };
   const method = "POST";
