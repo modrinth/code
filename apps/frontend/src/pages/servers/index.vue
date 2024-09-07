@@ -173,6 +173,7 @@
           </div>
 
           <div class="flex flex-col gap-4 rounded-xl bg-bg p-12 text-left">
+            <svg></svg>
             <h2 class="m-0 text-lg font-bold"></h2>
             <h3 class="m-0 text-base font-normal text-secondary"></h3>
           </div>
@@ -188,20 +189,69 @@
           Included with your server
         </div>
         <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
-
+          All the features you need
         </h1>
         <h2
           class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
+          Modrinth Servers come with unlimited storage, a custom subdomain, all the backups you
+          need, uncapped player slots and more, all included in your plan.
         </h2>
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <h2 class="m-0 text-lg font-bold">Custom subdomain</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Share your server with a custom
+              <span class="text-contrast">modrinth.gg</span> subdomain. Don't fumble with IP
+              addresses and ports. Just share your link.
+            </h3>
+            <div
+              aria-hidden="true"
+              class="ooh-shiny flex items-center justify-center rounded-full bg-bg-raised p-4"
+            >
+              <span class="font-bold text-contrast">{{ currentText }}</span
+              >.modrinth.gg
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { ButtonStyled } from "@modrinth/ui";
+
+const words = ["friends", "medieval-masters", "create-server", "bananaramas", "fluffles"];
+const currentWordIndex = ref(0);
+const currentText = ref("");
+const isDeleting = ref(false);
+const typingSpeed = 75;
+const deletingSpeed = 25;
+const pauseTime = 2000;
+
+const startTyping = () => {
+  const currentWord = words[currentWordIndex.value];
+  if (isDeleting.value) {
+    if (currentText.value.length > 0) {
+      currentText.value = currentText.value.slice(0, -1);
+      setTimeout(startTyping, deletingSpeed);
+    } else {
+      isDeleting.value = false;
+      currentWordIndex.value = (currentWordIndex.value + 1) % words.length;
+      setTimeout(startTyping, typingSpeed);
+    }
+  } else {
+    if (currentText.value.length < currentWord.length) {
+      currentText.value = currentWord.slice(0, currentText.value.length + 1);
+      setTimeout(startTyping, typingSpeed);
+    } else {
+      isDeleting.value = true;
+      setTimeout(startTyping, pauseTime);
+    }
+  }
+};
 
 onMounted(() => {
   document.body.style.background = "var(--color-accent-contrast)";
@@ -209,6 +259,7 @@ onMounted(() => {
   if (layoutDiv) {
     layoutDiv.style.background = "var(--color-accent-contrast)";
   }
+  startTyping();
 });
 
 onUnmounted(() => {
