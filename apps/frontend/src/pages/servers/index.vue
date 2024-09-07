@@ -38,7 +38,7 @@
         </div>
 
         <div
-          class="pointer-events-none relative -mt-24 flex h-full w-full flex-row items-end gap-24"
+          class="pointer-events-none relative flex h-full w-full flex-row items-end gap-24 md:-mt-24"
         >
           <div
             class="absolute left-0 right-0 top-0 max-h-[80%] overflow-hidden"
@@ -59,9 +59,9 @@
           <img
             src="~/assets/images/games/servers-hero-real-noshadow.png"
             alt=""
-            class="relative mt-8 h-full w-[55%] rounded-3xl object-cover"
+            class="relative mt-8 h-full w-full rounded-3xl object-cover md:w-[55%]"
           />
-          <div class="relative w-[45%]">
+          <div class="relative hidden w-[45%] md:block">
             <img
               src="~/assets/images/games/combined-hero.png"
               alt=""
