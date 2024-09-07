@@ -249,6 +249,7 @@ pub struct OAuthClientEdit {
     )]
     pub name: Option<String>,
 
+    #[validate(custom(function = "crate::util::validate::validate_no_restricted_scopes"))]
     pub max_scopes: Option<Scopes>,
 
     #[validate(length(min = 1))]

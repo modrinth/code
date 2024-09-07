@@ -1,10 +1,333 @@
 use crate::database::models::legacy_loader_fields::MinecraftGameVersion;
 use crate::database::redis::RedisPool;
+use crate::models::ids::base62_impl::to_base62;
 use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
 use chrono::{DateTime, Utc};
 use serde::Serialize;
 use sqlx::PgPool;
+
+const PLUGIN_LOADERS: &[&str] = &[
+    "bukkit",
+    "spigot",
+    "paper",
+    "purpur",
+    "bungeecord",
+    "waterfall",
+    "velocity",
+    "sponge",
+];
+
+struct WebhookMetadata {
+    pub project_url: String,
+    pub project_title: String,
+    pub project_summary: String,
+    pub display_project_type: String,
+    pub project_icon_url: Option<String>,
+    pub color: Option<u32>,
+
+    pub author: Option<WebhookAuthor>,
+
+    pub categories_formatted: Vec<String>,
+    pub loaders_formatted: Vec<String>,
+    pub versions_formatted: Vec<String>,
+
+    pub gallery_image: Option<String>,
+}
+
+struct WebhookAuthor {
+    pub name: String,
+    pub url: String,
+    pub icon_url: Option<String>,
+}
+
+async fn get_webhook_metadata(
+    project_id: ProjectId,
+    pool: &PgPool,
+    redis: &RedisPool,
+    emoji: bool,
+) -> Result<Option<WebhookMetadata>, ApiError> {
+    let project =
+        crate::database::models::project_item::Project::get_id(project_id.into(), pool, redis)
+            .await?;
+
+    if let Some(mut project) = project {
+        let mut owner = None;
+
+        if let Some(organization_id) = project.inner.organization_id {
+            let organization = crate::database::models::organization_item::Organization::get_id(
+                organization_id,
+                pool,
+                redis,
+            )
+            .await?;
+
+            if let Some(organization) = organization {
+                owner = Some(WebhookAuthor {
+                    name: organization.name,
+                    url: format!(
+                        "{}/organization/{}",
+                        dotenvy::var("SITE_URL").unwrap_or_default(),
+                        organization.slug
+                    ),
+                    icon_url: organization.icon_url,
+                });
+            }
+        } else {
+            let team = crate::database::models::team_item::TeamMember::get_from_team_full(
+                project.inner.team_id,
+                pool,
+                redis,
+            )
+            .await?;
+
+            if let Some(member) = team.into_iter().find(|x| x.is_owner) {
+                let user =
+                    crate::database::models::user_item::User::get_id(member.user_id, pool, redis)
+                        .await?;
+
+                if let Some(user) = user {
+                    owner = Some(WebhookAuthor {
+                        url: format!(
+                            "{}/user/{}",
+                            dotenvy::var("SITE_URL").unwrap_or_default(),
+                            user.username
+                        ),
+                        name: user.username,
+                        icon_url: user.avatar_url,
+                    });
+                }
+            }
+        };
+
+        let all_game_versions = MinecraftGameVersion::list(None, None, pool, redis).await?;
+
+        let versions = project
+            .aggregate_version_fields
+            .clone()
+            .into_iter()
+            .find_map(|vf| MinecraftGameVersion::try_from_version_field(&vf).ok())
+            .unwrap_or_default();
+
+        let formatted_game_versions = get_gv_range(versions, all_game_versions);
+
+        let mut project_type = project.project_types.pop().unwrap_or_default(); // TODO: Should this grab a not-first?
+
+        if project
+            .inner
+            .loaders
+            .iter()
+            .all(|x| PLUGIN_LOADERS.contains(&&**x))
+        {
+            project_type = "plugin".to_string();
+        } else if project.inner.loaders.iter().any(|x| x == "datapack") {
+            project_type = "datapack".to_string();
+        }
+
+        let mut display_project_type = match &*project_type {
+            "datapack" => "data pack",
+            "resourcepack" => "resource pack",
+            _ => &*project_type,
+        }
+        .to_string();
+
+        Ok(Some(WebhookMetadata {
+            project_url: format!(
+                "{}/{}/{}",
+                dotenvy::var("SITE_URL").unwrap_or_default(),
+                project_type,
+                project
+                    .inner
+                    .slug
+                    .clone()
+                    .unwrap_or_else(|| to_base62(project.inner.id.0 as u64))
+            ),
+            project_title: project.inner.name,
+            project_summary: project.inner.summary,
+            display_project_type: format!(
+                "{}{display_project_type}",
+                display_project_type.remove(0).to_uppercase()
+            ),
+            project_icon_url: project.inner.icon_url,
+            color: project.inner.color,
+            author: owner,
+            categories_formatted: project
+                .categories
+                .into_iter()
+                .map(|mut x| format!("{}{x}", x.remove(0).to_uppercase()))
+                .collect::<Vec<_>>(),
+            loaders_formatted: project
+                .inner
+                .loaders
+                .into_iter()
+                .map(|loader| {
+                    let mut x = if &*loader == "datapack" {
+                        "Data Pack".to_string()
+                    } else if &*loader == "mrpack" {
+                        "Modpack".to_string()
+                    } else {
+                        loader.clone()
+                    };
+
+                    if emoji {
+                        let emoji_id: i64 = match &*loader {
+                            "bukkit" => 1049793345481883689,
+                            "bungeecord" => 1049793347067314220,
+                            "canvas" => 1107352170656968795,
+                            "datapack" => 1057895494652788866,
+                            "fabric" => 1049793348719890532,
+                            "folia" => 1107348745571537018,
+                            "forge" => 1049793350498275358,
+                            "iris" => 1107352171743281173,
+                            "liteloader" => 1049793351630733333,
+                            "minecraft" => 1049793352964526100,
+                            "modloader" => 1049793353962762382,
+                            "neoforge" => 1140437823783190679,
+                            "optifine" => 1107352174415052901,
+                            "paper" => 1049793355598540810,
+                            "purpur" => 1140436034505674762,
+                            "quilt" => 1049793857681887342,
+                            "rift" => 1049793359373414502,
+                            "spigot" => 1049793413886779413,
+                            "sponge" => 1049793416969605231,
+                            "vanilla" => 1107350794178678855,
+                            "velocity" => 1049793419108700170,
+                            "waterfall" => 1049793420937412638,
+                            _ => 1049805243866681424,
+                        };
+
+                        format!("<:{loader}:{emoji_id}> {}{x}", x.remove(0).to_uppercase())
+                    } else {
+                        format!("{}{x}", x.remove(0).to_uppercase())
+                    }
+                })
+                .collect(),
+            versions_formatted: formatted_game_versions,
+            gallery_image: project
+                .gallery_items
+                .into_iter()
+                .find(|x| x.featured)
+                .map(|x| x.image_url),
+        }))
+    } else {
+        Ok(None)
+    }
+}
+
+pub async fn send_slack_webhook(
+    project_id: ProjectId,
+    pool: &PgPool,
+    redis: &RedisPool,
+    webhook_url: String,
+    message: Option<String>,
+) -> Result<(), ApiError> {
+    let metadata = get_webhook_metadata(project_id, pool, redis, false).await?;
+
+    if let Some(metadata) = metadata {
+        let mut blocks = vec![];
+
+        if let Some(message) = message {
+            blocks.push(serde_json::json!({
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": message,
+                }
+            }));
+        }
+
+        if let Some(ref author) = metadata.author {
+            let mut elements = vec![];
+
+            if let Some(ref icon_url) = author.icon_url {
+                elements.push(serde_json::json!({
+                    "type": "image",
+                    "image_url": icon_url,
+                    "alt_text": "Author"
+                }));
+            }
+
+            elements.push(serde_json::json!({
+                "type": "mrkdwn",
+                "text": format!("<{}|{}>", author.url, author.name)
+            }));
+
+            blocks.push(serde_json::json!({
+                "type": "context",
+                "elements": elements
+            }));
+        }
+
+        let mut project_block = serde_json::json!({
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": format!(
+                    "*<{}|{}>*\n\n{}\n\n*Categories:* {}\n\n*Loaders:* {}\n\n*Versions:* {}",
+                    metadata.project_url,
+                    metadata.project_title,
+                    metadata.project_summary,
+                    metadata.categories_formatted.join(", "),
+                    metadata.loaders_formatted.join(", "),
+                    metadata.versions_formatted.join(", ")
+                )
+            }
+        });
+
+        if let Some(icon_url) = metadata.project_icon_url {
+            if let Some(project_block) = project_block.as_object_mut() {
+                project_block.insert(
+                    "accessory".to_string(),
+                    serde_json::json!({
+                        "type": "image",
+                        "image_url": icon_url,
+                        "alt_text": metadata.project_title
+                    }),
+                );
+            }
+        }
+
+        blocks.push(project_block);
+
+        if let Some(gallery_image) = metadata.gallery_image {
+            blocks.push(serde_json::json!({
+                "type": "image",
+                "image_url": gallery_image,
+                "alt_text": metadata.project_title
+            }));
+        }
+
+        blocks.push(
+            serde_json::json!({
+                "type": "context",
+                "elements": [
+                    {
+                        "type": "image",
+                        "image_url": "https://cdn-raw.modrinth.com/modrinth-new.png",
+                        "alt_text": "Author"
+                    },
+                    {
+                        "type": "mrkdwn",
+                        "text": format!("{} on Modrinth • <!date^{}^{{date_short_pretty}} at {{time}}|Unknown date>", metadata.display_project_type, Utc::now().timestamp())
+                    }
+                ]
+            })
+        );
+
+        let client = reqwest::Client::new();
+
+        client
+            .post(&webhook_url)
+            .json(&serde_json::json!({
+                "blocks": blocks,
+            }))
+            .send()
+            .await
+            .map_err(|_| ApiError::Discord("Error while sending projects webhook".to_string()))?;
+    }
+
+    Ok(())
+}
 
 #[derive(Serialize)]
 struct DiscordEmbed {
@@ -58,17 +381,6 @@ struct DiscordWebhook {
     pub content: Option<String>,
 }
 
-const PLUGIN_LOADERS: &[&str] = &[
-    "bukkit",
-    "spigot",
-    "paper",
-    "purpur",
-    "bungeecord",
-    "waterfall",
-    "velocity",
-    "sponge",
-];
-
 pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
@@ -76,192 +388,54 @@ pub async fn send_discord_webhook(
     webhook_url: String,
     message: Option<String>,
 ) -> Result<(), ApiError> {
-    // TODO: this currently uses Minecraft as it is a v2 webhook, and requires 'game_versions', a minecraft-java loader field.
-    // TODO: This should be updated to use the generic loader fields w/ discord from the project game
+    let metadata = get_webhook_metadata(project_id, pool, redis, true).await?;
 
-    // TODO: This should use the project_item get route
-    let all_game_versions = MinecraftGameVersion::list(None, None, pool, redis).await?;
-
-    let row =
-        sqlx::query!(
-            "
-            SELECT m.id id, m.name name, m.summary summary, m.color color,
-            m.icon_url icon_url, m.slug slug,
-            u.username username, u.avatar_url avatar_url,
-            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
-            ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
-            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types,
-            ARRAY_AGG(DISTINCT g.slug) filter (where g.slug is not null) games,
-            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
-            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
-            FROM mods m
-            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE
-            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
-            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ALL($2)
-            LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id
-            LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id
-            LEFT JOIN loaders_project_types lpt ON lpt.joining_loader_id = lo.id
-            LEFT JOIN project_types pt ON pt.id = lpt.joining_project_type_id
-            LEFT JOIN loaders_project_types_games lptg ON lptg.loader_id = lo.id AND lptg.project_type_id = pt.id
-            LEFT JOIN games g ON lptg.game_id = g.id
-            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.is_owner = TRUE AND tm.accepted = TRUE
-            INNER JOIN users u ON tm.user_id = u.id
-            WHERE m.id = $1
-            GROUP BY m.id, u.id;
-            ",
-            project_id.0 as i64,
-            &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
-        )
-        .fetch_optional(pool)
-        .await?;
-
-    if let Some(project) = row {
+    if let Some(project) = metadata {
         let mut fields = vec![];
-
-        let categories = project.categories.unwrap_or_default();
-        let loaders = project.loaders.unwrap_or_default();
-
-        if !categories.is_empty() {
+        if !project.categories_formatted.is_empty() {
             fields.push(DiscordEmbedField {
                 name: "Categories",
-                value: categories
-                    .into_iter()
-                    .map(|mut x| format!("{}{x}", x.remove(0).to_uppercase()))
-                    .collect::<Vec<_>>()
-                    .join("\n"),
+                value: project.categories_formatted.join("\n"),
                 inline: true,
             });
         }
 
-        if !loaders.is_empty() {
-            let mut formatted_loaders: String = String::new();
-
-            for loader in &loaders {
-                let emoji_id: i64 = match &**loader {
-                    "bukkit" => 1049793345481883689,
-                    "bungeecord" => 1049793347067314220,
-                    "canvas" => 1107352170656968795,
-                    "datapack" => 1057895494652788866,
-                    "fabric" => 1049793348719890532,
-                    "folia" => 1107348745571537018,
-                    "forge" => 1049793350498275358,
-                    "iris" => 1107352171743281173,
-                    "liteloader" => 1049793351630733333,
-                    "minecraft" => 1049793352964526100,
-                    "modloader" => 1049793353962762382,
-                    "neoforge" => 1140437823783190679,
-                    "optifine" => 1107352174415052901,
-                    "paper" => 1049793355598540810,
-                    "purpur" => 1140436034505674762,
-                    "quilt" => 1049793857681887342,
-                    "rift" => 1049793359373414502,
-                    "spigot" => 1049793413886779413,
-                    "sponge" => 1049793416969605231,
-                    "vanilla" => 1107350794178678855,
-                    "velocity" => 1049793419108700170,
-                    "waterfall" => 1049793420937412638,
-                    _ => 1049805243866681424,
-                };
-
-                let mut x = if loader == "datapack" {
-                    "Data Pack"
-                } else {
-                    loader
-                }
-                .to_string();
-
-                formatted_loaders.push_str(&format!(
-                    "<:{loader}:{emoji_id}> {}{x}\n",
-                    x.remove(0).to_uppercase()
-                ));
-            }
-
+        if !project.loaders_formatted.is_empty() {
             fields.push(DiscordEmbedField {
                 name: "Loaders",
-                value: formatted_loaders,
+                value: project.loaders_formatted.join("\n"),
                 inline: true,
             });
         }
 
-        // TODO: Modified to keep "Versions" as a field as it may be hardcoded. Ideally, this pushes all loader fields to the embed for v3
-        // TODO: This might need some work to manually test
-        let version_fields = crate::database::models::project_item::Project::get_id(
-            crate::database::models::ids::ProjectId(project.id),
-            pool,
-            redis,
-        )
-        .await
-        .ok()
-        .flatten()
-        .map(|project| project.aggregate_version_fields)
-        .unwrap_or_default();
-
-        let versions = version_fields
-            .into_iter()
-            .find_map(|vf| MinecraftGameVersion::try_from_version_field(&vf).ok())
-            .unwrap_or_default();
-
-        if !versions.is_empty() {
-            let formatted_game_versions: String = get_gv_range(versions, all_game_versions);
+        if !project.versions_formatted.is_empty() {
             fields.push(DiscordEmbedField {
                 name: "Versions",
-                value: formatted_game_versions,
+                value: project.versions_formatted.join("\n"),
                 inline: true,
             });
         }
 
-        let mut project_types: Vec<String> = project.project_types.unwrap_or_default();
-        let mut project_type = project_types.pop().unwrap_or_default(); // TODO: Should this grab a not-first?
-
-        if loaders.iter().all(|x| PLUGIN_LOADERS.contains(&&**x)) {
-            project_type = "plugin".to_string();
-        } else if loaders.iter().any(|x| x == "datapack") {
-            project_type = "datapack".to_string();
-        }
-
-        let mut display_project_type = match &*project_type {
-            "datapack" => "data pack",
-            "resourcepack" => "resource pack",
-            _ => &*project_type,
-        }
-        .to_string();
-
         let embed = DiscordEmbed {
-            author: Some(DiscordEmbedAuthor {
-                name: project.username.clone(),
-                url: Some(format!(
-                    "{}/user/{}",
-                    dotenvy::var("SITE_URL").unwrap_or_default(),
-                    project.username
-                )),
-                icon_url: project.avatar_url,
+            author: project.author.map(|x| DiscordEmbedAuthor {
+                name: x.name,
+                url: Some(x.url),
+                icon_url: x.icon_url,
             }),
-            url: format!(
-                "{}/{}/{}",
-                dotenvy::var("SITE_URL").unwrap_or_default(),
-                project_type,
-                project.slug.unwrap_or_else(|| project_id.to_string())
-            ),
-            title: project.name, // Do not change DiscordEmbed
-            description: project.summary,
+            url: project.project_url,
+            title: project.project_title, // Do not change DiscordEmbed
+            description: project.project_summary,
             timestamp: Utc::now(),
-            color: project.color.unwrap_or(0x1bd96a) as u32,
+            color: project.color.unwrap_or(0x1bd96a),
             fields,
             thumbnail: DiscordEmbedThumbnail {
-                url: project.icon_url,
+                url: project.project_icon_url,
             },
-            image: if let Some(first) = project.featured_gallery.unwrap_or_default().first() {
-                Some(first.clone())
-            } else {
-                project.gallery.unwrap_or_default().first().cloned()
-            }
-            .map(|x| DiscordEmbedImage { url: Some(x) }),
+            image: project
+                .gallery_image
+                .map(|x| DiscordEmbedImage { url: Some(x) }),
             footer: Some(DiscordEmbedFooter {
-                text: format!(
-                    "{}{display_project_type} on Modrinth",
-                    display_project_type.remove(0).to_uppercase()
-                ),
+                text: format!("{} on Modrinth", project.display_project_type),
                 icon_url: Some("https://cdn-raw.modrinth.com/modrinth-new.png".to_string()),
             }),
         };
@@ -287,7 +461,7 @@ pub async fn send_discord_webhook(
 fn get_gv_range(
     mut game_versions: Vec<MinecraftGameVersion>,
     mut all_game_versions: Vec<MinecraftGameVersion>,
-) -> String {
+) -> Vec<String> {
     // both -> least to greatest
     game_versions.sort_by(|a, b| a.created.cmp(&b.created));
     game_versions.dedup_by(|a, b| a.version == b.version);
@@ -405,5 +579,5 @@ fn get_gv_range(
         }
     }
 
-    output.join("\n")
+    output
 }

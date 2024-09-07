@@ -398,17 +398,17 @@ pub async fn project_edit(
                 }
 
                 if user.role.is_mod() {
-                    if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
-                        crate::util::webhook::send_discord_webhook(
+                    if let Ok(webhook_url) = dotenvy::var("MODERATION_SLACK_WEBHOOK") {
+                        crate::util::webhook::send_slack_webhook(
                             project_item.inner.id.into(),
                             &pool,
                             &redis,
                             webhook_url,
                             Some(
                                 format!(
-                                    "**[{}]({}/user/{})** changed project status from **{}** to **{}**",
-                                    user.username,
+                                    "*<{}/user/{}|{}>* changed project status from *{}* to *{}*",
                                     dotenvy::var("SITE_URL")?,
+                                    user.username,
                                     user.username,
                                     &project_item.inner.status.as_friendly_str(),
                                     status.as_friendly_str(),
