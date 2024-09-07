@@ -9,7 +9,7 @@
     />
 
     <section class="relative mx-auto flex max-w-7xl flex-col px-3">
-      <div class="flex w-full flex-col gap-8">
+      <div class="flex w-full flex-col gap-10">
         <div
           class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
         >
@@ -19,7 +19,7 @@
           Play together on Modrinth Servers
         </h1>
         <h2
-          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[1.2rem]"
         >
           Start your own Minecraft server directly in the Modrinth app. Play your favorite mods,
           plugins, and datapacks — without the hassle of setup.
@@ -66,21 +66,134 @@
       </div>
     </section>
 
-    <section class="relative mx-auto mt-48 flex max-w-7xl flex-col px-3">
-      <div class="flex w-full flex-col items-center justify-center gap-8 text-center">
+    <section class="relative mx-auto mt-24 flex max-w-7xl flex-col px-3 pt-24">
+      <div class="flex w-full flex-col gap-8">
+        <div
+          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+        >
+          Why Modrinth Servers?
+        </div>
         <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
           Make a modpack. Now it's a server.
         </h1>
         <h2
-          class="relative m-0 max-w-lg text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
         >
-          Integrated with the Modrinth App. Choose from thousands of modpacks or create your own.
-          Invite your friends when you’re ready to play. It’s that easy.
+          Integrated with Modrinth App. Choose from thousands of modpacks or create your own from
+          your profiles. Invite your friends when you're ready to play.
         </h2>
-        <ButtonStyled color="brand" size="large">
-          <nuxt-link class="w-fit" to="/mods"> Get Started </nuxt-link>
-        </ButtonStyled>
-        <img src="~/assets/images/games/app-servers-hero.png" alt="" class="w-full" />
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+          <img
+            src="~/assets/images/games/excitement.png"
+            alt=""
+            class="absolute right-8 top-24 hidden max-w-[360px] lg:block"
+          />
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-8 text-brand"
+            >
+              <path
+                d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"
+              />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <circle cx="17.5" cy="17.5" r="3.5" />
+            </svg>
+            <h2 class="m-0 text-lg font-bold">Play where your mods are</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Modrinth manages every part of your server. Focus on playing with friends, not
+              transferring files, managing mods, or updating plugins.
+            </h3>
+          </div>
+
+          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-8 text-brand"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <h2 class="m-0 text-lg font-bold">Join with a single click</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Share your server with friends by sending them a link to your server. They can join
+              with a single click directly from the Modrinth app.
+            </h3>
+          </div>
+        </div>
+        <div class="relative">
+          <img
+            src="~/assets/images/games/servers-hero-square-fixed-forreal.png"
+            alt=""
+            class="w-full rounded-xl"
+          />
+        </div>
+        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
+          <div class="flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="size-8 text-brand"
+            >
+              <rect width="20" height="16" x="2" y="4" rx="2" />
+              <path d="M6 8h.01" />
+              <path d="M10 8h.01" />
+              <path d="M14 8h.01" />
+            </svg>
+            <h2 class="m-0 text-lg font-bold">Use an interface like no other</h2>
+            <h3 class="m-0 text-base font-normal text-secondary">
+              Keep track of your server's stats, and content on the website and in the Modrinth app.
+              It's never been easier to manage your server.
+            </h3>
+          </div>
+
+          <div class="flex flex-col gap-4 rounded-xl bg-bg p-12 text-left">
+            <h2 class="m-0 text-lg font-bold"></h2>
+            <h3 class="m-0 text-base font-normal text-secondary"></h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="relative mx-auto mt-24 flex max-w-7xl flex-col px-3 pt-24">
+      <div class="flex w-full flex-col gap-8">
+        <div
+          class="relative w-fit rounded-full bg-highlight-green px-3 py-1 text-sm font-bold text-brand backdrop-blur-lg"
+        >
+          Included with your server
+        </div>
+        <h1 class="relative m-0 max-w-2xl text-4xl leading-[120%] md:text-7xl">
+
+        </h1>
+        <h2
+          class="relative m-0 max-w-2xl text-base font-normal leading-[155%] text-secondary md:text-[18px]"
+        >
+        </h2>
       </div>
     </section>
   </div>
