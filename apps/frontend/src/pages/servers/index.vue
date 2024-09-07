@@ -71,7 +71,9 @@
       </div>
     </section>
 
-    <section class="section-hero relative mt-24 flex flex-col px-3 pt-24 md:mt-48 md:pt-48">
+    <section
+      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+    >
       <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
       <div class="relative mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
@@ -204,7 +206,9 @@
       </div>
     </section>
 
-    <section class="section-hero relative mt-24 flex flex-col px-3 pt-24 md:mt-48 md:pt-48">
+    <section
+      class="relative mt-24 flex flex-col bg-[radial-gradient(65%_50%_at_50%_-10%,var(--color-brand-highlight)_0%,var(--color-accent-contrast)_100%)] px-3 pt-24 md:mt-48 md:pt-48"
+    >
       <div class="faded-brand-line absolute top-0 h-[1px] w-full"></div>
       <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
         <div
@@ -340,14 +344,6 @@ onUnmounted(() => {
 .servers-hero {
   background: radial-gradient(
     65% 30% at 50% -10%,
-    var(--color-brand-highlight) 0%,
-    var(--color-accent-contrast) 100%
-  );
-}
-
-.section-hero {
-  background: radial-gradient(
-    65% 50% at 50% -10%,
     var(--color-brand-highlight) 0%,
     var(--color-accent-contrast) 100%
   );
