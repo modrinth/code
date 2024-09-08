@@ -11,6 +11,7 @@ const IMAGES_NAMESPACE: &str = "images";
 pub struct Image {
     pub id: ImageId,
     pub url: String,
+    pub raw_url: String,
     pub size: u64,
     pub created: DateTime<Utc>,
     pub owner_id: UserId,
@@ -32,14 +33,15 @@ impl Image {
         sqlx::query!(
             "
             INSERT INTO uploaded_images (
-                id, url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
+                id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+                $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
             );
             ",
             self.id as ImageId,
             self.url,
+            self.raw_url,
             self.size as i64,
             self.created,
             self.owner_id as UserId,
@@ -119,7 +121,7 @@ impl Image {
         use futures::stream::TryStreamExt;
         sqlx::query!(
             "
-            SELECT id, url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
+            SELECT id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
             FROM uploaded_images
             WHERE context = $1
             AND (mod_id = $2 OR ($2 IS NULL AND mod_id IS NULL))
@@ -142,6 +144,7 @@ impl Image {
             Image {
                 id,
                 url: row.url,
+                raw_url: row.raw_url,
                 size: row.size as u64,
                 created: row.created,
                 owner_id: UserId(row.owner_id),
@@ -185,7 +188,7 @@ impl Image {
             |image_ids| async move {
                 let images = sqlx::query!(
                     "
-                    SELECT id, url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
+                    SELECT id, url, raw_url, size, created, owner_id, context, mod_id, version_id, thread_message_id, report_id
                     FROM uploaded_images
                     WHERE id = ANY($1)
                     GROUP BY id;
@@ -197,6 +200,7 @@ impl Image {
                         let img = Image {
                             id: ImageId(i.id),
                             url: i.url,
+                            raw_url: i.raw_url,
                             size: i.size as u64,
                             created: i.created,
                             owner_id: UserId(i.owner_id),

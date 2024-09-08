@@ -40,6 +40,7 @@ pub struct User {
     pub email: Option<String>,
     pub email_verified: bool,
     pub avatar_url: Option<String>,
+    pub raw_avatar_url: Option<String>,
     pub bio: Option<String>,
     pub created: DateTime<Utc>,
     pub role: String,
@@ -57,7 +58,7 @@ impl User {
             "
             INSERT INTO users (
                 id, username, email,
-                avatar_url, bio, created,
+                avatar_url, raw_avatar_url, bio, created,
                 github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                 email_verified, password, paypal_id, paypal_country, paypal_email,
                 venmo_handle, stripe_customer_id
@@ -66,13 +67,14 @@ impl User {
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9, $10, $11, $12, $13,
-                $14, $15, $16, $17, $18, $19
+                $14, $15, $16, $17, $18, $19, $20
             )
             ",
             self.id as UserId,
             &self.username,
             self.email.as_ref(),
             self.avatar_url.as_ref(),
+            self.raw_avatar_url.as_ref(),
             self.bio.as_ref(),
             self.created,
             self.github_id,
@@ -165,7 +167,7 @@ impl User {
                 let users = sqlx::query!(
                     "
                     SELECT id, email,
-                        avatar_url, username, bio,
+                        avatar_url, raw_avatar_url, username, bio,
                         created, role, badges,
                         balance,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
@@ -190,6 +192,7 @@ impl User {
                             email: u.email,
                             email_verified: u.email_verified,
                             avatar_url: u.avatar_url,
+                            raw_avatar_url: u.raw_avatar_url,
                             username: u.username.clone(),
                             bio: u.bio,
                             created: u.created,

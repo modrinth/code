@@ -14,7 +14,8 @@ use crate::routes::internal::session::issue_session;
 use crate::routes::ApiError;
 use crate::util::captcha::check_turnstile_captcha;
 use crate::util::env::parse_strings_from_var;
-use crate::util::ext::{get_image_content_type, get_image_ext};
+use crate::util::ext::get_image_ext;
+use crate::util::img::upload_image_optimized;
 use crate::util::validate::{validation_errors_to_string, RE_URL_SAFE};
 use actix_web::web::{scope, Data, Payload, Query, ServiceConfig};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
@@ -112,9 +113,7 @@ impl TempUser {
             }
         }
 
-        let avatar_url = if let Some(avatar_url) = self.avatar_url {
-            let cdn_url = dotenvy::var("CDN_URL")?;
-
+        let (avatar_url, raw_avatar_url) = if let Some(avatar_url) = self.avatar_url {
             let res = reqwest::get(&avatar_url).await?;
             let headers = res.headers().clone();
 
@@ -122,36 +121,34 @@ impl TempUser {
                 .get(reqwest::header::CONTENT_TYPE)
                 .and_then(|ct| ct.to_str().ok())
             {
-                get_image_ext(content_type).map(|ext| (ext, content_type))
-            } else if let Some(ext) = avatar_url.rsplit('.').next() {
-                get_image_content_type(ext).map(|content_type| (ext, content_type))
+                get_image_ext(content_type)
             } else {
-                None
+                avatar_url.rsplit('.').next()
             };
 
-            if let Some((ext, content_type)) = img_data {
+            if let Some(ext) = img_data {
                 let bytes = res.bytes().await?;
-                let hash = sha1::Sha1::from(&bytes).hexdigest();
 
-                let upload_data = file_host
-                    .upload_file(
-                        content_type,
-                        &format!(
-                            "user/{}/{}.{}",
-                            crate::models::users::UserId::from(user_id),
-                            hash,
-                            ext
-                        ),
-                        bytes,
-                    )
-                    .await?;
+                let upload_result = upload_image_optimized(
+                    &format!("user/{}", crate::models::users::UserId::from(user_id)),
+                    bytes,
+                    ext,
+                    Some(96),
+                    Some(1.0),
+                    &**file_host,
+                )
+                .await;
 
-                Some(format!("{}/{}", cdn_url, upload_data.file_name))
+                if let Ok(upload_result) = upload_result {
+                    (Some(upload_result.url), Some(upload_result.raw_url))
+                } else {
+                    (None, None)
+                }
             } else {
-                None
+                (None, None)
             }
         } else {
-            None
+            (None, None)
         };
 
         if let Some(username) = username {
@@ -223,6 +220,7 @@ impl TempUser {
                 email: self.email,
                 email_verified: true,
                 avatar_url,
+                raw_avatar_url,
                 bio: self.bio,
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
@@ -1518,6 +1516,7 @@ pub async fn create_account_with_password(
         email: Some(new_account.email.clone()),
         email_verified: false,
         avatar_url: None,
+        raw_avatar_url: None,
         bio: None,
         created: Utc::now(),
         role: Role::Developer.to_string(),

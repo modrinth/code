@@ -33,6 +33,7 @@ impl CollectionBuilder {
             created: Utc::now(),
             updated: Utc::now(),
             icon_url: None,
+            raw_icon_url: None,
             color: None,
             status: self.status,
             projects: self.projects,
@@ -51,6 +52,7 @@ pub struct Collection {
     pub created: DateTime<Utc>,
     pub updated: DateTime<Utc>,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub color: Option<u32>,
     pub status: CollectionStatus,
     pub projects: Vec<ProjectId>,
@@ -65,11 +67,11 @@ impl Collection {
             "
             INSERT INTO collections (
                 id, user_id, name, description, 
-                created, icon_url, status
+                created, icon_url, raw_icon_url, status
             )
             VALUES (
                 $1, $2, $3, $4, 
-                $5, $6, $7
+                $5, $6, $7, $8
             )
             ",
             self.id as CollectionId,
@@ -78,6 +80,7 @@ impl Collection {
             self.description.as_ref(),
             self.created,
             self.icon_url.as_ref(),
+            self.raw_icon_url.as_ref(),
             self.status.to_string(),
         )
         .execute(&mut **transaction)
@@ -165,7 +168,7 @@ impl Collection {
                     let collections = sqlx::query!(
                         "
                     SELECT c.id id, c.name name, c.description description,
-                    c.icon_url icon_url, c.color color, c.created created, c.user_id user_id,
+                    c.icon_url icon_url, c.raw_icon_url raw_icon_url, c.color color, c.created created, c.user_id user_id,
                     c.updated updated, c.status status,
                     ARRAY_AGG(DISTINCT cm.mod_id) filter (where cm.mod_id is not null) mods
                     FROM collections c
@@ -183,6 +186,7 @@ impl Collection {
                             name: m.name.clone(),
                             description: m.description.clone(),
                             icon_url: m.icon_url.clone(),
+                            raw_icon_url: m.raw_icon_url.clone(),
                             color: m.color.map(|x| x as u32),
                             created: m.created,
                             updated: m.updated,

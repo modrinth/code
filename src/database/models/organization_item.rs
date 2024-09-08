@@ -30,6 +30,7 @@ pub struct Organization {
 
     /// The display icon for the organization
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub color: Option<u32>,
 }
 
@@ -40,8 +41,8 @@ impl Organization {
     ) -> Result<(), super::DatabaseError> {
         sqlx::query!(
             "
-            INSERT INTO organizations (id, slug, name, team_id, description, icon_url, color)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO organizations (id, slug, name, team_id, description, icon_url, raw_icon_url, color)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
             ",
             self.id.0,
             self.slug,
@@ -49,6 +50,7 @@ impl Organization {
             self.team_id as TeamId,
             self.description,
             self.icon_url,
+            self.raw_icon_url,
             self.color.map(|x| x as i32),
         )
         .execute(&mut **transaction)
@@ -125,7 +127,7 @@ impl Organization {
 
                     let organizations = sqlx::query!(
                         "
-                        SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color
+                        SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.raw_icon_url, o.color
                         FROM organizations o
                         WHERE o.id = ANY($1) OR LOWER(o.slug) = ANY($2)
                         GROUP BY o.id;
@@ -142,6 +144,7 @@ impl Organization {
                             team_id: TeamId(m.team_id),
                             description: m.description,
                             icon_url: m.icon_url,
+                            raw_icon_url: m.raw_icon_url,
                             color: m.color.map(|x| x as u32),
                         };
 
@@ -168,7 +171,7 @@ impl Organization {
     {
         let result = sqlx::query!(
             "
-            SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.color
+            SELECT o.id, o.slug, o.name, o.team_id, o.description, o.icon_url, o.raw_icon_url, o.color
             FROM organizations o
             LEFT JOIN mods m ON m.organization_id = o.id
             WHERE m.id = $1
@@ -187,6 +190,7 @@ impl Organization {
                 team_id: TeamId(result.team_id),
                 description: result.description,
                 icon_url: result.icon_url,
+                raw_icon_url: result.raw_icon_url,
                 color: result.color.map(|x| x as u32),
             }))
         } else {

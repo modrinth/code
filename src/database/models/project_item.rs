@@ -58,6 +58,7 @@ impl LinkUrl {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct GalleryItem {
     pub image_url: String,
+    pub raw_image_url: String,
     pub featured: bool,
     pub name: Option<String>,
     pub description: Option<String>,
@@ -71,7 +72,8 @@ impl GalleryItem {
         project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
-        let (project_ids, image_urls, featureds, names, descriptions, orderings): (
+        let (project_ids, image_urls, raw_image_urls, featureds, names, descriptions, orderings): (
+            Vec<_>,
             Vec<_>,
             Vec<_>,
             Vec<_>,
@@ -84,6 +86,7 @@ impl GalleryItem {
                 (
                     project_id.0,
                     gi.image_url,
+                    gi.raw_image_url,
                     gi.featured,
                     gi.name,
                     gi.description,
@@ -94,12 +97,13 @@ impl GalleryItem {
         sqlx::query!(
             "
             INSERT INTO mods_gallery (
-                mod_id, image_url, featured, name, description, ordering
+                mod_id, image_url, raw_image_url, featured, name, description, ordering
             )
-            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::bool[], $4::varchar[], $5::varchar[], $6::bigint[])
+            SELECT * FROM UNNEST ($1::bigint[], $2::varchar[], $3::varchar[], $4::bool[], $5::varchar[], $6::varchar[], $7::bigint[])
             ",
             &project_ids[..],
             &image_urls[..],
+            &raw_image_urls[..],
             &featureds[..],
             &names[..] as &[Option<String>],
             &descriptions[..] as &[Option<String>],
@@ -153,6 +157,7 @@ pub struct ProjectBuilder {
     pub summary: String,
     pub description: String,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub license_url: Option<String>,
     pub categories: Vec<CategoryId>,
     pub additional_categories: Vec<CategoryId>,
@@ -192,6 +197,7 @@ impl ProjectBuilder {
             downloads: 0,
             follows: 0,
             icon_url: self.icon_url,
+            raw_icon_url: self.raw_icon_url,
             license_url: self.license_url,
             license: self.license,
             slug: self.slug,
@@ -253,6 +259,7 @@ pub struct Project {
     pub downloads: i32,
     pub follows: i32,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub license_url: Option<String>,
     pub license: String,
     pub slug: Option<String>,
@@ -273,15 +280,15 @@ impl Project {
             "
             INSERT INTO mods (
                 id, team_id, name, summary, description,
-                published, downloads, icon_url, status, requested_status,
+                published, downloads, icon_url, raw_icon_url, status, requested_status,
                 license_url, license,
                 slug, color, monetization_status, organization_id
             )
             VALUES (
                 $1, $2, $3, $4, $5, $6, 
-                $7, $8, $9, $10, 
-                $11, $12, 
-                LOWER($13), $14, $15, $16
+                $7, $8, $9, $10, $11,
+                $12, $13,
+                LOWER($14), $15, $16, $17
             )
             ",
             self.id as ProjectId,
@@ -292,6 +299,7 @@ impl Project {
             self.published,
             self.downloads,
             self.icon_url.as_ref(),
+            self.raw_icon_url.as_ref(),
             self.status.as_str(),
             self.requested_status.map(|x| x.as_str()),
             self.license_url.as_ref(),
@@ -620,7 +628,7 @@ impl Project {
 
                 let mods_gallery: DashMap<ProjectId, Vec<GalleryItem>> = sqlx::query!(
                     "
-                    SELECT DISTINCT mod_id, mg.image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
+                    SELECT DISTINCT mod_id, mg.image_url, mg.raw_image_url, mg.featured, mg.name, mg.description, mg.created, mg.ordering
                     FROM mods_gallery mg
                     INNER JOIN mods m ON mg.mod_id = m.id
                     WHERE m.id = ANY($1) OR m.slug = ANY($2)
@@ -633,6 +641,7 @@ impl Project {
                             .or_default()
                             .push(GalleryItem {
                                 image_url: m.image_url,
+                                raw_image_url: m.raw_image_url,
                                 featured: m.featured.unwrap_or(false),
                                 name: m.name,
                                 description: m.description,
@@ -742,7 +751,7 @@ impl Project {
                 let projects = sqlx::query!(
                     "
                     SELECT m.id id, m.name name, m.summary summary, m.downloads downloads, m.follows follows,
-                    m.icon_url icon_url, m.description description, m.published published,
+                    m.icon_url icon_url, m.raw_icon_url raw_icon_url, m.description description, m.published published,
                     m.updated updated, m.approved approved, m.queued, m.status status, m.requested_status requested_status,
                     m.license_url license_url,
                     m.team_id team_id, m.organization_id organization_id, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
@@ -788,6 +797,7 @@ impl Project {
                                 summary: m.summary.clone(),
                                 downloads: m.downloads,
                                 icon_url: m.icon_url.clone(),
+                                raw_icon_url: m.raw_icon_url.clone(),
                                 published: m.published,
                                 updated: m.updated,
                                 license_url: m.license_url.clone(),

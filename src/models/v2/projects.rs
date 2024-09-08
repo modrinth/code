@@ -357,6 +357,7 @@ impl From<Version> for LegacyVersion {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct LegacyGalleryItem {
     pub url: String,
+    pub raw_url: String,
     pub featured: bool,
     pub title: Option<String>,
     pub description: Option<String>,
@@ -368,6 +369,7 @@ impl LegacyGalleryItem {
     fn from(data: crate::models::projects::GalleryItem) -> Self {
         Self {
             url: data.url,
+            raw_url: data.raw_url,
             featured: data.featured,
             title: data.name,
             description: data.description,

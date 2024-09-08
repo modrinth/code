@@ -26,6 +26,7 @@ use crate::routes::ApiError;
 use crate::search::indexing::remove_documents;
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use crate::util::img;
+use crate::util::img::{delete_old_images, upload_image_optimized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{web, HttpRequest, HttpResponse};
@@ -1317,109 +1318,95 @@ pub async fn project_icon_edit(
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
-        let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Some(&[Scopes::PROJECT_WRITE]),
-        )
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
+    let string = info.into_inner().0;
+
+    let project_item = db_models::Project::get(&string, &**pool, &redis)
         .await?
-        .1;
-        let string = info.into_inner().0;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
-        let project_item = db_models::Project::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput("The specified project does not exist!".to_string())
-            })?;
-
-        if !user.role.is_mod() {
-            let (team_member, organization_team_member) =
-                db_models::TeamMember::get_for_project_permissions(
-                    &project_item.inner,
-                    user.id.into(),
-                    &**pool,
-                )
-                .await?;
-
-            // Hide the project
-            if team_member.is_none() && organization_team_member.is_none() {
-                return Err(ApiError::CustomAuthentication(
-                    "The specified project does not exist!".to_string(),
-                ));
-            }
-
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &user.role,
-                &team_member,
-                &organization_team_member,
-            )
-            .unwrap_or_default();
-
-            if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit this project's icon.".to_string(),
-                ));
-            }
-        }
-
-        if let Some(icon) = project_item.inner.icon_url {
-            let name = icon.split(&format!("{cdn_url}/")).nth(1);
-
-            if let Some(icon_path) = name {
-                file_host.delete_file_version("", icon_path).await?;
-            }
-        }
-
-        let bytes =
-            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
-
-        let color = crate::util::img::get_color_from_img(&bytes)?;
-
-        let hash = sha1::Sha1::from(&bytes).hexdigest();
-        let project_id: ProjectId = project_item.inner.id.into();
-        let upload_data = file_host
-            .upload_file(
-                content_type,
-                &format!("data/{}/{}.{}", project_id, hash, ext.ext),
-                bytes.freeze(),
+    if !user.role.is_mod() {
+        let (team_member, organization_team_member) =
+            db_models::TeamMember::get_for_project_permissions(
+                &project_item.inner,
+                user.id.into(),
+                &**pool,
             )
             .await?;
 
-        let mut transaction = pool.begin().await?;
+        // Hide the project
+        if team_member.is_none() && organization_team_member.is_none() {
+            return Err(ApiError::CustomAuthentication(
+                "The specified project does not exist!".to_string(),
+            ));
+        }
 
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET icon_url = $1, color = $2
-            WHERE (id = $3)
-            ",
-            format!("{}/{}", cdn_url, upload_data.file_name),
-            color.map(|x| x as i32),
-            project_item.inner.id as db_ids::ProjectId,
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
         )
-        .execute(&mut *transaction)
-        .await?;
+        .unwrap_or_default();
 
-        transaction.commit().await?;
-        db_models::Project::clear_cache(
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-            &redis,
-        )
-        .await?;
-
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::InvalidInput(format!(
-            "Invalid format for project icon: {}",
-            ext.ext
-        )))
+        if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to edit this project's icon.".to_string(),
+            ));
+        }
     }
+
+    delete_old_images(
+        project_item.inner.icon_url,
+        project_item.inner.raw_icon_url,
+        &***file_host,
+    )
+    .await?;
+
+    let bytes =
+        read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+
+    let project_id: ProjectId = project_item.inner.id.into();
+    let upload_result = upload_image_optimized(
+        &format!("data/{}", project_id),
+        bytes.freeze(),
+        &ext.ext,
+        Some(96),
+        Some(1.0),
+        &***file_host,
+    )
+    .await?;
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+            UPDATE mods
+            SET icon_url = $1, raw_icon_url = $2, color = $3
+            WHERE (id = $4)
+            ",
+        upload_result.url,
+        upload_result.raw_url,
+        upload_result.color.map(|x| x as i32),
+        project_item.inner.id as db_ids::ProjectId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+    db_models::Project::clear_cache(project_item.inner.id, project_item.inner.slug, None, &redis)
+        .await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 pub async fn delete_project_icon(
@@ -1476,21 +1463,19 @@ pub async fn delete_project_icon(
         }
     }
 
-    let cdn_url = dotenvy::var("CDN_URL")?;
-    if let Some(icon) = project_item.inner.icon_url {
-        let name = icon.split(&format!("{cdn_url}/")).nth(1);
-
-        if let Some(icon_path) = name {
-            file_host.delete_file_version("", icon_path).await?;
-        }
-    }
+    delete_old_images(
+        project_item.inner.icon_url,
+        project_item.inner.raw_icon_url,
+        &***file_host,
+    )
+    .await?;
 
     let mut transaction = pool.begin().await?;
 
     sqlx::query!(
         "
         UPDATE mods
-        SET icon_url = NULL, color = NULL
+        SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
         project_item.inner.id as db_ids::ProjectId,
@@ -1527,132 +1512,122 @@ pub async fn add_gallery_item(
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
-        item.validate()
-            .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
+    item.validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
-        let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Some(&[Scopes::PROJECT_WRITE]),
-        )
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PROJECT_WRITE]),
+    )
+    .await?
+    .1;
+    let string = info.into_inner().0;
+
+    let project_item = db_models::Project::get(&string, &**pool, &redis)
         .await?
-        .1;
-        let string = info.into_inner().0;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
-        let project_item = db_models::Project::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput("The specified project does not exist!".to_string())
-            })?;
+    if project_item.gallery_items.len() > 64 {
+        return Err(ApiError::CustomAuthentication(
+            "You have reached the maximum of gallery images to upload.".to_string(),
+        ));
+    }
 
-        if project_item.gallery_items.len() > 64 {
-            return Err(ApiError::CustomAuthentication(
-                "You have reached the maximum of gallery images to upload.".to_string(),
-            ));
-        }
-
-        if !user.role.is_admin() {
-            let (team_member, organization_team_member) =
-                db_models::TeamMember::get_for_project_permissions(
-                    &project_item.inner,
-                    user.id.into(),
-                    &**pool,
-                )
-                .await?;
-
-            // Hide the project
-            if team_member.is_none() && organization_team_member.is_none() {
-                return Err(ApiError::CustomAuthentication(
-                    "The specified project does not exist!".to_string(),
-                ));
-            }
-
-            let permissions = ProjectPermissions::get_permissions_by_role(
-                &user.role,
-                &team_member,
-                &organization_team_member,
+    if !user.role.is_admin() {
+        let (team_member, organization_team_member) =
+            db_models::TeamMember::get_for_project_permissions(
+                &project_item.inner,
+                user.id.into(),
+                &**pool,
             )
-            .unwrap_or_default();
-
-            if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit this project's gallery.".to_string(),
-                ));
-            }
-        }
-
-        let bytes = read_from_payload(
-            &mut payload,
-            5 * (1 << 20),
-            "Gallery image exceeds the maximum of 5MiB.",
-        )
-        .await?;
-        let hash = sha1::Sha1::from(&bytes).hexdigest();
-
-        let id: ProjectId = project_item.inner.id.into();
-        let url = format!("data/{}/images/{}.{}", id, hash, &*ext.ext);
-
-        let file_url = format!("{cdn_url}/{url}");
-        if project_item
-            .gallery_items
-            .iter()
-            .any(|x| x.image_url == file_url)
-        {
-            return Err(ApiError::InvalidInput(
-                "You may not upload duplicate gallery images!".to_string(),
-            ));
-        }
-
-        file_host
-            .upload_file(content_type, &url, bytes.freeze())
             .await?;
 
-        let mut transaction = pool.begin().await?;
+        // Hide the project
+        if team_member.is_none() && organization_team_member.is_none() {
+            return Err(ApiError::CustomAuthentication(
+                "The specified project does not exist!".to_string(),
+            ));
+        }
 
-        if item.featured {
-            sqlx::query!(
-                "
+        let permissions = ProjectPermissions::get_permissions_by_role(
+            &user.role,
+            &team_member,
+            &organization_team_member,
+        )
+        .unwrap_or_default();
+
+        if !permissions.contains(ProjectPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to edit this project's gallery.".to_string(),
+            ));
+        }
+    }
+
+    let bytes = read_from_payload(
+        &mut payload,
+        2 * (1 << 20),
+        "Gallery image exceeds the maximum of 2MiB.",
+    )
+    .await?;
+
+    let id: ProjectId = project_item.inner.id.into();
+    let upload_result = upload_image_optimized(
+        &format!("data/{}/images", id),
+        bytes.freeze(),
+        &ext.ext,
+        Some(350),
+        Some(1.0),
+        &***file_host,
+    )
+    .await?;
+
+    if project_item
+        .gallery_items
+        .iter()
+        .any(|x| x.image_url == upload_result.url)
+    {
+        return Err(ApiError::InvalidInput(
+            "You may not upload duplicate gallery images!".to_string(),
+        ));
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    if item.featured {
+        sqlx::query!(
+            "
                 UPDATE mods_gallery
                 SET featured = $2
                 WHERE mod_id = $1
                 ",
-                project_item.inner.id as db_ids::ProjectId,
-                false,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
-
-        let gallery_item = vec![db_models::project_item::GalleryItem {
-            image_url: file_url,
-            featured: item.featured,
-            name: item.name,
-            description: item.description,
-            created: Utc::now(),
-            ordering: item.ordering.unwrap_or(0),
-        }];
-        GalleryItem::insert_many(gallery_item, project_item.inner.id, &mut transaction).await?;
-
-        transaction.commit().await?;
-        db_models::Project::clear_cache(
-            project_item.inner.id,
-            project_item.inner.slug,
-            None,
-            &redis,
+            project_item.inner.id as db_ids::ProjectId,
+            false,
         )
+        .execute(&mut *transaction)
+        .await?;
+    }
+
+    let gallery_item = vec![db_models::project_item::GalleryItem {
+        image_url: upload_result.url,
+        raw_image_url: upload_result.raw_url,
+        featured: item.featured,
+        name: item.name,
+        description: item.description,
+        created: Utc::now(),
+        ordering: item.ordering.unwrap_or(0),
+    }];
+    GalleryItem::insert_many(gallery_item, project_item.inner.id, &mut transaction).await?;
+
+    transaction.commit().await?;
+    db_models::Project::clear_cache(project_item.inner.id, project_item.inner.slug, None, &redis)
         .await?;
 
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::InvalidInput(format!(
-            "Invalid format for gallery image: {}",
-            ext.ext
-        )))
-    }
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -1891,9 +1866,9 @@ pub async fn delete_gallery_item(
     }
     let mut transaction = pool.begin().await?;
 
-    let id = sqlx::query!(
+    let item = sqlx::query!(
         "
-        SELECT id FROM mods_gallery
+        SELECT id, image_url, raw_image_url FROM mods_gallery
         WHERE image_url = $1
         ",
         item.url
@@ -1905,15 +1880,14 @@ pub async fn delete_gallery_item(
             "Gallery item at URL {} is not part of the project's gallery.",
             item.url
         ))
-    })?
-    .id;
+    })?;
 
-    let cdn_url = dotenvy::var("CDN_URL")?;
-    let name = item.url.split(&format!("{cdn_url}/")).nth(1);
-
-    if let Some(icon_path) = name {
-        file_host.delete_file_version("", icon_path).await?;
-    }
+    delete_old_images(
+        Some(item.image_url),
+        Some(item.raw_image_url),
+        &***file_host,
+    )
+    .await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -1922,7 +1896,7 @@ pub async fn delete_gallery_item(
         DELETE FROM mods_gallery
         WHERE id = $1
         ",
-        id
+        item.id
     )
     .execute(&mut *transaction)
     .await?;

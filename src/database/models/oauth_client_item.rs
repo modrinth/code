@@ -18,6 +18,7 @@ pub struct OAuthClient {
     pub id: OAuthClientId,
     pub name: String,
     pub icon_url: Option<String>,
+    pub raw_icon_url: Option<String>,
     pub max_scopes: Scopes,
     pub secret_hash: String,
     pub redirect_uris: Vec<OAuthRedirectUri>,
@@ -31,6 +32,7 @@ struct ClientQueryResult {
     id: i64,
     name: String,
     icon_url: Option<String>,
+    raw_icon_url: Option<String>,
     max_scopes: i64,
     secret_hash: String,
     created: DateTime<Utc>,
@@ -53,6 +55,7 @@ macro_rules! select_clients_with_predicate {
                 clients.id as "id!",
                 clients.name as "name!",
                 clients.icon_url as "icon_url?",
+                clients.raw_icon_url as "raw_icon_url?",
                 clients.max_scopes as "max_scopes!",
                 clients.secret_hash as "secret_hash!",
                 clients.created as "created!",
@@ -133,15 +136,16 @@ impl OAuthClient {
         sqlx::query!(
             "
             INSERT INTO oauth_clients (
-                id, name, icon_url, max_scopes, secret_hash, created_by
+                id, name, icon_url, raw_icon_url, max_scopes, secret_hash, created_by
             )
             VALUES (
-                $1, $2, $3, $4, $5, $6
+                $1, $2, $3, $4, $5, $6, $7
             )
             ",
             self.id.0,
             self.name,
             self.icon_url,
+            self.raw_icon_url,
             self.max_scopes.to_postgres(),
             self.secret_hash,
             self.created_by.0
@@ -161,11 +165,12 @@ impl OAuthClient {
         sqlx::query!(
             "
             UPDATE oauth_clients
-            SET name = $1, icon_url = $2, max_scopes = $3, url = $4, description = $5
-            WHERE (id = $6)
+            SET name = $1, icon_url = $2, raw_icon_url = $3, max_scopes = $4, url = $5, description = $6
+            WHERE (id = $7)
             ",
             self.name,
             self.icon_url,
+            self.raw_icon_url,
             self.max_scopes.to_postgres(),
             self.url,
             self.description,
@@ -243,6 +248,7 @@ impl From<ClientQueryResult> for OAuthClient {
             id: OAuthClientId(r.id),
             name: r.name,
             icon_url: r.icon_url,
+            raw_icon_url: r.raw_icon_url,
             max_scopes: Scopes::from_postgres(r.max_scopes),
             secret_hash: r.secret_hash,
             redirect_uris: redirects,

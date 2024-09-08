@@ -10,6 +10,7 @@ use crate::models::pats::Scopes;
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
 use crate::routes::ApiError;
+use crate::util::img::delete_old_images;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
@@ -371,78 +372,69 @@ pub async fn collection_icon_edit(
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
-        let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Some(&[Scopes::COLLECTION_WRITE]),
-        )
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::COLLECTION_WRITE]),
+    )
+    .await?
+    .1;
+
+    let string = info.into_inner().0;
+    let id = database::models::CollectionId(parse_base62(&string)? as i64);
+    let collection_item = database::models::Collection::get(id, &**pool, &redis)
         .await?
-        .1;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified collection does not exist!".to_string())
+        })?;
 
-        let string = info.into_inner().0;
-        let id = database::models::CollectionId(parse_base62(&string)? as i64);
-        let collection_item = database::models::Collection::get(id, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput("The specified collection does not exist!".to_string())
-            })?;
-
-        if !can_modify_collection(&collection_item, &user) {
-            return Ok(HttpResponse::Unauthorized().body(""));
-        }
-
-        if let Some(icon) = collection_item.icon_url {
-            let name = icon.split(&format!("{cdn_url}/")).nth(1);
-
-            if let Some(icon_path) = name {
-                file_host.delete_file_version("", icon_path).await?;
-            }
-        }
-
-        let bytes =
-            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
-
-        let color = crate::util::img::get_color_from_img(&bytes)?;
-
-        let hash = sha1::Sha1::from(&bytes).hexdigest();
-        let collection_id: CollectionId = collection_item.id.into();
-        let upload_data = file_host
-            .upload_file(
-                content_type,
-                &format!("data/{}/{}.{}", collection_id, hash, ext.ext),
-                bytes.freeze(),
-            )
-            .await?;
-
-        let mut transaction = pool.begin().await?;
-
-        sqlx::query!(
-            "
-            UPDATE collections
-            SET icon_url = $1, color = $2
-            WHERE (id = $3)
-            ",
-            format!("{}/{}", cdn_url, upload_data.file_name),
-            color.map(|x| x as i32),
-            collection_item.id as database::models::ids::CollectionId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        transaction.commit().await?;
-        database::models::Collection::clear_cache(collection_item.id, &redis).await?;
-
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::InvalidInput(format!(
-            "Invalid format for collection icon: {}",
-            ext.ext
-        )))
+    if !can_modify_collection(&collection_item, &user) {
+        return Ok(HttpResponse::Unauthorized().body(""));
     }
+
+    delete_old_images(
+        collection_item.icon_url,
+        collection_item.raw_icon_url,
+        &***file_host,
+    )
+    .await?;
+
+    let bytes =
+        read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+
+    let collection_id: CollectionId = collection_item.id.into();
+    let upload_result = crate::util::img::upload_image_optimized(
+        &format!("data/{}", collection_id),
+        bytes.freeze(),
+        &ext.ext,
+        Some(96),
+        Some(1.0),
+        &***file_host,
+    )
+    .await?;
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        UPDATE collections
+        SET icon_url = $1, raw_icon_url = $2, color = $3
+        WHERE (id = $4)
+        ",
+        upload_result.url,
+        upload_result.raw_url,
+        upload_result.color.map(|x| x as i32),
+        collection_item.id as database::models::ids::CollectionId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+    database::models::Collection::clear_cache(collection_item.id, &redis).await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 pub async fn delete_collection_icon(
@@ -474,21 +466,18 @@ pub async fn delete_collection_icon(
         return Ok(HttpResponse::Unauthorized().body(""));
     }
 
-    let cdn_url = dotenvy::var("CDN_URL")?;
-    if let Some(icon) = collection_item.icon_url {
-        let name = icon.split(&format!("{cdn_url}/")).nth(1);
-
-        if let Some(icon_path) = name {
-            file_host.delete_file_version("", icon_path).await?;
-        }
-    }
-
+    delete_old_images(
+        collection_item.icon_url,
+        collection_item.raw_icon_url,
+        &***file_host,
+    )
+    .await?;
     let mut transaction = pool.begin().await?;
 
     sqlx::query!(
         "
         UPDATE collections
-        SET icon_url = NULL, color = NULL
+        SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
         collection_item.id as database::models::ids::CollectionId,

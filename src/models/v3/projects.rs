@@ -215,6 +215,7 @@ impl From<QueryProject> for Project {
                 .into_iter()
                 .map(|x| GalleryItem {
                     url: x.image_url,
+                    raw_url: x.raw_image_url,
                     featured: x.featured,
                     name: x.name,
                     description: x.description,
@@ -387,6 +388,7 @@ impl Project {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GalleryItem {
     pub url: String,
+    pub raw_url: String,
     pub featured: bool,
     pub name: Option<String>,
     pub description: Option<String>,

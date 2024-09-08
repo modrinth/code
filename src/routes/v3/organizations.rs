@@ -14,6 +14,7 @@ use crate::models::pats::Scopes;
 use crate::models::teams::{OrganizationPermissions, ProjectPermissions};
 use crate::queue::session::AuthQueue;
 use crate::routes::v3::project_creation::CreateError;
+use crate::util::img::delete_old_images;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use crate::{database, models};
@@ -164,6 +165,7 @@ pub async fn organization_create(
         description: new_organization.description.clone(),
         team_id,
         icon_url: None,
+        raw_icon_url: None,
         color: None,
     };
     organization.clone().insert(&mut transaction).await?;
@@ -926,98 +928,89 @@ pub async fn organization_icon_edit(
     mut payload: web::Payload,
     session_queue: web::Data<AuthQueue>,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
-        let cdn_url = dotenvy::var("CDN_URL")?;
-        let user = get_user_from_headers(
-            &req,
-            &**pool,
-            &redis,
-            &session_queue,
-            Some(&[Scopes::ORGANIZATION_WRITE]),
-        )
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::ORGANIZATION_WRITE]),
+    )
+    .await?
+    .1;
+    let string = info.into_inner().0;
+
+    let organization_item = database::models::Organization::get(&string, &**pool, &redis)
         .await?
-        .1;
-        let string = info.into_inner().0;
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified organization does not exist!".to_string())
+        })?;
 
-        let organization_item = database::models::Organization::get(&string, &**pool, &redis)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput("The specified organization does not exist!".to_string())
-            })?;
-
-        if !user.role.is_mod() {
-            let team_member = database::models::TeamMember::get_from_user_id(
-                organization_item.team_id,
-                user.id.into(),
-                &**pool,
-            )
-            .await
-            .map_err(ApiError::Database)?;
-
-            let permissions =
-                OrganizationPermissions::get_permissions_by_role(&user.role, &team_member)
-                    .unwrap_or_default();
-
-            if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit this organization's icon.".to_string(),
-                ));
-            }
-        }
-
-        if let Some(icon) = organization_item.icon_url {
-            let name = icon.split(&format!("{cdn_url}/")).nth(1);
-
-            if let Some(icon_path) = name {
-                file_host.delete_file_version("", icon_path).await?;
-            }
-        }
-
-        let bytes =
-            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
-
-        let color = crate::util::img::get_color_from_img(&bytes)?;
-
-        let hash = sha1::Sha1::from(&bytes).hexdigest();
-        let organization_id: OrganizationId = organization_item.id.into();
-        let upload_data = file_host
-            .upload_file(
-                content_type,
-                &format!("data/{}/{}.{}", organization_id, hash, ext.ext),
-                bytes.freeze(),
-            )
-            .await?;
-
-        let mut transaction = pool.begin().await?;
-
-        sqlx::query!(
-            "
-            UPDATE organizations
-            SET icon_url = $1, color = $2
-            WHERE (id = $3)
-            ",
-            format!("{}/{}", cdn_url, upload_data.file_name),
-            color.map(|x| x as i32),
-            organization_item.id as database::models::ids::OrganizationId,
+    if !user.role.is_mod() {
+        let team_member = database::models::TeamMember::get_from_user_id(
+            organization_item.team_id,
+            user.id.into(),
+            &**pool,
         )
-        .execute(&mut *transaction)
-        .await?;
+        .await
+        .map_err(ApiError::Database)?;
 
-        transaction.commit().await?;
-        database::models::Organization::clear_cache(
-            organization_item.id,
-            Some(organization_item.slug),
-            &redis,
-        )
-        .await?;
+        let permissions =
+            OrganizationPermissions::get_permissions_by_role(&user.role, &team_member)
+                .unwrap_or_default();
 
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Err(ApiError::InvalidInput(format!(
-            "Invalid format for project icon: {}",
-            ext.ext
-        )))
+        if !permissions.contains(OrganizationPermissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to edit this organization's icon.".to_string(),
+            ));
+        }
     }
+
+    delete_old_images(
+        organization_item.icon_url,
+        organization_item.raw_icon_url,
+        &***file_host,
+    )
+    .await?;
+
+    let bytes =
+        read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
+
+    let organization_id: OrganizationId = organization_item.id.into();
+    let upload_result = crate::util::img::upload_image_optimized(
+        &format!("data/{}", organization_id),
+        bytes.freeze(),
+        &ext.ext,
+        Some(96),
+        Some(1.0),
+        &***file_host,
+    )
+    .await?;
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        UPDATE organizations
+        SET icon_url = $1, raw_icon_url = $2, color = $3
+        WHERE (id = $4)
+        ",
+        upload_result.url,
+        upload_result.raw_url,
+        upload_result.color.map(|x| x as i32),
+        organization_item.id as database::models::ids::OrganizationId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+    database::models::Organization::clear_cache(
+        organization_item.id,
+        Some(organization_item.slug),
+        &redis,
+    )
+    .await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 pub async fn delete_organization_icon(
@@ -1065,21 +1058,19 @@ pub async fn delete_organization_icon(
         }
     }
 
-    let cdn_url = dotenvy::var("CDN_URL")?;
-    if let Some(icon) = organization_item.icon_url {
-        let name = icon.split(&format!("{cdn_url}/")).nth(1);
-
-        if let Some(icon_path) = name {
-            file_host.delete_file_version("", icon_path).await?;
-        }
-    }
+    delete_old_images(
+        organization_item.icon_url,
+        organization_item.raw_icon_url,
+        &***file_host,
+    )
+    .await?;
 
     let mut transaction = pool.begin().await?;
 
     sqlx::query!(
         "
         UPDATE organizations
-        SET icon_url = NULL, color = NULL
+        SET icon_url = NULL, raw_icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
         organization_item.id as database::models::ids::OrganizationId,

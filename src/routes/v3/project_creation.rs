@@ -6,6 +6,7 @@ use crate::database::models::{self, image_item, User};
 use crate::database::redis::RedisPool;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
+use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::{ImageId, OrganizationId};
 use crate::models::images::{Image, ImageContext};
 use crate::models::pats::Scopes;
@@ -17,6 +18,7 @@ use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
 use crate::queue::session::AuthQueue;
 use crate::search::indexing::IndexingError;
+use crate::util::img::upload_image_optimized;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
@@ -481,7 +483,6 @@ async fn project_create_inner(
                         file_extension,
                         file_host,
                         field,
-                        &cdn_url,
                     )
                     .await?,
                 );
@@ -496,33 +497,40 @@ async fn project_create_inner(
                 if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
                     let data = read_from_field(
                         &mut field,
-                        5 * (1 << 20),
-                        "Gallery image exceeds the maximum of 5MiB.",
+                        2 * (1 << 20),
+                        "Gallery image exceeds the maximum of 2MiB.",
                     )
                     .await?;
-                    let hash = sha1::Sha1::from(&data).hexdigest();
+
                     let (_, file_extension) =
                         super::version_creation::get_name_ext(&content_disposition)?;
-                    let content_type = crate::util::ext::get_image_content_type(file_extension)
-                        .ok_or_else(|| {
-                            CreateError::InvalidIconFormat(file_extension.to_string())
-                        })?;
-                    let url = format!("data/{project_id}/images/{hash}.{file_extension}");
-                    let upload_data = file_host
-                        .upload_file(content_type, &url, data.freeze())
-                        .await?;
+
+                    let url = format!("data/{project_id}/images");
+                    let upload_result = upload_image_optimized(
+                        &url,
+                        data.freeze(),
+                        file_extension,
+                        Some(350),
+                        Some(1.0),
+                        file_host,
+                    )
+                    .await
+                    .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
+
                     uploaded_files.push(UploadedFile {
-                        file_id: upload_data.file_id,
-                        file_name: upload_data.file_name,
+                        file_id: upload_result.raw_url_path.clone(),
+                        file_name: upload_result.raw_url_path,
                     });
                     gallery_urls.push(crate::models::projects::GalleryItem {
-                        url: format!("{cdn_url}/{url}"),
+                        url: upload_result.url,
+                        raw_url: upload_result.raw_url,
                         featured: item.featured,
                         name: item.name.clone(),
                         description: item.description.clone(),
                         created: Utc::now(),
                         ordering: item.ordering,
                     });
+
                     return Ok(());
                 }
             }
@@ -715,6 +723,7 @@ async fn project_create_inner(
             summary: project_create_data.summary,
             description: project_create_data.description,
             icon_url: icon_data.clone().map(|x| x.0),
+            raw_icon_url: icon_data.clone().map(|x| x.1),
 
             license_url: project_create_data.license_url,
             categories,
@@ -729,6 +738,7 @@ async fn project_create_inner(
                 .iter()
                 .map(|x| models::project_item::GalleryItem {
                     image_url: x.url.clone(),
+                    raw_image_url: x.raw_url.clone(),
                     featured: x.featured,
                     name: x.name.clone(),
                     description: x.description.clone(),
@@ -736,7 +746,7 @@ async fn project_create_inner(
                     ordering: x.ordering,
                 })
                 .collect(),
-            color: icon_data.and_then(|x| x.1),
+            color: icon_data.and_then(|x| x.2),
             monetization_status: MonetizationStatus::Monetized,
         };
         let project_builder = project_builder_actual.clone();
@@ -943,29 +953,32 @@ async fn process_icon_upload(
     file_extension: &str,
     file_host: &dyn FileHost,
     mut field: Field,
-    cdn_url: &str,
-) -> Result<(String, Option<u32>), CreateError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(file_extension) {
-        let data = read_from_field(&mut field, 262144, "Icons must be smaller than 256KiB").await?;
+) -> Result<(String, String, Option<u32>), CreateError> {
+    let data = read_from_field(&mut field, 262144, "Icons must be smaller than 256KiB").await?;
+    let upload_result = crate::util::img::upload_image_optimized(
+        &format!("data/{}", to_base62(id)),
+        data.freeze(),
+        file_extension,
+        Some(96),
+        Some(1.0),
+        file_host,
+    )
+    .await
+    .map_err(|e| CreateError::InvalidIconFormat(e.to_string()))?;
 
-        let color = crate::util::img::get_color_from_img(&data)?;
+    uploaded_files.push(UploadedFile {
+        file_id: upload_result.raw_url_path.clone(),
+        file_name: upload_result.raw_url_path,
+    });
 
-        let hash = sha1::Sha1::from(&data).hexdigest();
-        let upload_data = file_host
-            .upload_file(
-                content_type,
-                &format!("data/{id}/{hash}.{file_extension}"),
-                data.freeze(),
-            )
-            .await?;
+    uploaded_files.push(UploadedFile {
+        file_id: upload_result.url_path.clone(),
+        file_name: upload_result.url_path,
+    });
 
-        uploaded_files.push(UploadedFile {
-            file_id: upload_data.file_id,
-            file_name: upload_data.file_name.clone(),
-        });
-
-        Ok((format!("{}/{}", cdn_url, upload_data.file_name), color))
-    } else {
-        Err(CreateError::InvalidIconFormat(file_extension.to_string()))
-    }
+    Ok((
+        upload_result.url,
+        upload_result.raw_url,
+        upload_result.color,
+    ))
 }
