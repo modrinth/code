@@ -60,6 +60,7 @@ const updateServerNameReq = async () => {
       text: "Your server settings were successfully changed.",
     });
   } catch (error) {
+    console.error(error);
     // @ts-ignore
     app.$notify({
       group: "serverOptions",
