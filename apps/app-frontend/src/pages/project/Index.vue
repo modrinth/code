@@ -232,15 +232,7 @@ import {
   GlobeIcon,
   ClipboardCopyIcon,
 } from '@modrinth/assets'
-import {
-  Categories,
-  EnvironmentIndicator,
-  Card,
-  Avatar,
-  Button,
-  Promotion,
-  NavRow,
-} from '@modrinth/ui'
+import { Categories, EnvironmentIndicator, Card, Avatar, Button, NavRow } from '@modrinth/ui'
 import { formatNumber } from '@modrinth/utils'
 import {
   BuyMeACoffeeIcon,
@@ -261,7 +253,7 @@ import { handleError } from '@/store/notifications.js'
 import { convertFileSrc } from '@tauri-apps/api/core'
 import ContextMenu from '@/components/ui/ContextMenu.vue'
 import { install as installVersion } from '@/store/install.js'
-import { get_project, get_project_many, get_team, get_version_many } from '@/helpers/cache.js'
+import { get_project, get_team, get_version_many } from '@/helpers/cache.js'
 import PromotionWrapper from '@/components/ui/PromotionWrapper.vue'
 
 dayjs.extend(relativeTime)

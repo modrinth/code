@@ -102,9 +102,9 @@ const props = defineProps({
   },
 })
 
-let expandedGalleryItem = ref(null)
-let expandedGalleryIndex = ref(0)
-let zoomedIn = ref(false)
+const expandedGalleryItem = ref(null)
+const expandedGalleryIndex = ref(0)
+const zoomedIn = ref(false)
 
 const nextImage = () => {
   expandedGalleryIndex.value++

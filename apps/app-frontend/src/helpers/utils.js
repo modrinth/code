@@ -56,7 +56,7 @@ export function debounce(fn, wait) {
     if (timer) {
       clearTimeout(timer) // clear any pre-existing timer
     }
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
+
     const context = this // get the current context
     timer = setTimeout(() => {
       fn.apply(context, args) // call the function if time expires
