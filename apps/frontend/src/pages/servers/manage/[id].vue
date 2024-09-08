@@ -73,8 +73,6 @@
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
-import { useServerStore } from "~/stores/servers.ts";
-import { PyroFetchError } from "~/composables/pyroFetch.ts";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;

@@ -1,6 +1,6 @@
 <template>
   <div class="flex w-full flex-col">
-    <ContentItem
+    <UiServersContentItem
       v-for="mod in mods"
       :key="mod.name"
       :name="mod.name"
@@ -12,7 +12,6 @@
 
 <script setup lang="ts">
 import { FileIcon } from "@modrinth/assets";
-import ContentItem from "~/components/ui/servers/ContentItem.vue";
 
 const mods = [
   {

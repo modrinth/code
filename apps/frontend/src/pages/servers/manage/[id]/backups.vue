@@ -218,8 +218,8 @@
         </div>
       </div>
     </div>
-    <PyroLoading v-else-if="status === 'pending' || backupsStatus === 'pending'" />
-    <PyroError
+    <UiServersPyroLoading v-else-if="status === 'pending' || backupsStatus === 'pending'" />
+    <UiServersPyroError
       v-else-if="status === 'error' || backupsStatus === 'error'"
       title="Could not load backups"
       message="Your backups could not be displayed due to a technical issue on our end. Please try again later."
@@ -241,9 +241,6 @@ import {
   XIcon,
 } from "@modrinth/assets";
 import { ref, reactive } from "vue";
-import { useServerStore } from "~/stores/servers.ts";
-import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
-import PyroError from "~/components/ui/servers/PyroError.vue";
 
 import type { ServerBackup } from "~/types/servers.ts";
 

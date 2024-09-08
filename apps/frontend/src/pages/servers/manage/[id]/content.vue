@@ -1,27 +1,23 @@
 <template>
   <div>
     <div v-if="data && status === 'success'">
-      <ServerSidebar :route="route" :nav-links="navLinks" />
+      <UiServersServerSidebar :route="route" :nav-links="navLinks" />
     </div>
     <UiServersPyroError
       v-else-if="status === 'error'"
       title="Error Accessing Server"
       message="Dont worry, your server is safe. We just can't connect to it right now."
     />
-    <PyroLoading v-else />
+    <UiServersPyroLoading v-else />
   </div>
 </template>
 
 <script setup lang="ts">
 import { BoxIcon, FileIcon } from "@modrinth/assets";
-import { useServerStore } from "~/stores/servers.ts";
-import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
-import ServerSidebar from "~/components/ui/servers/ServerSidebar.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
-const auth = await useAuth();
 
 await serverStore.fetchServerData(serverId);
 const { data, status } = await useLazyAsyncData(

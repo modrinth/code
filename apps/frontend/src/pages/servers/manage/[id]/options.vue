@@ -1,10 +1,9 @@
 <template>
-  <ServerSidebar :route="route" :nav-links="navLinks" />
+  <UiServersServerSidebar :route="route" :nav-links="navLinks" />
 </template>
 
 <script setup lang="ts">
 import { CogIcon, FileIcon, ListIcon, TextQuoteIcon, VersionIcon } from "@modrinth/assets";
-import ServerSidebar from "~/components/ui/servers/ServerSidebar.vue";
 
 const route = useNativeRoute();
 const serverId = route.params.id;
