@@ -48,7 +48,7 @@ const shownProfiles = computed(() =>
       return profile.name.toLowerCase().includes(searchFilter.value.toLowerCase())
     })
     .filter((profile) => {
-      let loaders = versions.value.flatMap((v) => v.loaders)
+      const loaders = versions.value.flatMap((v) => v.loaders)
 
       return (
         versions.value.flatMap((v) => v.game_versions).includes(profile.game_version) &&
@@ -59,7 +59,7 @@ const shownProfiles = computed(() =>
     }),
 )
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: async (projectVal, versionsVal, callback) => {
@@ -77,7 +77,7 @@ defineExpose({
     onInstall.value = callback
 
     const profilesVal = await list().catch(handleError)
-    for (let profile of profilesVal) {
+    for (const profile of profilesVal) {
       profile.installing = false
       profile.installedMod = await check_installed(profile.path, project.value.id).catch(
         handleError,
