@@ -118,8 +118,8 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Play where your mods are</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Modrinth manages every part of your server. Focus on playing with friends, not
-              transferring files, managing mods, or updating plugins.
+              Experience a seamless integration between your mods and your servers. Modpacks install
+              within seconds and run without a hitch.
             </h3>
           </div>
 
@@ -143,8 +143,8 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Join with a single click</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Share your server with friends by sending them a link to your server. They can join
-              with a single click directly from the Modrinth app.
+              Your servers are sharable with just one link. Easily invite your friends to join your
+              server. Modrinth takes care of installing the mods.
             </h3>
           </div>
         </div>
@@ -176,8 +176,8 @@
             </svg>
             <h2 class="m-0 text-lg font-bold">Manage it all on Modrinth</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              Keep track of your server's stats, and content on the website and in the Modrinth app.
-              It's never been easier to manage your server.
+              Manage your server, mods, and players all in one place. No need to switch between
+              different platforms just to play.
             </h3>
           </div>
 
@@ -197,10 +197,10 @@
               <polygon points="13 19 22 12 13 5 13 19" />
               <polygon points="2 19 11 12 2 5 2 19" />
             </svg>
-            <h2 class="m-0 text-lg font-bold">Experience the fastest, most reliable hosting</h2>
+            <h2 class="m-0 text-lg font-bold">Experience the fastest servers in the world</h2>
             <h3 class="m-0 text-base font-normal text-secondary">
-              DDoS protection built-in. 99.999% uptime. SSDs. Ryzen 9s. Powered by Pyro's custom
-              software that keeps your server running smoothly.
+              Modrinth Servers are hosted on the fastest, most reliable infrastructure using
+              custom-built software built by Pyro.
             </h3>
           </div>
         </div>
