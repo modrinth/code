@@ -1,5 +1,5 @@
 <template>
-  <ServerSidebar :route="route" :navLinks="navLinks" />
+  <ServerSidebar :route="route" :nav-links="navLinks" />
 </template>
 
 <script setup lang="ts">

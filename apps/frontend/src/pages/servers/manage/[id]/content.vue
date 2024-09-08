@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="data && status === 'success'">
-      <ServerSidebar :route="route" :navLinks="navLinks" />
+      <ServerSidebar :route="route" :nav-links="navLinks" />
     </div>
     <UiServersPyroError
       v-else-if="status === 'error'"
@@ -13,8 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { EditIcon, ImportIcon, BoxIcon, SearchIcon, FileIcon } from "@modrinth/assets";
-import LoaderIcon from "~/components/ui/servers/LoaderIcon.vue";
+import { BoxIcon, FileIcon } from "@modrinth/assets";
 import { useServerStore } from "~/stores/servers.ts";
 import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
 import ServerSidebar from "~/components/ui/servers/ServerSidebar.vue";

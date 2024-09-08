@@ -1,8 +1,8 @@
 <template>
   <div class="h-full w-full">
     <div
-      class="flex h-full w-full flex-col justify-between gap-6 p-8"
       v-if="data && status == 'success'"
+      class="flex h-full w-full flex-col justify-between gap-6 p-8"
     >
       <h2 class="text-3xl font-bold">server.properties</h2>
       <div v-for="(property, index) in liveProperties" :key="index">
@@ -46,8 +46,8 @@
       <button
         type="submit"
         class="btn btn-primary mt-4"
-        @click="() => saveProperties()"
         :disabled="isUpdating || !hasUnsavedChanges"
+        @click="() => saveProperties()"
       >
         {{ isUpdating ? "Saving..." : "Save" }}
       </button>

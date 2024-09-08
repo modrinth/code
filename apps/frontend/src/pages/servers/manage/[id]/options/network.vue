@@ -1,8 +1,8 @@
 <template>
   <div class="h-full w-full">
     <div
-      class="flex h-full w-full flex-col justify-between gap-6 p-8"
       v-if="data && status == 'success'"
+      class="flex h-full w-full flex-col justify-between gap-6 p-8"
     >
       <h2 class="text-3xl font-bold">Network</h2>
       <div class="flex h-full flex-col gap-2">
@@ -24,8 +24,8 @@
       <button
         type="submit"
         class="btn btn-primary"
-        @click="updateServerSubdomainReq"
         :disabled="isUpdating || !hasUnsavedChanges"
+        @click="updateServerSubdomainReq"
       >
         {{ isUpdating ? "Saving..." : "Save" }}
       </button>

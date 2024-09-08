@@ -395,14 +395,12 @@ const startTyping = () => {
       currentWordIndex.value = (currentWordIndex.value + 1) % words.length;
       setTimeout(startTyping, typingSpeed);
     }
+  } else if (currentText.value.length < currentWord.length) {
+    currentText.value = currentWord.slice(0, currentText.value.length + 1);
+    setTimeout(startTyping, typingSpeed);
   } else {
-    if (currentText.value.length < currentWord.length) {
-      currentText.value = currentWord.slice(0, currentText.value.length + 1);
-      setTimeout(startTyping, typingSpeed);
-    } else {
-      isDeleting.value = true;
-      setTimeout(startTyping, pauseTime);
-    }
+    isDeleting.value = true;
+    setTimeout(startTyping, pauseTime);
   }
 };
 
