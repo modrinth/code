@@ -12,7 +12,7 @@ const project = ref()
 const confirmModal = ref(null)
 const installing = ref(false)
 
-let onInstall = ref(() => {})
+const onInstall = ref(() => {})
 
 defineExpose({
   show: (projectVal, versionIdVal, callback) => {

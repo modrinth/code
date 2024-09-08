@@ -462,7 +462,7 @@ const promises = profileOptions.value.map(async (option) => {
       option.name,
       instances.map((name) => ({ name, selected: false })),
     )
-  } catch (error) {
+  } catch {
     // Allow failure silently
   }
 })

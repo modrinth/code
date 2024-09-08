@@ -88,8 +88,6 @@ import { loading_listener } from '@/helpers/events.js'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { XIcon } from '@modrinth/assets'
 import { MaximizeIcon, MinimizeIcon } from '@/assets/icons/index.js'
-import { TauriEvent } from '@tauri-apps/api/event'
-import { saveWindowState, StateFlags } from '@tauri-apps/plugin-window-state'
 import { getOS } from '@/helpers/utils.js'
 import { useLoading } from '@/store/loading.js'
 
