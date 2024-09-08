@@ -14,8 +14,8 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { type Mod } from "~/types/servers";
 import { BoxIcon } from "@modrinth/assets";
+import type { Mod } from "~/types/servers";
 
 export default defineComponent({
   name: "ModsInfo",
