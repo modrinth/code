@@ -97,7 +97,7 @@
           class="absolute right-8 top-0 hidden max-w-[360px] lg:block"
         />
         <div class="relative grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -123,7 +123,7 @@
             </h3>
           </div>
 
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -152,11 +152,11 @@
           <img
             src="~/assets/images/games/servers-hero-square-fixed-forreal.png"
             alt=""
-            class="w-full rounded-xl"
+            class="w-full rounded-2xl"
           />
         </div>
         <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-          <div class="flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+          <div class="flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -181,7 +181,7 @@
             </h3>
           </div>
 
-          <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+          <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -233,7 +233,7 @@
         />
         <div class="grid grid-cols-1 gap-9 lg:grid-cols-2">
           <div class="grid w-full grid-cols-1 gap-8">
-            <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -263,7 +263,7 @@
                 >.modrinth.gg
               </div>
             </div>
-            <div class="relative flex flex-col gap-4 rounded-xl bg-bg p-6 text-left md:p-12">
+            <div class="relative flex flex-col gap-4 rounded-2xl bg-bg p-6 text-left md:p-12">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -287,7 +287,7 @@
             </div>
           </div>
           <div
-            class="relative flex flex-col gap-4 overflow-hidden rounded-xl bg-highlight p-6 text-left backdrop-blur-xl md:p-12"
+            class="relative flex flex-col gap-4 overflow-hidden rounded-2xl bg-highlight p-6 text-left backdrop-blur-xl md:p-12"
           >
             <h2 class="m-0 text-lg font-bold">Unlimited storage</h2>
             <h3 class="m-0 text-base font-normal">
@@ -297,7 +297,7 @@
             <img
               src="~/assets/images/games/content-hero.png"
               alt=""
-              class="absolute -bottom-16 -right-[15%] max-w-2xl rounded-xl bg-brand p-4"
+              class="absolute -bottom-16 -right-[15%] max-w-2xl rounded-2xl bg-brand p-4"
             />
             <div
               class="absolute bottom-8 right-8 rounded-full bg-brand p-4 text-sm font-bold text-[var(--color-accent-contrast)]"
