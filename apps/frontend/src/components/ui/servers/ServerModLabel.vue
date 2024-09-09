@@ -12,28 +12,14 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 import { BoxIcon } from "@modrinth/assets";
 import type { Mod } from "~/types/servers";
 
-export default defineComponent({
-  name: "ModsInfo",
-  components: {
-    BoxIcon,
-  },
-  props: {
-    mods: {
-      type: Array as () => Mod[],
-      default: () => [],
-    },
-  },
-  setup(props) {
-    const modsCount = computed(() => props.mods?.length ?? 0);
+const props = defineProps<{
+  mods: Mod[];
+}>();
 
-    return {
-      modsCount,
-    };
-  },
-});
+const modsCount = computed(() => props.mods?.length ?? 0);
 </script>
