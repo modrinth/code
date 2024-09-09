@@ -26,7 +26,6 @@
               <h1 class="m-0 text-4xl font-bold text-[var(--color-contrast)]">
                 {{ serverData.name }}
               </h1>
-              <UiServersPanelServerStatus :state="serverPowerState" />
             </div>
 
             <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
@@ -48,11 +47,6 @@
               :ip="serverData.net.ip"
               :port="serverData.net.port"
               :subdomain="serverData.net.domain"
-            />
-            <UiServersPanelServerActionButton
-              :is-online="serverPowerState === 'running'"
-              :is-actioning="isActioning"
-              @action="sendPowerAction"
             />
           </div>
         </div>
@@ -77,12 +71,10 @@
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { LeftArrowIcon } from "@modrinth/assets";
-import type { ServerState } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
-const app = useNuxtApp();
 
 const { serverData: storeServerData } = storeToRefs(serverStore);
 
@@ -90,8 +82,6 @@ const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const isLoading = ref(true);
 const error = ref<Error | null>(null);
-const isActioning = ref(false);
-const serverPowerState = ref<ServerState>("stopped");
 
 const serverData = computed(() => storeServerData.value[serverId] || null);
 
@@ -106,33 +96,6 @@ const navLinks = [
   { label: "Backups", href: `/servers/manage/${serverId}/backups` },
   { label: "Options", href: `/servers/manage/${serverId}/options` },
 ];
-
-const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
-  const actionName = action.charAt(0).toUpperCase() + action.slice(1);
-  // @ts-ignore
-  app.$notify({
-    group: "server",
-    title: `${actionName}ing server`,
-    text: `Your server is now ${actionName.toLocaleLowerCase()}ing, this may take a few moments`,
-    type: "success",
-  });
-
-  try {
-    isActioning.value = true;
-    await serverStore.sendPowerAction(serverId, actionName);
-  } catch (error) {
-    console.error(`Error ${actionName}ing server:`, error);
-    // @ts-ignore
-    app.$notify({
-      group: "server",
-      title: `Error ${actionName}ing server`,
-      text: "An error occurred while attempting to perform the action.",
-      type: "error",
-    });
-  } finally {
-    isActioning.value = false;
-  }
-};
 
 definePageMeta({
   middleware: "auth",
