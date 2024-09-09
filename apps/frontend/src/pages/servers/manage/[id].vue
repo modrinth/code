@@ -107,8 +107,7 @@ const navLinks = [
   { label: "Options", href: `/servers/manage/${serverId}/options` },
 ];
 
-const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
-  isActioning.value = true;
+const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   // @ts-ignore
   app.$notify({
@@ -119,7 +118,8 @@ const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
   });
 
   try {
-    serverStore.sendPowerAction(serverId, actionName);
+    isActioning.value = true;
+    await serverStore.sendPowerAction(serverId, actionName);
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error);
     // @ts-ignore
