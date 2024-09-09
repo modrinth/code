@@ -14,13 +14,7 @@
       <div class="experimental-styles-within flex flex-row items-center justify-between">
         <div class="flex flex-row items-center gap-4">
           <h2 class="m-0 text-3xl font-extrabold text-[var(--color-contrast)]">Console</h2>
-          <UiServersPanelServerStatus :state="serverPowerState" />
         </div>
-        <UiServersPanelServerActionButton
-          :is-online="serverPowerState === 'running'"
-          :is-actioning="isActioning"
-          @action="sendPowerAction"
-        />
       </div>
 
       <UiServersPanelTerminal
@@ -51,13 +45,11 @@ const serverStore = useServerStore();
 
 const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
-const isActioning = ref(false);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const consoleOutput = ref<string[]>([]);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
-const serverPowerState = ref<ServerState>("stopped");
 
 const stats = ref<Stats>({
   current: {
@@ -80,7 +72,6 @@ const stats = ref<Stats>({
   },
 });
 
-const app = useNuxtApp();
 const route = useRoute();
 const serverId = route.params.id as string;
 
@@ -106,33 +97,6 @@ const animateMarginTop = () => {
       if (mt <= 0 || !fullScreen.value) clearInterval(interval);
     }, 10);
   }, 500);
-};
-
-const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
-  isActioning.value = true;
-  const actionName = action.charAt(0).toUpperCase() + action.slice(1);
-  // @ts-ignore
-  app.$notify({
-    group: "server",
-    title: `${actionName}ing server`,
-    text: `Your server is now ${actionName.toLocaleLowerCase()}ing, this may take a few moments`,
-    type: "success",
-  });
-
-  try {
-    serverStore.sendPowerAction(serverId, actionName);
-  } catch (error) {
-    console.error(`Error ${actionName}ing server:`, error);
-    // @ts-ignore
-    app.$notify({
-      group: "server",
-      title: `Error ${actionName}ing server`,
-      text: "An error occurred while attempting to perform the action.",
-      type: "error",
-    });
-  } finally {
-    isActioning.value = false;
-  }
 };
 
 const connectWebSocket = async () => {

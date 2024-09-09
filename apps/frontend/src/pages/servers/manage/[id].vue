@@ -5,13 +5,14 @@
       <div
         v-else-if="serverData"
         data-pyro-server-manager-root
-        class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
+        class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
       >
         <div class="flex flex-row items-center gap-6 pt-4">
           <UiAvatar
             no-shadow
             size="lg"
             alt="Server Icon"
+            style="width: 128px; height: 128px; min-width: 128px; min-height: 128px"
             :src="serverData?.project?.icon_url ?? undefined"
           />
           <div class="flex flex-col gap-4">
@@ -21,9 +22,13 @@
                 All servers
               </NuxtLink>
             </div>
-            <h1 class="m-0 text-4xl font-bold text-[var(--color-contrast)]">
-              {{ serverData.name }}
-            </h1>
+            <div class="flex flex-row items-center gap-4">
+              <h1 class="m-0 text-4xl font-bold text-[var(--color-contrast)]">
+                {{ serverData.name }}
+              </h1>
+              <UiServersPanelServerStatus :state="serverPowerState" />
+            </div>
+
             <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
               <UiServersServerGameLabel
                 v-if="showGameLabel"
@@ -38,23 +43,22 @@
               <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
             </div>
           </div>
-        </div>
-
-        <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
-          <UiNavTabs :links="navLinks" />
-
-          <div class="flex flex-row gap-2">
+          <div class="ml-auto flex flex-row gap-2">
             <UiServersPanelCopyIP
               :ip="serverData.net.ip"
               :port="serverData.net.port"
               :subdomain="serverData.net.domain"
             />
-            <UiServersPanelPlay
-              :server-id="serverData.server_id"
-              :ip="serverData.net.ip"
-              :port="serverData.net.port"
+            <UiServersPanelServerActionButton
+              :is-online="serverPowerState === 'running'"
+              :is-actioning="isActioning"
+              @action="sendPowerAction"
             />
           </div>
+        </div>
+
+        <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
+          <UiNavTabs :links="navLinks" />
         </div>
 
         <div data-pyro-mount class="h-full w-full">
@@ -73,10 +77,12 @@
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
+import type { ServerState } from "~/types/servers";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+const app = useNuxtApp();
 
 const { serverData: storeServerData } = storeToRefs(serverStore);
 
@@ -84,6 +90,8 @@ const errorTitle = ref("Error");
 const errorMessage = ref("An unexpected error occurred.");
 const isLoading = ref(true);
 const error = ref<Error | null>(null);
+const isActioning = ref(false);
+const serverPowerState = ref<ServerState>("stopped");
 
 const serverData = computed(() => storeServerData.value[serverId] || null);
 
@@ -92,11 +100,38 @@ const showLoaderLabel = computed(() => !!serverData.value?.loader);
 const showModLabel = computed(() => (serverData.value?.mods?.length ?? 0) > 0);
 
 const navLinks = [
-  { icon: HomeIcon, label: "Overview", href: `/servers/manage/${serverId}` },
-  { icon: CubeIcon, label: "Content", href: `/servers/manage/${serverId}/content` },
-  { icon: CloudIcon, label: "Backups", href: `/servers/manage/${serverId}/backups` },
-  { icon: CogIcon, label: "Options", href: `/servers/manage/${serverId}/options` },
+  { label: "Overview", href: `/servers/manage/${serverId}` },
+  { label: "Content", href: `/servers/manage/${serverId}/content` },
+  { label: "Backups", href: `/servers/manage/${serverId}/backups` },
+  { label: "Options", href: `/servers/manage/${serverId}/options` },
 ];
+
+const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
+  isActioning.value = true;
+  const actionName = action.charAt(0).toUpperCase() + action.slice(1);
+  // @ts-ignore
+  app.$notify({
+    group: "server",
+    title: `${actionName}ing server`,
+    text: `Your server is now ${actionName.toLocaleLowerCase()}ing, this may take a few moments`,
+    type: "success",
+  });
+
+  try {
+    serverStore.sendPowerAction(serverId, actionName);
+  } catch (error) {
+    console.error(`Error ${actionName}ing server:`, error);
+    // @ts-ignore
+    app.$notify({
+      group: "server",
+      title: `Error ${actionName}ing server`,
+      text: "An error occurred while attempting to perform the action.",
+      type: "error",
+    });
+  } finally {
+    isActioning.value = false;
+  }
+};
 
 definePageMeta({
   middleware: "auth",
