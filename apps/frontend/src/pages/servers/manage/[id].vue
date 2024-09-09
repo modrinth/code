@@ -76,7 +76,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
+import { LeftArrowIcon } from "@modrinth/assets";
 import type { ServerState } from "~/types/servers";
 
 const route = useNativeRoute();
@@ -102,6 +102,7 @@ const showModLabel = computed(() => (serverData.value?.mods?.length ?? 0) > 0);
 const navLinks = [
   { label: "Overview", href: `/servers/manage/${serverId}` },
   { label: "Content", href: `/servers/manage/${serverId}/content` },
+  { label: "Files", href: `/servers/manage/${serverId}/files` },
   { label: "Backups", href: `/servers/manage/${serverId}/backups` },
   { label: "Options", href: `/servers/manage/${serverId}/options` },
 ];
