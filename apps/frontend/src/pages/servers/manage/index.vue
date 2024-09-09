@@ -127,8 +127,7 @@ const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
     try {
       const response = await serverStore.listServers();
       return response;
-    } catch (error) {
-      console.error(error);
+    } catch {
       throw new PyroFetchError("Unable to load servers");
     }
   },
