@@ -93,3 +93,5 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     );
   }
 }
+
+// test
