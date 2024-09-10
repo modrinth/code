@@ -42,7 +42,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Install Tauri CLI
-        run: cargo install tauri-cli --git https://github.com/modrinth/tauri.git --rev 5b26cbff93fe4697338e56dfc7299ac8864b3445
+        run: cargo install tauri-cli --git https://github.com/modrinth/tauri.git --rev 5e2942876c2266594ed1db516c1d9975c873c36a
 
       - name: Setup rust cache
         uses: actions/cache@v4

@@ -738,8 +738,7 @@ impl CachedEntry {
                             .unwrap_or(false)
                 });
 
-                if let Some(data) = parsed_data
-                {
+                if let Some(data) = parsed_data {
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,

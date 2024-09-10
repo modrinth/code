@@ -5259,7 +5259,7 @@ checksum = "61c41af27dd6d1e27b1b16b489db798443478cef1f06a660c96db617ba5de3b1"
 [[package]]
 name = "tauri"
 version = "2.0.0-rc.10"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "anyhow",
  "bytes",
@@ -5293,7 +5293,7 @@ dependencies = [
  "tauri-macros",
  "tauri-runtime",
  "tauri-runtime-wry",
- "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5b26cbf)",
+ "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5e29428)",
  "thiserror",
  "tokio",
  "tray-icon",
@@ -5308,7 +5308,7 @@ dependencies = [
 [[package]]
 name = "tauri-build"
 version = "2.0.0-rc.9"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "anyhow",
  "cargo_toml",
@@ -5322,7 +5322,7 @@ dependencies = [
  "serde",
  "serde_json",
  "tauri-codegen",
- "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5b26cbf)",
+ "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5e29428)",
  "tauri-winres",
  "toml 0.8.19",
  "walkdir",
@@ -5331,7 +5331,7 @@ dependencies = [
 [[package]]
 name = "tauri-codegen"
 version = "2.0.0-rc.9"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "base64 0.22.1",
  "brotli",
@@ -5346,7 +5346,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "syn 2.0.77",
- "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5b26cbf)",
+ "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5e29428)",
  "thiserror",
  "time",
  "url",
@@ -5357,14 +5357,14 @@ dependencies = [
 [[package]]
 name = "tauri-macros"
 version = "2.0.0-rc.8"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
  "quote",
  "syn 2.0.77",
  "tauri-codegen",
- "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5b26cbf)",
+ "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5e29428)",
 ]
 
 [[package]]
@@ -5543,7 +5543,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime"
 version = "2.0.0-rc.9"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "dpi",
  "gtk",
@@ -5552,7 +5552,7 @@ dependencies = [
  "raw-window-handle 0.6.2",
  "serde",
  "serde_json",
- "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5b26cbf)",
+ "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5e29428)",
  "thiserror",
  "url",
  "windows 0.58.0",
@@ -5561,7 +5561,7 @@ dependencies = [
 [[package]]
 name = "tauri-runtime-wry"
 version = "2.0.0-rc.9"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "cocoa 0.26.0",
  "gtk",
@@ -5573,7 +5573,7 @@ dependencies = [
  "softbuffer",
  "tao",
  "tauri-runtime",
- "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5b26cbf)",
+ "tauri-utils 2.0.0-rc.9 (git+https://github.com/modrinth/tauri?rev=5e29428)",
  "url",
  "webkit2gtk",
  "webview2-com",
@@ -5617,7 +5617,7 @@ dependencies = [
 [[package]]
 name = "tauri-utils"
 version = "2.0.0-rc.9"
-source = "git+https://github.com/modrinth/tauri?rev=5b26cbf#5b26cbff93fe4697338e56dfc7299ac8864b3445"
+source = "git+https://github.com/modrinth/tauri?rev=5e29428#5e2942876c2266594ed1db516c1d9975c873c36a"
 dependencies = [
  "brotli",
  "cargo_metadata",
