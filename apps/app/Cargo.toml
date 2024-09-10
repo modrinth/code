@@ -8,7 +8,7 @@ edition = "2021"
 build = "build.rs"
 
 [build-dependencies]
-tauri-build = { git = "https://github.com/modrinth/tauri", features = ["codegen"], rev = "c2b059b" }
+tauri-build = { git = "https://github.com/modrinth/tauri", features = ["codegen"], rev = "5b26cbf" }
 
 [dependencies]
 theseus = { path = "../../packages/app-lib", features = ["tauri"] }
@@ -16,7 +16,7 @@ theseus = { path = "../../packages/app-lib", features = ["tauri"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 
-tauri = { git = "https://github.com/modrinth/tauri", features = ["devtools", "macos-private-api", "protocol-asset", "unstable"], rev = "c2b059b" }
+tauri = { git = "https://github.com/modrinth/tauri", features = ["devtools", "macos-private-api", "protocol-asset", "unstable"], rev = "5b26cbf" }
 tauri-plugin-window-state = "2.0.0-rc"
 tauri-plugin-deep-link = "2.0.0-rc"
 tauri-plugin-os = "2.0.0-rc"
