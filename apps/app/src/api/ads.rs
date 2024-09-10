@@ -18,7 +18,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 position: None,
             }));
 
-            /// We refresh the ads window every 5 minutes for performance
+            // We refresh the ads window every 5 minutes for performance
             let app = app.clone();
             tauri::async_runtime::spawn(async move {
                 loop {

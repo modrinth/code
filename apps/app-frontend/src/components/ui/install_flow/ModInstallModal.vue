@@ -150,7 +150,7 @@ const upload_icon = async () => {
       },
     ],
   })
-  icon.value = res ? res.path : null
+  icon.value = res.path ?? res
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)

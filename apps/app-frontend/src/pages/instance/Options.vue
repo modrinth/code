@@ -581,7 +581,7 @@ async function setIcon() {
 
   if (!value) return
 
-  icon.value = value.path
+  icon.value = value.path ?? value
   await edit_icon(props.instance.path, icon.value).catch(handleError)
 
   trackEvent('InstanceSetIcon')
