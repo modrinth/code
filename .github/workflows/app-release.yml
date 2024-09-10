@@ -62,9 +62,13 @@ jobs:
             !target/release/bundle/*/*.deb
             !target/release/bundle/*/*.rpm
 
-            !target/release/bundle/*/*.msi
-            !target/release/bundle/*/*.msi.zip
-            !target/release/bundle/*/*.msi.zip.sig
+            !target/release/bundle/msi/*.msi
+            !target/release/bundle/msi/*.msi.zip
+            !target/release/bundle/msi/*.msi.zip.sig
+            
+            !target/release/bundle/nsis/*.exe
+            !target/release/bundle/nsis/*.nsis.zip
+            !target/release/bundle/nsis/*.nsis.zip.sig
           key: ${{ runner.os }}-rust-target-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-rust-target-
@@ -117,6 +121,7 @@ jobs:
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          V1_COMPATIBLE_BIN_NAME: true
 
       - name: build app
         run: pnpm --filter=@modrinth/app run tauri build --config "tauri-release.conf.json"
@@ -126,6 +131,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          V1_COMPATIBLE_BIN_NAME: true
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v4
@@ -145,7 +151,10 @@ jobs:
             target/release/bundle/*/*.deb
             target/release/bundle/*/*.rpm
 
-            target/release/bundle/*/*.msi
-            target/release/bundle/*/*.msi.zip
-            target/release/bundle/*/*.msi.zip.sig
-
+            target/release/bundle/msi/*.msi
+            target/release/bundle/msi/*.msi.zip
+            target/release/bundle/msi/*.msi.zip.sig
+            
+            target/release/bundle/nsis/*.exe
+            target/release/bundle/nsis/*.nsis.zip
+            target/release/bundle/nsis/*.nsis.zip.sig
