@@ -379,7 +379,7 @@ const upload_icon = async () => {
     ],
   })
 
-  icon.value = res ? res.path : null
+  icon.value = res.path ?? res
 
   if (!icon.value) return
   display_icon.value = convertFileSrc(icon.value)
@@ -417,7 +417,7 @@ const openFile = async () => {
   const newProject = await open({ multiple: false })
   if (!newProject) return
   hide()
-  await install_from_file(newProject.path).catch(handleError)
+  await install_from_file(newProject.path ?? newProject).catch(handleError)
 
   trackEvent('InstanceCreate', {
     source: 'CreationModalFileOpen',
