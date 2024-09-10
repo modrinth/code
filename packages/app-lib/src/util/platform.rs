@@ -9,9 +9,21 @@ pub trait OsExt {
 
     /// Gets the OS + Arch of the current system
     fn native_arch(java_arch: &str) -> Self;
+
+    /// Gets the OS from an OS + Arch
+    fn get_os(&self) -> Self;
 }
 
 impl OsExt for Os {
+    fn native() -> Self {
+        match std::env::consts::OS {
+            "windows" => Self::Windows,
+            "macos" => Self::Osx,
+            "linux" => Self::Linux,
+            _ => Self::Unknown,
+        }
+    }
+
     fn native_arch(java_arch: &str) -> Self {
         if std::env::consts::OS == "windows" {
             if java_arch == "aarch64" {
@@ -38,12 +50,13 @@ impl OsExt for Os {
         }
     }
 
-    fn native() -> Self {
-        match std::env::consts::OS {
-            "windows" => Self::Windows,
-            "macos" => Self::Osx,
-            "linux" => Self::Linux,
-            _ => Self::Unknown,
+    fn get_os(&self) -> Self {
+        match self {
+            Os::OsxArm64 => Os::Osx,
+            Os::LinuxArm32 => Os::Linux,
+            Os::LinuxArm64 => Os::Linux,
+            Os::WindowsArm64 => Os::Windows,
+            _ => self.clone(),
         }
     }
 }
@@ -72,8 +85,8 @@ pub fn os_rule(
         if minecraft_updated
             && (name != &Os::LinuxArm64 || name != &Os::LinuxArm32)
         {
-            rule_match &=
-                &Os::native() == name || &Os::native_arch(java_arch) == name;
+            rule_match &= Os::native() == name.get_os()
+                || &Os::native_arch(java_arch) == name;
         } else {
             rule_match &= &Os::native_arch(java_arch) == name;
         }

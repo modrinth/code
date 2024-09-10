@@ -271,6 +271,7 @@ pub struct License {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GalleryItem {
     pub url: String,
+    pub raw_url: String,
     pub featured: bool,
     pub title: Option<String>,
     pub description: Option<String>,
@@ -703,6 +704,16 @@ impl CachedEntry {
             .await?;
 
             for row in query {
+                let row_exists = row.data.is_some();
+                let parsed_data = row
+                    .data
+                    .and_then(|x| serde_json::from_value::<CacheValue>(x).ok());
+
+                // If data is corrupted/failed to parse ignore it
+                if row_exists && parsed_data.is_none() {
+                    continue;
+                }
+
                 if row.expires <= Utc::now().timestamp() {
                     if cache_behaviour == CacheBehaviour::MustRevalidate {
                         continue;
@@ -727,10 +738,7 @@ impl CachedEntry {
                             .unwrap_or(false)
                 });
 
-                if let Some(data) = row
-                    .data
-                    .and_then(|x| serde_json::from_value::<CacheValue>(x).ok())
-                {
+                if let Some(data) = parsed_data {
                     return_vals.push(Self {
                         id: row.id,
                         alias: row.alias,

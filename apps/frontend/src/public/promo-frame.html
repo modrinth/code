@@ -58,13 +58,19 @@
     ]);
   });
 
+  let lastUrl = null
   window.addEventListener(
     "message",
     (event) => {
-      if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
+      if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__ && lastUrl !== event.data.modrinthOpenUrl) {
+        lastUrl = event.data.modrinthOpenUrl
         window.__TAURI_INTERNALS__.invoke("plugin:shell|open", {
           path: event.data.modrinthOpenUrl,
         });
+
+        setTimeout(() => {
+          lastUrl = null
+        }, 500)
       }
     },
     false,
