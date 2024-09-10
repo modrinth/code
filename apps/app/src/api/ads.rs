@@ -18,6 +18,24 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 position: None,
             }));
 
+            /// We refresh the ads window every 5 minutes for performance
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    if let Some(webview) = app.webviews().get_mut("ads-window")
+                    {
+                        let _ = webview.navigate(
+                            "https://modrinth.com/wrapper/app-ads-cookie"
+                                .parse()
+                                .unwrap(),
+                        );
+                    }
+
+                    tokio::time::sleep(std::time::Duration::from_secs(60 * 5))
+                        .await;
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

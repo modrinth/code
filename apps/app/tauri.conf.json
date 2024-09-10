@@ -25,7 +25,8 @@
         "template": "./msi/main.wxs"
       },
       "nsis": {
-        "installMode": "both"
+        "installMode": "perMachine",
+        "installerHooks": "./nsis/hooks.nsi"
       }
     },
     "longDescription": "",
