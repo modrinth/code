@@ -23,6 +23,9 @@
       "timestampUrl": "http://timestamp.digicert.com",
       "wix": {
         "template": "./msi/main.wxs"
+      },
+      "nsis": {
+        "installMode": "both"
       }
     },
     "longDescription": "",
@@ -48,7 +51,7 @@
     ]
   },
   "productName": "Modrinth App",
-  "version": "0.8.5",
+  "version": "0.8.6",
   "identifier": "ModrinthApp",
   "plugins": {
     "deep-link": {
