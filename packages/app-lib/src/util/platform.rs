@@ -85,7 +85,7 @@ pub fn os_rule(
         if minecraft_updated
             && (name != &Os::LinuxArm64 || name != &Os::LinuxArm32)
         {
-            rule_match &= &Os::native() == &name.get_os()
+            rule_match &= Os::native() == name.get_os()
                 || &Os::native_arch(java_arch) == name;
         } else {
             rule_match &= &Os::native_arch(java_arch) == name;
