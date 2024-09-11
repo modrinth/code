@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-server-list-root
-    class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-4"
+    class="experimental-styles-within relative mx-auto flex min-h-screen w-full max-w-[1280px] flex-col px-3"
   >
     <div class="relative flex h-fit w-full flex-col items-center justify-between md:flex-row">
       <h1 class="text-4xl font-bold text-[--color-contrast]">Servers</h1>
@@ -127,8 +127,7 @@ const { data: serverResponse, status } = await useLazyAsyncData<ServerResponse>(
     try {
       const response = await serverStore.listServers();
       return response;
-    } catch (error) {
-      console.error(error);
+    } catch {
       throw new PyroFetchError("Unable to load servers");
     }
   },

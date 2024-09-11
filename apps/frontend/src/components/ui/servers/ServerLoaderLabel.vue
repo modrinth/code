@@ -10,20 +10,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "LoaderInfo",
-  props: {
-    loader: {
-      type: String,
-      required: true,
-    },
-    loaderVersion: {
-      type: String,
-      required: true,
-    },
-  },
-});
+<script setup lang="ts">
+defineProps<{
+  loader: string;
+  loaderVersion: string;
+}>();
 </script>

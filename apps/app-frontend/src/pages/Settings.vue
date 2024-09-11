@@ -17,7 +17,7 @@ import { hide_ads_window } from '@/helpers/ads.js'
 import ConfirmModalWrapper from '@/components/ui/modal/ConfirmModalWrapper.vue'
 
 onMounted(() => {
-  hide_ads_window()
+  hide_ads_window(true)
 })
 
 const pageOptions = ['Home', 'Library']

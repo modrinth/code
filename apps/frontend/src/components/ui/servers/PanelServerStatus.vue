@@ -19,11 +19,11 @@ const getStatusClass = computed(() => {
     case "running":
       return "bg-green-400/10 text-green-500";
     case "stopped":
-      return "bg-button-border text-gray-500";
+      return "bg-bg-raised text-gray-400";
     case "crashed":
       return "bg-red-400/10 text-red-500";
     default:
-      return "bg-button-border text-gray-500";
+      return "bg-bg-raised text-gray-400";
   }
 });
 

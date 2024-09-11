@@ -18,6 +18,24 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 position: None,
             }));
 
+            // We refresh the ads window every 5 minutes for performance
+            let app = app.clone();
+            tauri::async_runtime::spawn(async move {
+                loop {
+                    if let Some(webview) = app.webviews().get_mut("ads-window")
+                    {
+                        let _ = webview.navigate(
+                            "https://modrinth.com/wrapper/app-ads-cookie"
+                                .parse()
+                                .unwrap(),
+                        );
+                    }
+
+                    tokio::time::sleep(std::time::Duration::from_secs(60 * 5))
+                        .await;
+                }
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
@@ -61,11 +79,11 @@ pub async fn init_ads_window<R: Runtime>(
             tauri::webview::WebviewBuilder::new(
                 "ads-window",
                 WebviewUrl::External(
-                    "https://modrinth.com/wrapper/app-ads".parse().unwrap(),
+                    "https://modrinth.com/wrapper/app-ads-cookie".parse().unwrap(),
                 ),
             )
             .initialization_script(LINK_SCRIPT)
-            .user_agent("ModrinthApp Ads Webview")
+            .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
             .zoom_hotkeys_enabled(false)
             .transparent(true),
             if state.shown {

@@ -5,46 +5,28 @@
   </button>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import { CopyIcon } from "@modrinth/assets";
+import { useNuxtApp } from "#app";
 
 const app = useNuxtApp();
 
-export default defineComponent({
-  name: "CopyIPButton",
-  components: {
-    CopyIcon,
-  },
-  props: {
-    ip: {
-      type: String,
-      required: true,
-    },
-    port: {
-      type: Number,
-      required: true,
-    },
-    subdomain: {
-      default: null,
-      type: String,
-    },
-  },
-  setup(props) {
-    const copyText = () => {
-      const text = props.subdomain ? `${props.subdomain}` : `${props.ip}:${props.port}`;
-      navigator.clipboard.writeText(text);
+const props = defineProps<{
+  ip: string;
+  port: number;
+  subdomain?: string | null;
+}>();
 
-      // @ts-ignore
-      app.$notify({
-        group: "server",
-        title: `Copied IP`,
-        text: `Your server's IP has been copied to your clipboard`,
-        type: "success",
-      });
-    };
+const copyText = () => {
+  const text = props.subdomain ? `${props.subdomain}` : `${props.ip}:${props.port}`;
+  navigator.clipboard.writeText(text);
 
-    return { copyText };
-  },
-});
+  // @ts-ignore
+  app.$notify({
+    group: "server",
+    title: `Copied IP`,
+    text: `Your server's IP has been copied to your clipboard`,
+    type: "success",
+  });
+};
 </script>

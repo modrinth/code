@@ -27,7 +27,7 @@
           :loader="loader!"
           :loader-version="loader_version ?? ''"
         />
-        <UiServersServerModLabel v-if="showModLabel" :mods="mods" />
+        <UiServersServerModLabel v-if="showModLabel" :mods="mods || []" />
       </div>
     </div>
   </NuxtLink>

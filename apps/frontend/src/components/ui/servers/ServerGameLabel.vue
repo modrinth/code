@@ -7,20 +7,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  name: "GameInfo",
-  props: {
-    game: {
-      type: String,
-      required: true,
-    },
-    mcVersion: {
-      type: String,
-      required: true,
-    },
-  },
-});
+<script setup lang="ts">
+defineProps<{
+  game: string;
+  mcVersion: string;
+}>();
 </script>

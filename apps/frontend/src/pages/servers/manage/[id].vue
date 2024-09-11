@@ -1,78 +1,74 @@
 <template>
-  <ClientOnly>
-    <div class="contents">
-      <UiServersPanelLoading v-if="isLoading" class="h-screen" />
-      <div
-        v-else-if="serverData"
-        data-pyro-server-manager-root
-        class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-4 sm:px-6"
-      >
-        <div class="flex flex-row items-center gap-6 pt-4">
-          <UiAvatar
-            no-shadow
-            size="lg"
-            alt="Server Icon"
-            :src="serverData?.project?.icon_url ?? undefined"
-          />
-          <div class="flex flex-col gap-4">
-            <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
-              <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
-                <LeftArrowIcon />
-                All servers
-              </NuxtLink>
-            </div>
+  <div class="contents">
+    <UiServersPanelLoading v-if="isLoading" class="h-screen" />
+    <div
+      v-else-if="serverData"
+      data-pyro-server-manager-root
+      class="mx-auto flex min-h-screen w-full max-w-[1280px] flex-col gap-6 px-3"
+    >
+      <div class="flex flex-row items-center gap-6 pt-4">
+        <UiAvatar
+          no-shadow
+          size="lg"
+          alt="Server Icon"
+          style="width: 128px; height: 128px; min-width: 128px; min-height: 128px"
+          :src="serverData?.project?.icon_url ?? undefined"
+        />
+        <div class="flex flex-col gap-4">
+          <div class="-mb-2 flex shrink-0 flex-row items-center gap-1">
+            <NuxtLink to="/servers/manage" class="breadcrumb goto-link flex w-fit items-center">
+              <LeftArrowIcon />
+              All servers
+            </NuxtLink>
+          </div>
+          <div class="flex flex-row items-center gap-4">
             <h1 class="m-0 text-4xl font-bold text-[var(--color-contrast)]">
               {{ serverData.name }}
             </h1>
-            <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
-              <UiServersServerGameLabel
-                v-if="showGameLabel"
-                :game="serverData.game!"
-                :mc-version="serverData.mc_version ?? ''"
-              />
-              <UiServersServerLoaderLabel
-                v-if="showLoaderLabel"
-                :loader="serverData.loader!"
-                :loader-version="serverData.loader_version ?? ''"
-              />
-              <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
-            </div>
+          </div>
+
+          <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
+            <UiServersServerGameLabel
+              v-if="showGameLabel"
+              :game="serverData.game!"
+              :mc-version="serverData.mc_version ?? ''"
+            />
+            <UiServersServerLoaderLabel
+              v-if="showLoaderLabel"
+              :loader="serverData.loader!"
+              :loader-version="serverData.loader_version ?? ''"
+            />
+            <UiServersServerModLabel v-if="showModLabel" :mods="serverData.mods" />
           </div>
         </div>
-
-        <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
-          <UiNavTabs :links="navLinks" />
-
-          <div class="flex flex-row gap-2">
-            <UiServersPanelCopyIP
-              :ip="serverData.net.ip"
-              :port="serverData.net.port"
-              :subdomain="serverData.net.domain"
-            />
-            <UiServersPanelPlay
-              :server-id="serverData.server_id"
-              :ip="serverData.net.ip"
-              :port="serverData.net.port"
-            />
-          </div>
+        <div class="ml-auto flex flex-row gap-2">
+          <UiServersPanelCopyIP
+            :ip="serverData.net.ip"
+            :port="serverData.net.port"
+            :subdomain="serverData.net.domain"
+          />
         </div>
-
-        <div data-pyro-mount class="h-full w-full">
-          <NuxtPage :route="route" />
-        </div>
-
-        <UiServersPoweredByPyro />
       </div>
 
-      <UiServersPyroError v-else-if="error" :title="errorTitle" :message="errorMessage" />
+      <div class="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
+        <UiNavTabs :links="navLinks" />
+      </div>
+
+      <div data-pyro-mount class="h-full w-full">
+        <NuxtPage :route="route" />
+      </div>
+
+      <UiServersPoweredByPyro />
     </div>
-  </ClientOnly>
+
+    <UiServersPyroError v-else-if="error" :title="errorTitle" :message="errorMessage" />
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { HomeIcon, CubeIcon, CloudIcon, CogIcon, LeftArrowIcon } from "@modrinth/assets";
+import { LeftArrowIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -92,10 +88,11 @@ const showLoaderLabel = computed(() => !!serverData.value?.loader);
 const showModLabel = computed(() => (serverData.value?.mods?.length ?? 0) > 0);
 
 const navLinks = [
-  { icon: HomeIcon, label: "Overview", href: `/servers/manage/${serverId}` },
-  { icon: CubeIcon, label: "Content", href: `/servers/manage/${serverId}/content` },
-  { icon: CloudIcon, label: "Backups", href: `/servers/manage/${serverId}/backups` },
-  { icon: CogIcon, label: "Options", href: `/servers/manage/${serverId}/options` },
+  { label: "Overview", href: `/servers/manage/${serverId}` },
+  { label: "Content", href: `/servers/manage/${serverId}/content` },
+  { label: "Files", href: `/servers/manage/${serverId}/files` },
+  { label: "Backups", href: `/servers/manage/${serverId}/backups` },
+  { label: "Options", href: `/servers/manage/${serverId}/options` },
 ];
 
 definePageMeta({

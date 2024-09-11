@@ -48,15 +48,16 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 import type { ServerState, Stats, WSAuth, WSEvent } from "~/types/servers";
 
 const serverStore = useServerStore();
+const app = useNuxtApp();
 
 const fullScreen = ref(false);
 const consoleStyle = ref({ height: "400px", marginTop: "0px" });
-const isActioning = ref(false);
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const consoleOutput = ref<string[]>([]);
 const cpuData = ref<number[]>([]);
 const ramData = ref<number[]>([]);
+const isActioning = ref(false);
 const serverPowerState = ref<ServerState>("stopped");
 
 const stats = ref<Stats>({
@@ -80,7 +81,6 @@ const stats = ref<Stats>({
   },
 });
 
-const app = useNuxtApp();
 const route = useRoute();
 const serverId = route.params.id as string;
 
@@ -108,8 +108,7 @@ const animateMarginTop = () => {
   }, 500);
 };
 
-const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
-  isActioning.value = true;
+const sendPowerAction = async (action: "restart" | "start" | "stop" | "kill") => {
   const actionName = action.charAt(0).toUpperCase() + action.slice(1);
   // @ts-ignore
   app.$notify({
@@ -120,7 +119,8 @@ const sendPowerAction = (action: "restart" | "start" | "stop" | "kill") => {
   });
 
   try {
-    serverStore.sendPowerAction(serverId, actionName);
+    isActioning.value = true;
+    await serverStore.sendPowerAction(serverId, actionName);
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error);
     // @ts-ignore

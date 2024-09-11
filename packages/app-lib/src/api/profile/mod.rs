@@ -40,14 +40,9 @@ pub mod update;
 #[tracing::instrument]
 pub async fn remove(path: &str) -> crate::Result<()> {
     let state = State::get().await?;
-
-    let mut transaction = state.pool.begin().await?;
-
-    Profile::remove(path, &mut transaction).await?;
+    Profile::remove(path, &state.pool).await?;
 
     emit_profile(path, ProfilePayloadType::Removed).await?;
-
-    transaction.commit().await?;
 
     Ok(())
 }

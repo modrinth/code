@@ -472,3 +472,5 @@ visiblemeasures.com, 1041, DIRECT #yieldmo
 iqzone.com,IQ190,RESELLER
 krushmedia.com, AJxF6R537a9M6CaTvK, RESELLER
 consumable.com, 2001460, DIRECT, aefcd3d2f45b5070
+
+google.com, pub-6729046591418183, RESELLER, f08c47fec0942fa0
