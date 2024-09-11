@@ -43,7 +43,7 @@
               alt=""
               class="h-full w-full max-w-24 rounded-2xl object-cover align-middle"
               height="256"
-              src="https://media.tenor.com/scX-kVPwUn8AAAAC/this-is-fine.gif"
+              src="~/assets/images/servers/this-is-fine.gif"
               width="256"
               loading="lazy"
               decoding="async"
