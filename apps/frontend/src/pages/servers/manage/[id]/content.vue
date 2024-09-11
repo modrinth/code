@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, FileIcon } from "@modrinth/assets";
+import { BoxIcon, CogIcon, FileIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
@@ -26,7 +26,7 @@ const { data, status } = await useLazyAsyncData(
 );
 
 const navLinks = [
-  { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content` },
-  { icon: FileIcon, label: "Files", href: `/servers/manage/${serverId}/content/files` },
+  { icon: CogIcon, label: "Loader", href: `/servers/manage/${serverId}/content` },
+  { icon: BoxIcon, label: "Mods", href: `/servers/manage/${serverId}/content/mods` },
 ];
 </script>

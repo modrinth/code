@@ -1,12 +1,15 @@
 <template>
   <div
-    class="flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem]"
+    class="group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] hover:bg-bg-raised"
   >
     <div class="flex items-center gap-2">
-      <component :is="icon" class="h-8 w-8 rounded-full bg-bg-raised p-[6px]" />
+      <component
+        :is="icon"
+        class="h-8 w-8 rounded-full bg-bg-raised p-[6px] group-hover:bg-brand-highlight group-hover:text-brand"
+      />
       <div class="flex flex-col">
-        <span class="font-bold">{{ name }}</span>
-        <span class="text-xs text-gray-500">{{ size }} MB</span>
+        <span class="font-bold group-hover:text-contrast">{{ name }}</span>
+        <span class="text-xs text-secondary group-hover:text-primary">{{ size }} MB</span>
       </div>
     </div>
     <OverflowMenu

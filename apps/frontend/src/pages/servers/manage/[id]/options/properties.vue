@@ -56,7 +56,7 @@
       <div class="flex flex-col items-center gap-4">
         <h2 class="text-3xl font-bold">Config not available</h2>
         <div class="text-center text-lg">
-          We couldent find a config, make sure you have started your server at least once. <br />
+          We couldn't find a config, make sure you have started your server at least once. <br />
           If this issue persists, please contact support.
         </div>
       </div>
