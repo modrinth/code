@@ -170,7 +170,7 @@
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
                   <div class="text-2xl font-extrabold text-white">{{ backup.name }}</div>
-                  <div v-if="index == 0" class="flex gap-2 font-bold text-brand">
+                  <div v-if="index == 0" class="flex gap-1 font-bold text-brand">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
                 </div>

@@ -51,7 +51,7 @@ const serverStore = useServerStore();
 const app = useNuxtApp();
 
 const fullScreen = ref(false);
-const consoleStyle = ref({ height: "400px", marginTop: "0px" });
+const consoleStyle = ref({ height: "700px", marginTop: "0px" });
 const isConnected = ref(false);
 const isWSAuthIncorrect = ref(false);
 const consoleOutput = ref<string[]>([]);
@@ -92,7 +92,7 @@ const toggleFullScreen = () => {
     consoleStyle.value.height = "70vh";
     animateMarginTop();
   } else {
-    consoleStyle.value.height = "400px";
+    consoleStyle.value.height = "700px";
     consoleStyle.value.marginTop = "0px";
   }
 };
