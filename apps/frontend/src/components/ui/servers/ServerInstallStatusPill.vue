@@ -27,7 +27,7 @@
   </div>
   <div
     v-if="state === 'Failed'"
-    class="flex w-fit flex-row items-center rounded-full bg-red px-2 py-0.5 text-sm font-bold text-white"
+    class="flex w-fit flex-row items-center rounded-full bg-red px-2 py-0.5 text-sm font-bold text-contrast"
   >
     <XIcon class="mr-1 h-3 w-3" />
     Failed to Install

@@ -30,7 +30,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Create backup</div>
+              <div class="text-2xl font-extrabold text-contrast">Create backup</div>
             </div>
             <button
               class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
@@ -43,7 +43,7 @@
             Your server will temporarily shutdown while the backup is being created.
           </div>
           <div class="flex flex-col gap-2">
-            <div class="font-semibold text-white">Name<span class="text-red-500">*</span></div>
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
               v-model="c_backupsName"
               type="text"
@@ -68,7 +68,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Rename backup</div>
+              <div class="text-2xl font-extrabold text-contrast">Rename backup</div>
             </div>
             <button
               class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
@@ -78,7 +78,7 @@
             </button>
           </div>
           <div class="mt-2 flex flex-col gap-2">
-            <div class="font-semibold text-white">Name<span class="text-red-500">*</span></div>
+            <div class="font-semibold text-contrast">Name<span class="text-red-500">*</span></div>
             <input
               v-model="r_backupsName"
               type="text"
@@ -103,7 +103,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Restore backup</div>
+              <div class="text-2xl font-extrabold text-contrast">Restore backup</div>
             </div>
             <button
               class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
@@ -114,7 +114,7 @@
           </div>
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-bg p-6">
-              <div class="text-2xl font-extrabold text-white">
+              <div class="text-2xl font-extrabold text-contrast">
                 {{ data.backups.find((b) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
@@ -146,7 +146,7 @@
                 size="sm"
                 alt="Server Icon"
               />
-              <div class="text-2xl font-extrabold text-white">Delete backup</div>
+              <div class="text-2xl font-extrabold text-contrast">Delete backup</div>
             </div>
             <button
               class="h-8 w-8 rounded-full bg-[#ffffff10] p-2 text-contrast"
@@ -157,7 +157,7 @@
           </div>
           <div class="flex flex-col gap-4">
             <div class="relative flex w-full flex-col gap-2 rounded-2xl bg-[#0e0e0ea4] p-6">
-              <div class="text-2xl font-extrabold text-white">
+              <div class="text-2xl font-extrabold text-contrast">
                 {{ data.backups.find((b) => b.id === currentBackup)?.name }}
               </div>
               <div class="flex gap-2 font-semibold text-contrast">
@@ -181,7 +181,7 @@
         <div class="relative w-full overflow-hidden rounded-2xl bg-bg-raised p-8">
           <div class="flex items-center justify-between">
             <div class="flex flex-col gap-2">
-              <div class="text-2xl font-extrabold text-white">
+              <div class="text-2xl font-extrabold text-contrast">
                 {{ data.used_backup_quota }} Backups
               </div>
               <div class="font-semibold text-contrast">
@@ -201,7 +201,7 @@
             <div class="flex items-center justify-between">
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
-                  <div class="text-2xl font-extrabold text-white">{{ backup.name }}</div>
+                  <div class="text-2xl font-extrabold text-contrast">{{ backup.name }}</div>
                   <div v-if="index == 0" class="flex gap-2 font-bold text-brand">
                     <CheckIcon class="h-5 w-5" /> Latest
                   </div>
@@ -240,7 +240,7 @@
                 direction="right"
                 class="bg-transparent"
               >
-                <MoreHorizontalIcon class="h-5 w-5 bg-transparent" />
+                <MoreHorizontalIcon class="h-5 w-5 bg-transparent text-contrast" />
 
                 <template #rename> <EditIcon /> Rename </template>
                 <template #restore> <ClipboardCopyIcon /> Restore </template>

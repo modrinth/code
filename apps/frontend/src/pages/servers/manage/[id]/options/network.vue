@@ -8,7 +8,7 @@
       <div class="flex h-full flex-col gap-2">
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-white">Subdomain</span>
+            <span class="text-lg font-bold text-contrast">Subdomain</span>
             <span> Change the subdomain to connect to your server </span>
           </label>
           <div class="flex w-[50%] items-center gap-2">

@@ -8,7 +8,7 @@
       <div class="flex h-full flex-col gap-2">
         <div class="card flex flex-col gap-4">
           <label for="username-field" class="flex flex-col gap-2">
-            <span class="text-lg font-bold text-white">Server name</span>
+            <span class="text-lg font-bold text-contrast">Server name</span>
             <span> Change the name of your server as it appears on Modrinth </span>
           </label>
           <input v-model="serverName" class="h-[50%] w-[40%]" @keyup.enter="updateServerNameReq" />

@@ -89,7 +89,7 @@ let socket: WebSocket | null = null;
 const toggleFullScreen = () => {
   fullScreen.value = !fullScreen.value;
   if (fullScreen.value) {
-    consoleStyle.value.height = "70vh";
+    consoleStyle.value.height = "90vh";
     animateMarginTop();
   } else {
     consoleStyle.value.height = "600px";

@@ -1,6 +1,8 @@
 <template>
   <div class="flex w-full flex-col rounded-xl border border-solid border-bg-raised">
-    <div class="flex items-center justify-between gap-2 rounded-t-xl bg-[#1e2024] px-4 py-2">
+    <div
+      class="flex items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
+    >
       <div class="flex items-center gap-2 text-contrast">
         <BoxIcon class="h-6 w-6 text-brand" />
         / config / jei / folder
