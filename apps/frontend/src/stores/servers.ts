@@ -145,7 +145,7 @@ export const useServerStore = defineStore("servers", {
 
     async renameBackup(serverId: string, backupId: string, newName: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+        await usePyroFetch(`servers/${serverId}/backups/${backupId}/rename`, {
           method: "POST",
           body: { name: newName },
         });
@@ -168,7 +168,7 @@ export const useServerStore = defineStore("servers", {
 
     async restoreBackup(serverId: string, backupId: string) {
       try {
-        await usePyroFetch(`servers/${serverId}/backups/${backupId}`, {
+        await usePyroFetch(`servers/${serverId}/backups/${backupId}/restore`, {
           method: "POST",
         });
       } catch (error) {
