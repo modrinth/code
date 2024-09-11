@@ -30,6 +30,14 @@
 import { BoxIcon, FileIcon, PlusIcon, UploadIcon } from "@modrinth/assets";
 import { Button } from "@modrinth/ui";
 
+const route = useNativeRoute();
+const serverId = route.params.id.toString();
+const serverStore = useServerStore();
+
+useHead({
+  title: `Files - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+});
+
 const mods = [
   {
     name: "Fabric API",

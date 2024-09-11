@@ -6,7 +6,12 @@
 import { CogIcon, FileIcon, ListIcon, TextQuoteIcon, VersionIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
-const serverId = route.params.id;
+const serverId = route.params.id.toString();
+const serverStore = useServerStore();
+
+useHead({
+  title: `Options - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+});
 
 const navLinks = [
   { icon: CogIcon, label: "General", href: `/servers/manage/${serverId}/options` },

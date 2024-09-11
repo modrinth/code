@@ -13,11 +13,15 @@
 </template>
 
 <script setup lang="ts">
-import { BoxIcon, CogIcon, FileIcon } from "@modrinth/assets";
+import { BoxIcon, CogIcon } from "@modrinth/assets";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
+
+useHead({
+  title: `Content - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+});
 
 await serverStore.fetchServerData(serverId);
 const { data, status } = await useLazyAsyncData(

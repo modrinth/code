@@ -285,6 +285,10 @@ const serverStore = useServerStore();
 const auth = await useAuth();
 const emits = defineEmits(["onDownload"]);
 
+useHead({
+  title: `Backups - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+});
+
 const backupError = ref<string | null>(null);
 
 const { data, status } = await useLazyAsyncData("backupsData", async () => {

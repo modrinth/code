@@ -84,6 +84,10 @@ const stats = ref<Stats>({
 const route = useRoute();
 const serverId = route.params.id as string;
 
+useHead({
+  title: `Overview - ${serverStore.serverData[serverId]?.name ?? "Server"} - Modrinth`,
+});
+
 let socket: WebSocket | null = null;
 
 const toggleFullScreen = () => {
