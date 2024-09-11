@@ -1,6 +1,6 @@
 <template>
   <div
-    class=grid h-[50vh] w-full grid-cols-1 rounded-xl border border-solid border-bg-raised md:flex"
+    class="grid h-[50vh] w-full grid-cols-1 rounded-xl border border-solid border-bg-raised md:flex"
   >
     <div class="col-start-1 row-start-1 flex h-full flex-col md:relative">
       <div
