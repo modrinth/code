@@ -1,7 +1,7 @@
 <template>
   <div
     data-pyro-terminal-holy-shit
-    class="monocraft-font console relative h-full w-full overflow-hidden rounded-xl text-sm"
+    class="terminal-font console relative h-full w-full overflow-hidden rounded-xl text-sm"
   >
     <div
       ref="scrollContainer"
@@ -182,8 +182,8 @@ watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
 </script>
 
 <style scoped>
-.monocraft-font {
-  font-family: "Monocraft", monospace;
+.terminal-font {
+  font-family: var(--mono-font);
   font-size: 18px;
   line-height: 1.5em;
 }

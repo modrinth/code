@@ -244,6 +244,7 @@ import { ref, reactive } from "vue";
 
 import type { ServerBackup } from "~/types/servers.ts";
 
+const app = useNuxtApp();
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
@@ -282,6 +283,13 @@ const createBackup = async () => {
 
     await refreshNuxtData("backupsData");
     createBackupModal.value.hide();
+    // @ts-ignore
+    app.$notify({
+      group: "server",
+      title: `Backup created`,
+      text: "Your backup has been created successfully.",
+      type: "error",
+    });
   } catch (error) {
     backupError.value = error as string;
   } finally {
