@@ -17,11 +17,11 @@ const props = defineProps<{
 const getStatusClass = computed(() => {
   switch (props.state) {
     case "running":
-      return "bg-green-400/10 text-green-500";
+      return "bg-highlight text-contrast";
     case "stopped":
-      return "bg-bg-raised text-gray-400";
+      return "bg-button-bg text-gray-400";
     case "crashed":
-      return "bg-red-400/10 text-red-500";
+      return "bg-bg-red text-red-500";
     default:
       return "bg-bg-raised text-gray-400";
   }
