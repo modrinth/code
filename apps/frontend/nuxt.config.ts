@@ -414,7 +414,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  css: ["~/assets/styles/tailwind.css", "~/assets/styles/fonts.css"],
+  css: ["~/assets/styles/tailwind.css"],
   postcss: {
     plugins: {
       tailwindcss: {},
