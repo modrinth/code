@@ -1,5 +1,5 @@
 <template>
-  <button class="btn btn-transparent" @click="copyText">
+  <button aria-label="Copy server IP" class="btn btn-transparent" @click="copyText">
     <CopyIcon />
     Copy IP
   </button>
