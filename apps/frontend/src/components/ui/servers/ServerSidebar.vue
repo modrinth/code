@@ -10,7 +10,7 @@
             sidebarVisible,
         }"
       >
-        <Button @click="toggleSidebar" class="h-10 w-10" transparent icon-only>
+        <Button class="h-10 w-10" transparent icon-only @click="toggleSidebar">
           <HamburgerIcon class="h-6 w-6 text-brand" />
         </Button>
       </div>
@@ -48,12 +48,12 @@
 <script setup lang="ts">
 import type { RouteLocationNormalized } from "vue-router";
 import { Button } from "@modrinth/ui";
+
+import { HamburgerIcon } from "@modrinth/assets";
 const props = defineProps<{
   navLinks: { label: string; href: string; icon: Component }[];
   route: RouteLocationNormalized;
 }>();
-
-import { HamburgerIcon } from "@modrinth/assets";
 
 const sidebarVisible = ref(false);
 const toggleSidebar = () => {
