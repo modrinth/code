@@ -7,7 +7,7 @@
       <h2 class="text-3xl font-bold">Info</h2>
       <div class="flex h-full flex-col gap-4">
         <p class="m-0">Server ID: <UiCopyCode v-if="serverId" :text="serverId" /></p>
-        <p class="m-0">Pack ID: <UiCopyCode v-if="data.modpack" :text="data.modpack" /></p>
+        <p class="m-0" v-if="data.modpack">Pack ID: <UiCopyCode :text="data.modpack" /></p>
       </div>
     </div>
     <UiServersPyroLoading v-else />
