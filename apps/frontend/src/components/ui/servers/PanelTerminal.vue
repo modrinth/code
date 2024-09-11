@@ -184,7 +184,7 @@ watch([visibleStartIndex, visibleEndIndex], updateItemHeights);
 <style scoped>
 .terminal-font {
   font-family: var(--mono-font);
-  font-size: 18px;
+  font-size: 1rem;
   line-height: 1.5em;
 }
 
