@@ -283,6 +283,9 @@ async function checkUpdates() {
           <RouterLink v-tooltip="'Library'" to="/library" class="btn icon-only collapsed-button">
             <LibraryIcon />
           </RouterLink>
+          <RouterLink v-tooltip="'Servers'" to="/servers" class="btn icon-only collapsed-button">
+            <LibraryIcon />
+          </RouterLink>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
           </Suspense>
