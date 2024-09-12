@@ -8,12 +8,26 @@
     data-pyro-server-listing
     :data-pyro-server-listing-id="server_id"
   >
-    <UiAvatar :src="iconUrl" no-shadow size="md" alt="Server Icon" />
-    <div class="ml-8 flex flex-col gap-3">
+    <!-- how do we want to get this now? -->
+    <UiAvatar :src="undefined" no-shadow size="md" alt="Server Icon" />
+    <div class="ml-8 flex flex-col gap-2.5">
       <div class="flex flex-col gap-2 md:flex-row md:items-center">
         <h2 class="m-0 text-xl font-bold text-[var(--color-contrast)]">{{ name }}</h2>
         <UiServersServerInstallStatusPill v-if="status.state" :state="status.state" />
         <ChevronRightIcon v-if="!status.isInstalling && !status.isFailed" />
+      </div>
+
+      <div
+        v-if="projectData?.title"
+        class="m-0 flex flex-row items-center gap-1 text-sm font-medium text-[var(--color-text-secondary)]"
+      >
+        <UiAvatar
+          :src="iconUrl"
+          no-shadow
+          style="min-height: 20px; min-width: 20px; height: 20px; width: 20px"
+          alt="Server Icon"
+        />
+        Using {{ projectData?.title || "Unknown" }}
       </div>
 
       <div class="flex flex-row items-center gap-4 text-[var(--color-text-secondary)]">
@@ -51,18 +65,21 @@ const showGameLabel = computed(() => !!props.game);
 const showLoaderLabel = computed(() => !!props.loader);
 const showModLabel = computed(() => (props.mods?.length ?? 0) > 0);
 
-const { data: iconData } = await useLazyAsyncData(`server-icon-${props.server_id}`, async () => {
-  if (props.modpack) {
-    const versionData: any = await toRaw(useBaseFetch(`version/${props.modpack}`));
-    if (versionData && versionData.project_id) {
-      const projectData: Project = (await toRaw(
-        useBaseFetch(`project/${versionData.project_id}`),
-      )) as Project;
-      return projectData.icon_url;
+const { data: projectData } = await useLazyAsyncData(
+  `server-project-${props.server_id}`,
+  async () => {
+    if (props.modpack) {
+      const versionData: any = await toRaw(useBaseFetch(`version/${props.modpack}`));
+      if (versionData && versionData.project_id) {
+        const projectData: Project = (await toRaw(
+          useBaseFetch(`project/${versionData.project_id}`),
+        )) as Project;
+        return projectData;
+      }
     }
-  }
-  return null;
-});
+    return null;
+  },
+);
 
-const iconUrl = computed(() => iconData.value || undefined);
+const iconUrl = computed(() => projectData.value?.icon_url || undefined);
 </script>
