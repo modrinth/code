@@ -45,7 +45,10 @@
               typeof property === 'object' ||
               property.includes(',') ||
               property.includes('{') ||
-              property.includes('}')
+              property.includes('}') ||
+              property.includes('[') ||
+              property.includes(']') ||
+              property.length > 30
             "
             class="w-[320px]"
           >

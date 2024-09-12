@@ -293,6 +293,18 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
+    async suspendServer(serverId: string, status: boolean) {
+      try {
+        await usePyroFetch(`servers/${serverId}/suspend`, {
+          method: "POST",
+          body: { suspended: status },
+        });
+      } catch (error) {
+        console.error("Error suspending server:", error);
+        throw error;
+      }
+    },
+
     clearError() {
       this.error = null;
     },
