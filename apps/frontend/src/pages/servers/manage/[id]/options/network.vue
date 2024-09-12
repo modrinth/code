@@ -11,7 +11,7 @@
             <span class="text-lg font-bold text-contrast">Subdomain</span>
             <span> Change the subdomain to connect to your server </span>
           </label>
-          <div class="flex w-[50%] items-center gap-2">
+          <div class="flex w-full items-center gap-2 md:w-[60%]">
             <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
             .{{ data.net.domain.split(".").slice(1).join(".") }}
           </div>

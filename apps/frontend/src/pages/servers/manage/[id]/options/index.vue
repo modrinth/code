@@ -11,7 +11,7 @@
             <span class="text-lg font-bold text-contrast">Server name</span>
             <span> Change the name of your server as it appears on Modrinth </span>
           </label>
-          <input v-model="serverName" class="h-[50%] w-[40%]" @keyup.enter="saveGeneral" />
+          <input v-model="serverName" class="w-full md:w-[50%]" @keyup.enter="saveGeneral" />
         </div>
       </div>
     </div>

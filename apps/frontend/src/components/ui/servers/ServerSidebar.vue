@@ -1,8 +1,8 @@
 <template>
   <div
-    class="grid h-[50vh] w-full grid-cols-1 rounded-xl border border-solid border-bg-raised md:flex"
+    class="relative h-[50vh] w-full grid-cols-1 rounded-xl border border-solid border-bg-raised md:flex"
   >
-    <div class="col-start-1 row-start-1 flex h-full flex-col md:relative">
+    <div class="absolute flex h-full flex-col md:relative">
       <div
         class="z-10 flex w-10 items-center gap-2 rounded-tl-xl text-lg font-bold text-contrast md:hidden"
         :class="{
@@ -10,13 +10,13 @@
             sidebarVisible,
         }"
       >
-        <Button class="h-10 w-10" transparent icon-only @click="toggleSidebar">
+        <Button class="h-[5%] w-10" transparent icon-only @click="toggleSidebar">
           <HamburgerIcon class="h-6 w-6 text-brand" />
         </Button>
       </div>
 
       <div
-        class="z-10 flex h-[90%] w-[16rem] flex-col gap-2 rounded-t-none border-0 border-r border-solid border-bg-raised bg-table-alternateRow p-4 md:mt-0 md:h-full md:rounded-l-xl"
+        class="z-10 flex h-[95%] w-[16rem] flex-col gap-2 rounded-t-none rounded-bl-xl border-0 border-r border-solid border-bg-raised bg-table-alternateRow p-4 md:mt-0 md:h-full md:rounded-l-xl"
         :class="{
           'hidden md:flex': !sidebarVisible,
         }"
@@ -37,7 +37,7 @@
     </div>
 
     <div
-      class="col-start-1 row-start-1 h-full w-full"
+      class="h-full w-full"
       :class="{ 'rounded-xl bg-black opacity-30 bg-blend-overlay': sidebarVisible && $mq == 'sm' }"
     >
       <NuxtPage :route="props.route" />
