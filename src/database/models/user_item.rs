@@ -7,7 +7,6 @@ use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::users::Badges;
 use chrono::{DateTime, Utc};
 use dashmap::DashMap;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::fmt::{Debug, Display};
 use std::hash::Hash;
@@ -45,8 +44,6 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
-
-    pub balance: Decimal,
 }
 
 impl User {
@@ -169,7 +166,6 @@ impl User {
                     SELECT id, email,
                         avatar_url, raw_avatar_url, username, bio,
                         created, role, badges,
-                        balance,
                         github_id, discord_id, gitlab_id, google_id, steam_id, microsoft_id,
                         email_verified, password, totp_secret, paypal_id, paypal_country, paypal_email,
                         venmo_handle, stripe_customer_id
@@ -198,7 +194,6 @@ impl User {
                             created: u.created,
                             role: u.role,
                             badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
-                            balance: u.balance,
                             password: u.password,
                             paypal_id: u.paypal_id,
                             paypal_country: u.paypal_country,

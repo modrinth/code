@@ -9,6 +9,7 @@ use crate::routes::internal::session::get_session_metadata;
 use actix_web::http::header::{HeaderValue, AUTHORIZATION};
 use actix_web::HttpRequest;
 use chrono::Utc;
+use rust_decimal::Decimal;
 
 pub async fn get_user_from_headers<'a, E>(
     req: &HttpRequest,
@@ -66,7 +67,7 @@ where
             paypal_address: db_user.paypal_email,
             paypal_country: db_user.paypal_country,
             venmo_handle: db_user.venmo_handle,
-            balance: db_user.balance,
+            balance: Decimal::ZERO,
         }),
         stripe_customer_id: db_user.stripe_customer_id,
     };

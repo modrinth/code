@@ -5,19 +5,20 @@ use crate::database::redis::RedisPool;
 use crate::models::ids::PayoutId;
 use crate::models::pats::Scopes;
 use crate::models::payouts::{PayoutMethodType, PayoutStatus};
-use crate::queue::payouts::PayoutsQueue;
+use crate::queue::payouts::{make_aditude_request, PayoutsQueue};
 use crate::queue::session::AuthQueue;
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
-use chrono::Utc;
+use chrono::{Datelike, Duration, TimeZone, Utc, Weekday};
 use hex::ToHex;
 use hmac::{Hmac, Mac, NewMac};
 use reqwest::Method;
 use rust_decimal::Decimal;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Sha256;
 use sqlx::PgPool;
+use std::collections::HashMap;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -27,7 +28,9 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(user_payouts)
             .service(create_payout)
             .service(cancel_payout)
-            .service(payment_methods),
+            .service(payment_methods)
+            .service(get_balance)
+            .service(platform_revenue),
     );
 }
 
@@ -128,27 +131,6 @@ pub async fn paypal_webhook(
             .await?;
 
             if let Some(result) = result {
-                sqlx::query!(
-                    "
-                    SELECT balance FROM users WHERE id = $1 FOR UPDATE
-                    ",
-                    result.user_id
-                )
-                .fetch_optional(&mut *transaction)
-                .await?;
-
-                sqlx::query!(
-                    "
-                    UPDATE users
-                    SET balance = balance + $1
-                    WHERE id = $2
-                    ",
-                    result.amount + result.fee.unwrap_or(Decimal::ZERO),
-                    result.user_id
-                )
-                .execute(&mut *transaction)
-                .await?;
-
                 sqlx::query!(
                     "
                     UPDATE payouts
@@ -255,27 +237,6 @@ pub async fn tremendous_webhook(
             if let Some(result) = result {
                 sqlx::query!(
                     "
-                    SELECT balance FROM users WHERE id = $1 FOR UPDATE
-                    ",
-                    result.user_id
-                )
-                .fetch_optional(&mut *transaction)
-                .await?;
-
-                sqlx::query!(
-                    "
-                    UPDATE users
-                    SET balance = balance + $1
-                    WHERE id = $2
-                    ",
-                    result.amount + result.fee.unwrap_or(Decimal::ZERO),
-                    result.user_id
-                )
-                .execute(&mut *transaction)
-                .await?;
-
-                sqlx::query!(
-                    "
                     UPDATE payouts
                     SET status = $1
                     WHERE platform_id = $2
@@ -380,7 +341,19 @@ pub async fn create_payout(
         ));
     }
 
-    if user.balance < body.amount || body.amount < Decimal::ZERO {
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        SELECT balance FROM users WHERE id = $1 FOR UPDATE
+        ",
+        user.id.0
+    )
+    .fetch_optional(&mut *transaction)
+    .await?;
+
+    let balance = get_user_balance(user.id.into(), &**pool).await?;
+    if balance.available < body.amount || body.amount < Decimal::ZERO {
         return Err(ApiError::InvalidInput(
             "You do not have enough funds to make this payout!".to_string(),
         ));
@@ -407,17 +380,6 @@ pub async fn create_payout(
             "You need to withdraw more to cover the fee!".to_string(),
         ));
     }
-
-    let mut transaction = pool.begin().await?;
-
-    sqlx::query!(
-        "
-        SELECT balance FROM users WHERE id = $1 FOR UPDATE
-        ",
-        user.id.0
-    )
-    .fetch_optional(&mut *transaction)
-    .await?;
 
     let payout_id = generate_payout_id(&mut transaction).await?;
 
@@ -620,17 +582,6 @@ pub async fn create_payout(
         }
     };
 
-    sqlx::query!(
-        "
-        UPDATE users
-        SET balance = balance - $1
-        WHERE id = $2
-        ",
-        body.amount,
-        user.id as crate::database::models::ids::UserId
-    )
-    .execute(&mut *transaction)
-    .await?;
     payout_item.insert(&mut transaction).await?;
 
     transaction.commit().await?;
@@ -758,4 +709,226 @@ pub async fn payment_methods(
         .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(methods))
+}
+
+#[derive(Serialize)]
+pub struct UserBalance {
+    pub available: Decimal,
+    pub pending: Decimal,
+}
+
+#[get("balance")]
+pub async fn get_balance(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+    session_queue: web::Data<AuthQueue>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(
+        &req,
+        &**pool,
+        &redis,
+        &session_queue,
+        Some(&[Scopes::PAYOUTS_READ]),
+    )
+    .await?
+    .1;
+
+    let balance = get_user_balance(user.id.into(), &**pool).await?;
+
+    Ok(HttpResponse::Ok().json(balance))
+}
+
+async fn get_user_balance(
+    user_id: crate::database::models::ids::UserId,
+    pool: &PgPool,
+) -> Result<UserBalance, sqlx::Error> {
+    let available = sqlx::query!(
+        "
+        SELECT SUM(amount)
+        FROM payouts_values
+        WHERE user_id = $1 AND date_available <= NOW()
+        ",
+        user_id.0
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    let pending = sqlx::query!(
+        "
+        SELECT SUM(amount)
+        FROM payouts_values
+        WHERE user_id = $1 AND date_available > NOW()
+        ",
+        user_id.0
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    let withdrawn = sqlx::query!(
+        "
+        SELECT SUM(amount) amount, SUM(fee) fee
+        FROM payouts
+        WHERE user_id = $1 AND (status = 'success' OR status = 'in-transit')
+        ",
+        user_id.0
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    let available = available
+        .map(|x| x.sum.unwrap_or(Decimal::ZERO))
+        .unwrap_or(Decimal::ZERO);
+    let pending = pending
+        .map(|x| x.sum.unwrap_or(Decimal::ZERO))
+        .unwrap_or(Decimal::ZERO);
+    let (withdrawn, fees) = withdrawn
+        .map(|x| {
+            (
+                x.amount.unwrap_or(Decimal::ZERO),
+                x.fee.unwrap_or(Decimal::ZERO),
+            )
+        })
+        .unwrap_or((Decimal::ZERO, Decimal::ZERO));
+
+    Ok(UserBalance {
+        available: available.round_dp(16) - withdrawn.round_dp(16) - fees.round_dp(16),
+        pending,
+    })
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RevenueResponse {
+    pub all_time: Decimal,
+    pub data: Vec<RevenueData>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct RevenueData {
+    pub time: u64,
+    pub revenue: Decimal,
+    pub creator_revenue: Decimal,
+}
+
+#[get("platform_revenue")]
+pub async fn platform_revenue(
+    pool: web::Data<PgPool>,
+    redis: web::Data<RedisPool>,
+) -> Result<HttpResponse, ApiError> {
+    let mut redis = redis.connect().await?;
+
+    const PLATFORM_REVENUE_NAMESPACE: &str = "platform_revenue";
+
+    let res: Option<RevenueResponse> = redis
+        .get_deserialized_from_json(PLATFORM_REVENUE_NAMESPACE, "0")
+        .await?;
+
+    if let Some(res) = res {
+        return Ok(HttpResponse::Ok().json(res));
+    }
+
+    let all_time_payouts = sqlx::query!(
+        "
+        SELECT SUM(amount) from payouts_values
+        ",
+    )
+    .fetch_optional(&**pool)
+    .await?
+    .and_then(|x| x.sum)
+    .unwrap_or(Decimal::ZERO);
+
+    let points =
+        make_aditude_request(&["METRIC_REVENUE", "METRIC_IMPRESSIONS"], "30d", "1d").await?;
+
+    let mut points_map = HashMap::new();
+
+    for point in points {
+        for point in point.points_list {
+            let entry = points_map.entry(point.time.seconds).or_insert((None, None));
+
+            if let Some(revenue) = point.metric.revenue {
+                entry.0 = Some(revenue);
+            }
+
+            if let Some(impressions) = point.metric.impressions {
+                entry.1 = Some(impressions);
+            }
+        }
+    }
+
+    let mut revenue_data = Vec::new();
+    let now = Utc::now();
+
+    for i in 1..=30 {
+        let time = now - Duration::days(i);
+        let start = time
+            .date_naive()
+            .and_hms_opt(0, 0, 0)
+            .unwrap()
+            .and_utc()
+            .timestamp();
+
+        if let Some((revenue, impressions)) = points_map.remove(&(start as u64)) {
+            // Before 9/5/24, when legacy payouts were in effect.
+            if start >= 1725494400 {
+                let revenue = revenue.unwrap_or(Decimal::ZERO);
+                let impressions = impressions.unwrap_or(0);
+
+                // Modrinth's share of ad revenue
+                let modrinth_cut = Decimal::from(1) / Decimal::from(4);
+                // Clean.io fee (ad antimalware). Per 1000 impressions.
+                let clean_io_fee = Decimal::from(8) / Decimal::from(1000);
+
+                let net_revenue =
+                    revenue - (clean_io_fee * Decimal::from(impressions) / Decimal::from(1000));
+
+                let payout = net_revenue * (Decimal::from(1) - modrinth_cut);
+
+                revenue_data.push(RevenueData {
+                    time: start as u64,
+                    revenue: net_revenue,
+                    creator_revenue: payout,
+                });
+
+                continue;
+            }
+        }
+
+        revenue_data.push(get_legacy_data_point(start as u64));
+    }
+
+    let res = RevenueResponse {
+        all_time: all_time_payouts,
+        data: revenue_data,
+    };
+
+    redis
+        .set_serialized_to_json(PLATFORM_REVENUE_NAMESPACE, 0, &res, Some(60 * 60))
+        .await?;
+
+    Ok(HttpResponse::Ok().json(res))
+}
+
+fn get_legacy_data_point(timestamp: u64) -> RevenueData {
+    let start = Utc.timestamp_opt(timestamp as i64, 0).unwrap();
+
+    let old_payouts_budget = Decimal::from(10_000);
+
+    let days = Decimal::from(28);
+    let weekdays = Decimal::from(20);
+    let weekend_bonus = Decimal::from(5) / Decimal::from(4);
+
+    let weekday_amount = old_payouts_budget / (weekdays + (weekend_bonus) * (days - weekdays));
+    let weekend_amount = weekday_amount * weekend_bonus;
+
+    let payout = match start.weekday() {
+        Weekday::Sat | Weekday::Sun => weekend_amount,
+        _ => weekday_amount,
+    };
+
+    RevenueData {
+        time: timestamp,
+        revenue: payout,
+        creator_revenue: payout * (Decimal::from(9) / Decimal::from(10)),
+    }
 }

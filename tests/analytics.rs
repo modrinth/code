@@ -24,8 +24,13 @@ pub async fn analytics_revenue() {
         let pool = test_env.db.pool.clone();
 
         // Generate sample revenue data- directly insert into sql
-        let (mut insert_user_ids, mut insert_project_ids, mut insert_payouts, mut insert_starts) =
-            (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        let (
+            mut insert_user_ids,
+            mut insert_project_ids,
+            mut insert_payouts,
+            mut insert_starts,
+            mut insert_availables,
+        ) = (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
 
         // Note: these go from most recent to least recent
         let money_time_pairs: [(f64, DateTime<Utc>); 10] = [
@@ -47,6 +52,7 @@ pub async fn analytics_revenue() {
             insert_project_ids.push(project_id);
             insert_payouts.push(Decimal::from_f64_retain(*money).unwrap());
             insert_starts.push(*time);
+            insert_availables.push(*time);
         }
 
         let mut transaction = pool.begin().await.unwrap();
@@ -55,6 +61,7 @@ pub async fn analytics_revenue() {
             insert_project_ids,
             insert_payouts,
             insert_starts,
+            insert_availables,
             &mut transaction,
         )
         .await

@@ -27,7 +27,6 @@ use chrono::{Duration, Utc};
 use rand_chacha::rand_core::SeedableRng;
 use rand_chacha::ChaCha20Rng;
 use reqwest::header::AUTHORIZATION;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashMap;
@@ -225,7 +224,6 @@ impl TempUser {
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
                 badges: Badges::default(),
-                balance: Decimal::ZERO,
             }
             .insert(transaction)
             .await?;
@@ -1521,7 +1519,6 @@ pub async fn create_account_with_password(
         created: Utc::now(),
         role: Role::Developer.to_string(),
         badges: Badges::default(),
-        balance: Decimal::ZERO,
     }
     .insert(&mut transaction)
     .await?;

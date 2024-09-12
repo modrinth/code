@@ -242,16 +242,14 @@ pub fn app_setup(
 
     {
         let pool_ref = pool.clone();
-        let redis_ref = redis_pool.clone();
         let client_ref = clickhouse.clone();
         scheduler.run(std::time::Duration::from_secs(60 * 60 * 6), move || {
             let pool_ref = pool_ref.clone();
-            let redis_ref = redis_ref.clone();
             let client_ref = client_ref.clone();
 
             async move {
                 info!("Started running payouts");
-                let result = process_payout(&pool_ref, &redis_ref, &client_ref).await;
+                let result = process_payout(&pool_ref, &client_ref).await;
                 if let Err(e) = result {
                     warn!("Payouts run failed: {:?}", e);
                 }
@@ -451,12 +449,12 @@ pub fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("MAXMIND_LICENSE_KEY");
 
-    failed |= check_var::<u64>("PAYOUTS_BUDGET");
-
     failed |= check_var::<String>("FLAME_ANVIL_URL");
 
     failed |= check_var::<String>("STRIPE_API_KEY");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
+
+    failed |= check_var::<u64>("ADITUDE_API_KEY");
 
     failed
 }
