@@ -1,28 +1,38 @@
 <template>
-  <div class="h-full w-full">
+  <div class="relative h-full w-full">
     <div
       v-if="data && status == 'success'"
       class="flex h-full w-full flex-col justify-between gap-6 p-8"
     >
       <h2 class="text-3xl font-bold">Startup</h2>
-      <button type="submit" class="btn btn-primary" :disabled="isUpdating" @click="">
-        {{ isUpdating ? "Saving..." : "Save" }}
-      </button>
     </div>
     <UiServersPyroLoading v-else />
+    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
+      <UiServersSaveBanner
+        v-if="hasUnsavedChanges"
+        :isUpdating="isUpdating"
+        :save="saveStartup"
+        :reset="resetStartup"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useServerStore } from "~/stores/servers.ts";
-
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();
-const isUpdating = ref(false);
-const temdata = ref("");
 
-const updateServerArgs = async () => {
+await serverStore.fetchServerData(serverId);
+const { data, status } = await useLazyAsyncData(
+  "infoServerData",
+  async () => await serverStore.getServerData(serverId),
+);
+
+const isUpdating = ref(false);
+const hasUnsavedChanges = ref(false);
+
+const saveStartup = async () => {
   try {
     isUpdating.value = true;
   } catch (error) {
@@ -38,9 +48,5 @@ const updateServerArgs = async () => {
   }
 };
 
-await serverStore.fetchServerData(serverId);
-const { data, status } = await useLazyAsyncData(
-  "infoServerData",
-  async () => await serverStore.getServerData(serverId),
-);
+const resetStartup = async () => {};
 </script>

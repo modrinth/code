@@ -15,16 +15,6 @@
 </template>
 
 <script setup lang="ts">
-import { useServerStore } from "~/stores/servers.ts";
-
-const { formatMessage } = useVIntl();
-const messages = defineMessages({
-  title: {
-    id: "server.options.info.title",
-    defaultMessage: "Info",
-  },
-});
-
 const route = useNativeRoute();
 const serverId = route.params.id as string;
 const serverStore = useServerStore();

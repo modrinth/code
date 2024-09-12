@@ -1,56 +1,71 @@
 <template>
-  <div class="h-full w-full">
+  <div class="relative h-full w-full">
     <div
+      class="flex h-full w-full flex-col justify-between gap-6 overflow-y-auto p-8"
       v-if="data && status == 'success'"
-      class="flex h-full w-full flex-col justify-between gap-6 p-8"
     >
       <h2 class="text-3xl font-bold">server.properties</h2>
       <div v-for="(property, index) in liveProperties" :key="index">
         <div class="mb-4 flex justify-between">
-          <label :for="index as unknown as string" class="block text-lg font-semibold">{{
-            index
-              .toString()
-              .split("-")
-              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-              .join(" ")
-          }}</label>
-          <div v-if="typeof property === 'boolean'">
-            <Checkbox id="property.id" v-model="liveProperties[index]" />
+          <label :for="index.toString()" class="block text-lg font-semibold">
+            {{
+              index
+                .toString()
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")
+            }}
+          </label>
+          <div v-if="overrides[index] && overrides[index].type === 'dropdown'">
+            <DropdownSelect
+              v-model="liveProperties[index]"
+              :name="property.id"
+              :options="overrides[index].options"
+              placeholder="Select..."
+            />
           </div>
-          <div v-else-if="typeof property === 'number'">
+          <div v-else-if="typeof property === 'boolean'">
             <input
-              :id="index as unknown as string"
+              id="property.id"
+              v-model="liveProperties[index]"
+              class="switch stylized-toggle"
+              type="checkbox"
+            />
+          </div>
+          <div v-else-if="typeof property === 'number'" class="w-[320px]">
+            <input
+              :id="index.toString()"
               v-model.number="liveProperties[index]"
               type="number"
               class="w-full rounded border p-2"
             />
           </div>
-          <div v-else-if="typeof property === 'object'">
+          <div
+            v-else-if="
+              typeof property === 'object' ||
+              property.includes(',') ||
+              property.includes('{') ||
+              property.includes('}')
+            "
+            class="w-[320px]"
+          >
             <textarea
-              :id="index as unknown as string"
+              :id="index.toString()"
               :value="JSON.stringify(property, null, 2)"
               class="w-full rounded border p-2"
             ></textarea>
           </div>
-          <div v-else>
+          <div v-else class="w-[320px]">
             <input
-              :id="index as unknown as string"
+              :id="index.toString()"
               :value="property"
               type="text"
               class="w-full rounded border p-2"
             />
           </div>
         </div>
-        <div class="h-[2px] w-full bg-divider"></div>
       </div>
-      <button
-        type="submit"
-        class="btn btn-primary mt-4"
-        :disabled="isUpdating || !hasUnsavedChanges"
-        @click="() => saveProperties()"
-      >
-        {{ isUpdating ? "Saving..." : "Save" }}
-      </button>
+      <div class="mt-10"></div>
     </div>
     <div v-else-if="status === 'error'" class="mt-12 flex w-full items-center justify-center">
       <div class="flex flex-col items-center gap-4">
@@ -62,17 +77,23 @@
       </div>
     </div>
     <UiServersPyroLoading v-else />
+    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
+      <UiServersSaveBanner
+        v-if="hasUnsavedChanges"
+        :isUpdating="isUpdating"
+        :save="saveProperties"
+        :reset="resetProperties"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import Checkbox from "~/components/ui/Checkbox.vue";
-import PyroLoading from "~/components/ui/servers/PyroLoading.vue";
+import { DropdownSelect } from "@modrinth/ui";
 
 const route = useNativeRoute();
 const serverId = route.params.id as string;
-const auth = await useAuth();
 const serverStore = useServerStore();
 
 const isUpdating = ref(false);
@@ -83,6 +104,17 @@ const { data, status } = await useAsyncData(
   "data",
   async () => await serverStore.fetchConfigFile(serverId, "ServerProperties"),
 );
+
+const overrides: { [key: string]: { type: string; options: string[] } } = {
+  difficulty: {
+    type: "dropdown",
+    options: ["peaceful", "easy", "normal", "hard"],
+  },
+  gamemode: {
+    type: "dropdown",
+    options: ["survival", "creative", "adventure", "spectator"],
+  },
+};
 
 console.log(data);
 
@@ -134,5 +166,9 @@ const saveProperties = async () => {
   } finally {
     isUpdating.value = false;
   }
+};
+
+const resetProperties = () => {
+  liveProperties.value = JSON.parse(JSON.stringify(data.value));
 };
 </script>

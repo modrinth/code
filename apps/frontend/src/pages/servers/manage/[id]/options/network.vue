@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full">
+  <div class="relative h-full w-full">
     <div
       v-if="data && status == 'success'"
       class="flex h-full w-full flex-col justify-between gap-6 p-8"
@@ -12,25 +12,21 @@
             <span> Change the subdomain to connect to your server </span>
           </label>
           <div class="flex w-[50%] items-center gap-2">
-            <input
-              v-model="serverSubdomain"
-              class="h-[50%] w-[63%]"
-              @keyup.enter="updateServerSubdomainReq"
-            />
+            <input v-model="serverSubdomain" class="h-[50%] w-[63%]" @keyup.enter="saveNetwork" />
             .{{ data.net.domain.split(".").slice(1).join(".") }}
           </div>
         </div>
       </div>
-      <button
-        type="submit"
-        class="btn btn-primary"
-        :disabled="isUpdating || !hasUnsavedChanges"
-        @click="updateServerSubdomainReq"
-      >
-        {{ isUpdating ? "Saving..." : "Save" }}
-      </button>
     </div>
     <UiServersPyroLoading v-else />
+    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
+      <UiServersSaveBanner
+        v-if="hasUnsavedChanges"
+        :isUpdating="isUpdating"
+        :save="saveNetwork"
+        :reset="resetNetwork"
+      />
+    </div>
   </div>
 </template>
 
@@ -53,7 +49,7 @@ const hasUnsavedChanges = computed(
   () => serverSubdomain.value !== data?.value?.net?.domain.split(".")[0],
 );
 
-const updateServerSubdomainReq = async () => {
+const saveNetwork = async () => {
   try {
     isUpdating.value = true;
     const available = (await serverStore.checkSubdomainAvailability(serverSubdomain.value)) as {
@@ -90,5 +86,9 @@ const updateServerSubdomainReq = async () => {
   } finally {
     isUpdating.value = false;
   }
+};
+
+const resetNetwork = () => {
+  serverSubdomain.value = data?.value?.net?.domain.split(".")[0] ?? "";
 };
 </script>

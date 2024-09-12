@@ -37,7 +37,7 @@
     </div>
 
     <div
-      class="col-start-1 row-start-1 h-full w-full overflow-y-auto"
+      class="col-start-1 row-start-1 h-full w-full"
       :class="{ 'rounded-xl bg-black opacity-30 bg-blend-overlay': sidebarVisible && $mq == 'sm' }"
     >
       <NuxtPage :route="props.route" />

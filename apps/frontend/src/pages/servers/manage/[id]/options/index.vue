@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full">
+  <div class="relative h-full w-full">
     <div
       v-if="data && status == 'success'"
       class="flex h-full w-full flex-col justify-between gap-6 p-8"
@@ -11,32 +11,29 @@
             <span class="text-lg font-bold text-contrast">Server name</span>
             <span> Change the name of your server as it appears on Modrinth </span>
           </label>
-          <input v-model="serverName" class="h-[50%] w-[40%]" @keyup.enter="updateServerNameReq" />
+          <input v-model="serverName" class="h-[50%] w-[40%]" @keyup.enter="saveGeneral" />
         </div>
       </div>
-      <button
-        type="submit"
-        class="btn btn-primary"
-        :disabled="isUpdating || !hasUnsavedChanges"
-        @click="updateServerNameReq"
-      >
-        {{ isUpdating ? "Saving..." : "Save" }}
-      </button>
     </div>
     <UiServersPyroLoading v-else />
+    <div class="absolute bottom-[2.5%] left-[2.5%] z-10 w-[95%]">
+      <UiServersSaveBanner
+        v-if="hasUnsavedChanges"
+        :isUpdating="isUpdating"
+        :save="saveGeneral"
+        :reset="resetGeneral"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
 const app = useNuxtApp();
 const route = useRoute();
 const serverId = route.params.id as string;
 
 const serverStore = useServerStore();
 
-const isUpdating = ref(false);
 const { data, status } = await useAsyncData(
   "data",
   async () => await serverStore.getServerData(serverId),
@@ -44,9 +41,10 @@ const { data, status } = await useAsyncData(
 
 const serverName = ref(data.value?.name || "");
 
+const isUpdating = ref(false);
 const hasUnsavedChanges = computed(() => serverName.value !== data.value?.name);
 
-const updateServerNameReq = async () => {
+const saveGeneral = async () => {
   try {
     isUpdating.value = true;
     await serverStore.updateServerName(serverId, serverName.value);
@@ -71,5 +69,9 @@ const updateServerNameReq = async () => {
   } finally {
     isUpdating.value = false;
   }
+};
+
+const resetGeneral = () => {
+  serverName.value = data.value?.name || "";
 };
 </script>
