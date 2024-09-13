@@ -37,7 +37,7 @@
       border-radius: 1rem;
       position: absolute;
       left: 0;
-      bottom: 0;
+      top: 0;
       z-index: 2;
     }
   </style>
@@ -58,19 +58,18 @@
     ]);
   });
 
-  let lastUrl = null
   window.addEventListener(
     "message",
     (event) => {
-      if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__ && lastUrl !== event.data.modrinthOpenUrl) {
-        lastUrl = event.data.modrinthOpenUrl
-        // window.__TAURI_INTERNALS__.invoke("plugin:shell|open", {
-        //   path: event.data.modrinthOpenUrl,
-        // });
+      if (event.data.modrinthAdClick && window.__TAURI_INTERNALS__) {
+        window.__TAURI_INTERNALS__.invoke("plugin:ads|record_ads_click", {});
+      }
 
-        setTimeout(() => {
-          lastUrl = null
-        }, 500)
+      if (event.data.modrinthOpenUrl && window.__TAURI_INTERNALS__) {
+        window.__TAURI_INTERNALS__.invoke("plugin:ads|open_link", {
+          path: event.data.modrinthOpenUrl,
+          origin: event.origin,
+        });
       }
     },
     false,
