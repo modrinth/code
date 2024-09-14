@@ -1,11 +1,11 @@
 import { $fetch, FetchError } from 'ofetch'
 
 interface PyroFetchOptions {
-  session?: string
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>
   accept?: 'application/json' | (string & {})
   version?: number
+  session?: string
 }
 
 export class PyroFetchError extends Error {
