@@ -1,12 +1,11 @@
 <template>
   <div data-pyro-mount class="w-full min-h-full p-8">
     <div class="flex justify-between items-center mb-4">
-      <h1 class="m-0">Servers</h1>
       <input
         v-model="searchQuery"
         type="text"
         placeholder="Search servers..."
-        class="px-3 py-2 border rounded-md"
+        class="px-3 py-2 w-full border rounded-md"
       />
     </div>
     <template v-if="!loading">
