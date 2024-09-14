@@ -321,6 +321,20 @@
           ]
         },
         {
+          "description": "ads:allow-open-link -> Enables the open_link command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-open-link"
+          ]
+        },
+        {
+          "description": "ads:allow-record-ads-click -> Enables the record_ads_click command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-record-ads-click"
+          ]
+        },
+        {
           "description": "ads:allow-scroll-ads-window -> Enables the scroll_ads_window command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -346,6 +360,20 @@
           "type": "string",
           "enum": [
             "ads:deny-init-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-open-link -> Denies the open_link command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-open-link"
+          ]
+        },
+        {
+          "description": "ads:deny-record-ads-click -> Denies the record_ads_click command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-record-ads-click"
           ]
         },
         {

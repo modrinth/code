@@ -1,12 +1,19 @@
 use serde::Serialize;
+use std::collections::HashSet;
+use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
+use tauri::{
+    Emitter, Listener, LogicalPosition, LogicalSize, Manager, Runtime,
+};
+use tauri_plugin_shell::{open, ShellExt};
 use tokio::sync::RwLock;
 
 pub struct AdsState {
     pub shown: bool,
     pub size: Option<LogicalSize<f32>>,
     pub position: Option<LogicalPosition<f32>>,
+    pub last_click: Option<Instant>,
+    pub malicious_origins: HashSet<String>,
 }
 
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
@@ -16,6 +23,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
                 shown: true,
                 size: None,
                 position: None,
+                last_click: None,
+                malicious_origins: HashSet::new(),
             }));
 
             // We refresh the ads window every 5 minutes for performance
@@ -43,6 +52,8 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             hide_ads_window,
             scroll_ads_window,
             show_ads_window,
+            record_ads_click,
+            open_link,
         ])
         .build()
 }
@@ -75,7 +86,7 @@ pub async fn init_ads_window<R: Runtime>(
             let _ = webview.set_size(LogicalSize::new(width, height));
         }
     } else if let Some(window) = app.get_window("main") {
-        let _ = window.add_child(
+        let window = window.add_child(
             tauri::webview::WebviewBuilder::new(
                 "ads-window",
                 WebviewUrl::External(
@@ -93,6 +104,12 @@ pub async fn init_ads_window<R: Runtime>(
             },
             LogicalSize::new(width, height),
         );
+
+        if let Ok(window) = window {
+            window.listen_any("click", |event| {
+                println!("click: {:?}", event);
+            });
+        }
     }
 
     Ok(())
@@ -156,6 +173,46 @@ pub async fn scroll_ads_window<R: Runtime>(
     scroll: f32,
 ) -> crate::api::Result<()> {
     let _ = app.emit("ads-scroll", ScrollEvent { scroll });
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn record_ads_click<R: Runtime>(
+    app: tauri::AppHandle<R>,
+) -> crate::api::Result<()> {
+    let state = app.state::<RwLock<AdsState>>();
+
+    let mut state = state.write().await;
+    state.last_click = Some(Instant::now());
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn open_link<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    path: String,
+    origin: String,
+) -> crate::api::Result<()> {
+    let state = app.state::<RwLock<AdsState>>();
+    let mut state = state.write().await;
+
+    if url::Url::parse(&path).is_ok()
+        && !state.malicious_origins.contains(&origin)
+    {
+        if let Some(last_click) = state.last_click {
+            if last_click.elapsed() < Duration::from_millis(100) {
+                let _ = app.shell().open(&path, None);
+                state.last_click = None;
+
+                return Ok(());
+            }
+        }
+    }
+
+    tracing::info!("Malicious click: {path} origin {origin}");
+    state.malicious_origins.insert(origin);
 
     Ok(())
 }
