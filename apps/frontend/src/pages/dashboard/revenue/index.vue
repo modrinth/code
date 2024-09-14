@@ -7,7 +7,7 @@
           You have
           <strong>{{ $formatMoney(userBalance.available) }}</strong>
           available to withdraw. <strong>{{ $formatMoney(userBalance.pending) }}</strong> of your
-          balance is <a class="text-link" href="#">pending</a>.
+          balance is <nuxt-link class="text-link" to="/legal/cmp-info#pending">pending</nuxt-link>.
         </p>
       </div>
       <p v-else>
@@ -15,7 +15,7 @@
         <strong>{{ $formatMoney(userBalance.available) }}</strong
         >, which is under the minimum of ${{ minWithdraw }} to withdraw.
         <strong>{{ $formatMoney(userBalance.pending) }}</strong> of your balance is
-        <a class="text-link" href="#">pending</a>.
+        <nuxt-link class="text-link" to="/legal/cmp-info#pending">pending</nuxt-link>.
       </p>
       <div class="input-group mt-4">
         <nuxt-link
