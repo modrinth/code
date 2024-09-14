@@ -13,13 +13,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { BoxIcon } from "@modrinth/assets";
-import type { Mod } from "~/types/servers";
+import { computed } from 'vue'
+import { BoxIcon } from '@modrinth/assets'
+import type { Mod } from '@/types/servers'
 
 const props = defineProps<{
-  mods: Mod[];
-}>();
+  mods: Mod[]
+}>()
 
-const modsCount = computed(() => props.mods?.length ?? 0);
+const modsCount = computed(() => props.mods?.length ?? 0)
 </script>
