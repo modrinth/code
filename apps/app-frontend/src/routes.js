@@ -66,6 +66,42 @@ export default new createRouter({
           component: Server.ManageOverview,
         },
         {
+          path: 'content',
+          name: 'servers.manage.content',
+          component: Server.ManageContent,
+          meta: {
+            breadcrumb: [
+              { name: 'Servers', link: '/servers' },
+              { name: '?Server', link: '/servers/manage/{id}' },
+              { name: 'Content' },
+            ],
+          },
+        },
+        {
+          path: 'files',
+          name: 'servers.manage.files',
+          component: Server.ManageFiles,
+          meta: {
+            breadcrumb: [
+              { name: 'Servers', link: '/servers' },
+              { name: '?Server', link: '/servers/manage/{id}' },
+              { name: 'Files' },
+            ],
+          },
+        },
+        {
+          path: 'backups',
+          name: 'servers.manage.backups',
+          component: Server.ManageBackups,
+          meta: {
+            breadcrumb: [
+              { name: 'Servers', link: '/servers' },
+              { name: '?Server', link: '/servers/manage/{id}' },
+              { name: 'Backups' },
+            ],
+          },
+        },
+        {
           path: 'options',
           name: 'servers.manage.options',
           component: Server.ManageOptionsIndex,
@@ -76,6 +112,12 @@ export default new createRouter({
               { name: 'Options' },
             ],
           },
+          children: [
+            {
+              path: '',
+              name: 'servers.manage.options.general',
+            },
+          ],
         },
       ],
     },
