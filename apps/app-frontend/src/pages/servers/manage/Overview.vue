@@ -1,7 +1,7 @@
 <template>
   <div>{{ server }}</div>
   <div>hai!</div>
-  <RouterLink :to="`/servers/manage/${server}/options`">Options</RouterLink>
+  <RouterLink :to="{ name: 'servers.manage.options', params: { server } }">Options</RouterLink>
 </template>
 
 <script setup lang="ts">
