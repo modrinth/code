@@ -454,7 +454,7 @@ async function purgeCache() {
           :min="8"
           :max="maxMemory"
           :step="64"
-          unit="mb"
+          unit="MB"
         />
       </div>
     </Card>
