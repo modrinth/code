@@ -35,7 +35,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
 import { XIcon } from "@modrinth/assets";
 
 export type StatusState = "Installing" | "Failed";
