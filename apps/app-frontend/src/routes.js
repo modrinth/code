@@ -51,6 +51,35 @@ export default new createRouter({
       },
     },
     {
+      path: '/servers/manage/:id',
+      name: 'ManageServer',
+      component: Server.ManageIndex,
+      props: true,
+      meta: {
+        useContext: true,
+        breadcrumb: [{ name: 'Servers', link: '/servers' }, { name: '?Server' }],
+      },
+      children: [
+        {
+          path: '',
+          name: 'Overview',
+          component: Server.ManageOverview,
+        },
+        {
+          path: 'options',
+          name: 'Options',
+          component: Server.ManageOverview,
+          meta: {
+            breadcrumb: [
+              { name: 'Servers', link: '/servers' },
+              { name: '?Server' },
+              { name: 'Options' },
+            ],
+          },
+        },
+      ],
+    },
+    {
       path: '/project/:id',
       name: 'Project',
       component: Project.Index,

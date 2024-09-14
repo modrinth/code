@@ -6,7 +6,7 @@
     class="flex flex-row items-center overflow-x-hidden rounded-3xl bg-bg-raised p-4"
     data-pyro-server-listing
     :data-pyro-server-listing-id="server_id"
-    :to="`/servers/manage/${server_id}`"
+    :to="`/servers/manage/${server_id}/options`"
   >
     <Avatar :src="undefined" no-shadow size="md" alt="Server Icon" />
     <div class="ml-8 flex flex-col gap-2.5">

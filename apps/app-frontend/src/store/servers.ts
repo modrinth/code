@@ -16,9 +16,11 @@ export const useServerStore = defineStore('servers', {
   }),
 
   actions: {
-    async fetchServerData(serverId: string) {
+    async fetchServerData(auth: string, serverId: string) {
       try {
-        const data = await usePyroFetch<Server>(`servers/${serverId}`)
+        const data = await usePyroFetch<Server>(`servers/${serverId}`, {
+          session: auth,
+        })
 
         if (data.modpack) {
           const pid: Project = await this.fetchModpackVersion(data.modpack)
@@ -30,13 +32,13 @@ export const useServerStore = defineStore('servers', {
           data.project = project as Project | null
         }
 
-        const backups = await this.fetchServerBackups(serverId)
+        const backups = await this.fetchServerBackups(auth, serverId)
         data.backups = backups
 
         this.serverData[serverId] = data
         this.error = null
       } catch (error) {
-        console.error('Error fetching server data:', error)
+        console.error('(PYROFETCH) Error fetching server data:', error)
         this.error = error instanceof Error ? error : new Error('An unknown error occurred')
         throw this.error
       }
@@ -72,9 +74,11 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async fetchServerBackups(serverId: string) {
+    async fetchServerBackups(auth: string, serverId: string) {
       try {
-        const result = await usePyroFetch<ServerBackup[]>(`servers/${serverId}/backups`)
+        const result = await usePyroFetch<ServerBackup[]>(`servers/${serverId}/backups`, {
+          session: auth,
+        })
         return result.sort((a, b) => (a.created_at > b.created_at ? -1 : 1))
       } catch (error) {
         console.error('Error fetching server backups:', error)
