@@ -49,6 +49,7 @@ paste = "1.0.15"
 opener = { version = "0.7.2", features = ["reveal", "dbus-vendored"] }
 
 native-dialog = "0.7.0"
+tauri-plugin-websocket = "2.0.0-rc.1"
 
 [target.'cfg(not(target_os = "linux"))'.dependencies]
 window-shadows = "0.2.1"

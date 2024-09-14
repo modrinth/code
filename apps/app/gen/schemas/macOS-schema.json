@@ -4115,6 +4115,41 @@
           ]
         },
         {
+          "description": "websocket:default -> Allows connecting and sending data to a WebSocket server",
+          "type": "string",
+          "enum": [
+            "websocket:default"
+          ]
+        },
+        {
+          "description": "websocket:allow-connect -> Enables the connect command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:allow-connect"
+          ]
+        },
+        {
+          "description": "websocket:allow-send -> Enables the send command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:allow-send"
+          ]
+        },
+        {
+          "description": "websocket:deny-connect -> Denies the connect command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:deny-connect"
+          ]
+        },
+        {
+          "description": "websocket:deny-send -> Denies the send command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:deny-send"
+          ]
+        },
+        {
           "description": "window-state:default -> This permission set configures what kind of\noperations are available from the window state plugin.\n\n#### Granted Permissions\n\nAll operations are enabled by default.\n\n",
           "type": "string",
           "enum": [

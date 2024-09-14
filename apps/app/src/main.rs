@@ -191,6 +191,7 @@ fn main() {
                 .with_filename("app-window-state.json")
                 .build(),
         )
+        .plugin(tauri_plugin_websocket::init())
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {

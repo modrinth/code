@@ -20,6 +20,7 @@
     "@tauri-apps/plugin-os": "^2.0.0-rc.0",
     "@tauri-apps/plugin-shell": "^2.0.0-rc.0",
     "@tauri-apps/plugin-updater": "^2.0.0-rc.0",
+    "@tauri-apps/plugin-websocket": "2.0.0-rc.1",
     "@tauri-apps/plugin-window-state": "^2.0.0-rc.0",
     "@vintl/vintl": "^4.4.1",
     "dayjs": "^1.11.10",
