@@ -44,7 +44,7 @@ export default new createRouter({
     },
     {
       path: '/servers',
-      name: 'Servers',
+      name: 'servers',
       component: Server.Index,
       meta: {
         breadcrumb: [{ name: 'Servers' }],
@@ -52,7 +52,7 @@ export default new createRouter({
     },
     {
       path: '/servers/manage/:id',
-      name: 'ManageServer',
+      name: 'servers.manage',
       component: Server.ManageIndex,
       props: true,
       meta: {
@@ -62,17 +62,17 @@ export default new createRouter({
       children: [
         {
           path: '',
-          name: 'Overview',
+          name: 'servers.manage.overview',
           component: Server.ManageOverview,
         },
         {
           path: 'options',
-          name: 'Options',
-          component: Server.ManageOverview,
+          name: 'servers.manage.options',
+          component: Server.ManageOptionsIndex,
           meta: {
             breadcrumb: [
               { name: 'Servers', link: '/servers' },
-              { name: '?Server' },
+              { name: '?Server', link: '/servers/manage/{id}' },
               { name: 'Options' },
             ],
           },
