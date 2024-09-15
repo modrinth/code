@@ -2,10 +2,8 @@ use serde::Serialize;
 use std::collections::HashSet;
 use std::time::{Duration, Instant};
 use tauri::plugin::TauriPlugin;
-use tauri::{
-    Emitter, Listener, LogicalPosition, LogicalSize, Manager, Runtime,
-};
-use tauri_plugin_shell::{open, ShellExt};
+use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, Runtime};
+use tauri_plugin_shell::ShellExt;
 use tokio::sync::RwLock;
 
 pub struct AdsState {
