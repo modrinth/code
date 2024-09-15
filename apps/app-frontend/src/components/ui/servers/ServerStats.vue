@@ -34,20 +34,20 @@
       <h3>Storage usage</h3>
 
       <div class="flex flex-col gap-2 pt-3">
-        <NuxtLink
+        <RouterLink
           :to="`/servers/manage/${serverId}/files`"
           class="flex h-5 flex-row items-center gap-2 text-sm"
         >
           <FolderOpenIcon />
           <p>World</p>
-        </NuxtLink>
-        <NuxtLink
+        </RouterLink>
+        <RouterLink
           :to="`/servers/manage/${serverId}/options/properties`"
           class="flex h-5 flex-row items-center gap-2 text-sm"
         >
           <FileTextIcon />
           <p>Server properties</p>
-        </NuxtLink>
+        </RouterLink>
       </div>
     </div>
   </div>
