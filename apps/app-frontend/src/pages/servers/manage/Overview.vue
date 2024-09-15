@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="isConnected && !isWSAuthIncorrect"
+    v-if="connectionState === 'connected'"
     data-pyro-server-manager-root
     class="flex flex-col gap-6"
   >
@@ -30,20 +30,17 @@
       />
     </div>
   </div>
-  <PanelOverviewLoading v-else-if="!isConnected && !isWSAuthIncorrect" />
+  <PanelOverviewLoading v-else-if="connectionState === 'connecting'" />
   <PyroError
-    v-else-if="isWSAuthIncorrect"
+    v-else-if="connectionState === 'auth-failed'"
     title="WebSocket authentication failed"
     message="Indicative of a server misconfiguration. Please report this to support."
   />
-  <PyroError
-    v-else
-    title="An error occurred"
-    message="Something went wrong while attempting to connect to your server. Your data is safe, and we're working to resolve the issue."
-  />
+  <PyroError v-else-if="connectionState === 'error'" :title="errorTitle" :message="errorMessage" />
 </template>
+
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import WebSocket from '@tauri-apps/plugin-websocket'
 import { useServerStore } from '@/store/servers'
@@ -61,13 +58,14 @@ const route = useRoute()
 
 const fullScreen = ref(false)
 const consoleStyle = ref({ height: '600px', marginTop: '0px' })
-const isConnected = ref(false)
-const isWSAuthIncorrect = ref(false)
+const connectionState = ref<'connecting' | 'connected' | 'auth-failed' | 'error'>('connecting')
 const consoleOutput = ref<string[]>([])
 const cpuData = ref<number[]>([])
 const ramData = ref<number[]>([])
 const isActioning = ref(false)
 const serverPowerState = ref<ServerState>('stopped')
+const errorTitle = ref('An error occurred')
+const errorMessage = ref('Something went wrong. Please try again later.')
 
 const props = defineProps<{
   server: Server
@@ -98,6 +96,9 @@ const stats = ref<Stats>({
 const serverId = route.params.id as string
 
 let socket: WebSocket | null = null
+let reconnectAttempts = 0
+const maxReconnectAttempts = 5
+const reconnectDelay = 5000
 
 const session = ref(props.credentials.session)
 const wsAuth = ref<WSAuth | null>(null)
@@ -134,25 +135,37 @@ const sendPowerAction = async (action: 'restart' | 'start' | 'stop' | 'kill') =>
     await serverStore.sendPowerAction(serverId, actionName)
   } catch (error) {
     console.error(`Error ${actionName}ing server:`, error)
+    errorTitle.value = `Failed to ${actionName.toLowerCase()} server`
+    errorMessage.value = `An error occurred while trying to ${actionName.toLowerCase()} the server. Please try again later.`
+    connectionState.value = 'error'
   } finally {
     isActioning.value = false
   }
 }
 
 const connectWebSocket = async () => {
-  console.log(session.value)
-  wsAuth.value = (await serverStore.requestWebsocket(session.value, serverId)) as WSAuth
-  console.log(wsAuth.value)
-  socket = await WebSocket.connect(`wss://${wsAuth.value.url}`)
+  try {
+    console.log(session.value)
+    wsAuth.value = (await serverStore.requestWebsocket(session.value, serverId)) as WSAuth
+    console.log(wsAuth.value)
+    socket = await WebSocket.connect(`wss://${wsAuth.value.url}`)
 
-  socket.addListener((msg) => handleWebSocketMessage(msg as unknown as WSEvent))
+    socket.addListener((msg) => handleWebSocketMessage(msg as unknown as WSEvent))
 
-  await socket.send(JSON.stringify({ event: 'auth', jwt: wsAuth.value.token }))
+    await socket.send(JSON.stringify({ event: 'auth', jwt: wsAuth.value.token }))
+
+    // Reset reconnect attempts on successful connection
+    reconnectAttempts = 0
+    connectionState.value = 'connected'
+  } catch (error) {
+    console.error('Failed to connect to WebSocket:', error)
+    handleConnectionError(error)
+  }
 }
+
 const handleWebSocketMessage = (msg: WSEvent) => {
   try {
     const data = typeof msg === 'string' ? JSON.parse(msg) : msg
-    console.log('Received WebSocket message:', data)
 
     const parsedData = JSON.parse(data.data)
 
@@ -172,7 +185,7 @@ const handleWebSocketMessage = (msg: WSEvent) => {
         updatePowerState(parsedData.state)
         break
       case 'auth-incorrect':
-        isWSAuthIncorrect.value = true
+        connectionState.value = 'auth-failed'
         break
     }
   } catch (error) {
@@ -185,7 +198,6 @@ const updatePowerState = (state: ServerState) => {
 }
 
 const updateStats = (data: Stats['current']) => {
-  isConnected.value = true
   stats.value = {
     current: data,
     past: stats.value.current,
@@ -206,15 +218,74 @@ const updateDataArray = (arr: number[], newValue: number) => {
 }
 
 const reauth = async () => {
-  wsAuth.value = (await serverStore.requestWebsocket(props.credentials.session, serverId)) as WSAuth
-  await socket?.send(JSON.stringify({ event: 'auth', jwt: wsAuth.value.token }))
+  try {
+    wsAuth.value = (await serverStore.requestWebsocket(
+      props.credentials.session,
+      serverId,
+    )) as WSAuth
+    await socket?.send(JSON.stringify({ event: 'auth', jwt: wsAuth.value.token }))
+  } catch (error) {
+    console.error('Failed to reauthenticate:', error)
+    handleConnectionError(error)
+  }
 }
 
-onMounted(connectWebSocket)
-onBeforeUnmount(async () => {
-  if (socket) {
-    await socket.disconnect()
+const handleConnectionError = (error: unknown) => {
+  console.error('Connection error:', error)
+
+  if (reconnectAttempts < maxReconnectAttempts) {
+    reconnectAttempts++
+    setTimeout(connectWebSocket, reconnectDelay)
+    connectionState.value = 'connecting'
+  } else {
+    errorTitle.value = 'Connection failed'
+    errorMessage.value =
+      'Unable to connect to the server after multiple attempts. Please check your internet connection and try again later.'
+    connectionState.value = 'error'
   }
+}
+
+const cleanupWebSocket = async () => {
+  if (socket) {
+    try {
+      await socket.disconnect()
+    } catch (error) {
+      console.error('Error disconnecting WebSocket:', error)
+    }
+    socket = null
+  }
+}
+
+onMounted(() => {
+  connectWebSocket()
+})
+
+onBeforeUnmount(() => {
+  cleanupWebSocket()
+})
+
+watch(
+  () => route.params.id,
+  async (newId, oldId) => {
+    if (newId !== oldId) {
+      await cleanupWebSocket()
+      connectWebSocket()
+    }
+  },
+)
+
+window.addEventListener('online', () => {
+  if (connectionState.value !== 'connected') {
+    reconnectAttempts = 0
+    connectWebSocket()
+  }
+})
+
+window.addEventListener('offline', () => {
+  connectionState.value = 'error'
+  errorTitle.value = 'Network disconnected'
+  errorMessage.value =
+    'Your internet connection appears to be offline. Please check your connection and try again.'
 })
 </script>
 
