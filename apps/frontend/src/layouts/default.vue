@@ -231,6 +231,7 @@
           </template>
           <template #revenue> <CurrencyIcon aria-hidden="true" /> Revenue </template>
           <template #analytics> <ChartIcon aria-hidden="true" /> Analytics </template>
+          <template #moderation> <ModerationIcon aria-hidden="true" /> Moderation </template>
           <template #sign-out> <LogOutIcon aria-hidden="true" /> Sign out </template>
         </OverflowMenu>
         <ButtonStyled v-else color="brand">
@@ -778,6 +779,7 @@ const userMenuOptions = computed(() => {
       link: "/settings",
     },
   ];
+
   // TODO: Only show if user has projects
   options = [
     ...options,
@@ -801,6 +803,24 @@ const userMenuOptions = computed(() => {
       link: "/dashboard/analytics",
     },
   ];
+
+  if (
+    (auth.value && auth.value.user && auth.value.user.role === "moderator") ||
+    auth.value.user.role === "admin"
+  ) {
+    options = [
+      ...options,
+      {
+        divider: true,
+      },
+      {
+        id: "moderation",
+        color: "orange",
+        link: "/moderation/review",
+      },
+    ];
+  }
+
   options = [
     ...options,
     {
