@@ -49,7 +49,7 @@ const saveGeneral = async () => {
     isUpdating.value = true;
     await serverStore.updateServerName(serverId, serverName.value);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await refreshNuxtData("backupsData");
+    await refreshNuxtData("data");
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

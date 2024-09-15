@@ -67,7 +67,7 @@ const saveNetwork = async () => {
     }
     await serverStore.changeSubdomain(serverId, serverSubdomain.value);
     await new Promise((resolve) => setTimeout(resolve, 500));
-    await refreshNuxtData("backupsData");
+    await refreshNuxtData("data");
     // @ts-ignore
     app.$notify({
       group: "serverOptions",

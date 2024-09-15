@@ -119,8 +119,6 @@ const overrides: { [key: string]: { type: string; options: string[] } } = {
   },
 };
 
-console.log(data);
-
 const liveProperties = ref(JSON.parse(JSON.stringify(data.value)));
 
 const hasUnsavedChanges = computed(() => JSON.stringify(changedPropertiesState.value) !== "{}");
