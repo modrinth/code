@@ -396,6 +396,9 @@ importers:
       '@codemirror/view':
         specifier: ^6.22.1
         version: 6.28.4
+      '@modrinth/assets':
+        specifier: workspace:*
+        version: link:../assets
       '@types/markdown-it':
         specifier: ^14.1.1
         version: 14.1.1
@@ -1962,7 +1965,6 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [darwin]
-
 
   '@tauri-apps/cli-darwin-x64@2.0.0-rc.4':
     resolution: {integrity: sha512-hBUWU/ef/Z/cLrRDq3x5euRx6kgbdWtVfekI4nhZmPBtM6uVbaaWpakmwGG7vOCP1IFD2qFMBUtIcIQeGTNlWQ==}
@@ -4371,7 +4373,6 @@ packages:
 
   mitt@3.0.1:
     resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
-
 
   mkdirp@1.0.4:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
