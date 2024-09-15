@@ -2,9 +2,7 @@
   "identifier": "plugins",
   "description": "",
   "local": true,
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "dialog:allow-open",
     "dialog:allow-confirm",
@@ -21,6 +19,7 @@
     "window-state:default",
     "window-state:allow-restore-state",
     "window-state:allow-save-window-state",
+    "websocket:default",
 
     "auth:default",
     "import:default",

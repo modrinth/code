@@ -38,7 +38,7 @@
       </div>
 
       <div data-pyro-mount class="h-full w-full">
-        <RouterView :server="serverData" />
+        <RouterView :credentials="credentials" :server="serverData" />
       </div>
 
       <PoweredByPyro />
@@ -67,7 +67,7 @@ import PyroError from '@/components/ui/servers/PyroError.vue'
 import { PyroFetchError } from '@/helpers/pyroFetch'
 import NavTabs from '@/components/ui/NavTabs.vue'
 
-type Credentials = {
+export type Credentials = {
   session: string
   expires: Date
   user_id: string

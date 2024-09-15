@@ -97,9 +97,11 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async requestWebsocket(serverId: string) {
+    async requestWebsocket(auth: string, serverId: string) {
       try {
-        return await usePyroFetch(`servers/${serverId}/ws`)
+        return await usePyroFetch(`servers/${serverId}/ws`, {
+          session: auth,
+        })
       } catch (error) {
         console.error('Error requesting websocket:', error)
         throw error
