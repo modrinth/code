@@ -3,15 +3,11 @@
 </template>
 
 <script setup lang="ts">
-import { useBreadcrumbs } from '@/store/breadcrumbs'
 import type { Server } from '@/types/servers'
+import type { Credentials } from '../Index.vue'
 
-const props = defineProps<{
+defineProps<{
   server: Server
+  credentials: Credentials
 }>()
-
-const server = props.server
-const breadcrumbs = useBreadcrumbs()
-
-await breadcrumbs.setName('Server', server.name)
 </script>
