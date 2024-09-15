@@ -1,6 +1,6 @@
 import { usePyroFetch } from '@/helpers/pyroFetch'
 import { defineStore } from 'pinia'
-import type { Project, Server, ServerBackup } from '@/types/servers'
+import type { Project, Server, ServerBackup, WSAuth } from '@/types/servers'
 import { toRaw } from 'vue'
 import { useFetch } from '@/helpers/fetch'
 
@@ -97,7 +97,7 @@ export const useServerStore = defineStore('servers', {
       }
     },
 
-    async requestWebsocket(auth: string, serverId: string) {
+    async requestWebsocket(auth: string, serverId: string): Promise<WSAuth> {
       try {
         return await usePyroFetch(`servers/${serverId}/ws`, {
           session: auth,
