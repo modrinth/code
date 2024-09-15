@@ -14,6 +14,7 @@ interface ServerConnection {
   errorMessage: string
   currentSession: string
   stats: Stats
+  messageHandler?: (msg: unknown) => void
 }
 
 export const useWebSocketStore = defineStore('webSocket', () => {
@@ -74,17 +75,19 @@ export const useWebSocketStore = defineStore('webSocket', () => {
       connection.connectionState = 'connecting'
       connection.currentSession = session
       const wsAuth = await serverStore.requestWebsocket(session, serverId)
-      if (connection.socket) {
-        await connection.socket.disconnect()
-      }
-      connection.socket = await WebSocket.connect(`wss://${wsAuth.url}`)
-      connection.socket.addListener((msg) =>
-        handleWebSocketMessage(serverId, msg as unknown as WSEvent),
-      )
 
-      connection.socket.addListener((msg) =>
-        handleWebSocketMessage(serverId, msg as unknown as WSEvent),
-      )
+      const newSocket = await WebSocket.connect(`wss://${wsAuth.url}`)
+
+      if (connection.socket) {
+        return
+      }
+
+      const messageHandler = (msg: unknown) => handleWebSocketMessage(serverId, msg as WSEvent)
+      newSocket.addListener(messageHandler)
+
+      connection.socket = newSocket
+      connection.messageHandler = messageHandler
+
       await connection.socket.send(JSON.stringify({ event: 'auth', jwt: wsAuth.token }))
 
       connection.connectionState = 'connected'
