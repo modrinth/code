@@ -538,7 +538,7 @@ async function verifyTwoFactorCode() {
     backupCodes.value = res.backup_codes;
     twoFactorStep.value = 2;
     await useAuth(auth.value.token);
-  } catch (err) {
+  } catch {
     twoFactorIncorrect.value = true;
   }
   stopLoading();
@@ -555,7 +555,7 @@ async function removeTwoFactor() {
     });
     manageTwoFactorModal.value.hide();
     await useAuth(auth.value.token);
-  } catch (err) {
+  } catch {
     twoFactorIncorrect.value = true;
   }
   stopLoading();

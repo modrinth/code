@@ -112,7 +112,7 @@ export const configuredXss = new FilterXSS({
           )
         }
         return safeAttrValue(tag, name, url.toString(), cssFilter)
-      } catch (err) {
+      } catch {
         /* empty */
       }
     }
@@ -149,7 +149,7 @@ export const md = (options = {}) => {
         if (allowedHostnames.includes(url.hostname)) {
           return defaultLinkOpenRenderer(tokens, idx, options, env, self)
         }
-      } catch (err) {
+      } catch {
         /* empty */
       }
     }

@@ -95,7 +95,7 @@ const props = defineProps<{
   members: User[];
   currentMember: User;
   dependencies: Dependency[];
-  resetProject: Function;
+  resetProject: (opts?: { dedupe?: "cancel" | "defer" }) => Promise<void>;
 }>();
 
 const version = computed(() => {
