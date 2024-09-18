@@ -321,6 +321,20 @@
           ]
         },
         {
+          "description": "ads:allow-open-link -> Enables the open_link command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-open-link"
+          ]
+        },
+        {
+          "description": "ads:allow-record-ads-click -> Enables the record_ads_click command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:allow-record-ads-click"
+          ]
+        },
+        {
           "description": "ads:allow-scroll-ads-window -> Enables the scroll_ads_window command without any pre-configured scope.",
           "type": "string",
           "enum": [
@@ -346,6 +360,20 @@
           "type": "string",
           "enum": [
             "ads:deny-init-ads-window"
+          ]
+        },
+        {
+          "description": "ads:deny-open-link -> Denies the open_link command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-open-link"
+          ]
+        },
+        {
+          "description": "ads:deny-record-ads-click -> Denies the record_ads_click command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "ads:deny-record-ads-click"
           ]
         },
         {
@@ -4084,6 +4112,41 @@
           "type": "string",
           "enum": [
             "utils:deny-show-launcher-logs-folder"
+          ]
+        },
+        {
+          "description": "websocket:default -> Allows connecting and sending data to a WebSocket server",
+          "type": "string",
+          "enum": [
+            "websocket:default"
+          ]
+        },
+        {
+          "description": "websocket:allow-connect -> Enables the connect command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:allow-connect"
+          ]
+        },
+        {
+          "description": "websocket:allow-send -> Enables the send command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:allow-send"
+          ]
+        },
+        {
+          "description": "websocket:deny-connect -> Denies the connect command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:deny-connect"
+          ]
+        },
+        {
+          "description": "websocket:deny-send -> Denies the send command without any pre-configured scope.",
+          "type": "string",
+          "enum": [
+            "websocket:deny-send"
           ]
         },
         {

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] hover:bg-bg-raised"
+    class="group flex w-full items-center justify-between border-0 border-b border-solid border-bg-raised p-[0.7rem] hover:bg-bg-raised cursor-pointer"
     @click="navigateToFolder"
   >
     <div class="flex items-center gap-2">

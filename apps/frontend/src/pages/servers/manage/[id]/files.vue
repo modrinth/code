@@ -7,17 +7,18 @@
       class="flex items-center justify-between gap-2 rounded-t-xl bg-table-alternateRow px-4 py-2"
     >
       <div class="flex items-center gap-2 text-contrast">
-        <span @click="navigateToSegment(-1)" class="breadcrumb-link flex items-center gap-2">
+        <span @click="navigateToSegment(-1)" class="breadcrumb-link flex items-center gap-2 cursor-pointer">
           <BoxIcon class="h-6 w-6 text-brand" />
-          /
+          <span class="opacity-50">/</span>
         </span>
         <span
           v-for="(segment, index) in breadcrumbSegments"
           :key="index"
           @click="navigateToSegment(index)"
-          class="breadcrumb-link"
+          class="breadcrumb-link cursor-pointer"
         >
-          {{ segment || "" }} /
+          {{ segment || "" }}
+          <span class="ms-1 opacity-50">/</span>
         </span>
       </div>
       <div class="flex items-center gap-2">
