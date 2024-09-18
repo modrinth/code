@@ -305,6 +305,37 @@ export const useServerStore = defineStore("servers", {
       }
     },
 
+    async getFileApiInfo(serverId: string) {
+      try {
+        return await usePyroFetch(`servers/${serverId}/fs`);
+      } catch (error) {
+        console.error("Error getting file api info:", error);
+        throw error;
+      }
+    },
+    async listDirContents(data: any, path: string, page: number, pageSize: number) {
+      try {
+        return (await usePyroFetch(`/list?path=${path}&page=${page}&page_size=${pageSize}`, {
+          override: data,
+        })) as {
+          current: number;
+          items: {
+            count: number;
+            created: number;
+            modified: number;
+            name: string;
+            path: string;
+            type: "directory" | "file";
+            size: number;
+          }[];
+          total: number;
+        };
+      } catch (error) {
+        console.error("Error listing dir contents:", error);
+        throw error;
+      }
+    },
+
     clearError() {
       this.error = null;
     },

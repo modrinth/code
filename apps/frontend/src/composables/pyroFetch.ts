@@ -5,6 +5,10 @@ interface PyroFetchOptions {
   body?: Record<string, any>;
   accept?: "application/json" | (string & {});
   version?: number;
+  override?: {
+    url: string;
+    token: string;
+  };
 }
 
 export class PyroFetchError extends Error {
@@ -27,7 +31,7 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     throw new PyroFetchError("Cannot pyrofetch without auth", 10000);
   }
 
-  const { method = "GET", body, accept = "application/json", version = 0 } = options;
+  const { method = "GET", body, accept = "application/json", version = 0, override } = options;
 
   const base = (import.meta.server ? config.pyroBaseUrl : config.public.pyroBaseUrl)?.replace(
     /\/$/,
@@ -41,11 +45,13 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     );
   }
 
-  const fullUrl = `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
+  const fullUrl = override?.url
+    ? `https://${override.url}/${path.replace(/^\//, "")}`
+    : `${base}/modrinth/v${version}/${path.replace(/^\//, "")}`;
 
   const headers: any = {
     Accept: accept,
-    Authorization: `Bearer ${authToken}`,
+    Authorization: `Bearer ${override?.token ?? authToken}`,
     "Access-Control-Allow-Headers": "Authorization",
     "User-Agent": "Pyro/1.0 (https://pyro.host)",
     Vary: "Accept, Origin",
@@ -59,6 +65,7 @@ export async function usePyroFetch<T>(path: string, options: PyroFetchOptions = 
     headers["Content-Type"] = "application/json";
   }
 
+  console.log("Pyro fetching", fullUrl);
   try {
     const response = await $fetch<T>(fullUrl, {
       method,
